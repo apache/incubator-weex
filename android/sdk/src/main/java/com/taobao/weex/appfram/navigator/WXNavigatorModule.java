@@ -235,7 +235,7 @@ public class WXNavigatorModule extends WXModule {
         }
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build());
         intent.addCategory(WEEX_NAVIGATOR_PUSH);
-        intent.putExtra(NavigatorActivity.INSTANCE_ID,mWXSDKInstance.getInstanceId());
+        intent.putExtra(WXNavigatorActivity.INSTANCE_ID, mWXSDKInstance.getInstanceId());
         mWXSDKInstance.getContext().startActivity(intent);
       }
     } catch (RuntimeException e) {

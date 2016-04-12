@@ -209,7 +209,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.WXDomPropConstant;
@@ -218,7 +217,6 @@ import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.view.WXImageView;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -247,9 +245,6 @@ public class WXImage extends WXComponent implements IWXRecyclerViewChild {
   public void flushView() {
     super.flushView();
     if (getView() != null) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.w("WXImage instanceId: " + mInstanceId + " flushView---->ref: " + mDomObj.ref + " src: " + mDomObj.attr.get("src"));
-      }
       if (getView() instanceof IWXUpdateComponent) {
         ((IWXUpdateComponent) getView()).updateDom(mDomObj);
       }
@@ -342,10 +337,6 @@ public class WXImage extends WXComponent implements IWXRecyclerViewChild {
   public void setSrc(String src) {
     if (mInstance.getImgLoaderAdapter() == null) {
       return;
-    }
-
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.w("WXImage instanceId: " + mInstanceId + " setSrc---->ref: " + mDomObj.ref + " src: " + src);
     }
 
     if (mDomObj.attr != null) {

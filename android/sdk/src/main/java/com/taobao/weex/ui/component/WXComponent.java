@@ -339,12 +339,11 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
     mDomObj = domObject;
     Spacing parentPadding = mParent.getDomObject().getPadding();
-    Spacing border = mDomObj.getBorder();
     Spacing margin = mDomObj.getMargin();
     int realWidth = (int) mDomObj.getLayoutWidth();
     int realHeight = (int) mDomObj.getLayoutHeight();
-    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) - border.get(Spacing.LEFT));
-    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) - border.get(Spacing.TOP));
+    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT));
+    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP));
     int realRight = (int) margin.get(Spacing.RIGHT);
     int realBottom = (int) margin.get(Spacing.BOTTOM);
 
@@ -777,7 +776,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
   @WXComponentProp(name = WXDomPropConstant.WX_BORDERRADIUS)
   public void setBorderRadius(float borderRadius) {
-    if (borderRadius > 0) {
+    if (borderRadius >= 0) {
       getOrCreateBorder().setBorderRadius(WXViewUtils.getRealPxByWidth(borderRadius));
     }
   }
@@ -788,7 +787,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   }
 
   private void setBorderRadius(int position, float borderRadius) {
-    if (borderRadius > 0) {
+    if (borderRadius >= 0) {
       getOrCreateBorder().setBorderRadius(position, WXViewUtils.getRealPxByWidth(borderRadius));
     }
   }
@@ -814,7 +813,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   }
 
   private void setBorderWidth(int position, float borderWidth) {
-    if (borderWidth > 0) {
+    if (borderWidth >= 0) {
       getOrCreateBorder().setBorderWidth(position, WXViewUtils.getRealPxByWidth(borderWidth));
     }
   }

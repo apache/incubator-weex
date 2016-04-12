@@ -211,6 +211,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
 
+import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -252,15 +253,15 @@ public class WXEnvironment {
    */
   public static Map<String, String> getConfig() {
     Map<String, String> configs = new HashMap<>();
-    configs.put("os", OS);
-    configs.put("appVersion", getAppVersionName());
-    configs.put("devId", DEV_Id);
-    configs.put("sysVersion", SYS_VERSION);
-    configs.put("sysModel", SYS_MODEL);
-    configs.put("weexVersion", String.valueOf(WXSDK_VERSION));
+    configs.put(WXConfig.os, OS);
+    configs.put(WXConfig.appVersion, getAppVersionName());
+    configs.put(WXConfig.devId, DEV_Id);
+    configs.put(WXConfig.sysVersion, SYS_VERSION);
+    configs.put(WXConfig.sysModel, SYS_MODEL);
+    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.putAll(options);
-    if(configs!=null&&configs.get("appName")==null){
-       configs.put("appName", sApplication.getPackageName());
+    if(configs!=null&&configs.get(WXConfig.appName)==null){
+       configs.put(WXConfig.appName, sApplication.getPackageName());
     }
     return configs;
   }

@@ -204,10 +204,10 @@
  */
 package com.taobao.weex.appfram.navigator;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -219,7 +219,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.utils.WXLogUtils;
 
-public class NavigatorActivity extends Activity {
+public class WXNavigatorActivity extends AppCompatActivity {
 
   public final static String INSTANCE_ID = "instanceId";
   private ViewGroup container;
@@ -230,10 +230,10 @@ public class NavigatorActivity extends Activity {
     container=new FrameLayout(this);
     setContentView(container,new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    if(getActionBar()!=null)
-      getActionBar().hide();
+    if(getSupportActionBar()!=null)
+      getSupportActionBar().hide();
     final Intent intent=getIntent();
-    instance = new WXSDKInstance(NavigatorActivity.this);
+    instance = new WXSDKInstance(WXNavigatorActivity.this);
     instance.setImgLoaderAdapter(
             WXSDKManager.getInstance().getSDKInstance(
                     intent.getStringExtra(INSTANCE_ID)).getImgLoaderAdapter());
