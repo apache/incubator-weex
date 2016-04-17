@@ -185,7 +185,8 @@ export function _compileRepeat(target, dest) {
   }
   const key = repeat.key || '$index'
   const value = repeat.value || '$value'
-  const trackBy = repeat.trackBy || target.trackBy || (target.attr && target.attr.trackBy) || key
+  const trackBy = repeat.trackBy || target.trackBy ||
+    (target.attr && target.attr.trackBy) || key
 
   const fragBlock = this._createBlock(dest)
   fragBlock.children = []
