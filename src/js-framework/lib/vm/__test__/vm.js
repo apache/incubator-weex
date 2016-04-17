@@ -1072,6 +1072,7 @@ describe('generate dom actions', () => {
           {
             shown: function () {return this.x % 2 === 0},
             repeat: function () {return this.list},
+            trackBy: 'uid',
             type: 'image', attr: {src: function () {return this.x}}
           },
           {type: 'next'}
