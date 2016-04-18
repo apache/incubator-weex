@@ -13,7 +13,7 @@ var defaults = {
   , disabledOpacity: 0.5
   , speed: '0.4s'
   , width: 100
-  , height: 60,
+  , height: 60
   // is width and height scalable ?
   , scalable: false
 }
