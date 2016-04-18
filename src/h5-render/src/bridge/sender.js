@@ -40,7 +40,7 @@ Sender.prototype = {
     var evt = utils.extend({}, event)
     evt.target = evt.currentTarget
     evt.value = event.target.value
-    evt.timeStamp = Date.now()
+    evt.timestamp = Date.now()
     _send(this.instanceId, {
       method: 'fireEvent',
       args: [ref, type, evt]

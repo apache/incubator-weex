@@ -91,7 +91,7 @@ var dom = {
     if (elem) {
       var offsetTop = elem.node.getBoundingClientRect().top
           + document.body.scrollTop
-      var offset = (Number(options.offset) || 0) * config.scale
+      var offset = (Number(options.offset) || 0) * this.scale
       var tween = scroll(0, offsetTop + offset, options)
       // tween.on('end', function () {
       // })
