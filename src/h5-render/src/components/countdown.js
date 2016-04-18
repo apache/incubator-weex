@@ -34,6 +34,7 @@ Countdown.prototype = Object.create(Atomic.prototype)
 
 Countdown.prototype.create = function () {
   var node = document.createElement('div')
+  node.classList.add('weex-element')
   var data = this.data
   var time = Number(data.attr.countdownTime) || 0
   var endTime = Date.now() / 1000 + time

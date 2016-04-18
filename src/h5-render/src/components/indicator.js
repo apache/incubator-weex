@@ -37,8 +37,8 @@ Indicator.prototype = Object.create(Atomic.prototype)
 Indicator.prototype.create = function () {
   var node = document.createElement('div')
   node.classList.add('weex-indicators')
+  node.classList.add('weex-element')
   node.style.position = 'absolute'
-  node.style.boxSizing = 'border-box'
   this.node = node
   this.style.itemSize.call(this, 0)
   this.itemColor = DEFAULT_ITEM_COLOR

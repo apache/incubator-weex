@@ -39,25 +39,7 @@ Switch.prototype.create = function () {
   node.appendChild(this.jack)
   node.className = this.options.className
   this.node = node
-
   this.attr.disabled.call(this, this.data.attr.disabled)
-  // this.attr.checked.call(this, data.attr.checked)
-  // this.setSize()
-  // this.setPosition()
-  // this.markAsSwitched()
-  // this.handleChange()
-  // this.handleClick()
-  // setTimeout(function () {
-  //   this.switchery = new Switchery(node, { disabled: false })
-  // }.bind(this), 25)
-  // var uuid = Math.floor(10000000000000 * Math.random()) + Date.now()
-  // this.className = 'weex-slct-' + uuid
-  // this.styleId = 'weex-style-' + uuid
-  // node.classList.add(this.className)
-  // For the consistency of input component's width.
-  // The date and time type of input will have a bigger width
-  // when the 'box-sizing' is not set to 'border-box'
-  // node.style['box-sizing'] = 'border-box'
   return node
 }
 
