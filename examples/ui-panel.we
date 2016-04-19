@@ -17,8 +17,8 @@
     data: {
       type: 'default',
       title: '',
-      paddingBody: 16,
-      paddingHead: 16,
+      paddingBody: 20,
+      paddingHead: 20,
       dataClass: '', // FIXME transfer class
       border: 0
     },
