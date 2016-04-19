@@ -47,9 +47,3 @@
     font-size: 40px;
   }
 </style>
-
-<script>
-  module.exports = {
-    data: {}
-  }
-</script>
