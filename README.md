@@ -1,4 +1,11 @@
 # Weex
+
+## Pre-release Notes
+
+Weex is currently in Pre-release Stage.
+
+We agrees that you may discuss technical information about Weex, except that you may not fork Weex to public repository , write public reviews or post screen shots using information from current repository(https://github.com/alibaba/weex) , redistribute weex within any form.
+
  
 > A framework for building Mobile cross-platform UI.
 
@@ -18,8 +25,8 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 ### Android 
 
 0. Prerequisites
-    0. Install [Node.js](http://nodejs.org/)
-    0. `npm install`
+    0. Install [Node.js](http://nodejs.org/) 4.0+
+    0. `npm install` to install project
     0. Install [Android Environment](http://developer.android.com/training/basics/firstapp/index.html)
 0. Run playground
     0. `npm run serve`
