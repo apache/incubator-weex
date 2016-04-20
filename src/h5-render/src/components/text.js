@@ -1,6 +1,7 @@
 'use strict'
 
 var Atomic = require('./component')
+var utils = require('../utils')
 
 var DEFAULT_FONT_SIZE = 32
 
@@ -8,7 +9,6 @@ var DEFAULT_FONT_SIZE = 32
 //  - value: text content.
 //  - lines: maximum lines of the text.
 function Text (data) {
-  this.lines = data.style.lines
   Atomic.call(this, data)
 }
 
@@ -16,12 +16,15 @@ Text.prototype = Object.create(Atomic.prototype)
 
 Text.prototype.create = function () {
   var node = document.createElement('div')
+  node.classList.add('weex-container')
   node.style.fontSize = DEFAULT_FONT_SIZE * this.data.scale + 'px'
   this.textNode = document.createElement('span')
   // Give the developers the ability to control space
   // and line-breakers.
   this.textNode.style.whiteSpace = 'pre-wrap'
-  this.updateLines(this.lines)
+  this.textNode.style.display = '-webkit-box'
+  this.textNode.style.webkitBoxOrient = 'vertical'
+  this.style.lines.call(this, this.data.style.lines)
   node.appendChild(this.textNode)
   return node
 }
@@ -62,19 +65,24 @@ Text.prototype.clearAttr = function () {
   this.node.firstChild.textContent = ''
 }
 
-Text.prototype.updateStyle = function (style) {
-  Atomic.prototype.updateStyle.call(this, style)
-  this.updateLines(style.lines)
-}
+Text.prototype.style = utils.extend(Object.create(Atomic.prototype.style), {
 
-Text.prototype.updateLines = function (lines) {
-  if (lines) {
-    this.textNode.style.overflow = 'hidden'
-    this.textNode.style.textOverflow = 'ellipsis'
-    this.textNode.style.display = '-webkit-box'
-    this.textNode.style.webkitLineClamp = lines
-    this.textNode.style.webkitBoxOrient = 'vertical'
+  lines: function (val) {
+    val = parseInt(val)
+    if (val !== val) { // NaN
+      return
+    }
+    if (val <= 0) {
+      this.textNode.style.textOverflow = ''
+      this.textNode.style.overflow = 'visible'
+      this.textNode.style.webkitLineClamp = ''
+    } else {
+      this.textNode.style.overflow = 'hidden'
+      this.textNode.style.textOverflow = 'ellipsis'
+      this.textNode.style.webkitLineClamp = lines
+    }
   }
-}
+
+})
 
 module.exports = Text

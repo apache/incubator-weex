@@ -20,6 +20,7 @@ define('@weex-component/ui-button', function (require, exports, module) {
 
 ;module.exports.style = {
   "btn": {
+    "display": "flex",
     "marginBottom": 0,
     "alignItems": "center",
     "justifyContent": "center",

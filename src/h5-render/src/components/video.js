@@ -51,7 +51,7 @@ Video.prototype.attr = {
 
 Video.prototype.create = function () {
   var node = document.createElement('video')
-  node.classList.add('weex-video')
+  node.classList.add('weex-video', 'weex-element')
   node.controls = true
   node.autoplay = this.autoPlay
   node.setAttribute('play-status', this.playStatus)

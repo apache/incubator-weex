@@ -22,7 +22,7 @@ Datepicker.prototype.create = function () {
   // For the consistency of input component's width.
   // The date and time type of input will have a bigger width
   // when the 'box-sizing' is not set to 'border-box'
-  node.style['box-sizing'] = 'border-box'
+  node.classList.add('weex-element')
   return node
 }
 

@@ -35,6 +35,7 @@ Image.prototype = Object.create(Atomic.prototype)
 
 Image.prototype.create = function () {
   var node = document.createElement('img')
+  node.classList.add('weex-element')
   node.style.display = 'block'
   node.style.outline = 'none'
   return node

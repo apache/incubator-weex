@@ -12,7 +12,10 @@ var defaults = {
   , className: 'weex-switch'
   , disabledOpacity: 0.5
   , speed: '0.4s'
-  , size: 'default'
+  , width: 100
+  , height: 60
+  // is width and height scalable ?
+  , scalable: false
 }
 
 // attrs:
@@ -22,6 +25,9 @@ function Switch (data) {
   this.options = utils.extend({}, defaults)
   this.checked = data.attr.checked
       && data.attr.checked !== 'false' ? true : false
+  this.data = data
+  this.width = this.options.width * data.scale
+  this.height = this.options.height * data.scale
   Atomic.call(this, data)
 }
 
@@ -33,27 +39,13 @@ Switch.prototype.create = function () {
   node.appendChild(this.jack)
   node.className = this.options.className
   this.node = node
-
   this.attr.disabled.call(this, this.data.attr.disabled)
-  // this.attr.checked.call(this, data.attr.checked)
-
-  // this.setSize()
-  this.setPosition()
-  // this.markAsSwitched()
-  // this.handleChange()
-  // this.handleClick()
-  // setTimeout(function () {
-  //   this.switchery = new Switchery(node, { disabled: false })
-  // }.bind(this), 25)
-  // var uuid = Math.floor(10000000000000 * Math.random()) + Date.now()
-  // this.className = 'weex-slct-' + uuid
-  // this.styleId = 'weex-style-' + uuid
-  // node.classList.add(this.className)
-  // For the consistency of input component's width.
-  // The date and time type of input will have a bigger width
-  // when the 'box-sizing' is not set to 'border-box'
-  // node.style['box-sizing'] = 'border-box'
   return node
+}
+
+Switch.prototype.onAppend = function () {
+  this.setSize()
+  this.setPosition()
 }
 
 Switch.prototype.attr = {
@@ -63,6 +55,17 @@ Switch.prototype.attr = {
                     : false
     this.disabled ? this.disable() : this.enable()
   }
+}
+
+Switch.prototype.setSize = function () {
+  var min = Math.min(this.width, this.height)
+  var max = Math.max(this.width, this.height)
+  this.node.style.width = max + 'px'
+  this.node.style.height = min + 'px'
+  this.node.style.borderRadius = min / 2 + 'px'
+  this.jack.style.width
+      = this.jack.style.height
+      = min + 'px'
 }
 
 Switch.prototype.setPosition = function (clicked) {
@@ -167,5 +170,34 @@ Switch.prototype.getClickHandler = function () {
   }
   return this._clickHandler
 }
+
+Switch.prototype.style
+    = utils.extend(Object.create(Atomic.prototype.style), {
+
+  width: function (val) {
+    if (!this.options.scalable) {
+      return
+    }
+    val = parseFloat(val)
+    if (val !== val || val < 0) { // NaN
+      val = this.options.width
+    }
+    this.width = val * this.data.scale
+    this.setSize()
+  },
+
+  height: function (val) {
+    if (!this.options.scalable) {
+      return
+    }
+    val = parseFloat(val)
+    if (val !== val || val < 0) { // NaN
+      val = this.options.height
+    }
+    this.height = val * this.data.scale
+    this.setSize()
+  }
+
+})
 
 module.exports = Switch
