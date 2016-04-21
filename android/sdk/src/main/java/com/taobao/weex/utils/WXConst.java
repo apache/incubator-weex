@@ -231,6 +231,7 @@ public class WXConst {
   public static final String RESULT = "result";
   public static final String DATA = "data";
   public static final String MESSAGE = "message";
+  public static final String DURATION = "duration";
   public static final String OK_TITLE = "okTitle";
   public static final String CANCEL_TITLE = "cancelTitle";
 
@@ -239,6 +240,7 @@ public class WXConst {
   public static final String MSG_FAILED = "MSG_FAILED";
 
   public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
+
 
 }
 
