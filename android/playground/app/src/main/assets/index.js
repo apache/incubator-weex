@@ -9,10 +9,12 @@ define('@weex-component/ui-list-item', function (require, exports, module) {
     }},
     methods: {
       touchstart: function() {
+        // FIXME android touch
         // TODO adaptive opposite bgColor
 //        this.bgColor = '#e6e6e6';
       },
       touchend: function() {
+        // FIXME android touchend not triggered
 //        this.bgColor = '#ffffff';
       }
     }
@@ -108,14 +110,16 @@ define('@weex-component/index', function (require, exports, module) {
     data: function () {return {
       cases: [
         {name: 'hello', title: 'Hello World'},
-//        {name: 'textDemo', title: 'Text'},
+        {name: 'textDemo', title: 'Text'},
         {name: 'imageDemo', title: 'Image'},
+        {name: 'common', title: 'Common Style'},
         {name: 'listBasic', title: 'List (Basic)'},
         {name: 'listDemo', title: 'List (Advanced)'},
         {name: 'sliderDemo', title: 'Slider'},
         {name: 'animation', title: 'Animation'},
         {name: 'modal', title: 'Modal'},
         {name: 'videoDemo', title: 'Video'},
+        {name: 'calculator', title: 'Calculator'},
         {name: 'ui', title: 'UI Gallery'},
         {name: 'template', title: 'Example Template'}
       ]
@@ -124,9 +128,15 @@ define('@weex-component/index', function (require, exports, module) {
       var bundleUrl = this.$getConfig().bundleUrl;
       console.log('hit', bundleUrl);
       var nativeBase;
-      if (bundleUrl.indexOf('your_current_IP') >= 0) { 
-        // in Android assets
+      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
+      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
+      if (isAndroidAssets) {
         nativeBase = 'file://assets/';
+      }
+      else if (isiOSAssets) {
+        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
+        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
+        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
       }
       else {
         var host = 'localhost:12580';

@@ -1,73 +1,3 @@
-define('@weex-component/ui-tip', function (require, exports, module) {
-
-;
-  module.exports = {
-    data: function () {return {
-      type: 'success',
-      value: ''
-    }}
-  }
-
-
-;module.exports.style = {
-  "tip": {
-    "paddingLeft": 36,
-    "paddingRight": 36,
-    "paddingTop": 36,
-    "paddingBottom": 36,
-    "borderRadius": 10
-  },
-  "tip-txt": {
-    "fontSize": 28
-  },
-  "tip-success": {
-    "backgroundColor": "#dff0d8",
-    "borderColor": "#d6e9c6"
-  },
-  "tip-txt-success": {
-    "color": "#3c763d"
-  },
-  "tip-info": {
-    "backgroundColor": "#d9edf7",
-    "borderColor": "#bce8f1"
-  },
-  "tip-txt-info": {
-    "color": "#31708f"
-  },
-  "tip-warning": {
-    "backgroundColor": "#fcf8e3",
-    "borderColor": "#faebcc"
-  },
-  "tip-txt-warning": {
-    "color": "#8a6d3b"
-  },
-  "tip-danger": {
-    "backgroundColor": "#f2dede",
-    "borderColor": "#ebccd1"
-  },
-  "tip-txt-danger": {
-    "color": "#a94442"
-  }
-}
-
-;module.exports.template = {
-  "type": "div",
-  "classList": function () {return ['tip', 'tip-' + (this.type)]},
-  "children": [
-    {
-      "type": "text",
-      "classList": function () {return ['tip-txt', 'tip-txt-' + (this.type)]},
-      "attr": {
-        "value": function () {return this.value}
-      }
-    }
-  ]
-}
-
-;})
-
-// module
-
 define('@weex-component/ui-panel', function (require, exports, module) {
 
 ;
@@ -178,19 +108,14 @@ define('@weex-component/ui-panel', function (require, exports, module) {
 
 // module
 
-define('@weex-component/imageDemo', function (require, exports, module) {
+define('@weex-component/common', function (require, exports, module) {
 
 ;
-  module.exports = {
-    data: function () {return {
-      img: '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg'
-    }}
-  }
-
 
 ;module.exports.style = {
-  "img": {
-    "marginBottom": 20
+  "txt": {
+    "marginBottom": 12,
+    "fontSize": 40
   }
 }
 
@@ -200,30 +125,17 @@ define('@weex-component/imageDemo', function (require, exports, module) {
     {
       "type": "ui-panel",
       "attr": {
-        "title": "width x height = 400 x 400"
+        "title": "Box Model",
+        "type": "primary"
       },
       "children": [
         {
-          "type": "ui-tip",
-          "attr": {
-            "type": "warning",
-            "value": "Weex screen width is 750"
-          },
-          "style": {
-            "marginBottom": 20
-          }
-        },
-        {
-          "type": "image",
+          "type": "text",
           "classList": [
-            "img"
+            "txt"
           ],
-          "style": {
-            "width": 400,
-            "height": 400
-          },
           "attr": {
-            "src": function () {return this.img}
+            "value": "default is black"
           }
         }
       ]
@@ -231,41 +143,16 @@ define('@weex-component/imageDemo', function (require, exports, module) {
     {
       "type": "ui-panel",
       "attr": {
-        "title": "200 x 200"
+        "title": "Flexbox"
       },
       "children": [
         {
-          "type": "image",
+          "type": "text",
           "classList": [
-            "img"
+            "txt"
           ],
-          "style": {
-            "width": 200,
-            "height": 200
-          },
           "attr": {
-            "src": function () {return this.img}
-          }
-        }
-      ]
-    },
-    {
-      "type": "ui-panel",
-      "attr": {
-        "title": "100 x 100"
-      },
-      "children": [
-        {
-          "type": "image",
-          "classList": [
-            "img"
-          ],
-          "style": {
-            "width": 100,
-            "height": 100
-          },
-          "attr": {
-            "src": function () {return this.img}
+            "value": "default is black"
           }
         }
       ]
@@ -276,4 +163,4 @@ define('@weex-component/imageDemo', function (require, exports, module) {
 ;})
 
 // require module
-bootstrap('@weex-component/imageDemo', {"transformerVersion":"0.1.8"})
+bootstrap('@weex-component/common', {"transformerVersion":"0.1.8"})
