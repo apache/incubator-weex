@@ -36,12 +36,16 @@ Format:
 
 * `{module}`, see [commit log module](#commit-log)
 * `{action}`
-    * Including: feature, bugfix
+    * `feature`: checkout from `{module}` and merge to `{module}` later. If `{module}` not exists, merge to `dev`
+    * `bugfix`: like `feature`, for bugfix only
+    * `hotfix`: checkout from `master` or release `tag`, merge to `master` and `{module}` later. If `{module}` not exists, merge to `dev`
 
 for example:
 
-* `android-bugfix-memoryLeak`
+* `android-bugfix-memory`
 * `jsfm-feature-communication`
+* `android-hotfix-compute-layout`
+
 
 ## Pull Request
 
