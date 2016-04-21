@@ -18,8 +18,8 @@
     "ios",
     "yunos"
   ],
-  "engines" : {
-    "node" : ">=4" 
+  "engines": {
+    "node": ">=4"
   },
   "scripts": {
     "install:js-framework": "cd ./src/js-framework && npm install && cd ../../",
@@ -47,10 +47,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "weex-transformer": "^0.1.8",
+    "gazeer": "^0.1.1",
+    "pre-commit": "^1.1.2",
     "serve": "^1.4.0",
-    "gazeer": "^0.1.0",
-    "pre-commit": "^1.1.2"
+    "weex-transformer": "^0.1.8"
   },
   "precommit": [
     "precommit"
