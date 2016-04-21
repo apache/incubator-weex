@@ -1,5 +1,5 @@
 #!/bin/sh
-commit_regex='^[+*-] \[android|ios|jsfm|html5|doc|website|example|test|all\] [^\n]{1,50}'
+commit_regex='^Merge.+|[+*-] \[android|ios|jsfm|html5|doc|website|example|test|all\] [^\n]{1,50}'
 
 if ! grep -iqE "$commit_regex" "$1"; then
     echo "ERROR: commit log format is not correct! Please use this format:
