@@ -1,8 +1,17 @@
 {
   "name": "weex",
   "version": "0.4.0",
-  "description": "weex",
+  "description": "A framework for building Mobile cross-platform UI",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alibaba/weex.git"
+  },
+  "homepage": "http://alibaba.github.io/weex/",
+  "bugs": {
+    "url": "https://github.com/alibaba/weex/issues"
+  },
+  "private": "true",
   "keywords": [
     "weex",
     "hybrid",
