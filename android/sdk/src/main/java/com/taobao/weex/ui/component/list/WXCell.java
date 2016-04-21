@@ -213,7 +213,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 /**
  * Root component for components in {@link WXListComponent}
  */
-public class WXCell extends WXVContainer implements IWXRecyclerViewChild {
+public class WXCell extends WXVContainer {
 
   public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
     super(instance, dom, parent, instanceId, true);

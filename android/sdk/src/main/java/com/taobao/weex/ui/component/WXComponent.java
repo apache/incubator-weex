@@ -958,9 +958,9 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
    * @return the original View
    */
   public View detachViewAndClearPreInfo() throws WXException {
-    if (!(this instanceof IWXRecyclerViewChild)) {
-      throw new WXException("Class " + getClass().getName() + " doesn't implement IWXRecyclerViewChild");
-    } else {
+//    if (!(this instanceof IWXRecyclerViewChild)) {
+//      throw new WXException("Class " + getClass().getName() + " doesn't implement IWXRecyclerViewChild");
+//    } else {
       View original = mHost;
       if (mBorder != null) {
         mBorder.detachView();
@@ -971,7 +971,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
       mPreRealTop = 0;
       mHost = null;
       return original;
-    }
+//    }
   }
 
   /**
