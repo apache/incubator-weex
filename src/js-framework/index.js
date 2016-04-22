@@ -7,7 +7,7 @@ for (let methodName in framework) {
         const ret = framework[methodName](...args)
         if (ret instanceof Error) {
             console.error(ret.toString())
-        } else (ret instanceof Array) {
+        } else if (ret instanceof Array) {
             ret.forEach(r => {
                 if (ret instanceof Error) {
                     console.error(r.toString())
