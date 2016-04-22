@@ -214,13 +214,14 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXViewUtils;
 
 
-public class WXBaseCircleIndicator extends View implements OnPageChangeListener, WXGestureObservable {
+public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeListener, WXGestureObservable {
 
   private final Paint mPaintPage = new Paint();
   private final Paint mPaintStroke = new Paint();
@@ -275,6 +276,8 @@ public class WXBaseCircleIndicator extends View implements OnPageChangeListener,
     mPaintPage.setColor(pageColor);
     mPaintFill.setStyle(Style.FILL);
     mPaintFill.setColor(fillColor);
+    this.setWillNotDraw(false);
+
   }
 
   /**
