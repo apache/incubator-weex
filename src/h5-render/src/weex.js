@@ -19,18 +19,18 @@ require('envd')
 var WEAPP_STYLE_ID = 'weapp-style'
 
 var DEFAULT_DESIGN_WIDTH = 750
+var DEFAULT_SCALE = window.innerWidth / DEFAULT_DESIGN_WIDTH
 var DEFAULT_ROOT_ID = 'weex'
 var DEFAULT_JSON_CALLBACK_NAME = 'weexJsonpCallback'
-
-// config.scale = window.innerWidth / DEFAULT_DESIGN_WIDTH
 
 window.WXEnvironment = {
   weexVersion: config.weexVersion,
   appName: lib.env.aliapp ? lib.env.aliapp.appname : null,
   appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
-  platform: lib.env.os ? lib.env.os.name : null,
-  osVersion: lib.env.os ? lib.env.os.version.val : null,
-  deviceHeight: window.innerHeight / config.scale
+  platform: 'Web',
+  osName: lib.env.browser ? lib.env.browser.name : null,
+  osVersion: lib.env.browser ? lib.env.browser.version.val : null,
+  deviceHeight: window.innerHeight / DEFAULT_SCALE
 }
 
 var _instanceMap = {}
