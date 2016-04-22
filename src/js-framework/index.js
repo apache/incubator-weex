@@ -9,7 +9,7 @@ for (let methodName in framework) {
             console.error(ret.toString())
         } else if (ret instanceof Array) {
             ret.forEach(r => {
-                if (ret instanceof Error) {
+                if (r instanceof Error) {
                     console.error(r.toString())
                 }
             })
