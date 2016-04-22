@@ -11,14 +11,16 @@
     data: {
       cases: [
         {name: 'hello', title: 'Hello World'},
-//        {name: 'textDemo', title: 'Text'},
         {name: 'imageDemo', title: 'Image'},
+        {name: 'textDemo', title: 'Text'},
+        {name: 'common', title: 'Common Style'},
         {name: 'listBasic', title: 'List (Basic)'},
         {name: 'listDemo', title: 'List (Advanced)'},
         {name: 'sliderDemo', title: 'Slider'},
         {name: 'animation', title: 'Animation'},
         {name: 'modal', title: 'Modal'},
         {name: 'videoDemo', title: 'Video'},
+        {name: 'calculator', title: 'Calculator'},
         {name: 'ui', title: 'UI Gallery'},
         {name: 'template', title: 'Example Template'}
       ]

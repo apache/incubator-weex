@@ -90,6 +90,8 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     data: function () {return {
       type: 'default',
       title: '',
+      paddingBody: 20,
+      paddingHead: 20,
       dataClass: '', // FIXME transfer class
       border: 0
     }},
@@ -124,10 +126,6 @@ define('@weex-component/ui-panel', function (require, exports, module) {
   "panel-header": {
     "backgroundColor": "#f5f5f5",
     "fontSize": 40,
-    "paddingLeft": 12,
-    "paddingRight": 12,
-    "paddingTop": 20,
-    "paddingBottom": 20,
     "color": "#333333"
   },
   "panel-header-primary": {
@@ -150,12 +148,7 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     "backgroundColor": "rgb(217,83,79)",
     "color": "#ffffff"
   },
-  "panel-body": {
-    "paddingLeft": 12,
-    "paddingRight": 12,
-    "paddingTop": 20,
-    "paddingBottom": 20
-  }
+  "panel-body": {}
 }
 
 ;module.exports.template = {
@@ -168,6 +161,12 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     {
       "type": "text",
       "classList": function () {return ['panel-header', 'panel-header-' + (this.type)]},
+      "style": {
+        "paddingTop": function () {return this.paddingHead},
+        "paddingBottom": function () {return this.paddingHead},
+        "paddingLeft": function () {return this.paddingHead*1.5},
+        "paddingRight": function () {return this.paddingHead*1.5}
+      },
       "attr": {
         "value": function () {return this.title}
       }
@@ -175,6 +174,12 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     {
       "type": "div",
       "classList": function () {return ['panel-body', 'panel-body-' + (this.type)]},
+      "style": {
+        "paddingTop": function () {return this.paddingBody},
+        "paddingBottom": function () {return this.paddingBody},
+        "paddingLeft": function () {return this.paddingBody*1.5},
+        "paddingRight": function () {return this.paddingBody*1.5}
+      },
       "children": [
         {
           "type": "content"
@@ -194,7 +199,7 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
   var img0 = '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg';
   var img1 = '//gw.alicdn.com/tps/i1/TB1M3sQMpXXXXakXXXXApNeJVXX-360-360.png';
   module.exports = {
-    data: {
+    data: function () {return {
       eventCnt: 0,
       togglePlayMsg: 'pause',
       sliders: [
@@ -325,7 +330,7 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
           ]
         }
       ]
-    },
+    }},
     methods: {
       ready: function() {
       },
@@ -358,13 +363,13 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
   },
   "slider": {
     "flexDirection": "row",
-    "width": 714,
-    "height": 400
+    "width": 690,
+    "height": 360
   },
   "indicator": {
     "position": "absolute",
-    "width": 714,
-    "height": 460,
+    "width": 690,
+    "height": 420,
     "top": 140,
     "left": 240,
     "itemColor": "#dddddd",
@@ -388,7 +393,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "auto-play = false"
+            "title": "auto-play = false",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -419,7 +425,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "auto-play = true"
+            "title": "auto-play = true",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -494,7 +501,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "default style"
+            "title": "default style",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -528,7 +536,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "width & height"
+            "title": "width & height",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -561,7 +570,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "left & top"
+            "title": "left & top",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -596,7 +606,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "itemColor & itemSelectedColor"
+            "title": "itemColor & itemSelectedColor",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -630,7 +641,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
         {
           "type": "ui-panel",
           "attr": {
-            "title": "itemSize"
+            "title": "itemSize",
+            "paddingBody": "0"
           },
           "children": [
             {
@@ -651,8 +663,8 @@ define('@weex-component/sliderDemo', function (require, exports, module) {
                     "itemSize": 40,
                     "top": 140,
                     "left": 180,
-                    "width": 714,
-                    "height": 460
+                    "width": 700,
+                    "height": 380
                   }
                 },
                 {
