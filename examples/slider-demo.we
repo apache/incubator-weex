@@ -5,14 +5,14 @@
       <ui-panel title="auto-play = false" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="false">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
       <ui-panel title="auto-play = true" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
     </ui-panel>
@@ -21,7 +21,7 @@
       <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}"
               onchange="handleSliderChange">
         <indicator class="indicator"></indicator>
-        <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+        <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
       </slider>
     </ui-panel>
 
@@ -30,35 +30,35 @@
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}"
                 onchange="handleSliderChange">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
       <ui-panel title="width & height" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}">
           <indicator style="itemColor: #dddddd;width:714;height:460;"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
       <ui-panel title="left & top" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="{{sliders[1].autoPlay}}">
           <indicator class="indicator" style="top:-140;left:-240"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
       <ui-panel title="itemColor & itemSelectedColor" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[2].interval}}" auto-play="{{sliders[2].autoPlay}}">
           <indicator class="indicator" style="itemSelectedColor:rgb(217, 83, 79);"></indicator>
-          <sliderpage repeat="{{sliders[2].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[2].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
       <ui-panel title="itemSize" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="{{sliders[1].autoPlay}}">
           <indicator style="itemColor: #dddddd;itemSize:40;top:140;left:180;width:700;height:380;"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
