@@ -167,7 +167,7 @@ we can use properties below to control placement of weex tag
 ## Type of Style Value
 
 - length: number followed by length unit `px`, `px` can be omitted.
-- colors: both hexadecimal colors (`#RRGGBB`) and RGBA colors (`rgb(255, 255, 255)`) is supported
+- colors: support multiple formats of values, including rgb (`rgb(255, 0, 0)`), rgba (`rgba(255, 0, 0, 0.5)`), hexadecimal (`#ff0000`), short hexadecimal (`#f00`), named color (`red`).
 - enumerated values: a limited number of string values.
 
 ## Simple Step
