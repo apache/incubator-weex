@@ -114,6 +114,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -138,6 +139,7 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Unlike other components, there is immutable bi-directional association between View and
@@ -153,6 +155,8 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
   private HashMap<String, Integer> typeList = new HashMap<>();
   private ArrayList<Integer> indoreCells;
   private int listCellCount = 0;
+
+  private SparseArray<WXComponent> mAppearComponents=new SparseArray<>();
 
 
   public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
@@ -442,5 +446,43 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
     } catch (Exception e) {
       WXLogUtils.d(TAG, "onLoadMore :" + WXLogUtils.getStackTrace(e));
     }
+  }
+
+  @Override
+  public void notifyAppearStateChange(int firstVisible, int lastVisible) {
+
+    WXLogUtils.e(TAG, "into--[notifyAppearStateChange]firstVisible:" + firstVisible + " lastVisible:" + lastVisible);
+
+    List<Integer> unRegisterKeys=new ArrayList<>();
+
+    //notify appear state
+    for(int i=0,len=mAppearComponents.size();i<len;i++){
+      int key=mAppearComponents.keyAt(i);
+      WXComponent value=mAppearComponents.get(key);
+      if(!value.registerAppearEvent){
+        unRegisterKeys.add(key);
+        continue;
+      }
+      if(key>=firstVisible && key<=lastVisible && !value.appearState){
+        value.notifyApppearStateChange(WXEventType.APPEAR);
+        value.appearState=true;
+      }else if((key<firstVisible || key>lastVisible) && value.appearState){
+        value.notifyApppearStateChange(WXEventType.DISAPPEAR);
+        value.appearState=false;
+      }
+      WXLogUtils.e(TAG,"key:"+key+" "+"appear:"+value.appearState);
+    }
+
+    //remove unregister Event
+    for(int i=0,len=unRegisterKeys.size();i<len;i++){
+      mAppearComponents.remove(unRegisterKeys.get(i));
+    }
+
+  }
+  public void bindAppearComponents(WXComponent component){
+    mAppearComponents.put(mChildren.indexOf(component), component);
+  }
+  public void unbindAppearComponents(WXComponent component){
+    mAppearComponents.remove(mAppearComponents.indexOfValue(component));
   }
 }

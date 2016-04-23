@@ -144,6 +144,7 @@ import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXException;
@@ -184,6 +185,8 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   public volatile WXVContainer mParent;
   public volatile WXDomObject mDomObj;
   public String mInstanceId;
+  public boolean registerAppearEvent;
+  public boolean appearState=false;
   protected int mOrientation = VERTICAL;
   protected WXSDKInstance mInstance;
   protected Context mContext;
@@ -495,6 +498,15 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
       }
       if (type.equals(WXEventType.DISAPPEAR) && scroller != null) {
         scroller.bindDisappearEvent(this);
+      }
+
+      if(TextUtils.equals(type,WXEventType.APPEAR) && getParent() instanceof WXListComponent){
+        ((WXListComponent)getParent()).bindAppearComponents(this);
+        registerAppearEvent=true;
+      }
+      if(TextUtils.equals(type,WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
+        ((WXListComponent)getParent()).unbindAppearComponents(this);
+        registerAppearEvent=false;
       }
     }
   }
@@ -914,6 +926,10 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
   public boolean containsGesture(WXGestureType WXGestureType) {
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
+  }
+
+  public void notifyApppearStateChange(String wxEventType){
+    WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,null);
   }
 
   public static class MeasureOutput {
