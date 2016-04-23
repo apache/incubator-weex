@@ -1,4 +1,5 @@
 # Service & Tools
 
-* [CLI](/tools/cli.md)
-* [Transformer](/tools/transformer.md)
+* [CLI](./cli.md)
+* [Transformer](./transformer.md)
+* [Playground App](./playground-app.md)
