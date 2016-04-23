@@ -1,0 +1,18 @@
+<template>
+  <scroller>
+    <ui-panel title="Box Model" type="primary">
+      <text class="txt">default is black</text>
+    </ui-panel>
+
+    <ui-panel title="Flexbox">
+      <text class="txt">default is black</text>
+    </ui-panel>
+  </scroller>
+</template>
+
+<style>
+  .txt {
+    margin-bottom: 12px;
+    font-size: 40px;
+  }
+</style>

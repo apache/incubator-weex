@@ -1,12 +1,12 @@
 <style>
-  .slideritem {
+  .slider-item {
     width: 348;
     height: 400;
   }
 </style>
 
 <template>
-  <image class="slideritem" src="{{image}}"></image>
+  <image class="slider-item" src="{{image}}"></image>
 </template>
 
 <script>

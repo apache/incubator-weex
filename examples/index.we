@@ -1,66 +1,27 @@
 <template>
-  <list>
-    <cell repeat="{{cases}}">
-      <indexItem title="{{title}}" url="{{url}}"></indexItem>
-    </cell>
-  </list>
+  <example-list items="{{items}}" dir="examples"></example-list>
 </template>
 
 <script>
   module.exports = {
-    data: {
-      cases: [
+    data: { 
+      items: [
         {name: 'hello', title: 'Hello World'},
-//        {name: 'textDemo', title: 'Text'},
-        {name: 'imageDemo', title: 'Image'},
-        {name: 'listBasic', title: 'List (Basic)'},
-        {name: 'listDemo', title: 'List (Advanced)'},
-        {name: 'sliderDemo', title: 'Slider'},
+        {name: 'image-demo', title: 'Image'},
+        {name: 'text-demo', title: 'Text'},
+        {name: 'common', title: 'Common Style'},
+        {name: 'list-basic', title: 'List (Basic)'},
+        {name: 'list-demo', title: 'List (Advanced)'},
+        {name: 'slider-demo', title: 'Slider'},
         {name: 'animation', title: 'Animation'},
         {name: 'modal', title: 'Modal'},
-        {name: 'videoDemo', title: 'Video'},
+        {name: 'video-demo', title: 'Video'},
+        {name: 'calculator', title: 'Calculator'},
         {name: 'ui', title: 'UI Gallery'},
         {name: 'template', title: 'Example Template'}
       ]
-    },
-    created: function() {
-      var bundleUrl = this.$getConfig().bundleUrl;
-      console.log('hit', bundleUrl);
-      var nativeBase;
-      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
-      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-      if (isAndroidAssets) {
-        nativeBase = 'file://assets/';
-      }
-      else if (isiOSAssets) {
-        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-      }
-      else {
-        var host = 'localhost:12580';
-        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-        if (matches && matches.length >= 2) {
-          host = matches[1];
-        }
-        nativeBase = '//' + host + '/examples/build/';
-      }
-      var h5Base = './index.html?page=./examples/build/';
-      // in Native
-      var base = nativeBase;
-      if (typeof window === 'object') {
-        // in Browser or WebView
-        base = h5Base;
-      }
-
-      for (var i in this.cases) {
-        var ca = this.cases[i];
-        ca.url = base + ca.name + '.js';
-      }
-      // see log in Android Logcat
-      console.log('hit', this.cases[0].url);
     }
-  }
+  } 
 </script>
 
 <style>

@@ -4,6 +4,10 @@
 
 Copy [template file](./template.we) and build an example with [UI Gallery](#ui-gallery).  
 
+## Rule
+
+0. File name is hyphen separated words, each word is lower case, like `.we`, `ui-button.we`
+0. DO NOT use [builtin components](../doc/components) name as file name, it may be failed ro run. 
 
 ## UI Gallery
 

@@ -5,6 +5,8 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     data: function () {return {
       type: 'default',
       title: '',
+      paddingBody: 20,
+      paddingHead: 20,
       dataClass: '', // FIXME transfer class
       border: 0
     }},
@@ -39,10 +41,6 @@ define('@weex-component/ui-panel', function (require, exports, module) {
   "panel-header": {
     "backgroundColor": "#f5f5f5",
     "fontSize": 40,
-    "paddingLeft": 12,
-    "paddingRight": 12,
-    "paddingTop": 20,
-    "paddingBottom": 20,
     "color": "#333333"
   },
   "panel-header-primary": {
@@ -65,12 +63,7 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     "backgroundColor": "rgb(217,83,79)",
     "color": "#ffffff"
   },
-  "panel-body": {
-    "paddingLeft": 12,
-    "paddingRight": 12,
-    "paddingTop": 20,
-    "paddingBottom": 20
-  }
+  "panel-body": {}
 }
 
 ;module.exports.template = {
@@ -83,6 +76,12 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     {
       "type": "text",
       "classList": function () {return ['panel-header', 'panel-header-' + (this.type)]},
+      "style": {
+        "paddingTop": function () {return this.paddingHead},
+        "paddingBottom": function () {return this.paddingHead},
+        "paddingLeft": function () {return this.paddingHead*1.5},
+        "paddingRight": function () {return this.paddingHead*1.5}
+      },
       "attr": {
         "value": function () {return this.title}
       }
@@ -90,6 +89,12 @@ define('@weex-component/ui-panel', function (require, exports, module) {
     {
       "type": "div",
       "classList": function () {return ['panel-body', 'panel-body-' + (this.type)]},
+      "style": {
+        "paddingTop": function () {return this.paddingBody},
+        "paddingBottom": function () {return this.paddingBody},
+        "paddingLeft": function () {return this.paddingBody*1.5},
+        "paddingRight": function () {return this.paddingBody*1.5}
+      },
       "children": [
         {
           "type": "content"
