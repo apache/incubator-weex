@@ -10,7 +10,7 @@ This component supports no child components.
 
 ### Attributes
 
-There is no specific attribute for this component other than the [common attributes](/references/common-attrs.md).
+There is no specific attribute for this component other than the [common attributes](../references/common-attrs.md).
 
 ### Styles
 
@@ -18,7 +18,7 @@ There is no specific attribute for this component other than the [common attribu
 - `item-selectedColor`: &lt;colors&gt; This style attribute sets the selected item color using either a named color or a color specified in the hexadecimal #RRGGBB format.
 - `item-size`: &lt;length&gt; The size of the indicator elements, which is an float attribute.
 
-**common styles**: check out the [common styles](/references/common-attrs.md)
+**common styles**: check out the [common styles](../references/common-attrs.md)
 
 - support flexbox related styles
 - support box model related styles
@@ -27,10 +27,10 @@ There is no specific attribute for this component other than the [common attribu
 
 ### Events
 
-**common events**: check out the [common events](/references/common-event.md)
+**common events**: check out the [common events](../references/common-event.md)
 
-- support `click` event. Check out [common events](/references/common-event.md)
-- support `appear` / `disappear` event. Check out [common events](/references/common-event.md)
+- support `click` event. Check out [common events](../references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
 
 ### Example
 

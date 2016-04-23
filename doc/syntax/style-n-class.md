@@ -73,13 +73,13 @@ It means that the width of the outermost container is 600px, The inside of the t
 
 * In order to simplify the page design and the complete underlying implementation, the width of our default screen is unified to 750 pixels, different screens should be scaled with corresponding ratio.
 * The CSS standard may support a lot of selectors, but now weex only support single-class selector.
-* The CSS standard can support many types of length units, but now weex only support pixel, and the `px` unit could be ignored, you can write number directly. More details can be found in [commmon styles](/references/common-style.md).
+* The CSS standard can support many types of length units, but now weex only support pixel, and the `px` unit could be ignored, you can write number directly. More details can be found in [commmon styles](../references/common-style.md).
 * The styles of Weex cannot be inherited to children elements, this is different to the CSS standard, such as `color` and `font-size`.
 * The CSS standard contains a lot of styles, but weex only sopport few styles which include layouts such as box model, flexbox, positions. And styles include `font-size`, `color`, etc.
 
 ## With Data-binding
 
-Page [data](/syntax/data-binding.md) can be bound in `style` and `class` attribute. For example:
+Page [data](./data-binding.md) can be bound in `style` and `class` attribute. For example:
 
 ```
 <template>
@@ -102,4 +102,4 @@ Page [data](/syntax/data-binding.md) can be bound in `style` and `class` attribu
 </script>
 ```
 
-Next, let's have a look at [events](/syntax/events.md).
+Next, let's have a look at [events](./events.md).

@@ -218,4 +218,4 @@ eg:
 </script>
 ```
 
-At last, you can learn how to write [config & data](/syntax/config-n-data.md) for a Weex page.
+At last, you can learn how to write [config & data](./config-n-data.md) for a Weex page.

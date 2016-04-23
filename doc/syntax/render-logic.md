@@ -25,4 +25,4 @@ The rendering result is obvious, The latter statement will render the element a 
 
 By default, elements are rendered as `node` mode. Once an element is in `tree` rendering mode, its children elements will always be rendered in `tree` mode.
 
-Next we will introduce [composed component](/syntax/composed-component.md).
+Next we will introduce [composed component](./composed-component.md).

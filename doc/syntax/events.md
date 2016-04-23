@@ -28,4 +28,4 @@ When an event handler called, it will receive an event object as the first argum
 * `target`: target `Element` of the event
 * `timestamp`: time stamp that event triggered
 
-Next, let's have a look at [display logic control](/syntax/display-logic.md).
+Next, let's have a look at [display logic control](./display-logic.md).
