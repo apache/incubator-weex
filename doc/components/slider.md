@@ -15,11 +15,11 @@ It supports all kinds of weex components as its slides, especially the `indicato
 
 - `auto-play`: &lt;boolean&gt; `true` | `false`. This value determines whether the slides plays automatically after the page rendering finished. The default value is `false`.
 
-Other attributes please check out the [common attributes](/references/common-attrs.md).
+Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles
 
-**common styles**: check out [common styles for components](/references/common-style.md)
+**common styles**: check out [common styles for components](../references/common-style.md)
 
 - support flexbox related styles
 - support box model related styles
@@ -30,10 +30,10 @@ Other attributes please check out the [common attributes](/references/common-att
 
 - `change`: triggerd when the slide's index is changed. The event object contains the attribute of `index`, which is the index number of the currently shown slide.
 
-**common events**: check out the [common events](/references/common-event.md)
+**common events**: check out the [common events](../references/common-event.md)
 
-- support `click` event. Check out [common events](/references/common-event.md)
-- support `appear` / `disappear` event. Check out [common events](/references/common-event.md)
+- support `click` event. Check out [common events](../references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
 
 ### Example
 

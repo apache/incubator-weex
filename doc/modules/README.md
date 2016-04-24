@@ -1,4 +1,5 @@
 # Built-in Modules
 
-* [steam](/modules/steam.md)
-* [modal](/modules/modal.md)
+* [steam](./steam.md)
+* [modal](./modal.md)
+* [animation](./animation.md)

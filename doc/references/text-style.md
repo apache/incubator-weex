@@ -1,6 +1,6 @@
 # Text Style
 
-Text alike components share some common style rules. The text alike components currently includes [`text`](/components/text.md) and [`input`](/components/input.md).
+Text alike components share some common style rules. The text alike components currently includes [`text`](../components/text.md) and [`input`](../components/input.md).
 
 ## Properties
 
