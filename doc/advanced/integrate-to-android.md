@@ -49,7 +49,7 @@ project(':weex_sdk_android').projectDir = new File(
     rootProject.projectDir, '../weex_sdk_android')
 ```
 
-Modify your `android/app/build.gradle` to use the `:weex_sdk_android` project instead of the pre-compiled library, e.g. - replace `compile 'com.taobao.android:weex_sdk:0.4.0` with `compile project(':weex_sdk_android')`:
+Modify your `android/app/build.gradle` to use the `:weex_sdk_android` project instead of the pre-compiled library, e.g. - replace `compile 'com.taobao.android:weex_sdk:0.4.1` with `compile project(':weex_sdk_android')`:
 
 ```gradle
 dependencies {
@@ -95,7 +95,7 @@ You should be able to use the _Run_ button to run your app on a device.
 
 In your app's `build.gradle` file add the WEEX dependency:
 
-    compile 'com.taobao.android:weex_sdk:0.4.0'
+    compile 'com.taobao.android:weex_sdk:0.4.1'
 
 You can find the latest version of the WEEX library on [jcenter](https://bintray.com/search?query=weex_sdk&forceAgnostic=true). Next, make sure you have the Internet permission in your `AndroidManifest.xml`:
 
