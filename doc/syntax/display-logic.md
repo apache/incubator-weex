@@ -112,4 +112,4 @@ Particularly for the `if` and `repeat` attribute, the mustache wrapper in values
 
 The two `<text>` components are both displayed.
 
-Next is [render logic control](/syntax/render-logic.md).
+Next is [render logic control](./render-logic.md).

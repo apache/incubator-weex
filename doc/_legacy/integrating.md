@@ -1,3 +1,3 @@
 # Integrating Weex Into Your App
-* [Android](android/integrating.md)
-* [HTML5](html5/integrating.md)
+* [Android](./advanced/integrate-to-android.md)
+* [HTML5](./advanced/integrate-to-html5.md)

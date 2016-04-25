@@ -58,6 +58,6 @@
   "devDependencies": {
     "gazeer": "^0.1.1",
     "serve": "^1.4.0",
-    "weex-transformer": "^0.1.8"
+    "weex-transformer": "^0.3.0"
   }
 }
