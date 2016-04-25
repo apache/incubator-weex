@@ -58,10 +58,20 @@ export function init(code, data) {
     'bootstrap',
     'register',
     'render',
+    '__weex_define__', // alias for define
+    '__weex_bootstrap__', // alias for bootstrap
     functionBody
   )
 
-  fn(define, require, document, bootstrap, register, render)
+  fn(
+    define,
+    require,
+    document,
+    bootstrap,
+    register,
+    render,
+    define,
+    bootstrap)
 
   perf.end('run bundle', this.id)
   return result
