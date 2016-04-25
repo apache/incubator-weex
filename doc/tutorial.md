@@ -197,6 +197,6 @@ You should see a  slider prepend  to our list.
 ![slider demo](http://gtms02.alicdn.com/tps/i2/TB1MB2gLVXXXXaLXpXXB8.XUXXX-596-1000.gif)
 
 
-More information about Slider Component can be found [here](/components/slider.md).
+More information about Slider Component can be found [here](components/slider.md).
 
-Just as previous example, the slider can be rendering in native, easily in Weex playground,also in your App. Please refer [the document](/advanced/main.md) for integrating Weex into your App.
+Just as previous example, the slider can be rendering in native, easily in Weex playground,also in your App. Please refer [the document](advanced/integrate-to-android.md) for integrating Weex into your App.
