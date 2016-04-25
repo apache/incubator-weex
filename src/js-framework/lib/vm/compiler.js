@@ -179,7 +179,7 @@ export function _compileFragment(target, dest, meta) {
 export function _compileRepeat(target, dest) {
   const repeat = target.repeat
   const oldStyle = typeof repeat === 'function'
-  let getter = repeat.getter || repeat
+  let getter = repeat.getter || repeat.expression || repeat
   if (typeof getter !== 'function') {
     getter = function () {return []}
   }
