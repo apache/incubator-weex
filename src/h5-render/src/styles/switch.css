@@ -1,5 +1,4 @@
 /* switch defaults. */
-
 .weex-switch {
   background-color: #fff;
   border: 1px solid #dfdfdf;
@@ -7,7 +6,6 @@
   display: inline-block;
   position: relative;
   vertical-align: middle;
-
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;

@@ -1,6 +1,7 @@
 .slider {
   position: relative;
 }
+
 .slider .indicator-container {
   position: absolute;
   display: -webkit-box;
@@ -15,23 +16,19 @@
   -webkit-justify-content: center;
   justify-content: center;
   font-size: 0;
-
-  .indicator {
-    border-radius: 50%;
-  }
-
-  &.row {
-    -webkit-box-orient: horizontal;
-    box-orient: horizontal;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-  }
-
-  &.column {
-    -webkit-box-orient: vertical;
-    box-orient: vertical;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-
+}
+.slider .indicator-container .indicator {
+  border-radius: 50%;
+}
+.slider .indicator-container.row {
+  -webkit-box-orient: horizontal;
+  box-orient: horizontal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+}
+.slider .indicator-container.column {
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-flex-direction: column;
+  flex-direction: column;
 }
