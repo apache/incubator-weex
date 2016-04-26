@@ -69,6 +69,7 @@ export function _compile(target, dest, meta) {
     context._content = context._createBlock(dest)
     return
   }
+
   if (context._targetNeedCheckRepeat(target, meta)) {
     context._compileRepeat(target, dest)
     return
@@ -352,6 +353,7 @@ export function _bindRepeat(target, fragBlock, info) {
       mergedData[valueName] = item
     }
     context = context._mergeContext(mergedData)
+    // console.log(context)
     vms.push(context)
     context._compile(target, fragBlock, {repeat: item})
   }
@@ -383,7 +385,7 @@ export function _bindRepeat(target, fragBlock, info) {
     }
   }
 
-  const list = this._watchBlock(fragBlock, target.repeat, 'repeat',
+  const list = this._watchBlock(fragBlock, getter, 'repeat',
     (data) => {
       if (!fragBlock) {
         return
