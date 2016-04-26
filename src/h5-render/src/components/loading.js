@@ -33,9 +33,9 @@ Loading.prototype.onAppend = function () {
     return
   }
   parent.scroller.addEventListener('pullup', function (e) {
-  	var obj = e.scrollObj
+    var obj = e.scrollObj
     self.adjustHeight(Math.abs(
-    	obj.getScrollHeight() - obj.getScrollTop() - scrollWrapHeight))
+      obj.getScrollHeight() - obj.getScrollTop() - scrollWrapHeight))
     if (!self.display) {
       self.show()
     }
@@ -53,8 +53,8 @@ Loading.prototype.adjustHeight = function (val) {
 Loading.prototype.handleLoading = function (e) {
   var parent = this.getParent()
   var offset = parent.scrollElement.getBoundingClientRect().height
-  					- parent.node.getBoundingClientRect().height
-  					+ DEFAULT_HEIGHT
+            - parent.node.getBoundingClientRect().height
+            + DEFAULT_HEIGHT
   this.node.style.height = DEFAULT_HEIGHT + 'px'
   this.node.style.bottom = -DEFAULT_HEIGHT + 'px'
   var translateStr = 'translate3d(0px,-' + offset + 'px,0px)'
@@ -77,15 +77,15 @@ Loading.prototype.hide = function () {
   var scrollElementHeight = parent.scrollElement.getBoundingClientRect().height
   var scrollWrapHeight = parent.node.getBoundingClientRect().height
   var left = scrollElementHeight
-  	- parent.scroller.getScrollTop()
-  	- scrollWrapHeight
+    - parent.scroller.getScrollTop()
+    - scrollWrapHeight
   if (left < 0) {
-  	var offset = scrollElementHeight
-  					- parent.node.getBoundingClientRect().height
-	 	var translateStr = 'translate3d(0px,-' + offset + 'px,0px)'
-	  parent.scrollElement.style[cssPrefix + 'transform']
-	    = cssPrefix + translateStr
-	  parent.scrollElement.style.transform = translateStr
+    var offset = scrollElementHeight
+            - parent.node.getBoundingClientRect().height
+    var translateStr = 'translate3d(0px,-' + offset + 'px,0px)'
+    parent.scrollElement.style[cssPrefix + 'transform']
+      = cssPrefix + translateStr
+    parent.scrollElement.style.transform = translateStr
   }
   this.node.style.display = 'none'
 }
