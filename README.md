@@ -19,8 +19,8 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 
 ## Use
 
-* See [Tutorial](http://alibaba.github.io/weex/doc/tutorial).
-* See [Weex Documentation](http://alibaba.github.io/weex/doc) for more information.
+* See [Tutorial](https://github.com/alibaba/weex/blob/dev/doc/tutorial.md).
+* See [Weex Documentation](https://github.com/alibaba/weex/blob/dev/doc) for more information.
 
 ### Android 
 
@@ -28,7 +28,7 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
     0. Install [Node.js](http://nodejs.org/) 4.0+
     0. Under project root 
         0. `npm install`, install project 
-        0. `npm run serve`
+        0. `npm run dev && npm run serve`
         0. `npm run watch`, in a new terminal window
     0. Install [Android Environment](http://developer.android.com/training/basics/firstapp/index.html)
 0. Run playground, In Android Studio
@@ -38,6 +38,8 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 0. [Add an example](./examples/README.md#add-an-example)
 
 ## Scripts
+
+### For end-user
 
 **clean `*.js` in the folders of `examples/build` and `test/build`**
 ```shell
@@ -49,17 +51,7 @@ npm run clean
 npm run transform
 ```
 
-**build js-framework and h5-render**
-```shell
-npm run build
-```
-
-**copy the built files to `playground`**
-```shell
-npm run copy
-```
-
-**npm run clean && npm run build**
+**npm run clean && npm run transform**
 ```shell
 npm run dev
 ```
@@ -74,12 +66,24 @@ npm run serve
 npm run watch
 ```
 
+### For SDK Developer
+
+**build js-framework and h5-render**
+```shell
+npm run build
+```
+
 **run test under js-framework and h5-render**
 ```shell
 npm run ci
 ```
 
-## for Windows
+**copy the built files to `playground`**
+```shell
+npm run copy
+```
+
+## For Windows
 
 Please install [Git for Windows](https://git-scm.com/download/win) or [Cygwin](https://www.cygwin.com/).
 
