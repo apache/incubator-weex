@@ -79,6 +79,10 @@ npm run watch
 npm run ci
 ```
 
+## for Windows
+
+Please install [Git for Windows](https://git-scm.com/download/win) or [Cygwin](https://www.cygwin.com/).
+
 ## Contributing
 
 See [Weex Contributing Guide](./CONTRIBUTING.md).
