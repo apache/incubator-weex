@@ -14,7 +14,6 @@
     },
     methods: {
       touchstart: function() {
-        // FIXME android touch
         // TODO adaptive opposite bgColor
 //        this.bgColor = '#e6e6e6';
       },
