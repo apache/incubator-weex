@@ -121,11 +121,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 //        mInstance.setImgLoaderAdapter(new ImageAdapter(this));
         mInstance.registerRenderListener(this);
       }
-      Activity ctx = this;
-      Rect outRect = new Rect();
-      ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
-      String path=mUri.getScheme().equals("file")?mUri.getLastPathSegment():mUri.toString();
-      mInstance.render(TAG, WXFileUtils.loadFileContent(path, this), mConfigMap, null, ScreenUtil.getDisplayWidth(this), ScreenUtil.getDisplayHeight(this), WXRenderStrategy.APPEND_ASYNC);
+      mContainer.post(new Runnable() {
+        @Override
+        public void run() {
+          Activity ctx = WXPageActivity.this;
+          Rect outRect = new Rect();
+          ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
+          String path=mUri.getScheme().equals("file")?mUri.getLastPathSegment():mUri.toString();
+          mInstance.render(TAG, WXFileUtils.loadFileContent(path, WXPageActivity.this),
+                           mConfigMap, null,
+                           ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil
+                               .getDisplayHeight(WXPageActivity.this),
+                           WXRenderStrategy.APPEND_ASYNC);
+        }
+      });
     }
     mInstance.onActivityCreate();
   }

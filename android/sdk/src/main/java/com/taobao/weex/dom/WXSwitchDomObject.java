@@ -202,123 +202,51 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.appfram.navigator;
+package com.taobao.weex.dom;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Rect;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import com.taobao.weex.utils.WXViewUtils;
 
-import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.utils.WXLogUtils;
+public class WXSwitchDomObject extends WXDomObject{
+    private static final float FIXED_WIDTH = 100;
+    private static final float FIXED_HEIGHT = 60;
 
-public class NavigatorActivity extends Activity {
-
-  public final static String INSTANCE_ID = "instanceId";
-  private ViewGroup container;
-  private WXSDKInstance instance;
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    container=new FrameLayout(this);
-    setContentView(container,new FrameLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    if(getActionBar()!=null)
-      getActionBar().hide();
-    final Intent intent=getIntent();
-    instance = new WXSDKInstance(NavigatorActivity.this);
-    instance.setImgLoaderAdapter(
-            WXSDKManager.getInstance().getSDKInstance(
-                    intent.getStringExtra(INSTANCE_ID)).getImgLoaderAdapter());
-    instance.registerRenderListener(new IWXRenderListener() {
-      @Override
-      public void onViewCreated(WXSDKInstance instance, View view) {
-        container.addView(view);
-        container.requestLayout();
-      }
-
-      @Override
-      public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-
-      }
-
-      @Override
-      public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
-      }
-
-      @Override
-      public void onException(WXSDKInstance instance, String errCode, String msg) {
-        WXLogUtils.e("WXEmbed", "Error code :" + errCode + ",\n error message :" + msg);
-      }
-    });
-    container.post(new Runnable() {
-      @Override
-      public void run() {
-        Rect outRect = new Rect();
-        getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
-        instance.renderByUrl(WXPerformance.DEFAULT,
-                        intent.getData().toString(),
-                        null, null, outRect.width(),
-                        outRect.height(),
-                        WXRenderStrategy.APPEND_ASYNC);
-      }
-    });
-    instance.onActivityCreate();
-  }
-
-  @Override
-  protected void onDestroy() {
-    if (instance != null) {
-      instance.onActivityDestroy();
+    @Override
+    public void layoutBefore() {
+        super.layoutBefore();
+        if (style == null){
+            style = new WXStyle();
+        }
+        setStyleWidth(FIXED_WIDTH);
+        setStyleHeight(FIXED_HEIGHT);
     }
-    super.onDestroy();
-  }
 
-  @Override
-  protected void onPause() {
-    if (instance != null) {
-      instance.onActivityPause();
+    @Override
+    public void setMaxWidth(float maxWidth) {
+        super.setMaxWidth(WXViewUtils.getRealPxByWidth(FIXED_WIDTH));
     }
-    super.onPause();
-  }
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    if (instance != null) {
-      instance.onActivityResume();
+    @Override
+    public void setMinWidth(float minWidth) {
+        super.setMinWidth(WXViewUtils.getRealPxByWidth(FIXED_WIDTH));
     }
-  }
 
-  @Override
-  protected void onStart() {
-    super.onStart();
-    if(instance!=null){
-      instance.onActivityStart();
+    @Override
+    public void setMaxHeight(float maxHeight) {
+        super.setMaxHeight(WXViewUtils.getRealPxByWidth(FIXED_HEIGHT));
     }
-  }
 
-  @Override
-  protected void onStop() {
-    if(instance!=null){
-      instance.onActivityStop();
+    @Override
+    public void setMinHeight(float minHeight) {
+        super.setMinHeight(WXViewUtils.getRealPxByWidth(FIXED_HEIGHT));
     }
-    super.onStop();
-  }
 
-  @Override
-  public void onBackPressed() {
-    if(instance!=null){
-      instance.onActivityBack();
+    @Override
+    public void setStyleWidth(float width) {
+        super.setStyleWidth(WXViewUtils.getRealPxByWidth(FIXED_WIDTH));
     }
-    super.onBackPressed();
-  }
+
+    @Override
+    public void setStyleHeight(float height) {
+        super.setStyleHeight(WXViewUtils.getRealPxByWidth(FIXED_HEIGHT));
+    }
 }

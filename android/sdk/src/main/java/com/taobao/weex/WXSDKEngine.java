@@ -209,12 +209,14 @@ import android.app.Application;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomRegistry;
+import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
@@ -329,11 +331,12 @@ public class WXSDKEngine {
       WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
       WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
       WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      //WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
+      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
       WXSDKEngine.registerModule("stream", WXStreamModule.class);
 
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
       registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
+      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
     }
