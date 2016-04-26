@@ -15,6 +15,7 @@ var receiver = require('./bridge/receiver')
 var components = require('./components')
 var api = require('./api')
 require('envd')
+require('httpurl')
 
 var WEAPP_STYLE_ID = 'weapp-style'
 
@@ -34,6 +35,29 @@ window.WXEnvironment = {
 }
 
 var _instanceMap = {}
+var _downgrades = {}
+
+var downgradable = ['list', 'scroller']
+
+; (function getGlobalDowngradesFromUrlParams() {
+
+  // Get global _downgrades from url's params.
+  var params = lib.httpurl(location.href).params
+  for (var k in params) {
+    if (params[k] !== true && params[k] !== 'true') {
+      continue
+    }
+    var match = k.match(/downgrade_(\w+)/)
+    if (!match || !match[1]) {
+      continue
+    }
+    var downk = match[1]
+    if (downk && (downgradable.indexOf(downk) !== -1)) {
+      _downgrades[downk] = true
+    }
+  }
+
+})()
 
 function Weex(options) {
 
@@ -53,6 +77,7 @@ function Weex(options) {
 
   this.data = options.data
 
+  this.initDowngrades(options.downgrade)
   this.initScale()
   this.initComponentManager()
   this.initBridge()
@@ -91,6 +116,21 @@ Weex.getInstance = function (instanceId) {
 }
 
 Weex.prototype = {
+
+  initDowngrades: function (dg) {
+    this.downgrades = utils.extend({}, _downgrades)
+    // Get downgrade component type from user's specification
+    // in weex's init options.
+    if (!utils.isArray(dg)) {
+      return
+    }
+    for (var i = 0, l = dg.length; i < l; i++) {
+      var downk = dg[i]
+      if (downgradable.indexOf(downk) !== -1) {
+        this.downgrades[downk] = true
+      }
+    }
+  },
 
   initBridge: function () {
     receiver.init(this)
