@@ -202,222 +202,139 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.component;
 
-import android.app.Application;
+import android.text.TextUtils;
 
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.appfram.navigator.WXNavigatorModule;
-import com.taobao.weex.bridge.WXModuleManager;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.dom.module.WXModalUIModule;
-import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXIndicator;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.WXWeb;
-import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.module.WXWebViewModule;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.ui.view.IWebView;
+import com.taobao.weex.ui.view.WXWebView;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public class WXSDKEngine {
+public class WXWeb extends WXComponent {
 
-  private static final String V8_SO_NAME = "weexcore";
-  private volatile static boolean init;
-  private static Object mLock = new Object();
+    private IWebView mWebView;
+    private String mUrl;
+    private boolean mUrlChanged;
 
-  @Deprecated
-  public static void init(Application application) {
-    init(application, null);
-  }
+    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
+        super(instance, dom, parent, instanceId, isLazy);
+        mWebView = new WXWebView(mContext);
+        mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
+            @Override
+            public void onError(String type, Object message) {
+                fireEvent(type, message);
+            }
+        });
+        mWebView.setOnPageListener(new IWebView.OnPageListener() {
+            @Override
+            public void onReceivedTitle(String title) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_RECEIVEDTITLE)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("title", title);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_RECEIVEDTITLE, params);
+                }
+            }
 
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter) {
-    init(application, utAdapter, null);
-  }
+            @Override
+            public void onPageStart(String url) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGESTART)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("url", url);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_PAGESTART, params);
+                }
+            }
 
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-      register();
+            @Override
+            public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGEFINISH)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("url", url);
+                    params.put("canGoBack", canGoBack);
+                    params.put("canGoForward", canGoForward);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_PAGEFINISH, params);
+                }
+            }
+        });
     }
-  }
 
-  public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-
-      WXSDKManager.getInstance().setIWXHttpAdapter(httpAdapter);
-      WXSDKManager.getInstance().setIWXImgLoaderAdapter(imgLoaderAdapter);
-      WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
-
-      register();
+    @Override
+    protected void initView() {
+        mHost = mWebView.getView();
     }
-  }
 
-  private static void register() {
-    try {
-      registerComponent(WXBasicComponentType.TEXT, WXText.class, false);
-      registerComponent(WXBasicComponentType.IMG, WXImage.class, false);
-      registerComponent(WXBasicComponentType.DIV, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.IMAGE, WXImage.class, false);
-      registerComponent(WXBasicComponentType.CONTAINER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
-      registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
-
-      registerComponent(WXBasicComponentType.LIST, WXListComponent.class, false);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
-      registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
-      registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
-      registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
-      registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
-      registerComponent(WXBasicComponentType.A, WXA.class, false);
-      registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
-      registerComponent(WXBasicComponentType.WEB, WXWeb.class);
-
-      WXModuleManager.registerModule("dom", WXDomModule.class, true);
-      WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
-      WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
-      WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
-      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
-      WXSDKEngine.registerModule("stream", WXStreamModule.class);
-
-      registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
-    } catch (WXException e) {
-      WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
+    @Override
+    public void flushView() {
+        super.flushView();
+        if (!TextUtils.isEmpty(mUrl) && mUrlChanged) {
+            mUrlChanged = false;
+            loadUrl(mUrl);
+        }
     }
-  }
 
-  /**
-   *
-   * Register component. The registration is singleton in {@link WXSDKEngine} level
-   * @param type name of component. Same as type filed in the JS.
-   * @param clazz the class of the {@link WXComponent} to be registered.
-   * @param appendTree true for appendTree flag
-   * @return true for registration success, false for otherwise.
-   * @throws WXException Throws exception if type conflicts.
-   */
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, appendTree);
-  }
+    @Override
+    public void destroy() {
+        super.destroy();
+        getWebView().destory();
+    }
 
-  /**
-   * Register module. This is a wrapper method for
-   * {@link WXModuleManager#registerModule(String, Class)}. The module register here only need to
-   * be singleton in {@link WXSDKInstance} level.
-   * @param moduleName  module name
-   * @param moduleClass module to be registered.
-   * @return true for registration success, false for otherwise.
-   * @see {@link WXModuleManager#registerModule(String, Class, boolean)}
-   */
-  public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    return WXModuleManager.registerModule(moduleName, moduleClass);
-  }
+    @WXComponentProp(name = "show-loading")
+    public void setShowLoading(boolean showLoading) {
+        getWebView().setShowLoading(showLoading);
+    }
 
-  public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
-    return WXDomRegistry.registerDomObject(type, clazz);
-  }
+    @WXComponentProp(name = "src")
+    public void setUrl(String url) {
+        if (TextUtils.isEmpty(url) || mHost == null) {
+            return;
+        }
+        mUrl = url;
+        mUrlChanged = true;
+    }
 
-  public static void callback(String instanceId, String funcId, Map<String, Object> data) {
-    WXSDKManager.getInstance().callback(instanceId, funcId, data);
-  }
+    public void setAction(String action) {
+        if (!TextUtils.isEmpty(action)) {
+            if (action.equals("goBack")) {
+                goBack();
+            } else if (action.equals("goForward")) {
+                goForward();
+            } else if (action.equals("reload")) {
+                reload();
+            }
+        }
+    }
 
-  /**
-   * Model switch, only applicable for developer model
-   * @param debug
-   */
-  public static void restartBridge(boolean debug) {
-    WXEnvironment.sDebugMode = debug;
-    WXSDKManager.getInstance().restartBridge();
-  }
+    private void fireEvent(String type, Object message) {
+        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_ERROR)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("type", type);
+            params.put("errorMsg", message);
+            WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_ERROR, params);
+        }
+    }
 
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, true);
-  }
+    private void loadUrl(String url) {
+        getWebView().loadUrl(url);
+    }
 
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(componentInfo, clazz);
-  }
+    private void reload() {
+        getWebView().reload();
+    }
 
-  public static void addCustomOptions(String key, String value) {
-    WXEnvironment.addCustomOptions(key, value);
-  }
+    private void goForward() {
+        getWebView().goForward();
+    }
 
-  public IWXUserTrackAdapter getIWXUserTrackAdapter() {
-    return WXSDKManager.getInstance().getIWXUserTrackAdapter();
-  }
+    private void goBack() {
+        getWebView().goBack();
+    }
 
-  public void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
-    WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
-  }
+    private IWebView getWebView() {
+        return mWebView;
+    }
 
-  public IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
-    return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
-  }
-
-  public void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
-    WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
-  }
-
-  public IWXHttpAdapter getIWXHttpAdapter() {
-    return WXSDKManager.getInstance().getIWXHttpAdapter();
-  }
-
-  public void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
-    WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
-  }
 }

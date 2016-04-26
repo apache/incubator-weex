@@ -268,11 +268,14 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
   }
 
   private void init() {
+    mPaintStroke.setAntiAlias(true);
     mPaintStroke.setStyle(Style.STROKE);
     //		mPaintStroke.setColor(strokeColor);
     //		mPaintStroke.setStrokeWidth(strokeWidth);
 
     mPaintFill.setStyle(Style.FILL);
+    mPaintFill.setAntiAlias(true);
+    mPaintPage.setAntiAlias(true);
     mPaintPage.setColor(pageColor);
     mPaintFill.setStyle(Style.FILL);
     mPaintFill.setColor(fillColor);
