@@ -248,6 +248,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private IWXRenderListener mRenderListener;
   private Context mContext;
   private volatile String mInstanceId;
+
+  public WXComponent getRootCom() {
+    return mRootCom;
+  }
+
   private WXComponent mRootCom;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
@@ -255,6 +260,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public IActivityNavBarSetter getActivityNavBarSetter() {
     return mActivityNavBarSetter;
+  }
+
+  public void setActivityNavBarSetter(IActivityNavBarSetter mActivityNavBarSetter) {
+    this.mActivityNavBarSetter = mActivityNavBarSetter;
   }
 
   private IActivityNavBarSetter mActivityNavBarSetter;

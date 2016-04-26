@@ -209,6 +209,10 @@ package com.taobao.weex.appfram.navigator;
  */
 public interface IActivityNavBarSetter {
 
+  boolean push(String param);
+
+  boolean pop(String param);
+
   boolean setNavBarRightItem(String param);
 
   boolean clearNavBarRightItem(String param);
@@ -222,7 +226,5 @@ public interface IActivityNavBarSetter {
   boolean clearNavBarMoreItem(String param);
 
   boolean setNavBarTitle(String param);
-
-  boolean clearNavBarTitle(String param);
 
 }
