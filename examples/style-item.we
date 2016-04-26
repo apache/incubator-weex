@@ -11,7 +11,7 @@
     },
     methods: {
       ready: function() {
-        // TODO why undefined?
+        // TODO issue why undefined?
         console.log(this.data);
       },
       bgColor: function() {
