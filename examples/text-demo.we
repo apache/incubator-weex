@@ -6,7 +6,7 @@
       <text class="txt" style="color:#0f0">#0f0</text>
       <text class="txt" style="color:red">keyword</text>
       <text class="txt" style="color:rgb(238, 162, 54)">rgb(238, 162, 54)</text>
-      <text class="txt" style="color:rgba(238, 162, 54, 0.5)">rgb(238, 162, 54, 0.5)</text>
+      <text class="txt" style="color:rgba(238, 162, 54, 0.5)">rgba(238, 162, 54, 0.5)</text>
     </ui-panel>
 
     <ui-panel title="font-size">
