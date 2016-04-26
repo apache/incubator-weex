@@ -344,7 +344,15 @@ export function _bindRepeat(target, fragBlock, info) {
     if (oldStyle) {
       mergedData = item
       if (typeof item === 'object') {
-        mergedData.INDEX = index
+        mergedData[keyName] = index
+        if (!mergedData.hasOwnProperty('INDEX')) {
+          Object.defineProperty(mergedData, 'INDEX', {
+            value: () => {
+              nativeLog('[WARNING] "INDEX" in repeat is deprecated,' +
+                ' please use "$index" instead')
+            }
+          })
+        }
       }
     }
     else {

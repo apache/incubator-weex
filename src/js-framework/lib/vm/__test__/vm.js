@@ -318,9 +318,9 @@ describe('generate virtual dom for a single vm', () => {
     expect(vm._app).equal(app)
     expect(vm.x).eql('<some image url>')
     expect(vm.list).eql([
-      {uid: 1, x: 1, INDEX: 0},
-      {uid: 2, x: 2, INDEX: 1},
-      {uid: 3, INDEX: 2}])
+      {uid: 1, x: 1, $index: 0},
+      {uid: 2, x: 2, $index: 1},
+      {uid: 3, $index: 2}])
 
     var el = doc.body
     expect(el.type).eql('container')
@@ -410,9 +410,9 @@ describe('generate virtual dom for a single vm', () => {
     expect(vm._app).equal(app)
     expect(vm.x).eql('<some image url>')
     expect(vm.list).eql([
-      {uid: 1, x: 1, INDEX: 0},
-      {uid: 2, x: 2, INDEX: 1},
-      {uid: 3, INDEX: 2}])
+      {uid: 1, x: 1, $index: 0},
+      {uid: 2, x: 2, $index: 1},
+      {uid: 3, $index: 2}])
 
     var el = doc.body
     expect(el.type).eql('container')
