@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if test -e .git/hooks; then
-  ln -sF ../../bin/pre-commit.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit 
-  ln -sF ../../bin/commit-msg.sh .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg 
-  ln -sF ../../bin/pre-push.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push 
+  ln -sf ../../bin/pre-commit.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit 
+  ln -sf ../../bin/commit-msg.sh .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg 
+  ln -sf ../../bin/pre-push.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push 
 fi
