@@ -202,242 +202,139 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.ui.component;
+
+import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.ui.view.IWebView;
+import com.taobao.weex.ui.view.WXWebView;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Manager class for render operation, mainly for managing {@link WXRenderStatement}.
- * This is <strong>not</strong> a thread-safe class
- */
-public class WXRenderManager {
+public class WXWeb extends WXComponent {
 
-  private ConcurrentHashMap<String, WXRenderStatement> mRegistries;
-  private WXRenderHandler mWXRenderHandler;
+    private IWebView mWebView;
+    private String mUrl;
+    private boolean mUrlChanged;
 
-  public WXRenderManager() {
-    mRegistries = new ConcurrentHashMap<>();
-    mWXRenderHandler = new WXRenderHandler();
-  }
+    public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
+        super(instance, dom, parent, instanceId, isLazy);
+        mWebView = new WXWebView(mContext);
+        mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
+            @Override
+            public void onError(String type, Object message) {
+                fireEvent(type, message);
+            }
+        });
+        mWebView.setOnPageListener(new IWebView.OnPageListener() {
+            @Override
+            public void onReceivedTitle(String title) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_RECEIVEDTITLE)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("title", title);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_RECEIVEDTITLE, params);
+                }
+            }
 
-  public WXRenderStatement getWXRenderStatement(String instanceId) {
-    return mRegistries.get(instanceId);
-  }
+            @Override
+            public void onPageStart(String url) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGESTART)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("url", url);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_PAGESTART, params);
+                }
+            }
 
-  public WXComponent getWXComponent(String instanceId, String ref) {
-    return getWXRenderStatement(instanceId).getComponent(ref);
-  }
-
-  public WXSDKInstance getWXSDKInstance(String instanceId) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
+            @Override
+            public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
+                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGEFINISH)) {
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("url", url);
+                    params.put("canGoBack", canGoBack);
+                    params.put("canGoForward", canGoForward);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_PAGEFINISH, params);
+                }
+            }
+        });
     }
-    return statement.getWXSDKInstance();
-  }
 
-  public void postOnUiThread(Runnable runnable, long delayMillis) {
-    mWXRenderHandler.postDelayed(runnable, delayMillis);
-  }
-
-  /**
-   * Remove renderStatement, can only be invoked in UI thread.
-   * @param instanceId {@link WXSDKInstance#mInstanceId}
-   */
-  public void removeRenderStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
+    @Override
+    protected void initView() {
+        mHost = mWebView.getView();
     }
-    WXRenderStatement statement = mRegistries.remove(instanceId);
-    if (statement != null) {
-      statement.destroy();
-    }
-  }
 
-  //TODO Use runnable temporarily
-  public void runOnThread(final String instanceId, final IWXRenderTask task) {
-    mWXRenderHandler.post(new Runnable() {
-
-      @Override
-      public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
+    @Override
+    public void flushView() {
+        super.flushView();
+        if (!TextUtils.isEmpty(mUrl) && mUrlChanged) {
+            mUrlChanged = false;
+            loadUrl(mUrl);
         }
-        task.execute();
-      }
-    });
-  }
+    }
 
-  public void flushView(final String instanceId, final String ref) {
-    mWXRenderHandler.post(new Runnable() {
+    @Override
+    public void destroy() {
+        super.destroy();
+        getWebView().destory();
+    }
 
-      @Override
-      public void run() {
-        WXRenderStatement statement = mRegistries.get(instanceId);
-        if (statement == null) {
-          return;
+    @WXComponentProp(name = "show-loading")
+    public void setShowLoading(boolean showLoading) {
+        getWebView().setShowLoading(showLoading);
+    }
+
+    @WXComponentProp(name = "src")
+    public void setUrl(String url) {
+        if (TextUtils.isEmpty(url) || mHost == null) {
+            return;
         }
-        statement.flushView(ref);
-      }
-    });
-  }
-
-  public void createInstance(WXSDKInstance instance, String instanceId) {
-    mRegistries.put(instanceId, new WXRenderStatement(instance, instanceId));
-  }
-
-  public void createBody(String instanceId, WXComponent component) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+        mUrl = url;
+        mUrlChanged = true;
     }
-    statement.createBody(component);
-  }
 
-  public WXComponent createBodyOnDomThread(String instanceId, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
+    public void setAction(String action) {
+        if (!TextUtils.isEmpty(action)) {
+            if (action.equals("goBack")) {
+                goBack();
+            } else if (action.equals("goForward")) {
+                goForward();
+            } else if (action.equals("reload")) {
+                reload();
+            }
+        }
     }
-    return statement.createBodyOnDomThread(domObject);
-  }
 
-  public void setLayout(String instanceId, String ref, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void fireEvent(String type, Object message) {
+        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_ERROR)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("type", type);
+            params.put("errorMsg", message);
+            WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_ERROR, params);
+        }
     }
-    statement.setLayout(ref, domObject);
-  }
 
-  /**
-   * Set extra info, other than attribute and style
-   */
-  public void setExtra(String instanceId, String ref, Object extra) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void loadUrl(String url) {
+        getWebView().loadUrl(url);
     }
-    statement.setExtra(ref, extra);
-  }
 
-  public void setPadding(String instanceId, String ref, Spacing padding, Spacing border) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void reload() {
+        getWebView().reload();
     }
-    statement.setPadding(ref, padding, border);
-  }
 
-  public void addComponent(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void goForward() {
+        getWebView().goForward();
     }
-    statement.addComponent(dom, parentRef, index);
-  }
 
-  public WXComponent createComponentOnDomThread(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
+    private void goBack() {
+        getWebView().goBack();
     }
-    return statement.createComponentOnDomThread(dom, parentRef, index);
-  }
 
-  public void addComponent(String instanceId, WXComponent component, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private IWebView getWebView() {
+        return mWebView;
     }
-    statement.addComponent(component, parentRef, index);
-  }
 
-  public void removeComponent(String instanceId, String ref) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.removeComponent(ref);
-  }
-
-  public void moveComponent(String instanceId, String ref, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.move(ref, parentRef, index);
-  }
-
-  public void updateAttrs(String instanceId, String ref, Map<String, Object> attrs) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateAttrs(ref, attrs);
-  }
-
-  public void updateStyle(String instanceId, String ref, Map<String, Object> style) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateStyle(ref, style);
-  }
-
-  public void addEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.addEvent(ref, type);
-  }
-
-  public void removeEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.removeEvent(ref, type);
-  }
-
-  public void scrollToComponent(String instanceId, String ref, Map<String, Object> options) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.scrollTo(ref, options);
-  }
-
-  public void createFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.createFinish(width, height);
-  }
-
-  public void refreshFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.refreshFinish(width, height);
-  }
-
-  public void startAnimation(String instanceId, String ref, String animation, String callBack) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.startAnimation(ref, animation, callBack);
-  }
 }

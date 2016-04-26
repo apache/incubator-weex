@@ -226,4 +226,5 @@ public class WXBasicComponentType {
   public static final String SWITCH = "switch";
   public static final String A = "a";
   public static final String EMBED = "embed";
+  public static final String WEB = "web";
 }

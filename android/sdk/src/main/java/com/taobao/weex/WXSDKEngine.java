@@ -233,8 +233,10 @@ import com.taobao.weex.ui.component.WXSlider;
 import com.taobao.weex.ui.component.WXSwitch;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
+import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
@@ -320,11 +322,13 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
       registerComponent(WXBasicComponentType.A, WXA.class, false);
       registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
+      registerComponent(WXBasicComponentType.WEB, WXWeb.class);
 
       WXModuleManager.registerModule("dom", WXDomModule.class, true);
       WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
       WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
       WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
+      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
       //WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
       WXSDKEngine.registerModule("stream", WXStreamModule.class);
 

@@ -202,242 +202,211 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.ui.view;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXUtils;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.http.SslError;
+import android.view.Gravity;
+import android.view.View;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.taobao.weex.utils.WXLogUtils;
 
-/**
- * Manager class for render operation, mainly for managing {@link WXRenderStatement}.
- * This is <strong>not</strong> a thread-safe class
- */
-public class WXRenderManager {
+public class WXWebView implements IWebView {
 
-  private ConcurrentHashMap<String, WXRenderStatement> mRegistries;
-  private WXRenderHandler mWXRenderHandler;
+    private Context mContext;
+    private WebView mWebView;
+    private ProgressBar mProgressBar;
+    private boolean mShowLoading = true;
 
-  public WXRenderManager() {
-    mRegistries = new ConcurrentHashMap<>();
-    mWXRenderHandler = new WXRenderHandler();
-  }
+    private OnErrorListener mOnErrorListener;
+    private OnPageListener mOnPageListener;
 
-  public WXRenderStatement getWXRenderStatement(String instanceId) {
-    return mRegistries.get(instanceId);
-  }
 
-  public WXComponent getWXComponent(String instanceId, String ref) {
-    return getWXRenderStatement(instanceId).getComponent(ref);
-  }
-
-  public WXSDKInstance getWXSDKInstance(String instanceId) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
+    public WXWebView(Context context) {
+        mContext = context;
     }
-    return statement.getWXSDKInstance();
-  }
 
-  public void postOnUiThread(Runnable runnable, long delayMillis) {
-    mWXRenderHandler.postDelayed(runnable, delayMillis);
-  }
+    @Override
+    public View getView() {
+        FrameLayout root = new FrameLayout(mContext);
+        root.setBackgroundColor(Color.WHITE);
 
-  /**
-   * Remove renderStatement, can only be invoked in UI thread.
-   * @param instanceId {@link WXSDKInstance#mInstanceId}
-   */
-  public void removeRenderStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
+        mWebView = new WebView(mContext);//mContext.getApplicationContext();
+        FrameLayout.LayoutParams wvLayoutParams =
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT);
+        wvLayoutParams.gravity = Gravity.CENTER;
+        mWebView.setLayoutParams(wvLayoutParams);
+        root.addView(mWebView);
+        initWebView(mWebView);
+
+        mProgressBar = new ProgressBar(mContext);
+        showProgressBar(false);
+        FrameLayout.LayoutParams pLayoutParams =
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT);
+        mProgressBar.setLayoutParams(pLayoutParams);
+        pLayoutParams.gravity = Gravity.CENTER;
+        root.addView(mProgressBar);
+        return root;
     }
-    WXRenderStatement statement = mRegistries.remove(instanceId);
-    if (statement != null) {
-      statement.destroy();
-    }
-  }
 
-  //TODO Use runnable temporarily
-  public void runOnThread(final String instanceId, final IWXRenderTask task) {
-    mWXRenderHandler.post(new Runnable() {
-
-      @Override
-      public void run() {
-        if (mRegistries.get(instanceId) == null) {
-          return;
+    @Override
+    public void destory() {
+        if (getWebView() != null) {
+            getWebView().removeAllViews();
+            getWebView().destroy();
+            mWebView = null;
         }
-        task.execute();
-      }
-    });
-  }
+    }
 
-  public void flushView(final String instanceId, final String ref) {
-    mWXRenderHandler.post(new Runnable() {
+    @Override
+    public void loadUrl(String url) {
+        getWebView().loadUrl(url);
+    }
 
-      @Override
-      public void run() {
-        WXRenderStatement statement = mRegistries.get(instanceId);
-        if (statement == null) {
-          return;
+    @Override
+    public void reload() {
+        getWebView().reload();
+    }
+
+    @Override
+    public void goBack() {
+        getWebView().goBack();
+    }
+
+    @Override
+    public void goForward() {
+        getWebView().goForward();
+    }
+
+    /*@Override
+    public void setVisibility(int visibility) {
+        if (mRootView != null) {
+            mRootView.setVisibility(visibility);
         }
-        statement.flushView(ref);
-      }
-    });
-  }
+    }*/
 
-  public void createInstance(WXSDKInstance instance, String instanceId) {
-    mRegistries.put(instanceId, new WXRenderStatement(instance, instanceId));
-  }
-
-  public void createBody(String instanceId, WXComponent component) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    @Override
+    public void setShowLoading(boolean shown) {
+        mShowLoading = shown;
     }
-    statement.createBody(component);
-  }
 
-  public WXComponent createBodyOnDomThread(String instanceId, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
+    @Override
+    public void setOnErrorListener(OnErrorListener listener) {
+        mOnErrorListener = listener;
     }
-    return statement.createBodyOnDomThread(domObject);
-  }
 
-  public void setLayout(String instanceId, String ref, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    @Override
+    public void setOnPageListener(OnPageListener listener) {
+        mOnPageListener = listener;
     }
-    statement.setLayout(ref, domObject);
-  }
 
-  /**
-   * Set extra info, other than attribute and style
-   */
-  public void setExtra(String instanceId, String ref, Object extra) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void showProgressBar(boolean shown) {
+        if (mShowLoading) {
+            mProgressBar.setVisibility(shown ? View.VISIBLE : View.GONE);
+        }
     }
-    statement.setExtra(ref, extra);
-  }
 
-  public void setPadding(String instanceId, String ref, Spacing padding, Spacing border) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private void showWebView(boolean shown) {
+        mWebView.setVisibility(shown ? View.VISIBLE : View.INVISIBLE);
     }
-    statement.setPadding(ref, padding, border);
-  }
 
-  public void addComponent(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+    private WebView getWebView() {
+        return mWebView;
     }
-    statement.addComponent(dom, parentRef, index);
-  }
 
-  public WXComponent createComponentOnDomThread(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
-    }
-    return statement.createComponentOnDomThread(dom, parentRef, index);
-  }
+    private void initWebView(WebView wv) {
+        WebSettings settings = wv.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setAppCacheEnabled(true);
+        settings.setUseWideViewPort(true);
+        settings.setDomStorageEnabled(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+        wv.setWebViewClient(new WebViewClient() {
 
-  public void addComponent(String instanceId, WXComponent component, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.addComponent(component, parentRef, index);
-  }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                WXLogUtils.v("tag", "onPageOverride " + url);
+                return true;
+            }
 
-  public void removeComponent(String instanceId, String ref) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.removeComponent(ref);
-  }
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                WXLogUtils.v("tag", "onPageStarted " + url);
+                if (mOnPageListener != null) {
+                    mOnPageListener.onPageStart(url);
+                }
+            }
 
-  public void moveComponent(String instanceId, String ref, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.move(ref, parentRef, index);
-  }
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                WXLogUtils.v("tag", "onPageFinished " + url);
+                if (mOnPageListener != null) {
+                    mOnPageListener.onPageFinish(url, view.canGoBack(), view.canGoForward());
+                }
+            }
 
-  public void updateAttrs(String instanceId, String ref, Map<String, Object> attrs) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateAttrs(ref, attrs);
-  }
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (mOnErrorListener != null) {
+                    //mOnErrorListener.onError("error", "page error code:" + error.getErrorCode() + ", desc:" + error.getDescription() + ", url:" + request.getUrl());
+                    mOnErrorListener.onError("error", "page error");
+                }
+            }
 
-  public void updateStyle(String instanceId, String ref, Map<String, Object> style) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateStyle(ref, style);
-  }
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                super.onReceivedHttpError(view, request, errorResponse);
+                if (mOnErrorListener != null) {
+                    mOnErrorListener.onError("error", "http error");
+                }
+            }
 
-  public void addEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.addEvent(ref, type);
-  }
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                super.onReceivedSslError(view, handler, error);
+                if (mOnErrorListener != null) {
+                    mOnErrorListener.onError("error", "ssl error");
+                }
+            }
 
-  public void removeEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.removeEvent(ref, type);
-  }
+        });
+        wv.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                showWebView(newProgress == 100);
+                showProgressBar(newProgress != 100);
+                WXLogUtils.v("tag", "onPageProgressChanged " + newProgress);
+            }
 
-  public void scrollToComponent(String instanceId, String ref, Map<String, Object> options) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.scrollTo(ref, options);
-  }
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                if (mOnPageListener != null) {
+                    mOnPageListener.onReceivedTitle(view.getTitle());
+                }
+            }
 
-  public void createFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
+        });
     }
-    statement.createFinish(width, height);
-  }
 
-  public void refreshFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.refreshFinish(width, height);
-  }
-
-  public void startAnimation(String instanceId, String ref, String animation, String callBack) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.startAnimation(ref, animation, callBack);
-  }
 }
