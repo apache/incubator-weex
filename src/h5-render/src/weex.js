@@ -1,6 +1,6 @@
 'use strict'
 
-require('./styles/base.scss')
+require('./styles/base.css')
 
 var config = require('./config')
 var Loader = require('./loader')

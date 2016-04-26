@@ -1,6 +1,6 @@
 'use strict'
 
-require('../styles/container.scss')
+require('../styles/container.css')
 
 var Component = require('./component')
 
