@@ -126,7 +126,7 @@ describe('the api of app', () => {
   describe('callback', () => {
     it('with a simple data', () => {
       const data = {a: 'b'}
-      app.callback('1', data, false)
+      app.callback('1', data, true)
       expect(spy2.calledOnce).to.be.true
       expect(spy2.args[0][0]).to.deep.equal(data)
       expect(app.callbacks[1]).to.be.a('function')
@@ -134,12 +134,12 @@ describe('the api of app', () => {
 
     it('multiple called', () => {
       const data = {a: 'b'}
-      app.callback('1', data, false)
+      app.callback('1', data, true)
       expect(spy2.calledTwice).to.be.true
       expect(spy2.args[0][0]).to.deep.equal(data)
       expect(app.callbacks[1]).to.be.a('function')
 
-      app.callback('1', data, true)
+      app.callback('1', data, false)
       expect(spy2.calledThrice).to.be.true
       expect(spy2.args[0][0]).to.deep.equal(data)
       expect(app.callbacks[1]).to.be.undefined

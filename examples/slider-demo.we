@@ -2,17 +2,17 @@
   <scroller class="body">
 
     <ui-panel title="auto-play" type="primary">
-      <ui-panel title="auto-play = false">
+      <ui-panel title="auto-play = false" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="false">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
-      <ui-panel title="auto-play = true">
+      <ui-panel title="auto-play = true" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
     </ui-panel>
@@ -21,44 +21,44 @@
       <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}"
               onchange="handleSliderChange">
         <indicator class="indicator"></indicator>
-        <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+        <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
       </slider>
     </ui-panel>
 
     <ui-panel title="Indicator" type="primary">
-      <ui-panel title="default style">
+      <ui-panel title="default style" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}"
                 onchange="handleSliderChange">
           <indicator class="indicator"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
-      <ui-panel title="width & height">
+      <ui-panel title="width & height" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[0].interval}}" auto-play="{{sliders[0].autoPlay}}">
           <indicator style="itemColor: #dddddd;width:714;height:460;"></indicator>
-          <sliderpage repeat="{{sliders[0].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[0].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
-      <ui-panel title="left & top">
+      <ui-panel title="left & top" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="{{sliders[1].autoPlay}}">
           <indicator class="indicator" style="top:-140;left:-240"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
-      <ui-panel title="itemColor & itemSelectedColor">
+      <ui-panel title="itemColor & itemSelectedColor" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[2].interval}}" auto-play="{{sliders[2].autoPlay}}">
           <indicator class="indicator" style="itemSelectedColor:rgb(217, 83, 79);"></indicator>
-          <sliderpage repeat="{{sliders[2].sliderPages}}"></sliderpage>
+          <slider-page repeat="{{sliders[2].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
-      <ui-panel title="itemSize">
+      <ui-panel title="itemSize" padding-body="0">
         <slider class="slider" append="tree" interval="{{sliders[1].interval}}" auto-play="{{sliders[1].autoPlay}}">
-          <indicator style="itemColor: #dddddd;itemSize:40;top:140;left:180;width:714;height:460;"></indicator>
-          <sliderpage repeat="{{sliders[1].sliderPages}}"></sliderpage>
+          <indicator style="itemColor: #dddddd;itemSize:40;top:140;left:180;width:700;height:380;"></indicator>
+          <slider-page repeat="{{sliders[1].sliderPages}}"></slider-page>
         </slider>
       </ui-panel>
 
@@ -69,6 +69,7 @@
 </template>
 
 <script>
+  require('./weex-ui');
   var img0 = '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg';
   var img1 = '//gw.alicdn.com/tps/i1/TB1M3sQMpXXXXakXXXXApNeJVXX-360-360.png';
   module.exports = {
@@ -239,14 +240,14 @@
     flex-direction: row;
     /*margin-left: 18;*/
     /*margin-right: 18;*/
-    width: 714;
-    height: 400;
+    width: 690;
+    height: 360;
   }
 
   .indicator {
     position: absolute;
-    width: 714;
-    height: 460;
+    width: 690;
+    height: 420;
     top: 140;
     left: 240;
     itemColor: #dddddd;

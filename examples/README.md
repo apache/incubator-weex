@@ -2,8 +2,13 @@
 
 ## Add an example
 
-Copy [template file](./template.we) and build an example with [UI Gallery](#ui-gallery).  
+* Add a file `newExample.we` copied from [template](./template.we) with [UI Gallery](#ui-gallery) (recommend).
+* In [index.we](./index.we), add an item `{name: 'newExample', title: 'New Example'}` for array `data.cases`
 
+## Rule
+
+0. File name is dash separated words, each word is lower case, like `index.we`, `ui-button.we`
+0. DO NOT use [builtin components](../doc/components) name as file name, it may be failed ro run. 
 
 ## UI Gallery
 

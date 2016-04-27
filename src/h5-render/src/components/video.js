@@ -2,7 +2,7 @@
 
 var Atomic = require('./atomic')
 var utils = require('../utils')
-require('../styles/video.scss')
+require('../styles/video.css')
 
 // attrs:
 //   - autoPlay: true | false (default: false)

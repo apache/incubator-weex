@@ -12,13 +12,13 @@ This component supports no child components but a text content.
 
 - `value`: &lt;string&gt; text value of this component. This is equal to the content of `<text>`.
 
-Other attributes please check out the [common attributes](/references/common-attrs.md).
+Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles
 
 - `lines`: specify the text lines. Default value is `0` for unlimited.
 
-**text styles**: checkout [text styles](/references/text-style.md)
+**text styles**: checkout [text styles](../references/text-style.md)
 
 - support `color` style.
 - support `font-size` style.
@@ -30,7 +30,7 @@ Other attributes please check out the [common attributes](/references/common-att
 - support `text-decoration` style.
 - support `text-align` style.
 
-**common styles**: check out [common styles for components](/references/common-style.md)
+**common styles**: check out [common styles for components](../references/common-style.md)
 
 - support flexbox related styles
 - support box model related styles
@@ -39,10 +39,10 @@ Other attributes please check out the [common attributes](/references/common-att
 
 ### Events
 
-**common events**: check out the [common events](/references/common-event.md)
+**common events**: check out the [common events](../references/common-event.md)
 
-- support `click` event. Check out [common events](/references/common-event.md)
-- support `appear` / `disappear` event. Check out [common events](/references/common-event.md)
+- support `click` event. Check out [common events](../references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
 
 ### Example
 

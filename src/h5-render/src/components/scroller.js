@@ -1,6 +1,6 @@
 'use strict'
 
-require('../styles/scroller.scss')
+require('../styles/scroller.css')
 require('scrolljs')
 
 // lib.scroll events:

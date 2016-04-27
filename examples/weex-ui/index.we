@@ -1,0 +1,7 @@
+<script>
+  require('./ui-button.we');
+  require('./ui-hn.we');
+  require('./ui-list-item.we');
+  require('./ui-panel.we');
+  require('./ui-tip.we');
+</script>

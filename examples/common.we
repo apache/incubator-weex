@@ -1,5 +1,12 @@
 <template>
-  <div>
-    <text>it works.</text>
-  </div>
+  <scroller>
+    <style-box></style-box>
+  </scroller>
 </template>
+
+<style>
+  .txt {
+    margin-bottom: 12px;
+    font-size: 40px;
+  }
+</style>

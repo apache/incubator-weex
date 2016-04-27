@@ -1,5 +1,7 @@
-### Module extend
+# How to customize native APIs ?
+
 Weex SDK provides only rendering capabilities, rather than have other capabilities, such as network, picture, and URL redirection. If you want the these features, you need to implement it.
+
 #### eventModule
 
 ```
