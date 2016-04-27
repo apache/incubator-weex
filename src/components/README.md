@@ -12,7 +12,6 @@ Reference:
     * `type`, ***default*** | primary | success | info | warning | danger | link 
     * `size`, ***large*** | middle | small
     * `value`
-    * `disabled`, ***false*** | true
 * Event: 
     * `click`
 * Example:
@@ -48,7 +47,6 @@ Reference:
 * Attributes: 
     * `type`, ***success*** | info | warning | danger 
     * `value`, ***large*** | middle | small
-    * `value`
     * `disabled`, ***false*** | true
 * Example:
     

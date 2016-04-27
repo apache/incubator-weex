@@ -7,31 +7,36 @@
 
     <wxc-panel title="Buttons" append="tree">
       <div style="flex-direction: row; margin-top: 12px" repeat="{{buttons}}">
-        <wxc-button type="{{type}}" size="large" value="{{type}}" click="{{clicked}}" style=""></wxc-button>
-        <wxc-button type="{{type}}" size="middle" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></wxc-button>
-        <wxc-button type="{{type}}" size="small" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></wxc-button>
+        <wxc-button type="{{type}}" size="large" value="{{type}}" onclick="{{clicked}}" style=""></wxc-button>
+        <wxc-button type="{{type}}" size="middle" value="{{type}}" onclick="{{clicked}}"
+                    style="margin-left:10px"></wxc-button>
+        <wxc-button type="{{type}}" size="small" value="{{type}}" onclick="{{clicked}}"
+                    style="margin-left:10px"></wxc-button>
       </div>
 
-      <div style="flex-direction: row; margin-top: 12px">
-        <wxc-button disabled="{{true}}" type="" size="large" value="Disabled" click="{{clicked}}"></wxc-button>
-        <wxc-button disabled="{{false}}" type="primary" size="large" value="Enabled" click="{{clicked}}" style="margin-left: 12px"></wxc-button>
-      </div>
+      <!--<div style="flex-direction: row; margin-top: 12px">-->
+      <!--<wxc-button disabled="{{true}}" type="" size="large" value="Disabled" onclick="{{clicked}}"></wxc-button>-->
+      <!--<wxc-button disabled="{{false}}" type="primary" size="large" value="Enabled" onclick="{{clicked}}"-->
+      <!--style="margin-left: 12px"></wxc-button>-->
+      <!--</div>-->
     </wxc-panel>
 
     <wxc-panel title="Panels">
-      <wxc-panel repeat="{{panels}}" title="Panels-{{type}}" type="{{type}}" border="1" style="margin-left: 12px;margin-right: 12px;">
+      <wxc-panel repeat="{{panels}}" title="Panels-{{type}}" type="{{type}}" border="1"
+                 style="margin-left: 12px;margin-right: 12px;">
         <text>Panels {{type}} content. Panels {{type}} content. Panels {{type}} content.</text>
       </wxc-panel>
     </wxc-panel>
 
     <wxc-panel title="List">
-      <wxc-list-item repeat="{{tips}}" click="{{clicked}}">
+      <wxc-list-item repeat="{{tips}}" onclick="{{clicked}}">
         <text class="item-txt">{{type}}</text>
       </wxc-list-item>
     </wxc-panel>
 
     <wxc-panel title="Tips">
-      <wxc-tip repeat="{{tips}}" style="margin-bottom: 20px;" value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></wxc-tip>
+      <wxc-tip repeat="{{tips}}" style="margin-bottom: 20px;"
+               value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></wxc-tip>
     </wxc-panel>
 
   </scroller>
@@ -42,58 +47,14 @@
 
   module.exports = {
     data: {
-      levels: [{
-        level: 1
-      }, {
-        level: 2
-      }, {
-        level: 3
-      }],
-      buttons: [{
-        type: 'default'
-      }, {
-        type: 'primary'
-      }, {
-        type: 'success'
-      }, {
-        type: 'info'
-      }, {
-        type: 'warning'
-      }, {
-        type: 'danger'
-      }, {
-        type: 'link'
-      }],
-      panels: [{
-        type: 'default'
-      }, {
-        type: 'primary'
-      }, {
-        type: 'success'
-      }, {
-        type: 'info'
-      }, {
-        type: 'warning'
-      }, {
-        type: 'danger'
-      }],
-      tips: [{
-        type: 'success'
-      }, {
-        type: 'info'
-      }, {
-        type: 'warning'
-      }, {
-        type: 'danger'
-      }]
+      levels: [{level: 1}, {level: 2}, {level: 3}],
+      buttons: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}, {type: 'link'}],
+      panels: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
+      tips: [{type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}]
     },
     methods: {
-      clicked: function(ev) {
-        console.log(ev);
-        this.$call('modal', 'toast', {
-          'message': 'clicked!',
-          duration: 0.5
-        });
+      clicked: function() {
+        this.$call('modal', 'toast', {'message': 'clicked!', duration: 0.5});
       }
     }
   }
