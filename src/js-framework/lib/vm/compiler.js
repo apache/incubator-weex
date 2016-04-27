@@ -297,7 +297,12 @@ export function _compileNativeComponent(template, dest, type) {
   this._bindElement(element, template)
 
   if (template.attr && template.attr.append) { // backward, append prop in attr
-    element.append = template.attr.append
+    template.append = template.attr.append
+  }
+
+  if (template.append) { // give the append attribute for ios adaptation
+    template.attr = template.attr || {}
+    template.attr.append = template.append
   }
 
   const treeMode = template.append === 'tree'
