@@ -13,6 +13,7 @@
 </template>
 
 <script>
+  require('./weex-ui');
   module.exports = {
     data: {},
     methods: {

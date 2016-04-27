@@ -7,7 +7,7 @@
       <ui-hn level="2" value="H3"></ui-hn>
       <ui-button type="warning" click="{{toast}}" value="Toast"></ui-button>
     </ui-panel>
-    
+
     <ui-panel title="Image" type="primary">
       <ui-tip type="warning" value="Weex screen width is 750" style="margin-bottom: 20px;"></ui-tip>
       <image class="img" style=" width: 400px; height: 400px;" src="{{img}}"></image>
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+  require('./weex-ui');
   module.exports = {
     data: {
       img: '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg'

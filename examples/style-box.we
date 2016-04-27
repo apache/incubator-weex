@@ -1,14 +1,43 @@
 <template>
-  <div>
-    <ui-panel title="Box Model" padding-body="0">
+  <scroller>
+    <ui-panel title="Box Model" padding-body="0" type="primary">
       <text class="box">Box</text>
     </ui-panel>
 
-    <!--<ui-panel title="border">-->
-      <!---->
-      <!--<text class="item">default is black</text>-->
-    <!--</ui-panel>-->
-  </div>
+    <ui-panel title="border" type="primary">
+      <ui-panel title="border-width" type="">
+        <div style="flex-direction: row;">
+          <style-item style="border-style: solid;border-width: 2px;border-color: #333;" value=""></style-item>
+          <style-item style="border-style: solid;border-width: 4px;border-color: #333;" value=""
+                      type=""></style-item>
+          <style-item style="border-style: solid;border-width: 10px;border-color: #333;" value=""></style-item>
+        </div>
+      </ui-panel>
+      <ui-panel title="border-color" type="">
+        <div style="flex-direction: row;">
+          <style-item style="border-style: solid;border-width: 4px;border-color: #333;" value=""></style-item>
+          <style-item style="border-style: solid;border-width: 4px;border-color: #ddd;" value=""
+                      type=""></style-item>
+          <style-item style="border-style: solid;border-width: 4px;border-color: red;" value=""></style-item>
+        </div>
+      </ui-panel>
+      <ui-panel title="border-style" type="">
+        <div style="flex-direction: row;">
+          <style-item style="border-style: solid;border-width: 4px;border-color: #333;" value=""></style-item>
+          <style-item style="border-style: dashed;border-width: 4px;border-color: #333;" value=""
+                      type=""></style-item>
+          <style-item style="border-style: dotted;border-width: 4px;border-color: #333;" value=""></style-item>
+        </div>
+      </ui-panel>
+      <ui-panel title="border-radius" type="">
+        <div style="flex-direction: row;">
+          <style-item style="height: 160px;border-radius:80px" value=""></style-item>
+          <style-item style="width: 75px;border-radius:37.5px" value=""></style-item>
+          <style-item style="border-radius:20px" value=""></style-item>
+        </div>
+      </ui-panel>
+    </ui-panel>
+  </scroller>
 </template>
 
 <style>
@@ -25,16 +54,13 @@
     margin-right: 40px;
     margin-bottom: 40px;
     border-width: 40px;
-    border-color: #D43F3A;
+    border-color: #333;
     border-style: solid;
-  }
-
-  .item {
-    margin-bottom: 12px;
   }
 </style>
 
 <script>
+  require('./weex-ui');
   module.exports = {
     data: {
       size: 40

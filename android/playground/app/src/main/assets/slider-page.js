@@ -40,64 +40,93 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ function(module, exports) {
+/******/ ({
 
-	;__weex_define__("@weex-component/38b4457674106dc782e4b6020e6d5a61", [], function(__weex_require__, __weex_exports__, __weex_module__){
+/***/ 0:
+/***/ function(module, exports, __webpack_require__) {
+
+	;__weex_define__("@weex-component/e21fe0303066e4258a94c39d24d20b21", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(14);
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      bgColor: '#ffffff',
-	      click: function() {
-	      }
+	      items: [],
+	      sliderItems: []
 	    }},
 	    methods: {
-	      touchstart: function() {
-	        // TODO adaptive opposite bgColor
-	//        this.bgColor = '#e6e6e6';
+	      ready: function() {
+	        this.sliderItems = this.getSliderItems()
 	      },
-	      touchend: function() {
-	        // FIXME android touchend not triggered
-	//        this.bgColor = '#ffffff';
+	      getSliderItems: function() {
+	        return this.items.map(function(item, index) {
+	          return item;
+	        }.bind(this));
 	      }
 	    }
-	  }
+	  };
 
 	;__weex_module__.exports.template={
 	  "type": "div",
 	  "classList": [
-	    "item"
+	    "slider-page"
 	  ],
-	  "events": {
-	    "click": "click",
-	    "touchstart": "touchstart",
-	    "touchend": "touchend"
-	  },
-	  "style": {
-	    "backgroundColor": function () {return this.bgColor}
-	  },
 	  "children": [
 	    {
-	      "type": "content"
+	      "type": "slider-item",
+	      "repeat": function () {return this.sliderItems}
 	    }
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "item": {
-	    "paddingTop": 25,
-	    "paddingBottom": 25,
-	    "paddingLeft": 35,
-	    "paddingRight": 35,
-	    "height": 160,
-	    "justifyContent": "center",
-	    "borderBottomWidth": 1,
-	    "borderColor": "#dddddd"
+	  "slider-page": {
+	    "flexDirection": "row",
+	    "justifyContent": "space-between",
+	    "width": 714,
+	    "height": 420
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/38b4457674106dc782e4b6020e6d5a61", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/e21fe0303066e4258a94c39d24d20b21", {"transformerVersion":"0.3.1"}, undefined)
+
+/***/ },
+
+/***/ 14:
+/***/ function(module, exports) {
+
+	;__weex_define__("@weex-component/slider-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	  __weex_module__.exports = {
+	    data: function () {return {
+	      image: '',
+	      link: '',
+	      href: ''
+	    }},
+	    methods: {
+	      ready: function() {
+	        this.href = this.link;
+	      }
+	    }
+	  };
+
+	;__weex_module__.exports.template={
+	  "type": "image",
+	  "classList": [
+	    "slider-item"
+	  ],
+	  "attr": {
+	    "src": function () {return this.image}
+	  }
+	}
+	;__weex_module__.exports.style={
+	  "slider-item": {
+	    "width": 348,
+	    "height": 400
+	  }
+	}
+	})
 
 /***/ }
-/******/ ]);
+
+/******/ });
