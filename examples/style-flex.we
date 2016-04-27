@@ -1,12 +1,12 @@
 <template>
   <scroller>
-    <ui-panel title="Box Model" type="primary">
+    <wxc-panel title="Box Model" type="primary">
       <text class="txt">default is black</text>
-    </ui-panel>
+    </wxc-panel>
 
-    <ui-panel title="Flexbox">
+    <wxc-panel title="Flexbox">
       <text class="txt">default is black</text>
-    </ui-panel>
+    </wxc-panel>
   </scroller>
 </template>
 
