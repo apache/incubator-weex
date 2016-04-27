@@ -11,8 +11,6 @@
     },
     methods: {
       ready: function() {
-        // TODO issue why undefined?
-        console.log(this.data);
       },
       bgColor: function() {
         return this.type == '1' ? '#BEAD92' : '#7BA3A8';
