@@ -1,5 +1,5 @@
 <template>
-  <scroller>
+  <div>
     <wxc-panel title="Box Model" padding-body="0" type="primary">
       <text class="box">Box</text>
     </wxc-panel>
@@ -37,7 +37,7 @@
         </div>
       </wxc-panel>
     </wxc-panel>
-  </scroller>
+  </div>
 </template>
 
 <style>

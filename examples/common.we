@@ -1,6 +1,7 @@
 <template>
   <scroller>
     <style-box></style-box>
+    <style-flex></style-flex>
   </scroller>
 </template>
 

@@ -1,13 +1,9 @@
 <template>
-  <scroller>
-    <wxc-panel title="Box Model" type="primary">
-      <text class="txt">default is black</text>
+  <div>
+    <wxc-panel title="Flexbox" type="primary">
+      <text class="txt">flex</text>
     </wxc-panel>
-
-    <wxc-panel title="Flexbox">
-      <text class="txt">default is black</text>
-    </wxc-panel>
-  </scroller>
+  </div>
 </template>
 
 <style>
