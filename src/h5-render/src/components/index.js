@@ -26,6 +26,7 @@ var components = {
     Weex.registerComponent('root', RootComponent)
     Weex.registerComponent('root', RootComponent)
     Weex.registerComponent('container', Container)
+    Weex.registerComponent('div', Container)
     Weex.registerComponent('image', Image)
     Weex.registerComponent('text', Text)
     Weex.registerComponent('list', List)
