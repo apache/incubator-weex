@@ -307,7 +307,10 @@ public class WXDomPropConstant {
 
   //ListView attrs
   public static final String WX_ATTR_SCOPE = "scope";
-  public static final String WX_ATTR_LOADMOREOFFSET = "loadmoreoffset";
+  public static final String WX_ATTR_LOAD_MORE_OFFSET = "loadmoreoffset";
+
+  //Image recycle attrs
+  public static final String WX_ATTR_RECYCLE_IMG = "recycleImage";
 
   public static final String WX_OVERFLOW = "overflow";
   public static final String WX_OVERFLOW_VISIBLE = "visible";

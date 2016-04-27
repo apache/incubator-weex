@@ -512,14 +512,16 @@ public class WXSDKInstance implements IWXActivityStateListener {
     if (mScrollView == null) {
       return;
     }
-    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (mRecycleImageManager != null) {
-          mRecycleImageManager.loadImage();
+    if (mRecycleImageManager != null && mRecycleImageManager.isRecycleImage()) {
+      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (mRecycleImageManager != null) {
+            mRecycleImageManager.loadImage();
+          }
         }
-      }
-    }, 250);
+      }, 250);
+    }
   }
 
   /********************************
