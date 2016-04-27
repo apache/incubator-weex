@@ -58,10 +58,20 @@ export function init(code, data) {
     'bootstrap',
     'register',
     'render',
+    '__weex_define__', // alias for define
+    '__weex_bootstrap__', // alias for bootstrap
     functionBody
   )
 
-  fn(define, require, document, bootstrap, register, render)
+  fn(
+    define,
+    require,
+    document,
+    bootstrap,
+    register,
+    render,
+    define,
+    bootstrap)
 
   perf.end('run bundle', this.id)
   return result
@@ -127,13 +137,13 @@ export function fireEvent(ref, type, e, domChanges) {
   return new Error(`invalid element reference "${ref}"`)
 }
 
-export function callback(callbackId, data, ifLast) {
+export function callback(callbackId, data, ifKeepAlive) {
   const callback = this.callbacks[callbackId]
 
   if (typeof callback === 'function') {
     callback(data) // data is already a object, @see: lib/framework.js
 
-    if (typeof ifLast === 'undefined' || ifLast === true) {
+    if (typeof ifKeepAlive === 'undefined' || ifKeepAlive === false) {
       this.callbacks[callbackId] = undefined
     }
 

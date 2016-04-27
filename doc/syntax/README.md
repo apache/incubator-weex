@@ -45,7 +45,7 @@ The root element of template: In a `template` tag, there could be only one root 
 
 Only these type of components are allowed for root element.
 
-* [See all built-in components](/components/README.md).
+* [See all built-in components](../components/README.md).
 
 ## `<style>`
 
@@ -68,7 +68,7 @@ First we could write inline `style` attribute in `<template>` element. Second we
 
 Both the two `text` components above have the same `font-size`, which is `64` pixel.
 
-* [See common styles in Weex](/references/common-style.md)
+* [See common styles in Weex](../references/common-style.md)
 
 ## `<script>`
 
@@ -101,8 +101,8 @@ The syntax is JavaScript (ES5) and it describes data and behavior of a Weex page
 </script>
 ```
 
-This piece of `<script>` code will generate some component options and assign it to `module.exports`. The three text components above respectively shows the current datetime, 'Alibaba' and 'Weex Team'. The `data` in the `<script>` code stores component data which could be used for [data-binding](/syntax/data-binding.md) in the `<template>`. When data changes, the bound value will be updated automatically. Also it could be read and written by `this.x` in its methods.
+This piece of `<script>` code will generate some component options and assign it to `module.exports`. The three text components above respectively shows the current datetime, 'Alibaba' and 'Weex Team'. The `data` in the `<script>` code stores component data which could be used for [data-binding](./data-binding.md) in the `<template>`. When data changes, the bound value will be updated automatically. Also it could be read and written by `this.x` in its methods.
 
-* [See component definitions references](/references/component-defs.md)
+* [See component definitions references](../references/component-defs.md)
 
-Next, let's have a look at [data-binding](/syntax/data-binding.md).
+Next, let's have a look at [data-binding](./data-binding.md).
