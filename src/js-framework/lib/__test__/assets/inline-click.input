@@ -21,7 +21,7 @@ module.exports = {
     {
       "type": "text",
       "events": {
-        "click": function (EVENT) {this.clicked('Hello World2',this.$event,EVENT)}
+        "click": function ($event) {this.clicked('Hello World2', $event)}
       },
       "attr": {
         "value": function () {return this.text}
