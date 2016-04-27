@@ -1,6 +1,5 @@
 <template>
-  <scroller class="body">
-
+  <scroller>
     <wxc-panel title="Title Levels">
       <wxc-hn repeat="{{levels}}" level="{{level}}" value="H{{level}}, Level {{level}}"></wxc-hn>
     </wxc-panel>
@@ -11,7 +10,7 @@
         <wxc-button type="{{type}}" size="middle" value="{{type}}" onclick="{{clicked}}"
                     style="margin-left:10px"></wxc-button>
         <wxc-button type="{{type}}" size="small" value="{{type}}" onclick="{{clicked}}"
-                    style="margin-left:10px"></wxc-button>
+                    style="margin-left:10px; width:130px;"></wxc-button>
       </div>
 
       <!--<div style="flex-direction: row; margin-top: 12px">-->
@@ -38,7 +37,6 @@
       <wxc-tip repeat="{{tips}}" style="margin-bottom: 20px;"
                value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></wxc-tip>
     </wxc-panel>
-
   </scroller>
 </template>
 
