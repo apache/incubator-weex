@@ -234,9 +234,9 @@ public class WXNavigatorActivity extends AppCompatActivity {
       getSupportActionBar().hide();
     final Intent intent=getIntent();
     instance = new WXSDKInstance(WXNavigatorActivity.this);
-    instance.setImgLoaderAdapter(
-            WXSDKManager.getInstance().getSDKInstance(
-                    intent.getStringExtra(INSTANCE_ID)).getImgLoaderAdapter());
+//    instance.setImgLoaderAdapter(
+//            WXSDKManager.getInstance().getSDKInstance(
+//                    intent.getStringExtra(INSTANCE_ID)).getImgLoaderAdapter());
     instance.registerRenderListener(new IWXRenderListener() {
       @Override
       public void onViewCreated(WXSDKInstance instance, View view) {

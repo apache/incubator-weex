@@ -260,7 +260,6 @@ public class WXEmbed extends WXDiv {
         WXLogUtils.e("WXEmbed", "Error code :" + errCode + ",\n error message :" + msg);
       }
     });
-    sdkInstance.setImgLoaderAdapter(mInstance.getImgLoaderAdapter());
     ViewGroup.LayoutParams layoutParams = getView().getLayoutParams();
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
                        src,
