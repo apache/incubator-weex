@@ -44,40 +44,101 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/b2070eb4e406e0aa00c361adbda2f4ab", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(10);
+	;__weex_define__("@weex-component/4b0da5e5b8d3c6608a205bdff6b0e32c", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
+	  __webpack_require__(1);
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      items: [
-	        {name: 'hello', title: 'Hello World'},
-	        {name: 'image-demo', title: 'Image'},
-	        {name: 'text-demo', title: 'Text'},
-	        {name: 'common', title: 'Common Style'},
-	        {name: 'list-basic', title: 'List (Basic)'},
-	        {name: 'list-demo', title: 'List (Advanced)'},
-	        {name: 'slider-demo', title: 'Slider'},
-	        {name: 'animation', title: 'Animation'},
-	        {name: 'modal', title: 'Modal'},
-	        {name: 'video-demo', title: 'Video'},
-	        {name: 'calculator', title: 'Calculator'},
-	        {name: 'ui', title: 'UI Gallery'},
-	        {name: 'template', title: 'Example Template'}
-	      ]
+	      img: '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg'
 	    }}
 	  }
 
 	;__weex_module__.exports.template={
-	  "type": "example-list",
-	  "attr": {
-	    "items": function () {return this.items},
-	    "dir": "examples"
+	  "type": "scroller",
+	  "children": [
+	    {
+	      "type": "ui-panel",
+	      "attr": {
+	        "title": "width x height = 400 x 400"
+	      },
+	      "children": [
+	        {
+	          "type": "ui-tip",
+	          "attr": {
+	            "type": "warning",
+	            "value": "Weex screen width is 750"
+	          },
+	          "style": {
+	            "marginBottom": 20
+	          }
+	        },
+	        {
+	          "type": "image",
+	          "classList": [
+	            "img"
+	          ],
+	          "style": {
+	            "width": 400,
+	            "height": 400
+	          },
+	          "attr": {
+	            "src": function () {return this.img}
+	          }
+	        }
+	      ]
+	    },
+	    {
+	      "type": "ui-panel",
+	      "attr": {
+	        "title": "200 x 200"
+	      },
+	      "children": [
+	        {
+	          "type": "image",
+	          "classList": [
+	            "img"
+	          ],
+	          "style": {
+	            "width": 200,
+	            "height": 200
+	          },
+	          "attr": {
+	            "src": function () {return this.img}
+	          }
+	        }
+	      ]
+	    },
+	    {
+	      "type": "ui-panel",
+	      "attr": {
+	        "title": "100 x 100"
+	      },
+	      "children": [
+	        {
+	          "type": "image",
+	          "classList": [
+	            "img"
+	          ],
+	          "style": {
+	            "width": 100,
+	            "height": 100
+	          },
+	          "attr": {
+	            "src": function () {return this.img}
+	          }
+	        }
+	      ]
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "img": {
+	    "marginBottom": 20
 	  }
 	}
-	;__weex_module__.exports.style={}
 	})
-	;__weex_bootstrap__("@weex-component/b2070eb4e406e0aa00c361adbda2f4ab", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/4b0da5e5b8d3c6608a205bdff6b0e32c", {"transformerVersion":"0.3.1"}, undefined)
 
 /***/ },
 /* 1 */
@@ -524,132 +585,6 @@
 	    "color": "#a94442"
 	  }
 	}
-	})
-
-/***/ },
-/* 7 */,
-/* 8 */,
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	;__weex_define__("@weex-component/example-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;
-	  __webpack_require__(1);
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      title: '',
-	      url: ''
-	    }},
-	    methods: {
-	      redirect: function() {
-	        this.$openURL(this.url);
-	      }
-	    }
-	  }
-
-	;__weex_module__.exports.template={
-	  "type": "ui-list-item",
-	  "attr": {
-	    "click": function () {return this.redirect}
-	  },
-	  "children": [
-	    {
-	      "type": "text",
-	      "classList": [
-	        "item-txt"
-	      ],
-	      "attr": {
-	        "value": function () {return this.title}
-	      }
-	    }
-	  ]
-	}
-	;__weex_module__.exports.style={
-	  "item-txt": {
-	    "fontSize": 48,
-	    "color": "#555555"
-	  }
-	}
-	})
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	;__weex_define__("@weex-component/example-list", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(9);
-
-	;
-	  __webpack_require__(1);
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      dir: 'examples',
-	      items: [
-	        {name: 'hello', title: 'Hello World', url: ''}
-	      ]
-	    }},
-	    created: function() {
-	      var bundleUrl = this.$getConfig().bundleUrl;
-	      console.log('hit', bundleUrl);
-	      var nativeBase;
-	      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
-	      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-	      if (isAndroidAssets) {
-	        nativeBase = 'file://assets/';
-	      }
-	      else if (isiOSAssets) {
-	        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-	      }
-	      else {
-	        var host = 'localhost:12580';
-	        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-	        if (matches && matches.length >= 2) {
-	          host = matches[1];
-	        }
-	        nativeBase = '//' + host + '/' + this.dir + '/build/';
-	      }
-	      var h5Base = './index.html?page=./' + this.dir + '/build/';
-	      // in Native
-	      var base = nativeBase;
-	      if (typeof window === 'object') {
-	        // in Browser or WebView
-	        base = h5Base;
-	      }
-
-	      for (var i in this.items) {
-	        var item = this.items[i];
-	        if (!item.url) {
-	          item.url = base + item.name + '.js';
-	        }
-	      }
-	      // see log in Android Logcat
-	      if (this.items.length) console.log('hit', this.items[0].url);
-	    }
-	  }
-
-	;__weex_module__.exports.template={
-	  "type": "list",
-	  "children": [
-	    {
-	      "type": "cell",
-	      "append": "tree",
-	      "repeat": function () {return this.items},
-	      "children": [
-	        {
-	          "type": "example-list-item",
-	          "attr": {
-	            "title": function () {return this.title},
-	            "url": function () {return this.url}
-	          }
-	        }
-	      ]
-	    }
-	  ]
-	}
-	;__weex_module__.exports.style={}
 	})
 
 /***/ }

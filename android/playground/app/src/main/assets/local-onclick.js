@@ -44,21 +44,36 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/32cf12d9ab61a354757287ad95ca966c", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/de562f46a417f3110ded06161e4a46db", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	  __weex_module__.exports = {
+	    methods: {
+	      clicked: function() {
+	        this.$call('modal', 'toast', {'message': 'clicked!'});
+	      }  
+	    }
+	  }
 
 	;__weex_module__.exports.template={
-	  "type": "div",
+	  "type": "container",
 	  "children": [
 	    {
-	      "type": "text",
+	      "type": "foo",
+	      "events": {
+	        "click": "clicked"
+	      }
+	    },
+	    {
+	      "type": "bar",
 	      "attr": {
-	        "value": "Form"
+	        "click": function () {return this.clicked}
 	      }
 	    }
 	  ]
 	}
 	})
-	;__weex_bootstrap__("@weex-component/32cf12d9ab61a354757287ad95ca966c", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/de562f46a417f3110ded06161e4a46db", {"transformerVersion":"0.3.1"}, undefined)
 
 /***/ }
 /******/ ]);
