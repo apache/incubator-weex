@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ui-panel title="Flex" type="primary">
+    <wxc-panel title="Flexbox" type="primary">
       <text class="txt">flex</text>
-    </ui-panel>
+    </wxc-panel>
   </div>
 </template>
 
@@ -11,5 +11,5 @@
 </style>
 
 <script>
-  require('./weex-ui');
+  require('weex-components');
 </script>

@@ -1,44 +1,44 @@
 <template>
   <scroller class="body">
 
-    <ui-panel title="Title Levels">
-      <ui-hn repeat="{{levels}}" level="{{level}}" value="H{{level}}, Level {{level}}"></ui-hn>
-    </ui-panel>
+    <wxc-panel title="Title Levels">
+      <wxc-hn repeat="{{levels}}" level="{{level}}" value="H{{level}}, Level {{level}}"></wxc-hn>
+    </wxc-panel>
 
-    <ui-panel title="Buttons" append="tree">
+    <wxc-panel title="Buttons" append="tree">
       <div style="flex-direction: row; margin-top: 12px" repeat="{{buttons}}">
-        <ui-button type="{{type}}" size="large" value="{{type}}" click="{{clicked}}" style=""></ui-button>
-        <ui-button type="{{type}}" size="middle" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></ui-button>
-        <ui-button type="{{type}}" size="small" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></ui-button>
+        <wxc-button type="{{type}}" size="large" value="{{type}}" click="{{clicked}}" style=""></wxc-button>
+        <wxc-button type="{{type}}" size="middle" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></wxc-button>
+        <wxc-button type="{{type}}" size="small" value="{{type}}" click="{{clicked}}" style="margin-left:10px"></wxc-button>
       </div>
 
       <div style="flex-direction: row; margin-top: 12px">
-        <ui-button disabled="{{true}}" type="" size="large" value="Disabled" click="{{clicked}}"></ui-button>
-        <ui-button disabled="{{false}}" type="primary" size="large" value="Enabled" click="{{clicked}}" style="margin-left: 12px"></ui-button>
+        <wxc-button disabled="{{true}}" type="" size="large" value="Disabled" click="{{clicked}}"></wxc-button>
+        <wxc-button disabled="{{false}}" type="primary" size="large" value="Enabled" click="{{clicked}}" style="margin-left: 12px"></wxc-button>
       </div>
-    </ui-panel>
+    </wxc-panel>
 
-    <ui-panel title="Panels">
-      <ui-panel repeat="{{panels}}" title="Panels-{{type}}" type="{{type}}" border="1" style="margin-left: 12px;margin-right: 12px;">
+    <wxc-panel title="Panels">
+      <wxc-panel repeat="{{panels}}" title="Panels-{{type}}" type="{{type}}" border="1" style="margin-left: 12px;margin-right: 12px;">
         <text>Panels {{type}} content. Panels {{type}} content. Panels {{type}} content.</text>
-      </ui-panel>
-    </ui-panel>
+      </wxc-panel>
+    </wxc-panel>
 
-    <ui-panel title="List">
-      <ui-list-item repeat="{{tips}}" click="{{clicked}}">
+    <wxc-panel title="List">
+      <wxc-list-item repeat="{{tips}}" click="{{clicked}}">
         <text class="item-txt">{{type}}</text>
-      </ui-list-item>
-    </ui-panel>
+      </wxc-list-item>
+    </wxc-panel>
 
-    <ui-panel title="Tips">
-      <ui-tip repeat="{{tips}}" style="margin-bottom: 20px;" value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></ui-tip>
-    </ui-panel>
+    <wxc-panel title="Tips">
+      <wxc-tip repeat="{{tips}}" style="margin-bottom: 20px;" value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></wxc-tip>
+    </wxc-panel>
 
   </scroller>
 </template>
 
 <script>
-  require('./weex-ui');
+  require('weex-components');
 
   module.exports = {
     data: {
