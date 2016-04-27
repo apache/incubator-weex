@@ -4,6 +4,7 @@ var Atomic = require('./component')
 var utils = require('../utils')
 
 var DEFAULT_FONT_SIZE = 32
+var DEFAULT_TEXT_OVERFLOW = 'ellipsis'
 
 // attr
 //  - value: text content.
@@ -77,10 +78,15 @@ Text.prototype.style = utils.extend(Object.create(Atomic.prototype.style), {
       this.textNode.style.overflow = 'visible'
       this.textNode.style.webkitLineClamp = ''
     } else {
+      var style = this.data ? this.data.style : null
       this.textNode.style.overflow = 'hidden'
-      this.textNode.style.textOverflow = 'ellipsis'
+      this.textNode.style.textOverflow = style ? style.textOverflow : DEFAULT_TEXT_OVERFLOW
       this.textNode.style.webkitLineClamp = val
     }
+  },
+
+  textOverflow: function (val) {
+    this.textNode.style.textOverflow = val
   }
 
 })
