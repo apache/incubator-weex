@@ -115,12 +115,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXLogUtils;
+
+import org.json.JSONObject;
 
 public class WXNavigatorModule extends WXModule {
 
@@ -131,8 +133,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void push(String param, final String callbackId) {
 
-    if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-      if (mWXSDKInstance.getActivityNavBarSetter().push(param)) {
+    if (WXSDKEngine.getActivityNavBarSetter() != null) {
+      if (WXSDKEngine.getActivityNavBarSetter().push(param)) {
         WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                WXConst.MSG_SUCCESS);
         return;
@@ -140,8 +142,8 @@ public class WXNavigatorModule extends WXModule {
     }
 
     try {
-      JSONObject jsonObject = JSONObject.parseObject(param);
-      String url = jsonObject.get(URL).toString();
+      JSONObject jsonObject = new JSONObject(param);
+      String url = jsonObject.optString(URL,"");
       if (!TextUtils.isEmpty(url)) {
         Uri rawUri = Uri.parse(url);
         String scheme = rawUri.getScheme();
@@ -156,7 +158,7 @@ public class WXNavigatorModule extends WXModule {
         WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                WXConst.MSG_SUCCESS);
       }
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
       WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
       WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                              WXConst.MSG_FAILED);
@@ -166,8 +168,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void pop(String param, final String callbackId) {
 
-    if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-      if (mWXSDKInstance.getActivityNavBarSetter().pop(param)) {
+    if (WXSDKEngine.getActivityNavBarSetter() != null) {
+      if (WXSDKEngine.getActivityNavBarSetter().pop(param)) {
         WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                WXConst.MSG_SUCCESS);
         return;
@@ -181,8 +183,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void setNavBarRightItem(String param, final String callbackId) {
     if (!TextUtils.isEmpty(param)) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().setNavBarRightItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().setNavBarRightItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -196,8 +198,8 @@ public class WXNavigatorModule extends WXModule {
 
   @WXModuleAnno
   public void clearNavBarRightItem(String param, final String callbackId) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().clearNavBarRightItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().clearNavBarRightItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -211,8 +213,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void setNavBarLeftItem(String param, final String callbackId) {
     if (!TextUtils.isEmpty(param)) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().setNavBarLeftItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().setNavBarLeftItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -227,8 +229,8 @@ public class WXNavigatorModule extends WXModule {
 
   @WXModuleAnno
   public void clearNavBarLeftItem(String param, final String callbackId) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().clearNavBarLeftItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter()!= null) {
+        if (WXSDKEngine.getActivityNavBarSetter().clearNavBarLeftItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -242,8 +244,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void setNavBarMoreItem(String param, final String callbackId) {
     if (!TextUtils.isEmpty(param)) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().setNavBarMoreItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().setNavBarMoreItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -258,8 +260,8 @@ public class WXNavigatorModule extends WXModule {
 
   @WXModuleAnno
   public void clearNavBarMoreItem(String param, final String callbackId) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().clearNavBarMoreItem(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().clearNavBarMoreItem(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;
@@ -273,8 +275,8 @@ public class WXNavigatorModule extends WXModule {
   @WXModuleAnno
   public void setNavBarTitle(String param, final String callbackId) {
     if (!TextUtils.isEmpty(param)) {
-      if (mWXSDKInstance.getActivityNavBarSetter() != null) {
-        if (mWXSDKInstance.getActivityNavBarSetter().setNavBarTitle(param)) {
+      if (WXSDKEngine.getActivityNavBarSetter() != null) {
+        if (WXSDKEngine.getActivityNavBarSetter().setNavBarTitle(param)) {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                  WXConst.MSG_SUCCESS);
           return;

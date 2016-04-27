@@ -257,16 +257,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
 
-
-  public IActivityNavBarSetter getActivityNavBarSetter() {
-    return mActivityNavBarSetter;
-  }
-
-  public void setActivityNavBarSetter(IActivityNavBarSetter mActivityNavBarSetter) {
-    this.mActivityNavBarSetter = mActivityNavBarSetter;
-  }
-
-  private IActivityNavBarSetter mActivityNavBarSetter;
   /**
    * Render strategy.
    */
@@ -299,17 +289,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
     init(context);
   }
 
-  /**
-   * WXSDKInstance constructor
-   * @param context
-   * @param activityNavBarSetter the implement of activityNavBarSetter
-   */
-  public WXSDKInstance(Context context,IActivityNavBarSetter activityNavBarSetter) {
-     init(context);
-     if(activityNavBarSetter!=null){
-       mActivityNavBarSetter = activityNavBarSetter;
-     }
-  }
 
   public void init(Context context) {
     mContext = context;

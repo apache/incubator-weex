@@ -209,6 +209,7 @@ import android.app.Application;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.WXException;
@@ -397,27 +398,37 @@ public class WXSDKEngine {
     WXEnvironment.addCustomOptions(key, value);
   }
 
-  public IWXUserTrackAdapter getIWXUserTrackAdapter() {
+  public static IWXUserTrackAdapter getIWXUserTrackAdapter() {
     return WXSDKManager.getInstance().getIWXUserTrackAdapter();
   }
 
-  public void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
+  public static void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
     WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
   }
 
-  public IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
+  public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
   }
 
-  public void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
+  public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
     WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
   }
 
-  public IWXHttpAdapter getIWXHttpAdapter() {
+  public static IWXHttpAdapter getIWXHttpAdapter() {
     return WXSDKManager.getInstance().getIWXHttpAdapter();
   }
 
-  public void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
+  public static void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
     WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
   }
+
+  public static IActivityNavBarSetter getActivityNavBarSetter() {
+    return  WXSDKManager.getInstance().getActivityNavBarSetter();
+  }
+
+  public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
+    WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
+  }
+
+
 }
