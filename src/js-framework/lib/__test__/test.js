@@ -465,6 +465,70 @@ describe('test input and output', function () {
     delete allDocs[name]
   })
 
+  it('repeat with array no-kv case', function () {
+    var name = 'repeat-array-no-kv'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+    expect(actual).eql(expected)
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
+  it('repeat with array v case', function () {
+    var name = 'repeat-array-v'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+    expect(actual).eql(expected)
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
+  it('repeat with array kv case', function () {
+    var name = 'repeat-array-kv'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+    expect(actual).eql(expected)
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
+  it('repeat with array non-obj case', function () {
+    var name = 'repeat-array-non-obj'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+    expect(actual).eql(expected)
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
   it('if-refresh case', function () {
     var name = 'if-refresh'
     var inputCode = readInput(name)
@@ -548,10 +612,36 @@ describe('test input and output', function () {
     var expected = eval('(' + outputCode + ')')
     var actual = doc.toJSON()
     expect(actual).eql(expected)
+
     framework.callJS(name, [{
       method: 'fireEvent',
       args: [doc.body.children[0].ref, 'click', {}]
     }])
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
+  it('inline click case', function () {
+    var name = 'inline-click'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+
+    expect(actual).eql(expected)
+
+    framework.callJS(name, [{
+      method: 'fireEvent',
+      args: [doc.body.children[0].ref, 'click', {}]
+    }])
+
+    expected.children[0].attr.value = 'Hello World2'
+    expect(doc.toJSON()).eql(expected)
 
     framework.destroyInstance(name)
     delete allDocs[name]
