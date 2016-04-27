@@ -51,7 +51,7 @@
         }
       }
       // see log in Android Logcat
-      if (this.items.length) console.log('hit', this.items[0].url); 
+      if (this.items.length) console.log('hit', this.items[0].url);
     }
   }
 </script>
