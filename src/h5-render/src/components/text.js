@@ -80,7 +80,9 @@ Text.prototype.style = utils.extend(Object.create(Atomic.prototype.style), {
     } else {
       var style = this.data ? this.data.style : null
       this.textNode.style.overflow = 'hidden'
-      this.textNode.style.textOverflow = style ? style.textOverflow : DEFAULT_TEXT_OVERFLOW
+      this.textNode.style.textOverflow = style
+        ? style.textOverflow
+        : DEFAULT_TEXT_OVERFLOW
       this.textNode.style.webkitLineClamp = val
     }
   },
