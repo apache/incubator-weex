@@ -238,7 +238,7 @@ public class WXText extends WXComponent implements IWXRecyclerViewChild {
   @Override
   protected void initView() {
     mHost = new WXTextView(mContext);
-    getView().setEllipsize(TruncateAt.END);
+//    getView().setEllipsize(TruncateAt.END);
     //Remove padding for ascents and descents
     getView().setIncludeFontPadding(false);
   }
@@ -303,6 +303,15 @@ public class WXText extends WXComponent implements IWXRecyclerViewChild {
       temp.setMaxLines(lines);
     } else if (lines == 1) {
       temp.setSingleLine(true);
+    }
+  }
+
+  @WXComponentProp(name = WXDomPropConstant.WX_TEXT_OVERFLOW)
+  public void setTextOverFlow(String textOverFlow) {
+    TextView temp = getView();
+    if(textOverFlow.equals(WXDomPropConstant.WX_TEXT_ELLIPSIS)){
+      temp.setSingleLine(true);
+      temp.setEllipsize(TruncateAt.END);
     }
   }
 }

@@ -277,6 +277,10 @@ public class WXDomPropConstant {
   public static final String WX_LINES = "lines";
   public static final String WX_FONTFAMILY = "fontFamily";
 
+  public static final String WX_TEXT_OVERFLOW = "textOverflow";
+  public static final String WX_TEXT_ELLIPSIS = "ellipsis";
+  public static final String WX_TEXT_CLIP = "clip";
+
   public static final String WX_ATTR_DISABLED = "disabled";
 
   public static final String WX_ATTR_PREFIX = "prefix";
