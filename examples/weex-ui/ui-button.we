@@ -12,14 +12,13 @@
       type: 'default',
       size: 'large',
       value: '',
-      // FIXME wait #1, to fix #60
       click: null,
       disabled: false
     },
     methods: {
       clicked: function(ev) {
         if (this.disabled) return;
-        if (this.click) this.click(ev);
+        this.click(ev);
       }
     }
   }

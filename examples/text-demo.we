@@ -47,3 +47,7 @@
     font-size: 40px;
   }
 </style>
+
+<script>
+  require('./weex-ui');
+</script>

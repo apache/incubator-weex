@@ -7,6 +7,7 @@
 </template>
 
 <script>
+  require('./weex-ui');
   module.exports = {
     data: {
       dir: 'examples',

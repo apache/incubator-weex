@@ -17,7 +17,7 @@
         <div style="flex-direction: row;">
           <style-item style="border-style: solid;border-width: 4px;border-color: #333;" value=""></style-item>
           <style-item style="border-style: solid;border-width: 4px;border-color: #ddd;" value=""
-                      type=""></style-item> 
+                      type=""></style-item>
           <style-item style="border-style: solid;border-width: 4px;border-color: red;" value=""></style-item>
         </div>
       </ui-panel>
@@ -60,6 +60,7 @@
 </style>
 
 <script>
+  require('./weex-ui');
   module.exports = {
     data: {
       size: 40

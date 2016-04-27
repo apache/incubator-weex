@@ -44,21 +44,55 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/32cf12d9ab61a354757287ad95ca966c", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/b47922e178c802e32fe49b4657b40ee2", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
-	;__weex_module__.exports.template={
-	  "type": "div",
-	  "children": [
-	    {
-	      "type": "text",
-	      "attr": {
-	        "value": "Form"
+	;
+	  __weex_module__.exports = {
+	    data: function () {return {
+	      value: '',
+	      type: '0' // 0, 1
+	    }},
+	    methods: {
+	      ready: function() {
+	        // TODO issue why undefined?
+	        console.log(this.data);
+	      },
+	      bgColor: function() {
+	        return this.type == '1' ? '#BEAD92' : '#7BA3A8';
 	      }
 	    }
-	  ]
+	  }
+
+	;__weex_module__.exports.template={
+	  "type": "text",
+	  "classList": [
+	    "item",
+	    "txt"
+	  ],
+	  "attr": {
+	    "value": function () {return this.value}
+	  },
+	  "style": {
+	    "backgroundColor": function () {return this.bgColor()}
+	  }
+	}
+	;__weex_module__.exports.style={
+	  "item": {
+	    "marginRight": 10,
+	    "marginBottom": 10,
+	    "width": 160,
+	    "height": 75,
+	    "paddingLeft": 8,
+	    "paddingRight": 8,
+	    "paddingTop": 8,
+	    "paddingBottom": 8
+	  },
+	  "txt": {
+	    "color": "#eeeeee"
+	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/32cf12d9ab61a354757287ad95ca966c", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/b47922e178c802e32fe49b4657b40ee2", {"transformerVersion":"0.3.1"}, undefined)
 
 /***/ }
 /******/ ]);

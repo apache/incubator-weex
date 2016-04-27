@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/32cf12d9ab61a354757287ad95ca966c", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/2494851eeab8598c27ff83ab9195bf2c", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;__weex_module__.exports.template={
 	  "type": "div",
@@ -52,13 +52,13 @@
 	    {
 	      "type": "text",
 	      "attr": {
-	        "value": "Form"
+	        "value": "ok"
 	      }
 	    }
 	  ]
 	}
 	})
-	;__weex_bootstrap__("@weex-component/32cf12d9ab61a354757287ad95ca966c", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/2494851eeab8598c27ff83ab9195bf2c", {"transformerVersion":"0.3.1"}, undefined)
 
 /***/ }
 /******/ ]);

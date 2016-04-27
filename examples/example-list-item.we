@@ -12,7 +12,7 @@
 </style>
 
 <script>
-  require('weex-ui/ui-list-item.we');
+  require('./weex-ui');
   module.exports = {
     data: {
       title: '',

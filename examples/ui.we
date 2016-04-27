@@ -38,7 +38,7 @@
 </template>
 
 <script>
-  require('weex-ui');
+  require('./weex-ui');
 
   module.exports = {
     data: {
