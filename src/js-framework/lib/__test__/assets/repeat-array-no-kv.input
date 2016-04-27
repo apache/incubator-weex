@@ -1,11 +1,11 @@
-define('@weex-component/repeat-index', function (require, exports, module) {
+define('@weex-component/repeat-array-no-kv', function (require, exports, module) {
 
 ;
   module.exports = {
     data: function () {return {
       titlelist: [
-        {title: 'Hello World1'},
-        {title: 'Hello World2'}
+        {text: 'Hello World1'},
+        {text: 'Hello World2'}
       ]
     }}
   }
@@ -23,12 +23,14 @@ define('@weex-component/repeat-index', function (require, exports, module) {
   "children": [
     {
       "type": "text",
-      "repeat": function () {return this.titlelist},
+      "repeat": {
+        expression: function() { return this.titlelist }
+      },
       "classList": [
         "title"
       ],
       "attr": {
-        "value": function () {return this.$index + ': ' + this.title}
+        "value": function () {return this.$index + ': ' + this.$value.text}
       }
     }
   ]
@@ -38,4 +40,4 @@ define('@weex-component/repeat-index', function (require, exports, module) {
 
 // require module
 
-bootstrap('@weex-component/repeat-index')
+bootstrap('@weex-component/repeat-array-no-kv')
