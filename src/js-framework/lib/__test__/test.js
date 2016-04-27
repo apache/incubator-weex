@@ -718,8 +718,22 @@ describe('test input and output', function () {
     delete allDocs[name]
   })
 
-  it('a wrong transformer version', () => {
+  it('a less wrong transformer version', () => {
     var name = 'transformer2'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    var result = framework.createInstance(name, inputCode)
+    expect(result).to.be.an.instanceof(Error)
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
+
+  it('a bigger wrong transformer version', () => {
+    var name = 'transformer3'
     var inputCode = readInput(name)
     var outputCode = readOutput(name)
     var doc = new Document(name)
