@@ -1,6 +1,8 @@
 # Weex Components
 
-A group of simple and useful components for [Weex](https://github.com/alibaba/weex).
+A group of simple and useful components for [Weex](https://github.com/alibaba/weex). See [examples](https://github.com/alibaba/weex/blob/component/examples/ui.we) for more details. 
+
+Reference: 
 
 ## Button
  
