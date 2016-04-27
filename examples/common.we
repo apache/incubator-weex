@@ -1,12 +1,10 @@
 <template>
   <scroller>
     <style-box></style-box>
+    <style-flex></style-flex>
   </scroller>
 </template>
 
-<style>
-  .txt {
-    margin-bottom: 12px;
-    font-size: 40px;
-  }
-</style>
+<script>
+
+</script>

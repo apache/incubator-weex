@@ -1,18 +1,15 @@
 <template>
-  <scroller>
-    <ui-panel title="Box Model" type="primary">
-      <text class="txt">default is black</text>
+  <div>
+    <ui-panel title="Flex" type="primary">
+      <text class="txt">flex</text>
     </ui-panel>
-
-    <ui-panel title="Flexbox">
-      <text class="txt">default is black</text>
-    </ui-panel>
-  </scroller>
+  </div>
 </template>
 
 <style>
-  .txt {
-    margin-bottom: 12px;
-    font-size: 40px;
-  }
+
 </style>
+
+<script>
+  require('./weex-ui');
+</script>
