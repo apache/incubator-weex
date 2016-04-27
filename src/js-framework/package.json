@@ -70,6 +70,6 @@
     "webpack": "~1.12.12"
   },
   "optionalDependencies": {
-    "weex-transformer": "~0.3"
+    "weex-transformer": ">=0.1.7 <0.4"
   }
 }
