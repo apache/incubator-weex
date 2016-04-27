@@ -6,7 +6,7 @@ Reference:
 
 ## Button
  
-[**wxc-button**](./src/wxc-button.we)
+**wxc-button**
 
 * Attributes: 
     * `type`, ***default*** | primary | success | info | warning | danger | link 
@@ -21,7 +21,7 @@ Reference:
 
 ## Panel
 
-[**wxc-panel**](./src/wxc-panel.we)
+**wxc-panel**
 
 * Attributes: 
     * `type`, ***default*** | primary | success | info | warning | danger 
@@ -33,7 +33,7 @@ Reference:
     
 ## Hn
  
-[**wxc-hn**](./src/wxc-hn.we)
+**wxc-hn**
 
 * Attributes: 
     * `level`, ***1*** | 2 | 3
@@ -43,7 +43,7 @@ Reference:
 
 ## Tip
  
-[**wxc-tip**](./src/wxc-tip.we)
+**wxc-tip**
 
 * Attributes: 
     * `type`, ***success*** | info | warning | danger 
@@ -56,7 +56,7 @@ Reference:
 
 ## List
  
-[**wxc-list-item**](./src/wxc-list-item.we)
+**wxc-list-item**
 
 * Event: 
     * `click`
