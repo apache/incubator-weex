@@ -500,14 +500,13 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
         scroller.bindDisappearEvent(this);
       }
 
-      if(TextUtils.equals(type,WXEventType.APPEAR) && getParent() instanceof WXListComponent){
-        ((WXListComponent)getParent()).bindAppearComponents(this);
+      if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
         registerAppearEvent=true;
       }
-      if(TextUtils.equals(type,WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
-        ((WXListComponent)getParent()).unbindAppearComponents(this);
-        registerAppearEvent=false;
+      if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
+        registerAppearEvent=true;
       }
+
     }
   }
 
@@ -642,6 +641,15 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     }
     if (type.equals(WXEventType.DISAPPEAR) && scroller != null) {
       scroller.unbindDisappearEvent(this);
+    }
+
+    if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
+      ((WXListComponent)getParent()).unbindAppearComponents(this);
+      registerAppearEvent=false;
+    }
+    if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
+      ((WXListComponent)getParent()).unbindAppearComponents(this);
+      registerAppearEvent=false;
     }
   }
 

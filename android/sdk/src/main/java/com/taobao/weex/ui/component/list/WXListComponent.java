@@ -211,6 +211,10 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "addChild child at " + index);
     }
+
+    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
+      mAppearComponents.put(index,child);
+    }
   }
 
   /**
@@ -225,6 +229,9 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
     recyclerViewBaseAdapter.notifyItemInserted(adapterPosition);
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "addChild child at " + index);
+    }
+    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
+      mAppearComponents.put(adapterPosition, child);
     }
   }
 
@@ -479,9 +486,7 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
     }
 
   }
-  public void bindAppearComponents(WXComponent component){
-    mAppearComponents.put(mChildren.indexOf(component), component);
-  }
+
   public void unbindAppearComponents(WXComponent component){
     mAppearComponents.remove(mAppearComponents.indexOfValue(component));
   }
