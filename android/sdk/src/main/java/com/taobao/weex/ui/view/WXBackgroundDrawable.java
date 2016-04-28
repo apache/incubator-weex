@@ -117,6 +117,12 @@ public class WXBackgroundDrawable extends Drawable {
     }
   }
 
+    static Paint debugPaint = new Paint();
+    static {
+      debugPaint.setColor(Color.GREEN);
+      debugPaint.setStyle(Paint.Style.STROKE);
+    }
+
   private void drawRectangularBackgroundWithBorders(Canvas canvas) {
     int useColor = WXViewUtils.multiplyColorAlpha(mColor, mAlpha);
     Rect bounds = getBounds();
