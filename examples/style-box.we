@@ -21,7 +21,6 @@
         </div>
       </wxc-panel>
       <wxc-panel title="border-style" type="">
-        <!--TODO -->
         <wxc-tip type="warning" value="just support four edges" style="margin-bottom: 10px;"></wxc-tip>
         <div style="flex-direction: row;">
           <style-item style="border-style: solid;border-width: 4px;border-color: #333;" value=""></style-item>
@@ -31,7 +30,7 @@
       </wxc-panel>
       <wxc-panel title="border-radius" type="">
         <div style="flex-direction: row;">
-          <style-item style="width: 75px;border-radius:37.5px" value=""></style-item>
+          <style-item style="width: 75px;border-radius:38px" value=""></style-item>
           <style-item style="border-radius:20px" value=""></style-item>
           <style-item style="border-top-left-radius:20px;border-top-right-radius:20px" value=""></style-item>
           <style-item style="border-bottom-left-radius:20px;border-bottom-right-radius:20px" value=""></style-item>
