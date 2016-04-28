@@ -1,5 +1,6 @@
 # Created by IDE
 .idea/
+*.iml
 
 # Created by Builder
 examples/build
