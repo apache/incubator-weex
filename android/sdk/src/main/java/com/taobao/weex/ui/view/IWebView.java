@@ -208,7 +208,7 @@ import android.view.View;
 
 public interface IWebView {
     public View getView();
-    public void destory();
+    public void destroy();
     public void loadUrl(String url);
     public void reload();
     public void goBack();

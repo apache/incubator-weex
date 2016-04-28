@@ -264,7 +264,7 @@ public class WXWebView implements IWebView {
     }
 
     @Override
-    public void destory() {
+    public void destroy() {
         if (getWebView() != null) {
             getWebView().removeAllViews();
             getWebView().destroy();

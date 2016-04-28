@@ -217,13 +217,22 @@ import java.util.Map;
 
 public class WXWeb extends WXComponent {
 
-    private IWebView mWebView;
+    protected IWebView mWebView;
     private String mUrl;
     private boolean mUrlChanged;
 
     public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
         super(instance, dom, parent, instanceId, isLazy);
+        createView();
+    }
+
+    protected void  createView(){
         mWebView = new WXWebView(mContext);
+    }
+
+    @Override
+    protected void initView() {
+
         mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
             @Override
             public void onError(String type, Object message) {
@@ -260,10 +269,6 @@ public class WXWeb extends WXComponent {
                 }
             }
         });
-    }
-
-    @Override
-    protected void initView() {
         mHost = mWebView.getView();
     }
 
@@ -279,7 +284,7 @@ public class WXWeb extends WXComponent {
     @Override
     public void destroy() {
         super.destroy();
-        getWebView().destory();
+        getWebView().destroy();
     }
 
     @WXComponentProp(name = "show-loading")
