@@ -3,9 +3,9 @@
     <wxc-panel title="Dialog">
       <wxc-tip type="success" value="It's a weex example template." style="margin-bottom: 20px;"></wxc-tip>
       <wxc-hn level="1" value="H1"></wxc-hn>
-      <wxc-button type="primary" click="{{toast}}" value="Toast"></wxc-button>
+      <wxc-button type="primary" onclick="{{toast}}" value="Toast"></wxc-button>
       <wxc-hn level="2" value="H3"></wxc-hn>
-      <wxc-button type="warning" click="{{toast}}" value="Toast"></wxc-button>
+      <wxc-button type="warning" onclick="{{toast}}" value="Toast"></wxc-button>
     </wxc-panel>
 
     <wxc-panel title="Image" type="primary">

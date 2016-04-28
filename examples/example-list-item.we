@@ -1,5 +1,5 @@
 <template>
-  <wxc-list-item click="{{redirect}}">
+  <wxc-list-item onclick="{{redirect}}">
     <text class="item-txt">{{ title }}</text>
   </wxc-list-item>
 </template>
