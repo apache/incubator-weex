@@ -458,7 +458,7 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible) {
 
-    WXLogUtils.e(TAG, "into--[notifyAppearStateChange]firstVisible:" + firstVisible + " lastVisible:" + lastVisible);
+    WXLogUtils.d(TAG, "into--[notifyAppearStateChange]firstVisible:" + firstVisible + " lastVisible:" + lastVisible);
 
     List<Integer> unRegisterKeys=new ArrayList<>();
 
@@ -477,7 +477,7 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
         value.notifyApppearStateChange(WXEventType.DISAPPEAR);
         value.appearState=false;
       }
-      WXLogUtils.e(TAG,"key:"+key+" "+"appear:"+value.appearState);
+      WXLogUtils.d(TAG,"key:"+key+" "+"appear:"+value.appearState);
     }
 
     //remove unregister Event
