@@ -1,5 +1,6 @@
 package com.alibaba.weex.util;
 
+import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
@@ -44,12 +45,13 @@ public class ScreenUtil {
         }
 
         if (activity.getSupportActionBar() != null) {
-//            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-//            int actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
-//            Log.e(TAG, "actionbar:" + actionbar);
-            int actionbar= activity.getSupportActionBar().getHeight();
-            Log.d(TAG, "actionbar:" + actionbar);
-            height -= actionbar;
+          int actionbar= activity.getSupportActionBar().getHeight();
+          if(actionbar==0){
+            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
+          }
+          Log.d(TAG, "actionbar:" + actionbar);
+          height -= actionbar;
         }
 
         int status = getStatusBarHeight(activity);
