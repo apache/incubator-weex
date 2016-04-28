@@ -16,7 +16,6 @@
 </style>
 
 <script>
-  require('./weex-ui');
   module.exports = {
     data: {
       items: [

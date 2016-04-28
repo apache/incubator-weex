@@ -18,12 +18,11 @@ var _registerModules = function (config) {
 var protocol = {
 
   // weex instances
-  _instances: {},
+  _instances: [],
 
   // api meta info
-  _meta: {},
+  _meta: [],
 
-  // Weex.registerApiModule used this to register and access apiModules.
   apiModule: {},
 
   injectWeexInstance: function (instance) {

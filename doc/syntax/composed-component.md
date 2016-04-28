@@ -113,7 +113,7 @@ for example:
 ## Notes
 
 - Every composed component have an independent `<style>` work scope.
-- If child component have `id` attribute, you can access the context of the child component by `this.$vm(id)`. See more about [find an element](./id.md).
-- Please refer to [communicate between components](./comm.md) for more communication issues.
+- If child component have `id` attribute, you can access the context of the child component by `this.$vm(id)`. See more about [find an element](/syntax/id.md).
+- Please refer to [communicate between components](/syntax/comm.md) for more communication issues.
 
-Next is how to [find an element](./id.md).
+Next is how to [find an element](/syntax/id.md).

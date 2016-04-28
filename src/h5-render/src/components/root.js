@@ -2,24 +2,17 @@
 
 var ComponentManager = require('../componentManager')
 var Component = require('./component')
-var utils = require('../utils')
 
-var scrollable = ['list', 'scroller']
+// If nodeType is in this WHITE_LIST, just ignore it and
+// replace it with a div element.
+var WHITE_LIST = []
 
 function RootComponent(data, nodeType) {
   var id = data.rootId + '-root'
   var componentManager = ComponentManager.getInstance(data.instanceId)
 
-  // If nodeType is in the downgrades map, just ignore it and
-  // replace it with a div element.
-  var downgrades = componentManager.weexInstance.downgrades
-  this.data = data
   // Return a NodeType instance.
-  if (nodeType && nodeType !== 'div' && !downgrades[nodeType]) {
-    // If the root component is a Scrolleable Component, then
-    // the html and body height should be fixed to the max height
-    // of viewport.
-    this.fixRootHeight()
+  if (nodeType && nodeType !== 'div' && WHITE_LIST.indexOf(nodeType) === -1) {
     data.type = nodeType
     var cmp = componentManager.createElement(data)
     cmp.node.id = id
@@ -44,18 +37,5 @@ function RootComponent(data, nodeType) {
 }
 
 RootComponent.prototype = Object.create(Component.prototype)
-
-RootComponent.prototype.fixRootHeight = function () {
-  var rootContainer = document.querySelector(
-      '#' + this.getComponentManager().weexInstance.rootId
-    ) || document.body
-  var html = document.documentElement
-  var body = document.body
-  !html.style.height && (html.style.height = '100%')
-  !body.style.height && (body.style.height = '100%')
-  !rootContainer.style.height && (rootContainer.style.height = '100%')
-  !this.data.style.height
-    && (this.data.style.height = window.innerHeight / this.data.scale)
-}
 
 module.exports = RootComponent

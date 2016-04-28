@@ -18,11 +18,12 @@ module.exports = {
     path: './dist',
     filename: 'index.js',
   },
+  // devtool: 'source-map',
   module: {
     loaders: [
       {
-        test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        test: /\.scss$/,
+        loaders: ['style', 'css?sourceMap', 'sass?sourceMap']
       }
     ]
   },

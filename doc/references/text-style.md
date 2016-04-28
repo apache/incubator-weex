@@ -1,6 +1,6 @@
 # Text Style
 
-Text alike components share some common style rules. The text alike components currently includes [`text`](../components/text.md) and [`input`](../components/input.md).
+Text alike components share some common style rules. The text alike components currently includes [`text`](/components/text.md) and [`input`](/components/input.md).
 
 ## Properties
 
@@ -26,8 +26,6 @@ Example:
 ## Type of Style Value
 
 - length: number followed by length unit `px`, `px` can be omitted.
-- colors: support multiple formats of values, including rgb (`rgb(255, 0, 0)`), rgba (`rgba(255, 0, 0, 0.5)`), hexadecimal (`#ff0000`), short hexadecimal (`#f00`), named color (`red`).
+- colors: support multiple formats of values, including rgb (`rgb(255, 0, 0)`), rgba (`rgba(255, 0, 0, 0.5)`), hexadecimal (`#ff0000`), short hexadecimal (`#f00`), named color (red).`
 - enumerated values: a limited number of string values.
-
-**Note:** [The list of color keywords.](./color-names.md)
 

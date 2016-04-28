@@ -79,7 +79,7 @@ Text.prototype.style = utils.extend(Object.create(Atomic.prototype.style), {
     } else {
       this.textNode.style.overflow = 'hidden'
       this.textNode.style.textOverflow = 'ellipsis'
-      this.textNode.style.webkitLineClamp = val
+      this.textNode.style.webkitLineClamp = lines
     }
   }
 

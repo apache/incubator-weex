@@ -1,4 +1,4 @@
-# How to customize a native Component ?
+### Customize a native Component 
 
 Weex has wrap up the most critical platform components,such as ScrollView、ListView、Text、Imageview. Certainly these components  can not completely meet your need. And  thousands of native UI components that alwaysly be  using in our project may be required to integrate into Weex easily. Fortunately,it's quite convenient to wrap up your own components that shuold be from any existing components.
 
@@ -13,7 +13,7 @@ Weex has wrap up the most critical platform components,such as ScrollView、List
 7. Weex params can be int, double, float, String, Map, List, self-defined class that implements WXObject interface 
 
 
-#### Refer to the following example: 
+####Refer to the following example: 
 
 	package com.taobao.weex.ui.component;
 	……
@@ -41,7 +41,7 @@ Weex has wrap up the most critical platform components,such as ScrollView、List
 
     }
 
-#### Component should be registered 
+####Component should be registered 
 
 	WXSDKEngine.registerComponent("MyView", MyViewComponent.class);
 	  	

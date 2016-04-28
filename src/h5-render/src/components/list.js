@@ -1,6 +1,6 @@
 'use strict'
 
-require('../styles/list.css')
+require('../styles/list.scss')
 require('scrolljs')
 
 var Component = require('./component')

@@ -6,7 +6,7 @@ var Component = require('./component')
 var ComponentManager = require('../componentManager')
 var LazyLoad = require('../lazyLoad')
 require('carrousel')
-require('../styles/slider.css')
+require('../styles/slider.scss')
 
 function Slider (data) {
   this.autoPlay = true  // always true for autoplay

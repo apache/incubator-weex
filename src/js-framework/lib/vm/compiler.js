@@ -76,8 +76,7 @@ export function _generate(target, parentEl, context) {
   }
 
   if (!context.hasOwnProperty('repeat') && target.repeat) {
-    const expression = target.repeat.expression || target.repeat
-    const list = expression.call(this)
+    const list = target.repeat.call(this)
     const repeatId = latestRepeatId++
     const latestItemId = markList(list, repeatId)
 
@@ -242,10 +241,9 @@ export function _setChildren(template, parentEl) {
  * @param  {object} fragBlock
  */
 export function _checkRepeat(target, fragBlock, repeatId, latestItemId) {
-  const expression = target.repeat.expression || target.repeat
   const children = fragBlock.children
 
-  this._watchBlock(fragBlock, expression, 'repeat', (value) => {
+  this._watchBlock(fragBlock, target.repeat, 'repeat', (value) => {
     if (!fragBlock) {
       return
     }

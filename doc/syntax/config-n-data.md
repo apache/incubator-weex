@@ -48,5 +48,5 @@ Notice that these two additional `<script>` are both optinal and have `type="con
 
 So that's all about Weex syntax. For more reading, please check out:
 
-* [how-tos](../how-to/main.md) articles and
-* [advanced](../advanced/main.md) topics.
+* [how-tos](/how-to/main.md) articles and
+* [advanced](/advanced/main.md) topics.

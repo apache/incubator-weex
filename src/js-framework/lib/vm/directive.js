@@ -63,9 +63,16 @@ export function _bindSubVm(subVm, template, repeatItem) {
 }
 
 export function _bindSubVmAfterInitialized(subVm, template) {
-  mergeClassStyle(template.classList, this, subVm)
   mergeStyle(template.style, this, subVm)
-  mergeEvent(template.events, this, subVm)
+
+  // bind events
+  // todo: rebind if subVm._rootEl changed
+  if (subVm._rootEl) {
+    for (const key in (template.events || {})) {
+      const value = template.events[key]
+      this._setEvent(subVm._rootEl, key, value)
+    }
+  }
 }
 
 function mergeProps(target, props, vm, subVm) {
@@ -76,10 +83,10 @@ function mergeProps(target, props, vm, subVm) {
     if (!props || props[key]) {
       const value = target[key]
       if (typeof value === 'function') {
-        const returnValue = vm._watch(value, function (v) {
+        vm._watch(value, function (v) {
           subVm[key] = v
         })
-        subVm[key] = returnValue
+        subVm[key] = value.bind(vm)()
       }
       else {
         subVm[key] = value
@@ -92,44 +99,16 @@ function mergeStyle(target, vm, subVm) {
   for (const key in target) {
     const value = target[key]
     if (typeof value === 'function') {
-      const returnValue = vm._watch(value, function (v) {
+      vm._watch(value, function (v) {
         if (subVm._rootEl) {
           subVm._rootEl.setStyle(key, v)
         }
       })
-      subVm._rootEl.setStyle(key, returnValue)
+      subVm._rootEl.setStyle(key, value.bind(vm)())
     }
     else {
       if (subVm._rootEl) {
         subVm._rootEl.setStyle(key, value)
-      }
-    }
-  }
-}
-
-function mergeClassStyle(target, vm, subVm) {
-  var css = vm._options && vm._options.style || {}
-
-  if (!subVm._rootEl) {
-    return
-  }
-
-  if (typeof target === 'function') {
-    const value = vm._watch(target,  v => {
-      setClassStyle(subVm._rootEl, css, v)
-    })
-    setClassStyle(subVm._rootEl, css, value)
-  } else if (target) {
-    setClassStyle(subVm._rootEl, css, target)
-  }
-}
-
-function mergeEvent(target, vm, subVm) {
-  if (target && subVm._rootEl) {
-    for (const type in target) {
-      const handler = vm[target[type]]
-      if (handler) {
-        subVm._rootEl.addEvent(type, bind(handler, vm))
       }
     }
   }
@@ -178,21 +157,6 @@ export function _setAttr(el, attr) {
   this._bindDir(el, 'attr', attr)
 }
 
-function setClassStyle(el, css, classList) {
-  const classStyle = {}
-  const length = classList.length
-
-  for (let i = 0; i < length; i++) {
-    const style = css[classList[i]]
-    if (style) {
-      for (const key in style) {
-        classStyle[key] = style[key]
-      }
-    }
-  }
-  el.setClassStyle(classStyle)
-}
-
 /**
  * bind classnames to an element
  */
@@ -206,15 +170,28 @@ export function _setClass(el, classList) {
     return
   }
 
-  const style = this._options && this._options.style || {}
+  const update = (classList) => {
+    const css = this._options.style
+    const classStyle = {}
+    const length = classList.length
+
+    for (let i = 0; i < length; i++) {
+      const style = css[classList[i]]
+      if (style) {
+        for (const key in style) {
+          classStyle[key] = style[key]
+        }
+      }
+    }
+    el.setClassStyle(classStyle)
+  }
+
   if (typeof classList === 'function') {
-    const value = this._watch(classList,  v => {
-      setClassStyle(el, style, v)
-    })
-    setClassStyle(el, style, value)
+    this._watch(classList, update)
+    update(classList.call(this))
   }
   else {
-    setClassStyle(el, style, classList)
+    update(classList)
   }
 }
 

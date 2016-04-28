@@ -5,7 +5,7 @@ var config = require('../config')
 var Atomic = require('./atomic')
 var Component = require('./component')
 
-require('../styles/indicator.css')
+require('../styles/indicator.scss')
 
 var DEFAULT_ITEM_COLOR = '#999'
 var DEFAULT_ITEM_SELECTED_COLOR = '#0000ff'

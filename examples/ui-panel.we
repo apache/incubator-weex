@@ -1,12 +1,8 @@
 <!-- Inspired by bootstrap http://getbootstrap.com/ -->
 <template>
   <div class="panel panel-{{type}}" style="border-width:{{border}}">
-    <text class="panel-header panel-header-{{type}}"
-          style="padding-top:{{paddingHead}};padding-bottom:{{paddingHead}};padding-left:{{paddingHead*1.5}};padding-right:{{paddingHead*1.5}}">
-      {{title}}
-    </text>
-    <div class="panel-body panel-body-{{type}}"
-         style="padding-top:{{paddingBody}};padding-bottom:{{paddingBody}};padding-left:{{paddingBody*1.5}};padding-right:{{paddingBody*1.5}}">
+    <text class="panel-header panel-header-{{type}}">{{title}}</text>
+    <div class="panel-body panel-body-{{type}}">
       <content></content>
     </div>
   </div>
@@ -17,8 +13,6 @@
     data: {
       type: 'default',
       title: '',
-      paddingBody: 20,
-      paddingHead: 20,
       dataClass: '', // FIXME transfer class
       border: 0
     },
@@ -70,10 +64,10 @@
   .panel-header {
     background-color: #f5f5f5;
     font-size: 40px;
-    /*padding-left: 12px;*/
-    /*padding-right: 12px;*/
-    /*padding-top: 20px;*/
-    /*padding-bottom: 20px;*/
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     color: #333;
   }
 
@@ -106,10 +100,10 @@
   }
 
   .panel-body {
-    /*padding-left: 12px;*/
-    /*padding-right: 12px;*/
-    /*padding-top: 20px;*/
-    /*padding-bottom: 20px;*/
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 
   .panel-body-default {

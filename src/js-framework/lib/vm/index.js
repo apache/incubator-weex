@@ -47,7 +47,6 @@ export default function Vm(
 
   this._options = component
   this._methods = component.methods || {}
-  this._computed = component.computed || {}
   this._css = component.style || {}
   this._ids = {}
   this._watchers = []

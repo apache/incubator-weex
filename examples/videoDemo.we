@@ -20,7 +20,6 @@
 </style>
 
 <script>
-  require('./weex-ui');
   module.exports = {
     data: {
       playStatus: 'play'

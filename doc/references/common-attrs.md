@@ -11,7 +11,7 @@ id="item-{{index}}"
 
 `id` gives weex tag a unique mark in `<template>` scope. With id attribute you can easily refer a weex tag.
 
-[more information](../syntax/id.md)
+[more information](/syntax/id.md)
 
 ## style
 
@@ -22,7 +22,7 @@ style="padding: {{x}}; margin: 0"
 
 weex tag inline style.
 
-[more information](../syntax/style-n-class.md)
+[more information](/syntax/style-n-class.md)
 
 ## class
 
@@ -41,7 +41,7 @@ repeat="{{items}}"
 
 provide a list of data, using current tag as a template to repeatedly generate the same weex tags.
 
-[more information](../syntax/display-logic.md)
+[more information](/syntax/display-logic.md)
 
 ## if
 
@@ -51,7 +51,7 @@ if="{{opened}}"
 
 provide a boolean value to decide whether or not to display current tag.
 
-[more information](../syntax/display-logic.md)
+[more information](/syntax/display-logic.md)
 
 ## append
 
@@ -61,7 +61,7 @@ append="tree/node"
 
 by providing the value of `tree` or `node`, it determines the progress of rendering.
 
-[more information](../syntax/render-logic.md)
+[more information](/syntax/render-logic.md)
 
 ## Event Handing (on...)
 
@@ -72,4 +72,4 @@ onappear="loadMore"
 
 register event handlers on weex tag
 
-[more information](../syntax/events.md)
+[more information](/syntax/events.md)

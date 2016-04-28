@@ -41,9 +41,7 @@ define('@weex-component/subvm', function (require, exports, module) {
 ;
   module.exports = {
     data: function () {return {
-      item: {a: 'a', b: 'b'},
-      className: 'fromOuter',
-      marginTop: 10
+      item: {a: 'a', b: 'b'}
     }}
   }
 
@@ -55,17 +53,6 @@ define('@weex-component/subvm', function (require, exports, module) {
   "children": [
     {
       "type": "innertpl",
-      "classList": function() {
-        return this.className
-      },
-      "style": {
-        marginTop: function() {
-          return this.marginTop
-        }
-      },
-      "events": {
-          "click": "clicked"
-      },
       "attr": {
         "outerData": function () {return this.item}
       }

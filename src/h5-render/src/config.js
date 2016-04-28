@@ -2,7 +2,7 @@
 
 var config = {
 
-  weexVersion: '0.5.0',
+  weexVersion: '1.4.0',
 
   debug: true
 

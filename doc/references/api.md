@@ -14,7 +14,7 @@ Return the vm element referenced by specific id.
 
 ### Tips
 * id is only guaranteed to be unique within the current (page)components, if you are looking for the parent components or child components, you can make use of the communication mode between components.
-* Further reading: [id](../syntax/id.md), [Communicate Between Components](../syntax/comm.md)
+* Further reading: [id], [Communicate Between Components]
 
 ## $scrollTo(id, offset)
 

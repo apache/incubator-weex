@@ -26,7 +26,7 @@ In Weex, we may set the `id` property for a particular element, just as unique i
     </script>
 ```
 
-`id` can also work with `repeat` attribute [See more about display logical control](./display-logic.md), and ensure repetitive elements with different `id`:
+`id` can also work with `repeat` attribute [See more about display logical control](/syntax/display-logic.md), and ensure repetitive elements with different `id`:
 
 ```
   <template>
@@ -53,6 +53,6 @@ In Weex, we may set the `id` property for a particular element, just as unique i
   </script>
 ```
 
-Additionally, in the [composed components](./composed-component.md), we can get the corresponding sub component through `this.$vm(id)` APIs.
+Additionally, in the [composed components](/syntax/composed-component.md), we can get the corresponding sub component through `this.$vm(id)` APIs.
 
-Next is how to [send messages between composed components](./comm.md).
+Next is how to [send messages between composed components](/syntax/comm.md).

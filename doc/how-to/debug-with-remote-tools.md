@@ -1,4 +1,5 @@
-# How to debug With Weex-Toolkit ?
+Debug With Weex-Toolkit
+=======================
 
 [Weex Toolkit](../tools/cli.md) is a multipurpose command line interface tool , it be designed to help you quickly  preview Weex `we file` and debug your  `we file`.
 

@@ -110,7 +110,7 @@ Once we have data-binding, the data changes will automatically trigger view chan
 
 Note: `data` and `methods` can't have duplicate fields, cause in the execution context -- `this`, we can access both of them.
 
-* [See more usage of `this` in vm APIs](../references/api.md)
+* [See more usage of `this` in vm APIs](/references/api.md)
 
 ### Usage of some special attributes in Data-Binding
 
@@ -137,7 +137,7 @@ while style can also get bound with `class` attribute, multiple classnames can b
 
 here if `{{size}}` and `{{status}}` have empty value, then only `class="title"` will be rendered.
 
-* [See more about style and class](./style-n-class.md)
+* [See more about style and class](/syntax/style-n-class.md)
 
 #### Event Handler: `on...`
 
@@ -187,7 +187,7 @@ The event handler is an attribute which name has a prefix `on...`. The other par
 
 We can also use `repeat` attribute to generate a list.
 
-* [See more about display logic control](./display-logic.md)
+* [See more about display logic control](/syntax/display-logic.md)
 
-Next, let's have a look at [style and class](./style-n-class.md).
+Next, let's have a look at [style and class](/syntax/style-n-class.md).
 

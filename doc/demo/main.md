@@ -1,3 +1,3 @@
 # Samples
 
-* [Hello World](./hello-world.md)
+* [Hello World](/demo/hello-world.md)

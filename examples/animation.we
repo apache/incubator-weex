@@ -23,7 +23,6 @@
 </template>
 
 <script>
-  require('./weex-ui');
   module.exports = {
     data: {
       transformOrigin: 'center center',

@@ -8,7 +8,7 @@ var utils = require('../utils')
 // TODO: refactor this scss code since this is strongly
 // dependent on lib.flexible other than the value of
 // scale.
-require('../styles/tabheader.css')
+require('../styles/tabheader.scss')
 
 function TabHeader(data) {
   Atomic.call(this, data)

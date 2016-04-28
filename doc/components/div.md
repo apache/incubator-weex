@@ -12,11 +12,11 @@ This type of component supports all kinds of weex component as its child compone
 
 ### Attributes
 
-There is no specific attribute for this component other than the [common attributes](../references/common-attrs.md).
+There is no specific attribute for this component other than the [common attributes](/references/common-attrs.md).
 
 ### Styles
 
-**common styles**: check out the [common styles](../references/common-attrs.md)
+**common styles**: check out the [common styles](/references/common-attrs.md)
 
 - support flexbox related styles
 - support box model related styles
@@ -25,10 +25,10 @@ There is no specific attribute for this component other than the [common attribu
 
 ### Events
 
-**common events**: check out the [common events](../references/common-event.md)
+**common events**: check out the [common events](/references/common-event.md)
 
-- support `click` event. Check out [common events](../references/common-event.md)
-- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
+- support `click` event. Check out [common events](/references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](/references/common-event.md)
 
 ### Examples
 

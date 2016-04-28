@@ -1,5 +1,5 @@
 <style>
-  .slider-page {
+  .sliderpage {
     flex-direction: row;
     justify-content: space-between;
 
@@ -9,8 +9,8 @@
 </style>
 
 <template>
-  <div class="slider-page">
-    <slider-item repeat="{{sliderItems}}"></slider-item>
+  <div class="sliderpage">
+    <slideritem repeat="{{sliderItems}}"></slideritem>
   </div>
 </template>
 
