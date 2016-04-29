@@ -296,6 +296,6 @@ public class WXUtils {
     }catch (Exception e){
       WXLogUtils.e("[WXUtils] isTabletDevice:" + WXLogUtils.getStackTrace(e));
     }
-    return true;
+    return false;
   }
 }
