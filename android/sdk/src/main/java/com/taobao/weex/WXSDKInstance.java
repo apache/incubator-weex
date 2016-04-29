@@ -214,7 +214,6 @@ import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
@@ -298,6 +297,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
     mWXPerformance = new WXPerformance();
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
+
+    mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+    mWXHttpAdapter=WXSDKManager.getInstance().getIWXHttpAdapter();
   }
 
 
