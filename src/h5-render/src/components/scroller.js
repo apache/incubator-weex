@@ -137,7 +137,7 @@ Scroller.prototype.insertBefore = function (child, before) {
   }
 }
 
-Scroller.prototype.removeChild = function () {
+Scroller.prototype.removeChild = function (child) {
   var children = this.data.children
   // remove from this.data.children
   var i = 0
