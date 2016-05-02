@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Validate branch name
 branch_regex="^(\d+\.\d+\.\d+)|(master|dev|android|ios|jsfm|html5|doc|website|example|test|all)(-(bugfix|feature|hotfix)-.+)?$"

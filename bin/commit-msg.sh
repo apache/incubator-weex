@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Validate commit log
 commit_regex='^Merge.+|[+*-] \[android|ios|jsfm|html5|doc|website|example|test|all\] [^\n]{1,50}'
