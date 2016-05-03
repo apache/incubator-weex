@@ -138,7 +138,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -152,7 +151,6 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
 
   private String TAG = "WXListComponent";
   private RecyclerViewBaseAdapter recyclerViewBaseAdapter;
-  private HashMap<String, Integer> typeList = new HashMap<>();
   private ArrayList<Integer> indoreCells;
   private int listCellCount = 0;
 
@@ -391,7 +389,6 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
   @Override
   public int getItemViewType(int position) {
     try {
-      String type = mChildren.get(position).getDomObject().attr.getScope();
       if (mChildren.get(position).getDomObject().isFixed()) {
         if (indoreCells == null) {
           indoreCells = new ArrayList<Integer>();
@@ -399,12 +396,6 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
         if (!indoreCells.contains(position)) {
           indoreCells.add(position);
         }
-      }
-      if (!TextUtils.isEmpty(type)) {
-        if (!typeList.containsKey(type)) {
-          typeList.put(type, position);
-        }
-        return typeList.get(type);
       }
     } catch (Exception e) {
       WXLogUtils.e(TAG, "getItemViewType:" + WXLogUtils.getStackTrace(e));
