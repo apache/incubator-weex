@@ -4,4 +4,6 @@
   require('./src/wxc-list-item.we');
   require('./src/wxc-panel.we');
   require('./src/wxc-tip.we');
+  require('./src/wxc-countdown.we');
+  require('./src/wxc-marquee.we');
 </script>

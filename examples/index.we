@@ -16,9 +16,10 @@
         {name: 'animation', title: 'Animation'},
         {name: 'modal', title: 'Modal'},
         {name: 'video-demo', title: 'Video'},
-        {name: 'calculator', title: 'Calculator'},
+        {name: 'countdown-demo', title: 'Countdown'},
+        {name: 'marquee-demo', title: 'Marquee'},
         {name: 'ui', title: 'UI Gallery'},
-        {name: 'template', title: 'Example Template'}
+        {name: 'calculator', title: 'Calculator'}
       ]
     }
   }
