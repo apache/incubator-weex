@@ -216,7 +216,16 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     } else {
       scroll = mDomObj.attr.getScrollDirection();
     }
-    if (scroll.equals("vertical")) {
+    if(("horizontal").equals(scroll)){
+      mOrientation = HORIZONTAL;
+      mHost = new WXHorizontalScrollView(mContext);
+      mRealView = new FrameLayout(mContext);
+      WXHorizontalScrollView scrollView = (WXHorizontalScrollView) getView();
+      FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+          LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+      scrollView.addView(mRealView, layoutParams);
+      mHost.setHorizontalScrollBarEnabled(true);
+    }else{
       mOrientation = VERTICAL;
       mHost = new WXScrollView(mContext, this);
       mRealView = new FrameLayout(mContext);
@@ -226,16 +235,8 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
           LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       mHost.setVerticalScrollBarEnabled(true);
-    } else {
-      mOrientation = HORIZONTAL;
-      mHost = new WXHorizontalScrollView(mContext);
-      mRealView = new FrameLayout(mContext);
-      WXHorizontalScrollView scrollView = (WXHorizontalScrollView) getView();
-      FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-          LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-      scrollView.addView(mRealView, layoutParams);
-      mHost.setHorizontalScrollBarEnabled(true);
     }
+
   }
 
   public int getScrollY() {
