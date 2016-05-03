@@ -10,7 +10,7 @@ This component supports no child components but a text content.
 
 ### Attributes
 
-- `src`: &lt;string&gt; The URL of the video to embed.
+- `src`: &lt;string&gt; The URL of the video to embed. Support `http` or `https` scheme, URL start with `//` is not support yet. 
 - `play-status`: &lt;boolean&gt; `play` | `pause`. Use it to control video's play/pause. Default value is `pause`.
 - `auto-play`: &lt;boolean&gt; `true` | `false`. Use it to control whether it is playing when the page initialization finished. Defalut value is `false`.
 
