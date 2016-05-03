@@ -301,8 +301,8 @@ export function _compileNativeComponent(template, dest, type) {
   }
 
   if (template.append) { // give the append attribute for ios adaptation
-    template.attr = template.attr || {}
-    template.attr.append = template.append
+    element.attr = element.attr || {}
+    element.attr.append = template.append
   }
 
   const treeMode = template.append === 'tree'

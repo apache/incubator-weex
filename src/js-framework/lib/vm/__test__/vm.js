@@ -109,7 +109,9 @@ describe('generate virtual dom for a single vm', () => {
     expect(spy.firstCall.args[2]).to.deep.equal({
       ref: '_root',
       type: 'cell',
-      attr: {},
+      attr: {
+        append: 'tree'
+      },
       style: {},
       children: [{
         ref: '3',
