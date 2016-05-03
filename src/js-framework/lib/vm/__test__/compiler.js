@@ -308,8 +308,14 @@ describe('generate workflow', () => {
     function check() {
       expect(vm._compile).callCount(3)
       expect(vm._compile.args[0]).eql([target, dest])
-      expect(vm._compile.args[1]).eql([target.children[0], {type: 'a'}])
-      expect(vm._compile.args[2]).eql([target.children[1], {type: 'a'}])
+      expect(vm._compile.args[1]).eql([target.children[0], {
+        attr: {
+          append: 'tree'
+        }, type: 'a'}])
+      expect(vm._compile.args[2]).eql([target.children[1], {
+        attr: {
+          append: 'tree'
+        }, type: 'a'}])
       expect(vm._createBlock).callCount(0)
       expect(vm._mergeContext).callCount(0)
       expect(vm.constructor).callCount(0)

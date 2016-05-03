@@ -6,6 +6,9 @@
   children: [{
     type: 'container',
     event: ['click'],
+    attr: {
+      append: 'tree'
+    },
     children: [{
       type: 'container',
       children: [{
