@@ -214,7 +214,6 @@ import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXDomPropConstant;
-import com.taobao.weex.common.WXException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.view.WXTextView;
@@ -222,7 +221,7 @@ import com.taobao.weex.ui.view.WXTextView;
 /**
  * Text component
  */
-public class WXText extends WXComponent implements IWXRecyclerViewChild {
+public class WXText extends WXComponent{
 
   /**
    * The default text size
@@ -267,7 +266,7 @@ public class WXText extends WXComponent implements IWXRecyclerViewChild {
   }
 
   @Override
-  public View detachViewAndClearPreInfo() throws WXException {
+  public View detachViewAndClearPreInfo() {
     mPreExtra = null;
     return super.detachViewAndClearPreInfo();
   }

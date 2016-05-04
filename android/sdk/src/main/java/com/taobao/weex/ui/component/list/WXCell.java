@@ -206,7 +206,6 @@ package com.taobao.weex.ui.component.list;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.IWXRecyclerViewChild;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 

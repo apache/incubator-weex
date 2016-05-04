@@ -202,239 +202,98 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.view.listview;
 
-import android.app.Application;
+import android.content.Context;
+import android.view.View;
 
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
-import com.taobao.weex.appfram.navigator.WXNavigatorModule;
-import com.taobao.weex.bridge.WXModuleManager;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.dom.module.WXModalUIModule;
-import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXIndicator;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXLoadingIndicator;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.WXWeb;
-import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.module.WXWebViewModule;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+public interface IRefreshLayout {
 
-import java.util.Map;
+    public View getView();
+    public void onPull(float scale);
+    public void refreshing();
+    public void resetRefreshing();
+    public void setVisibility(int visibility);
+    public void setPullLabel(CharSequence pullLabel);
+    public void setRefreshingLabel(CharSequence refreshingLabel);
+    public void setReleaseLabel(CharSequence releaseLabel);
+    public void setSuccessLabel(CharSequence releaseLabel);
+    public String getRefreshingSuccessLabelText(Context context);
+    public String getPullLabelText(Context context);
+    public String getReleaseLabelText(Context context);
+    public String getRefreshingLabelText(Context context);
 
-public class WXSDKEngine {
+    public class Adapter implements IRefreshLayout {
 
-  private static final String V8_SO_NAME = "weexcore";
-  private volatile static boolean init;
-  private static Object mLock = new Object();
+        View view;
 
-  @Deprecated
-  public static void init(Application application) {
-    init(application, null);
-  }
+        public Adapter(View view) {
+            this.view = view;
+        }
 
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter) {
-    init(application, utAdapter, null);
-  }
+        @Override
+        public View getView() {
+            return view;
+        }
 
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
+        @Override
+        public void onPull(float scale) {
 
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-      register();
+        }
+
+        @Override
+        public void refreshing() {
+
+        }
+
+        @Override
+        public void resetRefreshing() {
+
+        }
+
+        @Override
+        public void setVisibility(int visibility) {
+            this.view.setVisibility(visibility);
+        }
+
+        @Override
+        public void setPullLabel(CharSequence pullLabel) {
+
+        }
+
+        @Override
+        public void setRefreshingLabel(CharSequence refreshingLabel) {
+
+        }
+
+        @Override
+        public void setReleaseLabel(CharSequence releaseLabel) {
+
+        }
+
+        @Override
+        public void setSuccessLabel(CharSequence releaseLabel) {
+
+        }
+
+        @Override
+        public String getRefreshingSuccessLabelText(Context context) {
+            return null;
+        }
+
+        @Override
+        public String getPullLabelText(Context context) {
+            return null;
+        }
+
+        @Override
+        public String getReleaseLabelText(Context context) {
+            return null;
+        }
+
+        @Override
+        public String getRefreshingLabelText(Context context) {
+            return null;
+        }
     }
-  }
-
-  public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-
-      WXSDKManager.getInstance().setIWXHttpAdapter(httpAdapter);
-      WXSDKManager.getInstance().setIWXImgLoaderAdapter(imgLoaderAdapter);
-      WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
-
-      register();
-    }
-  }
-
-  private static void register() {
-    try {
-      registerComponent(WXBasicComponentType.TEXT, WXText.class, false);
-      registerComponent(WXBasicComponentType.IMG, WXImage.class, false);
-      registerComponent(WXBasicComponentType.DIV, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.IMAGE, WXImage.class, false);
-      registerComponent(WXBasicComponentType.CONTAINER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
-      registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
-
-      registerComponent(WXBasicComponentType.LIST, WXListComponent.class, false);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
-      registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
-      registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
-      registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
-      registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
-      registerComponent(WXBasicComponentType.A, WXA.class, false);
-      registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
-      registerComponent(WXBasicComponentType.WEB, WXWeb.class);
-      registerComponent(WXBasicComponentType.REFRESH, WXRefresh.class);
-      registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
-      registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
-
-      WXModuleManager.registerModule("dom", WXDomModule.class, true);
-      WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
-      WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
-      WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
-      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
-      WXSDKEngine.registerModule("stream", WXStreamModule.class);
-
-      registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
-    } catch (WXException e) {
-      WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
-    }
-  }
-
-  /**
-   *
-   * Register component. The registration is singleton in {@link WXSDKEngine} level
-   * @param type name of component. Same as type filed in the JS.
-   * @param clazz the class of the {@link WXComponent} to be registered.
-   * @param appendTree true for appendTree flag
-   * @return true for registration success, false for otherwise.
-   * @throws WXException Throws exception if type conflicts.
-   */
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, appendTree);
-  }
-
-  /**
-   * Register module. This is a wrapper method for
-   * {@link WXModuleManager#registerModule(String, Class)}. The module register here only need to
-   * be singleton in {@link WXSDKInstance} level.
-   * @param moduleName  module name
-   * @param moduleClass module to be registered.
-   * @return true for registration success, false for otherwise.
-   * @see {@link WXModuleManager#registerModule(String, Class, boolean)}
-   */
-  public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    return WXModuleManager.registerModule(moduleName, moduleClass);
-  }
-
-  public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
-    return WXDomRegistry.registerDomObject(type, clazz);
-  }
-
-  public static void callback(String instanceId, String funcId, Map<String, Object> data) {
-    WXSDKManager.getInstance().callback(instanceId, funcId, data);
-  }
-
-  /**
-   * Model switch, only applicable for developer model
-   * @param debug
-   */
-  public static void restartBridge(boolean debug) {
-    WXEnvironment.sDebugMode = debug;
-    WXSDKManager.getInstance().restartBridge();
-  }
-
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, true);
-  }
-
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(componentInfo, clazz);
-  }
-
-  public static void addCustomOptions(String key, String value) {
-    WXEnvironment.addCustomOptions(key, value);
-  }
-
-  public static IWXUserTrackAdapter getIWXUserTrackAdapter() {
-    return WXSDKManager.getInstance().getIWXUserTrackAdapter();
-  }
-
-  public static void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
-    WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
-  }
-
-  public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
-    return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
-  }
-
-  public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
-    WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
-  }
-
-  public static IWXHttpAdapter getIWXHttpAdapter() {
-    return WXSDKManager.getInstance().getIWXHttpAdapter();
-  }
-
-  public static void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
-    WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
-  }
-
-  public static IActivityNavBarSetter getActivityNavBarSetter() {
-    return  WXSDKManager.getInstance().getActivityNavBarSetter();
-  }
-
-  public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
-    WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
-  }
-
-
 }

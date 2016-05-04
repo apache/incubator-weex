@@ -227,4 +227,8 @@ public class WXBasicComponentType {
   public static final String A = "a";
   public static final String EMBED = "embed";
   public static final String WEB = "web";
+  public static final String REFRESH = "refres";
+  public static final String LOADING = "loading";
+  public static final String LOADING_INDICATOR = "loading-indicator";
+
 }

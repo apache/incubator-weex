@@ -230,7 +230,7 @@ import java.util.Map;
  *
  * Input component
  */
-public class WXInput extends WXComponent implements IWXRecyclerViewChild {
+public class WXInput extends WXComponent {
 
   private final InputMethodManager mInputMethodManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
   private String mBeforeText = "";

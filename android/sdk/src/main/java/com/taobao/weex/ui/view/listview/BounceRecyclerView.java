@@ -202,239 +202,277 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.view.listview;
 
-import android.app.Application;
+import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
+import android.view.View;
 
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
-import com.taobao.weex.appfram.navigator.WXNavigatorModule;
-import com.taobao.weex.bridge.WXModuleManager;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.dom.module.WXModalUIModule;
-import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXIndicator;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXLoadingIndicator;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.WXWeb;
-import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.module.WXWebViewModule;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
-import java.util.Map;
+public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
 
-public class WXSDKEngine {
+    private State mState = State.RESET;
+    private OnRefreshListener mOnRefreshListener;
+    private OnLoadMoreListener mOnLoadMoreListener;
+    private RefreshAdapterWrapper mRefreshAdapter;
 
-  private static final String V8_SO_NAME = "weexcore";
-  private volatile static boolean init;
-  private static Object mLock = new Object();
-
-  @Deprecated
-  public static void init(Application application) {
-    init(application, null);
-  }
-
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter) {
-    init(application, utAdapter, null);
-  }
-
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-      register();
+    private enum State {
+        PULL_TO_REFRESH_TOP,
+        RELEASE_TO_REFRESH_TOP,
+        PULL_TO_REFRESH_BOTTOM,
+        RELEASE_TO_REFRESH_BOTTOM,
+        REFRESHING,
+        LOADMORE,
+        LOADMORE_TOP,
+        RESET
     }
-  }
 
-  public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-
-      WXSDKManager.getInstance().setIWXHttpAdapter(httpAdapter);
-      WXSDKManager.getInstance().setIWXImgLoaderAdapter(imgLoaderAdapter);
-      WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
-
-      register();
+    public BounceRecyclerView(Context context) {
+        super(context);
     }
-  }
 
-  private static void register() {
-    try {
-      registerComponent(WXBasicComponentType.TEXT, WXText.class, false);
-      registerComponent(WXBasicComponentType.IMG, WXImage.class, false);
-      registerComponent(WXBasicComponentType.DIV, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.IMAGE, WXImage.class, false);
-      registerComponent(WXBasicComponentType.CONTAINER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
-      registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
-
-      registerComponent(WXBasicComponentType.LIST, WXListComponent.class, false);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
-      registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
-      registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
-      registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
-      registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
-      registerComponent(WXBasicComponentType.A, WXA.class, false);
-      registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
-      registerComponent(WXBasicComponentType.WEB, WXWeb.class);
-      registerComponent(WXBasicComponentType.REFRESH, WXRefresh.class);
-      registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
-      registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
-
-      WXModuleManager.registerModule("dom", WXDomModule.class, true);
-      WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
-      WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
-      WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
-      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
-      WXSDKEngine.registerModule("stream", WXStreamModule.class);
-
-      registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
-    } catch (WXException e) {
-      WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
+    public BounceRecyclerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
-  }
 
-  /**
-   *
-   * Register component. The registration is singleton in {@link WXSDKEngine} level
-   * @param type name of component. Same as type filed in the JS.
-   * @param clazz the class of the {@link WXComponent} to be registered.
-   * @param appendTree true for appendTree flag
-   * @return true for registration success, false for otherwise.
-   * @throws WXException Throws exception if type conflicts.
-   */
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, appendTree);
-  }
+    public void setOnRefreshListener(OnRefreshListener listener) {
+        mOnRefreshListener = listener;
+    }
 
-  /**
-   * Register module. This is a wrapper method for
-   * {@link WXModuleManager#registerModule(String, Class)}. The module register here only need to
-   * be singleton in {@link WXSDKInstance} level.
-   * @param moduleName  module name
-   * @param moduleClass module to be registered.
-   * @return true for registration success, false for otherwise.
-   * @see {@link WXModuleManager#registerModule(String, Class, boolean)}
-   */
-  public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    return WXModuleManager.registerModule(moduleName, moduleClass);
-  }
+    public void setOnLoadMoreListener(OnLoadMoreListener listener) {
+        mOnLoadMoreListener = listener;
+    }
 
-  public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
-    return WXDomRegistry.registerDomObject(type, clazz);
-  }
+    public void setAdapter(RecyclerViewBaseAdapter adapter) {
+        mRefreshAdapter = new RefreshAdapterWrapper(getContext(), adapter);
+        getBounceView().setAdapter(mRefreshAdapter);
+    }
 
-  public static void callback(String instanceId, String funcId, Map<String, Object> data) {
-    WXSDKManager.getInstance().callback(instanceId, funcId, data);
-  }
+    public RefreshAdapterWrapper getAdapter() {
+        return mRefreshAdapter;
+    }
 
-  /**
-   * Model switch, only applicable for developer model
-   * @param debug
-   */
-  public static void restartBridge(boolean debug) {
-    WXEnvironment.sDebugMode = debug;
-    WXSDKManager.getInstance().restartBridge();
-  }
+    public void refreshState() {
+        if (mOnRefreshListener != null) {
+            onRefreshComplete();
+        }
+        if (mOnLoadMoreListener != null) {
+            onLoadMoreComplete();
+        }
+    }
 
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, true);
-  }
+    @Override
+    public boolean isReadyForPullFromTop() {
+        LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
+        if (lm.findFirstVisibleItemPosition() == 0) {
+            final View firstVisibleChild = getBounceView().getChildAt(0);
+            if (firstVisibleChild != null) {
+                return firstVisibleChild.getTop() + getPaddingTop() >= getBounceView().getTop();
+            }
+        }
+        return false;
+    }
 
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(componentInfo, clazz);
-  }
+    @Override
+    public boolean isReadyForPullFromBottom() {
+        RecyclerView lv = getBounceView();
+        final RecyclerView.Adapter adapter = lv.getAdapter();
+        LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
+        final int lastItemPosition = adapter.getItemCount() - 1;
+        final int lastVisiblePosition = lm.findLastVisibleItemPosition();
+        if (lastVisiblePosition >= lastItemPosition) {
+            final int childIndex = lastVisiblePosition - lm.findFirstVisibleItemPosition();
+            final View lastVisibleChild = lv.getChildAt(childIndex);
+            if (lastVisibleChild != null) {
+                return lastVisibleChild.getBottom() + getPaddingTop() <= lv.getBottom();
+            }
+        }
+        return false;
+    }
 
-  public static void addCustomOptions(String key, String value) {
-    WXEnvironment.addCustomOptions(key, value);
-  }
+    @Override
+    public RecyclerView createBounceView(Context context) {
+        WXRecyclerView recyclerView = new WXRecyclerView(context);
+        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT);
+        return recyclerView;
+    }
 
-  public static IWXUserTrackAdapter getIWXUserTrackAdapter() {
-    return WXSDKManager.getInstance().getIWXUserTrackAdapter();
-  }
+    @Override
+    public IRefreshLayout createBounceHeaderView(Context context) {
+        return new IRefreshLayout.Adapter(new View(context));
+    }
 
-  public static void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
-    WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
-  }
+    @Override
+    public IRefreshLayout createBounceFooterView(Context context) {
+        return new IRefreshLayout.Adapter(new View(context));
+    }
 
-  public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
-    return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
-  }
+    @Override
+    protected void onTouchActionUp() {
+        super.onTouchActionUp();
+        if (!isRefreshing() && !isLoadingMore()) {
+            if (getState() == State.RELEASE_TO_REFRESH_TOP && null != mOnRefreshListener) {
+                getBounceHeaderView().setVisibility(View.INVISIBLE);
+                setState(State.REFRESHING);
+            } else if (getState() == State.RELEASE_TO_REFRESH_BOTTOM && null != mOnLoadMoreListener) {
+                getBounceFooterView().setVisibility(View.INVISIBLE);
+                setState(State.LOADMORE);
+            } else if (getState() != State.LOADMORE) {
+                setState(State.RESET);
+            }
+        }
+    }
 
-  public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
-    WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
-  }
+    @Override
+    protected void onPullStateChanged(int itemDimension, int scrollValue) {
+        super.onPullStateChanged(itemDimension, scrollValue);
+        if (!isRefreshing() && !isLoadingMore()) {
+            if (scrollValue < 0) {// refresh
+                if (refreshEnabled()) {
+                    setState(itemDimension >= Math.abs(scrollValue) ? State.PULL_TO_REFRESH_TOP : State.RELEASE_TO_REFRESH_TOP);
+                }
+                getBounceHeaderView().setVisibility(refreshEnabled() ? View.VISIBLE : View.INVISIBLE);
+            } else {// loadmore
+                if (loadMoreEnabled()) {
+                    setState(itemDimension >= Math.abs(scrollValue) ? State.PULL_TO_REFRESH_BOTTOM : State.RELEASE_TO_REFRESH_BOTTOM);
+                }
+                getBounceFooterView().setVisibility(loadMoreEnabled() ? View.VISIBLE : View.INVISIBLE);
+            }
+        }
+    }
 
-  public static IWXHttpAdapter getIWXHttpAdapter() {
-    return WXSDKManager.getInstance().getIWXHttpAdapter();
-  }
+    private void setState(State s) {
+        mState = s;
+        switch (s) {
+            case PULL_TO_REFRESH_TOP: {
+                /*if (mRefreshLayout != null) {
+                    setRefreshLabel(mRefreshLayout.getPullLabelText(getContext()));
+                }*/
+                break;
+            }
+            case RELEASE_TO_REFRESH_TOP: {
+                /*if (mRefreshLayout != null) {
+                    setRefreshLabel(mRefreshLayout.getReleaseLabelText(getContext()));
+                }*/
+                break;
+            }
+            case REFRESHING: {
+                //if (mRefreshLayout != null) {
+                //    setRefreshLabel(mRefreshLayout.getRefreshingLabelText(getContext()));
+                    onRefreshing();
+                //}
+                break;
+            }
+            case RESET: {
+                onReset();
+                break;
+            }
+            case LOADMORE: {
+                /*setMoreViewVisible(true);
+                mOnLoadMoreListener.onLoadMore();*/
+                onLoadingMore();
+                break;
+            }
+            case LOADMORE_TOP: {
+                /*setMoreViewTopVisible(true);
+                mOnLoadMoreTopListener.onLoadMore();*/
+                break;
+            }
+        }
+    }
 
-  public static void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
-    WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
-  }
+    private void onRefreshing() {
+        //mRefreshLayout.setVisibility(View.VISIBLE);
+        //mRefreshLayout.refreshing();
+        mRefreshAdapter.refreshing();
+        getBounceHeaderView().setVisibility(View.INVISIBLE);
+        if (mOnRefreshListener != null) {
+            mOnRefreshListener.onRefresh();
+        }
+    }
 
-  public static IActivityNavBarSetter getActivityNavBarSetter() {
-    return  WXSDKManager.getInstance().getActivityNavBarSetter();
-  }
+    private void notifyDataSetChanged(final RecyclerView recyclerView) {
+        mRefreshAdapter.notifyDataSetChanged();
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+                int lastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+                recyclerView.setAdapter(mRefreshAdapter);
+                layoutManager.scrollToPosition(lastVisibleItemPosition);
+            }
+        });
+    }
 
-  public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
-    WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
-  }
+    private void onLoadingMore() {
+        mRefreshAdapter.loadingMore();
+        getBounceFooterView().setVisibility(View.INVISIBLE);
+        notifyDataSetChanged(getBounceView());
+        if (mOnLoadMoreListener != null) {
+            mOnLoadMoreListener.onLoadMore();
+        }
+    }
 
+    private void onRefreshComplete() {
+        if (isRefreshing()) {
+            //setRefreshLabel(mRefreshLayout.getRefreshingSuccessLabelText(getContext()));
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getBounceHeaderView().setVisibility(View.VISIBLE);
+                    setState(State.RESET);
+                    //scrollTo(0, -mRefreshLayout.getView().getHeight());
+                    //smoothScroll(mRefreshLayout.getView().getHeight());
+                }
+            }, 500);
+        }
+    }
+
+    private void onLoadMoreComplete() {
+        if (isLoadingMore()) {
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getBounceFooterView().setVisibility(View.VISIBLE);
+                    setState(State.RESET);
+                    //scrollTo(0, -mRefreshLayout.getView().getHeight());
+                    //smoothScroll(mRefreshLayout.getView().getHeight());
+                }
+            }, 500);
+        }
+    }
+
+    private void onReset() {
+        /*if (mRefreshLayout != null) {
+            mRefreshLayout.resetRefreshing();
+            mRefreshLayout.setVisibility(View.GONE);
+        }*/
+        //setMoreViewVisible(false);
+        //setMoreViewTopVisible(false);
+        mRefreshAdapter.resetRefreshing();
+    }
+
+    private boolean refreshEnabled() {
+        return mOnRefreshListener != null;
+    }
+
+    private boolean loadMoreEnabled() {
+        return mOnLoadMoreListener != null;
+    }
+
+    private boolean isRefreshing() {
+        return getState() == State.REFRESHING;
+    }
+
+    private boolean isLoadingMore() {
+        return getState() == State.LOADMORE;
+    }
+
+    private State getState() {
+        return mState;
+    }
 
 }
