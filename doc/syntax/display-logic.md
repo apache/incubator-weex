@@ -91,6 +91,35 @@ The origin data properties which not belongs to the array will also be bound:
 </script>
 ```
 
+### A extension of repeat syntax
+
+#### use default `$index` for the index of array.
+
+e.g.
+
+```html
+<div repeat="{{list}}">
+  <text>No. {{$index + 1}}</text>
+<div>
+```
+
+#### specify the key and value of array.
+
+e.g.
+
+```html
+<div repeat="{{v in list}}">
+  <text>No. {{$index + 1}}, {{v.nickname}}</text>
+</div>
+```
+
+```html
+<div repeat="{{(k, v) in list}}">
+  <text>No. {{k + 1}}, {{v.nickname}}</text>
+</div>
+```
+
+
 ## Omitted mustach wrapper
 
 Particularly for the `if` and `repeat` attribute, the mustache wrapper in values could be omitted: just the same as data-binding syntax.
