@@ -1,8 +1,24 @@
 # APIs
 
-## $(id)
+## $el(id)
 
-Return the vm element referenced by specific id.
+Return the element referenced by specific id.
+
+### Arguments
+
+* `id`*(string)*: Unique identifier.
+
+### Returns
+
+* *(Element)*: Element object referenced.
+
+### Tips
+* id is only guaranteed to be unique within the current (page)components, if you are looking for the parent components or child components, you can make use of the communication mode between components.
+* Further reading: [id](../syntax/id.md), [Communicate Between Components](../syntax/comm.md)
+
+## $vm(id)
+
+Return the vm object referenced by specific id.
 
 ### Arguments
 
