@@ -34,7 +34,7 @@ Text.prototype.attr = {
   value: function (value) {
     var span = this.node.firstChild
     span.innerHTML = ''
-    if (!value) {
+    if (value == null || value === '') {
       return
     }
     span.textContent = value
