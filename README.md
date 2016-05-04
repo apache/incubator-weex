@@ -20,7 +20,7 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 ## Use
 
 * See [Tutorial](https://github.com/alibaba/weex/blob/dev/doc/tutorial.md).
-* See [Weex Documentation](https://github.com/alibaba/weex/blob/dev/doc) for more information.
+* See [Weex Documentation](https://github.com/alibaba/weex/blob/dev/doc/INSTALL.md) for more information.
 
 ### Android 
 
