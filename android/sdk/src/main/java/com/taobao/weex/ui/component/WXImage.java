@@ -223,7 +223,7 @@ import com.taobao.weex.utils.WXViewUtils;
 /**
  * Image component
  */
-public class WXImage extends WXComponent implements IWXRecyclerViewChild {
+public class WXImage extends WXComponent {
 
   public WXImage(WXSDKInstance instance, WXDomObject node,
                  WXVContainer parent, String instanceId, boolean lazy) {

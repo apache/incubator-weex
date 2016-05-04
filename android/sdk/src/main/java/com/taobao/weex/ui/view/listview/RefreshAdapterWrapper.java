@@ -202,239 +202,160 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.view.listview;
 
-import android.app.Application;
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
-import com.taobao.weex.appfram.navigator.WXNavigatorModule;
-import com.taobao.weex.bridge.WXModuleManager;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.dom.module.WXModalUIModule;
-import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXIndicator;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXLoadingIndicator;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.WXWeb;
-import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.module.WXWebViewModule;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
+import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
-import java.util.Map;
+public class RefreshAdapterWrapper extends RecyclerView.Adapter<ListBaseViewHolder> {
 
-public class WXSDKEngine {
+    private static final int ITEM_TYPE_REFRESH = 0xffffff;
+    private static final int ITEM_TYPE_LOADMORE = 0xffffff + 1;
 
-  private static final String V8_SO_NAME = "weexcore";
-  private volatile static boolean init;
-  private static Object mLock = new Object();
 
-  @Deprecated
-  public static void init(Application application) {
-    init(application, null);
-  }
+    private Status mStatus = Status.NORMAL;
+    private RecyclerViewBaseAdapter mInnerRecyclerViewAdapter;
+    private IRefreshLayout mRefreshLayout;
+    private IRefreshLayout mLoadMoreLayout;
 
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter) {
-    init(application, utAdapter, null);
-  }
-
-  @Deprecated
-  public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-      register();
+    private enum Status {
+        NORMAL,
+        REFRESH,
+        LOADMORE
     }
-  }
 
-  public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    synchronized (mLock) {
-      if (init) {
-        return;
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, utAdapter);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
-
-      WXSDKManager.getInstance().initScriptsFramework(framework);
-
-      WXSDKManager.getInstance().setIWXHttpAdapter(httpAdapter);
-      WXSDKManager.getInstance().setIWXImgLoaderAdapter(imgLoaderAdapter);
-      WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
-
-      register();
+    public RefreshAdapterWrapper(Context context, RecyclerViewBaseAdapter adapter) {
+        mInnerRecyclerViewAdapter = adapter;
+        init(context);
     }
-  }
 
-  private static void register() {
-    try {
-      registerComponent(WXBasicComponentType.TEXT, WXText.class, false);
-      registerComponent(WXBasicComponentType.IMG, WXImage.class, false);
-      registerComponent(WXBasicComponentType.DIV, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.IMAGE, WXImage.class, false);
-      registerComponent(WXBasicComponentType.CONTAINER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
-      registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
-
-      registerComponent(WXBasicComponentType.LIST, WXListComponent.class, false);
-      registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
-      registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
-      registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
-      registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
-      registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
-      registerComponent(WXBasicComponentType.A, WXA.class, false);
-      registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
-      registerComponent(WXBasicComponentType.WEB, WXWeb.class);
-      registerComponent(WXBasicComponentType.REFRESH, WXRefresh.class);
-      registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
-      registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
-
-      WXModuleManager.registerModule("dom", WXDomModule.class, true);
-      WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
-      WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
-      WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
-      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
-      WXSDKEngine.registerModule("stream", WXStreamModule.class);
-
-      registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
-    } catch (WXException e) {
-      WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
+    public void refreshing() {
+        mStatus = Status.REFRESH;
+        if (mRefreshLayout != null) {
+            mRefreshLayout.refreshing();
+        }
+        notifyDataSetChanged();
     }
-  }
 
-  /**
-   *
-   * Register component. The registration is singleton in {@link WXSDKEngine} level
-   * @param type name of component. Same as type filed in the JS.
-   * @param clazz the class of the {@link WXComponent} to be registered.
-   * @param appendTree true for appendTree flag
-   * @return true for registration success, false for otherwise.
-   * @throws WXException Throws exception if type conflicts.
-   */
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, appendTree);
-  }
+    public void resetRefreshing() {
+        mStatus = Status.NORMAL;
+        if (mRefreshLayout != null) {
+            mRefreshLayout.resetRefreshing();
+        }
+        if (mLoadMoreLayout != null) {
+            mLoadMoreLayout.resetRefreshing();
+        }
+        notifyDataSetChanged();
+    }
 
-  /**
-   * Register module. This is a wrapper method for
-   * {@link WXModuleManager#registerModule(String, Class)}. The module register here only need to
-   * be singleton in {@link WXSDKInstance} level.
-   * @param moduleName  module name
-   * @param moduleClass module to be registered.
-   * @return true for registration success, false for otherwise.
-   * @see {@link WXModuleManager#registerModule(String, Class, boolean)}
-   */
-  public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    return WXModuleManager.registerModule(moduleName, moduleClass);
-  }
+    public void loadingMore() {
+        mStatus = Status.LOADMORE;
+        if (mLoadMoreLayout != null) {
+            mLoadMoreLayout.refreshing();
+        }
+        notifyDataSetChanged();
+    }
 
-  public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
-    return WXDomRegistry.registerDomObject(type, clazz);
-  }
+    /*public void setRefreshLayout(IRefreshLayout refreshLayout) {
+        mRefreshLayout = refreshLayout;
+    }
 
-  public static void callback(String instanceId, String funcId, Map<String, Object> data) {
-    WXSDKManager.getInstance().callback(instanceId, funcId, data);
-  }
+    public void setLoadMoreLayout(IRefreshLayout loadMoreLayout) {
+        mLoadMoreLayout = loadMoreLayout;
+    }*/
 
-  /**
-   * Model switch, only applicable for developer model
-   * @param debug
-   */
-  public static void restartBridge(boolean debug) {
-    WXEnvironment.sDebugMode = debug;
-    WXSDKManager.getInstance().restartBridge();
-  }
+    public boolean isRefreshing() {
+        return mStatus == Status.REFRESH;
+    }
 
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, true);
-  }
+    public boolean isLoadingMore() {
+        return mStatus == Status.LOADMORE;
+    }
 
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(componentInfo, clazz);
-  }
+    @Override
+    public ListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (mStatus) {
+            case REFRESH:
+                if (viewType == ITEM_TYPE_REFRESH && mRefreshLayout != null) {
+                    return new ListBaseViewHolder(mRefreshLayout.getView());
+                }
+                break;
+            case LOADMORE:
+                if (viewType == ITEM_TYPE_LOADMORE && mLoadMoreLayout != null) {
+                    return new ListBaseViewHolder(mLoadMoreLayout.getView());
+                }
+                break;
+        }
+        return mInnerRecyclerViewAdapter.onCreateViewHolder(parent, viewType);
+    }
 
-  public static void addCustomOptions(String key, String value) {
-    WXEnvironment.addCustomOptions(key, value);
-  }
+    @Override
+    public void onBindViewHolder(ListBaseViewHolder holder, int position) {
+        if (position == 0) {
+            switch (mStatus) {
+                case REFRESH:
+                    //holder.setData();
+                    return;
+            }
+        } else if (position == getItemCount() - 1) {
+            switch (mStatus) {
+                case LOADMORE:
+                    return;
+            }
+        }
+        mInnerRecyclerViewAdapter.onBindViewHolder(holder, position);
+    }
 
-  public static IWXUserTrackAdapter getIWXUserTrackAdapter() {
-    return WXSDKManager.getInstance().getIWXUserTrackAdapter();
-  }
+    @Override
+    public int getItemCount() {
+        return mInnerRecyclerViewAdapter.getItemCount();
+    }
 
-  public static void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
-    WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
-  }
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            switch (mStatus) {
+                case REFRESH:
+                    return ITEM_TYPE_REFRESH;
+            }
+        } else if (position == getItemCount() - 1) {
+            switch (mStatus) {
+                case LOADMORE:
+                    return ITEM_TYPE_LOADMORE;
+            }
+        }
+        return mInnerRecyclerViewAdapter.getItemViewType(position);
+    }
 
-  public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
-    return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
-  }
+    @Override
+    public long getItemId(int position) {
+        return mInnerRecyclerViewAdapter.getItemId(position);
+    }
 
-  public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
-    WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
-  }
+    private void init(Context context) {
+        mRefreshLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
+        mLoadMoreLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
+    }
 
-  public static IWXHttpAdapter getIWXHttpAdapter() {
-    return WXSDKManager.getInstance().getIWXHttpAdapter();
-  }
+    private class Refreshlayout extends FrameLayout {
 
-  public static void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
-    WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
-  }
-
-  public static IActivityNavBarSetter getActivityNavBarSetter() {
-    return  WXSDKManager.getInstance().getActivityNavBarSetter();
-  }
-
-  public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
-    WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
-  }
-
+        public Refreshlayout(Context context) {
+            super(context);
+            setLayoutParams(
+                    new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            ProgressBar pb = new ProgressBar(context);
+            FrameLayout.LayoutParams pbLp =
+                    new LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+            pbLp.gravity = Gravity.CENTER_HORIZONTAL;
+            addView(pb, pbLp);
+        }
+    }
 
 }

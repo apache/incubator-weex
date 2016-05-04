@@ -202,16 +202,82 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view;
 
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.util.AttributeSet;
+import android.view.View;
 
-/**
- * Customize Components that wish to be reused in RecyclerView must implement this interface.
- * Then, components must check whether it should override
- * {@link WXComponent#detachViewAndClearPreInfo()} in order to be used in RecyclerView.
- * This interface provides an empty body, {@link WXComponent#detachViewAndClearPreInfo() }
- * will check whether its subclass implement this interface and execute default implementation.
- */
-public interface IWXRecyclerViewChild {
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
+
+public class WXLoadingIndicatorView extends View {
+
+    private int maxProgress = 100;
+    private int progress = 0;
+
+    private RectF oval;
+    private Paint paint;
+
+    public WXLoadingIndicatorView(Context context) {
+        this(context, null);
+    }
+
+    public WXLoadingIndicatorView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public WXLoadingIndicatorView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        oval = new RectF();
+        paint = new Paint();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        int width = this.getWidth();
+        int height = this.getHeight();
+
+        if (width != height) {
+            int min = Math.min(width, height);
+            width = min;
+            height = min;
+        }
+
+        paint.setAntiAlias(true);
+        paint.setColor(Color.GRAY);
+        canvas.drawColor(Color.TRANSPARENT);
+        int progressStrokeWidth = WXViewUtils.dip2px(4);
+        paint.setStrokeWidth(progressStrokeWidth);
+        paint.setStyle(Paint.Style.STROKE);
+
+        oval.left = progressStrokeWidth / 2; // 左上角x
+        oval.top = progressStrokeWidth / 2; // 左上角y
+        oval.right = width - progressStrokeWidth / 2; // 左下角x
+        oval.bottom = height - progressStrokeWidth / 2; // 右下角y
+
+        canvas.drawArc(oval, -90, ((float) progress / maxProgress) * 360, false, paint); // 绘制进度圆弧
+
+        WXLogUtils.v("tag", "progress "+progress);
+    }
+
+    public int getMaxProgress() {
+        return maxProgress;
+    }
+
+    public void setMaxProgress(int maxProgress) {
+        this.maxProgress = maxProgress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+        this.invalidate();
+    }
 
 }
+
