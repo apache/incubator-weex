@@ -185,7 +185,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   public volatile WXVContainer mParent;
   public volatile WXDomObject mDomObj;
   public String mInstanceId;
-  public boolean registerAppearEvent;
+  public boolean registerAppearEvent=false;
   public boolean appearState=false;
   protected int mOrientation = VERTICAL;
   protected WXSDKInstance mInstance;

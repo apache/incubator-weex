@@ -212,6 +212,7 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
 
     if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
       mAppearComponents.put(index,child);
+      child.registerAppearEvent=true;
     }
   }
 
@@ -230,6 +231,7 @@ public class WXListComponent extends WXVContainer implements IRecyclerAdapterLis
     }
     if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
       mAppearComponents.put(adapterPosition, child);
+      child.registerAppearEvent=true;
     }
   }
 
