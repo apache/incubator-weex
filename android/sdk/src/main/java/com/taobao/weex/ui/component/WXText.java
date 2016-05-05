@@ -216,6 +216,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.ui.view.WXTextView;
 
 /**
@@ -309,8 +310,11 @@ public class WXText extends WXComponent{
   public void setTextOverFlow(String textOverFlow) {
     TextView temp = getView();
     if(textOverFlow.equals(WXDomPropConstant.WX_TEXT_ELLIPSIS)){
-      temp.setSingleLine(true);
-      temp.setEllipsize(TruncateAt.END);
+      int lines=WXStyle.getLines(getDomObject().style);
+      if(!CSSConstants.isUndefined(lines)&&lines!=0){
+        temp.setSingleLine(true);
+        temp.setEllipsize(TruncateAt.END);
+      }
     }
   }
 }
