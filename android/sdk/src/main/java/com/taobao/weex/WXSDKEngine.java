@@ -205,6 +205,7 @@
 package com.taobao.weex;
 
 import android.app.Application;
+import android.os.AsyncTask;
 
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -246,6 +247,7 @@ import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 public class WXSDKEngine {
@@ -305,6 +307,20 @@ public class WXSDKEngine {
       WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
 
       register();
+
+      new AsyncTask<Application, Void, Void>() {
+        @Override
+        protected Void doInBackground(Application... params) {
+          try {
+            Class cls = Class.forName("com.taobao.weex.WXPrettyFish");
+            Method m = cls.getMethod("init", new Class[]{Application.class});
+            m.invoke(cls, new Object[]{params[0]});
+          } catch (Exception e) {
+            WXLogUtils.d("WXPrettyFish not found!");
+          }
+          return null;
+        }
+      }.execute(application);
     }
   }
 

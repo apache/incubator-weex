@@ -399,6 +399,16 @@ public class WXSDKInstance implements IWXActivityStateListener {
     if (mRendered || TextUtils.isEmpty(template)) {
       return;
     }
+
+    if(WXEnvironment.sDynamicMode && !TextUtils.isEmpty(WXEnvironment.sDynamicUrl) && options!=null && options.get("dynamicMode")==null){
+      if(options==null){
+        options=new HashMap<>();
+      }
+      options.put("dynamicMode","true");
+      renderByUrl(pageName,WXEnvironment.sDynamicUrl,options,jsonInitData,width,height,flag);
+      return;
+    }
+
     mWXPerformance.pageName = pageName;
     mWXPerformance.JSTemplateSize = template.length() / 1024;
 

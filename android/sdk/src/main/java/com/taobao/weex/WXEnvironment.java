@@ -248,6 +248,12 @@ public class WXEnvironment {
   private static Map<String, String> options = new HashMap<>();
 
   /**
+   * dynamic
+   */
+  public static boolean sDynamicMode = false;
+  public static String sDynamicUrl = "";
+
+  /**
    * Fetch system information.
    * @return map contains system information.
    */
