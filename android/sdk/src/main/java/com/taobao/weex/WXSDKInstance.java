@@ -400,10 +400,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
       return;
     }
 
+    if(options==null){
+      options=new HashMap<>();
+    }
+
     if(WXEnvironment.sDynamicMode && !TextUtils.isEmpty(WXEnvironment.sDynamicUrl) && options!=null && options.get("dynamicMode")==null){
-      if(options==null){
-        options=new HashMap<>();
-      }
       options.put("dynamicMode","true");
       renderByUrl(pageName,WXEnvironment.sDynamicUrl,options,jsonInitData,width,height,flag);
       return;
