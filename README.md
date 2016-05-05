@@ -11,13 +11,11 @@ We agree that you may discuss technical information about Weex, except that you 
 
 Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.github.io/weex/) for more information. 
 
-## Meet
+## Meet Weex
 
-* Install [Android Playground](http://g.tbcdn.cn/ali-wireless-h5/res/0.0.13/playground.apk).
+* [Install Playground](http://alibaba.github.io/weex/download.html).
 
-    <img src="http://alibaba.github.io/weex/img/android_playground_qr.png" width="160" height="160" >
-
-## Use
+## Use Weex
 
 * See [Tutorial](https://github.com/alibaba/weex/blob/dev/doc/tutorial.md).
 * See [Weex Documentation](https://github.com/alibaba/weex/blob/dev/doc/INSTALL.md) for more information.
@@ -28,8 +26,7 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
     0. Install [Node.js](http://nodejs.org/) 4.0+
     0. Under project root 
         0. `npm install`, install project 
-        0. `npm run dev && npm run serve`
-        0. `npm run watch`, in a new terminal window
+        0. `./start`
     0. Install [Android Environment](http://developer.android.com/training/basics/firstapp/index.html)
 0. Run playground, In Android Studio
     0. Open `android/playground`
