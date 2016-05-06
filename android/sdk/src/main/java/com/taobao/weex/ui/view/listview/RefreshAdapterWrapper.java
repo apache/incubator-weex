@@ -339,6 +339,11 @@ public class RefreshAdapterWrapper extends RecyclerView.Adapter<ListBaseViewHold
         return mInnerRecyclerViewAdapter.getItemId(position);
     }
 
+    @Override
+    public void onViewRecycled(ListBaseViewHolder holder) {
+        mInnerRecyclerViewAdapter.onViewRecycled(holder);
+    }
+
     private void init(Context context) {
         mRefreshLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
         mLoadMoreLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
