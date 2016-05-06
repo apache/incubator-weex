@@ -412,7 +412,8 @@ export function _bindRepeat(target, fragBlock, info) {
       const reusedMap = {}
       data.forEach((item, index) => {
         const key = trackBy ? item[trackBy] : index
-        if (!key) {
+        /* istanbul ignore if */
+        if (key == null || key === '') {
           return
         }
         trackMap[key] = item
