@@ -529,6 +529,22 @@ describe('test input and output', function () {
     delete allDocs[name]
   })
 
+  it('repeat-watch case', function () {
+    var name = 'repeat-watch'
+    var inputCode = readInput(name)
+    var outputCode = readOutput(name)
+    var doc = new Document(name)
+    allDocs[name] = doc
+
+    framework.createInstance(name, inputCode)
+    var expected = eval('(' + outputCode + ')')
+    var actual = doc.toJSON()
+    expect(actual).eql(expected)
+
+    framework.destroyInstance(name)
+    delete allDocs[name]
+  })
+
   it('if-refresh case', function () {
     var name = 'if-refresh'
     var inputCode = readInput(name)
