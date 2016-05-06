@@ -18,9 +18,7 @@ define('@weex-component/04f1048c50eca3454bc70de93d3213d4', function(require, exp
             for (var i = 0; i < this.more.length; i++) {
                 this.list.push(this.more[i]);
             }
-            this._app.updateActions()
         }
-
     }
 
 
