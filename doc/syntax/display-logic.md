@@ -119,6 +119,25 @@ e.g.
 </div>
 ```
 
+#### use `track-by` to specify unique attribute
+
+By default when replacing an array, `repeat` will cause the entire list to be re-rendered. However you can use `track-by` to specify an unique attribute as a hint, so that weex can reuse existing elements as much as possible.
+
+**NOTE: DO NOT USE DATA-BINDING SYNTAX FOR `track-by`**
+
+e.g.
+```html
+<template>
+  <container>
+    <container repeat="{{list}}" track-by="nickname" class="{{gender}}">
+      <image src="{{avatar}}"></image>
+      <text>{{nickname}} - {{group}}</text>
+    </container>
+  </container>
+</template>
+```
+
+Later on, when you replace the array including an item of the same nickname, it knows it can reuse the existing scope and DOM elements associated with the same nickname.
 
 ## Omitted mustach wrapper
 
