@@ -121,7 +121,7 @@ e.g.
 
 #### use `track-by` to specify unique attribute
 
-By default when replacing a array, `repeat` will cause the entire list to be re-rendered. However you can use `track-by` to specify an unique attribute as a hint, so that weex can reuse existing elements as much as possible.
+By default when replacing an array, `repeat` will cause the entire list to be re-rendered. However you can use `track-by` to specify an unique attribute as a hint, so that weex can reuse existing elements as much as possible.
 
 **NOTE: DO NOT USE DATA-BINDING SYNTAX FOR `track-by`**
 
@@ -137,7 +137,7 @@ e.g.
 </template>
 ```
 
-Later on, when you replace the array including a item of a same nickname, it knows it can reuse the existing scope and DOM elements associated with the same nickname.
+Later on, when you replace the array including an item of the same nickname, it knows it can reuse the existing scope and DOM elements associated with the same nickname.
 
 ## Omitted mustach wrapper
 
