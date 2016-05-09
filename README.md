@@ -43,6 +43,11 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 npm run clean
 ```
 
+**create `.we` file(run `npm run create -- -h` for help)**
+```shell
+npm run create -- name -o test
+```
+
 **transform `*.we` in the folders of `examples` & `test`**
 ```shell
 npm run transform
