@@ -44,8 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/17fb508e020e3effb4281b4e36e93645", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(8);
+	;__weex_define__("@weex-component/71fa7ec9e5c98b380ddb773ebddb7f8c", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(10);
 
 	;
 	  __webpack_require__(1);
@@ -56,10 +56,10 @@
 	  }
 
 	;__weex_module__.exports.template={
-	  "type": "scroller",
+	  "type": "div",
 	  "children": [
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "Box Model",
 	        "paddingBody": "0",
@@ -78,14 +78,14 @@
 	      ]
 	    },
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "border",
 	        "type": "primary"
 	      },
 	      "children": [
 	        {
-	          "type": "ui-panel",
+	          "type": "wxc-panel",
 	          "attr": {
 	            "title": "border-width",
 	            "type": ""
@@ -136,7 +136,7 @@
 	          ]
 	        },
 	        {
-	          "type": "ui-panel",
+	          "type": "wxc-panel",
 	          "attr": {
 	            "title": "border-color",
 	            "type": ""
@@ -187,7 +187,7 @@
 	          ]
 	        },
 	        {
-	          "type": "ui-panel",
+	          "type": "wxc-panel",
 	          "attr": {
 	            "title": "border-style",
 	            "type": ""
@@ -238,7 +238,7 @@
 	          ]
 	        },
 	        {
-	          "type": "ui-panel",
+	          "type": "wxc-panel",
 	          "attr": {
 	            "title": "border-radius",
 	            "type": ""
@@ -306,7 +306,9 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/17fb508e020e3effb4281b4e36e93645", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/71fa7ec9e5c98b380ddb773ebddb7f8c", {
+	  "transformerVersion": "0.3.1"
+	},undefined)
 
 /***/ },
 /* 1 */
@@ -320,6 +322,8 @@
 	  __webpack_require__(4);
 	  __webpack_require__(5);
 	  __webpack_require__(6);
+	  __webpack_require__(7);
+	  __webpack_require__(8);
 
 	})
 
@@ -327,32 +331,22 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-button", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-button", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
 	      type: 'default',
 	      size: 'large',
-	      value: '',
-	      click: null,
-	      disabled: false
+	      value: ''
 	    }},
 	    methods: {
-	      clicked: function(ev) {
-	        if (this.disabled) return;
-	        this.click(ev);
-	      }
 	    }
 	  }
 
 	;__weex_module__.exports.template={
 	  "type": "div",
 	  "classList": function () {return ['btn', 'btn-' + (this.type), 'btn-sz-' + (this.size)]},
-	  "events": {
-	    "click": "clicked"
-	  },
-	  "style": {},
 	  "children": [
 	    {
 	      "type": "text",
@@ -463,7 +457,7 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-hn", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-hn", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -522,14 +516,12 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      bgColor: '#ffffff',
-	      click: function() {
-	      }
+	      bgColor: '#ffffff'
 	    }},
 	    methods: {
 	      touchstart: function() {
@@ -550,7 +542,6 @@
 	    "item"
 	  ],
 	  "events": {
-	    "click": "click",
 	    "touchstart": "touchstart",
 	    "touchend": "touchend"
 	  },
@@ -581,7 +572,7 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-panel", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-panel", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -594,7 +585,6 @@
 	      border: 0
 	    }},
 	    ready: function() {
-	      console.log(this.data);
 	    }
 	  }
 
@@ -690,7 +680,7 @@
 /* 6 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-tip", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-tip", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -756,8 +746,219 @@
 	})
 
 /***/ },
-/* 7 */,
+/* 7 */
+/***/ function(module, exports) {
+
+	;__weex_define__("@weex-component/wxc-countdown", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	__weex_module__.exports = {
+	    data: function () {return {
+	        now: 0,
+	        remain: 0,
+	        time: {
+	            elapse: 0,
+	            D: '0',
+	            DD: '0',
+	            h: '0',
+	            hh: '00',
+	            H: '0',
+	            HH: '0',
+	            m: '0',
+	            mm: '00',
+	            M: '0',
+	            MM: '0',
+	            s: '0',
+	            ss: '00',
+	            S: '0',
+	            SS: '0'
+	        },
+	        outofview: false
+	    }},
+	    ready: function() {
+	        if (this.remain <= 0) {
+	            return;
+	        }
+	        // this.isWeb = this.$getConfig().env.platform === 'Web';
+	        this.now = Date.now();
+	        this.nextTick();
+	    },
+	    methods: {
+	        nextTick: function() {
+	            if (this.outofview) {
+	                setTimeout(this.nextTick.bind(this), 1000);
+	            } else {
+	                this.time.elapse = parseInt((Date.now() - this.now) / 1000);
+
+	                if (this.calc()) {
+	                    this.$emit('tick', Object.assign({}, this.time));
+	                    setTimeout(this.nextTick.bind(this), 1000);
+	                } else {
+	                    this.$emit('alarm', Object.assign({}, this.time));
+	                }
+	                this._app.updateActions(); 
+	            }
+	        },
+	        format: function(str) {
+	            if (str.length >= 2) {
+	                return str;
+	            } else {
+	                return '0' + str;
+	            }
+	        },
+	        calc: function() {
+	            var remain = this.remain - this.time.elapse;
+	            if (remain < 0) {
+	                remain = 0;
+	            }
+	            this.time.D = String(parseInt(remain / 86400));
+	            this.time.DD = this.format(this.time.D);
+	            this.time.h = String(parseInt((remain - parseInt(this.time.D) * 86400) / 3600));
+	            this.time.hh = this.format(this.time.h);
+	            this.time.H = String(parseInt(remain / 3600));
+	            this.time.HH = this.format(this.time.H);
+	            this.time.m = String(parseInt((remain - parseInt(this.time.H) * 3600) / 60));
+	            this.time.mm = this.format(this.time.m);
+	            this.time.M = String(parseInt(remain / 60));
+	            this.time.MM = this.format(this.time.M);
+	            this.time.s = String(remain - parseInt(this.time.M) * 60);
+	            this.time.ss = this.format(this.time.s);
+	            this.time.S = String(remain);
+	            this.time.SS = this.format(this.time.S);
+	            // console.log(remain, this.D, this.h, this.hh, this.H, this.HH, this.m, this.MM, this.s, this.ss, this.S, this.SS);
+	            return remain > 0;
+	        },
+	        appeared: function() {
+	            this.outofview = false;
+	        },
+	        disappeared: function() {
+	            this.outofview = true;
+	        }
+	    }
+	}
+
+	;__weex_module__.exports.template={
+	  "type": "div",
+	  "style": {
+	    "overflow": "hidden",
+	    "flexDirection": "row"
+	  },
+	  "events": {
+	    "appear": "appeared",
+	    "disappear": "disappeared"
+	  },
+	  "children": [
+	    {
+	      "type": "content"
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "wrap": {
+	    "overflow": "hidden"
+	  }
+	}
+	})
+
+/***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	;__weex_define__("@weex-component/wxc-marquee", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	__weex_module__.exports = {
+	    data: function () {return {
+	        step: 0,
+	        count: 0,
+	        index: 0,
+	        duration: 0,
+	        interval: 0,
+	        outofview: false
+	    }},
+	    ready: function () {
+	        if (this.interval > 0
+	                && this.step > 0
+	                && this.duration > 0) {
+	            this.nextTick();    
+	        }
+	    },
+	    methods: {
+	        nextTick: function() {
+	            var self = this;
+	            if (this.outofview) {
+	                setTimeout(self.nextTick.bind(self), self.interval);
+	            } else {
+	                setTimeout(function() {
+	                    self.animation(self.nextTick.bind(self));
+	                }, self.interval);
+	            }
+	        },
+	        animation: function(cb) {
+	            var self = this;
+	            var offset = -self.step * (self.index + 1);
+	            var $animation = __weex_require__('@weex-module/animation');
+	            $animation.transition(this.$el('anim'), {
+	              styles: {
+	                transform: 'translateY(' + String(offset) + 'px) translateZ(0)'
+	              },
+	              timingFunction: 'ease',
+	              duration: self.duration
+	            }, function() {
+	                self.index = (self.index + 1) % (self.count - 1);
+	                self.$emit('change');
+	                cb && cb();
+	            });
+	        },
+	        appeared: function() {
+	            this.outofview = false;
+	        },
+	        disappeared: function() {
+	            this.outofview = true;
+	        }
+	    }
+	}
+
+	;__weex_module__.exports.template={
+	  "type": "div",
+	  "classList": [
+	    "wrap"
+	  ],
+	  "events": {
+	    "appear": "appeared",
+	    "disappear": "disappeared"
+	  },
+	  "children": [
+	    {
+	      "type": "div",
+	      "id": "anim",
+	      "classList": [
+	        "anim"
+	      ],
+	      "children": [
+	        {
+	          "type": "content"
+	        }
+	      ]
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "wrap": {
+	    "overflow": "hidden",
+	    "position": "relative"
+	  },
+	  "anim": {
+	    "flexDirection": "column",
+	    "position": "absolute",
+	    "transform": "translateY(0) translateZ(0)"
+	  }
+	}
+	})
+
+/***/ },
+/* 9 */,
+/* 10 */
 /***/ function(module, exports) {
 
 	;__weex_define__("@weex-component/style-item", [], function(__weex_require__, __weex_exports__, __weex_module__){

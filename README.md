@@ -84,6 +84,10 @@ npm run copy
 
 Please install [Git for Windows](https://git-scm.com/download/win) or [Cygwin](https://www.cygwin.com/).
 
+## FAQ
+
+See [FAQ](./doc/faq.md) for more information.
+
 ## Contributing
 
-See [Weex Contributing Guide](./CONTRIBUTING.md).
+See [Weex Contributing Guide](./CONTRIBUTING.md) for more information.
