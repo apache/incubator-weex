@@ -223,7 +223,7 @@ import java.util.List;
  */
 public class WXRecycleImageManager {
 
-  public static final int VISIBLE_TOP_SPACE = -WXViewUtils.getScreenHeight() * 3 / 5;
+  public static final int VISIBLE_TOP_SPACE = -WXViewUtils.getScreenHeight() * 1;
   public static final int VISIBLE_BOTTOM_SPACE = -VISIBLE_TOP_SPACE;
 
   public static void setIfRecycleImage(boolean ifRecycleImage) {
@@ -234,7 +234,7 @@ public class WXRecycleImageManager {
     return IfRecycleImage;
   }
 
-  private static boolean IfRecycleImage = false;
+  private static boolean IfRecycleImage = true;
   /**
    * Location of imageView on the screen
    */

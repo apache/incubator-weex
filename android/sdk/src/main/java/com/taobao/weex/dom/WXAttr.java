@@ -356,7 +356,7 @@ public class WXAttr extends ConcurrentHashMap<String, Object> {
   public boolean getIsRecycleImage() {
     Object obj = get(WXDomPropConstant.WX_ATTR_RECYCLE_IMG);
     if (obj == null) {
-      return false;
+      return true;
     }
 
     try {
