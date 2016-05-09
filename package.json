@@ -39,6 +39,7 @@
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
+    "create": "./src/components/bin/create.js",
     "transform": "webpack --config webpack.config.js",
     "dev": "npm run clean && npm run transform",
     "watch": "webpack --watch --config webpack.config.js",

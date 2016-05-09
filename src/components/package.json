@@ -2,6 +2,9 @@
   "name": "weex-components",
   "version": "0.0.6",
   "main": "./index.we",
+  "bin": {
+    "wxc": "./bin/create.js"
+  },
   "description": "A group of simple and useful weex components",
   "license": "Apache-2.0",
   "repository": {
