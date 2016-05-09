@@ -3,6 +3,7 @@
 
 let path = require('path');
 let fs = require('fs');
+let npmlog = require('npmlog');
 
 let argv = require('yargs')
   .usage('Create component')
@@ -41,12 +42,12 @@ module.exports = {
 }
 
 function getPartedContent(name) {
-  const JS = `import template from './${name}.html';
-import style from './${name}.css';
+  const JS = `var template = require('./${name}.html');
+var style = require('./${name}.css');
 
 module.exports = {
-  template,
-  style,
+  template: template,
+  style: style,
   data: {
 
   },
@@ -56,7 +57,7 @@ module.exports = {
 };
 `;
 
-  const CSS = `.${name} {}`;
+  const CSS = `.wxc-${name} {}`;
   const HTML = `<div class="wxc-${name}"></div>`;
 
   return {
@@ -66,16 +67,28 @@ module.exports = {
   }
 }
 
+function write(name, type, content) {
+  let filepath = path.join(output, `${name}.${type}`);
+  if (fs.existsSync(filepath) && !argv.force) {
+    npmlog.error('exists: ', '%s', filepath);
+    npmlog.info('use --force to continue');
+    return false;
+  }
+  fs.writeFileSync(filepath, content, 'utf-8');
+  npmlog.info('write: ', '%s', filepath)
+  return true;
+}
+
 const CWD = process.cwd();
 const output = path.join(CWD, argv.out);
 argv._.forEach(function(name) {
   if (argv.parted) {
     let content = getPartedContent(name);
-    fs.writeFileSync(path.join(output, name + '.js'), content.JS, 'utf-8');
-    fs.writeFileSync(path.join(output, name + '.css'), content.CSS, 'utf-8');
-    fs.writeFileSync(path.join(output, name + '.html'), content.HTML, 'utf-8');
+    return write(name, 'js', content.JS) &&
+            write(name, 'css', content.CSS) &&
+            write(name, 'html', content.HTML);
   } else {
     let content = getWeContent(name);
-    fs.writeFileSync(path.join(output, name + '.we'), content, 'utf-8');
+    return write(name, 'we', content);
   }
 });

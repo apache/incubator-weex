@@ -27,5 +27,9 @@
     "html5",
     "android",
     "ios"
-  ]
+  ],
+  "dependencies": {
+    "npmlog": "^2.0.3",
+    "yargs": "^4.7.0"
+  }
 }
