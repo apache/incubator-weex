@@ -80,7 +80,7 @@
       </div>
     </wxc-panel>
     
-    <wxc-panel title="flex" type="primary">
+    <wxc-panel title="flex-wrap" type="primary">
       <div class="row" style="flex-wrap:wrap;background-color:grey;padding:10;">
         <style-item value="1:wrap"></style-item>
         <style-item value="2:wrap"></style-item>
