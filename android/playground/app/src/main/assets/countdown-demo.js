@@ -44,81 +44,234 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/2b3607ad57e8dd3f2dcd5329ee5d0df9", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(11);
+	;__weex_define__("@weex-component/ca89d0d7210707f1d1160c991094fdd1", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
+
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      dir: 'examples',
-	      items: [
-	        {name: 'hello', title: 'Hello World', url: ''}
-	      ]
+	      countdown1: {
+	        remain: 5000,
+	        time: {
+	          D: '0',
+	          hh: '00',
+	          mm: '00',
+	          ss: '00'
+	        }
+	      },
+	      countdown2: {
+	        remain: 5000,
+	        time: {
+	          MM: '0',
+	          ss: '0'
+	        }
+	      }
 	    }},
-	    created: function() {
-	      var bundleUrl = this.$getConfig().bundleUrl;
-	      console.log('hit', bundleUrl);
-	      var nativeBase;
-	      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
-	      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-	      if (isAndroidAssets) {
-	        nativeBase = 'file://assets/';
-	      }
-	      else if (isiOSAssets) {
-	        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-	      }
-	      else {
-	        var host = 'localhost:12580';
-	        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-	        if (matches && matches.length >= 2) {
-	          host = matches[1];
-	        }
-	        nativeBase = '//' + host + '/' + this.dir + '/build/';
-	      }
-	      var h5Base = './index.html?page=./' + this.dir + '/build/';
-	      // in Native
-	      var base = nativeBase;
-	      if (typeof window === 'object') {
-	        // in Browser or WebView
-	        base = h5Base;
-	      }
+	    ready: function() {
+	      this.initCountdown('countdown1');
+	      this.initCountdown('countdown2');
+	    },
+	    methods: {
+	      initCountdown: function(id) {
+	        var self = this;
 
-	      for (var i in this.items) {
-	        var item = this.items[i];
-	        if (!item.url) {
-	          item.url = base + item.name + '.js';
-	        }
+	        var $countdown = this.$vm(id);
+	        $countdown.$on('tick', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
+
+	        $countdown.$on('alarm', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
 	      }
-	      // see log in Android Logcat
-	      if (this.items.length) console.log('hit', this.items[0].url);
 	    }
 	  }
 
 	;__weex_module__.exports.template={
-	  "type": "list",
+	  "type": "scroller",
 	  "children": [
 	    {
-	      "type": "cell",
-	      "append": "tree",
-	      "repeat": function () {return this.items},
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "Countdown"
+	      },
 	      "children": [
 	        {
-	          "type": "example-list-item",
+	          "type": "wxc-countdown",
+	          "id": "countdown1",
 	          "attr": {
-	            "title": function () {return this.title},
-	            "url": function () {return this.url}
-	          }
+	            "remain": function () {return this.countdown1.remain}
+	          },
+	          "style": {
+	            "width": 750,
+	            "marginTop": 20,
+	            "marginBottom": 20
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.D}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "day(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.hh}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "hour(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.mm}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "minute(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.ss}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "second(s)"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-countdown",
+	          "id": "countdown2",
+	          "attr": {
+	            "remain": function () {return this.countdown2.remain}
+	          },
+	          "style": {
+	            "width": 600
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.MM}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": ":"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.ss}
+	              }
+	            }
+	          ]
 	        }
 	      ]
 	    }
 	  ]
 	}
-	;__weex_module__.exports.style={}
+	;__weex_module__.exports.style={
+	  "ctno1": {
+	    "borderRadius": 8,
+	    "paddingTop": 6,
+	    "paddingBottom": 6,
+	    "paddingRight": 4,
+	    "paddingLeft": 4,
+	    "marginLeft": 2,
+	    "marginRight": 2,
+	    "backgroundColor": "rgb(242,222,222)",
+	    "color": "rgb(169,68,66)"
+	  },
+	  "ctno2": {
+	    "borderRadius": 8,
+	    "paddingTop": 30,
+	    "paddingBottom": 30,
+	    "paddingLeft": 16,
+	    "paddingRight": 16,
+	    "backgroundColor": "rgb(217,237,247)",
+	    "color": "rgb(49,112,143)",
+	    "textAlign": "center",
+	    "fontSize": 40
+	  }
+	}
 	})
-	;__weex_bootstrap__("@weex-component/2b3607ad57e8dd3f2dcd5329ee5d0df9", {
+	;__weex_bootstrap__("@weex-component/ca89d0d7210707f1d1160c991094fdd1", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -764,53 +917,6 @@
 	    "flexDirection": "column",
 	    "position": "absolute",
 	    "transform": "translateY(0) translateZ(0)"
-	  }
-	}
-	})
-
-/***/ },
-/* 9 */,
-/* 10 */,
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	;__weex_define__("@weex-component/example-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;
-	  __webpack_require__(1);
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      title: '',
-	      url: ''
-	    }},
-	    methods: {
-	      redirect: function() {
-	        this.$openURL(this.url);
-	      }
-	    }
-	  }
-
-	;__weex_module__.exports.template={
-	  "type": "wxc-list-item",
-	  "events": {
-	    "click": "redirect"
-	  },
-	  "children": [
-	    {
-	      "type": "text",
-	      "classList": [
-	        "item-txt"
-	      ],
-	      "attr": {
-	        "value": function () {return this.title}
-	      }
-	    }
-	  ]
-	}
-	;__weex_module__.exports.style={
-	  "item-txt": {
-	    "fontSize": 48,
-	    "color": "#555555"
 	  }
 	}
 	})
