@@ -1,0 +1,16 @@
+<template>
+  <div>
+    <text>{{result}}</text>
+  </div>
+</template>
+
+<script>
+  module.exports = {
+    data: {
+      result: 'loading...'
+    },
+    ready: function() {
+      this.result = 'loaded';
+    }
+  };
+</script>
