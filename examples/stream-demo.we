@@ -1,10 +1,13 @@
 <template>
   <div>
-    <text>{{result}}</text>
+    <wxc-panel title="$sendHttp">
+      <text>{{result}}</text>
+    </wxc-panel>
   </div>
 </template>
 
 <script>
+  require('weex-components');
   module.exports = {
     data: {
       result: 'loading...'
