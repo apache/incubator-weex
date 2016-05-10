@@ -96,11 +96,11 @@ Loading.prototype.attr = {
   display: function (val) {
     if (val === true || val === 'true') {
       setTimeout(function () {
-       this.show()
+        this.show()
       }.bind(this), 0)
     } else {
       setTimeout(function () {
-       this.hide()
+        this.hide()
       }.bind(this), 0)
     }
   }
