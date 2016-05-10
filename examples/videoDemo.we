@@ -5,8 +5,8 @@
            auto-play="true" play-status="{{playStatus}}">
     </video>
     <div style="flex-direction: row; justify-content: center;">
-      <ui-button value="Pause" click="{{pause}}"></ui-button>
-      <ui-button value="Play" click="{{play}}" type="primary" style="margin-left:20px;"></ui-button>
+      <wxc-button value="Pause" onclick="{{pause}}"></wxc-button>
+      <wxc-button value="Play" onclick="{{play}}" type="primary" style="margin-left:20px;"></wxc-button>
     </div>
   </scroller>
 </template>
@@ -20,6 +20,7 @@
 </style>
 
 <script>
+  require('weex-components');
   module.exports = {
     data: {
       playStatus: 'play'
@@ -32,19 +33,15 @@
         this.playStatus = 'play'
       },
       onpause: function() {
-        this.playStatus = 'pause';
         this.$call('modal', 'toast', {'message': 'video pause'});
       },
       onstart: function() {
-        this.playStatus = 'play';
         this.$call('modal', 'toast', {'message': 'video start'});
       },
       onfinish: function() {
-      this.playStatus = 'finish';
         this.$call('modal', 'toast', {'message': 'video finish'});
       },
       onfail: function() {
-      this.playStatus = 'fail';
         this.$call('modal', 'toast', {'message': 'video fail'});
       }
     }

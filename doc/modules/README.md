@@ -1,4 +1,19 @@
 # Built-in Modules
 
-* [steam](/modules/steam.md)
-* [modal](/modules/modal.md)
+## How to use
+
+You can use a simply way like `require('@weex-module/name')` to access the apis of module. e.g.
+
+```javascript
+var dom = require('@weex-module/dom');
+dom.scrollTo(this.$el('someIdForElement'), {
+    offset: 0
+});
+```
+
+## Table of Contents
+
+* [dom](./dom.md)
+* [steam](./steam.md)
+* [modal](./modal.md)
+* [animation](./animation.md)
