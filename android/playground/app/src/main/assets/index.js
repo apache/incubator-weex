@@ -44,8 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/fd274e38d2571c835534dc7c6594cd11", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(13);
+	;__weex_define__("@weex-component/3f70dacdb4d5b5daf01d34d5c95af25a", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(12);
 
 	;
 	  __weex_module__.exports = {
@@ -54,16 +54,19 @@
 	        {name: 'hello', title: 'Hello World'},
 	        {name: 'image-demo', title: 'Image'},
 	        {name: 'text-demo', title: 'Text'},
-	        {name: 'common', title: 'Common Style'},
+	        {name: 'style', title: 'Common Style'},
 	        {name: 'list-basic', title: 'List (Basic)'},
 	        {name: 'list-demo', title: 'List (Advanced)'},
 	        {name: 'slider-demo', title: 'Slider'},
 	        {name: 'animation', title: 'Animation'},
+	        {name: 'instance-api', title: 'Instance API'},
 	        {name: 'modal', title: 'Modal'},
+	        {name: 'stream-demo', title: 'Stream'},
 	        {name: 'video-demo', title: 'Video'},
-	        {name: 'calculator', title: 'Calculator'},
+	        {name: 'countdown-demo', title: 'Countdown'},
+	        {name: 'marquee-demo', title: 'Marquee'},
 	        {name: 'ui', title: 'UI Gallery'},
-	        {name: 'template', title: 'Example Template'}
+	        {name: 'calculator', title: 'Calculator'}
 	      ]
 	    }}
 	  }
@@ -77,7 +80,7 @@
 	}
 	;__weex_module__.exports.style={}
 	})
-	;__weex_bootstrap__("@weex-component/fd274e38d2571c835534dc7c6594cd11", {
+	;__weex_bootstrap__("@weex-component/3f70dacdb4d5b5daf01d34d5c95af25a", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -730,8 +733,7 @@
 /***/ },
 /* 9 */,
 /* 10 */,
-/* 11 */,
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	;__weex_define__("@weex-component/example-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
@@ -776,11 +778,11 @@
 	})
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	;__weex_define__("@weex-component/example-list", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(12);
+	__webpack_require__(11);
 
 	;
 	  __webpack_require__(1);

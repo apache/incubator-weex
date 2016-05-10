@@ -44,8 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/71fa7ec9e5c98b380ddb773ebddb7f8c", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(10);
+	;__weex_define__("@weex-component/6833203031b24f8ce4cb9ca2b11d7266", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(16);
 
 	;
 	  __webpack_require__(1);
@@ -112,19 +112,29 @@
 	                  "type": "style-item",
 	                  "style": {
 	                    "borderStyle": "solid",
-	                    "borderWidth": 4,
+	                    "borderWidth": 10,
 	                    "borderColor": "#333333"
 	                  },
 	                  "attr": {
-	                    "value": "",
-	                    "type": ""
+	                    "value": ""
 	                  }
 	                },
 	                {
 	                  "type": "style-item",
 	                  "style": {
 	                    "borderStyle": "solid",
-	                    "borderWidth": 10,
+	                    "borderLeftWidth": 4,
+	                    "borderColor": "#333333"
+	                  },
+	                  "attr": {
+	                    "value": ""
+	                  }
+	                },
+	                {
+	                  "type": "style-item",
+	                  "style": {
+	                    "borderStyle": "solid",
+	                    "borderBottomWidth": 4,
 	                    "borderColor": "#333333"
 	                  },
 	                  "attr": {
@@ -167,8 +177,7 @@
 	                    "borderColor": "#dddddd"
 	                  },
 	                  "attr": {
-	                    "value": "",
-	                    "type": ""
+	                    "value": ""
 	                  }
 	                },
 	                {
@@ -193,6 +202,16 @@
 	            "type": ""
 	          },
 	          "children": [
+	            {
+	              "type": "wxc-tip",
+	              "attr": {
+	                "type": "warning",
+	                "value": "just support four edges"
+	              },
+	              "style": {
+	                "marginBottom": 10
+	              }
+	            },
 	            {
 	              "type": "div",
 	              "style": {
@@ -253,18 +272,8 @@
 	                {
 	                  "type": "style-item",
 	                  "style": {
-	                    "height": 160,
-	                    "borderRadius": 80
-	                  },
-	                  "attr": {
-	                    "value": ""
-	                  }
-	                },
-	                {
-	                  "type": "style-item",
-	                  "style": {
 	                    "width": 75,
-	                    "borderRadius": 37.5
+	                    "borderRadius": 38
 	                  },
 	                  "attr": {
 	                    "value": ""
@@ -274,6 +283,26 @@
 	                  "type": "style-item",
 	                  "style": {
 	                    "borderRadius": 20
+	                  },
+	                  "attr": {
+	                    "value": ""
+	                  }
+	                },
+	                {
+	                  "type": "style-item",
+	                  "style": {
+	                    "borderTopLeftRadius": 20,
+	                    "borderTopRightRadius": 20
+	                  },
+	                  "attr": {
+	                    "value": ""
+	                  }
+	                },
+	                {
+	                  "type": "style-item",
+	                  "style": {
+	                    "borderBottomLeftRadius": 20,
+	                    "borderBottomRightRadius": 20
 	                  },
 	                  "attr": {
 	                    "value": ""
@@ -306,7 +335,7 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/71fa7ec9e5c98b380ddb773ebddb7f8c", {
+	;__weex_bootstrap__("@weex-component/6833203031b24f8ce4cb9ca2b11d7266", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -958,7 +987,13 @@
 
 /***/ },
 /* 9 */,
-/* 10 */
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
+/* 16 */
 /***/ function(module, exports) {
 
 	;__weex_define__("@weex-component/style-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
@@ -970,12 +1005,8 @@
 	      type: '0' // 0, 1
 	    }},
 	    methods: {
-	      ready: function() {
-	        // TODO issue why undefined?
-	        console.log(this.data);
-	      },
 	      bgColor: function() {
-	        return this.type == '1' ? '#BEAD92' : '#7BA3A8';
+	        return this.type == '1' ? '#7BA3A8' : '#BEAD92';
 	      }
 	    }
 	  }
@@ -996,7 +1027,6 @@
 	;__weex_module__.exports.style={
 	  "item": {
 	    "marginRight": 10,
-	    "marginBottom": 10,
 	    "width": 160,
 	    "height": 75,
 	    "paddingLeft": 8,

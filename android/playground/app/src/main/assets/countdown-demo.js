@@ -44,10 +44,49 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/ca89d0d7210707f1d1160c991094fdd1", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
+
+	  __weex_module__.exports = {
+	    data: function () {return {
+	      countdown1: {
+	        remain: 5000,
+	        time: {
+	          D: '0',
+	          hh: '00',
+	          mm: '00',
+	          ss: '00'
+	        }
+	      },
+	      countdown2: {
+	        remain: 5000,
+	        time: {
+	          MM: '0',
+	          ss: '0'
+	        }
+	      }
+	    }},
+	    ready: function() {
+	      this.initCountdown('countdown1');
+	      this.initCountdown('countdown2');
+	    },
+	    methods: {
+	      initCountdown: function(id) {
+	        var self = this;
+
+	        var $countdown = this.$vm(id);
+	        $countdown.$on('tick', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
+
+	        $countdown.$on('alarm', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
+	      }
+	    }
+	  }
 
 	;__weex_module__.exports.template={
 	  "type": "scroller",
@@ -55,322 +94,184 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "color"
+	        "title": "Countdown"
 	      },
 	      "children": [
 	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
+	          "type": "wxc-countdown",
+	          "id": "countdown1",
 	          "attr": {
-	            "value": "default is black"
-	          }
+	            "remain": function () {return this.countdown1.remain}
+	          },
+	          "style": {
+	            "width": 750,
+	            "marginTop": 20,
+	            "marginBottom": 20
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.D}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "day(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.hh}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "hour(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.mm}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "minute(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.ss}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "second(s)"
+	              }
+	            }
+	          ]
 	        },
 	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "#286090"
-	          },
+	          "type": "wxc-countdown",
+	          "id": "countdown2",
 	          "attr": {
-	            "value": "#286090"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "#00ff00"
+	            "remain": function () {return this.countdown2.remain}
 	          },
-	          "attr": {
-	            "value": "#0f0"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
 	          "style": {
-	            "color": "#FF0000"
+	            "width": 600
 	          },
-	          "attr": {
-	            "value": "keyword"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "rgb(238,162,54)"
-	          },
-	          "attr": {
-	            "value": "rgb(238, 162, 54)"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "rgba(238,162,54,0.5)"
-	          },
-	          "attr": {
-	            "value": "rgba(238, 162, 54, 0.5)"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-size"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 32
-	          },
-	          "attr": {
-	            "value": "32"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 64
-	          },
-	          "attr": {
-	            "value": "64"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 100
-	          },
-	          "attr": {
-	            "value": "100"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-style"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontStyle": "normal"
-	          },
-	          "attr": {
-	            "value": "normal"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontStyle": "italic"
-	          },
-	          "attr": {
-	            "value": "italic"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-weight"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontWeight": "normal"
-	          },
-	          "attr": {
-	            "value": "normal"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontWeight": "bold"
-	          },
-	          "attr": {
-	            "value": "bold"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-decoration"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "none"
-	          },
-	          "attr": {
-	            "value": "none"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "underline"
-	          },
-	          "attr": {
-	            "value": "underline"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "line-through"
-	          },
-	          "attr": {
-	            "value": "line-through"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-align"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "left"
-	          },
-	          "attr": {
-	            "value": "left"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "center"
-	          },
-	          "attr": {
-	            "value": "center"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "right"
-	          },
-	          "attr": {
-	            "value": "right"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-overflow"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textOverflow": "clip",
-	            "width": 450,
-	            "lines": 1
-	          },
-	          "attr": {
-	            "value": "text-overflow:clip text-overflow:clip"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textOverflow": "ellipsis",
-	            "width": 450,
-	            "lines": 1
-	          },
-	          "attr": {
-	            "value": "text-overflow: ellipsis text-overflow: ellipsis"
-	          }
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.MM}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": ":"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.ss}
+	              }
+	            }
+	          ]
 	        }
 	      ]
 	    }
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "txt": {
-	    "marginBottom": 12,
+	  "ctno1": {
+	    "borderRadius": 8,
+	    "paddingTop": 6,
+	    "paddingBottom": 6,
+	    "paddingRight": 4,
+	    "paddingLeft": 4,
+	    "marginLeft": 2,
+	    "marginRight": 2,
+	    "backgroundColor": "rgb(242,222,222)",
+	    "color": "rgb(169,68,66)"
+	  },
+	  "ctno2": {
+	    "borderRadius": 8,
+	    "paddingTop": 30,
+	    "paddingBottom": 30,
+	    "paddingLeft": 16,
+	    "paddingRight": 16,
+	    "backgroundColor": "rgb(217,237,247)",
+	    "color": "rgb(49,112,143)",
+	    "textAlign": "center",
 	    "fontSize": 40
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", {
+	;__weex_bootstrap__("@weex-component/ca89d0d7210707f1d1160c991094fdd1", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
