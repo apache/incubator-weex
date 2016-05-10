@@ -44,10 +44,39 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/93d7260198ac388f8dc31fa3eb8477c6", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
+
+	  __weex_module__.exports = {
+	    data: function () {return {
+	      getResult: 'loading...',
+	      postResult: 'loading...'
+	    }},
+	    ready: function() {
+	      var stream = __weex_require__('@weex-module/stream');
+	      var me = this;
+	      var GET_URL = 'http://httpbin.org/get';
+	      var POST_URL = 'http://httpbin.org/post';
+	      
+	      stream.sendHttp({
+	        method: 'GET',
+	        url: GET_URL
+	      }, function(ret) {
+	        console.log('get', ret);
+	        me.getResult = ret;
+	      });
+
+	      stream.sendHttp({
+	        method: 'POST',
+	        url: POST_URL
+	      }, function(ret) {
+	        console.log('post', ret);
+	        me.postResult = ret;
+	      });
+	    }
+	  };
 
 	;__weex_module__.exports.template={
 	  "type": "scroller",
@@ -55,322 +84,44 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "color"
+	        "title": "stream.sendHttp",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
+	          "type": "wxc-panel",
 	          "attr": {
-	            "value": "default is black"
-	          }
+	            "title": "method = GET"
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "attr": {
+	                "value": function () {return this.getResult}
+	              }
+	            }
+	          ]
 	        },
 	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "#286090"
-	          },
+	          "type": "wxc-panel",
 	          "attr": {
-	            "value": "#286090"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "#00ff00"
+	            "title": "method = POST"
 	          },
-	          "attr": {
-	            "value": "#0f0"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "#FF0000"
-	          },
-	          "attr": {
-	            "value": "keyword"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "rgb(238,162,54)"
-	          },
-	          "attr": {
-	            "value": "rgb(238, 162, 54)"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "color": "rgba(238,162,54,0.5)"
-	          },
-	          "attr": {
-	            "value": "rgba(238, 162, 54, 0.5)"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-size"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 32
-	          },
-	          "attr": {
-	            "value": "32"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 64
-	          },
-	          "attr": {
-	            "value": "64"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontSize": 100
-	          },
-	          "attr": {
-	            "value": "100"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-style"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontStyle": "normal"
-	          },
-	          "attr": {
-	            "value": "normal"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontStyle": "italic"
-	          },
-	          "attr": {
-	            "value": "italic"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "font-weight"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontWeight": "normal"
-	          },
-	          "attr": {
-	            "value": "normal"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "fontWeight": "bold"
-	          },
-	          "attr": {
-	            "value": "bold"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-decoration"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "none"
-	          },
-	          "attr": {
-	            "value": "none"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "underline"
-	          },
-	          "attr": {
-	            "value": "underline"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textDecoration": "line-through"
-	          },
-	          "attr": {
-	            "value": "line-through"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-align"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "left"
-	          },
-	          "attr": {
-	            "value": "left"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "center"
-	          },
-	          "attr": {
-	            "value": "center"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textAlign": "right"
-	          },
-	          "attr": {
-	            "value": "right"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "text-overflow"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textOverflow": "clip",
-	            "width": 450,
-	            "lines": 1
-	          },
-	          "attr": {
-	            "value": "text-overflow:clip text-overflow:clip"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "style": {
-	            "textOverflow": "ellipsis",
-	            "width": 450,
-	            "lines": 1
-	          },
-	          "attr": {
-	            "value": "text-overflow: ellipsis text-overflow: ellipsis"
-	          }
+	          "children": [
+	            {
+	              "type": "text",
+	              "attr": {
+	                "value": function () {return this.postResult}
+	              }
+	            }
+	          ]
 	        }
 	      ]
 	    }
 	  ]
 	}
-	;__weex_module__.exports.style={
-	  "txt": {
-	    "marginBottom": 12,
-	    "fontSize": 40
-	  }
-	}
 	})
-	;__weex_bootstrap__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", {
+	;__weex_bootstrap__("@weex-component/93d7260198ac388f8dc31fa3eb8477c6", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

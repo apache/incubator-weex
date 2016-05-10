@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/080b1725e07c0c4c2abc2d6a65b42ae9", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/3f70dacdb4d5b5daf01d34d5c95af25a", [], function(__weex_require__, __weex_exports__, __weex_module__){
 	__webpack_require__(12);
 
 	;
@@ -59,8 +59,9 @@
 	        {name: 'list-demo', title: 'List (Advanced)'},
 	        {name: 'slider-demo', title: 'Slider'},
 	        {name: 'animation', title: 'Animation'},
-	        //{name: 'instance-api', title: 'Instance API'},
+	        {name: 'instance-api', title: 'Instance API'},
 	        {name: 'modal', title: 'Modal'},
+	        {name: 'stream-demo', title: 'Stream'},
 	        {name: 'video-demo', title: 'Video'},
 	        {name: 'countdown-demo', title: 'Countdown'},
 	        {name: 'marquee-demo', title: 'Marquee'},
@@ -79,7 +80,7 @@
 	}
 	;__weex_module__.exports.style={}
 	})
-	;__weex_bootstrap__("@weex-component/080b1725e07c0c4c2abc2d6a65b42ae9", {
+	;__weex_bootstrap__("@weex-component/3f70dacdb4d5b5daf01d34d5c95af25a", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
