@@ -321,7 +321,7 @@ class WXDomStatement {
       for (int i = 0; i < size; i++) {
         String fixedRef = root.getFixedStyleRefs().get(i);
         WXDomObject wxDomObject = mRegistry.get(fixedRef);
-        if (wxDomObject.parent != null) {
+        if (wxDomObject!=null && wxDomObject.parent != null) {
           wxDomObject.parent.remove(wxDomObject);
           root.add(wxDomObject, -1);
         }
