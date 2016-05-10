@@ -213,6 +213,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -380,6 +381,7 @@ public class WXListComponent extends WXVContainer implements
    */
   @Override
   public void onViewRecycled(ListBaseViewHolder holder) {
+    WXLogUtils.e("list","onViewRecycled");
     recycleImage(holder.itemView);
   }
 
@@ -392,6 +394,10 @@ public class WXListComponent extends WXVContainer implements
   @Override
   public void onBindViewHolder(ListBaseViewHolder holder, int position) {
     WXComponent component=getChild(position);
+    if (indoreCells != null
+        && indoreCells.contains(getItemViewType(position))){
+      return;
+    }
     if(component!=null){
       component.bind(null);
       component.flushView();
@@ -447,7 +453,7 @@ public class WXListComponent extends WXVContainer implements
       WXLogUtils.e(TAG,
                    "getItemViewType: NO ID, this will crash the whole render system of WXListRecyclerView");
     }
-    prepareFixedComponent(position);
+    prepareFixedComponent(position,itemViewType);
     return itemViewType;
   }
 
@@ -555,7 +561,10 @@ public class WXListComponent extends WXVContainer implements
 
   private void recycleImage(View view){
     if(view instanceof WXImageView){
+      WXLogUtils.e("recycleImage :"+view.hashCode());
       ((WXImageView) view).setImageDrawable(null);
+      mInstance.getImgLoaderAdapter().setImage(null, (WXImageView)view,
+                                               null, null);
     }
     else if(view instanceof ViewGroup){
       for(int i=0;i<((ViewGroup) view).getChildCount();i++){
@@ -567,8 +576,8 @@ public class WXListComponent extends WXVContainer implements
   @NonNull
   private ListBaseViewHolder createVHForFixedComponent() {
     FrameLayout view = new FrameLayout(mContext);
-    view.setBackgroundColor(Color.BLUE);
-    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
+    view.setBackgroundColor(Color.WHITE);
+    view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
     return new ListBaseViewHolder(view);
   }
 
@@ -602,13 +611,13 @@ public class WXListComponent extends WXVContainer implements
     return new ListBaseViewHolder(view);
   }
 
-  private void prepareFixedComponent(int position) {
+  private void prepareFixedComponent(int position,int viewType) {
     if (mChildren.get(position).getDomObject().isFixed()) {
       if (indoreCells == null) {
         indoreCells = new ArrayList<>();
       }
-      if (!indoreCells.contains(position)) {
-        indoreCells.add(position);
+      if (!indoreCells.contains(viewType)) {
+        indoreCells.add(viewType);
       }
     }
   }
