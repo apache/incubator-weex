@@ -340,7 +340,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
       params.setMargins(realLeft, realTop, realRight, realBottom);
       mHost.setLayoutParams(params);
     } else if (mParent.getRealView() instanceof BounceRecyclerView) {
-      mHost.setLayoutParams(new ViewGroup.LayoutParams(realWidth, realHeight));
+//      mHost.setLayoutParams(new ViewGroup.LayoutParams(realWidth, realHeight));
       //todo Nothing
     }
 
