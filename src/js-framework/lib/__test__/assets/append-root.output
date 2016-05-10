@@ -3,9 +3,6 @@
   style: {
     flexDirection: 'column'
   },
-  attr: {
-    append: "tree"
-  },
   children: [{
     type: 'container',
     children: [{

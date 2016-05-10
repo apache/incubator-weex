@@ -439,86 +439,6 @@ describe('test input and output', function () {
     delete allDocs[name]
   })
 
-  it('repeat with array no-kv case', function () {
-    var name = 'repeat-array-no-kv'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('repeat with array v case', function () {
-    var name = 'repeat-array-v'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('repeat with array kv case', function () {
-    var name = 'repeat-array-kv'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('repeat with array non-obj case', function () {
-    var name = 'repeat-array-non-obj'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('repeat-watch case', function () {
-    var name = 'repeat-watch'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
   it('if-refresh case', function () {
     var name = 'if-refresh'
     var inputCode = readInput(name)
@@ -602,36 +522,10 @@ describe('test input and output', function () {
     var expected = eval('(' + outputCode + ')')
     var actual = doc.toJSON()
     expect(actual).eql(expected)
-
     framework.callJS(name, [{
       method: 'fireEvent',
       args: [doc.body.children[0].ref, 'click', {}]
     }])
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('inline click case', function () {
-    var name = 'inline-click'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-
-    expect(actual).eql(expected)
-
-    framework.callJS(name, [{
-      method: 'fireEvent',
-      args: [doc.body.children[0].ref, 'click', {}]
-    }])
-
-    expected.children[0].attr.value = 'Hello World2'
-    expect(doc.toJSON()).eql(expected)
 
     framework.destroyInstance(name)
     delete allDocs[name]
@@ -708,7 +602,7 @@ describe('test input and output', function () {
     delete allDocs[name]
   })
 
-  it('a less wrong transformer version', () => {
+  it('a wrong transformer version', () => {
     var name = 'transformer2'
     var inputCode = readInput(name)
     var outputCode = readOutput(name)
@@ -717,52 +611,6 @@ describe('test input and output', function () {
 
     var result = framework.createInstance(name, inputCode)
     expect(result).to.be.an.instanceof(Error)
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-
-  it('a bigger wrong transformer version', () => {
-    var name = 'transformer3'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    var result = framework.createInstance(name, inputCode)
-    expect(result).to.be.an.instanceof(Error)
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('change data when created', function () {
-    var name = 'created'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
-    framework.destroyInstance(name)
-    delete allDocs[name]
-  })
-
-  it('change data when ready', function () {
-    var name = 'ready'
-    var inputCode = readInput(name)
-    var outputCode = readOutput(name)
-    var doc = new Document(name)
-    allDocs[name] = doc
-
-    framework.createInstance(name, inputCode)
-    var expected = eval('(' + outputCode + ')')
-    var actual = doc.toJSON()
-    expect(actual).eql(expected)
-
     framework.destroyInstance(name)
     delete allDocs[name]
   })

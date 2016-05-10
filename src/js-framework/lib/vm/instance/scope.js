@@ -21,7 +21,6 @@ exports._initScope = function () {
  * Initialize the data. 
  */
 
-const KEY_WORDS = ['$index', '$value', '$event']
 exports._initData = function () {
   // proxy data on instance
   var data = this._data
@@ -41,7 +40,7 @@ exports._initData = function () {
   i = keys.length
   while (i--) {
     key = keys[i]
-    if (KEY_WORDS.indexOf(key) > -1 || !_.isReserved(key)) {
+    if (!_.isReserved(key)) {
       this._proxy(key)
     }
   }

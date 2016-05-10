@@ -25,7 +25,7 @@ here is an example:
 <script type="data">
   module.exports = {
       title: 'Alibaba',
-      date: new Date().toLocaleString()
+      date: new Date().toLocalString()
   }
 </script>
 ```

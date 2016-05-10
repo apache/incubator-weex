@@ -1,48 +1,45 @@
 <template>
   <scroller>
-    <wxc-panel title="color">
-      <text class="txt">default is black</text>
+    <ui-panel title="color">
+      <text class="txt" style="width: 100;lines:1;text-overflow: ellipsis">default is black</text>
       <text class="txt" style="color:#286090">#286090</text>
       <text class="txt" style="color:#0f0">#0f0</text>
       <text class="txt" style="color:red">keyword</text>
       <text class="txt" style="color:rgb(238, 162, 54)">rgb(238, 162, 54)</text>
-      <text class="txt" style="color:rgba(238, 162, 54, 0.5)">rgba(238, 162, 54, 0.5)</text>
-    </wxc-panel>
+      <text class="txt" style="color:rgb(238, 162, 54, 0.5)">rgb(238, 162, 54, 0.5)</text>
+       <text class="txt" style="width: 500;lines:1;text-overflow: clip">text-overflow default is clip,text-overflow default is clip</text>
+      <text class="txt" style="width: 500;lines:1;text-overflow: ellipsis">text-overflow: ellipsis,text-overflow: ellipsis</text>
+    </ui-panel>
 
-    <wxc-panel title="font-size">
+    <ui-panel title="font-size">
       <!--<div style="flex-direction: row">-->
         <text class="txt" style="font-size: 32px;">32</text>
         <text class="txt" style="font-size: 64px;">64</text>
         <text class="txt" style="font-size: 100px;">100</text>
       <!--</div>-->
-    </wxc-panel>
+    </ui-panel>
 
-    <wxc-panel title="font-style">
+    <ui-panel title="font-style">
       <text class="txt" style="font-style: normal">normal</text>
       <text class="txt" style="font-style: italic">italic</text>
-    </wxc-panel>
+    </ui-panel>
 
-    <wxc-panel title="font-weight">
+    <ui-panel title="font-weight">
       <text class="txt" style="font-weight: normal">normal</text>
       <text class="txt" style="font-weight: bold">bold</text>
-    </wxc-panel>
+    </ui-panel>
 
-    <wxc-panel title="text-decoration">
+    <ui-panel title="text-decoration">
       <text class="txt" style="text-decoration: none">none</text>
       <text class="txt" style="text-decoration: underline">underline</text>
       <text class="txt" style="text-decoration: line-through">line-through</text>
-    </wxc-panel>
+    </ui-panel>
 
-    <wxc-panel title="text-align">
+    <ui-panel title="text-align">
       <text class="txt" style="text-align: left">left</text>
       <text class="txt" style="text-align: center">center</text>
       <text class="txt" style="text-align: right">right</text>
-    </wxc-panel>
-
-    <wxc-panel title="text-overflow">
-      <text class="txt" style="text-overflow:clip;width: 450;lines:1">text-overflow:clip text-overflow:clip</text>
-      <text class="txt" style="text-overflow:ellipsis;width: 450;lines:1">text-align: ellipsis text-align: ellipsis</text>
-    </wxc-panel>
+    </ui-panel>
   </scroller>
 </template>
 
@@ -54,5 +51,7 @@
 </style>
 
 <script>
-  require('weex-components');
+  module.exports = {
+    data: {}
+  }
 </script>

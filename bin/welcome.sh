@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 if ! test -e ./bin/.welcome; then
   touch ./bin/.welcome

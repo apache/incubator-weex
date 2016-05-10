@@ -60,5 +60,3 @@
     * [Transformer](/tools/transformer.md)
     * [Playground App](/tools/playground-app.md)
 
-* [FAQ](/faq.md)
-
