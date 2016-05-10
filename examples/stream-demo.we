@@ -8,12 +8,22 @@
 
 <script>
   require('weex-components');
+
+  var URL = 'http://g.tbcdn.cn/ali-wireless-h5/res/0.0.15/data.json';
   module.exports = {
     data: {
       result: 'loading...'
     },
     ready: function() {
-      this.result = 'loaded';
+      var stream = require('@weex-module/stream');
+      var me = this;
+      stream.sendHttp({
+        method: 'GET',
+        url: URL
+      }, function(ret) {
+        console.log('data', ret);
+        me.result = ret;
+      });
     }
   };
 </script>
