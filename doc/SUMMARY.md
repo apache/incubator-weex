@@ -29,6 +29,7 @@
     * [Built-in Components](/components/main.md)
         * [Common Attributes](/references/common-attrs.md)
         * [Common Style](/references/common-style.md)
+            * [Text Style](/references/text-style.md)
         * [Common Event](/references/common-event.md)
         * [Special Element](/components/special-element.md)
         * [&lt;div&gt;](/components/div.md)
@@ -47,13 +48,13 @@
         * [JS Bundle Format](/specs/js-bundle-format.md)
         * [JS Framework APIs](/specs/js-framework-apis.md)
         * [Virtual DOM APIs](/specs/virtual-dom-apis.md)
-* Demo
+* [Examples](demo/main.md)
     * [Hello World](demo/hello-world.md)
     * [Modal](demo/modal.md)
     * [List](demo/list.md)
     * [Slider](demo/slider.md)
     * [Animation](demo/animation.md)
-    * [More examples](https://github.com/alibaba/weex/tree/master/examples)
+    * [More](https://github.com/alibaba/weex/tree/dev/examples)
 
 * [Service & Tools](/tools/main.md)
     * [CLI](/tools/cli.md)
