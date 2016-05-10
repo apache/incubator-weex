@@ -549,7 +549,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   public void onScrollStopped(WXScrollView scrollView, int x, int y) {
     WXRecycleImageManager recycleImageManager = mInstance
         .getRecycleImageManager();
-    if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
+    if (recycleImageManager != null) {
       recycleImageManager.loadImage();
     }
   }
