@@ -1,0 +1,24 @@
+/* switch defaults. */
+.weex-switch {
+  background-color: #fff;
+  border: 1px solid #dfdfdf;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  box-sizing: content-box;
+  background-clip: content-box;
+}
+
+.weex-switch > small {
+  background: #fff;
+  border-radius: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  top: 0;
+}

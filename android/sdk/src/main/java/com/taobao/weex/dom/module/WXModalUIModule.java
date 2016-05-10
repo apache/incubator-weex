@@ -233,7 +233,6 @@ import java.util.Map;
  */
 public class WXModalUIModule extends WXModule {
 
-  private Toast toast;
   @WXModuleAnno
   public void toast(String param) {
 
@@ -259,12 +258,8 @@ public class WXModalUIModule extends WXModule {
     } else {
       duration = Toast.LENGTH_SHORT;
     }
-    if(toast== null){
-      toast =Toast.makeText(mWXSDKInstance.getContext(), message, duration);
-    } else {
-      toast.setDuration(duration);
-      toast.setText(message);
-    }
+
+    Toast toast = Toast.makeText(mWXSDKInstance.getContext(), message, duration);
     toast.setGravity(Gravity.CENTER, 0, 0);
     toast.show();
   }

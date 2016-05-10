@@ -208,6 +208,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXException;
 import com.taobao.weex.dom.WXDomObject;
 
 import java.util.ArrayList;
@@ -276,7 +277,7 @@ public abstract class WXVContainer extends WXComponent {
   }
 
   @Override
-  public View detachViewAndClearPreInfo(){
+  public View detachViewAndClearPreInfo() throws WXException {
     View original = super.detachViewAndClearPreInfo();
     if (mChildren != null) {
       int count = childCount();

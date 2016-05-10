@@ -405,10 +405,6 @@ class WXRenderStatement {
     return component;
   }
 
-  public WXComponent getComponent(String ref) {
-    return mRegistry.get(ref);
-  }
-
   /**
    * Clear registry information that current instance contains.
    */

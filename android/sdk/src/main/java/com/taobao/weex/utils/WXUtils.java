@@ -291,11 +291,6 @@ public class WXUtils {
   }
 
   public static boolean isTabletDevice() {
-    try{
-      return (WXEnvironment.getApplication().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }catch (Exception e){
-      WXLogUtils.e("[WXUtils] isTabletDevice:" + WXLogUtils.getStackTrace(e));
-    }
-    return false;
+    return (WXEnvironment.getApplication().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
   }
 }

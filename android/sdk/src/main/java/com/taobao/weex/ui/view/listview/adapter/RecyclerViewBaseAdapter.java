@@ -211,7 +211,7 @@ import android.view.ViewGroup;
 /**
  * Adapter for recyclerView
  */
-public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends RecyclerView.Adapter<T> {
+public class RecyclerViewBaseAdapter<T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T> {
 
   private String TAG = "RecyclerViewBaseAdapter";
   private IRecyclerAdapterListener iRecyclerAdapterListener;
@@ -248,7 +248,8 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public long getItemId(int position) {
-    return iRecyclerAdapterListener.getItemId(position);
+    //        WXLogUtils.d(TAG, "getItemId position " + position);
+    return super.getItemId(position);
   }
 
   @Override
@@ -257,6 +258,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
       return iRecyclerAdapterListener.getItemCount();
     }
     return 0;
+
   }
 
   @Override

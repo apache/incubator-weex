@@ -12,7 +12,7 @@ var Dep = require('../observer/dep')
 
 exports._initScope = function () {
   this._initData()
-  // this._initComputed()
+  this._initComputed()
   this._initMethods()
   // this._initMeta()
 }
@@ -21,6 +21,7 @@ exports._initScope = function () {
  * Initialize the data. 
  */
 
+const KEY_WORDS = ['$index', '$value', '$event']
 exports._initData = function () {
   // proxy data on instance
   var data = this._data
@@ -40,7 +41,7 @@ exports._initData = function () {
   i = keys.length
   while (i--) {
     key = keys[i]
-    if (!_.isReserved(key)) {
+    if (KEY_WORDS.indexOf(key) > -1 || !_.isReserved(key)) {
       this._proxy(key)
     }
   }
@@ -137,36 +138,37 @@ exports._unproxy = function (key) {
 //   }
 // }
 
-// /**
-//  * Setup computed properties. They are essentially
-//  * special getter/setters
-//  */
+/**
+ * Setup computed properties. They are essentially
+ * special getter/setters
+ */
 
-// function noop () {}
-// exports._initComputed = function () {
-//   var computed = this.$options.computed
-//   if (computed) {
-//     for (var key in computed) {
-//       var userDef = computed[key]
-//       var def = {
-//         enumerable: true,
-//         configurable: true
-//       }
-//       if (typeof userDef === 'function') {
-//         def.get = _.bind(userDef, this)
-//         def.set = noop
-//       } else {
-//         def.get = userDef.get
-//           ? _.bind(userDef.get, this)
-//           : noop
-//         def.set = userDef.set
-//           ? _.bind(userDef.set, this)
-//           : noop
-//       }
-//       Object.defineProperty(this, key, def)
-//     }
-//   }
-// }
+function noop () {}
+exports._initComputed = function () {
+  // var computed = this.$options.computed
+  var computed = this._computed
+  if (computed) {
+    for (var key in computed) {
+      var userDef = computed[key]
+      var def = {
+        enumerable: true,
+        configurable: true
+      }
+      if (typeof userDef === 'function') {
+        def.get = _.bind(userDef, this)
+        def.set = noop
+      } else {
+        def.get = userDef.get
+          ? _.bind(userDef.get, this)
+          : noop
+        def.set = userDef.set
+          ? _.bind(userDef.set, this)
+          : noop
+      }
+      Object.defineProperty(this, key, def)
+    }
+  }
+}
 
 /**
  * Setup instance methods. Methods must be bound to the

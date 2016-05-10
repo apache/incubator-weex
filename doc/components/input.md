@@ -18,13 +18,13 @@ This component supports no child components.
 - `disabled`: &lt;boolean&gt; a boolean attribute indicates that the form control is not available for interaction. In particular, the click event will not be dispatched on disabled controls.
 - `autofocus`: &lt;boolean&gt; a boolean attribute lets you specify that a form control should have input focus when the page loads.
 
-Other attributes please check out the [common attributes](/references/common-attrs.md).
+Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles
 
 - `placeholder-color`: the color of placeholder. Default value is ``#999999``.
 
-**text styles**: checkout [text styles](/references/text-style.md)
+**text styles**: checkout [text styles](../references/text-style.md)
 
 - support `color` style.
 - support `font-size` style.
@@ -33,7 +33,7 @@ Other attributes please check out the [common attributes](/references/common-att
 - support `text-align` style.
 
 
-**common styles**: check out [common styles for components](/references/common-style.md)
+**common styles**: check out [common styles for components](../references/common-style.md)
 
 - support flexbox related styles
 - support box model related styles
@@ -47,9 +47,9 @@ Other attributes please check out the [common attributes](/references/common-att
 - `focus`: a component has received focus.
 - `blur`: a component has lost focus.
 
-**common events**: check out the [common events](/references/common-event.md)
+**common events**: check out the [common events](../references/common-event.md)
 
-- support `appear` / `disappear` event. Check out [common events](/references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
 
 **Notes:** `<input>` does not support the common-event `click`. Please listen to the `input` or `change` event instead.
 

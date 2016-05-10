@@ -20,6 +20,27 @@ Weex allow `<template>` to bind event type and handler on an Element. The attrib
 
 When user clicks the image , handler function which defined in `<script>` code will be executed.
 
+## Inline Handler
+
+Beside a handler method name, you can also call a handler inline.
+
+e.g.
+```html
+<template>
+  <image onclick="handler('arg1', $event)" ...></image>
+</template>
+
+<script>
+  module.exports = {
+    methods: {
+      handler: function (arg1, e) {
+        // TODO
+      }
+    }
+  }
+</script>
+```
+
 ## Event Object
 
 When an event handler called, it will receive an event object as the first argument. Every event object will contains following properties.
@@ -28,4 +49,4 @@ When an event handler called, it will receive an event object as the first argum
 * `target`: target `Element` of the event
 * `timestamp`: time stamp that event triggered
 
-Next, let's have a look at [display logic control](/syntax/display-logic.md).
+Next, let's have a look at [display logic control](./display-logic.md).

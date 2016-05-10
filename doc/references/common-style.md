@@ -82,6 +82,10 @@ The align-items property vertically aligns the flexible container's items when t
 
 ![align-items](http://gtms02.alicdn.com/tps/i2/TB1VnHKMXXXXXcEaXXXDldN_pXX-1018-502.jpg)
 
+- `flex-wrap`: `wrap` | `nowrap`
+
+The flex-wrap property controls whether the flex container is single-line or multi-line. The default value is `nowarp`, means try to fit all items in single-line.
+
 ### Flex item
 
 - flex : &lt;number&gt;
@@ -167,8 +171,10 @@ we can use properties below to control placement of weex tag
 ## Type of Style Value
 
 - length: number followed by length unit `px`, `px` can be omitted.
-- colors: both hexadecimal colors (`#RRGGBB`) and RGBA colors (`rgb(255, 255, 255)`) is supported
+- colors: support multiple formats of values, including rgb (`rgb(255, 0, 0)`), rgba (`rgba(255, 0, 0, 0.5)`), hexadecimal (`#ff0000`), short hexadecimal (`#f00`), named color (`red`).
 - enumerated values: a limited number of string values.
+
+**Note:** [The list of color keywords.](./color-names.md)
 
 ## Simple Step
 

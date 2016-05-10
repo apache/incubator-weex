@@ -2,7 +2,7 @@
 
 var Atomic = require('./atomic')
 var utils = require('../utils')
-require('../styles/switch.scss')
+require('../styles/switch.css')
 
 var defaults = {
   color: '#64bd63'

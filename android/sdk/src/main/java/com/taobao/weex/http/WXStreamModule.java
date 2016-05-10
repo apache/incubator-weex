@@ -287,7 +287,7 @@ public class WXStreamModule extends WXModule {
           WXBridgeManager.getInstance().callback(mInstanceId, mCallback, (response == null || response.originalData == null) ? "{}" : new String(response.originalData));
         }
       },0);
-      WXLogUtils.e("WXStreamModule",response==null?"response is null":new String(response.originalData));
+      WXLogUtils.e("WXStreamModule", new String(response.originalData));
     }
   }
 
