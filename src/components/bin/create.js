@@ -6,8 +6,9 @@ let fs = require('fs');
 let npmlog = require('npmlog');
 
 let argv = require('yargs')
-  .usage('Create component')
-  .example('npm run create homepage -o ./example')
+  .usage('wxc [name] [--command]')
+  .example('# create one ".we" file\nwxc homepage -o ./example')
+  .example('# force to create parted files\nwxc header -p -f -o ./components')
   .boolean('p')
   .alias('p', 'parted')
   .describe('p', 'create parted files "js/css/html"')

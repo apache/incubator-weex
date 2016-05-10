@@ -5,6 +5,9 @@
   "bin": {
     "wxc": "./bin/create.js"
   },
+  "scripts": {
+    "create": "./bin/create.js"
+  },
   "description": "A group of simple and useful weex components",
   "license": "Apache-2.0",
   "repository": {
