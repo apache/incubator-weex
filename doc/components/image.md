@@ -22,6 +22,7 @@ Other attributes please check out the [common attributes](/references/common-att
 
 - `width`: &lt;length&gt; the width of the component. This style should be specified.
 - `height`: &lt;length&gt; the height of the component. This style should be specifed.
+- `resize`: &lt;string&gt; `cover`|`contain`|`stretch` Image display mode. 
 
 **common styles**: check out the [common styles](/references/common-attrs.md)
 
