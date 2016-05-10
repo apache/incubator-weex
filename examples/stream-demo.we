@@ -1,7 +1,6 @@
 <template>
   <scroller>
     <wxc-panel title="stream.sendHttp" type="primary">
-
       <wxc-panel title="method = GET">
         <text>{{getResult}}</text>
       </wxc-panel>
@@ -16,8 +15,6 @@
 <script>
   require('weex-components');
 
-  var GET_URL = 'http://httpbin.org/get';
-  var POST_URL = 'http://httpbin.org/post';
   module.exports = {
     data: {
       getResult: 'loading...',
@@ -26,6 +23,8 @@
     ready: function() {
       var stream = require('@weex-module/stream');
       var me = this;
+      var GET_URL = 'http://httpbin.org/get';
+      var POST_URL = 'http://httpbin.org/post';
       
       stream.sendHttp({
         method: 'GET',
