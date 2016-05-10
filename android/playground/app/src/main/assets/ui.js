@@ -44,64 +44,75 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/a2cdc2e49522edbc3ee4d71aa34f3cc5", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/0d2d8eb8b7cf352c59a1c9ed2cd2286c", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
 
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      levels: [{
-	        level: 1
-	      }, {
-	        level: 2
-	      }, {
-	        level: 3
-	      }],
-	      buttons: [{
-	        type: 'default'
-	      }, {
-	        type: 'primary'
-	      }, {
-	        type: 'success'
-	      }, {
-	        type: 'info'
-	      }, {
-	        type: 'warning'
-	      }, {
-	        type: 'danger'
-	      }, {
-	        type: 'link'
-	      }],
-	      panels: [{
-	        type: 'default'
-	      }, {
-	        type: 'primary'
-	      }, {
-	        type: 'success'
-	      }, {
-	        type: 'info'
-	      }, {
-	        type: 'warning'
-	      }, {
-	        type: 'danger'
-	      }],
-	      tips: [{
-	        type: 'success'
-	      }, {
-	        type: 'info'
-	      }, {
-	        type: 'warning'
-	      }, {
-	        type: 'danger'
-	      }]
+	      levels: [{level: 1}, {level: 2}, {level: 3}],
+	      buttons: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}, {type: 'link'}],
+	      panels: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
+	      tips: [{type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
+	      countdown1: {
+	        remain: 5000,
+	        time: {
+	          D: '0',
+	          hh: '00',
+	          mm: '00',
+	          ss: '00'
+	        }
+	      },
+	      countdown2: {
+	        remain: 5000,
+	        time: {
+	          MM: '0',
+	          ss: '0'
+	        }
+	      },
+	      marquee: {
+	        height: 30,
+	        duration: 1500,
+	        interval: 2000,
+	        list: [
+	          {text: 'Introducing Bots on Messenger'},
+	          {text: 'Capturing 3D 360-Stereo VR Video'},
+	          {text: 'The Future of Video on Facebook'},
+	          {text: 'Announcing Vue.js 2.0'},
+	          {text: 'Not Your Average Virtual-DOM'},
+	          {text: 'Templates, JSX, or Hyperscript?'}
+	        ]
+	      }
 	    }},
+	    ready: function() {
+	      this.initCountdown('countdown1');
+	      this.initCountdown('countdown2');
+	      this.initMarquee('marquee');
+	    },
 	    methods: {
-	      clicked: function(ev) {
-	        console.log(ev);
-	        this.$call('modal', 'toast', {
-	          'message': 'clicked!',
-	          duration: 0.5
+	      clicked: function() {
+	        var $modal = __weex_require__('@weex-module/modal');
+	        $modal.toast({'message': 'clicked!', duration: 0.5});
+	      },
+	      initCountdown: function(id) {
+	        var self = this;
+
+	        var $countdown = this.$vm(id);
+	        $countdown.$on('tick', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
+
+	        $countdown.$on('alarm', function(e) {
+	          Object.assign(self[id].time, e.detail);
+	        });
+	      },
+	      initMarquee: function(id) {
+	        var self = this;
+
+	        var $marquee = this.$vm(id);
+	        $marquee.$on('change', function() {
+	          console.log('marquee change');
 	        });
 	      }
 	    }
@@ -109,18 +120,15 @@
 
 	;__weex_module__.exports.template={
 	  "type": "scroller",
-	  "classList": [
-	    "body"
-	  ],
 	  "children": [
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "Title Levels"
 	      },
 	      "children": [
 	        {
-	          "type": "ui-hn",
+	          "type": "wxc-hn",
 	          "repeat": function () {return this.levels},
 	          "attr": {
 	            "level": function () {return this.level},
@@ -130,7 +138,7 @@
 	      ]
 	    },
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "Buttons"
 	      },
@@ -145,68 +153,43 @@
 	          "repeat": function () {return this.buttons},
 	          "children": [
 	            {
-	              "type": "ui-button",
+	              "type": "wxc-button",
 	              "attr": {
 	                "type": function () {return this.type},
 	                "size": "large",
-	                "value": function () {return this.type},
-	                "click": function () {return this.clicked}
+	                "value": function () {return this.type}
+	              },
+	              "events": {
+	                "click": "clicked"
 	              }
 	            },
 	            {
-	              "type": "ui-button",
+	              "type": "wxc-button",
 	              "attr": {
 	                "type": function () {return this.type},
 	                "size": "middle",
-	                "value": function () {return this.type},
-	                "click": function () {return this.clicked}
+	                "value": function () {return this.type}
+	              },
+	              "events": {
+	                "click": "clicked"
 	              },
 	              "style": {
 	                "marginLeft": 10
 	              }
 	            },
 	            {
-	              "type": "ui-button",
+	              "type": "wxc-button",
 	              "attr": {
 	                "type": function () {return this.type},
 	                "size": "small",
-	                "value": function () {return this.type},
-	                "click": function () {return this.clicked}
+	                "value": function () {return this.type}
+	              },
+	              "events": {
+	                "click": "clicked"
 	              },
 	              "style": {
-	                "marginLeft": 10
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "div",
-	          "style": {
-	            "flexDirection": "row",
-	            "marginTop": 12
-	          },
-	          "children": [
-	            {
-	              "type": "ui-button",
-	              "attr": {
-	                "disabled": function () {return true},
-	                "type": "",
-	                "size": "large",
-	                "value": "Disabled",
-	                "click": function () {return this.clicked}
-	              }
-	            },
-	            {
-	              "type": "ui-button",
-	              "attr": {
-	                "disabled": function () {return false},
-	                "type": "primary",
-	                "size": "large",
-	                "value": "Enabled",
-	                "click": function () {return this.clicked}
-	              },
-	              "style": {
-	                "marginLeft": 12
+	                "marginLeft": 10,
+	                "width": 130
 	              }
 	            }
 	          ]
@@ -214,13 +197,13 @@
 	      ]
 	    },
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "Panels"
 	      },
 	      "children": [
 	        {
-	          "type": "ui-panel",
+	          "type": "wxc-panel",
 	          "repeat": function () {return this.panels},
 	          "attr": {
 	            "title": function () {return 'Panels-' + (this.type)},
@@ -243,16 +226,16 @@
 	      ]
 	    },
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "List"
 	      },
 	      "children": [
 	        {
-	          "type": "ui-list-item",
+	          "type": "wxc-list-item",
 	          "repeat": function () {return this.tips},
-	          "attr": {
-	            "click": function () {return this.clicked}
+	          "events": {
+	            "click": "clicked"
 	          },
 	          "children": [
 	            {
@@ -269,13 +252,13 @@
 	      ]
 	    },
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
 	        "title": "Tips"
 	      },
 	      "children": [
 	        {
-	          "type": "ui-tip",
+	          "type": "wxc-tip",
 	          "repeat": function () {return this.tips},
 	          "style": {
 	            "marginBottom": 20
@@ -285,17 +268,245 @@
 	          }
 	        }
 	      ]
+	    },
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "Countdown"
+	      },
+	      "children": [
+	        {
+	          "type": "wxc-countdown",
+	          "id": "countdown1",
+	          "attr": {
+	            "remain": function () {return this.countdown1.remain}
+	          },
+	          "style": {
+	            "width": 750,
+	            "marginTop": 20,
+	            "marginBottom": 20
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.D}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "day(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.hh}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "hour(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.mm}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "minute(s)"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown1.time.ss}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno1"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": "second(s)"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-countdown",
+	          "id": "countdown2",
+	          "attr": {
+	            "remain": function () {return this.countdown2.remain}
+	          },
+	          "style": {
+	            "width": 600
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.MM}
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "style": {
+	                "backgroundColor": "#FFFFFF",
+	                "color": "#AAAAAA"
+	              },
+	              "attr": {
+	                "value": ":"
+	              }
+	            },
+	            {
+	              "type": "text",
+	              "classList": [
+	                "ctno2"
+	              ],
+	              "attr": {
+	                "value": function () {return this.countdown2.time.ss}
+	              }
+	            }
+	          ]
+	        }
+	      ]
+	    },
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "Marquee"
+	      },
+	      "children": [
+	        {
+	          "type": "wxc-marquee",
+	          "id": "marquee",
+	          "style": {
+	            "width": 700,
+	            "height": function () {return this.marquee.height*2},
+	            "backgroundColor": "rgb(223,240,216)",
+	            "borderRadius": 8,
+	            "paddingLeft": 10,
+	            "paddingRight": 10
+	          },
+	          "attr": {
+	            "step": function () {return this.marquee.height*2},
+	            "count": function () {return this.marquee.list.length},
+	            "interval": function () {return this.marquee.interval},
+	            "duration": function () {return this.marquee.duration}
+	          },
+	          "children": [
+	            {
+	              "type": "div",
+	              "repeat": function () {return this.marquee.list},
+	              "style": {
+	                "height": function () {return this.marquee.height*this.marquee.length},
+	                "paddingTop": function () {return this.marquee.height*0.5},
+	                "paddingBottom": function () {return this.marquee.height*0.5},
+	                "overflow": "hidden"
+	              },
+	              "children": [
+	                {
+	                  "type": "text",
+	                  "style": {
+	                    "height": function () {return this.marquee.height},
+	                    "color": "rgb(60,118,61)",
+	                    "fontSize": 28
+	                  },
+	                  "attr": {
+	                    "value": function () {return this.text}
+	                  }
+	                }
+	              ]
+	            }
+	          ]
+	        }
+	      ]
 	    }
 	  ]
 	}
 	;__weex_module__.exports.style={
+	  "ctno1": {
+	    "borderRadius": 8,
+	    "paddingTop": 6,
+	    "paddingBottom": 6,
+	    "paddingRight": 4,
+	    "paddingLeft": 4,
+	    "marginLeft": 2,
+	    "marginRight": 2,
+	    "backgroundColor": "rgb(242,222,222)",
+	    "color": "rgb(169,68,66)"
+	  },
+	  "ctno2": {
+	    "borderRadius": 8,
+	    "paddingTop": 30,
+	    "paddingBottom": 30,
+	    "paddingLeft": 16,
+	    "paddingRight": 16,
+	    "backgroundColor": "rgb(217,237,247)",
+	    "color": "rgb(49,112,143)",
+	    "textAlign": "center",
+	    "fontSize": 40
+	  },
 	  "item-txt": {
 	    "fontSize": 48,
 	    "color": "#555555"
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/a2cdc2e49522edbc3ee4d71aa34f3cc5", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/0d2d8eb8b7cf352c59a1c9ed2cd2286c", {
+	  "transformerVersion": "0.3.1"
+	},undefined)
 
 /***/ },
 /* 1 */
@@ -309,6 +520,8 @@
 	  __webpack_require__(4);
 	  __webpack_require__(5);
 	  __webpack_require__(6);
+	  __webpack_require__(7);
+	  __webpack_require__(8);
 
 	})
 
@@ -316,32 +529,22 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-button", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-button", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
 	      type: 'default',
 	      size: 'large',
-	      value: '',
-	      click: null,
-	      disabled: false
+	      value: ''
 	    }},
 	    methods: {
-	      clicked: function(ev) {
-	        if (this.disabled) return;
-	        this.click(ev);
-	      }
 	    }
 	  }
 
 	;__weex_module__.exports.template={
 	  "type": "div",
 	  "classList": function () {return ['btn', 'btn-' + (this.type), 'btn-sz-' + (this.size)]},
-	  "events": {
-	    "click": "clicked"
-	  },
-	  "style": {},
 	  "children": [
 	    {
 	      "type": "text",
@@ -452,7 +655,7 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-hn", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-hn", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -511,14 +714,12 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      bgColor: '#ffffff',
-	      click: function() {
-	      }
+	      bgColor: '#ffffff'
 	    }},
 	    methods: {
 	      touchstart: function() {
@@ -539,7 +740,6 @@
 	    "item"
 	  ],
 	  "events": {
-	    "click": "click",
 	    "touchstart": "touchstart",
 	    "touchend": "touchend"
 	  },
@@ -570,7 +770,7 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-panel", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-panel", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -583,7 +783,6 @@
 	      border: 0
 	    }},
 	    ready: function() {
-	      console.log(this.data);
 	    }
 	  }
 
@@ -679,7 +878,7 @@
 /* 6 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/ui-tip", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/wxc-tip", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -740,6 +939,217 @@
 	  },
 	  "tip-txt-danger": {
 	    "color": "#a94442"
+	  }
+	}
+	})
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	;__weex_define__("@weex-component/wxc-countdown", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	__weex_module__.exports = {
+	    data: function () {return {
+	        now: 0,
+	        remain: 0,
+	        time: {
+	            elapse: 0,
+	            D: '0',
+	            DD: '0',
+	            h: '0',
+	            hh: '00',
+	            H: '0',
+	            HH: '0',
+	            m: '0',
+	            mm: '00',
+	            M: '0',
+	            MM: '0',
+	            s: '0',
+	            ss: '00',
+	            S: '0',
+	            SS: '0'
+	        },
+	        outofview: false
+	    }},
+	    ready: function() {
+	        if (this.remain <= 0) {
+	            return;
+	        }
+	        // this.isWeb = this.$getConfig().env.platform === 'Web';
+	        this.now = Date.now();
+	        this.nextTick();
+	    },
+	    methods: {
+	        nextTick: function() {
+	            if (this.outofview) {
+	                setTimeout(this.nextTick.bind(this), 1000);
+	            } else {
+	                this.time.elapse = parseInt((Date.now() - this.now) / 1000);
+
+	                if (this.calc()) {
+	                    this.$emit('tick', Object.assign({}, this.time));
+	                    setTimeout(this.nextTick.bind(this), 1000);
+	                } else {
+	                    this.$emit('alarm', Object.assign({}, this.time));
+	                }
+	                this._app.updateActions(); 
+	            }
+	        },
+	        format: function(str) {
+	            if (str.length >= 2) {
+	                return str;
+	            } else {
+	                return '0' + str;
+	            }
+	        },
+	        calc: function() {
+	            var remain = this.remain - this.time.elapse;
+	            if (remain < 0) {
+	                remain = 0;
+	            }
+	            this.time.D = String(parseInt(remain / 86400));
+	            this.time.DD = this.format(this.time.D);
+	            this.time.h = String(parseInt((remain - parseInt(this.time.D) * 86400) / 3600));
+	            this.time.hh = this.format(this.time.h);
+	            this.time.H = String(parseInt(remain / 3600));
+	            this.time.HH = this.format(this.time.H);
+	            this.time.m = String(parseInt((remain - parseInt(this.time.H) * 3600) / 60));
+	            this.time.mm = this.format(this.time.m);
+	            this.time.M = String(parseInt(remain / 60));
+	            this.time.MM = this.format(this.time.M);
+	            this.time.s = String(remain - parseInt(this.time.M) * 60);
+	            this.time.ss = this.format(this.time.s);
+	            this.time.S = String(remain);
+	            this.time.SS = this.format(this.time.S);
+	            // console.log(remain, this.D, this.h, this.hh, this.H, this.HH, this.m, this.MM, this.s, this.ss, this.S, this.SS);
+	            return remain > 0;
+	        },
+	        appeared: function() {
+	            this.outofview = false;
+	        },
+	        disappeared: function() {
+	            this.outofview = true;
+	        }
+	    }
+	}
+
+	;__weex_module__.exports.template={
+	  "type": "div",
+	  "style": {
+	    "overflow": "hidden",
+	    "flexDirection": "row"
+	  },
+	  "events": {
+	    "appear": "appeared",
+	    "disappear": "disappeared"
+	  },
+	  "children": [
+	    {
+	      "type": "content"
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "wrap": {
+	    "overflow": "hidden"
+	  }
+	}
+	})
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	;__weex_define__("@weex-component/wxc-marquee", [], function(__weex_require__, __weex_exports__, __weex_module__){
+
+	;
+	__weex_module__.exports = {
+	    data: function () {return {
+	        step: 0,
+	        count: 0,
+	        index: 0,
+	        duration: 0,
+	        interval: 0,
+	        outofview: false
+	    }},
+	    ready: function () {
+	        if (this.interval > 0
+	                && this.step > 0
+	                && this.duration > 0) {
+	            this.nextTick();    
+	        }
+	    },
+	    methods: {
+	        nextTick: function() {
+	            var self = this;
+	            if (this.outofview) {
+	                setTimeout(self.nextTick.bind(self), self.interval);
+	            } else {
+	                setTimeout(function() {
+	                    self.animation(self.nextTick.bind(self));
+	                }, self.interval);
+	            }
+	        },
+	        animation: function(cb) {
+	            var self = this;
+	            var offset = -self.step * (self.index + 1);
+	            var $animation = __weex_require__('@weex-module/animation');
+	            $animation.transition(this.$el('anim'), {
+	              styles: {
+	                transform: 'translateY(' + String(offset) + 'px) translateZ(0)'
+	              },
+	              timingFunction: 'ease',
+	              duration: self.duration
+	            }, function() {
+	                self.index = (self.index + 1) % (self.count - 1);
+	                self.$emit('change');
+	                cb && cb();
+	            });
+	        },
+	        appeared: function() {
+	            this.outofview = false;
+	        },
+	        disappeared: function() {
+	            this.outofview = true;
+	        }
+	    }
+	}
+
+	;__weex_module__.exports.template={
+	  "type": "div",
+	  "classList": [
+	    "wrap"
+	  ],
+	  "events": {
+	    "appear": "appeared",
+	    "disappear": "disappeared"
+	  },
+	  "children": [
+	    {
+	      "type": "div",
+	      "id": "anim",
+	      "classList": [
+	        "anim"
+	      ],
+	      "children": [
+	        {
+	          "type": "content"
+	        }
+	      ]
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "wrap": {
+	    "overflow": "hidden",
+	    "position": "relative"
+	  },
+	  "anim": {
+	    "flexDirection": "column",
+	    "position": "absolute",
+	    "transform": "translateY(0) translateZ(0)"
 	  }
 	}
 	})

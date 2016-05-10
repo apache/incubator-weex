@@ -36,49 +36,7 @@ Support Android 4.1 (API 16) and iOS soon. See [Weex website](http://alibaba.git
 
 ## Scripts
 
-### For end-user
-
-**clean `*.js` in the folders of `examples/build` and `test/build`**
-```shell
-npm run clean
-```
-
-**transform `*.we` in the folders of `examples` & `test`**
-```shell
-npm run transform
-```
-
-**npm run clean && npm run transform**
-```shell
-npm run dev
-```
-
-**run a file server at `12580` port**
-```shell
-npm run serve
-```
-
-**run a watcher for `*.we` changed**
-```shell
-npm run watch
-```
-
-### For SDK Developer
-
-**build js-framework and h5-render**
-```shell
-npm run build
-```
-
-**run test under js-framework and h5-render**
-```shell
-npm run ci
-```
-
-**copy the built files to `playground`**
-```shell
-npm run copy
-```
+See [SCRIPTS.md](SCRIPTS.md) for more information.
 
 ## For Windows
 

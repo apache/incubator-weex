@@ -44,15 +44,15 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/3c282e90eb46eefb2b38a7428894132f", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/801b3f55fee9229094bde0734a045589", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;__weex_module__.exports.template={
-	  "type": "scroller",
+	  "type": "div",
 	  "children": [
 	    {
-	      "type": "ui-panel",
+	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Box Model",
+	        "title": "Flexbox",
 	        "type": "primary"
 	      },
 	      "children": [
@@ -62,24 +62,7 @@
 	            "txt"
 	          ],
 	          "attr": {
-	            "value": "default is black"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "ui-panel",
-	      "attr": {
-	        "title": "Flexbox"
-	      },
-	      "children": [
-	        {
-	          "type": "text",
-	          "classList": [
-	            "txt"
-	          ],
-	          "attr": {
-	            "value": "default is black"
+	            "value": "flex"
 	          }
 	        }
 	      ]
@@ -93,7 +76,9 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/3c282e90eb46eefb2b38a7428894132f", {"transformerVersion":"0.3.1"}, undefined)
+	;__weex_bootstrap__("@weex-component/801b3f55fee9229094bde0734a045589", {
+	  "transformerVersion": "0.3.1"
+	},undefined)
 
 /***/ }
 /******/ ]);
