@@ -41,7 +41,7 @@
 
     <wxc-panel title="text-overflow">
       <text class="txt" style="text-overflow:clip;width: 450;lines:1">text-overflow:clip text-overflow:clip</text>
-      <text class="txt" style="text-overflow:ellipsis;width: 450;lines:1">text-align: ellipsis text-align: ellipsis</text>
+      <text class="txt" style="text-overflow:ellipsis;width: 450;lines:1">text-overflow: ellipsis text-overflow: ellipsis</text>
     </wxc-panel>
   </scroller>
 </template>
