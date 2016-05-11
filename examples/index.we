@@ -6,6 +6,8 @@
   module.exports = {
     data: {
       items: [
+        // `name` key is the example filename without '.we'
+        // Support sub directory, e.g. 'new-fashion/index'
         {name: 'hello', title: 'Hello World'},
         {name: 'image-demo', title: 'Image'},
         {name: 'text-demo', title: 'Text'},
