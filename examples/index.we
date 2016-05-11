@@ -21,7 +21,8 @@
         {name: 'countdown-demo', title: 'Countdown'},
         {name: 'marquee-demo', title: 'Marquee'},
         {name: 'ui', title: 'UI Gallery'},
-        {name: 'calculator', title: 'Calculator'}
+        {name: 'calculator', title: 'Calculator'},
+        {name: 'hyperlink',title:'Hyperlink'}
       ]
     }
   }
