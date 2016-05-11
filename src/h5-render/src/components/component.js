@@ -75,7 +75,7 @@ Component.prototype = {
     if (parent
         && (typeof parent._isInScrollable !== 'boolean')
         && !parent.isScrollable()) {
-      if (parent.data.type === 'root') {
+      if (parent.data.ref === '_root') {
         this._isInScrollable = false
         return false
       }
@@ -83,18 +83,19 @@ Component.prototype = {
       this._parentScroller = parent._parentScroller
       return this._isInScrollable
     }
-    if (typeof parent._isInScrollable === 'boolean') {
+    if (parent && typeof parent._isInScrollable === 'boolean') {
       this._isInScrollable = parent._isInScrollable
       this._parentScroller = parent._parentScroller
       return this._isInScrollable
     }
-    if (parent.isScrollable()) {
+    if (parent && parent.isScrollable()) {
       this._isInScrollable = true
       this._parentScroller = parent
       return true
     }
     if (!parent) {
       console && console.error('isInScrollable - parent not exist.')
+      return
     }
   },
 
