@@ -1,7 +1,7 @@
 <template>
   <scroller>
     <wxc-panel title="Hyperlink" type="primary">
-      <a href="http://weex.alibaba-inc.com/raw/dist/5c3f2f66fb5ad68ab82be6cc0a022017.js">
+      <a href="http://g.tbcdn.cn/ali-wireless-h5/res/0.0.16/hello.js">
         <wxc-tip type="info" style="margin-bottom: 20px;"
           value="Click me to see how 'A' element opens a new world."></wxc-tip>
       </a>
@@ -17,6 +17,3 @@
     }
   }
 </script>
-
-<style>
-</style>
