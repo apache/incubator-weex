@@ -358,7 +358,6 @@ public class WXBridgeManager implements Callback {
         mWXBridge = (IWXBridge) waBridge.constructor(
             WXBridgeManager.class)
             .getInstance(WXBridgeManager.this);
-        WXLogUtils.setWebsocketBridge((WXWebsocketBridge) mWXBridge);
       } catch (HackAssertionException e) {
         e.printStackTrace();
       }

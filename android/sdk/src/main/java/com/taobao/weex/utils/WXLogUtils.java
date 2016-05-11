@@ -116,7 +116,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.LogLevel;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.bridge.WXWebsocketBridge;
+import com.taobao.weex.websocket.WXWebsocket;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -131,7 +131,6 @@ public class WXLogUtils {
   public static String WEEX_TAG = "weex";
   public static String WEEX_PERF_TAG = "weex_perf";
 
-  private static WXWebsocketBridge sWebsocketBridge;
   private static StringBuilder builder = new StringBuilder(50);
 
   public static void renderPerformanceLog(String type, long time) {
@@ -140,10 +139,6 @@ public class WXLogUtils {
       builder.append("[render time]").append(type).append(":").append(time);
       Log.d(WEEX_PERF_TAG, builder.substring(0));
     }
-  }
-
-  public static void setWebsocketBridge(WXWebsocketBridge websocketBridge) {
-    sWebsocketBridge = websocketBridge;
   }
 
   public static void d(String msg) {
@@ -178,7 +173,7 @@ public class WXLogUtils {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.e(WEEX_TAG, msg);
     }
-    sendLog(LogLevel.VERBOSE, msg);
+    sendLog(LogLevel.ERROR, msg);
   }
 
   public static void d(String tag, String msg) {
@@ -250,7 +245,7 @@ public class WXLogUtils {
   }
 
   private static void sendLog(LogLevel level, String msg) {
-    if (sWebsocketBridge != null && sWebsocketBridge.getWebsocket() != null && !TextUtils.isEmpty(msg)) {
+    if (WXWebsocket.getInstance()!=null && !TextUtils.isEmpty(msg)) {
 
       if (WXEnvironment.sLogLevel.compare(level)>=0) {
         List<String> arguments = new ArrayList<>();
@@ -259,7 +254,7 @@ public class WXLogUtils {
         Map<String, Object> msgObject = new HashMap<>();
         msgObject.put("method", "__logger");
         msgObject.put("arguments", arguments);
-        sWebsocketBridge.getWebsocket().sendMessage(JSON.toJSONString(msgObject));
+        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(msgObject));
       }
     }
   }

@@ -264,7 +264,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
-
+WXLogUtils.e("into--[onViewCreated]");
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }

@@ -208,60 +208,36 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.websocket.WXWebsocket;
-import com.taobao.weex.websocket.WXWebsocket.JSDebuggerCallback;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import okio.BufferedSource;
 
 /**
  * websocket bridge
  *
  * @author gulin
  */
-public class WXWebsocketBridge implements IWXBridge {
+public class WXWebsocketBridge implements IWXBridge,WXWebsocket.JSDebuggerCallback {
 
     private WXBridgeManager mJsManager;
-    private WXWebsocket mWaWebsocket;
     private volatile boolean mInit = false;
 
     public WXWebsocketBridge(WXBridgeManager jm) {
         mJsManager = jm;
-        mWaWebsocket = new WXWebsocket(this);
-        mWaWebsocket.connect(WXEnvironment.sDebugWsUrl,
-                new JSDebuggerCallback() {
-
-                    @Override
-                    public void onSuccess(String response) {
-                        mInit = true;
-                        WXSDKManager.getInstance().postOnUiThread(
-                                new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                                WXEnvironment.sApplication,
-                                                "切换到调试模式", Toast.LENGTH_SHORT)
-                                                .show();
-                                    }
-                                }, 0);
-                        WXLogUtils.d("connect websocket server success!");
-
-                        mWaWebsocket.setEnvironment(WXEnvironment.getConfig());
-                        mJsManager.initScriptsFramework(null);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable cause) {
-                        WXLogUtils.d("connect websocket server failure!");
-                    }
-
-                });
+        WXWebsocket.getInstance().registerListener(this);
     }
 
     @Override
@@ -285,7 +261,7 @@ public class WXWebsocketBridge implements IWXBridge {
             }
         }
         map.put("arguments", array);
-        mWaWebsocket.sendMessage(JSON.toJSONString(map));
+        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(map));
         return 0;
     }
 
@@ -307,7 +283,7 @@ public class WXWebsocketBridge implements IWXBridge {
         ArrayList<String> args = new ArrayList<>();
         args.add(scriptsFramework);
         map.put("arguments", args);
-        mWaWebsocket.sendMessage(JSON.toJSONString(map));
+        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(map));
         return 0;
     }
 
@@ -318,7 +294,52 @@ public class WXWebsocketBridge implements IWXBridge {
         }
     }
 
-    public WXWebsocket getWebsocket(){
-        return mWaWebsocket;
+    @Override
+    public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {
+        if (type != WebSocket.PayloadType.TEXT) {
+            WXLogUtils.w("Websocket received unexpected message with payload of type " + type);
+            return;
+        }
+
+        String message = null;
+        try {
+            message = payload.readUtf8();
+            JSONObject jsonObject = JSONObject.parseObject(message);
+            Object name = jsonObject.get("name");
+            Object value = jsonObject.get("value");
+            if (name == null || value == null) {
+                return;
+            }
+            if (name.toString().equals("callNative")) {
+                JSONArray jsonArray = JSONObject.parseArray(value.toString());
+                callNative(jsonArray.getString(0), jsonArray.getString(1),
+                           jsonArray.getString(2));
+            }
+        } catch (Exception e) {
+
+        } finally {
+            try {
+                payload.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onSuccess(Response response) {
+        if(response.isSuccessful()){
+            WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(WXEnvironment.sApplication,"Has switched to DEBUG mode, you can see the DEBUG information on the browser!",Toast.LENGTH_SHORT).show();
+                }
+            },0);
+        }
+    }
+
+    @Override
+    public void onFailure(Throwable cause) {
+        Toast.makeText(WXEnvironment.sApplication,"socket connect failure!",Toast.LENGTH_SHORT).show();
     }
 }

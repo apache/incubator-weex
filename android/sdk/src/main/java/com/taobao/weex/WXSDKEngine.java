@@ -246,6 +246,7 @@ import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.websocket.WXWebsocket;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -450,6 +451,18 @@ public class WXSDKEngine {
 
   public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
     WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
+  }
+
+  public static void switchDebugModel(boolean debug,String debugUrl){
+    if(debug){
+      WXEnvironment.sDebugMode=true;
+      WXEnvironment.sDebugWsUrl=debugUrl;
+      WXWebsocket.getInstance().connect(debugUrl);
+    }else{
+      WXEnvironment.sDebugMode=false;
+      WXEnvironment.sDebugWsUrl=null;
+      WXWebsocket.getInstance().closeQuietly();
+    }
   }
 
 
