@@ -146,7 +146,7 @@ public class WXWebSocketManager implements WebSocketListener {
   private WebSocket mWebSocket;
   private OkHttpClient mHttpClient;
 
-  private boolean isSupportWebsocket=true;
+  private boolean isSupportWebSocket =true;
 
   public static WXWebSocketManager getInstance() {
     return sWebsocket;
@@ -159,7 +159,7 @@ public class WXWebSocketManager implements WebSocketListener {
     try {
       mHttpClient= (OkHttpClient) Class.forName("com.squareup.okhttp.OkHttpClient").newInstance();
     } catch (Exception e) {
-      isSupportWebsocket=false;
+      isSupportWebSocket =false;
       return;
     }
     mHttpClient = new OkHttpClient();
@@ -182,7 +182,7 @@ public class WXWebSocketManager implements WebSocketListener {
   }
 
   public void closeQuietly() {
-    if(!isSupportWebsocket){
+    if(!isSupportWebSocket){
       return;
     }
     if (mWebSocket != null) {
@@ -196,7 +196,7 @@ public class WXWebSocketManager implements WebSocketListener {
   }
 
   public void sendMessage(String message) {
-    if(!isSupportWebsocket){
+    if(!isSupportWebSocket){
       return;
     }
     if (mWebSocket == null) {
@@ -305,7 +305,7 @@ public class WXWebSocketManager implements WebSocketListener {
   }
 
   private void setEnvironment(Map<String, String> options) {
-    if(!isSupportWebsocket){
+    if(!isSupportWebSocket){
       return;
     }
     List<Object> arguments = new ArrayList<>();
