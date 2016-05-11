@@ -808,7 +808,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     private int width;
     private int height;
     private WXRenderStrategy flag;
-    private long startReqeustTime;
+    private long startRequestTime;
 
     private WXHttpListener(String pageName, Map<String, Object> options, String jsonInitData, int width, int height, WXRenderStrategy flag, long startRequestTime) {
       this.pageName = pageName;
@@ -817,7 +817,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
       this.width = width;
       this.height = height;
       this.flag = flag;
-      this.startReqeustTime = startRequestTime;
+      this.startRequestTime = startRequestTime;
     }
 
 
@@ -839,7 +839,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
     @Override
     public void onHttpFinish(WXResponse response) {
 
-      mWXPerformance.networkTime = System.currentTimeMillis() - startReqeustTime;
+      mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
+      WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
 
       if (TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
