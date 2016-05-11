@@ -22,6 +22,7 @@
         {name: 'countdown-demo', title: 'Countdown'},
         {name: 'marquee-demo', title: 'Marquee'},
         {name: 'ui', title: 'UI Gallery'},
+        {name: 'new-fashion/index', title: 'Activity'},
         {name: 'calculator', title: 'Calculator'}
       ]
     }
