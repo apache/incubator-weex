@@ -138,25 +138,29 @@ import java.util.concurrent.TimeUnit;
 import okio.Buffer;
 import okio.BufferedSource;
 
-public class WXWebsocket implements WebSocketListener {
+public class WXWebSocketManager implements WebSocketListener {
 
-  private static WXWebsocket sWebsocket = new WXWebsocket();
+  private static WXWebSocketManager sWebsocket = new WXWebSocketManager();
 
   private final ConcurrentHashMap<Integer, JSDebuggerCallback> mCallbacks = new ConcurrentHashMap<>();
   private WebSocket mWebSocket;
   private OkHttpClient mHttpClient;
 
-  public static WXWebsocket getInstance() {
+  private boolean isSupportWebsocket=true;
+
+  public static WXWebSocketManager getInstance() {
     return sWebsocket;
   }
 
-  private WXWebsocket() {
+  private WXWebSocketManager() {
   }
 
   public void connect(String url) {
-    if (mHttpClient != null) {
-      throw new IllegalStateException(
-          "JSDebuggerWebSocketClient is already initialized.");
+    try {
+      mHttpClient= (OkHttpClient) Class.forName("com.squareup.okhttp.OkHttpClient").newInstance();
+    } catch (Exception e) {
+      isSupportWebsocket=false;
+      return;
     }
     mHttpClient = new OkHttpClient();
     mHttpClient.setConnectTimeout(10, TimeUnit.SECONDS);
@@ -178,6 +182,9 @@ public class WXWebsocket implements WebSocketListener {
   }
 
   public void closeQuietly() {
+    if(!isSupportWebsocket){
+      return;
+    }
     if (mWebSocket != null) {
       try {
         mWebSocket.close(1000, "End of session");
@@ -189,6 +196,9 @@ public class WXWebsocket implements WebSocketListener {
   }
 
   public void sendMessage(String message) {
+    if(!isSupportWebsocket){
+      return;
+    }
     if (mWebSocket == null) {
       return;
     }
@@ -295,6 +305,9 @@ public class WXWebsocket implements WebSocketListener {
   }
 
   private void setEnvironment(Map<String, String> options) {
+    if(!isSupportWebsocket){
+      return;
+    }
     List<Object> arguments = new ArrayList<>();
     arguments.add(options);
     Map<String, Object> objectMap = new HashMap<>();

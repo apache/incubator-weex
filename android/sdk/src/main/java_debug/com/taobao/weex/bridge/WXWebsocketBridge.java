@@ -216,7 +216,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.websocket.WXWebsocket;
+import com.taobao.weex.websocket.WXWebSocketManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -230,14 +230,14 @@ import okio.BufferedSource;
  *
  * @author gulin
  */
-public class WXWebsocketBridge implements IWXBridge,WXWebsocket.JSDebuggerCallback {
+public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebuggerCallback {
 
     private WXBridgeManager mJsManager;
     private volatile boolean mInit = false;
 
     public WXWebsocketBridge(WXBridgeManager jm) {
         mJsManager = jm;
-        WXWebsocket.getInstance().registerListener(this);
+        WXWebSocketManager.getInstance().registerListener(this);
     }
 
     @Override
@@ -261,7 +261,7 @@ public class WXWebsocketBridge implements IWXBridge,WXWebsocket.JSDebuggerCallba
             }
         }
         map.put("arguments", array);
-        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(map));
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
         return 0;
     }
 
@@ -283,7 +283,7 @@ public class WXWebsocketBridge implements IWXBridge,WXWebsocket.JSDebuggerCallba
         ArrayList<String> args = new ArrayList<>();
         args.add(scriptsFramework);
         map.put("arguments", args);
-        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(map));
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
         return 0;
     }
 

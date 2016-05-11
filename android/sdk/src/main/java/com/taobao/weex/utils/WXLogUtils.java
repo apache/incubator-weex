@@ -116,7 +116,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.LogLevel;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.websocket.WXWebsocket;
+import com.taobao.weex.websocket.WXWebSocketManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -245,7 +245,7 @@ public class WXLogUtils {
   }
 
   private static void sendLog(LogLevel level, String msg) {
-    if (WXWebsocket.getInstance()!=null && !TextUtils.isEmpty(msg)) {
+    if (WXWebSocketManager.getInstance()!=null && !TextUtils.isEmpty(msg)) {
 
       if (WXEnvironment.sLogLevel.compare(level)>=0) {
         List<String> arguments = new ArrayList<>();
@@ -254,7 +254,7 @@ public class WXLogUtils {
         Map<String, Object> msgObject = new HashMap<>();
         msgObject.put("method", "__logger");
         msgObject.put("arguments", arguments);
-        WXWebsocket.getInstance().sendMessage(JSON.toJSONString(msgObject));
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(msgObject));
       }
     }
   }

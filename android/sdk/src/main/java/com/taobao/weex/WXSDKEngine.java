@@ -246,7 +246,7 @@ import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
-import com.taobao.weex.websocket.WXWebsocket;
+import com.taobao.weex.websocket.WXWebSocketManager;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -457,11 +457,11 @@ public class WXSDKEngine {
     if(debug){
       WXEnvironment.sDebugMode=true;
       WXEnvironment.sDebugWsUrl=debugUrl;
-      WXWebsocket.getInstance().connect(debugUrl);
+      WXWebSocketManager.getInstance().connect(debugUrl);
     }else{
       WXEnvironment.sDebugMode=false;
       WXEnvironment.sDebugWsUrl=null;
-      WXWebsocket.getInstance().closeQuietly();
+      WXWebSocketManager.getInstance().closeQuietly();
     }
   }
 
