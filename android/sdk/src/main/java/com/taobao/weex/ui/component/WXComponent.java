@@ -245,6 +245,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     updateProperties();
     addEvents();
     updateExtra(mDomObj.getExtra());
+    flushView();
   }
 
   protected WXBorder getOrCreateBorder() {
@@ -617,7 +618,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
    * Flush the corresponding view.
    * If multiple property setter conflicts, this method can be called to resolve conflict.
    */
-  public void flushView() {
+  protected void flushView() {
 
   }
 

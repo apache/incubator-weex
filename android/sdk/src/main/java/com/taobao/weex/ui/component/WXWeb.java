@@ -273,7 +273,7 @@ public class WXWeb extends WXComponent {
     }
 
     @Override
-    public void flushView() {
+    protected void flushView() {
         super.flushView();
         if (!TextUtils.isEmpty(mUrl) && mUrlChanged) {
             mUrlChanged = false;

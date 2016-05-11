@@ -225,7 +225,6 @@ import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.ui.view.listview.IRefreshLayout;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
@@ -309,10 +308,6 @@ public class WXListComponent extends WXVContainer implements
     int index = mChildren.indexOf(child);
     getView().getAdapter().notifyItemInserted(index);
     checkRefreshOrLoading(child);
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "addChild child at " + index);
-    }
-
     if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
       mAppearComponents.put(index,child);
       child.registerAppearEvent=true;
@@ -330,9 +325,6 @@ public class WXListComponent extends WXVContainer implements
     int adapterPosition = index == -1 ? getView().getAdapter().getItemCount() - 1 : index;
     getView().getAdapter().notifyItemInserted(adapterPosition);
     checkRefreshOrLoading(child);
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "addChild child at " + index);
-    }
     if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
       mAppearComponents.put(adapterPosition, child);
       child.registerAppearEvent=true;
@@ -382,6 +374,7 @@ public class WXListComponent extends WXVContainer implements
   @Override
   public void onViewRecycled(ListBaseViewHolder holder) {
     recycleImage(holder.itemView);
+    WXLogUtils.d(TAG, "Recycle holder "+holder);
   }
 
   /**
@@ -399,8 +392,8 @@ public class WXListComponent extends WXVContainer implements
     }
     if(component!=null){
       component.bind(null);
-      component.flushView();
     }
+    WXLogUtils.d(TAG, "Bind holder "+holder);
   }
 
   /**
@@ -422,9 +415,9 @@ public class WXListComponent extends WXVContainer implements
         WXComponent component = getChild(i);
         if (component != null && getItemViewType(i) == viewType) {
           if (component.isLazy()) {
-              component.lazy(false);
-              component.createView(this, -1);
-              return new ListBaseViewHolder(component.getView());
+            component.lazy(false);
+            component.createView(this, -1);
+            return new ListBaseViewHolder(component.getView());
           } else if (component instanceof WXRefresh) {
             return createVHForWXRefresh(component);
           } else if (component instanceof WXLoading) {
@@ -471,6 +464,7 @@ public class WXListComponent extends WXVContainer implements
 
   @Override
   public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
+    WXLogUtils.d(TAG, "Failed to recycle "+holder);
     return false;
   }
 
@@ -496,10 +490,6 @@ public class WXListComponent extends WXVContainer implements
       }
 
       if (offScreenY < Integer.parseInt(offset)) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d(TAG, "offScreenY :" + offScreenY);
-        }
-
         if (listCellCount != mChildren.size()) {
           WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
           listCellCount = mChildren.size();
@@ -513,8 +503,6 @@ public class WXListComponent extends WXVContainer implements
 
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible) {
-
-    WXLogUtils.d(TAG, "into--[notifyAppearStateChange]firstVisible:" + firstVisible + " lastVisible:" + lastVisible);
 
     List<Integer> unRegisterKeys = new ArrayList<>();
 
@@ -559,9 +547,8 @@ public class WXListComponent extends WXVContainer implements
   }
 
   private void recycleImage(View view){
-    if(view instanceof WXImageView){
-      ((WXImageView) view).setImageDrawable(null);
-      mInstance.getImgLoaderAdapter().setImage(null, (WXImageView)view,
+    if(view instanceof ImageView){
+      mInstance.getImgLoaderAdapter().setImage(null, (ImageView)view,
                                                null, null);
     }
     else if(view instanceof ViewGroup){

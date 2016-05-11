@@ -372,14 +372,7 @@ class WXDomStatement {
     }
     mNormalTasks.clear();
     mAddDom.clear();
-
-    Iterator<String> iterator = mUpdate.iterator();
-    while (iterator.hasNext()) {
-      String ref = iterator.next();
-      mWXRenderManager.flushView(mInstanceId, ref);
-    }
     mUpdate.clear();
-
     mDirty = false;
   }
 
