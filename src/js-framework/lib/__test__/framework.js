@@ -188,19 +188,23 @@ describe('framework entry', () => {
   describe('refreshInstance', () => {
     it('modify showText to false', () => {
       framework.refreshInstance(instanceId, {showText: false})
-      expect(callNativeSpy.callCount).to.be.equal(1)
+      expect(callNativeSpy.callCount).to.be.equal(2)
 
       expect(callNativeSpy.firstCall.args[0]).to.be.equal(instanceId)
       expect(callNativeSpy.firstCall.args[1]).to.deep.equal([{
         module: 'dom',
         method: 'removeElement',
         args: ['5']
-      }, {
+      }])
+      expect(callNativeSpy.firstCall.args[2]).to.be.equal('-1')
+
+      expect(callNativeSpy.secondCall.args[0]).to.be.equal(instanceId)
+      expect(callNativeSpy.secondCall.args[1]).to.deep.equal([{
         module: 'dom',
         method: 'refreshFinish',
         args: []
       }])
-      expect(callNativeSpy.firstCall.args[2]).to.be.equal('-1')
+      expect(callNativeSpy.secondCall.args[2]).to.be.equal('-1')
     })
 
     it('with a non-exist instanceId', () => {
