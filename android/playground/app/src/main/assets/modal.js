@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/1023ccde152171be79fe2fd8dead8368", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/8ea70668c6413be67c175cef15957ba2", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -110,7 +110,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Toast"
+	        "title": "Toast",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -128,7 +129,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Dialog"
+	        "title": "Dialog",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -173,7 +175,7 @@
 	}
 	;__weex_module__.exports.style={}
 	})
-	;__weex_bootstrap__("@weex-component/1023ccde152171be79fe2fd8dead8368", {
+	;__weex_bootstrap__("@weex-component/8ea70668c6413be67c175cef15957ba2", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

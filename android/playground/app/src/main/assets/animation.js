@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/58532454722208faddda30d3b1b438d0", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/6dce51f79ed815347754cd36fdb73f89", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -153,7 +153,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Transform"
+	        "title": "Transform",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -214,7 +215,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Others"
+	        "title": "Others",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -298,7 +300,7 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/58532454722208faddda30d3b1b438d0", {
+	;__weex_bootstrap__("@weex-component/6dce51f79ed815347754cd36fdb73f89", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

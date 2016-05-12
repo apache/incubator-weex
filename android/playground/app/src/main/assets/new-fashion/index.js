@@ -44,192 +44,81 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/61cfa4c481726ebbd7c4306501946dbb", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/d62b089ac06ebcc65bac2f06583e2aac", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
-	  __webpack_require__(1);
-
+	  __webpack_require__(1)
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      levels: [{level: 1}, {level: 2}, {level: 3}],
-	      buttons: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}, {type: 'link'}],
-	      panels: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
-	      tips: [{type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
+	      tabItems: [
+	        {
+	          index: 0,
+	          title: "会场",
+	          titleColor: 0x0,
+	          icon: "",
+	          image: "http://gtms01.alicdn.com/tps/i1/TB1qw.hMpXXXXagXXXX9t7RGVXX-46-46.png",
+	          selectedImage: "http://gtms04.alicdn.com/tps/i4/TB16jjPMpXXXXazXVXX9t7RGVXX-46-46.png",
+	          src: "./examples/build/new-fashion/main.js",
+	          visibility: "visible",
+	        },
+	        {
+	          index: 1,
+	          title: "WEEX",
+	          titleColor: 0x0,
+	          icon:"",
+	          image: "http://gtms03.alicdn.com/tps/i3/TB1LEn9MpXXXXaUXpXX9t7RGVXX-46-46.png",
+	          selectedImage: "http://gtms02.alicdn.com/tps/i2/TB1qysbMpXXXXcnXXXX9t7RGVXX-46-46.png",
+	          src: "./examples/build/image-demo.js",
+	          visibility: "hidden",
+	        },
+	        {
+	          index: 2,
+	          title: "列表",
+	          titleColor: 0x0,
+	          icon:"",
+	          image: "http://gtms01.alicdn.com/tps/i1/TB1B0v5MpXXXXcvXpXX9t7RGVXX-46-46.png",
+	          selectedImage: "http://gtms04.alicdn.com/tps/i4/TB1NxY5MpXXXXcrXpXX9t7RGVXX-46-46.png",
+	          src: "./examples/build/list-demo.js",
+	          visibility: "hidden",
+	        }
+	      ],
 	    }},
 	    methods: {
-	      clicked: function() {
-	        var $modal = __weex_require__('@weex-module/modal');
-	        $modal.toast({'message': 'clicked!', duration: 0.5});
-	      }
+	      ready: function (e) {
+	        var vm = this;
+	        vm.$on('tabBar.onClick',function(e){
+	          var detail= e.detail;
+	          nativeLog('tabBar.onClick ' + detail.index);
+	        });
+	      },
 	    }
 	  }
 
 	;__weex_module__.exports.template={
-	  "type": "scroller",
+	  "type": "div",
 	  "children": [
 	    {
-	      "type": "wxc-panel",
+	      "type": "wxc-tabbar",
+	      "classList": [
+	        "tabbar"
+	      ],
 	      "attr": {
-	        "title": "Title Levels",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-hn",
-	          "repeat": function () {return this.levels},
-	          "attr": {
-	            "level": function () {return this.level},
-	            "value": function () {return 'H' + (this.level) + ', Level ' + (this.level)}
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Buttons",
-	        "type": "primary"
-	      },
-	      "append": "tree",
-	      "children": [
-	        {
-	          "type": "div",
-	          "style": {
-	            "flexDirection": "row",
-	            "marginTop": 12
-	          },
-	          "repeat": function () {return this.buttons},
-	          "children": [
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "large",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              }
-	            },
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "middle",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              },
-	              "style": {
-	                "marginLeft": 5,
-	                "width": 210
-	              }
-	            },
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "small",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              },
-	              "style": {
-	                "marginLeft": 5
-	              }
-	            }
-	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Panels",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-panel",
-	          "repeat": function () {return this.panels},
-	          "attr": {
-	            "title": function () {return 'Panels-' + (this.type)},
-	            "type": function () {return this.type},
-	            "border": "1"
-	          },
-	          "style": {
-	            "marginLeft": 12,
-	            "marginRight": 12
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return 'Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content.'}
-	              }
-	            }
-	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "List",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-list-item",
-	          "repeat": function () {return this.tips},
-	          "events": {
-	            "click": "clicked"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "classList": [
-	                "item-txt"
-	              ],
-	              "attr": {
-	                "value": function () {return this.type}
-	              }
-	            }
-	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Tips",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-tip",
-	          "repeat": function () {return this.tips},
-	          "style": {
-	            "marginBottom": 20
-	          },
-	          "attr": {
-	            "value": function () {return 'Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content.'}
-	          }
-	        }
-	      ]
+	        "tabItems": function () {return this.tabItems}
+	      }
 	    }
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "item-txt": {
-	    "fontSize": 48,
-	    "color": "#555555"
+	  "content": {
+	    "color": "#353535",
+	    "backgroundColor": "#666666"
+	  },
+	  "tabbar": {
+	    "backgroundColor": "#ffffff"
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/61cfa4c481726ebbd7c4306501946dbb", {
+	;__weex_bootstrap__("@weex-component/d62b089ac06ebcc65bac2f06583e2aac", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

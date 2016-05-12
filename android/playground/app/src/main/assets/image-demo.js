@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/944a1f786bb8fb094334fbec23f7fddb", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/e077e3efc7a3f703904f0ad11733c66e", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -126,19 +126,31 @@
 	      },
 	      "children": [
 	        {
-	          "type": "wxc-tip",
+	          "type": "wxc-panel",
 	          "attr": {
-	            "type": "warning",
-	            "value": "Default value is stretch"
+	            "title": "resize=stretch(default) 600 X 200"
 	          },
-	          "style": {
-	            "marginBottom": 20
-	          }
+	          "children": [
+	            {
+	              "type": "image",
+	              "classList": [
+	                "img"
+	              ],
+	              "style": {
+	                "width": 600,
+	                "height": 200
+	              },
+	              "attr": {
+	                "src": function () {return this.img},
+	                "resize": "stretch"
+	              }
+	            }
+	          ]
 	        },
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "600 X 600     resize=contain"
+	            "title": "resize=contain 600 X 600"
 	          },
 	          "children": [
 	            {
@@ -156,50 +168,28 @@
 	              }
 	            }
 	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "600 X 600     resize=cover"
-	      },
-	      "children": [
+	        },
 	        {
-	          "type": "image",
-	          "classList": [
-	            "img"
-	          ],
-	          "style": {
-	            "width": 600,
-	            "height": 600
-	          },
+	          "type": "wxc-panel",
 	          "attr": {
-	            "src": function () {return this.img},
-	            "resize": "cover"
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "600 X 200     resize=stretch"
-	      },
-	      "children": [
-	        {
-	          "type": "image",
-	          "classList": [
-	            "img"
-	          ],
-	          "style": {
-	            "width": 600,
-	            "height": 200
+	            "title": "resize=cover 600 X 600"
 	          },
-	          "attr": {
-	            "src": function () {return this.img},
-	            "resize": "stretch"
-	          }
+	          "children": [
+	            {
+	              "type": "image",
+	              "classList": [
+	                "img"
+	              ],
+	              "style": {
+	                "width": 600,
+	                "height": 600
+	              },
+	              "attr": {
+	                "src": function () {return this.img},
+	                "resize": "cover"
+	              }
+	            }
+	          ]
 	        }
 	      ]
 	    }
@@ -211,7 +201,7 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/944a1f786bb8fb094334fbec23f7fddb", {
+	;__weex_bootstrap__("@weex-component/e077e3efc7a3f703904f0ad11733c66e", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

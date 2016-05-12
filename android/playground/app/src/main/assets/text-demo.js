@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/ef1ddf959ebd2668225d3896982ea3cf", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -55,7 +55,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "color"
+	        "title": "color",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -132,7 +133,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "font-size"
+	        "title": "font-size",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -176,7 +178,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "font-style"
+	        "title": "font-style",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -208,7 +211,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "font-weight"
+	        "title": "font-weight",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -240,7 +244,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "text-decoration"
+	        "title": "text-decoration",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -284,7 +289,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "text-align"
+	        "title": "text-align",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -328,7 +334,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "text-overflow"
+	        "title": "text-overflow",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -370,7 +377,7 @@
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/75f715d6db82638cfd54dfb7b27e1662", {
+	;__weex_bootstrap__("@weex-component/ef1ddf959ebd2668225d3896982ea3cf", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

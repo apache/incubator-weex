@@ -44,25 +44,39 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/61cfa4c481726ebbd7c4306501946dbb", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/93d7260198ac388f8dc31fa3eb8477c6", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
 
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      levels: [{level: 1}, {level: 2}, {level: 3}],
-	      buttons: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}, {type: 'link'}],
-	      panels: [{type: 'default'}, {type: 'primary'}, {type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
-	      tips: [{type: 'success'}, {type: 'info'}, {type: 'warning'}, {type: 'danger'}],
+	      getResult: 'loading...',
+	      postResult: 'loading...'
 	    }},
-	    methods: {
-	      clicked: function() {
-	        var $modal = __weex_require__('@weex-module/modal');
-	        $modal.toast({'message': 'clicked!', duration: 0.5});
-	      }
+	    ready: function() {
+	      var stream = __weex_require__('@weex-module/stream');
+	      var me = this;
+	      var GET_URL = 'http://httpbin.org/get';
+	      var POST_URL = 'http://httpbin.org/post';
+	      
+	      stream.sendHttp({
+	        method: 'GET',
+	        url: GET_URL
+	      }, function(ret) {
+	        console.log('get', ret);
+	        me.getResult = ret;
+	      });
+
+	      stream.sendHttp({
+	        method: 'POST',
+	        url: POST_URL
+	      }, function(ret) {
+	        console.log('post', ret);
+	        me.postResult = ret;
+	      });
 	    }
-	  }
+	  };
 
 	;__weex_module__.exports.template={
 	  "type": "scroller",
@@ -70,166 +84,44 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Title Levels",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-hn",
-	          "repeat": function () {return this.levels},
-	          "attr": {
-	            "level": function () {return this.level},
-	            "value": function () {return 'H' + (this.level) + ', Level ' + (this.level)}
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Buttons",
-	        "type": "primary"
-	      },
-	      "append": "tree",
-	      "children": [
-	        {
-	          "type": "div",
-	          "style": {
-	            "flexDirection": "row",
-	            "marginTop": 12
-	          },
-	          "repeat": function () {return this.buttons},
-	          "children": [
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "large",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              }
-	            },
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "middle",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              },
-	              "style": {
-	                "marginLeft": 5,
-	                "width": 210
-	              }
-	            },
-	            {
-	              "type": "wxc-button",
-	              "attr": {
-	                "type": function () {return this.type},
-	                "size": "small",
-	                "value": function () {return this.type}
-	              },
-	              "events": {
-	                "click": "clicked"
-	              },
-	              "style": {
-	                "marginLeft": 5
-	              }
-	            }
-	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Panels",
+	        "title": "stream.sendHttp",
 	        "type": "primary"
 	      },
 	      "children": [
 	        {
 	          "type": "wxc-panel",
-	          "repeat": function () {return this.panels},
 	          "attr": {
-	            "title": function () {return 'Panels-' + (this.type)},
-	            "type": function () {return this.type},
-	            "border": "1"
-	          },
-	          "style": {
-	            "marginLeft": 12,
-	            "marginRight": 12
+	            "title": "method = GET"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return 'Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content.'}
+	                "value": function () {return this.getResult}
 	              }
 	            }
 	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "List",
-	        "type": "primary"
-	      },
-	      "children": [
+	        },
 	        {
-	          "type": "wxc-list-item",
-	          "repeat": function () {return this.tips},
-	          "events": {
-	            "click": "clicked"
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "method = POST"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
-	              "classList": [
-	                "item-txt"
-	              ],
 	              "attr": {
-	                "value": function () {return this.type}
+	                "value": function () {return this.postResult}
 	              }
 	            }
 	          ]
-	        }
-	      ]
-	    },
-	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Tips",
-	        "type": "primary"
-	      },
-	      "children": [
-	        {
-	          "type": "wxc-tip",
-	          "repeat": function () {return this.tips},
-	          "style": {
-	            "marginBottom": 20
-	          },
-	          "attr": {
-	            "value": function () {return 'Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content. Panels ' + (this.type) + ' content.'}
-	          }
 	        }
 	      ]
 	    }
 	  ]
 	}
-	;__weex_module__.exports.style={
-	  "item-txt": {
-	    "fontSize": 48,
-	    "color": "#555555"
-	  }
-	}
 	})
-	;__weex_bootstrap__("@weex-component/61cfa4c481726ebbd7c4306501946dbb", {
+	;__weex_bootstrap__("@weex-component/93d7260198ac388f8dc31fa3eb8477c6", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

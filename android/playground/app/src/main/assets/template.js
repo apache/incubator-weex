@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/0b1c53fdf902e607501f0c6d34ec0ea3", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/34cb65d2cb8795f5c54511b4cc1a203b", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -65,7 +65,8 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "Dialog"
+	        "title": "Dialog",
+	        "type": "primary"
 	      },
 	      "children": [
 	        {
@@ -143,6 +144,21 @@
 	          "attr": {
 	            "src": function () {return this.img}
 	          }
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "Image",
+	            "type": "default"
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "attr": {
+	                "value": "sub info"
+	              }
+	            }
+	          ]
 	        }
 	      ]
 	    }
@@ -150,7 +166,7 @@
 	}
 	;__weex_module__.exports.style={}
 	})
-	;__weex_bootstrap__("@weex-component/0b1c53fdf902e607501f0c6d34ec0ea3", {
+	;__weex_bootstrap__("@weex-component/34cb65d2cb8795f5c54511b4cc1a203b", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
