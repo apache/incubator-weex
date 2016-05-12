@@ -23,6 +23,18 @@ Web.prototype.create = function () {
   return node
 }
 
+Web.prototype.goBack = function () {
+  this.node.contentWindow.history.back()
+}
+
+Web.prototype.goForward = function () {
+  this.node.contentWindow.history.forward()
+}
+
+Web.prototype.reload = function () {
+  this.node.contentWindow.location.reload()
+}
+
 Web.prototype.attr = {
   src: function (val) {
     this.node.src = val
