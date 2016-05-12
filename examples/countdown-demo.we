@@ -1,6 +1,6 @@
 <template>
   <scroller>
-    <wxc-panel title="Countdown">
+    <wxc-panel title="Countdown" type="primary">
       <wxc-countdown id="countdown1" remain="{{countdown1.remain}}"
                      style="width:750; margin-top: 20; margin-bottom: 20;">
         <text class="ctno1">{{countdown1.time.D}}</text>

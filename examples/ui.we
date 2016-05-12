@@ -1,10 +1,10 @@
 <template>
   <scroller>
-    <wxc-panel title="Title Levels">
+    <wxc-panel title="Title Levels" type="primary">
       <wxc-hn repeat="{{levels}}" level="{{level}}" value="H{{level}}, Level {{level}}"></wxc-hn>
     </wxc-panel>
 
-    <wxc-panel title="Buttons" append="tree">
+    <wxc-panel title="Buttons" append="tree" type="primary">
       <div style="flex-direction: row; margin-top: 12px" repeat="{{buttons}}">
         <wxc-button type="{{type}}" size="large" value="{{type}}" onclick="{{clicked}}" style=""></wxc-button>
         <wxc-button type="{{type}}" size="middle" value="{{type}}" onclick="{{clicked}}"
@@ -20,20 +20,20 @@
       <!--</div>-->
     </wxc-panel>
 
-    <wxc-panel title="Panels">
+    <wxc-panel title="Panels" type="primary">
       <wxc-panel repeat="{{panels}}" title="Panels-{{type}}" type="{{type}}" border="1"
                  style="margin-left: 12px;margin-right: 12px;">
         <text>Panels {{type}} content. Panels {{type}} content. Panels {{type}} content.</text>
       </wxc-panel>
     </wxc-panel>
 
-    <wxc-panel title="List">
+    <wxc-panel title="List" type="primary">
       <wxc-list-item repeat="{{tips}}" onclick="{{clicked}}">
         <text class="item-txt">{{type}}</text>
       </wxc-list-item>
     </wxc-panel>
 
-    <wxc-panel title="Tips">
+    <wxc-panel title="Tips" type="primary">
       <wxc-tip repeat="{{tips}}" style="margin-bottom: 20px;"
                value="Panels {{type}} content. Panels {{type}} content. Panels {{type}} content."></wxc-tip>
     </wxc-panel>

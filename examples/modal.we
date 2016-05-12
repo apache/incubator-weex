@@ -1,10 +1,10 @@
 <template>
   <scroller>
-    <wxc-panel title="Toast">
+    <wxc-panel title="Toast" type="primary">
       <wxc-button type="primary" onclick="{{toast}}" value="Toast"></wxc-button>
     </wxc-panel>
 
-    <wxc-panel title="Dialog">
+    <wxc-panel title="Dialog" type="primary">
       <wxc-button type="success" onclick="{{alert}}" value="Alert" style="margin-bottom: 20px;"></wxc-button>
       <wxc-button type="primary" onclick="{{confirm}}" value="Confirm" style="margin-bottom: 20px;"></wxc-button>
       <wxc-button type="warning" onclick="{{prompt}}" value="Prompt"></wxc-button>

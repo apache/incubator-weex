@@ -1,6 +1,6 @@
 <template>
   <scroller>
-    <wxc-panel title="Marquee">
+    <wxc-panel title="Marquee" type="primary">
       <wxc-marquee id="marquee" style="width: 700; height: {{marquee.height * 2}}; background-color: rgb(223, 240, 216); border-radius: 8; padding-left: 10; padding-right: 10;" step="{{marquee.height * 2}}" count="{{marquee.list.length}}" interval="{{marquee.interval}}" duration="{{marquee.duration}}">
         <div repeat={{marquee.list}} style="height: {{marquee.height * marquee.length}}; padding-top: {{marquee.height * 0.5}}; padding-bottom: {{marquee.height * 0.5}}; overflow: hidden;">
           <text style="height: {{marquee.height}}; color: rgb(60, 118, 61); font-size: 28;">{{text}}</text>

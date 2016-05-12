@@ -5,25 +5,24 @@
       <wxc-panel title="400 X 400">
         <image class="img" style=" width: 400px; height: 400px;" src="{{img}}"></image>
       </wxc-panel>
+      
       <wxc-panel title="200 x 200">
         <image class="img" style=" width: 200px; height: 200px;" src="{{img}}"></image>
       </wxc-panel>
     </wxc-panel>
 
     <wxc-panel title="resize" type="primary">
-      <wxc-tip type="warning" value="Default value is stretch" style="margin-bottom: 20px;"></wxc-tip>
-      <wxc-panel title="600 X 600     resize=contain">
-        <image class="img" style=" width: 600px; height: 600px;" src="{{img}}" resize="contain"></image>
-      </wxc-panel>
-    </wxc-panel>
-    <wxc-panel title="600 X 600     resize=cover">
-        <image class="img" style=" width: 600px; height: 600px;" src="{{img}}" resize="cover"></image>
-      </wxc-panel>
-    </wxc-panel>
-    <wxc-panel title="600 X 200     resize=stretch">
+      <wxc-panel title="resize=stretch(default) 600 X 200 ">
         <image class="img" style=" width: 600px; height: 200px;" src="{{img}}" resize="stretch"></image>
       </wxc-panel>
-    </wxc-panel>
+      
+      <wxc-panel title="resize=contain 600 X 600 ">
+        <image class="img" style=" width: 600px; height: 600px;" src="{{img}}" resize="contain"></image>
+      </wxc-panel>
+      
+      <wxc-panel title="resize=cover 600 X 600">
+        <image class="img" style=" width: 600px; height: 600px;" src="{{img}}" resize="cover"></image>
+      </wxc-panel>
     </wxc-panel>
   </scroller>
 </template>
