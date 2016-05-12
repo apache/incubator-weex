@@ -510,14 +510,8 @@ class WXRenderStatement {
       return;
     }
 
-    int viewYInScroller=component.getAbsoluteY();
-
-    if(component.getParent()!=null){
-      viewYInScroller-=component.getParent().getAbsoluteY();
-    }
-
     scroller.scrollBy(0,
-                      scroller.getView().getScrollY() - viewYInScroller - offsetIntF);
+                      scroller.getView().getScrollY() - component.getAbsoluteY() - offsetIntF);
   }
 
   /**
