@@ -45,76 +45,51 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/c913f50614100cbae8ac0e99f5f32376", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(18);
+	;__weex_define__("@weex-component/8deee4229e8e47478c967d585a917549", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(19);
+	__webpack_require__(20);
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      NUMBER_742: 742,
-	      NUMBER_230: 230,
-	      NUMBER_4: 4
-	    }},
-	    methods: {
-	      ready: function () {
-	        var self = this;
-	        self._randomBrand();
-	      },
-	      _randomBrand: function () {
-	        var self = this;
-	        var bannerItems = self.ds.bannerItems;
-	        bannerItems = bannerItems.sort(function(){
-	          return Math.random()-0.5;
-	        });
-	        self.bannerItems =  bannerItems.slice(0,8);
-	        for(var i=0;i<bannerItems.length;i++){
-	          var item =  bannerItems[i];
-	          if(i%2===0){
-	            item.img = item.leftImg;
-	            item.url = item.rightUrl;
-	          }else{
-	            item.img = item.rightImg;
-	            item.url = item.rightUrl;
-	          }
-	        }
-	      }
-	    }
+	      NUMBER_750: 750,
+	      NUMBER_200: 200,
+	      NUMBER_373: 373,
+	      NUMBER_224:224,
+	      NUMBER_4:4
+	    }}
 	  }
 
 	;__weex_module__.exports.template={
 	  "type": "container",
-	  "classList": [
-	    "container"
-	  ],
+	  "shown": function () {return !this.ds.isHide},
 	  "children": [
 	    {
-	      "type": "image",
-	      "shown": function () {return this.ds.floorTitle},
-	      "classList": [
-	        "title"
-	      ],
-	      "attr": {
-	        "src": function () {return this.ds.floorTitle}
-	      }
-	    },
-	    {
 	      "type": "container",
-	      "style": {
-	        "marginLeft": 4,
-	        "marginRight": 4
-	      },
+	      "classList": [
+	        "big-banner-container"
+	      ],
 	      "children": [
 	        {
-	          "type": "banners",
+	          "type": "banner",
 	          "attr": {
-	            "ds": function () {return this.bannerItems},
-	            "direction": "column",
-	            "width": function () {return this.NUMBER_742},
-	            "height": function () {return this.NUMBER_230},
-	            "space": function () {return this.NUMBER_4}
+	            "width": function () {return this.NUMBER_750},
+	            "height": function () {return this.NUMBER_200},
+	            "src": function () {return this.ds.bigBannerImg},
+	            "href": function () {return this.ds.bigBannerUrl}
 	          }
 	        }
 	      ]
+	    },
+	    {
+	      "type": "banners",
+	      "attr": {
+	        "ds": function () {return this.ds.smallBannerItems},
+	        "width": function () {return this.NUMBER_373},
+	        "height": function () {return this.NUMBER_224},
+	        "direction": "row",
+	        "space": function () {return this.NUMBER_4}
+	      }
 	    }
 	  ]
 	}
@@ -123,19 +98,18 @@
 	    "width": 750,
 	    "height": 100
 	  },
-	  "container": {
-	    "marginBottom": 4,
-	    "backgroundColor": "#C0BABC"
+	  "big-banner-container": {
+	    "marginBottom": 4
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/c913f50614100cbae8ac0e99f5f32376", {
+	;__weex_bootstrap__("@weex-component/8deee4229e8e47478c967d585a917549", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
 /***/ },
 
-/***/ 17:
+/***/ 19:
 /***/ function(module, exports) {
 
 	;__weex_define__("@weex-component/banner", [], function(__weex_require__, __weex_exports__, __weex_module__){
@@ -181,11 +155,11 @@
 
 /***/ },
 
-/***/ 18:
+/***/ 20:
 /***/ function(module, exports, __webpack_require__) {
 
 	;__weex_define__("@weex-component/banners", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(17);
+	__webpack_require__(19);
 
 	;
 	  __weex_module__.exports = {

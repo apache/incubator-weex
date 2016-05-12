@@ -44,243 +44,192 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/559cd2049da887ae8989e25df99c5cab", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(28);
+	;__weex_define__("@weex-component/fa8ecf711424518a532b8970e33ccf30", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
-	  __webpack_require__(1);
-	  var img0 = '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg';
-	  var img1 = '//gw.alicdn.com/tps/i1/TB1M3sQMpXXXXakXXXXApNeJVXX-360-360.png';
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      eventCnt: 0,
-	      togglePlayMsg: 'pause',
-	      sliders: [
-	        {
-	          interval: 1000,
-	          autoPlay: true,
-	          sliderPages: [
-	            {
-	              items: [
+	    // 引入button
+	    __webpack_require__(1);
+
+	    // 用来在循环中生成index值
+	    var uid = 0;
+
+	    __weex_module__.exports = {
+	        "data":{
+	            itemsStatus:0,
+	            todos:[
 	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
+	                    "todoUid":uid++,
+	                    "status":"item-done",
+	                    "content":"xxxxxx",
+	                    "disableStatus":true
 	                },
 	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
+	                    "todoUid":uid++,
+	                    "status":"item-doing",
+	                    "content":"yyyyyy",
+	                    "disableStatus":true
 	                }
-	              ]
-	            },
-	            {
-	              items: [
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
-	            },
-	            {
-	              items: [
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
-	            }
-	          ]
+	            ]
 	        },
-	        {
-	          interval: 3000,
-	          autoPlay: true,
-	          sliderPages: [
-	            {
-	              items: [
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
+	        methods:{
+	            showAll: function() {
+
 	            },
-	            {
-	              items: [
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
+	            showOpened: function() {
+
 	            },
-	            {
-	              items: [
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
+	            showComplete: function() {
+
+	            },
+	            cleanCompletedTodos: function() {
+
+	            },
+	            finishInput: function(e) {
+	//                this.$call('modal', 'alert', {
+	//                    'message': "this is an debug tip",
+	//                    'okTitle': "OK",
+	//                    'cancelTitle': "cancel"
+	//                    }, function() {
+	//                });
+	//                return;
+	                var txt = e.value;
+
+	                if (txt.trim().length>0) {
+	                    this.todos.push({
+	                        "todoUid":uid++,
+	                        "status":"item-doing",
+	                        "content":txt.trim(),
+	                        "disableStatus":true
+	                    });
+	                    e.target.attr['value'] = '';
 	                }
-	              ]
+	            },
+	            editItem: function(e) {
+	                var todoUid= e.target.attr['todouid'];
+	                this.__enableItemByUid(todoUid);
+	                // 无法主动的focus到input上面
+	            },
+	            delItem: function(e) {
+	                var todoUid= parseInt(e.target.attr['todouid'],10);
+	                this.__removeItemByUid(todoUid);
+	            },
+	            __enableItemByUid: function(uid) {
+	                var idxInTodos = this.__findTodoIndexByUid(uid);
+	                this.todos[idxInTodos].disableStatus = false;
+	            },
+	            __findTodoIndexByUid: function(uid) {
+	                var result = -1;
+	                for (var i = 0;i < this.todos.length;i++) {
+	                    if (uid === this.todos[i].todoUid) {
+	                        result = i;
+	                        break;
+	                    }
+	                }
+	                return result;
+	            },
+	            __removeItemByUid:function(uid) {
+	                var idxInTodos = this.__findTodoIndexByUid(uid);
+	                this.todos.splice(idxInTodos,1);
 	            }
-	          ]
 	        },
-	        {
-	          interval: 5000,
-	          autoPlay: true,
-	          sliderPages: [
-	            {
-	              items: [
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
-	            },
-	            {
-	              items: [
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
-	            },
-	            {
-	              items: [
-	                {
-	                  image: img0,
-	                  link: '//h5.m.taobao.com/1'
-	                },
-	                {
-	                  image: img1,
-	                  link: '//h5.m.taobao.com/1'
-	                }
-	              ]
-	            }
-	          ]
+	        created: function() {
+	            this.itemsStatus = 1;
 	        }
-	      ]
-	    }},
-	    methods: {
-	      ready: function() {
-	      },
-	      togglePlay: function() {
-	        var autoPlay = this.sliders[0].autoPlay
-	        autoPlay = !autoPlay
-	        this.sliders[0].autoPlay = autoPlay
-	        this.togglePlayMsg = autoPlay ? 'pause' : 'play'
-	      },
-	      handleSliderChange: function() {
-	        var nowCnt = this.eventCnt + 1
-	        this.eventCnt = nowCnt
-	      },
-	      setInterval1: function() {
-	        this.sliders[0].interval = 1000;
-	      },
-	      setInterval3: function() {
-	        this.sliders[0].interval = 3000;
-	      },
-	      setInterval5: function() {
-	        this.sliders[0].interval = 5000;
-	      }
 	    }
-	  };
 
 	;__weex_module__.exports.template={
-	  "type": "scroller",
+	  "type": "list",
 	  "classList": [
-	    "body"
+	    "todo-list"
 	  ],
 	  "children": [
 	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "auto-play",
-	        "type": "primary"
-	      },
+	      "type": "cell",
+	      "append": "tree",
 	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "auto-play = false",
-	            "paddingBody": "0"
-	          },
+	          "type": "div",
+	          "classList": [
+	            "app-title-wrap"
+	          ],
 	          "children": [
 	            {
-	              "type": "slider",
+	              "type": "text",
 	              "classList": [
-	                "slider"
+	                "app-title"
 	              ],
-	              "append": "tree",
 	              "attr": {
-	                "interval": function () {return this.sliders[1].interval},
-	                "autoPlay": "false"
-	              },
-	              "children": [
-	                {
-	                  "type": "indicator",
-	                  "classList": [
-	                    "indicator"
-	                  ]
-	                },
-	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[1].sliderPages}
-	                }
-	              ]
+	                "value": "todos"
+	              }
 	            }
 	          ]
-	        },
+	        }
+	      ]
+	    },
+	    {
+	      "type": "cell",
+	      "append": "tree",
+	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "auto-play = true",
-	            "paddingBody": "0"
-	          },
+	          "type": "div",
+	          "classList": [
+	            "todo-area"
+	          ],
 	          "children": [
 	            {
-	              "type": "slider",
+	              "type": "div",
 	              "classList": [
-	                "slider"
+	                "todo-input-wrap"
 	              ],
-	              "append": "tree",
-	              "attr": {
-	                "interval": function () {return this.sliders[0].interval},
-	                "autoPlay": function () {return this.sliders[0].autoPlay}
-	              },
 	              "children": [
 	                {
-	                  "type": "indicator",
+	                  "type": "div",
 	                  "classList": [
-	                    "indicator"
+	                    "finish-toggle"
+	                  ],
+	                  "children": [
+	                    {
+	                      "type": "image",
+	                      "shown": function () {return this.itemsStatus===1},
+	                      "style": {
+	                        "width": 45,
+	                        "height": 30
+	                      },
+	                      "attr": {
+	                        "src": "https://gw.alicdn.com/tfs/TB1CnoDJFXXXXb6XVXXXXXXXXXX-77-51.jpg"
+	                      }
+	                    },
+	                    {
+	                      "type": "image",
+	                      "shown": function () {return this.itemsStatus===2},
+	                      "style": {
+	                        "width": 45,
+	                        "height": 30
+	                      },
+	                      "attr": {
+	                        "src": "https://gw.alicdn.com/tfs/TB1CnoDJFXXXXb6XVXXXXXXXXXX-77-51.jpg"
+	                      }
+	                    }
 	                  ]
 	                },
 	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[0].sliderPages}
+	                  "type": "input",
+	                  "classList": [
+	                    "todo-input"
+	                  ],
+	                  "attr": {
+	                    "type": "text",
+	                    "placeholder": "What needs to be done?"
+	                  },
+	                  "events": {
+	                    "change": "finishInput"
+	                  }
+	                },
+	                {
+	                  "type": "div",
+	                  "classList": [
+	                    "blank"
+	                  ]
 	                }
 	              ]
 	            }
@@ -289,219 +238,181 @@
 	      ]
 	    },
 	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": function () {return 'Event, ' + (this.eventCnt) + ' change'},
-	        "type": "primary"
-	      },
+	      "type": "cell",
+	      "append": "tree",
 	      "children": [
 	        {
-	          "type": "slider",
+	          "type": "div",
 	          "classList": [
-	            "slider"
+	            "todo-item"
 	          ],
-	          "append": "tree",
-	          "attr": {
-	            "interval": function () {return this.sliders[0].interval},
-	            "autoPlay": function () {return this.sliders[0].autoPlay}
-	          },
-	          "events": {
-	            "change": "handleSliderChange"
-	          },
+	          "repeat": function () {return this.todos},
 	          "children": [
 	            {
-	              "type": "indicator",
+	              "type": "div",
 	              "classList": [
-	                "indicator"
+	                "todo-status-done"
+	              ],
+	              "children": [
+	                {
+	                  "type": "image",
+	                  "shown": function () {return this.status==='item-doing'},
+	                  "style": {
+	                    "width": 70,
+	                    "height": 70
+	                  },
+	                  "attr": {
+	                    "src": "https://gw.alicdn.com/tfs/TB1Xr3GJFXXXXbmXVXXXXXXXXXX-153-153.jpg"
+	                  }
+	                },
+	                {
+	                  "type": "image",
+	                  "shown": function () {return this.status==='item-done'},
+	                  "style": {
+	                    "width": 70,
+	                    "height": 70
+	                  },
+	                  "attr": {
+	                    "src": "https://gw.alicdn.com/tfs/TB1pAg1JFXXXXX8XpXXXXXXXXXX-153-153.jpg"
+	                  }
+	                }
 	              ]
 	            },
 	            {
-	              "type": "slider-page",
-	              "repeat": function () {return this.sliders[0].sliderPages}
+	              "type": "input",
+	              "classList": function () {return ['todo-input', 'todo-content', this.status]},
+	              "attr": {
+	                "disabled": function () {return this.disableStatus},
+	                "type": "text",
+	                "value": function () {return this.content}
+	              }
+	            },
+	            {
+	              "type": "div",
+	              "classList": [
+	                "item-control"
+	              ],
+	              "children": [
+	                {
+	                  "type": "image",
+	                  "classList": [
+	                    "item-control-btn"
+	                  ],
+	                  "attr": {
+	                    "todouid": function () {return this.todoUid},
+	                    "src": "https://gw.alicdn.com/tfs/TB1gME_JFXXXXcmXpXXXXXXXXXX-48-48.jpg"
+	                  },
+	                  "events": {
+	                    "click": "editItem"
+	                  }
+	                },
+	                {
+	                  "type": "image",
+	                  "classList": [
+	                    "item-control-btn"
+	                  ],
+	                  "attr": {
+	                    "todouid": function () {return this.todoUid},
+	                    "src": "https://gw.alicdn.com/tfs/TB1txI5JFXXXXagXFXXXXXXXXXX-48-48.jpg"
+	                  },
+	                  "events": {
+	                    "click": "delItem"
+	                  }
+	                }
+	              ]
 	            }
 	          ]
 	        }
 	      ]
 	    },
 	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "Indicator",
-	        "type": "primary"
-	      },
+	      "type": "cell",
+	      "append": "tree",
+	      "shown": function () {return this.todos.length>0},
 	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "default style",
-	            "paddingBody": "0"
-	          },
+	          "type": "div",
+	          "classList": [
+	            "info-text-wrap"
+	          ],
 	          "children": [
 	            {
-	              "type": "slider",
+	              "type": "text",
 	              "classList": [
-	                "slider"
+	                "info-text"
 	              ],
-	              "append": "tree",
 	              "attr": {
-	                "interval": function () {return this.sliders[0].interval},
-	                "autoPlay": function () {return this.sliders[0].autoPlay}
-	              },
-	              "events": {
-	                "change": "handleSliderChange"
-	              },
-	              "children": [
-	                {
-	                  "type": "indicator",
-	                  "classList": [
-	                    "indicator"
-	                  ]
-	                },
-	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[0].sliderPages}
-	                }
-	              ]
+	                "value": function () {return (this.todos.length) + ' item left'}
+	              }
 	            }
 	          ]
-	        },
+	        }
+	      ]
+	    },
+	    {
+	      "type": "cell",
+	      "append": "tree",
+	      "shown": function () {return this.todos.length>0},
+	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "width & height",
-	            "paddingBody": "0"
-	          },
+	          "type": "div",
+	          "classList": [
+	            "sorting-wrap"
+	          ],
 	          "children": [
 	            {
-	              "type": "slider",
+	              "type": "div",
 	              "classList": [
-	                "slider"
+	                "sorting"
 	              ],
-	              "append": "tree",
-	              "attr": {
-	                "interval": function () {return this.sliders[0].interval},
-	                "autoPlay": function () {return this.sliders[0].autoPlay}
-	              },
 	              "children": [
 	                {
-	                  "type": "indicator",
-	                  "style": {
-	                    "itemColor": "#dddddd",
-	                    "width": 714,
-	                    "height": 460
-	                  }
-	                },
-	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[0].sliderPages}
-	                }
-	              ]
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "left & top",
-	            "paddingBody": "0"
-	          },
-	          "children": [
-	            {
-	              "type": "slider",
-	              "classList": [
-	                "slider"
-	              ],
-	              "append": "tree",
-	              "attr": {
-	                "interval": function () {return this.sliders[1].interval},
-	                "autoPlay": function () {return this.sliders[1].autoPlay}
-	              },
-	              "children": [
-	                {
-	                  "type": "indicator",
+	                  "type": "text",
 	                  "classList": [
-	                    "indicator"
+	                    "btn"
 	                  ],
-	                  "style": {
-	                    "top": -140,
-	                    "left": -240
+	                  "attr": {
+	                    "value": "all"
+	                  },
+	                  "events": {
+	                    "click": "showAll"
 	                  }
 	                },
 	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[1].sliderPages}
-	                }
-	              ]
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "itemColor & itemSelectedColor",
-	            "paddingBody": "0"
-	          },
-	          "children": [
-	            {
-	              "type": "slider",
-	              "classList": [
-	                "slider"
-	              ],
-	              "append": "tree",
-	              "attr": {
-	                "interval": function () {return this.sliders[2].interval},
-	                "autoPlay": function () {return this.sliders[2].autoPlay}
-	              },
-	              "children": [
-	                {
-	                  "type": "indicator",
+	                  "type": "text",
 	                  "classList": [
-	                    "indicator"
+	                    "btn"
 	                  ],
-	                  "style": {
-	                    "itemSelectedColor": "rgb(217, 83, 79)"
+	                  "attr": {
+	                    "value": "opened"
+	                  },
+	                  "events": {
+	                    "click": "showOpened"
 	                  }
 	                },
 	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[2].sliderPages}
-	                }
-	              ]
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "itemSize",
-	            "paddingBody": "0"
-	          },
-	          "children": [
-	            {
-	              "type": "slider",
-	              "classList": [
-	                "slider"
-	              ],
-	              "append": "tree",
-	              "attr": {
-	                "interval": function () {return this.sliders[1].interval},
-	                "autoPlay": function () {return this.sliders[1].autoPlay}
-	              },
-	              "children": [
-	                {
-	                  "type": "indicator",
-	                  "style": {
-	                    "itemColor": "#dddddd",
-	                    "itemSize": 40,
-	                    "top": 140,
-	                    "left": 180,
-	                    "width": 700,
-	                    "height": 380
+	                  "type": "text",
+	                  "classList": [
+	                    "btn"
+	                  ],
+	                  "attr": {
+	                    "value": "completed"
+	                  },
+	                  "events": {
+	                    "click": "showComplete"
 	                  }
 	                },
 	                {
-	                  "type": "slider-page",
-	                  "repeat": function () {return this.sliders[1].sliderPages}
+	                  "type": "text",
+	                  "classList": [
+	                    "btn"
+	                  ],
+	                  "attr": {
+	                    "value": "clean"
+	                  },
+	                  "events": {
+	                    "click": "cleanCompletedTodos"
+	                  }
 	                }
 	              ]
 	            }
@@ -512,26 +423,136 @@
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "body": {
+	  "todo-list": {
+	    "flexDirection": "column",
+	    "width": 750,
+	    "backgroundColor": "#f5f5f5"
+	  },
+	  "app-title": {
+	    "marginTop": 50,
+	    "marginBottom": 50,
+	    "fontSize": 120,
+	    "textAlign": "center",
+	    "color": "rgba(175,47,47,0.15)",
+	    "fontFamily": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+	  },
+	  "todo-input-wrap": {
+	    "display": "flex",
+	    "flexDirection": "row",
+	    "backgroundColor": "#ffffff",
+	    "borderTopWidth": 1,
+	    "borderBottomWidth": 1,
+	    "borderStyle": "solid",
+	    "borderColor": "#cccccc"
+	  },
+	  "finish-toggle": {
+	    "flex": 2,
+	    "height": 120,
+	    "lineHeight": 120,
+	    "overflow": "hidden",
+	    "fontSize": 60,
+	    "textAlign": "center",
+	    "fontWeight": "bold",
+	    "color": "#e6e6e6",
+	    "flexDirection": "row",
+	    "justifyContent": "center",
+	    "alignItems": "center"
+	  },
+	  "todo-input": {
+	    "height": 120,
+	    "flex": 7,
+	    "fontSize": 40,
+	    "marginLeft": 20,
+	    "borderWidth": 0,
+	    "fontStyle": "italic",
+	    "fontFamily": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+	  },
+	  "blank": {
+	    "flex": 1
+	  },
+	  "todo-item": {
+	    "display": "flex",
+	    "flexDirection": "row",
+	    "height": 120,
+	    "width": 750,
+	    "overflow": "hidden",
+	    "borderBottomWidth": 1,
+	    "borderStyle": "solid",
+	    "borderColor": "#cccccc",
 	    "backgroundColor": "#ffffff"
 	  },
-	  "slider": {
+	  "todo-status-done": {
+	    "flex": 2,
+	    "lineHeight": 120,
+	    "height": 120,
+	    "color": "#008000",
+	    "textAlign": "center",
+	    "fontSize": 40,
 	    "flexDirection": "row",
-	    "width": 690,
-	    "height": 360
+	    "justifyContent": "center",
+	    "alignItems": "center"
 	  },
-	  "indicator": {
-	    "position": "absolute",
-	    "width": 690,
-	    "height": 420,
-	    "top": 140,
-	    "left": 240,
-	    "itemColor": "#dddddd",
-	    "itemSelectedColor": "rgb(40, 96, 144)"
+	  "todo-content": {
+	    "color": "#333333",
+	    "fontStyle": "normal"
+	  },
+	  "item-control": {
+	    "flex": 2,
+	    "flexDirection": "row",
+	    "alignItems": "center"
+	  },
+	  "item-control-btn": {
+	    "width": 48,
+	    "height": 48,
+	    "marginRight": 20
+	  },
+	  "info-text-wrap": {
+	    "flexDirection": "column",
+	    "justifyContent": "center",
+	    "width": 750,
+	    "height": 80,
+	    "backgroundColor": "#ffffff"
+	  },
+	  "info-text": {
+	    "width": 700,
+	    "height": 40,
+	    "lineHeight": 40,
+	    "fontSize": 30,
+	    "paddingLeft": 50,
+	    "color": "#cccccc"
+	  },
+	  "sorting-wrap": {
+	    "width": 750,
+	    "height": 80,
+	    "backgroundColor": "#ffffff"
+	  },
+	  "sorting": {
+	    "display": "flex",
+	    "flexDirection": "row",
+	    "justifyContent": "space-between",
+	    "width": 550,
+	    "marginLeft": 100,
+	    "marginRight": 100,
+	    "height": 80
+	  },
+	  "btn": {
+	    "borderRadius": 3,
+	    "alignItems": "center",
+	    "marginLeft": 1,
+	    "marginTop": 15,
+	    "height": 50,
+	    "paddingTop": 5,
+	    "paddingLeft": 10,
+	    "paddingRight": 10,
+	    "fontSize": 30,
+	    "borderColor": "#cccccc",
+	    "borderWidth": 1,
+	    "borderStyle": "solid",
+	    "color": "#999999"
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/559cd2049da887ae8989e25df99c5cab", {
+	;__weex_bootstrap__("@weex-component/fa8ecf711424518a532b8970e33ccf30", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -1649,105 +1670,6 @@
 	    "marginTop": 5,
 	    "textAlign": "center",
 	    "fontSize": 20
-	  }
-	}
-	})
-
-/***/ },
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	;__weex_define__("@weex-component/slider-page", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(29);
-
-	;
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      items: [],
-	      sliderItems: []
-	    }},
-	    methods: {
-	      ready: function() {
-	        this.sliderItems = this.getSliderItems()
-	      },
-	      getSliderItems: function() {
-	        return this.items.map(function(item, index) {
-	          return item;
-	        }.bind(this));
-	      }
-	    }
-	  };
-
-	;__weex_module__.exports.template={
-	  "type": "div",
-	  "classList": [
-	    "slider-page"
-	  ],
-	  "children": [
-	    {
-	      "type": "slider-item",
-	      "repeat": function () {return this.sliderItems}
-	    }
-	  ]
-	}
-	;__weex_module__.exports.style={
-	  "slider-page": {
-	    "flexDirection": "row",
-	    "justifyContent": "space-between",
-	    "width": 714,
-	    "height": 420
-	  }
-	}
-	})
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	;__weex_define__("@weex-component/slider-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      image: '',
-	      link: '',
-	      href: ''
-	    }},
-	    methods: {
-	      ready: function() {
-	        this.href = this.link;
-	      }
-	    }
-	  };
-
-	;__weex_module__.exports.template={
-	  "type": "image",
-	  "classList": [
-	    "slider-item"
-	  ],
-	  "attr": {
-	    "src": function () {return this.image}
-	  }
-	}
-	;__weex_module__.exports.style={
-	  "slider-item": {
-	    "width": 348,
-	    "height": 400
 	  }
 	}
 	})

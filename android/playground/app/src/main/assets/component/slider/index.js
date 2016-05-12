@@ -44,49 +44,494 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/114e64ff480be8fdcfbd6fd445bcb06e", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/559cd2049da887ae8989e25df99c5cab", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(15);
 
 	;
-	  __webpack_require__(18);
+	  __webpack_require__(1);
+	  var img0 = '//gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg';
+	  var img1 = '//gw.alicdn.com/tps/i1/TB1M3sQMpXXXXakXXXXApNeJVXX-360-360.png';
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      items: [
-	        // `name` key is the example filename without '.we'
-	        // Support sub directory, e.g. 'new-fashion/index'
-	        {name: 'hello', title: 'Hello World'},
-	        {name: 'style/index', title: 'Common Style'},
-	        {name: 'animation', title: 'Animation'},
-	        // component
-	        {name: 'component/text-demo', title: 'Text'},
-	        {name: 'component/image-demo', title: 'Image'},
-	        {name: 'component/list/list-basic', title: 'List (Basic)'},
-	        {name: 'component/list/list-demo', title: 'List (Advanced)'},
-	        {name: 'component/slider/index', title: 'Slider'},
-	        {name: 'component/hyperlink',title:'A'},
-	        {name: 'component/video-demo', title: 'Video'},
-	        {name: 'component/countdown-demo', title: 'Countdown'},
-	        {name: 'component/marquee-demo', title: 'Marquee'},
-	        // module
-	        {name: 'module/instance-api', title: 'Instance API'},
-	        {name: 'module/modal', title: 'Modal'},
-	        {name: 'module/stream-demo', title: 'Stream'},
-	        // showcase
-	        {name: 'showcase/new-fashion/index', title: 'Activity'},
-	        {name: 'showcase/calculator', title: 'Calculator'},
-	        {name: 'showcase/ui', title: 'UI Gallery'}
+	      eventCnt: 0,
+	      togglePlayMsg: 'pause',
+	      sliders: [
+	        {
+	          interval: 1000,
+	          autoPlay: true,
+	          sliderPages: [
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          interval: 3000,
+	          autoPlay: true,
+	          sliderPages: [
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          interval: 5000,
+	          autoPlay: true,
+	          sliderPages: [
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            },
+	            {
+	              items: [
+	                {
+	                  image: img0,
+	                  link: '//h5.m.taobao.com/1'
+	                },
+	                {
+	                  image: img1,
+	                  link: '//h5.m.taobao.com/1'
+	                }
+	              ]
+	            }
+	          ]
+	        }
 	      ]
-	    }}
-	  }
+	    }},
+	    methods: {
+	      ready: function() {
+	      },
+	      togglePlay: function() {
+	        var autoPlay = this.sliders[0].autoPlay
+	        autoPlay = !autoPlay
+	        this.sliders[0].autoPlay = autoPlay
+	        this.togglePlayMsg = autoPlay ? 'pause' : 'play'
+	      },
+	      handleSliderChange: function() {
+	        var nowCnt = this.eventCnt + 1
+	        this.eventCnt = nowCnt
+	      },
+	      setInterval1: function() {
+	        this.sliders[0].interval = 1000;
+	      },
+	      setInterval3: function() {
+	        this.sliders[0].interval = 3000;
+	      },
+	      setInterval5: function() {
+	        this.sliders[0].interval = 5000;
+	      }
+	    }
+	  };
 
 	;__weex_module__.exports.template={
-	  "type": "example-list",
-	  "attr": {
-	    "items": function () {return this.items},
-	    "dir": "examples"
+	  "type": "scroller",
+	  "classList": [
+	    "body"
+	  ],
+	  "children": [
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "auto-play",
+	        "type": "primary"
+	      },
+	      "children": [
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "auto-play = false",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[1].interval},
+	                "autoPlay": "false"
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ]
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[1].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "auto-play = true",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[0].interval},
+	                "autoPlay": function () {return this.sliders[0].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ]
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[0].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        }
+	      ]
+	    },
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": function () {return 'Event, ' + (this.eventCnt) + ' change'},
+	        "type": "primary"
+	      },
+	      "children": [
+	        {
+	          "type": "slider",
+	          "classList": [
+	            "slider"
+	          ],
+	          "append": "tree",
+	          "attr": {
+	            "interval": function () {return this.sliders[0].interval},
+	            "autoPlay": function () {return this.sliders[0].autoPlay}
+	          },
+	          "events": {
+	            "change": "handleSliderChange"
+	          },
+	          "children": [
+	            {
+	              "type": "indicator",
+	              "classList": [
+	                "indicator"
+	              ]
+	            },
+	            {
+	              "type": "slider-page",
+	              "repeat": function () {return this.sliders[0].sliderPages}
+	            }
+	          ]
+	        }
+	      ]
+	    },
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "Indicator",
+	        "type": "primary"
+	      },
+	      "children": [
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "default style",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[0].interval},
+	                "autoPlay": function () {return this.sliders[0].autoPlay}
+	              },
+	              "events": {
+	                "change": "handleSliderChange"
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ]
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[0].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "width & height",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[0].interval},
+	                "autoPlay": function () {return this.sliders[0].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "style": {
+	                    "itemColor": "#dddddd",
+	                    "width": 714,
+	                    "height": 460
+	                  }
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[0].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "left & top",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[1].interval},
+	                "autoPlay": function () {return this.sliders[1].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ],
+	                  "style": {
+	                    "top": -140,
+	                    "left": -240
+	                  }
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[1].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "itemColor & itemSelectedColor",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[2].interval},
+	                "autoPlay": function () {return this.sliders[2].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ],
+	                  "style": {
+	                    "itemSelectedColor": "rgb(217, 83, 79)"
+	                  }
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[2].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "itemSize",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[1].interval},
+	                "autoPlay": function () {return this.sliders[1].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "style": {
+	                    "itemColor": "#dddddd",
+	                    "itemSize": 40,
+	                    "top": 140,
+	                    "left": 180,
+	                    "width": 700,
+	                    "height": 380
+	                  }
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[1].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        }
+	      ]
+	    }
+	  ]
+	}
+	;__weex_module__.exports.style={
+	  "body": {
+	    "backgroundColor": "#ffffff"
+	  },
+	  "slider": {
+	    "flexDirection": "row",
+	    "width": 690,
+	    "height": 360
+	  },
+	  "indicator": {
+	    "position": "absolute",
+	    "width": 690,
+	    "height": 420,
+	    "top": 140,
+	    "left": 240,
+	    "itemColor": "#dddddd",
+	    "itemSelectedColor": "rgb(40, 96, 144)"
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/114e64ff480be8fdcfbd6fd445bcb06e", {
+	;__weex_bootstrap__("@weex-component/559cd2049da887ae8989e25df99c5cab", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -1211,129 +1656,87 @@
 /***/ },
 /* 13 */,
 /* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/example-list-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/slider-page", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	__webpack_require__(16);
 
 	;
-	  __webpack_require__(1);
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      title: '',
-	      url: ''
+	      items: [],
+	      sliderItems: []
 	    }},
 	    methods: {
-	      redirect: function() {
-	        this.$openURL(this.url);
+	      ready: function() {
+	        this.sliderItems = this.getSliderItems()
+	      },
+	      getSliderItems: function() {
+	        return this.items.map(function(item, index) {
+	          return item;
+	        }.bind(this));
 	      }
 	    }
-	  }
+	  };
 
 	;__weex_module__.exports.template={
-	  "type": "wxc-list-item",
-	  "events": {
-	    "click": "redirect"
-	  },
+	  "type": "div",
+	  "classList": [
+	    "slider-page"
+	  ],
 	  "children": [
 	    {
-	      "type": "text",
-	      "classList": [
-	        "item-txt"
-	      ],
-	      "attr": {
-	        "value": function () {return this.title}
-	      }
+	      "type": "slider-item",
+	      "repeat": function () {return this.sliderItems}
 	    }
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "item-txt": {
-	    "fontSize": 48,
-	    "color": "#555555"
+	  "slider-page": {
+	    "flexDirection": "row",
+	    "justifyContent": "space-between",
+	    "width": 714,
+	    "height": 420
 	  }
 	}
 	})
 
 /***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/* 16 */
+/***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/example-list", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(17);
+	;__weex_define__("@weex-component/slider-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
-	  __webpack_require__(1);
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      dir: 'examples', // examples, test ...
-	      items: [
-	        {name: 'hello', title: 'Hello World', url: ''}
-	      ]
+	      image: '',
+	      link: '',
+	      href: ''
 	    }},
-	    created: function() {
-	      var bundleUrl = this.$getConfig().bundleUrl;
-	      console.log('hit', bundleUrl);
-	      var nativeBase;
-	      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
-	      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-	      if (isAndroidAssets) {
-	        nativeBase = 'file://assets/';
+	    methods: {
+	      ready: function() {
+	        this.href = this.link;
 	      }
-	      else if (isiOSAssets) {
-	        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-	        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-	      }
-	      else {
-	        var host = 'localhost:12580';
-	        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-	        if (matches && matches.length >= 2) {
-	          host = matches[1];
-	        }
-	        nativeBase = '//' + host + '/' + this.dir + '/build/';
-	      }
-	      var h5Base = './index.html?page=./' + this.dir + '/build/';
-	      // in Native
-	      var base = nativeBase;
-	      if (typeof window === 'object') {
-	        // in Browser or WebView
-	        base = h5Base;
-	      }
-
-	      for (var i in this.items) {
-	        var item = this.items[i];
-	        if (!item.url) {
-	          item.url = base + item.name + '.js';
-	        }
-	      }
-	      // see log in Android Logcat
-	      if (this.items.length) console.log('hit', this.items[0].url);
 	    }
-	  }
+	  };
 
 	;__weex_module__.exports.template={
-	  "type": "list",
-	  "children": [
-	    {
-	      "type": "cell",
-	      "append": "tree",
-	      "repeat": function () {return this.items},
-	      "children": [
-	        {
-	          "type": "example-list-item",
-	          "attr": {
-	            "title": function () {return this.title},
-	            "url": function () {return this.url}
-	          }
-	        }
-	      ]
-	    }
-	  ]
+	  "type": "image",
+	  "classList": [
+	    "slider-item"
+	  ],
+	  "attr": {
+	    "src": function () {return this.image}
+	  }
 	}
-	;__weex_module__.exports.style={}
+	;__weex_module__.exports.style={
+	  "slider-item": {
+	    "width": 348,
+	    "height": 400
+	  }
+	}
 	})
 
 /***/ }

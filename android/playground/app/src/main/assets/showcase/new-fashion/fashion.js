@@ -45,90 +45,79 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/de0c661a89abd9ebbbf4e61f69038784", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/29432e9104bfbc477db30914749dfb5b", [], function(__weex_require__, __weex_exports__, __weex_module__){
 	__webpack_require__(19);
-	__webpack_require__(18);
+	__webpack_require__(20);
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      ds: {},
-	      NUMBER_233: 233,
-	      NUMBER_172: 172,
-	      NUMBER_3: 3
+	      NUMBER_750: 750,
+	      NUMBER_250: 250,
+	      NUMBER_220: 220,
+	      NUMBER_262: 262,
+	      NUMBER_375: 375
 	    }},
 	    methods: {
 	      ready: function () {
 	        var self = this;
-	        self.isH5 = self._app.IS_H5;
-	        self.isTM = self._app.IS_TM;
-	        self.isTest = self._app.IS_TEST;
+	        self._randomStarBanner();
 	      },
+	      _randomStarBanner: function () {
+	        var self = this;
+	        if (!self.ds||!self.ds.firstStarBannerItems||!self.ds.secondStarBannerItems||!self.ds.thirdStarBannerItems) return;
+	        var starBanners = [];
+	        starBanners.push(self._app.Util.randomItemFromArr(self.ds.firstStarBannerItems));
+	        starBanners.push(self._app.Util.randomItemFromArr(self.ds.secondStarBannerItems));
+	        starBanners.push(self._app.Util.randomItemFromArr(self.ds.thirdStarBannerItems));
+	        self.ds.starBanners = starBanners;
+	      }
 	    }
-	  };
+	  }
 
 	;__weex_module__.exports.template={
 	  "type": "container",
-	  "classList": [
-	    "container"
-	  ],
+	  "shown": function () {return !this.ds.isHide},
 	  "children": [
 	    {
 	      "type": "image",
+	      "shown": function () {return this.ds.floorTitle},
 	      "classList": [
-	        "banner"
+	        "title"
 	      ],
 	      "attr": {
-	        "src": function () {return this.ds.topBanner}
+	        "src": function () {return this.ds.floorTitle}
+	      }
+	    },
+	    {
+	      "type": "banner",
+	      "attr": {
+	        "width": function () {return this.NUMBER_750},
+	        "height": function () {return this.NUMBER_262},
+	        "src": function () {return this.ds.bigBannerImg},
+	        "href": function () {return this.ds.bigBannerUrl}
+	      }
+	    },
+	    {
+	      "type": "banners",
+	      "attr": {
+	        "ds": function () {return this.ds.smallBannerItems},
+	        "width": function () {return this.NUMBER_375},
+	        "height": function () {return this.NUMBER_262},
+	        "direction": "row"
 	      }
 	    },
 	    {
 	      "type": "container",
-	      "classList": [
-	        "rule-container"
-	      ],
+	      "shown": function () {return !this.ds.isHideStarBanner},
 	      "children": [
-	        {
-	          "type": "link",
-	          "style": {
-	            "fontSize": 22,
-	            "color": "#ffffff",
-	            "textAlign": "center"
-	          },
-	          "attr": {
-	            "text": "帮助",
-	            "href": function () {return this.ds.ruleLink}
-	          }
-	        }
-	      ]
-	    },
-	    {
-	      "type": "container",
-	      "classList": [
-	        "announce"
-	      ],
-	      "children": [
-	        {
-	          "type": "image",
-	          "classList": [
-	            "announce-hd"
-	          ],
-	          "attr": {
-	            "src": function () {return this.ds.announceHdBanner}
-	          }
-	        },
 	        {
 	          "type": "banners",
-	          "style": {
-	            "marginLeft": 6,
-	            "marginRight": 6
-	          },
 	          "attr": {
-	            "ds": function () {return this.ds.bannerItems},
-	            "direction": "row",
-	            "width": function () {return this.NUMBER_233},
-	            "height": function () {return this.NUMBER_172},
-	            "space": function () {return this.NUMBER_3}
+	            "ds": function () {return this.ds.starBanners},
+	            "width": function () {return this.NUMBER_250},
+	            "height": function () {return this.NUMBER_220},
+	            "direction": "row"
 	          }
 	        }
 	      ]
@@ -136,63 +125,19 @@
 	  ]
 	}
 	;__weex_module__.exports.style={
-	  "banner": {
+	  "title": {
 	    "width": 750,
-	    "height": 782
-	  },
-	  "share-container": {
-	    "position": "absolute",
-	    "right": 100,
-	    "top": 15,
-	    "zIndex": 100,
-	    "fontSize": 20,
-	    "color": "#ffffff",
-	    "backgroundColor": "#000000",
-	    "borderRadius": 17,
-	    "width": 110,
-	    "height": 35,
-	    "justifyContent": "center",
-	    "alignItems": "center"
-	  },
-	  "rule-container": {
-	    "position": "absolute",
-	    "right": 22,
-	    "top": 15,
-	    "zIndex": 100,
-	    "fontSize": 20,
-	    "color": "#ffffff",
-	    "backgroundColor": "#000000",
-	    "borderRadius": 17,
-	    "width": 70,
-	    "height": 35,
-	    "justifyContent": "center"
-	  },
-	  "announce": {
-	    "backgroundColor": "#f5f3f4",
-	    "width": 716,
-	    "height": 286,
-	    "position": "absolute",
-	    "bottom": 17,
-	    "left": 17,
-	    "borderRadius": 5
-	  },
-	  "announce-hd": {
-	    "width": 700,
-	    "height": 90,
-	    "marginTop": 8,
-	    "marginBottom": 8,
-	    "marginLeft": 5,
-	    "marginRight": 5
+	    "height": 100
 	  }
 	}
 	})
-	;__weex_bootstrap__("@weex-component/de0c661a89abd9ebbbf4e61f69038784", {
+	;__weex_bootstrap__("@weex-component/29432e9104bfbc477db30914749dfb5b", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
 /***/ },
 
-/***/ 17:
+/***/ 19:
 /***/ function(module, exports) {
 
 	;__weex_define__("@weex-component/banner", [], function(__weex_require__, __weex_exports__, __weex_module__){
@@ -238,11 +183,11 @@
 
 /***/ },
 
-/***/ 18:
+/***/ 20:
 /***/ function(module, exports, __webpack_require__) {
 
 	;__weex_define__("@weex-component/banners", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(17);
+	__webpack_require__(19);
 
 	;
 	  __weex_module__.exports = {
@@ -327,44 +272,6 @@
 	      ]
 	    }
 	  ]
-	}
-	})
-
-/***/ },
-
-/***/ 19:
-/***/ function(module, exports) {
-
-	;__weex_define__("@weex-component/link", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;
-	  __weex_module__.exports = {
-	    data: function () {return {
-	      text: '',
-	      href: ''
-	    }},
-	    methods: {
-	      _clickHandler: function () {
-	        this.$call('modal', 'toast', {
-	          message: 'click',
-	          duration: 1
-	        });
-	      }
-	    }
-	  };
-
-	;__weex_module__.exports.template={
-	  "type": "text",
-	  "classList": [
-	    "link"
-	  ],
-	  "shown": function () {return this.href},
-	  "events": {
-	    "click": "_clickHandler"
-	  },
-	  "attr": {
-	    "value": function () {return this.text}
-	  }
 	}
 	})
 
