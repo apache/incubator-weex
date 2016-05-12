@@ -15,7 +15,19 @@ import {
 }
 from '../util'
 import * as perf from '../perf'
-import Listener, {createAction} from './dom-listener'
+import Listener from './dom-listener'
+
+export function updateActions() {
+  this.differ.flush()
+  const tasks = []
+  if (this.listener && this.listener.updates.length) {
+    tasks.push(...this.listener.updates)
+    this.listener.updates = []
+  }
+  if (tasks.length) {
+    this.callTasks(tasks)
+  }
+}
 
 export function init(code, data) {
   var result
@@ -95,21 +107,6 @@ export function getRootElement() {
   return body.toJSON ? body.toJSON() : {}
 }
 
-export function updateActions(addonTasks) {
-  this.differ.flush()
-  const tasks = []
-  if (this.listener && this.listener.updates.length) {
-    tasks.push(...this.listener.updates)
-    this.listener.updates = []
-  }
-  if (addonTasks && addonTasks.length) {
-    tasks.push(...addonTasks)
-  }
-  if (tasks.length) {
-    this.callTasks(tasks)
-  }
-}
-
 export function fireEvent(ref, type, e, domChanges) {
   if (Array.isArray(ref)) {
     ref.some((ref) => {
@@ -132,6 +129,7 @@ export function fireEvent(ref, type, e, domChanges) {
     const result = this.eventManager.fire(el, type, e)
     perf.end('manage event', ref + '-' + type)
     this.updateActions()
+    this.doc.listener.updateFinish()
     return result
   }
 
@@ -149,6 +147,7 @@ export function callback(callbackId, data, ifKeepAlive) {
     }
 
     this.updateActions()
+    this.doc.listener.updateFinish()
     return
   }
 
@@ -164,7 +163,8 @@ export function refreshData(data) {
     } else {
       extend(vm, data)
     }
-    this.updateActions([createAction('refreshFinish', [])])
+    this.updateActions()
+    this.doc.listener.refreshFinish()
     return
   }
 
