@@ -841,7 +841,7 @@
 	    data: function () {return {
 	        step: 0,
 	        count: 0,
-	        index: 0,
+	        index: 1,
 	        duration: 0,
 	        interval: 0,
 	        outofview: false
@@ -866,7 +866,7 @@
 	        },
 	        animation: function(cb) {
 	            var self = this;
-	            var offset = -self.step * (self.index + 1);
+	            var offset = -self.step * self.index;
 	            var $animation = __weex_require__('@weex-module/animation');
 	            $animation.transition(this.$el('anim'), {
 	              styles: {
@@ -875,8 +875,11 @@
 	              timingFunction: 'ease',
 	              duration: self.duration
 	            }, function() {
-	                self.index = (self.index + 1) % (self.count - 1);
-	                self.$emit('change');
+	                self.index = (self.index + 1) % (self.count);
+	                self.$emit('change', {
+	                    index: self.index,
+	                    count: self.count
+	                });
 	                cb && cb();
 	            });
 	        },
