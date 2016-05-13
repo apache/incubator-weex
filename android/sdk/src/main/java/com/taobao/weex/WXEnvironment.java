@@ -212,6 +212,7 @@ import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
 
 import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -242,6 +243,7 @@ public class WXEnvironment {
   public static String sDebugWsUrl = "";
   public static long sJSLibInitTime = 0;
   public static LogLevel sLogLevel= LogLevel.DEBUG;
+  public static boolean sSupportDebugTool=false;
   private static boolean isApkDebug = true;
   private static boolean isPerf = false;
 

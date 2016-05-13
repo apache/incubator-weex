@@ -202,7 +202,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.utils;
 
 /**
  * Created by lixinke on 16/5/11.

@@ -122,7 +122,7 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ws.WebSocket;
 import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
-import com.taobao.weex.LogLevel;
+import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXLogUtils;

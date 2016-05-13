@@ -1,0 +1,47 @@
+apply plugin: 'com.android.library'
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDir(['libs'])
+        }
+    }
+}
+
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
+}
+
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.taobao.android:prettyfish_base:1.1.1-SNAPSHOT'
+    compile 'com.taobao.android:dexposed:0.1.1@aar'
+    provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    provided 'com.alibaba:fastjson:1.1.45'
+    provided project(':weex_sdk_android')
+}

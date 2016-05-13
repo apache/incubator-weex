@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.alibaba.weex">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -36,6 +37,7 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:supportsRtl="true"
+            tools:overrideLibrary="com.taobao.android.dexposed"
             android:theme="@style/AppTheme">
         <uses-library android:name="android.test.runner"/>
         <!-- <activity -->

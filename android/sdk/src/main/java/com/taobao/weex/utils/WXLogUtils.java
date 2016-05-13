@@ -110,21 +110,14 @@
  */
 package com.taobao.weex.utils;
 
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-import com.taobao.weex.LogLevel;
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.websocket.WXWebSocketManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
 
 public class WXLogUtils {
 
@@ -245,16 +238,13 @@ public class WXLogUtils {
   }
 
   private static void sendLog(LogLevel level, String msg) {
-    if (WXWebSocketManager.getInstance()!=null && !TextUtils.isEmpty(msg)) {
-
-      if (WXEnvironment.sLogLevel.compare(level)>=0) {
-        List<String> arguments = new ArrayList<>();
-        arguments.add(level.getName());
-        arguments.add(msg);
-        Map<String, Object> msgObject = new HashMap<>();
-        msgObject.put("method", "__logger");
-        msgObject.put("arguments", arguments);
-        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(msgObject));
+    if(WXEnvironment.isApkDebugable() && WXEnvironment.sSupportDebugTool){
+      try {
+        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+        Method m = cls.getMethod("sendLog", new Class[]{LogLevel.class,String.class});
+        m.invoke(cls, new Object[]{level,msg});
+      } catch (Exception e) {
+        Log.d("weex","WXDebugTool not found!");
       }
     }
   }

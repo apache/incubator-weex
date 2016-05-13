@@ -51,6 +51,7 @@ dependencies {
     //compile 'com.taobao.android:weex_sdk:1.3.demo-SNAPSHOT@aar'
     /*source dependency*/
     compile project(':weex_sdk_android')
+//    compile project(':weex_debug')
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
