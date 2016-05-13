@@ -4,6 +4,7 @@ var config = require('../config')
 var utils = require('../utils')
 var ComponentManager = require('../componentManager')
 var flexbox = require('../flexbox')
+var valueFilter = require('../valueFilter')
 require('fixedsticky')
 
 function Component(data, nodeType) {
@@ -213,20 +214,20 @@ Component.prototype = {
   },
 
   updateStyle: function (style) {
+
     for (var key in style) {
       var value = style[key]
       var styleSetter = this.style[key]
-
       if (typeof styleSetter === 'function') {
         styleSetter.call(this, value)
-      } else {
-        if (typeof value === 'number'
-            && (key !== 'flex' && key !== 'opacity' && key !== 'zIndex')
-          ) {
-          value = value * this.data.scale + 'px'
-        }
-        this.node.style[key] = value
+        continue
       }
+      var parser = valueFilter.getFilters(key,
+          { scale: this.data.scale })[typeof value]
+      if (typeof parser === 'function') {
+        value = parser(value)
+      }
+      this.node.style[key] = value
     }
   },
 
