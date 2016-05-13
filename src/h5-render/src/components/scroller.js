@@ -117,7 +117,7 @@ Scroller.prototype.insertBefore = function (child, before) {
     isAppend = true
   } else {
     for (var l = children.length; i < l; i++) {
-      if (children[i].ref === child.data.ref) {
+      if (children[i].ref === before.data.ref) {
         break
       }
     }
