@@ -9,7 +9,6 @@ var valueFilter = {
       if (typeof parser === 'function') {
         styles[key] = parser(value)
       }
-      console.log('styles:', styles)
     }
   },
 
