@@ -309,17 +309,22 @@ public class WXSDKEngine {
 
       register();
 
-      new AsyncTask<Application, Void, Void>() {
+      new AsyncTask<Application, Void, Application>() {
         @Override
-        protected Void doInBackground(Application... params) {
+        protected Application doInBackground(Application... params) {
+          return params[0];
+        }
+
+        @Override
+        protected void onPostExecute(Application application1) {
+          super.onPostExecute(application1);
           try {
             Class cls = Class.forName("com.taobao.weex.WXPrettyFish");
             Method m = cls.getMethod("init", new Class[]{Application.class});
-            m.invoke(cls, new Object[]{params[0]});
+            m.invoke(cls, new Object[]{application1});
           } catch (Exception e) {
             WXLogUtils.d("WXPrettyFish not found!");
           }
-          return null;
         }
       }.execute(application);
     }

@@ -162,7 +162,6 @@ public class WXWebSocketManager implements WebSocketListener {
       isSupportWebSocket =false;
       return;
     }
-    mHttpClient = new OkHttpClient();
     mHttpClient.setConnectTimeout(10, TimeUnit.SECONDS);
     mHttpClient.setWriteTimeout(10, TimeUnit.SECONDS);
     // Disable timeouts for read
