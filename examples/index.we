@@ -25,6 +25,7 @@
         {name: 'component/marquee-demo', title: 'Marquee'},
         {name: 'component/web-demo', title: 'Web'},
         {name: 'component/navigator-demo', title: 'Navigator'},
+        {name: 'component/tabbar/tabbar-demo', title: 'Tabbar'},
 
         // module
         {name: 'module/instance-api', title: 'Instance API'},
