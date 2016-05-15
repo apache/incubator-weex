@@ -15,6 +15,7 @@
         // component
         {name: 'component/text-demo', title: 'Text'},
         {name: 'component/image-demo', title: 'Image'},
+        {name: 'component/scroller-demo', title: 'Scroller'},
         {name: 'component/list/list-basic', title: 'List (Basic)'},
         {name: 'component/list/list-demo', title: 'List (Advanced)'},
         {name: 'component/slider/index', title: 'Slider'},
@@ -23,6 +24,8 @@
         {name: 'component/countdown-demo', title: 'Countdown'},
         {name: 'component/marquee-demo', title: 'Marquee'},
         {name: 'component/web-demo', title: 'Web'},
+        {name: 'component/navigator-demo', title: 'Navigator'},
+
         // module
         {name: 'module/instance-api', title: 'Instance API'},
         {name: 'module/modal', title: 'Modal'},
