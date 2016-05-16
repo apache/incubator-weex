@@ -2,6 +2,11 @@
   .content {
     color: #353535;
     background-color: #666;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 </style>
 
@@ -10,11 +15,11 @@
     title-color="white" left-item-title="更多" left-item-color="white"
     right-item-src="http://gtms02.alicdn.com/tps/i2/TB1ED7iMpXXXXXEXXXXWA_BHXXX-48-48.png">
     <scroller class="content">
-      <refresh onRefresh="handleRefresh" display="{{displayRefresh}}"
+      <!--refresh onRefresh="handleRefresh" display="{{displayRefresh}}"
         style="flex-direction:row;">
         <spinner></spinner>
         <text style="margin-left:36;color:#eee;">下拉刷新...</text>
-      </refresh>
+      </refresh-->
       <headlines if="{{show0}}" ds="{{showData.header}}" append="tree"></headlines>
       <category if="{{show0}}" ds="{{showData.category}}" append="tree"></category>
       <coupon if="{{show1}}" ds="{{showData.coupon}}" append="tree"></coupon>
@@ -560,7 +565,7 @@
           // var spma = 'a222r';
           // var spmb = '7952482';
           var title = '新风尚主会场';
-          self.$setTitle(title);
+          //self.$setTitle(title);
           self._app.config = {
               // spma: spma,
               // spmb: spmb,
@@ -569,7 +574,7 @@
               // pageSpm: [spma, spmb, 0, 0].join('.')
           };
 
-          if (self._app.IS_H5) {
+          /*if (self._app.IS_H5) {
               // self.$setSpm(spma, spmb);
               if (window.lib && lib.mtop && lib.mtop.config) {
                   window.lib.mtop.config.prefix = 'api';
@@ -585,7 +590,7 @@
                       'spm-cnt': self._app.config.pageSpm
                   });
               }
-          }
+          }*/
 
       },
       _initUtil: function () {
