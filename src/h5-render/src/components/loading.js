@@ -75,33 +75,40 @@ Loading.prototype.show = function () {
 Loading.prototype.hide = function () {
   this.display = false
   var parent = this.getParent()
-  var scrollElement = parent.scrollElement || parent.listElement
-  var scrollElementHeight = scrollElement.getBoundingClientRect().height
-  var scrollWrapHeight = parent.node.getBoundingClientRect().height
-  var left = scrollElementHeight
-    - parent.scroller.getScrollTop()
-    - scrollWrapHeight
-  if (left < 0) {
-    var offset = scrollElementHeight
-            - parent.node.getBoundingClientRect().height
-    var translateStr = 'translate3d(0px,-' + offset + 'px,0px)'
-    scrollElement.style[cssPrefix + 'transform']
-      = cssPrefix + translateStr
-    scrollElement.style.transform = translateStr
+  if (parent) {
+    var scrollElement = parent.scrollElement || parent.listElement
+    var scrollElementHeight = scrollElement.getBoundingClientRect().height
+    var scrollWrapHeight = parent.node.getBoundingClientRect().height
+    var left = scrollElementHeight
+      - parent.scroller.getScrollTop()
+      - scrollWrapHeight
+    if (left < 0) {
+      var offset = scrollElementHeight
+              - parent.node.getBoundingClientRect().height
+      var translateStr = 'translate3d(0px,-' + offset + 'px,0px)'
+      scrollElement.style[cssPrefix + 'transform']
+        = cssPrefix + translateStr
+      scrollElement.style.transform = translateStr
+    }
   }
   this.node.style.display = 'none'
 }
 
 Loading.prototype.attr = {
   display: function (val) {
-    if (val === true || val === 'true') {
+    if (val === 'show') {
       setTimeout(function () {
         this.show()
       }.bind(this), 0)
-    } else {
+    } else if (val === 'hide') {
       setTimeout(function () {
         this.hide()
       }.bind(this), 0)
+    } else {
+      // TODO
+      console.error('h5render:attribute value of refresh \'display\' '
+          + val
+          + ' is invalid. Should be \'show\' or \'hide\'')
     }
   }
 }

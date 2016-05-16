@@ -76,24 +76,31 @@ Refresh.prototype.show = function () {
 Refresh.prototype.hide = function () {
   this.display = false
   var parent = this.getParent()
-  var scrollElement = parent.scrollElement || parent.listElement
-  var translateStr = 'translate3d(0px,0px,0px)'
-  scrollElement.style[cssPrefix + 'transform']
-    = cssPrefix + translateStr
-  scrollElement.style.transform = translateStr
+  if (parent) {
+    var scrollElement = parent.scrollElement || parent.listElement
+    var translateStr = 'translate3d(0px,0px,0px)'
+    scrollElement.style[cssPrefix + 'transform']
+      = cssPrefix + translateStr
+    scrollElement.style.transform = translateStr
+  }
   this.node.style.display = 'none'
 }
 
 Refresh.prototype.attr = {
   display: function (val) {
-    if (val === true || val === 'true') {
+    if (val === 'show') {
       setTimeout(function () {
         this.show()
       }.bind(this), 0)
-    } else {
+    } else if (val === 'hide') {
       setTimeout(function () {
         this.hide()
       }.bind(this), 0)
+    } else {
+      // TODO
+      console.error('h5render:attribute value of refresh \'display\' '
+          + val
+          + ' is invalid. Should be \'show\' or \'hide\'')
     }
   }
 }

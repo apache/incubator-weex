@@ -48,6 +48,7 @@ var components = {
     Weex.registerComponent('refresh', Refresh)
     Weex.registerComponent('loading', Loading)
     Weex.registerComponent('spinner', Spinner)
+    Weex.registerComponent('loading-indicator', Spinner)
     Weex.registerComponent('web', Web)
   }
 }
