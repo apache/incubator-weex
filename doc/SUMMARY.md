@@ -43,6 +43,7 @@
         * [&lt;slider&gt;](/components/slider.md)
             * [&lt;indicator&gt;](/components/indicator.md)
         * [&lt;video&gt;](/components/video.md)
+        * [&lt;a&gt;](/components/a.md)
     * [Built-in Modules](/modules/README.md)
         * [dom](/modules/dom.md)
         * [steam](/modules/stream.md)

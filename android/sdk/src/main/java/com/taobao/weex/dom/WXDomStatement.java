@@ -226,6 +226,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -255,6 +257,7 @@ class WXDomStatement {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set<String> mUpdate;
+  private List<String> mFlushviews;
   private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
@@ -276,6 +279,7 @@ class WXDomStatement {
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     mUpdate = new HashSet<>();
+    mFlushviews = new LinkedList<>();
     mWXRenderManager = renderManager;
   }
 
@@ -321,7 +325,7 @@ class WXDomStatement {
       for (int i = 0; i < size; i++) {
         String fixedRef = root.getFixedStyleRefs().get(i);
         WXDomObject wxDomObject = mRegistry.get(fixedRef);
-        if (wxDomObject.parent != null) {
+        if (wxDomObject!=null && wxDomObject.parent != null) {
           wxDomObject.parent.remove(wxDomObject);
           root.add(wxDomObject, -1);
         }
@@ -370,16 +374,13 @@ class WXDomStatement {
     for (int i = 0; i < count && !mDestroy; ++i) {
       mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
     }
+    for(String ref: mFlushviews){
+      mWXRenderManager.flushView(mInstanceId,ref);
+    }
+    mFlushviews.clear();
     mNormalTasks.clear();
     mAddDom.clear();
-
-    Iterator<String> iterator = mUpdate.iterator();
-    while (iterator.hasNext()) {
-      String ref = iterator.next();
-      mWXRenderManager.flushView(mInstanceId, ref);
-    }
     mUpdate.clear();
-
     mDirty = false;
   }
 
@@ -487,6 +488,7 @@ class WXDomStatement {
       }
     });
     mDirty = true;
+    mFlushviews.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -595,6 +597,7 @@ class WXDomStatement {
     });
 
     mDirty = true;
+    mFlushviews.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -732,6 +735,8 @@ class WXDomStatement {
       }
     });
     mDirty = true;
+    mFlushviews.add(ref);
+
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
@@ -763,6 +768,8 @@ class WXDomStatement {
 
     updateStyle(domObject, style);
     mDirty = true;
+    mFlushviews.add(ref);
+
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }

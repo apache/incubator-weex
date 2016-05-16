@@ -232,6 +232,10 @@ public class WXRenderManager {
     return mRegistries.get(instanceId);
   }
 
+  public WXComponent getWXComponent(String instanceId, String ref) {
+    return getWXRenderStatement(instanceId).getComponent(ref);
+  }
+
   public WXSDKInstance getWXSDKInstance(String instanceId) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
