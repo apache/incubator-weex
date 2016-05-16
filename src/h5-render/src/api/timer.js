@@ -2,16 +2,15 @@
 
 var timer = {
 
-  setTimeout: function (timeoutCallbackId, delay, callbackId) {
+  setTimeout: function (timeoutCallbackId, delay) {
     var sender = this.sender
-    var timer = setTimeout(function () {
+    var timerId = setTimeout(function () {
       sender.performCallback(timeoutCallbackId)
     }, delay)
-    sender.performCallback(callbackId, timer)
   },
 
-  clearTimeout: function (timer) {
-    clearTimeout(timer)
+  clearTimeout: function (timerId) {
+    clearTimeout(timerId)
   }
 
 }
