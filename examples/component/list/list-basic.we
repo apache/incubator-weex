@@ -3,7 +3,7 @@
     <list class="list">
       <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
         <text class="refresh-arrow" if="{{(refresh_display==='hide')}}">↓ Pull To Refresh</text>
-        <loading-indicator class="indicator"></loading-indicator>
+        <loading-indicator></loading-indicator>
       </refresh>
       <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">
         <div class="item">
@@ -62,9 +62,10 @@
       onrefresh: function(e) {
         var self = this;
         self.refresh_display = 'show';
-        self.$call('timer', 'setTimeout', function() {
+        // self.$call('timer', 'setTimeout', function() {
+        //   self.refresh_display = 'hide';
+        // },3000);
           self.refresh_display = 'hide';
-        },3000);
       },
       onappear: function (e) {
         var appearId = this.rows[e.target.attr.index].id;
