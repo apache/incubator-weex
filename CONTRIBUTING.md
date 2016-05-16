@@ -4,7 +4,17 @@ Welcome to create [Pull Requests](https://github.com/alibaba/weex/compare) or op
 
 ## Branch Management
 
-<img src="http://gtms04.alicdn.com/tps/i4/TB1sGpaJVXXXXaVXVXXIMvnJXXX-916-652.png" width="408" />  
+```
+master
+ ↑
+dev         <--- PR(hotfix/typo)
+ ↑ PR
+daily       <--- CI
+ ↑ merge/PR
+{domain}    <--- PR(feature/bugfix)
+ ↑ merge/PR
+{domain}-feature-{date}
+```  
 Weex Branches
 
 0. `dev`, `master` branch
