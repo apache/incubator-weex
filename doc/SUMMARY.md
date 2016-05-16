@@ -44,7 +44,11 @@
             * [&lt;indicator&gt;](/components/indicator.md)
         * [&lt;video&gt;](/components/video.md)
         * [&lt;a&gt;](/components/a.md)
-    * [Built-in Modules](/modules/main.md)
+    * [Built-in Modules](/modules/README.md)
+        * [dom](/modules/dom.md)
+        * [steam](/modules/stream.md)
+        * [modal](/modules/modal.md)
+        * [animation](/modules/animation.md)
     * Low-level Specs
         * [JS Bundle Format](/specs/js-bundle-format.md)
         * [JS Framework APIs](/specs/js-framework-apis.md)
