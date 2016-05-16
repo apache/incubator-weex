@@ -203,7 +203,8 @@ public class LayoutEngine {
       layoutNodeImpl(layoutContext, node, parentMaxWidth, parentDirection);
       node.updateLastLayout(node.csslayout);
     } else {
-      node.updateLastLayout(node.csslayout);
+      node.csslayout.copy(node.lastLayout);
+      node.updateLastLayout(node.lastLayout);//nothing changed
     }
 
     node.markHasNewLayout();

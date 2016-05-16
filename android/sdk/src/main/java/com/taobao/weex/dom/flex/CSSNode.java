@@ -60,9 +60,16 @@ public class CSSNode {
     return mIsLayoutChanged;
   }
 
+  /**
+   * must invoke after every layout finished,even nothing changed.
+   * @param newLayout
+   * @return
+     */
   public boolean updateLastLayout(CSSLayout newLayout){
-    mIsLayoutChanged = csslayout.equals(newLayout);
-    csslayout.copy(newLayout);
+    mIsLayoutChanged = lastLayout.equals(newLayout);
+    if(mIsLayoutChanged) {
+      lastLayout.copy(newLayout);
+    }
     return mIsLayoutChanged;
   }
 

@@ -58,6 +58,9 @@ public class CSSLayout {
 
   @Override
   public boolean equals(Object o) {
+    if(this == o){
+      return true;
+    }
     if(o instanceof CSSLayout){
       CSSLayout cl = (CSSLayout)o;
       return FloatUtil.floatsEqual(cl.position[POSITION_LEFT],this.position[POSITION_LEFT]) &&
