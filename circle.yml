@@ -5,4 +5,5 @@ test:
   override:
     - npm run ci
     - cd android/playground && ./gradlew assembleDebug
-    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS # playground artifacts
+    - cp -r android/sdk/build/outputs/ $CIRCLE_ARTIFACTS # sdk artifacts
