@@ -1,10 +1,9 @@
 'use strict'
 
-var sender = require('../bridge/sender')
-
 var timer = {
 
   setTimeout: function (callbackId, delay) {
+    var sender = this.sender
     var timer = setTimeout(function () {
       sender.performCallback(callbackId, timer)
     }, delay)
