@@ -8,7 +8,10 @@ A fixed height container which has multiple child components (cells) arranged in
 
 ### Child Components
 
-`cell` is a available candidate to be used as a child component for `list`.
+* `cell` is a available candidate to be used as a child component for `list`.
+
+* `refresh` component can be used inside list to add pull to refresh functionality.
+* `loading` component can be used inside list to add loading view at the bottom of scroller.
 
 ### Attributes
 
@@ -33,26 +36,140 @@ Other attributes please check out the [common attributes](../references/common-a
 
 - support `click` event. Check out [common events](../references/common-event.md)
 - support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
+- support `refresh` event .  If a refresh component is inside scroller, this event will be triggered when the scroller is swiping down.
+- support `loading` event .  If a loading component is inside scroller, this event will be triggered when user scrolling to the bottom.
 
 ### Example
 
 ```
 <template>
-  <list>
-    <cell repeat="{{list}}">
-      <text>{{name}}: ${{price}}</text>
-    </cell>
-  </list>
+  <div>
+    <list class="list">
+      <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
+        <text class="refresh-arrow" if="{{(refresh_display==='hide')}}">↓ Pull To Refresh</text>
+        <loading-indicator class="indicator"></loading-indicator>
+      </refresh>
+      <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">
+        <div class="item">
+          <text class="item-title">row {{id}}</text>
+        </div>
+      </cell>
+    </list>
+    <text class="count" value="Appear items:{{appearMin}} - {{appearMax}}"></text>
+  </div>
 </template>
 
+<style>
+  .list {
+    height: 810px;
+    border-width: 10px;
+    border-color: orange;
+  }
+  .count {
+    font-size: 48px;
+    margin:10px;
+  }
+  .refresh-view {
+    height: 80px;
+    width: 750px;
+    justify-content: center;
+    align-items: center;
+  }
+  .refresh-arrow {
+    font-size: 30px;
+    color: #45b5f0;
+  }
+  .indicator {
+    height: 40px;
+    width: 40px;
+    color:#45b5f0;
+  }
+  .row {
+    width: 750px;
+  }
+  .item {
+    justify-content: center;
+    border-bottom-width: 2px;
+    border-bottom-color: #c0c0c0;
+    height: 100px;
+    padding:20px;
+  }
+  .item-title {
+  }
+
+</style>
+
 <script>
+  require('weex-components');
   module.exports = {
+    methods: {
+      onrefresh: function(e) {
+        var self = this;
+        self.refresh_display = 'show';
+        self.$call('timer', 'setTimeout', function() {
+          self.refresh_display = 'hide';
+        },3000);
+      },
+      onappear: function (e) {
+        var appearId = this.rows[e.target.attr.index].id;
+        var appearIds = this.appearIds;
+        appearIds.push(appearId);
+        this.getMinAndMaxIds(appearIds);
+      },
+      ondisappear:function (e) {
+        var disAppearId = this.rows[e.target.attr.index].id;
+        var appearIds = this.appearIds;
+        var index = appearIds.indexOf(disAppearId);
+        if (index > -1) {
+          appearIds.splice(index, 1);
+        }
+        this.getMinAndMaxIds(appearIds);
+      },
+      getMinAndMaxIds:function (appearIds) {
+        appearIds.sort(function(a, b) {
+          return a - b;
+        });
+        this.appearIds = appearIds;
+        this.appearMax = appearIds[appearIds.length - 1];
+        this.appearMin = appearIds[0];
+      }
+    },
     data: {
-      list: [
-        {name: '...', price: 100},
-        {name: '...', price: 500},
-        {name: '...', price: 1.5},
-        ...
+      refresh_display : 'hide',
+      loading_display : 'hide',
+      appearMin:1,
+      appearMax:1,
+      appearIds:[],
+      rows:[
+        {id: 1},
+        {id: 2},
+        {id: 3},
+        {id: 4},
+        {id: 5},
+        {id: 6},
+        {id: 7},
+        {id: 8},
+        {id: 9},
+        {id: 10},
+        {id: 11},
+        {id: 12},
+        {id: 13},
+        {id: 14},
+        {id: 15},
+        {id: 16},
+        {id: 17},
+        {id: 18},
+        {id: 19},
+        {id: 20},
+        {id: 21},
+        {id: 22},
+        {id: 23},
+        {id: 24},
+        {id: 25},
+        {id: 26},
+        {id: 27},
+        {id: 28},
+        {id: 29}
       ]
     }
   }
