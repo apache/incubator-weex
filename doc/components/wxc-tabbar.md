@@ -36,7 +36,9 @@ Other attributes please check out the [common attributes](../references/common-a
 
 ### Example
 
-```
+`require('weex-components')` should be used with webpack, see [example](https://github.com/alibaba/weex/blob/example/examples/component/tabbar/tabbar-demo.we) for more detail.
+
+```html
 <template>
   <div style="flex-direction: column;">
     <wxc-tabbar tab-items = {{tabItems}}></wxc-tabbar>

@@ -18,7 +18,7 @@ Loads the previous location in the back-forward stack.
  
 ##### Example
 
-```
+```js
 var webview = require('@weex-module/webview');
 var webElement = this.$el('webview');
 webview.goBack(webElement.ref);
@@ -35,7 +35,7 @@ Loads the next location in the back-forward stack.
  
 ##### Example
 
-```
+```js
 var webview = require('@weex-module/webview');
 var webElement = this.$el('webview');
 webview.goForward(webElement.ref);
@@ -51,7 +51,7 @@ Reloads the current Html page.
  
 ##### Example
 
-```
+```js
 var webview = require('@weex-module/webview');
 var webElement = this.$el('webview');
 webview.reload(webElement.ref);
