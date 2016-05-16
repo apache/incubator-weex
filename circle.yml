@@ -4,3 +4,6 @@ machine:
 test:
   override:
     - npm run ci
+    - cd android/playground
+    - ./gradlew assembleRelease
+    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
