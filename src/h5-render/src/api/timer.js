@@ -2,11 +2,12 @@
 
 var timer = {
 
-  setTimeout: function (callbackId, delay) {
+  setTimeout: function (timeoutCallbackId, delay, callbackId) {
     var sender = this.sender
     var timer = setTimeout(function () {
-      sender.performCallback(callbackId, timer)
+      sender.performCallback(timeoutCallbackId)
     }, delay)
+    sender.performCallback(callbackId, timer)
   },
 
   clearTimeout: function (timer) {
@@ -18,7 +19,7 @@ var timer = {
 timer._meta = {
   timer: [{
     name: 'setTimeout',
-    args: ['function', 'number']
+    args: ['function', 'number', 'function']
   }, {
     name: 'clearTimeout',
     args: ['number']
