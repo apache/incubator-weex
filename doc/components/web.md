@@ -40,7 +40,7 @@ Other attributes please check out the [common attributes](../references/common-a
 
 ### Example
 
-```
+```js
 <div>
   <web style="width=...; height=...;" src="..." 	onpagestart="pagestart" onpagefinish="pagefinish" 	onerror="error">
   </web>
