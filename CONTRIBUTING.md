@@ -19,7 +19,7 @@ Weex Branches
 
 0. `dev`, `master` branch
     0. `dev` is the stable developing branch，`master` is the latest (pre-)release branch.
-    0. [Github Release](http://velocity.alibaba-inc.com/issues/2124) is used to publish a (pre-)release version to `master` branch.
+    0. [Github Release](https://help.github.com/articles/creating-releases/) is used to publish a (pre-)release version to `master` branch.
     0. A hotfix or typo PR can be committed to `dev`.
 0. `daily` branch
     0. `domain` branches are merged to `daily` every day.
