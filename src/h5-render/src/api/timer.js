@@ -6,27 +6,23 @@ var timer = {
 
   setTimeout: function (callbackId, delay) {
     var timer = setTimeout(function () {
-      sender.performCallback(callbackId)
+      sender.performCallback(callbackId, timer)
     }, delay)
   },
 
-  clearTimeout: function (callbackId) {
-    var sender =  this.sender
-    config.callback = function () {
-      sender.performCallback(callbackId)
-    }
-    modal.alert(config)
+  clearTimeout: function (timer) {
+    clearTimeout(timer)
   }
 
 }
 
 timer._meta = {
-  modal: [{
+  timer: [{
     name: 'setTimeout',
     args: ['function', 'number']
   }, {
     name: 'clearTimeout',
-    args: ['function']
+    args: ['number']
   }]
 }
 
