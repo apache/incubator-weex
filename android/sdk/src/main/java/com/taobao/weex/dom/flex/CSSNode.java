@@ -66,7 +66,7 @@ public class CSSNode {
    * @return
      */
   public boolean updateLastLayout(CSSLayout newLayout){
-    mIsLayoutChanged = lastLayout.equals(newLayout);
+    mIsLayoutChanged = !lastLayout.equals(newLayout);
     if(mIsLayoutChanged) {
       lastLayout.copy(newLayout);
     }
