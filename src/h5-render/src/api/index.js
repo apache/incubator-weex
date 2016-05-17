@@ -4,6 +4,9 @@ var pageInfo = require('./pageInfo')
 var stream = require('./stream')
 var modal = require('./modal')
 var animation = require('./animation')
+var webview = require('./webview')
+var timer = require('./timer')
+var navigator = require('./navigator')
 
 var api = {
   init: function (Weex) {
@@ -13,6 +16,9 @@ var api = {
     Weex.registerApiModule('stream', stream, stream._meta)
     Weex.registerApiModule('modal', modal, modal._meta)
     Weex.registerApiModule('animation', animation, animation._meta)
+    Weex.registerApiModule('webview', webview, webview._meta)
+    Weex.registerApiModule('timer', timer, timer._meta)
+    Weex.registerApiModule('navigator', navigator, navigator._meta)
   }
 }
 
