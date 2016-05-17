@@ -55,7 +55,6 @@
     },
     created: function () {
       var bundleUrl = this.$getConfig().bundleUrl;
-      console.log('hit', bundleUrl);
       var nativeBase;
       var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0;
       var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
@@ -89,45 +88,10 @@
     methods: {
       ready: function (e) {
         var vm = this;
-
         vm.$on('tabBar.onClick',function(e){
           var detail= e.detail;
           nativeLog('tabBar.onClick ' + detail.index);
         });
-
-        var bundleUrl = this.$getConfig().bundleUrl;
-        console.log('hit', bundleUrl);
-        var nativeBase;
-        var isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
-        var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-        if (isAndroidAssets) {
-          nativeBase = 'file://assets/';
-        }
-        else if (isiOSAssets) {
-          // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-          // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-          nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-        }
-        else {
-          var host = 'localhost:12580';
-          var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-          if (matches && matches.length >= 2) {
-            host = matches[1];
-          }
-          nativeBase = 'http://' + host + '/' + this.dir + '/build/';
-        }
-        var h5Base = './' + this.dir + '/build/';
-        // in Native
-        var base = nativeBase;
-        if (typeof window === 'object') {
-          // in Browser or WebView
-          base = h5Base;
-        }
-
-        for(var i = 0; i < this.tabItems.length; i++) {
-            var tabItem = this.tabItems[i];
-            tabItem.src = base + tabItem.src;
-        }
       },
     }
   }
