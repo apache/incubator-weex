@@ -20,6 +20,8 @@ Web.prototype = Object.create(Atomic.prototype)
 Web.prototype.create = function () {
   var node = document.createElement('iframe')
   node.classList.add('weex-element')
+  node.style.width = '100%'
+  node.style.height = '100%'
   return node
 }
 
@@ -46,9 +48,6 @@ Web.prototype.attr = {
 
 Web.prototype.bindEvents = function (evts) {
   Atomic.prototype.bindEvents.call(this, evts)
-  var evtsMap = {
-    pagefinish: 'load'
-  }
   var that = this
   this.node.addEventListener('load', function (e) {
     that.dispatchEvent('pagefinish', utils.extend({
