@@ -18,7 +18,7 @@ var timer = {
 timer._meta = {
   timer: [{
     name: 'setTimeout',
-    args: ['function', 'number', 'function']
+    args: ['function', 'number']
   }, {
     name: 'clearTimeout',
     args: ['number']
