@@ -48,9 +48,6 @@ Web.prototype.attr = {
 
 Web.prototype.bindEvents = function (evts) {
   Atomic.prototype.bindEvents.call(this, evts)
-  var evtsMap = {
-    pagefinish: 'load'
-  }
   var that = this
   this.node.addEventListener('load', function (e) {
     that.dispatchEvent('pagefinish', utils.extend({
