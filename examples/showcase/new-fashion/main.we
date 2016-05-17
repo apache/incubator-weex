@@ -27,7 +27,7 @@
     <scroller class="content">
       <refresh class="refresh" onRefresh="handleRefresh" display="{{displayRefresh}}"
         style="flex-direction:row;">
-        <spinner></spinner>
+        <loading-indicator></loading-indicator>
         <text style="margin-left:36;color:#eee;">下拉刷新...</text>
       </refresh>
       <headlines if="{{show0}}" ds="{{showData.header}}" append="tree"></headlines>
@@ -571,7 +571,6 @@
           self._app.OS = config.os;
           self._app.PLATFORM = config.platform;
           var title = '新风尚主会场';
-          // self.$setTitle(title);
           self._app.config = {
               title: title,
               pageName: '2016-xfs-main'
