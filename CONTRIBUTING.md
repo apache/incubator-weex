@@ -33,8 +33,6 @@ Weex Branches
 
 ### Branch Name 
 
-Format: 
-
 ```
 {module}-{action}-{shortName}
 ```
@@ -51,10 +49,7 @@ for example:
 * `jsfm-feature-communication`
 * `android-hotfix-compute-layout`
 
-
 ## Commit Log
-
-FORMAT
 
 ```
 {action} [{module}] {description}
@@ -66,12 +61,15 @@ FORMAT
     * `-` remove
 * `{module}`
     * Including: android, ios, jsfm, html5, component, doc, website, example, test, all 
+* `{description}`
+    * It's ***RECOMMENDED*** to close issue with syntax `close #123` or `fix #123`, see [the doc](https://help.github.com/articles/closing-issues-via-commit-messages/) for more detail. It's useful for responding issues and [release flow](https://github.com/alibaba/weex/releases/tag/v0.5.0).
 
 for example:
 
-* `+ [android] add refreshing for WebView`
-* `* [doc] update video auto-play property`
+* `+ [android] close #123, add refreshing for WebView`
+* `* [doc] fix #123, update video auto-play property`
 * `- [example] remove abc`
+
 
 ## Pull Request
 
