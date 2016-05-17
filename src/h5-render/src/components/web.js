@@ -20,6 +20,8 @@ Web.prototype = Object.create(Atomic.prototype)
 Web.prototype.create = function () {
   var node = document.createElement('iframe')
   node.classList.add('weex-element')
+  node.style.width = '100%'
+  node.style.height = '100%'
   return node
 }
 
