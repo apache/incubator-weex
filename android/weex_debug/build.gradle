@@ -39,7 +39,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.taobao.android:prettyfish_base:1.1.1-SNAPSHOT'
+    compile (name:'prettyfish_base', ext:'aar')
     compile 'com.taobao.android:dexposed:0.1.1@aar'
     provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided 'com.alibaba:fastjson:1.1.45'
