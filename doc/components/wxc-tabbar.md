@@ -10,15 +10,16 @@ This component supports no child components.
 
 ### Attributes
 
-- `tab-items`: This attribute contains an array of tabitem objects, each of which corresponds to a tab displayed by the tabbar. The order of the items in this attribute corresponds to the order of the items onscreen. You can customize the appearance of tabbar by setting tabitem. The properties of each tabitem describe as follows.
-  + index: &lt;integer&gt; an integer that you can use to identify item objects.
+- `tab-items`: This attribute contains an array of tabitem objects, each of which corresponds to the radio-style selection. The order of the items in this attribute corresponds to the order of the items onscreen. You can configure the appearance of tabbar by setting tabitem. Each tabitem properties can be described as follows.
+  + index: &lt;integer&gt; This attribute must be set to identify the order of the item.
   + title: &lt;string&gt; The item’s title. If null, a title is not displayed.
   + titleColor: &lt;color&gt;The item’s titleColor. Default is black color.  
   + image: &lt;string&gt;The icon displayed when the tabitem is unselected. If null, the icon is not displayed.
   + selectedImage:  &lt;string&gt;The icon displayed when the tabitem is selected. If null, the icon is not displayed.
   + src: &lt;string&gt;The  custom weex page to display.
-  + icon: &lt;string&gt;This is a special attribute. Be careful, You need to set the property even if it is empty. 
-        
+  + icon: &lt;string&gt;This is a special attribute. Be careful, You need to set the property even if it is empty.
+   + visibility: &lt;string&gt;`visible` | `hidden`. This attribute must be set to identify the display status. Default value is `visible`.
+                 
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles

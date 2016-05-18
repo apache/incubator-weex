@@ -11,9 +11,9 @@ A series of navigator operation apis like `push`, `pop`.
 #### Arguments
 
 * `options`*(object)*: some options.
-  * `url`*(stirng)*: The navigation item URL to push on the stack.
-  * `animated`*(string)*:  `true`if the navigation page should be animated; otherwise, `false`.
-* `callback`*(object)*: the callback function when execute the push action.  
+  * `url`*(stirng)*: The URL of the weex page to push.
+  * `animated`*(string)*:  `true`if the weex page is push through animation, otherwise, `false`.
+* `callback`*(object)*: the callback function after executing this action.  
 
 ##### Example
 
@@ -35,8 +35,8 @@ navigator.push(params, function(e) {
 #### Arguments
 
 * `options`*(object)*: some options.
-  * `animated`*(string)*:  `true`if the navigation page should be animated; otherwise, `false`.
-* `callback`*(object)*: the callback function when execute the pop action.  
+  * `animated`*(string)*:  `true` if the weex page is pop through animation; otherwise, `false`.
+* `callback`*(object)*: the callback function after executing this action.  
 ##### Example
 
 ```js
