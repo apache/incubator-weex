@@ -1,0 +1,112 @@
+<template>
+  <scroller class="list">
+    <div class="section" repeat="{{sections}}">
+      <div class="header">
+        <text class="header-title">{{title}}</text>
+      </div>
+      <div class="item" repeat="{{items}}">
+        <text class="item-title">row {{id}}</text>
+      </div>
+    </div>
+  </scroller>
+</template>
+
+<style>
+  .header {
+    background-color: #45b5f0;
+    padding: 20px;
+    height: 88px;
+    justify-content: center;
+  }
+
+  .header-title {
+    color: white;
+    font-weight: bold;
+  }
+
+  .item {
+    justify-content: center;
+    border-bottom-width: 2px;
+    border-bottom-color: #c0c0c0;
+    height: 100px;
+    padding: 20px;
+  }
+
+  .item-title {
+  }
+
+</style>
+
+<script>
+  require('weex-components');
+  module.exports = {
+    methods: {
+    },
+    data: {
+      sections: [
+        {
+          title: 'Header 1',
+          items: [
+            {id: 1},
+            {id: 2},
+            {id: 3},
+            {id: 4},
+            {id: 5}
+          ]
+        },
+        {
+          title: 'Header 2',
+          items: [
+            {id: 6},
+            {id: 7},
+            {id: 8},
+            {id: 9},
+            {id: 10},
+            {id: 11}
+          ]
+        },
+        {
+          title: 'Header 3',
+          items: [
+            {id: 12},
+            {id: 13},
+            {id: 14},
+            {id: 15},
+            {id: 16},
+            {id: 17},
+            {id: 18}
+          ]
+        },
+        {
+          title: 'Header 4',
+          items: [
+            {id: 19},
+            {id: 20},
+            {id: 21},
+            {id: 22}
+          ]
+        },
+        {
+          title: 'Header 5',
+          items: [
+            {id: 23},
+            {id: 24},
+            {id: 25},
+            {id: 26},
+            {id: 27}
+          ]
+        },
+        {
+          title: 'Header 6',
+          items: [
+            {id: 28},
+            {id: 29},
+            {id: 30},
+            {id: 31},
+            {id: 32}
+          ]
+        }
+      ]
+    }
+  }
+</script>

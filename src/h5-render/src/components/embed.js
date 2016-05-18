@@ -36,6 +36,7 @@ Embed.prototype.initWeex = function () {
   var config = {
     appId: this.id,
     source: this.source,
+    bundleUrl: this.source,
     loader: this.loader,
     width: this.node.getBoundingClientRect().width,
     rootId: this.id
