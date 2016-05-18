@@ -78,5 +78,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-annotations:23.1.1'
-    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
