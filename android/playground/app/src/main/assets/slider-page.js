@@ -46,7 +46,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	;__weex_define__("@weex-component/5ad7a924dc9da8e1fdbbc4b0828fdb93", [], function(__weex_require__, __weex_exports__, __weex_module__){
-	__webpack_require__(15);
+	__webpack_require__(29);
 
 	;
 	  __weex_module__.exports = {
@@ -93,7 +93,7 @@
 
 /***/ },
 
-/***/ 15:
+/***/ 29:
 /***/ function(module, exports) {
 
 	;__weex_define__("@weex-component/slider-item", [], function(__weex_require__, __weex_exports__, __weex_module__){
