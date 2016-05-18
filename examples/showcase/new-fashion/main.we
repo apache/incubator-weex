@@ -22,13 +22,12 @@
 
 <template>
   <wxc-navpage data-role="none" height={{navBarHeight}} background-color="#ff5898" title="新风尚会场"
-    title-color="white" 
-    right-item-src="http://gtms02.alicdn.com/tps/i2/TB1ED7iMpXXXXXEXXXXWA_BHXXX-48-48.png">
+    title-color="white" right-item-src="http://gtms02.alicdn.com/tps/i2/TB1ED7iMpXXXXXEXXXXWA_BHXXX-48-48.png">
     <scroller class="content">
       <refresh class="refresh" onRefresh="handleRefresh" display="{{displayRefresh}}"
         style="flex-direction:row;">
         <loading-indicator></loading-indicator>
-        <text style="margin-left:36;color:#eee;">下拉刷新...</text>
+        <text style="margin-left:36px;color:#eee;">下拉刷新...</text>
       </refresh>
       <headlines if="{{show0}}" ds="{{showData.header}}" append="tree"></headlines>
       <category if="{{show0}}" ds="{{showData.category}}" append="tree"></category>

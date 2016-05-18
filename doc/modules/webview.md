@@ -10,7 +10,7 @@ A series of web operation api like `goBack`, `goForward`,  and `reload`.
 
 ##### Description
 
-Loads the previous location in the back-forward stack.
+Loads the previous location in the history stack.
 
 #### Arguments
 
@@ -27,7 +27,7 @@ webview.goBack(webElement.ref);
 ### goForward(ref)
 
 ##### Description
-Loads the next location in the back-forward stack.
+Loads the next location in the history stack.
 
 #### Arguments
 
@@ -43,7 +43,7 @@ webview.goForward(webElement.ref);
     
 ### reload(ref)
 #### Description
-Reloads the current Html page.
+Reloads the current web page.
 
 #### Arguments
 
