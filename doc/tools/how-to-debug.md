@@ -29,8 +29,8 @@ weex --debugger
 
 #####3.start debug
 If you start server success you can find the address which like this:  
- ![IP](http://gw.alicdn.com/mt/TB107u8JVXXXXcaXVXXXXXXXXXX-718-110.png)
-copy ""http://30.10.217.78:4000/" to your browser。The browser will show a QR Code.  
+ ![IP](http://gw.alicdn.com/mt/TB107u8JVXXXXcaXVXXXXXXXXXX-718-110.png)  
+copy "http://30.10.217.78:4000/" to your browser。The browser will show a QR Code.  
 Use your 'playgroud' to scan the code QR in your browser.you can find this content:  
 ![server](http://gw.alicdn.com/mt/TB1EgO_JVXXXXa9XVXXXXXXXXXX-1698-648.png)
 
