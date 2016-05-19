@@ -33,6 +33,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.utils.WXFileUtils;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
