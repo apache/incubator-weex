@@ -1,4 +1,4 @@
-###Debug
+###How to Debug
 ####1.add dependency
 build.gradle
 
