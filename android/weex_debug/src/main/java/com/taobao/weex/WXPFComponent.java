@@ -2,7 +2,6 @@ package com.taobao.weex;
 
 import android.app.Application;
 import android.content.Context;
-import android.widget.Toast;
 
 import com.taobao.prettyfish.core.comp.AbstractComponent;
 
@@ -25,17 +24,18 @@ public class WXPFComponent extends AbstractComponent {
 
   @Override
   public String title() {
-    return "DEBUG";
+    return "3D";
   }
 
   @Override
   public boolean onClick(Context context) {
-    Toast.makeText(context, "ONClick", Toast.LENGTH_SHORT).show();
+    if(WXPrettyFish.sScalpelFrameLayout!=null){
+      WXPrettyFish.sScalpelFrameLayout.setLayerInteractionEnabled(!WXPrettyFish.sScalpelFrameLayout.isLayerInteractionEnabled());
+    }
     return false;
   }
 
   @Override
   public void onClose() {
-
   }
 }

@@ -2,6 +2,7 @@ package com.taobao.weex;
 
 import android.app.Application;
 
+import com.jakewharton.scalpel.ScalpelFrameLayout;
 import com.taobao.prettyfish.PrettyFishCommon;
 import com.taobao.prettyfish.core.comp.AbstractBaseComp;
 import com.taobao.prettyfish.core.fab.FloatWndManager;
@@ -10,6 +11,7 @@ import com.taobao.prettyfish.core.fab.FloatWndManager;
  * Created by lixinke on 16/5/4.
  */
 public class WXPrettyFish {
+  public static ScalpelFrameLayout sScalpelFrameLayout;
   public static void init(Application application) {
     PrettyFishCommon.init(application);
     AbstractBaseComp wxBaseComp=new AbstractBaseComp() {
@@ -25,5 +27,9 @@ public class WXPrettyFish {
     };
     wxBaseComp.registerComp(new WXPFComponent(application));
     FloatWndManager.registerBaseComp(wxBaseComp);
+  }
+
+  public static void updateScapleView(ScalpelFrameLayout scalpelFrameLayout){
+    sScalpelFrameLayout=scalpelFrameLayout;
   }
 }

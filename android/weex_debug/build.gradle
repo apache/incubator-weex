@@ -42,5 +42,6 @@ dependencies {
     compile (name:'prettyfish_base', ext:'aar')
     provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided 'com.alibaba:fastjson:1.1.45'
+    provided 'com.jakewharton.scalpel:scalpel:1.1.2'
     provided project(':weex_sdk_android')
 }

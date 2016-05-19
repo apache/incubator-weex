@@ -30,11 +30,11 @@ android {
         }
     }
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+//        release {
+//            signingConfig signingConfigs.release
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
         debug {
             testCoverageEnabled true
         }
@@ -87,5 +87,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
