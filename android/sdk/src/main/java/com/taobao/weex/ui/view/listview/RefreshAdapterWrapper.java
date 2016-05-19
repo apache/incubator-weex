@@ -344,6 +344,16 @@ public class RefreshAdapterWrapper extends RecyclerView.Adapter<ListBaseViewHold
         mInnerRecyclerViewAdapter.onViewRecycled(holder);
     }
 
+    @Override
+    public void onViewDetachedFromWindow(ListBaseViewHolder holder) {
+        mInnerRecyclerViewAdapter.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
+    public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
+        return mInnerRecyclerViewAdapter.onFailedToRecycleView(holder);
+    }
+
     private void init(Context context) {
         mRefreshLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
         mLoadMoreLayout = new IRefreshLayout.Adapter(new Refreshlayout(context));
