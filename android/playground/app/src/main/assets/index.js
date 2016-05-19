@@ -78,7 +78,8 @@
 	        // showcase
 	        {name: 'showcase/new-fashion/index', title: 'Activity'},
 	        {name: 'showcase/calculator', title: 'Calculator'},
-	        {name: 'showcase/ui', title: 'UI Gallery'}
+	        {name: 'showcase/ui', title: 'UI Gallery'},
+	        {name: 'List3000', title: 'List 3000'}
 	      ]
 	    }}
 	  }
