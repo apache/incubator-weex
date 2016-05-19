@@ -419,6 +419,12 @@ public class WXSDKEngine {
   }
 
   public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
+    if(IWXImgLoaderAdapter==null){
+      if(WXEnvironment.isApkDebugable()){
+        throw new IllegalStateException("ImageLoaderAdapter can not be set to null");
+      }
+      return;
+    }
     WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
   }
 
