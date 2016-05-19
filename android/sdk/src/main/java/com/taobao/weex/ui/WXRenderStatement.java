@@ -205,6 +205,7 @@
 package com.taobao.weex.ui;
 
 import android.animation.Animator;
+import android.graphics.Color;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Interpolator;
@@ -322,6 +323,7 @@ class WXRenderStatement {
     FrameLayout frameLayout = (FrameLayout) mGodComponent.getView();
     ViewGroup.LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
     frameLayout.setLayoutParams(layoutParams);
+    frameLayout.setBackgroundColor(Color.TRANSPARENT);
 
     WXComponent component = generateComponentTree(dom, mGodComponent);
     mGodComponent.addChild(component);
