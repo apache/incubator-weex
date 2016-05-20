@@ -219,8 +219,8 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.http.WXRequest;
+import com.taobao.weex.http.WXResponse;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.component.WXComponent;
@@ -233,6 +233,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -456,7 +457,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = url;
     if (wxRequest.paramMap == null) {
-      wxRequest.paramMap = new HashMap<String, Object>();
+      wxRequest.paramMap = new HashMap<String, String>();
     }
     wxRequest.paramMap.put("user-agent", WXHttpUtil.assembleUserAgent());
     adapter.sendRequest(wxRequest, new WXHttpListener(pageName, options, jsonInitData, width, height, flag, System.currentTimeMillis()));
@@ -842,12 +843,17 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
 
     @Override
+    public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
+
+    }
+
+    @Override
     public void onHttpUploadProgress(int uploadProgress) {
 
     }
 
     @Override
-    public void onHttpResponseProgress(int responseProgress) {
+    public void onHttpResponseProgress(int loadedLength) {
 
     }
 

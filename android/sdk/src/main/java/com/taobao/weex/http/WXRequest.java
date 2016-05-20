@@ -204,26 +204,32 @@
  */
 package com.taobao.weex.http;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Map;
 
-/**
- * Created by lixinke on 16/3/29.
- */
-public class WXHttpManager {
+public class WXRequest {
 
-  private static WXHttpManager ourInstance = new WXHttpManager();
-  private ExecutorService mExecutorService;
+  /**
+   * The request parameter
+   */
+  public Map<String, String> paramMap;
 
-  private WXHttpManager() {
-    mExecutorService = Executors.newFixedThreadPool(3);
-  }
+  /**
+   * The request URL
+   */
+  public String url;
+  /**
+   * The request method
+   */
+  public String method;
+  /**
+   * The request body
+   */
+  public String body;
 
-  public static WXHttpManager getInstance() {
-    return ourInstance;
-  }
+  /**
+   * The request time out
+   */
+  public int timeoutMs = 2500;
 
-  public void execute(Runnable runnable) {
-    mExecutorService.execute(runnable);
-  }
+
 }
