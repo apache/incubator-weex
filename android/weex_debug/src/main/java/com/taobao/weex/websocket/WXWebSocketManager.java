@@ -108,145 +108,211 @@
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  * for the specific language governing permissions and limitations under the License.
  */
-package com.taobao.weex.utils;
+package com.taobao.weex.websocket;
 
-import android.util.Log;
+import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ws.WebSocket;
+import com.squareup.okhttp.ws.WebSocketCall;
+import com.squareup.okhttp.ws.WebSocketListener;
+import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-public class WXLogUtils {
+import okio.Buffer;
+import okio.BufferedSource;
 
-  public static String WEEX_TAG = "weex";
-  public static String WEEX_PERF_TAG = "weex_perf";
+public class WXWebSocketManager implements WebSocketListener {
 
-  private static StringBuilder builder = new StringBuilder(50);
+  private static WXWebSocketManager sWebsocket = new WXWebSocketManager();
 
-  public static void renderPerformanceLog(String type, long time) {
-    if (WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) {
-      builder.setLength(0);
-      builder.append("[render time]").append(type).append(":").append(time);
-      Log.d(WEEX_PERF_TAG, builder.substring(0));
-    }
+  private final ConcurrentHashMap<Integer, JSDebuggerCallback> mCallbacks = new ConcurrentHashMap<>();
+  private WebSocket mWebSocket;
+  private OkHttpClient mHttpClient;
+
+  private boolean isSupportWebSocket =true;
+
+  public static WXWebSocketManager getInstance() {
+    return sWebsocket;
   }
 
-  public static void d(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.d(WEEX_TAG, msg);
-    }
-    sendLog(LogLevel.DEBUG, msg);
+  private WXWebSocketManager() {
   }
 
-  public static void info(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.i(WEEX_TAG, msg);
-    }
-    sendLog(LogLevel.INFO,msg);
-  }
-
-  public static void v(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.v(WEEX_TAG, msg);
-    }
-    sendLog(LogLevel.VERBOSE, msg);
-  }
-
-  public static void w(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.w(WEEX_TAG, msg);
-    }
-    sendLog(LogLevel.WARN, msg);
-  }
-
-  public static void e(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.e(WEEX_TAG, msg);
-    }
-    sendLog(LogLevel.ERROR, msg);
-  }
-
-  public static void d(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.d(tag, msg);
-    }
-    sendLog(LogLevel.DEBUG, msg);
-  }
-
-  public static void info(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.i(tag, msg);
-    }
-    sendLog(LogLevel.INFO, msg);
-  }
-
-  public static void v(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.v(tag, msg);
-    }
-    sendLog(LogLevel.VERBOSE, msg);
-  }
-
-  public static void w(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.w(tag, msg);
-    }
-    sendLog(LogLevel.WARN, msg);
-  }
-
-  public static void e(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.e(tag, msg);
-    }
-    sendLog(LogLevel.ERROR, msg);
-  }
-
-  public static void p(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
-      Log.d(WEEX_PERF_TAG, msg);
-    }
-  }
-
-  public static String getStackTrace(Exception e) {
-    if (e == null) {
-      return "";
-    }
-    StringWriter sw = null;
-    PrintWriter pw = null;
+  public void connect(String url) {
     try {
-      sw = new StringWriter();
-      pw = new PrintWriter(sw);
-      e.printStackTrace(pw);
-      pw.flush();
-      sw.flush();
-    } finally {
-      if (sw != null) {
-        try {
-          sw.close();
-        } catch (IOException e1) {
-          e1.printStackTrace();
-        }
-      }
-      if (pw != null) {
-        pw.close();
-      }
+      mHttpClient= (OkHttpClient) Class.forName("com.squareup.okhttp.OkHttpClient").newInstance();
+    } catch (Exception e) {
+      isSupportWebSocket =false;
+      return;
     }
-    return sw.toString();
+    mHttpClient.setConnectTimeout(10, TimeUnit.SECONDS);
+    mHttpClient.setWriteTimeout(10, TimeUnit.SECONDS);
+    // Disable timeouts for read
+    mHttpClient.setReadTimeout(0, TimeUnit.MINUTES);
+
+    Request request = new Request.Builder().url(url).build();
+    WebSocketCall call = WebSocketCall.create(mHttpClient, request);
+    call.enqueue(this);
   }
 
-  private static void sendLog(LogLevel level, String msg) {
-    if(WXEnvironment.isApkDebugable() && WXEnvironment.sSupportDebugTool){
+  public boolean isConnect(String url) {
+    return mHttpClient != null;
+  }
+
+  public void registerListener(JSDebuggerCallback callback) {
+    mCallbacks.put(mCallbacks.size(), callback);
+  }
+
+  public void closeQuietly() {
+    if(!isSupportWebSocket){
+      return;
+    }
+    if (mWebSocket != null) {
       try {
-        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
-        Method m = cls.getMethod("sendLog", new Class[]{LogLevel.class,String.class});
-        m.invoke(cls, new Object[]{level,msg});
-      } catch (Exception e) {
-        Log.d("weex","WXDebugTool not found!");
+        mWebSocket.close(1000, "End of session");
+      } catch (IOException e) {
+        // swallow, no need to handle it here
       }
+      mWebSocket = null;
     }
   }
 
+  public void sendMessage(String message) {
+    if(!isSupportWebSocket){
+      return;
+    }
+    if (mWebSocket == null) {
+      return;
+    }
+    Buffer messageBuffer = new Buffer();
+    messageBuffer.writeUtf8(message);
+    try {
+      mWebSocket.sendMessage(WebSocket.PayloadType.TEXT, messageBuffer);
+    } catch (IOException e) {
+    }
+  }
+
+  @Override
+  public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
+      throws IOException {
+    if (type != WebSocket.PayloadType.TEXT) {
+      WXLogUtils.w(
+          "Websocket received unexpected message with payload of type "
+          + type);
+      return;
+    }
+    for (JSDebuggerCallback callback : mCallbacks.values()) {
+      callback.onMessage(payload, type);
+    }
+
+    String message = null;
+    try {
+      message = payload.readUtf8();
+      JSONObject jsonObject = JSONObject.parseObject(message);
+      Object name = jsonObject.get("method");
+      Object value = jsonObject.get("arguments");
+      if (name == null || value == null) {
+        return;
+      }
+      if (TextUtils.equals(name.toString(), "setLogLevel")) {
+        JSONArray jsonArray = JSONObject.parseArray(value.toString());
+        String level = jsonArray.get(0).toString();
+        WXEnvironment.sLogLevel = LogLevel.valueOf(level.toUpperCase());
+        WXLogUtils.v("into--[onMessage]setLogLevel");
+      }
+    } catch (Exception e) {
+
+    } finally {
+      payload.close();
+    }
+  }
+
+  @Override
+  public void onClose(int code, String reason) {
+    mWebSocket = null;
+  }
+
+  @Override
+  public void onPong(Buffer payload) {
+    // ignore
+  }
+
+  private void abort(String message, Throwable cause) {
+    WXLogUtils.e(
+        "Error occurred, shutting down websocket connection: "
+        + message);
+    closeQuietly();
+
+    for (JSDebuggerCallback callback : mCallbacks.values()) {
+      callback.onFailure(cause);
+    }
+    mCallbacks.clear();
+  }
+
+  @Override
+  public void onFailure(IOException e) {
+    abort("Websocket exception", e);
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(WXEnvironment.sApplication,"socket connect failure!",Toast.LENGTH_SHORT).show();
+      }
+    },0);
+  }
+
+  @Override
+  public void onOpen(WebSocket webSocket, Request arg1, Response arg2)
+      throws IOException {
+    mWebSocket = webSocket;
+    setEnvironment(WXEnvironment.getConfig());
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Toast.makeText(WXEnvironment.sApplication, "Has switched to DEBUG mode, you can see the DEBUG information on the browser!", Toast.LENGTH_SHORT).show();
+      }
+    },0);
+    for (JSDebuggerCallback callback : mCallbacks.values()) {
+      callback.onSuccess(arg2);
+    }
+    WXLogUtils.e("into--[onOpen]");
+  }
+
+  public interface JSDebuggerCallback {
+
+    void onMessage(BufferedSource payload, WebSocket.PayloadType type);
+
+    void onSuccess(Response response);
+
+    void onFailure(Throwable cause);
+  }
+
+  private void setEnvironment(Map<String, String> options) {
+    if(!isSupportWebSocket){
+      return;
+    }
+    List<Object> arguments = new ArrayList<>();
+    arguments.add(options);
+    Map<String, Object> objectMap = new HashMap<>();
+    objectMap.put("method", "setEnvironment");
+    objectMap.put("arguments", arguments);
+    sendMessage(JSON.toJSONString(objectMap));
+    WXLogUtils.info("into--[onOpen]");
+  }
 }
