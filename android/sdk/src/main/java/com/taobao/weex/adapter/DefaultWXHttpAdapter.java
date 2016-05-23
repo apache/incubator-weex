@@ -322,6 +322,9 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
   }
 
   private String readInputStream(InputStream inputStream, OnHttpListener listener) throws IOException {
+    if(inputStream == null){
+      return null;
+    }
     StringBuilder builder = new StringBuilder();
     BufferedReader localBufferedReader = new BufferedReader(new InputStreamReader(inputStream));
     char[] data = new char[2048];

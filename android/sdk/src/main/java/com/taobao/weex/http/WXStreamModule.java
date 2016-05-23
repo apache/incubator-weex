@@ -274,7 +274,7 @@ public class WXStreamModule extends WXModule {
    *  <li>headers: object 响应头</li>
    */
   @WXModuleAnno
-  public void fetch(String optionsStr,String callback,String progressCallback){
+  public void fetch(String optionsStr,final String callback,String progressCallback){
     JSONObject optionsObj = JSON.parseObject(optionsStr);
     String method = optionsObj.getString("method");
     String url = optionsObj.getString("url");
@@ -292,13 +292,16 @@ public class WXStreamModule extends WXModule {
     sendRequest(builder.createOptions(), new ResponseCallback() {
       @Override
       public void onResponse(WXResponse response, Map<String, String> headers) {
-        Map<String,Object> resp = new HashMap<String, Object>();
-        resp.put("status",response.statusCode);
-        int code = Integer.parseInt(response.statusCode);
-        resp.put("ok",(code>=200&&code<=299));
-        //TODO error text need define.
-        resp.put("statusText","");
-        resp.put("headers",headers);
+        if(callback != null) {
+          Map<String, Object> resp = new HashMap<String, Object>();
+          resp.put("status", response.statusCode);
+          int code = Integer.parseInt(response.statusCode);
+          resp.put("ok", (code >= 200 && code <= 299));
+          //TODO error text need define.
+          resp.put("statusText", response.errorMsg);
+          resp.put("headers", headers);
+          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(),callback,resp);
+        }
       }
     }, progressCallback);
   }
@@ -329,6 +332,8 @@ public class WXStreamModule extends WXModule {
 
     if (mWXSDKInstance != null && mWXSDKInstance.getWXHttpAdapter() != null) {
       mWXSDKInstance.getWXHttpAdapter().sendRequest(wxRequest, new StreamHttpListener(mWXSDKInstance.getInstanceId(), callback,progressCallback));
+    }else{
+      WXLogUtils.e("WXStreamModule","No HttpAdapter found,request failed.");
     }
   }
 
@@ -355,7 +360,7 @@ public class WXStreamModule extends WXModule {
       if(mProgressCallback !=null) {
         mResponse.put("readyState",1);//readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
         mResponse.put("length",0);
-        WXBridgeManager.getInstance().callback(mInstanceId, mProgressCallback,mResponse);
+        WXBridgeManager.getInstance().callback(mInstanceId, mProgressCallback,mResponse,true);
       }
     }
 
@@ -379,14 +384,16 @@ public class WXStreamModule extends WXModule {
 
       mResponse.put("headers",simpleHeaders);
       mRespHeaders = simpleHeaders;
-
+      if(mProgressCallback!=null){
+        WXBridgeManager.getInstance().callback(mInstanceId,mProgressCallback,mResponse,true);
+      }
     }
 
     @Override
     public void onHttpResponseProgress(int loadedLength) {
       mResponse.put("length",loadedLength);
       if(mProgressCallback!=null){
-        WXBridgeManager.getInstance().callback(mInstanceId,mProgressCallback,mResponse);
+        WXBridgeManager.getInstance().callback(mInstanceId,mProgressCallback,mResponse,true);
       }
 
     }
