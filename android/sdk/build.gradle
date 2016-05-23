@@ -57,6 +57,9 @@ android {
         main {
             assets.srcDirs = ['assets']
             jniLibs.srcDir(['libs'])
+            java {
+                srcDirs = ["src/main/java"];
+            }
         }
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
@@ -78,6 +81,7 @@ dependencies {
     provided 'com.android.support:support-v4:23.1.1'
     provided 'com.android.support:appcompat-v7:23.1.1'
     provided 'com.alibaba:fastjson:1.1.45'
+    provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-core:1.3'
