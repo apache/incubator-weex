@@ -79,7 +79,8 @@
 	        {name: 'showcase/new-fashion/index', title: 'Activity'},
 	        {name: 'showcase/calculator', title: 'Calculator'},
 	        {name: 'showcase/ui', title: 'UI Gallery'},
-	        {name: 'List3000', title: 'List 3000'}
+	        {name: 'List3000', title: 'List 3000'},
+	         {name: 'List3', title: 'List 3'}
 	      ]
 	    }}
 	  }
