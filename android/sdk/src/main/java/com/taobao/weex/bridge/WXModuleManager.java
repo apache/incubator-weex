@@ -313,6 +313,10 @@ public class WXModuleManager {
       Type paramClazz;
       for (int i = 0; i < paramClazzs.length; i++) {
         paramClazz = paramClazzs[i];
+        if(i>=args.size() && !paramClazz.getClass().isPrimitive()){
+          params[i] = null;
+          continue;
+        }
         value = args.get(i);
 
         if (paramClazz == JSONObject.class) {

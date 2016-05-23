@@ -263,6 +263,7 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
           }
         } catch (IOException e) {
           e.printStackTrace();
+          response.statusCode = "-1";
           response.errorCode="-1";
           response.errorMsg=e.getMessage();
           if(listener!=null){

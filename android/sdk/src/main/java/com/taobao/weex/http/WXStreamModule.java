@@ -297,6 +297,11 @@ public class WXStreamModule extends WXModule {
           resp.put("status", response.statusCode);
           int code = Integer.parseInt(response.statusCode);
           resp.put("ok", (code >= 200 && code <= 299));
+          if(response.originalData==null){
+            resp.put("data",null);
+          }else{
+            resp.put("data",new String(response.originalData));
+          }
           //TODO error text need define.
           resp.put("statusText", response.errorMsg);
           resp.put("headers", headers);
@@ -374,12 +379,12 @@ public class WXStreamModule extends WXModule {
       mResponse.put("readyState",2);
       mResponse.put("status",statusCode);
 
-      Iterator<String> it = headers.keySet().iterator();
+      Iterator<Map.Entry<String,List<String>>> it = headers.entrySet().iterator();
       Map<String,String> simpleHeaders = new HashMap<>();
       while(it.hasNext()){
-        String key = it.next();
-        if(headers.get(key)!=null && headers.get(key).size()>0)
-        simpleHeaders.put(key,headers.get(key).get(0));
+        Map.Entry<String,List<String>> entry = it.next();
+        if(entry.getValue().size()>0)
+          simpleHeaders.put(entry.getKey()==null?"_":entry.getKey(),entry.getValue().get(0));
       }
 
       mResponse.put("headers",simpleHeaders);
