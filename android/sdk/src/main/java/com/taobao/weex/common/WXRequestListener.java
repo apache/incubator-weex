@@ -205,6 +205,8 @@
 package com.taobao.weex.common;
 
 
+import com.taobao.weex.http.WXResponse;
+
 public interface WXRequestListener {
 
   void onSuccess(int requestType, Object context, WXResponse response);

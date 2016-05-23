@@ -202,28 +202,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.http;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+package com.taobao.weex.common;
 
 /**
- * Created by lixinke on 16/3/29.
+ * Created by sospartan on 5/20/16.
  */
-public class WXHttpManager {
-
-  private static WXHttpManager ourInstance = new WXHttpManager();
-  private ExecutorService mExecutorService;
-
-  private WXHttpManager() {
-    mExecutorService = Executors.newFixedThreadPool(3);
-  }
-
-  public static WXHttpManager getInstance() {
-    return ourInstance;
-  }
-
-  public void execute(Runnable runnable) {
-    mExecutorService.execute(runnable);
-  }
+public interface Destroyable {
+    public void destroy();
 }

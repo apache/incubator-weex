@@ -536,29 +536,48 @@ public class WXBridgeManager implements Callback {
 
   /**
    * Invoke JavaScript callback
+   * @see #callback(String, String, String, boolean)
    */
   public void callback(String instanceId, String callback,
                        Map<String, Object> data) {
-    if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
-        || mJSHandler == null) {
-      return;
-    }
     callback(instanceId, callback,
              data == null ? "{}" : WXJsonUtils.fromObjectToJSONString(data));
   }
 
+  /**
+   * Invoke JavaScript callback
+   * @see #callback(String, String, String, boolean)
+   */
+  public void callback(String instanceId, String callback,
+                       Map<String, Object> data,boolean keepAlive) {
+    callback(instanceId, callback,
+            data == null ? "{}" : WXJsonUtils.fromObjectToJSONString(data),keepAlive);
+  }
+
+  /**
+   * Invoke JavaScript callback
+   * @see #callback(String, String, String, boolean)
+   */
   public void callback(final String instanceId, final String callback,
-                       final String data) {
+                       final String data){
+    callback(instanceId,callback,data,false);
+  }
+
+  /**
+   *
+   * @param instanceId Weex Instance Id
+   * @param callback  callback referenece handle
+   * @param data callback data
+   * @param keepAlive if keep callback instance alive for later use
+     */
+  public void callback(final String instanceId, final String callback,
+                       final String data,boolean keepAlive) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
         || mJSHandler == null) {
       return;
     }
 
-    if (!checkMainThread()) {
-      throw new WXRuntimeException(
-          "callback must be called by main thread");
-    }
-    addUITask(METHOD_CALLBACK, instanceId, callback, data);
+    addUITask(METHOD_CALLBACK, instanceId, callback, data,keepAlive);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
 

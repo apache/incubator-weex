@@ -202,149 +202,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.adapter;
+package com.taobao.weex.http;
 
-import android.text.TextUtils;
-
-import com.taobao.weex.http.WXRequest;
-import com.taobao.weex.http.WXResponse;
-import com.taobao.weex.utils.WXLogUtils;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-
-public class DefaultWXHttpAdapter implements IWXHttpAdapter {
-
-  private ExecutorService mExecutorService;
-
-  private void execute(Runnable runnable){
-    if(mExecutorService==null){
-      mExecutorService = Executors.newFixedThreadPool(3);
-    }
-    mExecutorService.execute(runnable);
-  }
-
-  @Override
-  public void sendRequest(final WXRequest request, final OnHttpListener listener) {
-    if (listener != null) {
-      listener.onHttpStart();
-    }
-    execute(new Runnable() {
-      @Override
-      public void run() {
-        WXResponse response = new WXResponse();
-        try {
-          HttpURLConnection connection = openConnection(request, listener);
-          Map<String,List<String>> headers = connection.getHeaderFields();
-          int responseCode = connection.getResponseCode();
-          if(listener != null){
-            listener.onHeadersReceived(responseCode,headers);
-          }
-
-          response.statusCode = String.valueOf(responseCode);
-          if (responseCode >= 200 && responseCode<=299) {
-            response.originalData = readInputStream(connection.getInputStream(), listener).getBytes();
-          } else {
-            response.errorMsg = readInputStream(connection.getErrorStream(), listener);
-          }
-          if (listener != null) {
-            listener.onHttpFinish(response);
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-          response.errorCode="-1";
-          response.errorMsg=e.getMessage();
-          if(listener!=null){
-            listener.onHttpFinish(response);
-          }
-        }
-      }
-    });
-  }
-
+public class WXRequest {
 
   /**
-   * Opens an {@link HttpURLConnection} with parameters.
-   *
-   * @param request
-   * @param listener
-   * @return an open connection
-   * @throws IOException
+   * The request parameter
    */
-  private HttpURLConnection openConnection(WXRequest request, OnHttpListener listener) throws IOException {
-    URL url = new URL(request.url);
-    HttpURLConnection connection = createConnection(url);
-    connection.setConnectTimeout(request.timeoutMs);
-    connection.setReadTimeout(request.timeoutMs);
-    connection.setUseCaches(false);
-    connection.setDoInput(true);
-
-    if (request.paramMap != null) {
-      Set<String> keySets = request.paramMap.keySet();
-      for (String key : keySets) {
-        connection.addRequestProperty(key, request.paramMap.get(key));
-      }
-    }
-
-    if ("POST".equals(request.method)) {
-      connection.setRequestMethod("POST");
-      if (request.body != null) {
-        if (listener != null) {
-          listener.onHttpUploadProgress(0);
-        }
-        connection.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-        //TODO big stream will cause OOM; Progress callback is meaningless
-        out.write(request.body.getBytes());
-        out.close();
-        if (listener != null) {
-          listener.onHttpUploadProgress(100);
-        }
-      }
-    } else if (!TextUtils.isEmpty(request.method)) {
-      connection.setRequestMethod(request.method);
-    } else {
-      connection.setRequestMethod("GET");
-    }
-
-    return connection;
-  }
-
-  private String readInputStream(InputStream inputStream, OnHttpListener listener) throws IOException {
-    if(inputStream == null){
-      return null;
-    }
-    StringBuilder builder = new StringBuilder();
-    BufferedReader localBufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-    char[] data = new char[2048];
-    int len;
-    while ((len = localBufferedReader.read(data)) != -1) {
-      builder.append(data, 0, len);
-      if (listener != null) {
-        listener.onHttpResponseProgress(builder.length());
-      }
-    }
-    localBufferedReader.close();
-    return builder.toString();
-  }
+  public Map<String, String> paramMap;
 
   /**
-   * Create an {@link HttpURLConnection} for the specified {@code url}.
+   * The request URL
    */
-  protected HttpURLConnection createConnection(URL url) throws IOException {
-    return (HttpURLConnection) url.openConnection();
-  }
+  public String url;
+  /**
+   * The request method
+   */
+  public String method;
+  /**
+   * The request body
+   */
+  public String body;
+
+  /**
+   * The request time out
+   */
+  public int timeoutMs = 2500;
 
 
 }

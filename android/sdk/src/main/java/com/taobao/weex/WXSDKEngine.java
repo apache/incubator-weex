@@ -120,6 +120,7 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.bridge.WXModuleManager;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
@@ -264,13 +265,13 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
 
-      WXModuleManager.registerModule("dom", WXDomModule.class, true);
-      WXModuleManager.registerModule("modal", WXModalUIModule.class, true);
-      WXModuleManager.registerModule("instanceWrap", WXInstanceWrap.class, true);
-      WXModuleManager.registerModule("animation", WXAnimationModule.class, true);
-      WXModuleManager.registerModule("webview", WXWebViewModule.class, true);
-      WXModuleManager.registerModule("navigator", WXNavigatorModule.class, false);
-      WXSDKEngine.registerModule("stream", WXStreamModule.class);
+      registerModule("dom", WXDomModule.class, true);
+      registerModule("modal", WXModalUIModule.class, true);
+      registerModule("instanceWrap", WXInstanceWrap.class, true);
+      registerModule("animation", WXAnimationModule.class, true);
+      registerModule("webview", WXWebViewModule.class, true);
+      registerModule("navigator", WXNavigatorModule.class);
+      registerModule("stream", WXStreamModule.class);
 
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
       registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
@@ -295,15 +296,47 @@ public class WXSDKEngine {
 
   /**
    * Register module. This is a wrapper method for
-   * {@link WXModuleManager#registerModule(String, Class)}. The module register here only need to
+   * {@link #registerModule(String, Class, boolean)}. The module register here only need to
    * be singleton in {@link WXSDKInstance} level.
    * @param moduleName  module name
    * @param moduleClass module to be registered.
    * @return true for registration success, false for otherwise.
-   * @see {@link WXModuleManager#registerModule(String, Class, boolean)}
+   * @see {@link WXModuleManager#registerModule(String, WXModuleManager.ModuleFactory, boolean)}
    */
+  public static <T extends WXModule> boolean registerModule(String moduleName, Class<T> moduleClass,boolean global) throws WXException {
+    return registerModule(moduleName, new WXModuleManager.ModuleFactory<>(moduleClass),global);
+  }
+
+  /**
+   * Register module. This is a wrapper method for
+   * {@link #registerModule(String, Class, boolean)}. The module register here only need to
+   * be singleton in {@link WXSDKInstance} level.
+   * @param moduleName  module name
+   * @param factory module factory to be registered. You can override {@link DestroyableModuleFactory#buildInstance()} to customize module creation.
+   * @return true for registration success, false for otherwise.
+   * @see {@link WXModuleManager#registerModule(String, WXModuleManager.ModuleFactory, boolean)}
+   */
+  public static <T extends WXModule> boolean registerModuleWithFactory(String moduleName, DestroyableModuleFactory factory, boolean global) throws WXException {
+    return registerModule(moduleName, factory,global);
+  }
+
+  private static <T extends WXModule> boolean registerModule(String moduleName, WXModuleManager.ModuleFactory factory, boolean global) throws WXException {
+    return WXModuleManager.registerModule(moduleName, factory,global);
+  }
+
   public static boolean registerModule(String moduleName, Class<? extends WXModule> moduleClass) throws WXException {
-    return WXModuleManager.registerModule(moduleName, moduleClass);
+    return registerModule(moduleName, moduleClass,false);
+  }
+
+  /**
+   * module implement {@link Destroyable}
+   */
+  public static abstract class DestroyableModule extends WXModule implements Destroyable {}
+
+  public static  abstract  class DestroyableModuleFactory<T extends DestroyableModule> extends WXModuleManager.ModuleFactory<T>{
+    public DestroyableModuleFactory(Class<T> clz) {
+      super(clz);
+    }
   }
 
   public static boolean registerDomObject(String type, Class<? extends WXDomObject> clazz) throws WXException {
