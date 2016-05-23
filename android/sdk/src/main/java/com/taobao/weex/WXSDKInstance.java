@@ -644,6 +644,14 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
+  /**
+   * call back when update finish
+   */
+  public void onUpdateFinish() {
+    WXLogUtils.d("Instance onUpdateSuccess");
+  }
+
+
   public void runOnUiThread(Runnable action) {
     WXSDKManager.getInstance().postOnUiThread(action, 0);
   }
