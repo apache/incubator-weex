@@ -554,10 +554,6 @@ public class WXBridgeManager implements Callback {
       return;
     }
 
-    if (!checkMainThread()) {
-      throw new WXRuntimeException(
-          "callback must be called by main thread");
-    }
     addUITask(METHOD_CALLBACK, instanceId, callback, data);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
