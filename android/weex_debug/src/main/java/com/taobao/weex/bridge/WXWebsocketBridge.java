@@ -202,148 +202,144 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.bridge;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.widget.Toast;
 
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.utils.LogLevel;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ws.WebSocket;
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.websocket.WXWebSocketManager;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXEnvironment {
+import okio.BufferedSource;
 
-  public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
-  public static final String SYS_MODEL = android.os.Build.MODEL;
-  /*********************
-   * Global config
-   ***************************/
+/**
+ * websocket bridge
+ *
+ * @author gulin
+ */
+public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebuggerCallback {
 
-  public static String JS_LIB_SDK_VERSION = "v0.13.9";
+    private WXBridgeManager mJsManager;
+    private volatile boolean mInit = false;
 
-  public static String WXSDK_VERSION = "1.5.0";
-  public static Application sApplication;
-  public static final String DEV_Id = getDevId();
-  public static int sDeafultWidth = 750;
-  public volatile static boolean sSupport = false;
-  public volatile static boolean JsFrameworkInit = false;
-  /**
-   * Debug model
-   */
-  public static boolean sDebugMode = false;
-  public static String sDebugWsUrl = "";
-  public static long sJSLibInitTime = 0;
-  public static LogLevel sLogLevel= LogLevel.DEBUG;
-  public static boolean sSupportDebugTool=false;
-  private static boolean isApkDebug = true;
-  private static boolean isPerf = false;
-
-  private static Map<String, String> options = new HashMap<>();
-
-  /**
-   * dynamic
-   */
-  public static boolean sDynamicMode = false;
-  public static String sDynamicUrl = "";
-
-  /**
-   * Fetch system information.
-   * @return map contains system information.
-   */
-  public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
-    return configs;
-  }
-
-  /**
-   * Get the version of the current app.
-   */
-  private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
-    try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: " + WXLogUtils.getStackTrace(e));
-    }
-    return versionName;
-  }
-
-  public static void addCustomOptions(String key, String value) {
-    options.put(key, value);
-  }
-
-  public static boolean isSupport() {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + WXEnvironment.sSupport
-                   + " WXEnvironment.JsFrameworkInit:" + WXEnvironment.JsFrameworkInit
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
-    }
-    return WXEnvironment.sSupport && WXEnvironment.JsFrameworkInit && !WXUtils.isTabletDevice();
-  }
-
-  public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
+    public WXWebsocketBridge(WXBridgeManager jm) {
+        mJsManager = jm;
+        WXWebSocketManager.getInstance().registerListener(this);
     }
 
-    if (isPerf) {
-      return false;
+    @Override
+    public int execJS(String instanceId, String namespace, String function,
+                      WXJSObject[] args) {
+        if (!mInit || TextUtils.isEmpty(instanceId)
+                || TextUtils.isEmpty(function)) {
+            return -1;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", function);
+
+        ArrayList<Object> array = new ArrayList<>();
+        int argsCount = args == null ? 0 : args.length;
+        for (int i = 0; i < argsCount; i++) {
+            if (args[i].type != WXJSObject.String) {
+                array.add(JSON.parse(args[i].data.toString()));
+            } else {
+                array.add(args[i].data);
+            }
+        }
+        map.put("arguments", array);
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
+        return 0;
     }
 
-    if (!isApkDebug) {
-      return false;
+    @Override
+    public void callNative(String instanceId, String tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return;
+        mJsManager.callNative(instanceId, tasks, callback);
     }
-    try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment isApkDebugable Exception: " + WXLogUtils.getStackTrace(e));
+
+    @Override
+    public int initFramework(String scriptsFramework,WXParams params) {
+        if (!mInit) {
+            return -1;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", "evalFramework");
+        ArrayList<String> args = new ArrayList<>();
+        args.add(scriptsFramework);
+        map.put("arguments", args);
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
+        return 0;
     }
-    return false;
-  }
 
-  public static boolean isPerf() {
-    return isPerf;
-  }
-
-  private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-  }
-
-  public static Application getApplication() {
-    return sApplication;
-  }
-
-  public void initMetrics() {
-    if (sApplication == null) {
-      return;
+    @Override
+    public void reportJSException(String instanceId, String func, String exception) {
+        if (mJsManager != null) {
+            mJsManager.reportJSException(instanceId, func, exception);
+        }
     }
-  }
 
+    @Override
+    public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {
+        if (type != WebSocket.PayloadType.TEXT) {
+            WXLogUtils.w("Websocket received unexpected message with payload of type " + type);
+            return;
+        }
+
+        String message = null;
+        try {
+            message = payload.readUtf8();
+            JSONObject jsonObject = JSONObject.parseObject(message);
+            Object name = jsonObject.get("name");
+            Object value = jsonObject.get("value");
+            if (name == null || value == null) {
+                return;
+            }
+            if (name.toString().equals("callNative")) {
+                JSONArray jsonArray = JSONObject.parseArray(value.toString());
+                callNative(jsonArray.getString(0), jsonArray.getString(1),
+                           jsonArray.getString(2));
+            }
+        } catch (Exception e) {
+
+        } finally {
+            try {
+                payload.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onSuccess(Response response) {
+        if(response.isSuccessful()){
+            WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(WXEnvironment.sApplication,"Has switched to DEBUG mode, you can see the DEBUG information on the browser!",Toast.LENGTH_SHORT).show();
+                }
+            },0);
+        }
+    }
+
+    @Override
+    public void onFailure(Throwable cause) {
+        Toast.makeText(WXEnvironment.sApplication,"socket connect failure!",Toast.LENGTH_SHORT).show();
+    }
 }

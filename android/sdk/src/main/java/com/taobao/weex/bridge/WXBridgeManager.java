@@ -218,6 +218,7 @@ import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXRefreshData;
@@ -886,6 +887,7 @@ public class WXBridgeManager implements Callback {
     wxParams.setWeexVersion(config.get("weexVersion"));
     wxParams.setDeviceModel(config.get("sysModel"));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
+    wxParams.setLogLevel(config.get(WXConfig.logLevel));
     String appName = config.get("appName");
     if (!TextUtils.isEmpty(appName)) {
       wxParams.setAppName(appName);
