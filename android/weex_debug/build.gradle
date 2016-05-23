@@ -1,9 +1,21 @@
-apply plugin: 'com.android.library'
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+    }
+}
+
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
     }
 }
+apply plugin: 'com.android.library'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -38,10 +50,11 @@ repositories{
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    provided 'com.android.support:appcompat-v7:23.1.1'
     compile (name:'prettyfish_base', ext:'aar')
-    provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     provided 'com.alibaba:fastjson:1.1.45'
-    provided 'com.jakewharton.scalpel:scalpel:1.1.2'
+    //compile 'com.taobao.android:weex_sdk:0.4.+'
     provided project(':weex_sdk_android')
 }

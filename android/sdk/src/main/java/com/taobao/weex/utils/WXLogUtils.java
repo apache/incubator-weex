@@ -238,7 +238,7 @@ public class WXLogUtils {
   }
 
   private static void sendLog(LogLevel level, String msg) {
-    if(WXEnvironment.isApkDebugable() && WXEnvironment.sSupportDebugTool){
+    if(WXEnvironment.isApkDebugable()){
       try {
         Class cls = Class.forName("com.taobao.weex.WXDebugTool");
         Method m = cls.getMethod("sendLog", new Class[]{LogLevel.class,String.class});
