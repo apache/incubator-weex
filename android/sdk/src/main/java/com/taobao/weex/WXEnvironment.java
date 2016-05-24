@@ -245,7 +245,7 @@ public class WXEnvironment {
   public static LogLevel sLogLevel= LogLevel.DEBUG;
   public static boolean sSupportDebugTool=false;
   private static boolean isApkDebug = true;
-  private static boolean isPerf = false;
+  private static boolean isPerf = true;
 
   private static Map<String, String> options = new HashMap<>();
 

@@ -346,7 +346,7 @@ class WXDomStatement {
    * in the queue.
    */
   void batch() {
-
+    long start0 = System.currentTimeMillis();
     if (!mDirty || mDestroy) {
       return;
     }
@@ -359,14 +359,16 @@ class WXDomStatement {
     rebuildingDomTree(rootDom);
 
     layoutBefore(rootDom);
-
+    long start = System.currentTimeMillis();
     rootDom.calculateLayout(mLayoutContext);
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).firstScreenCssLayoutTime(System.currentTimeMillis() - start);
+    }
     //		if (WXEnvironment.isApkDebugable()) {
     //			WXLogUtils.d("csslayout", "------------start------------");
     //			WXLogUtils.d("csslayout", rootDom.toString());
     //			WXLogUtils.d("csslayout", "------------end------------");
     //		}
-
     applyUpdate(rootDom);
 
     updateDomObj();
@@ -382,6 +384,10 @@ class WXDomStatement {
     mAddDom.clear();
     mUpdate.clear();
     mDirty = false;
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).firstScreenBatchTime(System.currentTimeMillis() - start0);
+    }
+
   }
 
   /**

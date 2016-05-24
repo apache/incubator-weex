@@ -735,6 +735,47 @@ public class WXSDKInstance implements IWXActivityStateListener {
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", time);
   }
 
+  private boolean mCallNative =true;
+  public void firstScreenCallNativeTime(long time) {
+    mWXPerformance.screenRenderCallNativeTime += time;
+    if(mEnd && mCallNative) {
+      WXLogUtils.renderPerformanceLog("firstScreenCallNativeTime", mWXPerformance.screenRenderCallNativeTime);
+      mWXPerformance.screenRenderCallNativeTime = 0;
+      mCallNative =false;
+    }
+  }
+
+  private boolean mBatch =true;
+  public void firstScreenBatchTime(long time) {
+    mWXPerformance.firstScreenBatchTime += time;
+    if(mEnd && mBatch) {
+      WXLogUtils.renderPerformanceLog("firstScreenBatchTime", mWXPerformance.firstScreenBatchTime);
+      mWXPerformance.firstScreenBatchTime = 0;
+      mBatch =false;
+    }
+  }
+
+  private boolean mIsJsonParse = true;
+  public void firstScreenJsonParseTime(long time) {
+    mWXPerformance.firstScreenParseJsonTime += time;
+    if(mEnd&&mIsJsonParse) {
+      WXLogUtils.renderPerformanceLog("firstScreenJsonParseTime", mWXPerformance.firstScreenParseJsonTime);
+      mWXPerformance.firstScreenParseJsonTime = 0;
+      mIsJsonParse =false;
+    }
+  }
+
+  private boolean mIsCssLayout = true;
+  public void firstScreenCssLayoutTime(long time) {
+    mWXPerformance.firstScreenCssLayoutTime += time;
+    if(mEnd &&mIsCssLayout) {
+      WXLogUtils.renderPerformanceLog("firstScreenCssLayoutTime", mWXPerformance.firstScreenCssLayoutTime);
+      mWXPerformance.firstScreenCssLayoutTime =0;
+      mIsCssLayout =false;
+    }
+  }
+
+
   public void createInstanceFinished(long time) {
     if (time > 0) {
       mWXPerformance.communicateTime = time;

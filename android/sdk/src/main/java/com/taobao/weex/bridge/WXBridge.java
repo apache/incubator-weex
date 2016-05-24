@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.bridge;
 
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 
 /**
@@ -238,7 +239,12 @@ class WXBridge implements IWXBridge {
    * @param callback
    */
   public void callNative(String instanceId, String tasks, String callback) {
+    long start = System.currentTimeMillis();
     WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
+
+    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenCallNativeTime(System.currentTimeMillis() - start);
+    }
   }
 
   /**

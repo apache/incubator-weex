@@ -423,7 +423,13 @@ public class WXBridgeManager implements Callback {
       mLodBuilder.setLength(0);
     }
 
+    long start = System.currentTimeMillis();
     JSONArray array = JSON.parseArray(tasks);
+
+    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenJsonParseTime(System.currentTimeMillis() - start);
+    }
+
     int size = array.size();
     if (size > 0) {
       try {
