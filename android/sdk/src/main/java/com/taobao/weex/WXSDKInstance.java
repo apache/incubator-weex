@@ -737,11 +737,21 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   private boolean mCallNative =true;
   public void firstScreenCallNativeTime(long time) {
-    mWXPerformance.screenRenderCallNativeTime += time;
+    mWXPerformance.firstScreenRenderCallNativeTime += time;
     if(mEnd && mCallNative) {
-      WXLogUtils.renderPerformanceLog("firstScreenCallNativeTime", mWXPerformance.screenRenderCallNativeTime);
-      mWXPerformance.screenRenderCallNativeTime = 0;
+      WXLogUtils.renderPerformanceLog("firstScreenCallNativeTime", mWXPerformance.firstScreenRenderCallNativeTime);
+      mWXPerformance.firstScreenRenderCallNativeTime = 0;
       mCallNative =false;
+    }
+  }
+
+  private boolean mCreateInstance =true;
+  public void firstScreenCreateInstanceTime(long time) {
+    mWXPerformance.firstScreenCreateInstanceTime = time -mRenderStartTime;
+    if(mCreateInstance) {
+      WXLogUtils.renderPerformanceLog("firstScreenCreateInstanceTime", mWXPerformance.firstScreenCreateInstanceTime);
+      mWXPerformance.firstScreenRenderCallNativeTime = 0;
+      mCreateInstance =false;
     }
   }
 

@@ -257,7 +257,7 @@ class WXDomStatement {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set<String> mUpdate;
-  private List<String> mFlushviews;
+  private List<String> mFlushViews;
   private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
@@ -279,7 +279,7 @@ class WXDomStatement {
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     mUpdate = new HashSet<>();
-    mFlushviews = new LinkedList<>();
+    mFlushViews = new LinkedList<>();
     mWXRenderManager = renderManager;
   }
 
@@ -376,10 +376,10 @@ class WXDomStatement {
     for (int i = 0; i < count && !mDestroy; ++i) {
       mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
     }
-    for(String ref: mFlushviews){
+    for(String ref: mFlushViews){
       mWXRenderManager.flushView(mInstanceId,ref);
     }
-    mFlushviews.clear();
+    mFlushViews.clear();
     mNormalTasks.clear();
     mAddDom.clear();
     mUpdate.clear();
@@ -494,7 +494,7 @@ class WXDomStatement {
       }
     });
     mDirty = true;
-    mFlushviews.add(domObject.ref);
+    mFlushViews.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -603,7 +603,7 @@ class WXDomStatement {
     });
 
     mDirty = true;
-    mFlushviews.add(domObject.ref);
+    mFlushViews.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -741,7 +741,7 @@ class WXDomStatement {
       }
     });
     mDirty = true;
-    mFlushviews.add(ref);
+    mFlushViews.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -774,7 +774,7 @@ class WXDomStatement {
 
     updateStyle(domObject, style);
     mDirty = true;
-    mFlushviews.add(ref);
+    mFlushViews.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);

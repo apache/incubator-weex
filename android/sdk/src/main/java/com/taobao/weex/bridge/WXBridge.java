@@ -240,6 +240,9 @@ class WXBridge implements IWXBridge {
    */
   public void callNative(String instanceId, String tasks, String callback) {
     long start = System.currentTimeMillis();
+    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenCreateInstanceTime(start);
+    }
     WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
 
     if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {

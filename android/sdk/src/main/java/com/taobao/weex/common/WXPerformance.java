@@ -263,7 +263,12 @@ public class WXPerformance {
   /**
    * Call native Time spent when rendering first screen
    */
-  public long screenRenderCallNativeTime;
+  public long firstScreenRenderCallNativeTime;
+
+  /**
+   * Create Instance Time spent when rendering first screen
+   */
+  public long firstScreenCreateInstanceTime;
 
   /**
    * Call native Time spent when rendering first screen
