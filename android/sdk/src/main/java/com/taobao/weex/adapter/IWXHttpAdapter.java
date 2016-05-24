@@ -205,8 +205,8 @@
 package com.taobao.weex.adapter;
 
 
-import com.taobao.weex.http.WXRequest;
-import com.taobao.weex.http.WXResponse;
+import com.taobao.weex.common.WXRequest;
+import com.taobao.weex.common.WXResponse;
 
 import java.util.List;
 import java.util.Map;

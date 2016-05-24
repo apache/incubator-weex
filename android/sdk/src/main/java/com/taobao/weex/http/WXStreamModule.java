@@ -211,6 +211,8 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXModuleAnno;
+import com.taobao.weex.common.WXRequest;
+import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
