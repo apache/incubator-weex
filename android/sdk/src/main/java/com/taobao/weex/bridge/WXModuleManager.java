@@ -321,6 +321,12 @@ public class WXModuleManager {
 
         if (paramClazz == JSONObject.class) {
           params[i] = value;
+        } else if(JSCallback.class == paramClazz){
+          if(value instanceof String){
+            params[i] = new SimpleJSCallback(instanceId,(String)value);
+          }else{
+            throw new Exception("Parameter type not match.");
+          }
         } else {
           String sValue;
           if (value instanceof String) {
@@ -415,6 +421,27 @@ public class WXModuleManager {
         ((Destroyable)module).destroy();
       }
 
+    }
+  }
+
+  private static class SimpleJSCallback implements JSCallback{
+    String mInstanceId;
+    String mCallbackId;
+
+    SimpleJSCallback(String instanceId,String callbackId){
+      this.mCallbackId = callbackId;
+      this.mInstanceId = instanceId;
+    }
+
+
+    @Override
+    public void invoke(Map<String, Object> data) {
+      WXBridgeManager.getInstance().callback(mInstanceId,mCallbackId,data,false);
+    }
+
+    @Override
+    public void invokeAndKeepAlive(Map<String, Object> data) {
+      WXBridgeManager.getInstance().callback(mInstanceId,mCallbackId,data,true);
     }
   }
 
