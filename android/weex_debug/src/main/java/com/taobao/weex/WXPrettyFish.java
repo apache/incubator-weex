@@ -2,10 +2,10 @@ package com.taobao.weex;
 
 import android.app.Application;
 
-import com.jakewharton.scalpel.ScalpelFrameLayout;
 import com.taobao.prettyfish.PrettyFishCommon;
 import com.taobao.prettyfish.core.comp.AbstractBaseComp;
 import com.taobao.prettyfish.core.fab.FloatWndManager;
+import com.taobao.weex.scalpel.ScalpelFrameLayout;
 
 /**
  * Created by lixinke on 16/5/4.

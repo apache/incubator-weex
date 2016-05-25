@@ -53,7 +53,7 @@ dependencies {
     provided 'com.android.support:appcompat-v7:23.1.1'
     compile (name:'prettyfish_base', ext:'aar')
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
-    compile 'com.jakewharton.scalpel:scalpel:1.1.2'
+//    compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     provided 'com.alibaba:fastjson:1.1.45'
     //compile 'com.taobao.android:weex_sdk:0.4.+'
     provided project(':weex_sdk_android')

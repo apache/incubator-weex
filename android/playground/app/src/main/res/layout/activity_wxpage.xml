@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-<com.jakewharton.scalpel.ScalpelFrameLayout android:layout_width="match_parent"
+<com.taobao.weex.scalpel.ScalpelFrameLayout android:layout_width="match_parent"
                                             android:layout_height="match_parent"
         android:id="@+id/scalpel_frame_layout">
         <FrameLayout
@@ -43,7 +43,7 @@
 
 
         </FrameLayout>
-</com.jakewharton.scalpel.ScalpelFrameLayout>
+</com.taobao.weex.scalpel.ScalpelFrameLayout>
 
         <!--<Button-->
             <!--android:id="@+id/weex_refresh"-->
