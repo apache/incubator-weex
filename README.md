@@ -1,4 +1,4 @@
-# Weex
+# Weex [![CircleCI](https://circleci.com/gh/alibaba/weex/tree/dev.svg?style=svg)](https://circleci.com/gh/alibaba/weex/tree/dev)
 
 ## Pre-release Notes
 
