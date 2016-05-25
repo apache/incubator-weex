@@ -205,6 +205,7 @@
 package com.taobao.weex.http;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -219,6 +220,14 @@ import java.util.List;
 import java.util.Map;
 
 public class WXStreamModule extends WXModule {
+
+  final IWXHttpAdapter mAdapter;
+  public WXStreamModule(){
+    this(null);
+  }
+  public WXStreamModule(IWXHttpAdapter adapter){
+   mAdapter = adapter;
+  }
 
   /**
    * send HTTP request
@@ -276,7 +285,13 @@ public class WXStreamModule extends WXModule {
    */
   @WXModuleAnno
   public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
-    JSONObject optionsObj = JSON.parseObject(optionsStr);
+
+    JSONObject optionsObj = null;
+    try {
+      optionsObj = JSON.parseObject(optionsStr);
+    }catch (JSONException e){
+      e.printStackTrace();
+    }
 
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
@@ -347,8 +362,10 @@ public class WXStreamModule extends WXModule {
       wxRequest.paramMap.putAll(options.getHeaders());
     }
 
-    if (mWXSDKInstance != null && mWXSDKInstance.getWXHttpAdapter() != null) {
-      mWXSDKInstance.getWXHttpAdapter().sendRequest(wxRequest, new StreamHttpListener(callback,progressCallback));
+
+    IWXHttpAdapter adapter = ( mAdapter==null && mWXSDKInstance != null) ? mWXSDKInstance.getWXHttpAdapter() : mAdapter;
+    if (adapter != null) {
+      adapter.sendRequest(wxRequest, new StreamHttpListener(callback,progressCallback));
     }else{
       WXLogUtils.e("WXStreamModule","No HttpAdapter found,request failed.");
     }

@@ -202,106 +202,129 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.bridge;
+package com.taobao.weex.http;
 
-import android.os.Handler;
-
-import android.os.HandlerThread;
 import android.os.Looper;
-import com.taobao.weex.WXSDKInstance;
-import junit.framework.TestCase;
+import android.telecom.Call;
+import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.WXRequest;
+import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.common.WXThread;
+import junit.framework.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.robolectric.Robolectric;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.mockito.Mockito.*;
+
 
 /**
- * Created by lixinke on 16/2/24.
+ * Created by sospartan on 5/24/16.
  */
 @RunWith(RobolectricTestRunner.class)
-public class WXBridgeManagerTest extends TestCase {
+@PrepareForTest({WXStreamModule.class, IWXHttpAdapter.class})
+public class WXStreamModuleTest {
 
-    public void setUp() throws Exception {
-        super.setUp();
+  @Before
+  public void setup() throws Exception{
+
+  }
+
+  private WXResponse successResponse(){
+    WXResponse resp = new WXResponse();
+    resp.data = "data";
+    resp.statusCode = "200";
+    return resp;
+  }
+
+  static class Callback implements JSCallback{
+     Map<String, Object> mData;
+
+    @Override
+    public void invoke(Map<String, Object> data) {
+      mData = data;
     }
 
-    @Test
-    public void testGetJSHander() throws Exception {
-        Handler handler=WXBridgeManager.getInstance().getJSHandler();
-        assertNotNull(handler);
+    @Override
+    public void invokeAndKeepAlive(Map<String, Object> data) {
+      mData = data;
     }
+  }
 
-    public void testGetInstance() throws Exception {
 
-        WXBridgeManager instance = WXBridgeManager.getInstance();
-        assertNotNull(instance);
+  @Test
+  public void testFetchInvaildOptions() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        listener.onHttpFinish(successResponse());
+      }
+    };
 
-    }
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("",cb,null);
 
-    public void testRestart() throws Exception {
+    assert   !(boolean)cb.mData.get("ok");
+  }
 
-    }
+  @Test
+  public void testFetchSuccessFinish() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        listener.onHttpFinish(successResponse());
+      }
+    };
 
-    public void testSetStackTopInstance() throws Exception {
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("{'url':'http://www.taobao.com'}",cb,null);
 
-        WXBridgeManager.getInstance().setStackTopInstance("");
-    }
+    assert   (boolean)cb.mData.get("ok");
+  }
 
-    public void testCallNative() throws Exception {
 
-    }
+  @Test
+  public void testFetchHeaderReceived() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        Map<String,List<String>> headers = new HashMap<>();
+        headers.put("key", Arrays.asList("someval"));
+        listener.onHeadersReceived(200,headers);
+      }
+    };
 
-    public void testInitScriptsFramework() throws Exception {
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("{'url':'http://www.taobao.com'}",null,cb);
 
-    }
+    assert   ((Map<String,String>)cb.mData.get("headers")).get("key").equals("someval");
+  }
 
-    public void testFireEvent() throws Exception {
+  @Test
+  public void testFetchRequestHttpbinCallback() throws Exception{
+    WXStreamModule streamModule = new WXStreamModule(new DefaultWXHttpAdapter());
+    JSCallback progress = mock(JSCallback.class);
+    JSCallback finish = mock(JSCallback.class);
+    System.out.print("request start "+System.currentTimeMillis());
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,progress);
+    verify(progress,timeout(10*1000)).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
+    verify(finish,timeout(10*1000)).invoke(anyMapOf(String.class, Object.class));
+    System.out.print("\nrequest finish"+System.currentTimeMillis());
+  }
 
-    }
-
-    public void testCallback() throws Exception {
-
-    }
-
-    public void testCallback1() throws Exception {
-
-    }
-
-    public void testRefreshInstance() throws Exception {
-
-    }
-
-    public void testCreateInstance() throws Exception {
-
-    }
-
-    public void testDestroyInstance() throws Exception {
-
-    }
-
-    public void testRegisterComponents() throws Exception {
-
-    }
-
-    public void testRegisterModules() throws Exception {
-
-    }
-
-    public void testHandleMessage() throws Exception {
-
-    }
-
-    public void testDestroy() throws Exception {
-
-    }
-
-    public void testReportJSException() throws Exception {
-
-    }
-
-    public void testCommitJSBridgeAlarmMonitor() throws Exception {
-
-    }
 }
