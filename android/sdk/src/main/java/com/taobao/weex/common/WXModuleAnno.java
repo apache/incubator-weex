@@ -208,6 +208,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/** TODO: 1.change to a better name; 2. remove unused moduleMethod property **/
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface WXModuleAnno {

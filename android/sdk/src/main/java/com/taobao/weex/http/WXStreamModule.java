@@ -205,12 +205,13 @@
 package com.taobao.weex.http;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
+import com.taobao.weex.common.*;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
@@ -219,6 +220,14 @@ import java.util.List;
 import java.util.Map;
 
 public class WXStreamModule extends WXModule {
+
+  final IWXHttpAdapter mAdapter;
+  public WXStreamModule(){
+    this(null);
+  }
+  public WXStreamModule(IWXHttpAdapter adapter){
+   mAdapter = adapter;
+  }
 
   /**
    * send HTTP request
@@ -246,7 +255,8 @@ public class WXStreamModule extends WXModule {
     sendRequest(builder.createOptions(), new ResponseCallback() {
       @Override
       public void onResponse(WXResponse response, Map<String, String> headers) {
-        WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, (response == null || response.originalData == null) ? "{}" : new String(response.originalData));
+        if(callback != null)
+          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, (response == null || response.originalData == null) ? "{}" : new String(response.originalData));
       }
     }, null);
   }
@@ -274,8 +284,25 @@ public class WXStreamModule extends WXModule {
    *  <li>headers: object 响应头</li>
    */
   @WXModuleAnno
-  public void fetch(String optionsStr,final String callback,String progressCallback){
-    JSONObject optionsObj = JSON.parseObject(optionsStr);
+  public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
+
+    JSONObject optionsObj = null;
+    try {
+      optionsObj = JSON.parseObject(optionsStr);
+    }catch (JSONException e){
+      e.printStackTrace();
+    }
+
+    boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
+    if(invaildOption){
+      if(callback != null) {
+        Map<String, Object> resp = new HashMap<String, Object>();
+        resp.put("ok", false);
+        resp.put("statusText", "invaild options.");
+        callback.invoke(resp);
+      }
+      return;
+    }
     String method = optionsObj.getString("method");
     String url = optionsObj.getString("url");
     JSONObject headers = optionsObj.getJSONObject("headers");
@@ -305,7 +332,7 @@ public class WXStreamModule extends WXModule {
           //TODO error text need define.
           resp.put("statusText", response.errorMsg);
           resp.put("headers", headers);
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(),callback,resp);
+          callback.invoke(resp);
         }
       }
     }, progressCallback);
@@ -322,7 +349,7 @@ public class WXStreamModule extends WXModule {
   }
 
 
-  private void sendRequest(Options options,ResponseCallback callback,String progressCallback){
+  private void sendRequest(Options options,ResponseCallback callback,JSCallback progressCallback){
     WXRequest wxRequest = new WXRequest();
     wxRequest.method = options.getMethod();
     wxRequest.url = options.getUrl();
@@ -335,8 +362,10 @@ public class WXStreamModule extends WXModule {
       wxRequest.paramMap.putAll(options.getHeaders());
     }
 
-    if (mWXSDKInstance != null && mWXSDKInstance.getWXHttpAdapter() != null) {
-      mWXSDKInstance.getWXHttpAdapter().sendRequest(wxRequest, new StreamHttpListener(mWXSDKInstance.getInstanceId(), callback,progressCallback));
+
+    IWXHttpAdapter adapter = ( mAdapter==null && mWXSDKInstance != null) ? mWXSDKInstance.getWXHttpAdapter() : mAdapter;
+    if (adapter != null) {
+      adapter.sendRequest(wxRequest, new StreamHttpListener(callback,progressCallback));
     }else{
       WXLogUtils.e("WXStreamModule","No HttpAdapter found,request failed.");
     }
@@ -347,14 +376,12 @@ public class WXStreamModule extends WXModule {
   }
 
   private static class StreamHttpListener implements IWXHttpAdapter.OnHttpListener {
-    private String mInstanceId;
     private ResponseCallback mCallback;
-    private String mProgressCallback;
+    private JSCallback mProgressCallback;
     private Map<String,Object> mResponse = new HashMap<>();
     private Map<String,String> mRespHeaders;
 
-    private StreamHttpListener(String instanceId, ResponseCallback callback,String progressCallback) {
-      mInstanceId = instanceId;
+    private StreamHttpListener(ResponseCallback callback,JSCallback progressCallback) {
       mCallback = callback;
       mProgressCallback = progressCallback;
     }
@@ -365,7 +392,7 @@ public class WXStreamModule extends WXModule {
       if(mProgressCallback !=null) {
         mResponse.put("readyState",1);//readyState: number 请求状态，1 OPENED，开始连接；2 HEADERS_RECEIVED；3 LOADING
         mResponse.put("length",0);
-        WXBridgeManager.getInstance().callback(mInstanceId, mProgressCallback,mResponse,true);
+        mProgressCallback.invokeAndKeepAlive(mResponse);
       }
     }
 
@@ -390,7 +417,7 @@ public class WXStreamModule extends WXModule {
       mResponse.put("headers",simpleHeaders);
       mRespHeaders = simpleHeaders;
       if(mProgressCallback!=null){
-        WXBridgeManager.getInstance().callback(mInstanceId,mProgressCallback,mResponse,true);
+        mProgressCallback.invokeAndKeepAlive(mResponse);
       }
     }
 
@@ -398,7 +425,7 @@ public class WXStreamModule extends WXModule {
     public void onHttpResponseProgress(int loadedLength) {
       mResponse.put("length",loadedLength);
       if(mProgressCallback!=null){
-        WXBridgeManager.getInstance().callback(mInstanceId,mProgressCallback,mResponse,true);
+        mProgressCallback.invokeAndKeepAlive(mResponse);
       }
 
     }

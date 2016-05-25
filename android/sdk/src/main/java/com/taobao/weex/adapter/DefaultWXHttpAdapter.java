@@ -206,9 +206,8 @@ package com.taobao.weex.adapter;
 
 import android.text.TextUtils;
 
-import com.taobao.weex.http.WXRequest;
-import com.taobao.weex.http.WXResponse;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.common.WXRequest;
+import com.taobao.weex.common.WXResponse;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

@@ -202,54 +202,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.adapter;
+package com.taobao.weex.common;
 
-
-import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.common.WXResponse;
-
-import java.util.List;
 import java.util.Map;
 
-public interface IWXHttpAdapter {
+public class WXRequest {
 
   /**
-   * http request method
-   *
-   * @param request weex assemble request
-   * @param listener http response notify
-   * @return
+   * The request parameter
    */
-  void sendRequest(WXRequest request, OnHttpListener listener);
+  public Map<String, String> paramMap;
 
-  interface OnHttpListener {
+  /**
+   * The request URL
+   */
+  public String url;
+  /**
+   * The request method
+   */
+  public String method;
+  /**
+   * The request body
+   */
+  public String body;
 
-    /**
-     * start request
-     */
-    void onHttpStart();
+  /**
+   * The request time out
+   */
+  public int timeoutMs = 2500;
 
-    /**
-     * headers received
-     */
-    void onHeadersReceived(int statusCode,Map<String,List<String>> headers);
 
-    /**
-     * post progress
-     * @param uploadProgress
-     */
-    void onHttpUploadProgress(int uploadProgress);
-
-    /**
-     * response loaded length (bytes), full length should read from headers (content-length)
-     * @param loadedLength
-     */
-    void onHttpResponseProgress(int loadedLength);
-
-    /**
-     * http response finish
-     * @param response
-     */
-    void onHttpFinish(WXResponse response);
-  }
 }

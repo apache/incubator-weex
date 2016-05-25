@@ -202,34 +202,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.http;
+package com.taobao.weex.bridge;
 
 import java.util.Map;
 
-public class WXRequest {
+/**
+ * Created by sospartan on 5/24/16.
+ */
+public interface JSCallback {
+  /**
+   * invoke javascript callback method, this method will destoryed after invoke.
+   * @param data
+   */
+  void invoke(Map<String,Object> data);
 
   /**
-   * The request parameter
+   * invoke javascript callback method and keep callback alive for later use.
+   * @param data
    */
-  public Map<String, String> paramMap;
-
-  /**
-   * The request URL
-   */
-  public String url;
-  /**
-   * The request method
-   */
-  public String method;
-  /**
-   * The request body
-   */
-  public String body;
-
-  /**
-   * The request time out
-   */
-  public int timeoutMs = 2500;
-
-
+  void invokeAndKeepAlive(Map<String,Object> data);
 }

@@ -202,54 +202,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.adapter;
+package com.taobao.weex.common;
 
-
-import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.common.WXResponse;
-
-import java.util.List;
 import java.util.Map;
 
-public interface IWXHttpAdapter {
+public class WXResponse {
 
   /**
-   * http request method
-   *
-   * @param request weex assemble request
-   * @param listener http response notify
-   * @return
+   * Status code
    */
-  void sendRequest(WXRequest request, OnHttpListener listener);
+  public String statusCode;
 
-  interface OnHttpListener {
+  /**
+   * Byte stream fetched from the connection
+   */
+  public String data;
 
-    /**
-     * start request
-     */
-    void onHttpStart();
+  public byte[] originalData;
 
-    /**
-     * headers received
-     */
-    void onHeadersReceived(int statusCode,Map<String,List<String>> headers);
+  /**
+   * Server internal error
+   */
+  public String errorCode;
 
-    /**
-     * post progress
-     * @param uploadProgress
-     */
-    void onHttpUploadProgress(int uploadProgress);
+  /**
+   * Server error message
+   */
+  public String errorMsg;
 
-    /**
-     * response loaded length (bytes), full length should read from headers (content-length)
-     * @param loadedLength
-     */
-    void onHttpResponseProgress(int loadedLength);
+  /**
+   * Message for toast
+   */
+  public String toastMsg;
 
-    /**
-     * http response finish
-     * @param response
-     */
-    void onHttpFinish(WXResponse response);
-  }
+  /**
+   * Parameter for further extension.
+   */
+  public Map<String, Object> extendParams;
 }
