@@ -428,7 +428,7 @@ public class WXBridgeManager implements Callback {
     JSONArray array = JSON.parseArray(tasks);
 
     if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenJsonParseTime(System.currentTimeMillis() - start);
+      WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
     }
 
     int size = array.size();
@@ -680,7 +680,6 @@ public class WXBridgeManager implements Callback {
             }
           }
         }, 0);
-        WXLogUtils.renderPerformanceLog("invokeCreateInstance", totalTime);
       }
     }, instanceId);
   }

@@ -659,6 +659,15 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onRenderSuccess(final int width, final int height) {
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
+    WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
+    WXLogUtils.renderPerformanceLog("   TotalCallNativeTime", mWXPerformance.callNativeTime);
+    WXLogUtils.renderPerformanceLog("       TotalJsonParseTime", mWXPerformance.parseJsonTime);
+    WXLogUtils.renderPerformanceLog("   TotalBatchTime", mWXPerformance.batchTime);
+    WXLogUtils.renderPerformanceLog("       TotalCssLayoutTime", mWXPerformance.cssLayoutTime);
+    WXLogUtils.renderPerformanceLog("       TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
+    WXLogUtils.renderPerformanceLog("       TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+
+
     mWXPerformance.totalTime = time;
     WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
     WXComponent.mComponentNum = 0;
@@ -728,62 +737,51 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
+
+  private boolean mCreateInstance =true;
+  public void firstScreenCreateInstanceTime(long time) {
+    if(mCreateInstance) {
+      mWXPerformance.firstScreenCreateInstanceTime = time -mRenderStartTime;
+      mCreateInstance =false;
+    }
+  }
+
+  public void callNativeTime(long time) {
+    mWXPerformance.callNativeTime += time;
+  }
+
+  public void jsonParseTime(long time) {
+    mWXPerformance.parseJsonTime += time;
+  }
+
   public void firstScreenRenderFinished(long endTime) {
     mEnd = true;
     long time = endTime - mRenderStartTime;
     mWXPerformance.screenRenderTime = time;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", time);
+    WXLogUtils.renderPerformanceLog("   firstScreenCreateInstanceTime", mWXPerformance.firstScreenCreateInstanceTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenCallNativeTime", mWXPerformance.callNativeTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenJsonParseTime", mWXPerformance.parseJsonTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenBatchTime", mWXPerformance.batchTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenCssLayoutTime", mWXPerformance.cssLayoutTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
   }
 
-  private boolean mCallNative =true;
-  public void firstScreenCallNativeTime(long time) {
-    mWXPerformance.firstScreenRenderCallNativeTime += time;
-    if(mEnd && mCallNative) {
-      WXLogUtils.renderPerformanceLog("firstScreenCallNativeTime", mWXPerformance.firstScreenRenderCallNativeTime);
-      mWXPerformance.firstScreenRenderCallNativeTime = 0;
-      mCallNative =false;
-    }
+  public void batchTime(long time) {
+    mWXPerformance.batchTime += time;
+  }
+  public void cssLayoutTime(long time) {
+      mWXPerformance.cssLayoutTime += time;
   }
 
-  private boolean mCreateInstance =true;
-  public void firstScreenCreateInstanceTime(long time) {
-    mWXPerformance.firstScreenCreateInstanceTime = time -mRenderStartTime;
-    if(mCreateInstance) {
-      WXLogUtils.renderPerformanceLog("firstScreenCreateInstanceTime", mWXPerformance.firstScreenCreateInstanceTime);
-      mWXPerformance.firstScreenRenderCallNativeTime = 0;
-      mCreateInstance =false;
-    }
+  public void applyUpdateTime(long time) {
+      mWXPerformance.applyUpdateTime += time;
   }
 
-  private boolean mBatch =true;
-  public void firstScreenBatchTime(long time) {
-    mWXPerformance.firstScreenBatchTime += time;
-    if(mEnd && mBatch) {
-      WXLogUtils.renderPerformanceLog("firstScreenBatchTime", mWXPerformance.firstScreenBatchTime);
-      mWXPerformance.firstScreenBatchTime = 0;
-      mBatch =false;
+  public void updateDomObjTime(long time) {
+      mWXPerformance.updateDomObjTime += time;
     }
-  }
-
-  private boolean mIsJsonParse = true;
-  public void firstScreenJsonParseTime(long time) {
-    mWXPerformance.firstScreenParseJsonTime += time;
-    if(mEnd&&mIsJsonParse) {
-      WXLogUtils.renderPerformanceLog("firstScreenJsonParseTime", mWXPerformance.firstScreenParseJsonTime);
-      mWXPerformance.firstScreenParseJsonTime = 0;
-      mIsJsonParse =false;
-    }
-  }
-
-  private boolean mIsCssLayout = true;
-  public void firstScreenCssLayoutTime(long time) {
-    mWXPerformance.firstScreenCssLayoutTime += time;
-    if(mEnd &&mIsCssLayout) {
-      WXLogUtils.renderPerformanceLog("firstScreenCssLayoutTime", mWXPerformance.firstScreenCssLayoutTime);
-      mWXPerformance.firstScreenCssLayoutTime =0;
-      mIsCssLayout =false;
-    }
-  }
 
 
   public void createInstanceFinished(long time) {

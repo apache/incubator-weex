@@ -246,7 +246,7 @@ class WXBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
 
     if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenCallNativeTime(System.currentTimeMillis() - start);
+      WXSDKManager.getInstance().getSDKInstance(instanceId).callNativeTime(System.currentTimeMillis() - start);
     }
   }
 

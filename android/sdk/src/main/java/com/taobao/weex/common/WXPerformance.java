@@ -253,17 +253,17 @@ public class WXPerformance {
    * Time used for
    * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
    */
-  public double communicateTime;
+  public long communicateTime;
 
   /**
    * Time spent when rendering first screen
    */
-  public double screenRenderTime;
+  public long screenRenderTime;
 
   /**
    * Call native Time spent when rendering first screen
    */
-  public long firstScreenRenderCallNativeTime;
+  public long callNativeTime;
 
   /**
    * Create Instance Time spent when rendering first screen
@@ -273,17 +273,28 @@ public class WXPerformance {
   /**
    * Call native Time spent when rendering first screen
    */
-  public long firstScreenBatchTime;
+  public long batchTime;
 
   /**
    * Call native Time spent when rendering first screen
    */
-  public long firstScreenParseJsonTime;
+  public long parseJsonTime;
+
+  /**
+   *  UpdateDomObj Time spent when rendering first screen
+   */
+  public long updateDomObjTime;
+
+  /**
+   *  ApplyUpdate Time spent when rendering first screen
+   */
+  public long applyUpdateTime;
+
 
   /**
    *  CssLayout Time spent when rendering first screen
    */
-  public long firstScreenCssLayoutTime;
+  public long cssLayoutTime;
 
   /**
    * Time spent, the unit is micro second
