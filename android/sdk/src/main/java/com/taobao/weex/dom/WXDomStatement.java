@@ -673,8 +673,8 @@ class WXDomStatement {
       }
       return;
     }
-    parent.remove(domObject);
     clearRegistryForDom(domObject);
+    parent.remove(domObject);
 
     mNormalTasks.add(new IWXRenderTask() {
 
