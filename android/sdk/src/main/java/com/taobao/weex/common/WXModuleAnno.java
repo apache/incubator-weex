@@ -213,6 +213,7 @@ import java.lang.annotation.RetentionPolicy;
 @Inherited
 public @interface WXModuleAnno {
 
+  @Deprecated
   boolean moduleMethod() default true;
 
   boolean runOnUIThread() default true;

@@ -460,7 +460,7 @@ public class WXModuleManager {
         for (Method method : mClazz.getMethods()) {
           // iterates all the annotations available in the method
           for (Annotation anno : method.getDeclaredAnnotations()) {
-            if (anno != null && anno instanceof WXModuleAnno && ((WXModuleAnno) anno).moduleMethod()) {
+            if (anno != null && anno instanceof WXModuleAnno ) {
               methods.add(method.getName());
             }
           }
@@ -477,7 +477,7 @@ public class WXModuleManager {
         for (Method method : mClazz.getMethods()) {
           // iterates all the annotations available in the method
           for (Annotation anno : method.getDeclaredAnnotations()) {
-            if (anno != null && anno instanceof WXModuleAnno && ((WXModuleAnno) anno).moduleMethod()) {
+            if (anno != null && anno instanceof WXModuleAnno ) {
               moduleMethods.put(method.getName(), method);
             }
           }
