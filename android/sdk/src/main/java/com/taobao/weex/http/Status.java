@@ -204,159 +204,77 @@
  */
 package com.taobao.weex.http;
 
-import android.os.Looper;
-import android.telecom.Call;
-import com.taobao.weex.adapter.DefaultWXHttpAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.common.WXResponse;
-import com.taobao.weex.common.WXThread;
-import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.RobolectricTestRunner;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.mockito.Mockito.*;
-import static junit.framework.Assert.*;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by sospartan on 5/24/16.
+ * Created by sospartan on 5/26/16.
  */
-@RunWith(RobolectricTestRunner.class)
-@PrepareForTest({WXStreamModule.class, IWXHttpAdapter.class})
-public class WXStreamModuleTest {
+public class Status {
+  public static final String UNKNOWN_STATUS = "unknown status";
+  public static final String ERR_INVALID_REQUEST = "ERR_INVALID_REQUEST";
+  public static final String ERR_CONNECT_FAILED = "ERR_CONNECT_FAILED";
 
-  @Before
-  public void setup() throws Exception{
+  private static Map<String,String> statusMap = new HashMap<>();
 
+  static {
+    statusMap.put("100","Continue");
+    statusMap.put("101","Switching Protocol");
+    statusMap.put("200","OK");
+    statusMap.put("201","Created");
+    statusMap.put("202","Accepted");
+    statusMap.put("203","Non-Authoritative Information");
+    statusMap.put("204","No Content");
+    statusMap.put("205","Reset Content");
+    statusMap.put("206","Partial Content");
+    statusMap.put("300","Multiple Choice");
+    statusMap.put("301","Moved Permanently");
+    statusMap.put("302","Found");
+    statusMap.put("303","See Other");
+    statusMap.put("304","Not Modified");
+    statusMap.put("305","Use Proxy");
+    statusMap.put("306","unused");
+    statusMap.put("307","Temporary Redirect");
+    statusMap.put("308","Permanent Redirect");
+    statusMap.put("400","Bad Request");
+    statusMap.put("401","Unauthorized");
+    statusMap.put("402","Payment Required");
+    statusMap.put("403","Forbidden");
+    statusMap.put("404","Not Found");
+    statusMap.put("405","Method Not Allowed");
+    statusMap.put("406","Not Acceptable");
+    statusMap.put("407","Proxy Authentication Required");
+    statusMap.put("408","Request Timeout");
+    statusMap.put("409","Conflict");
+    statusMap.put("410","Gone");
+    statusMap.put("411","Length Required");
+    statusMap.put("412","Precondition Failed");
+    statusMap.put("413","Payload Too Large");
+    statusMap.put("414","URI Too Long");
+    statusMap.put("415","Unsupported Media Type");
+    statusMap.put("416","Requested Range Not Satisfiable");
+    statusMap.put("417","Expectation Failed");
+    statusMap.put("418","I'm a teapot");
+    statusMap.put("421","Misdirected Request");
+    statusMap.put("426","Upgrade Required");
+    statusMap.put("428","Precondition Required");
+    statusMap.put("429","Too Many Requests");
+    statusMap.put("431","Request Header Fields Too Large");
+    statusMap.put("500","Internal Server Error");
+    statusMap.put("501","Not Implemented");
+    statusMap.put("502","Bad Gateway");
+    statusMap.put("503","Service Unavailable");
+    statusMap.put("504","Gateway Timeout");
+    statusMap.put("505","HTTP Version Not Supported");
+    statusMap.put("506","Variant Also Negotiates");
+    statusMap.put("507","Variant Also Negotiates");
+    statusMap.put("511","Network Authentication Required");
   }
 
-  private WXResponse successResponse(){
-    WXResponse resp = new WXResponse();
-    resp.data = "data";
-    resp.statusCode = "200";
-    return resp;
-  }
-
-  static class Callback implements JSCallback{
-     Map<String, Object> mData;
-
-    @Override
-    public void invoke(Map<String, Object> data) {
-      mData = data;
-    }
-
-    @Override
-    public void invokeAndKeepAlive(Map<String, Object> data) {
-      mData = data;
-    }
-  }
-
-
-  @Test
-  public void testFetchInvaildOptions() throws Exception{
-    IWXHttpAdapter adapter = new IWXHttpAdapter() {
-      @Override
-      public void sendRequest(WXRequest request, OnHttpListener listener) {
-        listener.onHttpFinish(successResponse());
-      }
-    };
-
-    WXStreamModule streamModule = new WXStreamModule(adapter);
-    Callback cb = new Callback();
-    streamModule.fetch("",cb,null);
-
-    assert   !(boolean)cb.mData.get("ok");
-  }
-
-  @Test
-  public void testFetchSuccessFinish() throws Exception{
-    IWXHttpAdapter adapter = new IWXHttpAdapter() {
-      @Override
-      public void sendRequest(WXRequest request, OnHttpListener listener) {
-        listener.onHttpFinish(successResponse());
-      }
-    };
-
-    WXStreamModule streamModule = new WXStreamModule(adapter);
-    Callback cb = new Callback();
-    streamModule.fetch("{'url':'http://www.taobao.com'}",cb,null);
-
-    assert   (boolean)cb.mData.get("ok");
-  }
-
-
-  @Test
-  public void testFetchHeaderReceived() throws Exception{
-    IWXHttpAdapter adapter = new IWXHttpAdapter() {
-      @Override
-      public void sendRequest(WXRequest request, OnHttpListener listener) {
-        Map<String,List<String>> headers = new HashMap<>();
-        headers.put("key", Arrays.asList("someval"));
-        listener.onHeadersReceived(200,headers);
-      }
-    };
-
-    WXStreamModule streamModule = new WXStreamModule(adapter);
-    Callback cb = new Callback();
-    streamModule.fetch("{'url':'http://www.taobao.com'}",null,cb);
-
-    assert   ((Map<String,String>)cb.mData.get("headers")).get("key").equals("someval");
-  }
-
-  @Test
-  public void testFetchRequestHttpbinCallback() throws Exception{
-    WXStreamModule streamModule = new WXStreamModule(new DefaultWXHttpAdapter());
-    JSCallback progress = mock(JSCallback.class);
-    JSCallback finish = mock(JSCallback.class);
-    System.out.print("request start "+System.currentTimeMillis());
-    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,progress);
-    verify(progress,timeout(10*1000)).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
-    verify(finish,timeout(10*1000)).invoke(anyMapOf(String.class, Object.class));
-    System.out.print("\nrequest finish"+System.currentTimeMillis());
-  }
-
-
-  @Test
-  public void testFetchStatus() throws Exception{
-    WXStreamModule streamModule = new WXStreamModule(new IWXHttpAdapter() {
-      @Override
-      public void sendRequest(WXRequest request, OnHttpListener listener) {
-        WXResponse response = new WXResponse();
-        response.statusCode = "-1";
-        listener.onHttpFinish(response);
-      }
-    });
-    Callback finish = new Callback();
-
-    streamModule.fetch("",finish,null);
-    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_INVALID_REQUEST);
-
-    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
-    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_CONNECT_FAILED);
-
-    streamModule = new WXStreamModule(new IWXHttpAdapter() {
-      @Override
-      public void sendRequest(WXRequest request, OnHttpListener listener) {
-        WXResponse response = new WXResponse();
-        response.statusCode = "302";
-        listener.onHttpFinish(response);
-      }
-    });
-    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
-    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.getStatusText("302"));
+  public static String getStatusText(String code){
+    if(!statusMap.containsKey(code))
+      return UNKNOWN_STATUS;
+    return statusMap.get(code);
   }
 
 }

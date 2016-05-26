@@ -221,7 +221,10 @@ import java.util.Map;
 
 public class WXStreamModule extends WXModule {
 
+  public static final String STATUS_TEXT = "statusText";
+  public static final String STATUS = "status";
   final IWXHttpAdapter mAdapter;
+
   public WXStreamModule(){
     this(null);
   }
@@ -296,9 +299,9 @@ public class WXStreamModule extends WXModule {
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
     if(invaildOption){
       if(callback != null) {
-        Map<String, Object> resp = new HashMap<String, Object>();
+        Map<String, Object> resp = new HashMap<>();
         resp.put("ok", false);
-        resp.put("statusText", "invaild options.");
+        resp.put(STATUS_TEXT, Status.ERR_INVALID_REQUEST);
         callback.invoke(resp);
       }
       return;
@@ -320,17 +323,21 @@ public class WXStreamModule extends WXModule {
       @Override
       public void onResponse(WXResponse response, Map<String, String> headers) {
         if(callback != null) {
-          Map<String, Object> resp = new HashMap<String, Object>();
-          resp.put("status", response.statusCode);
-          int code = Integer.parseInt(response.statusCode);
-          resp.put("ok", (code >= 200 && code <= 299));
-          if(response.originalData==null){
-            resp.put("data",null);
-          }else{
-            resp.put("data",new String(response.originalData));
+          Map<String, Object> resp = new HashMap<>();
+          if(response == null|| "-1".equals(response.statusCode)){
+            resp.put(STATUS,"-1");
+            resp.put(STATUS_TEXT,Status.ERR_CONNECT_FAILED);
+          }else {
+            resp.put(STATUS, response.statusCode);
+            int code = Integer.parseInt(response.statusCode);
+            resp.put("ok", (code >= 200 && code <= 299));
+            if (response.originalData == null) {
+              resp.put("data", null);
+            } else {
+              resp.put("data", new String(response.originalData));
+            }
+            resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
-          //TODO error text need define.
-          resp.put("statusText", response.errorMsg);
           resp.put("headers", headers);
           callback.invoke(resp);
         }
