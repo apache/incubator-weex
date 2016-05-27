@@ -29,7 +29,7 @@ public class WXPFComponent extends AbstractComponent {
 
   @Override
   public boolean onClick(Context context) {
-    WXPrettyFish.switchLayerInteractionEnabled();
+    WXDebugTool.switchLayerInteractionEnabled();
     return false;
   }
 
