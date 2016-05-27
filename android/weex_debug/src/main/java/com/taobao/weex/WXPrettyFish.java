@@ -32,4 +32,9 @@ public class WXPrettyFish {
   public static void updateScapleView(ScalpelFrameLayout scalpelFrameLayout){
     sScalpelFrameLayout=scalpelFrameLayout;
   }
+  public static void switchLayerInteractionEnabled(){
+    if(sScalpelFrameLayout!=null){
+      sScalpelFrameLayout.setLayerInteractionEnabled(!sScalpelFrameLayout.isLayerInteractionEnabled());
+    }
+  }
 }
