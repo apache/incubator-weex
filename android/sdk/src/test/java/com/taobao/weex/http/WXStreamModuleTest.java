@@ -323,8 +323,8 @@ public class WXStreamModuleTest {
     JSCallback finish = mock(JSCallback.class);
     System.out.print("request start "+System.currentTimeMillis());
     streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,progress);
-    verify(progress,timeout(10*1000)).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
-    verify(finish,timeout(10*1000)).invoke(anyMapOf(String.class, Object.class));
+    verify(progress,timeout(10*1000).atLeastOnce()).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
+    verify(finish,timeout(10*1000).times(1)).invoke(anyMapOf(String.class, Object.class));
     System.out.print("\nrequest finish"+System.currentTimeMillis());
   }
 
