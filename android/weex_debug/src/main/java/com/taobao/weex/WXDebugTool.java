@@ -3,6 +3,7 @@ package com.taobao.weex;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.scalpel.ScalpelFrameLayout;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.websocket.WXWebSocketManager;
 
@@ -15,6 +16,8 @@ import java.util.Map;
  * Created by lixinke on 16/5/13.
  */
 public class WXDebugTool {
+
+  public static ScalpelFrameLayout sScalpelFrameLayout;
 
   public static void sendLog(LogLevel level, String msg) {
     if (WXWebSocketManager.getInstance() != null && !TextUtils.isEmpty(msg)) {
@@ -35,5 +38,15 @@ public class WXDebugTool {
   }
   public static void close(){
     WXWebSocketManager.getInstance().closeQuietly();
+  }
+
+  public static void updateScapleView(ScalpelFrameLayout scalpelFrameLayout){
+    sScalpelFrameLayout=scalpelFrameLayout;
+  }
+
+  public static void switchLayerInteractionEnabled(){
+    if(sScalpelFrameLayout!=null){
+      sScalpelFrameLayout.setLayerInteractionEnabled(!sScalpelFrameLayout.isLayerInteractionEnabled());
+    }
   }
 }

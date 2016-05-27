@@ -29,9 +29,7 @@ public class WXPFComponent extends AbstractComponent {
 
   @Override
   public boolean onClick(Context context) {
-    if(WXPrettyFish.sScalpelFrameLayout!=null){
-      WXPrettyFish.sScalpelFrameLayout.setLayerInteractionEnabled(!WXPrettyFish.sScalpelFrameLayout.isLayerInteractionEnabled());
-    }
+    WXDebugTool.switchLayerInteractionEnabled();
     return false;
   }
 
