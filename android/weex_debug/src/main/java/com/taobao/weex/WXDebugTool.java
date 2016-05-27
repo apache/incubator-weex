@@ -40,8 +40,8 @@ public class WXDebugTool {
     WXWebSocketManager.getInstance().closeQuietly();
   }
 
-  public static void updateScapleView(ScalpelFrameLayout scalpelFrameLayout){
-    sScalpelFrameLayout=scalpelFrameLayout;
+  public static void updateScapleView(Object scalpelFrameLayout){
+    sScalpelFrameLayout= (ScalpelFrameLayout) scalpelFrameLayout;
   }
 
   public static void switchLayerInteractionEnabled(){

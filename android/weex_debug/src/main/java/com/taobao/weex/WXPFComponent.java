@@ -5,6 +5,9 @@ import android.content.Context;
 
 import com.taobao.prettyfish.core.comp.AbstractComponent;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 
 public class WXPFComponent extends AbstractComponent {
 
@@ -29,7 +32,22 @@ public class WXPFComponent extends AbstractComponent {
 
   @Override
   public boolean onClick(Context context) {
-    WXDebugTool.switchLayerInteractionEnabled();
+
+    try {
+      Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+      Method m = cls.getMethod("switchLayerInteractionEnabled", null);
+      m.invoke(null, null);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
+    }
+
+//    WXDebugTool.switchLayerInteractionEnabled();
     return false;
   }
 
