@@ -622,7 +622,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
       try {
         Class cls = Class.forName("com.taobao.weex.WXDebugTool");
         Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
-        m.invoke(cls, null);
+        m.invoke(cls, new Object[0]);
       } catch (Exception e) {
         WXLogUtils.d(WXLogUtils.getStackTrace(e));
       }
