@@ -35,8 +35,8 @@ public class WXPFComponent extends AbstractComponent {
 
     try {
       Class cls = Class.forName("com.taobao.weex.WXDebugTool");
-      Method m = cls.getMethod("switchLayerInteractionEnabled", null);
-      m.invoke(null, null);
+      Method m = cls.getMethod("switchLayerInteractionEnabled", new Class[0]);
+      m.invoke(null, new Object[0]);
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     } catch (NoSuchMethodException e) {
