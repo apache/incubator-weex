@@ -267,6 +267,7 @@ public class WXBridgeManager implements Callback {
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
   public static final String METHOD_CALL_JS = "callJS";
+  public static final String METHOD_SET_TIMEOUT = "setTimeoutCallback";
   public static final String METHOD_REGISTER_MODULES = "registerModules";
   public static final String METHOD_REGISTER_COMPONENTS = "registerComponents";
   public static final String METHOD_FIRE_EVENT = "fireEvent";
@@ -423,7 +424,13 @@ public class WXBridgeManager implements Callback {
       mLodBuilder.setLength(0);
     }
 
+    long start = System.currentTimeMillis();
     JSONArray array = JSON.parseArray(tasks);
+
+    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
+    }
+
     int size = array.size();
     if (size > 0) {
       try {
@@ -673,7 +680,6 @@ public class WXBridgeManager implements Callback {
             }
           }
         }, 0);
-        WXLogUtils.renderPerformanceLog("invokeCreateInstance", totalTime);
       }
     }, instanceId);
   }
@@ -791,7 +797,7 @@ public class WXBridgeManager implements Callback {
         TimerInfo timerInfo = (TimerInfo) msg.obj;
         WXJSObject obj = new WXJSObject(WXJSObject.String, timerInfo.callbackId);
         WXJSObject[] args = {obj};
-        mWXBridge.execJS("", null, "setTimeoutCallback", args);
+        mWXBridge.execJS("", null, METHOD_SET_TIMEOUT, args);
         break;
       default:
         break;
