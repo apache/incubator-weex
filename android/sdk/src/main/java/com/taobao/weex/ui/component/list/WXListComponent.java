@@ -289,8 +289,14 @@ public class WXListComponent extends WXVContainer implements
     getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
   }
 
+  //TODO Make this method return WXRecyclerView
   @Override
   public BounceRecyclerView getView() {
+    return (BounceRecyclerView) super.getView();
+  }
+
+  @Override
+  public BounceRecyclerView getRealView() {
     return (BounceRecyclerView) super.getView();
   }
 
@@ -304,14 +310,7 @@ public class WXListComponent extends WXVContainer implements
    */
   @Override
   public void addChild(WXComponent child) {
-    super.addChild(child);
-    int index = mChildren.indexOf(child);
-    getView().getAdapter().notifyItemInserted(index);
-    checkRefreshOrLoading(child);
-    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
-      mAppearComponents.put(index,child);
-      child.registerAppearEvent=true;
-    }
+    addChild(child,-1);
   }
 
   /**
@@ -350,9 +349,16 @@ public class WXListComponent extends WXVContainer implements
    */
   @Override
   public void remove(WXComponent child) {
+    remove(child,true);
+  }
+
+  @Override
+  public void remove(WXComponent child, boolean destroy) {
     int index = mChildren.indexOf(child);
-    child.detachViewAndClearPreInfo();
-    super.remove(child);
+    if(destroy) {
+      child.detachViewAndClearPreInfo();
+    }
+    super.remove(child, destroy);
     getView().getAdapter().notifyItemRemoved(index);
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "removeChild child at " + index);
@@ -391,7 +397,7 @@ public class WXListComponent extends WXVContainer implements
       return;
     }
     if(component!=null){
-      component.bind(null);
+      component.bind(holder.getView());
       component.flushView();
     }
     WXLogUtils.d(TAG, "Bind holder "+holder);

@@ -644,6 +644,7 @@ class WXDomStatement {
     });
 
     mDirty = true;
+    mFlushviews.add(ref);
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }

@@ -439,7 +439,7 @@ class WXRenderStatement {
       return;
     }
     WXVContainer oldParent = component.getParent();
-    oldParent.remove(component);
+    oldParent.remove(component,false);
     ((WXVContainer) newParent).addChild(component, index);
   }
 
