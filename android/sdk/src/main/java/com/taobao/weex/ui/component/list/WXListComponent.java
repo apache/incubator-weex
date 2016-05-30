@@ -247,7 +247,7 @@ public class WXListComponent extends WXVContainer implements
                                                   IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
 
   private String TAG = "WXListComponent";
-  private ArrayList<Integer> indoreCells;
+  private ArrayList<Integer> mFakeCells;
   private int listCellCount = 0;
   private WXRefresh mRefresh;
   private WXLoading mLoading;
@@ -390,8 +390,8 @@ public class WXListComponent extends WXVContainer implements
   @Override
   public void onBindViewHolder(ListBaseViewHolder holder, int position) {
     WXComponent component=getChild(position);
-    if (indoreCells != null
-        && indoreCells.contains(getItemViewType(position))){
+    if (mFakeCells != null
+        && mFakeCells.contains(getItemViewType(position))){
       return;
     }
     if(component!=null){
@@ -413,7 +413,7 @@ public class WXListComponent extends WXVContainer implements
   @Override
   public ListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-    if (indoreCells != null && indoreCells.contains(viewType)) {
+    if (mFakeCells != null && mFakeCells.contains(viewType)) {
       return createVHForFixedComponent();
     } else if (mChildren != null) {
       for (int i = 0; i < childCount(); i++) {
@@ -553,9 +553,12 @@ public class WXListComponent extends WXVContainer implements
 
   private void recycleImage(View view){
     if(view instanceof ImageView){
-      mInstance.getImgLoaderAdapter().setImage(null, (ImageView)view,
-                                               null, null);
+      if(mInstance!=null &&mInstance.getImgLoaderAdapter()!= null) {
+        mInstance.getImgLoaderAdapter().setImage(null, (ImageView) view,
+                null, null);
+      }
     }
+
     else if(view instanceof ViewGroup){
       for(int i=0;i<((ViewGroup) view).getChildCount();i++){
         recycleImage(((ViewGroup) view).getChildAt(i));
@@ -603,11 +606,11 @@ public class WXListComponent extends WXVContainer implements
 
   private void prepareFixedComponent(int position,int viewType) {
     if (mChildren.get(position).getDomObject().isFixed()) {
-      if (indoreCells == null) {
-        indoreCells = new ArrayList<>();
+      if (mFakeCells == null) {
+        mFakeCells = new ArrayList<>();
       }
-      if (!indoreCells.contains(viewType)) {
-        indoreCells.add(viewType);
+      if (!mFakeCells.contains(viewType)) {
+        mFakeCells.add(viewType);
       }
     }
   }
