@@ -204,26 +204,159 @@
  */
 package com.taobao.weex.http;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import android.os.Looper;
+import android.telecom.Call;
+import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.WXRequest;
+import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.common.WXThread;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.robolectric.RobolectricTestRunner;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.mockito.Mockito.*;
+import static junit.framework.Assert.*;
+
 
 /**
- * Created by lixinke on 16/3/29.
+ * Created by sospartan on 5/24/16.
  */
-public class WXHttpManager {
+@RunWith(RobolectricTestRunner.class)
+@PrepareForTest({WXStreamModule.class, IWXHttpAdapter.class})
+public class WXStreamModuleTest {
 
-  private static WXHttpManager ourInstance = new WXHttpManager();
-  private ExecutorService mExecutorService;
+  @Before
+  public void setup() throws Exception{
 
-  private WXHttpManager() {
-    mExecutorService = Executors.newFixedThreadPool(3);
   }
 
-  public static WXHttpManager getInstance() {
-    return ourInstance;
+  private WXResponse successResponse(){
+    WXResponse resp = new WXResponse();
+    resp.data = "data";
+    resp.statusCode = "200";
+    return resp;
   }
 
-  public void execute(Runnable runnable) {
-    mExecutorService.execute(runnable);
+  static class Callback implements JSCallback{
+     Map<String, Object> mData;
+
+    @Override
+    public void invoke(Map<String, Object> data) {
+      mData = data;
+    }
+
+    @Override
+    public void invokeAndKeepAlive(Map<String, Object> data) {
+      mData = data;
+    }
   }
+
+
+  @Test
+  public void testFetchInvaildOptions() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        listener.onHttpFinish(successResponse());
+      }
+    };
+
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("",cb,null);
+
+    assert   !(boolean)cb.mData.get("ok");
+  }
+
+  @Test
+  public void testFetchSuccessFinish() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        listener.onHttpFinish(successResponse());
+      }
+    };
+
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("{'url':'http://www.taobao.com'}",cb,null);
+
+    assert   (boolean)cb.mData.get("ok");
+  }
+
+
+  @Test
+  public void testFetchHeaderReceived() throws Exception{
+    IWXHttpAdapter adapter = new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        Map<String,List<String>> headers = new HashMap<>();
+        headers.put("key", Arrays.asList("someval"));
+        listener.onHeadersReceived(200,headers);
+      }
+    };
+
+    WXStreamModule streamModule = new WXStreamModule(adapter);
+    Callback cb = new Callback();
+    streamModule.fetch("{'url':'http://www.taobao.com'}",null,cb);
+
+    assert   ((Map<String,String>)cb.mData.get("headers")).get("key").equals("someval");
+  }
+
+  @Test
+  public void testFetchRequestHttpbinCallback() throws Exception{
+    WXStreamModule streamModule = new WXStreamModule(new DefaultWXHttpAdapter());
+    JSCallback progress = mock(JSCallback.class);
+    JSCallback finish = mock(JSCallback.class);
+    System.out.print("request start "+System.currentTimeMillis());
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,progress);
+    verify(progress,timeout(10*1000).atLeastOnce()).invokeAndKeepAlive(anyMapOf(String.class, Object.class));
+    verify(finish,timeout(10*1000).times(1)).invoke(anyMapOf(String.class, Object.class));
+    System.out.print("\nrequest finish"+System.currentTimeMillis());
+  }
+
+
+  @Test
+  public void testFetchStatus() throws Exception{
+    WXStreamModule streamModule = new WXStreamModule(new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        WXResponse response = new WXResponse();
+        response.statusCode = "-1";
+        listener.onHttpFinish(response);
+      }
+    });
+    Callback finish = new Callback();
+
+    streamModule.fetch("",finish,null);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_INVALID_REQUEST);
+
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.ERR_CONNECT_FAILED);
+
+    streamModule = new WXStreamModule(new IWXHttpAdapter() {
+      @Override
+      public void sendRequest(WXRequest request, OnHttpListener listener) {
+        WXResponse response = new WXResponse();
+        response.statusCode = "302";
+        listener.onHttpFinish(response);
+      }
+    });
+    streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.getStatusText("302"));
+  }
+
 }

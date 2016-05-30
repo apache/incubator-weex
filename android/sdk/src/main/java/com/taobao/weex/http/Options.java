@@ -202,17 +202,102 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.http;
 
-class WXTagSpan {
+import java.util.HashMap;
+import java.util.Map;
 
-  private final String mRef;
+/**
+ * Created by sospartan on 5/19/16.
+ */
+class Options {
+  private String method;
+  private String url;
+  private Map<String, String> headers;
+  private String body;
+  private Type type = Type.text;
 
-  public WXTagSpan(String ref) {
-    mRef = ref;
+  private Options(String method, String url, Map<String, String> headers, String body, Type type) {
+    this.method = method;
+    this.url = url;
+    this.headers = headers;
+    this.body = body;
+    this.type = type;
   }
 
-  public String getTag() {
-    return mRef;
+  public String getMethod() {
+    return method;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public Map<String, String> getHeaders() {
+    return headers;
+  }
+
+  public String getBody() {
+    return body;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public enum Type {
+    json, text
+  }
+
+  public static class Builder {
+    private String method;
+    private String url;
+    private Map<String, String> headers = new HashMap<>();
+    private String body;
+    private Type type;
+
+    public Builder setMethod(String method) {
+      this.method = method;
+      return this;
+    }
+
+    public Builder setUrl(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public Builder putHeader(String key,String value){
+      this.headers.put(key,value);
+      return this;
+    }
+
+    public Builder setBody(String body) {
+      this.body = body;
+      return this;
+    }
+
+    /**
+     * default text
+     * json = jsonp
+     * @param type
+     * @return
+       */
+    public Builder setType(String type) {
+      if(Type.json.name().equals(type)||"jsonp".equals(type)){
+        this.type = Type.json;
+      }else{
+        this.type = Type.text;
+      }
+      return this;
+    }
+
+    public Builder setType(Type type) {
+      this.type = type;
+      return this;
+    }
+
+    public Options createOptions() {
+      return new Options(method, url, headers, body, type);
+    }
   }
 }
