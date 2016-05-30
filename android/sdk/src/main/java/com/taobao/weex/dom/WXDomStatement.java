@@ -369,6 +369,8 @@ class WXDomStatement {
     //			WXLogUtils.d("csslayout", "------------end------------");
     //		}
 
+    layoutAfter(rootDom);
+
     start = System.currentTimeMillis();
     applyUpdate(rootDom);
     if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
@@ -410,6 +412,17 @@ class WXDomStatement {
     int count = dom.childCount();
     for (int i = 0; i < count; ++i) {
       layoutBefore(dom.getChild(i));
+    }
+  }
+
+  private void layoutAfter(WXDomObject dom){
+    if (dom == null || !dom.hasUpdate() || mDestroy) {
+      return;
+    }
+    dom.layoutAfter();
+    int count = dom.childCount();
+    for (int i = 0; i < count; ++i) {
+      layoutAfter(dom.getChild(i));
     }
   }
 
