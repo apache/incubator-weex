@@ -354,11 +354,11 @@ public class WXListComponent extends WXVContainer implements
 
   @Override
   public void remove(WXComponent child, boolean destroy) {
+    super.remove(child, destroy);
     int index = mChildren.indexOf(child);
     if(destroy) {
       child.detachViewAndClearPreInfo();
     }
-    super.remove(child, destroy);
     getView().getAdapter().notifyItemRemoved(index);
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "removeChild child at " + index);

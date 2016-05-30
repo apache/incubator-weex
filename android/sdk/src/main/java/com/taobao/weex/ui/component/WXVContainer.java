@@ -339,7 +339,11 @@ public abstract class WXVContainer extends WXComponent {
     }
 
     mChildren.remove(child);
-    if (getRealView() != null) {
+    if(mInstance!=null
+            &&mInstance.getRootView()!=null
+            && child.mDomObj.isFixed()){
+      mInstance.getRootView().removeView(child.getView());
+    }else if(getRealView() != null) {
       getRealView().removeView(child.getView());
     }
     if(destroy) {
