@@ -16,6 +16,7 @@ A fixed height container which has multiple child components (cells) arranged in
 
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
+-  `orientation`: &lt;string&gt; list item layout in column (`vertical`) or row (`horizontal`), default is `vertical`.
 ### Styles
 
 **common styles**: check out [common styles for components](../references/common-style.md)

@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -218,13 +219,10 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.ui.view.listview.IRefreshLayout;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
@@ -282,7 +280,13 @@ public class WXListComponent extends WXVContainer implements
   protected void initView() {
     RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
     recyclerViewBaseAdapter.setHasStableIds(true);
-    mHost = new BounceRecyclerView(mContext);
+
+    String scroll = "vertical";
+    if (mDomObj != null && mDomObj.attr != null) {
+      scroll = (String) mDomObj.attr.get("orientation");
+    }
+
+    mHost = new BounceRecyclerView(mContext,"horizontal".equals(scroll)?HORIZONTAL:VERTICAL);
     getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
     getView().setAdapter(recyclerViewBaseAdapter);
     getView().getBounceView().clearOnScrollListeners();

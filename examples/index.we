@@ -12,6 +12,7 @@
         {name: 'style', title: 'Common Style'},
         {name: 'list-basic', title: 'List (Basic)'},
         {name: 'list-demo', title: 'List (Advanced)'},
+        {name: 'list-demo', title: 'List (Horizontal)'},
         {name: 'slider-demo', title: 'Slider'},
         {name: 'animation', title: 'Animation'},
         {name: 'instance-api', title: 'Instance API'},

@@ -206,6 +206,7 @@ package com.taobao.weex.ui.view.listview;
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
@@ -230,12 +231,12 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
         RESET
     }
 
-    public BounceRecyclerView(Context context) {
-        super(context);
+    public BounceRecyclerView(Context context,int orientation) {
+        super(context,orientation);
     }
 
     public BounceRecyclerView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context, attrs, OrientationHelper.VERTICAL);
     }
 
     public void setOnRefreshListener(OnRefreshListener listener) {
@@ -265,19 +266,19 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
     }
 
     @Override
-    public boolean isReadyForPullFromTop() {
+    public boolean isReadyForPullFromStart() {
         LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
         if (lm.findFirstVisibleItemPosition() == 0) {
             final View firstVisibleChild = getBounceView().getChildAt(0);
             if (firstVisibleChild != null) {
-                return firstVisibleChild.getTop() + getPaddingTop() >= getBounceView().getTop();
+                return isVertical()?firstVisibleChild.getTop() + getPaddingTop() >= getBounceView().getTop():firstVisibleChild.getLeft() + getPaddingLeft() >= getBounceView().getLeft();
             }
         }
         return false;
     }
 
     @Override
-    public boolean isReadyForPullFromBottom() {
+    public boolean isReadyForPullFromEnd() {
         RecyclerView lv = getBounceView();
         final RecyclerView.Adapter adapter = lv.getAdapter();
         LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
@@ -287,7 +288,7 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
             final int childIndex = lastVisiblePosition - lm.findFirstVisibleItemPosition();
             final View lastVisibleChild = lv.getChildAt(childIndex);
             if (lastVisibleChild != null) {
-                return lastVisibleChild.getBottom() + getPaddingTop() <= lv.getBottom();
+                return isVertical()?lastVisibleChild.getBottom() + getPaddingTop() <= lv.getBottom():lastVisibleChild.getRight() + getPaddingLeft() <= lv.getRight();
             }
         }
         return false;
@@ -296,7 +297,7 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
     @Override
     public RecyclerView createBounceView(Context context) {
         WXRecyclerView recyclerView = new WXRecyclerView(context);
-        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT);
+        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT,getOrientation());
         return recyclerView;
     }
 
