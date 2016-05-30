@@ -648,7 +648,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
         public void run() {
           if (mRenderListener != null && mContext != null) {
             mRootCom = component;
-            if(WXEnvironment.isApkDebugable()){
+            if(WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer){
               try {
                 Class scalpelClas=Class.forName("com.taobao.weex.scalpel.ScalpelFrameLayout");
                 Constructor constructor=scalpelClas.getConstructor(new Class[]{Context.class});
