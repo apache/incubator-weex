@@ -618,11 +618,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
       listener.onActivityDestroy();
     }
     destroy();
-    if(WXEnvironment.isApkDebugable()){
+    if(WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer){
       try {
         Class cls = Class.forName("com.taobao.weex.WXDebugTool");
         Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
-        m.invoke(cls, new Object[0]);
+        m.invoke(null, new Object[0]);
       } catch (Exception e) {
         WXLogUtils.d(WXLogUtils.getStackTrace(e));
       }
