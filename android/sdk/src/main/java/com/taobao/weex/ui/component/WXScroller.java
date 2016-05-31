@@ -251,9 +251,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
         @Override
         public void onScrollStopped(WXScrollView scrollView, int x, int y) {
           List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-          for (OnWXScrollListener listener : listeners) {
-            if (listener != null) {
-              listener.onScrollStateChanged(scrollView,x,y,OnWXScrollListener.IDLE);
+          if(listeners!=null && listeners.size()>0){
+            for (OnWXScrollListener listener : listeners) {
+              if (listener != null) {
+                listener.onScrollStateChanged(scrollView,x,y,OnWXScrollListener.IDLE);
+              }
             }
           }
         }
@@ -261,9 +263,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
         @Override
         public void onScroll(WXScrollView scrollView, int x, int y) {
           List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-          for (OnWXScrollListener listener : listeners) {
-            if (listener != null) {
-              listener.onScrolled(scrollView, x, y);
+          if(listeners!=null && listeners.size()>0){
+            for (OnWXScrollListener listener : listeners) {
+              if (listener != null) {
+                listener.onScrolled(scrollView, x, y);
+              }
             }
           }
         }

@@ -293,15 +293,17 @@ public class WXListComponent extends WXVContainer implements
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
         List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-        for (OnWXScrollListener listener : listeners) {
-          if (listener != null) {
-            int tempState = RecyclerView.SCROLL_STATE_IDLE;
-            if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
-              newState=OnWXScrollListener.DRAGGING;
-            }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
-              newState = OnWXScrollListener.SETTLING;
+        if(listeners!=null && listeners.size()>0){
+          for (OnWXScrollListener listener : listeners) {
+            if (listener != null) {
+              int tempState = RecyclerView.SCROLL_STATE_IDLE;
+              if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                newState=OnWXScrollListener.DRAGGING;
+              }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
+                newState = OnWXScrollListener.SETTLING;
+              }
+              listener.onScrollStateChanged(recyclerView, tempState, recyclerView.getScrollX(), recyclerView.getScrollY());
             }
-            listener.onScrollStateChanged(recyclerView, tempState, recyclerView.getScrollX(), recyclerView.getScrollY());
           }
         }
       }
@@ -310,9 +312,11 @@ public class WXListComponent extends WXVContainer implements
       public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
         List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-        for (OnWXScrollListener listener : listeners) {
-          if (listener != null) {
-            listener.onScrolled(recyclerView, dx, dy);
+        if(listeners!=null && listeners.size()>0){
+          for (OnWXScrollListener listener : listeners) {
+            if (listener != null) {
+              listener.onScrolled(recyclerView, dx, dy);
+            }
           }
         }
       }
