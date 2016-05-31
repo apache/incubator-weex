@@ -526,10 +526,10 @@ public class WXListComponent extends WXVContainer implements
         continue;
       }
       if(key>=firstVisible && key<=lastVisible && !value.appearState){
-        value.notifyApppearStateChange(WXEventType.APPEAR);
+        value.notifyAppearStateChange(WXEventType.APPEAR);
         value.appearState=true;
       }else if((key<firstVisible || key>lastVisible) && value.appearState){
-        value.notifyApppearStateChange(WXEventType.DISAPPEAR);
+        value.notifyAppearStateChange(WXEventType.DISAPPEAR);
         value.appearState=false;
       }
       WXLogUtils.d(TAG,"key:"+key+" "+"appear:"+value.appearState);
