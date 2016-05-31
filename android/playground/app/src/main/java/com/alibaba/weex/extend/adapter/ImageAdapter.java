@@ -1,4 +1,4 @@
-package com.alibaba.weex.extend;
+package com.alibaba.weex.extend.adapter;
 
 import android.text.TextUtils;
 import android.widget.ImageView;
