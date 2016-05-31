@@ -596,12 +596,30 @@ public class WXSDKInstance implements IWXActivityStateListener {
     for (IWXActivityStateListener listener : mActivityStateListeners) {
       listener.onActivityPause();
     }
+    if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer) {
+      try {
+        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+        Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
+        m.invoke(null, new Object[]{null});
+      } catch (Exception e) {
+        WXLogUtils.d(WXLogUtils.getStackTrace(e));
+      }
+    }
   }
 
   @Override
   public void onActivityResume() {
     for (IWXActivityStateListener listener : mActivityStateListeners) {
       listener.onActivityResume();
+    }
+    if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer && mRootCom != null && mRootCom.getView() != null && mRootCom.getView().getParent() != null) {
+      try {
+        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+        Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
+        m.invoke(null, new Object[]{mRootCom.getView().getParent()});
+      } catch (Exception e) {
+        WXLogUtils.d(WXLogUtils.getStackTrace(e));
+      }
     }
   }
 
@@ -618,15 +636,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
       listener.onActivityDestroy();
     }
     destroy();
-    if(WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer){
-      try {
-        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
-        Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
-        m.invoke(null, new Object[0]);
-      } catch (Exception e) {
-        WXLogUtils.d(WXLogUtils.getStackTrace(e));
-      }
-    }
   }
 
   @Override
@@ -648,12 +657,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
         public void run() {
           if (mRenderListener != null && mContext != null) {
             mRootCom = component;
-            if(WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer){
+            if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer) {
               try {
-                Class scalpelClas=Class.forName("com.taobao.weex.scalpel.ScalpelFrameLayout");
-                Constructor constructor=scalpelClas.getConstructor(new Class[]{Context.class});
-                ViewGroup container=(ViewGroup) constructor.newInstance(mContext);
-                if(container!=null){
+                Class scalpelClas = Class.forName("com.taobao.weex.scalpel.ScalpelFrameLayout");
+                Constructor constructor = scalpelClas.getConstructor(new Class[]{Context.class});
+                ViewGroup container = (ViewGroup) constructor.newInstance(mContext);
+                if (container != null) {
                   container.addView(component.getView());
                   Class cls = Class.forName("com.taobao.weex.WXDebugTool");
                   Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
@@ -663,8 +672,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
                 }
               } catch (Exception e) {
                 WXLogUtils.d(WXLogUtils.getStackTrace(e));
-                if(component.getView().getParent()!=null){
-                  ((ViewGroup)component.getView().getParent()).removeView(component.getView());
+                if (component.getView().getParent() != null) {
+                  ((ViewGroup) component.getView().getParent()).removeView(component.getView());
                 }
               }
             }
