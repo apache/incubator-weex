@@ -202,111 +202,156 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.alibaba.weex.commons.util;
+package com.alibaba.weex.commons;
 
-import android.content.res.TypedArray;
-import android.graphics.Point;
-import android.os.Build;
-import android.support.v7.app.ActionBar;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import com.alibaba.weex.commons.util.ScreenUtil;
+import com.alibaba.weex.commons.util.AssertUtil;
+import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXRenderStrategy;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ScreenUtil {
-    private static final String TAG = "WXTBUtil";
+/**
+ * Created by sospartan on 5/30/16.
+ */
+public abstract class AbstractWeexActivity extends AppCompatActivity implements IWXRenderListener {
+  private static final String TAG = "AbstractWeexActivity";
 
-    private static boolean isSupportSmartBar = false;
+  private ViewGroup mContainer;
+  private WXSDKInstance mInstance;
 
-    static {
-        isSupportSmartBar = isSupportSmartBar();
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    createWeexInstance();
+    mInstance.onActivityCreate();
+  }
+
+  protected final void setContainer(ViewGroup container){
+    mContainer = container;
+  }
+
+  protected final ViewGroup getContainer(){
+    return mContainer;
+  }
+
+  protected void destoryWeexInstance(){
+    if(mInstance != null){
+      mInstance.registerRenderListener(null);
+      mInstance.destroy();
+      mInstance = null;
     }
-    public static int getDisplayWidth(AppCompatActivity activity){
-        int width=0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            width = point.x;
-        }
-        return width;
+  }
+
+  protected void createWeexInstance(){
+    destoryWeexInstance();
+
+    Rect outRect = new Rect();
+    getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
+
+    mInstance = new WXSDKInstance(this);
+    mInstance.registerRenderListener(this);
+  }
+
+  protected void renderPage(String template,String source){
+    renderPage(template,source,null);
+  }
+
+  protected void renderPage(String template,String source,String jsonInitData){
+    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, source);
+    mInstance.render(
+      getPageName(),
+      template,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
+
+  protected void renderPageByURL(String url){
+    renderPageByURL(url,null);
+  }
+
+  protected void renderPageByURL(String url,String jsonInitData){
+    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, url);
+    mInstance.renderByUrl(
+      getPageName(),
+      url,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
+
+  protected String getPageName(){
+    return TAG;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    if(mInstance!=null){
+      mInstance.onActivityStart();
     }
+  }
 
-    public static int getDisplayHeight(AppCompatActivity activity) {
-        int height = 0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            height=point.y;
-        }
-
-        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
-
-        if (isSupportSmartBar) {
-            int smartBarHeight = getSmartBarHeight(activity);
-            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
-            height -= smartBarHeight;
-        }
-
-        if (activity.getSupportActionBar() != null) {
-          int actionbar= activity.getSupportActionBar().getHeight();
-          if(actionbar==0){
-            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
-          }
-          Log.d(TAG, "actionbar:" + actionbar);
-          height -= actionbar;
-        }
-
-        int status = getStatusBarHeight(activity);
-        Log.d(TAG, "status:" + status);
-
-        height -= status;
-
-        Log.d(TAG,"height:"+height);
-        return height;
+  @Override
+  public void onResume() {
+    super.onResume();
+    if(mInstance!=null){
+      mInstance.onActivityResume();
     }
+  }
 
-    private static int getStatusBarHeight(AppCompatActivity activity) {
-        Class<?> c;
-        Object obj;
-        Field field;
-        int x;
-        int statusBarHeight = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return statusBarHeight;
+  @Override
+  public void onPause() {
+    super.onPause();
+    if(mInstance!=null){
+      mInstance.onActivityPause();
     }
+  }
 
-    private static int getSmartBarHeight(AppCompatActivity activity) {
-        ActionBar actionbar = activity.getSupportActionBar();
-        if (actionbar != null)
-            try {
-                Class c = Class.forName("com.android.internal.R$dimen");
-                Object obj = c.newInstance();
-                Field field = c.getField("mz_action_button_min_height");
-                int height = Integer.parseInt(field.get(obj).toString());
-                return activity.getResources().getDimensionPixelSize(height);
-            } catch (Exception e) {
-                e.printStackTrace();
-                actionbar.getHeight();
-            }
-        return 0;
+  @Override
+  public void onStop() {
+    super.onStop();
+    if(mInstance!=null){
+      mInstance.onActivityStop();
     }
+  }
 
-    private static boolean isSupportSmartBar() {
-        try {
-            final Method method = Build.class.getMethod("hasSmartBar");
-            return method != null;
-        } catch (final Exception e) {
-            return false;
-        }
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if(mInstance!=null){
+      mInstance.onActivityDestroy();
     }
+  }
+
+  @Override
+  public void onViewCreated(WXSDKInstance wxsdkInstance, View view) {
+    if (mContainer != null) {
+      mContainer.addView(view);
+    }
+  }
+
+
+
+  @Override
+  public void onRefreshSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
+
+  }
 }

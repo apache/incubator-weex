@@ -202,111 +202,49 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.alibaba.weex.commons.util;
+package com.alibaba.weex.commons.adapter;
 
-import android.content.res.TypedArray;
-import android.graphics.Point;
-import android.os.Build;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.text.TextUtils;
+import android.widget.ImageView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import com.squareup.picasso.Picasso;
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.common.WXImageStrategy;
+import com.taobao.weex.dom.WXImageQuality;
 
-public class ScreenUtil {
-    private static final String TAG = "WXTBUtil";
+public class ImageAdapter implements IWXImgLoaderAdapter {
 
-    private static boolean isSupportSmartBar = false;
+  public ImageAdapter() {
+  }
 
-    static {
-        isSupportSmartBar = isSupportSmartBar();
-    }
-    public static int getDisplayWidth(AppCompatActivity activity){
-        int width=0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            width = point.x;
+  @Override
+  public void setImage(final String url, final ImageView view,
+                       WXImageQuality quality, WXImageStrategy strategy) {
+
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+
+      @Override
+      public void run() {
+        if(view==null||view.getLayoutParams()==null){
+          return;
         }
-        return width;
-    }
-
-    public static int getDisplayHeight(AppCompatActivity activity) {
-        int height = 0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            height=point.y;
+        if (TextUtils.isEmpty(url)) {
+          view.setImageBitmap(null);
+          return;
         }
-
-        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
-
-        if (isSupportSmartBar) {
-            int smartBarHeight = getSmartBarHeight(activity);
-            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
-            height -= smartBarHeight;
+        String temp = url;
+        if (url.startsWith("//")) {
+          temp = "http:" + url;
         }
-
-        if (activity.getSupportActionBar() != null) {
-          int actionbar= activity.getSupportActionBar().getHeight();
-          if(actionbar==0){
-            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
-          }
-          Log.d(TAG, "actionbar:" + actionbar);
-          height -= actionbar;
+        if (view.getLayoutParams().width <= 0 || view.getLayoutParams().height <= 0) {
+          return;
         }
-
-        int status = getStatusBarHeight(activity);
-        Log.d(TAG, "status:" + status);
-
-        height -= status;
-
-        Log.d(TAG,"height:"+height);
-        return height;
-    }
-
-    private static int getStatusBarHeight(AppCompatActivity activity) {
-        Class<?> c;
-        Object obj;
-        Field field;
-        int x;
-        int statusBarHeight = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return statusBarHeight;
-    }
-
-    private static int getSmartBarHeight(AppCompatActivity activity) {
-        ActionBar actionbar = activity.getSupportActionBar();
-        if (actionbar != null)
-            try {
-                Class c = Class.forName("com.android.internal.R$dimen");
-                Object obj = c.newInstance();
-                Field field = c.getField("mz_action_button_min_height");
-                int height = Integer.parseInt(field.get(obj).toString());
-                return activity.getResources().getDimensionPixelSize(height);
-            } catch (Exception e) {
-                e.printStackTrace();
-                actionbar.getHeight();
-            }
-        return 0;
-    }
-
-    private static boolean isSupportSmartBar() {
-        try {
-            final Method method = Build.class.getMethod("hasSmartBar");
-            return method != null;
-        } catch (final Exception e) {
-            return false;
-        }
-    }
+        Picasso.with(WXEnvironment.getApplication())
+            .load(temp)
+            .into(view);
+      }
+    },0);
+  }
 }
