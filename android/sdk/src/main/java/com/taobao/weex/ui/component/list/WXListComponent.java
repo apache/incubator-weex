@@ -218,6 +218,7 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
@@ -287,6 +288,35 @@ public class WXListComponent extends WXVContainer implements
     getView().setAdapter(recyclerViewBaseAdapter);
     getView().getBounceView().clearOnScrollListeners();
     getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+    getView().getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+        List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+        for (OnWXScrollListener listener : listeners) {
+          if (listener != null) {
+            int tempState = RecyclerView.SCROLL_STATE_IDLE;
+            if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+              newState=OnWXScrollListener.DRAGGING;
+            }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
+              newState = OnWXScrollListener.SETTLING;
+            }
+            listener.onScrollStateChanged(recyclerView, tempState, recyclerView.getScrollX(), recyclerView.getScrollY());
+          }
+        }
+      }
+
+      @Override
+      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        super.onScrolled(recyclerView, dx, dy);
+        List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+        for (OnWXScrollListener listener : listeners) {
+          if (listener != null) {
+            listener.onScrolled(recyclerView, dx, dy);
+          }
+        }
+      }
+    });
   }
 
   //TODO Make this method return WXRecyclerView
