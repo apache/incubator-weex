@@ -24,7 +24,7 @@ public class SplashActivity extends AppCompatActivity {
     AnimationSet animationSet = new AnimationSet(false);
     animationSet.addAnimation(scaleAnimation);
     animationSet.addAnimation(rotateAnimation);
-    animationSet.setDuration(1000);
+    animationSet.setDuration(1500);
 
     animationSet.setAnimationListener(new Animation.AnimationListener() {
       @Override
