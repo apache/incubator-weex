@@ -1,5 +1,6 @@
 package com.alibaba.weex;
 
+import com.alibaba.weex.commons.BaseWeexActivity;
 import com.google.zxing.client.android.CaptureActivity;
 
 import android.annotation.SuppressLint;
@@ -21,7 +22,7 @@ import android.widget.Button;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 
-public class WXBaseActivity extends AppCompatActivity {
+public class WXBaseActivity extends BaseWeexActivity {
 
   private static final int SENSOR_SHAKE = 10;
   private SensorManager sensorManager;
