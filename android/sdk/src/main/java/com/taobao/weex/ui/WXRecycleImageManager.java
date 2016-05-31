@@ -212,6 +212,8 @@ import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.view.WXHorizontalScrollView;
+import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -251,7 +253,7 @@ public class WXRecycleImageManager {
   }
 
   public boolean addImage(WXComponent view) {
-    if(!IfRecycleImage){
+    if(!IfRecycleImage||view==null||!isAncestorScrollView(view.getView())){
       return false;
     }
     if (mAllImages != null && !mAllImages.contains(view) && mInstance != null) {
@@ -338,5 +340,17 @@ public class WXRecycleImageManager {
 
     public WXComponent image;
     public boolean isRecycle;
+  }
+
+  private boolean isAncestorScrollView(View view){
+    if(view!=null){
+      if(view.getParent() instanceof View){
+        View parent= (View) view.getParent();
+        if(parent instanceof WXScrollView || parent instanceof WXHorizontalScrollView){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
