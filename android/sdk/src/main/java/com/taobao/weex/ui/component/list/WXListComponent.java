@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -302,7 +303,17 @@ public class WXListComponent extends WXVContainer implements
               }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
                 newState = OnWXScrollListener.SETTLING;
               }
-              listener.onScrollStateChanged(recyclerView, tempState, recyclerView.getScrollX(), recyclerView.getScrollY());
+              RecyclerView.LayoutManager layoutManager=recyclerView.getLayoutManager();
+              LinearLayoutManager linearLayoutManager=null;
+              int x=0,y=0;
+              if(layoutManager instanceof LinearLayoutManager){
+                linearLayoutManager=(LinearLayoutManager)layoutManager;
+              }
+              if(linearLayoutManager!=null){
+                x=0;
+                y=linearLayoutManager.findFirstVisibleItemPosition();
+              }
+              listener.onScrollStateChanged(recyclerView, x, y,tempState);
             }
           }
         }
