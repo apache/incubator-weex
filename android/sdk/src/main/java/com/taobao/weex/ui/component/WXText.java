@@ -237,7 +237,8 @@ public class WXText extends WXComponent{
 
   @Override
   public void updateExtra(Object extra) {
-    if(extra instanceof Layout&&!extra.equals(getView().getTextLayout())) {
+    if(extra instanceof Layout &&
+       getView()!=null && !extra.equals(getView().getTextLayout())) {
       final Layout layout = (Layout) extra;
       getView().setTextLayout(layout);
       getView().invalidate();
