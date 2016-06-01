@@ -30,7 +30,7 @@ import com.taobao.weex.utils.WXFileUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXMainActivity extends WXBaseActivity implements IWXRenderListener {
+public class IndexActivity extends WXBaseActivity implements IWXRenderListener {
 
   private static final int CAMARA_PERMISSION_REQUEST_CODE = 0x1;
 
@@ -46,7 +46,7 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_wx_main);
+    setContentView(R.layout.activity_index);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     toolbar.setTitle("WEEX");
     setSupportActionBar(toolbar);
@@ -73,7 +73,6 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
     }
 
     mInstance = new WXSDKInstance(this);
-//    mInstance.setImgLoaderAdapter(new ImageAdapter(this));
     mInstance.registerRenderListener(this);
 
     Map<String, Object> options = new HashMap<>();

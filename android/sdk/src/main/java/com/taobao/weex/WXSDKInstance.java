@@ -232,6 +232,8 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -594,12 +596,30 @@ public class WXSDKInstance implements IWXActivityStateListener {
     for (IWXActivityStateListener listener : mActivityStateListeners) {
       listener.onActivityPause();
     }
+    if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer) {
+      try {
+        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+        Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
+        m.invoke(null, new Object[]{null});
+      } catch (Exception e) {
+        WXLogUtils.d(WXLogUtils.getStackTrace(e));
+      }
+    }
   }
 
   @Override
   public void onActivityResume() {
     for (IWXActivityStateListener listener : mActivityStateListeners) {
       listener.onActivityResume();
+    }
+    if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer && mRootCom != null && mRootCom.getView() != null && mRootCom.getView().getParent() != null) {
+      try {
+        Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+        Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
+        m.invoke(null, new Object[]{mRootCom.getView().getParent()});
+      } catch (Exception e) {
+        WXLogUtils.d(WXLogUtils.getStackTrace(e));
+      }
     }
   }
 
@@ -637,6 +657,26 @@ public class WXSDKInstance implements IWXActivityStateListener {
         public void run() {
           if (mRenderListener != null && mContext != null) {
             mRootCom = component;
+            if (WXEnvironment.isApkDebugable() && WXEnvironment.sShow3DLayer) {
+              try {
+                Class scalpelClas = Class.forName("com.taobao.weex.scalpel.ScalpelFrameLayout");
+                Constructor constructor = scalpelClas.getConstructor(new Class[]{Context.class});
+                ViewGroup container = (ViewGroup) constructor.newInstance(mContext);
+                if (container != null) {
+                  container.addView(component.getView());
+                  Class cls = Class.forName("com.taobao.weex.WXDebugTool");
+                  Method m = cls.getMethod("updateScapleView", new Class[]{Object.class});
+                  m.invoke(cls, new Object[]{container});
+                  mRenderListener.onViewCreated(WXSDKInstance.this, container);
+                  return;
+                }
+              } catch (Exception e) {
+                WXLogUtils.d(WXLogUtils.getStackTrace(e));
+                if (component.getView().getParent() != null) {
+                  ((ViewGroup) component.getView().getParent()).removeView(component.getView());
+                }
+              }
+            }
             mRenderListener.onViewCreated(WXSDKInstance.this, component.getView());
           }
         }

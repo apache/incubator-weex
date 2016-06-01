@@ -126,6 +126,7 @@ import org.json.JSONObject;
 
 public class WXNavigatorModule extends WXModule {
 
+  private final static String INSTANCE_ID = "instanceId";
   private final static String TAG = "Navigator";
   private final static String WEEX="com.taobao.android.intent.category.WEEX";
   private final static String URL = "url";
@@ -153,7 +154,7 @@ public class WXNavigatorModule extends WXModule {
         }
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build());
         intent.addCategory(WEEX);
-        intent.putExtra(WXNavigatorActivity.INSTANCE_ID, mWXSDKInstance.getInstanceId());
+        intent.putExtra(INSTANCE_ID, mWXSDKInstance.getInstanceId());
         mWXSDKInstance.getContext().startActivity(intent);
         WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
                                                WXConst.MSG_SUCCESS);

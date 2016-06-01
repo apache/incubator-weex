@@ -391,6 +391,10 @@ public class WXSDKEngine {
     WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
   }
 
+  public static void show3DLayer(boolean show){
+    WXEnvironment.sShow3DLayer=show;
+  }
+
   public static void switchDebugModel(boolean debug, String debugUrl) {
     if (!WXEnvironment.isApkDebugable()) {
       return;

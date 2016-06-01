@@ -247,6 +247,8 @@ public class WXEnvironment {
   private static boolean isApkDebug = true;
   private static boolean isPerf = false;
 
+  public static boolean sShow3DLayer=true;
+
   private static Map<String, String> options = new HashMap<>();
 
   /**
