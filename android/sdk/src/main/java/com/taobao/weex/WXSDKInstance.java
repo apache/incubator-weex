@@ -215,6 +215,7 @@ import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
@@ -287,6 +288,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private ScrollView mScrollView;
   private WXScrollViewListener mWXScrollViewListener;
 
+  private List<OnWXScrollListener> mWXScrollListeners;
+
   private ViewGroup rootView;
 
   public WXSDKInstance(Context context) {
@@ -326,10 +329,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
+  @Deprecated
   public void registerScrollViewListener(WXScrollViewListener scrollViewListener) {
     mWXScrollViewListener = scrollViewListener;
   }
 
+  @Deprecated
   public WXScrollViewListener getScrollViewListener() {
     return mWXScrollViewListener;
   }
@@ -908,6 +913,17 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void setRootView(ViewGroup rootView) {
     this.rootView = rootView;
+  }
+
+  public synchronized List<OnWXScrollListener> getWXScrollListeners() {
+    return mWXScrollListeners;
+  }
+
+  public synchronized void registerOnWXScrollListener(OnWXScrollListener wxScrollListener) {
+    if(mWXScrollListeners==null){
+      mWXScrollListeners=new ArrayList<>();
+    }
+    mWXScrollListeners.add(wxScrollListener);
   }
 
   /**

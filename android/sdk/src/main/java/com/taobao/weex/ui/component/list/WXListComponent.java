@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -218,6 +219,7 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
@@ -287,6 +289,52 @@ public class WXListComponent extends WXVContainer implements
     getView().setAdapter(recyclerViewBaseAdapter);
     getView().getBounceView().clearOnScrollListeners();
     getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+    getView().getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+        List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+        if(listeners!=null && listeners.size()>0){
+          for (OnWXScrollListener listener : listeners) {
+            if (listener != null) {
+              int tempState = RecyclerView.SCROLL_STATE_IDLE;
+              if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                newState=OnWXScrollListener.DRAGGING;
+              }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
+                newState = OnWXScrollListener.SETTLING;
+              }
+              RecyclerView.LayoutManager layoutManager=recyclerView.getLayoutManager();
+              LinearLayoutManager linearLayoutManager=null;
+              int x=0,y=0;
+              if(layoutManager instanceof LinearLayoutManager){
+                linearLayoutManager=(LinearLayoutManager)layoutManager;
+              }
+              if(linearLayoutManager!=null){
+                x=0;
+                int position = linearLayoutManager.findFirstVisibleItemPosition();
+                View firstVisiableChildView = layoutManager.findViewByPosition(position);
+                int itemHeight = firstVisiableChildView.getHeight();
+                y= (position) * itemHeight - firstVisiableChildView.getTop();
+              }
+              listener.onScrollStateChanged(recyclerView, x, y,tempState);
+            }
+          }
+        }
+      }
+
+      @Override
+      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        super.onScrolled(recyclerView, dx, dy);
+        List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+        if(listeners!=null && listeners.size()>0){
+          for (OnWXScrollListener listener : listeners) {
+            if (listener != null) {
+              listener.onScrolled(recyclerView, dx, dy);
+            }
+          }
+        }
+      }
+    });
   }
 
   //TODO Make this method return WXRecyclerView
