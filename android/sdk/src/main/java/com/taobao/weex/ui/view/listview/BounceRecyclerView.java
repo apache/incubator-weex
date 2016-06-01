@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.view.listview;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -250,6 +251,11 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
     public void setAdapter(RecyclerViewBaseAdapter adapter) {
         mRefreshAdapter = new RefreshAdapterWrapper(getContext(), adapter);
         getBounceView().setAdapter(mRefreshAdapter);
+
+    }
+
+    public void addTransformItemDecoration(TransformItemDecoration decoration){
+        getBounceView().addItemDecoration(decoration);
     }
 
     public RefreshAdapterWrapper getAdapter() {
@@ -474,6 +480,76 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
 
     private State getState() {
         return mState;
+    }
+
+
+    public static class TransformItemDecoration extends RecyclerView.ItemDecoration{
+        boolean mIsVertical = true;
+        float mAlpha = -1f;
+        int mXTranslate = 0;
+        int mYTranslate = 0;
+        int mRotation = 0;
+        float mScale = 0;
+
+        public TransformItemDecoration(boolean isVertical,float alpha,int translateX,int translateY,int rotation,float scale){
+            this.mIsVertical = isVertical;
+            this.mAlpha = alpha;
+            this.mXTranslate = translateX;
+            this.mYTranslate = translateY;
+            this.mRotation = rotation;
+            this.mScale = scale;
+        }
+
+
+        @Override
+        public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            super.onDrawOver(c, parent, state);
+            int width = parent.getWidth();
+            int height = parent.getHeight();
+            for (int i = 0,count=parent.getChildCount(); i < count; i++) {
+                updateItem(parent.getChildAt(i),width,height);
+            }
+        }
+
+        private void updateItem(View child,int width,int height) {
+            int size,childCenter,containerSize;
+            if (mIsVertical) {
+                containerSize = height;
+                size = child.getHeight();
+                childCenter = child.getTop() + size / 2;
+            } else {
+                containerSize = width;
+                size = child.getWidth();
+                childCenter = child.getLeft() + size / 2;
+            }
+
+            final int actionDistance = (containerSize + size) / 2;
+            final float effectsAmount = Math.min(1.0f, Math.max(-1.0f, (1.0f / actionDistance) * (childCenter - containerSize/2)));
+
+
+            if(mAlpha>0){
+                child.setAlpha(1-mAlpha*Math.abs(effectsAmount));
+            }
+
+            if(mScale>0){
+                float scale = 1-mScale*Math.abs(effectsAmount);
+                child.setScaleX(scale);
+                child.setScaleY(scale);
+            }
+
+            if(mRotation!=0){
+                child.setRotation(mRotation * effectsAmount);
+            }
+
+            if(mXTranslate!=0){
+                child.setTranslationX(mXTranslate * Math.abs( effectsAmount));
+            }
+
+            if(mYTranslate!=0){
+                child.setTranslationY(mYTranslate * Math.abs( effectsAmount));
+            }
+
+        }
     }
 
 }

@@ -286,11 +286,19 @@ public class WXListComponent extends WXVContainer implements
       scroll = (String) mDomObj.attr.get("orientation");
     }
 
-    mHost = new BounceRecyclerView(mContext,"horizontal".equals(scroll)?HORIZONTAL:VERTICAL);
-    getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
-    getView().setAdapter(recyclerViewBaseAdapter);
-    getView().getBounceView().clearOnScrollListeners();
-    getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+    boolean isHorizontal = "horizontal".equals(scroll);
+    BounceRecyclerView view = new BounceRecyclerView(mContext,isHorizontal?HORIZONTAL:VERTICAL);
+
+    view.getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
+    view.setAdapter(recyclerViewBaseAdapter);
+    view.addTransformItemDecoration(new BounceRecyclerView.TransformItemDecoration(!isHorizontal,1f,0,100,30,1f));
+    view.getBounceView().clearOnScrollListeners();
+    view.getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+    mHost = view;
+  }
+
+  private BounceRecyclerView.TransformItemDecoration parseTransform(String transformExp){
+    return null;
   }
 
   @Override
