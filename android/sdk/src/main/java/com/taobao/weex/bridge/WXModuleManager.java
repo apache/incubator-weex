@@ -488,7 +488,7 @@ public class WXModuleManager {
       return moduleMethods;
     }
 
-    WXModule buildInstance() throws IllegalAccessException, InstantiationException {
+    public WXModule buildInstance() throws IllegalAccessException, InstantiationException {
       return mClazz.newInstance();
     }
 
