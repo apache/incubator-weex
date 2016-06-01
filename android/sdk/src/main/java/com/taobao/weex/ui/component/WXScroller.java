@@ -121,7 +121,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.WXRecycleImageManager;
+//import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.view.IWXScroller;
 import com.taobao.weex.ui.view.WXHorizontalScrollView;
 import com.taobao.weex.ui.view.WXScrollView;
@@ -208,9 +208,9 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   @Override
   protected void initView() {
     String scroll;
-    if (mDomObj != null && mDomObj.attr != null) {
-      mInstance.getRecycleImageManager().setIfRecycleImage(mDomObj.attr.getIsRecycleImage());
-    }
+//    if (mDomObj != null && mDomObj.attr != null) {
+//      mInstance.getRecycleImageManager().setIfRecycleImage(mDomObj.attr.getIsRecycleImage());
+//    }
     if (mDomObj == null || mDomObj.attr == null) {
       scroll = "vertical";
     } else {
@@ -396,21 +396,21 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       }
     }, 16);
 
-    final WXRecycleImageManager recycleImageManager = mInstance
-        .getRecycleImageManager();
-
-    if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
-      getView().postDelayed(new Runnable() {
-
-        @Override
-        public void run() {
-          if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
-            recycleImageManager.loadImage();
-          }
-        }
-      }, 250);
-
-    }
+//    final WXRecycleImageManager recycleImageManager = mInstance
+//        .getRecycleImageManager();
+//
+//    if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
+//      getView().postDelayed(new Runnable() {
+//
+//        @Override
+//        public void run() {
+//          if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
+//            recycleImageManager.loadImage();
+//          }
+//        }
+//      }, 250);
+//
+//    }
   }
 
   @Override
@@ -547,11 +547,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
 
   @Override
   public void onScrollStopped(WXScrollView scrollView, int x, int y) {
-    WXRecycleImageManager recycleImageManager = mInstance
-        .getRecycleImageManager();
-    if (recycleImageManager != null) {
-      recycleImageManager.loadImage();
-    }
+//    WXRecycleImageManager recycleImageManager = mInstance
+//        .getRecycleImageManager();
+//    if (recycleImageManager != null) {
+//      recycleImageManager.loadImage();
+//    }
   }
 
   @Override

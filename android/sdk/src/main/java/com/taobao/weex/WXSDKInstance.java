@@ -222,7 +222,7 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.http.WXHttpUtil;
-import com.taobao.weex.ui.WXRecycleImageManager;
+//import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
@@ -279,7 +279,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
    * Refresh start time
    */
   private long mRefreshStartTime;
-  private WXRecycleImageManager mRecycleImageManager;
+//  private WXRecycleImageManager mRecycleImageManager;
   private ConcurrentLinkedQueue<IWXActivityStateListener> mActivityStateListeners;
   private WXPerformance mWXPerformance;
   private ScrollView mScrollView;
@@ -295,7 +295,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void init(Context context) {
     mContext = context;
     mActivityStateListeners = new ConcurrentLinkedQueue<>();
-    mRecycleImageManager = new WXRecycleImageManager(this);
+//    mRecycleImageManager = new WXRecycleImageManager(this);
 
     mWXPerformance = new WXPerformance();
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
@@ -521,9 +521,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
     return mGodViewWidth;
   }
 
-  public WXRecycleImageManager getRecycleImageManager() {
-    return mRecycleImageManager;
-  }
+//  public WXRecycleImageManager getRecycleImageManager() {
+//    return mRecycleImageManager;
+//  }
 
   public IWXImgLoaderAdapter getImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
@@ -541,16 +541,16 @@ public class WXSDKInstance implements IWXActivityStateListener {
     if (mScrollView == null) {
       return;
     }
-    if (mRecycleImageManager != null && mRecycleImageManager.isRecycleImage()) {
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if (mRecycleImageManager != null) {
-            mRecycleImageManager.loadImage();
-          }
-        }
-      }, 250);
-    }
+//    if (mRecycleImageManager != null && mRecycleImageManager.isRecycleImage()) {
+//      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+//        @Override
+//        public void run() {
+//          if (mRecycleImageManager != null) {
+//            mRecycleImageManager.loadImage();
+//          }
+//        }
+//      }, 250);
+//    }
   }
 
   /********************************
@@ -842,10 +842,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
-    if (mRecycleImageManager != null) {
-      mRecycleImageManager.destroy();
-      mRecycleImageManager = null;
-    }
+//    if (mRecycleImageManager != null) {
+//      mRecycleImageManager.destroy();
+//      mRecycleImageManager = null;
+//    }
 
     if (mRootCom != null && mRootCom.getView() != null) {
       mRootCom.destroy();
