@@ -343,6 +343,18 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
     }
   }
 
+  @Override
+  protected void bindImpl(View view) {
+    if(view==null){
+      super.bindImpl(view);
+    }
+    else if(view instanceof ViewGroup){
+      if(((ViewGroup) view).getChildAt(0) instanceof WXCircleViewPager){
+        super.bindImpl(((ViewGroup) view).getChildAt(0));
+      }
+    }
+  }
+
   public void addIndicator(WXIndicator indicator) {
     mIndicator = indicator;
     mIndicator.getView().setCircleViewPager(mViewPager);
