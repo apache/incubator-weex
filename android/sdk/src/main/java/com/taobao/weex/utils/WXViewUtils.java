@@ -281,7 +281,7 @@ public class WXViewUtils {
     if (mUseWebPx) {
       return (float) Math.rint(pxValue);
     } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDeafultWidth);
+      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
       return realPx > 0.005 && realPx < 1 ? 1 : (float) Math.rint(realPx);
     }
   }
@@ -290,7 +290,7 @@ public class WXViewUtils {
     if (mUseWebPx) {
       return (int) pxValue;
     } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDeafultWidth);
+      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
       return realPx > 0.005 && realPx < 1 ? 1 : (int) realPx - 1;
     }
   }
@@ -310,7 +310,7 @@ public class WXViewUtils {
     if (mUseWebPx) {
       return pxValue;
     } else {
-      float realPx = (pxValue * WXEnvironment.sDeafultWidth / getScreenWidth());
+      float realPx = (pxValue * WXEnvironment.sDefaultWidth / getScreenWidth());
       return realPx > 0.005 && realPx < 1 ? 1 : realPx;
     }
   }

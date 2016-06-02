@@ -233,7 +233,7 @@ public class WXEnvironment {
   public static String WXSDK_VERSION = "1.5.0";
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
-  public static int sDeafultWidth = 750;
+  public static int sDefaultWidth = 750;
   public volatile static boolean sSupport = false;
   public volatile static boolean JsFrameworkInit = false;
   /**
