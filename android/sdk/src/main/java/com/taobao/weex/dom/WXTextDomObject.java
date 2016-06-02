@@ -153,10 +153,11 @@ public class WXTextDomObject extends WXDomObject {
     }
     hasBeenMeasured =false;
 
-    if(layout!=null&&!layout.equals(atomicReference.getAndSet(layout))) {
+    if(layout!=null&&!layout.equals(atomicReference.get())) {
       //TODO Warm up, a profile should be used to see the improvement.
       warmUpTextLayoutCache();
     }
+    swap();
     super.layoutAfter();
   }
 

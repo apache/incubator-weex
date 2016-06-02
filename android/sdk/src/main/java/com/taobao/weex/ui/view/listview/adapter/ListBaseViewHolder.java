@@ -207,6 +207,10 @@ package com.taobao.weex.ui.view.listview.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.taobao.weex.ui.component.WXComponent;
+
+import java.lang.ref.WeakReference;
+
 
 /**
  * There are bi-directional association between ViewHolder and View.
@@ -214,12 +218,32 @@ import android.view.View;
  * From View to ViewHolder, this is done by set {@link android.view.ViewGroup.LayoutParams} to View.
  */
 public class ListBaseViewHolder extends RecyclerView.ViewHolder {
+  private int mViewType;
+  private WXComponent mComponent;
 
-  public ListBaseViewHolder(View view) {
+  public ListBaseViewHolder(WXComponent component, int viewType) {
+    super(component.getView());
+    mViewType = viewType;
+    mComponent = component;
+  }
+  public ListBaseViewHolder(View view, int viewType) {
     super(view);
+    mViewType = viewType;
   }
 
   public View getView() {
     return itemView;
+  }
+
+  public int getViewType() {
+    return mViewType;
+  }
+  public void setComponentUsing(boolean using){
+    if(mComponent!=null) {
+      mComponent.setUsing(using);
+    }
+  }
+  public WXComponent getComponent(){
+    return mComponent;
   }
 }

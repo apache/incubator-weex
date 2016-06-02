@@ -224,16 +224,38 @@ public abstract class WXVContainer extends WXComponent {
   }
 
   @Override
-  protected void bindImpl(View view) {
-    super.bindImpl(view);
+  public void applyLayoutAndEvent(WXComponent component) {
+    if(!isLazy()) {
+      if (component == null) {
+        component = this;
+      }
+      super.applyLayoutAndEvent(component);
+      int count = childCount();
+      for (int i = 0; i < count; i++) {
+        getChild(i).applyLayoutAndEvent(((WXVContainer)component).getChild(i));
+      }
+    }
+  }
+
+  @Override
+  public void lazy(boolean lazy) {
+    super.lazy(lazy);
     int count = childCount();
-    for (int i = 0; i < count; ++i) {
-      if (view == null) {
-        getChild(i).bindImpl(null);
-      } else {
-        if (view instanceof ViewGroup) {
-          getChild(i).bindImpl(((ViewGroup) view).getChildAt(i));
-        }
+    for (int i = 0; i < count; i++) {
+      getChild(i).lazy(lazy);
+    }
+  }
+
+  @Override
+  public void bindData(WXComponent component) {
+    if(!isLazy()) {
+      if (component == null) {
+        component = this;
+      }
+      super.bindData(component);
+      int count = childCount();
+      for (int i = 0; i < count; i++) {
+        getChild(i).bindData(((WXVContainer)component).getChild(i));
       }
     }
   }
@@ -352,11 +374,11 @@ public abstract class WXVContainer extends WXComponent {
   }
 
   @Override
-  public void flushView() {
+  public void flushView(WXComponent component) {
     int count=childCount();
     for(int i=0;i<count;i++){
-      getChild(i).flushView();
+      getChild(i).flushView(component);
     }
-    super.flushView();
+    super.flushView(component);
   }
 }

@@ -119,9 +119,10 @@ import android.widget.FrameLayout.LayoutParams;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.WXRecycleImageManager;
+//import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.view.IWXScroller;
 import com.taobao.weex.ui.view.WXHorizontalScrollView;
 import com.taobao.weex.ui.view.WXScrollView;
@@ -131,6 +132,7 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -208,9 +210,9 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   @Override
   protected void initView() {
     String scroll;
-    if (mDomObj != null && mDomObj.attr != null) {
-      mInstance.getRecycleImageManager().setIfRecycleImage(mDomObj.attr.getIsRecycleImage());
-    }
+//    if (mDomObj != null && mDomObj.attr != null) {
+//      mInstance.getRecycleImageManager().setIfRecycleImage(mDomObj.attr.getIsRecycleImage());
+//    }
     if (mDomObj == null || mDomObj.attr == null) {
       scroll = "vertical";
     } else {
@@ -235,6 +237,41 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
           LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
       mHost.setVerticalScrollBarEnabled(true);
+      scrollView.addScrollViewListener(new WXScrollViewListener() {
+        @Override
+        public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
+
+        }
+
+        @Override
+        public void onScrollToBottom(WXScrollView scrollView, int x, int y) {
+
+        }
+
+        @Override
+        public void onScrollStopped(WXScrollView scrollView, int x, int y) {
+          List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+          if(listeners!=null && listeners.size()>0){
+            for (OnWXScrollListener listener : listeners) {
+              if (listener != null) {
+                listener.onScrollStateChanged(scrollView,x,y,OnWXScrollListener.IDLE);
+              }
+            }
+          }
+        }
+
+        @Override
+        public void onScroll(WXScrollView scrollView, int x, int y) {
+          List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+          if(listeners!=null && listeners.size()>0){
+            for (OnWXScrollListener listener : listeners) {
+              if (listener != null) {
+                listener.onScrolled(scrollView, x, y);
+              }
+            }
+          }
+        }
+      });
     }
 
   }
@@ -396,21 +433,21 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       }
     }, 16);
 
-    final WXRecycleImageManager recycleImageManager = mInstance
-        .getRecycleImageManager();
-
-    if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
-      getView().postDelayed(new Runnable() {
-
-        @Override
-        public void run() {
-          if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
-            recycleImageManager.loadImage();
-          }
-        }
-      }, 250);
-
-    }
+//    final WXRecycleImageManager recycleImageManager = mInstance
+//        .getRecycleImageManager();
+//
+//    if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
+//      getView().postDelayed(new Runnable() {
+//
+//        @Override
+//        public void run() {
+//          if (recycleImageManager != null && recycleImageManager.isRecycleImage()) {
+//            recycleImageManager.loadImage();
+//          }
+//        }
+//      }, 250);
+//
+//    }
   }
 
   @Override
@@ -547,11 +584,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
 
   @Override
   public void onScrollStopped(WXScrollView scrollView, int x, int y) {
-    WXRecycleImageManager recycleImageManager = mInstance
-        .getRecycleImageManager();
-    if (recycleImageManager != null) {
-      recycleImageManager.loadImage();
-    }
+//    WXRecycleImageManager recycleImageManager = mInstance
+//        .getRecycleImageManager();
+//    if (recycleImageManager != null) {
+//      recycleImageManager.loadImage();
+//    }
   }
 
   @Override
