@@ -428,6 +428,7 @@ public class WXListComponent extends WXVContainer implements
     @Override
     public void onViewRecycled(ListBaseViewHolder holder) {
         holder.setComponentUsing(false);
+        recycleImage(holder.getView());
         WXLogUtils.d(TAG, "Recycle holder " + holder);
     }
 
