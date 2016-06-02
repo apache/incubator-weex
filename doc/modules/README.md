@@ -15,7 +15,7 @@ dom.scrollTo(this.$el('someIdForElement'), {
 ## Table of Contents
 
 * [dom](./dom.md)
-* [steam](./stream.md)
+* [stream](./stream.md)
 * [modal](./modal.md)
 * [animation](./animation.md)
 * [navigator](./navigator.md)
