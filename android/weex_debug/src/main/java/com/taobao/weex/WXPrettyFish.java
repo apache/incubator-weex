@@ -5,6 +5,7 @@ import android.app.Application;
 import com.taobao.prettyfish.PrettyFishCommon;
 import com.taobao.prettyfish.core.comp.AbstractBaseComp;
 import com.taobao.prettyfish.core.fab.FloatWndManager;
+import com.taobao.prettyfish_base.R;
 
 /**
  * Created by lixinke on 16/5/4.

@@ -59,11 +59,6 @@ android {
 
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -75,7 +70,7 @@ dependencies {
     /*source dependency*/
     compile project(':weex_sdk_android')
     compile project(':weex_debug')
-    compile (name:'prettyfish_base', ext:'aar')
+//    compile (name:'prettyfish_base', ext:'aar')
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'

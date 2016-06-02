@@ -32,17 +32,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main {
-            jniLibs.srcDir(['libs'])
-        }
-    }
-}
-
-repositories{
-    flatDir{
-        dirs 'libs'
-    }
 }
 
 
@@ -51,7 +40,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     provided 'com.android.support:appcompat-v7:23.1.1'
-    compile (name:'prettyfish_base', ext:'aar')
+//    compile (name:'prettyfish_base', ext:'aar')
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
 //    compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     provided 'com.alibaba:fastjson:1.1.45'
