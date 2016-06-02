@@ -1,5 +1,5 @@
 # &lt;web&gt;
-<span class="weex-version">0.4</span>
+<span class="weex-version">0.5</span>
 
 ### Summary
 
