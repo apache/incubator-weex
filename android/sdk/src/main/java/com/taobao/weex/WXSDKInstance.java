@@ -800,10 +800,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
     mWXPerformance.parseJsonTime += time;
   }
 
-  public void firstScreenRenderFinished(long endTime) {
+  public void firstScreenRenderFinished() {
     mEnd = true;
-    long time = endTime - mRenderStartTime;
-    mWXPerformance.screenRenderTime = time;
+    mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
     WXLogUtils.renderPerformanceLog("   firstScreenCreateInstanceTime", mWXPerformance.firstScreenCreateInstanceTime);
     WXLogUtils.renderPerformanceLog("   firstScreenCallNativeTime", mWXPerformance.callNativeTime);
