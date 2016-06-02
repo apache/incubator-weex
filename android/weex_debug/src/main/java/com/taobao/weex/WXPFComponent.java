@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.taobao.prettyfish.core.comp.AbstractComponent;
+import com.taobao.prettyfish_base.R;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
