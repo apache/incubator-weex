@@ -281,16 +281,15 @@ public class WXListComponent extends WXVContainer implements
         return super.measure(width, outHeight);
     }
 
+    protected int getOrientation(){
+        return VERTICAL;
+    }
+
     @Override
     protected void initView() {
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
-        String scroll = "vertical";
-        if (mDomObj != null && mDomObj.attr != null) {
-            scroll = (String) mDomObj.attr.get("orientation");
-        }
-        boolean isHorizontal = "horizontal".equals(scroll);
-        BounceRecyclerView view = new BounceRecyclerView(mContext,isHorizontal?HORIZONTAL:VERTICAL);
+        BounceRecyclerView view = new BounceRecyclerView(mContext,getOrientation());
         view.getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
         view.setAdapter(recyclerViewBaseAdapter);
         view.getBounceView().clearOnScrollListeners();

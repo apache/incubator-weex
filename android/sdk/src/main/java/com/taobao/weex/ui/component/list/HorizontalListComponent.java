@@ -202,35 +202,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.list;
+
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXVContainer;
 
 /**
- * basic Component types
+ * Created by sospartan on 6/2/16.
  */
-public class WXBasicComponentType {
+public class HorizontalListComponent extends WXListComponent {
+  public HorizontalListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
+    super(instance, node, parent, instanceId, lazy);
+  }
 
-  public static final String TEXT = "text";
-  public static final String IMAGE = "image";
-  public static final String IMG = "img";
-  public static final String CONTAINER = "container";
-  public static final String DIV = "div";
-  public static final String SCROLLER = "scroller";
-  public static final String SLIDER = "slider";
-  public static final String LIST = "list";
-  public static final String VLIST = "vlist";
-  public static final String HLIST = "hlist";
-  public static final String CELL = "cell";
-  public static final String HEADER = "header";
-  public static final String FOOTER = "footer";
-  public static final String INDICATOR = "indicator";
-  public static final String VIDEO = "video";
-  public static final String INPUT = "input";
-  public static final String SWITCH = "switch";
-  public static final String A = "a";
-  public static final String EMBED = "embed";
-  public static final String WEB = "web";
-  public static final String REFRESH = "refresh";
-  public static final String LOADING = "loading";
-  public static final String LOADING_INDICATOR = "loading-indicator";
-
+  @Override
+  protected int getOrientation() {
+    return HORIZONTAL;
+  }
 }

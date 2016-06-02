@@ -1,10 +1,13 @@
-# &lt;list&gt;
+# &lt;list&gt;(&lt;vlist&gt;,&lt;hlist&gt;)
 
 ### Summary
 
-A fixed height container which has multiple child components (cells) arranged in one column. If total height of its child components is higher then the height of itself, the whole child components are scrollable and it's high-performanced.
+A fixed height container which has multiple child components (cells) arranged in one column. If total height of its child components is higher then the height of itself, the whole child components are scrollable and it's high-performanced.   
 
 **Notes:** height of `list` must be specified (list's styles must contain `height` or pair of `top`, `bottom` or flex value if outter container's `flex-direction` value is `column`).
+
+### Orientation
+The `list` is alias of `vlist` which display component in vertical oritentation, and `hlist` for the horizontal scroll component.   
 
 ### Child Components
 
@@ -18,13 +21,10 @@ A fixed height container which has multiple child components (cells) arranged in
 
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
--  `orientation`: &lt;string&gt; determine list item layout in column (`vertical`) or row (`horizontal`), default is `vertical`.
-
-
 - `transform`: &lt;string&gt; define item transformation. See next section for mmore detail.
 
 ### Item Transformation
-The `tranform` attribute allow you tranlate,rotate,scale and change transparency of item according distance between item and list component's center in the `orientation` direction. Item right in middle has no transformation applied.   
+The `tranform` attribute allow you tranlate,rotate,scale and change transparency of item according distance between item and list component's center. Item right in middle has no transformation applied.   
 
 The value is a simple expression, like    
 ```

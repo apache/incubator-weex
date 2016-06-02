@@ -150,6 +150,7 @@ import com.taobao.weex.ui.component.WXSwitch;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
+import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXWebViewModule;
@@ -235,7 +236,8 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
       registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
 
-      registerComponent(WXBasicComponentType.LIST, WXListComponent.class, false);
+      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
+      registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
       registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
@@ -276,7 +278,24 @@ public class WXSDKEngine {
    * @throws WXException Throws exception if type conflicts.
    */
   public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    return WXComponentRegistry.registerComponent(type, clazz, appendTree);
+    return registerComponent(clazz, appendTree,type);
+  }
+
+  /**
+   *
+   * Register component. The registration is singleton in {@link WXSDKEngine} level
+   * @param clazz the class of the {@link WXComponent} to be registered.
+   * @param appendTree true for appendTree flag
+   * @return true for registration success, false for otherwise.
+   * @param names names(alias) of component. Same as type filed in the JS.
+   * @throws WXException Throws exception if type conflicts.
+   */
+  public static boolean registerComponent(Class<? extends WXComponent> clazz, boolean appendTree,String ... names) throws WXException {
+    boolean result =  true;
+    for(String name:names) {
+      result  = result && WXComponentRegistry.registerComponent(name, clazz, appendTree);
+    }
+    return result;
   }
 
   /**

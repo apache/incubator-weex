@@ -3,7 +3,7 @@
    <div class="block">
      <text>Horizontal list</text>
    </div>
-  <list orientation="horizontal" class="list" onloadmore="loadmore" loadmoreoffset=2000>
+  <hlist class="list" onloadmore="loadmore" loadmoreoffset=2000>
     <cell class="cell" onclick="oncellclick" rownumber={{id}} repeat="{{shopList}}" scope="{{scopeValue}}" append="tree"
           composite={{composite}}>
       <div class="shopDiv">
@@ -139,7 +139,7 @@
         </div>
       </div>
     </cell>
-  </list>
+  </hlist>
   <div class="block">
      <text>In</text>
    </div>
