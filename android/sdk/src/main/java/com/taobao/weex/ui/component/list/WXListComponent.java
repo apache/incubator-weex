@@ -251,7 +251,8 @@ public class WXListComponent extends WXVContainer implements
         IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
 
     private String TAG = "WXListComponent";
-    private int listCellCount = 0;
+    private int mListCellCount = 0;
+    private String mLoadMoreRetry ="";
     private WXRefresh mRefresh;
     private WXLoading mLoading;
 
@@ -570,11 +571,14 @@ public class WXListComponent extends WXVContainer implements
             }
 
             if (offScreenY < Integer.parseInt(offset)) {
-                if (listCellCount != mChildren.size()) {
-                    WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
-                    listCellCount = mChildren.size();
-                }
+                String loadMoreRetry = mDomObj.attr.getLoadMoreRetry();
 
+                if (mListCellCount != mChildren.size()
+                        || !mLoadMoreRetry.equals(loadMoreRetry)) {
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+                    mListCellCount = mChildren.size();
+                    mLoadMoreRetry = loadMoreRetry;
+                }
             }
         } catch (Exception e) {
             WXLogUtils.d(TAG, "onLoadMore :" + WXLogUtils.getStackTrace(e));
