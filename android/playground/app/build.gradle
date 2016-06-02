@@ -70,7 +70,6 @@ dependencies {
     /*source dependency*/
     compile project(':weex_sdk_android')
     compile project(':weex_debug')
-//    compile (name:'prettyfish_base', ext:'aar')
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
@@ -83,5 +82,4 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
-    //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
