@@ -250,7 +250,6 @@ public class WXListComponent extends WXVContainer implements
         IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
 
     private String TAG = "WXListComponent";
-    private ArrayList<Integer> mFakeCells;
     private int listCellCount = 0;
     private WXRefresh mRefresh;
     private WXLoading mLoading;
