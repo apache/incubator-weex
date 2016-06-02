@@ -212,7 +212,7 @@ import android.view.View;
 
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
-public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
+public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
     private State mState = State.NONE;
     private OnRefreshListener mOnRefreshListener;
@@ -295,7 +295,7 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
     }
 
     @Override
-    public RecyclerView createBounceView(Context context) {
+    public WXRecyclerView createBounceView(Context context) {
         WXRecyclerView recyclerView = new WXRecyclerView(context);
         recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT);
         return recyclerView;

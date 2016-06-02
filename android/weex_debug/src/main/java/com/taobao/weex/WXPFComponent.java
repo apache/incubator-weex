@@ -23,7 +23,7 @@ public class WXPFComponent extends AbstractComponent {
 
   @Override
   public int iconRes() {
-    return R.drawable.ic_action_bug;
+    return R.drawable.ic_action_3d;
   }
 
   @Override

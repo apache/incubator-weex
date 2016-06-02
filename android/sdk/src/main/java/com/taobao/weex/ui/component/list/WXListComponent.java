@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -218,6 +219,7 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
@@ -236,6 +238,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -246,365 +249,430 @@ import java.util.List;
  * or not even exist.
  */
 public class WXListComponent extends WXVContainer implements
-                                                  IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
+        IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
 
-  private String TAG = "WXListComponent";
-  private ArrayList<Integer> mFakeCells;
-  private int listCellCount = 0;
-  private WXRefresh mRefresh;
-  private WXLoading mLoading;
+    private String TAG = "WXListComponent";
+    private ArrayList<Integer> mFakeCells;
+    private int listCellCount = 0;
+    private WXRefresh mRefresh;
+    private WXLoading mLoading;
 
-  private SparseArray<WXComponent> mAppearComponents = new SparseArray<>();
+    private SparseArray<WXComponent> mAppearComponents = new SparseArray<>();
+    private HashMap<String, Long> mRefToViewType;
 
-
-  public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
-  }
-
-  /**
-   * Measure the size of the recyclerView. If the height of the recyclerView exceeds the height of
-   * {@link com.taobao.weex.ui.WXRenderStatement#mGodComponent}, {@link
-   * WXViewUtils#getWeexHeight(String)}-{@link #mAbsoluteY} is returned.
-   *
-   * @param width  the expected width
-   * @param height the expected height
-   * @return the result of measurement
-   */
-  @Override
-  protected MeasureOutput measure(int width, int height) {
-    int screenH = WXViewUtils.getScreenHeight();
-    int weexH = WXViewUtils.getWeexHeight(mInstanceId);
-    int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
-    return super.measure(width, outHeight);
-  }
-
-  @Override
-  protected void initView() {
-    RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
-    recyclerViewBaseAdapter.setHasStableIds(true);
-    mHost = new BounceRecyclerView(mContext);
-    getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
-    getView().setAdapter(recyclerViewBaseAdapter);
-    getView().getBounceView().clearOnScrollListeners();
-    getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
-  }
-
-  @Override
-  public BounceRecyclerView getView() {
-    return (BounceRecyclerView) super.getView();
-  }
-
-  /**
-   * Append a child component to the end of WXListComponent. This will not refresh the underlying
-   * view immediately. The message of index of the inserted child is given to the adapter, and the
-   * adapter will determine when to refresh. The default implementation of adapter will push the
-   * message into a message and refresh the view in a period of time.
-   *
-   * @param child the inserted child
-   */
-  @Override
-  public void addChild(WXComponent child) {
-    super.addChild(child);
-    int index = mChildren.indexOf(child);
-    getView().getAdapter().notifyItemInserted(index);
-    checkRefreshOrLoading(child);
-    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
-      mAppearComponents.put(index,child);
-      child.registerAppearEvent=true;
+    public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
+        super(instance, node, parent, instanceId, lazy);
     }
-  }
 
-  /**
-   * @param child the inserted child
-   * @param index the index of the child to be inserted.
-   * @see #addChild(WXComponent)
-   */
-  @Override
-  public void addChild(WXComponent child, int index) {
-    super.addChild(child, index);
-    int adapterPosition = index == -1 ? getView().getAdapter().getItemCount() - 1 : index;
-    getView().getAdapter().notifyItemInserted(adapterPosition);
-    checkRefreshOrLoading(child);
-    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
-      mAppearComponents.put(adapterPosition, child);
-      child.registerAppearEvent=true;
+    /**
+     * Measure the size of the recyclerView. If the height of the recyclerView exceeds the height of
+     * {@link com.taobao.weex.ui.WXRenderStatement#mGodComponent}, {@link
+     * WXViewUtils#getWeexHeight(String)}-{@link #mAbsoluteY} is returned.
+     *
+     * @param width  the expected width
+     * @param height the expected height
+     * @return the result of measurement
+     */
+    @Override
+    protected MeasureOutput measure(int width, int height) {
+        int screenH = WXViewUtils.getScreenHeight();
+        int weexH = WXViewUtils.getWeexHeight(mInstanceId);
+        int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
+        return super.measure(width, outHeight);
     }
-  }
 
-  /**
-   * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,
-   * {@link WXVContainer#addSubView(View, int)} is an empty implementation in {@link
-   * com.taobao.weex.ui.view.listview.WXRecyclerView}
-   */
-  @Override
-  protected void addSubView(View child, int index) {
-  }
+    @Override
+    protected void initView() {
+        RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
+        recyclerViewBaseAdapter.setHasStableIds(true);
+        mHost = new BounceRecyclerView(mContext);
+        getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
+        getView().setAdapter(recyclerViewBaseAdapter);
+        getView().getBounceView().clearOnScrollListeners();
+        getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+        getView().getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+                if(listeners!=null && listeners.size()>0){
+                    for (OnWXScrollListener listener : listeners) {
+                        if (listener != null) {
+                            int tempState = RecyclerView.SCROLL_STATE_IDLE;
+                            if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                                newState=OnWXScrollListener.DRAGGING;
+                            }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
+                                newState = OnWXScrollListener.SETTLING;
+                            }
+                            RecyclerView.LayoutManager layoutManager=recyclerView.getLayoutManager();
+                            LinearLayoutManager linearLayoutManager=null;
+                            int x=0,y=0;
+                            if(layoutManager instanceof LinearLayoutManager){
+                                linearLayoutManager=(LinearLayoutManager)layoutManager;
+                            }
+                            if(linearLayoutManager!=null){
+                                x=0;
+                                int position = linearLayoutManager.findFirstVisibleItemPosition();
+                                View firstVisiableChildView = layoutManager.findViewByPosition(position);
+                                int itemHeight = firstVisiableChildView.getHeight();
+                                y= (position) * itemHeight - firstVisiableChildView.getTop();
+                            }
+                            listener.onScrollStateChanged(recyclerView, x, y,tempState);
+                        }
+                    }
+                }
+            }
 
-  /**
-   * Remove the child from WXListComponent. This method will use {@link
-   * java.util.List#indexOf(Object)} to retrieve the component to be deleted. Like {@link
-   * #addChild(WXComponent)}, this method will not refresh the view immediately, the adapter will
-   * decide when to refresh.
-   *
-   * @param child the child to be removed
-   */
-  @Override
-  public void remove(WXComponent child) {
-    int index = mChildren.indexOf(child);
-    child.detachViewAndClearPreInfo();
-    super.remove(child);
-    getView().getAdapter().notifyItemRemoved(index);
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "removeChild child at " + index);
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+                if(listeners!=null && listeners.size()>0){
+                    for (OnWXScrollListener listener : listeners) {
+                        if (listener != null) {
+                            listener.onScrolled(recyclerView, dx, dy);
+                        }
+                    }
+                }
+            }
+        });
     }
-  }
 
-  @Override
-  public void computeVisiblePointInViewCoordinate(PointF pointF) {
-    RecyclerView view = getView().getBounceView();
-    pointF.set(view.computeHorizontalScrollOffset(), view.computeVerticalScrollOffset());
-  }
-
-  /**
-   * Recycle viewHolder and its underlying view. This may because the view is removed or reused.
-   * Either case, this method will be called.
-   *
-   * @param holder The view holder to be recycled.
-   */
-  @Override
-  public void onViewRecycled(ListBaseViewHolder holder) {
-    recycleImage(holder.itemView);
-    WXLogUtils.d(TAG, "Recycle holder "+holder);
-  }
-
-  /**
-   * Bind the component of the position to the holder. Then flush the view.
-   *
-   * @param holder   viewHolder, which holds reference to the view
-   * @param position position of component in WXListComponent
-   */
-  @Override
-  public void onBindViewHolder(ListBaseViewHolder holder, int position) {
-    WXComponent component=getChild(position);
-    if (mFakeCells != null
-        && mFakeCells.contains(getItemViewType(position))){
-      return;
+    //TODO Make this method return WXRecyclerView
+    @Override
+    public BounceRecyclerView getView() {
+        return (BounceRecyclerView) super.getView();
     }
-    if(component!=null){
-      component.bind(null);
-      component.flushView();
+
+    @Override
+    public BounceRecyclerView getRealView() {
+        return (BounceRecyclerView) super.getView();
     }
-    WXLogUtils.d(TAG, "Bind holder "+holder);
-  }
 
-  /**
-   * Create an instance of {@link ListBaseViewHolder} for the given viewType (not for the given
-   * index). This method will look up for the first component that fits the viewType requirement and
-   * doesn't be used. Then create the certain type of view, detach the view from the component.
-   *
-   * @param parent   the ViewGroup into which the new view will be inserted
-   * @param viewType the type of the new view
-   * @return the created view holder.
-   */
-  @Override
-  public ListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    /**
+     * Append a child component to the end of WXListComponent. This will not refresh the underlying
+     * view immediately. The message of index of the inserted child is given to the adapter, and the
+     * adapter will determine when to refresh. The default implementation of adapter will push the
+     * message into a message and refresh the view in a period of time.
+     *
+     * @param child the inserted child
+     */
+    @Override
+    public void addChild(WXComponent child) {
+        addChild(child, -1);
+    }
 
-    if (mFakeCells != null && mFakeCells.contains(viewType)) {
-      return createVHForFixedComponent();
-    } else if (mChildren != null) {
-      for (int i = 0; i < childCount(); i++) {
-        WXComponent component = getChild(i);
-        if (component != null && getItemViewType(i) == viewType) {
-          if (component.isLazy()) {
-            component.lazy(false);
-            component.createView(this, -1);
-            return new ListBaseViewHolder(component.getView());
-          } else if (component instanceof WXRefresh) {
-            return createVHForWXRefresh(component);
-          } else if (component instanceof WXLoading) {
-            return createVHForWXLoading(component);
-          } else if (getChild(i).getView() != null) {
-            return new ListBaseViewHolder(component.getView());
-          }
+    /**
+     * @param child the inserted child
+     * @param index the index of the child to be inserted.
+     * @see #addChild(WXComponent)
+     */
+    @Override
+    public void addChild(WXComponent child, int index) {
+        super.addChild(child, index);
+        int adapterPosition = index == -1 ? getView().getAdapter().getItemCount() - 1 : index;
+        getView().getAdapter().notifyItemInserted(adapterPosition);
+        checkRefreshOrLoading(child);
+        if (child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)) {
+            mAppearComponents.put(adapterPosition, child);
+            child.registerAppearEvent = true;
         }
-      }
-      WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
     }
-    throw new WXRuntimeException("mChildren is null");
-  }
 
-  /**
-   * Return the child component type. The type is defined by scopeValue in .we file.
-   *
-   * @param position the position of the child component.
-   * @return the type of certain component.
-   */
-  @Override
-  public int getItemViewType(int position) {
-    int itemViewType = (int) getView().getAdapter().getItemId(position);
-    if (itemViewType == RecyclerView.NO_ID) {
-      WXLogUtils.e(TAG,
-                   "getItemViewType: NO ID, this will crash the whole render system of WXListRecyclerView");
+    /**
+     * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,
+     * {@link WXVContainer#addSubView(View, int)} is an empty implementation in {@link
+     * com.taobao.weex.ui.view.listview.WXRecyclerView}
+     */
+    @Override
+    protected void addSubView(View child, int index) {
     }
-    prepareFixedComponent(position,itemViewType);
-    return itemViewType;
-  }
 
-  /**
-   * Get child component num.
-   *
-   * @return return the size of {@link #mChildren} if mChildren is not empty, otherwise, return 0;
-   */
-  @Override
-  public int getItemCount() {
-    if (mChildren != null) {
-      return mChildren.size();
+    /**
+     * Remove the child from WXListComponent. This method will use {@link
+     * java.util.List#indexOf(Object)} to retrieve the component to be deleted. Like {@link
+     * #addChild(WXComponent)}, this method will not refresh the view immediately, the adapter will
+     * decide when to refresh.
+     *
+     * @param child the child to be removed
+     */
+    @Override
+    public void remove(WXComponent child) {
+        remove(child, true);
     }
-    return 0;
-  }
 
-  @Override
-  public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
-    WXLogUtils.d(TAG, "Failed to recycle "+holder);
-    return false;
-  }
-
-  @Override
-  public long getItemId(int position) {
-    long id;
-    try {
-      id = Long.parseLong(getChild(position).getDomObject().ref);
-    } catch (RuntimeException e) {
-      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
-      id = RecyclerView.NO_ID;
+    @Override
+    public void remove(WXComponent child, boolean destroy) {
+        super.remove(child, destroy);
+        int index = mChildren.indexOf(child);
+        if (destroy) {
+            child.detachViewAndClearPreInfo();
+        }
+        getView().getAdapter().notifyItemRemoved(index);
+        if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(TAG, "removeChild child at " + index);
+        }
     }
-    return id;
-  }
 
-  @Override
-  public void onLoadMore(int offScreenY) {
-    try {
-      String offset = mDomObj.attr.getLoadMoreOffset();
+    @Override
+    public void computeVisiblePointInViewCoordinate(PointF pointF) {
+        RecyclerView view = getView().getBounceView();
+        pointF.set(view.computeHorizontalScrollOffset(), view.computeVerticalScrollOffset());
+    }
 
-      if (TextUtils.isEmpty(offset)) {
-        return;
-      }
+    /**
+     * Recycle viewHolder and its underlying view. This may because the view is removed or reused.
+     * Either case, this method will be called.
+     *
+     * @param holder The view holder to be recycled.
+     */
+    @Override
+    public void onViewRecycled(ListBaseViewHolder holder) {
+        holder.setComponentUsing(false);
+        WXLogUtils.d(TAG, "Recycle holder " + holder);
+    }
 
-      if (offScreenY < Integer.parseInt(offset)) {
-        if (listCellCount != mChildren.size()) {
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
-          listCellCount = mChildren.size();
+    /**
+     * Bind the component of the position to the holder. Then flush the view.
+     *
+     * @param holder   viewHolder, which holds reference to the view
+     * @param position position of component in WXListComponent
+     */
+    @Override
+    public void onBindViewHolder(ListBaseViewHolder holder, int position) {
+        if (holder == null) return;
+        holder.setComponentUsing(true);
+        WXComponent component = getChild(position);
+        if ( component == null
+                || (component instanceof WXRefresh)
+                || (component instanceof WXLoading)
+                || (component.mDomObj!=null && component.mDomObj.isFixed())
+                ) {
+
+            WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
+            return;
         }
 
-      }
-    } catch (Exception e) {
-      WXLogUtils.d(TAG, "onLoadMore :" + WXLogUtils.getStackTrace(e));
-    }
-  }
-
-  @Override
-  public void notifyAppearStateChange(int firstVisible, int lastVisible) {
-
-    List<Integer> unRegisterKeys = new ArrayList<>();
-
-    //notify appear state
-    for(int i=0,len=mAppearComponents.size();i<len;i++){
-      int key=mAppearComponents.keyAt(i);
-      WXComponent value=mAppearComponents.get(key);
-      if(!value.registerAppearEvent){
-        unRegisterKeys.add(key);
-        continue;
-      }
-      if(key>=firstVisible && key<=lastVisible && !value.appearState){
-        value.notifyApppearStateChange(WXEventType.APPEAR);
-        value.appearState=true;
-      }else if((key<firstVisible || key>lastVisible) && value.appearState){
-        value.notifyApppearStateChange(WXEventType.DISAPPEAR);
-        value.appearState=false;
-      }
-      WXLogUtils.d(TAG,"key:"+key+" "+"appear:"+value.appearState);
+        if (component != null
+            && holder.getComponent() != null
+                && holder.getComponent() instanceof WXCell) {
+            holder.getComponent().bindData(component);
+        }
+        WXLogUtils.d(TAG, "Bind holder " + holder);
     }
 
-    //remove unregister Event
-    for(int i=0,len=unRegisterKeys.size();i<len;i++){
-      mAppearComponents.remove(unRegisterKeys.get(i));
+    /**
+     * Create an instance of {@link ListBaseViewHolder} for the given viewType (not for the given
+     * index). This method will look up for the first component that fits the viewType requirement and
+     * doesn't be used. Then create the certain type of view, detach the view f[rom the component.
+     *
+     * @param parent   the ViewGroup into which the new view will be inserted
+     * @param viewType the type of the new view
+     * @return the created view holder.
+     */
+    @Override
+    public ListBaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        WXLogUtils.d(TAG, "onCreateViewHolder");
+        if (mChildren != null) {
+            for (int i = 0; i < childCount(); i++) {
+                WXComponent component = getChild(i);
+                if (component == null
+                        || component.isUsing()
+                        || getItemViewType(i) != viewType)
+                    continue;
+                if (component instanceof WXRefresh) {
+                    return createVHForWXRefresh(component, viewType);
+                } else if (component instanceof WXLoading) {
+                    return createVHForWXLoading(component, viewType);
+                } else if (component.mDomObj!=null && component.mDomObj.isFixed()) {
+                    return createVHForFixedComponent(viewType);
+                } else {
+                    if (component.getRealView() != null) {
+                        return new ListBaseViewHolder(component, viewType);
+                    } else {
+                        component.lazy(false);
+                        component.createView(this, -1);
+                        component.applyLayoutAndEvent(component);
+                        return new ListBaseViewHolder(component, viewType);
+                    }
+
+                }
+            }
+        }
+        WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
+        throw new WXRuntimeException("mChildren is null");
     }
 
-  }
 
-  public void unbindAppearComponents(WXComponent component){
-    mAppearComponents.remove(mAppearComponents.indexOfValue(component));
-  }
+    /**
+     * Return the child component type. The type is defined by scopeValue in .we file.
+     *
+     * @param position the position of the child component.
+     * @return the type of certain component.
+     */
+    @Override
+    public int getItemViewType(int position) {
+        long id;
+        try {
+            id = Integer.parseInt(getChild(position).getDomObject().ref);
+            String type = mChildren.get(position).getDomObject().attr.getScope();
 
-  private void checkRefreshOrLoading(WXComponent child) {
-    if (child instanceof WXRefresh) {
-      getView().setOnRefreshListener((WXRefresh) child);
-      mRefresh = (WXRefresh) child;
+            if (!TextUtils.isEmpty(type)) {
+                if (mRefToViewType == null) {
+                    mRefToViewType = new HashMap<>();
+                }
+                if (!mRefToViewType.containsKey(type)) {
+                    mRefToViewType.put(type, id);
+                }
+                id = mRefToViewType.get(type);
+
+            }
+        } catch (RuntimeException e) {
+            WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+            id = RecyclerView.NO_ID;
+            WXLogUtils.e(TAG, "getItemViewType: NO ID, this will crash the whole render system of WXListRecyclerView");
+
+        }
+        return (int) id;
     }
-    if (child instanceof WXLoading) {
-      getView().setOnLoadMoreListener((WXLoading) child);
-      mLoading = (WXLoading) child;
+
+    /**
+     * Get child component num.
+     *
+     * @return return the size of {@link #mChildren} if mChildren is not empty, otherwise, return 0;
+     */
+    @Override
+    public int getItemCount() {
+        if (mChildren != null) {
+            return mChildren.size();
+        }
+        return 0;
     }
-  }
 
-  private void recycleImage(View view){
-    if(view instanceof ImageView){
-      mInstance.getImgLoaderAdapter().setImage(null, (ImageView)view,
-                                               null, null);
+    @Override
+    public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
+        WXLogUtils.d(TAG, "Failed to recycle " + holder);
+        return false;
     }
-    else if(view instanceof ViewGroup){
-      for(int i=0;i<((ViewGroup) view).getChildCount();i++){
-        recycleImage(((ViewGroup) view).getChildAt(i));
-      }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
     }
-  }
 
-  @NonNull
-  private ListBaseViewHolder createVHForFixedComponent() {
-    FrameLayout view = new FrameLayout(mContext);
-    view.setBackgroundColor(Color.WHITE);
-    view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
-    return new ListBaseViewHolder(view);
-  }
+    @Override
+    public void onLoadMore(int offScreenY) {
+        try {
+            String offset = mDomObj.attr.getLoadMoreOffset();
 
-  @NonNull
-  private ListBaseViewHolder createVHForWXLoading(WXComponent component) {
-    getView().setBounceFooterView(new IRefreshLayout.Adapter(component.getView()) {
-      @Override
-      public void onPull(float scale) {
-        super.onPull(scale);
-        mLoading.onPullLoadingIndicator((int) scale);
-      }
-    });
-    FrameLayout view = new FrameLayout(mContext);
-    view.setBackgroundColor(Color.TRANSPARENT);
-    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
-    return new ListBaseViewHolder(view);
-  }
+            if (TextUtils.isEmpty(offset)) {
+                return;
+            }
 
-  @NonNull
-  private ListBaseViewHolder createVHForWXRefresh(WXComponent component) {
-    getView().setBounceHeaderView(new IRefreshLayout.Adapter(component.getView()) {
-      @Override
-      public void onPull(float scale) {
-        super.onPull(scale);
-        mRefresh.onPullLoadingIndicator((int) scale);
-      }
-    });
-    FrameLayout view = new FrameLayout(mContext);
-    view.setBackgroundColor(Color.TRANSPARENT);
-    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
-    return new ListBaseViewHolder(view);
-  }
+            if (offScreenY < Integer.parseInt(offset)) {
+                if (listCellCount != mChildren.size()) {
+                    WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+                    listCellCount = mChildren.size();
+                }
 
-  private void prepareFixedComponent(int position,int viewType) {
-    if (mChildren.get(position).getDomObject().isFixed()) {
-      if (mFakeCells == null) {
-        mFakeCells = new ArrayList<>();
-      }
-      if (!mFakeCells.contains(viewType)) {
-        mFakeCells.add(viewType);
-      }
+            }
+        } catch (Exception e) {
+            WXLogUtils.d(TAG, "onLoadMore :" + WXLogUtils.getStackTrace(e));
+        }
     }
-  }
+
+    @Override
+    public void notifyAppearStateChange(int firstVisible, int lastVisible) {
+
+        List<Integer> unRegisterKeys = new ArrayList<>();
+
+        //notify appear state
+        for (int i = 0, len = mAppearComponents.size(); i < len; i++) {
+            int key = mAppearComponents.keyAt(i);
+            WXComponent value = mAppearComponents.get(key);
+            if (!value.registerAppearEvent) {
+                unRegisterKeys.add(key);
+                continue;
+            }
+            if (key >= firstVisible && key <= lastVisible && !value.appearState) {
+                value.notifyAppearStateChange(WXEventType.APPEAR);
+                value.appearState = true;
+            } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
+                value.notifyAppearStateChange(WXEventType.DISAPPEAR);
+                value.appearState = false;
+            }
+            WXLogUtils.d(TAG, "key:" + key + " " + "appear:" + value.appearState);
+        }
+
+        //remove unregister Event
+        for (int i = 0, len = unRegisterKeys.size(); i < len; i++) {
+            mAppearComponents.remove(unRegisterKeys.get(i));
+        }
+
+    }
+
+    public void unbindAppearComponents(WXComponent component) {
+        mAppearComponents.remove(mAppearComponents.indexOfValue(component));
+    }
+
+    private void checkRefreshOrLoading(WXComponent child) {
+        if (child instanceof WXRefresh) {
+            getView().setOnRefreshListener((WXRefresh) child);
+            mRefresh = (WXRefresh) child;
+        }
+        if (child instanceof WXLoading) {
+            getView().setOnLoadMoreListener((WXLoading) child);
+            mLoading = (WXLoading) child;
+        }
+    }
+
+    private void recycleImage(View view) {
+        if (view instanceof ImageView) {
+            mInstance.getImgLoaderAdapter().setImage(null, (ImageView) view,
+                    null, null);
+        } else if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                recycleImage(((ViewGroup) view).getChildAt(i));
+            }
+        }
+    }
+
+    @NonNull
+    private ListBaseViewHolder createVHForFixedComponent(int viewType) {
+        FrameLayout view = new FrameLayout(mContext);
+        view.setBackgroundColor(Color.WHITE);
+        view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
+        return new ListBaseViewHolder(view, viewType);
+    }
+
+    @NonNull
+    private ListBaseViewHolder createVHForWXLoading(WXComponent component, int viewType) {
+        getView().setBounceFooterView(new IRefreshLayout.Adapter(component.getView()) {
+            @Override
+            public void onPull(float scale) {
+                super.onPull(scale);
+                mLoading.onPullLoadingIndicator((int) scale);
+            }
+        });
+        FrameLayout view = new FrameLayout(mContext);
+        view.setBackgroundColor(Color.TRANSPARENT);
+        view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
+        return new ListBaseViewHolder(view, viewType);
+    }
+
+    @NonNull
+    private ListBaseViewHolder createVHForWXRefresh(WXComponent component, int viewType) {
+        getView().setBounceHeaderView(new IRefreshLayout.Adapter(component.getView()) {
+            @Override
+            public void onPull(float scale) {
+                super.onPull(scale);
+                mRefresh.onPullLoadingIndicator((int) scale);
+            }
+        });
+        FrameLayout view = new FrameLayout(mContext);
+        view.setBackgroundColor(Color.TRANSPARENT);
+        view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
+        return new ListBaseViewHolder(view, viewType);
+    }
+
 }

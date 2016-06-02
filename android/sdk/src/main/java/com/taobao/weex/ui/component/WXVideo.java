@@ -344,8 +344,8 @@ public class WXVideo extends WXComponent {
   }
 
   @Override
-  public void flushView() {
-    super.flushView();
+  public void flushView(WXComponent component) {
+    super.flushView(component);
 
     if (!TextUtils.isEmpty(mSrc) && mSrcChanged) {
       mSrcChanged = false;

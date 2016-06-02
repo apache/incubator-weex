@@ -202,17 +202,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui.view;
 
-class WXTagSpan {
+public interface IWXTextView {
 
-  private final String mRef;
-
-  public WXTagSpan(String ref) {
-    mRef = ref;
-  }
-
-  public String getTag() {
-    return mRef;
-  }
+  CharSequence getText();
 }
