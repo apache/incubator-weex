@@ -490,15 +490,17 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
         int mXTranslate = 0;
         int mYTranslate = 0;
         int mRotation = 0;
-        float mScale = 0;
+        float mScaleX = 0;
+        float mScaleY  = 0;
 
-        public TransformItemDecoration(boolean isVertical,float alpha,int translateX,int translateY,int rotation,float scale){
+        public TransformItemDecoration(boolean isVertical,float alpha,int translateX,int translateY,int rotation,float scaleX,float scaleY){
             this.mIsVertical = isVertical;
             this.mAlpha = alpha;
             this.mXTranslate = translateX;
             this.mYTranslate = translateY;
             this.mRotation = rotation;
-            this.mScale = scale;
+            this.mScaleX = scaleX;
+            this.mScaleY = scaleY;
         }
 
 
@@ -532,10 +534,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
                 child.setAlpha(1-mAlpha*Math.abs(effectsAmount));
             }
 
-            if(mScale>0){
-                float scale = 1-mScale*Math.abs(effectsAmount);
-                child.setScaleX(scale);
-                child.setScaleY(scale);
+            if(mScaleX>0||mScaleY>0){
+                child.setScaleX(1-mScaleX*Math.abs(effectsAmount));
+                child.setScaleY(1-mScaleY*Math.abs(effectsAmount));
             }
 
             if(mRotation!=0){
