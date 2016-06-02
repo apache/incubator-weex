@@ -202,43 +202,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.listview;
+package com.taobao.weex.ui.component.list;
 
-import android.content.Context;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.View;
-import android.view.ViewGroup;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXVContainer;
 
-public class WXRecyclerView extends RecyclerView {
-
-  public static final int TYPE_LINEAR_LAYOUT = 1;
-  public static final int TYPE_GRID_LAYOUT = 2;
-  public static final int TYPE_STAGGERED_GRID_LAYOUT = 3;
-
-  public WXRecyclerView(Context context) {
-    super(context);
+/**
+ * Created by sospartan on 6/2/16.
+ */
+public class HorizontalListComponent extends WXListComponent {
+  public HorizontalListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
+    super(instance, node, parent, instanceId, lazy);
   }
 
-  /**
-   *
-   * @param context
-   * @param type
-   * @param orientation should be {@link OrientationHelper#HORIZONTAL} or {@link OrientationHelper#VERTICAL}
-     */
-  public void initView(Context context, int type,int orientation) {
-
-    if (type == TYPE_GRID_LAYOUT) {
-      setLayoutManager(new GridLayoutManager(context, 2,orientation,false));
-    } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new StaggeredGridLayoutManager(2, orientation));
-    } else if (type == TYPE_LINEAR_LAYOUT) {
-      setLayoutManager(new LinearLayoutManager(context,orientation,false));
-    }
+  @Override
+  protected int getOrientation() {
+    return HORIZONTAL;
   }
-
 }

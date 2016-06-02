@@ -228,6 +228,7 @@ import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.ui.view.listview.IRefreshLayout;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
@@ -239,6 +240,8 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Unlike other components, there is immutable bi-directional association between View and
@@ -250,11 +253,13 @@ import java.util.List;
 public class WXListComponent extends WXVContainer implements
         IRecyclerAdapterListener<ListBaseViewHolder>, IOnLoadMoreListener {
 
+    public static final String TRANSFORM = "transform";
     private String TAG = "WXListComponent";
     private int mListCellCount = 0;
     private String mLoadMoreRetry ="";
     private WXRefresh mRefresh;
     private WXLoading mLoading;
+    private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
     private SparseArray<WXComponent> mAppearComponents = new SparseArray<>();
     private HashMap<String, Long> mRefToViewType;
@@ -280,16 +285,77 @@ public class WXListComponent extends WXVContainer implements
         return super.measure(width, outHeight);
     }
 
+    protected int getOrientation(){
+        return VERTICAL;
+    }
+
+  /**
+   * These transform functions are supported:
+   - `scale(x,y)`: scale item, x and y should be a positive float number.
+   - `translate(x,y)`: translate item, `x` and `y` shoule be integer numbers.
+   - `opacity(n)`: change the transparency of item, `n` must in `[0,1.0]`.
+   - `rotate(n)`: rotate item, n is integer number.
+   * @param raw
+   * @return
+   */
+    private RecyclerView.ItemDecoration parseTransforms(String raw){
+        if(raw == null){
+            return null;
+        }
+        float scaleX = 0f,scaleY = 0f;
+        int translateX = 0,translateY = 0;
+        float opacity = 0f;
+        int rotate = 0;
+            //public TransformItemDecoration(boolean isVertical,float alpha,int translateX,int translateY,int rotation,float scale)
+        Matcher matcher = transformPattern.matcher(raw);
+        while(matcher.find()){
+            String match = matcher.group();
+            String name = matcher.group(1);
+            try {
+                switch (name) {
+                    case "scale":
+                        scaleX = Float.parseFloat(matcher.group(2));
+                        scaleY = Float.parseFloat(matcher.group(3));
+                        break;
+                    case "translate":
+                        translateX = Integer.parseInt(matcher.group(2));
+                        translateY = Integer.parseInt(matcher.group(3));
+                        break;
+                    case "opacity":
+                        opacity = Float.parseFloat(matcher.group(2));
+                        break;
+                    case "rotate":
+                        rotate = Integer.parseInt(matcher.group(2));
+                        break;
+                    default:
+                        WXLogUtils.e(TAG, "Invaild transform expression:" + match);
+                        break;
+                }
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+                WXLogUtils.e(TAG, "Invaild transform expression:" + match);
+            }
+        }
+        return new BounceRecyclerView.TransformItemDecoration(getOrientation() == VERTICAL,opacity,translateX,translateY,rotate,scaleX,scaleY);
+    }
+
     @Override
     protected void initView() {
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
-        mHost = new BounceRecyclerView(mContext);
-        getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
-        getView().setAdapter(recyclerViewBaseAdapter);
-        getView().getBounceView().clearOnScrollListeners();
-        getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
-        getView().getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+        BounceRecyclerView view = new BounceRecyclerView(mContext,getOrientation());
+        WXRecyclerView bounceview = view.getBounceView();
+
+        String transforms = (String) mDomObj.attr.get(TRANSFORM);
+        if(transforms != null){
+            view.getBounceView().addItemDecoration(parseTransforms(transforms));
+        }
+
+        bounceview.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setAdapter(recyclerViewBaseAdapter);
+        bounceview.clearOnScrollListeners();
+        bounceview.addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+        bounceview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -335,6 +401,7 @@ public class WXListComponent extends WXVContainer implements
                 }
             }
         });
+        mHost = view;
     }
 
     //TODO Make this method return WXRecyclerView
