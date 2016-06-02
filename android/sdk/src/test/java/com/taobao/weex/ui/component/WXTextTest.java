@@ -295,8 +295,8 @@ public class WXTextTest {
     public void testBind(){
         testCreateView();
 //        mWXText.bind(null);
-        mWXText.applyLayoutAndEvent(mWXText.mDomObj);
-        mWXText.bindData(mWXText.mDomObj);
+        mWXText.applyLayoutAndEvent(mWXText);
+        mWXText.bindData(mWXText);
 
         assertNotNull(mWXText.getView().getLayoutParams());
         assertEquals(100, mWXText.getView().getLayoutParams().height);
