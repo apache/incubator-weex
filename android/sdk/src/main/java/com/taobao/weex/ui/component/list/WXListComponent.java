@@ -285,12 +285,17 @@ public class WXListComponent extends WXVContainer implements
     protected void initView() {
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
-        mHost = new BounceRecyclerView(mContext);
-        getView().getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
-        getView().setAdapter(recyclerViewBaseAdapter);
-        getView().getBounceView().clearOnScrollListeners();
-        getView().getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
-        getView().getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+        String scroll = "vertical";
+        if (mDomObj != null && mDomObj.attr != null) {
+            scroll = (String) mDomObj.attr.get("orientation");
+        }
+        boolean isHorizontal = "horizontal".equals(scroll);
+        BounceRecyclerView view = new BounceRecyclerView(mContext,isHorizontal?HORIZONTAL:VERTICAL);
+        view.getBounceView().setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setAdapter(recyclerViewBaseAdapter);
+        view.getBounceView().clearOnScrollListeners();
+        view.getBounceView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+        view.getBounceView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -336,6 +341,7 @@ public class WXListComponent extends WXVContainer implements
                 }
             }
         });
+        mHost = view;
     }
 
     //TODO Make this method return WXRecyclerView
