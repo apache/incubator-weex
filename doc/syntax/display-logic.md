@@ -1,4 +1,5 @@
 # Display Logic Control
+<span class="weex-version">0.5</span>
 
 There are two attributes for display logic control: `if` and `repeat`. We can create Weex page structure and effects more flexible with them.
 

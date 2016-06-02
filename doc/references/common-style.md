@@ -1,4 +1,5 @@
 # Common Style
+<span class="weex-version">0.4</span>
 
 All of weex tags share some common style rules
 

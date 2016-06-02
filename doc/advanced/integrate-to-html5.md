@@ -1,4 +1,5 @@
 ## Integrate Weex HTML5 to your project
+<span class="weex-version">0.4</span>
 
 ### Intro
 

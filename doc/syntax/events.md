@@ -1,4 +1,5 @@
 #  Events
+<span class="weex-version">0.5</span>
 
 Weex allow `<template>` to bind event type and handler on an Element. The attribute name is the event type with prefix `on...` and the attribute value is handler method name. For instance: `onclick="handler"`. e.g.
 

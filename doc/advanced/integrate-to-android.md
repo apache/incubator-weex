@@ -1,4 +1,5 @@
 # import Weex Android to your project
+<span class="weex-version">0.4</span>
 
 You will need to build Weex from source if you want to work on a new feature/bug fix, try out the latest features which are not released yet, or maintain your own fork with patches that cannot be merged to the core.
 

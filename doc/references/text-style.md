@@ -1,4 +1,5 @@
 # Text Style
+<span class="weex-version">0.5</span>
 
 Text alike components share some common style rules. The text alike components currently includes [`text`](../components/text.md) and [`input`](../components/input.md).
 

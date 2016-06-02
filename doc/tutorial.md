@@ -1,4 +1,5 @@
 # Tutorial
+<span class="weex-version">0.4</span>
 
 We will make a simple but realistic list of tech that weex used, this form of list also work for a lot of e-commerce app/mobile site.
 

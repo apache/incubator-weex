@@ -1,4 +1,5 @@
 # Built-in Modules
+<span class="weex-version">0.5</span>
 
 ## How to use
 

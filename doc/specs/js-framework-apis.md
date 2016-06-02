@@ -1,4 +1,5 @@
 # JS Framework APIs
+<span class="weex-version">0.4</span>
 
 ## Intro about JS Runtime
 
