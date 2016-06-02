@@ -166,7 +166,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
           Activity ctx = WXPageActivity.this;
           Rect outRect = new Rect();
           ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
-          String path=mUri.getScheme().equals("file")?mUri.getLastPathSegment():mUri.toString();
+          mConfigMap.put("bundleUrl",mUri.toString());
+          String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
           mInstance.render(TAG, WXFileUtils.loadFileContent(path, WXPageActivity.this),
                            mConfigMap, null,
                            ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil
@@ -178,6 +179,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mInstance.onActivityCreate();
   }
 
+  private String assembleFilePath(Uri uri) {
+    if(uri!=null && uri.getPath()!=null){
+      return uri.getPath().replaceFirst("/","");
+    }
+    return "";
+  }
+
   private void initUIAndData() {
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -186,6 +194,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     ActionBar actionBar = getSupportActionBar();
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setTitle(mUri.toString().substring(mUri.toString().lastIndexOf(File.separator) + 1));
+
 
     mContainer = (ViewGroup) findViewById(R.id.container);
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
@@ -257,7 +266,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     //        TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
-
   }
 
   @Override
@@ -299,7 +307,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
-
+WXLogUtils.e("into--[onViewCreated]");
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }

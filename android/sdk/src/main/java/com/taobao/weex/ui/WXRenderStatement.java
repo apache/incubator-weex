@@ -205,6 +205,7 @@
 package com.taobao.weex.ui;
 
 import android.animation.Animator;
+import android.graphics.Color;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Interpolator;
@@ -272,7 +273,7 @@ class WXRenderStatement {
     if (component == null) {
       return;
     }
-    component.flushView();
+    component.flushView(component);
   }
 
   /**
@@ -286,7 +287,9 @@ class WXRenderStatement {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
     start = System.currentTimeMillis();
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
+
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
     }
@@ -322,6 +325,7 @@ class WXRenderStatement {
     FrameLayout frameLayout = (FrameLayout) mGodComponent.getView();
     ViewGroup.LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
     frameLayout.setLayoutParams(layoutParams);
+    frameLayout.setBackgroundColor(Color.TRANSPARENT);
 
     WXComponent component = generateComponentTree(dom, mGodComponent);
     mGodComponent.addChild(component);
@@ -385,7 +389,8 @@ class WXRenderStatement {
       return;
     }
     component.createView(parent, index);
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
     parent.addChild(component, index);
     WXAnimationModule.applyTransformStyle(component.mDomObj.style, component);
   }
@@ -399,8 +404,8 @@ class WXRenderStatement {
       return component;
     }
     WXVContainer parent = component.getParent();
-    parent.remove(component);
     clearRegistryForComponent(component);
+    parent.remove(component);
     component.destroy();
     return component;
   }
@@ -439,7 +444,7 @@ class WXRenderStatement {
       return;
     }
     WXVContainer oldParent = component.getParent();
-    oldParent.remove(component);
+    oldParent.remove(component,false);
     ((WXVContainer) newParent).addChild(component, index);
   }
 
@@ -547,6 +552,15 @@ class WXRenderStatement {
   void refreshFinish(int width, int height) {
     mWXSDKInstance.onRefreshSuccess(width, height);
   }
+
+  /**
+   * weex refresh finish
+   * @see WXSDKInstance#onUpdateFinish()
+   */
+  void updateFinish() {
+    mWXSDKInstance.onUpdateFinish();
+  }
+
 
   private WXComponent generateComponentTree(WXDomObject dom, WXVContainer parent) {
     if (dom == null || parent == null) {

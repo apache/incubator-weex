@@ -214,9 +214,9 @@ import android.view.View;
 
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
-public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
+public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
-    private State mState = State.RESET;
+    private State mState = State.NONE;
     private OnRefreshListener mOnRefreshListener;
     private OnLoadMoreListener mOnLoadMoreListener;
     private RefreshAdapterWrapper mRefreshAdapter;
@@ -229,7 +229,8 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
         REFRESHING,
         LOADMORE,
         LOADMORE_TOP,
-        RESET
+        RESET,
+        NONE
     }
 
     public BounceRecyclerView(Context context,int orientation) {
@@ -301,7 +302,7 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
     }
 
     @Override
-    public RecyclerView createBounceView(Context context) {
+    public WXRecyclerView createBounceView(Context context) {
         WXRecyclerView recyclerView = new WXRecyclerView(context);
         recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT,getOrientation());
         return recyclerView;
@@ -327,7 +328,7 @@ public class BounceRecyclerView extends BaseBounceView<RecyclerView> {
             } else if (getState() == State.RELEASE_TO_REFRESH_BOTTOM && null != mOnLoadMoreListener) {
                 getBounceFooterView().setVisibility(View.INVISIBLE);
                 setState(State.LOADMORE);
-            } else if (getState() != State.LOADMORE) {
+            } else if (getState() != State.LOADMORE && getState()!=State.NONE) {
                 setState(State.RESET);
             }
         }
