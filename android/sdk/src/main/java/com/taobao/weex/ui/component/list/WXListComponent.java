@@ -402,7 +402,6 @@ public class WXListComponent extends WXVContainer implements
 
     @Override
     public void remove(WXComponent child, boolean destroy) {
-        super.remove(child, destroy);
         int index = mChildren.indexOf(child);
         if (destroy) {
             child.detachViewAndClearPreInfo();
@@ -411,6 +410,7 @@ public class WXListComponent extends WXVContainer implements
         if (WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(TAG, "removeChild child at " + index);
         }
+        super.remove(child, destroy);
     }
 
     @Override
