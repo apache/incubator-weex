@@ -226,25 +226,19 @@ public class WXSDKEngine {
     WXEnvironment.sApplication = application;
     WXEnvironment.JsFrameworkInit = false;
 
+    if(config != null ) {
+      sm.setIWXHttpAdapter(config.getHttpAdapter());
+      sm.setIWXImgLoaderAdapter(config.getImgAdapter());
+      sm.setIWXUserTrackAdapter(config.getUtAdapter());
+    }
+    WXSoInstallMgrSdk.init(application);
+    WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+    if (!WXEnvironment.sSupport) {
+      return;
+    }
 
-    sm.postOnDomThread(new Runnable() {
-      @Override
-      public void run() {
-        if(config != null ) {
-          sm.setIWXHttpAdapter(config.getHttpAdapter());
-          sm.setIWXImgLoaderAdapter(config.getImgAdapter());
-          sm.setIWXUserTrackAdapter(config.getUtAdapter());
-        }
-        WXSoInstallMgrSdk.init(application);
-        WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-        if (!WXEnvironment.sSupport) {
-          return;
-        }
-
-        WXSDKManager.getInstance().initScriptsFramework(null);
-        register();
-      }
-    });
+    WXSDKManager.getInstance().initScriptsFramework(null);
+    register();
 
   }
 
