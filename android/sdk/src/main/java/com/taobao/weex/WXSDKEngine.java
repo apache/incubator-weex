@@ -166,16 +166,25 @@ public class WXSDKEngine {
   private volatile static boolean init;
   private static Object mLock = new Object();
 
+  /**
+   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
+   */
   @Deprecated
   public static void init(Application application) {
     init(application, null);
   }
 
+  /**
+   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
+   */
   @Deprecated
   public static void init(Application application, IWXUserTrackAdapter utAdapter) {
     init(application, utAdapter, null);
   }
 
+  /**
+   * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
+   */
   @Deprecated
   public static void init(Application application, IWXUserTrackAdapter utAdapter, String framework) {
     initialize(application,

@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.taobao.weex.InitConfig;
-import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.component.WTRichText;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.WXEventModule;
