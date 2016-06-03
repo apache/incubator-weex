@@ -54,7 +54,7 @@ weex tech_list.we   // Weex H5 renderer is not released , so , the commond not w
 
 A browser window will open automatically  to display  something like below
 
-![weex html5 render](http://gtms02.alicdn.com/tps/i2/TB1y151LVXXXXXXaXXXoRYgWVXX-495-584.jpg)
+![weex html5 render](images/tut1.jpg)
 
 
 **Weex H5 renderer is not released , So please using Weex Playground App based preview for a while**
@@ -109,12 +109,12 @@ weex tech_list.we --qr
 An QR code will be display in the terminal window, like:
 
 
-![weex qr](http://gtms01.alicdn.com/tps/i1/TB1ggfiLVXXXXbPXXXXELJK6FXX-334-379.jpg)
+![weex qr](images/tut2.jpg)
 
 
 The QR code will work together with Weex playground App, you can download the app  [here](http://alibaba.github.io/weex/download.html).  After successful installation, open Weex playground App then click scan icon at  top right corner, then scan the Qr code in your terminal.If all works well, a beautiful list will be displayed in your phone. Here, i must stress that the list is render using native widget ( no webkit ), so your app get faster loading and less memory overhead than common embedded webkit  renderer.
 
-![list1 in Android](http://gtms04.alicdn.com/tps/i4/TB1FH15LVXXXXcYXFXXFzbANVXX-504-896.png)
+![list1 in Android](images/tut3.png)
 
 Now open tech_list.we again and trying to change some text, after changes saved the Weex playground App will  immediately display these changes.  this called **Hot-Reload**, it also works with default Weex browser renderer. We hope hot-reload will be  helpful when you debug Weex script.
 
@@ -195,7 +195,7 @@ weex tech_list.we
 
 You should see a  slider prepend  to our list.
 
-![slider demo](http://gtms02.alicdn.com/tps/i2/TB1MB2gLVXXXXaLXpXXB8.XUXXX-596-1000.gif)
+![slider demo](images/tut4.gif)
 
 
 More information about Slider Component can be found [here](components/slider.md).
