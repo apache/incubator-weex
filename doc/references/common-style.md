@@ -81,7 +81,7 @@ The justify-content property horizontally aligns the flexible container's items 
 
 The align-items property vertically aligns the flexible container's items when the items do not use all available space on the cross-axis. `stretch` is  the default value, meaning the items are stretched to fit the container. `flex-start` means the items are positioned at the top of the container; `flex-end` means the items are positioned at the bottom of the container; `center` means items are positioned at the center of the container (vertically).
 
-![align-items](http://gtms02.alicdn.com/tps/i2/TB1VnHKMXXXXXcEaXXXDldN_pXX-1018-502.jpg)
+![align-items](../images/css-flexbox-align.jpg)
 
 ### Flex item
 
@@ -126,6 +126,19 @@ mixed direction alignment:
       <text style="flex: 1; font-size: 16;">$100</text>
     </div>
   </div>
+</template>
+```
+
+one text align left , the other float right:
+
+![one text align left , the other float right](../images/css-flexbox-sample.png)
+
+```html
+<template>
+<div style="flex-direction: row; justify-content: space-between;">
+   <text>WEEX</text>
+   <text>2016-05-08</text>
+</div>
 </template>
 ```
 
