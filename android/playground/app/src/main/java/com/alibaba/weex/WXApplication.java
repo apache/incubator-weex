@@ -3,10 +3,11 @@ package com.alibaba.weex;
 import android.app.Application;
 
 import com.alibaba.weex.commons.adapter.ImageAdapter;
-import com.alibaba.weex.extend.Components.WTRichText;
-import com.alibaba.weex.extend.Modules.RenderModule;
-import com.alibaba.weex.extend.Modules.WXEventModule;
 import com.taobao.weex.InitConfig;
+import com.alibaba.weex.commons.adapter.ImageAdapter;
+import com.alibaba.weex.extend.component.WTRichText;
+import com.alibaba.weex.extend.module.RenderModule;
+import com.alibaba.weex.extend.module.WXEventModule;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
 

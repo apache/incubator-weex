@@ -27,13 +27,11 @@ import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXDebugTool;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.scalpel.ScalpelFrameLayout;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -197,8 +195,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setTitle(mUri.toString().substring(mUri.toString().lastIndexOf(File.separator) + 1));
 
-    ScalpelFrameLayout scalpelFrameLayout=(ScalpelFrameLayout)findViewById(R.id.scalpel_frame_layout);
-    WXDebugTool.updateScapleView(scalpelFrameLayout);
 
     mContainer = (ViewGroup) findViewById(R.id.container);
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
@@ -270,7 +266,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     //        TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
-    WXDebugTool.updateScapleView(null);
   }
 
   @Override

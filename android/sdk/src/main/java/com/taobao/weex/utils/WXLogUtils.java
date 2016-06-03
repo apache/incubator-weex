@@ -173,35 +173,35 @@ public class WXLogUtils {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.d(tag, msg);
     }
-    sendLog(LogLevel.DEBUG, msg);
+    sendLog(LogLevel.DEBUG, tag + ":" + msg);
   }
 
   public static void info(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.i(tag, msg);
     }
-    sendLog(LogLevel.INFO, msg);
+    sendLog(LogLevel.INFO, tag+":"+msg);
   }
 
   public static void v(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.v(tag, msg);
     }
-    sendLog(LogLevel.VERBOSE, msg);
+    sendLog(LogLevel.VERBOSE, tag+":"+msg);
   }
 
   public static void w(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.w(tag, msg);
     }
-    sendLog(LogLevel.WARN, msg);
+    sendLog(LogLevel.WARN, tag+":"+msg);
   }
 
   public static void e(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.e(tag, msg);
     }
-    sendLog(LogLevel.ERROR, msg);
+    sendLog(LogLevel.ERROR, tag+":"+msg);
   }
 
   public static void p(String msg) {

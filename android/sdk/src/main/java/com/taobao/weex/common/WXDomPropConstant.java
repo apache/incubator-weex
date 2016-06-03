@@ -311,6 +311,7 @@ public class WXDomPropConstant {
 
   //ListView attrs
   public static final String WX_ATTR_SCOPE = "scope";
+  public static final String WX_ATTR_LOAD_MORE_RETRY = "loadmoreretry";
   public static final String WX_ATTR_LOAD_MORE_OFFSET = "loadmoreoffset";
 
   //Image recycle attrs

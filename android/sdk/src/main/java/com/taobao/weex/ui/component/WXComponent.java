@@ -200,6 +200,8 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealTop = 0;
   private WXGesture wxGesture;
 
+  private boolean isUsing = false;
+
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
     mInstance = instance;
     mContext = mInstance.getContext();
@@ -223,28 +225,29 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     mLazy = lazy;
   }
 
-  /**
-   * bind view's prop
-   *
-   * @param view
-   */
-  public final void bind(View view) {
-    if (!mLazy) {
-      bindImpl(view);
+
+  public void applyLayoutAndEvent(WXComponent component) {
+    if(!isLazy()) {
+      if (component == null) {
+        component = this;
+      }
+      getOrCreateBorder().attachView(mHost);
+      setLayout(component.mDomObj);
+      setPadding(component.mDomObj.getPadding(), component.mDomObj.getBorder());
+      addEvents();
+
     }
   }
 
-  protected void bindImpl(View view) {
-    if (view != null) {
-      mHost = view;
-      getOrCreateBorder().attachView(view);
+  public void bindData(WXComponent component){
+    if(!isLazy()) {
+      if (component == null) {
+        component = this;
+      }
+      updateProperties(component.mDomObj.style);
+      updateProperties(component.mDomObj.attr);
+      updateExtra(component.mDomObj.getExtra());
     }
-
-    setLayout(mDomObj);
-    setPadding(mDomObj.getPadding(), mDomObj.getBorder());
-    updateProperties();
-    addEvents();
-    updateExtra(mDomObj.getExtra());
   }
 
   protected WXBorder getOrCreateBorder() {
@@ -283,7 +286,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
     //calculate first screen time
     if (!mInstance.mEnd && mAbsoluteY >= WXViewUtils.getScreenHeight()) {
-      mInstance.firstScreenRenderFinished(System.currentTimeMillis());
+      mInstance.firstScreenRenderFinished();
     }
 
     if (mHost == null) {
@@ -362,14 +365,14 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     mHost.setPadding(left, top, right, bottom);
   }
 
-  private void updateProperties() {
-    if (mDomObj.attr != null && mDomObj.attr.size() > 0) {
-      updateProperties(mDomObj.attr);
-    }
-    if (mDomObj.style != null && mDomObj.style.size() > 0) {
-      updateProperties(mDomObj.style);
-    }
-  }
+//  private void updateProperties() {
+//    if (mDomObj.attr != null && mDomObj.attr.size() > 0) {
+//      updateProperties(mDomObj.attr);
+//    }
+//    if (mDomObj.style != null && mDomObj.style.size() > 0) {
+//      updateProperties(mDomObj.style);
+//    }
+//  }
 
   private void addEvents() {
     int count = mDomObj.event == null ? 0 : mDomObj.event.size();
@@ -397,7 +400,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   }
 
   public final void updateProperties(Map<String, Object> props) {
-    if (props.isEmpty() || mHost == null) {
+    if (props == null||props.isEmpty() || mHost == null) {
       return;
     }
     Map<String, Method> methodMap = WXComponentPropCache.getMethods(getClass());
@@ -577,7 +580,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
    * @param index
    */
   public final void createView(WXVContainer parent, int index) {
-    if (!mLazy) {
+    if(!isLazy()) {
       createViewImpl(parent, index);
     }
   }
@@ -617,7 +620,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
    * Flush the corresponding view.
    * If multiple property setter conflicts, this method can be called to resolve conflict.
    */
-  public void flushView() {
+  public void flushView(WXComponent component) {
 
   }
 
@@ -907,7 +910,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     mPreRealWidth = 0;
     mPreRealHeight = 0;
     mPreRealTop = 0;
-    mHost = null;
+//    mHost = null;
     return original;
   }
 
@@ -932,6 +935,14 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
   public void notifyAppearStateChange(String wxEventType){
     WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,null);
+  }
+
+  public boolean isUsing() {
+    return isUsing;
+  }
+
+  public void setUsing(boolean using) {
+    isUsing = using;
   }
 
   public static class MeasureOutput {

@@ -273,7 +273,7 @@ class WXRenderStatement {
     if (component == null) {
       return;
     }
-    component.flushView();
+    component.flushView(component);
   }
 
   /**
@@ -287,7 +287,9 @@ class WXRenderStatement {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
     start = System.currentTimeMillis();
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
+
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
     }
@@ -387,7 +389,8 @@ class WXRenderStatement {
       return;
     }
     component.createView(parent, index);
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
     parent.addChild(component, index);
     WXAnimationModule.applyTransformStyle(component.mDomObj.style, component);
   }
