@@ -4,13 +4,11 @@ build.gradle
 
 ```` gradle
 compile project(':weex_debug')
-compile 'com.taobao.android:dexposed:0.1.8'
-compile 'com.jakewharton.scalpel:scalpel:1.1.2'
 ````  
 setting.gradle
 
 ```` gradle
-include ":weex_debug"
+include ":weex_debug"  
 project(":weex_debug").projectDir=new File("../weex_debug")
 ````
 
@@ -34,7 +32,7 @@ copy "http://30.10.217.78:4000/" to your browser。The browser will show a QR Co
 Use your 'playgroud' to scan the code QR in your browser.you can find this content:  
 ![server](http://gw.alicdn.com/mt/TB1EgO_JVXXXXa9XVXXXXXXXXXX-1698-648.png)
 
-#####DEvice Log Level
+#####Device Log Level
 
 The sort of Level Log is as follows：
 Error > Warn > Info > Debug > Verbose > ALL.  
