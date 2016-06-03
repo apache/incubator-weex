@@ -213,6 +213,7 @@ public class WXSDKEngine {
       }
 
       doInitInternal(application,config);
+      init = true;
 
       if (WXEnvironment.isApkDebugable()) {
         initPrettyFish(application);
@@ -222,6 +223,10 @@ public class WXSDKEngine {
 
   private static void doInitInternal(final Application application,final InitConfig config){
     final WXSDKManager sm = WXSDKManager.getInstance();
+    WXEnvironment.sApplication = application;
+    WXEnvironment.JsFrameworkInit = false;
+
+
     sm.postOnDomThread(new Runnable() {
       @Override
       public void run() {
@@ -230,9 +235,6 @@ public class WXSDKEngine {
           sm.setIWXImgLoaderAdapter(config.getImgAdapter());
           sm.setIWXUserTrackAdapter(config.getUtAdapter());
         }
-        init = true;
-        WXEnvironment.sApplication = application;
-        WXEnvironment.JsFrameworkInit = false;
         WXSoInstallMgrSdk.init(application);
         WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!WXEnvironment.sSupport) {
