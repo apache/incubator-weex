@@ -202,125 +202,156 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.alibaba.weex.commons;
 
-import android.text.TextUtils;
-
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKEngine;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import com.alibaba.weex.commons.util.ScreenUtil;
+import com.alibaba.weex.commons.util.AssertUtil;
+import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.common.WXRenderStrategy;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 5/30/16.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
+public abstract class AbstractWeexActivity extends AppCompatActivity implements IWXRenderListener {
+  private static final String TAG = "AbstractWeexActivity";
 
-    WXRenderStatement mWXRenderStatement;
+  private ViewGroup mContainer;
+  private WXSDKInstance mInstance;
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-//        WXSDKEngine.init(RuntimeEnvironment.application);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new WXRenderStatement(instance, "123");
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    createWeexInstance();
+    mInstance.onActivityCreate();
+  }
+
+  protected final void setContainer(ViewGroup container){
+    mContainer = container;
+  }
+
+  protected final ViewGroup getContainer(){
+    return mContainer;
+  }
+
+  protected void destoryWeexInstance(){
+    if(mInstance != null){
+      mInstance.registerRenderListener(null);
+      mInstance.destroy();
+      mInstance = null;
     }
+  }
 
-    public void testCreateBody() throws Exception {
+  protected void createWeexInstance(){
+    destoryWeexInstance();
 
+    Rect outRect = new Rect();
+    getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
+
+    mInstance = new WXSDKInstance(this);
+    mInstance.registerRenderListener(this);
+  }
+
+  protected void renderPage(String template,String source){
+    renderPage(template,source,null);
+  }
+
+  protected void renderPage(String template,String source,String jsonInitData){
+    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, source);
+    mInstance.render(
+      getPageName(),
+      template,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
+
+  protected void renderPageByURL(String url){
+    renderPageByURL(url,null);
+  }
+
+  protected void renderPageByURL(String url,String jsonInitData){
+    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, url);
+    mInstance.renderByUrl(
+      getPageName(),
+      url,
+      options,
+      jsonInitData,
+      ScreenUtil.getDisplayWidth(this),
+      ScreenUtil.getDisplayHeight(this),
+      WXRenderStrategy.APPEND_ASYNC);
+  }
+
+  protected String getPageName(){
+    return TAG;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    if(mInstance!=null){
+      mInstance.onActivityStart();
     }
+  }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
+  @Override
+  public void onResume() {
+    super.onResume();
+    if(mInstance!=null){
+      mInstance.onActivityResume();
     }
+  }
 
-    public void testSetPadding() throws Exception {
-
+  @Override
+  public void onPause() {
+    super.onPause();
+    if(mInstance!=null){
+      mInstance.onActivityPause();
     }
+  }
 
-    public void testSetLayout() throws Exception {
-
+  @Override
+  public void onStop() {
+    super.onStop();
+    if(mInstance!=null){
+      mInstance.onActivityStop();
     }
+  }
 
-    public void testSetExtra() throws Exception {
-
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if(mInstance!=null){
+      mInstance.onActivityDestroy();
     }
+  }
 
-    public void testAddComponent() throws Exception {
-
+  @Override
+  public void onViewCreated(WXSDKInstance wxsdkInstance, View view) {
+    if (mContainer != null) {
+      mContainer.addView(view);
     }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
+  }
 
 
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
 
-    }
+  @Override
+  public void onRefreshSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
 
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
+  }
 }

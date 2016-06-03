@@ -2,7 +2,9 @@ package com.alibaba.weex;
 
 import android.app.Application;
 
-import com.alibaba.weex.extend.adapter.ImageAdapter;
+import com.alibaba.weex.commons.adapter.ImageAdapter;
+import com.taobao.weex.InitConfig;
+import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.component.WTRichText;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.WXEventModule;
@@ -16,7 +18,11 @@ public class WXApplication extends Application {
     super.onCreate();
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
-    WXSDKEngine.init(this,null,null,new ImageAdapter(),null);
+    WXSDKEngine.initialize(this,
+      new InitConfig.Builder()
+      .setImgAdapter(new ImageAdapter())
+      .build()
+    );
 
     try {
 

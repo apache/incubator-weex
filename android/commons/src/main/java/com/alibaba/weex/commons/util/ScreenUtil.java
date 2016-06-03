@@ -202,125 +202,111 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.alibaba.weex.commons.util;
 
-import android.text.TextUtils;
+import android.content.res.TypedArray;
+import android.graphics.Point;
+import android.os.Build;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
+public class ScreenUtil {
+    private static final String TAG = "WXTBUtil";
 
-/**
- * Created by lixinke on 16/3/2.
- */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
+    private static boolean isSupportSmartBar = false;
 
-    WXRenderStatement mWXRenderStatement;
-
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-//        WXSDKEngine.init(RuntimeEnvironment.application);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new WXRenderStatement(instance, "123");
+    static {
+        isSupportSmartBar = isSupportSmartBar();
+    }
+    public static int getDisplayWidth(AppCompatActivity activity){
+        int width=0;
+        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
+            Point point=new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(point);
+            width = point.x;
+        }
+        return width;
     }
 
-    public void testCreateBody() throws Exception {
+    public static int getDisplayHeight(AppCompatActivity activity) {
+        int height = 0;
+        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
+            Point point=new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(point);
+            height=point.y;
+        }
 
+        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
+
+        if (isSupportSmartBar) {
+            int smartBarHeight = getSmartBarHeight(activity);
+            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
+            height -= smartBarHeight;
+        }
+
+        if (activity.getSupportActionBar() != null) {
+          int actionbar= activity.getSupportActionBar().getHeight();
+          if(actionbar==0){
+            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
+            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
+          }
+          Log.d(TAG, "actionbar:" + actionbar);
+          height -= actionbar;
+        }
+
+        int status = getStatusBarHeight(activity);
+        Log.d(TAG, "status:" + status);
+
+        height -= status;
+
+        Log.d(TAG,"height:"+height);
+        return height;
     }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
+    private static int getStatusBarHeight(AppCompatActivity activity) {
+        Class<?> c;
+        Object obj;
+        Field field;
+        int x;
+        int statusBarHeight = 0;
+        try {
+            c = Class.forName("com.android.internal.R$dimen");
+            obj = c.newInstance();
+            field = c.getField("status_bar_height");
+            x = Integer.parseInt(field.get(obj).toString());
+            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return statusBarHeight;
     }
 
-    public void testSetPadding() throws Exception {
-
+    private static int getSmartBarHeight(AppCompatActivity activity) {
+        ActionBar actionbar = activity.getSupportActionBar();
+        if (actionbar != null)
+            try {
+                Class c = Class.forName("com.android.internal.R$dimen");
+                Object obj = c.newInstance();
+                Field field = c.getField("mz_action_button_min_height");
+                int height = Integer.parseInt(field.get(obj).toString());
+                return activity.getResources().getDimensionPixelSize(height);
+            } catch (Exception e) {
+                e.printStackTrace();
+                actionbar.getHeight();
+            }
+        return 0;
     }
 
-    public void testSetLayout() throws Exception {
-
-    }
-
-    public void testSetExtra() throws Exception {
-
-    }
-
-    public void testAddComponent() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
-
-
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
-    }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
+    private static boolean isSupportSmartBar() {
+        try {
+            final Method method = Build.class.getMethod("hasSmartBar");
+            return method != null;
+        } catch (final Exception e) {
+            return false;
+        }
     }
 }

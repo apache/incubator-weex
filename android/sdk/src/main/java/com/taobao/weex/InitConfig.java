@@ -202,125 +202,64 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex;
 
-import android.text.TextUtils;
-
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
+import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 5/31/16.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
+public class InitConfig {
+  private IWXHttpAdapter httpAdapter;
+  private IWXImgLoaderAdapter imgAdapter;
+  private IWXUserTrackAdapter utAdapter;
 
-    WXRenderStatement mWXRenderStatement;
+  public IWXHttpAdapter getHttpAdapter() {
+    return httpAdapter;
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-//        WXSDKEngine.init(RuntimeEnvironment.application);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new WXRenderStatement(instance, "123");
-    }
+  public IWXImgLoaderAdapter getImgAdapter() {
+    return imgAdapter;
+  }
 
-    public void testCreateBody() throws Exception {
+  public IWXUserTrackAdapter getUtAdapter() {
+    return utAdapter;
+  }
 
-    }
+  private InitConfig() {
+  }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
-    }
-
-    public void testSetPadding() throws Exception {
+  public static class Builder{
+    IWXHttpAdapter httpAdapter;
+    IWXImgLoaderAdapter imgAdapter;
+    IWXUserTrackAdapter utAdapter;
+    public Builder(){
 
     }
 
-    public void testSetLayout() throws Exception {
-
+    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
+      this.httpAdapter = httpAdapter;
+      return this;
     }
 
-    public void testSetExtra() throws Exception {
-
+    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
+      this.imgAdapter = imgAdapter;
+      return this;
     }
 
-    public void testAddComponent() throws Exception {
-
+    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
+      this.utAdapter = utAdapter;
+      return this;
     }
 
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
-
-
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
+    public InitConfig build(){
+      InitConfig config =  new InitConfig();
+      config.httpAdapter = this.httpAdapter;
+      config.imgAdapter = this.imgAdapter;
+      config.utAdapter = this.utAdapter;
+      return config;
     }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
+  }
 }
