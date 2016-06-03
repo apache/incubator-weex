@@ -301,10 +301,10 @@ public class WXEnvironment {
   public static boolean isSupport() {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("WXEnvironment.sSupport:" + WXEnvironment.sSupport
-                   + " WXEnvironment.JsFrameworkInit:" + WXEnvironment.JsFrameworkInit
+                   + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
                    + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
     }
-    return WXEnvironment.sSupport && WXEnvironment.JsFrameworkInit && !WXUtils.isTabletDevice();
+    return WXEnvironment.sSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
   }
 
   public static boolean isApkDebugable() {

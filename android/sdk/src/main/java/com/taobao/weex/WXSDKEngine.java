@@ -164,7 +164,7 @@ public class WXSDKEngine {
 
   private static final String V8_SO_NAME = "weexcore";
   private volatile static boolean init;
-  private static Object mLock = new Object();
+  private static final Object mLock = new Object();
 
   /**
    * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
@@ -194,6 +194,13 @@ public class WXSDKEngine {
     );
   }
 
+
+  public static boolean isInitialized(){
+    synchronized(mLock) {
+      return init;
+    }
+  }
+
   /**
    *
    * @param application
@@ -204,45 +211,60 @@ public class WXSDKEngine {
       if (init) {
         return;
       }
-      if(config != null ) {
-        WXSDKManager sm = WXSDKManager.getInstance();
-        sm.setIWXHttpAdapter(config.getHttpAdapter());
-        sm.setIWXImgLoaderAdapter(config.getImgAdapter());
-        sm.setIWXUserTrackAdapter(config.getUtAdapter());
-      }
-      init = true;
-      WXEnvironment.sApplication = application;
-      WXEnvironment.JsFrameworkInit = false;
-      WXSoInstallMgrSdk.init(application);
-      WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-      if (!WXEnvironment.sSupport) {
-        return;
-      }
 
-      WXSDKManager.getInstance().initScriptsFramework(null);
-      register();
+      doInitInternal(application,config);
 
       if (WXEnvironment.isApkDebugable()) {
-        new AsyncTask<Application, Void, Application>() {
-          @Override
-          protected Application doInBackground(Application... params) {return params[0];}
-
-          @Override
-          protected void onPostExecute(Application application1) {
-            super.onPostExecute(application1);
-            try {
-              Class cls = Class.forName("com.taobao.weex.WXPrettyFish");
-              Method m = cls.getMethod("init", new Class[]{Application.class});
-              m.invoke(cls, new Object[]{application1});
-              WXEnvironment.sSupportDebugTool=true;
-            } catch (Exception e) {
-              Log.d("weex","WXPrettyFish not found!");
-              WXEnvironment.sSupportDebugTool=false;
-            }
-          }
-        }.execute(application);
+        initPrettyFish(application);
       }
     }
+  }
+
+  private static void doInitInternal(final Application application,final InitConfig config){
+    final WXSDKManager sm = WXSDKManager.getInstance();
+    sm.postOnDomThread(new Runnable() {
+      @Override
+      public void run() {
+        if(config != null ) {
+          sm.setIWXHttpAdapter(config.getHttpAdapter());
+          sm.setIWXImgLoaderAdapter(config.getImgAdapter());
+          sm.setIWXUserTrackAdapter(config.getUtAdapter());
+        }
+        init = true;
+        WXEnvironment.sApplication = application;
+        WXEnvironment.JsFrameworkInit = false;
+        WXSoInstallMgrSdk.init(application);
+        WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+        if (!WXEnvironment.sSupport) {
+          return;
+        }
+
+        WXSDKManager.getInstance().initScriptsFramework(null);
+        register();
+      }
+    });
+
+  }
+
+  private static void initPrettyFish(Application app){
+    new AsyncTask<Application, Void, Application>() {
+      @Override
+      protected Application doInBackground(Application... params) {return params[0];}
+
+      @Override
+      protected void onPostExecute(Application application1) {
+        super.onPostExecute(application1);
+        try {
+          Class cls = Class.forName("com.taobao.weex.WXPrettyFish");
+          Method m = cls.getMethod("init", new Class[]{Application.class});
+          m.invoke(cls, new Object[]{application1});
+          WXEnvironment.sSupportDebugTool=true;
+        } catch (Exception e) {
+          Log.d("weex","WXPrettyFish not found!");
+          WXEnvironment.sSupportDebugTool=false;
+        }
+      }
+    }.execute(app);
   }
 
   @Deprecated

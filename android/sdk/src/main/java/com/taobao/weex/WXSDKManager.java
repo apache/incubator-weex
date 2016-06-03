@@ -209,6 +209,10 @@ public class WXSDKManager {
     mWXRenderManager.postOnUiThread(runnable, delayMillis);
   }
 
+  public void postOnDomThread(Runnable runnable){
+    mWXDomManager.post(runnable);
+  }
+
   public void destroy() {
     if (mWXDomManager != null) {
       mWXDomManager.destroy();
