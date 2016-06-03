@@ -5,7 +5,7 @@ All of weex tags share some common style rules
 
 ## Box Model
 
-![box model](http://www.codeproject.com/KB/HTML/567385/boxmodel-image.png)
+![box model](../images/css-boxmodel.png)
 
 Weex box model based on the CSS box model, all of weex elements can be considered as boxes.  The term "box model" is used when talking about design and layout. The box model is essentially a box that wraps around every HTML element. It consists of margins, borders, paddings, and the actual content.
 
@@ -75,7 +75,7 @@ The flex-direction property specifies the direction of the flexible items inside
 
 The justify-content property horizontally aligns the flexible container's items when the items do not use all available space on the main-axis. `flex-start` is the default value, meaning the flex items are positioned at the beginning of the container. `flex-end`` means the items are positioned at the end of the container. `center` means the items are positioned at the center of the container. `space-between` means the items are positioned with space between the lines.
 
-![justify-content](http://www.w3.org/TR/css3-flexbox/images/flex-pack.svg)
+![justify-content](../images/css-flexbox-justify.svg)
 
 - `align-items`: `stretch` | `flex-start` | `center` | `flex-end`
 
