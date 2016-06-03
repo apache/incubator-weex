@@ -74,9 +74,6 @@ public class WXTextDomObject extends WXDomObject {
     @Override
     public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
       WXTextDomObject textDomObject = (WXTextDomObject) node;
-      if (textDomObject.spannableStringBuilder.length() == 0) {
-        return;
-      }
       if (CSSConstants.isUndefined(width)) {
         width = node.cssstyle.maxWidth;
       }
