@@ -9,15 +9,19 @@
 
 package com.facebook.stetho.common;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import android.util.Log;
+
+import com.facebook.stetho.inspector.console.CLog;
+import com.facebook.stetho.inspector.protocol.module.Console;
 
 /**
  * Logging helper specifically for use by Stetho internals.
  */
 public class LogUtil {
-  private static final String TAG = "stetho";
+  private static final String TAG = "weex";
 
   public static void e(String format, Object... args) {
     e(format(format, args));
@@ -138,5 +142,20 @@ public class LogUtil {
       default:
         return LogRedirector.isLoggable(TAG, priority);
     }
+  }
+
+  private static final HashMap<String, Console.MessageLevel> sLevelMap = new HashMap<String, Console.MessageLevel>(5);
+
+  static {
+    sLevelMap.put("verbose", Console.MessageLevel.LOG);
+    sLevelMap.put("info", Console.MessageLevel.LOG);
+    sLevelMap.put("assert", Console.MessageLevel.LOG);
+    sLevelMap.put("debug", Console.MessageLevel.DEBUG);
+    sLevelMap.put("warning", Console.MessageLevel.WARNING);
+    sLevelMap.put("error", Console.MessageLevel.ERROR);
+  }
+
+  public static void log(String level, String messageText) {
+    CLog.writeToConsole(sLevelMap.get(level), Console.MessageSource.JAVASCRIPT, messageText);
   }
 }

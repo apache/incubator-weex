@@ -211,6 +211,7 @@ import com.taobao.weex.WXEnvironment;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 
 public class WXLogUtils {
 
@@ -224,72 +225,84 @@ public class WXLogUtils {
       builder.setLength(0);
       builder.append("[render time]").append(type).append(":").append(time);
       Log.d(WEEX_PERF_TAG, builder.substring(0));
+      writeConsoleLog("debug", builder.substring(0));
     }
   }
 
   public static void d(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.d(WEEX_TAG, msg);
+      writeConsoleLog("debug", msg);
     }
   }
 
   public static void info(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.i(WEEX_TAG, msg);
+      writeConsoleLog("info", msg);
     }
   }
 
   public static void v(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.v(WEEX_TAG, msg);
+      writeConsoleLog("verbose", msg);
     }
   }
 
   public static void w(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.w(WEEX_TAG, msg);
+      writeConsoleLog("warning", msg);
     }
   }
 
   public static void e(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.e(WEEX_TAG, msg);
+      writeConsoleLog("error", msg);
     }
   }
 
   public static void d(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.d(tag, msg);
+      writeConsoleLog("debug", tag + ":" + msg);
     }
   }
 
-  public static void info(String tag, String msg) {
+  public static void i(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.i(tag, msg);
+      writeConsoleLog("info", tag + ":" + msg);
     }
   }
 
   public static void v(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.v(tag, msg);
+      writeConsoleLog("verbose", tag + ":" + msg);
     }
   }
 
   public static void w(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.w(tag, msg);
+      writeConsoleLog("warning", tag + ":" + msg);
     }
   }
 
   public static void e(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.e(tag, msg);
+      writeConsoleLog("error", tag + ":" + msg);
     }
   }
 
   public static void p(String msg) {
     if (WXEnvironment.isApkDebugable() && msg != null) {
       Log.d(WEEX_PERF_TAG, msg);
+      writeConsoleLog("debug", msg);
     }
   }
 
@@ -318,5 +331,19 @@ public class WXLogUtils {
       }
     }
     return sw.toString();
+  }
+
+
+  private static void writeConsoleLog(String level, String message) {
+    if (WXEnvironment.isApkDebugable()) {
+      try {
+        Class cls = Class.forName("com.facebook.stetho.common.LogUtil");
+        Method m = cls.getMethod("log", new Class[]{String.class, String.class});
+        m.invoke(cls, new Object[]{level, message});
+      } catch (Exception e) {
+        Log.d(WEEX_TAG, "WXDebugTool not found!");
+      }
+    }
+
   }
 }
