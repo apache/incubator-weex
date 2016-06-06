@@ -119,6 +119,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.navigator.WXNavigatorModule;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
@@ -165,6 +166,7 @@ public class WXSDKEngine {
   private static final String V8_SO_NAME = "weexcore";
   private volatile static boolean init;
   private static final Object mLock = new Object();
+  private static final String TAG = "WXSDKEngine";
 
   /**
    * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
@@ -222,24 +224,28 @@ public class WXSDKEngine {
   }
 
   private static void doInitInternal(final Application application,final InitConfig config){
-    final WXSDKManager sm = WXSDKManager.getInstance();
     WXEnvironment.sApplication = application;
     WXEnvironment.JsFrameworkInit = false;
 
-    if(config != null ) {
-      sm.setIWXHttpAdapter(config.getHttpAdapter());
-      sm.setIWXImgLoaderAdapter(config.getImgAdapter());
-      sm.setIWXUserTrackAdapter(config.getUtAdapter());
-    }
-    WXSoInstallMgrSdk.init(application);
-    WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-    if (!WXEnvironment.sSupport) {
-      return;
-    }
+    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        WXSDKManager sm = WXSDKManager.getInstance();
+        if(config != null ) {
+          sm.setIWXHttpAdapter(config.getHttpAdapter());
+          sm.setIWXImgLoaderAdapter(config.getImgAdapter());
+          sm.setIWXUserTrackAdapter(config.getUtAdapter());
+        }
+        WXSoInstallMgrSdk.init(application);
+        WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+        if (!WXEnvironment.sSupport) {
+          return;
+        }
 
-    WXSDKManager.getInstance().initScriptsFramework(null);
-    register();
-
+        sm.initScriptsFramework(null);
+        register();
+      }
+    });
   }
 
   private static void initPrettyFish(Application app){
