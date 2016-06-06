@@ -220,6 +220,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEventType;
@@ -567,8 +568,8 @@ public class WXListComponent extends WXVContainer implements
             }
         }
         WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
-        return createVHForFakeComponent(viewType);
-//        throw new WXRuntimeException("mChildren is null");
+//        return createVHForFakeComponent(viewType);
+        throw new WXRuntimeException("mChildren is null");
     }
 
 
