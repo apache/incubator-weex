@@ -1,7 +1,5 @@
 package com.alibaba.weex;
 
-import com.google.zxing.client.android.CaptureActivity;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.weex.util.ScreenUtil;
+import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
@@ -35,7 +34,8 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
   private static final int CAMARA_PERMISSION_REQUEST_CODE = 0x1;
 
   private static final String TAG = "IndexFragment";
-  private static String CURRENT_IP="your_current_IP"; // your_current_IP
+  private static String CURRENT_IP = "30.10.216.161"; //"your_current_IP"; // your_current_IP
+  // private static String CURRENT_IP = "localhost";
   private static final String WEEX_INDEX_URL = "http://"+CURRENT_IP+":12580/examples/build/index.js";
 
   private ViewGroup mContainer;

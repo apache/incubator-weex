@@ -6,6 +6,7 @@ import com.alibaba.weex.extend.Components.WTRichText;
 import com.alibaba.weex.extend.ImageAdapter;
 import com.alibaba.weex.extend.Modules.RenderModule;
 import com.alibaba.weex.extend.Modules.WXEventModule;
+import com.facebook.stetho.Stetho;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
@@ -29,5 +30,6 @@ public class WXApplication extends Application {
     } catch (WXException e) {
       e.printStackTrace();
     }
+    Stetho.initializeWithDefaults(this);
   }
 }
