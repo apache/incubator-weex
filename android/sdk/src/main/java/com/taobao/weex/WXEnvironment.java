@@ -214,6 +214,7 @@ import android.telephony.TelephonyManager;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
@@ -234,7 +235,6 @@ public class WXEnvironment {
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
   public static int sDefaultWidth = 750;
-  public volatile static boolean sSupport = false;
   public volatile static boolean JsFrameworkInit = false;
   /**
    * Debug model
@@ -299,12 +299,13 @@ public class WXEnvironment {
   }
 
   public static boolean isSupport() {
+    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport();
     if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + WXEnvironment.sSupport
+      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
                    + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
                    + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
     }
-    return WXEnvironment.sSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
+    return isCPUSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
   }
 
   public static boolean isApkDebugable() {

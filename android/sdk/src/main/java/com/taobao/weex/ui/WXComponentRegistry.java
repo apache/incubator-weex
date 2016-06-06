@@ -229,15 +229,6 @@ public class WXComponentRegistry {
       return false;
     }
 
-//    if (sComponent.containsKey(type)) {
-//      if (WXEnvironment.isApkDebugable()) {
-//        throw new WXException("Exist duplicate component :" + type);
-//      } else {
-//        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
-//        return false;
-//      }
-//    }
-
     WXComponentPropCache.getMethods(clazz);
 
     Map<String, String> componentInfo = new HashMap<>();

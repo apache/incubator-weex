@@ -237,8 +237,8 @@ public class WXSDKEngine {
           sm.setIWXUserTrackAdapter(config.getUtAdapter());
         }
         WXSoInstallMgrSdk.init(application);
-        WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
-        if (!WXEnvironment.sSupport) {
+        boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
+        if (!isSoInitSuccess) {
           return;
         }
 

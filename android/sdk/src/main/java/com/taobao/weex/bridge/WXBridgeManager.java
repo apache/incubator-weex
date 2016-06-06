@@ -496,10 +496,6 @@ public class WXBridgeManager implements Callback {
    * @param framework String representation of the framework to be init.
    */
   public synchronized void initScriptsFramework(String framework) {
-    if (!WXEnvironment.sSupport) {
-      return;
-    }
-
     Message msg = mJSHandler.obtainMessage();
     msg.obj = framework;
     msg.what = WXJSBridgeMsgType.INIT_FRAMEWORK;
@@ -655,7 +651,7 @@ public class WXBridgeManager implements Callback {
    */
   public void createInstance(final String instanceId, final String template,
                              final Map<String, Object> options, final String data) {
-    if (!WXEnvironment.sSupport || TextUtils.isEmpty(instanceId)
+    if ( TextUtils.isEmpty(instanceId)
         || TextUtils.isEmpty(template) || mJSHandler == null) {
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
       if (instance != null) {
@@ -740,7 +736,7 @@ public class WXBridgeManager implements Callback {
   }
 
   public void destroyInstance(final String instanceId) {
-    if (!WXEnvironment.sSupport || mJSHandler == null
+    if ( mJSHandler == null
         || TextUtils.isEmpty(instanceId)) {
       return;
     }
@@ -948,7 +944,7 @@ public class WXBridgeManager implements Callback {
    */
 
   public void registerModules(final Map<String, Object> modules) {
-    if (!WXEnvironment.sSupport || mJSHandler == null || modules == null
+    if ( mJSHandler == null || modules == null
         || modules.size() == 0) {
       return;
     }
@@ -964,7 +960,7 @@ public class WXBridgeManager implements Callback {
    * Registered component
    */
   public void registerComponents(final ArrayList<Map<String, String>> components) {
-    if (!WXEnvironment.sSupport || mJSHandler == null || components == null
+    if ( mJSHandler == null || components == null
         || components.size() == 0) {
       return;
     }
