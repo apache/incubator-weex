@@ -131,6 +131,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -162,6 +163,7 @@ public class WXSDKManager {
   private IWXUserTrackAdapter mIWXUserTrackAdapter;
   private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
   private IWXHttpAdapter mIWXHttpAdapter;
+  private IWXDebugAdapter mIWXDebugAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
 
   private WXSDKManager() {
@@ -300,5 +302,12 @@ public class WXSDKManager {
 
   void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
     mIWXHttpAdapter = IWXHttpAdapter;
+  }
+  public IWXDebugAdapter getIWXDebugAdapter() {
+    return mIWXDebugAdapter;
+  }
+
+  public void setIWXDebugAdapter(IWXDebugAdapter IWXDebugAdapter) {
+    mIWXDebugAdapter = IWXDebugAdapter;
   }
 }

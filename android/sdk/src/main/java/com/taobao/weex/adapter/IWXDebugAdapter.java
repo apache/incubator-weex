@@ -202,77 +202,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.adapter;
 
-import com.taobao.weex.adapter.IWXDebugAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import android.app.Application;
+import android.view.View;
+
+import com.taobao.weex.WXSDKInstance;
 
 /**
- * Created by sospartan on 5/31/16.
+ * Created by lixinke on 16/6/6.
  */
-public class InitConfig {
-  private IWXHttpAdapter httpAdapter;
-  private IWXImgLoaderAdapter imgAdapter;
-  private IWXUserTrackAdapter utAdapter;
-  private IWXDebugAdapter debugAdapter;
+public interface IWXDebugAdapter {
 
-  public IWXHttpAdapter getHttpAdapter() {
-    return httpAdapter;
-  }
+  void initDebug(Application application);
 
-  public IWXImgLoaderAdapter getImgAdapter() {
-    return imgAdapter;
-  }
+  /**
+   * wrap weex container
+   */
+  View wrapContainer(WXSDKInstance instance, View wxView);
 
-  public IWXUserTrackAdapter getUtAdapter() {
-    return utAdapter;
-  }
+  void putDebugOptions(String key, String value);
 
-  public IWXDebugAdapter getDebugAdapter(){
-    return debugAdapter;
-  }
-
-  private InitConfig() {
-  }
-
-  public static class Builder{
-    IWXHttpAdapter httpAdapter;
-    IWXImgLoaderAdapter imgAdapter;
-    IWXUserTrackAdapter utAdapter;
-    IWXDebugAdapter debugAdapter;
-    public Builder(){
-
-    }
-
-    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
-      this.httpAdapter = httpAdapter;
-      return this;
-    }
-
-    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
-      this.imgAdapter = imgAdapter;
-      return this;
-    }
-
-    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
-      this.utAdapter = utAdapter;
-      return this;
-    }
-
-    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
-      this.debugAdapter=debugAdapter;
-      return this;
-    }
-
-    public InitConfig build(){
-      InitConfig config =  new InitConfig();
-      config.httpAdapter = this.httpAdapter;
-      config.imgAdapter = this.imgAdapter;
-      config.utAdapter = this.utAdapter;
-      config.debugAdapter=this.debugAdapter;
-      return config;
-    }
-  }
+  String getDebugOptions(String key);
 }

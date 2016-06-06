@@ -162,6 +162,8 @@ public class WeexUiTestCaseTcInputEvent extends ActivityInstrumentationTestCase2
                                        Log.e(TAG, "EditText onclick clcik!");
                                    }
                                });
+                               sleep(3000);
+
                            }
                            else if(hintText.equals("oninput")){
 

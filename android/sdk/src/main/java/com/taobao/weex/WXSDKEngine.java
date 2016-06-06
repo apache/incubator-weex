@@ -111,7 +111,6 @@
 package com.taobao.weex;
 
 import android.app.Application;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -215,8 +214,8 @@ public class WXSDKEngine {
       doInitInternal(application,config);
       init = true;
 
-      if (WXEnvironment.isApkDebugable()) {
-        initPrettyFish(application);
+      if (WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null) {
+        WXSDKManager.getInstance().getIWXDebugAdapter().initDebug(application);
       }
     }
   }
@@ -230,6 +229,7 @@ public class WXSDKEngine {
       sm.setIWXHttpAdapter(config.getHttpAdapter());
       sm.setIWXImgLoaderAdapter(config.getImgAdapter());
       sm.setIWXUserTrackAdapter(config.getUtAdapter());
+      sm.setIWXDebugAdapter(config.getDebugAdapter());
     }
     WXSoInstallMgrSdk.init(application);
     WXEnvironment.sSupport = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
@@ -240,27 +240,6 @@ public class WXSDKEngine {
     WXSDKManager.getInstance().initScriptsFramework(null);
     register();
 
-  }
-
-  private static void initPrettyFish(Application app){
-    new AsyncTask<Application, Void, Application>() {
-      @Override
-      protected Application doInBackground(Application... params) {return params[0];}
-
-      @Override
-      protected void onPostExecute(Application application1) {
-        super.onPostExecute(application1);
-        try {
-          Class cls = Class.forName("com.taobao.weex.WXPrettyFish");
-          Method m = cls.getMethod("init", new Class[]{Application.class});
-          m.invoke(cls, new Object[]{application1});
-          WXEnvironment.sSupportDebugTool=true;
-        } catch (Exception e) {
-          Log.d("weex","WXPrettyFish not found!");
-          WXEnvironment.sSupportDebugTool=false;
-        }
-      }
-    }.execute(app);
   }
 
   @Deprecated
