@@ -378,9 +378,9 @@ public class WXListComponent extends WXVContainer implements
                             if(linearLayoutManager!=null){
                                 x=0;
                                 int position = linearLayoutManager.findFirstVisibleItemPosition();
-                                View firstVisiableChildView = layoutManager.findViewByPosition(position);
-                                int itemHeight = firstVisiableChildView.getHeight();
-                                y= (position) * itemHeight - firstVisiableChildView.getTop();
+                                View firstVisibleChildView = layoutManager.findViewByPosition(position);
+                                int itemHeight = firstVisibleChildView.getHeight();
+                                y= (position) * itemHeight - firstVisibleChildView.getTop();
                             }
                             listener.onScrollStateChanged(recyclerView, x, y,tempState);
                         }
