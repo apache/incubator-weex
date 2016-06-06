@@ -8,6 +8,7 @@ import com.alibaba.weex.extend.component.WTRichText;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.adapter.DefautDebugAdapter;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
@@ -18,10 +19,10 @@ public class WXApplication extends Application {
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
-      new InitConfig.Builder()
-      .setImgAdapter(new ImageAdapter())
-      .build()
-    );
+                           new InitConfig.Builder()
+                               .setImgAdapter(new ImageAdapter()).setDebugAdapter(new DefautDebugAdapter())
+                               .build()
+                          );
 
     try {
 
