@@ -207,7 +207,6 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -359,34 +358,25 @@ public class WXListComponent extends WXVContainer implements
         bounceview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-                if(listeners!=null && listeners.size()>0){
-                    for (OnWXScrollListener listener : listeners) {
-                        if (listener != null) {
-                            int tempState = RecyclerView.SCROLL_STATE_IDLE;
-                            if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
-                                newState=OnWXScrollListener.DRAGGING;
-                            }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
-                                newState = OnWXScrollListener.SETTLING;
-                            }
-                            RecyclerView.LayoutManager layoutManager=recyclerView.getLayoutManager();
-                            LinearLayoutManager linearLayoutManager=null;
-                            int x=0,y=0;
-                            if(layoutManager instanceof LinearLayoutManager){
-                                linearLayoutManager=(LinearLayoutManager)layoutManager;
-                            }
-                            if(linearLayoutManager!=null){
-                                x=0;
-                                int position = linearLayoutManager.findFirstVisibleItemPosition();
-                                View firstVisibleChildView = layoutManager.findViewByPosition(position);
-                                int itemHeight = firstVisibleChildView.getHeight();
-                                y= (position) * itemHeight - firstVisibleChildView.getTop();
-                            }
-                            listener.onScrollStateChanged(recyclerView, x, y,tempState);
-                        }
+              super.onScrollStateChanged(recyclerView, newState);
+              List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+              if (listeners != null && listeners.size() > 0) {
+                for (OnWXScrollListener listener : listeners) {
+                  if (listener != null) {
+                    int tempState = RecyclerView.SCROLL_STATE_IDLE;
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                      newState = OnWXScrollListener.DRAGGING;
+                    } else if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                      newState = OnWXScrollListener.SETTLING;
                     }
+                    View topView = recyclerView.getChildAt(0);
+                    if (topView != null && listener != null) {
+                      int y = topView.getTop();
+                      listener.onScrollStateChanged(recyclerView, 0, y, tempState);
+                    }
+                  }
                 }
+              }
             }
 
             @Override
