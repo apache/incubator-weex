@@ -644,7 +644,7 @@ public class WXListComponent extends WXVContainer implements
     }
 
     @Override
-    public void notifyAppearStateChange(int firstVisible, int lastVisible) {
+    public void notifyAppearStateChange(int firstVisible, int lastVisible,int directionX,int directionY) {
 
         List<Integer> unRegisterKeys = new ArrayList<>();
 
@@ -657,10 +657,12 @@ public class WXListComponent extends WXVContainer implements
                 continue;
             }
             if (key >= firstVisible && key <= lastVisible && !value.appearState) {
-                value.notifyAppearStateChange(WXEventType.APPEAR);
+              String direction=directionY>0?"up":"down";
+                value.notifyAppearStateChange(WXEventType.APPEAR,direction);
                 value.appearState = true;
             } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
-                value.notifyAppearStateChange(WXEventType.DISAPPEAR);
+              String direction=directionY>0?"up":"down";
+              value.notifyAppearStateChange(WXEventType.DISAPPEAR,direction);
                 value.appearState = false;
             }
             WXLogUtils.d(TAG, "key:" + key + " " + "appear:" + value.appearState);

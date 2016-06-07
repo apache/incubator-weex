@@ -933,8 +933,10 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  public void notifyAppearStateChange(String wxEventType){
-    WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,null);
+  public void notifyAppearStateChange(String wxEventType,String direction){
+    Map<String, Object> params = new HashMap<>();
+    params.put("direction", direction);
+    WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,params);
   }
 
   public boolean isUsing() {
