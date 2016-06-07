@@ -21,8 +21,8 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 
 ## Use Weex
 
-* See [Tutorial](https://github.com/alibaba/weex/blob/dev/doc/tutorial.md).
-* See [Weex Documentation](https://github.com/alibaba/weex/blob/dev/doc/INSTALL.md) for more information.
+* See [Tutorial](http://alibaba.github.io/weex/doc/tutorial.html).
+* See [Weex Documentation](http://alibaba.github.io/weex/doc/) for more information.
 
 ### Android 
 
@@ -40,11 +40,11 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 
 ## Scripts
 
-See [SCRIPTS.md](SCRIPTS.md) for more information.
+See [SCRIPTS.md](./SCRIPTS.md) for more information.
 
 ## FAQ
 
-See [FAQ](./doc/faq.md) for more information.
+See [FAQ](http://alibaba.github.io/weex/doc/faq.html) for more information.
 
 ## Contributing
 
