@@ -267,11 +267,14 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
     mDomObj = domObject;
     Spacing parentPadding = mParent.getDomObject().getPadding();
+    Spacing parentBorder = mParent.getDomObject().getBorder();
     Spacing margin = mDomObj.getMargin();
     int realWidth = (int) mDomObj.getLayoutWidth();
     int realHeight = (int) mDomObj.getLayoutHeight();
-    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) );
-    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) );
+    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) -
+                          parentBorder.get(Spacing.LEFT));
+    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) -
+                         parentBorder.get(Spacing.TOP));
     int realRight = (int) margin.get(Spacing.RIGHT);
     int realBottom = (int) margin.get(Spacing.BOTTOM);
 
