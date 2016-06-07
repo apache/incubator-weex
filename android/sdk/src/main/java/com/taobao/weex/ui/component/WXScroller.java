@@ -428,7 +428,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
    * @param y vertical distance. Negative for scroll to top
    */
   public void scrollBy(final int x, final int y) {
-    if (getView() == null || mOrientation != VERTICAL) {
+    if (getView() == null) {
       return;
     }
 
@@ -436,7 +436,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
 
       @Override
       public void run() {
-        ((WXScrollView) getView()).smoothScrollBy(0, -y);
+        if(mOrientation==VERTICAL){
+          ((WXScrollView) getView()).smoothScrollBy(0, -y);
+        }else{
+          ((WXHorizontalScrollView)getView()).smoothScrollBy(-x,0);
+        }
         getView().invalidate();
       }
     }, 16);
