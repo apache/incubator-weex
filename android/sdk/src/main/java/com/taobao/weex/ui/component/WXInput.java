@@ -253,7 +253,8 @@ public class WXInput extends WXComponent {
     }
 
     inputView.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
-    inputView.setSingleLine();//default use single line , same to ios 
+    inputView.setSingleLine();//default use single line , same to ios
+    inputView.setMovementMethod(null);
     mHost = inputView;
   }
 
