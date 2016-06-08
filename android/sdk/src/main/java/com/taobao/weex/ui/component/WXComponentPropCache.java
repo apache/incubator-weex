@@ -230,13 +230,16 @@ public class WXComponentPropCache {
       Annotation[] annotations;
       int annotationsCount;
       Annotation anno;
+
       for (Method method : clazz.getMethods()) {
-        annotations = method.getDeclaredAnnotations();
-        annotationsCount = annotations.length;
-        for (int i = 0; i < annotationsCount; ++i) {
-          anno = annotations[i];
-          if (anno != null && anno instanceof WXComponentProp) {
-            methodMap.put(((WXComponentProp) anno).name(), method);
+        if (method.isAnnotationPresent(WXComponentProp.class)) {
+          annotations = method.getDeclaredAnnotations();
+          annotationsCount = annotations.length;
+          for (int i = 0; i < annotationsCount; ++i) {
+            anno = annotations[i];
+            if (anno != null && anno instanceof WXComponentProp) {
+              methodMap.put(((WXComponentProp) anno).name(), method);
+            }
           }
         }
       }
