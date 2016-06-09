@@ -15,6 +15,7 @@
     * [How-tos](/how-to/main.md)
         * [Require 3rd-party Libs](/how-to/require-3rd-party-libs.md)
         * [Transform Code Into JS Bundle](/how-to/transform-code-into-js-bundle.md)
+        * [Preview In Browser](/how-to/preview-in-browser.md)        
     * [Advanced](/advanced/main.md)
         * [How It Works](/advanced/how-it-works.md)
         * [How Data Binding Works](/advanced/how-data-binding-works.md)
