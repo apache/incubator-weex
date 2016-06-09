@@ -17,7 +17,7 @@ project(":weex_debug").projectDir=new File("../weex_debug")
 Tip: if your local weex tool version<0.0.31 you shoud update your weex tool
 
 ````shell
-npm install -g weex-toolkit@0.0.31
+npm install -g weex-toolkit
 ````  
 Next: you can start local server
 
