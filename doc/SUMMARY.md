@@ -48,7 +48,7 @@
         * [wxc-navpage](/components/wxc-navpage.md)
     * [Built-in Modules](/modules/README.md)
         * [dom](/modules/dom.md)
-        * [steam](/modules/stream.md)
+        * [stream](/modules/stream.md)
         * [modal](/modules/modal.md)
         * [animation](/modules/animation.md)
         * [webview](/modules/webview.md)
