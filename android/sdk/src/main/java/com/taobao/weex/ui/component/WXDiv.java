@@ -219,7 +219,9 @@ public class WXDiv extends WXVContainer {
 
   @Override
   protected void initView() {
-    mHost = new WXFrameLayout(mContext);
+    if(mContext!=null) {
+      mHost = new WXFrameLayout(mContext);
+    }
   }
 
   @Override
