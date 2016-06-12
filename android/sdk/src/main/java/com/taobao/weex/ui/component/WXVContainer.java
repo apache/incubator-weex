@@ -276,8 +276,9 @@ public abstract class WXVContainer extends WXComponent {
     for (int i = 0; i < count; ++i) {
       getChild(i).createViewImpl(this, i);
     }
-
-    getView().setClipToPadding(false);
+    if(getView()!=null){
+       getView().setClipToPadding(false);
+    }
   }
 
   @Override
