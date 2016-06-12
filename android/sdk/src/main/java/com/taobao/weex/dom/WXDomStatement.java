@@ -507,32 +507,37 @@ class WXDomStatement {
     domObject.ref = WXDomObject.ROOT;
     domObject.updateStyle(style);
     transformStyle(domObject, true);
-    final WXComponent component = mWXRenderManager.createBodyOnDomThread(mInstanceId, domObject);
-    AddDomInfo addDomInfo = new AddDomInfo();
-    addDomInfo.component = component;
-    mAddDom.put(domObject.ref, addDomInfo);
 
-    mNormalTasks.add(new IWXRenderTask() {
+    try {
+      final WXComponent component = mWXRenderManager.createBodyOnDomThread(mInstanceId, domObject);
+      AddDomInfo addDomInfo = new AddDomInfo();
+      addDomInfo.component = component;
+      mAddDom.put(domObject.ref, addDomInfo);
 
-      @Override
-      public void execute() {
-        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-        if(instance == null || instance.getContext()== null) {
-          WXLogUtils.e("instance is null or instance is destroy!");
-          return;
+      mNormalTasks.add(new IWXRenderTask() {
+
+        @Override
+        public void execute() {
+          WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+          if (instance == null || instance.getContext() == null) {
+            WXLogUtils.e("instance is null or instance is destroy!");
+            return;
+          }
+          try {
+            mWXRenderManager.createBody(mInstanceId, component);
+          } catch (Exception e) {
+            WXLogUtils.e("create body failed." + e.getMessage());
+          }
         }
-        try {
-          mWXRenderManager.createBody(mInstanceId, component);
-        }catch (Exception e){
-          WXLogUtils.e("create body failed."+e.getMessage());
-        }
+      });
+      mDirty = true;
+      mFlushes.add(domObject.ref);
+
+      if (instance != null) {
+        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
       }
-    });
-    mDirty = true;
-    mFlushes.add(domObject.ref);
-
-    if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    }catch (Exception e){
+      WXLogUtils.e("create body in dom thread failed." + e.getMessage());
     }
   }
 
