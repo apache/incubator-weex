@@ -10,6 +10,7 @@ package com.taobao.weex.dom;
 
 import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.text.DynamicLayout;
 import android.text.Editable;
 import android.text.Layout;
@@ -150,7 +151,8 @@ public class WXTextDomObject extends WXDomObject {
     }
     hasBeenMeasured =false;
 
-    if(layout!=null&&!layout.equals(atomicReference.get())) {
+    if(layout!=null && !layout.equals(atomicReference.get()) &&
+       Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT) {
       //TODO Warm up, a profile should be used to see the improvement.
       warmUpTextLayoutCache();
     }
