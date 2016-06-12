@@ -613,7 +613,9 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   }
 
   protected void initView() {
-    mHost = new FrameLayout(mContext);
+    if(mContext!=null) {
+      mHost = new FrameLayout(mContext);
+    }
   }
 
   public View getView() {
