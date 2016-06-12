@@ -204,6 +204,7 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -215,6 +216,7 @@ public class InitConfig {
   private IWXHttpAdapter httpAdapter;
   private IWXImgLoaderAdapter imgAdapter;
   private IWXUserTrackAdapter utAdapter;
+  private IWXDebugAdapter debugAdapter;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -228,6 +230,10 @@ public class InitConfig {
     return utAdapter;
   }
 
+  public IWXDebugAdapter getDebugAdapter(){
+    return debugAdapter;
+  }
+
   private InitConfig() {
   }
 
@@ -235,6 +241,7 @@ public class InitConfig {
     IWXHttpAdapter httpAdapter;
     IWXImgLoaderAdapter imgAdapter;
     IWXUserTrackAdapter utAdapter;
+    IWXDebugAdapter debugAdapter;
     public Builder(){
 
     }
@@ -254,11 +261,17 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
+      this.debugAdapter=debugAdapter;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
       config.imgAdapter = this.imgAdapter;
       config.utAdapter = this.utAdapter;
+      config.debugAdapter=this.debugAdapter;
       return config;
     }
   }

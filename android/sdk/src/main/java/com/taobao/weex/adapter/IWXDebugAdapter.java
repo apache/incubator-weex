@@ -202,11 +202,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.listview.adapter;
+package com.taobao.weex.adapter;
 
+import android.app.Application;
+import android.view.View;
 
-public interface IOnLoadMoreListener {
+import com.taobao.weex.WXSDKInstance;
 
-  void onLoadMore(int offScreenY);
-  void notifyAppearStateChange(int firstVisible,int lastVisible,int directionX,int directionY);
+/**
+ * Created by lixinke on 16/6/6.
+ */
+public interface IWXDebugAdapter {
+
+  void initDebug(Application application);
+
+  /**
+   * wrap weex container
+   */
+  View wrapContainer(WXSDKInstance instance, View wxView);
+
+  void putDebugOptions(String key, String value);
+
+  String getDebugOptions(String key);
 }

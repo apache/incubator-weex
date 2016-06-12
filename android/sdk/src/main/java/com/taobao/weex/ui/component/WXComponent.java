@@ -200,6 +200,12 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
+
+  private int mPrePaddingLeft = 0;
+  private int mPrePaddingTop = 0;
+  private int mPrePaddingRight = 0;
+  private int mPrePaddingBottom = 0;
+
   private WXGesture wxGesture;
   private ComponentHolder mHolder;
 
@@ -274,11 +280,14 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
     mDomObj = domObject;
     Spacing parentPadding = mParent.getDomObject().getPadding();
+    Spacing parentBorder = mParent.getDomObject().getBorder();
     Spacing margin = mDomObj.getMargin();
     int realWidth = (int) mDomObj.getLayoutWidth();
     int realHeight = (int) mDomObj.getLayoutHeight();
-    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) );
-    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) );
+    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) -
+                          parentBorder.get(Spacing.LEFT));
+    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) -
+                         parentBorder.get(Spacing.TOP));
     int realRight = (int) margin.get(Spacing.RIGHT);
     int realBottom = (int) margin.get(Spacing.BOTTOM);
 
@@ -366,10 +375,20 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
     int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
 
+    if(left == mPrePaddingLeft && top == mPrePaddingTop
+            && right == mPrePaddingRight && bottom== mPrePaddingBottom ){
+      WXLogUtils.d("zshshr","setPadding none!!!!!");
+      return;
+    }
+
     if (mHost == null) {
       return;
     }
     mHost.setPadding(left, top, right, bottom);
+    mPrePaddingLeft = left;
+    mPrePaddingTop = top;
+    mPrePaddingRight = right;
+    mPrePaddingBottom = bottom;
   }
 
 //  private void updateProperties() {
@@ -601,7 +620,9 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   }
 
   protected void initView() {
-    mHost = new FrameLayout(mContext);
+    if(mContext!=null) {
+      mHost = new FrameLayout(mContext);
+    }
   }
 
   public View getView() {
@@ -940,8 +961,10 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  public void notifyAppearStateChange(String wxEventType){
-    WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,null);
+  public void notifyAppearStateChange(String wxEventType,String direction){
+    Map<String, Object> params = new HashMap<>();
+    params.put("direction", direction);
+    WXBridgeManager.getInstance().fireEvent(mInstanceId,getRef(),wxEventType,params);
   }
 
   public boolean isUsing() {

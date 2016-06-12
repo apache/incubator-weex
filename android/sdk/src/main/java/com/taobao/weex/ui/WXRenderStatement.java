@@ -225,6 +225,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.view.WXHorizontalScrollView;
+import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -519,18 +521,24 @@ class WXRenderStatement {
     int offsetIntF = (int) WXViewUtils.getRealPxByWidth(offsetInt);
     int[] scrollerP = new int[2];
     scroller.getView().getLocationOnScreen(scrollerP);
-    if (scrollerP[1] == component.getAbsoluteY()) {
+    if (scrollerP[1] == component.getAbsoluteY() && scroller.getView() instanceof WXScrollView) {
+      return;
+    }
+
+    if(scrollerP[0] == component.getAbsoluteX() && scroller.getView() instanceof WXHorizontalScrollView){
       return;
     }
 
     int viewYInScroller=component.getAbsoluteY();
+    int viewXInScroller=component.getAbsoluteX();
     WXComponent ancestor=component;
     while((ancestor=ancestor.getParent())!=null){
       if(ancestor instanceof WXScroller){
         viewYInScroller-=ancestor.getAbsoluteY();
+        viewXInScroller-=ancestor.getAbsoluteX();
       }
     }
-    scroller.scrollBy(0,
+    scroller.scrollBy(scroller.getView().getScrollX()-viewXInScroller-offsetIntF,
                       scroller.getView().getScrollY() - viewYInScroller - offsetIntF);
   }
 

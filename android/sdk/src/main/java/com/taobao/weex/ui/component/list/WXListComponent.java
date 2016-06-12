@@ -207,7 +207,6 @@ package com.taobao.weex.ui.component.list;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -220,6 +219,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEventType;
@@ -259,6 +259,7 @@ public class WXListComponent extends WXVContainer implements
     private String mLoadMoreRetry ="";
     private WXRefresh mRefresh;
     private WXLoading mLoading;
+    private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
     private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
     private SparseArray<WXComponent> mAppearComponents = new SparseArray<>();
@@ -358,34 +359,36 @@ public class WXListComponent extends WXVContainer implements
         bounceview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
-                if(listeners!=null && listeners.size()>0){
-                    for (OnWXScrollListener listener : listeners) {
-                        if (listener != null) {
-                            int tempState = RecyclerView.SCROLL_STATE_IDLE;
-                            if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
-                                newState=OnWXScrollListener.DRAGGING;
-                            }else if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
-                                newState = OnWXScrollListener.SETTLING;
-                            }
-                            RecyclerView.LayoutManager layoutManager=recyclerView.getLayoutManager();
-                            LinearLayoutManager linearLayoutManager=null;
-                            int x=0,y=0;
-                            if(layoutManager instanceof LinearLayoutManager){
-                                linearLayoutManager=(LinearLayoutManager)layoutManager;
-                            }
-                            if(linearLayoutManager!=null){
-                                x=0;
-                                int position = linearLayoutManager.findFirstVisibleItemPosition();
-                                View firstVisiableChildView = layoutManager.findViewByPosition(position);
-                                int itemHeight = firstVisiableChildView.getHeight();
-                                y= (position) * itemHeight - firstVisiableChildView.getTop();
-                            }
-                            listener.onScrollStateChanged(recyclerView, x, y,tempState);
+              super.onScrollStateChanged(recyclerView, newState);
+
+                if(newState == RecyclerView.SCROLL_STATE_IDLE ){
+                    for(ListBaseViewHolder holder:recycleViewList){
+                        if(holder!=null
+                                && holder.getComponent()!=null
+                                && !holder.getComponent().isUsing()) {
+                            recycleImage(holder.getView());
                         }
                     }
+                    recycleViewList.clear();
                 }
+              List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+              if (listeners != null && listeners.size() > 0) {
+                for (OnWXScrollListener listener : listeners) {
+                  if (listener != null) {
+                    int tempState = RecyclerView.SCROLL_STATE_IDLE;
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                      newState = OnWXScrollListener.DRAGGING;
+                    } else if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                      newState = OnWXScrollListener.SETTLING;
+                    }
+                    View topView = recyclerView.getChildAt(0);
+                    if (topView != null && listener != null) {
+                      int y = topView.getTop();
+                      listener.onScrollStateChanged(recyclerView, 0, y, tempState);
+                    }
+                  }
+                }
+              }
             }
 
             @Override
@@ -494,9 +497,10 @@ public class WXListComponent extends WXVContainer implements
      */
     @Override
     public void onViewRecycled(ListBaseViewHolder holder) {
+        long begin=System.currentTimeMillis();
         holder.setComponentUsing(false);
-        recycleImage(holder.getView());
-        WXLogUtils.d(TAG, "Recycle holder " + holder);
+        recycleViewList.add(holder);
+        WXLogUtils.d(TAG, "Recycle holder " +(System.currentTimeMillis()-begin)+"  Thread:"+Thread.currentThread().getName());
     }
 
     /**
@@ -507,6 +511,7 @@ public class WXListComponent extends WXVContainer implements
      */
     @Override
     public void onBindViewHolder(ListBaseViewHolder holder, int position) {
+        long begin=System.currentTimeMillis();
         if (holder == null) return;
         holder.setComponentUsing(true);
         WXComponent component = getChild(position);
@@ -523,9 +528,11 @@ public class WXListComponent extends WXVContainer implements
         if (component != null
             && holder.getComponent() != null
                 && holder.getComponent() instanceof WXCell) {
+            holder.getComponent().applyLayoutAndEvent(component);
             holder.getComponent().bindData(component);
         }
-        WXLogUtils.d(TAG, "Bind holder " + holder);
+        WXLogUtils.d(TAG, "Bind holder "+(System.currentTimeMillis()-begin)+"  Thread:"+Thread.currentThread().getName());
+
     }
 
     /**
@@ -557,9 +564,11 @@ public class WXListComponent extends WXVContainer implements
                     if (component.getRealView() != null) {
                         return new ListBaseViewHolder(component, viewType);
                     } else {
-                        component.lazy(false);
-                        component.createView(this, -1);
-                        component.applyLayoutAndEvent(component);
+                        long begin=System.currentTimeMillis();
+                         component.lazy(false);
+                         component.createView(this, -1);
+
+                        WXLogUtils.d(TAG,"onCreateViewHolder lazy create:"+(System.currentTimeMillis()-begin)+"  Thread:"+Thread.currentThread().getName());
                         return new ListBaseViewHolder(component, viewType);
                     }
 
@@ -567,8 +576,7 @@ public class WXListComponent extends WXVContainer implements
             }
         }
         WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
-        return createVHForFakeComponent(viewType);
-//        throw new WXRuntimeException("mChildren is null");
+        throw new WXRuntimeException("mChildren is null");
     }
 
 
@@ -653,7 +661,7 @@ public class WXListComponent extends WXVContainer implements
     }
 
     @Override
-    public void notifyAppearStateChange(int firstVisible, int lastVisible) {
+    public void notifyAppearStateChange(int firstVisible, int lastVisible,int directionX,int directionY) {
 
         List<Integer> unRegisterKeys = new ArrayList<>();
 
@@ -666,10 +674,12 @@ public class WXListComponent extends WXVContainer implements
                 continue;
             }
             if (key >= firstVisible && key <= lastVisible && !value.appearState) {
-                value.notifyAppearStateChange(WXEventType.APPEAR);
+              String direction=directionY>0?"up":"down";
+                value.notifyAppearStateChange(WXEventType.APPEAR,direction);
                 value.appearState = true;
             } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
-                value.notifyAppearStateChange(WXEventType.DISAPPEAR);
+              String direction=directionY>0?"up":"down";
+              value.notifyAppearStateChange(WXEventType.DISAPPEAR,direction);
                 value.appearState = false;
             }
             WXLogUtils.d(TAG, "key:" + key + " " + "appear:" + value.appearState);
