@@ -521,7 +521,11 @@ class WXDomStatement {
           WXLogUtils.e("instance is null or instance is destroy!");
           return;
         }
-        mWXRenderManager.createBody(mInstanceId, component);
+        try {
+          mWXRenderManager.createBody(mInstanceId, component);
+        }catch (Exception e){
+          WXLogUtils.e("create body failed."+e.getMessage());
+        }
       }
     });
     mDirty = true;
@@ -634,7 +638,12 @@ class WXDomStatement {
           WXLogUtils.e("instance is null or instance is destroy!");
           return;
         }
-        mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        try {
+          mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        }catch (Exception e){
+          e.printStackTrace();
+          WXLogUtils.e("add component failed."+e.getMessage());
+        }
       }
     });
 
