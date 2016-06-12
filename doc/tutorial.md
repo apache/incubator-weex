@@ -117,7 +117,7 @@ The QR code can work together with [Weex Playground App](http://alibaba.github.i
 
 Here, I must stress that the list is rendered by native view ( not Webkit ), so your app get faster loading and less memory overhead than common Webview renderer.
 
-After changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
+Now open tech_list.we again and trying to change some text,after changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
 
 ## Add Build-in Component
 
