@@ -516,6 +516,11 @@ class WXDomStatement {
 
       @Override
       public void execute() {
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        if(instance == null || instance.getContext()== null) {
+          WXLogUtils.e("instance is null or instance is destroy!");
+          return;
+        }
         mWXRenderManager.createBody(mInstanceId, component);
       }
     });
@@ -624,6 +629,11 @@ class WXDomStatement {
 
       @Override
       public void execute() {
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        if(instance == null || instance.getContext()== null) {
+          WXLogUtils.e("instance is null or instance is destroy!");
+          return;
+        }
         mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
       }
     });
