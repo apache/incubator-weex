@@ -205,12 +205,14 @@
 package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
 /**
  * div component
  */
+@Component(lazyload = false)
 public class WXDiv extends WXVContainer {
 
   public WXDiv(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {

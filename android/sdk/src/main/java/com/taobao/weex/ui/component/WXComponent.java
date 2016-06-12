@@ -149,6 +149,8 @@ import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.ComponentHolder;
+import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXBackgroundDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -199,6 +201,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private WXGesture wxGesture;
+  private ComponentHolder mHolder;
 
   private boolean isUsing = false;
 
@@ -211,6 +214,10 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     mLazy = isLazy;
     mGestureType = new HashSet<>();
     ++mComponentNum;
+  }
+
+  public void setHolder(ComponentHolder holder){
+    mHolder = holder;
   }
 
   /**
@@ -403,15 +410,15 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     if (props == null||props.isEmpty() || mHost == null) {
       return;
     }
-    Map<String, Method> methodMap = WXComponentPropCache.getMethods(getClass());
+
 
     Iterator<Entry<String, Object>> iterator = props.entrySet().iterator();
     while (iterator.hasNext()) {
       String key = iterator.next().getKey();
-      Method method = methodMap.get(key);
+      Method method = mHolder.getMethod(key);
       if (method != null) {
         try {
-          Type[] paramClazzs = WXComponentPropCache.getMethodGenericParameterTypes(method);
+          Type[] paramClazzs = mHolder.getMethodTypes(key);
           if (paramClazzs.length != 1) {
             WXLogUtils.e("[WXComponent] setX method only one parameter：" + method);
             return;

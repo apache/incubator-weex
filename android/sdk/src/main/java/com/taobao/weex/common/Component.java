@@ -202,86 +202,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.common;
 
-import android.text.TextUtils;
-
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.utils.WXLogUtils;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * All components must be registered within this class before used.
+ * Created by sospartan on 6/12/16.
  */
-public class WXComponentRegistry {
-
-  private static Map<String, ComponentHolder> sTypeComponentMap = new HashMap<>();
-  private static Map<String, String> sClassTypeMap = new HashMap<>();
-
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    if (clazz == null || TextUtils.isEmpty(type)) {
-      return false;
-    }
-
-    Map<String, String> componentInfo = new HashMap<>();
-    componentInfo.put("type", type);
-    if (appendTree) {
-      componentInfo.put("append", "tree");
-    }
-
-    return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
-  }
-
-  public static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    //same component class for different name
-    ComponentHolder holder;
-    if(sClassTypeMap.get(clazz.getName()) == null){
-      holder = new ComponentHolder(clazz);
-      sClassTypeMap.put(clazz.getName(),type);
-    }else{
-      //use the same holder
-      holder = sTypeComponentMap.get(sClassTypeMap.get(clazz.getName()));
-    }
-
-    sTypeComponentMap.put(type, holder);
-    return true;
-  }
-
-  private static boolean registerJSComponent(Map<String, String> componentInfo) throws WXException {
-    ArrayList<Map<String, String>> coms = new ArrayList<>();
-    coms.add(componentInfo);
-    WXSDKManager.getInstance().registerComponents(coms);
-    return true;
-  }
-
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    if (componentInfo == null || clazz == null) {
-      return false;
-    }
-
-    String type = componentInfo.get("style");
-    if (type == null) {
-      return false;
-    }
-    if (sTypeComponentMap.containsKey(type)) {
-      if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Exist duplicate component:" + type);
-      } else {
-        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
-        return false;
-      }
-    }
-
-    return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
-  }
-
-  public static ComponentHolder getComponent(String type) {
-    return sTypeComponentMap.get(type);
-  }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Component {
+  boolean lazyload() default true;
 }
