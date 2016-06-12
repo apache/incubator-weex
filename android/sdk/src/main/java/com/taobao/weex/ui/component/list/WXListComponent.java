@@ -363,7 +363,9 @@ public class WXListComponent extends WXVContainer implements
 
                 if(newState == RecyclerView.SCROLL_STATE_IDLE ){
                     for(ListBaseViewHolder holder:recycleViewList){
-                        if(!holder.getComponent().isUsing()) {
+                        if(holder!=null
+                                && holder.getComponent()!=null
+                                && !holder.getComponent().isUsing()) {
                             recycleImage(holder.getView());
                         }
                     }
