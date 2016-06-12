@@ -40,14 +40,17 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 
 ### iOS
 0. Prerequisites
-    0. Same with Android 1.1 and 1.2
+	0. Install [Node.js](http://nodejs.org/) 4.0+
+    0. Under project root 
+        0. `npm install`, install project 
+        0. `./start`
     0. Install [iOS Environment](https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppStoreDistributionTutorial/Setup/Setup.html)
     0. Install [CocoaPods](https://guides.cocoapods.org/using/getting-started.html)
  0. Open `ios/playground`
-    0. run `pod install` in ios/
-    0. open `WeexDemo.xcworkspace` in xcode
-    0. In `DemoDefine.h`(you can search this file by xcode default hot key `cmd+space+o`), modify `CURRENT_IP` to your local IP
+    0. Run `pod install` in ios/playground
+    0. Open `WeexDemo.xcworkspace` in Xcode
     0. Click <img src="http://img1.tbcdn.cn/L1/461/1/5470b677a2f2eaaecf412cc55eeae062dbc275f9" height="16" > (`Run` button) or use default hot key `cmd + r` in xcode
+    0. If you want to run demo on your device. In `DemoDefine.h`(you can search this file by Xcode default hot key `cmd+space+o`), modify `CURRENT_IP` to your local IP
 0. [Add an example](./examples/README.md#add-an-example)
 
 ## Scripts
