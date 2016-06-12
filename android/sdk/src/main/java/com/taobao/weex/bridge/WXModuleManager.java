@@ -446,6 +446,7 @@ public class WXModuleManager {
   }
 
   public static  class ModuleFactory<T extends WXModule>{
+    public static final String TAG = "ModuleFactory";
     Class<T> mClazz;
     ArrayList<String> mMethods;
     HashMap<String, Method> mMethodMap;
@@ -454,39 +455,28 @@ public class WXModuleManager {
       mClazz = clz;
     }
 
-    private ArrayList<String> extractMethodNames() {
+    private void generateMethodMap() {
+      WXLogUtils.d(TAG,"extractMethodNames");
       ArrayList<String> methods = new ArrayList<>();
+      HashMap<String,Method> methodMap = new HashMap<>();
       try {
         for (Method method : mClazz.getMethods()) {
           // iterates all the annotations available in the method
           for (Annotation anno : method.getDeclaredAnnotations()) {
             if (anno != null && anno instanceof WXModuleAnno ) {
               methods.add(method.getName());
+              methodMap.put(method.getName(),method);
+              break;
             }
           }
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXModuleManager] extractMethodNames:" + e.getStackTrace());
       }
-      return methods;
+      mMethods = methods;
+      mMethodMap = methodMap;
     }
 
-    private HashMap<String, Method> generateMethodMap() {
-      HashMap<String, Method> moduleMethods = new HashMap<>();
-      try {
-        for (Method method : mClazz.getMethods()) {
-          // iterates all the annotations available in the method
-          for (Annotation anno : method.getDeclaredAnnotations()) {
-            if (anno != null && anno instanceof WXModuleAnno ) {
-              moduleMethods.put(method.getName(), method);
-            }
-          }
-        }
-      } catch (Throwable e) {
-        WXLogUtils.e("[WXModuleManager] generateMethodMap:" + e.getCause());
-      }
-      return moduleMethods;
-    }
 
     public WXModule buildInstance() throws IllegalAccessException, InstantiationException {
       return mClazz.newInstance();
@@ -494,14 +484,14 @@ public class WXModuleManager {
 
     ArrayList<String> getMethodNames(){
       if(mMethods==null){
-        mMethods = extractMethodNames();
+        generateMethodMap();
       }
       return mMethods;
     }
 
     HashMap<String, Method> getMethodMap(){
       if(mMethodMap==null){
-        mMethodMap = generateMethodMap();
+        generateMethodMap();
       }
       return mMethodMap;
     }
