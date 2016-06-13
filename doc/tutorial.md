@@ -29,7 +29,7 @@ You can copy and paste above code to a Weex file named `tech_list.we` (`.we` is 
 
 ## Preview
 
-First you need to install [Node](https://nodejs.org/en/download/stable/). Then you can install Weex CLI program with command:
+First you need to install [Node](https://nodejs.org/en/download/stable/). Then you can install Weex CLI program  [Weex Toolkit](https://www.npmjs.com/package/weex-toolkit) with command:
 
 ```
 npm install -g weex-toolkit
@@ -38,7 +38,6 @@ npm install -g weex-toolkit
 After the installation finished, you could ensure the Weex CLI is properly installed by typing `weex` on the command line. You should see the following help text displayed:
 
 ```
-$ weex
 Usage: weex foo/bar/your_next_best_weex_script_file.we  [options]
 
 Options:
