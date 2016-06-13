@@ -45,7 +45,8 @@ Options:
   -o,--output  transform weex we file to JS Bundle, output path (single JS bundle file or dir)
   -s,--server  start a http file server, weex .we file will be transforme to JS bundle on the server , specify local root path using the option  
   ......
-  --help  Show help                    
+  --help  Show help         
+  -h, --host [default: "127.0.0.1"]
 ```
 
 If all works well, navigate to the directory where you save the newly created `tech_list.we`, then type:
@@ -99,12 +100,13 @@ We can't call one item an list, so we need add more item to our tech list. open 
 </style>
 ```
 
-Now we will try to  render our  tech_list.we  with Weex native renderer.  open your terminal and  navigate to the directory where you save the tech_list.we again,then type
+Now we will try to  render our  tech_list.we  with Weex native renderer.  Open your terminal and  navigate to the directory where you save the tech_list.we again, then type
 
 ```
-weex tech_list.we --qr
-
+weex tech_list.we --qr -h {ip or hostname}
 ```
+
+It's ***RECOMMENDED*** to use `-h` option to specify your local ip address or hostname.
 
 An QR code will be display in the terminal window like:
 
@@ -116,7 +118,7 @@ The QR code can work together with [Weex Playground App](http://alibaba.github.i
 
 Here, I must stress that the list is rendered by native view ( not Webkit ), so your app get faster loading and less memory overhead than common Webview renderer.
 
-After changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
+Now open tech_list.we again and trying to change some text,after changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
 
 ## Add Build-in Component
 
