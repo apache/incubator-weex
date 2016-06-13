@@ -7,8 +7,8 @@
  */
 
 #import <UIKit/UIKit.h>
-#import <ZXingObjC/ZXingObjC.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface WXScannerVC : UIViewController <ZXCaptureDelegate>
+@interface WXScannerVC : UIViewController <AVCaptureMetadataOutputObjectsDelegate>
 
 @end
