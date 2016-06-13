@@ -270,14 +270,6 @@ class WXRenderStatement {
     return mWXSDKInstance;
   }
 
-  public void flushView(String ref) {
-    WXComponent component = mRegistry.get(ref);
-    if (component == null) {
-      return;
-    }
-    component.flushView(component);
-  }
-
   /**
    * create RootView ，every weex Instance View has a rootView;
    * @see com.taobao.weex.dom.WXDomStatement#createBody(JSONObject)

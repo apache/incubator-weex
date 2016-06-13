@@ -226,7 +226,6 @@ public class WXVideo extends WXComponent {
   private WXVideoView mVideoView;
   private boolean mAutoPlay;
   private String mSrc;
-  private boolean mSrcChanged;
   private boolean mPrepared;
   private boolean mError;
   private ProgressBar mProgressBar;
@@ -344,17 +343,6 @@ public class WXVideo extends WXComponent {
   }
 
   @Override
-  public void flushView(WXComponent component) {
-    super.flushView(component);
-
-    if (!TextUtils.isEmpty(mSrc) && mSrcChanged) {
-      mSrcChanged = false;
-      mVideoView.setVideoURI(Uri.parse(mSrc));
-      mProgressBar.setVisibility(View.VISIBLE);
-    }
-  }
-
-  @Override
   public void destroy() {
     super.destroy();
   }
@@ -364,8 +352,12 @@ public class WXVideo extends WXComponent {
     if (TextUtils.isEmpty(src) || mHost == null) {
       return;
     }
-    mSrc = src;
-    mSrcChanged = true;
+
+    if (!TextUtils.isEmpty(src)) {
+      mVideoView.setVideoURI(Uri.parse(src));
+      mProgressBar.setVisibility(View.VISIBLE);
+      mSrc = src;
+    }
   }
 
   @WXComponentProp(name = "autoPlay")

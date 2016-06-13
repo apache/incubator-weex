@@ -637,14 +637,6 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     mDomObj = dom;
   }
 
-  /**
-   * Flush the corresponding view.
-   * If multiple property setter conflicts, this method can be called to resolve conflict.
-   */
-  public void flushView(WXComponent component) {
-
-  }
-
   public final void removeEvent(String type) {
     if (TextUtils.isEmpty(type)) {
       return;

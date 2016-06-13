@@ -256,7 +256,6 @@ class WXDomStatement {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set<String> mUpdate;
-  private Set<String> mFlushes;
   private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
@@ -278,7 +277,6 @@ class WXDomStatement {
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     mUpdate = new HashSet<>();
-    mFlushes = new LinkedHashSet<>();
     mWXRenderManager = renderManager;
   }
 
@@ -391,10 +389,6 @@ class WXDomStatement {
     for (int i = 0; i < count && !mDestroy; ++i) {
       mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
     }
-    for(String ref: mFlushes){
-      mWXRenderManager.flushView(mInstanceId,ref);
-    }
-    mFlushes.clear();
     mNormalTasks.clear();
     mAddDom.clear();
     mUpdate.clear();
@@ -531,7 +525,6 @@ class WXDomStatement {
         }
       });
       mDirty = true;
-      mFlushes.add(domObject.ref);
 
       if (instance != null) {
         instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -653,7 +646,6 @@ class WXDomStatement {
     });
 
     mDirty = true;
-    mFlushes.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -791,7 +783,6 @@ class WXDomStatement {
       }
     });
     mDirty = true;
-    mFlushes.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -824,7 +815,6 @@ class WXDomStatement {
 
     updateStyle(domObject, style);
     mDirty = true;
-    mFlushes.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
