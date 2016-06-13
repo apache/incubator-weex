@@ -16,7 +16,9 @@
 
 @interface WXScannerVC ()
 
-@property (nonatomic, strong) ZXCapture *capture;
+@property (nonatomic, strong) AVCaptureSession * session;
+@property (nonatomic, strong) AVCaptureVideoPreviewLayer *captureLayer;
+@property (nonatomic, strong) UIView *sanFrameView;
 
 @property (nonatomic) BOOL opened;
 
@@ -27,69 +29,60 @@
 #pragma mark - lifeCircle
 
 - (void)dealloc {
-    [self.capture.layer removeFromSuperlayer];
+    [_captureLayer removeFromSuperlayer];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    
     [self setupNaviBar];
     
-    self.capture = [[ZXCapture alloc] init];
-    self.capture.camera = self.capture.back;
-    self.capture.focusMode = AVCaptureFocusModeContinuousAutoFocus;
-    self.capture.rotation = 90.0f;
+    self.session = [[AVCaptureSession alloc]init];
+    [_session setSessionPreset:AVCaptureSessionPresetHigh];
+    AVCaptureDevice * device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    AVCaptureDeviceInput * input = [AVCaptureDeviceInput deviceInputWithDevice:device error:nil];
+    AVCaptureMetadataOutput * output = [[AVCaptureMetadataOutput alloc]init];
+    [output setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
+    [_session addInput:input];
+    [_session addOutput:output];
     
-    self.capture.layer.frame = self.view.bounds;
-    [self.view.layer addSublayer:self.capture.layer];
-
+    output.metadataObjectTypes=@[AVMetadataObjectTypeQRCode,AVMetadataObjectTypeEAN13Code, AVMetadataObjectTypeEAN8Code, AVMetadataObjectTypeCode128Code];
+    
+    _captureLayer = [AVCaptureVideoPreviewLayer layerWithSession:_session];
+    _captureLayer.videoGravity=AVLayerVideoGravityResizeAspectFill;
+    _captureLayer.frame=self.view.layer.bounds;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.view.layer addSublayer:self.capture.layer];
-    [self.capture start];
-    
-    self.capture.delegate = self;
-    self.capture.layer.frame = self.view.bounds;
-    
-    CGAffineTransform captureSizeTransform = CGAffineTransformMakeScale(320 / self.view.frame.size.width, 480 / self.view.frame.size.height);
-    self.capture.scanRect = CGRectApplyAffineTransform(self.view.frame, captureSizeTransform);
+    [self.view.layer addSublayer:_captureLayer];
+    [_session startRunning];
 }
 
 - (void) viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     
-    [self.capture.layer removeFromSuperlayer];
-    [self.capture stop];
+    [_captureLayer removeFromSuperlayer];
+    [_session stopRunning];
 }
 
-#pragma mark - ZXCaptureDelegate
-
-- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result {
-    if (!result) return;
-
-    [self.capture.layer removeFromSuperlayer];
-    [self.capture stop];
-    
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection
+{
+    [_captureLayer removeFromSuperlayer];
+    [_session stopRunning];
     if (!_opened) {
-        //Vibrate
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
         _opened = YES;
-        __weak __typeof__(self) weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            weakSelf.opened = NO;
-        });
-        
-        [self openURL:result.text];
+        if (metadataObjects.count > 0) {
+            AVMetadataMachineReadableCodeObject * metadataObject = [metadataObjects objectAtIndex : 0 ];
+            [self openURL:metadataObject.stringValue];
+        }
     }
 }
 
-- (void) openURL:(NSString*)URL
+- (void)openURL:(NSString*)URL
 {
     NSURL *url = [NSURL URLWithString:URL];
     [self remoteDebug:url];
