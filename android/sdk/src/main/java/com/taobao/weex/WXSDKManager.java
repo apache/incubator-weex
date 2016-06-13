@@ -286,6 +286,9 @@ public class WXSDKManager {
   }
 
   void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
+    if(IWXImgLoaderAdapter==null){
+      throw new NullPointerException("image adapter is null!");
+    }
     mIWXImgLoaderAdapter = IWXImgLoaderAdapter;
   }
 

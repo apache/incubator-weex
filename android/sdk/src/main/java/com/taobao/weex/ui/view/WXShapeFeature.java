@@ -379,8 +379,29 @@ public class WXShapeFeature {
         }
 
         mMatrix.reset();
-        mMatrix.setScale(scale, scale);
-        mMatrix.postTranslate(translateX + 0.5f, translateY + 0.5f);
+        if(mHost instanceof ImageView && ((ImageView)mHost).getScaleType()== ImageView.ScaleType.FIT_XY){
+          mMatrix.setScale(vWidth / (float) bmWidth, vHeight / (float) bmHeight);
+        }else if(mHost instanceof ImageView && ((ImageView)mHost).getScaleType() == ImageView.ScaleType.CENTER_INSIDE){
+          float dx;
+          float dy;
+
+          if (bmWidth <= vWidth && bmHeight <= vHeight) {
+            scale = 1.0f;
+          } else {
+            scale = Math.min((float) vWidth / (float) bmWidth,
+                             (float) vHeight / (float) bmHeight);
+          }
+
+          dx = Math.round((vWidth - bmWidth * scale) * 0.5f);
+          dy = Math.round((vHeight - bmHeight * scale) * 0.5f);
+
+          mMatrix.setScale(scale, scale);
+          mMatrix.postTranslate(dx, dy);
+        }else{
+          mMatrix.setScale(scale, scale);
+          mMatrix.postTranslate(translateX + 0.5f, translateY + 0.5f);
+        }
+
         bitmapShader.setLocalMatrix(mMatrix);
         wrapShapeDrawable.getPaint().setShader(bitmapShader);
       } else {
