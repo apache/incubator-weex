@@ -69,6 +69,11 @@
 #endif
 }
 
+#pragma mark weex inspector
+- (void)initWeexInspector {
+    
+}
+
 #pragma mark weex
 - (void)initWeexSDK
 {
