@@ -207,12 +207,15 @@ package com.taobao.weex.ui.component;
 import android.text.Layout;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
+import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXTextView;
 
 /**
  * Text component
  */
+@Component(lazyload = false)
 public class WXText extends WXComponent{
 
   /**

@@ -208,7 +208,9 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.ComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -226,8 +228,8 @@ public class WXComponentFactory {
       return null;
     }
 
-    Class<? extends WXComponent> clazz = WXComponentRegistry.getComponent(node.type);
-    if (clazz == null) {
+    ComponentHolder holder = WXComponentRegistry.getComponent(node.type);
+    if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
         StringBuilder tag = new StringBuilder();
         tag.append("WXComponentFactory error type:[");
@@ -235,14 +237,15 @@ public class WXComponentFactory {
         WXLogUtils.e(tag.toString());
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
-      clazz = WXComponentRegistry.getComponent("container");
+      holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
+      if(holder == null){
+        throw new WXRuntimeException("Container component not found.");
+      }
     }
 
     try {
-      if (WXComponent.class.isAssignableFrom(clazz)) {
-        WXComponent component = clazz.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, String.class, boolean.class)
-            .newInstance(instance, node, parent, instanceId, lazy);
-        return component;
+      if (WXComponent.class.isAssignableFrom(holder.getComponentClass())) {
+        return holder.createInstance(instance, node, parent, instanceId, lazy);
       }
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {

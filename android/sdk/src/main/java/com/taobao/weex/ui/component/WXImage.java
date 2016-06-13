@@ -211,6 +211,7 @@ import android.widget.ImageView.ScaleType;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
@@ -222,6 +223,7 @@ import com.taobao.weex.utils.WXResourceUtils;
 /**
  * Image component
  */
+@Component(lazyload = false)
 public class WXImage extends WXComponent {
 
     public WXImage(WXSDKInstance instance, WXDomObject node,

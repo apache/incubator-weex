@@ -202,66 +202,110 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui;
 
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
+import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXComponentPropCache {
+/**
+ * Created by sospartan on 6/12/16.
+ */
+public class ComponentHolder {
+  public static final String TAG = "ComponentHolder";
+  private final Class<? extends WXComponent> mClz;
+  private Map<String, Method> mMethods;
+  private Map<String, Type[]> mMethodParameterTypes;
+  private Constructor<? extends WXComponent> mConstructor;
 
-  private static Map<Class<? extends WXComponent>, HashMap<String, Method>> sComponentPropSetterMethod =
-      new HashMap<>();
-
-  private static Map<Method, Type[]> sMethodGenericParameterTypes = new HashMap<>();
-
-  public static HashMap<String, Method> getMethods(Class<? extends WXComponent> clazz) {
-
-    HashMap<String, Method> methodMap = sComponentPropSetterMethod.get(clazz);
-    if (methodMap != null) {
-      return methodMap;
+  ComponentHolder(Class<? extends WXComponent> clz) {
+    this.mClz = clz;
+    Annotation[] annotations = clz.getDeclaredAnnotations();
+    for (Annotation annotation :
+      annotations) {
+      if (annotation instanceof Component){
+        if(!((Component) annotation).lazyload()){
+          generate();
+        }
+        return;
+      }
     }
-    methodMap = new HashMap<>();
-    try {
-      Annotation[] annotations;
-      int annotationsCount;
-      Annotation anno;
+  }
 
-      for (Method method : clazz.getMethods()) {
-        if (method.isAnnotationPresent(WXComponentProp.class)) {
-          annotations = method.getDeclaredAnnotations();
-          annotationsCount = annotations.length;
-          for (int i = 0; i < annotationsCount; ++i) {
-            anno = annotations[i];
-            if (anno != null && anno instanceof WXComponentProp) {
-              methodMap.put(((WXComponentProp) anno).name(), method);
-            }
-          }
+  private synchronized void generate(){
+    WXLogUtils.d(TAG,"Generate Component:"+mClz.getSimpleName());
+    HashMap<String, Method> methods = new HashMap<>();
+    Map<String, Type[]> typeMap = new HashMap<>();
+
+    Annotation[] annotations;
+    Annotation anno;
+    for (Method method : mClz.getMethods()) {
+      annotations = method.getDeclaredAnnotations();
+      for (int i = 0,annotationsCount = annotations.length;
+           i < annotationsCount; ++i) {
+        anno = annotations[i];
+        if (anno != null && anno instanceof WXComponentProp) {
+          String name = ((WXComponentProp) anno).name();
+          methods.put(name, method);
+          typeMap.put(name,method.getGenericParameterTypes());
+          break;
         }
       }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXComponentPropCache] getMethods: " + WXLogUtils.getStackTrace(e));
-      return null;
     }
-    sComponentPropSetterMethod.put(clazz, methodMap);
-    return methodMap;
+
+    mMethods = methods;
+    mMethodParameterTypes = typeMap;
+    try {
+      mConstructor = mClz.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, String.class, boolean.class);
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+      throw new WXRuntimeException("Can't find constructor of component.");
+    }
   }
 
-  public static Type[] getMethodGenericParameterTypes(Method method) {
-    Type[] types = sMethodGenericParameterTypes.get(method);
-    try {
-      if (types == null) {
-        types = method.getGenericParameterTypes();
-        sMethodGenericParameterTypes.put(method, types);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXComponentPropCache] getMethodGenericParameterTypes: " + WXLogUtils.getStackTrace(e));
-      return null;
+
+
+  public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    if(mConstructor == null){
+      generate();
     }
-    return types;
+    WXComponent component =  mConstructor.newInstance(instance,node,parent,instanceId,lazy);
+    component.setHolder(this);
+    return component;
   }
+
+  public Class<? extends WXComponent> getComponentClass(){
+    return mClz;
+  }
+
+  public Method getMethod(String name){
+    if(mMethods == null){
+      generate();
+    }
+
+    return mMethods.get(name);
+  }
+
+  public Type[] getMethodTypes(String methodName){
+    if(mMethods == null){
+      generate();
+    }
+
+    return mMethodParameterTypes.get(methodName);
+  }
+
+
 }
