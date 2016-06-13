@@ -215,6 +215,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 
+import android.widget.EditText;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXDomPropConstant;
@@ -255,42 +256,13 @@ public class WXInput extends WXComponent {
     inputView.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
     inputView.setSingleLine();//default use single line , same to ios
     inputView.setMovementMethod(null);
+
     mHost = inputView;
   }
 
   @Override
   public WXEditText getView() {
     return (WXEditText) super.getView();
-  }
-
-  @Override
-  public void flushView(WXComponent component) {
-    super.flushView(component);
-    if (mHost == null) {
-      return;
-    }
-    ((WXEditText) mHost).setRawInputType(getInputType(mType));
-    if (mAutoFocus) {
-      mHost.setFocusable(true);
-      mHost.requestFocus();
-      mHost.setFocusableInTouchMode(true);
-      mHost.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          showSoftKeyboard();
-        }
-      }, 16);
-    } else {
-      mHost.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          hideSoftKeyboard();
-        }
-      }, 16);
-    }
-    if (mTextAlign > 0) {
-      getView().setGravity(mTextAlign | Gravity.CENTER_VERTICAL);
-    }
   }
 
   @Override
@@ -429,6 +401,25 @@ public class WXInput extends WXComponent {
       return;
     }
     mAutoFocus = autofocus;
+    EditText inputView = (EditText)mHost;
+    if (mAutoFocus) {
+      inputView.setFocusable(true);
+      inputView.requestFocus();
+      inputView.setFocusableInTouchMode(true);
+      inputView.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          showSoftKeyboard();
+        }
+      }, 16);
+    } else {
+      inputView.postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          hideSoftKeyboard();
+        }
+      }, 16);
+    }
   }
 
     @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_SINGLELINE)
@@ -461,11 +452,15 @@ public class WXInput extends WXComponent {
       return;
     }
     mType = type;
+    ((EditText)mHost).setRawInputType(getInputType(mType));
   }
 
   @WXComponentProp(name = WXDomPropConstant.WX_TEXTALIGN)
   public void setTextAlign(String textAlign) {
     mTextAlign = getTextAlign(textAlign);
+    if (mTextAlign > 0) {
+      ((EditText)mHost).setGravity(mTextAlign | Gravity.CENTER_VERTICAL);
+    }
   }
 
   private int getTextAlign(String textAlign) {

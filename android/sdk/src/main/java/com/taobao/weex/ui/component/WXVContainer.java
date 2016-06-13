@@ -373,13 +373,4 @@ public abstract class WXVContainer extends WXComponent {
       child.destroy();
     }
   }
-
-  @Override
-  public void flushView(WXComponent component) {
-    int count=childCount();
-    for(int i=0;i<count;i++){
-      getChild(i).flushView(component);
-    }
-    super.flushView(component);
-  }
 }

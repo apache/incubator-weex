@@ -319,7 +319,7 @@ public class WXBridgeManager implements Callback {
     } else {
       mWXBridge = new WXBridge();
     }
-    mJSThread = new WXThread("JSBridgeThread", this);
+    mJSThread = new WXThread("WeexJSBridgeThread", this);
     mJSHandler = mJSThread.getHandler();
   }
 
