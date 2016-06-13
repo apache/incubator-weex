@@ -10,7 +10,6 @@
 #import "WXDemoViewController.h"
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXStreamModule.h"
-#import "WXSelectComponent.h"
 #import "WXEventModule.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXImgLoaderDefaultImpl.h"
@@ -83,13 +82,13 @@
     [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)];
     [WXSDKEngine registerHandler:[WXEventModule new] withProtocol:@protocol(WXEventModuleProtocol)];
     
-    [WXSDKEngine registerComponent:@"select" withClass:[WXSelectComponent class]];
+    [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
     [self atAddPlugin];
     
 #ifdef DEBUG
     [WXDebugTool setDebug:YES];
-    [WXLog setLogLevel:WXLogLevelVerbose];
+    [WXLog setLogLevel:WXLogLevelInfo];
 #else
     [WXDebugTool setDebug:NO];
 #endif

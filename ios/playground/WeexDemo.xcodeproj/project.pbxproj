@@ -33,7 +33,6 @@
 		DCA812FB1D0401570029BF62 /* WXImgLoaderDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFFD1D029753001C8592 /* WXImgLoaderDefaultImpl.m */; };
 		DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF01D029685001C8592 /* WXATLoggerPlugin.m */; };
 		DCABAFF41D029685001C8592 /* WXATViewHierarchyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFF21D029685001C8592 /* WXATViewHierarchyPlugin.m */; };
-		DCABAFFB1D029748001C8592 /* WXSelectComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFFA1D029748001C8592 /* WXSelectComponent.m */; };
 		DCABAFFE1D029753001C8592 /* WXImgLoaderDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABAFFD1D029753001C8592 /* WXImgLoaderDefaultImpl.m */; };
 		DCABB0011D02975E001C8592 /* WXEventModule.m in Sources */ = {isa = PBXBuildFile; fileRef = DCABB0001D02975E001C8592 /* WXEventModule.m */; };
 		DCD286E01CF491AC00C601CA /* weex-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DCD286DF1CF491AC00C601CA /* weex-icon.png */; };
@@ -546,7 +545,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCABAFFB1D029748001C8592 /* WXSelectComponent.m in Sources */,
 				DCABAFF31D029685001C8592 /* WXATLoggerPlugin.m in Sources */,
 				2AE88A2C1C8544E6003329DE /* WXScannerVC.m in Sources */,
 				775BEE861C1E8ECC008D1629 /* WXDemoViewController.m in Sources */,
