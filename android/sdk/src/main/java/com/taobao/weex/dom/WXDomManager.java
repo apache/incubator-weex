@@ -236,7 +236,7 @@ public final class WXDomManager {
   public WXDomManager(WXRenderManager renderManager) {
     mWXRenderManager = renderManager;
     mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WXDomThread", new WXDomHandler(this));
+    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
     mDomHandler = mDomThread.getHandler();
   }
 
