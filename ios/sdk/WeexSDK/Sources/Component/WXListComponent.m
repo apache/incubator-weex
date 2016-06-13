@@ -264,7 +264,6 @@
     [cellView.contentView addSubview:cell.view];
     
     double time = -[self.weexInstance.renderStartDate timeIntervalSinceNow] * 1000;
-    WXLogInfo(@"View Create Finish...%ld, %f", (long)indexPath.row, time);
 
     return cellView;
 }
