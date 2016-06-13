@@ -247,6 +247,7 @@ public class WXTextTest {
 
         mParentDomObj = Mockito.mock(WXDomObject.class);
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());
+        Mockito.when(mParentDomObj.getBorder()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.clone()).thenReturn(mParentDomObj);
         mParentDomObj.ref = "_root";
 
