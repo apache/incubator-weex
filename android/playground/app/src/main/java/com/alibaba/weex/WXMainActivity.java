@@ -34,7 +34,7 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
   private static final int CAMARA_PERMISSION_REQUEST_CODE = 0x1;
 
   private static final String TAG = "IndexFragment";
-  private static String CURRENT_IP = "30.10.216.161"; //"your_current_IP"; // your_current_IP
+  private static String CURRENT_IP =  "your_current_IP";// "30.30.149.180";  // your_current_IP
   // private static String CURRENT_IP = "localhost";
   private static final String WEEX_INDEX_URL = "http://"+CURRENT_IP+":12580/examples/build/index.js";
 

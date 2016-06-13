@@ -144,7 +144,7 @@ public class LogUtil {
     }
   }
 
-  private static final HashMap<String, Console.MessageLevel> sLevelMap = new HashMap<String, Console.MessageLevel>(5);
+  private static final HashMap<String, Console.MessageLevel> sLevelMap = new HashMap<String, Console.MessageLevel>(6);
 
   static {
     sLevelMap.put("verbose", Console.MessageLevel.LOG);
