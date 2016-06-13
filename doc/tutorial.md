@@ -46,7 +46,8 @@ Options:
   -o,--output  transform weex we file to JS Bundle, output path (single JS bundle file or dir)
   -s,--server  start a http file server, weex .we file will be transforme to JS bundle on the server , specify local root path using the option  
   ......
-  --help  Show help                    
+  --help  Show help         
+  -h, --host [default: "127.0.0.1"]
 ```
 
 If all works well, navigate to the directory where you save the newly created `tech_list.we`, then type:
@@ -100,12 +101,13 @@ We can't call one item an list, so we need add more item to our tech list. open 
 </style>
 ```
 
-Now we will try to  render our  tech_list.we  with Weex native renderer.  open your terminal and  navigate to the directory where you save the tech_list.we again,then type
+Now we will try to  render our  tech_list.we  with Weex native renderer.  Open your terminal and  navigate to the directory where you save the tech_list.we again, then type
 
 ```
-weex tech_list.we --qr
-
+weex tech_list.we --qr -h {ip or hostname}
 ```
+
+It's ***RECOMMENDED*** to use `-h` option to specify your local ip address or hostname.
 
 An QR code will be display in the terminal window like:
 
