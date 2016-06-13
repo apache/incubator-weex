@@ -857,7 +857,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
 
-      if (TextUtils.equals("200", response.statusCode)) {
+      if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, width, height, flag);
       } else if (TextUtils.equals(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR, response.statusCode)) {
