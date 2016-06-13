@@ -198,12 +198,6 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
-
-  private int mPrePaddingLeft = 0;
-  private int mPrePaddingTop = 0;
-  private int mPrePaddingRight = 0;
-  private int mPrePaddingBottom = 0;
-
   private WXGesture wxGesture;
 
   private boolean isUsing = false;
@@ -368,20 +362,10 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     int right = (int) (padding.get(Spacing.RIGHT) + border.get(Spacing.RIGHT));
     int bottom = (int) (padding.get(Spacing.BOTTOM) + border.get(Spacing.BOTTOM));
 
-    if(left == mPrePaddingLeft && top == mPrePaddingTop
-            && right == mPrePaddingRight && bottom== mPrePaddingBottom ){
-      WXLogUtils.d("zshshr","setPadding none!!!!!");
-      return;
-    }
-
     if (mHost == null) {
       return;
     }
     mHost.setPadding(left, top, right, bottom);
-    mPrePaddingLeft = left;
-    mPrePaddingTop = top;
-    mPrePaddingRight = right;
-    mPrePaddingBottom = bottom;
   }
 
 //  private void updateProperties() {
