@@ -263,8 +263,6 @@
     
     [cellView.contentView addSubview:cell.view];
     
-    double time = -[self.weexInstance.renderStartDate timeIntervalSinceNow] * 1000;
-
     return cellView;
 }
 
