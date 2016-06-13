@@ -92,7 +92,7 @@ The syntax is JavaScript (ES5) and it describes data and behavior of a Weex page
   module.exports = {
     data: {
       title: 'Alibaba',
-      date: null
+      datetime: null
     },
     methods: {
       getTitle: function () {
