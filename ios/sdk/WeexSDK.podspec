@@ -1,7 +1,6 @@
 # coding: utf-8
 Pod::Spec.new do |s|
 
-
   s.name         = "WeexSDK"
   s.version      = "0.6.0"
   s.summary      = "WeexSDK Source ."
@@ -17,7 +16,10 @@ Pod::Spec.new do |s|
            Alibaba-INC copyright
     LICENSE
   }
-
+  s.authors      = { "cxfeng1"  => "cxfeng1@gmail.com",
+                     "boboning" => "ningli928@163.com",
+                     "acton393" =>"zhangxing610321@gmail.com"
+                   }
   s.platform     = :ios
   s.ios.deployment_target = '7.0'
   s.source =  { :path => '.' }

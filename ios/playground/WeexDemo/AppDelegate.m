@@ -89,7 +89,7 @@
     
 #ifdef DEBUG
     [WXDebugTool setDebug:YES];
-    [WXLog setLogLevel:WXLogLevelVerbose];
+    [WXLog setLogLevel:WXLogLevelInfo];
 #else
     [WXDebugTool setDebug:NO];
 #endif
