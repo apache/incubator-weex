@@ -253,6 +253,15 @@ public class WXSoInstallMgrSdk {
     mContext = c;
   }
 
+
+  public static boolean isCPUSupport(){
+    String cpuType = _cpuType();
+    if (cpuType.equalsIgnoreCase(MIPS) || cpuType.equalsIgnoreCase(X86)) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Load so library.
    * First, it will try use {@link System#loadLibrary(String)} to load library.

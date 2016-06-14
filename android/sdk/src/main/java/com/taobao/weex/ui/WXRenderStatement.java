@@ -225,6 +225,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.view.WXHorizontalScrollView;
+import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -268,14 +270,6 @@ class WXRenderStatement {
     return mWXSDKInstance;
   }
 
-  public void flushView(String ref) {
-    WXComponent component = mRegistry.get(ref);
-    if (component == null) {
-      return;
-    }
-    component.flushView();
-  }
-
   /**
    * create RootView ，every weex Instance View has a rootView;
    * @see com.taobao.weex.dom.WXDomStatement#createBody(JSONObject)
@@ -287,7 +281,9 @@ class WXRenderStatement {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
     start = System.currentTimeMillis();
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
+
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
     }
@@ -387,7 +383,8 @@ class WXRenderStatement {
       return;
     }
     component.createView(parent, index);
-    component.bind(null);
+    component.applyLayoutAndEvent(component);
+    component.bindData(component);
     parent.addChild(component, index);
     WXAnimationModule.applyTransformStyle(component.mDomObj.style, component);
   }
@@ -441,7 +438,7 @@ class WXRenderStatement {
       return;
     }
     WXVContainer oldParent = component.getParent();
-    oldParent.remove(component);
+    oldParent.remove(component,false);
     ((WXVContainer) newParent).addChild(component, index);
   }
 
@@ -516,18 +513,24 @@ class WXRenderStatement {
     int offsetIntF = (int) WXViewUtils.getRealPxByWidth(offsetInt);
     int[] scrollerP = new int[2];
     scroller.getView().getLocationOnScreen(scrollerP);
-    if (scrollerP[1] == component.getAbsoluteY()) {
+    if (scrollerP[1] == component.getAbsoluteY() && scroller.getView() instanceof WXScrollView) {
+      return;
+    }
+
+    if(scrollerP[0] == component.getAbsoluteX() && scroller.getView() instanceof WXHorizontalScrollView){
       return;
     }
 
     int viewYInScroller=component.getAbsoluteY();
+    int viewXInScroller=component.getAbsoluteX();
     WXComponent ancestor=component;
     while((ancestor=ancestor.getParent())!=null){
       if(ancestor instanceof WXScroller){
         viewYInScroller-=ancestor.getAbsoluteY();
+        viewXInScroller-=ancestor.getAbsoluteX();
       }
     }
-    scroller.scrollBy(0,
+    scroller.scrollBy(scroller.getView().getScrollX()-viewXInScroller-offsetIntF,
                       scroller.getView().getScrollY() - viewYInScroller - offsetIntF);
   }
 
@@ -549,6 +552,15 @@ class WXRenderStatement {
   void refreshFinish(int width, int height) {
     mWXSDKInstance.onRefreshSuccess(width, height);
   }
+
+  /**
+   * weex refresh finish
+   * @see WXSDKInstance#onUpdateFinish()
+   */
+  void updateFinish() {
+    mWXSDKInstance.onUpdateFinish();
+  }
+
 
   private WXComponent generateComponentTree(WXDomObject dom, WXVContainer parent) {
     if (dom == null || parent == null) {

@@ -256,7 +256,6 @@ class WXDomStatement {
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
   private Set<String> mUpdate;
-  private Set<String> mFlushes;
   private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
@@ -278,7 +277,6 @@ class WXDomStatement {
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
     mUpdate = new HashSet<>();
-    mFlushes = new LinkedHashSet<>();
     mWXRenderManager = renderManager;
   }
 
@@ -345,6 +343,7 @@ class WXDomStatement {
    * in the queue.
    */
   void batch() {
+    long start0 = System.currentTimeMillis();
 
     if (!mDirty || mDestroy) {
       return;
@@ -358,29 +357,46 @@ class WXDomStatement {
     rebuildingDomTree(rootDom);
 
     layoutBefore(rootDom);
+    long start = System.currentTimeMillis();
+
 
     rootDom.calculateLayout(mLayoutContext);
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).cssLayoutTime(System.currentTimeMillis() - start);
+    }
+
     //		if (WXEnvironment.isApkDebugable()) {
     //			WXLogUtils.d("csslayout", "------------start------------");
     //			WXLogUtils.d("csslayout", rootDom.toString());
     //			WXLogUtils.d("csslayout", "------------end------------");
     //		}
 
-    applyUpdate(rootDom);
+    layoutAfter(rootDom);
 
+    start = System.currentTimeMillis();
+    applyUpdate(rootDom);
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).applyUpdateTime(System.currentTimeMillis() - start);
+    }
+
+    start = System.currentTimeMillis();
     updateDomObj();
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).updateDomObjTime(System.currentTimeMillis() - start);
+    }
+
     int count = mNormalTasks.size();
     for (int i = 0; i < count && !mDestroy; ++i) {
       mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
     }
-    for(String ref: mFlushes){
-      mWXRenderManager.flushView(mInstanceId,ref);
-    }
-    mFlushes.clear();
     mNormalTasks.clear();
     mAddDom.clear();
     mUpdate.clear();
     mDirty = false;
+    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
+      WXSDKManager.getInstance().getSDKInstance(mInstanceId).batchTime(System.currentTimeMillis() - start0);
+    }
+
   }
 
   /**
@@ -395,6 +411,17 @@ class WXDomStatement {
     int count = dom.childCount();
     for (int i = 0; i < count; ++i) {
       layoutBefore(dom.getChild(i));
+    }
+  }
+
+  private void layoutAfter(WXDomObject dom){
+    if (dom == null || !dom.hasUpdate() || mDestroy) {
+      return;
+    }
+    dom.layoutAfter();
+    int count = dom.childCount();
+    for (int i = 0; i < count; ++i) {
+      layoutAfter(dom.getChild(i));
     }
   }
 
@@ -485,17 +512,27 @@ class WXDomStatement {
 
         @Override
         public void execute() {
-          mWXRenderManager.createBody(mInstanceId, component);
+
+          WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+          if (instance == null || instance.getContext() == null) {
+            WXLogUtils.e("instance is null or instance is destroy!");
+            return;
+          }
+          try {
+            mWXRenderManager.createBody(mInstanceId, component);
+          } catch (Exception e) {
+            WXLogUtils.e("create body failed." + e.getMessage());
+          }
         }
       });
       mDirty = true;
-      mFlushes.add(domObject.ref);
 
       if (instance != null) {
         instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
       }
     }catch (Exception e){
-      WXLogUtils.e("create body failed."+e.getMessage());
+
+      WXLogUtils.e("create body in dom thread failed." + e.getMessage());
     }
   }
 
@@ -596,12 +633,21 @@ class WXDomStatement {
 
       @Override
       public void execute() {
-        mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+        if(instance == null || instance.getContext()== null) {
+          WXLogUtils.e("instance is null or instance is destroy!");
+          return;
+        }
+        try {
+          mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        }catch (Exception e){
+          e.printStackTrace();
+          WXLogUtils.e("add component failed."+e.getMessage());
+        }
       }
     });
 
     mDirty = true;
-    mFlushes.add(domObject.ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -739,7 +785,6 @@ class WXDomStatement {
       }
     });
     mDirty = true;
-    mFlushes.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -772,7 +817,6 @@ class WXDomStatement {
 
     updateStyle(domObject, style);
     mDirty = true;
-    mFlushes.add(ref);
 
     if (instance != null) {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -1012,6 +1056,30 @@ class WXDomStatement {
 
     return domObject;
   }
+
+  /**
+   * Create a command object for notifying {@link WXRenderManager} that the process of update
+   * given view is finished, and put the command object in the queue.
+   */
+  void updateFinish() {
+    if (mDestroy) {
+      return;
+    }
+    mNormalTasks.add(new IWXRenderTask() {
+
+      @Override
+      public void execute() {
+        mWXRenderManager.updateFinish(mInstanceId);
+      }
+    });
+
+    mDirty = true;
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+    if (instance != null) {
+      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    }
+  }
+
 
   /**
    * Creating the mapping between {@link WXDomObject#ref} to {@link WXDomObject}

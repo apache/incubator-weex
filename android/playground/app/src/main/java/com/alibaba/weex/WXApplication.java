@@ -2,12 +2,13 @@ package com.alibaba.weex;
 
 import android.app.Application;
 
-import com.alibaba.weex.extend.Components.WTRichText;
-import com.alibaba.weex.extend.ImageAdapter;
-import com.alibaba.weex.extend.Modules.RenderModule;
-import com.alibaba.weex.extend.Modules.WXEventModule;
-import com.taobao.weex.WXEnvironment;
+import com.alibaba.weex.commons.adapter.ImageAdapter;
+import com.taobao.weex.InitConfig;
+import com.alibaba.weex.extend.component.WTRichText;
+import com.alibaba.weex.extend.module.RenderModule;
+import com.alibaba.weex.extend.module.WXEventModule;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.adapter.DefautDebugAdapter;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
@@ -17,8 +18,11 @@ public class WXApplication extends Application {
     super.onCreate();
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
-//    WXSDKEngine.addCustomOptions("infoCollect", "false");
-    WXSDKEngine.init(this,null,null,new ImageAdapter(),null);
+    WXSDKEngine.initialize(this,
+                           new InitConfig.Builder()
+                               .setImgAdapter(new ImageAdapter()).setDebugAdapter(new DefautDebugAdapter())
+                               .build()
+                          );
 
     try {
 

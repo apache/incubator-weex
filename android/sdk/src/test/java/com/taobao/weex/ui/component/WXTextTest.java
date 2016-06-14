@@ -247,6 +247,7 @@ public class WXTextTest {
 
         mParentDomObj = Mockito.mock(WXDomObject.class);
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());
+        Mockito.when(mParentDomObj.getBorder()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.clone()).thenReturn(mParentDomObj);
         mParentDomObj.ref = "_root";
 
@@ -294,7 +295,9 @@ public class WXTextTest {
     @Test
     public void testBind(){
         testCreateView();
-        mWXText.bind(null);
+//        mWXText.bind(null);
+        mWXText.applyLayoutAndEvent(mWXText);
+        mWXText.bindData(mWXText);
 
         assertNotNull(mWXText.getView().getLayoutParams());
         assertEquals(100, mWXText.getView().getLayoutParams().height);
