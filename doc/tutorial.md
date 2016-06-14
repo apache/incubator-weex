@@ -29,7 +29,7 @@ You can copy and paste above code to a Weex file named `tech_list.we` (`.we` is 
 
 ## Preview
 
-First you need to install [Node](https://nodejs.org/en/download/stable/). Then you can install Weex CLI program with command:
+First you need to install [Node](https://nodejs.org/en/download/stable/). Then you can install Weex CLI program  [Weex Toolkit](https://www.npmjs.com/package/weex-toolkit) with command:
 
 ```
 npm install -g weex-toolkit
@@ -38,16 +38,15 @@ npm install -g weex-toolkit
 After the installation finished, you could ensure the Weex CLI is properly installed by typing `weex` on the command line. You should see the following help text displayed:
 
 ```
-$ weex
 Usage: weex foo/bar/your_next_best_weex_script_file.we  [options]
 
 Options:
-  --qr    display QR code for native runtime                           [boolean]
-  -o      transform weex JS bundle only, specify bundle file name using the
-          option                                 [default: "no JSBundle output"]
-  -s      start a http file server, weex .we file will be transformed on the
-          server, specify local root path using the option     [default: false]
-  --help  Show help                                                    [boolean]
+  --qr     display QR code for native runtime, 
+  -o,--output  transform weex we file to JS Bundle, output path (single JS bundle file or dir)
+  -s,--server  start a http file server, weex .we file will be transforme to JS bundle on the server , specify local root path using the option  
+  ......
+  --help  Show help         
+  -h, --host [default: "127.0.0.1"]
 ```
 
 If all works well, navigate to the directory where you save the newly created `tech_list.we`, then type:
@@ -56,15 +55,9 @@ If all works well, navigate to the directory where you save the newly created `t
 weex tech_list.we
 ```
 
-An QR code will be display in the terminal window like:
+A browser window will open automatically  to display  something like below
 
-![Weex CLI](images/tut-cli-qrcode.png)
-
-The QR code can work together with [Weex Playground App](http://alibaba.github.io/weex/download.html). Open it and tap the scan icon at the top-right corner, then scan the Qr code the terminal made. Then you will see the result.
-
-![First Example](images/tut-first.png)
-
-Here, I must stress that the list is rendered by native view ( not Webkit ), so your app get faster loading and less memory overhead than common Webview renderer.
+![weex html5 render](http://gtms02.alicdn.com/tps/i2/TB1y151LVXXXXXXaXXXoRYgWVXX-495-584.jpg)
 
 ## Intro Weex Syntax
 
@@ -107,11 +100,25 @@ We can't call one item an list, so we need add more item to our tech list. open 
 </style>
 ```
 
-After changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
+Now we will try to  render our  tech_list.we  with Weex native renderer.  Open your terminal and  navigate to the directory where you save the tech_list.we again, then type
 
-And a beautiful list will be displayed in your phone.
+```
+weex tech_list.we --qr -h {ip or hostname}
+```
+
+It's ***RECOMMENDED*** to use `-h` option to specify your local ip address or hostname.
+
+An QR code will be display in the terminal window like:
+
+![Weex CLI](images/tut-cli-qrcode.png)
+
+The QR code can work together with [Weex Playground App](http://alibaba.github.io/weex/download.html). Open it and tap the scan icon at the top-right corner, then scan the Qr code in your terminal.If all works well, a beautiful list will be displayed in your phone.
 
 ![Second Example](images/tut-second.png)
+
+Here, I must stress that the list is rendered by native view ( not Webkit ), so your app get faster loading and less memory overhead than common Webview renderer.
+
+Now open tech_list.we again and trying to change some text,after changes saved the Weex playground App will immediately display these changes. we called it **Hot-Reload**. Hope it can help you use Weex better.
 
 ## Add Build-in Component
 
