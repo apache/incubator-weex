@@ -56,7 +56,7 @@ If all works well, navigate to the directory where you save the newly created `t
 weex tech_list.we
 ```
 
-A browser window will open automatically  to display  something like below
+A browser window will open automatically  to display  something like below     ( weex-toolkit version must greater then 0.1.0 , please check using `weex --version` cmd)
 
 ![weex html5 render](http://gtms02.alicdn.com/tps/i2/TB1y151LVXXXXXXaXXXoRYgWVXX-495-584.jpg)
 

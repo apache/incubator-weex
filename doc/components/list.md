@@ -1,4 +1,5 @@
-# &lt;list&gt; <sup class="wx-v">0.4</sup>
+# &lt;list&gt; 
+<span class="weex-version">0.4</span>
 
 ### Summary
 
