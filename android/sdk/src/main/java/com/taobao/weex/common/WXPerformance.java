@@ -332,19 +332,19 @@ public class WXPerformance {
    */
   public String errMsg;
 
-  public Map<String,String> getMeasureMap(){
-    Map<String,String> quotas = new HashMap<>();
-    quotas.put("JSTemplateSize", Double.toString(JSTemplateSize));
-    quotas.put("JSLibSize", Double.toString(JSLibSize));
-    quotas.put("communicateTime", Long.toString(communicateTime));
-    quotas.put("screenRenderTime", Long.toString(screenRenderTime));
-    quotas.put("totalTime", Double.toString(totalTime));
-    quotas.put("localReadTime", Double.toString(localReadTime));
-    quotas.put("JSLibInitTime", Long.toString(JSLibInitTime));
-    quotas.put("networkTime", Long.toString(networkTime));
-    quotas.put("templateLoadTime", Long.toString(templateLoadTime));
-    quotas.put("SDKInitInvokeTime",Long.toString(WXEnvironment.sSDKInitInvokeTime));
-    quotas.put("SDKInitExecuteTime",Long.toString(WXEnvironment.sSDKInitExecuteTime));
+  public Map<String,Double> getMeasureMap(){
+    Map<String,Double> quotas = new HashMap<>();
+    quotas.put("JSTemplateSize", JSTemplateSize);
+    quotas.put("JSLibSize", JSLibSize);
+    quotas.put("communicateTime", (double)communicateTime);
+    quotas.put("screenRenderTime", (double)screenRenderTime);
+    quotas.put("totalTime", totalTime);
+    quotas.put("localReadTime", localReadTime);
+    quotas.put("JSLibInitTime", (double)JSLibInitTime);
+    quotas.put("networkTime", (double)networkTime);
+    quotas.put("templateLoadTime", (double)templateLoadTime);
+    quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
+    quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
     return quotas;
   }
 
