@@ -242,6 +242,10 @@ public class WXEnvironment {
   public static boolean sDebugMode = false;
   public static String sDebugWsUrl = "";
   public static long sJSLibInitTime = 0;
+
+  public static long sSDKInitInvokeTime = 0;//调用SDK初始化的耗时
+  public static long sSDKInitExecuteTime = 0;//SDK初始化执行耗时
+
   public static LogLevel sLogLevel= LogLevel.DEBUG;
   public static boolean sSupportDebugTool=false;
   private static boolean isApkDebug = true;
