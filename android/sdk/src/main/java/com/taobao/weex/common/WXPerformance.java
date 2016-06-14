@@ -204,7 +204,6 @@
  */
 package com.taobao.weex.common;
 
-import android.content.Intent;
 import com.taobao.weex.WXEnvironment;
 
 import java.util.HashMap;
@@ -357,6 +356,24 @@ public class WXPerformance {
     quotas.put("JSLibVersion", JSLibVersion);
     quotas.put("WXSDKVersion", WXSDKVersion);
     return quotas;
+  }
+
+  public static String[] getDimensions(){
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion"};
+  }
+
+  public static String[] getMeasures(){
+    return new String[]{"JSTemplateSize",
+        "JSLibSize",
+        "communicateTime",
+        "screenRenderTime",
+        "totalTime",
+        "localReadTime",
+        "JSLibInitTime",
+        "networkTime",
+        "templateLoadTime",
+        "SDKInitInvokeTime",
+        "SDKInitExecuteTime"};
   }
 
   @Override
