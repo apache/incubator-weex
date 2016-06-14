@@ -206,32 +206,19 @@ package com.taobao.weex.ui.view.listview;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
+import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
 
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
-    private State mState = State.NONE;
-    private OnRefreshListener mOnRefreshListener;
-    private OnLoadMoreListener mOnLoadMoreListener;
-    private RefreshAdapterWrapper mRefreshAdapter;
-
-    private enum State {
-        PULL_TO_REFRESH_TOP,
-        RELEASE_TO_REFRESH_TOP,
-        PULL_TO_REFRESH_BOTTOM,
-        RELEASE_TO_REFRESH_BOTTOM,
-        REFRESHING,
-        LOADMORE,
-        LOADMORE_TOP,
-        RESET,
-        NONE
-    }
+    private RecyclerViewBaseAdapter adapter = null;
+    private WXRecyclerView recyclerView;
 
     public BounceRecyclerView(Context context,int orientation) {
         super(context,orientation);
@@ -241,248 +228,30 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
         super(context, attrs, OrientationHelper.VERTICAL);
     }
 
-    public void setOnRefreshListener(OnRefreshListener listener) {
-        mOnRefreshListener = listener;
-    }
-
-    public void setOnLoadMoreListener(OnLoadMoreListener listener) {
-        mOnLoadMoreListener = listener;
-    }
-
     public void setAdapter(RecyclerViewBaseAdapter adapter) {
-        mRefreshAdapter = new RefreshAdapterWrapper(getContext(), adapter);
-        getBounceView().setAdapter(mRefreshAdapter);
+        this.adapter = adapter;
+        getInnerView().setAdapter(adapter);
 
     }
 
-    public void addTransformItemDecoration(TransformItemDecoration decoration){
-        getBounceView().addItemDecoration(decoration);
-    }
-
-    public RefreshAdapterWrapper getAdapter() {
-        return mRefreshAdapter;
-    }
-
-    public void refreshState() {
-        if (mOnRefreshListener != null) {
-            onRefreshComplete();
-        }
-        if (mOnLoadMoreListener != null) {
-            onLoadMoreComplete();
-        }
+    public RecyclerViewBaseAdapter getAdapter() {
+        return adapter;
     }
 
     @Override
-    public boolean isReadyForPullFromStart() {
-        LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
-        if (lm.findFirstVisibleItemPosition() == 0) {
-            final View firstVisibleChild = getBounceView().getChildAt(0);
-            if (firstVisibleChild != null) {
-                return isVertical()?firstVisibleChild.getTop() + getPaddingTop() >= getBounceView().getTop():firstVisibleChild.getLeft() + getPaddingLeft() >= getBounceView().getLeft();
-            }
-        }
-        return false;
-    }
+    public WXSwipeRefreshLayout createBounceView(Context context) {
+        swipeRefreshLayout = new WXSwipeRefreshLayout(context);
+        swipeRefreshLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-    @Override
-    public boolean isReadyForPullFromEnd() {
-        RecyclerView lv = getBounceView();
-        final RecyclerView.Adapter adapter = lv.getAdapter();
-        LinearLayoutManager lm = (LinearLayoutManager) getBounceView().getLayoutManager();
-        final int lastItemPosition = adapter.getItemCount() - 1;
-        final int lastVisiblePosition = lm.findLastVisibleItemPosition();
-        if (lastVisiblePosition >= lastItemPosition) {
-            final int childIndex = lastVisiblePosition - lm.findFirstVisibleItemPosition();
-            final View lastVisibleChild = lv.getChildAt(childIndex);
-            if (lastVisibleChild != null) {
-                return isVertical()?lastVisibleChild.getBottom() + getPaddingTop() <= lv.getBottom():lastVisibleChild.getRight() + getPaddingLeft() <= lv.getRight();
-            }
-        }
-        return false;
-    }
+        recyclerView = new WXRecyclerView(context);
+        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
 
-    @Override
-    public WXRecyclerView createBounceView(Context context) {
-        WXRecyclerView recyclerView = new WXRecyclerView(context);
-        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT,getOrientation());
-        return recyclerView;
-    }
+        swipeRefreshLayout.addView(recyclerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-    @Override
-    public IRefreshLayout createBounceHeaderView(Context context) {
-        return new IRefreshLayout.Adapter(new View(context));
-    }
+        addView(swipeRefreshLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-    @Override
-    public IRefreshLayout createBounceFooterView(Context context) {
-        return new IRefreshLayout.Adapter(new View(context));
+        return swipeRefreshLayout;
     }
-
-    @Override
-    protected void onTouchActionUp() {
-        super.onTouchActionUp();
-        if (!isRefreshing() && !isLoadingMore()) {
-            if (getState() == State.RELEASE_TO_REFRESH_TOP && null != mOnRefreshListener) {
-                getBounceHeaderView().setVisibility(View.INVISIBLE);
-                setState(State.REFRESHING);
-            } else if (getState() == State.RELEASE_TO_REFRESH_BOTTOM && null != mOnLoadMoreListener) {
-                getBounceFooterView().setVisibility(View.INVISIBLE);
-                setState(State.LOADMORE);
-            } else if (getState() != State.LOADMORE && getState()!=State.NONE) {
-                setState(State.RESET);
-            }
-        }
-    }
-
-    @Override
-    protected void onPullStateChanged(int itemDimension, int scrollValue) {
-        super.onPullStateChanged(itemDimension, scrollValue);
-        if (!isRefreshing() && !isLoadingMore()) {
-            if (scrollValue < 0) {// refresh
-                if (refreshEnabled()) {
-                    setState(itemDimension >= Math.abs(scrollValue) ? State.PULL_TO_REFRESH_TOP : State.RELEASE_TO_REFRESH_TOP);
-                }
-                getBounceHeaderView().setVisibility(refreshEnabled() ? View.VISIBLE : View.INVISIBLE);
-            } else {// loadmore
-                if (loadMoreEnabled()) {
-                    setState(itemDimension >= Math.abs(scrollValue) ? State.PULL_TO_REFRESH_BOTTOM : State.RELEASE_TO_REFRESH_BOTTOM);
-                }
-                getBounceFooterView().setVisibility(loadMoreEnabled() ? View.VISIBLE : View.INVISIBLE);
-            }
-        }
-    }
-
-    private void setState(State s) {
-        mState = s;
-        switch (s) {
-            case PULL_TO_REFRESH_TOP: {
-                /*if (mRefreshLayout != null) {
-                    setRefreshLabel(mRefreshLayout.getPullLabelText(getContext()));
-                }*/
-                break;
-            }
-            case RELEASE_TO_REFRESH_TOP: {
-                /*if (mRefreshLayout != null) {
-                    setRefreshLabel(mRefreshLayout.getReleaseLabelText(getContext()));
-                }*/
-                break;
-            }
-            case REFRESHING: {
-                //if (mRefreshLayout != null) {
-                //    setRefreshLabel(mRefreshLayout.getRefreshingLabelText(getContext()));
-                    onRefreshing();
-                //}
-                break;
-            }
-            case RESET: {
-                onReset();
-                break;
-            }
-            case LOADMORE: {
-                /*setMoreViewVisible(true);
-                mOnLoadMoreListener.onLoadMore();*/
-                onLoadingMore();
-                break;
-            }
-            case LOADMORE_TOP: {
-                /*setMoreViewTopVisible(true);
-                mOnLoadMoreTopListener.onLoadMore();*/
-                break;
-            }
-        }
-    }
-
-    private void onRefreshing() {
-        //mRefreshLayout.setVisibility(View.VISIBLE);
-        //mRefreshLayout.refreshing();
-        mRefreshAdapter.refreshing();
-        getBounceHeaderView().setVisibility(View.INVISIBLE);
-        if (mOnRefreshListener != null) {
-            mOnRefreshListener.onRefresh();
-        }
-    }
-
-    private void notifyDataSetChanged(final RecyclerView recyclerView) {
-        mRefreshAdapter.notifyDataSetChanged();
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-                int lastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-                recyclerView.setAdapter(mRefreshAdapter);
-                layoutManager.scrollToPosition(lastVisibleItemPosition);
-            }
-        });
-    }
-
-    private void onLoadingMore() {
-        mRefreshAdapter.loadingMore();
-        getBounceFooterView().setVisibility(View.INVISIBLE);
-        notifyDataSetChanged(getBounceView());
-        if (mOnLoadMoreListener != null) {
-            mOnLoadMoreListener.onLoadMore();
-        }
-    }
-
-    private void onRefreshComplete() {
-        if (isRefreshing()) {
-            //setRefreshLabel(mRefreshLayout.getRefreshingSuccessLabelText(getContext()));
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getBounceHeaderView().setVisibility(View.VISIBLE);
-                    setState(State.RESET);
-                    //scrollTo(0, -mRefreshLayout.getView().getHeight());
-                    //smoothScroll(mRefreshLayout.getView().getHeight());
-                }
-            }, 500);
-        }
-    }
-
-    private void onLoadMoreComplete() {
-        if (isLoadingMore()) {
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getBounceFooterView().setVisibility(View.VISIBLE);
-                    setState(State.RESET);
-                    //scrollTo(0, -mRefreshLayout.getView().getHeight());
-                    //smoothScroll(mRefreshLayout.getView().getHeight());
-                }
-            }, 500);
-        }
-    }
-
-    private void onReset() {
-        /*if (mRefreshLayout != null) {
-            mRefreshLayout.resetRefreshing();
-            mRefreshLayout.setVisibility(View.GONE);
-        }*/
-        //setMoreViewVisible(false);
-        //setMoreViewTopVisible(false);
-        mRefreshAdapter.resetRefreshing();
-    }
-
-    private boolean refreshEnabled() {
-        return mOnRefreshListener != null;
-    }
-
-    private boolean loadMoreEnabled() {
-        return mOnLoadMoreListener != null;
-    }
-
-    private boolean isRefreshing() {
-        return getState() == State.REFRESHING;
-    }
-
-    private boolean isLoadingMore() {
-        return getState() == State.LOADMORE;
-    }
-
-    private State getState() {
-        return mState;
-    }
-
 
     public static class TransformItemDecoration extends RecyclerView.ItemDecoration{
         boolean mIsVertical = true;
@@ -552,6 +321,15 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
             }
 
         }
+    }
+
+    public WXSwipeRefreshLayout getSwipeRefreshLayout() {
+        return swipeRefreshLayout;
+    }
+
+    @Override
+    public WXRecyclerView getInnerView() {
+        return recyclerView;
     }
 
 }

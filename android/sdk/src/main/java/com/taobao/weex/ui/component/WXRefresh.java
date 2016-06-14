@@ -205,24 +205,22 @@
 package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.listview.OnRefreshListener;
 
 /**
  * div component
  */
-public class WXRefresh extends WXBaseRefresh implements OnRefreshListener {
+public class WXRefresh extends WXBaseRefresh {
 
   public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
     super(instance, node, parent, instanceId, lazy);
   }
 
-  @Override
-  public void onRefresh() {
-    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
-      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
-    }
-  }
+//  @Override
+//  public void onRefresh() {
+//    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
+//      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
+//    }
+//  }
 
 }

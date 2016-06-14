@@ -202,8 +202,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.listview;
+package com.taobao.weex.ui.view.refresh;
 
-public interface OnRefreshListener {
-    public void onRefresh();
+import android.content.Context;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+
+public abstract class DipUtils {
+
+    public static float dipToPx(Context context, float value) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, metrics);
+    }
 }

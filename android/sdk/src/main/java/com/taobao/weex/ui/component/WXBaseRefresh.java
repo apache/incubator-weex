@@ -208,9 +208,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 
 /**
  * div component
@@ -249,17 +247,11 @@ public class WXBaseRefresh extends WXVContainer {
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
       if (display.equals("hide")) {
-        if (getParent() instanceof WXListComponent && getParent().getView() instanceof BounceRecyclerView) {
-          BounceRecyclerView brv = (BounceRecyclerView) getParent().getView();
-          brv.refreshState();
-        }
+//        if (getParent() instanceof WXListComponent && getParent().getView() instanceof BounceRecyclerView) {
+//          BounceRecyclerView brv = (BounceRecyclerView) getParent().getView();
+//          brv.refreshState();
+//        }
       }
-    }
-  }
-
-  public void onPullLoadingIndicator(int progress) {
-    if (mLoadingIndicator != null) {
-      mLoadingIndicator.onPullLoadingIndicator(progress);
     }
   }
 

@@ -2,7 +2,7 @@
   <div>
     <list class="list">
       <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
-        <text class="refresh-arrow" if="{{(refresh_display==='hide')}}">↓ Pull To Refresh</text>
+        <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">↓ Pull To Refresh</text>
         <loading-indicator></loading-indicator>
       </refresh>
       <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">

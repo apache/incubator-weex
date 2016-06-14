@@ -205,40 +205,19 @@
 package com.taobao.weex.ui.view.listview;
 
 import android.content.Context;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.widget.Scroller;
+
+import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
 
 public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
-    private static final float FRICTION = 2.0f;
-    private static final int DEFAULT_DURATION = 250;
-
-    private int mTouchSlop;
-    private boolean mIsBeingDragged;
-    private float mLastMotionY;
-    private float mLastMotionX;
-    private Mode mMode;
-    protected Scroller mScroller;
     private T mView;
-    private IRefreshLayout mRefreshLayout;
-    private IRefreshLayout mLoadMoreLayout;
-    //scrollValue, for scroll padding use, 目前设置的值正好和正常的值相反
-    private int mScrollValue = 0;
-    private int mMaxPadding = 0;
-    private GestureDetectorCompat mGestureDetector;
-    private boolean mBounceable = true;
-
-
     private int mOrientation = OrientationHelper.VERTICAL;
-    private static final int[] STATE_LAYOUT_WIDTH = {LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT};
-    private static final int[] STATE_LAYOUT_HEIGHT = {LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT};
+    protected WXSwipeRefreshLayout swipeRefreshLayout;
 
     enum Mode {
         PULL_FROM_START,
@@ -261,20 +240,8 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     private void init(Context context) {
         ViewConfiguration config = ViewConfiguration.get(getContext());
-        mTouchSlop = config.getScaledTouchSlop();
-        mScroller = new Scroller(context);
-
-        mView = createBounceView(context);
-        addView(mView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-        mRefreshLayout = createBounceHeaderView(context);
-        if (mRefreshLayout != null) {
-            addView(mRefreshLayout.getView(), STATE_LAYOUT_WIDTH[mOrientation], STATE_LAYOUT_HEIGHT[mOrientation]);
-        }
-        mLoadMoreLayout = createBounceFooterView(context);
-        if (mLoadMoreLayout != null) {
-            addView(mLoadMoreLayout.getView(), STATE_LAYOUT_WIDTH[mOrientation], STATE_LAYOUT_HEIGHT[mOrientation]);
-        }
+        createBounceView(context);
+        mView = getInnerView();
     }
 
     public final T getBounceView() {
@@ -283,129 +250,6 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     boolean isVertical(){
         return mOrientation==OrientationHelper.VERTICAL;
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        final int action = ev.getAction();
-        if (action != MotionEvent.ACTION_DOWN && mIsBeingDragged) {
-            return true;
-        }
-        switch (action) {
-            case MotionEvent.ACTION_DOWN: {
-                mLastMotionY = ev.getRawY();
-                mLastMotionX = ev.getRawX();
-                //两个listview之间切换，其中某个listview.setPadding()时，会使getPaddingTop()和scrollValue的值不统一，需要进行统一
-                mScrollValue = isVertical()?-getPaddingTop():-getPaddingLeft();
-                break;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                float x = ev.getRawX();
-                float y = ev.getRawY();
-                float deltaX = ev.getRawX() - mLastMotionX;
-                float deltaY = ev.getRawY() - mLastMotionY;
-                float degree = isVertical()?Math.abs(deltaY) / Math.abs(deltaX):Math.abs(deltaX) / Math.abs(deltaY);
-
-                float mainDelta = isVertical()?deltaY:deltaX;
-                if (Math.abs(mainDelta) > mTouchSlop && degree >= 1.7f && mBounceable) {
-                    if (mainDelta > 0 && isReadyForPullFromStart()) {
-                        mLastMotionX = x;
-                        mLastMotionY = y;
-                        mIsBeingDragged = true;
-                        mMode = Mode.PULL_FROM_START;
-                    } else if (mainDelta < 0 && isReadyForPullFromEnd()) {
-                        mLastMotionX = x;
-                        mLastMotionY = y;
-                        mIsBeingDragged = true;
-                        mMode = Mode.PULL_FROM_END;
-                    }
-
-                }
-                break;
-            }
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP: {
-                mIsBeingDragged = false;
-            }
-        }
-        return mIsBeingDragged;
-    }
-
-    private int getStartPadding(){
-        return isVertical()?getPaddingTop():getPaddingLeft();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        if (mGestureDetector != null) {
-            mGestureDetector.onTouchEvent(ev);
-        }
-        switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                if (ev.getEdgeFlags() != 0) {
-                    return false;
-                }
-                mLastMotionX = ev.getRawX();
-                mLastMotionY = ev.getRawY();
-                mScrollValue = isVertical()?-getPaddingTop():-getPaddingLeft();
-                return mIsBeingDragged;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                if (mIsBeingDragged) {
-                    float raw = isVertical()?ev.getRawY():ev.getRawX();
-                    startPull(raw);
-                    return true;
-                }
-                break;
-            }
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP: {
-                if (mIsBeingDragged) {
-                    this.mScrollValue = isVertical()?-getPaddingTop():-getPaddingLeft();
-                    mIsBeingDragged = false;
-                    onTouchActionUp();
-                    if (mMaxPadding > 0) {
-                        /**
-                         * 1.当listview当前在paddingTop＝0时，向下拉时，要回到初始位置0，deltaY为－paddingTop < 0
-                         * 2.当listview在最小－PADDING时，向上拉时，要回到位置－PADDING，deltaY为(-PADDING - getPaddingTop()) > 0
-                         * bug:
-                         * listview item超过一屏时，当2的状态时，listview不会向上pull
-                         * fix：
-                         * listview设置不能向上弹
-                         */
-                        int startPadding = getStartPadding();
-                        if (startPadding > 0/*|| getPaddingTop() < -mMaxPadding*/) {
-                            mScrollValue = startPadding > 0 ? 0 : -mMaxPadding;
-                            backToInitPos(startPadding, startPadding > 0 ? -startPadding : (-mMaxPadding - startPadding));
-                        }
-                    } else {
-                        int delta = isVertical()?getScrollY():getScrollX();
-                        backToInitPos(delta, -delta);
-                    }
-                    mMode = null;
-                    return true;
-                }
-                break;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void computeScroll() {
-        super.computeScroll();
-        if (mScroller.computeScrollOffset()) {
-            int x = mScroller.getCurrX();
-            int y = mScroller.getCurrY();
-            //Helper.logv("compute scroll y:" + y);
-            if (mMaxPadding > 0) {
-                this.mScrollValue = isVertical()?-y:-x;//根据scroll.fling() y在－PADDING －0 之间
-                setPadding(x, y, 0, 0);
-            } else {
-                scrollTo(x, y);
-            }
-            invalidate();
-        }
     }
 
     @Override
@@ -482,156 +326,12 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         }
     }
 
-    protected void smoothScroll(int value) {
-        if(isVertical()) {
-            mScroller.startScroll(0, getScrollY(), 0, value);
-        }else{
-            mScroller.startScroll(getScrollX(), 0, value, 0);
-        }
-        invalidate();
+    public abstract WXSwipeRefreshLayout createBounceView(Context context);
+    public abstract T getInnerView();
+
+    public void resetHeaderView(View headerView) {
+        if (swipeRefreshLayout != null)
+            if (swipeRefreshLayout.getHeaderView() != null)
+                swipeRefreshLayout.getHeaderView().resetView(headerView);
     }
-
-    public void setBounceable(boolean bounceable) {
-        mBounceable = bounceable;
-    }
-
-    public void setEffectMaxHeight(int padding) {
-        this.mMaxPadding = padding;
-        if (mGestureDetector == null) {
-            mGestureDetector = new GestureDetectorCompat(getContext(), mGestureListener);
-        }
-    }
-
-    private void startPull(float raw) {
-        int scrollValue = 0;
-        final float last;
-        last = isVertical()?mLastMotionY:mLastMotionX;
-        switch (mMode) {
-            case PULL_FROM_START: {
-                scrollValue = Math.round(Math.min(last - raw, 0) / FRICTION);
-                break;
-            }
-            case PULL_FROM_END: {
-                scrollValue = Math.round(Math.max(last - raw, 0) / FRICTION);
-                break;
-            }
-        }
-        pullScrollTo(this.mScrollValue + scrollValue);
-    }
-
-    private void pullScrollTo(int scrollValue) {
-        int maxScroll = getMaximumPullScroll();
-        scrollValue = Math.min(maxScroll, Math.max(-maxScroll, scrollValue));
-        //scrollTo(0, scrollValue);
-        if (mMaxPadding > 0) {
-            if(isVertical()) {
-                setPadding(0, -scrollValue <= -mMaxPadding ? -mMaxPadding : -scrollValue, 0, 0);
-            }else{
-                setPadding(-scrollValue <= -mMaxPadding ? -mMaxPadding : -scrollValue,0,0,0);
-            }
-        } else {
-            if(isVertical()) {
-                scrollTo(0, scrollValue);
-            }else{
-                scrollTo(scrollValue,0);
-            }
-        }
-
-        onPull(scrollValue);
-    }
-
-    private void onPull(int scrollValue) {
-        IRefreshLayout pullLayout = null;
-        switch (mMode) {
-            case PULL_FROM_START:
-                pullLayout = mRefreshLayout;
-                break;
-            case PULL_FROM_END:
-                pullLayout = mLoadMoreLayout;
-                break;
-        }
-        if ((mMode == Mode.PULL_FROM_START || mMode == Mode.PULL_FROM_END) && pullLayout != null) {
-            final int itemDimension = isVertical()?pullLayout.getView().getHeight():pullLayout.getView().getWidth();
-            float scaleOfLayout = Math.abs(scrollValue) / (float) itemDimension;
-            float angle = scaleOfLayout * 90f;
-            pullLayout.onPull(angle);
-
-            onPullStateChanged(itemDimension, scrollValue);
-        }
-    }
-
-    private void backToInitPos(int start, int delta) {
-        int duration = DEFAULT_DURATION;
-        if (mRefreshLayout != null) {
-            int scrollLen = Math.abs(isVertical()?getScrollY():getScrollX());
-            int limit = isVertical()?mRefreshLayout.getView().getHeight():mRefreshLayout.getView().getWidth();
-            if (scrollLen < limit) {
-                duration = DEFAULT_DURATION;
-            } else {
-                duration = (scrollLen - limit)* DEFAULT_DURATION / (getMaximumPullScroll() - limit);
-            }
-        }
-        if(isVertical()){
-            mScroller.startScroll(0, start, 0, delta, duration);
-        }else{
-            mScroller.startScroll(start,0,delta,0, duration);
-        }
-
-        invalidate();
-    }
-
-    private int getMaximumPullScroll() {
-        return Math.round(isVertical()?getResources().getDisplayMetrics().heightPixels:getResources().getDisplayMetrics().widthPixels / (FRICTION));
-    }
-
-    protected IRefreshLayout getBounceHeaderView() {
-        return mRefreshLayout;
-    }
-
-    protected IRefreshLayout getBounceFooterView() {
-        return mLoadMoreLayout;
-    }
-
-    public void setBounceHeaderView(IRefreshLayout layout) {
-        mRefreshLayout = layout;
-        if (mRefreshLayout != null && getChildCount() > 1) {
-            removeViewAt(1);
-            addView(mRefreshLayout.getView(), 1);
-        }
-    }
-
-    public void setBounceFooterView(IRefreshLayout layout) {
-        mLoadMoreLayout = layout;
-        if (mLoadMoreLayout != null && getChildCount() > 2) {
-            removeViewAt(2);
-            addView(mLoadMoreLayout.getView(), 2);
-        }
-    }
-
-    public abstract boolean isReadyForPullFromStart();
-    public abstract boolean isReadyForPullFromEnd();
-    public abstract T createBounceView(Context context);
-    public abstract IRefreshLayout createBounceHeaderView(Context context);
-
-    public IRefreshLayout createBounceFooterView(Context context) {
-        return null;
-    }
-
-    protected void onPullStateChanged(int itemDimension, int scrollValue) {}
-
-    protected void onTouchActionUp() {}
-
-    private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if(isVertical()) {
-                mScroller.fling(getPaddingLeft(), getPaddingTop(), 0, (int) velocityY, 0, 0, -mMaxPadding, 0);
-            }else{
-                mScroller.fling(getPaddingLeft(), getPaddingTop(), (int) velocityX, 0, -mMaxPadding, 0, 0,  0);
-            }
-            invalidate();
-            return true;
-        }
-    };
-
 }
