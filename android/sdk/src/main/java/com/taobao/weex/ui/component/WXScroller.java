@@ -194,13 +194,13 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   protected MeasureOutput measure(int width, int height) {
     MeasureOutput measureOutput = new MeasureOutput();
     if (this.mOrientation == WXVContainer.HORIZONTAL) {
-      int screenW = WXViewUtils.getScreenWidth();
+      int screenW = WXViewUtils.getScreenWidth(WXEnvironment.sApplication);
       int weexW = WXViewUtils.getWeexWidth(mInstanceId);
       measureOutput.width = width > (weexW >= screenW ? screenW : weexW) ? FrameLayout.LayoutParams.MATCH_PARENT
                                                                          : width;
       measureOutput.height = height;
     } else {
-      int screenH = WXViewUtils.getScreenHeight();
+      int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
       int weexH = WXViewUtils.getWeexHeight(mInstanceId);
       measureOutput.height = height > (weexH >= screenH ? screenH : weexH) ? FrameLayout.LayoutParams.MATCH_PARENT
                                                                            : height;

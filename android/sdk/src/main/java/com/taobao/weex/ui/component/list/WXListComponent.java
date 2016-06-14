@@ -280,7 +280,7 @@ public class WXListComponent extends WXVContainer implements
      */
     @Override
     protected MeasureOutput measure(int width, int height) {
-        int screenH = WXViewUtils.getScreenHeight();
+        int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
         int weexH = WXViewUtils.getWeexHeight(mInstanceId);
         int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
         return super.measure(width, outHeight);

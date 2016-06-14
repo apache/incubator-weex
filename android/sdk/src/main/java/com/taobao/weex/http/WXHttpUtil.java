@@ -244,7 +244,7 @@ public class WXHttpUtil {
           .append(TextUtils.isEmpty(config.get(WXConfig.externalUserAgent)) ? "" : config.get(WXConfig.externalUserAgent))
           .append(TextUtils.isEmpty(config.get(WXConfig.externalUserAgent)) ? "" : " ")
 
-          .append(WXViewUtils.getScreenWidth() + "x" + WXViewUtils.getScreenHeight());
+          .append(WXViewUtils.getScreenWidth(WXEnvironment.sApplication) + "x" + WXViewUtils.getScreenHeight(WXEnvironment.sApplication));
       sDefautUA = builder.toString();
     }
     return sDefautUA;
