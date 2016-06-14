@@ -97,6 +97,7 @@
     NSTextAlignment _textAlign;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
+    CGFloat _lineHeight;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -138,6 +139,7 @@ do {\
     WX_STYLE_FILL_TEXT(textAlign, textAlign, NSTextAlignment, NO)
     WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
+    WX_STYLE_FILL_TEXT(lineHeight, lineHeight, WXPixelType, YES)
     
     UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP], self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT]);
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
@@ -274,15 +276,16 @@ do {\
     } else if(_textDecoration == WXTextDecorationLineThrough){
         [attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlinePatternSolid | NSUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
     }
+     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     if (_textAlign) {
-        
-        NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
         paragraphStyle.alignment = _textAlign;
-        [attributedString addAttribute:NSParagraphStyleAttributeName
-                                 value:paragraphStyle
-                                 range:(NSRange){0, attributedString.length}];
-        
     }
+    if (_lineHeight) {
+        paragraphStyle.lineHeightMultiple = _lineHeight/font.lineHeight;
+    }
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:paragraphStyle
+                             range:(NSRange){0, attributedString.length}];
     
     return attributedString;
 }
@@ -309,7 +312,6 @@ do {\
         if ([_textOverflow isEqualToString:@"ellipsis"])
             textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
     }
-    
     textContainer.maximumNumberOfLines = _lines > 0 ? _lines : 0;
     textContainer.size = (CGSize){isnan(width) ? CGFLOAT_MAX : width, CGFLOAT_MAX};
     
