@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.taobao.weex.dom.WXStyle.UNSET;
+
 /**
  * Class for calculating a given text's height and width. The calculating of width and height of
  * text is done by {@link Layout}.
@@ -86,7 +88,7 @@ public class WXTextDomObject extends WXDomObject {
     }
   };
 
-  public static final int UNSET = -1;
+
   private static final TextPaint TEXT_PAINT = new TextPaint();
   private static final Canvas DUMMY_CANVAS = new Canvas();
   private static final String ELLIPSIS = "\u2026";
@@ -103,6 +105,7 @@ public class WXTextDomObject extends WXDomObject {
   private int mFontWeight = UNSET;
   private int mNumberOfLines = UNSET;
   private int mFontSize = UNSET;
+  private int mLineHeight = UNSET;
   private float previousWidth = Float.NaN;
   private String mFontFamily = null;
   private String mText = null;
@@ -253,6 +256,9 @@ public class WXTextDomObject extends WXDomObject {
       }
       mAlignment = WXStyle.getTextAlignment(style);
       textOverflow = WXStyle.getTextOverflow(style);
+      int lineHeight=WXStyle.getLineHeight(style);
+      if(lineHeight!=UNSET)
+        mLineHeight=lineHeight;
     }
   }
 
@@ -345,6 +351,9 @@ public class WXTextDomObject extends WXDomObject {
                                      new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily)));
       }
       ops.add(new SetSpanOperation(start, end, new AlignmentSpan.Standard(mAlignment)));
+      if(mLineHeight !=UNSET) {
+        ops.add(new SetSpanOperation(start, end, new WXLineHeightSpan(mLineHeight)));
+      }
     }
     return ops;
   }

@@ -281,6 +281,8 @@ public class WXDomPropConstant {
   public static final String WX_TEXT_ELLIPSIS = "ellipsis";
   public static final String WX_TEXT_CLIP = "clip";
 
+  public static final String WX_TEXT_LINE_HEIGHT="lineHeight";
+
   public static final String WX_ATTR_DISABLED = "disabled";
 
   public static final String WX_ATTR_PREFIX = "prefix";

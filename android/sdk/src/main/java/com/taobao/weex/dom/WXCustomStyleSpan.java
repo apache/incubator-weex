@@ -45,12 +45,12 @@ class WXCustomStyleSpan extends MetricAffectingSpan {
 
     int want = 0;
     if ((weight == Typeface.BOLD)
-        || ((oldStyle & Typeface.BOLD) != 0 && weight == WXTextDomObject.UNSET)) {
+        || ((oldStyle & Typeface.BOLD) != 0 && weight == WXStyle.UNSET)) {
       want |= Typeface.BOLD;
     }
 
     if ((style == Typeface.ITALIC)
-        || ((oldStyle & Typeface.ITALIC) != 0 && style == WXTextDomObject.UNSET)) {
+        || ((oldStyle & Typeface.ITALIC) != 0 && style == WXStyle.UNSET)) {
       want |= Typeface.ITALIC;
     }
 
@@ -84,14 +84,14 @@ class WXCustomStyleSpan extends MetricAffectingSpan {
    * Returns {@link Typeface#NORMAL} or {@link Typeface#ITALIC}.
    */
   public int getStyle() {
-    return (mStyle == WXTextDomObject.UNSET ? 0 : mStyle);
+    return (mStyle == WXStyle.UNSET ? 0 : mStyle);
   }
 
   /**
    * Returns {@link Typeface#NORMAL} or {@link Typeface#BOLD}.
    */
   public int getWeight() {
-    return (mWeight == WXTextDomObject.UNSET ? 0 : mWeight);
+    return (mWeight == WXStyle.UNSET ? 0 : mWeight);
   }
 
   /**
