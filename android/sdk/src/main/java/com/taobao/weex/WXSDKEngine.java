@@ -212,8 +212,9 @@ public class WXSDKEngine {
       if (init) {
         return;
       }
-
+      long start = System.currentTimeMillis();
       doInitInternal(application,config);
+      WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       init = true;
 
       if (WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null) {
@@ -229,6 +230,7 @@ public class WXSDKEngine {
     WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
       @Override
       public void run() {
+        long start = System.currentTimeMillis();
         WXSDKManager sm = WXSDKManager.getInstance();
         if(config != null ) {
           sm.setIWXHttpAdapter(config.getHttpAdapter());
@@ -242,6 +244,7 @@ public class WXSDKEngine {
         }
         sm.initScriptsFramework(null);
         register();
+        WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
       }
     });
   }
