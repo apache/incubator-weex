@@ -1,5 +1,7 @@
 # Syntax
 <span class="weex-version">0.4</span>
+<a href="https://github.com/weexteam/article/issues/8"  class="weex-translate">cn</a>
+
 
 A simple Weex page sample is just a piece of `<template>` code, a piece of `<style>` code and a piece of `<script>` code. The three parts together describe a whole Weex page.
 

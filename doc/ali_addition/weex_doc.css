@@ -88,7 +88,6 @@ dl, ol, ul {
 
 
 .menu>li>a {
-
     display: block;
     padding: .7rem 1rem;
     line-height: 1;
@@ -114,6 +113,20 @@ span.weex-version{
     border-radius: 10px;
 }
 
+a.weex-translate{
+    font-size: 16px;
+    position: relative;
+    top: -12px;
+    left: 20px;
+    padding: 3px 7px;    
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+    background-color: #de2810;
+}
 
 .wx-v{
     padding: 3px 7px;

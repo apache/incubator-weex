@@ -31,8 +31,8 @@ function contentLoaded(win, fn) {
 		doc[add](pre + 'readystatechange', init, false);
 		win[add](pre + 'load', init, false);
 	}
-
 }
+
 
 
 function getTextWidth(text, font) {
@@ -44,8 +44,6 @@ function getTextWidth(text, font) {
     return metrics.width;
 }
 
-contentLoaded(window, function(){
-})
 
 
 function rePostionVersion(vDis){
@@ -54,11 +52,20 @@ function rePostionVersion(vDis){
     var vOffset = $(".weex-version").offset();
     var titleJObj = $(".weex-version").parents(".markdown-section").find("h1,h2,h3");
     var titleOffset = titleJObj.offset();
-    var titleWidth = getTextWidth(titleJObj.text() ,  titleJObj.css("font") );
-
     var vDistance = (vOffset.top - titleOffset.top + vDis  );
     var hDistance = (titleJObj.width());
     $(".weex-version").css("transform", "translate("+hDistance+"px,-"+vDistance+"px)"); 
 }
 
-window._rePostionVersion =   rePostionVersion
+
+function rePostionTranslate(){
+    if ($(".weex-version").length < 1){return ;}
+    var translateMark = $(".weex-translate").filter(':visible');
+    var titleJObj = translateMark.parents(".markdown-section").find("h1,h2,h3").eq(0);
+    titleJObj.append(translateMark);
+}
+
+window._rePostionVersion =   function () {
+    rePostionVersion();
+    rePostionTranslate();
+}
