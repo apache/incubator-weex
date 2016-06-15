@@ -25,4 +25,10 @@
 
 + (NSString*)getReplacedJSFramework;
 
+/**
+ *  launch weex inspector
+ *  @param url  : ws://ip:9000/device, ip is your computer device ip or localhost
+ **/
++ (void)launchInspectorWithSocketUrl:(NSURL *)url;
+
 @end
