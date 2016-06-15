@@ -208,7 +208,6 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -223,7 +222,6 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
@@ -485,15 +483,10 @@ public class WXListComponent extends WXVContainer implements
                         || getItemViewType(i) != viewType)
                     continue;
                 if (component instanceof WXRefresh) {
-                    Log.i("miomin", ((WXText) (((WXRefresh) component).getChild(0))).getView().getText().toString());
-//                    Log.i("miomin", "height:" + component.getView().getLayoutParams().height + ",width:" + component.getView().getLayoutParams().width);
-                    component.getView().measure(0, 0);
-                    Log.i("miomin", component.getView().getMeasuredWidth() + "");
-                    Log.i("miomin", component.getView().getMeasuredHeight() + "");
-                    bounceRecyclerView.resetHeaderView(component.getView());
+                    bounceRecyclerView.setHeaderView(component.getView());
                     return createVHForWXRefresh(component, viewType);
                 } else if (component instanceof WXLoading) {
-                    bounceRecyclerView.resetFooterView(component.getView());
+                    bounceRecyclerView.setFooterView(component.getView());
                     return createVHForWXLoading(component, viewType);
                 } else if (component.mDomObj!=null && component.mDomObj.isFixed()) {
                     return createVHForFakeComponent(viewType);

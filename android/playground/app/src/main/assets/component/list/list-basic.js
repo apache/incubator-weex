@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/261a16dccab72c5433435ffc58e018e5", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/e99ff1a91aa9a00f32ef51a36e480ed8", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -137,7 +137,7 @@
 	        {
 	          "type": "refresh",
 	          "classList": [
-	            "refresh-view"
+	            "flexbox-center"
 	          ],
 	          "attr": {
 	            "display": function () {return this.refresh_display}
@@ -146,6 +146,13 @@
 	            "refresh": "onrefresh"
 	          },
 	          "children": [
+	            {
+	              "type": "loading-indicator",
+	              "style": {
+	                "height": 60,
+	                "width": 60
+	              }
+	            },
 	            {
 	              "type": "text",
 	              "classList": [
@@ -158,12 +165,6 @@
 	              "shown": function () {return (this.refresh_display==='hide')},
 	              "attr": {
 	                "value": "Pull To Refresh"
-	              }
-	            },
-	            {
-	              "type": "loading-indicator",
-	              "style": {
-	                "height": 60
 	              }
 	            }
 	          ]
@@ -256,9 +257,7 @@
 	  },
 	  "refresh-view": {
 	    "height": 80,
-	    "width": 750,
-	    "justifyContent": "center",
-	    "alignItems": "center"
+	    "width": 750
 	  },
 	  "refresh-arrow": {
 	    "fontSize": 30,
@@ -278,10 +277,17 @@
 	    "borderBottomColor": "#c0c0c0",
 	    "height": 100,
 	    "padding": 20
+	  },
+	  "flexbox-center": {
+	    "display": "flex",
+	    "MsFlexAlign": "center",
+	    "WebkitAlignItems": "center",
+	    "WebkitBoxAlign": "center",
+	    "alignItems": "center"
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/261a16dccab72c5433435ffc58e018e5", {
+	;__weex_bootstrap__("@weex-component/e99ff1a91aa9a00f32ef51a36e480ed8", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

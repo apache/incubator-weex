@@ -329,15 +329,15 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     public abstract WXSwipeRefreshLayout createBounceView(Context context);
     public abstract T getInnerView();
 
-    public void resetHeaderView(View headerView) {
+    public void setHeaderView(View headerView) {
         if (swipeRefreshLayout != null)
             if (swipeRefreshLayout.getHeaderView() != null)
-                swipeRefreshLayout.getHeaderView().resetView(headerView);
+                swipeRefreshLayout.getHeaderView().setRefreshView(headerView);
     }
 
-    public void resetFooterView(View footerView) {
+    public void setFooterView(View footerView) {
         if (swipeRefreshLayout != null)
             if (swipeRefreshLayout.getFooterView() != null)
-                swipeRefreshLayout.getFooterView().resetView(footerView);
+                swipeRefreshLayout.getFooterView().setRefreshView(footerView);
     }
 }

@@ -1,9 +1,9 @@
 <template>
   <div>
     <list class="list">
-      <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
+      <refresh class="flexbox-center" display="{{refresh_display}}" onrefresh="onrefresh">
+        <loading-indicator style="height:60;width:60" ></loading-indicator>
         <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">Pull To Refresh</text>
-        <loading-indicator style="height:60" ></loading-indicator>
       </refresh>
       <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">
         <div class="item">
@@ -32,8 +32,6 @@
   .refresh-view {
     height: 80px;
     width: 750px;
-    justify-content: center;
-    align-items: center;
   }
   .refresh-arrow {
     font-size: 30px;
@@ -55,6 +53,15 @@
     padding:20px;
   }
   .item-title {
+  }
+  .flexbox-center {
+      display: -ms-flex;
+      display: -webkit-flex;
+      display: flex;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      -webkit-box-align: center;
+      align-items: center;
   }
 
 </style>

@@ -210,128 +210,105 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class WXRefreshLayout extends LinearLayout {
+public class RefreshLayout extends LinearLayout {
 
-    private static final int DEFAULT_CIRCLE_SIZE = 42;
-    private CircleProgressBar circleProgressBar;
-    private TextView tvLoad;
+  private static final int DEFAULT_CIRCLE_SIZE = 42;
+  private CircleProgressBar circleProgressBar;
+  private TextView tvLoad;
 
-    public WXRefreshLayout(Context context) {
-        super(context);
-        setupViews();
+  public RefreshLayout(Context context) {
+    super(context);
+    setupViews();
+  }
+
+  public RefreshLayout(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    setupViews();
+  }
+
+  public RefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    setupViews();
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  public RefreshLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+    setupViews();
+  }
+
+  /**
+   * 添加View
+   */
+  private void setupViews() {
+    this.setOrientation(VERTICAL);
+    this.setGravity(Gravity.CENTER);
+  }
+
+  public void setRefreshView(View view) {
+    removeView(tvLoad);
+    removeView(circleProgressBar);
+    addView(view);
+  }
+
+  public void setLoadText(String loadtText) {
+    if (tvLoad != null) {
+      tvLoad.setText(loadtText);
     }
+  }
 
-    public WXRefreshLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setupViews();
+  public void setLoadTextColor(int color) {
+    if (tvLoad != null) {
+      tvLoad.setTextColor(color);
     }
+  }
 
-    public WXRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        setupViews();
+  public void setProgressBgColor(int color) {
+    if (circleProgressBar != null)
+
+    {
+      circleProgressBar.setBackgroundColor(color);
     }
+  }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public WXRefreshLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        setupViews();
+  public void setProgressColor(int color) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setColorSchemeColors(color);
     }
+  }
 
-    /**
-     * 添加View
-     */
-    private void setupViews() {
-        this.setOrientation(VERTICAL);
-        this.setGravity(Gravity.CENTER);
-
-        circleProgressBar = new CircleProgressBar(getContext());
-        LayoutParams lp = new LayoutParams((int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE),
-                (int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE));
-        addView(circleProgressBar, lp);
-        tvLoad = new TextView(getContext());
-        addView(tvLoad);
+  /**
+   * 开始动画
+   */
+  public void start() {
+    if (circleProgressBar != null) {
+      circleProgressBar.start();
     }
+  }
 
-    public void resetView(View view) {
-        removeView(tvLoad);
-        LinearLayout linearLayout = new LinearLayout(getContext());
-        linearLayout.setOrientation(VERTICAL);
-        linearLayout.setGravity(Gravity.CENTER);
-        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        linearLayout.setLayoutParams(lp);
-
-        View child = null;
-
-        while (((ViewGroup) view).getChildCount() > 0) {
-            child = ((ViewGroup) view).getChildAt(0);
-            if (child instanceof CircleProgressBar) {
-                removeView(circleProgressBar);
-                circleProgressBar = new CircleProgressBar(getContext());
-                circleProgressBar.setIndicator_color(((CircleProgressBar) child).getIndicator_color());
-                LayoutParams _lp = new LayoutParams((int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE),
-                        (int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE));
-                linearLayout.addView(circleProgressBar, _lp);
-                ((ViewGroup) view).removeViewAt(0);
-                continue;
-            }
-            ((ViewGroup) view).removeViewAt(0);
-            linearLayout.addView(child);
-        }
-
-        addView(linearLayout);
+  /**
+   * 设置动画起始位置
+   */
+  public void setStartEndTrim(float startAngle, float endAngle) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setStartEndTrim(startAngle, endAngle);
     }
+  }
 
-    public void setLoadText(String loadtText) {
-        if (tvLoad != null)
-            tvLoad.setText(loadtText);
+  /**
+   * 停止动画
+   */
+  public void stop() {
+    if (circleProgressBar != null) {
+      circleProgressBar.stop();
     }
+  }
 
-    public void setLoadTextColor(int color) {
-        if (tvLoad != null)
-            tvLoad.setTextColor(color);
-    }
-
-    public void setProgressBgColor(int color) {
-        if (circleProgressBar != null)
-
-            circleProgressBar.setBackgroundColor(color);
-    }
-
-    public void setProgressColor(int color) {
-        if (circleProgressBar != null)
-            circleProgressBar.setColorSchemeColors(color);
-    }
-
-    /**
-     * 开始动画
-     */
-    public void start() {
-        if (circleProgressBar != null)
-            circleProgressBar.start();
-    }
-
-    /**
-     * 设置动画起始位置
-     */
-    public void setStartEndTrim(float startAngle, float endAngle) {
-        if (circleProgressBar != null)
-            circleProgressBar.setStartEndTrim(startAngle, endAngle);
-    }
-
-    /**
-     * 停止动画
-     */
-    public void stop() {
-        if (circleProgressBar != null)
-            circleProgressBar.stop();
-    }
-
-    public void setProgressRotation(float rotation) {
-        if (circleProgressBar != null)
-            circleProgressBar.setProgressRotation(rotation);
-    }
+  public void setProgressRotation(float rotation) {
+    if (circleProgressBar != null)
+      circleProgressBar.setProgressRotation(rotation);
+  }
 }

@@ -210,8 +210,8 @@ import android.util.TypedValue;
 
 public abstract class DipUtils {
 
-    public static float dipToPx(Context context, float value) {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, metrics);
-    }
+  public static float dipToPx(Context context, float value) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, metrics);
+  }
 }

@@ -207,23 +207,24 @@ package com.taobao.weex.ui.view.refresh;
 import android.animation.Animator;
 
 public class WXRefreshAnimatorListener implements Animator.AnimatorListener {
-    @Override
-    public void onAnimationStart(Animator animation) {
 
-    }
+  @Override
+  public void onAnimationStart(Animator animation) {
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
+  }
 
-    }
+  @Override
+  public void onAnimationEnd(Animator animation) {
 
-    @Override
-    public void onAnimationCancel(Animator animation) {
+  }
 
-    }
+  @Override
+  public void onAnimationCancel(Animator animation) {
 
-    @Override
-    public void onAnimationRepeat(Animator animation) {
+  }
 
-    }
+  @Override
+  public void onAnimationRepeat(Animator animation) {
+
+  }
 }
