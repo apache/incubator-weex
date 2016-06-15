@@ -2,14 +2,18 @@
   <div>
     <list class="list">
       <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
-        <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">↓ Pull To Refresh</text>
-        <loading-indicator></loading-indicator>
+        <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">Pull To Refresh</text>
+        <loading-indicator style="height:60" ></loading-indicator>
       </refresh>
       <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">
         <div class="item">
           <text class="item-title">row {{id}}</text>
         </div>
       </cell>
+      <loading class="refresh-view">
+        <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">Load more</text>
+        <loading-indicator style="height:60" ></loading-indicator>
+      </loading>
     </list>
     <text class="count" value="Appear items:{{appearMin}} - {{appearMax}}"></text>
   </div>

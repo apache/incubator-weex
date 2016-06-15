@@ -245,13 +245,12 @@ public class WXRefreshLayout extends LinearLayout {
      * 添加View
      */
     private void setupViews() {
-        this.setOrientation(HORIZONTAL);
+        this.setOrientation(VERTICAL);
         this.setGravity(Gravity.CENTER);
 
         circleProgressBar = new CircleProgressBar(getContext());
         LayoutParams lp = new LayoutParams((int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE),
                 (int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE));
-        lp.rightMargin = (int) DipUtils.dipToPx(getContext(), 10);
         addView(circleProgressBar, lp);
         tvLoad = new TextView(getContext());
         addView(tvLoad);
@@ -262,15 +261,22 @@ public class WXRefreshLayout extends LinearLayout {
         LinearLayout linearLayout = new LinearLayout(getContext());
         linearLayout.setOrientation(VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
-        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         linearLayout.setLayoutParams(lp);
 
         View child = null;
 
-        while (((ViewGroup)view).getChildCount() > 0) {
-            child = ((ViewGroup)view).getChildAt(0);
+        while (((ViewGroup) view).getChildCount() > 0) {
+            child = ((ViewGroup) view).getChildAt(0);
             if (child instanceof CircleProgressBar) {
-                setProgressColor(((CircleProgressBar)child).getIndicator_color());
+                removeView(circleProgressBar);
+                circleProgressBar = new CircleProgressBar(getContext());
+                circleProgressBar.setIndicator_color(((CircleProgressBar) child).getIndicator_color());
+                LayoutParams _lp = new LayoutParams((int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE),
+                        (int) DipUtils.dipToPx(getContext(), DEFAULT_CIRCLE_SIZE));
+                linearLayout.addView(circleProgressBar, _lp);
+                ((ViewGroup) view).removeViewAt(0);
+                continue;
             }
             ((ViewGroup) view).removeViewAt(0);
             linearLayout.addView(child);
@@ -280,43 +286,52 @@ public class WXRefreshLayout extends LinearLayout {
     }
 
     public void setLoadText(String loadtText) {
-        this.tvLoad.setText(loadtText);
+        if (tvLoad != null)
+            tvLoad.setText(loadtText);
     }
 
     public void setLoadTextColor(int color) {
-        tvLoad.setTextColor(color);
+        if (tvLoad != null)
+            tvLoad.setTextColor(color);
     }
 
     public void setProgressBgColor(int color) {
-        circleProgressBar.setBackgroundColor(color);
+        if (circleProgressBar != null)
+
+            circleProgressBar.setBackgroundColor(color);
     }
 
     public void setProgressColor(int color) {
-        circleProgressBar.setColorSchemeColors(color);
+        if (circleProgressBar != null)
+            circleProgressBar.setColorSchemeColors(color);
     }
 
     /**
      * 开始动画
      */
     public void start() {
-        circleProgressBar.start();
+        if (circleProgressBar != null)
+            circleProgressBar.start();
     }
 
     /**
      * 设置动画起始位置
      */
     public void setStartEndTrim(float startAngle, float endAngle) {
-        circleProgressBar.setStartEndTrim(startAngle, endAngle);
+        if (circleProgressBar != null)
+            circleProgressBar.setStartEndTrim(startAngle, endAngle);
     }
 
     /**
      * 停止动画
      */
     public void stop() {
-        circleProgressBar.stop();
+        if (circleProgressBar != null)
+            circleProgressBar.stop();
     }
 
     public void setProgressRotation(float rotation) {
-        circleProgressBar.setProgressRotation(rotation);
+        if (circleProgressBar != null)
+            circleProgressBar.setProgressRotation(rotation);
     }
 }

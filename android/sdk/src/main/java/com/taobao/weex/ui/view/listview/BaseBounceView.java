@@ -334,4 +334,10 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
             if (swipeRefreshLayout.getHeaderView() != null)
                 swipeRefreshLayout.getHeaderView().resetView(headerView);
     }
+
+    public void resetFooterView(View footerView) {
+        if (swipeRefreshLayout != null)
+            if (swipeRefreshLayout.getFooterView() != null)
+                swipeRefreshLayout.getFooterView().resetView(footerView);
+    }
 }

@@ -493,6 +493,7 @@ public class WXListComponent extends WXVContainer implements
                     bounceRecyclerView.resetHeaderView(component.getView());
                     return createVHForWXRefresh(component, viewType);
                 } else if (component instanceof WXLoading) {
+                    bounceRecyclerView.resetFooterView(component.getView());
                     return createVHForWXLoading(component, viewType);
                 } else if (component.mDomObj!=null && component.mDomObj.isFixed()) {
                     return createVHForFakeComponent(viewType);

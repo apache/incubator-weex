@@ -876,6 +876,10 @@ public class WXSwipeRefreshLayout extends FrameLayout {
         return headerView;
     }
 
+    public WXRefreshLayout getFooterView() {
+        return footerView;
+    }
+
     public boolean ismPullLoadEnable() {
         return mPullLoadEnable;
     }
