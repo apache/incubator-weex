@@ -202,7 +202,7 @@ NSTimeInterval JSLibInitTime = 0;
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
-        [self.componentManager unload];
+        [weakSelf.componentManager unload];
         dispatch_async(dispatch_get_main_queue(), ^{
             [WXSDKManager removeInstanceforID:weakSelf.instanceId];
         });
