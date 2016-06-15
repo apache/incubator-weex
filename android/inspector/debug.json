@@ -1,0 +1,17 @@
+{
+  "domain": "WxDebug",
+  "hidden": true,
+  "types": [],
+  "commands": [
+    {
+      "name": "calljs",
+      "parameters": [
+        { "name": "namespace", "type": "string" },
+        { "name": "instanceId", "type": "string" },
+        { "name": "method", "type": "string" },
+        { "name": "args", "type": "array" }
+      ],
+      "description": "native call this to run js function"
+    }
+  ]
+}

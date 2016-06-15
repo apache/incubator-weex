@@ -337,7 +337,7 @@ public class WXLogUtils {
   private static void writeConsoleLog(String level, String message) {
     if (WXEnvironment.isApkDebugable()) {
       try {
-        Class cls = Class.forName("com.facebook.stetho.common.LogUtil");
+        Class cls = Class.forName("com.taobao.weex.devtools.common.LogUtil");
         Method m = cls.getMethod("log", new Class[]{String.class, String.class});
         m.invoke(cls, new Object[]{level, message});
       } catch (Exception e) {

@@ -1,2 +1,2 @@
--keep class com.facebook.stetho.** { *; }
--dontwarn com.facebook.stetho.**
+-keep class com.taobao.weex.devtools.** { *; }
+-dontwarn com.taobao.weex.devtools.**
