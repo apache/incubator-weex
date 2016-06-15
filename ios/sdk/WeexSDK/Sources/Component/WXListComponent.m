@@ -121,6 +121,10 @@
     WXAssertComponentThread();
     
     [_cellComponents removeObject:cell];
+    
+    for (WXCellComponent *cell in _cellComponents) {
+        cell.indexPath = [NSIndexPath indexPathForRow:[_cellComponents indexOfObject:cell] inSection:0];
+    }
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell
@@ -221,7 +225,8 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    WXCellComponent *cell = _cellComponents[indexPath.row];
+    
+    WXCellComponent *cell = [_cellComponents wx_safeObjectAtIndex:indexPath.row];
     return cell.calculatedFrame.size.height;
 }
 

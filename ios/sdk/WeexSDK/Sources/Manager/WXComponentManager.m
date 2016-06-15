@@ -24,6 +24,7 @@ static NSThread *WXComponentThread;
 @implementation WXComponentManager
 {
     __weak WXSDKInstance *_weexInstance;
+    BOOL _isValid;
     
     BOOL _stopRunning;
     NSUInteger _noTaskTickCount;
@@ -57,6 +58,7 @@ static NSThread *WXComponentThread;
         _indexDict = [NSMapTable strongToWeakObjectsMapTable];
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
+        _isValid = YES;
         
         [self _startDisplayLink];
     }
@@ -412,6 +414,13 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     _rootComponent = nil;
     
     [self _stopDisplayLink];
+    
+    _isValid = NO;
+}
+
+- (BOOL)isValid
+{
+    return _isValid;
 }
 
 #pragma mark Layout Batch
