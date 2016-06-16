@@ -80,26 +80,6 @@ CGSize WXScreenSize(void)
     return [UIScreen mainScreen].bounds.size;
 }
 
-CGFloat WXScreenResizeRadio(void)
-{
-    static CGFloat resizeScale;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        CGSize size = WXScreenSize();
-        CGFloat deviceWidth;
-        if (size.width > size.height) {
-            // Landscape
-            deviceWidth = size.height;
-        } else {
-            deviceWidth = size.width;
-        }
-        
-        resizeScale = deviceWidth / WXDefaultScreenWidth;
-    });
-    
-    return resizeScale;
-}
-
 CGFloat WXRoundPixelValue(CGFloat value)
 {
     CGFloat scale = WXScreenScale();
@@ -384,6 +364,31 @@ CGPoint WXPixelPointResize(CGPoint value)
                                   ^(NSData *data, NSURLResponse *response, NSError *error) {
                                   }];
     [task resume];
+}
+
+CGFloat WXScreenResizeRadio(void)
+{
+    return [WXUtility screenResizeScale];
+}
+
++ (CGFloat)screenResizeScale
+{
+    static CGFloat resizeScale;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        CGSize size = WXScreenSize();
+        CGFloat deviceWidth;
+        if (size.width > size.height) {
+            // Landscape
+            deviceWidth = size.height;
+        } else {
+            deviceWidth = size.width;
+        }
+        
+        resizeScale = deviceWidth / WXDefaultScreenWidth;
+    });
+    
+    return resizeScale;
 }
 
 @end

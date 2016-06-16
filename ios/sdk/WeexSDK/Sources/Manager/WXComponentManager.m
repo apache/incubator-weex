@@ -361,7 +361,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponent *root = [_indexDict objectForKey:WX_SDK_ROOT_REF];
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{        
-        UIView *rootView = root.view;
+        UIView *rootView = instance.rootView;
         [instance finishPerformance];
         
         if(instance.renderFinish){

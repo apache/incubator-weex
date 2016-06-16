@@ -149,7 +149,12 @@
     WXAssert(indexPath, @"Laid out cell:%@ has not been inserted to cell list before", cell);
 
     if (indexPath.row == 0) {
-        cell.absolutePosition = CGPointZero;
+        if (_tableView.tableHeaderView) {
+            cell.absolutePosition = CGPointMake(0, _tableView.tableHeaderView.frame.size.height);
+        } else {
+            cell.absolutePosition = CGPointZero;
+        }
+
     } else {
         WXCellComponent *previousCell = _cellComponents[indexPath.row - 1];
         CGPoint previousCellPostion = previousCell.absolutePosition;
@@ -246,16 +251,17 @@
 {
     static NSString *reuseIdentifier = @"WXTableViewCell";
     
-    WXCellComponent *cell = _cellComponents[indexPath.row];
-    if (cell.scope.length > 0) {
-        //        reuseIdentifier = cell.scope;
-    }
-    
-    UITableViewCell *cellView = [_tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
+    UITableViewCell *cellView = [_tableView cellForRowAtIndexPath:indexPath];
     if (!cellView) {
         cellView = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
         cellView.backgroundColor = [UIColor clearColor];
     } else {
+    }
+    
+    WXCellComponent *cell = [_cellComponents wx_safeObjectAtIndex:indexPath.row];
+    
+    if (!cell) {
+        return cellView;
     }
     
     if (cell.view.superview == cellView.contentView) {
