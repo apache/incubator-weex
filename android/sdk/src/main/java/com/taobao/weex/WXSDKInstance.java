@@ -216,11 +216,13 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.component.WXComponent;
@@ -508,6 +510,13 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
   public Context getContext() {
+    if(mContext == null){
+      mContext = WXEnvironment.sApplication;
+      if(WXEnvironment.isApkDebugable()){
+        throw new WXRuntimeException("WXSdkInstance mContext == null");
+      }
+      WXLogUtils.e("WXSdkInstance mContext == null");
+    }
     return mContext;
   }
 

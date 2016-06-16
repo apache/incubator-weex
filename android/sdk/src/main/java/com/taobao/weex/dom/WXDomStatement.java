@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
@@ -485,7 +487,11 @@ class WXDomStatement {
 
         @Override
         public void execute() {
-          mWXRenderManager.createBody(mInstanceId, component);
+          try {
+            mWXRenderManager.createBody(mInstanceId, component);
+          }catch(Exception e){
+            WXLogUtils.e("createBody Exception:"+e.getMessage());
+          }
         }
       });
       mDirty = true;
@@ -596,7 +602,12 @@ class WXDomStatement {
 
       @Override
       public void execute() {
-        mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        try {
+          mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
+        }catch(Exception e){
+          WXLogUtils.e("addComponent exception:"+e.getMessage());
+
+        }
       }
     });
 
