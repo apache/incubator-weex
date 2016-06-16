@@ -229,9 +229,6 @@
     
     [self viewWillUnload];
     
-    [_view removeFromSuperview];
-    [_layer removeFromSuperlayer];
-    
     _view.gestureRecognizers = nil;
     
     [self _removeAllEvents];

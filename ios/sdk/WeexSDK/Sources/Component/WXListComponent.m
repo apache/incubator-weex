@@ -136,6 +136,7 @@
     
     [_completedCells removeObject:cell];
     
+    WXLogInfo(@"Delete cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
     [UIView performWithoutAnimation:^{
         [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
     }];
@@ -165,12 +166,12 @@
     
     if (![_completedCells containsObject:cell]) {
         [_completedCells addObject:cell];
-        WXLogVerbose(@"Insert cell at row:%ld", (long)indexPath.row);
+        WXLogInfo(@"Insert cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
         [UIView performWithoutAnimation:^{
             [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }];
     } else {
-        WXLogVerbose(@"Reload cell at row:%ld", (long)indexPath.row);
+        WXLogInfo(@"Reload cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
         [UIView performWithoutAnimation:^{
             [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }];
@@ -222,9 +223,9 @@
     NSArray *visibleIndexPaths = [tableView indexPathsForVisibleRows];
     if (![visibleIndexPaths containsObject:indexPath]) {
         WXCellComponent *component = [_cellComponents wx_safeObjectAtIndex:indexPath.row];
-        dispatch_async(dispatch_get_main_queue(), ^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
             [component _unloadView];
-        });
+//        });
     }
 }
 
@@ -249,9 +250,10 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    WXLogInfo(@"Getting cell at row:%ld", (long)indexPath.row);
     static NSString *reuseIdentifier = @"WXTableViewCell";
     
-    UITableViewCell *cellView = [_tableView cellForRowAtIndexPath:indexPath];
+    UITableViewCell *cellView = [_tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
     if (!cellView) {
         cellView = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
         cellView.backgroundColor = [UIColor clearColor];
@@ -273,6 +275,8 @@
     }
     
     [cellView.contentView addSubview:cell.view];
+    
+    WXLogInfo(@"Created cell:%@ view:%@ cellView:%@ at row:%ld", cell.ref, cell.view, cellView, (long)indexPath.row);
     
     return cellView;
 }
