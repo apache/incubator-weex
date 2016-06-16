@@ -265,7 +265,7 @@ public class WXRecycleImageManager {
   }
 
   public void loadImage() {
-    if(!IfRecycleImage){
+    if(!IfRecycleImage || mAllImages==null){
       return;
     }
     ImageInfo imageInfo;
