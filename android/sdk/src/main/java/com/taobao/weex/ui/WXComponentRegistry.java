@@ -266,15 +266,12 @@ public class WXComponentRegistry {
       return false;
     }
 
-    String type = componentInfo.get("style");
+    String type = componentInfo.get("type");
     if (type == null) {
-      return false;
-    }
-    if (sComponent.containsKey(type)) {
       if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Exist duplicate component:" + type);
+        throw new WXException("registerComponent  component must has type Name" + type);
       } else {
-        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
+        WXLogUtils.e("registerComponent component must has type Name: " + type);
         return false;
       }
     }
