@@ -160,12 +160,12 @@ NSTimeInterval JSLibInitTime = 0;
     }
     
     //TODO WXRootView
-    self.rootView = [[WXView alloc] initWithFrame:self.frame];
-    if(self.onCreate) {
-        WXPerformBlockOnMainThread(^{
+    WXPerformBlockOnMainThread(^{
+        self.rootView = [[WXView alloc] initWithFrame:self.frame];
+        if(self.onCreate) {
             self.onCreate(self.rootView);
-        });
-    }
+        }
+    });
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:source options:dictionary data:data];
 }
