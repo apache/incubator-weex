@@ -26,7 +26,6 @@ Other attributes please check out the [common attributes](../references/common-a
 - `margin` and `margin-xx`s
 - `padding` and `padding-xx`s
 - `border` and `border-xx`s
-- `color` and `background-color`
 
 **Notes:** Specially the `width` and `height` related properties is not configurable and the size of this component is fixed to `100x60` (for the design width 750px).
 
