@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.util.TypedValue;
 import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
@@ -225,6 +226,7 @@ public class WXSwitch extends WXComponent{
   protected void initView() {
     super.initView();
     mHost = new WXSwitchView(mContext);
+    getView().setTextSize(TypedValue.COMPLEX_UNIT_PX,22);
   }
 
   @Override
