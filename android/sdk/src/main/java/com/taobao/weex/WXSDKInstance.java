@@ -216,7 +216,6 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -568,7 +567,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
   public void registerActivityStateListener(IWXActivityStateListener listener) {
-    if (listener == null) {
+    if (listener == null || mActivityStateListeners==null) {
       return;
     }
     if(mActivityStateListeners == null){
