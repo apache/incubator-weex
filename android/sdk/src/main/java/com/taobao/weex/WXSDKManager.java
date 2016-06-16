@@ -290,7 +290,6 @@ public class WXSDKManager {
   }
 
   public IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
-    WXLogUtils.e("WXSDKManager","count:"+mCount.get());
     return mIWXImgLoaderAdapter;
   }
 
