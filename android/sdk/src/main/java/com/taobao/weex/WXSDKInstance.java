@@ -279,7 +279,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
    */
   private long mRefreshStartTime;
   private WXRecycleImageManager mRecycleImageManager;
-  private ConcurrentLinkedQueue<IWXActivityStateListener> mActivityStateListeners;
+  private ConcurrentLinkedQueue<IWXActivityStateListener> mActivityStateListeners = new ConcurrentLinkedQueue<>();
   private WXPerformance mWXPerformance;
   private ScrollView mScrollView;
   private WXScrollViewListener mWXScrollViewListener;
@@ -293,7 +293,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void init(Context context) {
     mContext = context;
-    mActivityStateListeners = new ConcurrentLinkedQueue<>();
     mRecycleImageManager = new WXRecycleImageManager(this);
 
     mWXPerformance = new WXPerformance();
@@ -562,6 +561,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void registerActivityStateListener(IWXActivityStateListener listener) {
     if (listener == null) {
       return;
+    }
+    if(mActivityStateListeners == null){
+       mActivityStateListeners = new ConcurrentLinkedQueue<>();
     }
 
     if (!mActivityStateListeners.contains(listener)) {
