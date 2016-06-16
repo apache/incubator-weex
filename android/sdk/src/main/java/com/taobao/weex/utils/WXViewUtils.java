@@ -243,6 +243,9 @@ public class WXViewUtils {
     return -3;
   }
   public static int getScreenHeight() {
+    if(WXEnvironment.sApplication==null){
+      return 0;
+    }
     return WXEnvironment.sApplication.getResources()
         .getDisplayMetrics()
         .heightPixels;
@@ -261,6 +264,9 @@ public class WXViewUtils {
   }
 
   public static int getScreenWidth() {
+    if(WXEnvironment.sApplication==null){
+      return 0;
+    }
     return  WXEnvironment.sApplication.getResources()
         .getDisplayMetrics()
         .widthPixels;
