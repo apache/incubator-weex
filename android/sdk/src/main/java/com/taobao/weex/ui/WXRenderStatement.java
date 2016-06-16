@@ -206,6 +206,7 @@ package com.taobao.weex.ui;
 
 import android.animation.Animator;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Interpolator;
@@ -273,7 +274,12 @@ class WXRenderStatement {
     if (component == null) {
       return;
     }
-    component.flushView();
+    try {
+      component.flushView();
+    }catch(Exception e){
+       WXLogUtils.e("Exception:"+e.getMessage());
+    }
+
   }
 
   /**
