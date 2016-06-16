@@ -141,7 +141,7 @@ public class ChromeDiscoveryHandler implements HttpHandler {
     StringBuilder b = new StringBuilder();
     b.append(getAppLabel());
 
-    b.append(" (powered by Weex, inspired by Stetho)");
+    b.append(" (powered by Weex)");
 
     String processName = ProcessUtil.getProcessName();
     int colonIndex = processName.indexOf(':');
