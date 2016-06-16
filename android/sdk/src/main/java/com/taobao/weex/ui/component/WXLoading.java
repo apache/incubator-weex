@@ -213,8 +213,8 @@ import com.taobao.weex.ui.view.WXLoadingLayout;
  */
 public class WXLoading extends WXBaseRefresh {
 
-  public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
+  public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
+    super(instance, node, parent, lazy);
   }
 
   @Override

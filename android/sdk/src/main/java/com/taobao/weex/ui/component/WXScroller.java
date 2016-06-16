@@ -169,8 +169,8 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   private WXScrollView tempscview;
 
   public WXScroller(WXSDKInstance instance, WXDomObject node,
-                    WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
+                    WXVContainer parent, boolean lazy) {
+    super(instance, node, parent, lazy);
     tempscview = new WXScrollView(mContext);
   }
 

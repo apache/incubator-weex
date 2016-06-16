@@ -213,8 +213,8 @@ import com.taobao.weex.ui.view.WXRefreshLayout;
  */
 public class WXRefresh extends WXBaseRefresh {
 
-  public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
+  public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
+    super(instance, node, parent, lazy);
   }
 
   @Override

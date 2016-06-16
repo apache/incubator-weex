@@ -227,8 +227,8 @@ import com.taobao.weex.utils.WXResourceUtils;
 public class WXImage extends WXComponent {
 
     public WXImage(WXSDKInstance instance, WXDomObject node,
-                   WXVContainer parent, String instanceId, boolean lazy) {
-        super(instance, node, parent, instanceId, lazy);
+                   WXVContainer parent, boolean lazy) {
+        super(instance, node, parent, lazy);
     }
 
     @Override
@@ -293,7 +293,7 @@ public class WXImage extends WXComponent {
         if (resizeMode.equals("cover")) {
             scaleType = ScaleType.CENTER_CROP;
         } else if (resizeMode.equals("contain")) {
-            scaleType = ScaleType.CENTER_INSIDE;
+            scaleType = ScaleType.FIT_CENTER;
         } else if (resizeMode.equals("stretch")) {
             scaleType = ScaleType.FIT_XY;
         } else if (resizeMode.equals("center")) {

@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/e99ff1a91aa9a00f32ef51a36e480ed8", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/c6322ab1e3a1a87418ec804c181cbc23", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -137,7 +137,7 @@
 	        {
 	          "type": "refresh",
 	          "classList": [
-	            "flexbox-center"
+	            "refresh-view"
 	          ],
 	          "attr": {
 	            "display": function () {return this.refresh_display}
@@ -226,7 +226,8 @@
 	            {
 	              "type": "loading-indicator",
 	              "style": {
-	                "height": 60
+	                "height": 60,
+	                "width": 60
 	              }
 	            }
 	          ]
@@ -256,8 +257,13 @@
 	    "margin": 10
 	  },
 	  "refresh-view": {
-	    "height": 80,
-	    "width": 750
+	    "height": 120,
+	    "width": 750,
+	    "display": "flex",
+	    "MsFlexAlign": "center",
+	    "WebkitAlignItems": "center",
+	    "WebkitBoxAlign": "center",
+	    "alignItems": "center"
 	  },
 	  "refresh-arrow": {
 	    "fontSize": 30,
@@ -277,17 +283,10 @@
 	    "borderBottomColor": "#c0c0c0",
 	    "height": 100,
 	    "padding": 20
-	  },
-	  "flexbox-center": {
-	    "display": "flex",
-	    "MsFlexAlign": "center",
-	    "WebkitAlignItems": "center",
-	    "WebkitBoxAlign": "center",
-	    "alignItems": "center"
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/e99ff1a91aa9a00f32ef51a36e480ed8", {
+	;__weex_bootstrap__("@weex-component/c6322ab1e3a1a87418ec804c181cbc23", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

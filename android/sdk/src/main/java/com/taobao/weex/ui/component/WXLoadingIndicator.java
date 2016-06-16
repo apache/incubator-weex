@@ -212,8 +212,8 @@ public class WXLoadingIndicator extends WXComponent {
 
     private CircleProgressBar circleProgressBar;
 
-    public WXLoadingIndicator(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        super(instance, dom, parent, instanceId, isLazy);
+    public WXLoadingIndicator(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
+        super(instance, dom, parent, isLazy);
     }
 
     @Override
