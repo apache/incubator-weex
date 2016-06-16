@@ -53,7 +53,8 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
               }];
 }
 
-- (void)fetch:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(NSString *)progressCallback{
+- (void)fetch:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(NSString *)progressCallback
+{
     __block NSInteger received = 0;
     __block NSHTTPURLResponse *httpResponse = nil;
     __block NSMutableDictionary * callbackRsp =[[NSMutableDictionary alloc] init];
