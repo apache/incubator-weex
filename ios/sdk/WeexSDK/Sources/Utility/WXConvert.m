@@ -518,7 +518,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return  WXImageQualityHigh;
     }
     
-    return  WXImageQualityNormal;
+    return  WXImageQualityLow;
 }
 
 + (WXImageSharp)WXImageSharp:(id)value
@@ -531,7 +531,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         else if ([string isEqualToString:@"unsharpen"])
             return WXImageSharpeningNone;
     }
-    return  WXImageSharpening;
+    return  WXImageSharpeningNone;
 }
 
 #pragma mark Scroller
