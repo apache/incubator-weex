@@ -269,9 +269,18 @@ public class WXComponentRegistry {
     String type = componentInfo.get("type");
     if (type == null) {
       if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("registerComponent  component must has type Name" + type);
+        throw new WXException("Exist duplicate component:" + type);
       } else {
-        WXLogUtils.e("registerComponent component must has type Name: " + type);
+        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
+        return false;
+      }
+    }
+
+    if (sComponent.containsKey(type)) {
+      if (WXEnvironment.isApkDebugable()) {
+        throw new WXException("Exist duplicate component:" + type);
+      } else {
+        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
         return false;
       }
     }
