@@ -244,9 +244,7 @@ public class WXComponentFactory {
     }
 
     try {
-      if (WXComponent.class.isAssignableFrom(holder.getComponentClass())) {
-        return holder.createInstance(instance, node, parent, lazy);
-      }
+      return holder.createInstance(instance, node, parent, lazy);
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
         StringBuilder builder = new StringBuilder("WXComponentFactory Exception type:[");
