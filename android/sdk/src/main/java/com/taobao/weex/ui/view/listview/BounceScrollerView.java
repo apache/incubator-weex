@@ -202,31 +202,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.listview;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXRefreshLayout;
+import android.content.Context;
+import android.widget.FrameLayout;
 
-/**
- * div component
- */
-public class WXRefresh extends WXBaseRefresh {
+import com.taobao.weex.ui.component.WXScroller;
+import com.taobao.weex.ui.view.WXScrollView;
+import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
 
-  public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
-  }
+public class BounceScrollerView extends BaseBounceView<WXScrollView> {
 
-  @Override
-  protected void initView() {
-    mHost = new WXRefreshLayout(mContext);
-  }
+    public WXScrollView scrollView;
 
-//  @Override
-//  public void onRefresh() {
-//    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
-//      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
-//    }
-//  }
+    public BounceScrollerView(Context context, int orientation,WXScroller waScroller) {
+        super(context,orientation);
+        if (scrollView != null)
+            scrollView.setWAScroller(waScroller);
+    }
+
+    @Override
+    public WXSwipeRefreshLayout createBounceView(Context context) {
+        swipeRefreshLayout = new WXSwipeRefreshLayout(context);
+        swipeRefreshLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        scrollView = new WXScrollView(context);
+        swipeRefreshLayout.addView(scrollView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        addView(swipeRefreshLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        return swipeRefreshLayout;
+    }
+
+    @Override
+    public WXScrollView getInnerView() {
+        return scrollView;
+    }
 
 }

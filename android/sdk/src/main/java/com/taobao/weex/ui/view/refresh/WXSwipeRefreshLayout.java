@@ -253,8 +253,8 @@ public class WXSwipeRefreshLayout extends FrameLayout {
   private static final int ACTION_PULL_DOWN_REFRESH = 0;
   private static final int ACTION_PULL_UP_LOAD_MORE = 1;
 
-  private RefreshLayout headerView;
-  private RefreshLayout footerView;
+  private WXRefreshView headerView;
+  private WXRefreshView footerView;
   private View mContentView;
 
   /**
@@ -355,7 +355,7 @@ public class WXSwipeRefreshLayout extends FrameLayout {
     if (getChildCount() > 1) {
       throw new RuntimeException("can only have one child");
     }
-    loadingViewFinalHeight = DipUtils.dipToPx(context, LOADING_VIEW_FINAL_HEIGHT_DP);
+    loadingViewFinalHeight = WXDipUtils.dipToPx(context, LOADING_VIEW_FINAL_HEIGHT_DP);
     loadingViewOverHeight = loadingViewFinalHeight * 2;
 
     if (isInEditMode() && attrs == null) {
@@ -433,7 +433,7 @@ public class WXSwipeRefreshLayout extends FrameLayout {
     LayoutParams lp;
     if (mPullRefreshEnable) {
       lp = new LayoutParams(LayoutParams.MATCH_PARENT, 0);
-      headerView = new RefreshLayout(getContext());
+      headerView = new WXRefreshView(getContext());
       //            headerView.setLoadText(TextUtils.isEmpty(mPullRefreshText) ?
       //                    getContext().getString(R.string.default_pull_refresh_text) : mPullRefreshText);
       headerView.setStartEndTrim(0, 0.75f);
@@ -448,7 +448,7 @@ public class WXSwipeRefreshLayout extends FrameLayout {
       //上拉加载更多视图
       lp = new LayoutParams(LayoutParams.MATCH_PARENT, 0);
       lp.gravity = Gravity.BOTTOM;
-      footerView = new RefreshLayout(getContext());
+      footerView = new WXRefreshView(getContext());
       //            footerView.setLoadText(TextUtils.isEmpty(mPullLoadText) ?
       //                    getContext().getString(R.string.default_pull_load_text) : mPullLoadText);
       footerView.setStartEndTrim(0.5f, 1.25f);
@@ -871,11 +871,11 @@ public class WXSwipeRefreshLayout extends FrameLayout {
     }
   }
 
-  public RefreshLayout getHeaderView() {
+  public WXRefreshView getHeaderView() {
     return headerView;
   }
 
-  public RefreshLayout getFooterView() {
+  public WXRefreshView getFooterView() {
     return footerView;
   }
 

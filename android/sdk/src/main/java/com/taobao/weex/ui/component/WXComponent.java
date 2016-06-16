@@ -148,16 +148,16 @@ import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.ComponentHolder;
-import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXBackgroundDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
+import com.taobao.weex.ui.view.WXRefreshLayout;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
-import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -202,6 +202,8 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealTop = 0;
   private WXGesture wxGesture;
   private ComponentHolder mHolder;
+  private static WXRefreshLayout wxRefreshLayout;
+  private static float refreshMargin = 0;
 
   private boolean isUsing = false;
 
@@ -272,7 +274,30 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
       return;
     }
 
+    if (this instanceof WXRefresh) {
+      wxRefreshLayout = (WXRefreshLayout) getView();
+      refreshMargin = mDomObj.csslayout.dimensions[CSSLayout.DIMENSION_HEIGHT];
+    }
+
+    if ((this instanceof WXBaseRefresh && mParent instanceof WXScroller)) {
+      return;
+    }
+
     mDomObj = domObject;
+
+    if (mParent instanceof WXScroller) {
+      if (!(this instanceof WXBaseRefresh)) {
+        if (wxRefreshLayout != null) {
+          wxRefreshLayout.measure(0, 0);
+          CSSLayout newLayout = new CSSLayout();
+          newLayout.copy(mDomObj.csslayout);
+          newLayout.position[CSSLayout.POSITION_TOP] = mDomObj.csslayout.position[CSSLayout
+              .POSITION_TOP] - refreshMargin;
+          mDomObj.csslayout.copy(newLayout);
+        }
+      }
+    }
+
     Spacing parentPadding = mParent.getDomObject().getPadding();
     Spacing parentBorder = mParent.getDomObject().getBorder();
     Spacing margin = mDomObj.getMargin();
@@ -352,9 +377,6 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
       ScrollView.LayoutParams params = new ScrollView.LayoutParams(realWidth, realHeight);
       params.setMargins(realLeft, realTop, realRight, realBottom);
       mHost.setLayoutParams(params);
-    } else if (mParent.getRealView() instanceof BounceRecyclerView) {
-//      mHost.setLayoutParams(new ViewGroup.LayoutParams(realWidth, realHeight));
-      //todo Nothing
     }
 
     mPreRealWidth = realWidth;

@@ -334,7 +334,7 @@ public class WXListComponent extends WXVContainer implements
 
         String transforms = (String) mDomObj.attr.get(TRANSFORM);
         if (transforms != null) {
-            bounceRecyclerView.getBounceView().addItemDecoration(parseTransforms(transforms));
+            bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
 
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);

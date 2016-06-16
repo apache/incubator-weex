@@ -202,31 +202,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXRefreshLayout;
+import android.content.Context;
 
-/**
- * div component
- */
-public class WXRefresh extends WXBaseRefresh {
+public class WXLoadingLayout extends WXBaseRefreshLayout {
 
-  public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, String instanceId, boolean lazy) {
-    super(instance, node, parent, instanceId, lazy);
+  public WXLoadingLayout(Context context) {
+    super(context);
   }
-
-  @Override
-  protected void initView() {
-    mHost = new WXRefreshLayout(mContext);
-  }
-
-//  @Override
-//  public void onRefresh() {
-//    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
-//      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
-//    }
-//  }
-
 }

@@ -202,113 +202,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh;
+package com.taobao.weex.ui.view;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
-import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-public class RefreshLayout extends LinearLayout {
+public class WXBaseRefreshLayout extends WXFrameLayout {
 
-  private static final int DEFAULT_CIRCLE_SIZE = 42;
-  private CircleProgressBar circleProgressBar;
-  private TextView tvLoad;
-
-  public RefreshLayout(Context context) {
+  public WXBaseRefreshLayout(Context context) {
     super(context);
-    setupViews();
-  }
-
-  public RefreshLayout(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    setupViews();
-  }
-
-  public RefreshLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    setupViews();
-  }
-
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public RefreshLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    setupViews();
-  }
-
-  /**
-   * 添加View
-   */
-  private void setupViews() {
-    this.setOrientation(VERTICAL);
-    this.setGravity(Gravity.CENTER);
-  }
-
-  public void setRefreshView(View view) {
-    removeView(tvLoad);
-    removeView(circleProgressBar);
-    addView(view);
-  }
-
-  public void setLoadText(String loadtText) {
-    if (tvLoad != null) {
-      tvLoad.setText(loadtText);
-    }
-  }
-
-  public void setLoadTextColor(int color) {
-    if (tvLoad != null) {
-      tvLoad.setTextColor(color);
-    }
-  }
-
-  public void setProgressBgColor(int color) {
-    if (circleProgressBar != null)
-
-    {
-      circleProgressBar.setBackgroundColor(color);
-    }
-  }
-
-  public void setProgressColor(int color) {
-    if (circleProgressBar != null) {
-      circleProgressBar.setColorSchemeColors(color);
-    }
-  }
-
-  /**
-   * 开始动画
-   */
-  public void start() {
-    if (circleProgressBar != null) {
-      circleProgressBar.start();
-    }
-  }
-
-  /**
-   * 设置动画起始位置
-   */
-  public void setStartEndTrim(float startAngle, float endAngle) {
-    if (circleProgressBar != null) {
-      circleProgressBar.setStartEndTrim(startAngle, endAngle);
-    }
-  }
-
-  /**
-   * 停止动画
-   */
-  public void stop() {
-    if (circleProgressBar != null) {
-      circleProgressBar.stop();
-    }
-  }
-
-  public void setProgressRotation(float rotation) {
-    if (circleProgressBar != null)
-      circleProgressBar.setProgressRotation(rotation);
   }
 }

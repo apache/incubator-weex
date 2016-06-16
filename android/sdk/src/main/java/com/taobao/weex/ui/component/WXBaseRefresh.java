@@ -222,11 +222,6 @@ public class WXBaseRefresh extends WXVContainer {
   }
 
   @Override
-  protected void initView() {
-    mHost = new WXFrameLayout(mContext);
-  }
-
-  @Override
   public void addChild(WXComponent child) {
     super.addChild(child);
     this.checkLoadingIndicator(child);

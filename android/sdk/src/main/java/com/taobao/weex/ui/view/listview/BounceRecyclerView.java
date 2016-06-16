@@ -242,14 +242,11 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
     public WXSwipeRefreshLayout createBounceView(Context context) {
         swipeRefreshLayout = new WXSwipeRefreshLayout(context);
         swipeRefreshLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-
         recyclerView = new WXRecyclerView(context);
         recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
-
         swipeRefreshLayout.addView(recyclerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         addView(swipeRefreshLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
         return swipeRefreshLayout;
     }
 
@@ -321,10 +318,6 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
             }
 
         }
-    }
-
-    public WXSwipeRefreshLayout getSwipeRefreshLayout() {
-        return swipeRefreshLayout;
     }
 
     @Override

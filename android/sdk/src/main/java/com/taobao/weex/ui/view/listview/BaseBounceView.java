@@ -208,21 +208,14 @@ import android.content.Context;
 import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
 
 public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
-    private T mView;
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeRefreshLayout swipeRefreshLayout;
-
-    enum Mode {
-        PULL_FROM_START,
-        PULL_FROM_END
-    }
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
@@ -239,13 +232,7 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     }
 
     private void init(Context context) {
-        ViewConfiguration config = ViewConfiguration.get(getContext());
         createBounceView(context);
-        mView = getInnerView();
-    }
-
-    public final T getBounceView() {
-        return mView;
     }
 
     boolean isVertical(){
@@ -331,13 +318,11 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     public void setHeaderView(View headerView) {
         if (swipeRefreshLayout != null)
-            if (swipeRefreshLayout.getHeaderView() != null)
                 swipeRefreshLayout.getHeaderView().setRefreshView(headerView);
     }
 
     public void setFooterView(View footerView) {
         if (swipeRefreshLayout != null)
-            if (swipeRefreshLayout.getFooterView() != null)
                 swipeRefreshLayout.getFooterView().setRefreshView(footerView);
     }
 }

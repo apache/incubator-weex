@@ -204,14 +204,124 @@
  */
 package com.taobao.weex.ui.view.refresh;
 
+import android.annotation.TargetApi;
 import android.content.Context;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
+import android.os.Build;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
-public abstract class DipUtils {
+public class WXRefreshView extends FrameLayout {
 
-  public static float dipToPx(Context context, float value) {
-    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, metrics);
+  private CircleProgressBar circleProgressBar;
+  private TextView tvLoad;
+
+  public WXRefreshView(Context context) {
+    super(context);
+    setupViews();
+  }
+
+  public WXRefreshView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    setupViews();
+  }
+
+  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    setupViews();
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+    setupViews();
+  }
+
+  /**
+   * 添加View
+   */
+  private void setupViews() {
+//    this.setOrientation(VERTICAL);
+//    this.setGravity(Gravity.CENTER);
+  }
+
+  public void setRefreshView(final View view) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        removeAllViews();
+        View child = null;
+        View temp = view;
+        if (view.getParent() != null) {
+          ((ViewGroup) view.getParent()).removeView(view);
+        }
+        for (int i = 0;i<((ViewGroup)temp).getChildCount(); i++) {
+          child = ((ViewGroup) temp).getChildAt(i);
+          if (child instanceof CircleProgressBar)
+            circleProgressBar = (CircleProgressBar) child;
+        }
+        addView(temp);
+      }
+    });
+  }
+
+  public void setLoadText(String loadtText) {
+    if (tvLoad != null) {
+      tvLoad.setText(loadtText);
+    }
+  }
+
+  public void setLoadTextColor(int color) {
+    if (tvLoad != null) {
+      tvLoad.setTextColor(color);
+    }
+  }
+
+  public void setProgressBgColor(int color) {
+    if (circleProgressBar != null)
+
+    {
+      circleProgressBar.setBackgroundColor(color);
+    }
+  }
+
+  public void setProgressColor(int color) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setColorSchemeColors(color);
+    }
+  }
+
+  /**
+   * 开始动画
+   */
+  public void start() {
+    if (circleProgressBar != null) {
+      circleProgressBar.start();
+    }
+  }
+
+  /**
+   * 设置动画起始位置
+   */
+  public void setStartEndTrim(float startAngle, float endAngle) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setStartEndTrim(startAngle, endAngle);
+    }
+  }
+
+  /**
+   * 停止动画
+   */
+  public void stop() {
+    if (circleProgressBar != null) {
+      circleProgressBar.stop();
+    }
+  }
+
+  public void setProgressRotation(float rotation) {
+    if (circleProgressBar != null)
+      circleProgressBar.setProgressRotation(rotation);
   }
 }

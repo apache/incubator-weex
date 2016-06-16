@@ -212,6 +212,7 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
@@ -261,9 +262,8 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller, W
   private int[] stickyScrollerP = new int[2];
   private int[] stickyViewP = new int[2];
 
-  public WXScrollView(Context context, WXScroller waScroller) {
+  public WXScrollView(Context context) {
     super(context);
-    mWAScroller = waScroller;
     mScrollViewListeners = new ArrayList<>();
     init();
     try {
@@ -431,6 +431,9 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller, W
   }
 
   private void showStickyView() {
+    if (mWAScroller == null) {
+      Log.i("miomin","null");
+    }
     View curStickyView = procSticky(mWAScroller.getStickMap());
 
     if (curStickyView != null) {
@@ -522,5 +525,9 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller, W
     void onScrollStopped(WXScrollView scrollView, int x, int y);
 
     void onScroll(WXScrollView scrollView, int x, int y);
+  }
+
+  public void setWAScroller(WXScroller mWAScroller) {
+    this.mWAScroller = mWAScroller;
   }
 }
