@@ -54,13 +54,13 @@ You can register the customized module by calling the method `registerModule:wit
 		
     	[WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];```
     	
-### Adapter extend
+### Handler extend
 
 Weex SDK doesn't have capabilitis, such as image download 、navigator operation，please implement these protocols by yourself.
 
 #### WXImgLoaderProtocol
 <font color="gray">
-Weex SDK has no image download capability, you need to implement WXImgLoaderProtocol. Refer to the following examples.
+Weex SDK has no image download capability, you need to implement `WXImgLoaderProtocol`. Refer to the following examples.
 
 ```objective-c
       
@@ -105,7 +105,7 @@ Implement above protocol as follows.
 	
 #### Register the handler
 
-You can register the handler which implements the protocol by calling  `registerModule:withClass` in WXSDKEngine.
+You can register the handler which implements the protocol by calling  `registerHandler:withProtocol` in WXSDKEngine.
 
 ```objective-c
       
@@ -116,10 +116,10 @@ You can register the handler which implements the protocol by calling  `register
  	   * @param protocol The protocol to confirm
  	   */
        + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
-		
+		       
        [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)];```
-       
-       ## Custom Native Components for iOS
+              
+## Custom Native Components for iOS
 
 ### Component extend
 

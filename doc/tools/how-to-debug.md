@@ -1,5 +1,5 @@
 ###How to Debug
-####1.add dependency
+####1.add dependency(iOS skip this step)
 build.gradle
 
 ```` gradle
