@@ -969,6 +969,7 @@ static NSArray *prettyStringPrinters = nil;
 
         NSString *requestID = [self requestIDForTask:dataTask];
         PDNetworkResponse *networkResponse = [PDNetworkResponse networkResponseWithURLResponse:response request:[self requestForTask:dataTask]];
+        /*
         PDNetworkResourceTiming *timeline = [[PDNetworkResourceTiming alloc] init];
         timeline.requestTime = [NSNumber numberWithInt:0.5];
         timeline.proxyStart = [NSNumber numberWithInt:9999];
@@ -983,7 +984,7 @@ static NSArray *prettyStringPrinters = nil;
         timeline.sendEnd = [NSNumber numberWithInt:5];
         timeline.receiveHeadersEnd = [NSNumber numberWithInt:9];
         networkResponse.timing = timeline;
-        
+        */
 
         [self.domain responseReceivedWithRequestId:requestID
                                            frameId:@"3888.3"
@@ -1126,6 +1127,8 @@ static NSArray *prettyStringPrinters = nil;
         type = @"Image";
     } else if ([contentType rangeOfString:@"json"].length != 0) {
         type = @"XHR";
+    } else if ([contentType rangeOfString:@"javascript"].length != 0) {
+        type = @"Script";
     }
 
     return type;
