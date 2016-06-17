@@ -10,11 +10,11 @@ $：curl -sk https://cloud.github.com/downloads/square/PonyDebugger/bootstrap-po
 
 $：ponyd serve —listen-interface=localhost
 
-此时打开浏览器输入
+3.此时打开浏览器输入
 
 http://localhost:9000开始调试
 
-3.如果真机调试localhost改为本机ip
+如果真机调试localhost改为本机ip
 
 注：如果第一步执行错误，无响应或是执行之后无法执行pondy命令，尝试手动安装，执行步骤如下：
 
