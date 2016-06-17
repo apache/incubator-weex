@@ -152,12 +152,14 @@ static NSThread *WXComponentThread;
     _rootCSSNode->context = (__bridge void *)(self);
     _rootCSSNode->children_count = 1;
     
+    __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
+        __strong typeof(self) strongSelf = weakSelf;
         if (CGRectEqualToRect(instance.rootView.frame, CGRectZero)) {
-            CGRect newFrame = CGRectMake(WXRoundPixelValue(_rootCSSNode->layout.position[CSS_LEFT]),
-                                         WXRoundPixelValue(_rootCSSNode->layout.position[CSS_TOP]),
-                                         WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_WIDTH]),
-                                         WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_HEIGHT]));
+            CGRect newFrame = CGRectMake(WXRoundPixelValue(strongSelf->_rootCSSNode->layout.position[CSS_LEFT]),
+                                         WXRoundPixelValue(strongSelf->_rootCSSNode->layout.position[CSS_TOP]),
+                                         WXRoundPixelValue(strongSelf->_rootCSSNode->layout.dimensions[CSS_WIDTH]),
+                                         WXRoundPixelValue(strongSelf->_rootCSSNode->layout.dimensions[CSS_HEIGHT]));
             instance.rootView.frame = newFrame;
         }
         [instance.rootView addSubview:rootComponent.view];
@@ -372,7 +374,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 {
     WXAssertComponentThread();
     
-    WXComponent *root = [_indexDict objectForKey:WX_SDK_ROOT_REF];
     WXSDKInstance *instance  = self.weexInstance;
     [self _addUITask:^{        
         UIView *rootView = instance.rootView;
