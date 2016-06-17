@@ -47,13 +47,11 @@ NSTimeInterval JSLibInitTime = 0;
         _instanceId = [NSString stringWithFormat:@"%ld", (long)instanceId];
 
         [WXSDKManager storeInstance:self forID:_instanceId];
-        _frame = CGRectMake(NAN, NAN, NAN, NAN);
         
         _bizType = @"";
         _pageName = @"";
         _screenRenderTime = 0;
-        
-        _frame = CGRectMake(NAN, NAN, NAN, NAN);
+
         _moduleInstances = [NSMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
