@@ -225,6 +225,7 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.WXConst;
@@ -253,12 +254,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private IWXRenderListener mRenderListener;
   private Context mContext;
   private volatile String mInstanceId;
-
-  public WXComponent getRootCom() {
-    return mRootCom;
-  }
-
-  private WXComponent mRootCom;
+  private WXComponent mGodCom;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
 
@@ -295,6 +291,16 @@ public class WXSDKInstance implements IWXActivityStateListener {
     init(context);
   }
 
+  public WXComponent getGodCom() {
+    return mGodCom;
+  }
+
+  public WXComponent getRootCom() {
+    if (getGodCom() == null)
+      return null;
+    else
+      return ((WXVContainer) (this.getGodCom())).getChild(0);
+  }
 
   public void init(Context context) {
     mContext = context;
@@ -637,7 +643,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
         @Override
         public void run() {
           if (mRenderListener != null && mContext != null) {
-            mRootCom = component;
+            mGodCom = component;
             View wxView=component.getView();
             if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
               wxView=WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
@@ -847,10 +853,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
 
-    if (mRootCom != null && mRootCom.getView() != null) {
-      mRootCom.destroy();
-      destroyView(mRootCom.getView());
-      mRootCom = null;
+    if (mGodCom != null && mGodCom.getView() != null) {
+      mGodCom.destroy();
+      destroyView(mGodCom.getView());
+      mGodCom = null;
     }
 
     if (mActivityStateListeners != null) {
