@@ -139,7 +139,7 @@
 
 - (NSUInteger)indexOfObject:(id)anObject
 {
-    __block index = NSNotFound;
+    __block NSUInteger index = NSNotFound;
     dispatch_sync(_queue, ^{
         for (int i = 0; i < [_array count]; i ++) {
             if ([_array objectAtIndex:i] == anObject) {
