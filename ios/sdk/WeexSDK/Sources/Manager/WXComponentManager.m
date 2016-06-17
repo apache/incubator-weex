@@ -133,7 +133,7 @@ static NSThread *WXComponentThread;
     WXSDKInstance *instance = self.weexInstance;
     instance.rootView.wx_component = rootComponent;
     
-    _rootCSSNode = wx_new_css_node();
+    _rootCSSNode = new_css_node();
     if (CGRectEqualToRect(instance.frame, CGRectZero)) {
         _rootCSSNode->style.position[CSS_LEFT] = [WXConvert WXPixelType:data[@"style"][@"left"]];
         _rootCSSNode->style.position[CSS_TOP] = [WXConvert WXPixelType:data[@"style"][@"top"]];

@@ -124,7 +124,7 @@ CGPoint WXPixelPointResize(CGPoint value)
 + (NSDictionary *)getEnvironment
 {
     NSString *platform = @"iOS";
-    NSString *sysVersion = [[UIDevice currentDevice] systemVersion];
+    NSString *sysVersion = [[UIDevice currentDevice] systemVersion] ?: @"";
     NSString *weexVersion = WX_SDK_VERSION;
     NSString *machine = [self deviceName] ? : @"";
     NSString *appVersion = [WXAppConfiguration appVersion] ? : @"";
@@ -144,7 +144,7 @@ CGPoint WXPixelPointResize(CGPoint value)
                                     @"deviceWidth":@(deviceWidth * scale),
                                     @"deviceHeight":@(deviceHeight * scale),
                                     @"scale":@(scale),
-                                    @"logLevel":[WXLog logLevelString]
+                                    @"logLevel":[WXLog logLevelString] ?: @"error"
                                 }];
     return data;
 }
