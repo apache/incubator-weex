@@ -11,6 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk{
+            abiFilters "armeabi"
+        }
     }
     applicationVariants.all { variant ->
         variant.outputs.each { output ->

@@ -252,12 +252,7 @@ public class WXModuleManager {
     }
 
     if (sModuleFactoryMap.containsKey(moduleName)) {
-      if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Duplicate the Module name:" + moduleName);
-      } else {
-        WXLogUtils.e("WXComponentRegistry Duplicate the Module name: " + moduleName);
-        return false;
-      }
+        WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
     }
 
     if (global) {

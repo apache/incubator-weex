@@ -175,7 +175,7 @@ public class WXSDKManager {
   public static WXSDKManager getInstance() {
     if (sManager == null) {
       synchronized (WXSDKManager.class) {
-        if (sManager == null) {
+        if(sManager == null) {
           sManager = new WXSDKManager();
         }
       }
@@ -183,11 +183,11 @@ public class WXSDKManager {
     return sManager;
   }
 
-  IActivityNavBarSetter getActivityNavBarSetter() {
+  public IActivityNavBarSetter getActivityNavBarSetter() {
     return mActivityNavBarSetter;
   }
 
-  void setActivityNavBarSetter(IActivityNavBarSetter mActivityNavBarSetter) {
+  public void setActivityNavBarSetter(IActivityNavBarSetter mActivityNavBarSetter) {
     this.mActivityNavBarSetter = mActivityNavBarSetter;
   }
 
