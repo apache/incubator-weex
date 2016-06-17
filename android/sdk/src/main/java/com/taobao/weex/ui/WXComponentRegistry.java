@@ -210,9 +210,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentPropCache;
 import com.taobao.weex.utils.WXLogUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -222,23 +220,13 @@ import java.util.Map;
  */
 public class WXComponentRegistry {
 
-  private static Map<String, Class<? extends WXComponent>> sComponent = new HashMap<>();
+  private static Map<String, ComponentHolder> sTypeComponentMap = new HashMap<>();
+  private static Map<String, String> sClassTypeMap = new HashMap<>();
 
   public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
     if (clazz == null || TextUtils.isEmpty(type)) {
       return false;
     }
-
-//    if (sComponent.containsKey(type)) {
-//      if (WXEnvironment.isApkDebugable()) {
-//        throw new WXException("Exist duplicate component :" + type);
-//      } else {
-//        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
-//        return false;
-//      }
-//    }
-
-    WXComponentPropCache.getMethods(clazz);
 
     Map<String, String> componentInfo = new HashMap<>();
     componentInfo.put("type", type);
@@ -250,7 +238,17 @@ public class WXComponentRegistry {
   }
 
   public static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    sComponent.put(type, clazz);
+    //same component class for different name
+    ComponentHolder holder;
+    if(sClassTypeMap.get(clazz.getName()) == null){
+      holder = new ComponentHolder(clazz);
+      sClassTypeMap.put(clazz.getName(),type);
+    }else{
+      //use the same holder
+      holder = sTypeComponentMap.get(sClassTypeMap.get(clazz.getName()));
+    }
+
+    sTypeComponentMap.put(type, holder);
     return true;
   }
 
@@ -275,8 +273,7 @@ public class WXComponentRegistry {
         return false;
       }
     }
-
-    if (sComponent.containsKey(type)) {
+    if (sTypeComponentMap.containsKey(type)) {
       if (WXEnvironment.isApkDebugable()) {
         throw new WXException("Exist duplicate component:" + type);
       } else {
@@ -285,12 +282,11 @@ public class WXComponentRegistry {
       }
     }
 
-    WXComponentPropCache.getMethods(clazz);
-
     return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
   }
 
-  public static Class<? extends WXComponent> getComponent(String type) {
-    return sComponent.get(type);
+  public static ComponentHolder getComponent(String type) {
+    return sTypeComponentMap.get(type);
   }
+
 }

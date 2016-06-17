@@ -215,6 +215,7 @@ import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
@@ -223,7 +224,6 @@ import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.http.WXHttpUtil;
-import com.taobao.weex.ui.WXRecycleImageManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
@@ -233,9 +233,12 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 /**
  * Each instance of WXSDKInstance represents an running weex instance.
@@ -244,7 +247,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class WXSDKInstance implements IWXActivityStateListener {
 
   public boolean mEnd = false;
-  // adapters
+  public static final String BUNDLE_URL = "bundleUrl";
   protected IWXUserTrackAdapter mUserTrackAdapter;
   protected IWXHttpAdapter mWXHttpAdapter;
   private IWXRenderListener mRenderListener;
@@ -279,11 +282,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
    * Refresh start time
    */
   private long mRefreshStartTime;
-  private WXRecycleImageManager mRecycleImageManager;
   private ConcurrentLinkedQueue<IWXActivityStateListener> mActivityStateListeners = new ConcurrentLinkedQueue<>();
   private WXPerformance mWXPerformance;
   private ScrollView mScrollView;
   private WXScrollViewListener mWXScrollViewListener;
+
+  private List<OnWXScrollListener> mWXScrollListeners;
 
   private ViewGroup rootView;
 
@@ -294,7 +298,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void init(Context context) {
     mContext = context;
-    mRecycleImageManager = new WXRecycleImageManager(this);
 
     mWXPerformance = new WXPerformance();
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
@@ -323,10 +326,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
+  @Deprecated
   public void registerScrollViewListener(WXScrollViewListener scrollViewListener) {
     mWXScrollViewListener = scrollViewListener;
   }
 
+  @Deprecated
   public WXScrollViewListener getScrollViewListener() {
     return mWXScrollViewListener;
   }
@@ -438,8 +443,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
     if (options == null) {
       options = new HashMap<String, Object>();
     }
-    if (!options.containsKey("bundleUrl")) {
-      options.put("bundleUrl", url);
+    if (!options.containsKey(BUNDLE_URL)) {
+      options.put(BUNDLE_URL, url);
     }
 
     Uri uri=Uri.parse(url);
@@ -456,9 +461,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = url;
     if (wxRequest.paramMap == null) {
-      wxRequest.paramMap = new HashMap<String, Object>();
+      wxRequest.paramMap = new HashMap<String, String>();
     }
-    wxRequest.paramMap.put("user-agent", WXHttpUtil.assembleUserAgent());
+    wxRequest.paramMap.put("user-agent", WXHttpUtil.assembleUserAgent(mContext,WXEnvironment.getConfig()));
     adapter.sendRequest(wxRequest, new WXHttpListener(pageName, options, jsonInitData, width, height, flag, System.currentTimeMillis()));
     mWXHttpAdapter = adapter;
   }
@@ -527,9 +532,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
     return mGodViewWidth;
   }
 
-  public WXRecycleImageManager getRecycleImageManager() {
-    return mRecycleImageManager;
-  }
 
   public IWXImgLoaderAdapter getImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
@@ -546,16 +548,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void reloadImages() {
     if (mScrollView == null) {
       return;
-    }
-    if (mRecycleImageManager != null && mRecycleImageManager.isRecycleImage()) {
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if (mRecycleImageManager != null) {
-            mRecycleImageManager.loadImage();
-          }
-        }
-      }, 250);
     }
   }
 
@@ -646,12 +638,24 @@ public class WXSDKInstance implements IWXActivityStateListener {
         public void run() {
           if (mRenderListener != null && mContext != null) {
             mRootCom = component;
-            mRenderListener.onViewCreated(WXSDKInstance.this, component.getView());
+            View wxView=component.getView();
+            if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
+              wxView=WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
+            }
+            mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
           }
         }
       });
     }
   }
+
+  /**
+   * call back when update finish
+   */
+  public void onUpdateFinish() {
+    WXLogUtils.d("Instance onUpdateSuccess");
+  }
+
 
   public void runOnUiThread(Runnable action) {
     WXSDKManager.getInstance().postOnUiThread(action, 0);
@@ -660,6 +664,15 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onRenderSuccess(final int width, final int height) {
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
+    WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
+    WXLogUtils.renderPerformanceLog("   TotalCallNativeTime", mWXPerformance.callNativeTime);
+    WXLogUtils.renderPerformanceLog("       TotalJsonParseTime", mWXPerformance.parseJsonTime);
+    WXLogUtils.renderPerformanceLog("   TotalBatchTime", mWXPerformance.batchTime);
+    WXLogUtils.renderPerformanceLog("       TotalCssLayoutTime", mWXPerformance.cssLayoutTime);
+    WXLogUtils.renderPerformanceLog("       TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
+    WXLogUtils.renderPerformanceLog("       TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+
+
     mWXPerformance.totalTime = time;
     WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
     WXComponent.mComponentNum = 0;
@@ -729,12 +742,51 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
-  public void firstScreenRenderFinished(long endTime) {
-    mEnd = true;
-    long time = endTime - mRenderStartTime;
-    mWXPerformance.screenRenderTime = time;
-    WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", time);
+
+  private boolean mCreateInstance =true;
+  public void firstScreenCreateInstanceTime(long time) {
+    if(mCreateInstance) {
+      mWXPerformance.firstScreenCreateInstanceTime = time -mRenderStartTime;
+      mCreateInstance =false;
+    }
   }
+
+  public void callNativeTime(long time) {
+    mWXPerformance.callNativeTime += time;
+  }
+
+  public void jsonParseTime(long time) {
+    mWXPerformance.parseJsonTime += time;
+  }
+
+  public void firstScreenRenderFinished() {
+    mEnd = true;
+    mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
+    WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenCreateInstanceTime", mWXPerformance.firstScreenCreateInstanceTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenCallNativeTime", mWXPerformance.callNativeTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenJsonParseTime", mWXPerformance.parseJsonTime);
+    WXLogUtils.renderPerformanceLog("   firstScreenBatchTime", mWXPerformance.batchTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenCssLayoutTime", mWXPerformance.cssLayoutTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenApplyUpdateTime", mWXPerformance.applyUpdateTime);
+    WXLogUtils.renderPerformanceLog("       firstScreenUpdateDomObjTime", mWXPerformance.updateDomObjTime);
+  }
+
+  public void batchTime(long time) {
+    mWXPerformance.batchTime += time;
+  }
+  public void cssLayoutTime(long time) {
+      mWXPerformance.cssLayoutTime += time;
+  }
+
+  public void applyUpdateTime(long time) {
+      mWXPerformance.applyUpdateTime += time;
+  }
+
+  public void updateDomObjTime(long time) {
+      mWXPerformance.updateDomObjTime += time;
+    }
+
 
   public void createInstanceFinished(long time) {
     if (time > 0) {
@@ -794,10 +846,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
-    if (mRecycleImageManager != null) {
-      mRecycleImageManager.destroy();
-      mRecycleImageManager = null;
-    }
 
     if (mRootCom != null && mRootCom.getView() != null) {
       mRootCom.destroy();
@@ -820,6 +868,17 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void setRootView(ViewGroup rootView) {
     this.rootView = rootView;
+  }
+
+  public synchronized List<OnWXScrollListener> getWXScrollListeners() {
+    return mWXScrollListeners;
+  }
+
+  public synchronized void registerOnWXScrollListener(OnWXScrollListener wxScrollListener) {
+    if(mWXScrollListeners==null){
+      mWXScrollListeners=new ArrayList<>();
+    }
+    mWXScrollListeners.add(wxScrollListener);
   }
 
   /**
@@ -852,12 +911,17 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
 
     @Override
+    public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
+
+    }
+
+    @Override
     public void onHttpUploadProgress(int uploadProgress) {
 
     }
 
     @Override
-    public void onHttpResponseProgress(int responseProgress) {
+    public void onHttpResponseProgress(int loadedLength) {
 
     }
 
@@ -866,7 +930,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
-
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
         render(pageName, template, options, jsonInitData, width, height, flag);

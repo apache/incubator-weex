@@ -25,7 +25,7 @@ import com.alibaba.weex.https.HotRefreshManager;
 import com.alibaba.weex.https.WXHttpManager;
 import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
-import com.alibaba.weex.util.ScreenUtil;
+import com.alibaba.weex.commons.util.ScreenUtil;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
@@ -33,6 +33,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.utils.WXFileUtils;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -194,6 +195,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setTitle(mUri.toString().substring(mUri.toString().lastIndexOf(File.separator) + 1));
 
+
     mContainer = (ViewGroup) findViewById(R.id.container);
     mProgressBar = (ProgressBar) findViewById(R.id.progress);
     mWXHandler = new Handler(this);
@@ -221,10 +223,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       public void onSuccess(WXHttpTask task) {
         Log.e(TAG, "into--[http:onSuccess] url:" + url);
         try {
-          mConfigMap.put("bundleUrl", url + Constants.WEEX_SAMPLES_KEY);
+          mConfigMap.put("bundleUrl", url);
           mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil.getDisplayHeight(WXPageActivity.this), WXRenderStrategy.APPEND_ASYNC);
-
-          //                    mInstance.render(new String(task.response.data, "utf-8"), mContainer.getWidth(), mContainer.getHeight());
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
@@ -264,7 +264,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     //        TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
-
   }
 
   @Override
@@ -306,7 +305,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
-
+WXLogUtils.e("into--[onViewCreated]");
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }
