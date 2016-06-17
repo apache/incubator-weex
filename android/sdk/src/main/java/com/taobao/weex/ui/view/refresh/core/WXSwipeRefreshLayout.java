@@ -438,7 +438,6 @@ public class WXSwipeRefreshLayout extends FrameLayout {
       //                    getContext().getString(R.string.default_pull_refresh_text) : mPullRefreshText);
       headerView.setStartEndTrim(0, 0.75f);
       headerView.setBackgroundColor(mLoadViewBgColor);
-      headerView.setLoadTextColor(mLoadViewTextColor);
       headerView.setProgressBgColor(mProgressBgColor);
       headerView.setProgressColor(mProgressColor);
       addView(headerView, lp);
@@ -453,7 +452,6 @@ public class WXSwipeRefreshLayout extends FrameLayout {
       //                    getContext().getString(R.string.default_pull_load_text) : mPullLoadText);
       footerView.setStartEndTrim(0.5f, 1.25f);
       footerView.setBackgroundColor(mLoadViewBgColor);
-      footerView.setLoadTextColor(mLoadViewTextColor);
       footerView.setProgressBgColor(mProgressBgColor);
       footerView.setProgressColor(mProgressColor);
       addView(footerView, lp);

@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/c6322ab1e3a1a87418ec804c181cbc23", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/1db44eabec6bad5890f917d5941a572e", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -150,7 +150,8 @@
 	              "type": "loading-indicator",
 	              "style": {
 	                "height": 60,
-	                "width": 60
+	                "width": 60,
+	                "color": "rgb(238,162,54)"
 	              }
 	            },
 	            {
@@ -227,7 +228,8 @@
 	              "type": "loading-indicator",
 	              "style": {
 	                "height": 60,
-	                "width": 60
+	                "width": 60,
+	                "color": "#3192e1"
 	              }
 	            }
 	          ]
@@ -247,11 +249,6 @@
 	})
 	;__weex_module__.exports.style = __weex_module__.exports.style || {}
 	;Object.assign(__weex_module__.exports.style, {
-	  "list": {
-	    "height": 810,
-	    "borderWidth": 10,
-	    "borderColor": "#FFA500"
-	  },
 	  "count": {
 	    "fontSize": 48,
 	    "margin": 10
@@ -286,7 +283,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/c6322ab1e3a1a87418ec804c181cbc23", {
+	;__weex_bootstrap__("@weex-component/1db44eabec6bad5890f917d5941a572e", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

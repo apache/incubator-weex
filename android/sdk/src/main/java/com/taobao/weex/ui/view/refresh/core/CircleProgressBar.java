@@ -534,12 +534,4 @@ public class CircleProgressBar extends ImageView {
   public void setProgressRotation(float rotation) {
     mProgressDrawable.setProgressRotation(rotation);
   }
-
-  public void setIndicator_color(int color) {
-    this.indicator_color = color;
-  }
-
-  public int getIndicator_color() {
-    return indicator_color;
-  }
 }

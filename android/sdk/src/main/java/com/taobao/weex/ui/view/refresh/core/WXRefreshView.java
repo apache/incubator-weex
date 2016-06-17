@@ -208,15 +208,16 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 public class WXRefreshView extends FrameLayout {
 
   private CircleProgressBar circleProgressBar;
-  private TextView tvLoad;
+  private LinearLayout linearLayout;
 
   public WXRefreshView(Context context) {
     super(context);
@@ -243,15 +244,19 @@ public class WXRefreshView extends FrameLayout {
    * 添加View
    */
   private void setupViews() {
-//    this.setOrientation(VERTICAL);
-//    this.setGravity(Gravity.CENTER);
+    linearLayout = new LinearLayout(getContext());
+    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
+                                                                     .MATCH_PARENT,LinearLayout
+        .LayoutParams.MATCH_PARENT);
+    linearLayout.setOrientation(LinearLayout.VERTICAL);
+    linearLayout.setGravity(Gravity.CENTER);
+    addView(linearLayout,lp);
   }
 
   public void setRefreshView(final View view) {
     post(new Runnable() {
       @Override
       public void run() {
-        removeAllViews();
         View child = null;
         View temp = view;
         if (view.getParent() != null) {
@@ -262,21 +267,9 @@ public class WXRefreshView extends FrameLayout {
           if (child instanceof CircleProgressBar)
             circleProgressBar = (CircleProgressBar) child;
         }
-        addView(temp);
+        linearLayout.addView(temp);
       }
     });
-  }
-
-  public void setLoadText(String loadtText) {
-    if (tvLoad != null) {
-      tvLoad.setText(loadtText);
-    }
-  }
-
-  public void setLoadTextColor(int color) {
-    if (tvLoad != null) {
-      tvLoad.setTextColor(color);
-    }
   }
 
   public void setProgressBgColor(int color) {
