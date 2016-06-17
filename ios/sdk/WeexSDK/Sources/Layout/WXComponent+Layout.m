@@ -17,21 +17,6 @@
 
 #pragma mark Public
 
-- (CGRect)calculatedFrame
-{
-    return _calculatedFrame;
-}
-
-- (CGPoint)absolutePosition
-{
-    return _absolutePosition;
-}
-
-- (css_node_t *)cssNode
-{
-    return _cssNode;
-}
-
 - (void)setNeedsLayout
 {
     _isLayoutDirty = YES;

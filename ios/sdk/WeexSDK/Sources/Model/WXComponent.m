@@ -22,6 +22,7 @@
 #import "WXThreadSafeMutableArray.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
+#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 @interface WXComponent () <UIGestureRecognizerDelegate>
 
@@ -108,6 +109,90 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ ref=%@> %@", _type, _ref, _view];
+}
+
+#pragma mark Property
+
+- (UIView *)view
+{
+    if ([self isViewLoaded]) {
+        return _view;
+    } else {
+        WXAssertMainThread();
+        
+        // compositing child will be drew by its composited ancestor
+        if (_compositingChild) {
+            return nil;
+        }
+        
+        [self viewWillLoad];
+        
+        _view = [self loadView];
+        
+        _layer = _view.layer;
+        _view.frame = _calculatedFrame;
+        
+        _view.hidden = _visibility == WXVisibilityShow ? NO : YES;
+        _view.clipsToBounds = _clipToBounds;
+        
+        if (![self _needsDrawBorder]) {
+            _layer.borderColor = _borderTopColor.CGColor;
+            _layer.borderWidth = _borderTopWidth;
+            _layer.cornerRadius = _borderTopLeftRadius;
+            _layer.opacity = _opacity;
+            _view.backgroundColor = _backgroundColor;
+        }
+        
+        _view.wx_component = self;
+        _layer.wx_component = self;
+        
+        [self _initEvents:self.events];
+        
+        if (_positionType == WXPositionTypeSticky) {
+            [self.ancestorScroller addStickyComponent:self];
+        }
+        
+        if (self.supercomponent && self.supercomponent->_async) {
+            self->_async = YES;
+        }
+        
+        [self setNeedsDisplay];
+        [self viewDidLoad];
+        
+        if (_lazyCreateView) {
+            if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
+                NSInteger index = [((WXComponent *)self.supercomponent).subcomponents indexOfObject:self];
+                if (index != NSNotFound) {
+                    [((WXComponent *)self.supercomponent) insertSubview:self atIndex:index];
+                }
+            }
+            for (WXComponent *subcomponent in self.subcomponents) {
+                [self.view addSubview:subcomponent.view];
+            }
+        }
+        
+        return _view;
+    }
+}
+
+- (CALayer *)layer
+{
+    return _layer;
+}
+
+- (CGRect)calculatedFrame
+{
+    return _calculatedFrame;
+}
+
+- (CGPoint)absolutePosition
+{
+    return _absolutePosition;
+}
+
+- (css_node_t *)cssNode
+{
+    return _cssNode;
 }
 
 #pragma mark Component Hierarchy 
