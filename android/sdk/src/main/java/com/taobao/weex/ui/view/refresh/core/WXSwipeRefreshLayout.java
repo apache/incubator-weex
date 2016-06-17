@@ -202,7 +202,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh;
+package com.taobao.weex.ui.view.refresh.core;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;

@@ -125,12 +125,11 @@ import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.IWXScroller;
+import com.taobao.weex.ui.view.WXBaseRefreshLayout;
 import com.taobao.weex.ui.view.WXHorizontalScrollView;
-import com.taobao.weex.ui.view.WXLoadingLayout;
-import com.taobao.weex.ui.view.WXRefreshLayout;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
-import com.taobao.weex.ui.view.listview.BounceScrollerView;
+import com.taobao.weex.ui.view.refresh.wrapper.BounceScrollerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -195,9 +194,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       return;
     }
 
-    if (child instanceof WXRefreshLayout) {
-      return;
-    } else if (child instanceof WXLoadingLayout) {
+    if (child instanceof WXBaseRefreshLayout) {
       return;
     } else {
       int count = tempscview.getChildCount();

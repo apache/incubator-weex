@@ -202,126 +202,127 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh;
+package com.taobao.weex.ui.view.refresh.wrapper;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
+import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
-public class WXRefreshView extends FrameLayout {
+import com.taobao.weex.ui.view.refresh.core.WXSwipeRefreshLayout;
 
-  private CircleProgressBar circleProgressBar;
-  private TextView tvLoad;
+public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
-  public WXRefreshView(Context context) {
-    super(context);
-    setupViews();
-  }
+    private int mOrientation = OrientationHelper.VERTICAL;
+    protected WXSwipeRefreshLayout swipeRefreshLayout;
 
-  public WXRefreshView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    setupViews();
-  }
+    public BaseBounceView(Context context,int orientation) {
+        this(context, null,orientation);
+    }
 
-  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    setupViews();
-  }
+    public BaseBounceView(Context context, AttributeSet attrs,int orientataion) {
+        super(context, attrs);
+        mOrientation = orientataion;
+        init(context);
+    }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    setupViews();
-  }
+    public int getOrientation(){
+        return mOrientation;
+    }
 
-  /**
-   * 添加View
-   */
-  private void setupViews() {
-//    this.setOrientation(VERTICAL);
-//    this.setGravity(Gravity.CENTER);
-  }
+    private void init(Context context) {
+        createBounceView(context);
+    }
 
-  public void setRefreshView(final View view) {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        removeAllViews();
-        View child = null;
-        View temp = view;
-        if (view.getParent() != null) {
-          ((ViewGroup) view.getParent()).removeView(view);
+    boolean isVertical(){
+        return mOrientation==OrientationHelper.VERTICAL;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        //Helper.logv("BaseBounceView onMeasure");
+        View child0 = getChildAt(0);
+        int w = 0;
+        int h = 0;
+        if (child0 != null) {
+            child0.measure(widthMeasureSpec, heightMeasureSpec);
+            w = child0.getMeasuredWidth();
+            h = child0.getMeasuredHeight();
         }
-        for (int i = 0;i<((ViewGroup)temp).getChildCount(); i++) {
-          child = ((ViewGroup) temp).getChildAt(i);
-          if (child instanceof CircleProgressBar)
-            circleProgressBar = (CircleProgressBar) child;
+        measureChild(w,h,1);
+        measureChild(w,h,2);
+    }
+
+    private void measureChild(int w,int h,int index){
+        View child = getChildAt(index);
+        if (child != null) {
+            LayoutParams lp = child.getLayoutParams();
+            if(isVertical()) {
+                child.measure(
+                        MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(lp.height, lp.height > 0 ? MeasureSpec.EXACTLY : MeasureSpec.AT_MOST)
+                );
+            }else{
+                child.measure(
+                        MeasureSpec.makeMeasureSpec(lp.width, lp.width > 0 ? MeasureSpec.EXACTLY : MeasureSpec.AT_MOST),
+                        MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY)
+                );
+            }
         }
-        addView(temp);
-      }
-    });
-  }
-
-  public void setLoadText(String loadtText) {
-    if (tvLoad != null) {
-      tvLoad.setText(loadtText);
     }
-  }
 
-  public void setLoadTextColor(int color) {
-    if (tvLoad != null) {
-      tvLoad.setTextColor(color);
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        View child0 = getChildAt(0);
+        int paddingLeft,paddingTop,childRight,childBottom;
+        paddingLeft=getPaddingLeft();
+        paddingTop=getPaddingTop();
+        childRight=r-l-getPaddingRight();
+        childBottom = b-t-getPaddingBottom();
+
+        if (child0 != null) {
+            if(isVertical()){
+                child0.layout(paddingLeft, paddingTop, childRight, b-t-paddingTop);
+            }else{
+                child0.layout(paddingLeft, paddingTop, r-l-paddingLeft, childBottom);
+            }
+
+        }
+        View child1 = getChildAt(1);
+        if (child1 != null) {
+            if(isVertical()) {
+                int h = child1.getMeasuredHeight();
+                child1.layout(paddingLeft, -h, childRight, 0);
+            }else{
+                int w = child1.getMeasuredWidth();
+                child1.layout(-w, paddingTop, 0, childBottom);
+            }
+        }
+        View child2 = getChildAt(2);
+        if (child2 != null) {
+            if(isVertical()) {
+                int h = child2.getMeasuredHeight();
+                child2.layout(paddingLeft, b, childRight, b + h);
+            }else{
+                int w = child2.getMeasuredWidth();
+                child2.layout(r, paddingTop, r+w , childBottom);
+            }
+        }
     }
-  }
 
-  public void setProgressBgColor(int color) {
-    if (circleProgressBar != null)
+    public abstract WXSwipeRefreshLayout createBounceView(Context context);
+    public abstract T getInnerView();
 
-    {
-      circleProgressBar.setBackgroundColor(color);
+    public void setHeaderView(View headerView) {
+        if (swipeRefreshLayout != null)
+                swipeRefreshLayout.getHeaderView().setRefreshView(headerView);
     }
-  }
 
-  public void setProgressColor(int color) {
-    if (circleProgressBar != null) {
-      circleProgressBar.setColorSchemeColors(color);
+    public void setFooterView(View footerView) {
+        if (swipeRefreshLayout != null)
+                swipeRefreshLayout.getFooterView().setRefreshView(footerView);
     }
-  }
-
-  /**
-   * 开始动画
-   */
-  public void start() {
-    if (circleProgressBar != null) {
-      circleProgressBar.start();
-    }
-  }
-
-  /**
-   * 设置动画起始位置
-   */
-  public void setStartEndTrim(float startAngle, float endAngle) {
-    if (circleProgressBar != null) {
-      circleProgressBar.setStartEndTrim(startAngle, endAngle);
-    }
-  }
-
-  /**
-   * 停止动画
-   */
-  public void stop() {
-    if (circleProgressBar != null) {
-      circleProgressBar.stop();
-    }
-  }
-
-  public void setProgressRotation(float rotation) {
-    if (circleProgressBar != null)
-      circleProgressBar.setProgressRotation(rotation);
-  }
 }

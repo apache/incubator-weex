@@ -154,7 +154,6 @@ import com.taobao.weex.ui.ComponentHolder;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXBackgroundDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
-import com.taobao.weex.ui.view.WXRefreshLayout;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
@@ -202,7 +201,6 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealTop = 0;
   private WXGesture wxGesture;
   private ComponentHolder mHolder;
-  private static WXRefreshLayout wxRefreshLayout;
   private static float refreshMargin = 0;
 
   private boolean isUsing = false;
@@ -280,7 +278,6 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     }
 
     if (this instanceof WXRefresh) {
-      wxRefreshLayout = (WXRefreshLayout) getView();
       refreshMargin = mDomObj.csslayout.dimensions[CSSLayout.DIMENSION_HEIGHT];
     }
 
@@ -292,14 +289,11 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
 
     if (mParent instanceof WXScroller) {
       if (!(this instanceof WXBaseRefresh)) {
-        if (wxRefreshLayout != null) {
-          wxRefreshLayout.measure(0, 0);
           CSSLayout newLayout = new CSSLayout();
           newLayout.copy(mDomObj.csslayout);
           newLayout.position[CSSLayout.POSITION_TOP] = mDomObj.csslayout.position[CSSLayout
               .POSITION_TOP] - refreshMargin;
           mDomObj.csslayout.copy(newLayout);
-        }
       }
     }
 

@@ -206,7 +206,7 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXLoadingLayout;
+import com.taobao.weex.ui.view.WXBaseRefreshLayout;
 
 /**
  * div component
@@ -219,7 +219,7 @@ public class WXLoading extends WXBaseRefresh {
 
   @Override
   protected void initView() {
-    mHost = new WXLoadingLayout(mContext);
+    mHost = new WXBaseRefreshLayout(mContext);
   }
 
 //  @Override

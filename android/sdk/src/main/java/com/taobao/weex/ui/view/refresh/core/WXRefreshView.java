@@ -202,29 +202,126 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh;
+package com.taobao.weex.ui.view.refresh.core;
 
-import android.animation.Animator;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.os.Build;
+import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
-public class WXRefreshAnimatorListener implements Animator.AnimatorListener {
+public class WXRefreshView extends FrameLayout {
 
-  @Override
-  public void onAnimationStart(Animator animation) {
+  private CircleProgressBar circleProgressBar;
+  private TextView tvLoad;
 
+  public WXRefreshView(Context context) {
+    super(context);
+    setupViews();
   }
 
-  @Override
-  public void onAnimationEnd(Animator animation) {
-
+  public WXRefreshView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    setupViews();
   }
 
-  @Override
-  public void onAnimationCancel(Animator animation) {
-
+  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    setupViews();
   }
 
-  @Override
-  public void onAnimationRepeat(Animator animation) {
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+    setupViews();
+  }
 
+  /**
+   * 添加View
+   */
+  private void setupViews() {
+//    this.setOrientation(VERTICAL);
+//    this.setGravity(Gravity.CENTER);
+  }
+
+  public void setRefreshView(final View view) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        removeAllViews();
+        View child = null;
+        View temp = view;
+        if (view.getParent() != null) {
+          ((ViewGroup) view.getParent()).removeView(view);
+        }
+        for (int i = 0;i<((ViewGroup)temp).getChildCount(); i++) {
+          child = ((ViewGroup) temp).getChildAt(i);
+          if (child instanceof CircleProgressBar)
+            circleProgressBar = (CircleProgressBar) child;
+        }
+        addView(temp);
+      }
+    });
+  }
+
+  public void setLoadText(String loadtText) {
+    if (tvLoad != null) {
+      tvLoad.setText(loadtText);
+    }
+  }
+
+  public void setLoadTextColor(int color) {
+    if (tvLoad != null) {
+      tvLoad.setTextColor(color);
+    }
+  }
+
+  public void setProgressBgColor(int color) {
+    if (circleProgressBar != null)
+
+    {
+      circleProgressBar.setBackgroundColor(color);
+    }
+  }
+
+  public void setProgressColor(int color) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setColorSchemeColors(color);
+    }
+  }
+
+  /**
+   * 开始动画
+   */
+  public void start() {
+    if (circleProgressBar != null) {
+      circleProgressBar.start();
+    }
+  }
+
+  /**
+   * 设置动画起始位置
+   */
+  public void setStartEndTrim(float startAngle, float endAngle) {
+    if (circleProgressBar != null) {
+      circleProgressBar.setStartEndTrim(startAngle, endAngle);
+    }
+  }
+
+  /**
+   * 停止动画
+   */
+  public void stop() {
+    if (circleProgressBar != null) {
+      circleProgressBar.stop();
+    }
+  }
+
+  public void setProgressRotation(float rotation) {
+    if (circleProgressBar != null)
+      circleProgressBar.setProgressRotation(rotation);
   }
 }

@@ -202,7 +202,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.listview;
+package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -212,8 +212,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
-import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
+import com.taobao.weex.ui.view.refresh.core.WXSwipeRefreshLayout;
 
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 

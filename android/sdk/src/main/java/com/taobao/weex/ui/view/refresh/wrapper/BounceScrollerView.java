@@ -202,14 +202,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.listview;
+package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.view.WXScrollView;
-import com.taobao.weex.ui.view.refresh.WXSwipeRefreshLayout;
+import com.taobao.weex.ui.view.refresh.core.WXSwipeRefreshLayout;
 
 public class BounceScrollerView extends BaseBounceView<WXScrollView> {
 

@@ -206,7 +206,7 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.refresh.CircleProgressBar;
+import com.taobao.weex.ui.view.refresh.core.CircleProgressBar;
 
 public class WXLoadingIndicator extends WXComponent {
 
