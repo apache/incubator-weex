@@ -104,6 +104,10 @@
         
         cellComponent.indexPath = [NSIndexPath indexPathForRow:insertIndex inSection:0];
         [_cellComponents insertObject:subcomponent atIndex:insertIndex];
+        
+        for (WXCellComponent *cell in _cellComponents) {
+            cell.indexPath = [NSIndexPath indexPathForRow:[_cellComponents indexOfObject:cell] inSection:0];
+        }
     }
 }
 
