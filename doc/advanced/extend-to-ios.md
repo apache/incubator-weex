@@ -1,4 +1,5 @@
-##Extend to iOS 
+##Extend to iOS
+<a href="https://github.com/weexteam/article/issues/17"  class="weex-translate">cn</a>
  
 ### Module extend
 

@@ -1,4 +1,5 @@
 # import Weex iOS to your project
+<a href="https://github.com/weexteam/article/issues/18"  class="weex-translate">cn</a>
 
 You will need to build Weex from source if you want to work on a new feature/bug fix, try out the latest features not released yet, or maintain your own fork with patches that cannot be merged to the core.
 
