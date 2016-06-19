@@ -347,10 +347,10 @@
         // Only support WXLayer
         return NO;
     }
-    if (_async) {
-        // Async layer always draw border
-        return YES;
-    }
+//    if (_async) {
+//        // Async layer always draw border
+//        return YES;
+//    }
     if (!(_borderLeftStyle == _borderTopStyle &&
           _borderTopStyle == _borderRightStyle &&
           _borderRightStyle == _borderBottomStyle &&
