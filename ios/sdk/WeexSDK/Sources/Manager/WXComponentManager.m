@@ -204,6 +204,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     [supercomponent _insertSubcomponent:component atIndex:index];
     
+    // use _lazyCreateView to forbid component like cell's view creating
+    if(supercomponent->_lazyCreateView) {
+        component->_lazyCreateView = YES;
+    }
+    
     [self _addUITask:^{
         [supercomponent insertSubview:component atIndex:index];
     }];

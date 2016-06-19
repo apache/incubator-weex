@@ -166,8 +166,9 @@
                     [((WXComponent *)self.supercomponent) insertSubview:self atIndex:index];
                 }
             }
-            for (WXComponent *subcomponent in self.subcomponents) {
-                [self.view addSubview:subcomponent.view];
+            for (int i = 0; i < self.subcomponents.count; i++) {
+                WXComponent *subcomponent = self.subcomponents[i];
+                [self insertSubview:subcomponent atIndex:i];
             }
         }
         
