@@ -243,6 +243,8 @@ public class WXSDKEngine {
         sm.initScriptsFramework(null);
         register();
         WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
+        WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
+        WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
       }
     });
   }
