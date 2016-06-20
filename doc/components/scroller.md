@@ -35,11 +35,11 @@ There is no specific attribute for this component other than the [common attribu
 
 ```
 <template>
-  <scoller>
+  <scroller>
     <div repeat="{{list}}">
       <text>{{name}}: ${{price}}</text>
     </div>
-  </scoller>
+  </scroller>
 </template>
 
 <script>

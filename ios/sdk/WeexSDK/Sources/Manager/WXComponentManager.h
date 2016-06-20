@@ -15,6 +15,7 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 @interface WXComponentManager : NSObject
 
 @property (nonatomic, readonly, weak) WXSDKInstance *weexInstance;
+@property (nonatomic, readonly, assign) BOOL isValid;
 
 /**
  * @abstract initialize with weex instance

@@ -44,6 +44,9 @@ WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
     
     WXPerformBlockOnComponentThread(^{
         WXComponentManager *mananger = weakSelf.weexInstance.componentManager;
+        if (!mananger.isValid) {
+            return;
+        }
         [mananger startComponentTasks];
         block(mananger);
     });
