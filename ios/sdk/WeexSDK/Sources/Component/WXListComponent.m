@@ -161,7 +161,7 @@
         }
 
     } else {
-        WXCellComponent *previousCell = _cellComponents[indexPath.row - 1];
+        WXCellComponent *previousCell = [_cellComponents wx_safeObjectAtIndex:(indexPath.row - 1)];
         CGPoint previousCellPostion = previousCell.absolutePosition;
         cell.absolutePosition = CGPointMake(previousCellPostion.x, previousCellPostion.y + previousCell.calculatedFrame.size.height);
     }
