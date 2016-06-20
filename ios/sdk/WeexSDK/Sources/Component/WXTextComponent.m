@@ -267,7 +267,9 @@ do {\
     
     // set font
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
-    [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
+    if (font) {
+        [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
+    }
     
     if(_textDecoration == WXTextDecorationUnderline){
         [attributedString addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlinePatternSolid | NSUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
