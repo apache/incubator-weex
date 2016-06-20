@@ -227,9 +227,8 @@
     NSArray *visibleIndexPaths = [tableView indexPathsForVisibleRows];
     if (![visibleIndexPaths containsObject:indexPath]) {
         WXCellComponent *component = [_cellComponents wx_safeObjectAtIndex:indexPath.row];
-//        dispatch_async(dispatch_get_main_queue(), ^{
-            [component _unloadView];
-//        });
+        // Must invoke synchronously otherwise it will remove the view just added.
+        [component _unloadView];
     }
 }
 
@@ -289,7 +288,7 @@
 
 - (void)setLoadmoreretry:(NSUInteger)loadmoreretry
 {
-    if (loadmoreretry > self.loadmoreretry) {
+    if (loadmoreretry != self.loadmoreretry) {
         _previousLoadMoreRowNumber = 0;
     }
     
