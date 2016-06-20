@@ -205,13 +205,15 @@
 package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
+import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 
 /**
  * div component
  */
-public class WXRefresh extends WXBaseRefresh {
+public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefreshListener{
 
   public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
@@ -222,11 +224,10 @@ public class WXRefresh extends WXBaseRefresh {
     mHost = new WXBaseRefreshLayout(mContext);
   }
 
-//  @Override
-//  public void onRefresh() {
-//    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
-//      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
-//    }
-//  }
-
+  @Override
+  public void onRefresh() {
+    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONREFRESH)) {
+      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONREFRESH);
+    }
+  }
 }

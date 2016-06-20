@@ -210,12 +210,13 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.taobao.weex.ui.view.refresh.core.WXSwipeRefreshLayout;
+import com.taobao.weex.ui.view.refresh.core.WXRefreshView;
+import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 
 public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     private int mOrientation = OrientationHelper.VERTICAL;
-    protected WXSwipeRefreshLayout swipeRefreshLayout;
+    protected WXSwipeLayout swipeLayout;
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
@@ -237,6 +238,22 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     boolean isVertical(){
         return mOrientation==OrientationHelper.VERTICAL;
+    }
+
+    public void setOnRefreshListener(WXSwipeLayout.WXOnRefreshListener onRefreshListener) {
+        swipeLayout.setOnRefreshListener(onRefreshListener);
+    }
+
+    public void setOnLoadingListener(WXSwipeLayout.WXOnLoadingListener onLoadingListener) {
+        swipeLayout.setOnLoadingListener(onLoadingListener);
+    }
+
+    public void finishPullRefresh() {
+        swipeLayout.finishPullRefresh();
+    }
+
+    public void finishPullLoad() {
+        swipeLayout.finishPullLoad();
     }
 
     @Override
@@ -313,16 +330,36 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         }
     }
 
-    public abstract WXSwipeRefreshLayout createBounceView(Context context);
+    public abstract WXSwipeLayout createBounceView(Context context);
     public abstract T getInnerView();
 
+    /**
+     *
+     * @param headerView should be {@link WXRefreshView}
+     */
     public void setHeaderView(View headerView) {
-        if (swipeRefreshLayout != null)
-                swipeRefreshLayout.getHeaderView().setRefreshView(headerView);
+        setRefreshEnable(true);
+        if (swipeLayout != null)
+            if (swipeLayout.getHeaderView() != null)
+                swipeLayout.getHeaderView().setRefreshView(headerView);
     }
 
+    /**
+     *
+     * @param footerView should be {@link WXRefreshView}
+     */
     public void setFooterView(View footerView) {
-        if (swipeRefreshLayout != null)
-                swipeRefreshLayout.getFooterView().setRefreshView(footerView);
+        setLoadmoreEnable(true);
+        if (swipeLayout != null)
+            if (swipeLayout.getFooterView() != null)
+                swipeLayout.getFooterView().setRefreshView(footerView);
+    }
+
+    public void setRefreshEnable(boolean enable) {
+        swipeLayout.setPullRefreshEnable(enable);
+    }
+
+    public void setLoadmoreEnable(boolean enable) {
+        swipeLayout.setPullLoadEnable(enable);
     }
 }

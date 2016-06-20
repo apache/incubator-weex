@@ -205,10 +205,13 @@
 package com.taobao.weex.ui.component;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 
 /**
  * div component
@@ -240,12 +243,12 @@ public class WXBaseRefresh extends WXVContainer {
 
   @WXComponentProp(name = "display")
   public void setDisplay(String display) {
+    Log.i("miomin","finish");
     if (!TextUtils.isEmpty(display)) {
       if (display.equals("hide")) {
-//        if (getParent() instanceof WXListComponent && getParent().getView() instanceof BounceRecyclerView) {
-//          BounceRecyclerView brv = (BounceRecyclerView) getParent().getView();
-//          brv.refreshState();
-//        }
+        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
+          ((BaseBounceView)getParent().getView()).finishPullRefresh();
+        }
       }
     }
   }

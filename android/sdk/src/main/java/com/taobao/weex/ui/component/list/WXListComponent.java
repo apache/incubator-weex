@@ -223,10 +223,11 @@ import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
+import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
+import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -325,7 +326,7 @@ public class WXListComponent extends WXVContainer implements
                 WXLogUtils.e(TAG, "Invaild transform expression:" + match);
             }
         }
-        return new BounceRecyclerView.TransformItemDecoration(getOrientation() == VERTICAL,opacity,translateX,translateY,rotate,scaleX,scaleY);
+        return new TransformItemDecoration(getOrientation() == VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
     }
 
     @Override
@@ -444,8 +445,8 @@ public class WXListComponent extends WXVContainer implements
         holder.setComponentUsing(true);
         WXComponent component = getChild(position);
         if ( component == null
-//                || (component instanceof WXRefresh)
-//                || (component instanceof WXLoading)
+                || (component instanceof WXRefresh)
+                || (component instanceof WXLoading)
                 || (component.mDomObj!=null && component.mDomObj.isFixed())
                 ) {
 
@@ -478,6 +479,7 @@ public class WXListComponent extends WXVContainer implements
         if (mChildren != null) {
             for (int i = 0; i < childCount(); i++) {
                 WXComponent component = getChild(i);
+                checkRefreshOrLoading(component);
                 if (component == null
                         || component.isUsing()
                         || getItemViewType(i) != viewType)
@@ -509,6 +511,15 @@ public class WXListComponent extends WXVContainer implements
         throw new WXRuntimeException("mChildren is null");
     }
 
+  private void checkRefreshOrLoading(WXComponent child) {
+    if (child instanceof WXRefresh) {
+      bounceRecyclerView.setOnRefreshListener((WXRefresh)child);
+    }
+
+    if (child instanceof WXLoading) {
+      bounceRecyclerView.setOnLoadingListener((WXLoading)child);
+    }
+  }
 
     /**
      * Return the child component type. The type is defined by scopeValue in .we file.

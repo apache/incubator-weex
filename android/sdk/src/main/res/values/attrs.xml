@@ -231,7 +231,7 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="WXSwipeRefreshLayout">
+    <declare-styleable name="WXSwipeLayout">
         <!--Loading视图背景颜色-->
         <attr name="load_view_bg_color" format="color|reference"/>
         <!--进度条颜色-->

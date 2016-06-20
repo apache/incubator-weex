@@ -10,7 +10,7 @@
           <text class="item-title">row {{id}}</text>
         </div>
       </cell>
-      <loading class="refresh-view">
+      <loading class="refresh-view" onloading="onloading">
         <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">Load more</text>
         <loading-indicator style="height:60;width:60;color:#3192e1"></loading-indicator>
       </loading>
@@ -67,11 +67,13 @@
     methods: {
       onrefresh: function(e) {
         var self = this;
-        self.refresh_display = 'show';
-        // self.$call('timer', 'setTimeout', function() {
-        //   self.refresh_display = 'hide';
-        // },3000);
-          self.refresh_display = 'hide';
+        self.refresh_display = 'hide';
+      },
+      onloading: function(e) {
+        this.$call('modal', 'toast', {
+          'message': "onloading",
+          'duration': 2
+        });
       },
       onappear: function (e) {
         var appearId = this.rows[e.target.attr.index].id;
