@@ -1,5 +1,3 @@
-<merge>
-
     <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/appbarLayout"
@@ -79,11 +77,10 @@
                     android:ellipsize="end"
                     android:gravity="center"
                     android:singleLine="true"
+                    android:textStyle="bold"
                     android:textColor="@color/whiteLight"
-                    android:textSize="18sp" />
+                    android:textSize="20sp" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
-
-</merge>

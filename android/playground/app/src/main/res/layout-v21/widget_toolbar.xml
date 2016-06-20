@@ -76,9 +76,10 @@
                 android:layout_toRightOf="@id/leftItem"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:textStyle="bold"
                 android:singleLine="true"
                 android:textColor="@color/whiteLight"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
