@@ -246,10 +246,4 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
     }
-
-    @Override
-    public WXRecyclerView getInnerView() {
-        return innerView;
-    }
-
 }

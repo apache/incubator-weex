@@ -344,7 +344,6 @@ public class WXListComponent extends WXVContainer implements
         mHost = bounceRecyclerView;
     }
 
-    //TODO Make this method return WXRecyclerView
     @Override
     public BounceRecyclerView getView() {
         return (BounceRecyclerView) super.getView();

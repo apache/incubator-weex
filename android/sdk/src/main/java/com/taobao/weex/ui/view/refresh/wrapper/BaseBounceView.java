@@ -333,7 +333,10 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     }
 
     public abstract WXSwipeLayout createBounceView(Context context);
-    public abstract T getInnerView();
+
+    public T getInnerView() {
+        return innerView;
+    }
 
     /**
      *

@@ -185,6 +185,14 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     return super.getView();
   }
 
+  private ViewGroup getInnerView() {
+    if (mHost instanceof BounceScrollerView) {
+      return ((BounceScrollerView) mHost).getInnerView();
+    } else {
+      return getView();
+    }
+  }
+
   /**
    * Intercept refresh view and loading view
    */
@@ -233,7 +241,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
 
   private void checkRefreshOrLoading(WXComponent child) {
     if (child instanceof WXRefresh) {
-      ((BounceScrollerView)getView()).setOnRefreshListener((WXRefresh)child);
+      ((BounceScrollerView)mHost).setOnRefreshListener((WXRefresh)child);
       final WXComponent temp = child;
       Runnable runnable=new Runnable(){
         @Override
@@ -245,7 +253,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     }
 
     if (child instanceof WXLoading) {
-      ((BounceScrollerView)getView()).setOnLoadingListener((WXLoading)child);
+      ((BounceScrollerView)mHost).setOnLoadingListener((WXLoading)child);
       final WXComponent temp = child;
       Runnable runnable=new Runnable(){
         @Override
@@ -266,8 +274,8 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     if (mStickyMap != null) {
       mStickyMap.clear();
     }
-    if (getView() != null && getView() instanceof IWXScroller) {
-      ((IWXScroller) getView()).destroy();
+    if (getInnerView() != null && getInnerView() instanceof IWXScroller) {
+      ((IWXScroller) getInnerView()).destroy();
     }
   }
 
@@ -305,7 +313,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       mOrientation = HORIZONTAL;
       mHost = new WXHorizontalScrollView(mContext);
       mRealView = new FrameLayout(mContext);
-      WXHorizontalScrollView scrollView = (WXHorizontalScrollView) getView();
+      WXHorizontalScrollView scrollView = (WXHorizontalScrollView) getInnerView();
       scrollView.setScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
         @Override
         public void onScrollChanged(WXHorizontalScrollView scrollView, int x, int y, int oldx, int oldy) {
@@ -365,11 +373,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
   }
 
   public int getScrollY() {
-    return getView() == null ? 0 : getView().getScrollY();
+    return getInnerView() == null ? 0 : getInnerView().getScrollY();
   }
 
   public int getScrollX() {
-    return getView() == null ? 0 : getView().getScrollX();
+    return getInnerView() == null ? 0 : getInnerView().getScrollX();
   }
 
   public Map<String, HashMap<String, WXComponent>> getStickMap() {
@@ -469,7 +477,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
    */
   public void unbindAppearEvent(WXComponent component) {
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getView());
+        .get(getInnerView());
     if (appearMap == null) {
       return;
     }
@@ -488,7 +496,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
    */
   public void unbindDisappearEvent(WXComponent component) {
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getView());
+        .get(getInnerView());
     if (appearMap == null) {
       return;
     }
@@ -508,20 +516,20 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
    * @param y vertical distance. Negative for scroll to top
    */
   public void scrollBy(final int x, final int y) {
-    if (getView() == null) {
+    if (getInnerView() == null) {
       return;
     }
 
-    getView().postDelayed(new Runnable() {
+    getInnerView().postDelayed(new Runnable() {
 
       @Override
       public void run() {
         if(mOrientation==VERTICAL){
-          ((WXScrollView) getView()).smoothScrollBy(0, -y);
+          ((WXScrollView) getInnerView()).smoothScrollBy(0, -y);
         }else{
-          ((WXHorizontalScrollView)getView()).smoothScrollBy(-x,0);
+          ((WXHorizontalScrollView)getInnerView()).smoothScrollBy(-x,0);
         }
-        getView().invalidate();
+        getInnerView().invalidate();
       }
     }, 16);
 
@@ -573,7 +581,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     AppearData appearData;
     if (mScrollRect == null) {
       mScrollRect = new Rect();
-      getView().getHitRect(mScrollRect);
+      getInnerView().getHitRect(mScrollRect);
     }
     while (iterator.hasNext()) {
       entry = iterator.next();

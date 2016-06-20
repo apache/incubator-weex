@@ -228,9 +228,4 @@ public class BounceScrollerView extends BaseBounceView<WXScrollView> {
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
     }
-
-    @Override
-    public WXScrollView getInnerView() {
-        return innerView;
-    }
 }
