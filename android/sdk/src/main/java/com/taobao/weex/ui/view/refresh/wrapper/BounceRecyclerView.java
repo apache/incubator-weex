@@ -216,7 +216,6 @@ import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
     private RecyclerViewBaseAdapter adapter = null;
-    private WXRecyclerView recyclerView;
 
     public BounceRecyclerView(Context context,int orientation) {
         super(context,orientation);
@@ -240,9 +239,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
     public WXSwipeLayout createBounceView(Context context) {
         swipeLayout = new WXSwipeLayout(context);
         swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        recyclerView = new WXRecyclerView(context);
-        recyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
-        swipeLayout.addView(recyclerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        innerView = new WXRecyclerView(context);
+        innerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
+        swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
@@ -250,7 +249,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
     @Override
     public WXRecyclerView getInnerView() {
-        return recyclerView;
+        return innerView;
     }
 
 }

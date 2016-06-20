@@ -217,6 +217,8 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeLayout swipeLayout;
+    protected T innerView;
+
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
@@ -361,5 +363,9 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     public void setLoadmoreEnable(boolean enable) {
         swipeLayout.setPullLoadEnable(enable);
+    }
+
+    public WXSwipeLayout getSwipeLayout() {
+        return swipeLayout;
     }
 }

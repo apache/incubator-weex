@@ -85,20 +85,12 @@
       onrefresh: function(e) {
         var self = this;
         self.refresh_display = 'show';
-        self.$call('timer', 'setTimeout', function() {
-          self.refresh_display = 'hide';
-        }, 3000);
+        self.refresh_display = 'hide';
       },
-      onloading: function() {
+      onloading: function(e) {
         var self = this;
         self.loading_display = 'show';
-        self.$call('timer', 'setTimeout', function() {
-          if (self.sections.length <= 5) {
-            self.sections.push(self.moreSections[self.sections.length - 2]);
-          }
-
-          self.loading_display = 'hide';
-        }, 3000);
+        self.loading_display = 'hide';
       }
     },
     data: {

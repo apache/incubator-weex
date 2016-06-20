@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/47db7c8a2e4e20dedaab66df04dd96ea", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/4a0169486f84ce938fd025f02d493b76", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -52,13 +52,21 @@
 	    methods: {
 	      onrefresh: function(e) {
 	        var self = this;
+	        self.refresh_display = 'show';
+	        this.$call('modal', 'toast', {
+	          'message': "onrefresh",
+	          'duration': 2
+	        });
 	        self.refresh_display = 'hide';
 	      },
 	      onloading: function(e) {
+	        var self = this;
+	        self.loading_display = 'show';
 	        this.$call('modal', 'toast', {
 	          'message': "onloading",
 	          'duration': 2
 	        });
+	        self.loading_display = 'hide';
 	      },
 	      onappear: function (e) {
 	        var appearId = this.rows[e.target.attr.index].id;
@@ -211,6 +219,9 @@
 	          "classList": [
 	            "refresh-view"
 	          ],
+	          "attr": {
+	            "display": function () {return this.loading_display}
+	          },
 	          "events": {
 	            "loading": "onloading"
 	          },
@@ -288,7 +299,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/47db7c8a2e4e20dedaab66df04dd96ea", {
+	;__weex_bootstrap__("@weex-component/4a0169486f84ce938fd025f02d493b76", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

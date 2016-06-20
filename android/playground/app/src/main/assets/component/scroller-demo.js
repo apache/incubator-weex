@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/2fe31774dec5260e2fdc8cb950060acb", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/ba54782e95d6a294a75a9df39824e036", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -53,20 +53,12 @@
 	      onrefresh: function(e) {
 	        var self = this;
 	        self.refresh_display = 'show';
-	        self.$call('timer', 'setTimeout', function() {
-	          self.refresh_display = 'hide';
-	        }, 3000);
+	        self.refresh_display = 'hide';
 	      },
-	      onloading: function() {
+	      onloading: function(e) {
 	        var self = this;
 	        self.loading_display = 'show';
-	        self.$call('timer', 'setTimeout', function() {
-	          if (self.sections.length <= 5) {
-	            self.sections.push(self.moreSections[self.sections.length - 2]);
-	          }
-
-	          self.loading_display = 'hide';
-	        }, 3000);
+	        self.loading_display = 'hide';
 	      }
 	    },
 	    data: function () {return {
@@ -298,7 +290,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/2fe31774dec5260e2fdc8cb950060acb", {
+	;__weex_bootstrap__("@weex-component/ba54782e95d6a294a75a9df39824e036", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

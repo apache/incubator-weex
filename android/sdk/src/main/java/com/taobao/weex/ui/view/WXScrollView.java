@@ -212,7 +212,6 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
@@ -431,9 +430,6 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller, W
   }
 
   private void showStickyView() {
-    if (mWAScroller == null) {
-      Log.i("miomin","null");
-    }
     View curStickyView = procSticky(mWAScroller.getStickMap());
 
     if (curStickyView != null) {

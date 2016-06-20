@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.component;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
@@ -243,11 +242,18 @@ public class WXBaseRefresh extends WXVContainer {
 
   @WXComponentProp(name = "display")
   public void setDisplay(String display) {
-    Log.i("miomin","finish");
     if (!TextUtils.isEmpty(display)) {
       if (display.equals("hide")) {
         if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
-          ((BaseBounceView)getParent().getView()).finishPullRefresh();
+          if (((BaseBounceView)getParent().getView()).getSwipeLayout().isRefreshing()) {
+            getParent().getView().postDelayed(new Runnable() {
+              @Override
+              public void run() {
+                ((BaseBounceView) getParent().getView()).finishPullRefresh();
+                ((BaseBounceView) getParent().getView()).finishPullLoad();
+              }
+            }, 2000);
+          }
         }
       }
     }

@@ -196,14 +196,14 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
 
     if (child instanceof WXBaseRefreshLayout) {
       return;
+    }
+
+    int count = tempscview.getChildCount();
+    index = index >= count ? -1 : index;
+    if (index == -1) {
+      getRealView().addView(child);
     } else {
-      int count = tempscview.getChildCount();
-      index = index >= count ? -1 : index;
-      if (index == -1) {
-        getRealView().addView(child);
-      } else {
-        getRealView().addView(child, index);
-      }
+      getRealView().addView(child, index);
     }
   }
 
@@ -213,25 +213,9 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       return;
     }
 
-    if (child instanceof WXRefresh) {
-      final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
-        @Override
-        public void run() {
-          ((BounceScrollerView)mHost).setHeaderView(temp.getView());
-        }
-      };
-      handler.postDelayed(runnable,100);
-      return;
-    } else if (child instanceof WXLoading) {
-      final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
-        @Override
-        public void run() {
-          ((BounceScrollerView)mHost).setFooterView(temp.getView());
-        }
-      };
-      handler.postDelayed(runnable,100);
+    checkRefreshOrLoading(child);
+
+    if (child instanceof WXBaseRefresh) {
       return;
     }
 
@@ -244,6 +228,32 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       mChildren.add(child);
     } else {
       mChildren.add(index, child);
+    }
+  }
+
+  private void checkRefreshOrLoading(WXComponent child) {
+    if (child instanceof WXRefresh) {
+      ((BounceScrollerView)getView()).setOnRefreshListener((WXRefresh)child);
+      final WXComponent temp = child;
+      Runnable runnable=new Runnable(){
+        @Override
+        public void run() {
+          ((BounceScrollerView)mHost).setHeaderView(temp.getView());
+        }
+      };
+      handler.postDelayed(runnable,100);
+    }
+
+    if (child instanceof WXLoading) {
+      ((BounceScrollerView)getView()).setOnLoadingListener((WXLoading)child);
+      final WXComponent temp = child;
+      Runnable runnable=new Runnable(){
+        @Override
+        public void run() {
+          ((BounceScrollerView)mHost).setFooterView(temp.getView());
+        }
+      };
+      handler.postDelayed(runnable,100);
     }
   }
 

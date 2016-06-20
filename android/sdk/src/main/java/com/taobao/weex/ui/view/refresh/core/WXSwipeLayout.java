@@ -142,7 +142,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
@@ -151,7 +150,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   private WXOnRefreshListener onRefreshListener;
   private WXOnLoadingListener onLoadingListener;
-  private WXRefreshLayoutController refreshLayoutController;
 
   private float mTotalUnconsumed;
   private NestedScrollingParentHelper mNestedScrollingParentHelper;
@@ -159,15 +157,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   private final int[] mParentScrollConsumed = new int[2];
   private final int[] mParentOffsetInWindow = new int[2];
   private boolean mNestedScrollInProgress;
-
-  public interface WXRefreshLayoutController {
-
-    //当前下拉刷新是否可用
-    boolean isPullRefreshEnable();
-
-    //当前上拉加载是否可用，比如列表已无更多数据，可禁用上拉加载功能
-    boolean isPullLoadEnable();
-  }
 
   public interface WXOnRefreshListener {
     void onRefresh();
@@ -191,9 +180,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   //是否支持上拉加载更多
   private boolean mPullLoadEnable = false;
-
-  //是否自动加载更多：false-释放后加载更多，true-到达上拉加载条件后自动触发
-  private boolean mAutoLoadMore;
 
   //上一次触摸的Y位置
   private float preY;
@@ -276,7 +262,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     mProgressColor = Color.RED;
     mPullRefreshText = "";
     mPullLoadText = "";
-    mAutoLoadMore = false;
 
     mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
     mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
@@ -320,10 +305,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     switch (ev.getActionMasked()) {
       case MotionEvent.ACTION_DOWN: {
-        if (refreshLayoutController != null) {
-          mPullRefreshEnable = refreshLayoutController.isPullRefreshEnable();
-          mPullLoadEnable = refreshLayoutController.isPullLoadEnable();
-        }
         preY = ev.getY();
         preX = ev.getX();
         actionDetermined = false;
@@ -376,8 +357,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         float dx = currentX - preX;
         preY = currentY;
         preX = currentX;
-        handleScroll(dy);
-        observerArriveBottom();
+        moveSpinner(dy);
         return true;
       }
 
@@ -420,7 +400,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       } else {
         mTotalUnconsumed -= dy;
         consumed[1] = dy;
-
       }
 
       //判断是下拉刷新还是上拉加载更多
@@ -431,8 +410,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       } else {
         mCurrentAction = -1;
       }
-
-      handleNestedScroll(mTotalUnconsumed);
+      moveNestedSpinner(mTotalUnconsumed);
     }
 
     // Now let our nested parent consume the leftovers
@@ -476,7 +454,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     // This is a decent indication of whether we should take over the event stream or not.
     final int dy = dyUnconsumed + mParentOffsetInWindow[1];
     mTotalUnconsumed += Math.abs(dy);
-    handleNestedScroll(mTotalUnconsumed);
+    moveNestedSpinner(mTotalUnconsumed);
 
     //判断是下拉刷新还是上拉加载更多
     if (mTotalUnconsumed > 0 && !canChildScrollUp() && mPullRefreshEnable) {
@@ -547,42 +525,10 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     return mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY);
   }
 
-  private void observerArriveBottom() {
-    if (isRefreshing || !mAutoLoadMore || !mPullLoadEnable) {
-      return;
-    }
-    mContentView.getViewTreeObserver().addOnScrollChangedListener(
-        new ViewTreeObserver.OnScrollChangedListener() {
-
-          @Override
-          public void onScrollChanged() {
-            mContentView.removeCallbacks(flingRunnable);
-            mContentView.postDelayed(flingRunnable, 6);
-          }
-        });
-  }
-
-  private Runnable flingRunnable = new Runnable() {
-    @Override
-    public void run() {
-      if (isRefreshing || !mAutoLoadMore || !mPullLoadEnable) {
-        return;
-      }
-
-      if (!canChildScrollDown()) {
-        mCurrentAction = ACTION_PULL_UP_LOAD_MORE;
-        isRefreshing = true;
-        startPullUpLoadMore(0);
-      }
-    }
-  };
-
   /**
    * 处理滚动
    */
-  private boolean handleScroll(float distanceY) {
-
-//    Log.i("miomin", "handleScroll：" + distanceY);
+  private boolean moveSpinner(float distanceY) {
 
     if (!canChildScrollUp() && mCurrentAction == ACTION_PULL_DOWN_REFRESH &&
         mPullRefreshEnable) {
@@ -632,9 +578,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     return false;
   }
 
-  private boolean handleNestedScroll(float distanceY) {
-
-//    Log.i("miomin", "handleScroll：" + distanceY);
+  private boolean moveNestedSpinner(float distanceY) {
 
     if (!canChildScrollUp() &&
         mPullRefreshEnable) {
@@ -889,12 +833,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     this.onRefreshListener = onRefreshListener;
   }
 
-  public void setRefreshLayoutController(WXRefreshLayoutController nsRefreshLayoutController) {
-    this.refreshLayoutController = nsRefreshLayoutController;
-  }
-
   /**
-   * 完成下拉刷新动作
+   * 完成下拉刷新
    */
   public void finishPullRefresh() {
     if (mCurrentAction == ACTION_PULL_DOWN_REFRESH) {
@@ -903,7 +843,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   /**
-   * 完成上拉加载更多动作
+   * 完成上拉加载更多
    */
   public void finishPullLoad() {
     if (mCurrentAction == ACTION_PULL_UP_LOAD_MORE) {
@@ -933,5 +873,9 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   public void setPullRefreshEnable(boolean mPullRefreshEnable) {
     this.mPullRefreshEnable = mPullRefreshEnable;
+  }
+
+  public boolean isRefreshing() {
+    return isRefreshing;
   }
 }
