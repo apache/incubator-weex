@@ -122,13 +122,21 @@ NSTimeInterval JSLibInitTime = 0;
                                                  userInfo:@{@"message":@"status code error."}];
             }
             
-           if (error) {
-               WXLogError(@"Connection to %@ occurs an error:%@", request.URL, error);
-               if (weakSelf.onFailed) {
-                   weakSelf.onFailed(error);
-               }
-               return ;
-           }
+            if (error) {
+                WXLogError(@"Connection to %@ occurs an error:%@", request.URL, error);
+                if (weakSelf.onFailed) {
+                    weakSelf.onFailed(error);
+                }
+                return;
+            }
+                       
+            if (!totalData) {
+                WXLogError(@"Connection to %@ but no data return", request.URL);
+                if (weakSelf.onFailed) {
+                    weakSelf.onFailed(error);
+                }
+                return;
+            }
                    
             NSString *script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
             weakSelf.networkTime = -[networkStart timeIntervalSinceNow];
