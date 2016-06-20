@@ -87,7 +87,7 @@
     return (int)(count);
 }
 
-- (void)_calculatedFrameDidChange
+- (void)_frameDidCalculated
 {
     WXAssertComponentThread();
 }
@@ -111,7 +111,7 @@
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
         _calculatedFrame = newFrame;
         [self _recomputeBorderRadius];
-        [self _calculatedFrameDidChange];
+        [self _frameDidCalculated];
         [dirtyComponents addObject:self];
     }
     

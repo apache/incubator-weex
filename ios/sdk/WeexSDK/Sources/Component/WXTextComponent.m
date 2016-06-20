@@ -324,10 +324,8 @@ do {\
     return textStorage;
 }
 
-- (void)_calculatedFrameDidChange
+- (void)_frameDidCalculated
 {
-    [super _calculatedFrameDidChange];
-    
     CGFloat width = self.calculatedFrame.size.width - (_padding.left + _padding.right);
     _textStorage = [self textStorageWithWidth:width];
 }
