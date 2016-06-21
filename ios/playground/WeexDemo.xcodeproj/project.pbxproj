@@ -357,7 +357,7 @@
 				TargetAttributes = {
 					775BEE7A1C1E8ECC008D1629 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = E9NTP5L2G2;
+						DevelopmentTeam = J24N9CCW5B;
 					};
 					775BEE931C1E8ECC008D1629 = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -708,7 +708,7 @@
 					"$(inherited)",
 					"-licucore",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.taobao.WeexDemo-luics";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -737,7 +737,7 @@
 					"$(inherited)",
 					"-licucore",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.taobao.WeexDemo-luics";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";

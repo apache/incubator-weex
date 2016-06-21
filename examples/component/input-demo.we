@@ -1,0 +1,44 @@
+<template>
+  <scroller>
+    <wxc-panel title="input" type="primary">
+      <input
+        type="text"
+        placeholder="Text Input"
+        class="input"
+        autofocus="true"
+        value="{{txt}}"
+        onchange="onchange"
+        oninput="oninput"
+      />
+      <text>oninput: {{txt}}</text>
+      <text>onchange: {{txt}}</text>
+    </wxc-panel>
+  </scroller>
+</template>
+
+<style>
+  .input {
+    font-size: 60px;
+    height: 80px;
+    width: 400px;
+  }
+</style>
+
+<script>
+  require('weex-components');
+  module.exports = {
+    data: {
+      txt: ''
+    },
+    methods: {
+      onchange: function(event) {
+        this.txt = event.value;
+        console.log('onchange', event.value);
+      },
+      oninput: function(event) {
+        this.txt = event.value;
+        console.log('oninput', event.value);
+      }
+    }
+  };
+</script>
