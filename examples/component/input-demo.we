@@ -6,12 +6,12 @@
         placeholder="Text Input"
         class="input"
         autofocus="true"
-        value="{{txt}}"
+        value=""
         onchange="onchange"
         oninput="oninput"
       />
-      <text>oninput: {{txt}}</text>
-      <text>onchange: {{txt}}</text>
+      <text>oninput: {{txtInput}}</text>
+      <text>onchange: {{txtChange}}</text>
     </wxc-panel>
   </scroller>
 </template>
@@ -28,15 +28,16 @@
   require('weex-components');
   module.exports = {
     data: {
-      txt: ''
+      txtInput: '',
+      txtChange: ''
     },
     methods: {
       onchange: function(event) {
-        this.txt = event.value;
+        this.txtChange = event.value;
         console.log('onchange', event.value);
       },
       oninput: function(event) {
-        this.txt = event.value;
+        this.txtInput = event.value;
         console.log('oninput', event.value);
       }
     }
