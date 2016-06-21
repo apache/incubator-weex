@@ -166,7 +166,7 @@
     
     [self _removeAllEvents];
     
-    if(_positionType == WXPositionTypeSticky && self.ancestorScroller){
+    if(self.ancestorScroller){
         [self.ancestorScroller removeStickyComponent:self];
         [self.ancestorScroller removeScrollToListener:self];
     }
