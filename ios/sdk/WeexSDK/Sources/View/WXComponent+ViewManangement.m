@@ -166,12 +166,12 @@
     
     [self _removeAllEvents];
     
-    if(self.ancestorScroller){
+    if(_positionType == WXPositionTypeSticky && self.ancestorScroller){
         [self.ancestorScroller removeStickyComponent:self];
         [self.ancestorScroller removeScrollToListener:self];
     }
     
-    for (WXComponent *subcomponents in self.subcomponents) {
+    for (WXComponent *subcomponents in [self.subcomponents reverseObjectEnumerator]) {
         [subcomponents _unloadView];
     }
     
