@@ -92,11 +92,12 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     [[WXSDKManager bridgeMgr] callBack:self.weexInstance.instanceId funcId:progressCallback params:[WXUtility JSONString:callbackRsp] keepAlive:true];
     
     id<WXNetworkProtocol> networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
+    __block NSString *respEncode = nil;
     [networkHandler sendRequest:request
                 withSendingData:^(int64_t bytesSent, int64_t totalBytes) {
                 } withResponse:^(NSURLResponse *response) {
                     httpResponse = (NSHTTPURLResponse*)response;
-                    
+                    respEncode = httpResponse.textEncodingName;
                     [callbackRsp setObject:@{ @"HEADERS_RECEIVED" : @2  } forKey:@"readyState"];
                     [callbackRsp setObject:[NSNumber numberWithInteger:httpResponse.statusCode] forKey:@"status"];
                     [callbackRsp setObject:httpResponse.allHeaderFields forKey:@"headers"];
@@ -122,7 +123,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
                     [callbackRsp removeObjectForKey:@"readyState"];
                     [callbackRsp removeObjectForKey:@"length"];
                     [callbackRsp removeObjectForKey:@"keepalive"];
-                    [callbackRsp setObject:httpResponse.statusCode >= 200 && httpResponse.statusCode <= 299?@true : @false forKey:@"ok"];
+                    [callbackRsp setObject:httpResponse.statusCode >= 200 && httpResponse.statusCode <= 299 ? @true : @false forKey:@"ok"];
                     if (error) {
                         //error
                         [callbackRsp setObject:@(-1) forKey:@"status"];
@@ -142,10 +143,18 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
                     }else {
                         // no error
                         NSString *responseData = nil;
-                        responseData = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
-                        [callbackRsp setObject:responseData forKey:@"data"];
+                        if (!respEncode) {
+                            respEncode = @"utf-8";
+                        }
+                        CFStringEncoding *cfStrEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef) respEncode);
+                        if (cfStrEncoding == kCFStringEncodingInvalidId) {
+                            WXLogError(@"not supported encode");
+                        } else {
+                            NSStringEncoding encoding = CFStringConvertEncodingToNSStringEncoding(cfStrEncoding);
+                            responseData = [[NSString alloc]initWithData:totalData encoding:encoding];
+                            [callbackRsp setObject:responseData forKey:@"data"];
+                        }
                     }
-                    
                     callback([WXUtility JSONString:callbackRsp]);
                 }];
 }
