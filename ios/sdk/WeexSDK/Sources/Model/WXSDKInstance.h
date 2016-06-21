@@ -187,7 +187,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSString *pageName;
 @property (nonatomic, strong) NSDictionary *properties;
 @property (nonatomic, weak) id pageObject;
-
+@property (nonatomic, assign) NSTimeInterval networkTime;
 
 - (void)finishPerformance;
 

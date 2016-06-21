@@ -14,7 +14,6 @@
 
 //performance
 @property (nonatomic, strong) NSDate *renderStartDate;
-@property (nonatomic, assign) NSTimeInterval networkTime;
 @property (nonatomic, assign) NSTimeInterval communicateTime;
 extern NSTimeInterval JSLibInitTime;
 @property (nonatomic, assign) NSTimeInterval screenRenderTime;
