@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.weex.R;
@@ -48,7 +49,11 @@ public abstract class WXBaseNavActivity extends WXBaseActivity implements IWXRen
         ViewGroup viewById = (ViewGroup) getWindow().getDecorView().findViewById(android.R.id.content);
         LayoutInflater flater = LayoutInflater.from(this);
         View toolbar_page = flater.inflate(R.layout.widget_toolbar, null);
-        ((ViewGroup)(viewById.getChildAt(0))).addView(toolbar_page,0);
+        Toolbar toolbar = (Toolbar) toolbar_page.findViewById(R.id.toolbar);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
+                                                                         .MATCH_PARENT,
+                                                                     toolbar.getLayoutParams().height);
+        ((ViewGroup)(viewById.getChildAt(0))).addView(toolbar_page,0,lp);
     }
 
     private void initToolbar() {
