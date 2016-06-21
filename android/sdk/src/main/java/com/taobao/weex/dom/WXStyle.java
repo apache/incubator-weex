@@ -345,6 +345,7 @@ public class WXStyle extends ConcurrentHashMap<String, Object> {
     int lineHeight = WXUtils.getInt(style.get(WXDomPropConstant.WX_TEXT_LINE_HEIGHT));
     if (lineHeight <= 0) {
       lineHeight = UNSET;
+      return lineHeight;
     }
     return (int) WXViewUtils.getRealPxByWidth(lineHeight);
   }
