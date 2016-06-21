@@ -12,7 +12,7 @@
 #import "NSArray+Weex.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
-#import "WXSDKInstance.h"
+#import "WXSDKInstance_private.h"
 
 @interface WXTableView : UITableView
 
@@ -162,7 +162,7 @@
     
     [_completedCells removeObject:cell];
     
-    WXLogInfo(@"Delete cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
+    WXLogVerbose(@"Delete cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
     [UIView performWithoutAnimation:^{
         [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
     }];
@@ -192,12 +192,12 @@
     
     if (![_completedCells containsObject:cell]) {
         [_completedCells addObject:cell];
-        WXLogInfo(@"Insert cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
+        WXLogVerbose(@"Insert cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
         [UIView performWithoutAnimation:^{
             [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }];
     } else {
-        WXLogInfo(@"Reload cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
+        WXLogVerbose(@"Reload cell:%@ at row:%ld", cell.ref, (long)indexPath.row);
         [UIView performWithoutAnimation:^{
             [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         }];
@@ -275,7 +275,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    WXLogInfo(@"Getting cell at row:%ld", (long)indexPath.row);
+    WXLogVerbose(@"Getting cell at row:%ld", (long)indexPath.row);
     static NSString *reuseIdentifier = @"WXTableViewCell";
     
     UITableViewCell *cellView = [_tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
@@ -301,7 +301,7 @@
     
     [cellView.contentView addSubview:cell.view];
     
-    WXLogInfo(@"Created cell:%@ view:%@ cellView:%@ at row:%ld", cell.ref, cell.view, cellView, (long)indexPath.row);
+    WXLogVerbose(@"Created cell:%@ view:%@ cellView:%@ at row:%ld", cell.ref, cell.view, cellView, (long)indexPath.row);
     
     return cellView;
 }

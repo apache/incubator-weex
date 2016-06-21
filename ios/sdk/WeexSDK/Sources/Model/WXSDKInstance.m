@@ -174,6 +174,8 @@ NSTimeInterval JSLibInitTime = 0;
     });
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:source options:dictionary data:data];
+    
+    self.JSTemplateSize = [source lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
 }
 
 - (void)setFrame:(CGRect)frame
@@ -263,9 +265,11 @@ NSTimeInterval JSLibInitTime = 0;
     NSDictionary* dict = @{BIZTYPE:self.bizType,
                            PAGENAME:self.pageName,
                            WXSDKVERSION:WX_SDK_VERSION,
+                           JSLIBVERSION:WX_JS_FRAMEWORK_VERSION,
                            NETWORKTIME:@(_networkTime * 1000),
                            COMMUNICATETIME:[NSNumber numberWithDouble:_communicateTime * 1000],
                            JSLIBINITTIME:[NSNumber numberWithDouble:JSLibInitTime * 1000],
+                           JSTEMPLATESIZE:@(self.JSTemplateSize),
                            SCREENRENDERTIME:[NSNumber numberWithDouble:(_screenRenderTime > 0 ? _screenRenderTime : totalTime) * 1000],
                            TOTALTIME:[NSNumber numberWithDouble:totalTime * 1000]
                            };

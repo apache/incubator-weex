@@ -11,11 +11,14 @@
 #define BIZTYPE             @"bizType"
 #define PAGENAME            @"pageName"
 #define WXSDKVERSION        @"WXSDKVersion"
+#define JSLIBVERSION        @"JSLibVersion"
 #define JSLIBINITTIME       @"JSLibInitTime"
+#define JSTEMPLATESIZE      @"JSTemplateSize"
 #define NETWORKTIME         @"networkTime"
 #define COMMUNICATETIME     @"communicateTime"
 #define SCREENRENDERTIME    @"screenRenderTime"
 #define TOTALTIME           @"totalTime"
+
 
 @protocol WXAppMonitorProtocol <WXModuleProtocol>
 

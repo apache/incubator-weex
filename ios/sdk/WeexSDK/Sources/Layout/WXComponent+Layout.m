@@ -219,9 +219,9 @@ do {\
 
 - (void)_fillAbsolutePositions
 {
-    CGPoint absolutePostion = self.absolutePosition;
+    CGPoint absolutePosition = self.absolutePosition;
     for (WXComponent *subcomponent in self.subcomponents) {
-        subcomponent.absolutePosition = CGPointMake(absolutePostion.x + subcomponent.calculatedFrame.origin.x, absolutePostion.y + subcomponent.calculatedFrame.origin.y);
+        subcomponent.absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
         [subcomponent _fillAbsolutePositions];
     }
 }

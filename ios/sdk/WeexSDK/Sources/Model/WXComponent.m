@@ -204,7 +204,18 @@
             }
         }
         
+        [self handleFirstScreenTime];
+        
         return _view;
+    }
+}
+
+- (void)handleFirstScreenTime
+{
+    if (self.absolutePosition.y > self.weexInstance.rootView.frame.size.height) {
+        if (self.weexInstance.screenRenderTime == 0) {
+            self.weexInstance.screenRenderTime = [[NSDate new] timeIntervalSinceDate:self.weexInstance.renderStartDate];
+        }
     }
 }
 
