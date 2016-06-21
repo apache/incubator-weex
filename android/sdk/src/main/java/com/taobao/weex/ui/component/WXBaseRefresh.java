@@ -252,7 +252,7 @@ public class WXBaseRefresh extends WXVContainer {
                 ((BaseBounceView) getParent().getView()).finishPullRefresh();
                 ((BaseBounceView) getParent().getView()).finishPullLoad();
               }
-            }, 2000);
+            }, 500);
           }
         }
       }

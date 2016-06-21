@@ -204,15 +204,15 @@
  */
 package com.taobao.weex.ui.view.refresh.core;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import com.taobao.weex.ui.view.refresh.circlebar.CircleProgressBar;
 
 public class WXRefreshView extends FrameLayout {
 
@@ -234,15 +234,6 @@ public class WXRefreshView extends FrameLayout {
     setupViews();
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public WXRefreshView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    setupViews();
-  }
-
-  /**
-   * 添加View
-   */
   private void setupViews() {
     linearLayout = new LinearLayout(getContext());
     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams
@@ -286,27 +277,18 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
-  /**
-   * 开始动画
-   */
   public void start() {
     if (circleProgressBar != null) {
       circleProgressBar.start();
     }
   }
 
-  /**
-   * 设置动画起始位置
-   */
   public void setStartEndTrim(float startAngle, float endAngle) {
     if (circleProgressBar != null) {
       circleProgressBar.setStartEndTrim(startAngle, endAngle);
     }
   }
 
-  /**
-   * 停止动画
-   */
   public void stop() {
     if (circleProgressBar != null) {
       circleProgressBar.stop();

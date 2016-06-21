@@ -209,6 +209,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.view.refresh.core.WXRefreshView;
 import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
@@ -217,7 +218,7 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeLayout swipeLayout;
-    protected T innerView;
+    private T innerView;
 
 
     public BaseBounceView(Context context,int orientation) {
@@ -332,11 +333,20 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         }
     }
 
-    public abstract WXSwipeLayout createBounceView(Context context);
+    private WXSwipeLayout createBounceView(Context context) {
+        swipeLayout = new WXSwipeLayout(context);
+        swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        innerView = setInnerView(context);
+        swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        return swipeLayout;
+    }
 
     public T getInnerView() {
         return innerView;
     }
+
+    public abstract T setInnerView(Context context);
 
     /**
      *

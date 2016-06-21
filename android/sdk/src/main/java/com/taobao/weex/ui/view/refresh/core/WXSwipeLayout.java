@@ -139,6 +139,8 @@ import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -166,62 +168,69 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     void onLoading();
   }
 
-  private static final int LOADING_VIEW_FINAL_HEIGHT_DP = 80;
+  static class WXRefreshAnimatorListener implements Animator.AnimatorListener {
 
-  private static final int ACTION_PULL_DOWN_REFRESH = 0;
-  private static final int ACTION_PULL_UP_LOAD_MORE = 1;
+    @Override
+    public void onAnimationStart(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
+
+    }
+  }
 
   private WXRefreshView headerView;
   private WXRefreshView footerView;
-  private View mContentView;
+  private View mTargetView;
 
-  //是否支持下拉刷新
+  private static final int REFRESH_VIEW_HEIGHT = 80;
+  private static final int PULL_REFRESH = 0;
+  private static final int LOAD_MORE = 1;
+
+  // Enable PullRefresh and Loadmore
   private boolean mPullRefreshEnable = false;
-
-  //是否支持上拉加载更多
   private boolean mPullLoadEnable = false;
 
-  //上一次触摸的Y位置
+  // Last TouchEvent Y Position
   private float preY;
   private float preX;
 
-  //是否正在进行刷新操作
-  private boolean isRefreshing = false;
+  // Is Refreshing
+  private boolean mRefreshing = false;
 
-  //加载视图最终展示的高度
-  private float loadingViewFinalHeight = 0;
+  // RefreshView Height
+  private float loadingViewHeight = 0;
 
-  //加载视图回弹的高度
-  private float loadingViewOverHeight = 0;
+  // RefreshView Over Flow Height
+  private float refreshViewFlowHeight = 0;
 
-  private boolean actionDetermined = false;
+  // Is Drag
+  private boolean isDrag = false;
+  // Drag Action
   private int mCurrentAction = -1;
 
-  //LoadView背景颜色
-  private int mLoadViewBgColor;
-
-  //进度条背景颜色
+  // RefreshView Attrs
+  private int mRefreshViewBgColor;
   private int mProgressBgColor;
-
-  //进度条颜色
   private int mProgressColor;
 
-  //LoadView文字颜色
-  private int mLoadViewTextColor;
-
-  //下拉刷新文字描述
-  private String mPullRefreshText;
-
-  //上拉加载文字描述
-  private String mPullLoadText;
-
-  //点击移动距离的误差值（点击操作可能会导致轻微的滑动）
-  private static final int CLICK_TOUCH_DEVIATION = 4;
+  private static final int CLICK_FAULT_TOLERABT = 3;
 
   public WXSwipeLayout(Context context) {
     super(context);
     initAttrs(context, null);
-
   }
 
   public WXSwipeLayout(Context context, AttributeSet attrs) {
@@ -240,28 +249,22 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     initAttrs(context, attrs);
   }
 
-  /**
-   * 初始化控件属性
-   */
   private void initAttrs(Context context, AttributeSet attrs) {
 
     if (getChildCount() > 1) {
-      throw new RuntimeException("SwipeLayout should not have more than one child");
+      throw new RuntimeException("WXSwipeLayout should not have more than one child");
     }
 
-    loadingViewFinalHeight = WXDipUtils.dipToPx(context, LOADING_VIEW_FINAL_HEIGHT_DP);
-    loadingViewOverHeight = loadingViewFinalHeight * 2;
+    loadingViewHeight = dipToPx(context, REFRESH_VIEW_HEIGHT);
+    refreshViewFlowHeight = loadingViewHeight * 2;
 
     if (isInEditMode() && attrs == null) {
       return;
     }
 
-    mLoadViewBgColor = Color.TRANSPARENT;
-    mLoadViewTextColor = Color.BLACK;
+    mRefreshViewBgColor = Color.TRANSPARENT;
     mProgressBgColor = Color.TRANSPARENT;
     mProgressColor = Color.RED;
-    mPullRefreshText = "";
-    mPullLoadText = "";
 
     mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
     mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
@@ -271,27 +274,27 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   @Override
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-    mContentView = getChildAt(0);
+    mTargetView = getChildAt(0);
     setupViews();
   }
 
   private void setupViews() {
-    //下拉刷新视图
+    // SetUp HeaderView
     FrameLayout.LayoutParams lp;
     lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0);
     headerView = new WXRefreshView(getContext());
     headerView.setStartEndTrim(0, 0.75f);
-    headerView.setBackgroundColor(mLoadViewBgColor);
+    headerView.setBackgroundColor(mRefreshViewBgColor);
     headerView.setProgressBgColor(mProgressBgColor);
     headerView.setProgressColor(mProgressColor);
     addView(headerView, lp);
 
-    //上拉加载更多视图
+    // SetUp FooterView
     lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 0);
     lp.gravity = Gravity.BOTTOM;
     footerView = new WXRefreshView(getContext());
     footerView.setStartEndTrim(0.5f, 1.25f);
-    footerView.setBackgroundColor(mLoadViewBgColor);
+    footerView.setBackgroundColor(mRefreshViewBgColor);
     footerView.setProgressBgColor(mProgressBgColor);
     footerView.setProgressColor(mProgressColor);
     addView(footerView, lp);
@@ -299,7 +302,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    if ((!mPullRefreshEnable && !mPullLoadEnable) || isRefreshing) {
+    if ((!mPullRefreshEnable && !mPullLoadEnable) || mRefreshing) {
       return super.onInterceptTouchEvent(ev);
     }
 
@@ -307,7 +310,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       case MotionEvent.ACTION_DOWN: {
         preY = ev.getY();
         preX = ev.getX();
-        actionDetermined = false;
+        isDrag = false;
         return super.onInterceptTouchEvent(ev);
       }
 
@@ -318,13 +321,13 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         float dx = currentX - preX;
         preY = currentY;
         preX = currentX;
-        if (!actionDetermined) {
-          actionDetermined = true;
-          //判断是下拉刷新还是上拉加载更多
+        if (!isDrag) {
+          isDrag = true;
+          // Make a Decision of Action
           if (dy > 0 && !canChildScrollUp() && mPullRefreshEnable) {
-            mCurrentAction = ACTION_PULL_DOWN_REFRESH;
+            mCurrentAction = PULL_REFRESH;
           } else if (dy < 0 && !canChildScrollDown() && mPullLoadEnable) {
-            mCurrentAction = ACTION_PULL_UP_LOAD_MORE;
+            mCurrentAction = LOAD_MORE;
           } else {
             mCurrentAction = -1;
           }
@@ -345,7 +348,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if ((!mPullRefreshEnable && !mPullLoadEnable) || isRefreshing) {
+    if ((!mPullRefreshEnable && !mPullLoadEnable) || mRefreshing) {
       return false;
     }
 
@@ -375,13 +378,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-    return isEnabled() && !isRefreshing
+    return isEnabled() && !mRefreshing
            && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
   }
 
   @Override
   public void onNestedScrollAccepted(View child, View target, int axes) {
-    // Reset the counter of how much leftover scroll needs to be consumed.
     mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
     // Dispatch up to the nested parent
     startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
@@ -391,8 +393,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   @Override
   public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-    // If we are in the middle of consuming, a scroll, then we want to move the spinner back up
-    // before allowing the list to scroll
     if (mTotalUnconsumed > 0) {
       if (dy > mTotalUnconsumed) {
         consumed[1] = dy - (int) mTotalUnconsumed;
@@ -402,11 +402,11 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         consumed[1] = dy;
       }
 
-      //判断是下拉刷新还是上拉加载更多
+      // Make a Decision of Action
       if (mTotalUnconsumed > 0 && !canChildScrollUp() && mPullRefreshEnable) {
-        mCurrentAction = ACTION_PULL_DOWN_REFRESH;
+        mCurrentAction = PULL_REFRESH;
       } else if (mTotalUnconsumed < 0 && !canChildScrollDown() && mPullLoadEnable) {
-        mCurrentAction = ACTION_PULL_UP_LOAD_MORE;
+        mCurrentAction = LOAD_MORE;
       } else {
         mCurrentAction = -1;
       }
@@ -430,8 +430,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   public void onStopNestedScroll(View target) {
     mNestedScrollingParentHelper.onStopNestedScroll(target);
     mNestedScrollInProgress = false;
-    // Finish the spinner for nested scrolling if we ever consumed any
-    // unconsumed nested scroll
     if (mTotalUnconsumed > 0) {
       releaseTouch();
       mTotalUnconsumed = 0;
@@ -447,20 +445,15 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed,
                          mParentOffsetInWindow);
 
-    // This is a bit of a hack. Nested scrolling works from the bottom up, and as we are
-    // sometimes between two nested scrolling views, we need a way to be able to know when any
-    // nested scrolling parent has stopped handling events. We do that by using the
-    // 'offset in window 'functionality to see if we have been moved from the event.
-    // This is a decent indication of whether we should take over the event stream or not.
     final int dy = dyUnconsumed + mParentOffsetInWindow[1];
     mTotalUnconsumed += Math.abs(dy);
     moveNestedSpinner(mTotalUnconsumed);
 
-    //判断是下拉刷新还是上拉加载更多
+    // Make a Decision of Action
     if (mTotalUnconsumed > 0 && !canChildScrollUp() && mPullRefreshEnable) {
-      mCurrentAction = ACTION_PULL_DOWN_REFRESH;
+      mCurrentAction = PULL_REFRESH;
     } else if (mTotalUnconsumed < 0 && !canChildScrollDown() && mPullLoadEnable) {
-      mCurrentAction = ACTION_PULL_UP_LOAD_MORE;
+      mCurrentAction = LOAD_MORE;
     } else {
       mCurrentAction = -1;
     }
@@ -525,51 +518,46 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     return mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY);
   }
 
-  /**
-   * 处理滚动
-   */
   private boolean moveSpinner(float distanceY) {
 
-    if (!canChildScrollUp() && mCurrentAction == ACTION_PULL_DOWN_REFRESH &&
+    if (!canChildScrollUp() && mCurrentAction == PULL_REFRESH &&
         mPullRefreshEnable) {
       //下拉刷新
       LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
       lp.height += distanceY;
       if (lp.height < 0) {
         lp.height = 0;
-      } else if (lp.height > loadingViewOverHeight) {
-        lp.height = (int) loadingViewOverHeight;
+      } else if (lp.height > refreshViewFlowHeight) {
+        lp.height = (int) refreshViewFlowHeight;
       }
       headerView.setLayoutParams(lp);
-      if (lp.height < loadingViewOverHeight) {
-        //                headerView.setLoadText(TextUtils.isEmpty(mPullRefreshText) ?
-        //                        getContext().getString(R.string.default_pull_refresh_text) : mPullRefreshText);
+      if (lp.height < refreshViewFlowHeight) {
+        //TODO updateLoadText
       } else {
-        //                headerView.setLoadText(getContext().getString(R.string.release_to_refresh));
+        //TODO updateLoadText
       }
-      headerView.setProgressRotation(lp.height / loadingViewOverHeight);
+      headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       adjustContentViewHeight(lp.height);
       if (lp.height > 0) {
         return true;
       }
 
-    } else if (!canChildScrollDown() && mCurrentAction == ACTION_PULL_UP_LOAD_MORE && mPullLoadEnable) {
+    } else if (!canChildScrollDown() && mCurrentAction == LOAD_MORE && mPullLoadEnable) {
       //上拉加载更多
       LayoutParams lp = (LayoutParams) footerView.getLayoutParams();
       lp.height -= distanceY;
       if (lp.height < 0) {
         lp.height = 0;
-      } else if (lp.height > loadingViewOverHeight) {
-        lp.height = (int) loadingViewOverHeight;
+      } else if (lp.height > refreshViewFlowHeight) {
+        lp.height = (int) refreshViewFlowHeight;
       }
       footerView.setLayoutParams(lp);
-      if (lp.height < loadingViewOverHeight) {
-        //                footerView.setLoadText(TextUtils.isEmpty(mPullLoadText) ?
-        //                        getContext().getString(R.string.default_pull_load_text) : mPullLoadText);
+      if (lp.height < refreshViewFlowHeight) {
+        //TODO updateLoadText
       } else {
-        //                footerView.setLoadText(getContext().getString(R.string.release_to_load));
+        //TODO updateLoadText
       }
-      footerView.setProgressRotation(lp.height / loadingViewOverHeight);
+      footerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       adjustContentViewHeight(-lp.height);
       if (lp.height > 0) {
         return true;
@@ -582,22 +570,20 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
     if (!canChildScrollUp() &&
         mPullRefreshEnable) {
-      //下拉刷新
       LayoutParams lp = (LayoutParams) headerView.getLayoutParams();
       lp.height = (int) distanceY;
       if (lp.height < 0) {
         lp.height = 0;
-      } else if (lp.height > loadingViewOverHeight) {
-        lp.height = (int) loadingViewOverHeight;
+      } else if (lp.height > refreshViewFlowHeight) {
+        lp.height = (int) refreshViewFlowHeight;
       }
       headerView.setLayoutParams(lp);
-      if (lp.height < loadingViewOverHeight) {
-        //                headerView.setLoadText(TextUtils.isEmpty(mPullRefreshText) ?
-        //                        getContext().getString(R.string.default_pull_refresh_text) : mPullRefreshText);
+      if (lp.height < refreshViewFlowHeight) {
+        //TODO updateLoadText
       } else {
-        //                headerView.setLoadText(getContext().getString(R.string.release_to_refresh));
+        //TODO updateLoadText
       }
-      headerView.setProgressRotation(lp.height / loadingViewOverHeight);
+      headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       adjustContentViewHeight(lp.height);
       if (lp.height > 0) {
         return true;
@@ -608,38 +594,34 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   private void adjustContentViewHeight(float h) {
-    mContentView.setTranslationY(h);
+    mTargetView.setTranslationY(h);
   }
 
   private boolean releaseTouch() {
 
     boolean result = false;
     LayoutParams lp;
-    if (mPullRefreshEnable && mCurrentAction == ACTION_PULL_DOWN_REFRESH) {
+    if (mPullRefreshEnable && mCurrentAction == PULL_REFRESH) {
       lp = (LayoutParams) headerView.getLayoutParams();
-      if (lp.height >= loadingViewOverHeight) {
-        //触发下拉刷新
+      if (lp.height >= refreshViewFlowHeight) {
         startPullDownRefresh(lp.height);
         result = true;
       } else if (lp.height > 0) {
-        //未满足下拉刷新触发条件，重置状态
         resetPullDownRefresh(lp.height);
-        result = lp.height >= CLICK_TOUCH_DEVIATION;
+        result = lp.height >= CLICK_FAULT_TOLERABT;
       } else {
         resetPullRefreshState();
       }
     }
 
-    if (mPullLoadEnable && mCurrentAction == ACTION_PULL_UP_LOAD_MORE) {
+    if (mPullLoadEnable && mCurrentAction == LOAD_MORE) {
       lp = (LayoutParams) footerView.getLayoutParams();
-      if (lp.height >= loadingViewOverHeight) {
-        //触发上拉加载更多
+      if (lp.height >= refreshViewFlowHeight) {
         startPullUpLoadMore(lp.height);
         result = true;
       } else if (lp.height > 0) {
-        //未满足上拉加载更多触发条件，重置状态
         resetPullUpLoadMore(lp.height);
-        result = lp.height >= CLICK_TOUCH_DEVIATION;
+        result = lp.height >= CLICK_FAULT_TOLERABT;
       } else {
         resetPullLoadState();
       }
@@ -648,8 +630,8 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   private void startPullDownRefresh(int headerViewHeight) {
-    isRefreshing = true;
-    ValueAnimator animator = ValueAnimator.ofFloat(headerViewHeight, loadingViewFinalHeight);
+    mRefreshing = true;
+    ValueAnimator animator = ValueAnimator.ofFloat(headerViewHeight, loadingViewHeight);
     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
@@ -663,8 +645,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       @Override
       public void onAnimationEnd(Animator animation) {
         headerView.start();
-        //                headerView.setLoadText(getContext().getString(R.string.refresh_text));
-
+        //TODO updateLoadText
         if (onRefreshListener != null) {
           onRefreshListener.onRefresh();
         }
@@ -674,11 +655,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     animator.start();
   }
 
-  /**
-   * 重置下拉刷新状态
-   *
-   * @param headerViewHeight 当前下拉刷新视图的高度
-   */
   private void resetPullDownRefresh(int headerViewHeight) {
     headerView.stop();
     headerView.setStartEndTrim(0, 0.75f);
@@ -705,16 +681,15 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
 
   private void resetPullRefreshState() {
     //重置动画结束才算完全完成刷新动作
-    isRefreshing = false;
-    actionDetermined = false;
+    mRefreshing = false;
+    isDrag = false;
     mCurrentAction = -1;
-    //        headerView.setLoadText(TextUtils.isEmpty(mPullRefreshText) ?
-    //                getContext().getString(R.string.default_pull_refresh_text) : mPullRefreshText);
+    //TODO updateLoadText
   }
 
   private void startPullUpLoadMore(int headerViewHeight) {
-    isRefreshing = true;
-    ValueAnimator animator = ValueAnimator.ofFloat(headerViewHeight, loadingViewFinalHeight);
+    mRefreshing = true;
+    ValueAnimator animator = ValueAnimator.ofFloat(headerViewHeight, loadingViewHeight);
     animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
       public void onAnimationUpdate(ValueAnimator animation) {
@@ -728,8 +703,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
       @Override
       public void onAnimationEnd(Animator animation) {
         footerView.start();
-        //                footerView.setLoadText(getContext().getString(R.string.load_text));
-
+        //TODO updateLoadText
         if (onLoadingListener != null) {
           onLoadingListener.onLoading();
         }
@@ -739,11 +713,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     animator.start();
   }
 
-  /**
-   * 重置上拉加载状态
-   *
-   * @param headerViewHeight 当前上拉加载视图的高度
-   */
   private void resetPullUpLoadMore(int headerViewHeight) {
     footerView.stop();
     footerView.setStartEndTrim(0.5f, 1.25f);
@@ -769,45 +738,37 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   private void resetPullLoadState() {
-    //重置动画结束才算完全完成刷新动作
-    isRefreshing = false;
-    actionDetermined = false;
+    mRefreshing = false;
+    isDrag = false;
     mCurrentAction = -1;
-    //        footerView.setLoadText(TextUtils.isEmpty(mPullLoadText) ?
-    //                getContext().getString(R.string.default_pull_load_text) : mPullLoadText);
+    //TODO updateLoadText
   }
 
-  /**
-   * @return 子视图是否可以下拉
-   */
   public boolean canChildScrollUp() {
-    if (mContentView == null) {
+    if (mTargetView == null) {
       return false;
     }
     if (Build.VERSION.SDK_INT < 14) {
-      if (mContentView instanceof AbsListView) {
-        final AbsListView absListView = (AbsListView) mContentView;
+      if (mTargetView instanceof AbsListView) {
+        final AbsListView absListView = (AbsListView) mTargetView;
         return absListView.getChildCount() > 0
                && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
                                                                     .getTop() < absListView.getPaddingTop());
       } else {
-        return ViewCompat.canScrollVertically(mContentView, -1) || mContentView.getScrollY() > 0;
+        return ViewCompat.canScrollVertically(mTargetView, -1) || mTargetView.getScrollY() > 0;
       }
     } else {
-      return ViewCompat.canScrollVertically(mContentView, -1);
+      return ViewCompat.canScrollVertically(mTargetView, -1);
     }
   }
 
-  /**
-   * @return 子视图是否可以上划
-   */
   public boolean canChildScrollDown() {
-    if (mContentView == null) {
+    if (mTargetView == null) {
       return false;
     }
     if (Build.VERSION.SDK_INT < 14) {
-      if (mContentView instanceof AbsListView) {
-        final AbsListView absListView = (AbsListView) mContentView;
+      if (mTargetView instanceof AbsListView) {
+        final AbsListView absListView = (AbsListView) mTargetView;
         if (absListView.getChildCount() > 0) {
           int lastChildBottom = absListView.getChildAt(absListView.getChildCount() - 1)
               .getBottom();
@@ -818,11 +779,16 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
         }
 
       } else {
-        return ViewCompat.canScrollVertically(mContentView, 1) || mContentView.getScrollY() > 0;
+        return ViewCompat.canScrollVertically(mTargetView, 1) || mTargetView.getScrollY() > 0;
       }
     } else {
-      return ViewCompat.canScrollVertically(mContentView, 1);
+      return ViewCompat.canScrollVertically(mTargetView, 1);
     }
+  }
+
+  public float dipToPx(Context context, float value) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, metrics);
   }
 
   public void setOnLoadingListener(WXOnLoadingListener onLoadingListener) {
@@ -833,20 +799,14 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     this.onRefreshListener = onRefreshListener;
   }
 
-  /**
-   * 完成下拉刷新
-   */
   public void finishPullRefresh() {
-    if (mCurrentAction == ACTION_PULL_DOWN_REFRESH) {
+    if (mCurrentAction == PULL_REFRESH) {
       resetPullDownRefresh(headerView == null ? 0 : headerView.getMeasuredHeight());
     }
   }
 
-  /**
-   * 完成上拉加载更多
-   */
   public void finishPullLoad() {
-    if (mCurrentAction == ACTION_PULL_UP_LOAD_MORE) {
+    if (mCurrentAction == LOAD_MORE) {
       resetPullUpLoadMore(footerView == null ? 0 : footerView.getMeasuredHeight());
     }
   }
@@ -876,6 +836,6 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
   }
 
   public boolean isRefreshing() {
-    return isRefreshing;
+    return mRefreshing;
   }
 }

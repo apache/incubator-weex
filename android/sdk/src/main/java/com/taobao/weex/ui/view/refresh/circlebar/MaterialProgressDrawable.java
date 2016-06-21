@@ -202,7 +202,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh.core;
+package com.taobao.weex.ui.view.refresh.circlebar;
 
 import android.content.Context;
 import android.content.res.Resources;

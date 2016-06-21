@@ -207,11 +207,9 @@ package com.taobao.weex.ui.view.refresh.wrapper;
 import android.content.Context;
 import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
-import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
@@ -228,7 +226,6 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
     public void setAdapter(RecyclerViewBaseAdapter adapter) {
         this.adapter = adapter;
         getInnerView().setAdapter(adapter);
-
     }
 
     public RecyclerViewBaseAdapter getAdapter() {
@@ -236,14 +233,9 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
     }
 
     @Override
-    public WXSwipeLayout createBounceView(Context context) {
-        swipeLayout = new WXSwipeLayout(context);
-        swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        innerView = new WXRecyclerView(context);
-        innerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
-        swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-
-        addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        return swipeLayout;
+    public WXRecyclerView setInnerView(Context context) {
+        WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
+        wxRecyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
+        return wxRecyclerView;
     }
 }

@@ -205,27 +205,20 @@
 package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
-import android.widget.FrameLayout;
 
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.view.WXScrollView;
-import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 
 public class BounceScrollerView extends BaseBounceView<WXScrollView> {
 
     public BounceScrollerView(Context context, int orientation,WXScroller waScroller) {
         super(context,orientation);
-        if (innerView != null)
-            innerView.setWAScroller(waScroller);
+        if (getInnerView() != null)
+            getInnerView().setWAScroller(waScroller);
     }
 
     @Override
-    public WXSwipeLayout createBounceView(Context context) {
-        swipeLayout = new WXSwipeLayout(context);
-        swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        innerView = new WXScrollView(context);
-        swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        return swipeLayout;
+    public WXScrollView setInnerView(Context context) {
+        return new WXScrollView(context);
     }
 }
