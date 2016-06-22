@@ -19,6 +19,7 @@
 #import "WXSDKError.h"
 #import "WXAssert.h"
 #import "WXSDKManager.h"
+#import "WXDebugTool.h"
 
 @interface WXBridgeContext ()
 
@@ -44,6 +45,7 @@
     if (self) {
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
+        _debugJS = [WXDebugTool isDebug];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jsError:) name:WX_JS_ERROR_NOTIFICATION_NAME object:nil];
     }
     return self;
