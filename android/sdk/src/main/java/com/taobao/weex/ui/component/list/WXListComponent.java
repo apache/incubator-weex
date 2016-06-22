@@ -439,9 +439,8 @@ public class WXListComponent extends WXVContainer implements
     @Override
     public void addChild(WXComponent child, int index) {
         super.addChild(child, index);
-        int adapterPosition = index == -1 ? getView().getAdapter().getItemCount() - 1 : index;
-        getView().getAdapter().notifyItemInserted(adapterPosition);
-        checkRefreshOrLoading(child);
+
+        int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
         if (child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)) {
             mAppearComponents.put(adapterPosition, child);
             child.registerAppearEvent = true;
@@ -455,6 +454,14 @@ public class WXListComponent extends WXVContainer implements
      */
     @Override
     protected void addSubView(View child, int index) {
+      BounceRecyclerView view =  getView();
+      if(view == null){
+        return;
+      }
+
+      int pos = index == -1 ?view.getAdapter().getItemCount()-1:index;
+      view.getAdapter().notifyItemInserted(pos);
+      checkRefreshOrLoading(mChildren.get(pos));
     }
 
     /**
