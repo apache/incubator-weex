@@ -43,7 +43,7 @@ android {
 //            moduleName "weexcore"
 //            cFlags "-I" + file(libsDir+"v8core").absolutePath
 //            ldLibs "log",libsDir + "libv8_base.a",libsDir + "libv8_snapshot.a"
-            abiFilters "armeabi"
+            abiFilters "armeabi","x86"
         }
     }
     buildTypes {
