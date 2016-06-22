@@ -376,25 +376,25 @@
 #pragma mark Layout
 
 /**
- *  @see WXComponents+Layout.m
+ *  @see WXComponent+Layout.m
  */
 
 #pragma mark View Management
 
 /**
- *  @see WXComponents+ViewManagement.m
+ *  @see WXComponent+ViewManagement.m
  */
 
 #pragma mark Events
 
 /**
- *  @see WXComponents+Events.m
+ *  @see WXComponent+Events.m
  */
 
 #pragma mark Display
 
 /**
- *  @see WXComponents+Display.m
+ *  @see WXComponent+Display.m
  */
 
 @end

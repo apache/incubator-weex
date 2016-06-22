@@ -6,7 +6,7 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXComponent+ViewManangement.h"
+#import "WXComponent+ViewManagement.h"
 #import "WXComponent_internal.h"
 #import "WXAssert.h"
 #import "WXView.h"
@@ -15,7 +15,7 @@
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
-@implementation WXComponent (ViewManangement)
+@implementation WXComponent (ViewManagement)
 
 #pragma mark Public
 
