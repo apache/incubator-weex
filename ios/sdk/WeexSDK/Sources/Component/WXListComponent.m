@@ -12,6 +12,7 @@
 #import "NSArray+Weex.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
+#import "NSObject+WXSwizzle.h"
 #import "WXSDKInstance_private.h"
 
 @interface WXTableView : UITableView
@@ -55,6 +56,7 @@
         _completedCells = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         
         [self fillPadding];
+        [self fixFlicker];
     }
     
     return self;
@@ -70,6 +72,7 @@
         }
     }
 }
+
 
 - (UIView *)loadView
 {
@@ -327,6 +330,24 @@
 {
     BOOL superNeedLoadMore = [super isNeedLoadMore];
     return superNeedLoadMore && _previousLoadMoreRowNumber != [self tableView:_tableView numberOfRowsInSection:0];
+}
+
+- (void)fixFlicker
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        //(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero after insert cells, any other more elegant way?
+        NSString *a = @"ntOffsetIfNe";
+        NSString *b = @"adjustConte";
+        
+        NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
+        [[self class] weex_swizzle:[WXTableView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
+    });
+}
+
+- (void)fixedFlickerSelector
+{
+    // DO NOT delete this method.
 }
 
 
