@@ -375,16 +375,10 @@ public class WXListComponent extends WXVContainer implements
               if (listeners != null && listeners.size() > 0) {
                 for (OnWXScrollListener listener : listeners) {
                   if (listener != null) {
-                    int tempState = RecyclerView.SCROLL_STATE_IDLE;
-                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                      newState = OnWXScrollListener.DRAGGING;
-                    } else if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-                      newState = OnWXScrollListener.SETTLING;
-                    }
                     View topView = recyclerView.getChildAt(0);
                     if (topView != null && listener != null) {
                       int y = topView.getTop();
-                      listener.onScrollStateChanged(recyclerView, 0, y, tempState);
+                      listener.onScrollStateChanged(recyclerView, 0, y, newState);
                     }
                   }
                 }
