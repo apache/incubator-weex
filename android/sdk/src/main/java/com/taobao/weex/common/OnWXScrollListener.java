@@ -127,6 +127,7 @@
  */
 package com.taobao.weex.common;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 
@@ -135,16 +136,16 @@ public interface OnWXScrollListener {
   /**
    * The  view is not currently scrolling.
    */
-  int IDLE = 0;
+  int IDLE = RecyclerView.SCROLL_STATE_IDLE;
   /**
    * The view is currently being dragged by outside input such as user touch input.
    */
-  int DRAGGING = IDLE + 1;
+  int DRAGGING = RecyclerView.SCROLL_STATE_DRAGGING;
   /**
    * The view is currently animating to a final position while not under
    * outside control.
    */
-  int SETTLING = DRAGGING + 1;
+  int SETTLING = RecyclerView.SCROLL_STATE_SETTLING;
 
   /**
    * Callback method to be invoked when the view has been scrolled. This will be
