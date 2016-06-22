@@ -345,6 +345,7 @@ public class WXPerformance {
     quotas.put("templateLoadTime", (double)templateLoadTime);
     quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
     quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
+    quotas.put("firstScreenJSFExecuteTime",(double)firstScreenCreateInstanceTime);
     return quotas;
   }
 
