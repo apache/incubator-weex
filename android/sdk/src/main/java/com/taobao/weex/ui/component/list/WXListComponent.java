@@ -441,10 +441,14 @@ public class WXListComponent extends WXVContainer implements
         super.addChild(child, index);
 
         int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
-        if (child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)) {
-            mAppearComponents.put(adapterPosition, child);
-            child.registerAppearEvent = true;
-        }
+      BounceRecyclerView view =  getView();
+      if(view != null) {
+        view.getAdapter().notifyItemInserted(adapterPosition);
+      }
+      if (child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)) {
+          mAppearComponents.put(adapterPosition, child);
+          child.registerAppearEvent = true;
+      }
     }
 
     /**
@@ -460,7 +464,6 @@ public class WXListComponent extends WXVContainer implements
       }
 
       int pos = index == -1 ?view.getAdapter().getItemCount()-1:index;
-      view.getAdapter().notifyItemInserted(pos);
       checkRefreshOrLoading(mChildren.get(pos));
     }
 
