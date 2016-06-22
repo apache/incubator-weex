@@ -285,6 +285,37 @@
     }
 }
 
+- (CGSize (^)(CGSize))measureBlock
+{
+    __weak typeof(self) weakSelf = self;
+    return ^CGSize (CGSize constrainedSize) {
+        
+        CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:nil];
+        //TODO:more elegant way to use max and min constrained size
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
+            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
+            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        }
+        
+        return (CGSize) {
+            WXCeilPixelValue(computedSize.width),
+            WXCeilPixelValue(computedSize.height)
+        };
+    };
+}
+
+
 #pragma mark -
 #pragma mark UITextFieldDelegate
 
