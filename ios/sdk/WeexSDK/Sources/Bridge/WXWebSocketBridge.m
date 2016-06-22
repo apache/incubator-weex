@@ -97,14 +97,16 @@
 -(void)_evaluateNative:(NSString *)data
 {
     NSDictionary *dict = [WXUtility objectFromJSON:data];
-    NSString *method = [dict objectForKey:@"method"];
-    NSArray *args = [dict objectForKey:@"arguments"];
+    //[dict objectForKey:@"method"] return @"WxDebug.method"
+//    NSString *originMethod = [dict objectForKey:@"method"];
+    NSString *method = [[dict objectForKey:@"method"] substringFromIndex:8];
+    NSDictionary *args = [dict objectForKey:@"params"];
     
     if ([method isEqualToString:@"callNative"]) {
         // call native
-        NSString *instanceId = args[0];
-        NSArray *methods = args[1];
-        NSString *callbackId = args[2];
+        NSString *instanceId = args[@"instance"];
+        NSArray *methods = args[@"tasks"];
+        NSString *callbackId = args[@"callback"];
         
         // params parse
         if(!methods || methods.count <= 0){
@@ -113,25 +115,50 @@
         //call native
         WXLogVerbose(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
         _nativeCallBlock(instanceId, methods, callbackId);
-    } else if ([method isEqualToString:@"setLogLevel"]) {
+    } /*else if ([method isEqualToString:@"setLogLevel"]) {
         NSString *levelString = [args firstObject];
         [WXLog setLogLevelString:levelString];
-    }
+    }*/
 }
 
 #pragma mark - WXBridgeProtocol
 
 - (void)executeJSFramework:(NSString *)frameworkScript
 {
-    [self callJSMethod:@"evalFramework" args:@[frameworkScript]];
+//    [self callJSMethod:@"evalFramework" args:@[frameworkScript]];
+    
+    NSDictionary *args = @{@"source":frameworkScript};
+    [self callJSMethod:@"WxDebug.initJSRuntime" params:args];
+}
+
+- (void)callJSMethod:(NSString *)method params:(NSDictionary*)params {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:method forKey:@"method"];
+    [dict setObject:params forKey:@"arguments"];
+    
+    [_msgAry addObject:[WXUtility JSONString:dict]];
+    [self _executionMsgAry];
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args
 {
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    [params setObject:method forKey:@"method"];
+    [params setObject:args forKey:@"args"];
+    
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:@"WxDebug.callJS" forKey:@"method"];
+    [dict setObject:params forKey:@"params"];
+    
+    [_msgAry addObject:[WXUtility JSONString:dict]];
+    [self _executionMsgAry];
+    
+    /*
     if (![method isEqualToString:@"__logger"]) {
         // prevent recursion
         WXLogVerbose(@"Calling JS... method:%@, args:%@", method, [WXUtility JSONString:args]);
     }
+    
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     [dict setObject:method forKey:@"method"];
@@ -139,6 +166,7 @@
     
     [_msgAry addObject:[WXUtility JSONString:dict]];
     [self _executionMsgAry];
+    */
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
@@ -174,7 +202,7 @@
 {
     WXLogWarning(@"Websocket Connected:%@", webSocket.url);
     _isConnect = YES;
-    [self _initEnvironment];
+//    [self _initEnvironment];
     __weak typeof(self) weakSelf = self;
     [self executeBridgeThead:^() {
         [weakSelf _executionMsgAry];

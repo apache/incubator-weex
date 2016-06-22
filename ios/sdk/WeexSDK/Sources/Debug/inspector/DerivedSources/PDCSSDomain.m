@@ -104,6 +104,22 @@
             if (inherited != nil) {
                 [params setObject:inherited forKey:@"inherited"];
             }
+            
+            /*
+            PDCSSCSSStyle *inlineStyle = [[PDCSSCSSStyle alloc] init];
+            inlineStyle.styleSheetId = @"22222.2";
+            inlineStyle.cssProperties = @[];
+            inlineStyle.cssText = @"";
+            inlineStyle.shorthandEntries = @[];
+            PDCSSSourceRange *range = [[PDCSSSourceRange alloc] init];
+            range.startLine = [NSNumber numberWithInt:0];
+            range.endLine = [NSNumber numberWithInt:0];
+            range.startColumn = [NSNumber numberWithInt:0];
+            range.endColumn = [NSNumber numberWithInt:0];
+            inlineStyle.range = range;
+            
+            [params setObject:[inlineStyle PD_JSONObject] forKey:@"inlineStyle"];
+             */
 
             responseCallback(params, error);
         }];

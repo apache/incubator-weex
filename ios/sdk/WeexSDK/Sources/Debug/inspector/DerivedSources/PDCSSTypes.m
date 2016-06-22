@@ -177,7 +177,9 @@
     dispatch_once(&onceToken, ^{
         mappings = [[NSDictionary alloc] initWithObjectsAndKeys:
                     @"ruleId",@"ruleId",
+                    @"styleSheetId",@"styleSheetId",
                     @"selectorText",@"selectorText",
+                    @"selectorList",@"selectorList",
                     @"sourceURL",@"sourceURL",
                     @"sourceLine",@"sourceLine",
                     @"origin",@"origin",
@@ -191,7 +193,9 @@
 }
 
 @dynamic ruleId;
+@dynamic styleSheetId;
 @dynamic selectorText;
+@dynamic selectorList;
 @dynamic sourceURL;
 @dynamic sourceLine;
 @dynamic origin;
@@ -209,17 +213,24 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         mappings = [[NSDictionary alloc] initWithObjectsAndKeys:
-                    @"start",@"start",
-                    @"end",@"end",
+                    @"startLine",@"startLine",
+                    @"endLine",@"endLine",
+                    @"startColumn",@"startColumn",
+                    @"endColumn",@"endColumn",
                     nil];
     });
 
     return mappings;
 }
 
-@dynamic start;
-@dynamic end;
- 
+//@dynamic start;
+//@dynamic end;
+
+@dynamic startLine;
+@dynamic endLine;
+@dynamic startColumn;
+@dynamic endColumn;
+
 @end
 
 @implementation PDCSSShorthandEntry
@@ -294,6 +305,7 @@
     dispatch_once(&onceToken, ^{
         mappings = [[NSDictionary alloc] initWithObjectsAndKeys:
                     @"styleId",@"styleId",
+                    @"styleSheetId",@"styleSheetId",
                     @"cssProperties",@"cssProperties",
                     @"shorthandEntries",@"shorthandEntries",
                     @"cssText",@"cssText",
@@ -307,6 +319,7 @@
 }
 
 @dynamic styleId;
+@dynamic styleSheetId;
 @dynamic cssProperties;
 @dynamic shorthandEntries;
 @dynamic cssText;
@@ -470,5 +483,25 @@
 @dynamic content;
 @dynamic regions;
  
+@end
+
+@implementation PDCSSSelectorListData
+
++ (NSDictionary *)keysToEncode;
+{
+    static NSDictionary *mappings = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        mappings = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    @"selectors",@"selectors",
+                    @"text",@"text",
+                    nil];
+    });
+    
+    return mappings;
+}
+@dynamic selectors;
+@dynamic text;
+
 @end
 

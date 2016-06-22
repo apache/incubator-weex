@@ -18,6 +18,8 @@
 
 @property (nonatomic, strong) PDDOMDomain *domain;
 
+@property (nonatomic, strong) PDDOMNode *rootDomNode;
+
 + (PDDOMDomainController *)defaultInstance;
 + (void)startMonitoringUIViewChanges;
 

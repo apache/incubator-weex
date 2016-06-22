@@ -26,6 +26,7 @@
 #import "PDConsoleDomainController.h"
 #import "PDDebuggerDomainController.h"
 #import "PDTimelineDomainController.h"
+#import "PDCSSDomainController.h"
 
 
 static NSString *const PDClientIDKey = @"com.squareup.PDDebugger.clientID";
@@ -156,13 +157,14 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSInteger dotPosition = [fullMethodName rangeOfString:@"."].location;
     NSString *domainName = [fullMethodName substringToIndex:dotPosition];
     NSString *methodName = [fullMethodName substringFromIndex:dotPosition + 1];
+    /*
     if ([domainName isEqualToString:@"Runtime"]) {
         NSLog(@"");
     }
     if ([domainName isEqualToString:@"Page"]) {
         NSLog(@"");
     }
-
+*/
     NSString *objectID = [obj objectForKey:@"id"];
 
     PDResponseCallback responseCallback = ^(NSDictionary *result, id error) {
@@ -189,7 +191,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
         NSData *data = [NSJSONSerialization dataWithJSONObject:response options:0 error:nil];
         NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
+//        NSLog(@"devtool protocol:%@",response);
         [webSocket send:encodedData];
     };
 
@@ -463,6 +465,11 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 #pragma mark - Timeline
 - (void)enableTimeline {
     [self _addController:[PDTimelineDomainController defaultInstance]];
+}
+
+#pragma mark CSSStyle
+- (void)enableCSSStyle {
+    [self _addController:[PDCSSDomainController defaultInstance]];
 }
 
 #pragma mark - Private Methods

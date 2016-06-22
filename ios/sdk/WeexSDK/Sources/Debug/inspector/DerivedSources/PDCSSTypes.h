@@ -16,6 +16,7 @@
 
 @class PDCSSSourceRange;
 @class PDCSSCSSStyle;
+@class PDCSSSelectorListData;
 
 
 // This object identifies a CSS style in a unique way.
@@ -134,9 +135,15 @@
 // The CSS rule identifier (absent for user agent stylesheet and user-specified stylesheet rules).
 @property (nonatomic, strong) PDCSSCSSRuleId *ruleId;
 
+@property (nonatomic, strong) NSString *styleSheetId;
+
 // Rule selector.
 // Type: string
 @property (nonatomic, strong) NSString *selectorText;
+
+//Rule selector list
+//Type: PDCSSSelectorListData array
+@property (nonatomic, strong)PDCSSSelectorListData *selectorList;
 
 // Parent stylesheet resource URL (for regular rules).
 // Type: string
@@ -167,11 +174,19 @@
 
 // Start of range (inclusive).
 // Type: integer
-@property (nonatomic, strong) NSNumber *start;
+//@property (nonatomic, strong) NSNumber *start;
+
+@property (nonatomic, strong) NSNumber *startLine;
+
+@property (nonatomic, strong) NSNumber *endLine;
+
+@property (nonatomic, strong) NSNumber *startColumn;
+
+@property (nonatomic, strong) NSNumber *endColumn;
 
 // End of range (exclusive).
 // Type: integer
-@property (nonatomic, strong) NSNumber *end;
+//@property (nonatomic, strong) NSNumber *end;
 
 @end
 
@@ -220,6 +235,9 @@
 
 // The CSS style identifier (absent for attribute styles).
 @property (nonatomic, strong) PDCSSCSSStyleId *styleId;
+
+//
+@property (nonatomic, strong) NSString *styleSheetId;
 
 // CSS properties in the style.
 // Type: array
@@ -383,6 +401,14 @@
 // An array of regions associated with the Named Flow.
 // Type: array
 @property (nonatomic, strong) NSArray *regions;
+
+@end
+
+@interface PDCSSSelectorListData : PDObject
+
+@property (nonatomic, strong)NSArray *selectors;
+
+@property (nonatomic, copy)NSString *text;
 
 @end
 

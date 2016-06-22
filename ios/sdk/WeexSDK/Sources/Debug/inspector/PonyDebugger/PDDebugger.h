@@ -81,6 +81,9 @@ extern void _PDLogObjectsImpl(NSString *severity, NSArray *arguments);
 #pragma mark Timeline
 - (void)enableTimeline;
 
+#pragma mark CSSStyle
+- (void)enableCSSStyle;
+
 #pragma mark - listenning on server
 //- (void)serverStartWithHost:(NSString *)host port:(NSUInteger)port;
 

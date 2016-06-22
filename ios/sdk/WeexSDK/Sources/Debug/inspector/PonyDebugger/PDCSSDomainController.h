@@ -7,15 +7,12 @@
  */
 
 #import "PonyDebugger.h"
-#import "PDDebuggerDomain.h"
-#import "PDDynamicDebuggerDomain.h"
+#import "PDCSSDomain.h"
 
-@interface PDDebuggerDomainController : PDDomainController <PDDebuggerCommandDelegate>
+@interface PDCSSDomainController : PDDomainController<PDCSSCommandDelegate>
 
-+ (PDDebuggerDomainController *)defaultInstance;
++ (PDCSSDomainController *)defaultInstance;
 
-- (void)remoteDebuggerControllerTest;
-
-@property (nonatomic, strong) PDDebuggerDomain *domain;
+@property (nonatomic, strong) PDCSSDomain *domain;
 
 @end

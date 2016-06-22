@@ -37,9 +37,11 @@ static NSString* WXDebugrepJSFramework;
 
 + (BOOL)isDebug
 {
+    /*
 #ifdef DEBUG
     return YES;
 #endif
+     */
     return WXIsDebug;
 }
 
@@ -116,6 +118,7 @@ static NSString* WXDebugrepJSFramework;
 
 #pragma mark weex inspector
 + (void)launchInspectorWithSocketUrl:(NSURL *)url {
+    
     PDDebugger *debugger = [PDDebugger defaultInstance];
     //    [debugger serverStartWithHost:@"localhost" port:9009];
     
@@ -141,6 +144,8 @@ static NSString* WXDebugrepJSFramework;
     
     [debugger enableTimeline];
     
+    [debugger enableCSSStyle];
+    
     // Connect to a specific host
     if ([url isKindOfClass:NSString.class]) {
         url = [NSURL URLWithString:(NSString *)url];
@@ -150,7 +155,7 @@ static NSString* WXDebugrepJSFramework;
     if (![url isKindOfClass:NSURL.class]) {
         url = nil;
     }
-    [debugger connectToURL:[NSURL URLWithString:@"ws://localhost:9000/device"]];
+    [debugger connectToURL:url];
     // Or auto connect via bonjour discovery
     //[debugger autoConnect];
     // Or to a specific ponyd bonjour service

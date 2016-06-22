@@ -71,16 +71,16 @@
     frame.securityOrigin = [NSBundle mainBundle].bundlePath;//[[NSBundle mainBundle] bundleIdentifier];
     frame.url = localPath;
     frame.loaderId = @"11111";
-    frame.mimeType = @"Other";
+    frame.mimeType = @"application/javascript";
     
     PDFrameResource *resource = [[PDFrameResource alloc] init];
     resource.url = @"index.js";
-    resource.mimeType = @"text/javascript";
+    resource.mimeType = @"application/javascript";
     resource.type = @"Script";
     
     PDPageFrameResourceTree *resourceTree = [[PDPageFrameResourceTree alloc] init];
     resourceTree.frame = frame;
-    resourceTree.resources = @[];
+    resourceTree.resources = @[resource];
     
     callback(resourceTree, nil);
 }

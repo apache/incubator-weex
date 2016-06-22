@@ -49,6 +49,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 @implementation PDDOMDomainController
 
 @dynamic domain;
+@synthesize rootDomNode;
 
 #pragma mark - NSObject
 
@@ -626,7 +627,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     rootNode.nodeType = @(kPDDOMNodeTypeDocument);
     rootNode.nodeName = @"#document";
     rootNode.children = @[ [self rootElement] ];
-    
+    self.rootDomNode = rootNode;
     return rootNode;
 }
 
