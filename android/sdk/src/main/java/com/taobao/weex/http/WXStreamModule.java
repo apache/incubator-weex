@@ -214,16 +214,20 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.*;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WXStreamModule extends WXModule {
 
   public static final String STATUS_TEXT = "statusText";
   public static final String STATUS = "status";
   final IWXHttpAdapter mAdapter;
+  static final Pattern CHARSET_PATTERN = Pattern.compile("charset=([a-z0-9-]+)");
 
   public WXStreamModule(){
     this(null);
@@ -259,7 +263,11 @@ public class WXStreamModule extends WXModule {
       @Override
       public void onResponse(WXResponse response, Map<String, String> headers) {
         if(callback != null)
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, (response == null || response.originalData == null) ? "{}" : new String(response.originalData));
+          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback,
+            (response == null || response.originalData == null) ? "{}" :
+              readAsString(response.originalData,
+                headers.get("Content-Type")
+              ));
       }
     }, null);
   }
@@ -334,7 +342,10 @@ public class WXStreamModule extends WXModule {
             if (response.originalData == null) {
               resp.put("data", null);
             } else {
-              resp.put("data", new String(response.originalData));
+              resp.put("data",
+                readAsString(response.originalData,
+                  headers.get("Content-Type")
+                ));
             }
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
@@ -344,6 +355,23 @@ public class WXStreamModule extends WXModule {
       }
     }, progressCallback);
   }
+
+  static String readAsString(byte[] data,String cType){
+    String charset = "utf-8";
+    if(cType != null){
+      Matcher matcher = CHARSET_PATTERN.matcher(cType.toLowerCase());
+      if(matcher.find()){
+        charset = matcher.group(1);
+      }
+    }
+    try {
+      return new String(data,charset);
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      return new String(data);
+    }
+  }
+
 
   private void extractHeaders(JSONObject headers, Options.Builder builder){
     if(headers != null){
