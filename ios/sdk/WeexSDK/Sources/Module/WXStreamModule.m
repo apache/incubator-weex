@@ -146,7 +146,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
                         if (!respEncode) {
                             respEncode = @"utf-8";
                         }
-                        CFStringEncoding *cfStrEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef) respEncode);
+                        CFStringEncoding cfStrEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef) respEncode);
                         if (cfStrEncoding == kCFStringEncodingInvalidId) {
                             WXLogError(@"not supported encode");
                         } else {
