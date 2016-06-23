@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import com.taobao.weex.devtools.debug.DebugServerProxy;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.dumpapp.DumpappHttpSocketLikeHandler;
@@ -397,6 +398,8 @@ public class WeexInspector {
 
       ServerManager serverManager = new ServerManager(server);
       serverManager.start();
+      // connect to debugger server through WebSocket
+      new DebugServerProxy(getInspectorModules()).start();
     }
 
     private class RealSocketHandlerFactory implements SocketHandlerFactory {
