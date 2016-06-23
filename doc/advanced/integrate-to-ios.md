@@ -89,6 +89,7 @@ WXSDKInstance is a very imporent class, which provides you with some basic metho
 
 
 #### 5. Destroy Weex Instance
+
 Please release weex instance in dealloc stage of viewContoller, or it will lead to memory leak.
 
 ```
@@ -97,3 +98,13 @@ Please release weex instance in dealloc stage of viewContoller, or it will lead 
     [_instance destroyInstance];
 }
 ```
+
+#### 6. Build .IPA for Weex
+
+We can also pack all the JS files into the app's resources. This way you can run your app without development server and submit it to the AppStore.
+
+* [Install weex-toolkit](https://github.com/alibaba/weex_toolchain/tree/master/toolkit) and transform your `.we` file to JS by running `weex index.we -o index.js`, `index.we` is the entry file of your app.
+* Move `index.js` to your app's Xcode project and add the file to your target.
+* Replace `[_instance renderWithURL:'httpURL']` with: `[_instance renderWithURL: [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"js"]]`
+
+* Go for Product -> Archive in Xcode and follow the steps to build your .IPA file and submit it to the AppStore.
