@@ -208,6 +208,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXLogUtils;
@@ -233,8 +234,23 @@ public class WXComponentRegistry {
     if (appendTree) {
       componentInfo.put("append", "tree");
     }
+    registerInternal(type,clazz,componentInfo);
+    return true;
+  }
 
-    return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
+  private static void registerInternal(final String type,final Class<? extends WXComponent> clazz, final Map<String, String> componentInfo){
+    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          registerNativeComponent(type, clazz);
+          registerJSComponent(componentInfo);
+        } catch (WXException e) {
+          e.printStackTrace();
+        }
+
+      }
+    });
   }
 
   private static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
@@ -273,7 +289,12 @@ public class WXComponentRegistry {
     }
 
     String type = componentInfo.get("type");
-    return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
+    if(type == null){
+      return false;
+    }else{
+      registerInternal(type,clazz,componentInfo);
+      return true;
+    }
   }
 
   public static ComponentHolder getComponent(String type) {
