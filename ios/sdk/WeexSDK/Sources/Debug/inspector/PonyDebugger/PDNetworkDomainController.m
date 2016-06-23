@@ -975,8 +975,8 @@ static NSArray *prettyStringPrinters = nil;
         PDNetworkResponse *networkResponse = [PDNetworkResponse networkResponseWithURLResponse:response request:[self requestForTask:dataTask]];
         /*
         PDNetworkResourceTiming *timeline = [[PDNetworkResourceTiming alloc] init];
-        timeline.requestTime = [NSNumber numberWithInt:0.5];
-        timeline.proxyStart = [NSNumber numberWithInt:9999];
+        timeline.requestTime = [NSNumber numberWithDouble:startDate.timeIntervalSince1970];//[NSDate PD_timestamp];
+        timeline.proxyStart = [NSNumber numberWithInt:0];
         timeline.proxyEnd = [NSNumber numberWithInt:10001];
         timeline.dnsStart = [NSNumber numberWithInt:89];
         timeline.dnsEnd = [NSNumber numberWithInt:90];
@@ -984,12 +984,11 @@ static NSArray *prettyStringPrinters = nil;
         timeline.connectEnd = [NSNumber numberWithInt:34];
         timeline.sslStart = [NSNumber numberWithInt:0];
         timeline.sslEnd = [NSNumber numberWithInt:1];
-        timeline.sendStart = [NSNumber numberWithInt:3];
-        timeline.sendEnd = [NSNumber numberWithInt:5];
-        timeline.receiveHeadersEnd = [NSNumber numberWithInt:9];
+        timeline.sendStart = [NSDate PD_timestamp];
+        timeline.sendEnd = [NSDate PD_timestamp];
+        timeline.receiveHeadersEnd = [NSNumber numberWithDouble:startDate.timeIntervalSince1970];//[NSDate PD_timestamp];
         networkResponse.timing = timeline;
-        */
-
+         */
         [self.domain responseReceivedWithRequestId:requestID
                                            frameId:@"3888.3"
                                           loaderId:@"11111"
