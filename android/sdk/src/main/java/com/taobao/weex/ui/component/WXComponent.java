@@ -138,7 +138,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import com.alibaba.fastjson.JSON;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -150,8 +149,7 @@ import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.ComponentHolder;
-import com.taobao.weex.ui.WXComponentRegistry;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXBackgroundDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -161,8 +159,6 @@ import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.ui.view.listview.BounceRecyclerView;
 import com.taobao.weex.utils.*;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -199,7 +195,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private WXGesture wxGesture;
-  private ComponentHolder mHolder;
+  private IFComponentHolder mHolder;
 
   private boolean isUsing = false;
 
@@ -219,7 +215,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     ++mComponentNum;
   }
 
-  public void setHolder(ComponentHolder holder){
+  public void bindHolder(IFComponentHolder holder){
     mHolder = holder;
   }
 
