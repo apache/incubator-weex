@@ -266,7 +266,7 @@ public class WXStreamModule extends WXModule {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback,
             (response == null || response.originalData == null) ? "{}" :
               readAsString(response.originalData,
-                headers.get("Content-Type")
+                headers!=null?headers.get("Content-Type"):""
               ));
       }
     }, null);
