@@ -27,6 +27,10 @@ dependencies {
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile project(':weex_sdk_android')
+    compile 'com.alibaba:fastjson:1.1.45'
+    compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
 }
 
 //apply from: rootProject.file('release.gradle')
