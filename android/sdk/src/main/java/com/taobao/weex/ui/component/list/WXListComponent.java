@@ -443,6 +443,7 @@ public class WXListComponent extends WXVContainer implements
           mAppearComponents.put(adapterPosition, child);
           child.registerAppearEvent = true;
       }
+      checkRefreshOrLoading(child);
     }
 
     /**
@@ -458,7 +459,6 @@ public class WXListComponent extends WXVContainer implements
       }
 
       int pos = index == -1 ?view.getAdapter().getItemCount()-1:index;
-      checkRefreshOrLoading(mChildren.get(pos));
     }
 
     /**
