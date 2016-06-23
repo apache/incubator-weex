@@ -505,7 +505,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
-
+    // swipe and scroll
+    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(@"UIScrollViewPanGestureRecognizer")]) {
+        return YES;
+    }
+    
 //#ifdef DEBUG
 //    if ([gestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]
 //        || [otherGestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]) {
