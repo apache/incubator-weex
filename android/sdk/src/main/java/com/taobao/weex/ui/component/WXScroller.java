@@ -173,7 +173,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     tempscview = new WXScrollView(mContext);
   }
 
-  Handler handler=new Handler();
+  private Handler handler=new Handler();
 
   @Override
   public ViewGroup getRealView() {

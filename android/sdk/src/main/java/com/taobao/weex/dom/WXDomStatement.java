@@ -204,8 +204,6 @@
  */
 package com.taobao.weex.dom;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
@@ -228,7 +226,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -486,6 +483,9 @@ class WXDomStatement {
     }
 
     WXDomObject domObject = parseInner(element);
+    if(domObject==null){
+      return;
+    }
     Map<String, Object> style = new HashMap<>(5);
     if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_FLEXDIRECTION)) {
       style.put(WXDomPropConstant.WX_FLEXDIRECTION, "column");
@@ -1018,11 +1018,10 @@ class WXDomStatement {
 
     String type = (String) map.get("type");
     WXDomObject domObject = WXDomObjectFactory.newInstance(type);
-    //        if (WXBasicComponentType.isText(type)) {
-    //            domObject = new WXTextDomObject();
-    //        } else {
-    //            domObject = new WXDomObject();
-    //        }
+
+    if(domObject==null){
+      return null;
+    }
 
     domObject.type = type;
     domObject.ref = (String) map.get("ref");

@@ -381,4 +381,8 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     public WXSwipeLayout getSwipeLayout() {
         return swipeLayout;
     }
+
+    public abstract void onRefreshingComplete();
+
+    public abstract void onLoadmoreComplete();
 }

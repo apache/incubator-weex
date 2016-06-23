@@ -264,9 +264,7 @@ public class WXRefreshView extends FrameLayout {
   }
 
   public void setProgressBgColor(int color) {
-    if (circleProgressBar != null)
-
-    {
+    if (circleProgressBar != null) {
       circleProgressBar.setBackgroundColor(color);
     }
   }
@@ -277,7 +275,7 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
-  public void start() {
+  protected void startAnimation() {
     if (circleProgressBar != null) {
       circleProgressBar.start();
     }
@@ -289,7 +287,7 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
-  public void stop() {
+  protected void stopAnimation() {
     if (circleProgressBar != null) {
       circleProgressBar.stop();
     }

@@ -204,11 +204,15 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.text.TextUtils;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
 import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
+import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 
 /**
  * div component
@@ -226,8 +230,22 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   @Override
   public void onLoading() {
-    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.RECYCLERVIEW_ONLOADING)) {
-      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.RECYCLERVIEW_ONLOADING);
+    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.ONLOADING)) {
+      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.ONLOADING);
+    }
+  }
+
+  @WXComponentProp(name = "display")
+  public void setDisplay(String display) {
+    if (!TextUtils.isEmpty(display)) {
+      if (display.equals("hide")) {
+        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
+          if (((BaseBounceView)getParent().getView()).getSwipeLayout().isRefreshing()) {
+            ((BaseBounceView) getParent().getView()).finishPullLoad();
+            ((BaseBounceView) getParent().getView()).onLoadmoreComplete();
+          }
+        }
+      }
     }
   }
 }

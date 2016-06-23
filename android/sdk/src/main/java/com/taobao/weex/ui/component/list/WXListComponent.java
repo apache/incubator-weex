@@ -478,7 +478,7 @@ public class WXListComponent extends WXVContainer implements
         if (mChildren != null) {
             for (int i = 0; i < childCount(); i++) {
                 WXComponent component = getChild(i);
-                checkRefreshOrLoading(component);
+                setRefreshOrLoadingListener(component);
                 if (component == null
                         || component.isUsing()
                         || getItemViewType(i) != viewType)
@@ -510,7 +510,7 @@ public class WXListComponent extends WXVContainer implements
         throw new WXRuntimeException("mChildren is null");
     }
 
-  private void checkRefreshOrLoading(WXComponent child) {
+  private void setRefreshOrLoadingListener(WXComponent child) {
     if (child instanceof WXRefresh) {
       bounceRecyclerView.setOnRefreshListener((WXRefresh)child);
     }

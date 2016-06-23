@@ -221,4 +221,14 @@ public class BounceScrollerView extends BaseBounceView<WXScrollView> {
     public WXScrollView setInnerView(Context context) {
         return new WXScrollView(context);
     }
+
+    @Override
+    public void onRefreshingComplete() {
+        //TODO update scroller dataset
+    }
+
+    @Override
+    public void onLoadmoreComplete() {
+        //TODO update scroller dataset
+    }
 }

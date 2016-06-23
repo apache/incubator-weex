@@ -204,13 +204,9 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.text.TextUtils;
-
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 
 /**
  * div component
@@ -238,25 +234,6 @@ public class WXBaseRefresh extends WXVContainer {
   @Override
   public WXFrameLayout getView() {
     return (WXFrameLayout) super.getView();
-  }
-
-  @WXComponentProp(name = "display")
-  public void setDisplay(String display) {
-    if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
-        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
-          if (((BaseBounceView)getParent().getView()).getSwipeLayout().isRefreshing()) {
-            getParent().getView().postDelayed(new Runnable() {
-              @Override
-              public void run() {
-                ((BaseBounceView) getParent().getView()).finishPullRefresh();
-                ((BaseBounceView) getParent().getView()).finishPullLoad();
-              }
-            }, 500);
-          }
-        }
-      }
-    }
   }
 
   private void checkLoadingIndicator(WXComponent child) {

@@ -223,8 +223,6 @@ import com.taobao.weappplus_sdk.R;
 
 public class CircleProgressBar extends ImageView {
 
-  private int indicator_color = Color.BLACK;
-
   private static final int KEY_SHADOW_COLOR = 0x1E000000;
   private static final int FILL_SHADOW_COLOR = 0x3D000000;
   // PX

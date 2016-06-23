@@ -238,4 +238,16 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
         wxRecyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
         return wxRecyclerView;
     }
+
+    @Override
+    public void onRefreshingComplete() {
+        if (adapter != null)
+            adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoadmoreComplete() {
+        if (adapter != null)
+            adapter.notifyDataSetChanged();
+    }
 }
