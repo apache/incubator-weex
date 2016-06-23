@@ -37,6 +37,12 @@ As the sample above, the component name should be hyphenated (a-z, 0-9, "-"). Ot
 
 And, the method call `bootstrap()` allows 1~3 parameters: root module name (String), config info (optional JSON) and external data (optional JSON).
 
+
+## NOTICE
+After Weex added multi-module support ( support using `require` in your `<script>` tag  include other we file or js code into current we file). we begin using [Webpack](https://webpack.github.io/) as module bundler in our tool chain. So the eventual format of Weex JSBundle is webpack packed .
+
+if you are JS Ninja, explore [weex-transformer](https://www.npmjs.com/package/weex-transformer) will give your unpacked , original Weex JS Bundle .
+
 ## Content of Composed Components
 
 A module of composed component contains 3 parts: whole options definition, additional template option definition and additional style option definition.
