@@ -74,6 +74,17 @@ compile(project(':weex-custom-module')) {
 }
 ```
 
+#### 4、How to load local Your Js bundle in the directory of Android assets
+Besides load a Js Bundle online, you also can load the js bundle from the directory of Android assets.
+
+For Example:
+  
+   ```   
+   String yourbundleStr =  WXFileUtils.loadFileContent("yourBundle.js", context);
+   WXSDKInstance.render(TAG, yourbundleStr, options, null, width, Height, WXRenderStrategy.APPEND_ASYNC);
+  ```
+
+
 ## Building from Android Studio
 
 From the Welcome screen of Android Studio choose "Import project" and select the `playground` folder of your app.
