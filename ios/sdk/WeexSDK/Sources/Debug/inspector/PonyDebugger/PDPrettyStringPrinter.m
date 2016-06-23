@@ -22,7 +22,8 @@
     return
     ([contentType rangeOfString:@"json"].location != NSNotFound)
     || ([contentType rangeOfString:@"text"].location != NSNotFound)
-    || ([contentType rangeOfString:@"xml"].location != NSNotFound);
+    || ([contentType rangeOfString:@"xml"].location != NSNotFound)
+    || ([contentType rangeOfString:@"javascript"].location != NSNotFound);
 }
 
 - (BOOL)canPrettyStringPrintRequest:(NSURLRequest *)request;

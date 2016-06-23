@@ -67,9 +67,9 @@
     
     PDPageFrame *frame = [[PDPageFrame alloc] init];
     frame.identifier = @"3888.3";
-//    frame.name = @"Root";
+    frame.name = @"Root";
     frame.securityOrigin = [NSBundle mainBundle].bundlePath;//[[NSBundle mainBundle] bundleIdentifier];
-    frame.url = localPath;
+    frame.url = localPath;//localPath;
     frame.loaderId = @"11111";
     frame.mimeType = @"application/javascript";
     

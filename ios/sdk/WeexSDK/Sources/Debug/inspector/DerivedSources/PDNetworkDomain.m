@@ -13,6 +13,7 @@
 #import "PDNetworkDomain.h"
 #import "PDObject.h"
 #import "PDNetworkTypes.h"
+#import "PDDebuggerDomainController.h"
 
 
 @interface PDNetworkDomain ()
@@ -101,6 +102,8 @@
     }
     
     [self.debuggingServer sendEventWithName:@"Network.responseReceived" parameters:params];
+    
+    [[PDDebuggerDomainController defaultInstance] getScriptSourceTreeWithId:requestId url:response.url isContentScript:[NSNumber numberWithBool:NO] sourceMapURL:@""];
 }
 
 // Fired when data chunk was received over the network.
@@ -318,19 +321,23 @@
         [self.delegate domain:self enableWithCallback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"disable"] && [self.delegate respondsToSelector:@selector(domain:disableWithCallback:)]) {
+    }
+    else if ([methodName isEqualToString:@"disable"] && [self.delegate respondsToSelector:@selector(domain:disableWithCallback:)]) {
         [self.delegate domain:self disableWithCallback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"setUserAgentOverride"] && [self.delegate respondsToSelector:@selector(domain:setUserAgentOverrideWithUserAgent:callback:)]) {
+    }
+    else if ([methodName isEqualToString:@"setUserAgentOverride"] && [self.delegate respondsToSelector:@selector(domain:setUserAgentOverrideWithUserAgent:callback:)]) {
         [self.delegate domain:self setUserAgentOverrideWithUserAgent:[params objectForKey:@"userAgent"] callback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"setExtraHTTPHeaders"] && [self.delegate respondsToSelector:@selector(domain:setExtraHTTPHeadersWithHeaders:callback:)]) {
+    }
+    else if ([methodName isEqualToString:@"setExtraHTTPHeaders"] && [self.delegate respondsToSelector:@selector(domain:setExtraHTTPHeadersWithHeaders:callback:)]) {
         [self.delegate domain:self setExtraHTTPHeadersWithHeaders:[params objectForKey:@"headers"] callback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"getResponseBody"] && [self.delegate respondsToSelector:@selector(domain:getResponseBodyWithRequestId:callback:)]) {
+    }
+    else if ([methodName isEqualToString:@"getResponseBody"] && [self.delegate respondsToSelector:@selector(domain:getResponseBodyWithRequestId:callback:)]) {
         [self.delegate domain:self getResponseBodyWithRequestId:[params objectForKey:@"requestId"] callback:^(NSString *body, NSNumber *base64Encoded, id error) {
             NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:2];
 
@@ -343,7 +350,8 @@
 
             responseCallback(params, error);
         }];
-    } else if ([methodName isEqualToString:@"canClearBrowserCache"] && [self.delegate respondsToSelector:@selector(domain:canClearBrowserCacheWithCallback:)]) {
+    }
+    else if ([methodName isEqualToString:@"canClearBrowserCache"] && [self.delegate respondsToSelector:@selector(domain:canClearBrowserCacheWithCallback:)]) {
         [self.delegate domain:self canClearBrowserCacheWithCallback:^(NSNumber *result, id error) {
             NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:1];
 
@@ -353,11 +361,13 @@
 
             responseCallback(params, error);
         }];
-    } else if ([methodName isEqualToString:@"clearBrowserCache"] && [self.delegate respondsToSelector:@selector(domain:clearBrowserCacheWithCallback:)]) {
+    }
+    else if ([methodName isEqualToString:@"clearBrowserCache"] && [self.delegate respondsToSelector:@selector(domain:clearBrowserCacheWithCallback:)]) {
         [self.delegate domain:self clearBrowserCacheWithCallback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"canClearBrowserCookies"] && [self.delegate respondsToSelector:@selector(domain:canClearBrowserCookiesWithCallback:)]) {
+    }
+    else if ([methodName isEqualToString:@"canClearBrowserCookies"] && [self.delegate respondsToSelector:@selector(domain:canClearBrowserCookiesWithCallback:)]) {
         [self.delegate domain:self canClearBrowserCookiesWithCallback:^(NSNumber *result, id error) {
             NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:1];
 
@@ -367,15 +377,18 @@
 
             responseCallback(params, error);
         }];
-    } else if ([methodName isEqualToString:@"clearBrowserCookies"] && [self.delegate respondsToSelector:@selector(domain:clearBrowserCookiesWithCallback:)]) {
+    }
+    else if ([methodName isEqualToString:@"clearBrowserCookies"] && [self.delegate respondsToSelector:@selector(domain:clearBrowserCookiesWithCallback:)]) {
         [self.delegate domain:self clearBrowserCookiesWithCallback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else if ([methodName isEqualToString:@"setCacheDisabled"] && [self.delegate respondsToSelector:@selector(domain:setCacheDisabledWithCacheDisabled:callback:)]) {
+    }
+    else if ([methodName isEqualToString:@"setCacheDisabled"] && [self.delegate respondsToSelector:@selector(domain:setCacheDisabledWithCacheDisabled:callback:)]) {
         [self.delegate domain:self setCacheDisabledWithCacheDisabled:[params objectForKey:@"cacheDisabled"] callback:^(id error) {
             responseCallback(nil, error);
         }];
-    } else {
+    }
+    else {
         [super handleMethodWithName:methodName parameters:params responseCallback:responseCallback];
     }
 }

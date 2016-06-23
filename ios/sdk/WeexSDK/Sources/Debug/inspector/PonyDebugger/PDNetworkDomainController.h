@@ -28,6 +28,8 @@
 + (void)registerPrettyStringPrinter:(id<PDPrettyStringPrinting>)prettyStringPrinter;
 + (void)unregisterPrettyStringPrinter:(id<PDPrettyStringPrinting>)prettyStringPrinter;
 
+- (NSCache *)getNetWorkResponseCache;
+
 @end
 
 

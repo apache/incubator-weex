@@ -16,6 +16,11 @@
 
 - (void)remoteDebuggerControllerTest;
 
+- (void)getScriptSourceTreeWithId:(NSString *)scriptId
+                              url:(NSString *)url
+                  isContentScript:(NSNumber *)isContentScript
+                     sourceMapURL:(NSString *)sourceMapURL;
+
 @property (nonatomic, strong) PDDebuggerDomain *domain;
 
 @end

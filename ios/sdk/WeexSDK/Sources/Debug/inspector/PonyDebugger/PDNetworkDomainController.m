@@ -576,13 +576,17 @@ static NSArray *prettyStringPrinters = nil;
     callback([response objectForKey:@"body"], [response objectForKey:@"base64Encoded"], nil);
 }
 
+#pragma mark - public Methods
+- (NSCache *)getNetWorkResponseCache {
+    return _responseCache;
+}
 
 #pragma mark - Private Methods
 
 - (void)setResponse:(NSData *)responseBody forRequestID:(NSString *)requestID response:(NSURLResponse *)response request:(NSURLRequest *)request;
 {
     id<PDPrettyStringPrinting> prettyStringPrinter = [PDNetworkDomainController prettyStringPrinterForResponse:response withRequest:request];
-
+    
     NSString *encodedBody;
     BOOL isBinary;
     if (!prettyStringPrinter) {
@@ -1129,6 +1133,8 @@ static NSArray *prettyStringPrinters = nil;
         type = @"XHR";
     } else if ([contentType rangeOfString:@"javascript"].length != 0) {
         type = @"Script";
+    } else if ([contentType rangeOfString:@"css"].length != 0) {
+        type = @"Stylesheet";
     }
 
     return type;

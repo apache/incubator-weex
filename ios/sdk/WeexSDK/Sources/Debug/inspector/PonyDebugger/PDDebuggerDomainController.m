@@ -24,6 +24,13 @@
     [self.domain globalObjectCleared];
 }
 
+- (void)getScriptSourceTreeWithId:(NSString *)scriptId
+                              url:(NSString *)url
+                  isContentScript:(NSNumber *)isContentScript
+                     sourceMapURL:(NSString *)sourceMapURL {
+    [self.domain scriptParsedWithScriptId:scriptId url:url startLine:[NSNumber numberWithInt:0] startColumn:[NSNumber numberWithInt:0] endLine:[NSNumber numberWithInt:0] endColumn:[NSNumber numberWithInt:0] isContentScript:isContentScript sourceMapURL:sourceMapURL];
+}
+
 + (Class)domainClass {
     return [PDDebuggerDomain class];
 }
@@ -158,7 +165,9 @@
 // Param scriptId: Id of the script to get source for.
 // Callback Param scriptSource: Script source.
 - (void)domain:(PDDebuggerDomain *)domain getScriptSourceWithScriptId:(NSString *)scriptId callback:(void (^)(NSString *scriptSource, id error))callback {
-    
+    NSCache *responseCache = [[PDNetworkDomainController defaultInstance] getNetWorkResponseCache];
+    NSDictionary *response = [responseCache objectForKey:scriptId];
+    callback([response objectForKey:@"body"], nil);
 }
 
 // Returns detailed informtation on given function.

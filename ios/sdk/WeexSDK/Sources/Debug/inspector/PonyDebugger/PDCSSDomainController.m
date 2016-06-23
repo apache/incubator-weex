@@ -117,9 +117,13 @@
     rule.selectorList = selectorData;
     rule.style = style;
     
-    NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
-    NSArray *matchCSSRules = @[ruleMatch];
-    callback(matchCSSRules,pseudoElements,inherited,nil);
+    if ([rule PD_JSONObject]) {
+        NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
+        NSArray *matchCSSRules = @[ruleMatch];
+        callback(matchCSSRules,pseudoElements,inherited,nil);
+    }else {
+        callback(nil,pseudoElements,inherited,nil);
+    }
 }
 
 - (void)domain:(PDCSSDomain *)domain getInlineStylesForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(PDCSSCSSStyle *inlineStyle, PDCSSCSSStyle *attributesStyle, id error))callback {
