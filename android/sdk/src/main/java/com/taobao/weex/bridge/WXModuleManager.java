@@ -240,26 +240,37 @@ public class WXModuleManager {
   /**
    * Register module to JavaScript and Android
    */
-  public static boolean registerModule(String moduleName, ModuleFactory factory, boolean global) throws WXException {
+  public static boolean registerModule(final String moduleName, final ModuleFactory factory, final boolean global) throws WXException {
     if (moduleName == null || factory == null) {
       return false;
     }
 
-    if (sModuleFactoryMap.containsKey(moduleName)) {
-        WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
-    }
+    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        if (sModuleFactoryMap.containsKey(moduleName)) {
+          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+        }
 
-    if (global) {
-      try {
-        WXModule wxModule = factory.buildInstance();
-        sGlobalModuleMap.put(moduleName, wxModule);
-      } catch (Exception e) {
-        WXLogUtils.e(moduleName + " class must have a default constructor without params. " + WXLogUtils.getStackTrace(e));
-        return false;
+        if (global) {
+          try {
+            WXModule wxModule = factory.buildInstance();
+            sGlobalModuleMap.put(moduleName, wxModule);
+          } catch (Exception e) {
+            WXLogUtils.e(moduleName + " class must have a default constructor without params. " + WXLogUtils.getStackTrace(e));
+          }
+        }
+
+        try {
+          registerNativeModule(moduleName, factory);
+        } catch (WXException e) {
+          e.printStackTrace();
+        }
+        registerJSModule(moduleName, factory);
       }
-    }
+    });
+    return true;
 
-    return registerNativeModule(moduleName, factory) && registerJSModule(moduleName, factory);
   }
 
   static boolean registerNativeModule(String moduleName, ModuleFactory factory) throws WXException {

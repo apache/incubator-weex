@@ -241,12 +241,13 @@ public class WXSDKEngine {
           return;
         }
         sm.initScriptsFramework(null);
-        register();
+
         WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
         WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
         WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
       }
     });
+    register();
   }
 
   @Deprecated
