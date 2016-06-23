@@ -6,10 +6,34 @@ Paragraphs [Maintain Your Component Code](./maintain-your-component-code.md), [M
 
 Now come back to the topic `transform code into js bundle`. There are several ways to achieve the goal.
 
+## weex-toolkit
+```bash
+$npm install -g weex-toolkit
+```
+
+### transform a `we file` to JS Bundle
+```
+$weex your_best_weex.we  -o .
+```
+`your_best_weex.we` will be transform to JS Bundle file `your_best_weex.js` , saved in your current directory
+
+### transform a `we file` to JS Bundle , watch this file ，auto run transformer if change happen.
+```
+$weex your_best_weex.we  -o . --watch
+```
+
+### transform every we file in a directory 
+```
+$weex we/file/storage/path  -o outputpath
+```
+every `we file` in `we/file/storage/path` we be transform to JS Bundle  , saved in `outputpath` path
+
+please access [npmjs.com](https://www.npmjs.com/package/weex-toolkit) for more information about weex-toolkit.
+
 ## transformer
 
 ```bash
-tnpm install weex-transformer
+npm install weex-transformer
 ```
 
 ### CLI Tool
@@ -54,7 +78,7 @@ returns:
 ## gulp weex
 
 ```bash
-tnpm install gulp-weex
+npm install gulp-weex
 ```
 
 ```javascript
