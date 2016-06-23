@@ -308,6 +308,11 @@ public class WXPerformance {
   public long networkTime;
 
   /**
+   * component Count
+   */
+  public long componentCount;
+
+  /**
    * Version of JavaScript libraray
    */
   public String JSLibVersion = WXEnvironment.JS_LIB_SDK_VERSION;
@@ -345,6 +350,8 @@ public class WXPerformance {
     quotas.put("templateLoadTime", (double)templateLoadTime);
     quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
     quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
+    quotas.put("firstScreenJSFExecuteTime",(double)firstScreenCreateInstanceTime);
+    quotas.put("componentCount",(double)componentCount);
     return quotas;
   }
 

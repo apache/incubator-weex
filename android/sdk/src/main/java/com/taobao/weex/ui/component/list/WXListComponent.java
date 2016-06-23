@@ -216,6 +216,7 @@ import android.widget.ImageView;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
@@ -223,15 +224,19 @@ import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
 import com.taobao.weex.ui.view.listview.adapter.IRecyclerAdapterListener;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
+import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -243,10 +248,12 @@ import java.util.regex.Pattern;
  * or not even exist.
  */
 public class WXListComponent extends WXVContainer implements
-        IRecyclerAdapterListener<ListBaseViewHolder> {
+        IRecyclerAdapterListener<ListBaseViewHolder>,IOnLoadMoreListener {
 
     public static final String TRANSFORM = "transform";
     private String TAG = "WXListComponent";
+    private int mListCellCount = 0;
+    private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
     private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
     private SparseArray<WXComponent> mAppearComponents = new SparseArray<>();
@@ -341,7 +348,52 @@ public class WXListComponent extends WXVContainer implements
         RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
         recyclerViewBaseAdapter.setHasStableIds(true);
         bounceRecyclerView.setAdapter(recyclerViewBaseAdapter);
-        mHost = bounceRecyclerView;
+        bounceRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        bounceRecyclerView.getInnerView().clearOnScrollListeners();
+        bounceRecyclerView.getInnerView().addOnScrollListener(new WXRecyclerViewOnScrollListener(this));
+        bounceRecyclerView.getInnerView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+              super.onScrollStateChanged(recyclerView, newState);
+
+                if(newState == RecyclerView.SCROLL_STATE_IDLE ){
+                    for(ListBaseViewHolder holder:recycleViewList){
+                        if(holder!=null
+                                && holder.getComponent()!=null
+                                && !holder.getComponent().isUsing()) {
+                            recycleImage(holder.getView());
+                        }
+                    }
+                    recycleViewList.clear();
+                }
+              List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+              if (listeners != null && listeners.size() > 0) {
+                for (OnWXScrollListener listener : listeners) {
+                  if (listener != null) {
+                    View topView = recyclerView.getChildAt(0);
+                    if (topView != null && listener != null) {
+                      int y = topView.getTop();
+                      listener.onScrollStateChanged(recyclerView, 0, y, newState);
+                    }
+                  }
+                }
+              }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+                if(listeners!=null && listeners.size()>0){
+                    for (OnWXScrollListener listener : listeners) {
+                        if (listener != null) {
+                            listener.onScrolled(recyclerView, dx, dy);
+                        }
+                    }
+                }
+            }
+        });
+      mHost = bounceRecyclerView;
     }
 
     @Override
@@ -390,6 +442,12 @@ public class WXListComponent extends WXVContainer implements
      */
     @Override
     protected void addSubView(View child, int index) {
+      BounceRecyclerView view =  getView();
+      if(view == null){
+        return;
+      }
+
+      int pos = index == -1 ?view.getAdapter().getItemCount()-1:index;
     }
 
     /**
@@ -428,6 +486,7 @@ public class WXListComponent extends WXVContainer implements
     public void onViewRecycled(ListBaseViewHolder holder) {
         long begin=System.currentTimeMillis();
         holder.setComponentUsing(false);
+        recycleViewList.add(holder);
         WXLogUtils.d(TAG, "Recycle holder " +(System.currentTimeMillis()-begin)+"  Thread:"+Thread.currentThread().getName());
     }
 
@@ -574,6 +633,62 @@ public class WXListComponent extends WXVContainer implements
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    @Override
+    public void onLoadMore(int offScreenY) {
+      try {
+        String offset = mDomObj.attr.getLoadMoreOffset();
+
+        if (TextUtils.isEmpty(offset)) {
+          return;
+        }
+
+        if (offScreenY < Integer.parseInt(offset)) {
+          String loadMoreRetry = mDomObj.attr.getLoadMoreRetry();
+
+//          if (mListCellCount != mChildren.size()
+//              || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
+//            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+            mListCellCount = mChildren.size();
+//            mLoadMoreRetry = loadMoreRetry;
+//          }
+        }
+      } catch (Exception e) {
+        WXLogUtils.d(TAG, "onLoadMore :" + WXLogUtils.getStackTrace(e));
+      }
+    }
+
+    @Override
+    public void notifyAppearStateChange(int firstVisible, int lastVisible,int directionX,int directionY) {
+
+      List<Integer> unRegisterKeys = new ArrayList<>();
+
+      //notify appear state
+      for (int i = 0, len = mAppearComponents.size(); i < len; i++) {
+        int key = mAppearComponents.keyAt(i);
+        WXComponent value = mAppearComponents.get(key);
+        if (!value.registerAppearEvent) {
+          unRegisterKeys.add(key);
+          continue;
+        }
+        if (key >= firstVisible && key <= lastVisible && !value.appearState) {
+          String direction=directionY>0?"up":"down";
+          value.notifyAppearStateChange(WXEventType.APPEAR,direction);
+          value.appearState = true;
+        } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
+          String direction=directionY>0?"up":"down";
+          value.notifyAppearStateChange(WXEventType.DISAPPEAR,direction);
+          value.appearState = false;
+        }
+        WXLogUtils.d(TAG, "key:" + key + " " + "appear:" + value.appearState);
+      }
+
+      //remove unregister Event
+      for (int i = 0, len = unRegisterKeys.size(); i < len; i++) {
+        mAppearComponents.remove(unRegisterKeys.get(i));
+      }
+
     }
 
     public void unbindAppearComponents(WXComponent component) {

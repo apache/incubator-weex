@@ -237,7 +237,15 @@ public class WXComponentRegistry {
     return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
   }
 
-  public static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
+  private static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
+    if (type == null) {
+      if (WXEnvironment.isApkDebugable()) {
+        throw new WXException("Component name required." );
+      } else {
+        WXLogUtils.e("Component name required." + type);
+        return false;
+      }
+    }
     //same component class for different name
     ComponentHolder holder;
     if(sClassTypeMap.get(clazz.getName()) == null){
@@ -265,23 +273,6 @@ public class WXComponentRegistry {
     }
 
     String type = componentInfo.get("type");
-    if (type == null) {
-      if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Exist duplicate component:" + type);
-      } else {
-        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
-        return false;
-      }
-    }
-    if (sTypeComponentMap.containsKey(type)) {
-      if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Exist duplicate component:" + type);
-      } else {
-        WXLogUtils.e("WXComponentRegistry Exist duplicate component: " + type);
-        return false;
-      }
-    }
-
     return registerNativeComponent(type, clazz) && registerJSComponent(componentInfo);
   }
 

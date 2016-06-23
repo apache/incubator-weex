@@ -323,7 +323,7 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
           LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
       scrollView.addView(mRealView, layoutParams);
-      mHost.setHorizontalScrollBarEnabled(true);
+      mHost.setHorizontalScrollBarEnabled(false);
     }else{
       mOrientation = VERTICAL;
       mHost = new BounceScrollerView(mContext, mOrientation, this);

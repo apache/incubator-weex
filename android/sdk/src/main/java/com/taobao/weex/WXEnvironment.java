@@ -231,11 +231,13 @@ public class WXEnvironment {
 
   public static String JS_LIB_SDK_VERSION = "v0.13.10";
 
-  public static String WXSDK_VERSION = "0.6.0";
+  public static String WXSDK_VERSION = "1.5.1.3";
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
   public static int sDefaultWidth = 750;
   public volatile static boolean JsFrameworkInit = false;
+
+  public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
   /**
    * Debug model
    */
@@ -302,7 +304,9 @@ public class WXEnvironment {
   }
 
   public static boolean isSupport() {
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport();
+    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
+    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86()&&excludeX86;
+    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport()&&!isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
                    + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()

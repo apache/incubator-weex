@@ -287,7 +287,7 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
 
       registerModule("dom", WXDomModule.class, true);
-      registerModule("modal", WXModalUIModule.class, true);
+      registerModule("modal", WXModalUIModule.class, false);
       registerModule("instanceWrap", WXInstanceWrap.class, true);
       registerModule("animation", WXAnimationModule.class, true);
       registerModule("webview", WXWebViewModule.class, true);

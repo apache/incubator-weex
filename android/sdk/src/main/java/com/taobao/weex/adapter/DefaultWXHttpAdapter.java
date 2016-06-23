@@ -209,11 +209,7 @@ import android.text.TextUtils;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -253,7 +249,7 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
 
           response.statusCode = String.valueOf(responseCode);
           if (responseCode >= 200 && responseCode<=299) {
-            response.originalData = readInputStream(connection.getInputStream(), listener).getBytes();
+            response.originalData = readInputStreamAsBytes(connection.getInputStream(), listener);
           } else {
             response.errorMsg = readInputStream(connection.getErrorStream(), listener);
           }
@@ -319,6 +315,29 @@ public class DefaultWXHttpAdapter implements IWXHttpAdapter {
     }
 
     return connection;
+  }
+
+  private byte[] readInputStreamAsBytes(InputStream inputStream,OnHttpListener listener) throws IOException{
+    if(inputStream == null){
+      return null;
+    }
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+    int nRead;
+    int readCount = 0;
+    byte[] data = new byte[2048];
+
+    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+      buffer.write(data, 0, nRead);
+      readCount += nRead;
+      if (listener != null) {
+        listener.onHttpResponseProgress(readCount);
+      }
+    }
+
+    buffer.flush();
+
+    return buffer.toByteArray();
   }
 
   private String readInputStream(InputStream inputStream, OnHttpListener listener) throws IOException {

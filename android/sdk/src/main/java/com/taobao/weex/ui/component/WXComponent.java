@@ -317,7 +317,7 @@ public abstract class WXComponent implements IWXObject, IWXActivityStateListener
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && mAbsoluteY >= WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) {
+    if (!mInstance.mEnd && mAbsoluteY >= mInstance.getWeexHeight()) {
       mInstance.firstScreenRenderFinished();
     }
 
