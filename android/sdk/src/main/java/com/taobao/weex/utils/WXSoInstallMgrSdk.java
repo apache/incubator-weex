@@ -253,6 +253,10 @@ public class WXSoInstallMgrSdk {
     mContext = c;
   }
 
+  public static boolean isX86(){
+    String cpuType = _cpuType();
+    return cpuType.equalsIgnoreCase(X86);
+  }
 
   public static boolean isCPUSupport(){
     String cpuType = _cpuType();
