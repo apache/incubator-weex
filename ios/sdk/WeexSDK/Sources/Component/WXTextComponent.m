@@ -322,7 +322,10 @@ do {\
             textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
     }
     textContainer.maximumNumberOfLines = _lines > 0 ? _lines : 0;
-    textContainer.size = (CGSize){isnan(width) ? CGFLOAT_MAX : width, CGFLOAT_MAX};
+
+    //fix https://github.com/alibaba/weex/issues/552
+    CGSize textStorageSize = textStorage.size;
+    textContainer.size = (CGSize){isnan(width) ? textStorageSize.width : width, textStorageSize.height};
     
     [layoutManager addTextContainer:textContainer];
     [layoutManager ensureLayoutForTextContainer:textContainer];
