@@ -191,7 +191,13 @@
     
     NSIndexPath *indexPath = cell.indexPath;
     WXAssert(indexPath, @"Rendered cell:%@ has not been inserted to cell list before", cell);
-
+    
+    NSInteger currentRowNumber = [_tableView numberOfRowsInSection:0];
+    if (!indexPath || indexPath.row >= currentRowNumber) {
+        WXLogError(@"Incorrect row:%ld in cellDidRendered, currentRowNumber:%ld", indexPath.row, currentRowNumber);
+        return;
+    }
+    
     CGRect cellRect = [_tableView rectForRowAtIndexPath:indexPath];
     if (cellRect.origin.y + cellRect.size.height >= _tableView.frame.size.height) {
         if (self.weexInstance.screenRenderTime == 0) {
