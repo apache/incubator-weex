@@ -21,6 +21,7 @@ import com.taobao.weex.devtools.inspector.elements.DocumentView;
 import com.taobao.weex.devtools.inspector.elements.ElementInfo;
 import com.taobao.weex.devtools.inspector.elements.NodeDescriptor;
 import com.taobao.weex.devtools.inspector.elements.NodeType;
+import com.taobao.weex.devtools.inspector.elements.StyleAccumulator;
 import com.taobao.weex.devtools.inspector.helper.ChromePeerManager;
 import com.taobao.weex.devtools.inspector.helper.PeersRegisteredListener;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcException;
@@ -255,6 +256,122 @@ public class DOM implements ChromeDevtoolsDomain {
     if (request.searchId != null) {
       mSearchResults.remove(request.searchId);
     }
+  }
+
+  @ChromeDevtoolsMethod
+  public GetBoxModelResponse getBoxModel(JsonRpcPeer peer, JSONObject params) {
+    GetBoxModelResponse response = new GetBoxModelResponse();
+    final BoxModel model = new BoxModel();
+    final GetBoxModelRequest request = mObjectMapper.convertValue(
+            params,
+            GetBoxModelRequest.class);
+
+    if (request.nodeId == null) {
+      return null;
+    }
+
+    response.model = model;
+
+    mDocument.postAndWait(new Runnable() {
+      @Override
+      public void run() {
+        Object elementForNodeId = mDocument.getElementForNodeId(request.nodeId);
+
+        if (elementForNodeId == null) {
+          LogUtil.w("Failed to get style of an element that does not exist, nodeid=" +
+                  request.nodeId);
+          return;
+        }
+
+        mDocument.getElementStyles(
+                elementForNodeId,
+                new StyleAccumulator() {
+                  @Override
+                  public void store(String name, String value, boolean isDefault) {
+                    if (!isDefault) {
+//                      ArrayList<Double> padding = new ArrayList<>(8);
+//                      padding.add(new Double(100));
+//                      padding.add(new Double(100));
+//                      padding.add(new Double(800));
+//                      padding.add(new Double(100));
+//                      padding.add(new Double(800));
+//                      padding.add(new Double(800));
+//                      padding.add(new Double(100));
+//                      padding.add(new Double(800));
+//                      model.padding = padding;
+//
+//                      ArrayList<Double> content = new ArrayList<>(8);
+//                      content.add(new Double(400));
+//                      content.add(new Double(400));
+//                      content.add(new Double(600));
+//                      content.add(new Double(400));
+//                      content.add(new Double(600));
+//                      content.add(new Double(600));
+//                      content.add(new Double(400));
+//                      content.add(new Double(600));
+//                      model.content = content;
+//
+//                      ArrayList<Double> border = new ArrayList<>(8);
+//                      border.add(new Double(50));
+//                      border.add(new Double(50));
+//                      border.add(new Double(850));
+//                      border.add(new Double(50));
+//                      border.add(new Double(850));
+//                      border.add(new Double(850));
+//                      border.add(new Double(50));
+//                      border.add(new Double(850));
+//                      model.border = border;
+//
+//                      ArrayList<Double> margin = new ArrayList<>(8);
+//                      margin.add(new Double(25));
+//                      margin.add(new Double(25));
+//                      margin.add(new Double(900));
+//                      margin.add(new Double(25));
+//                      margin.add(new Double(900));
+//                      margin.add(new Double(900));
+//                      margin.add(new Double(25));
+//                      margin.add(new Double(900));
+//                      model.margin = margin;
+
+                      if ("width".equals(name)) {
+                        model.width = Integer.valueOf(value);
+                      }
+                      if ("height".equals(name)) {
+                        model.height = Integer.valueOf(value);
+                      }
+                    }
+                  }
+                });
+      }
+    });
+
+
+    return response;
+  }
+
+  public static final class GetBoxModelResponse implements JsonRpcResult {
+    @JsonProperty(required = true)
+    public BoxModel model;
+  }
+
+  private static class GetBoxModelRequest {
+    @JsonProperty
+    public Integer nodeId;
+  }
+
+  private static class BoxModel {
+    @JsonProperty(required = true)
+    List<Double> content;
+    @JsonProperty(required = true)
+    List<Double> padding;
+    @JsonProperty(required = true)
+    List<Double> border;
+    @JsonProperty(required = true)
+    List<Double> margin;
+    @JsonProperty(required = true)
+    Integer width;
+    @JsonProperty(required = true)
+    Integer height;
   }
 
   private Node createNodeForElement(

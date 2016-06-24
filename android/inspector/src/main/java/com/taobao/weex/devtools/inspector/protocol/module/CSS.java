@@ -28,7 +28,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CSS implements ChromeDevtoolsDomain {
   private final ChromePeerManager mPeerManager;
@@ -71,6 +73,8 @@ public class CSS implements ChromeDevtoolsDomain {
           return;
         }
 
+        // fix devtools not show the box
+        mockStyleProperty(result.computedStyle, sProperties);
         mDocument.getElementStyles(
             element,
             new StyleAccumulator() {
@@ -89,6 +93,47 @@ public class CSS implements ChromeDevtoolsDomain {
     });
 
     return result;
+  }
+
+  private static final HashMap<String, String> sProperties = new HashMap<String, String>();
+
+  static {
+    sProperties.put("height", "");
+    sProperties.put("width", "");
+
+    sProperties.put("padding-left","");
+    sProperties.put("padding-top","");
+    sProperties.put("padding-right","");
+    sProperties.put("padding-bottom","");
+
+    sProperties.put("border-left-width","");
+    sProperties.put("border-top-width","");
+    sProperties.put("border-right-width","");
+    sProperties.put("border-bottom-width","");
+
+    sProperties.put("margin-left","");
+    sProperties.put("margin-top","");
+    sProperties.put("margin-right","");
+    sProperties.put("margin-bottom","");
+    
+    sProperties.put("left","");
+    sProperties.put("top","");
+    sProperties.put("right","");
+    sProperties.put("bottom","");
+  }
+
+  private void mockStyleProperty(List<CSSComputedStyleProperty> computedStyle, HashMap<String, String> properties) {
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      addStyleProperty(computedStyle, entry.getKey(), entry.getValue());
+      System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+    }
+  }
+
+  private void addStyleProperty(List<CSSComputedStyleProperty> computedStyle, String name, String value) {
+    CSSComputedStyleProperty property = new CSSComputedStyleProperty();
+    property.name = name;
+    property.value = value;
+    computedStyle.add(property);
   }
 
   @ChromeDevtoolsMethod
@@ -253,7 +298,7 @@ public class CSS implements ChromeDevtoolsDomain {
     public String value;
 
     @JsonProperty
-    public Boolean imporant;
+    public Boolean important;
   }
 
   private static class CSSProperty {
