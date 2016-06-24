@@ -31,6 +31,7 @@ import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.MeasureOutput;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXLogUtils;
@@ -80,11 +81,11 @@ public class WXTextDomObject extends WXDomObject {
       if (CSSConstants.isUndefined(width)) {
         width = node.cssstyle.maxWidth;
       }
-      textDomObject.updateLayout(width);
+      textDomObject.updateLayout(width,false);
       textDomObject.hasBeenMeasured = true;
-      textDomObject.previousWidth = width;
+      textDomObject.previousWidth = textDomObject.layout.getWidth();
       measureOutput.height = textDomObject.layout.getHeight();
-      measureOutput.width = textDomObject.layout.getWidth();
+      measureOutput.width = textDomObject.previousWidth;
     }
   };
 
@@ -146,11 +147,14 @@ public class WXTextDomObject extends WXDomObject {
 
   @Override
   public void layoutAfter() {
-    if (!hasBeenMeasured) {
+    if(hasBeenMeasured){
+      if(layout!=null&& !FloatUtil.floatsEqual(getTextContentWidth(),previousWidth)){
+        recalculateLayout();
+      }
+    }
+    else{
       updateStyleAndText();
-      updateSpannableStringBuilder(mText);
-      updateLayout(getLayoutWidth());
-      previousWidth = getLayoutWidth();
+      recalculateLayout();
     }
     hasBeenMeasured =false;
 
@@ -213,6 +217,24 @@ public class WXTextDomObject extends WXDomObject {
     return dom;
   }
 
+  private float getTextContentWidth(){
+    float rawWidth=getLayoutWidth(), left, right;
+    Spacing padding=getPadding();
+    if(!CSSConstants.isUndefined((left=padding.get(Spacing.LEFT)))){
+      rawWidth-=left;
+    }
+    if(!CSSConstants.isUndefined((right=padding.get(Spacing.RIGHT)))){
+      rawWidth-=right;
+    }
+    return rawWidth;
+  }
+
+  private void recalculateLayout() {
+    updateSpannableStringBuilder(mText);
+    updateLayout(getTextContentWidth(),true);
+    previousWidth = layout.getWidth();
+  }
+
   /**
    * Update style and text.
    */
@@ -265,14 +287,25 @@ public class WXTextDomObject extends WXDomObject {
   /**
    * Update layout according to {@link #mText} and span
    * @param width the specified width.
+   * @param forceWidth If true, force the text width to the specified width, otherwise, text width
+   *                   may equals to or be smaller than the specified width.
    */
-  private void updateLayout(float width) {
-    int textWidth = (int) Math.ceil(CSSConstants.isUndefined(width) ?
-                                    Layout.getDesiredWidth(spannableStringBuilder, TEXT_PAINT)
-                                                                    : width);
+  private void updateLayout(float width, boolean forceWidth) {
+    float textWidth;
+    if(forceWidth){
+      textWidth=width;
+    }
+    else {
+      float desiredWidth = Layout.getDesiredWidth(spannableStringBuilder, TEXT_PAINT);
+      if (CSSConstants.isUndefined(width) || desiredWidth < width) {
+        textWidth = desiredWidth;
+      } else {
+        textWidth = width;
+      }
+    }
     if (layout == null||!FloatUtil.floatsEqual(previousWidth, width)) {
-      layout = new DynamicLayout(spannableStringBuilder, TEXT_PAINT, textWidth, Layout.Alignment
-          .ALIGN_NORMAL, 1, 0, true);
+      layout = new DynamicLayout(spannableStringBuilder, TEXT_PAINT, (int) Math.ceil(textWidth),
+                                 Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
     }
 
     if (mNumberOfLines != UNSET && mNumberOfLines > 0 && mNumberOfLines < layout.getLineCount()) {
@@ -291,7 +324,7 @@ public class WXTextDomObject extends WXDomObject {
           stringBuilder.append(ELLIPSIS);
         }
         updateSpannableStringBuilder(stringBuilder.toString());
-        updateLayout(width);
+        updateLayout(width, forceWidth);
       }
     }
   }
