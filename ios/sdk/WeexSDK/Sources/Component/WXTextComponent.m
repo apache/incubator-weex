@@ -139,7 +139,13 @@ do {\
     WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
     
-    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP], self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT]);
+    UIEdgeInsets padding = {
+        WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
+        WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
+        WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
+        WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
+    };
+    
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         _padding = padding;
         [self setNeedsRepaint];
