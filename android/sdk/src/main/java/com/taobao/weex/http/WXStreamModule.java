@@ -344,7 +344,7 @@ public class WXStreamModule extends WXModule {
             } else {
               resp.put("data",
                 readAsString(response.originalData,
-                  headers.get("Content-Type")
+                  headers!=null?headers.get("Content-Type"):""
                 ));
             }
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
