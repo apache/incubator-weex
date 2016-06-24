@@ -238,6 +238,8 @@ public class WXEnvironment {
   public volatile static boolean JsFrameworkInit = false;
 
   public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
+
+  public static final boolean SETTING_FORCE_VERTICAL_SCREEN = false;
   /**
    * Debug model
    */
