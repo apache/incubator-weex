@@ -47,8 +47,9 @@
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
                 levelMap = @{
-                             @"__ERROR":@(WXLogFlagError),
+                             @"__ERROR": @(WXLogFlagError),
                              @"__WARN": @(WXLogFlagWarning),
+                             @"__LOG": @(WXLogFlagInfo),
                              @"__INFO": @(WXLogFlagInfo),
                              @"__DEBUG": @(WXLogFlagDebug),
                              @"__VERBOSE": @(WXLogFlagVerbose)
