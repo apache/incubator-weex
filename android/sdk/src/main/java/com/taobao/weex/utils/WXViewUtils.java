@@ -284,17 +284,15 @@ public class WXViewUtils {
   @Deprecated
   public static int getScreenWidth( ) {
     if(WXEnvironment.sApplication!=null) {
-      if (WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN) {
-        int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
+      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
 
-        if (WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN) {
-          int height = WXEnvironment.sApplication.getResources()
-                  .getDisplayMetrics()
-                  .heightPixels;
-          width = height > width ? width : height;
-        }
-        return width;
+      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
+        int height = WXEnvironment.sApplication.getResources()
+                .getDisplayMetrics()
+                .heightPixels;
+        width = height > width ?width:height;
       }
+      return width;
     }
     if(WXEnvironment.isApkDebugable()){
       throw new WXRuntimeException("Error Context is null When getScreenHeight");
