@@ -54,6 +54,7 @@
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;
 @property (nonatomic, strong) NSString *placeholder;
+@property (nonatomic) NSUInteger maxLength;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -109,6 +110,11 @@
         }
         if (attributes[@"value"]) {
             _inputView.text = attributes[@"value"];
+        }
+        if (attributes[@"maxlength"]) {
+            _maxLength = [attributes[@"maxlength"] integerValue];
+        } else {
+            _maxLength = 0;
         }
         
         if (styles[@"color"]) {
@@ -234,6 +240,10 @@
     if (attributes[@"disabled"]) {
         [_inputView setEnabled:[attributes[@"disabled"] boolValue]];
     }
+    if (attributes[@"maxlength"]) {
+        _maxLength = attributes[@"maxlength"];
+    }
+    
     if (attributes[@"placeholder"]) {
         _placeholder = attributes[@"placeholder"];
         _inputView.placeholder = _placeholder;
@@ -328,6 +338,20 @@
     if (_clickEvent) {
         [self fireEvent:@"click" params:nil];
     }
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if (_maxLength) {
+        NSUInteger oldLength = [textField.text length];
+        NSUInteger replacementLength = [string length];
+        NSUInteger rangeLength = range.length;
+        
+        NSUInteger newLength = oldLength - rangeLength + replacementLength;
+        
+        return newLength <= _maxLength ;
+    }
+    return YES;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
