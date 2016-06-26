@@ -11,15 +11,28 @@
 		执行完会显示native需要链接的ws地址,之后自动打开chrome 。
 
 ## native 调用 
-0. +(void)launchInspectorWithSocketUrl:(NSURL *)url，
- 
-   url为terminal显示的ws地址。
+0. inspect调试
+	* 程序启动时调用 +(void)launchInspectorWithSocketUrl:(NSURL *)url，url为terminal显示的ws地址。
 
-	 eg：[WXDebugTool launchInspectorWithSocketUrl:[NSURL URLWithString:@"ws://30.30.29.242:8088/debugProxy/native"]];
+	 eg：- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    //launch inspector
+    [WXDebugTool launchInspectorWithSocketUrl:[NSURL URLWithString:@"ws://30.30.29.242:8088/debugProxy/native"]];
+}
+	 
+	* 启动app，此时chrome页会显示你的设备与app name，选择启动inspector开启调试模式
 
-	启动app，此时chrome页会显示你的设备与app name，选择启动inspector和debugger开启调试模式
+0. debugger调试
+	* 程序启动时调用+ (void)launchDebugWithSocketUrl:(NSString *)url;
+	 
+	 eg：-(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    //launch debug
+    [WXDebugTool launchDebugWithSocketUrl:@"ws://30.30.29.242:8088/debugProxy/native"];
+}
 
-0. 如果你选择debugger模式，点击debugger按钮，此时app会提示您重启app，重启之后可以断点调试。
+	* 启动app，此时chrome页会显示你的设备与app name，选择启动debugger开启调试模式
+
 
 
 
