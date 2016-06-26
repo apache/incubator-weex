@@ -274,8 +274,6 @@ public class WXSDKEngine {
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
-      registerComponent(WXBasicComponentType.HEADER, WXDiv.class, false);
-      registerComponent(WXBasicComponentType.FOOTER, WXDiv.class, false);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
       registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);

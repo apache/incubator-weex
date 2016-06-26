@@ -326,7 +326,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     parentHelper = new NestedScrollingParentHelper(this);
 
     loadingViewHeight = dipToPx(context, REFRESH_VIEW_HEIGHT);
-    refreshViewFlowHeight = loadingViewHeight * 2;
+    refreshViewFlowHeight = loadingViewHeight * (float)1.5;
 
     if (isInEditMode() && attrs == null) {
       return;

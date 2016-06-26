@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component.list;
 
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -474,6 +475,12 @@ public class WXListComponent extends WXVContainer implements
             WXLogUtils.d(TAG, "removeChild child at " + index);
         }
         super.remove(child, destroy);
+    }
+
+    @Override
+    public void computeVisiblePointInViewCoordinate(PointF pointF) {
+      RecyclerView view = getView().getInnerView();
+      pointF.set(view.computeHorizontalScrollOffset(), view.computeVerticalScrollOffset());
     }
 
     /**
