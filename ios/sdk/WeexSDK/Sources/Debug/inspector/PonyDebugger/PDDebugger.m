@@ -150,7 +150,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     
     dispatch_async(dispatch_get_main_queue(), ^{
 //        [self sendEventWithName:@"Gateway.registerDevice" parameters:parameters];
-        [self sendEventWithName:@"WxDebug.registerDevice" parameters:parameters];
+        [self _registerDeviceWithParams:parameters];
+        
     });
 }
 
@@ -296,7 +297,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 - (void)sendEventWithName:(NSString *)methodName parameters:(id)params;
 {
-    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:methodName, @"method", [params PD_JSONObject], @"params", nil];
+    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:methodName, @"method", [params PD_JSONObject], @"params",nil];
 
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
     NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -478,6 +479,17 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 }
 
 #pragma mark - Private Methods
+
+- (void)_registerDeviceWithParams:(id)params {
+    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:@"WxDebug.registerDevice", @"method", [params PD_JSONObject], @"params",[NSNumber numberWithInt:0],@"id",nil];
+    
+    NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
+    NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    if (_socket.readyState == SR_OPEN) {
+        [_socket send:encodedData];
+    }
+}
 
 - (void)_resolveService:(NSNetService*)service;
 {

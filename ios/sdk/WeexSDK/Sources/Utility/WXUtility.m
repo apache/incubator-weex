@@ -15,6 +15,8 @@
 #import <sys/utsname.h>
 #import <UIKit/UIScreen.h>
 
+static NSString *const WXClientIDKey = @"com.taobao.Weex.clientID";
+
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
 {
     if ([NSThread isMainThread]) {
@@ -166,6 +168,31 @@ CGPoint WXPixelPointResize(CGPoint value)
                                     @"scale":@(scale),
                                     @"logLevel":[WXLog logLevelString]
                                 }];
+    return data;
+}
+
++ (NSDictionary *)getDebugEnvironment {
+    NSString *platform = @"iOS";
+    NSString *weexVersion = WX_SDK_VERSION;
+    NSString *machine = [self deviceName] ? : @"";
+    NSString *appName = [WXAppConfiguration appName] ? : @"";
+    NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:WXClientIDKey];
+    if (!clientID) {
+        CFUUIDRef uuid = CFUUIDCreate(NULL);
+        clientID = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+        assert(clientID);
+        CFRelease(uuid);
+        
+        [[NSUserDefaults standardUserDefaults] setObject:clientID forKey:WXClientIDKey];
+    }
+    
+    NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
+                                                            @"platform":platform,
+                                                            @"weexVersion":weexVersion,
+                                                            @"model":machine,
+                                                            @"name":appName,
+                                                            @"deviceId":clientID,
+                                                        }];
     return data;
 }
 

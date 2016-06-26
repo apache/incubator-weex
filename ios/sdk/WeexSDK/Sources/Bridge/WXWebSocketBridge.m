@@ -62,6 +62,15 @@
     [self callJSMethod:@"setEnvironment" args:@[[WXUtility getEnvironment]]];
 }
 
+- (void)registerDevice {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:@"WxDebug.registerDevice" forKey:@"method"];
+    [dict setObject:[WXUtility getDebugEnvironment] forKey:@"params"];
+    [dict setObject:[NSNumber numberWithInt:0] forKey:@"id"];
+    [_msgAry insertObject:[WXUtility JSONString:dict] atIndex:0];
+    [self _executionMsgAry];
+}
+
 - (void)_disconnect
 {
     _msgAry = nil;
@@ -203,6 +212,7 @@
     WXLogWarning(@"Websocket Connected:%@", webSocket.url);
     _isConnect = YES;
 //    [self _initEnvironment];
+    [self registerDevice];
     __weak typeof(self) weakSelf = self;
     [self executeBridgeThead:^() {
         [weakSelf _executionMsgAry];
