@@ -44,59 +44,40 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/9dc047404865acabbbd4844a27483821", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/6c7b31e9640a3460351bcd855406e8da", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
 	    data: function () {return {
-	      items: [{
-	        id: 1
-	      }, {
-	        id: 2
-	      }, {
-	        id: 3
-	      }]
-	    }}
-	  }
-
-	;__weex_module__.exports.template={
-	  "type": "div",
-	  "children": [
-	    {
-	      "type": "text",
-	      "repeat": function () {return this.items},
-	      "style": {
-	        "fontSize": 100,
-	        "color": "#FF0000"
-	      },
-	      "attr": {
-	        "value": function () {return 'Hello ' + (this.id)}
-	      }
-	    },
-	    {
-	      "type": "text",
-	      "style": {
-	        "fontSize": 100,
-	        "color": "#FF0000"
-	      },
-	      "attr": {
-	        "value": "Hello Weex!"
-	      }
-	    },
-	    {
-	      "type": "image",
-	      "attr": {
-	        "src": "http://gw.alicdn.com/tps/i2/TB1DpsmMpXXXXabaXXX20ySQVXX-512-512.png_400x400.jpg"
-	      },
-	      "style": {
-	        "width": 200,
-	        "height": 200
+	      text: '',
+	      href: ''
+	    }},
+	    methods: {
+	      _clickHandler: function () {
+	        this.$call('modal', 'toast', {
+	          message: 'click',
+	          duration: 1
+	        });
 	      }
 	    }
-	  ]
-	}
+	  };
+
+	;__weex_module__.exports.template = __weex_module__.exports.template || {}
+	;Object.assign(__weex_module__.exports.template, {
+	  "type": "text",
+	  "classList": [
+	    "link"
+	  ],
+	  "shown": function () {return this.href},
+	  "events": {
+	    "click": "_clickHandler"
+	  },
+	  "attr": {
+	    "value": function () {return this.text}
+	  }
 	})
-	;__weex_bootstrap__("@weex-component/9dc047404865acabbbd4844a27483821", {
+	})
+	;__weex_bootstrap__("@weex-component/6c7b31e9640a3460351bcd855406e8da", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

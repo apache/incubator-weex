@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/5967f205d011fc83a8277f74388ee8ff", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/0b2cda5d89d515dff33c7b77b4143139", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(16);
@@ -78,7 +78,6 @@
 	        // showcase
 	        {name: 'showcase/new-fashion/index', title: 'Activity'},
 	        {name: 'showcase/calculator', title: 'Calculator'},
-	        {name: 'showcase/minesweeper', title: 'Minesweeper'},
 	        {name: 'showcase/ui', title: 'UI Gallery'}
 	      ]
 	    }}
@@ -93,7 +92,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/5967f205d011fc83a8277f74388ee8ff", {
+	;__weex_bootstrap__("@weex-component/0b2cda5d89d515dff33c7b77b4143139", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -849,7 +848,7 @@
 	    {
 	      "type": "image",
 	      "classList": [
-	        "left-image"
+	        "right-image"
 	      ],
 	      "attr": {
 	        "naviItemPosition": "right",
@@ -944,14 +943,14 @@
 	  "left-image": {
 	    "position": "absolute",
 	    "bottom": 20,
-	    "right": 28,
+	    "left": 28,
 	    "width": 50,
 	    "height": 50
 	  },
 	  "right-image": {
 	    "position": "absolute",
 	    "bottom": 20,
-	    "left": 28,
+	    "right": 28,
 	    "width": 50,
 	    "height": 50
 	  }

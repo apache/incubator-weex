@@ -30,7 +30,7 @@ public class IndexActivity extends AbstractWeexActivity {
 
   private static final String TAG = "IndexActivity";
   private static final String DEFAULT_IP = "your_current_IP";
-  private static String CURRENT_IP= DEFAULT_IP; // your_current_IP
+  private static String CURRENT_IP= "30.10.216.8"; // your_current_IP
   private static final String WEEX_INDEX_URL = "http://"+CURRENT_IP+":12580/examples/build/index.js";
 
   private ProgressBar mProgressBar;
@@ -81,6 +81,11 @@ public class IndexActivity extends AbstractWeexActivity {
     if (id == R.id.action_refresh) {
       if(!TextUtils.equals(CURRENT_IP,DEFAULT_IP)){
         createWeexInstance();
+        if(TextUtils.equals(CURRENT_IP,DEFAULT_IP)){
+          renderPage(WXFileUtils.loadFileContent("index.js", this),WEEX_INDEX_URL);
+        }else{
+          renderPageByURL(WEEX_INDEX_URL);
+        }
         return true;
       }
     } else if (id == R.id.action_scan) {
