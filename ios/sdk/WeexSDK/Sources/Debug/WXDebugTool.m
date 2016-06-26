@@ -163,4 +163,9 @@ static NSString* WXDebugrepJSFramework;
 
 }
 
++ (void)launchDebugWithSocketUrl:(NSString *)url {
+    [WXDebugTool setDebug:YES];
+    [WXSDKEngine connectDebugServer:url];
+}
+
 @end

@@ -28,6 +28,8 @@
 #import "PDTimelineDomainController.h"
 #import "PDCSSDomainController.h"
 
+#import "WXAppConfiguration.h"
+
 
 static NSString *const PDClientIDKey = @"com.squareup.PDDebugger.clientID";
 static NSString *const PDBonjourServiceType = @"_ponyd._tcp";
@@ -115,15 +117,17 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] ?: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-        clientID, @"device_id",
-        deviceName, @"device_name",
-        device.localizedModel, @"device_model",
-        [[NSBundle mainBundle] bundleIdentifier], @"app_id",
-        appName, @"app_name",
-        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"], @"app_version",
-        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], @"app_build",
+        clientID, @"deviceId",
+        deviceName, @"platform",
+        device.localizedModel, @"model",
+        [WXAppConfiguration appVersion],@"weexVersion",
+        /*[[NSBundle mainBundle] bundleIdentifier], @"app_id",*/
+        appName, @"name",
+        /*[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"], @"app_version",
+        [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], @"app_build",*/
         nil];
     
+    /*
     NSString *appIconFile = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIconFile"];
     if (!appIconFile) {
         NSArray *files = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIconFiles"];
@@ -142,10 +146,11 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 #endif
             [parameters setObject:base64IconString forKey:@"app_icon_base64"];
         }
-    }
+    }*/
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self sendEventWithName:@"Gateway.registerDevice" parameters:parameters];
+//        [self sendEventWithName:@"Gateway.registerDevice" parameters:parameters];
+        [self sendEventWithName:@"WxDebug.registerDevice" parameters:parameters];
     });
 }
 

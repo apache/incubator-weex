@@ -31,4 +31,6 @@
  **/
 + (void)launchInspectorWithSocketUrl:(NSURL *)url;
 
++ (void)launchDebugWithSocketUrl:(NSString *)url;
+
 @end
