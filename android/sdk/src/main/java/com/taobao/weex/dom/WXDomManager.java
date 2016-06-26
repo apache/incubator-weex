@@ -516,4 +516,12 @@ public final class WXDomManager {
     }
     statement.refreshFinish();
   }
+
+  public void dumpDomTree(String instanceId) {
+    WXDomStatement statement = mDomRegistries.get(instanceId);
+    if (statement == null) {
+      return;
+    }
+    //statement.rebuildingDomTree();
+  }
 }

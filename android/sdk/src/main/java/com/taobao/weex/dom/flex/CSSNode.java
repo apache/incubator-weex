@@ -183,6 +183,7 @@ public class CSSNode {
 
     result.append(indentation.toString());
     result.append(csslayout.toString());
+    result.append(cssstyle.toString());
 
     if (getChildCount() == 0) {
       return;

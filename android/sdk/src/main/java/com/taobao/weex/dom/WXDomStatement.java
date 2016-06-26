@@ -360,13 +360,13 @@ class WXDomStatement {
     layoutBefore(rootDom);
 
     rootDom.calculateLayout(mLayoutContext);
-    //		if (WXEnvironment.isApkDebugable()) {
-    //			WXLogUtils.d("csslayout", "------------start------------");
-    //			WXLogUtils.d("csslayout", rootDom.toString());
-    //			WXLogUtils.d("csslayout", "------------end------------");
-    //		}
 
     applyUpdate(rootDom);
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("csslayout", "------------start------------");
+      WXLogUtils.d("csslayout", rootDom.toString());
+      WXLogUtils.d("csslayout", "------------end------------");
+    }
 
     updateDomObj();
     int count = mNormalTasks.size();

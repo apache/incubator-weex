@@ -523,4 +523,8 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
     fixedStyleRefs.add(ref);
   }
+
+  public String dumpDomTree() {
+    return ref + ": " + toString();
+  }
 }

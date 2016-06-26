@@ -117,10 +117,6 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
         startActivity(new Intent(this, CaptureActivity.class));
       }
       return true;
-    } else if (id == R.id.action_debug) {
-//      WXEnvironment.sDebugWsUrl = "ws://30.30.30.9:8088/debugProxy/native";
-//      WXSDKEngine.restartBridge(true);
-//      new DebugServerProxy(WeexInspector);
     }
     return super.onOptionsItemSelected(item);
   }
