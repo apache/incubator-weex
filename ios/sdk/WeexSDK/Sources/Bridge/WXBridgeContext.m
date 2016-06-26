@@ -45,7 +45,6 @@
     if (self) {
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
-        _debugJS = [WXDebugTool isDebug];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jsError:) name:WX_JS_ERROR_NOTIFICATION_NAME object:nil];
     }
     return self;
@@ -75,6 +74,7 @@
 - (id<WXBridgeProtocol>)jsBridge
 {
     WXAssertBridgeThread();
+    _debugJS = [WXDebugTool isDebug];
     
     Class bridgeClass = _debugJS ? [WXWebSocketBridge class] : [WXJSCoreBridge class];
     

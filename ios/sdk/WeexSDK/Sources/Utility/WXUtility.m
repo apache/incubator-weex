@@ -172,8 +172,21 @@ CGPoint WXPixelPointResize(CGPoint value)
 }
 
 + (NSDictionary *)getDebugEnvironment {
-    NSString *platform = @"iOS";
-    NSString *weexVersion = WX_SDK_VERSION;
+#if TARGET_IPHONE_SIMULATOR
+    NSDictionary *environment = [[NSProcessInfo processInfo] environment];
+    NSString *userName = [environment objectForKey:@"USER"];
+    if (!userName) {
+        NSString *simulatorHostHome = [environment objectForKey:@"SIMULATOR_HOST_HOME"];
+        if ([simulatorHostHome hasPrefix:@"/Users/"]) {
+            userName = [simulatorHostHome substringFromIndex:7];
+        }
+    }
+    NSString *deviceName = userName ? [NSString stringWithFormat:@"%@'s Simulator", userName] : @"iOS Simulator";
+#else
+    NSString *deviceName = device.name;
+#endif
+    NSString *platform = deviceName;
+    NSString *weexVersion = [WXAppConfiguration appVersion];
     NSString *machine = [self deviceName] ? : @"";
     NSString *appName = [WXAppConfiguration appName] ? : @"";
     NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:WXClientIDKey];

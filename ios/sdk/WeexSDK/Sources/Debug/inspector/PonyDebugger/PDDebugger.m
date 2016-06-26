@@ -30,6 +30,10 @@
 
 #import "WXAppConfiguration.h"
 
+#import <objc/runtime.h>
+#import <objc/message.h>
+#import <sys/utsname.h>
+
 
 static NSString *const PDClientIDKey = @"com.squareup.PDDebugger.clientID";
 static NSString *const PDBonjourServiceType = @"_ponyd._tcp";
@@ -89,6 +93,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket;
 {
+    
     NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:PDClientIDKey];
     if (!clientID) {
         CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -115,11 +120,12 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSString *deviceName = device.name;
 #endif
 
+    NSString *machine = [self _deviceName] ? : @"";
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] ?: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
         clientID, @"deviceId",
         deviceName, @"platform",
-        device.localizedModel, @"model",
+        machine, @"model",
         [WXAppConfiguration appVersion],@"weexVersion",
         /*[[NSBundle mainBundle] bundleIdentifier], @"app_id",*/
         appName, @"name",
@@ -479,6 +485,13 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 }
 
 #pragma mark - Private Methods
+
+- (NSString *)_deviceName
+{
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+}
 
 - (void)_registerDeviceWithParams:(id)params {
     NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:@"WxDebug.registerDevice", @"method", [params PD_JSONObject], @"params",[NSNumber numberWithInt:0],@"id",nil];
