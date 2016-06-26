@@ -294,7 +294,7 @@ public class ObjectMapper {
     return value;
   }
 
-  private JSONArray convertListToJsonArray(Object value)
+  public JSONArray convertListToJsonArray(Object value)
       throws InvocationTargetException, IllegalAccessException {
     JSONArray array = new JSONArray();
     List<Object> list = (List<Object>) value;

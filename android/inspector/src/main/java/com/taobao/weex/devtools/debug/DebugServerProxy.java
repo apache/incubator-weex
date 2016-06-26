@@ -1,12 +1,19 @@
 package com.taobao.weex.devtools.debug;
 
+import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.IWXDebugProxy;
+import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.inspector.MessageHandlingException;
@@ -26,55 +33,101 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okio.BufferedSource;
 
-public class DebugServerProxy {
+public class DebugServerProxy implements IWXDebugProxy {
     private static final String TAG = "DebugServerProxy";
-
     private DebugSocketClient mWebSocketClient;
     private ObjectMapper mObjectMapper = new ObjectMapper();
     private MethodDispatcher mMethodDispatcher;
     private Iterable<ChromeDevtoolsDomain> mDomainModules;
-    private JsonRpcPeer mPeer = null;
+    private JsonRpcPeer mPeer;
     private String mRemoteUrl = WXEnvironment.sDebugWsUrl;
+    private WXBridgeManager mJsManager;
+    private Context mContext;
+    private DebugBridge mBridge;
 
-    public DebugServerProxy(Iterable<ChromeDevtoolsDomain> domainModules) {
+    public DebugServerProxy(Context context, WXBridgeManager jsManager) {
+        mContext = context;
         mWebSocketClient = new DebugSocketClient(this);
-        mDomainModules = domainModules;
+        mJsManager = jsManager;
+
+        mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
+    }
+
+    private static void logDispatchException(JsonRpcException e) {
+        JsonRpcError errorMessage = e.getErrorMessage();
+        switch (errorMessage.code) {
+            case METHOD_NOT_FOUND:
+                LogRedirector.d(TAG, "Method not implemented: " + errorMessage.message);
+                break;
+            default:
+                LogRedirector.w(TAG, "Error processing remote message", e);
+        }
     }
 
     public void start() {
-        mWebSocketClient.connect(mRemoteUrl,
-                new DebugSocketClient.Callback() {
+        WeexInspector.initializeWithDefaults(mContext);
+        mBridge = DebugBridge.getInstance();
+        mBridge.setPeer(mPeer);
+        mBridge.setBridgeManager(mJsManager);
+        mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
 
-                    @Override
-                    public void onSuccess(String response) {
-                        mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
+            private void sayHello() {
+                Map<String, Object> func = new HashMap<>();
+                func.put("name", mContext.getPackageName());
+                func.put("model", WXEnvironment.SYS_MODEL);
+                func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+                func.put("platform", WXEnvironment.OS);
+                func.put("deviceId",((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE))
+                        .getDeviceId());
 
-                        mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
-                        WXSDKManager.getInstance().postOnUiThread(
-                                new Runnable() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", "0");
+                map.put("method", "WxDebug.registerDevice");
+                map.put("params", func);
+                mWebSocketClient.sendMessage(0, JSON.toJSONString(map));
+            }
 
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(
-                                                WXEnvironment.sApplication,
-                                                "Inspector Start", Toast.LENGTH_SHORT)
-                                                .show();
-                                    }
-                                }, 0);
-                        WXLogUtils.d("connect debugger server success!");
-                    }
+            @Override
+            public void onSuccess(String response) {
+                mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
+                mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
 
-                    @Override
-                    public void onFailure(Throwable cause) {
-                        WXLogUtils.d("connect debugger server failure!! " + cause.toString());
-                    }
+                sayHello();
 
-                });
+                WXSDKManager.getInstance().postOnUiThread(
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                Toast.makeText(
+                                        WXEnvironment.sApplication,
+                                        "WeexInspector Started", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }, 0);
+                WXLogUtils.d("connect debugger server success!");
+                if (mJsManager != null) {
+                    mJsManager.initScriptsFramework(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable cause) {
+                WXLogUtils.d("connect debugger server failure!! " + cause.toString());
+            }
+
+        });
     }
 
+    @Override
+    public IWXBridge getWXBridge() {
+        return mBridge;
+    }
 
     public void handleMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
         if (type != WebSocket.PayloadType.TEXT) {
@@ -82,11 +135,15 @@ public class DebugServerProxy {
             return;
         }
         try {
-            Util.throwIfNull(mPeer);
             try {
                 String message = payload.readUtf8();
                 if (!TextUtils.isEmpty(message)) {
-                    handleRemoteMessage(mPeer, message);
+                    if (message.contains("WxDebug.callNative")   /* &&false */) {
+                        handleDebugMessage(message);
+                    } else {
+                        Util.throwIfNull(mPeer);
+                        handleRemoteMessage(mPeer, message);
+                    }
                 }
                 Log.v(TAG, "onMessage " + message);
             } catch (Exception e) {
@@ -99,6 +156,21 @@ public class DebugServerProxy {
             if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
                 LogRedirector.v(TAG, "Unexpected I/O exception processing message: " + e);
             }
+        }
+    }
+
+    private void handleDebugMessage(String message) {
+        Log.v(TAG, "onMessage " + message);
+        com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(message);
+
+        String method = jsonObject.getString("method");
+        com.alibaba.fastjson.JSONObject params = jsonObject.getJSONObject("params");
+        if (!TextUtils.isEmpty(method) && "WxDebug.callNative".equals(method) && params != null) {
+            String instance = params.getString("instance");
+            String callback = params.getString("callback");
+            String tasks = params.getString("tasks");
+            Log.v(TAG, "WxDebug.callNative " + tasks);
+            mBridge.callNative(instance, tasks, callback);
         }
     }
 
@@ -169,14 +241,4 @@ public class DebugServerProxy {
         Log.v(TAG, "handleRemoteResponse : " + responseNode.toString());
     }
 
-    private static void logDispatchException(JsonRpcException e) {
-        JsonRpcError errorMessage = e.getErrorMessage();
-        switch (errorMessage.code) {
-            case METHOD_NOT_FOUND:
-                LogRedirector.d(TAG, "Method not implemented: " + errorMessage.message);
-                break;
-            default:
-                LogRedirector.w(TAG, "Error processing remote message", e);
-        }
-    }
 }

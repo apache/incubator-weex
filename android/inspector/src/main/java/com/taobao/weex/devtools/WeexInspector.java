@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
-import com.taobao.weex.devtools.debug.DebugServerProxy;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.dumpapp.DumpappHttpSocketLikeHandler;
@@ -50,6 +49,7 @@ import com.taobao.weex.devtools.inspector.protocol.module.Page;
 import com.taobao.weex.devtools.inspector.protocol.module.Profiler;
 import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
+import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
 import com.taobao.weex.devtools.server.AddressNameHelper;
 import com.taobao.weex.devtools.server.LazySocketHandler;
@@ -325,6 +325,7 @@ public class WeexInspector {
     public Iterable<ChromeDevtoolsDomain> finish() {
       provideIfDesired(new Console());
       provideIfDesired(new Debugger());
+      provideIfDesired(new WxDebug());
       DocumentProviderFactory documentModel = resolveDocumentProvider();
       if (documentModel != null) {
         Document document = new Document(documentModel);
@@ -399,7 +400,7 @@ public class WeexInspector {
       ServerManager serverManager = new ServerManager(server);
       serverManager.start();
       // connect to debugger server through WebSocket
-      new DebugServerProxy(getInspectorModules()).start();
+      // new DebugServerProxy(getInspectorModules(), null).start();
     }
 
     private class RealSocketHandlerFactory implements SocketHandlerFactory {

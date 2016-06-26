@@ -34,9 +34,8 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
   private static final int CAMARA_PERMISSION_REQUEST_CODE = 0x1;
 
   private static final String TAG = "IndexFragment";
-  private static String CURRENT_IP =  "your_current_IP";// "30.30.149.180";  // your_current_IP
-  // private static String CURRENT_IP = "localhost";
-  private static final String WEEX_INDEX_URL = "http://"+CURRENT_IP+":12580/examples/build/index.js";
+  private static String CURRENT_IP =  WXApplication.CURRENT_IP;
+  private static final String WEEX_INDEX_URL = "http://" + CURRENT_IP + ":12580/examples/build/index.js";
 
   private ViewGroup mContainer;
   private ProgressBar mProgressBar;
@@ -118,6 +117,10 @@ public class WXMainActivity extends WXBaseActivity implements IWXRenderListener 
         startActivity(new Intent(this, CaptureActivity.class));
       }
       return true;
+    } else if (id == R.id.action_debug) {
+//      WXEnvironment.sDebugWsUrl = "ws://30.30.30.9:8088/debugProxy/native";
+//      WXSDKEngine.restartBridge(true);
+//      new DebugServerProxy(WeexInspector);
     }
     return super.onOptionsItemSelected(item);
   }
