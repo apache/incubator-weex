@@ -1,5 +1,7 @@
 # Weex [![CircleCI](https://circleci.com/gh/alibaba/weex/tree/dev.svg?style=svg&circle-token=b83b047a3a01f6ec26458a455530a5ddc261925f)](https://circleci.com/gh/alibaba/weex/tree/dev)
 
+*note: just use `npm run vue` after `npm install` to run vue 2.0*
+
 ## Pre-release Notes
 
 Weex is currently in Pre-release Stage.
