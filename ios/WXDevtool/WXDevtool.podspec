@@ -25,9 +25,6 @@ Pod::Spec.new do |s|
   s.source_files = 'inspector/**/*.{h,m,mm,c}'
 
   s.requires_arc = true
-#  s.prefix_header_file = 'WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
-
-#  s.xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => '$(inherited) DEBUG=1' }
   s.frameworks = 'Foundation', 'UIKit'
   s.dependency 'SocketRocket'
 end
