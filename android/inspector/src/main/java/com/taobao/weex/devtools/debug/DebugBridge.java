@@ -1,7 +1,9 @@
 package com.taobao.weex.devtools.debug;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.telephony.TelephonyManager;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -22,8 +24,10 @@ import java.util.Map;
 public class DebugBridge implements IWXBridge {
     private static final String TAG = "DebugBridge";
     private static volatile DebugBridge sInstance;
+    private Object mLock = new Object();
     private WXBridgeManager mJsManager;
     private SimpleSession mSession;
+    private MyBroadcastReceiver mReceiver;
 
     private DebugBridge() {
 
@@ -43,6 +47,7 @@ public class DebugBridge implements IWXBridge {
 
     public void setSession(SimpleSession session) {
         mSession = session;
+        registerBroadcastReceiver();
     }
 
     public void setBridgeManager(WXBridgeManager bridgeManager) {
@@ -51,31 +56,24 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int initFramework(String framework, WXParams params) {
-        if (mSession == null || (mSession != null && !mSession.isOpen())) {
-            return -1;
+        while (mSession == null || (mSession != null && !mSession.isOpen())) {
+            synchronized (mLock) {
+                try {
+                    Log.v(TAG, "waiting for session now");
+                    mLock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        unregisterBroadcastReceiver();
+
+        if (mSession != null && mSession.isOpen()) {
+            mSession.sendText(getInitFrameworkMessage(framework));
+            return 1;
         }
 
-        mSession.sendText(getShakeHandsMessage());
-        Log.e(TAG, "ShakeHands");
-        mSession.sendText(getInitFrameworkMessage(framework));
-        Log.e(TAG, "InitFrameworkMessage");
-        return 1;
-    }
-
-    private String getShakeHandsMessage() {
-        Map<String, Object> func = new HashMap<>();
-        func.put("name", WXEnvironment.getApplication().getPackageName());
-        func.put("model", WXEnvironment.SYS_MODEL);
-        func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
-        func.put("platform", WXEnvironment.OS);
-        func.put("deviceId",((TelephonyManager) WXEnvironment.getApplication().getSystemService(Context.TELEPHONY_SERVICE))
-                .getDeviceId());
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", "0");
-        map.put("method", "WxDebug.registerDevice");
-        map.put("params", func);
-        return JSON.toJSONString(map);
+        return 0;
     }
 
     private String getInitFrameworkMessage(String framework) {
@@ -132,6 +130,37 @@ public class DebugBridge implements IWXBridge {
     public void reportJSException(String instanceId, String func, String exception) {
         if (mJsManager != null) {
             mJsManager.reportJSException(instanceId, func, exception);
+        }
+    }
+
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (DebugServerProxy.ACTION_DEBUG_SERVER_CONNECTED.equals(intent.getAction())) {
+                Log.v(TAG, "connect to debug server success");
+                synchronized (mLock) {
+                    mLock.notify();
+                }
+            } else if (DebugServerProxy.ACTION_DEBUG_SERVER_CONNECT_FAILED.equals(intent.getAction())) {
+                Log.v(TAG, "connect to debug server failed");
+                synchronized (mLock) {
+                    mLock.notify();
+                }
+            }
+        }
+    }
+
+    private void registerBroadcastReceiver() {
+        mReceiver = new MyBroadcastReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DebugServerProxy.ACTION_DEBUG_SERVER_CONNECTED);
+        filter.addAction(DebugServerProxy.ACTION_DEBUG_SERVER_CONNECT_FAILED);
+        WXEnvironment.getApplication().registerReceiver(mReceiver, filter);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        if (mReceiver != null) {
+            WXEnvironment.getApplication().unregisterReceiver(mReceiver);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.taobao.weex.devtools.debug;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -43,9 +44,11 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
         // Disable timeouts for read
         mHttpClient.setReadTimeout(0, TimeUnit.MINUTES);
 
-        Request request = new Request.Builder().url(url).build();
-        WebSocketCall call = WebSocketCall.create(mHttpClient, request);
-        call.enqueue(this);
+        if (!TextUtils.isEmpty(url)) {
+            Request request = new Request.Builder().url(url).build();
+            WebSocketCall call = WebSocketCall.create(mHttpClient, request);
+            call.enqueue(this);
+        }
     }
 
     public void closeQuietly() {
@@ -112,11 +115,6 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
     @Override
     public void onOpen(WebSocket webSocket, Request arg1, Response arg2)
             throws IOException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         mWebSocket = webSocket;
         if (mConnectCallback != null) {
             mConnectCallback.onSuccess(null);

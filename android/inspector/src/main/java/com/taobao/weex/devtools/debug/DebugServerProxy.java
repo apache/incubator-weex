@@ -1,10 +1,13 @@
 package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
+import android.content.Intent;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
@@ -31,11 +34,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okio.BufferedSource;
 
 public class DebugServerProxy implements IWXDebugProxy {
     private static final String TAG = "DebugServerProxy";
+    public static final String ACTION_DEBUG_SERVER_CONNECTED = "DEBUG_SERVER_CONNECTED";
+    public static final String ACTION_DEBUG_SERVER_CONNECT_FAILED = "DEBUG_SERVER_CONNECT_FAILED";
     private DebugSocketClient mWebSocketClient;
     private ObjectMapper mObjectMapper = new ObjectMapper();
     private MethodDispatcher mMethodDispatcher;
@@ -71,11 +78,28 @@ public class DebugServerProxy implements IWXDebugProxy {
         mBridge.setBridgeManager(mJsManager);
         mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
 
+            private String getShakeHandsMessage() {
+                Map<String, Object> func = new HashMap<>();
+                func.put("name", WXEnvironment.getApplication().getPackageName());
+                func.put("model", WXEnvironment.SYS_MODEL);
+                func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+                func.put("platform", WXEnvironment.OS);
+                func.put("deviceId", ((TelephonyManager) WXEnvironment.getApplication()
+                        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId());
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", "0");
+                map.put("method", "WxDebug.registerDevice");
+                map.put("params", func);
+                return JSON.toJSONString(map);
+            }
+
             @Override
             public void onSuccess(String response) {
+                mWebSocketClient.sendText(getShakeHandsMessage());
+                mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECTED));
                 mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
                 mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
-
                 WXSDKManager.getInstance().postOnUiThread(
                         new Runnable() {
 
@@ -95,6 +119,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
             @Override
             public void onFailure(Throwable cause) {
+                mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECT_FAILED));
                 WXLogUtils.d("connect debugger server failure!! " + cause.toString());
             }
 
@@ -122,7 +147,6 @@ public class DebugServerProxy implements IWXDebugProxy {
                         handleRemoteMessage(mPeer, message);
                     }
                 }
-                Log.v(TAG, "onMessage " + message);
             } catch (Exception e) {
 
             } finally {
@@ -137,7 +161,6 @@ public class DebugServerProxy implements IWXDebugProxy {
     }
 
     private void handleDebugMessage(String message) {
-        Log.v(TAG, "onMessage " + message);
         com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(message);
 
         String method = jsonObject.getString("method");
@@ -146,7 +169,6 @@ public class DebugServerProxy implements IWXDebugProxy {
             String instance = params.getString("instance");
             String callback = params.getString("callback");
             String tasks = params.getString("tasks");
-            Log.v(TAG, "WxDebug.callNative " + tasks);
             mBridge.callNative(instance, tasks, callback);
         }
     }
@@ -154,7 +176,6 @@ public class DebugServerProxy implements IWXDebugProxy {
     private void handleRemoteMessage(JsonRpcPeer peer, String message)
             throws IOException, MessageHandlingException, JSONException {
         // Parse as a generic JSONObject first since we don't know if this is a request or response.
-        Log.v(TAG, "handleRemoteMessage : " + message);
         JSONObject messageNode = new JSONObject(message);
         if (messageNode.has("method")) {
             handleRemoteRequest(peer, messageNode);
@@ -198,7 +219,6 @@ public class DebugServerProxy implements IWXDebugProxy {
                 jsonObject = mObjectMapper.convertValue(response, JSONObject.class);
                 responseString = jsonObject.toString();
             }
-            Log.v(TAG, "handleRemoteRequest : " + responseString);
             peer.getWebSocket().sendText(responseString);
         }
     }
@@ -215,7 +235,6 @@ public class DebugServerProxy implements IWXDebugProxy {
         if (pendingRequest.callback != null) {
             pendingRequest.callback.onResponse(peer, response);
         }
-        Log.v(TAG, "handleRemoteResponse : " + responseNode.toString());
     }
 
 }

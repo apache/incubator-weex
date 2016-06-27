@@ -11,7 +11,7 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
-  public static String CURRENT_IP =  "30.30.29.246"; // "your_current_IP"
+  public static String CURRENT_IP =  "your_current_IP"; // "30.30.29.246";
 
   @Override
   public void onCreate() {
@@ -35,7 +35,10 @@ public class WXApplication extends Application {
   }
 
   private void initDebugEnv(boolean enable, String host) {
-    WXEnvironment.sDebugMode = enable;
-    WXEnvironment.sDebugWsUrl = "ws://" + host + ":8088/debugProxy/native";
+    if (!"your_current_IP".equals(host)) {
+      WXEnvironment.sDebugMode = enable;
+      WXEnvironment.sDebugWsUrl = "ws://" + host + ":8088/debugProxy/native";
+    }
   }
+
 }
