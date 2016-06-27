@@ -22,6 +22,7 @@ Remote debug for your native iOS app using Chrome Developer Tools
 }
 	 
 	* 启动app，此时chrome页会显示你的设备与app name，选择启动inspector开启调试模式
+	* 日志实时打印支持不同级别打印。eg：PDLogE()/PDLogW等
 
 0. debugger调试
 	* 程序启动时调用+ (void)launchDebugWithSocketUrl:(NSString *)url;
