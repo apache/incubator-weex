@@ -555,14 +555,7 @@
             WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_WIDTH]),
             WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_HEIGHT])
         };
-        
-//        if (_scrollDirection == WXScrollDirectionVertical && size.height > self.cssNode->layout.dimensions[CSS_HEIGHT] && superAbsolutePosition.y + size.height <= self.weexInstance.rootView.frame.size.height) {
-//            // vertical frame
-//            self.cssNode->layout.dimensions[CSS_HEIGHT] = size.height;
-//        } else if (_scrollDirection == WXScrollDirectionHorizontal && size.width > self.cssNode->layout.dimensions[CSS_WIDTH] && superAbsolutePosition.x + size.width <= self.weexInstance.rootView.frame.size.width) {
-//            // horizontal frame
-//            self.cssNode->layout.dimensions[CSS_WIDTH] = size.width;
-//        } else
+
         if (!CGSizeEqualToSize(size, _contentSize)) {
             // content size
             _contentSize = size;

@@ -131,6 +131,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  */
 + (NSString * _Nullable)JSONString:(id _Nonnull)object;
 
+
 #define WXEncodeJson(obj)  [WXUtility JSONString:obj]
 
 /**
@@ -244,6 +245,11 @@ CGRect WXPixelFrameResize(CGRect value);
  *
  */
 CGPoint WXPixelPointResize(CGPoint value);
+
+/**
+ *  @abstract detect if a frame is valid, not having NaN value.
+ */
++ (BOOL)isFrameValid:(CGRect)frame;
 
 /**
  *  @abstract Returns the document directory path.

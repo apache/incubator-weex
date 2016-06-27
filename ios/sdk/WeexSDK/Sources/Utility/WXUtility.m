@@ -391,4 +391,10 @@ CGFloat WXScreenResizeRadio(void)
     return resizeScale;
 }
 
++ (BOOL)isFrameValid:(CGRect)frame
+{
+    return !isnan(frame.origin.x) && !isnan(frame.origin.y)
+    && !isnan(frame.size.width) && !isnan(frame.size.height);
+}
+
 @end
