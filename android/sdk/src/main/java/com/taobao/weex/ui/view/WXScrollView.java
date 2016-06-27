@@ -382,12 +382,14 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     if (mHasNotDoneActionDown) {
       MotionEvent down = MotionEvent.obtain(ev);
       down.setAction(MotionEvent.ACTION_DOWN);
-//      super.onTouchEvent(down);
       mHasNotDoneActionDown = false;
+    }
+
+    if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+      ox = ev.getX();
+      oy = ev.getY();
       // Dispatch touch event to parent view
       startNestedScroll(ViewCompat.SCROLL_AXIS_HORIZONTAL | ViewCompat.SCROLL_AXIS_VERTICAL);
-      // should be return(bug fix)
-      return super.onTouchEvent(down);
     }
 
     if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
@@ -399,13 +401,15 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     if (ev.getAction() == MotionEvent.ACTION_MOVE) {
       float clampedX = ev.getX();
       float clampedY = ev.getY();
-      int dx = (int) (clampedX - ox);
-      int dy = (int) (clampedY - oy);
+      int dx = (int) (ox - clampedX);
+      int dy = (int) (oy - clampedY);
+
       if (dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)) {
         // sub dx/dy was consumed by parent view!!!
-        ev.setLocation(clampedX-consumed[0],clampedY-consumed[1]);
+        ev.setLocation(clampedX+consumed[0],clampedY+consumed[1]);
       }
-      return super.onTouchEvent(ev);
+      ox = ev.getX();
+      oy = ev.getY();
     }
 
     boolean result = super.onTouchEvent(ev);
