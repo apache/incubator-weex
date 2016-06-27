@@ -106,26 +106,11 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
         [[NSUserDefaults standardUserDefaults] setObject:clientID forKey:PDClientIDKey];
     }
 
-    UIDevice *device = [UIDevice currentDevice];
-#if TARGET_IPHONE_SIMULATOR
-    NSDictionary *environment = [[NSProcessInfo processInfo] environment];
-    NSString *userName = [environment objectForKey:@"USER"];
-    if (!userName) {
-        NSString *simulatorHostHome = [environment objectForKey:@"SIMULATOR_HOST_HOME"];
-        if ([simulatorHostHome hasPrefix:@"/Users/"]) {
-            userName = [simulatorHostHome substringFromIndex:7];
-        }
-    }
-    NSString *deviceName = userName ? [NSString stringWithFormat:@"%@'s Simulator", userName] : @"iOS Simulator";
-#else
-    NSString *deviceName = device.name;
-#endif
-
     NSString *machine = [self _deviceName] ? : @"";
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"] ?: [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
         clientID, @"deviceId",
-        deviceName, @"platform",
+        @"iOS", @"platform",
         machine, @"model",
         [WXAppConfiguration appVersion],@"weexVersion",
         /*[[NSBundle mainBundle] bundleIdentifier], @"app_id",*/
@@ -487,10 +472,32 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 - (NSString *)_deviceName
 {
-    struct utsname systemInfo;
-    uname(&systemInfo);
-    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    /*
+    UIDevice *device = [UIDevice currentDevice];
+#if TARGET_IPHONE_SIMULATOR
+    NSDictionary *environment = [[NSProcessInfo processInfo] environment];
+    NSString *userName = [environment objectForKey:@"USER"];
+    if (!userName) {
+        NSString *simulatorHostHome = [environment objectForKey:@"SIMULATOR_HOST_HOME"];
+        if ([simulatorHostHome hasPrefix:@"/Users/"]) {
+            userName = [simulatorHostHome substringFromIndex:7];
+        }
+    }
+    NSString *deviceName = userName ? [NSString stringWithFormat:@"%@'s Simulator", userName] : @"iOS Simulator";
+#else
+    NSString *deviceName = device.name;
+#endif
+  */
+
+//    struct utsname systemInfo;
+//    uname(&systemInfo);
+//    NSString *machine = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    NSString *machine = [[UIDevice currentDevice] model];
+    NSString *systemVer = [[UIDevice currentDevice] systemVersion] ? : @"";
+    NSString *model = [NSString stringWithFormat:@"%@:%@",machine,systemVer];
+    return model;
 }
+
 
 - (void)_registerDeviceWithParams:(id)params {
     NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:@"WxDebug.registerDevice", @"method", [params PD_JSONObject], @"params",[NSNumber numberWithInt:0],@"id",nil];
