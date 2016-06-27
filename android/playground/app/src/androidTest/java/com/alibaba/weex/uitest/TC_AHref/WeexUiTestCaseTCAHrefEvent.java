@@ -64,14 +64,6 @@ public class WeexUiTestCaseTCAHrefEvent extends ActivityInstrumentationTestCase2
         Thread.sleep(2000);
     }
 
-//    public void testPreConditions()
-//    {
-//        assertNotNull(waTestPageActivity);
-//        assertNotNull(mViewGroup);
-//        assertNotNull(mCaseListIndexView);
-//
-//    }
-
     public void testAherf(){
 
         for(final View caseView : mCaseListIndexView){
