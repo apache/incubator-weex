@@ -28,16 +28,21 @@
 
 #pragma mark - private method
 - (PDDOMNode *)p_getNodeFromNodeId:(NSNumber *)nodeId rootNode:(PDDOMNode *)rootNode{
+    if (!rootNode) {
+        return nil;
+    }
     if ([nodeId longValue] == [rootNode.nodeId longValue]) {
         return rootNode;
     }
-    
-    for (PDDOMNode *node in rootNode.children) {
-        if ([node.nodeId longValue] == [nodeId longValue]) {
-            return node;
-        }else if(node.children.count > 0){
-            if ([self p_getNodeFromNodeId:nodeId rootNode:node]) {
-                return [self p_getNodeFromNodeId:nodeId rootNode:node];
+    if (rootNode.children.count > 0) {
+        for (PDDOMNode *node in rootNode.children) {
+            if ([node.nodeId longValue] == [nodeId longValue]) {
+                return node;
+            }else {
+                PDDOMNode *returnNode = [self p_getNodeFromNodeId:nodeId rootNode:node];
+                if (returnNode) {
+                    return returnNode;
+                }
             }
         }
     }
@@ -67,7 +72,11 @@
     //assembling object of rule
     PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
-    
+    if (!node) {
+        NSLog(@"breakpoint error");
+        callback(nil,pseudoElements,inherited,nil);
+        return;
+    }
     PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
     selectorData.text = node.nodeName;
     selectorData.selectors = @[@{@"text":node.nodeName}];
@@ -116,7 +125,6 @@
     rule.origin = @"inspector";
     rule.selectorList = selectorData;
     rule.style = style;
-    
     if ([rule PD_JSONObject]) {
         NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
         NSArray *matchCSSRules = @[ruleMatch];

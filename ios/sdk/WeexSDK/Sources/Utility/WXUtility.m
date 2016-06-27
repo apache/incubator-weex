@@ -172,6 +172,7 @@ CGPoint WXPixelPointResize(CGPoint value)
 }
 
 + (NSDictionary *)getDebugEnvironment {
+    UIDevice *device = [UIDevice currentDevice];
 #if TARGET_IPHONE_SIMULATOR
     NSDictionary *environment = [[NSProcessInfo processInfo] environment];
     NSString *userName = [environment objectForKey:@"USER"];

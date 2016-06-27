@@ -27,10 +27,16 @@
 
 /**
  *  launch weex inspector
- *  @param url  : ws://ip:9000/device, ip is your computer device ip or localhost
+ *  @param url  : ws://ip:port/debugProxy/native, ip and port is your devtool server address
+ *                eg:@"ws://30.30.29.242:8088/debugProxy/native"
  **/
 + (void)launchInspectorWithSocketUrl:(NSURL *)url;
 
+/**
+ *  launch weex debug
+ *  @param url  : ws://ip:port/debugProxy/native, ip and port is your devtool server address
+ *                eg:@"ws://30.30.29.242:8088/debugProxy/native"
+ **/
 + (void)launchDebugWithSocketUrl:(NSString *)url;
 
 @end

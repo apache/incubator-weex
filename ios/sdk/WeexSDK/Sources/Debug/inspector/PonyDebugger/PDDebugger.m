@@ -63,6 +63,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSMutableDictionary *_domains;
     NSMutableDictionary *_controllers;
     __strong SRWebSocket *_socket;
+    NSMutableArray  *_msgAry;
+    BOOL _isConnect;
 }
 
 + (PDDebugger *)defaultInstance;
@@ -82,7 +84,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     if (!self) {
         return nil;
     }
-    
+    _isConnect = NO;
     _domains = [[NSMutableDictionary alloc] init];
     _controllers = [[NSMutableDictionary alloc] init];
     
@@ -93,7 +95,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket;
 {
-    
+    _isConnect = YES;
     NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:PDClientIDKey];
     if (!clientID) {
         CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -105,7 +107,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     }
 
     UIDevice *device = [UIDevice currentDevice];
-    
 #if TARGET_IPHONE_SIMULATOR
     NSDictionary *environment = [[NSProcessInfo processInfo] environment];
     NSString *userName = [environment objectForKey:@"USER"];
@@ -221,6 +222,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSLog(@"Debugger closed");
     _socket.delegate = nil;
     _socket = nil;
+    _isConnect = NO;
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
@@ -307,10 +309,10 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
     NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    if (_socket.readyState == SR_OPEN) {
-        [_socket send:encodedData];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_msgAry addObject:encodedData];
+        [self _executionMsgAry];
+    });
 }
 
 #pragma mark Connect / Disconnect
@@ -349,6 +351,9 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)connectToURL:(NSURL *)url;
 {
     NSLog(@"Connecting to %@", url);
+    _msgAry = nil;
+    _msgAry = [NSMutableArray array];
+    
     [_socket close];
     _socket.delegate = nil;
     
@@ -364,6 +369,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 - (void)disconnect;
 {
+    _msgAry = nil;
     [_bonjourBrowser stop];
     _bonjourBrowser.delegate = nil;
     _bonjourBrowser = nil;
@@ -485,6 +491,15 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 }
 
 #pragma mark - Private Methods
+- (void)_executionMsgAry {
+    if (!_isConnect) return;
+    
+    for (NSString *msg in _msgAry) {
+        [_socket send:msg];
+    }
+    [_msgAry removeAllObjects];
+}
+
 
 - (NSString *)_deviceName
 {
@@ -498,10 +513,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
     NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
-    if (_socket.readyState == SR_OPEN) {
-        [_socket send:encodedData];
-    }
+    [_msgAry insertObject:encodedData atIndex:0];
+    [self _executionMsgAry];
 }
 
 - (void)_resolveService:(NSNetService*)service;
