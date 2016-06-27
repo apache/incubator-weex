@@ -9,9 +9,9 @@
 #import "PonyDebugger.h"
 #import "PDTimelineDomain.h"
 
-@interface PDTimelineDomainController : PDDomainController
+@interface WXTimelineDomainController : PDDomainController
 
-+(PDTimelineDomainController *)defaultInstance;
++(WXTimelineDomainController *)defaultInstance;
 
 @property (nonatomic, strong) PDTimelineDomain *domain;
 

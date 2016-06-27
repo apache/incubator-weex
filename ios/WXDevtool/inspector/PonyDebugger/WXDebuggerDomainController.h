@@ -10,9 +10,9 @@
 #import "PDDebuggerDomain.h"
 #import "PDDynamicDebuggerDomain.h"
 
-@interface PDDebuggerDomainController : PDDomainController <PDDebuggerCommandDelegate>
+@interface WXDebuggerDomainController : PDDomainController <PDDebuggerCommandDelegate>
 
-+ (PDDebuggerDomainController *)defaultInstance;
++ (WXDebuggerDomainController *)defaultInstance;
 
 - (void)remoteDebuggerControllerTest;
 

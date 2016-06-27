@@ -6,18 +6,18 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PDCSSDomainController.h"
+#import "WXCSSDomainController.h"
 #import "PDDOMDomainController.h"
 #import "PDCSSTypes.h"
 
-@implementation PDCSSDomainController
+@implementation WXCSSDomainController
 @dynamic domain;
 
-+ (PDCSSDomainController *)defaultInstance {
-    static PDCSSDomainController *defaultInstance = nil;
++ (WXCSSDomainController *)defaultInstance {
+    static WXCSSDomainController *defaultInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        defaultInstance = [[PDCSSDomainController alloc] init];
+        defaultInstance = [[WXCSSDomainController alloc] init];
     });
     return defaultInstance;
 }

@@ -7,21 +7,21 @@
  * This source code is licensed under the Apache Licence 2.0.
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
-#import "PDTimelineDomainController.h"
+#import "WXTimelineDomainController.h"
 
-@interface PDTimelineDomainController () <PDTimelineCommandDelegate>
+@interface WXTimelineDomainController () <PDTimelineCommandDelegate>
 
 @end
 
-@implementation PDTimelineDomainController
+@implementation WXTimelineDomainController
 
 @dynamic domain;
 
-+(PDTimelineDomainController *)defaultInstance {
-    static PDTimelineDomainController *defaultInstance = nil;
++(WXTimelineDomainController *)defaultInstance {
+    static WXTimelineDomainController *defaultInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        defaultInstance = [[PDTimelineDomainController alloc] init];
+        defaultInstance = [[WXTimelineDomainController alloc] init];
     });
     
     return defaultInstance;

@@ -6,16 +6,16 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PDDebuggerDomainController.h"
+#import "WXDebuggerDomainController.h"
 
-@implementation PDDebuggerDomainController
+@implementation WXDebuggerDomainController
 @dynamic domain;
 
-+ (PDDebuggerDomainController *)defaultInstance {
-    static PDDebuggerDomainController *defaultInstance = nil;
++ (WXDebuggerDomainController *)defaultInstance {
+    static WXDebuggerDomainController *defaultInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        defaultInstance = [[PDDebuggerDomainController alloc] init];
+        defaultInstance = [[WXDebuggerDomainController alloc] init];
     });
     return defaultInstance;
 }

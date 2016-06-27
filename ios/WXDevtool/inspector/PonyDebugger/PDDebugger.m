@@ -24,9 +24,9 @@
 #import "PDDOMDomainController.h"
 #import "PDInspectorDomainController.h"
 #import "PDConsoleDomainController.h"
-#import "PDDebuggerDomainController.h"
-#import "PDTimelineDomainController.h"
-#import "PDCSSDomainController.h"
+#import "WXDebuggerDomainController.h"
+#import "WXTimelineDomainController.h"
+#import "WXCSSDomainController.h"
 
 #import "WXAppConfiguration.h"
 
@@ -457,21 +457,21 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)enableRemoteDebugger {
     [self _addController:[PDRuntimeDomainController defaultInstance]];
     [self _addController:[PDPageDomainController defaultInstance]];
-    [self _addController:[PDDebuggerDomainController defaultInstance]];
+    [self _addController:[WXDebuggerDomainController defaultInstance]];
 }
 
 - (void)remoteDebuggertest {
-    [[PDDebuggerDomainController defaultInstance] remoteDebuggerControllerTest];
+    [[WXDebuggerDomainController defaultInstance] remoteDebuggerControllerTest];
 }
 
 #pragma mark - Timeline
 - (void)enableTimeline {
-    [self _addController:[PDTimelineDomainController defaultInstance]];
+    [self _addController:[WXTimelineDomainController defaultInstance]];
 }
 
 #pragma mark CSSStyle
 - (void)enableCSSStyle {
-    [self _addController:[PDCSSDomainController defaultInstance]];
+    [self _addController:[WXCSSDomainController defaultInstance]];
 }
 
 #pragma mark - Private Methods

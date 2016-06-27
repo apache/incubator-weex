@@ -8,8 +8,8 @@
 
 #import "PonyDebugger.h"
 
-@interface PDProfilerDomainController : PDDomainController
+@interface WXProfilerDomainController : PDDomainController
 
-+(PDProfilerDomainController *)defaultInstace;
++(WXProfilerDomainController *)defaultInstace;
 
 @end

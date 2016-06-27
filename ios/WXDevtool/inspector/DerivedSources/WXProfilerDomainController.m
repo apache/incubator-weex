@@ -6,15 +6,15 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PDProfilerDomainController.h"
+#import "WXProfilerDomainController.h"
 
-@implementation PDProfilerDomainController
+@implementation WXProfilerDomainController
 
-+(PDProfilerDomainController *)defaultInstace {
-    static PDProfilerDomainController *defaultInstance = nil;
++(WXProfilerDomainController *)defaultInstace {
+    static WXProfilerDomainController *defaultInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        defaultInstance = [[PDProfilerDomainController alloc] init];
+        defaultInstance = [[WXProfilerDomainController alloc] init];
     });
     
     return defaultInstance;

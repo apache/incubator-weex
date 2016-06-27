@@ -9,9 +9,9 @@
 #import "PonyDebugger.h"
 #import "PDCSSDomain.h"
 
-@interface PDCSSDomainController : PDDomainController<PDCSSCommandDelegate>
+@interface WXCSSDomainController : PDDomainController<PDCSSCommandDelegate>
 
-+ (PDCSSDomainController *)defaultInstance;
++ (WXCSSDomainController *)defaultInstance;
 
 @property (nonatomic, strong) PDCSSDomain *domain;
 
