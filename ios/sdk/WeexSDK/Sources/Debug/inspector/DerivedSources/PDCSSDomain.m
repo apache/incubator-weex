@@ -93,6 +93,10 @@
         }];
     } else if ([methodName isEqualToString:@"getMatchedStylesForNode"] && [self.delegate respondsToSelector:@selector(domain:getMatchedStylesForNodeWithNodeId:includePseudo:includeInherited:callback:)]) {
         [self.delegate domain:self getMatchedStylesForNodeWithNodeId:[params objectForKey:@"nodeId"] includePseudo:[params objectForKey:@"includePseudo"] includeInherited:[params objectForKey:@"includeInherited"] callback:^(NSArray *matchedCSSRules, NSArray *pseudoElements, NSArray *inherited, id error) {
+            if (!matchedCSSRules) {
+                responseCallback(nil, error);
+                return;
+            }
             NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:3];
 
             if (matchedCSSRules != nil) {

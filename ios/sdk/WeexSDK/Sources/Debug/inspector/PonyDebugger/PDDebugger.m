@@ -170,14 +170,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSInteger dotPosition = [fullMethodName rangeOfString:@"."].location;
     NSString *domainName = [fullMethodName substringToIndex:dotPosition];
     NSString *methodName = [fullMethodName substringFromIndex:dotPosition + 1];
-    /*
-    if ([domainName isEqualToString:@"Runtime"]) {
-        NSLog(@"");
-    }
-    if ([domainName isEqualToString:@"Page"]) {
-        NSLog(@"");
-    }
-*/
     NSString *objectID = [obj objectForKey:@"id"];
 
     PDResponseCallback responseCallback = ^(NSDictionary *result, id error) {
@@ -191,20 +183,12 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
             }];
             [response setObject:newResult forKey:@"result"];
         }else {
-            NSMutableDictionary *newResult = [[NSMutableDictionary alloc] initWithCapacity:result.count];
+            NSMutableDictionary *newResult = [[NSMutableDictionary alloc] init];
             [response setObject:newResult forKey:@"result"];
         }
 
-        if (error) {
-//            [response setObject:[error PD_JSONObjectCopy] forKey:@"error"];
-        }
-//        else {
-//            [response setObject:[NSNull null] forKey:@"error"];
-//        }
-
         NSData *data = [NSJSONSerialization dataWithJSONObject:response options:0 error:nil];
         NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-//        NSLog(@"devtool protocol:%@",response);
         [webSocket send:encodedData];
     };
 

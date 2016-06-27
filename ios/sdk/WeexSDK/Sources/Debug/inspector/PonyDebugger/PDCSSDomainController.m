@@ -160,10 +160,10 @@
             position = [self p_formateFrame:node.attributes[idx + 1]];
         }
     }];
-    NSString *width = nil;
-    NSString *height = nil;
-    NSString *top = nil;
-    NSString *left = nil;
+    NSString *width = @"";
+    NSString *height = @"";
+    NSString *top = @"";
+    NSString *left = @"";
     if (position.count == 4) {
         width = position[2];
         height = position[3];
