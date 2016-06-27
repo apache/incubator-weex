@@ -2,7 +2,7 @@ package com.alibaba.weex;
 
 import android.app.Application;
 
-import com.alibaba.weex.commons.adapter.FrescoImageAdapter;
+import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
 import com.alibaba.weex.extend.component.WTRichText;
 import com.alibaba.weex.extend.module.RenderModule;
@@ -21,7 +21,7 @@ public class WXApplication extends Application {
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
                            new InitConfig.Builder()
-                               .setImgAdapter(new FrescoImageAdapter())
+                               .setImgAdapter(new ImageAdapter())
                                .setDebugAdapter(new PlayDebugAdapter())
                                .build()
                           );
