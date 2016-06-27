@@ -32,4 +32,6 @@
 - (void)removeView:(UIView *)view;
 - (void)addView:(UIView *)view;
 
+- (PDDOMNode *)rootNode;
+
 @end

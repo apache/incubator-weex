@@ -73,9 +73,12 @@
     PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     if (!node) {
-        NSLog(@"breakpoint error");
-        callback(nil,pseudoElements,inherited,nil);
-        return;
+        rootDomNode = [PDDOMDomainController defaultInstance].rootNode;
+        node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
+        if (!node) {
+            callback(nil,pseudoElements,inherited,nil);
+            return;
+        }
     }
     PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
     selectorData.text = node.nodeName;

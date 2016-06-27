@@ -172,7 +172,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 {
     self.objectsForNodeIds = [[NSMutableDictionary alloc] init];
     self.nodeIdsForObjects = [[NSMutableDictionary alloc] init];
-    self.nodeIdCounter = 0;
+    self.nodeIdCounter = 2;
     callback([self rootNode], nil);
 }
 
@@ -623,7 +623,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (PDDOMNode *)rootNode;
 {
     PDDOMNode *rootNode = [[PDDOMNode alloc] init];
-    rootNode.nodeId = [self getAndIncrementNodeIdCount];
+    rootNode.nodeId = [NSNumber numberWithInt:0];//[self getAndIncrementNodeIdCount];
     rootNode.nodeType = @(kPDDOMNodeTypeDocument);
     rootNode.nodeName = @"#document";
     rootNode.children = @[ [self rootElement] ];
@@ -634,7 +634,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (PDDOMNode *)rootElement;
 {
     PDDOMNode *rootElement = [[PDDOMNode alloc] init];
-    rootElement.nodeId = [self getAndIncrementNodeIdCount];
+    rootElement.nodeId = [NSNumber numberWithInt:1];//[self getAndIncrementNodeIdCount];
     rootElement.nodeType = @(kPDDOMNodeTypeElement);
     rootElement.nodeName = @"iosml";
     rootElement.children = [self windowNodes];
@@ -694,7 +694,12 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     
     elementNode.children = children;
     elementNode.childNodeCount = @([elementNode.children count]);
-    elementNode.nodeId = [self getAndIncrementNodeIdCount];
+    NSNumber *nodeId = [self.nodeIdsForObjects objectForKey:[NSValue valueWithNonretainedObject:object]];
+    if (nodeId) {
+        elementNode.nodeId = nodeId;
+    }else {
+        elementNode.nodeId = [self getAndIncrementNodeIdCount];
+    }
     elementNode.attributes = [self attributesArrayForObject:object];
     
     return elementNode;
@@ -901,5 +906,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         [[PDDOMDomainController defaultInstance] addView:[[self subviews] objectAtIndex:index2]];
     }
 }
+
 
 @end
