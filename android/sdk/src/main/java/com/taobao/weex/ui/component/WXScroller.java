@@ -215,6 +215,9 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     }
   }
 
+  /**
+   * Intercept refresh view and loading view
+   */
   @Override
   public void addChild(WXComponent child, int index) {
     if (child == null || index < -1) {
@@ -239,6 +242,14 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
     }
   }
 
+  /**
+   * Setting refresh view and loading view
+   */
+
+  /**
+   * Setting refresh view and loading view
+   * @param child the refresh_view or loading_view
+   */
   private void checkRefreshOrLoading(WXComponent child) {
     if (child instanceof WXRefresh) {
       ((BounceScrollerView)mHost).setOnRefreshListener((WXRefresh)child);

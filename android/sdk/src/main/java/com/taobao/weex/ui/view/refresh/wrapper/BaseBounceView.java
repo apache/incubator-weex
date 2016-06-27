@@ -214,12 +214,15 @@ import android.widget.FrameLayout;
 import com.taobao.weex.ui.view.refresh.core.WXRefreshView;
 import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 
+/**
+ * BounceView(SwipeLayout) contains Scroller/List and refresh/loading view
+ * @param <T> InnerView
+ */
 public abstract class BaseBounceView<T extends View> extends ViewGroup {
 
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeLayout swipeLayout;
     private T innerView;
-
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
@@ -333,6 +336,9 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         }
     }
 
+    /**
+     * Init Swipelayout
+     */
     private WXSwipeLayout createBounceView(Context context) {
         swipeLayout = new WXSwipeLayout(context);
         swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -342,6 +348,9 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         return swipeLayout;
     }
 
+    /**
+     * @return the child of swipelayout : recyclerview or scrollview
+     */
     public T getInnerView() {
         return innerView;
     }

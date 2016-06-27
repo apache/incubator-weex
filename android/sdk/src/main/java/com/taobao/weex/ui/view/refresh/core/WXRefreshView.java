@@ -244,6 +244,11 @@ public class WXRefreshView extends FrameLayout {
     addView(linearLayout,lp);
   }
 
+  /**
+   * Setting refresh view or loading view
+   *
+   * @param view refresh or loading
+   */
   public void setRefreshView(final View view) {
     post(new Runnable() {
       @Override
@@ -263,12 +268,22 @@ public class WXRefreshView extends FrameLayout {
     });
   }
 
+  /**
+   * Set loading_indicator bgColor
+   *
+   * @param color
+   */
   public void setProgressBgColor(int color) {
     if (circleProgressBar != null) {
       circleProgressBar.setBackgroundColor(color);
     }
   }
 
+  /**
+   * Set loading_indicator color
+   *
+   * @param color
+   */
   public void setProgressColor(int color) {
     if (circleProgressBar != null) {
       circleProgressBar.setColorSchemeColors(color);
@@ -281,6 +296,12 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
+  /**
+   * Set the start and end trim for the progress spinner arc.
+   *
+   * @param startAngle start angle
+   * @param endAngle end angle
+   */
   public void setStartEndTrim(float startAngle, float endAngle) {
     if (circleProgressBar != null) {
       circleProgressBar.setStartEndTrim(startAngle, endAngle);
@@ -293,6 +314,11 @@ public class WXRefreshView extends FrameLayout {
     }
   }
 
+  /**
+   * Set the amount of rotation to apply to the progress spinner.
+   *
+   * @param rotation Rotation is from [0..1]
+   */
   public void setProgressRotation(float rotation) {
     if (circleProgressBar != null)
       circleProgressBar.setProgressRotation(rotation);
