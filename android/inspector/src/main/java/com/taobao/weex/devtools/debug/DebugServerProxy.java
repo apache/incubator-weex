@@ -1,12 +1,10 @@
 package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
@@ -33,8 +31,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import okio.BufferedSource;
 
@@ -54,7 +50,6 @@ public class DebugServerProxy implements IWXDebugProxy {
         mContext = context;
         mWebSocketClient = new DebugSocketClient(this);
         mJsManager = jsManager;
-
         mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
     }
 
@@ -72,32 +67,14 @@ public class DebugServerProxy implements IWXDebugProxy {
     public void start() {
         WeexInspector.initializeWithDefaults(mContext);
         mBridge = DebugBridge.getInstance();
-        mBridge.setPeer(mPeer);
+        mBridge.setSession(mWebSocketClient);
         mBridge.setBridgeManager(mJsManager);
         mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
-
-            private void sayHello() {
-                Map<String, Object> func = new HashMap<>();
-                func.put("name", mContext.getPackageName());
-                func.put("model", WXEnvironment.SYS_MODEL);
-                func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
-                func.put("platform", WXEnvironment.OS);
-                func.put("deviceId",((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE))
-                        .getDeviceId());
-
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", "0");
-                map.put("method", "WxDebug.registerDevice");
-                map.put("params", func);
-                mWebSocketClient.sendMessage(0, JSON.toJSONString(map));
-            }
 
             @Override
             public void onSuccess(String response) {
                 mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
                 mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
-
-                sayHello();
 
                 WXSDKManager.getInstance().postOnUiThread(
                         new Runnable() {

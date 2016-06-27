@@ -302,10 +302,11 @@ public class WXSDKEngine {
   }
 
   public static void init(Application application, String framework, IWXUserTrackAdapter utAdapter, IWXImgLoaderAdapter imgLoaderAdapter, IWXHttpAdapter httpAdapter) {
-    init(application, utAdapter, framework);
+    WXEnvironment.sApplication = application;
     WXSDKManager.getInstance().setIWXHttpAdapter(httpAdapter);
     WXSDKManager.getInstance().setIWXImgLoaderAdapter(imgLoaderAdapter);
     WXSDKManager.getInstance().setIWXUserTrackAdapter(utAdapter);
+    init(application, utAdapter, framework);
   }
 
   private static void register() {

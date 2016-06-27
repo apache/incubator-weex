@@ -1,13 +1,16 @@
 package com.taobao.weex.devtools.debug;
 
+import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
+import com.taobao.weex.devtools.websocket.SimpleSession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +23,7 @@ public class DebugBridge implements IWXBridge {
     private static final String TAG = "DebugBridge";
     private static volatile DebugBridge sInstance;
     private WXBridgeManager mJsManager;
-    private JsonRpcPeer mPeer;
+    private SimpleSession mSession;
 
     private DebugBridge() {
 
@@ -38,8 +41,8 @@ public class DebugBridge implements IWXBridge {
         return sInstance;
     }
 
-    public void setPeer(JsonRpcPeer peer) {
-        mPeer = peer;
+    public void setSession(SimpleSession session) {
+        mSession = session;
     }
 
     public void setBridgeManager(WXBridgeManager bridgeManager) {
@@ -48,27 +51,47 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int initFramework(String framework, WXParams params) {
-//            if (!mInit) {
-//                return -1;
-//            }
+        if (mSession == null || (mSession != null && !mSession.isOpen())) {
+            return -1;
+        }
 
+        mSession.sendText(getShakeHandsMessage());
+        Log.e(TAG, "ShakeHands");
+        mSession.sendText(getInitFrameworkMessage(framework));
+        Log.e(TAG, "InitFrameworkMessage");
+        return 1;
+    }
+
+    private String getShakeHandsMessage() {
+        Map<String, Object> func = new HashMap<>();
+        func.put("name", WXEnvironment.getApplication().getPackageName());
+        func.put("model", WXEnvironment.SYS_MODEL);
+        func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+        func.put("platform", WXEnvironment.OS);
+        func.put("deviceId",((TelephonyManager) WXEnvironment.getApplication().getSystemService(Context.TELEPHONY_SERVICE))
+                .getDeviceId());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", "0");
+        map.put("method", "WxDebug.registerDevice");
+        map.put("params", func);
+        return JSON.toJSONString(map);
+    }
+
+    private String getInitFrameworkMessage(String framework) {
         Map<String, Object> func = new HashMap<>();
         func.put("source", framework);
 
         Map<String, Object> map = new HashMap<>();
         map.put("method", "WxDebug.initJSRuntime");
         map.put("params", func);
-        Log.v(TAG, JSON.toJSONString(map));
-        if (mPeer != null) {
-            mPeer.getWebSocket().sendText(JSON.toJSONString(map));
-            return 1;
-        }
-        return 0;
+
+        return JSON.toJSONString(map);
     }
 
     @Override
     public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
-        //        if (!mInit || (TextUtils.isEmpty(instanceId) && !WXBridgeManager.METHOD_REGISTER_MODULES.equals(function))
+//        if (!mInit || (TextUtils.isEmpty(instanceId) && !WXBridgeManager.METHOD_REGISTER_MODULES.equals(function))
 //                || TextUtils.isEmpty(function)) {
 //            return -1;
 //        }
@@ -91,8 +114,8 @@ public class DebugBridge implements IWXBridge {
         Map<String, Object> map = new HashMap<>();
         map.put("method", "WxDebug.callJS");
         map.put("params", func);
-        if (mPeer != null) {
-            mPeer.getWebSocket().sendText(JSON.toJSONString(map));
+        if (mSession != null && mSession.isOpen()) {
+            mSession.sendText(JSON.toJSONString(map));
         }
 
         return 0;
@@ -100,8 +123,6 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public void callNative(String instanceId, String tasks, String callback) {
-//            if (!mInit || mJsManager == null)
-//                return;
         if (mJsManager != null) {
             mJsManager.callNative(instanceId, tasks, callback);
         }

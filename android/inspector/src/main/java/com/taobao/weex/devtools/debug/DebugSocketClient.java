@@ -69,6 +69,7 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
             Log.v(TAG, "sendMessage " + message);
             mWebSocket.sendMessage(WebSocket.PayloadType.TEXT, messageBuffer);
         } catch (IOException e) {
+            Log.e(TAG, "sendMessage IOException " + e.toString());
         }
     }
 
@@ -111,6 +112,11 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
     @Override
     public void onOpen(WebSocket webSocket, Request arg1, Response arg2)
             throws IOException {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mWebSocket = webSocket;
         if (mConnectCallback != null) {
             mConnectCallback.onSuccess(null);
@@ -133,7 +139,7 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
 
     @Override
     public boolean isOpen() {
-        return mWebSocket == null;
+        return mWebSocket != null;
     }
 
     public interface Callback {

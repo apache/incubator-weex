@@ -334,9 +334,8 @@ public class WXBridgeManager implements Callback {
                 .getInstance(WXEnvironment.sApplication, WXBridgeManager.this);
         if (debugProxy != null) {
           debugProxy.start();
-          IWXBridge debugBridge = debugProxy.getWXBridge();
           if (remoteDebug) {
-            mWXBridge = debugBridge;
+            mWXBridge = debugProxy.getWXBridge();
           }
         }
       } catch (HackAssertionException e) {

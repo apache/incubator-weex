@@ -29,7 +29,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
     @ChromeDevtoolsMethod
     public void callNative(JsonRpcPeer peer, JSONObject params) {
         if (params != null) {
-            DebugBridge.getInstance().callNative(params.optString("instance"),
+            DebugBridge.getInstance().callNative(
+                    params.optString("instance"),
                     params.optString("tasks"),
                     params.optString("callback"));
         }
