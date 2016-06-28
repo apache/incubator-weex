@@ -250,6 +250,8 @@ public class WXRefreshView extends FrameLayout {
    * @param view refresh or loading
    */
   public void setRefreshView(final View view) {
+    if (view == null)
+      return;
     post(new Runnable() {
       @Override
       public void run() {

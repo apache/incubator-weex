@@ -247,19 +247,23 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     }
 
     public void setOnRefreshListener(WXSwipeLayout.WXOnRefreshListener onRefreshListener) {
-        swipeLayout.setOnRefreshListener(onRefreshListener);
+        if (swipeLayout != null)
+            swipeLayout.setOnRefreshListener(onRefreshListener);
     }
 
     public void setOnLoadingListener(WXSwipeLayout.WXOnLoadingListener onLoadingListener) {
-        swipeLayout.setOnLoadingListener(onLoadingListener);
+        if (swipeLayout != null)
+            swipeLayout.setOnLoadingListener(onLoadingListener);
     }
 
     public void finishPullRefresh() {
-        swipeLayout.finishPullRefresh();
+        if (swipeLayout != null)
+            swipeLayout.finishPullRefresh();
     }
 
     public void finishPullLoad() {
-        swipeLayout.finishPullLoad();
+        if (swipeLayout != null)
+            swipeLayout.finishPullLoad();
     }
 
     @Override
@@ -343,6 +347,8 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
         swipeLayout = new WXSwipeLayout(context);
         swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         innerView = setInnerView(context);
+        if (innerView == null)
+            return null;
         swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
@@ -380,11 +386,13 @@ public abstract class BaseBounceView<T extends View> extends ViewGroup {
     }
 
     public void setRefreshEnable(boolean enable) {
-        swipeLayout.setPullRefreshEnable(enable);
+        if (swipeLayout != null)
+            swipeLayout.setPullRefreshEnable(enable);
     }
 
     public void setLoadmoreEnable(boolean enable) {
-        swipeLayout.setPullLoadEnable(enable);
+        if (swipeLayout != null)
+            swipeLayout.setPullLoadEnable(enable);
     }
 
     public WXSwipeLayout getSwipeLayout() {

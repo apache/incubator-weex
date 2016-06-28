@@ -225,7 +225,8 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
 
     public void setAdapter(RecyclerViewBaseAdapter adapter) {
         this.adapter = adapter;
-        getInnerView().setAdapter(adapter);
+        if (getInnerView() != null)
+            getInnerView().setAdapter(adapter);
     }
 
     public RecyclerViewBaseAdapter getAdapter() {

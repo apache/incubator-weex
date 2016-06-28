@@ -479,9 +479,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       headerView.setLayoutParams(lp);
       headerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       moveTargetView(lp.height);
-      if (lp.height > 0) {
-        return true;
-      }
+      return true;
     } else if (!canChildScrollDown() && mPullLoadEnable && mCurrentAction == LOAD_MORE) {
       // Load more
       LayoutParams lp = (LayoutParams) footerView.getLayoutParams();
@@ -498,9 +496,7 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent 
       footerView.setLayoutParams(lp);
       footerView.setProgressRotation(lp.height / refreshViewFlowHeight);
       moveTargetView(-lp.height);
-      if (lp.height>0) {
-        return true;
-      }
+      return true;
     }
     return false;
   }

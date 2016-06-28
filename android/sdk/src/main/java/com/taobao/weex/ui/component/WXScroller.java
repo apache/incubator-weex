@@ -202,8 +202,10 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       return;
     }
 
-    if (child instanceof WXBaseRefreshLayout) {
-      return;
+    if(mOrientation==VERTICAL){
+      if (child instanceof WXBaseRefreshLayout) {
+        return;
+      }
     }
 
     int count = tempscview.getChildCount();
@@ -224,10 +226,11 @@ public class WXScroller extends WXVContainer implements WXScrollViewListener {
       return;
     }
 
-    checkRefreshOrLoading(child);
-
-    if (child instanceof WXBaseRefresh) {
-      return;
+    if(mOrientation==VERTICAL) {
+      checkRefreshOrLoading(child);
+      if (child instanceof WXBaseRefresh) {
+        return;
+      }
     }
 
     if (mChildren == null) {
