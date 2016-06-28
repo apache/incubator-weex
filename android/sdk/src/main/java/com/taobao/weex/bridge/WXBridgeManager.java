@@ -539,30 +539,18 @@ public class WXBridgeManager implements Callback {
 
   /**
    * Invoke JavaScript callback
-   * @see #callback(String, String, String, boolean)
+   * @see #callback(String, String, String)
    */
-  public void callback(String instanceId, String callback,
-                       Map<String, Object> data) {
-    callback(instanceId, callback,
-             data == null ? "{}" : WXJsonUtils.fromObjectToJSONString(data));
+  public void callback(String instanceId, String callback,String data) {
+    callback(instanceId, callback,data,false);
   }
 
   /**
    * Invoke JavaScript callback
-   * @see #callback(String, String, String, boolean)
-   */
-  public void callback(String instanceId, String callback,
-                       Map<String, Object> data,boolean keepAlive) {
-    callback(instanceId, callback,
-            data == null ? "{}" : WXJsonUtils.fromObjectToJSONString(data),keepAlive);
-  }
-
-  /**
-   * Invoke JavaScript callback
-   * @see #callback(String, String, String, boolean)
+   * @see #callback(String, String, Map<String, Object>)
    */
   public void callback(final String instanceId, final String callback,
-                       final String data){
+                       final Map<String, Object> data){
     callback(instanceId,callback,data,false);
   }
 
@@ -574,7 +562,7 @@ public class WXBridgeManager implements Callback {
    * @param keepAlive if keep callback instance alive for later use
      */
   public void callback(final String instanceId, final String callback,
-                       final String data,boolean keepAlive) {
+                       final Object data,boolean keepAlive) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
         || mJSHandler == null) {
       return;
