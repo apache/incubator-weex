@@ -7,7 +7,7 @@ Remote debug for your native iOS app using Chrome Developer Tools
 
 	0. $:npm install -g weex-debugger
 
-	0. $:weex-debug   
+	0. $:weex-devtool  
 
 		执行完会显示native需要链接的ws地址,之后自动打开chrome 。
 
