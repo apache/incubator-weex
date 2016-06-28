@@ -15,6 +15,8 @@
 #import <sys/utsname.h>
 #import <UIKit/UIScreen.h>
 
+static NSString *const WXClientIDKey = @"com.taobao.Weex.clientID";
+
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
 {
     if ([NSThread isMainThread]) {
@@ -146,6 +148,31 @@ CGPoint WXPixelPointResize(CGPoint value)
                                     @"scale":@(scale),
                                     @"logLevel":[WXLog logLevelString] ?: @"error"
                                 }];
+    return data;
+}
+
++ (NSDictionary *)getDebugEnvironment {
+    NSString *platform = @"iOS";
+    NSString *weexVersion = [WXAppConfiguration appVersion];
+    NSString *machine = [self registeredDeviceName] ? : @"";
+    NSString *appName = [WXAppConfiguration appName] ? : @"";
+    NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:WXClientIDKey];
+    if (!clientID) {
+        CFUUIDRef uuid = CFUUIDCreate(NULL);
+        clientID = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+        assert(clientID);
+        CFRelease(uuid);
+        
+        [[NSUserDefaults standardUserDefaults] setObject:clientID forKey:WXClientIDKey];
+    }
+    
+    NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
+                                                            @"platform":platform,
+                                                            @"weexVersion":weexVersion,
+                                                            @"model":machine,
+                                                            @"name":appName,
+                                                            @"deviceId":clientID,
+                                                        }];
     return data;
 }
 
@@ -344,7 +371,15 @@ CGPoint WXPixelPointResize(CGPoint value)
 {
     struct utsname systemInfo;
     uname(&systemInfo);
-    return [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    NSString *machine = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    return machine;
+}
+
++ (NSString *)registeredDeviceName {
+    NSString *machine = [[UIDevice currentDevice] model];
+    NSString *systemVer = [[UIDevice currentDevice] systemVersion] ? : @"";
+    NSString *model = [NSString stringWithFormat:@"%@:%@",machine,systemVer];
+    return model;
 }
 
 + (void)addStatTrack:(NSString *)appName
