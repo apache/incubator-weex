@@ -16,8 +16,6 @@
 #import <sys/utsname.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
-#import "PonyDebugger.h"
-
 @interface WXJSCoreBridge ()
 
 @property (nonatomic, strong)  JSContext *jsContext;
@@ -69,18 +67,6 @@
                     } else {
                         [string appendFormat:@"%@ ", jsVal];
                         WXLogInfo(@"%@", string);
-                    }
-                    NSInteger logLevel = [flag integerValue];
-                    if (logLevel & WXLogFlagError) {
-                        PDLogE(@"%@",string);
-                    }else if (logLevel & WXLogFlagInfo) {
-                        PDLogI(@"%@",string);
-                    }else if (logLevel & WXLogFlagVerbose) {
-                        //PDLogI(@"%@",string);
-                    }else if (logLevel & WXLogFlagWarning) {
-                        PDLogW(@"%@",string);
-                    }else if (logLevel & WXLogFlagDebug) {
-                        //PDLogD(@"%@",string);
                     }
                 }
                 [string appendFormat:@"%@ ", jsVal ];

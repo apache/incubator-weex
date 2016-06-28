@@ -154,7 +154,7 @@ CGPoint WXPixelPointResize(CGPoint value)
 + (NSDictionary *)getDebugEnvironment {
     NSString *platform = @"iOS";
     NSString *weexVersion = [WXAppConfiguration appVersion];
-    NSString *machine = [self deviceName] ? : @"";
+    NSString *machine = [self registeredDeviceName] ? : @"";
     NSString *appName = [WXAppConfiguration appName] ? : @"";
     NSString *clientID = [[NSUserDefaults standardUserDefaults] stringForKey:WXClientIDKey];
     if (!clientID) {
@@ -369,9 +369,13 @@ CGPoint WXPixelPointResize(CGPoint value)
 
 + (NSString *)deviceName
 {
-//    struct utsname systemInfo;
-//    uname(&systemInfo);
-//    NSString *machine = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    NSString *machine = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    return machine;
+}
+
++ (NSString *)registeredDeviceName {
     NSString *machine = [[UIDevice currentDevice] model];
     NSString *systemVer = [[UIDevice currentDevice] systemVersion] ? : @"";
     NSString *model = [NSString stringWithFormat:@"%@:%@",machine,systemVer];
