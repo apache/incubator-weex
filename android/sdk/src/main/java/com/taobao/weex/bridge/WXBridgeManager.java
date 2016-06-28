@@ -340,8 +340,8 @@ public class WXBridgeManager implements Callback {
 
   /**
    * Get Handler for JS Thread.
-   * Be <storng> careful</storng> with this method, inappropriate using of JS handler may cause
-   * significant <strong>performance penalty</strong>.
+   * careful with this method, inappropriate using of JS handler may cause
+   * significant performance penalty.
    * @return Handler the handler in JS thread.
    */
   public Handler getJSHandler() {

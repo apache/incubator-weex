@@ -270,9 +270,7 @@ public class WXListComponent extends WXVContainer implements
     }
 
     /**
-     * Measure the size of the recyclerView. If the height of the recyclerView exceeds the height of
-     * {@link com.taobao.weex.ui.WXRenderStatement#mGodComponent}, {@link
-     * WXViewUtils#getWeexHeight(String)}-{@link #mAbsoluteY} is returned.
+     * Measure the size of the recyclerView.
      *
      * @param width  the expected width
      * @param height the expected height
