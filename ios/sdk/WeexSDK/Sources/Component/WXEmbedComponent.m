@@ -96,13 +96,9 @@
             [self _renderWithURL:_sourceURL];
         }
         [self _updateState:WeexInstanceAppear];
-        
-        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
     }
     else {
         [self _updateState:WeexInstanceDisappear];
-        
-        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
     }
 }
 
@@ -139,6 +135,8 @@
             weakSelf.embedView = view;
             weakSelf.renderFinished = YES;
             [weakSelf.view addSubview:weakSelf.embedView];
+            
+            [weakSelf _updateState:WeexInstanceAppear];
         });
     };
 }
@@ -151,9 +149,17 @@
     
     _embedInstance.state = state;
     
-    if (state == WeexInstanceAppear || state == WeexInstanceForeground )
-    {
+//    if (state == WeexInstanceAppear || state == WeexInstanceForeground )
+//    {
+//        [self setNavigationWithStyles:self.embedInstance.naviBarStyles];
+//    }
+    
+    if (state == WeexInstanceAppear) {
         [self setNavigationWithStyles:self.embedInstance.naviBarStyles];
+        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
+    }
+    else if (state == WeexInstanceDisappear ){
+        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
     }
 }
 

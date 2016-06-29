@@ -11,6 +11,7 @@
 #import <WeexSDK/WXSDKEngine.h>
 #import <WeexSDK/WXUtility.h>
 #import <WeexSDK/WXDebugTool.h>
+#import <WeexSDK/WXSDKManager.h>
 #import "UIViewController+WXDemoNaviBar.h"
 #import "DemoDefine.h"
 
@@ -55,6 +56,19 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    if (self.instance) {
+        [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    if (self.instance) {
+         [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
