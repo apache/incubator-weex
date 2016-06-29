@@ -56,19 +56,13 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    if (self.instance) {
-        [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
-    }
+    [self updateInstanceState:WeexInstanceAppear];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
-    if (self.instance) {
-         [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
-    }
+    [self updateInstanceState:WeexInstanceDisappear];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -126,6 +120,7 @@
     
     _instance.renderFinish = ^(UIView *view) {
         NSLog(@"render finish");
+        [weakSelf updateInstanceState:WeexInstanceAppear];
     };
     
     _instance.updateFinish = ^(UIView *view) {
@@ -142,6 +137,20 @@
     }else {
         _source = nil;
         [_instance renderWithURL:[NSURL URLWithString:randomURL] options:@{@"bundleUrl":URL.absoluteString} data:nil];
+    }
+}
+
+- (void)updateInstanceState:(WXState)state
+{
+    if (_instance && _instance.state != state) {
+        _instance.state = state;
+        
+        if (state == WeexInstanceAppear) {
+            [[WXSDKManager bridgeMgr] fireEvent:_instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
+        }
+        else if (state == WeexInstanceDisappear) {
+            [[WXSDKManager bridgeMgr] fireEvent:_instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
+        }
     }
 }
 

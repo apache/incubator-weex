@@ -149,18 +149,26 @@
         weakSelf.weexView = view;
         [weakSelf.view addSubview:weakSelf.weexView];
     };
+    
+    _instance.onFailed = ^(NSError *error) {
+        
+    };
+    
+    _instance.refreshFinish = ^(UIView *view) {
+        [weakSelf _updateInstanceState:WeexInstanceAppear];
+    };
 }
 
 - (void)_updateInstanceState:(WXState)state
 {
-    if (_instance) {
+    if (_instance && _instance.state != state) {
         _instance.state = state;
         
         if (state == WeexInstanceAppear) {
-            [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
+            [[WXSDKManager bridgeMgr] fireEvent:_instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
         }
         else if (state == WeexInstanceDisappear) {
-            [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
+            [[WXSDKManager bridgeMgr] fireEvent:_instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
         }
     }
 }
