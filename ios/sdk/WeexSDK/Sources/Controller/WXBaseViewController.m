@@ -11,6 +11,7 @@
 #import "WXSDKInstance.h"
 #import "WXSDKInstance_private.h"
 #import "WXSDKEngine.h"
+#import "WXSDKManager.h"
 #import "WXUtility.h"
 
 @interface WXBaseViewController ()
@@ -99,12 +100,16 @@
 {
     [super viewDidAppear:animated];
     [self _updateInstanceState:WeexInstanceAppear];
+    
+    [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     [self _updateInstanceState:WeexInstanceDisappear];
+    
+    [[WXSDKManager bridgeMgr] fireEvent:self.instance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
 }
 
 - (void)didReceiveMemoryWarning

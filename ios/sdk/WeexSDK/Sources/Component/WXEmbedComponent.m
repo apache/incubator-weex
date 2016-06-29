@@ -11,6 +11,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXComponent+Navigation.h"
 #import "WXSDKInstance.h"
+#import "WXSDKManager.h"
 #import "WXConvert.h"
 
 @interface WXEmbedComponent ()
@@ -95,9 +96,13 @@
             [self _renderWithURL:_sourceURL];
         }
         [self _updateState:WeexInstanceAppear];
+        
+        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
     }
     else {
         [self _updateState:WeexInstanceDisappear];
+        
+        [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
     }
 }
 
