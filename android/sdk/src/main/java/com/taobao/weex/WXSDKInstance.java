@@ -930,6 +930,27 @@ public class WXSDKInstance implements IWXActivityStateListener {
     public void onHttpFinish(WXResponse response) {
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
+      if(response.extendParams!=null){
+        Object actualNetworkTime=response.extendParams.get("actualNetworkTime");
+        mWXPerformance.actualNetworkTime=actualNetworkTime instanceof Long?(long)actualNetworkTime:0;
+        WXLogUtils.renderPerformanceLog("actualNetworkTime", mWXPerformance.actualNetworkTime);
+
+        Object pureNetworkTime=response.extendParams.get("pureNetworkTime");
+        mWXPerformance.pureNetworkTime=pureNetworkTime instanceof Long?(long)pureNetworkTime:0;
+        WXLogUtils.renderPerformanceLog("pureNetworkTime", mWXPerformance.pureNetworkTime);
+
+        Object connectionType=response.extendParams.get("connectionType");
+        mWXPerformance.connectionType=connectionType instanceof String?(String)connectionType:"";
+
+        Object packageSpendTime=response.extendParams.get("packageSpendTime");
+        mWXPerformance.packageSpendTime=packageSpendTime instanceof Long ?(long)packageSpendTime:0;
+
+        Object syncTaskTime=response.extendParams.get("syncTaskTime");
+        mWXPerformance.syncTaskTime=syncTaskTime instanceof Long ?(long)syncTaskTime:0;
+
+        Object requestType=response.extendParams.get("requestType");
+        mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
+      }
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
