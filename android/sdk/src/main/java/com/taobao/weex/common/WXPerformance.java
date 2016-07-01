@@ -385,7 +385,7 @@ public class WXPerformance {
   }
 
   public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion"};
+    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"};
   }
 
   public static String[] getMeasures(){
@@ -397,9 +397,11 @@ public class WXPerformance {
         "localReadTime",
         "JSLibInitTime",
         "networkTime",
+        "componentCount",
         "templateLoadTime",
         "SDKInitInvokeTime",
-        "SDKInitExecuteTime"};
+        "SDKInitExecuteTime",
+        "firstScreenJSFExecuteTime"};
   }
 
   @Override
