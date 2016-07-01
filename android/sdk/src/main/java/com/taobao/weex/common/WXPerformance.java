@@ -401,6 +401,10 @@ public class WXPerformance {
         "templateLoadTime",
         "SDKInitInvokeTime",
         "SDKInitExecuteTime",
+        "packageSpendTime",
+        "syncTaskTime",
+        "pureNetworkTime",
+        "actualNetworkTime",
         "firstScreenJSFExecuteTime"};
   }
 
