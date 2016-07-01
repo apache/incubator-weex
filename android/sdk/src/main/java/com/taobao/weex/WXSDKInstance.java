@@ -439,7 +439,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
     render(WXPerformance.DEFAULT, template, null, null, width, height, mRenderStrategy);
   }
 
-  public void renderByUrl(final String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+  public void renderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
+
+    pageName = wrapPageName(pageName, url);
+
     if (options == null) {
       options = new HashMap<String, Object>();
     }
@@ -466,6 +469,24 @@ public class WXSDKInstance implements IWXActivityStateListener {
     wxRequest.paramMap.put("user-agent", WXHttpUtil.assembleUserAgent(mContext,WXEnvironment.getConfig()));
     adapter.sendRequest(wxRequest, new WXHttpListener(pageName, options, jsonInitData, width, height, flag, System.currentTimeMillis()));
     mWXHttpAdapter = adapter;
+  }
+
+  private String wrapPageName(String pageName, String url) {
+    if(TextUtils.equals(pageName, WXPerformance.DEFAULT)){
+      pageName=url;
+      try {
+        Uri uri=Uri.parse(url);
+        if(uri!=null){
+          Uri.Builder builder=new Uri.Builder();
+          builder.scheme(uri.getScheme());
+          builder.authority(uri.getAuthority());
+          builder.path(uri.getPath());
+          pageName=builder.toString();
+        }
+      } catch (Exception e) {
+      }
+    }
+    return pageName;
   }
 
   private String assembleFilePath(Uri uri) {
