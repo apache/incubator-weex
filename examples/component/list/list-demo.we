@@ -1,8 +1,5 @@
 <template>
-  <list class="list" onloadmore="loadmore" loadmoreoffset=2000>
-    <!--<div class="fixed" style="background-color:{{backgroundColor}}" onclick="onfixedclick">-->
-    <!--<text style="font-size:30px;color:white;font-weight: bold;">Composite:{{composite}}</text>-->
-    <!--</div>-->
+  <list class="list" loadmoreoffset=2000>
     <cell class="cell" onclick="oncellclick" rownumber={{id}} repeat="{{shopList}}" scope="{{scopeValue}}" append="tree"
           composite={{composite}}>
       <div class="shopDiv">
@@ -529,12 +526,6 @@
       ],
     },
     methods: {
-      loadmore: function(e) {
-        this.$call('modal', 'toast', {
-          'message': 'loadmore',
-          'duration': 2.0
-        });
-      },
       oncellclick: function(e) {
         this.$call('modal', 'toast', {
           'message': 'row ' + e.target.attr.rownumber + ' clicked',

@@ -1,5 +1,5 @@
 <template>
-  <scroller class="list">
+  <scroller class="list" append＝"tree">
     <div class="section" repeat="{{sections}}">
       <div class="header">
         <text class="header-title">{{title}}</text>
@@ -64,7 +64,9 @@
             {id: 10},
             {id: 11}
           ]
-        },
+        }
+      ],
+      moreSections: [
         {
           title: 'Header 3',
           items: [
@@ -105,8 +107,8 @@
             {id: 31},
             {id: 32}
           ]
-        }
+        },
       ]
-    }
+    },
   }
 </script>
