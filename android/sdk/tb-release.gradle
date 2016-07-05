@@ -5,7 +5,7 @@
  * */
 apply from: 'http://mirrors.taobao.net/mirror/gradle/android-parent.gradle'
 group = 'com.taobao.android'
-version = '1.5.3.1'
+version = '1.5.3.debug-SNAPSHOT'
 
 description = """weex_sdk"""
 
