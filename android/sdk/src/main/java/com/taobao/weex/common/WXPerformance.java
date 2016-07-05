@@ -420,6 +420,7 @@ public class WXPerformance {
              + ",componentCount:" + componentCount
              + ",syncTaskTime:" + syncTaskTime
              + ",pureNetworkTime:" + pureNetworkTime
+             + ",networkTime:" + networkTime
              + ",actualNetworkTime:" + actualNetworkTime
              + ",packageSpendTime:" + packageSpendTime
              + ",connectionType:" + connectionType
