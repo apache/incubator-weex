@@ -207,7 +207,6 @@ package com.taobao.weex.ui.component.list;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
@@ -217,19 +216,19 @@ import com.taobao.weex.ui.view.WXFrameLayout;
  */
 public class WXCell extends WXVContainer {
 
+    public int lastLocationY = -1;
+
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
         super(instance, dom, parent,true );
     }
 
-  /**
-   * If Cell is Sticky, need wraped FrameLayout
-   */
-  @Override
+    /**
+     * If Cell is Sticky, need wraped FrameLayout
+     */
+    @Override
     protected void initView() {
         if(mContext!=null) {
-            if (mDomObj.style.get(WXDomPropConstant.WX_POSITION) != null && mDomObj.style.get(WXDomPropConstant.WX_POSITION)
-                .equals
-                (WXDomPropConstant.WX_POSITION_STICKY)) {
+            if (mDomObj != null && mDomObj.isSticky()) {
                 mHost = new WXFrameLayout(mContext);
                 ((ViewGroup) mHost).addView(new WXFrameLayout(mContext));
             } else {
@@ -242,8 +241,7 @@ public class WXCell extends WXVContainer {
     public ViewGroup getRealView() {
         if (mHost == null)
             return null;
-        if (mDomObj.style.get(WXDomPropConstant.WX_POSITION) != null && mDomObj.style.get(WXDomPropConstant.WX_POSITION).equals
-            (WXDomPropConstant.WX_POSITION_STICKY)) {
+        if (mDomObj != null && mDomObj.isSticky()) {
             return (ViewGroup) ((ViewGroup) mHost).getChildAt(0);
         } else {
             return super.getRealView();
