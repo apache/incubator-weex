@@ -208,6 +208,7 @@ import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Component;
+import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.WXFrameLayout;
@@ -221,6 +222,7 @@ public class WXHeader extends WXCell {
   public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
     lazy(false);
+    setSticky(WXDomPropConstant.WX_POSITION_STICKY);
   }
 
   @Override

@@ -202,105 +202,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.helper;
 
-import android.os.Handler;
-import android.view.View;
+import com.taobao.weex.ui.component.Scrollable;
+import com.taobao.weex.ui.component.WXComponent;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXBaseRefreshLayout;
-import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
-
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Parent of Refreshable Container，if your component support refresh or loadmore, should extends WXRefreshContainer
- * Such as WXScroller. Except WXListComponent.
+ * Created by miomin on 16/7/7.
  */
-public class WXRefreshableContainer extends WXVContainer {
+public class WXStickyHelper {
 
-  private Handler handler=new Handler();
+    private Scrollable scrollable;
 
-  public WXRefreshableContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-  }
-
-  /**
-   * Intercept refresh view and loading view
-   */
-  @Override
-  protected void addSubView(View child, int index) {
-    if (child == null || getRealView() == null) {
-      return;
+    public WXStickyHelper(Scrollable scrollable) {
+        this.scrollable = scrollable;
     }
 
-    if (child instanceof WXBaseRefreshLayout) {
-      return;
-    }
-
-    int count = getRealView().getChildCount();
-    index = index >= count ? -1 : index;
-    if (index == -1) {
-      getRealView().addView(child);
-    } else {
-      getRealView().addView(child, index);
-    }
-  }
-
-  /**
-   * Intercept refresh view and loading view
-   */
-  @Override
-  public void addChild(WXComponent child, int index) {
-    if (child == null || index < -1) {
-      return;
-    }
-
-    checkRefreshOrLoading(child);
-    if (child instanceof WXBaseRefresh) {
-      return;
-    }
-
-    if (mChildren == null) {
-      mChildren = new ArrayList<>();
-    }
-    int count = mChildren.size();
-    index = index >= count ? -1 : index;
-    if (index == -1) {
-      mChildren.add(child);
-    } else {
-      mChildren.add(index, child);
-    }
-  }
-
-  /**
-   * Setting refresh view and loading view
-   * @param child the refresh_view or loading_view
-   */
-  private void checkRefreshOrLoading(WXComponent child) {
-    if (child instanceof WXRefresh) {
-      ((BaseBounceView)mHost).setOnRefreshListener((WXRefresh)child);
-      final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
-        @Override
-        public void run() {
-          ((BaseBounceView)mHost).setHeaderView(temp.getView());
+    public void bindStickStyle(WXComponent component, Map<String, HashMap<String, WXComponent>> mStickyMap) {
+        Scrollable scroller = component.getParentScroller();
+        if (scroller == null) {
+            return;
         }
-      };
-      handler.postDelayed(runnable,100);
+        HashMap<String, WXComponent> stickyMap = mStickyMap.get(scroller
+                .getRef());
+        if (stickyMap == null) {
+            stickyMap = new HashMap<>();
+        }
+        if (stickyMap.containsKey(component.getRef())) {
+            return;
+        }
+        stickyMap.put(component.getRef(), component);
+        mStickyMap.put(scroller.getRef(), stickyMap);
     }
 
-    if (child instanceof WXLoading) {
-      ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
-      final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
-        @Override
-        public void run() {
-          ((BaseBounceView)mHost).setFooterView(temp.getView());
+    public void unbindStickStyle(WXComponent component, Map<String, HashMap<String, WXComponent>> mStickyMap) {
+        Scrollable scroller = component.getParentScroller();
+        if (scroller == null) {
+            return;
         }
-      };
-      handler.postDelayed(runnable,100);
+        HashMap<String, WXComponent> stickyMap = mStickyMap.get(scroller
+                .getRef());
+        if (stickyMap == null) {
+            return;
+        }
+        stickyMap.remove(component.getRef());
     }
-  }
 }
