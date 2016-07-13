@@ -229,7 +229,7 @@ public class WXEnvironment {
    * Global config
    ***************************/
 
-  public static String JS_LIB_SDK_VERSION = "v0.14.6";
+  public static String JS_LIB_SDK_VERSION = "v0.14.7";
 
   public static String WXSDK_VERSION = "0.6.1";
   public static Application sApplication;
