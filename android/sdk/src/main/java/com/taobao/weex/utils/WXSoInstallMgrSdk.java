@@ -224,6 +224,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import dalvik.system.PathClassLoader;
+
 
 /**
  * Utility class for managing so library, including load native library and version management.
@@ -387,16 +389,25 @@ public class WXSoInstallMgrSdk {
     if (null == context) {
       return false;
     }
+    try{
+      long start=System.currentTimeMillis();
+      if(WXSoInstallMgrSdk.class.getClassLoader() instanceof PathClassLoader ) {
 
-    String path = "/data/data/" + context.getPackageName() + "/lib" + "/lib" + libName + ".so";
+        String path = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(libName);
+        File file = new File(path);
 
-    File file = new File(path);
-
-    if (size == file.length()) {
-      return true;
+        if (!file.exists() || size == file.length()) {
+          WXLogUtils.w("weex so size check path :" + path+"   "+(System.currentTimeMillis() - start));
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }catch(Throwable e ){
+      WXLogUtils.e("weex so size check fail exception :"+e.getMessage());
     }
 
-    return false;
+    return true;
   }
 
   /**
