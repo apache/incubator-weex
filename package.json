@@ -81,7 +81,7 @@
     "semver": "^5.1.0",
     "transitionize": "0.0.3",
     "weex-components": "^0.1.3",
-    "weex-vue-framework": "^0.1.0",
+    "weex-vue-framework": "^0.1.2",
     "weex-vue-loader": "^0.1.0"
   },
   "devDependencies": {
