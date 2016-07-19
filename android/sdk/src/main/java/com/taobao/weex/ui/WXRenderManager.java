@@ -211,6 +211,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -279,8 +280,8 @@ public class WXRenderManager {
     });
   }
 
-  public void createInstance(WXSDKInstance instance, String instanceId) {
-    mRegistries.put(instanceId, new WXRenderStatement(instance, instanceId));
+  public void createInstance(WXSDKInstance instance) {
+    mRegistries.put(instance.getInstanceId(), new WXRenderStatement(instance));
   }
 
   public void createBody(String instanceId, WXComponent component) {
@@ -431,11 +432,13 @@ public class WXRenderManager {
   }
 
 
-  public void startAnimation(String instanceId, @NonNull String ref, @Nullable String callBack) {
+  public void startAnimation(String instanceId, @NonNull String ref,
+                             @NonNull WXAnimationBean animationBean, @Nullable String
+      callBack) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
-    statement.startAnimation(ref, callBack);
+    statement.startAnimation(ref, animationBean, callBack);
   }
 }

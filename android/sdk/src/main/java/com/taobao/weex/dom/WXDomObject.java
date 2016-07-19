@@ -228,6 +228,8 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
+  public static final String TRANSFORM = "transform";
+  public static final String TRANSFORM_ORIGIN = "transformOrigin";
   public AtomicBoolean sDestroy = new AtomicBoolean();
   public String ref = ROOT;
   public String type = WXBasicComponentType.SCROLLER;
@@ -296,11 +298,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
     if (hasNewLayout()) {
       markLayoutSeen();
     }
-  }
-
-
-  public boolean isSticky() {
-    return style == null ? false : style.isSticky();
   }
 
   public boolean isFixed() {
@@ -518,6 +515,15 @@ public class WXDomObject extends CSSNode implements Cloneable {
       }
       children.clear();
     }
+  }
+
+  /** package **/
+  /**
+   * Get default style map for component.
+   * @return
+   */
+  protected Map<String,String> getDefaultStyle(){
+    return null;
   }
 
   public ArrayList<String> getFixedStyleRefs() {

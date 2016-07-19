@@ -218,6 +218,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -238,7 +239,6 @@ import java.util.Map;
  */
 class WXRenderStatement {
 
-  private String mInstanceId;
   private Map<String, WXComponent> mRegistry;
   private WXSDKInstance mWXSDKInstance;
   /**
@@ -246,9 +246,8 @@ class WXRenderStatement {
    */
   private WXVContainer mGodComponent;
 
-  public WXRenderStatement(WXSDKInstance instance, String instaceId) {
+  public WXRenderStatement(WXSDKInstance instance) {
     mWXSDKInstance = instance;
-    mInstanceId = instaceId;
     mRegistry = new HashMap<>();
   }
 
@@ -558,7 +557,7 @@ class WXRenderStatement {
     return component;
   }
 
-  void startAnimation(@NonNull String ref, @Nullable String callBack) {
-    WXAnimationModule.startAnimation(mWXSDKInstance,mRegistry.get(ref),callBack);
+  void startAnimation(@NonNull String ref, @NonNull WXAnimationBean animationBean, @Nullable String callBack) {
+    WXAnimationModule.startAnimation(mWXSDKInstance, mRegistry.get(ref), animationBean, callBack);
   }
 }

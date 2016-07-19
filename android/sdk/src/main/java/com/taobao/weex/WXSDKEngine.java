@@ -111,6 +111,7 @@
 package com.taobao.weex;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -129,34 +130,13 @@ import com.taobao.weex.common.TypeModuleFactory;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXDomRegistry;
-import com.taobao.weex.dom.WXSwitchDomObject;
-import com.taobao.weex.dom.WXTextDomObject;
+import com.taobao.weex.dom.*;
 import com.taobao.weex.dom.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
-import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXHeader;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXIndicator;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXLoadingIndicator;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.WXWeb;
+import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
@@ -288,6 +268,7 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
       registerComponent(WXBasicComponentType.VIDEO, WXVideo.class, false);
       registerComponent(WXBasicComponentType.INPUT, WXInput.class, false);
+      registerComponent(WXBasicComponentType.TEXTAREA, Textarea.class,false);
       registerComponent(WXBasicComponentType.SWITCH, WXSwitch.class, false);
       registerComponent(WXBasicComponentType.A, WXA.class, false);
       registerComponent(WXBasicComponentType.EMBED, WXEmbed.class, true);
@@ -306,9 +287,15 @@ public class WXSDKEngine {
       registerModule("stream", WXStreamModule.class);
       registerModule("timer", WXTimerModule.class, true);
 
+      registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
-      registerDomObject(WXBasicComponentType.INPUT, WXTextDomObject.class);
+      registerDomObject(WXBasicComponentType.INPUT, BasicEditTextDomObject.class);
+      registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);
+      registerDomObject(WXBasicComponentType.LIST, WXListDomObject.class);
+      registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
+      registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
+      registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:" + WXLogUtils.getStackTrace(e));
     }
@@ -333,7 +320,7 @@ public class WXSDKEngine {
    * @param clazz the class of the {@link WXComponent} to be registered.
    * @param appendTree true for appendTree flag
    * @return true for registration success, false for otherwise.
-   * @param names names(alias) of component. Same as type filed in the JS.
+   * @param names names(alias) of component. Same as type field in the JS.
    * @throws WXException Throws exception if type conflicts.
    */
   public static boolean registerComponent(Class<? extends WXComponent> clazz, boolean appendTree,String ... names) throws WXException {
@@ -498,20 +485,18 @@ public class WXSDKEngine {
       }
     }
   }
-  public static void reload(final Application application,boolean remoteDebug){
-    if(remoteDebug){
-      WXEnvironment.sRemoteDebugMode=true;
-      WXBridgeManager.getInstance().restart();
-      WXBridgeManager.getInstance().initScriptsFramework(null);
-      WXModuleManager.reload();
-      WXComponentRegistry.reload();
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          LocalBroadcastManager.getInstance(application).sendBroadcast(new Intent(JS_FRAMEWORK_RELOAD));
-        }
-      }, 1000);
-    }
+  public static void reload(final Context context, boolean remoteDebug) {
+    WXEnvironment.sRemoteDebugMode = remoteDebug;
+    WXBridgeManager.getInstance().restart();
+    WXBridgeManager.getInstance().initScriptsFramework(null);
+    WXModuleManager.reload();
+    WXComponentRegistry.reload();
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(JS_FRAMEWORK_RELOAD));
+      }
+    }, 1000);
   }
 
   public static void reload() {

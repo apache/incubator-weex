@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -215,11 +216,14 @@ import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * Slider indicator
  */
-public class WXIndicator extends WXComponent {
+public class WXIndicator extends WXComponent<WXCircleIndicator> {
 
   @Deprecated
   public WXIndicator(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -231,20 +235,24 @@ public class WXIndicator extends WXComponent {
   }
 
   @Override
-  protected void initView() {
-    mHost = new WXCircleIndicator(mContext);
+  protected WXCircleIndicator initComponentHostView(Context context) {
+    WXCircleIndicator view = new WXCircleIndicator(context);
     if (mParent instanceof WXSlider) {
-      ((WXSlider) mParent).addIndicator(this);
+      return view;
     } else {
       if (WXEnvironment.isApkDebugable()) {
         throw new WXRuntimeException("WXIndicator initView error.");
       }
     }
+    return null;
   }
 
   @Override
-  public WXCircleIndicator getView() {
-    return (WXCircleIndicator) super.getView();
+  protected void onHostViewInitialized(WXCircleIndicator host) {
+    super.onHostViewInitialized(host);
+    if (mParent instanceof WXSlider) {
+      ((WXSlider) mParent).addIndicator(this);
+    }
   }
 
   @WXComponentProp(name = "itemColor")
@@ -289,6 +297,20 @@ public class WXIndicator extends WXComponent {
       mHost.setVisibility(View.VISIBLE);
     } else {
       mHost.setVisibility(View.GONE);
+    }
+  }
+
+  public static class IndicatorDomNode extends WXDomObject{
+    public IndicatorDomNode(){
+      super();
+    }
+
+    @Override
+    protected Map<String, String> getDefaultStyle() {
+      Map<String,String> map = new HashMap<>();
+      map.put("left","0");
+      map.put("top","0");
+      return map;
     }
   }
 }

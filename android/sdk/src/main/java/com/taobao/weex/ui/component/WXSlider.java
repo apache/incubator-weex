@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Context;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.view.View;
@@ -227,8 +228,12 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXSlider extends WXVContainer implements OnPageChangeListener {
+public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeListener {
 
+  public static final String INDEX = "index";
+  public static final String SHOW_INDICATORS = "showIndicators";
+  public static final String AUTO_PLAY = "autoPlay";
+  public static final String INTERVAL = "interval";
   Map<String, Object> params = new HashMap<>();
   /**
    * Scrollable sliderview
@@ -243,10 +248,6 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
    * Adapter for sliderview
    */
   private WXCirclePageAdapter mAdapter;
-  /**
-   * Container for sliderview
-   */
-  private FrameLayout mRoot;
 
   private boolean mShowIndicators;
 
@@ -260,22 +261,23 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
   }
 
   @Override
-  protected void initView() {
-    mRoot = new FrameLayout(mContext);
+  protected FrameLayout initComponentHostView(Context context) {
+    FrameLayout view = new FrameLayout(context);
     // init view pager
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
-        LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    mViewPager = new WXCircleViewPager(mContext);
+      LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    mViewPager = new WXCircleViewPager(context);
     mViewPager.setLayoutParams(pagerParams);
 
     // init adapter
     mAdapter = new WXCirclePageAdapter();
     mViewPager.setAdapter(mAdapter);
     // add to parent
-    mRoot.addView(mViewPager);
-    mHost = mRoot;
+    view.addView(mViewPager);
     mViewPager.setOnPageChangeListener(this);
     registerActivityStateListener();
+
+    return view;
   }
 
   //TODO Slider don't support any gesture for now.
@@ -349,23 +351,19 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
     }
   }
 
-//  @Override
-//  protected void bindImpl(View view) {
-//    if(view==null){
-//      super.bindImpl(view);
-//    }
-//    else if(view instanceof ViewGroup){
-//      if(((ViewGroup) view).getChildAt(0) instanceof WXCircleViewPager){
-//        super.bindImpl(((ViewGroup) view).getChildAt(0));
-//      }
-//    }
-//  }
-
   public void addIndicator(WXIndicator indicator) {
+    FrameLayout root = getView();
+    if (root == null) {
+      return;
+    }
     mIndicator = indicator;
-    mIndicator.getView().setCircleViewPager(mViewPager);
-    mIndicator.getView().setOnPageChangeListener(this);
-    mRoot.addView(mIndicator.getView());
+    WXCircleIndicator indicatorView = indicator.getView();
+    if(indicatorView != null){
+      indicatorView.setCircleViewPager(mViewPager);
+      indicatorView.setOnPageChangeListener(this);
+      root.addView(indicatorView);
+    }
+
   }
 
   @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SLIDER_VALUE)
@@ -384,7 +382,7 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
     mViewPager.setCurrentItem(i);
   }
 
-  @WXComponentProp(name = "autoPlay")
+  @WXComponentProp(name = AUTO_PLAY)
   public void setAutoPlay(String autoPlay) {
     if (TextUtils.isEmpty(autoPlay) || autoPlay.equals("false")) {
       mViewPager.stopAutoScroll();
@@ -394,7 +392,7 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
     }
   }
 
-  @WXComponentProp(name = "showIndicators")
+  @WXComponentProp(name = SHOW_INDICATORS)
   public void setShowIndicators(String show) {
     if (TextUtils.isEmpty(show) || show.equals("false")) {
       mShowIndicators = false;
@@ -411,6 +409,20 @@ public class WXSlider extends WXVContainer implements OnPageChangeListener {
   @Override
   public void onPageScrolled(int arg0, float arg1, int arg2) {
 
+  }
+
+  @WXComponentProp(name = INTERVAL)
+  public void setInterval(int intervalMS){
+    if(mViewPager != null){
+      mViewPager.setIntervalTime(intervalMS);
+    }
+  }
+
+  @WXComponentProp(name = INDEX)
+  public void setIndex(int index){
+    if(mViewPager != null){
+      mViewPager.setCurrentItem(index);
+    }
   }
 
   @Override
