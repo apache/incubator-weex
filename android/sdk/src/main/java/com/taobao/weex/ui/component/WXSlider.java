@@ -222,6 +222,7 @@ import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
@@ -363,6 +364,38 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
       root.addView(indicatorView);
     }
 
+  }
+
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key) {
+      case WXDomPropConstant.WX_ATTR_SLIDER_VALUE:
+        String value = WXUtils.getString(param,null);
+        if (value != null)
+          setValue(value);
+        return true;
+      case AUTO_PLAY:
+        String aotu_play = WXUtils.getString(param,null);
+        if (aotu_play != null)
+          setAutoPlay(aotu_play);
+        return true;
+      case SHOW_INDICATORS:
+        String indicators = WXUtils.getString(param,null);
+        if (indicators != null)
+          setShowIndicators(indicators);
+        return true;
+      case INTERVAL:
+        Integer interval = WXUtils.getInteger(param,null);
+        if (interval != null)
+          setInterval(interval);
+        return true;
+      case INDEX:
+        Integer index = WXUtils.getInteger(param,null);
+        if (index != null)
+          setIndex(index);
+        return true;
+    }
+    return super.setProperty(key, param);
   }
 
   @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SLIDER_VALUE)

@@ -222,10 +222,12 @@ import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXFileUtils;
@@ -286,6 +288,8 @@ public class WXBridgeManager implements Callback {
   private static long LOW_MEM_VALUE = 80;
 
   private static WXBridgeManager mBridgeManager;
+
+  private WXDomModule sDomModule;
 
   /**
    * next tick tasks, can set priority
@@ -474,7 +478,13 @@ public class WXBridgeManager implements Callback {
         for (int i = 0; i < size; ++i) {
           task = (JSONObject) array.get(i);
           if (task != null && WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-            WXModuleManager.callModuleMethod(instanceId, (String) task.get("module"), (String) task.get("method"), (JSONArray) task.get("args"));
+            if (TextUtils.equals(WXDomModule.WXDOM, (String) task.get(WXDomModule.MODULE))) {
+              sDomModule = getDomModule(instanceId);
+              sDomModule.callDomMethod(task);
+            } else {
+              WXModuleManager.callModuleMethod(instanceId, (String) task.get(WXDomModule.MODULE),
+                      (String) task.get(WXDomModule.METHOD), (JSONArray) task.get(WXDomModule.ARGS));
+            }
           }
         }
       } catch (Exception e) {
@@ -897,6 +907,7 @@ public class WXBridgeManager implements Callback {
           mInit = true;
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
+          registerDomModule();
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
         }
@@ -1092,6 +1103,16 @@ public class WXBridgeManager implements Callback {
     public String callbackId;
     public long time;
     public String instanceId;
+  }
+
+  private void registerDomModule() throws WXException {
+    if (sDomModule == null)
+      sDomModule = new WXDomModule();
+  }
+
+  private WXDomModule getDomModule(String instanceId) {
+    sDomModule.mWXSDKInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    return sDomModule;
   }
 
 }
