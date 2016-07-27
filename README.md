@@ -36,7 +36,7 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 
 #### Runtime
 
-On Android Platform , Weex code executed by [weex_v8core](https://github.com/alibaba/weex_v8core) which based on google v8 JavaScript engine.
+On Android Platform , Weex code is executed in [weex_v8core](https://github.com/alibaba/weex_v8core) which is based on Google V8 JavaScript engine.
 
 ### iOS
 
@@ -64,10 +64,10 @@ See [SCRIPTS.md](./SCRIPTS.md) for more information.
 See [FAQ](http://alibaba.github.io/weex/doc/faq.html) for more information.
 
 
-### Community based weex knowledge site 
+### Community based Weex knowledge site 
 
 * [weex article](https://github.com/weexteam/article/wiki) : article collection about Weex
-* [weex.help](http://weex.help/)  :  an independent forum about Weex
+* [weex.help](http://weex.help/)  : 3rd forum about Weex
 * [gitter.im chinese room](https://gitter.im/weexteam/cn?utm_source=share-link&utm_medium=link&utm_campaign=share-link) :   an instant message chat room about Weex
 
 ## Contributing
