@@ -33,6 +33,11 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
     0. Click <img src="http://gtms04.alicdn.com/tps/i4/TB1wCcqMpXXXXakXpXX3G7tGXXX-34-44.png" height="16" > (`Run` button)
 0. [Add an example](./examples/README.md#add-an-example)
 
+
+#### Android Runtime
+
+On Android Platform , Weex code executed by [weex_v8core](https://github.com/alibaba/weex_v8core) which based on google v8 JavaScript engine.
+
 ### iOS
 
 0. Prerequisites
@@ -58,6 +63,15 @@ See [SCRIPTS.md](./SCRIPTS.md) for more information.
 
 See [FAQ](http://alibaba.github.io/weex/doc/faq.html) for more information.
 
+
+### Community based weex knowledge site 
+
+* [weex article](https://github.com/weexteam/article/wiki) : article collection about Weex
+* [weex.help](http://weex.help/)  :  an independent forum about Weex
+* [weex gitter.im chinese room](https://gitter.im/weexteam/cn?utm_source=share-link&utm_medium=link&utm_campaign=share-link) :   an instant message chat room about Weex
+
 ## Contributing
 
 See [Weex Contributing Guide](./CONTRIBUTING.md) for more information.
+
+
