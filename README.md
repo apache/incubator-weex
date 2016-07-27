@@ -68,7 +68,7 @@ See [FAQ](http://alibaba.github.io/weex/doc/faq.html) for more information.
 
 * [weex article](https://github.com/weexteam/article/wiki) : article collection about Weex
 * [weex.help](http://weex.help/)  :  an independent forum about Weex
-* [weex gitter.im chinese room](https://gitter.im/weexteam/cn?utm_source=share-link&utm_medium=link&utm_campaign=share-link) :   an instant message chat room about Weex
+* [gitter.im chinese room](https://gitter.im/weexteam/cn?utm_source=share-link&utm_medium=link&utm_campaign=share-link) :   an instant message chat room about Weex
 
 ## Contributing
 
