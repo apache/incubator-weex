@@ -34,7 +34,7 @@ Please ***INSTALL [Git for Windows](https://git-scm.com/download/win)*** and run
 0. [Add an example](./examples/README.md#add-an-example)
 
 
-#### Android Runtime
+#### Runtime
 
 On Android Platform , Weex code executed by [weex_v8core](https://github.com/alibaba/weex_v8core) which based on google v8 JavaScript engine.
 
