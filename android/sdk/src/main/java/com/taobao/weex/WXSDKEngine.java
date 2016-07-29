@@ -133,6 +133,8 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.*;
 import com.taobao.weex.dom.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
+import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.animation.WXAnimationModule;
@@ -145,6 +147,7 @@ import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -206,6 +209,7 @@ public class WXSDKEngine {
       long start = System.currentTimeMillis();
       doInitInternal(application,config);
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
+      WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
       init = true;
     }
   }
@@ -213,6 +217,7 @@ public class WXSDKEngine {
   private static void doInitInternal(final Application application,final InitConfig config){
     WXEnvironment.sApplication = application;
     WXEnvironment.JsFrameworkInit = false;
+    final long initStart = System.currentTimeMillis();
 
     WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
       @Override
@@ -236,8 +241,9 @@ public class WXSDKEngine {
         sm.initScriptsFramework(null);
 
         WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
-        WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
         WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
+        WXEnvironment.sSDKInitTime = System.currentTimeMillis() - initStart;
+        WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
       }
     });
     register();
@@ -256,12 +262,53 @@ public class WXSDKEngine {
 
   private static void register() {
     try {
-      registerComponent(WXBasicComponentType.TEXT, WXText.class, false);
-      registerComponent(WXDiv.class, false,WXBasicComponentType.CONTAINER,WXBasicComponentType.DIV,WXBasicComponentType.HEADER,WXBasicComponentType.FOOTER);
-      registerComponent(WXImage.class, false,WXBasicComponentType.IMAGE,WXBasicComponentType.IMG);
-      registerComponent(WXBasicComponentType.SCROLLER, WXScroller.class, false);
-      registerComponent(WXBasicComponentType.SLIDER, WXSlider.class, true);
-
+      registerComponent(
+        WXText.class,
+        new SimpleComponentHolder(
+          WXText.class,
+          new WXText.Ceator()
+        ),
+        false,
+        WXBasicComponentType.TEXT
+      );
+      registerComponent(
+        WXDiv.class,
+        new SimpleComponentHolder(
+          WXDiv.class,
+          new WXDiv.Ceator()
+        ),
+        false,
+        WXBasicComponentType.CONTAINER,
+        WXBasicComponentType.DIV,
+        WXBasicComponentType.HEADER,
+        WXBasicComponentType.FOOTER
+      );
+      registerComponent(
+        WXImage.class,
+        new SimpleComponentHolder(
+          WXImage.class,
+          new WXImage.Ceator()
+        ),
+        false,
+        WXBasicComponentType.IMAGE,
+        WXBasicComponentType.IMG
+      );
+      registerComponent( WXScroller.class,
+        new SimpleComponentHolder(
+          WXScroller.class,
+          new WXScroller.Ceator()
+        ),
+        false,
+        WXBasicComponentType.SCROLLER
+      );
+      registerComponent( WXSlider.class,
+        new SimpleComponentHolder(
+          WXSlider.class,
+          new WXSlider.Ceator()
+        ),
+        true,
+        WXBasicComponentType.SLIDER
+      );
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
@@ -323,8 +370,12 @@ public class WXSDKEngine {
    * @throws WXException Throws exception if type conflicts.
    */
   public static boolean registerComponent(Class<? extends WXComponent> clazz, boolean appendTree,String ... names) throws WXException {
-    boolean result =  true;
     SimpleComponentHolder holder = new SimpleComponentHolder(clazz);
+    return registerComponent(clazz,holder,appendTree,names);
+  }
+
+  static boolean registerComponent(Class<? extends WXComponent> clazz, IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
+    boolean result =  true;
     Map<String, String> componentInfo = new HashMap<>();
     if (appendTree) {
       componentInfo.put("append", "tree");
