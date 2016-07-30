@@ -202,52 +202,101 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *
- */
-package com.taobao.weex.utils;
+package com.taobao.weex.appfram.storage;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.taobao.weex.utils.WXLogUtils;
+
+public class WXDatabaseSupplier extends SQLiteOpenHelper {
+
+    private static final String DATABASE_NAME = "WXStorage";
+    private static final int DATABASE_VERSION = 1;
+
+    private long mMaximumDatabaseSize = 5L * 1024L * 1024L;
+
+    private static WXDatabaseSupplier sInstance;
+
+    private Context mContext;
+    private SQLiteDatabase mDb;
 
 
-public class WXConst {
+    static final String TABLE_STORAGE = "default_wx_storage";
+    static final String COLUMN_KEY = "key";
+    static final String COLUMN_VALUE = "value";
 
-  public static final String MODULE_NAME = "weex";
+    private static final String STATEMENT_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_STORAGE + " ("
+            + COLUMN_KEY
+            + " TEXT PRIMARY KEY,"
+            + COLUMN_VALUE
+            + " TEXT NOT NULL"
+            + ")";
 
-  //Performance
-  public static final String LOAD = "load";
 
-  //Alert
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
+    private WXDatabaseSupplier(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.mContext = context;
+    }
 
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
+    public static WXDatabaseSupplier getInstance(Context context) {
+        if (context == null) {
+            WXLogUtils.e("can not get context instance...");
+            return null;
+        }
+        if (sInstance == null) {
+            sInstance = new WXDatabaseSupplier(context);
+        }
+        return sInstance;
+    }
 
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
+    SQLiteDatabase getDatabase() {
+        ensureDatabase();
+        return mDb;
+    }
 
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(STATEMENT_CREATE_TABLE);
+    }
 
-  public static final String MSG_FAILED = "MSG_FAILED";
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion != newVersion) {
+            deleteDB();
+            onCreate(db);
+        }
+    }
 
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
 
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
+
+    synchronized void ensureDatabase() {
+        if (mDb != null && mDb.isOpen()) {
+            return;
+        }
+        mDb = getWritableDatabase();
+        mDb.setMaximumSize(mMaximumDatabaseSize);
+    }
+
+    public synchronized void setMaximumSize(long size) {
+        mMaximumDatabaseSize = size;
+        if (mDb != null) {
+            mDb.setMaximumSize(mMaximumDatabaseSize);
+        }
+    }
+
+    private boolean deleteDB() {
+        closeDatabase();
+        return mContext.deleteDatabase(DATABASE_NAME);
+    }
+
+    public void closeDatabase() {
+        if (mDb != null && mDb.isOpen()) {
+            mDb.close();
+            mDb = null;
+        }
+    }
+
+
 }
-

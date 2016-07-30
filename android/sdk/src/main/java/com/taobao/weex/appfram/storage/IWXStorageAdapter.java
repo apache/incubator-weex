@@ -202,52 +202,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.taobao.weex.appfram.storage;
+
+import java.util.Map;
+
 /**
- *
- */
-package com.taobao.weex.utils;
+ * interface for {@link WXStorageModule} class.
+ * this interface works as an adapter for different storage strategy.
+ * the default is use {@link android.database.sqlite.SQLiteDatabase} to store k-v pairs.
+ * You can call {@link com.taobao.weex.WXSDKEngine#setIWXStorageAdapter(IWXStorageAdapter)} to inject your own
+ * storage implementation.
+ * */
+public interface IWXStorageAdapter {
+    void setItem(String key, String value,OnResultReceivedListener listener);
 
+    void getItem(String key,OnResultReceivedListener listener);
 
-public class WXConst {
+    void removeItem(String key,OnResultReceivedListener listener);
 
-  public static final String MODULE_NAME = "weex";
+    void length(OnResultReceivedListener listener);
 
-  //Performance
-  public static final String LOAD = "load";
+    void getAllKeys(OnResultReceivedListener listener);
 
-  //Alert
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
+    /**
+     * the callback of storage operation.
+     * */
+    interface OnResultReceivedListener {
+        void onReceived(Map<String,Object> data);
+    }
 
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
-
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
-
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
-
-  public static final String MSG_FAILED = "MSG_FAILED";
-
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
-
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
 }
-

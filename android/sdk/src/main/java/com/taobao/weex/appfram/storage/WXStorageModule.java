@@ -202,52 +202,138 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.taobao.weex.appfram.storage;
+
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXModuleAnno;
+
+import java.util.Map;
+
 /**
- *
+ * Created by rowandjj(chuyi)<br/>
  */
-package com.taobao.weex.utils;
+public class WXStorageModule extends WXModule implements IWXStorage {
+
+    private IWXStorageAdapter mStorageAdapter;
+
+    private IWXStorageAdapter ability() {
+        if (mStorageAdapter != null) {
+            return mStorageAdapter;
+        }
+        mStorageAdapter = WXSDKEngine.getIWXStorageAdapter();
+        return mStorageAdapter;
+    }
 
 
-public class WXConst {
+    @Override
+    @WXModuleAnno
+    public void setItem(String key, String value, @Nullable final JSCallback callback) {
+        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+            StorageResultHandler.handleInvalidParam(callback);
+            return;
+        }
 
-  public static final String MODULE_NAME = "weex";
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.setItem(key, value, new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
 
-  //Performance
-  public static final String LOAD = "load";
 
-  //Alert
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
+    }
 
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
+    @Override
+    @WXModuleAnno
+    public void getItem(String key, @Nullable final JSCallback callback) {
+        if (TextUtils.isEmpty(key)) {
+            StorageResultHandler.handleInvalidParam(callback);
+            return;
+        }
 
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.getItem(key, new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
+    }
 
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
+    @Override
+    @WXModuleAnno
+    public void removeItem(String key, @Nullable final JSCallback callback) {
+        if (TextUtils.isEmpty(key)) {
+            StorageResultHandler.handleInvalidParam(callback);
+            return;
+        }
 
-  public static final String MSG_FAILED = "MSG_FAILED";
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.removeItem(key, new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
+    }
 
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
+    @Override
+    @WXModuleAnno
+    public void length(@Nullable final JSCallback callback) {
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.length(new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
+    }
 
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
+    @Override
+    @WXModuleAnno
+    public void getAllKeys(@Nullable final JSCallback callback) {
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.getAllKeys(new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
+    }
 }
-

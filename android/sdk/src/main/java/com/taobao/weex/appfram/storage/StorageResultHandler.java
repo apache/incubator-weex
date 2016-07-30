@@ -202,52 +202,92 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *
- */
-package com.taobao.weex.utils;
+package com.taobao.weex.appfram.storage;
+
+import android.support.annotation.Nullable;
+
+import com.taobao.weex.bridge.JSCallback;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class StorageResultHandler {
+
+    private StorageResultHandler() {
+    }
+
+    private static final String RESULT = "result";
+    private static final String DATA = "data";
 
 
-public class WXConst {
+    private static final String UNDEFINED = "undefined";
+    private static final String RESULT_FAILED_NO_HANDLER = "no_handler";
+    private static final String RESULT_FAILED_INVALID_PARAM = "invalid_param";
 
-  public static final String MODULE_NAME = "weex";
 
-  //Performance
-  public static final String LOAD = "load";
+    private static final String RESULT_OK = "success";
+    private static final String RESULT_FAILED = "failed";
 
-  //Alert
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
 
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
+    public static Map<String, Object> getItemResult(String result) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put(RESULT, result != null ? RESULT_OK : RESULT_FAILED);
+        map.put(DATA, result != null ? result : UNDEFINED);
+        return map;
+    }
 
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
+    public static Map<String, Object> setItemResult(boolean result) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put(RESULT, result ? RESULT_OK : RESULT_FAILED);
+        map.put(DATA, UNDEFINED);
+        return map;
+    }
 
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
 
-  public static final String MSG_FAILED = "MSG_FAILED";
+    public static Map<String, Object> removeItemResult(boolean result) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put(RESULT, result ? RESULT_OK : RESULT_FAILED);
+        map.put(DATA, UNDEFINED);
+        return map;
+    }
 
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
+    public static Map<String, Object> getLengthResult(long result) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put(RESULT, RESULT_OK);
+        map.put(DATA, result);
+        return map;
+    }
 
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
+    public static Map<String, Object> getAllkeysResult(List<String> result) {
+        if (result == null) {
+            result = new ArrayList<>(1);
+        }
+        Map<String, Object> map = new HashMap<>(4);
+        map.put(RESULT, RESULT_OK);
+        map.put(DATA, result);
+        return map;
+    }
+
+
+    private static void handleResult(@Nullable JSCallback callback, String result, Object data) {
+        if (callback == null) {
+            return;
+        }
+        Map<String, Object> retVal = new HashMap<>(4);
+        retVal.put(RESULT, result);
+        retVal.put(DATA, data);
+        callback.invoke(retVal);
+    }
+
+    public static void handleNoHandlerError(@Nullable JSCallback callback) {
+        handleResult(callback, RESULT_FAILED, RESULT_FAILED_NO_HANDLER);
+    }
+
+    public static void handleInvalidParam(@Nullable JSCallback callback) {
+        handleResult(callback, RESULT_FAILED, RESULT_FAILED_INVALID_PARAM);
+    }
+
+
 }
-

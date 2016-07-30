@@ -202,52 +202,175 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *
- */
-package com.taobao.weex.utils;
+package com.taobao.weex.appfram.storage;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteStatement;
+
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class DefaultWXStorage implements IWXStorageAdapter {
+
+    private WXDatabaseSupplier mDatabaseSupplier;
+
+    private ExecutorService mExecutorService;
+
+    private void execute(Runnable runnable) {
+        if (mExecutorService == null) {
+            mExecutorService = Executors.newSingleThreadExecutor();
+        }
+        mExecutorService.execute(runnable);
+    }
+
+    public DefaultWXStorage(Context context) {
+        this.mDatabaseSupplier = WXDatabaseSupplier.getInstance(context);
+    }
 
 
-public class WXConst {
+    @Override
+    public void setItem(final String key, final String value, final OnResultReceivedListener listener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> data = StorageResultHandler.setItemResult(performSetItem(key, value));
+                listener.onReceived(data);
+            }
+        });
+    }
 
-  public static final String MODULE_NAME = "weex";
+    @Override
+    public void getItem(final String key, final OnResultReceivedListener listener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> data = StorageResultHandler.getItemResult(performGetItem(key));
+                listener.onReceived(data);
+            }
+        });
+    }
 
-  //Performance
-  public static final String LOAD = "load";
+    @Override
+    public void removeItem(final String key, final OnResultReceivedListener listener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> data = StorageResultHandler.removeItemResult(performRemoveItem(key));
+                listener.onReceived(data);
+            }
+        });
+    }
 
-  //Alert
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
+    @Override
+    public void length(final OnResultReceivedListener listener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> data = StorageResultHandler.getLengthResult(performGetLength());
+                listener.onReceived(data);
+            }
+        });
+    }
 
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
+    @Override
+    public void getAllKeys(final OnResultReceivedListener listener) {
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                Map<String, Object> data = StorageResultHandler.getAllkeysResult(performGetAllKeys());
+                listener.onReceived(data);
+            }
+        });
+    }
 
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
 
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
+    private boolean performSetItem(String key, String value) {
+        String sql = "INSERT OR REPLACE INTO " + WXDatabaseSupplier.TABLE_STORAGE + " VALUES (?,?);";
+        SQLiteStatement statement = mDatabaseSupplier.getDatabase().compileStatement(sql);
+        try {
+            statement.clearBindings();
+            statement.bindString(1, key);
+            statement.bindString(2, value);
+            statement.execute();
+            return true;
+        } catch (Exception e) {
+            WXLogUtils.e("DefaultWXStorage", e.getMessage());
+            return false;
+        } finally {
+            statement.close();
+            mDatabaseSupplier.closeDatabase();
+        }
+    }
 
-  public static final String MSG_FAILED = "MSG_FAILED";
+    private String performGetItem(String key) {
+        Cursor c = mDatabaseSupplier.getDatabase().query(WXDatabaseSupplier.TABLE_STORAGE,
+                new String[]{WXDatabaseSupplier.COLUMN_VALUE},
+                WXDatabaseSupplier.COLUMN_KEY + "=?",
+                new String[]{key},
+                null, null, null);
+        try {
+            if (c.moveToNext()) {
+                return c.getString(c.getColumnIndex(WXDatabaseSupplier.COLUMN_VALUE));
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            WXLogUtils.e("DefaultWXStorage", e.getMessage());
+            return null;
+        } finally {
+            c.close();
+            mDatabaseSupplier.closeDatabase();
+        }
+    }
 
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
+    private boolean performRemoveItem(String key) {
+        int count = 0;
+        try {
+            count = mDatabaseSupplier.getDatabase().delete(WXDatabaseSupplier.TABLE_STORAGE,
+                    WXDatabaseSupplier.COLUMN_KEY + "=?",
+                    new String[]{key});
+        } finally {
+            mDatabaseSupplier.closeDatabase();
+        }
+        return count == 1;
+    }
 
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
+    private long performGetLength() {
+        String sql = "SELECT count(" + WXDatabaseSupplier.COLUMN_KEY + ") FROM " + WXDatabaseSupplier.TABLE_STORAGE;
+        SQLiteStatement statement = mDatabaseSupplier.getDatabase().compileStatement(sql);
+        try {
+            return statement.simpleQueryForLong();
+        } catch (Exception e) {
+            WXLogUtils.e("DefaultWXStorage", e.getMessage());
+            return 0;
+        } finally {
+            statement.close();
+            mDatabaseSupplier.closeDatabase();
+        }
+    }
+
+    private List<String> performGetAllKeys() {
+        List<String> result = new ArrayList<>();
+        Cursor c = mDatabaseSupplier.getDatabase().query(WXDatabaseSupplier.TABLE_STORAGE, new String[]{WXDatabaseSupplier.COLUMN_KEY}, null, null, null, null, null);
+        try {
+            while (c.moveToNext()) {
+                result.add(c.getString(c.getColumnIndex(WXDatabaseSupplier.COLUMN_KEY)));
+            }
+            return result;
+        } catch (Exception e) {
+            WXLogUtils.e("DefaultWXStorage", e.getMessage());
+            return result;
+        } finally {
+            c.close();
+            mDatabaseSupplier.closeDatabase();
+        }
+    }
+
+
 }
-
