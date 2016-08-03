@@ -539,9 +539,11 @@ class WXDomStatement {
     //If there is height or width in JS, then that value will override value here.
     if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_WIDTH)) {
       style.put(WXDomPropConstant.WX_WIDTH, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
+      domObject.setModifyWidth(true);
     }
     if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_HEIGHT)) {
       style.put(WXDomPropConstant.WX_HEIGHT, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)));
+      domObject.setModifyHeight(true);
     }
     domObject.ref = WXDomObject.ROOT;
     domObject.updateStyle(style);
@@ -565,7 +567,7 @@ class WXDomStatement {
           try {
             mWXRenderManager.createBody(mInstanceId, component);
           } catch (Exception e) {
-            WXLogUtils.e("create body failed." + e.getMessage());
+            WXLogUtils.e("create body failed.", e);
           }
         }
 
@@ -691,8 +693,7 @@ class WXDomStatement {
         try {
           mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
         }catch (Exception e){
-          e.printStackTrace();
-          WXLogUtils.e("add component failed."+e.getMessage());
+          WXLogUtils.e("add component failed.", e);
         }
       }
 
@@ -786,6 +787,7 @@ class WXDomStatement {
     }
     clearRegistryForDom(domObject);
     parent.remove(domObject);
+    mRegistry.remove(ref);
 
     mNormalTasks.add(new IWXRenderTask() {
 
@@ -1233,7 +1235,7 @@ class WXDomStatement {
       }
       return animationBean;
     } catch (RuntimeException e) {
-      WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      WXLogUtils.e("", e);
       return null;
     }
   }
@@ -1253,7 +1255,7 @@ class WXDomStatement {
           return animationBean;
         }
       }catch (RuntimeException e){
-        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+        WXLogUtils.e("", e);
         return null;
       }
     }
