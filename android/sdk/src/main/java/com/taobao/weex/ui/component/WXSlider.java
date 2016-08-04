@@ -496,7 +496,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
 
       Map<String, Object> domChanges = new HashMap<>();
       Map<String, Object> attrsChanges = new HashMap<>();
-      attrsChanges.put("value", realPosition);
+      attrsChanges.put("index", realPosition);
       domChanges.put("attrs", attrsChanges);
       WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
           WXEventType.SLIDER_CHANGE, params, domChanges);
