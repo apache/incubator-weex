@@ -250,7 +250,6 @@ public class WXInput extends AbstractEditComponent{
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
     editText.setSingleLine();//default use single line , same to ios
-    editText.setMovementMethod(null);//disable scroll
   }
 
   @Override
