@@ -204,10 +204,14 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.widget.EditText;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.view.WXEditText;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -218,20 +222,59 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.taobao.weex.common.WXDomPropConstant.*;
 
 /**
  * Created by sospartan on 8/3/16.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest
 public class EditComponentTest {
+  static final String[] PROPS = {
+      WX_TEXTALIGN,
+      WX_FONTSIZE,
+      WX_COLOR,
+      WX_ATTR_INPUT_TYPE,
+      WX_ATTR_INPUT_VALUE,
+      WX_ATTR_INPUT_PLACEHOLDER,
+      WX_INPUT_PLACEHOLDER_COLOR,
+      WX_ATTR_INPUT_AUTOFOCUS,
+      WX_ATTR_INPUT_LINES,
+      WX_ATTR_INPUT_SINGLELINE,
+      WX_ATTR_INPUT_MAXLENGTH,
+      WX_ATTR_TEXTAREA_ROWS};
+  static final Object[][] TEST_VALUES = {
+      {null,WX_TEXTALIGN_CENTER,WX_TEXTALIGN_LEFT,WX_TEXTALIGN_RIGHT,"kdkdkdk"},
+      {null,12,Integer.MAX_VALUE,0,-2},
+      {"red","#000","#ffffff","rgb(12,23,45)"},
+      {"DKDK",
+          WX_ATTR_INPUT_TYPE_TEXT,
+          WX_ATTR_INPUT_TYPE_PASSWORD,
+          WX_ATTR_INPUT_TYPE_TEL,
+          WX_ATTR_INPUT_TYPE_EMAIL,
+          WX_ATTR_INPUT_TYPE_URL,
+          WX_ATTR_INPUT_TYPE_DATE,
+          WX_ATTR_INPUT_TYPE_TIME,
+          WX_ATTR_INPUT_TYPE_DATETIME},
+      {null,123,"dkdkdkdk"},
+      {null,123,"dkdkdkdk"},
+      {"red","#000","#ffffff","rgb(12,23,45)"},
+      {null,true,"true","false",false,"test"},
+      {null,34,Integer.MAX_VALUE,-1,"test"},
+      {null,true,"true","false",false,"test"},
+      {null,34,Integer.MAX_VALUE,-1,"test"},
+      {null,34,Integer.MAX_VALUE,-1,"test"},
+      };
 
   AbstractEditComponent component;
 
   public static AbstractEditComponent create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (AbstractEditComponent)new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(),new TestDomObject(),WXDivTest.create(),false);
+    return (AbstractEditComponent) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
 
@@ -251,60 +294,32 @@ public class EditComponentTest {
     component.addEvent(null);
     component.addEvent("");
     component.addEvent(WXEventType.CLICK);
+    component.addEvent(WXEventType.INPUT);
+    component.addEvent(WXEventType.INPUT_CHANGE);
+
+    WXEditText view = component.getHostView();
+    view.performClick();
+    view.setText("");
+    view.requestFocus();
+    view.setText("hello");
+    view.clearFocus();
+    view.setText(null);
   }
 
   @Test
   public void testSetProperty() throws Exception {
+    Map<String, Object> props = new HashMap<>();
+    int len = PROPS.length;
+
+    for (int i=0;i<len;i++){
+      for (Object obj:TEST_VALUES[i]){
+        props.put(PROPS[i],obj);
+        component.updateProperties(props);
+      }
+
+    }
 
   }
 
-  @Test
-  public void testSetPlaceholder() throws Exception {
 
-  }
-
-  @Test
-  public void testSetPlaceholderColor() throws Exception {
-
-  }
-
-  @Test
-  public void testSetType() throws Exception {
-
-  }
-
-  @Test
-  public void testSetAutofocus() throws Exception {
-
-  }
-
-  @Test
-  public void testSetColor() throws Exception {
-
-  }
-
-  @Test
-  public void testSetFontSize() throws Exception {
-
-  }
-
-  @Test
-  public void testSetTextAlign() throws Exception {
-
-  }
-
-  @Test
-  public void testSetSingleLine() throws Exception {
-
-  }
-
-  @Test
-  public void testSetLines() throws Exception {
-
-  }
-
-  @Test
-  public void testSetMaxLength() throws Exception {
-
-  }
 }
