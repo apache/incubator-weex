@@ -211,36 +211,26 @@ import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.IWXUpdateComponent;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
-public class WXImageView extends ImageView implements IWXUpdateComponent, WXGestureObservable {
+public class WXImageView extends ImageView implements WXGestureObservable {
 
-  private WXShapeFeature mImageShapeFeature;
   private WXGesture wxGesture;
 
-  public WXImageView(Context context, WXDomObject element) {
+  public WXImageView(Context context) {
     super(context);
-    mImageShapeFeature = new WXShapeFeature(getContext(), this, element);
-  }
-
-  @Override
-  public void updateDom(WXDomObject domObject) {
-    mImageShapeFeature.updateDom(domObject);
   }
 
   @Override
   public void setImageResource(int resId) {
     Drawable drawable = getResources().getDrawable(resId);
-    drawable = mImageShapeFeature.wrapDrawable(drawable);
     super.setImageDrawable(drawable);
   }
 
   @Override
   public void setImageDrawable(Drawable drawable) {
-    drawable = mImageShapeFeature.wrapDrawable(drawable);
     super.setImageDrawable(drawable);
     if(getScaleType()==ScaleType.MATRIX && getDrawable()!=null){
       Matrix matrix = getImageMatrix();
@@ -264,9 +254,15 @@ public class WXImageView extends ImageView implements IWXUpdateComponent, WXGest
 
   @Override
   protected void onDraw(Canvas canvas) {
-    mImageShapeFeature.beforeOnDraw(canvas);
+    canvas.save();
+    if(getBackground() instanceof BorderDrawable){
+      canvas.clipPath(((BorderDrawable) getBackground()).getContentClip(getPaddingTop(),
+                                                                        getPaddingRight(),
+                                                                        getPaddingBottom(),
+                                                                        getPaddingLeft()));
+    }
     super.onDraw(canvas);
-    mImageShapeFeature.afterOnDraw(canvas);
+    canvas.restore();
   }
 
   @Override
@@ -283,27 +279,4 @@ public class WXImageView extends ImageView implements IWXUpdateComponent, WXGest
     return result;
   }
 
-  @Override
-  protected void onLayout(boolean changed, int left, int top, int right,
-                          int bottom) {
-    mImageShapeFeature.beforeOnLayout(changed, left, top, right, bottom);
-    super.onLayout(changed, left, top, right, bottom);
-    mImageShapeFeature.afterOnLayout(changed, left, top, right, bottom);
-  }
-
-  @Override
-  public void setBackgroundResource(int resid) {
-    Drawable drawable = getResources().getDrawable(resid);
-    drawable = mImageShapeFeature.wrapDrawable(drawable);
-    super.setBackgroundDrawable(drawable);
-  }
-
-  @Override
-  public void setBackgroundDrawable(Drawable d) {
-    Drawable drawable = d;
-    if (mImageShapeFeature != null) {
-      mImageShapeFeature.wrapDrawable(d);
-    }
-    super.setBackgroundDrawable(drawable);
-  }
 }

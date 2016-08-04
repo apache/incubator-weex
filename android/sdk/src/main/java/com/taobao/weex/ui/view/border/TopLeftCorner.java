@@ -202,11 +202,47 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.border;
 
-import com.taobao.weex.dom.WXDomObject;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.support.annotation.NonNull;
 
-public interface IWXUpdateComponent {
+class TopLeftCorner extends BorderCorner {
 
-  void updateDom(WXDomObject domObj);
+  TopLeftCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
+    super(cornerRadius, preBorderWidth, postBorderWidth, borderBox);
+  }
+
+  @Override
+  protected float getAngleBisectorDegree() {
+    return 225;
+  }
+
+  @NonNull
+  @Override
+  protected RectF getRoundCornerOval() {
+    return new RectF(getPreBorderWidth() / 2,
+                     getPostBorderWidth() / 2,
+                     2 * getCornerOuterRadius() - getPreBorderWidth() / 2,
+                     2 * getCornerOuterRadius() - getPreBorderWidth() / 2);
+  }
+
+  @NonNull
+  @Override
+  protected PointF getRoundCornerStart() {
+    return new PointF(getPreBorderWidth() / 2, getCornerOuterRadius());
+  }
+
+  @NonNull
+  @Override
+  protected PointF getSharpCornerVertex() {
+    return new PointF(getPreBorderWidth() / 2, getPostBorderWidth() / 2);
+  }
+
+  @NonNull
+  @Override
+  protected PointF getRoundCornerEnd() {
+    return new PointF(getCornerOuterRadius(), getPostBorderWidth() / 2);
+  }
 }

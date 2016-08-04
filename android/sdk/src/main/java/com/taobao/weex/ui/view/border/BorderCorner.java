@@ -202,110 +202,88 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.border;
 
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
-import android.view.View;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.support.annotation.NonNull;
 
-import com.taobao.weex.ui.view.WXBackgroundDrawable;
+import com.taobao.weex.dom.flex.FloatUtil;
 
-/**
- * Support the border
- */
-public class WXBorder {
+abstract class BorderCorner {
 
-  private WXBackgroundDrawable mBackgroundDrawable;
-  private View mHost;
+  final static float SWEEP_ANGLE = 45;
+  private final float mCornerRadius;
+  private final float mPreBorderWidth;
+  private final float mPostBorderWidth;
+  private final RectF mBorderBox;
 
-  public WXBorder() {
+  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
+    mCornerRadius = cornerRadius;
+    mPreBorderWidth = preBorderWidth;
+    mPostBorderWidth = postBorderWidth;
+    mBorderBox = borderBox;
   }
 
-  public void attachView(View host) {
-    mHost = host;
+  abstract protected float getAngleBisectorDegree();
+
+  @NonNull
+  abstract protected RectF getRoundCornerOval();
+
+  protected RectF getBorderBox() {
+    return mBorderBox;
   }
 
-  public void detachView() {
-    mHost = null;
-  }
-
-  public void setBackgroundColor(int color) {
-    if (mHost == null) {
-      return;
-    }
-    if (color == Color.TRANSPARENT && mBackgroundDrawable == null) {
-      // don't do anything, no need to allocate BackgroundDrawable
-      // for transparent background
+  @NonNull
+  PointF getCornerStart() {
+    PointF lineStart;
+    if (hasRoundCorner()) {
+      lineStart = getRoundCornerStart();
     } else {
-      getOrCreateViewBackground().setColor(color);
+      lineStart = getSharpCornerVertex();
     }
+    return lineStart;
   }
 
-  @SuppressWarnings("deprecation")
-  private WXBackgroundDrawable getOrCreateViewBackground() {
-    if (mBackgroundDrawable == null) {
-      mBackgroundDrawable = new WXBackgroundDrawable();
-      Drawable backgroundDrawable = mHost.getBackground();
-      mHost.setBackgroundDrawable(null);
-      if (backgroundDrawable == null) {
-        mHost.setBackgroundDrawable(mBackgroundDrawable);
-      } else {
-        LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{
-            mBackgroundDrawable, backgroundDrawable});
-        mHost.setBackgroundDrawable(layerDrawable);
-      }
-    }
-    return mBackgroundDrawable;
+  boolean hasRoundCorner() {
+    return !FloatUtil.floatsEqual(0, getCornerOuterRadius()) && hasInnerCorner();
   }
 
-  @SuppressWarnings("deprecation")
-  public void setTranslucentBackgroundDrawable(Drawable background) {
-    if (mHost == null) {
-      return;
-    }
-    mHost.setBackgroundDrawable(null);
-    if (mBackgroundDrawable != null && background != null) {
-      LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{
-          mBackgroundDrawable, background});
-      mHost.setBackgroundDrawable(layerDrawable);
-    } else if (background != null) {
-      mHost.setBackgroundDrawable(background);
-    }
+  @NonNull
+  abstract protected PointF getRoundCornerStart();
+
+  @NonNull
+  abstract protected PointF getSharpCornerVertex();
+
+  protected float getCornerOuterRadius() {
+    return mCornerRadius;
   }
 
-  public void setBorderWidth(int position, float width) {
-    if (mHost == null) {
-      return;
-    }
-    getOrCreateViewBackground().setBorderWidth(position, width);
+  private boolean hasInnerCorner() {
+    return (getCornerOuterRadius() - getPreBorderWidth() / 2 > 0) &&
+           (getCornerOuterRadius() - getPostBorderWidth() / 2 > 0);
   }
 
-  public void setBorderColor(int position, int color) {
-    if (mHost == null) {
-      return;
-    }
-    getOrCreateViewBackground().setBorderColor(position, color);
+  protected float getPreBorderWidth() {
+    return mPreBorderWidth;
   }
 
-  public void setBorderRadius(int position, float borderRadius) {
-    if (mHost == null) {
-      return;
-    }
-    getOrCreateViewBackground().setRadius(borderRadius, position);
+  protected float getPostBorderWidth() {
+    return mPostBorderWidth;
   }
 
-  public void setBorderRadius(float borderRadius) {
-    if (mHost == null) {
-      return;
+  @NonNull
+  PointF getCornerEnd() {
+    PointF lineEnd;
+    if (hasRoundCorner()) {
+      lineEnd = getRoundCornerEnd();
+    } else {
+      lineEnd = getSharpCornerVertex();
     }
-    getOrCreateViewBackground().setRadius(borderRadius);
+    return lineEnd;
   }
 
-  public void setBorderStyle(String style) {
-    if (mHost == null) {
-      return;
-    }
-    getOrCreateViewBackground().setBorderStyle(style);
-  }
+  @NonNull
+  abstract protected PointF getRoundCornerEnd();
+
 }

@@ -205,6 +205,8 @@
 package com.taobao.weex.utils;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 
@@ -338,6 +340,18 @@ public class WXViewUtils {
     }
   }
 
+  public static float getRealSubPxByWidth(float pxValue) {
+    if (Float.isNaN(pxValue)) {
+      return pxValue;
+    }
+    if (mUseWebPx) {
+      return (float) Math.rint(pxValue);
+    } else {
+      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
+      return realPx > 0.005 && realPx < 1 ? 1 : realPx;
+    }
+  }
+
   public static int getRealPxByWidth2(float pxValue) {
     if (mUseWebPx) {
       return (int) pxValue;
@@ -434,4 +448,15 @@ public class WXViewUtils {
       return TRANSLUCENT;
     }
   }
+
+  @SuppressWarnings("deprecation")
+  public static void setBackGround(View view, Drawable drawable){
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
+      view.setBackgroundDrawable(drawable);
+    }
+    else{
+      view.setBackground(drawable);
+    }
+  }
+
 }

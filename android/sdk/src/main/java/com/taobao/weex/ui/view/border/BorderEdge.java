@@ -202,114 +202,51 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.border;
 
-import android.content.Context;
-import android.text.TextUtils;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
+import android.graphics.Path;
+import android.graphics.PointF;
+import android.support.annotation.NonNull;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.common.WXDomPropConstant;
-import com.taobao.weex.common.WXImageSharpen;
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.view.WXImageView;
-import com.taobao.weex.utils.WXUtils;
+class BorderEdge {
 
+  private
+  @NonNull
+  final BorderCorner mPreCorner;
+  private
+  @NonNull
+  final BorderCorner mPostCorner;
 
-/**
- * Image component
- */
-@Component(lazyload = false)
-public class WXImage extends WXComponent<ImageView> {
+  private final int mEdge;
 
-    @Deprecated
-    public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        this(instance,dom,parent,isLazy);
+  BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner, int edge) {
+    mPreCorner = preCorner;
+    mPostCorner = postCorner;
+    mEdge = edge;
+  }
+
+  @NonNull
+  Path createPath() {
+    Path path = new Path();
+    if (mPreCorner.hasRoundCorner()) {
+      path.addArc(mPreCorner.getRoundCornerOval(), mPreCorner.getAngleBisectorDegree(),
+                  BorderCorner.SWEEP_ANGLE);
     }
 
-    public WXImage(WXSDKInstance instance, WXDomObject node,
-                   WXVContainer parent, boolean lazy) {
-        super(instance, node, parent, lazy);
+    PointF lineStart = mPreCorner.getCornerEnd();
+    PointF lineEnd = mPostCorner.getCornerStart();
+    path.moveTo(lineStart.x, lineStart.y);
+    path.lineTo(lineEnd.x, lineEnd.y);
+
+    if (mPostCorner.hasRoundCorner()) {
+      path.addArc(mPostCorner.getRoundCornerOval(),
+                  mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
+                  BorderCorner.SWEEP_ANGLE);
     }
+    return path;
+  }
 
-    @Override
-    protected WXImageView initComponentHostView(Context context) {
-        WXImageView view = new WXImageView(mContext);
-        view.setScaleType(ScaleType.FIT_XY);
-        return view;
-    }
-
-    @Override
-    protected boolean setProperty(String key, Object param) {
-        switch (key) {
-            case WXDomPropConstant.WX_RESIZE_MODE:
-                String resize_mode = WXUtils.getString(param,null);
-                if (resize_mode != null)
-                    setResizeMode(resize_mode);
-                return true;
-            case WXDomPropConstant.WX_RESIZE:
-                String resize = WXUtils.getString(param,null);
-                if (resize != null)
-                    setResize(resize);
-                return true;
-            case WXDomPropConstant.WX_ATTR_SRC:
-                String src = WXUtils.getString(param,null);
-                if (src != null)
-                    setSrc(src);
-                return true;
-        }
-        return super.setProperty(key, param);
-    }
-
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE_MODE)
-    public void setResizeMode(String resizeMode) {
-        ((ImageView) getHostView()).setScaleType(getResizeMode(resizeMode));
-    }
-
-    private ScaleType getResizeMode(String resizeMode) {
-        ScaleType scaleType = ScaleType.FIT_XY;
-        if (TextUtils.isEmpty(resizeMode)) {
-            return scaleType;
-        }
-
-        if (resizeMode.equals("cover")) {
-            scaleType = ScaleType.CENTER_CROP;
-        } else if (resizeMode.equals("contain")) {
-            scaleType = ScaleType.FIT_CENTER;
-        } else if (resizeMode.equals("stretch")) {
-            scaleType = ScaleType.FIT_XY;
-        } else if (resizeMode.equals("center")) {
-            scaleType = ScaleType.CENTER;
-        } else if (resizeMode.equals("start")) {
-            scaleType = ScaleType.MATRIX;
-        } else if (resizeMode.equals("end")) {
-            scaleType = ScaleType.FIT_END;
-        }
-        return scaleType;
-    }
-
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE)
-    public void setResize(String resize) {
-        ((ImageView) getHostView()).setScaleType(getResizeMode(resize));
-    }
-
-    @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SRC)
-    public void setSrc(String src) {
-
-        WXImageStrategy imageStrategy = new WXImageStrategy();
-        imageStrategy.isClipping = true;
-
-        WXImageSharpen imageSharpen = mDomObj.attr.getImageSharpen();
-        imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
-
-        IWXImgLoaderAdapter imgLoaderAdapter = mInstance.getImgLoaderAdapter();
-        if (imgLoaderAdapter != null) {
-            imgLoaderAdapter.setImage(src, ((ImageView) getHostView()),
-                    mDomObj.attr.getImageQuality(), imageStrategy);
-        }
-    }
+  int getEdge() {
+    return mEdge;
+  }
 }

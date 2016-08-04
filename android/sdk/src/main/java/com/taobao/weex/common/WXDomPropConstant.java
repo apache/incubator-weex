@@ -238,6 +238,11 @@ public class WXDomPropConstant {
   public static final String WX_BORDER_BOTTOM_COLOR = "borderBottomColor";
   public static final String WX_BORDER_LEFT_COLOR = "borderLeftColor";
 
+  public static final String WX_BORDER_RIGHT_STYLE="borderRightStyle";
+  public static final String WX_BORDER_BOTTOM_STYLE="borderBottomStyle";
+  public static final String WX_BORDER_LEFT_STYLE="borderLeftStyle";
+  public static final String WX_BORDER_TOP_STYLE="borderTopStyle";
+
   public static final String WX_BORDER_TOP_LEFT_RADIUS = "borderTopLeftRadius";
   public static final String WX_BORDER_TOP_RIGHT_RADIUS = "borderTopRightRadius";
   public static final String WX_BORDER_BOTTOM_RIGHT_RADIUS = "borderBottomRightRadius";
