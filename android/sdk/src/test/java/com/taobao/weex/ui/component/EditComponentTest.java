@@ -202,14 +202,109 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui.component;
+
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by sospartan on 7/27/16.
+ * Created by sospartan on 8/3/16.
  */
-public class TestDomObject extends WXDomObject {
-  public TestDomObject(){
-    style = new WXStyle();
-    attr = new WXAttr();
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
+@PrepareForTest
+public class EditComponentTest {
+
+  AbstractEditComponent component;
+
+  public static AbstractEditComponent create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (AbstractEditComponent)new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(),new TestDomObject(),WXDivTest.create(),false);
+  }
+
+
+  @Before
+  public void setUp() throws Exception {
+    component = create();
+    ComponentTest.create(component);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    ComponentTest.destory(component);
+  }
+
+  @Test
+  public void testAddEvent() throws Exception {
+    component.addEvent(null);
+    component.addEvent("");
+    component.addEvent(WXEventType.CLICK);
+  }
+
+  @Test
+  public void testSetProperty() throws Exception {
+
+  }
+
+  @Test
+  public void testSetPlaceholder() throws Exception {
+
+  }
+
+  @Test
+  public void testSetPlaceholderColor() throws Exception {
+
+  }
+
+  @Test
+  public void testSetType() throws Exception {
+
+  }
+
+  @Test
+  public void testSetAutofocus() throws Exception {
+
+  }
+
+  @Test
+  public void testSetColor() throws Exception {
+
+  }
+
+  @Test
+  public void testSetFontSize() throws Exception {
+
+  }
+
+  @Test
+  public void testSetTextAlign() throws Exception {
+
+  }
+
+  @Test
+  public void testSetSingleLine() throws Exception {
+
+  }
+
+  @Test
+  public void testSetLines() throws Exception {
+
+  }
+
+  @Test
+  public void testSetMaxLength() throws Exception {
+
   }
 }

@@ -202,14 +202,44 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui;
+
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
+
+import java.lang.reflect.InvocationTargetException;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 7/27/16.
+ * Created by sospartan on 8/4/16.
  */
-public class TestDomObject extends WXDomObject {
-  public TestDomObject(){
-    style = new WXStyle();
-    attr = new WXAttr();
-  }
+public class ComponentHolderTest {
+    public static class TestComponentHolder implements IFComponentHolder{
+
+      WXComponent mComponent;
+      TestComponentHolder(WXComponent comp){
+        mComponent = comp;
+      }
+
+      @Override
+      public void loadIfNonLazy() {
+
+      }
+
+      @Override
+      public Invoker getMethod(String name) {
+        return null;
+      }
+
+      @Override
+      public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        mComponent.bindHolder(this);
+        return mComponent;
+      }
+    }
+
 }

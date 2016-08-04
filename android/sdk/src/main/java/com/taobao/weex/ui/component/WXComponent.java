@@ -671,7 +671,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * create view
    *
    * @param parent
-   * @param index
+   * @param index Position in parent
    */
   public final void createView(WXVContainer parent, int index) {
     if(!isLazy()) {

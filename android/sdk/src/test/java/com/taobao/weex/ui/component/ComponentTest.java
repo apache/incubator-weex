@@ -202,14 +202,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui.component;
+
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.ComponentHolderTest;
 
 /**
- * Created by sospartan on 7/27/16.
+ * Created by sospartan on 8/3/16.
  */
-public class TestDomObject extends WXDomObject {
-  public TestDomObject(){
-    style = new WXStyle();
-    attr = new WXAttr();
+public class ComponentTest {
+  static void create(WXComponent comp){
+    TestDomObject domObject = new TestDomObject();
+    WXDiv parent = WXDivTest.create();
+    comp.setLayout(domObject);
+    comp.createView(parent,1);
+
+    domObject = new TestDomObject();
+    comp.updateDom(domObject);
+    comp.applyLayoutAndEvent(comp);
+  }
+
+  static void destory(WXComponent comp){
+    comp.destroy();
   }
 }
