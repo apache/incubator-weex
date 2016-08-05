@@ -207,7 +207,7 @@ package com.taobao.weex.ui.component;
 import android.widget.EditText;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.SimpleComponentHolder;
@@ -225,7 +225,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.taobao.weex.common.WXDomPropConstant.*;
+import static com.taobao.weex.common.Constants.Name.*;
+import static com.taobao.weex.common.Constants.Value.*;
 
 /**
  * Created by sospartan on 8/3/16.
@@ -236,31 +237,31 @@ import static com.taobao.weex.common.WXDomPropConstant.*;
 @PrepareForTest
 public class EditComponentTest {
   static final String[] PROPS = {
-      WX_TEXTALIGN,
-      WX_FONTSIZE,
-      WX_COLOR,
-      WX_ATTR_INPUT_TYPE,
-      WX_ATTR_INPUT_VALUE,
-      WX_ATTR_INPUT_PLACEHOLDER,
-      WX_INPUT_PLACEHOLDER_COLOR,
-      WX_ATTR_INPUT_AUTOFOCUS,
-      WX_ATTR_INPUT_LINES,
-      WX_ATTR_INPUT_SINGLELINE,
-      WX_ATTR_INPUT_MAXLENGTH,
-      WX_ATTR_TEXTAREA_ROWS};
+      TEXT_ALIGN,
+      FONT_SIZE,
+      COLOR,
+      TYPE,
+      VALUE,
+      PLACE_HOLDER,
+      PLACEHOLDER_COLOR,
+      AUTOFOCUS,
+      LINES,
+      SINGLELINE,
+      MAX_LENGTH,
+      ROWS};
   static final Object[][] TEST_VALUES = {
-      {null,WX_TEXTALIGN_CENTER,WX_TEXTALIGN_LEFT,WX_TEXTALIGN_RIGHT,"kdkdkdk"},
+      {null,CENTER, Constants.Name.LEFT, Constants.Name.RIGHT,"kdkdkdk"},
       {null,12,Integer.MAX_VALUE,0,-2},
       {"red","#000","#ffffff","rgb(12,23,45)"},
       {"DKDK",
-          WX_ATTR_INPUT_TYPE_TEXT,
-          WX_ATTR_INPUT_TYPE_PASSWORD,
-          WX_ATTR_INPUT_TYPE_TEL,
-          WX_ATTR_INPUT_TYPE_EMAIL,
-          WX_ATTR_INPUT_TYPE_URL,
-          WX_ATTR_INPUT_TYPE_DATE,
-          WX_ATTR_INPUT_TYPE_TIME,
-          WX_ATTR_INPUT_TYPE_DATETIME},
+          TEXT,
+          PASSWORD,
+          TEL,
+          EMAIL,
+          URL,
+          DATE,
+          TIME,
+          DATETIME},
       {null,123,"dkdkdkdk"},
       {null,123,"dkdkdkdk"},
       {"red","#000","#ffffff","rgb(12,23,45)"},

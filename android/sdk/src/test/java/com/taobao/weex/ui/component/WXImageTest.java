@@ -117,7 +117,7 @@ import android.widget.ImageView;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
@@ -197,7 +197,7 @@ public class WXImageTest {
     WXImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
-    mWXImage.setProperty(WXDomPropConstant.WX_RESIZE_MODE, "cover");
+    mWXImage.setProperty(Constants.Name.RESIZE_MODE, "cover");
     ImageView.ScaleType scaleType = mWXImage.getHostView().getScaleType();
     assertEquals(scaleType, ImageView.ScaleType.CENTER_CROP);
 
