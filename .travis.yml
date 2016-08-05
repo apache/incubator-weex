@@ -1,5 +1,5 @@
 language: objective-c
-xcode_workspace: ios/playground/MyNewProject.xcworkspace # path to your xcodeproj folder
+xcode_workspace: ios/playground/WeexDemo.xcworkspace # path to your workspace
 xcode_scheme: WeexDemo
 podfile: ios/playground/Podfile
 
