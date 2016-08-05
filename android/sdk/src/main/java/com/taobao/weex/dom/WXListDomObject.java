@@ -206,7 +206,7 @@ package com.taobao.weex.dom;
 
 import android.support.v4.util.ArrayMap;
 
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 
 import java.util.Map;
@@ -228,16 +228,16 @@ public class WXListDomObject extends WXDomObject {
 
         if (isVertical) {
             if (style != null) {
-                if (style.get(WXDomPropConstant.WX_HEIGHT) == null &&
-                        style.get(WXDomPropConstant.WX_FLEX) == null) {
-                    map.put(WXDomPropConstant.WX_FLEX, "1");
+                if (style.get(Constants.Name.HEIGHT) == null &&
+                        style.get(Constants.Name.FLEX) == null) {
+                    map.put(Constants.Name.FLEX, "1");
                 }
             }
         } else {
             if (style != null) {
-                if (style.get(WXDomPropConstant.WX_WIDTH) == null &&
-                        style.get(WXDomPropConstant.WX_FLEX) == null) {
-                    map.put(WXDomPropConstant.WX_FLEX, "1");
+                if (style.get(Constants.Name.WIDTH) == null &&
+                        style.get(Constants.Name.FLEX) == null) {
+                    map.put(Constants.Name.FLEX, "1");
                 }
             }
         }

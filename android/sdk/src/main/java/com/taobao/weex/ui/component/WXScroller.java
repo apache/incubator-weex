@@ -217,7 +217,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
@@ -508,7 +508,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SHOWSCROLLBAR:
+      case Constants.Name.SHOW_SCROLLBAR:
         Boolean result = WXUtils.getBoolean(param,null);
         if (result != null)
           setShowScrollbar(result);
@@ -517,7 +517,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SHOWSCROLLBAR)
+  @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
   public void setShowScrollbar(boolean show) {
     if (mOrientation == VERTICAL) {
       getInnerView().setVerticalScrollBarEnabled(show);

@@ -204,10 +204,7 @@
  */
 package com.taobao.weex.dom;
 
-import com.taobao.weex.common.WXDomPropConstant;
-import com.taobao.weex.dom.flex.Spacing;
-
-import java.util.Map;
+import com.taobao.weex.common.Constants;
 
 /**
  * Created by sospartan on 7/12/16.
@@ -227,7 +224,7 @@ public class TextAreaEditTextDomObject extends BasicEditTextDomObject {
   protected void updateStyleAndAttrs() {
     super.updateStyleAndAttrs();
     if (attr != null) {
-      Object raw = attr.get(WXDomPropConstant.WX_ATTR_TEXTAREA_ROWS);
+      Object raw = attr.get(Constants.Name.ROWS);
       if( raw == null){
         return;
       }else if(raw instanceof  String) {

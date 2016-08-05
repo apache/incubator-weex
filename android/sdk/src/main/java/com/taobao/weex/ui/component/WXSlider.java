@@ -215,7 +215,7 @@ import android.widget.FrameLayout;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
@@ -378,7 +378,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SLIDER_VALUE:
+      case Constants.Name.VALUE:
         String value = WXUtils.getString(param, null);
         if (value != null) {
           setValue(value);
@@ -412,7 +412,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SLIDER_VALUE)
+  @WXComponentProp(name = Constants.Name.VALUE)
   public void setValue(String value) {
     if (value == null || mHost == null) {
       return;
@@ -496,7 +496,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
 
       Map<String, Object> domChanges = new HashMap<>();
       Map<String, Object> attrsChanges = new HashMap<>();
-      attrsChanges.put("index", realPosition);
+      attrsChanges.put("value", realPosition);
       domChanges.put("attrs", attrsChanges);
       WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
           WXEventType.SLIDER_CHANGE, params, domChanges);

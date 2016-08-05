@@ -204,32 +204,9 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.content.Context;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.Layout;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.text.method.PasswordTransformationMethod;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-
-import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.ui.view.WXEditText;
-import com.taobao.weex.utils.WXResourceUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *

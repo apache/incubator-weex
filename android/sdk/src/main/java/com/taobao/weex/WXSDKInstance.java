@@ -218,7 +218,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
@@ -1000,10 +1000,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
         if (mGodCom instanceof WXVContainer) {
           WXComponent rootComponent = ((WXVContainer) mGodCom).getChild(0);
           if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyHeight()) {
-            style.put(WXDomPropConstant.WX_HEIGHT, realHeight);
+            style.put(Constants.Name.HEIGHT, realHeight);
           }
           if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyWidth()) {
-            style.put(WXDomPropConstant.WX_WIDTH, realWidth);
+            style.put(Constants.Name.WIDTH, realWidth);
           }
           updateRootComponentStyle(style);
         }
