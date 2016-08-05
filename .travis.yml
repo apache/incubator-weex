@@ -1,6 +1,6 @@
 language: objective-c
 xcode_workspace: ios/playground/MyNewProject.xcworkspace # path to your xcodeproj folder
 xcode_scheme: WeexDemo
-podfile: ios/playground/
+podfile: ios/playground/Podfile
 
 osx_image: xcode7.3
