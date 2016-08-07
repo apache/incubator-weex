@@ -221,17 +221,26 @@ class BottomLeftCorner extends BorderCorner {
 
   @NonNull
   @Override
-  protected RectF getRoundCornerOval() {
+  protected RectF getOvalIfInnerCornerExist() {
     return new RectF(getPostBorderWidth() / 2,
-                     getBorderBox().height() - (2 * getCornerOuterRadius() - getPreBorderWidth() / 2),
-                     2 * getCornerOuterRadius() - getPostBorderWidth() / 2,
+                     getBorderBox().height() - (2 * getOuterCornerRadius() - getPreBorderWidth() / 2),
+                     2 * getOuterCornerRadius() - getPostBorderWidth() / 2,
                      getBorderBox().height() - getPreBorderWidth() / 2);
   }
 
   @NonNull
   @Override
+  protected RectF getOvalIfInnerCornerNotExist() {
+    return new RectF(getOuterCornerRadius()/2,
+                     getBorderBox().height()-1.5f*getOuterCornerRadius(),
+                     1.5f*getOuterCornerRadius(),
+                     getBorderBox().height()-getOuterCornerRadius()/2);
+  }
+
+  @NonNull
+  @Override
   protected PointF getRoundCornerStart() {
-    return new PointF(getCornerOuterRadius(),
+    return new PointF(getOuterCornerRadius(),
                       getBorderBox().height() - getPreBorderWidth() / 2);
   }
 
@@ -244,8 +253,24 @@ class BottomLeftCorner extends BorderCorner {
 
   @NonNull
   @Override
+  protected PointF getSharpCornerStart() {
+    PointF pointF=getSharpCornerVertex();
+    pointF.y=getBorderBox().height();
+    return pointF;
+  }
+
+  @NonNull
+  @Override
+  protected PointF getSharpCornerEnd() {
+    PointF pointF=getSharpCornerVertex();
+    pointF.x=0;
+    return pointF;
+  }
+
+  @NonNull
+  @Override
   protected PointF getRoundCornerEnd() {
     return new PointF(getPostBorderWidth() / 2,
-                      getBorderBox().height() - getCornerOuterRadius());
+                      getBorderBox().height() - getOuterCornerRadius());
   }
 }

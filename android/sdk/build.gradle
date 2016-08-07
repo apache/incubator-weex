@@ -97,7 +97,6 @@ dependencies {
 license{
     header=file('license/LICENSE')
     excludes (["**/WXDataStructureUtil.java",
-               "**/BorderDrawable.java",
                "**/Spacing.java",
                "**/MeasureOutput.java",
                "**/LayoutEngine.java",
