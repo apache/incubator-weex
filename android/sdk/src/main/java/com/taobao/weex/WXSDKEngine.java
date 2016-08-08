@@ -240,7 +240,7 @@ public class WXSDKEngine {
         if (!isSoInitSuccess) {
           return;
         }
-        sm.initScriptsFramework(null);
+        sm.initScriptsFramework(config!=null?config.getFramework():null);
 
         WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;
         WXLogUtils.renderPerformanceLog("SDKInitExecuteTime", WXEnvironment.sSDKInitExecuteTime);
