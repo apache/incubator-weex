@@ -168,12 +168,8 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * abstract component
@@ -205,6 +201,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private WXGesture wxGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
+  private List<OnClickListener> mHostClickListeners;
+
+  interface OnClickListener{
+    void onHostViewClick();
+  }
 
   @Deprecated
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -250,6 +251,30 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       addEvents();
 
     }
+  }
+
+  protected final void addClickListner(OnClickListener l){
+    if(l != null && mHost != null) {
+      if(mHostClickListeners == null){
+        mHostClickListeners = new ArrayList<>();
+        mHost.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            for (OnClickListener listener : mHostClickListeners){
+              if(listener != null) {
+                listener.onHostViewClick();
+              }
+            }
+          }
+        });
+      }
+      mHostClickListeners.add(l);
+
+    }
+  }
+
+  protected final void removeClickListener(OnClickListener l){
+    mHostClickListeners.remove(l);
   }
 
   public void bindData(WXComponent component){
@@ -546,20 +571,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     mDomObj.addEvent(type);
     if (type.equals(WXEventType.CLICK) && getRealView() != null) {
-      mHost.setOnClickListener(new View.OnClickListener() {
+      addClickListner(new OnClickListener() {
         @Override
-        public void onClick(View v) {
+        public void onHostViewClick() {
           Map<String, Object> params = new HashMap<>();
           int[] location = new int[2];
           mHost.getLocationOnScreen(location);
-          params.put("x",location[0]);
-          params.put("y",location[1]);
-          params.put("width",mDomObj.getCSSLayoutWidth());
-          params.put("height",mDomObj.getCSSLayoutHeight());
+          params.put("x", location[0]);
+          params.put("y", location[1]);
+          params.put("width", mDomObj.getCSSLayoutWidth());
+          params.put("height", mDomObj.getCSSLayoutHeight());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
-                                               mDomObj.ref,
-                                               WXEventType.CLICK,
-                                               params);
+              mDomObj.ref,
+              WXEventType.CLICK,
+              params);
         }
       });
     } else if ((type.equals(WXEventType.FOCUS) || type.equals(WXEventType.BLUR)) && getRealView()
@@ -716,9 +741,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /**
    * After view init.
    */
-  protected void onHostViewInitialized(T host){
-
-  }
+  protected void onHostViewInitialized(T host){}
 
   public T getHostView() {
     return mHost;
