@@ -218,12 +218,14 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -435,7 +437,7 @@ public class WXBridgeManager implements Callback {
         || !mJSThread.isWXThreadAlive() || mJSThread.getLooper() == null) {
       return;
     }
-    mJSHandler.removeMessages(what,obj);
+    mJSHandler.removeMessages(what, obj);
   }
 
   /**
@@ -555,7 +557,7 @@ public class WXBridgeManager implements Callback {
 
   public void fireEvent(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data){
-    this.fireEvent(instanceId,ref,type,data,null);
+    this.fireEvent(instanceId, ref, type, data, null);
   }
 
   /**
@@ -676,6 +678,27 @@ public class WXBridgeManager implements Callback {
     }
     instance.commitUTStab(WXConst.JS_BRIDGE, errCode);
   }
+
+  public void commitAlert(final String type, final WXErrorCode errorCode) {
+    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+    if (userTrackAdapter == null || TextUtils.isEmpty(type) || (errorCode == WXErrorCode.WX_SUCCESS)) {
+      return;
+    }
+
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        WXPerformance performance = null;
+        if (errorCode != null) {
+          performance = new WXPerformance();
+          performance.errCode = errorCode.getErrorCode();
+          performance.errMsg = errorCode.getErrorMsg();
+        }
+        userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
+      }
+    }, 0);
+  }
+
 
   /**
    * Create instance.
@@ -897,6 +920,7 @@ public class WXBridgeManager implements Callback {
       }
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
+        commitAlert(WXConst.JS_FRAMEWORK,WXErrorCode.WX_ERR_JS_FRAMEWORK);
         return;
       }
       try {
@@ -910,11 +934,14 @@ public class WXBridgeManager implements Callback {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
+          commitAlert(WXConst.JS_FRAMEWORK,null);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+          commitAlert(WXConst.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+        commitAlert(WXConst.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
       }
     }
   }
