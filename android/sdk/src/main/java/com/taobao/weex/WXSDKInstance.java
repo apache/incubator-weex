@@ -217,8 +217,8 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
@@ -873,32 +873,24 @@ public class WXSDKInstance implements IWXActivityStateListener {
    * UserTrack Log
    */
   public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (errorCode == WXErrorCode.WX_SUCCESS) {
+    if (mUserTrackAdapter == null || TextUtils.isEmpty(type) || errorCode==null) {
       return;
     }
     runOnUiThread(new Runnable() {
-
       @Override
       public void run() {
-        if (mUserTrackAdapter == null || TextUtils.isEmpty(type)) {
-          return;
+        WXPerformance performance = null;
+        if (errorCode != WXErrorCode.WX_SUCCESS) {
+          performance = new WXPerformance();
+          performance.errCode = errorCode.getErrorCode();
+          performance.errMsg = errorCode.getErrorMsg();
+          if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(performance.toString());
+          }
         }
-        // Log for commit
-        if (errorCode.getErrorCode() == null && errorCode.getErrorMsg() == null) {
-          mUserTrackAdapter.commit(mContext, null, type, null, null);
-          return;
-        }
-
-        WXPerformance perf = new WXPerformance();
-        perf.errCode = errorCode.getErrorCode();
-        perf.errMsg = errorCode.getErrorMsg();
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d(perf.toString());
-        }
-        mUserTrackAdapter.commit(mContext, null, type, perf, null);
+        mUserTrackAdapter.commit(mContext, null, type, performance, null);
       }
     });
-
   }
 
   private void destroyView(View rootView) {
