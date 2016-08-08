@@ -253,7 +253,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  protected final void addClickListner(OnClickListener l){
+  protected final void addClickListener(OnClickListener l){
     if(l != null && mHost != null) {
       if(mHostClickListeners == null){
         mHostClickListeners = new ArrayList<>();
@@ -571,7 +571,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     mDomObj.addEvent(type);
     if (type.equals(WXEventType.CLICK) && getRealView() != null) {
-      addClickListner(new OnClickListener() {
+      addClickListener(new OnClickListener() {
         @Override
         public void onHostViewClick() {
           Map<String, Object> params = new HashMap<>();

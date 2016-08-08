@@ -204,9 +204,6 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.text.TextUtils;
-import android.view.View;
-
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -228,7 +225,7 @@ public class WXA extends WXDiv {
   @Override
   protected void onHostViewInitialized(WXFrameLayout host) {
     super.onHostViewInitialized(host);
-    addClickListner(new OnClickListener() {
+    addClickListener(new OnClickListener() {
       @Override
       public void onHostViewClick() {
         if (mDomObj.attr != null && mDomObj.attr.get("href") != null) {
