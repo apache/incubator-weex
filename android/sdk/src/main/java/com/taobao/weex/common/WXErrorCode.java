@@ -304,7 +304,7 @@ public enum WXErrorCode {
 
   WX_ERR_JSDOWNLOAD_START("-2201", "js bundle download start"),
 
-  WX_ERR_JSBUNDLE_DOWNLOAD("-2202", "js bundle download err"),
+  WX_ERR_JSBUNDLE_DOWNLOAD("-2299", "js bundle download err"),
 
   WX_ERR_JSBUNDLE_EMPTY("-2203", "js bundle empty"),
 
