@@ -260,7 +260,7 @@ public enum WXErrorCode {
   /**
    * Failure for createBody
    */
-  WX_ERR_DOM_CREATEBODY("-2101", "createBody error"),
+  WX_ERR_DOM_CREATEBODY("-2100", "createBody error"),
   /**
    * Failure for updateAttrs
    */
