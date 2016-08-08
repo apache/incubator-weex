@@ -681,7 +681,7 @@ public class WXBridgeManager implements Callback {
 
   public void commitAlert(final String type, final WXErrorCode errorCode) {
     final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (userTrackAdapter == null || TextUtils.isEmpty(type) || (errorCode == WXErrorCode.WX_SUCCESS)) {
+    if (userTrackAdapter == null || TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
 
@@ -689,7 +689,7 @@ public class WXBridgeManager implements Callback {
       @Override
       public void run() {
         WXPerformance performance = null;
-        if (errorCode != null) {
+        if (errorCode != WXErrorCode.WX_SUCCESS) {
           performance = new WXPerformance();
           performance.errCode = errorCode.getErrorCode();
           performance.errMsg = errorCode.getErrorMsg();
@@ -934,7 +934,7 @@ public class WXBridgeManager implements Callback {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
-          commitAlert(WXConst.JS_FRAMEWORK,null);
+          commitAlert(WXConst.JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
           commitAlert(WXConst.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
