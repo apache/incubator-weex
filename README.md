@@ -59,6 +59,11 @@ On Android Platform , Weex code is executed in [weex_v8core](https://github.com/
 
 See [SCRIPTS.md](./SCRIPTS.md) for more information.
 
+
+## Weex file(.we) Editor Syntax Highlight
+
+You can use [Vue.js](http://vuejs.org/) syntax highlighter for Weex file(.we file) editing. There are some examples: [for vim](https://github.com/posva/vim-vue) , [for Sublime](https://github.com/vuejs/vue-syntax-highlight) , [for ATOM](https://atom.io/packages/language-vue-component). If your favorite editor have no Vue.js synatax highlighter ,in most cases HTML5 model is suitable for Weex file editing.
+
 ## FAQ
 
 See [FAQ](http://alibaba.github.io/weex/doc/faq.html) for more information.
