@@ -131,6 +131,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -268,12 +269,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (mBackgroundDrawable == null) {
       Drawable backgroundDrawable = mHost.getBackground();
       WXViewUtils.setBackGround(mHost,null);
+      mBackgroundDrawable = new BorderDrawable();
       if (backgroundDrawable == null) {
-        mBackgroundDrawable = new BorderDrawable();
+        WXViewUtils.setBackGround(mHost,mBackgroundDrawable);
       } else {
-        mBackgroundDrawable = new BorderDrawable(backgroundDrawable);
+        //TODO replace layerDrawable with Another.
+        WXViewUtils.setBackGround(mHost,new LayerDrawable(new Drawable[]{
+            mBackgroundDrawable,backgroundDrawable}));
       }
-      WXViewUtils.setBackGround(mHost,mBackgroundDrawable);
     }
     return mBackgroundDrawable;
   }
@@ -851,9 +854,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void setBorderRadius(String key, float borderRadius) {
-    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.JELLY_BEAN_MR2){
-      getHostView().setLayerType(View.LAYER_TYPE_SOFTWARE,null);
-    }
     if (borderRadius >= 0) {
       switch (key) {
         case WXDomPropConstant.WX_BORDERRADIUS:

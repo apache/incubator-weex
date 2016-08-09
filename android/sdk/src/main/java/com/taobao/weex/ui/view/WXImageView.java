@@ -114,14 +114,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.widget.ImageView;
@@ -135,54 +138,71 @@ public class WXImageView extends ImageView implements WXGestureObservable {
   private class ImageClipDrawable extends Drawable {
 
     private
-    @Nullable
+    @NonNull
     Paint mPaint;
     private
     @Nullable
-    Path mPath;
-    private final Drawable mOriginal;
+    final Drawable mOriginal;
 
     private ImageClipDrawable(@Nullable Drawable original) {
       mOriginal = original;
-      if(original!=null) {
+      mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+      if (mOriginal != null) {
         if (getBackground() instanceof BorderDrawable) {
-          mPath = ((BorderDrawable) getBackground()).getContentPath(getPaddingTop(),
-                                                                    getPaddingRight(),
-                                                                    getPaddingBottom(),
-                                                                    getPaddingLeft());
-          if (original instanceof BitmapDrawable) {
-            Bitmap bitmap = ((BitmapDrawable) original).getBitmap();
+          Path path = ((BorderDrawable) getBackground()).getContentPath(getPaddingTop(),
+                                                                        getPaddingRight(),
+                                                                        getPaddingBottom(),
+                                                                        getPaddingLeft());
+          if (mOriginal instanceof BitmapDrawable) {
+            path.offset(-getPaddingLeft(), -getPaddingTop());
+            Bitmap bitmap = ((BitmapDrawable) mOriginal).getBitmap();
+            RectF bounds = new RectF(ImageClipDrawable.this.getBounds());
+            Matrix matrix = new Matrix();
+            matrix.setScale(bounds.width() / bitmap.getWidth(),
+                            bounds.height() / bitmap.getHeight());
             BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            bitmapShader.setLocalMatrix(matrix);
             mPaint.setStyle(Paint.Style.FILL);
             mPaint.setShader(bitmapShader);
+            canvas.save();
+            canvas.drawPath(path, mPaint);
+            canvas.restore();
+          } else {
+            //TODO layerType
+            canvas.clipPath(path);
+            mOriginal.draw(canvas);
           }
+        } else {
+          mOriginal.draw(canvas);
         }
       }
     }
 
     @Override
-    public void draw(Canvas canvas) {
-      if (mPaint != null && mPath != null) {
-        canvas.drawPath(mPath, mPaint);
-      } else if(mOriginal!=null){
-        mOriginal.draw(canvas);
+    public void setAlpha(int i) {
+      if (mOriginal != null) {
+        mOriginal.setAlpha(i);
       }
     }
 
     @Override
-    public void setAlpha(int i) {
-
-    }
-
-    @Override
     public void setColorFilter(ColorFilter colorFilter) {
-
+      if (mOriginal != null) {
+        mOriginal.setColorFilter(colorFilter);
+      }
     }
 
     @Override
     public int getOpacity() {
-      return 0;
+      if (mOriginal != null) {
+        return mOriginal.getOpacity();
+      } else {
+        return 0;
+      }
     }
 
     @Override
@@ -205,7 +225,7 @@ public class WXImageView extends ImageView implements WXGestureObservable {
 
   @Override
   public void setImageDrawable(Drawable drawable) {
-    super.setImageDrawable(drawable);
+    super.setImageDrawable(new ImageClipDrawable(drawable));
     if (getScaleType() == ScaleType.MATRIX && getDrawable() != null) {
       Matrix matrix = getImageMatrix();
       int dwidth = getDrawable().getIntrinsicWidth();
@@ -224,19 +244,6 @@ public class WXImageView extends ImageView implements WXGestureObservable {
       matrix.setScale(scale, scale);
       setImageMatrix(matrix);
     }
-  }
-
-  @Override
-  protected void onDraw(Canvas canvas) {
-    canvas.save();
-    if(getBackground() instanceof BorderDrawable){
-      canvas.clipPath(((BorderDrawable) getBackground()).getContentPath(getPaddingTop(),
-                                                                        getPaddingRight(),
-                                                                        getPaddingBottom(),
-                                                                        getPaddingLeft()));
-    }
-    super.onDraw(canvas);
-    canvas.restore();
   }
 
   @Override
