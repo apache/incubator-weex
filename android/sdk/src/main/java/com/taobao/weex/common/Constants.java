@@ -299,6 +299,8 @@ public class Constants {
     String IMAGE_SHARPEN = "imageSharpen";
     String SHARPEN = "sharpen";
     String PREFIX = "prefix";
+    String INDEX = "index";
+    String INTERVAL = "interval";
   }
 
   public interface Value {
