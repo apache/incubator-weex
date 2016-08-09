@@ -220,7 +220,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.WXTextDomObject;
@@ -258,7 +258,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    * @param editText
    */
   protected void appleStyleAfterCreated(WXEditText editText) {
-    String alignStr = (String) mDomObj.style.get(WXDomPropConstant.WX_TEXTALIGN);
+    String alignStr = (String) mDomObj.style.get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
       textAlign = Gravity.LEFT;
@@ -343,52 +343,52 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_INPUT_PLACEHOLDER:
+      case Constants.Name.PLACEHOLDER:
         String placeholder = WXUtils.getString(param,null);
         if (placeholder != null)
           setPlaceholder(placeholder);
         return true;
-      case WXDomPropConstant.WX_INPUT_PLACEHOLDER_COLOR:
+      case Constants.Name.PLACEHOLDER_COLOR:
         String placeholder_color = WXUtils.getString(param,null);
         if (placeholder_color != null)
           setPlaceholderColor(placeholder_color);
         return true;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE:
+      case Constants.Name.TYPE:
         String input_type = WXUtils.getString(param,null);
         if (input_type != null)
           setType(input_type);
         return true;
-      case WXDomPropConstant.WX_ATTR_INPUT_AUTOFOCUS:
+      case Constants.Name.AUTOFOCUS:
         Boolean result = WXUtils.getBoolean(param, null);
         if (result != null)
           setAutofocus(result);
         return true;
-      case WXDomPropConstant.WX_COLOR:
+      case Constants.Name.COLOR:
         String color = WXUtils.getString(param,null);
         if (color != null)
           setColor(color);
         return true;
-      case WXDomPropConstant.WX_FONTSIZE:
+      case Constants.Name.FONT_SIZE:
         String fontsize = WXUtils.getString(param,null);
         if (fontsize != null)
           setFontSize(fontsize);
         return true;
-      case WXDomPropConstant.WX_TEXTALIGN:
+      case Constants.Name.TEXT_ALIGN:
         String text_align = WXUtils.getString(param,null);
         if (text_align != null)
           setTextAlign(text_align);
         return true;
-      case WXDomPropConstant.WX_ATTR_INPUT_SINGLELINE:
+      case Constants.Name.SINGLELINE:
         Boolean singLineResult = WXUtils.getBoolean(param, null);
         if (singLineResult != null)
           setSingleLine(singLineResult);
         return true;
-      case WXDomPropConstant.WX_ATTR_INPUT_LINES:
+      case Constants.Name.LINES:
         Integer lines = WXUtils.getInteger(param, null);
         if (lines != null)
           setLines(lines);
         return true;
-      case WXDomPropConstant.WX_ATTR_INPUT_MAXLENGTH:
+      case Constants.Name.MAX_LENGTH:
         Integer maxlength = WXUtils.getInteger(param, null);
         if (maxlength != null)
           setMaxLength(maxlength);
@@ -397,7 +397,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_PLACEHOLDER)
+  @WXComponentProp(name = Constants.Name.PLACEHOLDER)
   public void setPlaceholder(String placeholder) {
     if (placeholder == null || mHost == null) {
       return;
@@ -405,7 +405,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     ((WXEditText) mHost).setHint(placeholder);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_INPUT_PLACEHOLDER_COLOR)
+  @WXComponentProp(name = Constants.Name.PLACEHOLDER_COLOR)
   public void setPlaceholderColor(String color) {
     if (mHost != null && !TextUtils.isEmpty(color)) {
       int colorInt = WXResourceUtils.getColor(color);
@@ -415,7 +415,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_TYPE)
+  @WXComponentProp(name = Constants.Name.TYPE)
   public void setType(String type) {
     if (type == null || mHost == null) {
       return;
@@ -424,7 +424,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     ((EditText) mHost).setRawInputType(getInputType(mType));
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_AUTOFOCUS)
+  @WXComponentProp(name = Constants.Name.AUTOFOCUS)
   public void setAutofocus(boolean autofocus) {
     if (mHost == null) {
       return;
@@ -451,7 +451,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_COLOR)
+  @WXComponentProp(name = Constants.Name.COLOR)
   public void setColor(String color) {
     if (mHost != null && !TextUtils.isEmpty(color)) {
       int colorInt = WXResourceUtils.getColor(color);
@@ -461,14 +461,14 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_FONTSIZE)
+  @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
     if (mHost != null && fontSize != null && mDomObj.style != null) {
       ((WXEditText) mHost).setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_TEXTALIGN)
+  @WXComponentProp(name = Constants.Name.TEXT_ALIGN)
   public void setTextAlign(String textAlign) {
     int align = getTextAlign(textAlign);
     if (align > 0) {
@@ -476,7 +476,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_SINGLELINE)
+  @WXComponentProp(name = Constants.Name.SINGLELINE)
   public void setSingleLine(boolean singleLine) {
     if (mHost == null) {
       return;
@@ -484,7 +484,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     ((WXEditText) mHost).setSingleLine(singleLine);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_LINES)
+  @WXComponentProp(name = Constants.Name.LINES)
   public void setLines(int lines) {
     if (getHostView() == null) {
       return;
@@ -492,7 +492,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     getHostView().setLines(lines);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_INPUT_MAXLENGTH)
+  @WXComponentProp(name = Constants.Name.MAX_LENGTH)
   public void setMaxLength(int maxLength) {
     if (getHostView() == null) {
       return;
@@ -508,29 +508,29 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private int getInputType(String type) {
     int inputType;
     switch (type) {
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_TEXT:
+      case Constants.Value.TEXT:
         inputType = InputType.TYPE_CLASS_TEXT;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_DATE:
+      case Constants.Value.DATE:
         inputType = InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_DATETIME:
+      case Constants.Value.DATETIME:
         inputType = InputType.TYPE_CLASS_DATETIME;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_EMAIL:
+      case Constants.Value.EMAIL:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_PASSWORD:
+      case Constants.Value.PASSWORD:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
         getHostView().setTransformationMethod(PasswordTransformationMethod.getInstance());
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_TEL:
+      case Constants.Value.TEL:
         inputType = InputType.TYPE_CLASS_PHONE;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_TIME:
+      case Constants.Value.TIME:
         inputType = InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME;
         break;
-      case WXDomPropConstant.WX_ATTR_INPUT_TYPE_URL:
+      case Constants.Value.URL:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
         break;
       default:
@@ -557,11 +557,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (TextUtils.isEmpty(textAlign)) {
       return align;
     }
-    if (textAlign.equals(WXDomPropConstant.WX_TEXTALIGN_LEFT)) {
+    if (textAlign.equals(Constants.Value.LEFT)) {
       align = Gravity.LEFT;
-    } else if (textAlign.equals(WXDomPropConstant.WX_TEXTALIGN_CENTER)) {
+    } else if (textAlign.equals(Constants.Value.CENTER)) {
       align = Gravity.CENTER;
-    } else if (textAlign.equals(WXDomPropConstant.WX_TEXTALIGN_RIGHT)) {
+    } else if (textAlign.equals(Constants.Value.RIGHT)) {
       align = Gravity.RIGHT;
     }
     return align;

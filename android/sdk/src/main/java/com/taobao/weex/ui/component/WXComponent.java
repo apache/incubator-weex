@@ -150,7 +150,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXObject;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
@@ -163,6 +163,7 @@ import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
+import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
@@ -171,12 +172,8 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * abstract component
@@ -208,6 +205,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private WXGesture wxGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
+  private List<OnClickListener> mHostClickListeners;
+
+  interface OnClickListener{
+    void onHostViewClick();
+  }
 
   @Deprecated
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -252,6 +254,30 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       addEvents();
 
     }
+  }
+
+  protected final void addClickListener(OnClickListener l){
+    if(l != null && mHost != null) {
+      if(mHostClickListeners == null){
+        mHostClickListeners = new ArrayList<>();
+        mHost.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            for (OnClickListener listener : mHostClickListeners){
+              if(listener != null) {
+                listener.onHostViewClick();
+              }
+            }
+          }
+        });
+      }
+      mHostClickListeners.add(l);
+
+    }
+  }
+
+  protected final void removeClickListener(OnClickListener l){
+    mHostClickListeners.remove(l);
   }
 
   public void bindData(WXComponent component){
@@ -383,6 +409,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.height = realHeight;
       params.setMargins(realLeft, 0, realRight, 0);
       mHost.setLayoutParams(params);
+    } else if(mParent.getRealView() instanceof BaseBounceView && this instanceof WXBaseRefresh) {
+      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(realWidth,realHeight);
+      params.setMargins(realLeft, realTop, realRight, realBottom);
+      mHost.setLayoutParams(params);
     } else if (mParent.getRealView() instanceof FrameLayout) {
       FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(realWidth, realHeight);
       params.setMargins(realLeft, realTop, realRight, realBottom);
@@ -485,63 +515,63 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
      */
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_DISABLED:
+      case Constants.Name.DISABLED:
         Boolean disabled = WXUtils.getBoolean(param,null);
         if (disabled != null)
           setDisabled(disabled);
         return true;
-      case WXDomPropConstant.WX_POSITION:
+      case Constants.Name.POSITION:
         String position = WXUtils.getString(param,null);
         if (position != null)
           setSticky(position);
         return true;
-      case WXDomPropConstant.WX_BACKGROUNDCOLOR:
+      case Constants.Name.BACKGROUND_COLOR:
         String bgColor = WXUtils.getString(param,null);
         if (bgColor != null)
           setBackgroundColor(bgColor);
         return true;
-      case WXDomPropConstant.WX_OPACITY:
+      case Constants.Name.OPACITY:
         Float opacity = WXUtils.getFloat(param,null);
         if (opacity != null)
           setOpacity(opacity);
         return true;
-      case WXDomPropConstant.WX_BORDERRADIUS:
-      case WXDomPropConstant.WX_BORDER_TOP_LEFT_RADIUS:
-      case WXDomPropConstant.WX_BORDER_TOP_RIGHT_RADIUS:
-      case WXDomPropConstant.WX_BORDER_BOTTOM_RIGHT_RADIUS:
-      case WXDomPropConstant.WX_BORDER_BOTTOM_LEFT_RADIUS:
+      case Constants.Name.BORDER_RADIUS:
+      case Constants.Name.BORDER_TOP_LEFT_RADIUS:
+      case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
         Float radius = WXUtils.getFloat(param,null);
         if (radius != null)
           setBorderRadius(key,radius);
         return true;
-      case WXDomPropConstant.WX_BORDERWIDTH:
-      case WXDomPropConstant.WX_BORDER_TOP_WIDTH:
-      case WXDomPropConstant.WX_BORDER_RIGHT_WIDTH:
-      case WXDomPropConstant.WX_BORDER_BOTTOM_WIDTH:
-      case WXDomPropConstant.WX_BORDER_LEFT_WIDTH:
+      case Constants.Name.BORDER_WIDTH:
+      case Constants.Name.BORDER_TOP_WIDTH:
+      case Constants.Name.BORDER_RIGHT_WIDTH:
+      case Constants.Name.BORDER_BOTTOM_WIDTH:
+      case Constants.Name.BORDER_LEFT_WIDTH:
         Float width = WXUtils.getFloat(param,null);
         if (width != null)
           setBorderWidth(key,width);
         return true;
-      case WXDomPropConstant.WX_BORDERSTYLE:
-      case WXDomPropConstant.WX_BORDER_RIGHT_STYLE:
-      case WXDomPropConstant.WX_BORDER_BOTTOM_STYLE:
-      case WXDomPropConstant.WX_BORDER_LEFT_STYLE:
-      case WXDomPropConstant.WX_BORDER_TOP_STYLE:
+      case Constants.Name.BORDER_STYLE:
+      case Constants.Name.BORDER_RIGHT_STYLE:
+      case Constants.Name.BORDER_BOTTOM_STYLE:
+      case Constants.Name.BORDER_LEFT_STYLE:
+      case Constants.Name.BORDER_TOP_STYLE:
         String border_style = WXUtils.getString(param,null);
         if (border_style != null)
           setBorderStyle(key, border_style);
         return true;
-      case WXDomPropConstant.WX_BORDERCOLOR:
-      case WXDomPropConstant.WX_BORDER_TOP_COLOR:
-      case WXDomPropConstant.WX_BORDER_RIGHT_COLOR:
-      case WXDomPropConstant.WX_BORDER_BOTTOM_COLOR:
-      case WXDomPropConstant.WX_BORDER_LEFT_COLOR:
+      case Constants.Name.BORDER_COLOR:
+      case Constants.Name.BORDER_TOP_COLOR:
+      case Constants.Name.BORDER_RIGHT_COLOR:
+      case Constants.Name.BORDER_BOTTOM_COLOR:
+      case Constants.Name.BORDER_LEFT_COLOR:
         String border_color = WXUtils.getString(param,null);
         if (border_color != null)
           setBorderColor(key, border_color);
         return true;
-      case WXDomPropConstant.WX_VISIBILITY:
+      case Constants.Name.VISIBILITY:
         String visibility = WXUtils.getString(param,null);
         if (visibility != null)
           setVisibility(visibility);
@@ -557,20 +587,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     mDomObj.addEvent(type);
     if (type.equals(WXEventType.CLICK) && getRealView() != null) {
-      mHost.setOnClickListener(new View.OnClickListener() {
+      addClickListener(new OnClickListener() {
         @Override
-        public void onClick(View v) {
+        public void onHostViewClick() {
           Map<String, Object> params = new HashMap<>();
           int[] location = new int[2];
           mHost.getLocationOnScreen(location);
-          params.put("x",location[0]);
-          params.put("y",location[1]);
-          params.put("width",mDomObj.getCSSLayoutWidth());
-          params.put("height",mDomObj.getCSSLayoutHeight());
+          params.put("x", location[0]);
+          params.put("y", location[1]);
+          params.put("width", mDomObj.getCSSLayoutWidth());
+          params.put("height", mDomObj.getCSSLayoutHeight());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
-                                               mDomObj.ref,
-                                               WXEventType.CLICK,
-                                               params);
+              mDomObj.ref,
+              WXEventType.CLICK,
+              params);
         }
       });
     } else if ((type.equals(WXEventType.FOCUS) || type.equals(WXEventType.BLUR)) && getRealView()
@@ -726,9 +756,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /**
    * After view init.
    */
-  protected void onHostViewInitialized(T host){
-
-  }
+  protected void onHostViewInitialized(T host){}
 
   public T getHostView() {
     return mHost;
@@ -830,7 +858,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void setSticky(String sticky) {
-    if (!TextUtils.isEmpty(sticky) && sticky.equals(WXDomPropConstant.WX_POSITION_STICKY)) {
+    if (!TextUtils.isEmpty(sticky) && sticky.equals(Constants.Value.STICKY)) {
       Scrollable waScroller = getParentScroller();
       if (waScroller != null) {
         waScroller.bindStickStyle(this);
@@ -856,19 +884,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void setBorderRadius(String key, float borderRadius) {
     if (borderRadius >= 0) {
       switch (key) {
-        case WXDomPropConstant.WX_BORDERRADIUS:
+        case Constants.Name.BORDER_RADIUS:
           getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_RADIUS_ALL, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
-        case WXDomPropConstant.WX_BORDER_TOP_LEFT_RADIUS:
+        case Constants.Name.BORDER_TOP_LEFT_RADIUS:
           getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
-        case WXDomPropConstant.WX_BORDER_TOP_RIGHT_RADIUS:
+        case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
           getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
-        case WXDomPropConstant.WX_BORDER_BOTTOM_RIGHT_RADIUS:
+        case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
           getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
-        case WXDomPropConstant.WX_BORDER_BOTTOM_LEFT_RADIUS:
+        case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
           getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
       }
@@ -878,19 +906,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void setBorderWidth(String key, float borderWidth) {
     if (borderWidth >= 0) {
       switch (key) {
-        case WXDomPropConstant.WX_BORDERWIDTH:
+        case Constants.Name.BORDER_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
-        case WXDomPropConstant.WX_BORDER_TOP_WIDTH:
+        case Constants.Name.BORDER_TOP_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
-        case WXDomPropConstant.WX_BORDER_RIGHT_WIDTH:
+        case Constants.Name.BORDER_RIGHT_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
-        case WXDomPropConstant.WX_BORDER_BOTTOM_WIDTH:
+        case Constants.Name.BORDER_BOTTOM_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
-        case WXDomPropConstant.WX_BORDER_LEFT_WIDTH:
+        case Constants.Name.BORDER_LEFT_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
       }
@@ -900,19 +928,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void setBorderStyle(String key, String borderStyle) {
     if(!TextUtils.isEmpty(borderStyle)){
       switch (key){
-        case WXDomPropConstant.WX_BORDERSTYLE:
+        case Constants.Name.BORDER_STYLE:
           getOrCreateBorder().setBorderStyle(Spacing.ALL,borderStyle);
           break;
-        case WXDomPropConstant.WX_BORDER_RIGHT_STYLE:
+        case Constants.Name.BORDER_RIGHT_STYLE:
           getOrCreateBorder().setBorderStyle(Spacing.RIGHT,borderStyle);
           break;
-        case WXDomPropConstant.WX_BORDER_BOTTOM_STYLE:
+        case Constants.Name.BORDER_BOTTOM_STYLE:
           getOrCreateBorder().setBorderStyle(Spacing.BOTTOM,borderStyle);
           break;
-        case WXDomPropConstant.WX_BORDER_LEFT_STYLE:
+        case Constants.Name.BORDER_LEFT_STYLE:
           getOrCreateBorder().setBorderStyle(Spacing.LEFT,borderStyle);
           break;
-        case WXDomPropConstant.WX_BORDER_TOP_STYLE:
+        case Constants.Name.BORDER_TOP_STYLE:
           getOrCreateBorder().setBorderStyle(Spacing.TOP,borderStyle);
           break;
       }
@@ -924,19 +952,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       int colorInt = WXResourceUtils.getColor(borderColor);
       if (colorInt != Integer.MIN_VALUE) {
         switch (key) {
-          case WXDomPropConstant.WX_BORDERCOLOR:
+          case Constants.Name.BORDER_COLOR:
             getOrCreateBorder().setBorderColor(Spacing.ALL, colorInt);
             break;
-          case WXDomPropConstant.WX_BORDER_TOP_COLOR:
+          case Constants.Name.BORDER_TOP_COLOR:
             getOrCreateBorder().setBorderColor(Spacing.TOP, colorInt);
             break;
-          case WXDomPropConstant.WX_BORDER_RIGHT_COLOR:
+          case Constants.Name.BORDER_RIGHT_COLOR:
             getOrCreateBorder().setBorderColor(Spacing.RIGHT, colorInt);
             break;
-          case WXDomPropConstant.WX_BORDER_BOTTOM_COLOR:
+          case Constants.Name.BORDER_BOTTOM_COLOR:
             getOrCreateBorder().setBorderColor(Spacing.BOTTOM, colorInt);
             break;
-          case WXDomPropConstant.WX_BORDER_LEFT_COLOR:
+          case Constants.Name.BORDER_LEFT_COLOR:
             getOrCreateBorder().setBorderColor(Spacing.LEFT, colorInt);
             break;
         }
@@ -948,18 +976,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   @Nullable
   String getVisibility() {
     try {
-      return (String) getDomObject().style.get(WXDomPropConstant.WX_VISIBILITY);
+      return (String) getDomObject().style.get(Constants.Name.VISIBILITY);
     } catch (Exception e) {
-      return WXDomPropConstant.WX_VISIBILITY_VISIBLE;
+      return Constants.Value.VISIBLE;
     }
   }
 
   public void setVisibility(String visibility) {
     View view;
     if ((view = getRealView()) != null) {
-      if (TextUtils.equals(visibility, WXDomPropConstant.WX_VISIBILITY_VISIBLE)) {
+      if (TextUtils.equals(visibility, Constants.Value.VISIBLE)) {
         view.setVisibility(View.VISIBLE);
-      } else if (TextUtils.equals(visibility, WXDomPropConstant.WX_VISIBILITY_HIDDEN)) {
+      } else if (TextUtils.equals(visibility, Constants.Value.HIDDEN)) {
         view.setVisibility(View.GONE);
       }
     }

@@ -210,21 +210,33 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.Component;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.utils.WXUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Image component
  */
 @Component(lazyload = false)
 public class WXImage extends WXComponent<ImageView> {
+
+    public static class Ceator implements ComponentCreator {
+        public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXImage(instance,node,parent,lazy);
+        }
+    }
+
 
     @Deprecated
     public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -246,17 +258,17 @@ public class WXImage extends WXComponent<ImageView> {
     @Override
     protected boolean setProperty(String key, Object param) {
         switch (key) {
-            case WXDomPropConstant.WX_RESIZE_MODE:
+            case Constants.Name.RESIZE_MODE:
                 String resize_mode = WXUtils.getString(param,null);
                 if (resize_mode != null)
                     setResizeMode(resize_mode);
                 return true;
-            case WXDomPropConstant.WX_RESIZE:
+            case Constants.Name.RESIZE:
                 String resize = WXUtils.getString(param,null);
                 if (resize != null)
                     setResize(resize);
                 return true;
-            case WXDomPropConstant.WX_ATTR_SRC:
+            case Constants.Name.SRC:
                 String src = WXUtils.getString(param,null);
                 if (src != null)
                     setSrc(src);
@@ -265,7 +277,7 @@ public class WXImage extends WXComponent<ImageView> {
         return super.setProperty(key, param);
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE_MODE)
+    @WXComponentProp(name = Constants.Name.RESIZE_MODE)
     public void setResizeMode(String resizeMode) {
         ((ImageView) getHostView()).setScaleType(getResizeMode(resizeMode));
     }
@@ -292,12 +304,12 @@ public class WXImage extends WXComponent<ImageView> {
         return scaleType;
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE)
+    @WXComponentProp(name = Constants.Name.RESIZE)
     public void setResize(String resize) {
         ((ImageView) getHostView()).setScaleType(getResizeMode(resize));
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SRC)
+    @WXComponentProp(name = Constants.Name.SRC)
     public void setSrc(String src) {
 
         WXImageStrategy imageStrategy = new WXImageStrategy();
@@ -306,9 +318,28 @@ public class WXImage extends WXComponent<ImageView> {
         WXImageSharpen imageSharpen = mDomObj.attr.getImageSharpen();
         imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
+        imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
+            @Override
+            public void onImageFinish(String url,ImageView imageView, boolean result, Map extra) {
+                if(!result && imageView!=null){
+                    imageView.setImageDrawable(null);
+                }
+                if(getDomObject()!=null && getDomObject().containsEvent(WXEventType.ONLOAD)){
+                    Map<String,Object> params=new HashMap<String, Object>();
+                    params.put("success",result);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(),WXEventType.ONLOAD,params);
+                }
+            }
+        });
+
+        if(mDomObj.attr!=null && mDomObj.attr.containsKey(Constants.Name.PLACE_HOLDER)){
+            String placeHolder= (String) mDomObj.attr.get(Constants.Name.PLACE_HOLDER);
+            imageStrategy.placeHolder=placeHolder;
+        }
+
         IWXImgLoaderAdapter imgLoaderAdapter = mInstance.getImgLoaderAdapter();
         if (imgLoaderAdapter != null) {
-            imgLoaderAdapter.setImage(src, ((ImageView) getHostView()),
+            imgLoaderAdapter.setImage(src, getHostView(),
                     mDomObj.attr.getImageQuality(), imageStrategy);
         }
     }

@@ -206,16 +206,18 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 
-import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
@@ -224,6 +226,9 @@ import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.WXDomHandler;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXEventType;
@@ -235,6 +240,7 @@ import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -254,8 +260,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
   protected IWXUserTrackAdapter mUserTrackAdapter;
   protected IWXHttpAdapter mWXHttpAdapter;
   private IWXRenderListener mRenderListener;
-  private Context mContext;
-  private volatile String mInstanceId;
+  Context mContext;
+  volatile String mInstanceId;
   private WXComponent mGodCom;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
@@ -436,7 +442,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
     if(WXEnvironment.sDynamicMode && !TextUtils.isEmpty(WXEnvironment.sDynamicUrl) && options!=null && options.get("dynamicMode")==null){
       options.put("dynamicMode","true");
-      renderByUrl(pageName,WXEnvironment.sDynamicUrl,options,jsonInitData,width,height,flag);
+      renderByUrl(pageName, WXEnvironment.sDynamicUrl, options, jsonInitData, width, height, flag);
       return;
     }
 
@@ -475,14 +481,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
     Uri uri=Uri.parse(url);
     if(uri!=null && TextUtils.equals(uri.getScheme(),"file")){
-      render(pageName, WXFileUtils.loadFileContent(assembleFilePath(uri), mContext),options,jsonInitData,width,height,flag);
+      render(pageName, WXFileUtils.loadAsset(assembleFilePath(uri), mContext),options,jsonInitData,width,height,flag);
       return;
     }
 
     IWXHttpAdapter adapter=WXSDKManager.getInstance().getIWXHttpAdapter();
-    if (adapter == null) {
-      adapter = new DefaultWXHttpAdapter();
-    }
 
     WXRequest wxRequest = new WXRequest();
     wxRequest.url = url;
@@ -870,32 +873,24 @@ public class WXSDKInstance implements IWXActivityStateListener {
    * UserTrack Log
    */
   public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (errorCode == WXErrorCode.WX_SUCCESS) {
+    if (mUserTrackAdapter == null || TextUtils.isEmpty(type) || errorCode==null) {
       return;
     }
     runOnUiThread(new Runnable() {
-
       @Override
       public void run() {
-        if (mUserTrackAdapter == null || TextUtils.isEmpty(type)) {
-          return;
+        WXPerformance performance = null;
+        if (errorCode != WXErrorCode.WX_SUCCESS) {
+          performance = new WXPerformance();
+          performance.errCode = errorCode.getErrorCode();
+          performance.errMsg = errorCode.getErrorMsg();
+          if (WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(performance.toString());
+          }
         }
-        // Log for commit
-        if (errorCode.getErrorCode() == null && errorCode.getErrorMsg() == null) {
-          mUserTrackAdapter.commit(mContext, null, type, null, null);
-          return;
-        }
-
-        WXPerformance perf = new WXPerformance();
-        perf.errCode = errorCode.getErrorCode();
-        perf.errMsg = errorCode.getErrorMsg();
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d(perf.toString());
-        }
-        mUserTrackAdapter.commit(mContext, null, type, perf, null);
+        mUserTrackAdapter.commit(mContext, null, type, performance, null);
       }
     });
-
   }
 
   private void destroyView(View rootView) {
@@ -912,7 +907,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
       }
     } catch (Exception e) {
-      WXLogUtils.e("WXSDKInstance destroyView Exception: " + WXLogUtils.getStackTrace(e));
+      WXLogUtils.e("WXSDKInstance destroyView Exception: ", e);
     }
   }
 
@@ -959,6 +954,53 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public void setRefreshMargin(float refreshMargin) {
     this.refreshMargin = refreshMargin;
+  }
+
+  private void updateRootComponentStyle(JSONObject style) {
+
+    Message message = Message.obtain();
+    WXDomTask task = new WXDomTask();
+    task.instanceId = getInstanceId();
+    if (task.args == null) {
+      task.args = new ArrayList<>();
+    }
+    task.args.add(WXDomObject.ROOT);
+    task.args.add(style);
+    message.obj = task;
+    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+  }
+
+  public void setSize(int width, int height) {
+    if (width < 0 || height < 0) {
+      return;
+    }
+    mGodViewWidth = width;
+    mGodViewHeight = height;
+    float realWidth = WXViewUtils.getWebPxByWidth(width);
+    float realHeight = WXViewUtils.getWebPxByWidth(height);
+
+    View godView = mGodCom.getHostView();
+    if (godView != null) {
+      ViewGroup.LayoutParams layoutParams = godView.getLayoutParams();
+      if (layoutParams != null) {
+        layoutParams.width = width;
+        layoutParams.height = height;
+        godView.setLayoutParams(layoutParams);
+
+        JSONObject style = new JSONObject();
+        if (mGodCom instanceof WXVContainer) {
+          WXComponent rootComponent = ((WXVContainer) mGodCom).getChild(0);
+          if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyHeight()) {
+            style.put(Constants.Name.HEIGHT, realHeight);
+          }
+          if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyWidth()) {
+            style.put(Constants.Name.WIDTH, realWidth);
+          }
+          updateRootComponentStyle(style);
+        }
+      }
+    }
   }
 
   /**

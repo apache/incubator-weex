@@ -202,219 +202,101 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom.module;
+package com.taobao.weex.ui.module;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.text.TextUtils;
-import android.view.Gravity;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import com.taobao.weex.bridge.JSCallback;
+import android.os.Message;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
-import com.taobao.weex.utils.WXConst;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
+import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.utils.WXFileUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
-import org.json.JSONObject;
-
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-
+import static org.junit.Assert.*;
+import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
 
 /**
- * WXModalUIModule module provide toast、alert、confirm、prompt to display the message.
- * for example(weex JS):
- * this.$call('modal','toast',{'message':'test toast','duration': 2.0});
+ * Created by sospartan on 7/28/16.
  */
-public class WXModalUIModule extends WXModule {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
+@PrepareForTest(WXBridgeManager.class)
+public class WXTimerModuleTest {
 
-  private Toast toast;
-  @WXModuleAnno
-  public void toast(String param) {
+  @Rule
+  public PowerMockRule rule = new PowerMockRule();
 
-    String message = "";
-    int duration = Toast.LENGTH_SHORT;
-    if (!TextUtils.isEmpty(param)) {
-      try {
-        param = URLDecoder.decode(param, "utf-8");
-        JSONObject jsObj = new JSONObject(param);
-        message = jsObj.optString(WXConst.MESSAGE);
-        duration = jsObj.optInt(WXConst.DURATION);
-      } catch (Exception e) {
-        WXLogUtils.e("[WXModalUIModule] alert param parse error " + WXLogUtils.getStackTrace(e));
-      }
-    }
-    if (TextUtils.isEmpty(message)) {
-      WXLogUtils.e("[WXModalUIModule] toast param parse is null ");
-      return;
-    }
+  WXTimerModule module;
+  WXBridgeManager bridge;
 
-    if (duration > 3) {
-      duration = Toast.LENGTH_LONG;
-    } else {
-      duration = Toast.LENGTH_SHORT;
-    }
-    if(toast== null){
-      toast =Toast.makeText(mWXSDKInstance.getContext(), message, duration);
-    } else {
-      toast.setDuration(duration);
-      toast.setText(message);
-    }
-    toast.setGravity(Gravity.CENTER, 0, 0);
-    toast.show();
+  @Before
+  public void setup() throws Exception{
+    module = new WXTimerModule();
+    module.mWXSDKInstance = WXSDKInstanceTest.createInstance();
+
+    bridge = Mockito.mock(WXBridgeManager.class);
+    WXBridgeManagerTest.setBridgeManager(bridge);
+
   }
 
-  @WXModuleAnno
-  public void alert(String param, final JSCallback callback) {
+  @Test
+  public void testSetTimeout() throws Exception {
+    module.setTimeout(1,2);
+    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)2));
 
-    if (mWXSDKInstance.getContext() instanceof Activity) {
+    reset(bridge);
+    module.setTimeout(0,0);
+    Mockito.verify(bridge,never()).sendMessageDelayed(any(Message.class),anyLong());
 
-      String message = "";
-      String okTitle = WXConst.OK;
-      if (!TextUtils.isEmpty(param)) {
-        try {
-          param = URLDecoder.decode(param, "utf-8");
-          JSONObject jsObj = new JSONObject(param);
-          message = jsObj.optString(WXConst.MESSAGE);
-          okTitle = jsObj.optString(WXConst.OK_TITLE);
-        } catch (Exception e) {
-          WXLogUtils.e("[WXModalUIModule] alert param parse error " + WXLogUtils.getStackTrace(e));
-        }
-      }
-      if (TextUtils.isEmpty(message)) {
-        message="";
-      }
-      AlertDialog.Builder builder = new AlertDialog.Builder(mWXSDKInstance.getContext());
-      builder.setMessage(message);
 
-      final String okTitle_f = TextUtils.isEmpty(okTitle) ? WXConst.OK : okTitle;
-      builder.setPositiveButton(okTitle_f, new OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          callback.invoke(okTitle_f);
-        }
-      });
-      AlertDialog alertDialog = builder.create();
-      alertDialog.setCanceledOnTouchOutside(false);
-      alertDialog.show();
-    } else {
-      WXLogUtils.e("[WXModalUIModule] when call alert mWXSDKInstance.getContext() must instanceof Activity");
-    }
   }
 
-  @WXModuleAnno
-  public void confirm(String param, final String callbackId) {
+  @Test
+  public void testSetInterval() throws Exception {
+    module.setInterval(0,1);
+    Mockito.verify(bridge,never()).sendMessageDelayed(any(Message.class),anyLong());
 
-    if (mWXSDKInstance.getContext() instanceof Activity) {
-      String message = "";
-      String okTitle = WXConst.OK;
-      String cancelTitle = WXConst.CANCEL;
+    reset(bridge);
+    module.setInterval(1,-1);
+    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)0));
 
-      if (!TextUtils.isEmpty(param)) {
-        try {
-          param = URLDecoder.decode(param, "utf-8");
-          JSONObject jsObj = new JSONObject(param);
-          message = jsObj.optString(WXConst.MESSAGE);
-          okTitle = jsObj.optString(WXConst.OK_TITLE);
-          cancelTitle = jsObj.optString(WXConst.CANCEL_TITLE);
-        } catch (Exception e) {
-          WXLogUtils.e("[WXModalUIModule] confirm param parse error " + WXLogUtils.getStackTrace(e));
-        }
-      }
-      if (TextUtils.isEmpty(message)) {
-        message="";
-      }
-      AlertDialog.Builder builder = new AlertDialog.Builder(mWXSDKInstance.getContext());
-      builder.setMessage(message);
-
-      final String okTitle_f = TextUtils.isEmpty(okTitle) ? WXConst.OK : okTitle;
-      final String cancelTitle_f = TextUtils.isEmpty(cancelTitle) ? WXConst.CANCEL : cancelTitle;
-
-      builder.setPositiveButton(okTitle_f, new OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId, okTitle_f);
-
-        }
-      });
-      builder.setNegativeButton(cancelTitle_f, new OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId, cancelTitle_f);
-
-        }
-      });
-      AlertDialog alertDialog = builder.create();
-      alertDialog.setCanceledOnTouchOutside(false);
-      alertDialog.show();
-    } else {
-      WXLogUtils.e("[WXModalUIModule] when call confirm mWXSDKInstance.getContext() must instanceof Activity");
-    }
+    reset(bridge);
+    module.setInterval(1,2);
+    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)2));
   }
 
-  @WXModuleAnno
-  public void prompt(String param, final String callbackId) {
-    if (mWXSDKInstance.getContext() instanceof Activity) {
-      String message = "";
-      String defaultValue = "";
-      String okTitle = WXConst.OK;
-      String cancelTitle = WXConst.CANCEL;
+  @Test
+  public void testClearTimeout() throws Exception {
+    module.clearTimeout(0);
+    Mockito.verify(bridge,never()).removeMessage(anyInt(),anyInt());
 
-      if (!TextUtils.isEmpty(param)) {
-        try {
-          param = URLDecoder.decode(param, "utf-8");
-          JSONObject jsObj = new JSONObject(param);
-          message = jsObj.optString("message");
-          okTitle = jsObj.optString("okTitle");
-          cancelTitle = jsObj.optString("cancelTitle");
-          defaultValue = jsObj.optString("default");
-        } catch (Exception e) {
-          WXLogUtils.e("[WXModalUIModule] confirm param parse error " + WXLogUtils.getStackTrace(e));
-        }
-      }
-
-      if (TextUtils.isEmpty(message)) {
-        message="";
-      }
-      AlertDialog.Builder builder = new AlertDialog.Builder(mWXSDKInstance.getContext());
-      builder.setMessage(message);
-
-      final EditText editText = new EditText(mWXSDKInstance.getContext());
-      editText.setText(defaultValue);
-      builder.setView(editText);
-      final String okTitle_f = TextUtils.isEmpty(okTitle) ? WXConst.OK : okTitle;
-      final String cancelTitle_f = TextUtils.isEmpty(cancelTitle) ? WXConst.CANCEL : cancelTitle;
-      builder.setPositiveButton(okTitle_f, new OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          Map<String, Object> result = new HashMap<String, Object>();
-          result.put(WXConst.RESULT, okTitle_f);
-          result.put(WXConst.DATA, editText.getText().toString());
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId, result);
-
-        }
-      });
-      builder.setNegativeButton(cancelTitle_f, new OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          Map<String, Object> result = new HashMap<String, Object>();
-          result.put(WXConst.RESULT, cancelTitle_f);
-          result.put(WXConst.DATA, editText.getText().toString());
-          WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId, result);
-        }
-      });
-      AlertDialog alertDialog = builder.create();
-      alertDialog.setCanceledOnTouchOutside(false);
-      alertDialog.show();
-    } else {
-      WXLogUtils.e("when call prompt mWXSDKInstance.getContext() must instanceof Activity");
-    }
+    reset(bridge);
+    module.clearTimeout(1);
+    Mockito.verify(bridge,times(1)).removeMessage(eq(WXJSBridgeMsgType.MODULE_TIMEOUT),eq(1));
   }
 
+  @Test
+  public void testClearInterval() throws Exception {
+    module.clearInterval(0);
+    Mockito.verify(bridge,never()).removeMessage(anyInt(),anyInt());
+
+    reset(bridge);
+    module.clearInterval(1);
+    Mockito.verify(bridge,times(1)).removeMessage(eq(WXJSBridgeMsgType.MODULE_INTERVAL),eq(1));
+  }
 }

@@ -206,6 +206,7 @@ package com.taobao.weex.ui;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
@@ -215,6 +216,8 @@ import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -236,8 +239,12 @@ public class WXRenderManager {
     return mRegistries.get(instanceId);
   }
 
-  public WXComponent getWXComponent(String instanceId, String ref) {
-    return getWXRenderStatement(instanceId).getComponent(ref);
+  public @Nullable WXComponent getWXComponent(String instanceId, String ref) {
+    if(instanceId == null || TextUtils.isEmpty(ref)){
+      return null;
+    }
+    WXRenderStatement stmt = getWXRenderStatement(instanceId);
+    return stmt == null?null:stmt.getComponent(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
@@ -440,5 +447,19 @@ public class WXRenderManager {
       return;
     }
     statement.startAnimation(ref, animationBean, callBack);
+  }
+
+  public List<WXSDKInstance> getAllInstances() {
+    ArrayList<WXSDKInstance> instances = null;
+    if (mRegistries != null && !mRegistries.isEmpty()) {
+      instances = new ArrayList<WXSDKInstance>();
+      for (Map.Entry<String, WXRenderStatement> entry : mRegistries.entrySet()) {
+        WXRenderStatement renderStatement = entry.getValue();
+        if (renderStatement != null) {
+          instances.add(renderStatement.getWXSDKInstance());
+        }
+      }
+    }
+    return instances;
   }
 }

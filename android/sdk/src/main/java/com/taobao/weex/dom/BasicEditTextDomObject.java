@@ -205,7 +205,7 @@
 package com.taobao.weex.dom;
 
 import android.text.TextPaint;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.MeasureOutput;
@@ -259,19 +259,19 @@ public class BasicEditTextDomObject extends WXDomObject {
     if (style != null) {
       int fontSize = UNSET, fontStyle = UNSET, fontWeight = UNSET;
       String fontFamily = null;
-      if (style.containsKey(WXDomPropConstant.WX_FONTSIZE)) {
+      if (style.containsKey(Constants.Name.FONT_SIZE)) {
         fontSize = WXStyle.getFontSize(style);
       }
 
-      if (style.containsKey(WXDomPropConstant.WX_FONTFAMILY)) {
+      if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         fontFamily = WXStyle.getFontFamily(style);
       }
 
-      if (style.containsKey(WXDomPropConstant.WX_FONTSTYLE)) {
+      if (style.containsKey(Constants.Name.FONT_STYLE)) {
         fontStyle = WXStyle.getFontStyle(style);
       }
 
-      if (style.containsKey(WXDomPropConstant.WX_FONTWEIGHT)) {
+      if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
         fontWeight = WXStyle.getFontWeight(style);
       }
 

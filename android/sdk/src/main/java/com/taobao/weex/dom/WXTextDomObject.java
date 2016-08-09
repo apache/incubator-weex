@@ -27,7 +27,7 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.UnderlineSpan;
 
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.FloatUtil;
@@ -172,7 +172,7 @@ public class WXTextDomObject extends WXDomObject {
   public void updateAttr(Map<String, Object> attrs) {
     swap();
     super.updateAttr(attrs);
-    if (attrs.containsKey(WXDomPropConstant.WX_ATTR_VALUE)) {
+    if (attrs.containsKey(Constants.Name.VALUE)) {
       mText = WXAttr.getValue(attrs);
     }
   }
@@ -204,7 +204,7 @@ public class WXTextDomObject extends WXDomObject {
       }
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("WXTextDomObject clone error: " + WXLogUtils.getStackTrace(e));
+        WXLogUtils.e("WXTextDomObject clone error: ", e);
       }
     }
     if (dom != null) {
@@ -254,29 +254,29 @@ public class WXTextDomObject extends WXDomObject {
    */
   private void updateStyleImp(Map<String, Object> style) {
     if (style != null) {
-      if (style.containsKey(WXDomPropConstant.WX_LINES)) {
+      if (style.containsKey(Constants.Name.LINES)) {
         int lines = WXStyle.getLines(style);
         if (lines > 0) {
           mNumberOfLines = lines;
         }
       }
-      if (style.containsKey(WXDomPropConstant.WX_FONTSIZE)) {
+      if (style.containsKey(Constants.Name.FONT_SIZE)) {
         mFontSize = WXStyle.getFontSize(style);
       }
-      if (style.containsKey(WXDomPropConstant.WX_FONTWEIGHT)) {
+      if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
         mFontWeight = WXStyle.getFontWeight(style);
       }
-      if (style.containsKey(WXDomPropConstant.WX_FONTSTYLE)) {
+      if (style.containsKey(Constants.Name.FONT_STYLE)) {
         mFontStyle = WXStyle.getFontStyle(style);
       }
-      if (style.containsKey(WXDomPropConstant.WX_COLOR)) {
+      if (style.containsKey(Constants.Name.COLOR)) {
         mColor = WXResourceUtils.getColor(WXStyle.getTextColor(style));
         mIsColorSet = mColor != Integer.MIN_VALUE;
       }
-      if (style.containsKey(WXDomPropConstant.WX_TEXTDECORATION)) {
+      if (style.containsKey(Constants.Name.TEXT_DECORATION)) {
         mTextDecoration = WXStyle.getTextDecoration(style);
       }
-      if (style.containsKey(WXDomPropConstant.WX_FONTFAMILY)) {
+      if (style.containsKey(Constants.Name.FONT_FAMILY)) {
         mFontFamily = WXStyle.getFontFamily(style);
       }
       mAlignment = WXStyle.getTextAlignment(style);
@@ -456,7 +456,7 @@ public class WXTextDomObject extends WXDomObject {
       layout.draw(DUMMY_CANVAS);
       result = true;
     } catch (Exception e) {
-      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+      WXLogUtils.eTag(TAG, e);
       result = false;
     }
     return result;

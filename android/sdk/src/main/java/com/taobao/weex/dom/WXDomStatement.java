@@ -214,7 +214,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -530,18 +530,20 @@ class WXDomStatement {
       return;
     }
     Map<String, Object> style = new HashMap<>(5);
-    if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_FLEXDIRECTION)) {
-      style.put(WXDomPropConstant.WX_FLEXDIRECTION, "column");
+    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.FLEX_DIRECTION)) {
+      style.put(Constants.Name.FLEX_DIRECTION, "column");
     }
-    if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_BACKGROUNDCOLOR)) {
-      style.put(WXDomPropConstant.WX_BACKGROUNDCOLOR, "#ffffff");
+    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.BACKGROUND_COLOR)) {
+      style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
     }
     //If there is height or width in JS, then that value will override value here.
-    if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_WIDTH)) {
-      style.put(WXDomPropConstant.WX_WIDTH, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
+    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.WIDTH)) {
+      style.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
+      domObject.setModifyWidth(true);
     }
-    if (domObject.style == null || !domObject.style.containsKey(WXDomPropConstant.WX_HEIGHT)) {
-      style.put(WXDomPropConstant.WX_HEIGHT, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)));
+    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.HEIGHT)) {
+      style.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)));
+      domObject.setModifyHeight(true);
     }
     domObject.ref = WXDomObject.ROOT;
     domObject.updateStyle(style);
@@ -565,7 +567,7 @@ class WXDomStatement {
           try {
             mWXRenderManager.createBody(mInstanceId, component);
           } catch (Exception e) {
-            WXLogUtils.e("create body failed." + e.getMessage());
+            WXLogUtils.e("create body failed.", e);
           }
         }
 
@@ -661,14 +663,8 @@ class WXDomStatement {
       return;
     }
 
-    if (domObject.isFixed()) {
-      WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
-      if (rootDom == null) {
-        return;
-      }
-      rootDom.add2FixedDomList(domObject.ref);
+    findFixed(domObject);
 
-    }
     parent.add(domObject, index);
 
     transformStyle(domObject, true);
@@ -691,8 +687,7 @@ class WXDomStatement {
         try {
           mWXRenderManager.addComponent(mInstanceId, component, parentRef, index);
         }catch (Exception e){
-          e.printStackTrace();
-          WXLogUtils.e("add component failed."+e.getMessage());
+          WXLogUtils.e("add component failed.", e);
         }
       }
 
@@ -708,6 +703,28 @@ class WXDomStatement {
       instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
+
+  /**
+   * Find fixed node and tell root dom
+   * @param obj
+   */
+  void findFixed(WXDomObject obj){
+    WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
+    if (rootDom == null) {
+      return;
+    }
+    if (obj.isFixed()) {
+      rootDom.add2FixedDomList(obj.ref);
+    }
+
+    int childrenCount = obj.childCount();
+    if(childrenCount > 0){
+      for (int i = 0;i < childrenCount;i++){
+        findFixed(obj.getChild(i));
+      }
+    }
+  }
+
 
   /**
    * Create a command object for moving the specific {@link WXDomObject} to a new parent.
@@ -786,6 +803,7 @@ class WXDomStatement {
     }
     clearRegistryForDom(domObject);
     parent.remove(domObject);
+    mRegistry.remove(ref);
 
     mNormalTasks.add(new IWXRenderTask() {
 
@@ -1233,7 +1251,7 @@ class WXDomStatement {
       }
       return animationBean;
     } catch (RuntimeException e) {
-      WXLogUtils.e(WXLogUtils.getStackTrace(e));
+      WXLogUtils.e("", e);
       return null;
     }
   }
@@ -1253,7 +1271,7 @@ class WXDomStatement {
           return animationBean;
         }
       }catch (RuntimeException e){
-        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+        WXLogUtils.e("", e);
         return null;
       }
     }

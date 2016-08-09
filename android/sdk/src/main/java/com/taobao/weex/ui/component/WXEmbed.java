@@ -216,7 +216,7 @@ import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
@@ -245,7 +245,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SRC:
+      case Constants.Name.SRC:
         String src = WXUtils.getString(param,null);
         if (src != null)
           setSrc(src);
@@ -254,14 +254,14 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SRC)
+  @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
     this.src = src;
     if (instance != null) {
       instance.destroy();
       instance = null;
     }
-    if (TextUtils.equals(getVisibility(), WXDomPropConstant.WX_VISIBILITY_VISIBLE)) {
+    if (TextUtils.equals(getVisibility(), Constants.Value.VISIBLE)) {
       instance = createInstance();
     }
   }
@@ -322,7 +322,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   public void setVisibility(String visibility) {
     super.setVisibility(visibility);
-    boolean visible = TextUtils.equals(getVisibility(), WXDomPropConstant.WX_VISIBILITY_VISIBLE);
+    boolean visible = TextUtils.equals(getVisibility(), Constants.Value.VISIBLE);
     if (!TextUtils.isEmpty(src) && visible) {
       if (instance == null) {
         instance = createInstance();

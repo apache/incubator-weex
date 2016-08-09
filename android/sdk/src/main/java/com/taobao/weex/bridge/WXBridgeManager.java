@@ -218,12 +218,14 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -287,7 +289,7 @@ public class WXBridgeManager implements Callback {
 
   private static long LOW_MEM_VALUE = 80;
 
-  private static WXBridgeManager mBridgeManager;
+  static WXBridgeManager mBridgeManager;
 
   private WXDomModule sDomModule;
 
@@ -357,7 +359,7 @@ public class WXBridgeManager implements Callback {
           }
         }
       } catch (HackAssertionException e) {
-        WXLogUtils.e("launchInspector HackAssertionException " + e);
+        WXLogUtils.e("launchInspector HackAssertionException ", e);
       }
     }
   }
@@ -435,7 +437,7 @@ public class WXBridgeManager implements Callback {
         || !mJSThread.isWXThreadAlive() || mJSThread.getLooper() == null) {
       return;
     }
-    mJSHandler.removeMessages(what,obj);
+    mJSHandler.removeMessages(what, obj);
   }
 
   /**
@@ -449,6 +451,9 @@ public class WXBridgeManager implements Callback {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callNative: call Native tasks is null");
       }
+      WXErrorCode errorCode=WXErrorCode.WX_ERR_INVOKE_NATIVE;
+      errorCode.appendErrMsg("[WXBridgeManager] callNative: call Native tasks is null");
+      commitJSBridgeAlarmMonitor(instanceId, errorCode);
       return INSTANCE_RENDERING_ERROR;
     }
 
@@ -460,6 +465,7 @@ public class WXBridgeManager implements Callback {
     }
 
     if(mDestroyedInstanceId!=null &&mDestroyedInstanceId.contains(instanceId)){
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
       return DESTROY_INSTANCE;
     }
 
@@ -488,11 +494,15 @@ public class WXBridgeManager implements Callback {
           }
         }
       } catch (Exception e) {
-        WXLogUtils.e("[WXBridgeManager] callNative exception: " + WXLogUtils.getStackTrace(e));
+        WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+        WXErrorCode errorCode=WXErrorCode.WX_ERR_INVOKE_NATIVE;
+        errorCode.appendErrMsg("[WXBridgeManager] callNative exception");
+        commitJSBridgeAlarmMonitor(instanceId, errorCode);
       }
     }
 
     if (UNDEFINED.equals(callback)) {
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
       return INSTANCE_RENDERING_ERROR;
     }
     // get next tick
@@ -555,7 +565,7 @@ public class WXBridgeManager implements Callback {
 
   public void fireEvent(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data){
-    this.fireEvent(instanceId,ref,type,data,null);
+    this.fireEvent(instanceId, ref, type, data, null);
   }
 
   /**
@@ -676,6 +686,27 @@ public class WXBridgeManager implements Callback {
     }
     instance.commitUTStab(WXConst.JS_BRIDGE, errCode);
   }
+
+  public void commitAlert(final String type, final WXErrorCode errorCode) {
+    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+    if (userTrackAdapter == null || TextUtils.isEmpty(type) || errorCode == null) {
+      return;
+    }
+
+    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        WXPerformance performance = null;
+        if (errorCode != WXErrorCode.WX_SUCCESS) {
+          performance = new WXPerformance();
+          performance.errCode = errorCode.getErrorCode();
+          performance.errMsg = errorCode.getErrorMsg();
+        }
+        userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
+      }
+    }, 0);
+  }
+
 
   /**
    * Create instance.
@@ -889,14 +920,18 @@ public class WXBridgeManager implements Callback {
 
   private void initFramework(String framework){
     if (!isJSFrameworkInit()) {
+      WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_FRAMEWORK;
+
       if (TextUtils.isEmpty(framework)) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("weex JS framework from assets");
         }
-        framework = WXFileUtils.loadFileContent("main.js", WXEnvironment.getApplication());
+        framework = WXFileUtils.loadAsset("main.js", WXEnvironment.getApplication());
       }
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
+        errorCode.appendErrMsg("JS Framework is empty!");
+        commitAlert(WXConst.JS_FRAMEWORK, errorCode);
         return;
       }
       try {
@@ -904,15 +939,22 @@ public class WXBridgeManager implements Callback {
         if(mWXBridge.initFramework(framework, assembleDefaultOptions())==INIT_FRAMEWORK_OK){
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
           WXLogUtils.renderPerformanceLog("initFramework", WXEnvironment.sJSLibInitTime);
+          WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
+          WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
           mInit = true;
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
+          commitAlert(WXConst.JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+          errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+          commitAlert(WXConst.JS_FRAMEWORK, errorCode);
         }
       } catch (Throwable e) {
-        WXLogUtils.e("[WXBridgeManager] invokeInitFramework " + e.getCause());
+        WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
+        errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework exception!");
+        commitAlert(WXConst.JS_FRAMEWORK, errorCode);
       }
     }
   }
@@ -949,7 +991,8 @@ public class WXBridgeManager implements Callback {
       invokeExecJS(String.valueOf(instanceId), null, METHOD_CALL_JS, args);
 
     } catch (Throwable e) {
-      WXLogUtils.e("WXBridgeManager" + e.getMessage());
+      WXLogUtils.e("WXBridgeManager", e);
+      commitAlert(WXConst.JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
     }
 
     // If task is not empty, loop until it is empty
@@ -1045,7 +1088,7 @@ public class WXBridgeManager implements Callback {
     try {
       mWXBridge.execJS("", null, METHOD_REGISTER_MODULES, args);
     } catch (Throwable e) {
-      WXLogUtils.e("[WXBridgeManager] invokeRegisterModules:" + (e == null ? "" : e.getStackTrace()));
+      WXLogUtils.e("[WXBridgeManager] invokeRegisterModules:", e);
     }
   }
 
@@ -1063,7 +1106,7 @@ public class WXBridgeManager implements Callback {
     try {
       mWXBridge.execJS("", null, METHOD_REGISTER_COMPONENTS, args);
     } catch (Throwable e) {
-      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents " + (e == null ? "" : e.getCause()));
+      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents ", e);
     }
   }
 
