@@ -204,63 +204,52 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
+import com.taobao.weappplus_sdk.BuildConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/9/16.
  */
-public class ComponentTest {
-  static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXDiv parent = WXDivTest.create();
-    comp.setLayout(domObject);
-    comp.createView(parent,1);
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class TextareaTest  {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
+  Textarea component;
 
-    addEvent(comp);
+  @Before
+  public void setUp() throws Exception {
+    component = EditComponentTest.createTextarea();
+    ComponentTest.create(component);
   }
 
-
-  static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
+  @Test
+  public void testSetProperty() throws Exception {
     Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
+    int len = EditComponentTest.PROPS.length;
 
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
+    for (int i = 0; i < len; i++) {
+      for (Object obj : EditComponentTest.TEST_VALUES[i]) {
+        props.put(EditComponentTest.PROPS[i], obj);
+        component.updateProperties(props);
       }
 
     }
   }
 
-  static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
-  }
-
-  static void destory(WXComponent comp){
-    comp.destroy();
-  }
-
-  static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
+  @After
+  public void tearDown() throws Exception {
+    ComponentTest.destory(component);
   }
 }

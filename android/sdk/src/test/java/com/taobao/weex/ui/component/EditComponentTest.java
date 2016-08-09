@@ -204,12 +204,11 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.widget.EditText;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.view.WXEditText;
 import org.junit.After;
@@ -274,8 +273,12 @@ public class EditComponentTest {
 
   AbstractEditComponent component;
 
-  public static AbstractEditComponent create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (AbstractEditComponent) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+  public static WXInput create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXInput) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+  }
+
+  public static Textarea createTextarea() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (Textarea) new SimpleComponentHolder(Textarea.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
 
@@ -291,13 +294,7 @@ public class EditComponentTest {
   }
 
   @Test
-  public void testAddEvent() throws Exception {
-    component.addEvent(null);
-    component.addEvent("");
-    component.addEvent(WXEventType.CLICK);
-    component.addEvent(WXEventType.INPUT);
-    component.addEvent(WXEventType.INPUT_CHANGE);
-
+  public void testEvent() throws Exception {
     WXEditText view = component.getHostView();
     view.performClick();
     view.setText("");
@@ -309,17 +306,8 @@ public class EditComponentTest {
 
   @Test
   public void testSetProperty() throws Exception {
-    Map<String, Object> props = new HashMap<>();
-    int len = PROPS.length;
 
-    for (int i=0;i<len;i++){
-      for (Object obj:TEST_VALUES[i]){
-        props.put(PROPS[i],obj);
-        component.updateProperties(props);
-      }
-
-    }
-
+    ComponentTest.setProperty(component,PROPS,TEST_VALUES);
   }
 
 

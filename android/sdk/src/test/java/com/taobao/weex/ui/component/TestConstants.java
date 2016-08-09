@@ -204,63 +204,20 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import com.taobao.weex.dom.WXEvent;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/9/16.
  */
-public class ComponentTest {
-  static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXDiv parent = WXDivTest.create();
-    comp.setLayout(domObject);
-    comp.createView(parent,1);
-
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
-
-    addEvent(comp);
-  }
-
-
-  static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
-  }
-
-  static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
-  }
-
-  static void destory(WXComponent comp){
-    comp.destroy();
-  }
-
-  static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
-  }
+public class TestConstants {
+  public static final String Events[] = {"", null,
+      WXEventType.INPUT,
+      WXEventType.INPUT_CHANGE,
+      WXEventType.APPEAR,
+      WXEventType.BLUR,
+      WXEventType.CLICK,
+      WXEventType.CHANGE,
+      WXEventType.FOCUS,
+      WXEventType.DISAPPEAR,
+  };
 }

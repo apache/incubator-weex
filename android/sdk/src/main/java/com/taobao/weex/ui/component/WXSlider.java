@@ -243,7 +243,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   /**
    * Scrollable sliderview
    */
-  private WXCircleViewPager mViewPager;
+  /** package **/ WXCircleViewPager mViewPager;
   /**
    * Circle indicator
    */
@@ -408,6 +408,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     return super.setProperty(key, param);
   }
 
+  @Deprecated
   @WXComponentProp(name = Constants.Name.VALUE)
   public void setValue(String value) {
     if (value == null || mHost == null) {
@@ -463,6 +464,9 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   @WXComponentProp(name = Constants.Name.INDEX)
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
+      if(index >= mAdapter.getRealCount() || index < 0){
+        return;
+      }
       index = index % mAdapter.getRealCount();
       mViewPager.setCurrentItem(index);
     }

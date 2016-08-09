@@ -204,63 +204,116 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static org.junit.Assert.*;
+import static com.taobao.weex.common.Constants.Name;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/9/16.
  */
-public class ComponentTest {
-  static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXDiv parent = WXDivTest.create();
-    comp.setLayout(domObject);
-    comp.createView(parent,1);
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXSliderTest {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
+  WXSlider component;
 
-    addEvent(comp);
+  static final String[] PROPS = {
+      Name.AUTO_PLAY,
+      Name.VALUE,
+      "unknown",
+      Name.INTERVAL,
+      Name.INDEX,
+      Name.SHOW_INDICATORS
+  };
+
+  static final Object[][] VALUES = {
+      {"","true","false",true,false,null},
+      {"","1","0",1,-1,null},
+      {null,"","test"},
+      {"","100","0",100,-1,null},
+      {"","1","0",1,2,3,-1,null},
+      {"","true","false",true,false,null}
+  };
+
+  public static WXSlider create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXSlider) new SimpleComponentHolder(WXSlider.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
-
-  static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
+  public static WXIndicator createIndicator() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXIndicator) new SimpleComponentHolder(WXIndicator.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
-  static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
+  @Before
+  public void setup() throws Exception {
+    component = create();
+    ComponentTest.create(component);
   }
 
-  static void destory(WXComponent comp){
-    comp.destroy();
+  @Test
+  public void testSetProperties() throws Exception {
+    ComponentTest.setProperty(component,PROPS,VALUES);
   }
 
-  static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
+  @Test
+  public void testPages() throws Exception {
+    component = create();
+    component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
+    component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
+    component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
+    component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
+    component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
+
+    WXIndicator indicator = new WXIndicator(component.mInstance,new TestDomObject(),component,false);
+    ComponentTest.create(indicator);
+    component.addChild(indicator);
+    ComponentTest.create(component);
+
+    assertEquals(5,component.mViewPager.getCirclePageAdapter().getRealCount());
+    assertEquals(6,component.getChildCount());
+
+    component.mViewPager.setCurrentItem(0);
   }
+
+  static final String[] IPROPS = {
+      Name.ITEM_SIZE,
+      Name.ITEM_SELECTED_COLOR,
+      Name.ITEM_COLOR,
+      "unknown"
+  };
+
+  static final Object[][] IVALUES = {
+      {"0",0,1,"test"},
+      {"#ffffff",123,-1},
+      {"#ffffff",123,-1},
+      {"#ffffff",123,-1},
+  };
+
+  @Test
+  public void testIndicator() throws Exception {
+    WXIndicator indicator = createIndicator();
+    indicator.mParent = component;
+    ComponentTest.create(indicator);
+    component.addChild(indicator);
+    ComponentTest.setProperty(indicator,IPROPS,IVALUES);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    ComponentTest.destory(component);
+  }
+
 }
