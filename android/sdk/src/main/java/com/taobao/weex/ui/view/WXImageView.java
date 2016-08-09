@@ -132,6 +132,7 @@ import android.widget.ImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import com.taobao.weex.utils.WXViewUtils;
 
 public class WXImageView extends ImageView implements WXGestureObservable {
 
@@ -141,72 +142,66 @@ public class WXImageView extends ImageView implements WXGestureObservable {
     @NonNull
     Paint mPaint;
     private
-    @Nullable
+    @NonNull
     final Drawable mOriginal;
 
-    private ImageClipDrawable(@Nullable Drawable original) {
+    private ImageClipDrawable(@NonNull Drawable original) {
       mOriginal = original;
       mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
     public void draw(Canvas canvas) {
-      if (mOriginal != null) {
-        if (getBackground() instanceof BorderDrawable) {
-          Path path = ((BorderDrawable) getBackground()).getContentPath(getPaddingTop(),
-                                                                        getPaddingRight(),
-                                                                        getPaddingBottom(),
-                                                                        getPaddingLeft());
-          if (mOriginal instanceof BitmapDrawable) {
-            path.offset(-getPaddingLeft(), -getPaddingTop());
-            Bitmap bitmap = ((BitmapDrawable) mOriginal).getBitmap();
-            RectF bounds = new RectF(ImageClipDrawable.this.getBounds());
-            Matrix matrix = new Matrix();
-            matrix.setScale(bounds.width() / bitmap.getWidth(),
-                            bounds.height() / bitmap.getHeight());
-            BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            bitmapShader.setLocalMatrix(matrix);
-            mPaint.setStyle(Paint.Style.FILL);
-            mPaint.setShader(bitmapShader);
-            canvas.save();
-            canvas.drawPath(path, mPaint);
-            canvas.restore();
-          } else {
-            //TODO layerType
-            canvas.clipPath(path);
-            mOriginal.draw(canvas);
-          }
-        } else {
-          mOriginal.draw(canvas);
+      if(mOriginal instanceof BitmapDrawable){
+        Path path;
+        RectF bounds = new RectF(ImageClipDrawable.this.getBounds());
+        BorderDrawable borderDrawable;
+        if ((borderDrawable= WXViewUtils.getBorderDrawable(WXImageView.this)) != null) {
+          path = borderDrawable.getContentPath(getPaddingTop(),
+                                               getPaddingRight(),
+                                               getPaddingBottom(),
+                                               getPaddingLeft());
+          path.offset(-getPaddingLeft(), -getPaddingTop());
         }
+        else{
+          path=new Path();
+          path.addRect(bounds, Path.Direction.CW);
+        }
+
+        Bitmap bitmap = ((BitmapDrawable) mOriginal).getBitmap();
+        Matrix matrix = new Matrix();
+        matrix.setScale(bounds.width() / bitmap.getWidth(),
+                        bounds.height() / bitmap.getHeight());
+        BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        bitmapShader.setLocalMatrix(matrix);
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setShader(bitmapShader);
+        canvas.drawPath(path, mPaint);
+      }
+      else{
+        //TODO Not strictly clip according to background-clip:border-box
+        mOriginal.draw(canvas);
       }
     }
 
     @Override
     public void setAlpha(int i) {
-      if (mOriginal != null) {
-        mOriginal.setAlpha(i);
-      }
+      mOriginal.setAlpha(i);
     }
 
     @Override
     public void setColorFilter(ColorFilter colorFilter) {
-      if (mOriginal != null) {
-        mOriginal.setColorFilter(colorFilter);
-      }
+      mOriginal.setColorFilter(colorFilter);
     }
 
     @Override
     public int getOpacity() {
-      if (mOriginal != null) {
-        return mOriginal.getOpacity();
-      } else {
-        return 0;
-      }
+      return mOriginal.getOpacity();
     }
 
     @Override
     protected void onBoundsChange(Rect bounds) {
+      mOriginal.setBounds(bounds);
       ImageClipDrawable.this.invalidateSelf();
     }
   }
@@ -225,7 +220,11 @@ public class WXImageView extends ImageView implements WXGestureObservable {
 
   @Override
   public void setImageDrawable(Drawable drawable) {
-    super.setImageDrawable(new ImageClipDrawable(drawable));
+    if (drawable != null) {
+      super.setImageDrawable(new ImageClipDrawable(drawable));
+    } else {
+      super.setImageDrawable(null);
+    }
     if (getScaleType() == ScaleType.MATRIX && getDrawable() != null) {
       Matrix matrix = getImageMatrix();
       int dwidth = getDrawable().getIntrinsicWidth();

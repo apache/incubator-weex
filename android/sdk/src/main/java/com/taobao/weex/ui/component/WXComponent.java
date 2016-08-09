@@ -273,7 +273,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (backgroundDrawable == null) {
         WXViewUtils.setBackGround(mHost,mBackgroundDrawable);
       } else {
-        //TODO replace layerDrawable with Another.
+        //TODO Not strictly clip according to background-clip:border-box
         WXViewUtils.setBackGround(mHost,new LayerDrawable(new Drawable[]{
             mBackgroundDrawable,backgroundDrawable}));
       }
