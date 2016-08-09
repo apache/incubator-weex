@@ -265,7 +265,9 @@ public class WXAnimationModule extends WXModule {
       Animator animator = createAnimator(animationBean, component.getHostView());
       if (animator != null) {
         Animator.AnimatorListener animatorCallback = createAnimatorListener(mWXSDKInstance, callback);
-        component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE,null);
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.JELLY_BEAN_MR2) {
+          component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
         Interpolator interpolator = createTimeInterpolator(animationBean);
         if (animatorCallback != null) {
           animator.addListener(animatorCallback);
