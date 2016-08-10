@@ -182,10 +182,6 @@ static dispatch_queue_t WXImageUpdateQueue;
     dispatch_async(WXImageUpdateQueue, ^{
         [self cancelImage];
         
-        if (CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-            return;
-        }
-        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error){
             WXLogError(@"Error downloading image:%@, detail:%@", url, [error localizedDescription]);
         };
