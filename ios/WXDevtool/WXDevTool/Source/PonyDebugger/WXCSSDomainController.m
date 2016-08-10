@@ -153,7 +153,7 @@
                 if ([[vdomStyles objectForKey:key] isKindOfClass:[NSString class]]) {
                     cssProperty.value = [vdomStyles objectForKey:key];
                 }else {
-                    cssProperty.value = [NSString stringWithFormat:@"%@",[vdomStyles objectForKey:key];
+                    cssProperty.value = [NSString stringWithFormat:@"%@",[vdomStyles objectForKey:key]];
                 }
                 [vdomCssText appendString:[NSString stringWithFormat:@"%@:%@;",cssProperty.name,cssProperty.value]];
                 [vdomCssProperties addObject:[cssProperty PD_JSONObject]];
