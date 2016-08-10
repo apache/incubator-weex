@@ -204,7 +204,6 @@
  */
 package com.taobao.weex.utils;
 
-
 import com.taobao.weappplus_sdk.BuildConfig;
 
 import org.junit.Before;
