@@ -556,16 +556,7 @@ public class BorderDrawable extends Drawable {
     float borderWidth = getBorderWidth(side);
     int color = WXViewUtils.multiplyColorAlpha(getBorderColor(side), mAlpha);
     BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(side)];
-    Shader shader;
-
-    if (side == Spacing.TOP || side == Spacing.BOTTOM) {
-      shader = borderStyle.getLineShader(borderWidth, color, false);
-    } else if (side == Spacing.LEFT || side == Spacing.RIGHT) {
-      shader = borderStyle.getLineShader(borderWidth, color, true);
-    } else {
-      shader = null;
-    }
-
+    Shader shader=borderStyle.getLineShader(borderWidth,color,side);
     mPaint.setShader(shader);
     mPaint.setColor(color);
     mPaint.setStrokeWidth(borderWidth);

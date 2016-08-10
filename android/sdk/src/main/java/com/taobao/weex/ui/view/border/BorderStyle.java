@@ -212,27 +212,29 @@ import android.graphics.Shader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.taobao.weex.dom.flex.Spacing;
+
 enum BorderStyle {
   SOLID,
   DASHED,
   DOTTED;
 
   @Nullable
-  Shader getLineShader(float borderWidth, int borderColor, boolean vertical) {
+  Shader getLineShader(float borderWidth, int borderColor, int edge) {
     switch (this) {
       case DOTTED:
-        if (vertical) {
+        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
           return new LinearGradient(0, 0, 0, borderWidth * 2, new int[]{borderColor, Color
               .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
-        } else {
+        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
           return new LinearGradient(0, 0, borderWidth * 2, 0, new int[]{borderColor, Color
               .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
         }
       case DASHED:
-        if (vertical) {
+        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
           return new LinearGradient(0, 0, 0, borderWidth * 6, new int[]{borderColor, Color
               .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
-        } else {
+        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
           return new LinearGradient(0, 0, borderWidth * 6, 0, new int[]{borderColor, Color
               .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
         }
