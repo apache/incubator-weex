@@ -204,8 +204,12 @@
  */
 package com.taobao.weex.ui.view.border;
 
+import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.LinearGradient;
 import android.graphics.PathEffect;
+import android.graphics.Shader;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 enum BorderStyle {
@@ -214,16 +218,24 @@ enum BorderStyle {
   DOTTED;
 
   @Nullable
-  PathEffect getPathEffect(float borderWidth) {
+  Shader getLineShader(float borderWidth, int borderColor, boolean vertical) {
     switch (this) {
-      case SOLID:
-        return null;
-      case DASHED:
-        return new DashPathEffect(
-            new float[]{borderWidth * 3, borderWidth * 3, borderWidth * 3, borderWidth * 3}, 0);
       case DOTTED:
-        return new DashPathEffect(
-            new float[]{borderWidth, borderWidth, borderWidth, borderWidth}, 0);
+        if (vertical) {
+          return new LinearGradient(0, 0, 0, borderWidth * 2, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else {
+          return new LinearGradient(0, 0, borderWidth * 2, 0, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        }
+      case DASHED:
+        if (vertical) {
+          return new LinearGradient(0, 0, 0, borderWidth * 6, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else {
+          return new LinearGradient(0, 0, borderWidth * 6, 0, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        }
       default:
         return null;
     }

@@ -238,7 +238,7 @@ class BorderEdge {
     PointF lineStart = mPreCorner.getCornerEnd();
     Path path;
     if (mPreCorner.hasOuterCorner()) {
-      path=new Path();
+      path = new Path();
       if (mPreCorner.hasInnerCorner()) {
         path.addArc(mPreCorner.getOvalIfInnerCornerExist(),
                     mPreCorner.getAngleBisectorDegree(),
@@ -249,7 +249,7 @@ class BorderEdge {
                     mPreCorner.getAngleBisectorDegree(),
                     BorderCorner.SWEEP_ANGLE);
       }
-      canvas.drawPath(path,paint);
+      canvas.drawPath(path, paint);
     } else {
       PointF actualStart = mPreCorner.getSharpCornerStart();
       canvas.drawLine(actualStart.x, actualStart.y, lineStart.x, lineStart.y, paint);
@@ -257,13 +257,10 @@ class BorderEdge {
 
     paint.setStrokeWidth(mBorderWidth);
     PointF lineEnd = mPostCorner.getCornerStart();
-    path=new Path();
-    path.moveTo(lineStart.x,lineStart.y);
-    path.lineTo(lineEnd.x,lineEnd.y);
-    canvas.drawPath(path,paint);
+    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
 
     if (mPostCorner.hasOuterCorner()) {
-      path=new Path();
+      path = new Path();
       if (mPostCorner.hasInnerCorner()) {
         path.addArc(mPostCorner.getOvalIfInnerCornerExist(),
                     mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
@@ -274,7 +271,7 @@ class BorderEdge {
                     mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
                     BorderCorner.SWEEP_ANGLE);
       }
-      canvas.drawPath(path,paint);
+      canvas.drawPath(path, paint);
     } else {
       PointF actualEnd = mPostCorner.getSharpCornerEnd();
       canvas.drawLine(lineEnd.x, lineEnd.y, actualEnd.x, actualEnd.y, paint);

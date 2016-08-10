@@ -213,6 +213,7 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -282,12 +283,14 @@ public class BorderDrawable extends Drawable {
       if ((useColor >>> 24) != 0) {
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(useColor);
+        mPaint.setShader(null);
         canvas.drawPath(mPathForBorderOutline, mPaint);
       }
     }
     mPaint.setStyle(Paint.Style.STROKE);
     mPaint.setStrokeJoin(Paint.Join.ROUND);
     drawBorders(canvas);
+    mPaint.setShader(null);
     canvas.restore();
   }
 
@@ -551,12 +554,21 @@ public class BorderDrawable extends Drawable {
 
   private void preparePaint(int side) {
     float borderWidth = getBorderWidth(side);
-    int color = getBorderColor(side);
+    int color = WXViewUtils.multiplyColorAlpha(getBorderColor(side), mAlpha);
     BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(side)];
-    PathEffect pathEffect = borderStyle.getPathEffect(borderWidth);
-    mPaint.setColor(WXViewUtils.multiplyColorAlpha(color, mAlpha));
+    Shader shader;
+
+    if (side == Spacing.TOP || side == Spacing.BOTTOM) {
+      shader = borderStyle.getLineShader(borderWidth, color, false);
+    } else if (side == Spacing.LEFT || side == Spacing.RIGHT) {
+      shader = borderStyle.getLineShader(borderWidth, color, true);
+    } else {
+      shader = null;
+    }
+
+    mPaint.setShader(shader);
+    mPaint.setColor(color);
     mPaint.setStrokeWidth(borderWidth);
-    mPaint.setPathEffect(pathEffect);
   }
 
   private int getBorderColor(int position) {
