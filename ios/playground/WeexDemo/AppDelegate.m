@@ -19,7 +19,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <ATSDK/ATManager.h>
 
-
 @interface AppDelegate ()
 @end
 
@@ -40,6 +39,8 @@
     
     // Override point for customization after application launch.
     [self startSplashScreen];
+    
+    [self checkUpdate];
     
     return YES;
 }
@@ -82,24 +83,23 @@
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
-    [self atAddPlugin];
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];
 #endif
     
 #ifdef DEBUG
+    [self atAddPlugin];
     [WXDebugTool setDebug:YES];
     [WXLog setLogLevel:WXLogLevelLog];
+    
+    #ifndef UITEST
+        [[ATManager shareInstance] show];
+    #endif
 #else
     [WXDebugTool setDebug:NO];
     [WXLog setLogLevel:WXLogLevelError];
 #endif
-    
-#ifndef UITEST
-    [[ATManager shareInstance] show];
-#endif
-    
 }
 
 - (UIViewController *)demoController
@@ -191,7 +191,7 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *infoDic = [[NSBundle mainBundle] infoDictionary];
-        NSString *currentVersion = [infoDic objectForKey:@"CFBundleVersion"];
+        NSString *currentVersion = [infoDic objectForKey:@"CFBundleShortVersionString"];
         NSString *URL = @"http://itunes.apple.com/lookup?id=1130862662";
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
         [request setURL:[NSURL URLWithString:URL]];
@@ -213,11 +213,9 @@
                     [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:weakSelf.latestVer];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"New Version" message:@"Will update to a new version" delegate:self cancelButtonTitle:@"cancel" otherButtonTitles:@"update", nil];
-                        alert.tag = 1000;
                         [alert show];
                     });
                 }
-                
             }
         }
     });
