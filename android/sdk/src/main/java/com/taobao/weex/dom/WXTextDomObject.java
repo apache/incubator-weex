@@ -218,13 +218,21 @@ public class WXTextDomObject extends WXDomObject {
    * @return the width of the dom that excludes left-padding and right-padding.
    */
   private float getTextContentWidth() {
-    float rawWidth = getLayoutWidth(), left, right;
+    float rawWidth = getLayoutWidth();
+    float leftPadding, rightPadding, leftBorder, rightBorder;
     Spacing padding = getPadding();
-    if (!CSSConstants.isUndefined((left = padding.get(Spacing.LEFT)))) {
-      rawWidth -= left;
+    Spacing border = getBorder();
+    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
+      rawWidth -= leftBorder;
     }
-    if (!CSSConstants.isUndefined((right = padding.get(Spacing.RIGHT)))) {
-      rawWidth -= right;
+    if (!CSSConstants.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
+      rawWidth -= leftPadding;
+    }
+    if (!CSSConstants.isUndefined(rightBorder = padding.get(Spacing.RIGHT))) {
+      rawWidth -= rightBorder;
+    }
+    if (!CSSConstants.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
+      rawWidth -= rightPadding;
     }
     return rawWidth;
   }
