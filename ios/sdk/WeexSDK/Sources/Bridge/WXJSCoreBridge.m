@@ -10,6 +10,7 @@
 #import "WXDefine.h"
 #import "WXAssert.h"
 #import "WXLog.h"
+#import "WXDefine.h"
 #import "WXUtility.h"
 #import "WXSDKEngine.h"
 #import "WXSDKError.h"
@@ -18,6 +19,7 @@
 #import "WXHandlerFactory.h"
 #import <sys/utsname.h>
 #import <JavaScriptCore/JavaScriptCore.h>
+#import "WXPolyfillSet.h"
 
 @interface WXJSCoreBridge ()
 
@@ -53,13 +55,11 @@
                 levelMap = @{
                              @"__ERROR": @(WXLogFlagError),
                              @"__WARN": @(WXLogFlagWarning),
-                             @"__LOG": @(WXLogFlagInfo),
                              @"__INFO": @(WXLogFlagInfo),
                              @"__DEBUG": @(WXLogFlagDebug),
                              @"__LOG": @(WXLogFlagLog)
                              };
             });
-            
             NSMutableString *string = [NSMutableString string];
             [string appendString:@"jsLog: "];
             NSArray *args = [JSContext currentArguments];
@@ -90,6 +90,11 @@
             
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
         };
+        
+        if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
+            // solve iOS7 memory problem
+            _jsContext[@"__weex_set_polyfill__"] = [WXPolyfillSet class];
+        }
     }
     return self;
 }
