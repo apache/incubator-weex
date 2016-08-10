@@ -543,8 +543,8 @@ public class BorderDrawable extends Drawable {
   }
 
   private void drawOneSide(Canvas canvas, @NonNull BorderEdge borderEdge) {
-    preparePaint(borderEdge.getEdge());
     if (!FloatUtil.floatsEqual(0, getBorderWidth(borderEdge.getEdge()))) {
+      preparePaint(borderEdge.getEdge());
       borderEdge.drawEdge(canvas, mPaint);
     }
   }

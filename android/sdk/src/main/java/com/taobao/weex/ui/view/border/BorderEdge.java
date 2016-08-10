@@ -257,7 +257,10 @@ class BorderEdge {
 
     paint.setStrokeWidth(mBorderWidth);
     PointF lineEnd = mPostCorner.getCornerStart();
-    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
+    path=new Path();
+    path.moveTo(lineStart.x,lineStart.y);
+    path.lineTo(lineEnd.x,lineEnd.y);
+    canvas.drawPath(path,paint);
 
     if (mPostCorner.hasOuterCorner()) {
       path=new Path();
