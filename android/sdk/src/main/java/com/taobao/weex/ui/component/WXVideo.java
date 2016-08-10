@@ -202,6 +202,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
@@ -229,20 +230,22 @@ import java.util.Map;
 
 public class WXVideo extends WXComponent<FrameLayout> {
 
-  public static final String PLAY_STATUS = "playStatus";
-  public static final String PLAY = "play";
-  public static final String PAUSE = "pause";
-  public static final String STOP = "stop";
-  private WXVideoView mVideoView;
+  /**
+   * package
+   **/
+  WXVideoView mVideoView;
   private boolean mAutoPlay;
   private String mSrc;
-  private boolean mPrepared;
+  /**
+   * package
+   **/
+  boolean mPrepared;
   private boolean mError;
   private ProgressBar mProgressBar;
 
   @Deprecated
   public WXVideo(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+    this(instance, dom, parent, isLazy);
   }
 
   public WXVideo(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
@@ -256,16 +259,16 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
     mVideoView = new WXVideoView(mContext);
     FrameLayout.LayoutParams videoLayoutParams =
-      new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.MATCH_PARENT);
+        new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT);
     videoLayoutParams.gravity = Gravity.CENTER;
     mVideoView.setLayoutParams(videoLayoutParams);
     videoRoot.addView(mVideoView);
 
     mProgressBar = new ProgressBar(mContext);
     FrameLayout.LayoutParams pLayoutParams =
-      new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-        FrameLayout.LayoutParams.WRAP_CONTENT);
+        new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT);
     mProgressBar.setLayoutParams(pLayoutParams);
     pLayoutParams.gravity = Gravity.CENTER;
     videoRoot.addView(mProgressBar);
@@ -286,7 +289,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         mError = true;
 
         if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_FAIL)) {
-          WXVideo.this.notify(WXEventType.VIDEO_FAIL,STOP);
+          WXVideo.this.notify(WXEventType.VIDEO_FAIL, Constants.Value.STOP);
         }
         return true;
       }
@@ -305,9 +308,9 @@ public class WXVideo extends WXComponent<FrameLayout> {
           mVideoView.start();
         }
         mVideoView.seekTo(5);
-        if(!mStopped) {
+        if (!mStopped) {
           controller.show(3);
-        }else {
+        } else {
           controller.hide();
         }
         mStopped = false;
@@ -322,7 +325,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onCompletion");
         }
         if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_FINISH)) {
-          WXVideo.this.notify(WXEventType.VIDEO_FINISH,STOP);
+          WXVideo.this.notify(WXEventType.VIDEO_FINISH, Constants.Value.STOP);
         }
       }
     });
@@ -335,7 +338,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onPause");
         }
         if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_PAUSE)) {
-          WXVideo.this.notify(WXEventType.VIDEO_PAUSE,PAUSE);
+          WXVideo.this.notify(WXEventType.VIDEO_PAUSE, Constants.Value.PAUSE);
         }
       }
 
@@ -346,7 +349,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         }
 
         if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_START)) {
-          WXVideo.this.notify(WXEventType.VIDEO_START,PLAY);
+          WXVideo.this.notify(WXEventType.VIDEO_START, Constants.Value.PLAY);
         }
       }
     });
@@ -354,20 +357,20 @@ public class WXVideo extends WXComponent<FrameLayout> {
     mVideoView.setMediaController(controller);
     controller.setMediaPlayer(mVideoView);
 
-   return videoRoot;
+    return videoRoot;
   }
 
-  private void notify(String event, String newStatus){
+  private void notify(String event, String newStatus) {
     Map<String, Object> params = new HashMap<>(2);
-    params.put(PLAY_STATUS, newStatus);
+    params.put(Constants.Name.PLAY_STATUS, newStatus);
     params.put("timeStamp", System.currentTimeMillis());
 
     Map<String, Object> domChanges = new HashMap<>();
     Map<String, Object> attrsChanges = new HashMap<>();
-    attrsChanges.put(PLAY_STATUS,newStatus);
-    domChanges.put("attrs",attrsChanges);
+    attrsChanges.put(Constants.Name.PLAY_STATUS, newStatus);
+    domChanges.put("attrs", attrsChanges);
 
-    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), event, params,domChanges);
+    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), event, params, domChanges);
   }
 
   @Override
@@ -379,22 +382,25 @@ public class WXVideo extends WXComponent<FrameLayout> {
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.SRC:
-        String src = WXUtils.getString(param,null);
-        if (src != null)
+        String src = WXUtils.getString(param, null);
+        if (src != null) {
           setSrc(src);
+        }
         return true;
       case Constants.Name.AUTO_PLAY:
-        Boolean result = WXUtils.getBoolean(param,null);
-        if (result !=  null)
+        Boolean result = WXUtils.getBoolean(param, null);
+        if (result != null) {
           setAutoPlay(result);
+        }
         return true;
-      case PLAY_STATUS:
-        String status = WXUtils.getString(param,null);
-        if (status != null)
+      case Constants.Name.PLAY_STATUS:
+        String status = WXUtils.getString(param, null);
+        if (status != null) {
           setPlaystatus(status);
+        }
         return true;
     }
-    return super.setProperty(key,param);
+    return super.setProperty(key, param);
   }
 
   @WXComponentProp(name = Constants.Name.SRC)
@@ -417,19 +423,19 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
   private boolean mStopped;
 
-  @WXComponentProp(name = PLAY_STATUS)
+  @WXComponentProp(name = Constants.Name.PLAY_STATUS)
   public void setPlaystatus(String playstatus) {
 
     if (mPrepared && !mError && !mStopped) {
-      if (playstatus.equals(PLAY)) {
+      if (playstatus.equals(Constants.Value.PLAY)) {
         mVideoView.start();
-      } else if (playstatus.equals(PAUSE)) {
+      } else if (playstatus.equals(Constants.Value.PAUSE)) {
         mVideoView.pause();
-      } else if (playstatus.equals(STOP)) {
+      } else if (playstatus.equals(Constants.Value.STOP)) {
         mVideoView.stopPlayback();
         mStopped = true;
       }
-    } else if ((mError || mStopped) && playstatus.equals(PLAY)) {
+    } else if ((mError || mStopped) && playstatus.equals(Constants.Value.PLAY)) {
       mError = false;
       mVideoView.resume();
       mProgressBar.setVisibility(View.VISIBLE);

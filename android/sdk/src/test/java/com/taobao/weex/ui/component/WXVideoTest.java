@@ -202,134 +202,69 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.ui.component;
 
-public class Constants {
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
-  public interface Name {
+import java.lang.reflect.InvocationTargetException;
 
-    String WIDTH = "width";
-    String MIN_WIDTH = "minWidth";
-    String MAX_WIDTH = "maxWidth";
-    String HEIGHT = "height";
-    String MIN_HEIGHT = "minHeight";
-    String MAX_HEIGHT = "maxHeight";
-    String ALIGN_ITEMS = "alignItems";
-    String ALIGN_SELF = "alignSelf";
-    String FLEX = "flex";
-    String FLEX_DIRECTION = "flexDirection";
-    String JUSTIFY_CONTENT = "justifyContent";
-    String FLEX_WRAP = "flexWrap";
-    String BACKGROUND_COLOR = "backgroundColor";
-    String OPACITY = "opacity";
-    String BORDER_RADIUS = "borderRadius";
-    String BORDER_WIDTH = "borderWidth";
-    String BORDER_COLOR = "borderColor";
-    String BORDER_STYLE = "borderStyle";
-    String BORDER_TOP_WIDTH = "borderTopWidth";
-    String BORDER_RIGHT_WIDTH = "borderRightWidth";
-    String BORDER_BOTTOM_WIDTH = "borderBottomWidth";
-    String BORDER_LEFT_WIDTH = "borderLeftWidth";
-    String BORDER_TOP_COLOR = "borderTopColor";
-    String BORDER_RIGHT_COLOR = "borderRightColor";
-    String BORDER_BOTTOM_COLOR = "borderBottomColor";
-    String BORDER_LEFT_COLOR = "borderLeftColor";
-    String BORDER_TOP_LEFT_RADIUS = "borderTopLeftRadius";
-    String BORDER_TOP_RIGHT_RADIUS = "borderTopRightRadius";
-    String BORDER_BOTTOM_RIGHT_RADIUS = "borderBottomRightRadius";
-    String BORDER_BOTTOM_LEFT_RADIUS = "borderBottomLeftRadius";
-    String MARGIN = "margin";
-    String MARGIN_TOP = "marginTop";
-    String MARGIN_LEFT = "marginLeft";
-    String MARGIN_RIGHT = "marginRight";
-    String MARGIN_BOTTOM = "marginBottom";
-    String PADDING = "padding";
-    String PADDING_TOP = "paddingTop";
-    String PADDING_LEFT = "paddingLeft";
-    String PADDING_RIGHT = "paddingRight";
-    String PADDING_BOTTOM = "paddingBottom";
-    String POSITION = "position";
-    String LEFT = "left";
-    String TOP = "top";
-    String RIGHT = "right";
-    String BOTTOM = "bottom";
-    String TEXT_DECORATION = "textDecoration";
-    String TEXT_ALIGN = "textAlign";
-    String FONT_WEIGHT = "fontWeight";
-    String FONT_STYLE = "fontStyle";
-    String FONT_SIZE = "fontSize";
-    String COLOR = "color";
-    String LINES = "lines";
-    String FONT_FAMILY = "fontFamily";
-    String TEXT_OVERFLOW = "textOverflow";
-    String ELLIPSIS = "ellipsis";
-    String LINE_HEIGHT ="lineHeight";
-    String DISABLED = "disabled";
-    String VALUE = "value";
-    String IMAGE_QUALITY = "imageQuality";
-    String QUALITY = "quality";
-    String SRC = "src";
-    String PLACE_HOLDER ="placeHolder";
-    String RESIZE_MODE = "resizeMode";
-    String SHOW_INDICATORS = "showIndicators";
-    String AUTO_PLAY = "autoPlay";
-    String SHOW_SCROLLBAR = "showScrollbar";
-    String SCROLL_DIRECTION = "scrollDirection";
-    String SCOPE = "scope";
-    String LOADMORERETRY = "loadmoreretry";
-    String LOADMOREOFFSET = "loadmoreoffset";
-    String RECYCLE_IMAGE = "recycleImage";
-    String OVERFLOW = "overflow";
-    String TYPE = "type";
-    String PLACEHOLDER = "placeholder";
-    String PLACEHOLDER_COLOR = "placeholderColor";
-    String AUTOFOCUS = "autofocus";
-    String SINGLELINE = "singleline";
-    String MAX_LENGTH = "maxLength";
-    String ROWS = "rows";
-    String CHECKED = "checked";
-    String VISIBILITY = "visibility";
-    String ITEM_COLOR = "itemColor";
-    String ITEM_SELECTED_COLOR = "itemSelectedColor";
-    String ITEM_SIZE = "itemSize";
-    String DISPLAY = "display";
-    String SHOW_LOADING = "show-loading";
-    String SUFFIX = "suffix";
-    String RESIZE = "resize";
-    String IMAGE_SHARPEN = "imageSharpen";
-    String SHARPEN = "sharpen";
-    String PREFIX = "prefix";
-    String INDEX = "index";
-    String INTERVAL = "interval";
-    String PLAY_STATUS = "playStatus";
+import static org.junit.Assert.*;
+
+/**
+ * Created by sospartan on 8/10/16.
+ */
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXVideoTest {
+
+  WXVideo component;
+
+  static final String[] PROPS = {
+      Constants.Name.PLAY_STATUS,
+      Constants.Name.AUTO_PLAY,
+      "unknown",
+      Constants.Name.SRC,
+  };
+
+  static final Object[][] VALUES = {
+      {"", Constants.Value.PLAY, Constants.Value.PAUSE,Constants.Value.STOP,null},
+      {"","true","false",true,false,null},
+      {null,"","test"},
+      {"","http://taobao.com","0",100,null},
+  };
+
+  public static WXVideo create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXVideo) new SimpleComponentHolder(WXVideo.class)
+        .createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
-  public interface Value {
-
-    String STICKY = "sticky";
-    String FIXED = "fixed";
-    String LEFT = "left";
-    String RIGHT = "right";
-    String CENTER = "center";
-    String BOLD = "bold";
-    String ITALIC = "italic";
-    String ORIGINAL = "original";
-    String LOW = "low";
-    String NORMAL = "normal";
-    String HIGH = "high";
-    String VISIBLE = "visible";
-    String HIDDEN = "hidden";
-    String TEXT = "text";
-    String PASSWORD = "password";
-    String TEL = "tel";
-    String EMAIL = "email";
-    String URL = "url";
-    String DATE = "date";
-    String TIME = "time";
-    String DATETIME = "datetime";
-    String PLAY = "play";
-    String PAUSE = "pause";
-    String STOP = "stop";
+  @Before
+  public void setUp() throws Exception {
+    component = create();
+    ComponentTest.create(component);
   }
 
+  @After
+  public void tearDown() throws Exception {
+    ComponentTest.destory(component);
+  }
+
+  @Test
+  public void testSetProperty() throws Exception {
+    component.mPrepared = true;
+    ComponentTest.setProperty(component,PROPS,VALUES);
+  }
 }
