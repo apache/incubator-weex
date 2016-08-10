@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.ui.view.border;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -222,97 +224,61 @@ class BorderEdge {
   final BorderCorner mPostCorner;
 
   private final int mEdge;
+  private final float mBorderWidth;
 
-  BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner, int edge) {
+  BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner, int edge, float
+      borderWidth) {
     mPreCorner = preCorner;
     mPostCorner = postCorner;
     mEdge = edge;
+    mBorderWidth = borderWidth;
   }
 
-  @NonNull
-  Path createMainPath() {
-    Path path = new Path();
+  void drawEdge(@NonNull Canvas canvas, @NonNull Paint paint) {
     PointF lineStart = mPreCorner.getCornerEnd();
+    Path path;
     if (mPreCorner.hasOuterCorner()) {
-      path.addArc(mPreCorner.getOvalIfInnerCornerExist(),
-                  mPreCorner.getAngleBisectorDegree(),
-                  BorderCorner.SWEEP_ANGLE);
+      path=new Path();
+      if (mPreCorner.hasInnerCorner()) {
+        path.addArc(mPreCorner.getOvalIfInnerCornerExist(),
+                    mPreCorner.getAngleBisectorDegree(),
+                    BorderCorner.SWEEP_ANGLE);
+      } else {
+        paint.setStrokeWidth(mPreCorner.getOuterCornerRadius());
+        path.addArc(mPreCorner.getOvalIfInnerCornerNotExist(),
+                    mPreCorner.getAngleBisectorDegree(),
+                    BorderCorner.SWEEP_ANGLE);
+      }
+      canvas.drawPath(path,paint);
     } else {
-      PointF actualStart=mPreCorner.getSharpCornerStart();
-      path.moveTo(actualStart.x,actualStart.y);
-      path.lineTo(lineStart.x,lineStart.y);
+      PointF actualStart = mPreCorner.getSharpCornerStart();
+      canvas.drawLine(actualStart.x, actualStart.y, lineStart.x, lineStart.y, paint);
     }
 
+    paint.setStrokeWidth(mBorderWidth);
     PointF lineEnd = mPostCorner.getCornerStart();
-    path.moveTo(lineStart.x, lineStart.y);
-    path.lineTo(lineEnd.x, lineEnd.y);
+    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
 
     if (mPostCorner.hasOuterCorner()) {
-      path.addArc(mPostCorner.getOvalIfInnerCornerExist(),
-                  mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                  BorderCorner.SWEEP_ANGLE);
+      path=new Path();
+      if (mPostCorner.hasInnerCorner()) {
+        path.addArc(mPostCorner.getOvalIfInnerCornerExist(),
+                    mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
+                    BorderCorner.SWEEP_ANGLE);
+      } else {
+        paint.setStrokeWidth(mPostCorner.getOuterCornerRadius());
+        path.addArc(mPostCorner.getOvalIfInnerCornerNotExist(),
+                    mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
+                    BorderCorner.SWEEP_ANGLE);
+      }
+      canvas.drawPath(path,paint);
     } else {
-      PointF actualEnd=mPostCorner.getSharpCornerEnd();
-      path.lineTo(actualEnd.x,actualEnd.y);
+      PointF actualEnd = mPostCorner.getSharpCornerEnd();
+      canvas.drawLine(lineEnd.x, lineEnd.y, actualEnd.x, actualEnd.y, paint);
     }
-    return path;
   }
 
-  @Nullable
-  Path createHeadingOvalPath() {
-    Path path = null;
-    if (mPreCorner.hasOuterCorner() && !mPreCorner.hasInnerCorner()) {
-      path = new Path();
-      path.addArc(mPreCorner.getOvalIfInnerCornerNotExist(),
-                  mPreCorner.getAngleBisectorDegree(),
-                  BorderCorner.SWEEP_ANGLE);
-    }
-    return path;
-  }
-
-  @Nullable
-  Path createTrailingOvalPath() {
-    Path path = null;
-    if (mPostCorner.hasOuterCorner() && !mPostCorner.hasInnerCorner()) {
-      path = new Path();
-      path.addArc(mPostCorner.getOvalIfInnerCornerNotExist(),
-                  mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                  BorderCorner.SWEEP_ANGLE);
-    }
-    return path;
-  }
-
-  int getEdge() {
+  public int getEdge() {
     return mEdge;
-  }
-
-  int getHeadingCornerIndex() {
-    switch (mEdge) {
-      case Spacing.TOP:
-        return BorderDrawable.BORDER_TOP_LEFT_RADIUS;
-      case Spacing.RIGHT:
-        return BorderDrawable.BORDER_TOP_RIGHT_RADIUS;
-      case Spacing.BOTTOM:
-        return BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS;
-      case Spacing.LEFT:
-        return BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS;
-      default:
-        return BorderDrawable.BORDER_RADIUS_UNDEFINED;
-    }
-  }
-
-  int getTrailingCornerIndex() {
-    switch (mEdge) {
-      case Spacing.TOP:
-        return BorderDrawable.BORDER_TOP_RIGHT_RADIUS;
-      case Spacing.RIGHT:
-        return BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS;
-      case Spacing.BOTTOM:
-        return BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS;
-      case Spacing.LEFT:
-        return BorderDrawable.BORDER_TOP_LEFT_RADIUS;
-      default:
-        return BorderDrawable.BORDER_RADIUS_UNDEFINED;
-    }
   }
 }

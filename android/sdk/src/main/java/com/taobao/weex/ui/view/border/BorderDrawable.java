@@ -487,10 +487,14 @@ public class BorderDrawable extends Drawable {
           getBorderWidth(Spacing.BOTTOM),
           getBorderWidth(Spacing.LEFT),
           rectBounds);
-      drawOneSide(canvas, new BorderEdge(topLeft, topRight, Spacing.TOP));
-      drawOneSide(canvas, new BorderEdge(topRight, bottomRight, Spacing.RIGHT));
-      drawOneSide(canvas, new BorderEdge(bottomRight, bottomLeft, Spacing.BOTTOM));
-      drawOneSide(canvas, new BorderEdge(bottomLeft, topLeft, Spacing.LEFT));
+      drawOneSide(canvas, new BorderEdge(topLeft, topRight, Spacing.TOP,
+                                         getBorderWidth(Spacing.TOP)));
+      drawOneSide(canvas, new BorderEdge(topRight, bottomRight, Spacing.RIGHT,
+                                         getBorderWidth(Spacing.RIGHT)));
+      drawOneSide(canvas, new BorderEdge(bottomRight, bottomLeft, Spacing.BOTTOM,
+                                         getBorderWidth(Spacing.BOTTOM)));
+      drawOneSide(canvas, new BorderEdge(bottomLeft, topLeft, Spacing.LEFT,
+                                         getBorderWidth(Spacing.LEFT)));
     }
   }
 
@@ -541,25 +545,7 @@ public class BorderDrawable extends Drawable {
   private void drawOneSide(Canvas canvas, @NonNull BorderEdge borderEdge) {
     preparePaint(borderEdge.getEdge());
     if (!FloatUtil.floatsEqual(0, getBorderWidth(borderEdge.getEdge()))) {
-      Path headingArc = borderEdge.createHeadingOvalPath();
-      if (headingArc != null && mOverlappingBorderRadius != null) {
-        float borderRadius = getBorderRadius(mOverlappingBorderRadius, borderEdge
-            .getHeadingCornerIndex());
-        mPaint.setStrokeWidth(borderRadius);
-        canvas.drawPath(headingArc, mPaint);
-      }
-
-      mPaint.setStrokeWidth(getBorderWidth(borderEdge.getEdge()));
-      Path path = borderEdge.createMainPath();
-      canvas.drawPath(path, mPaint);
-
-      Path trailingArc = borderEdge.createTrailingOvalPath();
-      if (trailingArc != null && mOverlappingBorderRadius != null) {
-        float borderRadius = getBorderRadius(mOverlappingBorderRadius, borderEdge
-            .getTrailingCornerIndex());
-        mPaint.setStrokeWidth(borderRadius);
-        canvas.drawPath(trailingArc, mPaint);
-      }
+      borderEdge.drawEdge(canvas, mPaint);
     }
   }
 
