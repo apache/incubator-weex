@@ -40,4 +40,6 @@
 - (void)addWXComponentRef:(NSString *)ref withInstanceId:(NSString *)instanceId;
 - (void)removeInstanceDicWithInstance:(NSString *)instanceId;
 
+- (id)_getComponentFromRef:(NSString *)subRef;
+
 @end

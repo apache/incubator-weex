@@ -837,6 +837,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 {
     NSMutableArray *domNodes = [NSMutableArray array];
     for (id component in self.rootComponent.subcomponents) {
+        WXComponent *transComponent = (WXComponent *)component;
         PDDOMNode *elementNode = [self nodeForComponent:component];
         [domNodes addObject:elementNode];
     }
@@ -865,12 +866,11 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     elementNode.nodeName = component.type;
     elementNode.children = children;
     elementNode.childNodeCount = @([children count]);
-    elementNode.nodeId = [NSNumber numberWithFloat:[component.ref floatValue] + 2];
+    elementNode.nodeId = [NSNumber numberWithFloat:[component.ref integerValue] + 2];
     elementNode.attributes = [self attributesArrayForObject:[self.objectsForComponentRefs objectForKey:component.ref]];
     return elementNode;
 }
 #pragma mark - WeexSDKMethod
-
 - (NSString *)_weexInstanceId
 {
     NSArray *instanceIds = [[WXSDKManager bridgeMgr] getInstanceIdStack];
@@ -888,7 +888,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     return currentInstance.rootView.wx_component;
 }
 
-- (WXComponent *)_getComponentFromRef:(NSString *)subRef
+- (id)_getComponentFromRef:(NSString *)subRef
 {
     NSString *instanceId = [self _weexInstanceId];
     WXSDKInstance *currentInstance = [WXSDKManager instanceForID:instanceId];
@@ -1037,10 +1037,10 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     }
     WXComponent *corrComponent = [self _getComponentFromRef:ref];
     NSNumber *parentNodeId = nil;
-    NSNumber *corrNodeId = [NSNumber numberWithFloat:[corrComponent.ref floatValue]];
+    NSNumber *corrNodeId = [NSNumber numberWithFloat:[corrComponent.ref integerValue]];
     
     if (corrComponent.supercomponent) {
-        parentNodeId = [NSNumber numberWithFloat:[corrComponent.supercomponent.ref floatValue]];
+        parentNodeId = [NSNumber numberWithFloat:[corrComponent.supercomponent.ref integerValue]];
     } else if ([corrComponent.ref isEqualToString:@"_root"]) {
         // Document are always children of the root element node
         parentNodeId = @(1);
@@ -1064,14 +1064,14 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     WXComponent *corrComponent = [self _getComponentFromRef:ref];
     WXComponent *parentComponent = corrComponent.supercomponent;
     WXComponent *previousComponent = nil;
-    NSNumber *parentNodeId = [NSNumber numberWithFloat:[parentComponent.ref floatValue]];
+    NSNumber *parentNodeId = [NSNumber numberWithFloat:[parentComponent.ref integerValue]];
     NSNumber *previousNodeId = nil;
     if (parentComponent && [self.objectsForComponentRefs objectForKey:parentComponent.ref]) {
         PDDOMNode *node = [self nodeForComponent:corrComponent];
         NSUInteger indexOfComponent = [parentComponent.subcomponents indexOfObject:corrComponent];
         if (indexOfComponent <[parentComponent.subcomponents count] - 1) {
             previousComponent = [parentComponent.subcomponents objectAtIndex:indexOfComponent + 1];
-            previousNodeId = [NSNumber numberWithFloat:[previousComponent.ref floatValue]];
+            previousNodeId = [NSNumber numberWithFloat:[previousComponent.ref integerValue]];
         }
         [self.domain childNodeInsertedWithParentNodeId:parentNodeId previousNodeId:previousNodeId node:node];
     } else if ([corrComponent.ref isEqualToString:@"_root"]) {

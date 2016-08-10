@@ -9,6 +9,8 @@
 #import "WXCSSDomainController.h"
 #import "PDDOMDomainController.h"
 #import "PDCSSTypes.h"
+#import <WeexSDK/WXComponent.h>
+#import <WeexSDK/WXSDKInstance.h>
 
 @implementation WXCSSDomainController
 @dynamic domain;
@@ -80,10 +82,11 @@
             return;
         }
     }
+    
+    /********actual********/
     PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
     selectorData.text = node.nodeName;
-    selectorData.selectors = @[@{@"text":node.nodeName}];
-    
+    selectorData.selectors = @[@{@"text":node.nodeName},@{@"text":@"actual value"}];
     //assembling object of cssStyle
     PDCSSCSSStyle *style = [[PDCSSCSSStyle alloc] init];
     NSMutableArray *cssProperties = [NSMutableArray array];
@@ -122,15 +125,57 @@
     style.shorthandEntries = @[];
     style.cssText = cssText;
     style.cssProperties = [NSArray arrayWithArray:cssProperties];
-    
     PDCSSCSSRule *rule = [[PDCSSCSSRule alloc] init];
     rule.media = @[];
     rule.origin = @"inspector";
     rule.selectorList = selectorData;
     rule.style = style;
-    if ([rule PD_JSONObject]) {
+    /********vdom********/
+    PDCSSSelectorListData *vdomSelectorData = [[PDCSSSelectorListData alloc] init];
+    vdomSelectorData.text = node.nodeName;
+    vdomSelectorData.selectors = @[@{@"text":node.nodeName},@{@"text":@"vdom value"}];
+    //assembling object of cssStyle
+    PDCSSCSSStyle *vdomStyle = [[PDCSSCSSStyle alloc] init];
+    NSMutableArray *vdomCssProperties = [NSMutableArray array];
+    NSMutableString *vdomCssText = [[NSMutableString alloc] init];
+    NSInteger transformNodeId = nodeId.integerValue;
+    if (transformNodeId > 2) {
+        transformNodeId -= 2;
+    }
+    NSString *nodeKey = [NSString stringWithFormat:@"%ld",transformNodeId];
+    WXComponent *component = [[PDDOMDomainController defaultInstance] _getComponentFromRef:nodeKey];
+    if (component) {
+        NSDictionary *vdomStyles = component.styles;
+        if (vdomStyles.allKeys > 0) {
+            for (NSString *key in vdomStyles.allKeys) {
+                PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
+                cssProperty.name = key;
+                if ([[vdomStyles objectForKey:key] isKindOfClass:[NSString class]]) {
+                    cssProperty.value = [vdomStyles objectForKey:key];
+                }else {
+                    cssProperty.value = [NSString stringWithFormat:@"%@",[vdomStyles objectForKey:key];
+                }
+                [vdomCssText appendString:[NSString stringWithFormat:@"%@:%@;",cssProperty.name,cssProperty.value]];
+                [vdomCssProperties addObject:[cssProperty PD_JSONObject]];
+            }
+        }
+    }
+    
+    vdomStyle.shorthandEntries = @[];
+    vdomStyle.cssText = vdomCssText;
+    vdomStyle.cssProperties = [NSArray arrayWithArray:vdomCssProperties];
+    
+    PDCSSCSSRule *vdomRule = [[PDCSSCSSRule alloc] init];
+    vdomRule.media = @[];
+    vdomRule.origin = @"inspector";
+    vdomRule.selectorList = vdomSelectorData;
+    vdomRule.style = vdomStyle;
+    
+    
+    if ([rule PD_JSONObject] && [vdomRule PD_JSONObject]) {
         NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
-        NSArray *matchCSSRules = @[ruleMatch];
+        NSDictionary *vdomRuleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[vdomRule PD_JSONObject]};
+        NSArray *matchCSSRules = @[ruleMatch, vdomRuleMatch];
         callback(matchCSSRules,pseudoElements,inherited,nil);
     }else {
         callback(nil,pseudoElements,inherited,nil);
