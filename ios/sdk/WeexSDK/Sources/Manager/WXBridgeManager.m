@@ -44,6 +44,11 @@ static NSThread *WXBridgeThread;
     return self;
 }
 
+- (WXSDKInstance *)topInstance
+{
+    return _bridgeCtx.topInstance;
+}
+
 - (void)unload
 {
     _bridgeCtx = nil;
@@ -233,7 +238,7 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     [self executeJsMethod:method];
 }
 
-- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(NSString *) params keepAlive:(BOOL)keepAlive {
+- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive {
     NSArray *args = nil;
     if (keepAlive) {
         args = @[[funcId copy], params? [params copy]:@"\"{}\"", @true];
@@ -250,7 +255,7 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     [self executeJsMethod:method];
 }
 
-- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(NSString *)params
+- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params
 {
     [self callBack:instanceId funcId:funcId params:params keepAlive:NO];
 }
