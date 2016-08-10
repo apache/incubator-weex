@@ -25,6 +25,11 @@
                   data:(id)data;
 
 /**
+ * @abstract return currentInstanceId
+ **/
+- (NSArray *)getInstanceIdStack;
+
+/**
  *  Destroy Instance Method
  *  @param instance  :   instance id
  **/

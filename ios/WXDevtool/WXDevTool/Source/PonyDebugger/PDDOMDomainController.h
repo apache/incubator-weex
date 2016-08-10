@@ -22,6 +22,7 @@
 
 + (PDDOMDomainController *)defaultInstance;
 + (void)startMonitoringUIViewChanges;
++ (void)startMonitoringWeexComponentChanges;
 
 // The key paths will be reflected as attributes of the DOM node
 // Note that support is currently limited to CGPoint, CGSize, CGRect, and numeric types (including BOOL).
@@ -31,7 +32,12 @@
 // These should only be used by the swizzled UIView observing methods
 - (void)removeView:(UIView *)view;
 - (void)addView:(UIView *)view;
+- (void)stopTrackingAllViews;
 
-- (PDDOMNode *)rootNode;
+//- (PDDOMNode *)rootNode;
+- (PDDOMNode *)rootComponentNode;
+- (void)removeWXComponentRef:(NSString *)ref withInstanceId:(NSString *)instanceId;
+- (void)addWXComponentRef:(NSString *)ref withInstanceId:(NSString *)instanceId;
+- (void)removeInstanceDicWithInstance:(NSString *)instanceId;
 
 @end

@@ -423,7 +423,11 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     // Choosing frame, alpha, and hidden as the default key paths to display
     [[PDDOMDomainController defaultInstance] setViewKeyPathsToDisplay:@[@"frame", @"alpha", @"hidden"]];
     
+#if VDom
+    [PDDOMDomainController startMonitoringWeexComponentChanges];
+#else
     [PDDOMDomainController startMonitoringUIViewChanges];
+#endif
 }
 
 - (void)setDisplayedViewAttributeKeyPaths:(NSArray *)keyPaths;
@@ -471,15 +475,12 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 #pragma mark - WXBridgeProtocol
 - (void)executeJSFramework:(NSString *)frameworkScript {
-    //WXLogInfo(@"======yangshengtao 0:jsThread:%@,currentThread:%@",_bridgeThread,[NSThread currentThread]);
-//    [self _initBridgeThread];
     NSDictionary *WXEnvironment = @{@"WXEnvironment":[WXUtility getEnvironment]};
     NSDictionary *args = @{@"source":frameworkScript, @"env":WXEnvironment};
     [self callJSMethod:@"WxDebug.initJSRuntime" params:args];
 }
 
 - (void)callJSMethod:(NSString *)method params:(NSDictionary*)params {
-//    [self _initBridgeThread];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     [dict setObject:method forKey:@"method"];
     [dict setObject:params forKey:@"params"];
@@ -488,8 +489,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args {
-//    WXLogInfo(@"======yangshengtao 0:jsThread:%@,currentThread:%@",_bridgeThread,[NSThread currentThread]);
-//    [self _initBridgeThread];
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
     [params setObject:method forKey:@"method"];
     [params setObject:args forKey:@"args"];

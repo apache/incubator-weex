@@ -59,8 +59,11 @@ static NSThread *WXComponentThread;
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
         _isValid = YES;
-        
-        [self _startDisplayLink];
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnComponentThread(^{
+            __strong typeof(self) strongSelf = weakSelf;
+            [strongSelf _startDisplayLink];
+        });
     }
     
     return self;
@@ -276,6 +279,10 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     return [dict objectForKey:ref];
 }
 
+- (WXComponent *)componentForRoot
+{
+    return _rootComponent;
+}
 
 - (WXComponent *)_buildComponentForData:(NSDictionary *)data
 {

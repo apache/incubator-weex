@@ -66,6 +66,11 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  */
 - (WXComponent *)componentForRef:(NSString *)ref;
 
+/**
+ * @abstract return root component
+ */
+- (WXComponent *)componentForRoot;
+
 
 ///--------------------------------------
 /// @name Updating

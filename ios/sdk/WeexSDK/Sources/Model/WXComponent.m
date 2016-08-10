@@ -116,6 +116,11 @@
     return [styles copy];
 }
 
+- (NSString *)type
+{
+    return _type;
+}
+
 - (NSDictionary *)attributes
 {
     NSDictionary *attributes;
@@ -179,6 +184,7 @@
         }
         
         _view.wx_component = self;
+        _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
         [self _initEvents:self.events];
@@ -420,6 +426,18 @@
 {
     id weakWrapper = [[WXWeakObjectWrapper alloc] initWithWeakObject:wx_component];
     objc_setAssociatedObject(self, @selector(wx_component), weakWrapper, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSString *)wx_ref
+{
+    WXWeakObjectWrapper *weakWrapper = objc_getAssociatedObject(self, @selector(wx_ref));
+    return [weakWrapper weakObject];
+}
+
+- (void)setWx_ref:(NSString *)wx_ref
+{
+    id weakWrapper = [[WXWeakObjectWrapper alloc] initWithWeakObject:wx_ref];
+    objc_setAssociatedObject(self, @selector(wx_ref), weakWrapper, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

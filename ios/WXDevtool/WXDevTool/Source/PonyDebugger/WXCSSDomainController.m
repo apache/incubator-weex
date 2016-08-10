@@ -70,10 +70,10 @@
     NSArray *pseudoElements = @[];
     
     //assembling object of rule
-    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
+    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     if (!node) {
-        rootDomNode = [PDDOMDomainController defaultInstance].rootNode;
+        rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
         node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
         if (!node) {
             callback(nil,pseudoElements,inherited,nil);
