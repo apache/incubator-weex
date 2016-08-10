@@ -21,6 +21,7 @@ import Embed from './embed'
 // import Loading from './loading'
 import Spinner from './spinner'
 import Web from './web'
+import Textarea from './textarea'
 
 export default {
   init: function (Weex) {
@@ -48,5 +49,6 @@ export default {
     // Weex.install(Loading)
     Weex.install(Spinner)
     Weex.install(Web)
+    Weex.install(Textarea)
   }
 }
