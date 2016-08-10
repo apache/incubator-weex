@@ -230,9 +230,9 @@ public class WXEnvironment {
    * Global config
    ***************************/
 
-  public static String JS_LIB_SDK_VERSION = "v0.14.7";
+  public static String JS_LIB_SDK_VERSION = "v0.15.2";
 
-  public static String WXSDK_VERSION = "0.6.3.3";
+  public static String WXSDK_VERSION = "0.7.0.1";
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
   public static int sDefaultWidth = 750;
