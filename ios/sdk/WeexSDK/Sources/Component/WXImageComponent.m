@@ -213,6 +213,7 @@ static dispatch_queue_t WXImageUpdateQueue;
             }];
         }
         if (weakSelf.imageSrc) {
+            WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
             NSDictionary *userInfo = @{@"imageQuality":@(weakSelf.imageQuality), @"imageSharp":@(weakSelf.imageSharp)};
             
             dispatch_async(dispatch_get_main_queue(), ^{
