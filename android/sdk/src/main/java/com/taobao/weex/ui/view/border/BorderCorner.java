@@ -237,10 +237,6 @@ abstract class BorderCorner {
     return lineStart;
   }
 
-  boolean hasOuterAndInnerCorner() {
-    return hasOuterCorner() && hasInnerCorner();
-  }
-
   boolean hasOuterCorner() {
     return !FloatUtil.floatsEqual(0, getOuterCornerRadius());
   }
