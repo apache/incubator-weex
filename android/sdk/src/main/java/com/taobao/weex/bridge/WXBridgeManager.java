@@ -1137,7 +1137,7 @@ public class WXBridgeManager implements Callback {
       // TODO add errCode
       instance.onJSException(null, function, exception);
     }
-    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(exception);
+//    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(exception);
     commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
   }
 
