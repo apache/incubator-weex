@@ -246,8 +246,8 @@ abstract class BorderCorner {
   }
 
   boolean hasInnerCorner() {
-    return (getOuterCornerRadius() - getPreBorderWidth() / 2 > 0) &&
-           (getOuterCornerRadius() - getPostBorderWidth() / 2 > 0);
+    return (getOuterCornerRadius() - getPreBorderWidth() > 0) &&
+           (getOuterCornerRadius() - getPostBorderWidth() > 0);
   }
 
   @NonNull
