@@ -297,6 +297,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * @return ScrollView
    */
   public ViewGroup getInnerView() {
+    if(mHost == null)
+      return null;
     if (mHost instanceof BounceScrollerView) {
       return ((BounceScrollerView) mHost).getInnerView();
     } else {
@@ -519,6 +521,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SHOWSCROLLBAR)
   public void setShowScrollbar(boolean show) {
+    if(getInnerView()==null){
+      return;
+    }
     if (mOrientation == VERTICAL) {
       getInnerView().setVerticalScrollBarEnabled(show);
     } else {
@@ -584,8 +589,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindAppearEvent(WXComponent component) {
+    View view = getInnerView();
+    if(view == null)
+      return;
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getInnerView());
+        .get(view);
     if (appearMap == null) {
       return;
     }
@@ -604,8 +612,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindDisappearEvent(WXComponent component) {
+    View view = getInnerView();
+    if(view == null)
+      return;
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getInnerView());
+        .get(view);
     if (appearMap == null) {
       return;
     }
@@ -643,6 +654,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
       @Override
       public void run() {
+        if(getInnerView()==null){
+          return;
+        }
         if(mOrientation==VERTICAL){
           ((WXScrollView) getInnerView()).smoothScrollBy(0, y);
         }else{
@@ -684,8 +698,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     AppearData appearData;
     if (mScrollRect == null) {
       mScrollRect = new Rect();
-      getInnerView().getHitRect(mScrollRect);
-    }
+        getInnerView().getHitRect(mScrollRect);
+      }
     while (iterator.hasNext()) {
       entry = iterator.next();
       appearData = entry.getValue();
