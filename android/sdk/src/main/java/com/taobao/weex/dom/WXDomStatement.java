@@ -368,29 +368,24 @@ class WXDomStatement {
 
     rootDom.calculateLayout(mLayoutContext);
 
-    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(mInstanceId).cssLayoutTime(System.currentTimeMillis() - start);
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+    if(instance != null) {
+      instance.cssLayoutTime(System.currentTimeMillis() - start);
     }
-
-    //		if (WXEnvironment.isApkDebugable()) {
-    //			WXLogUtils.d("csslayout", "------------start------------");
-    //			WXLogUtils.d("csslayout", rootDom.toString());
-    //			WXLogUtils.d("csslayout", "------------end------------");
-    //		}
-
 
     layoutAfter(rootDom);
 
     start = System.currentTimeMillis();
     applyUpdate(rootDom);
-    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(mInstanceId).applyUpdateTime(System.currentTimeMillis() - start);
+
+    if(instance != null) {
+      instance.applyUpdateTime(System.currentTimeMillis() - start);
     }
 
     start = System.currentTimeMillis();
     updateDomObj();
-    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(mInstanceId).updateDomObjTime(System.currentTimeMillis() - start);
+    if(instance != null) {
+      instance.updateDomObjTime(System.currentTimeMillis() - start);
     }
 
     WXLogUtils.d("Batch","animation size :" +animations.size());
@@ -405,8 +400,8 @@ class WXDomStatement {
     mAddDom.clear();
     animations.clear();
     mDirty = false;
-    if(WXSDKManager.getInstance().getSDKInstance(mInstanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(mInstanceId).batchTime(System.currentTimeMillis() - start0);
+    if(instance != null) {
+      instance.batchTime(System.currentTimeMillis() - start0);
     }
 
   }
