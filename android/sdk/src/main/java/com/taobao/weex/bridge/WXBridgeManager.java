@@ -1151,6 +1151,7 @@ public class WXBridgeManager implements Callback {
   private void registerDomModule() throws WXException {
     if (sDomModule == null)
       sDomModule = new WXDomModule();
+    /** Tell Javascript Framework what methods you have. This is Required.**/
     Map<String,Object> domMap=new HashMap<>();
     domMap.put(WXDomModule.WXDOM,WXDomModule.METHODS);
     registerModules(domMap);

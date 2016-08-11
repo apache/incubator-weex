@@ -217,10 +217,15 @@ import java.util.ArrayList;
 
 
 /**
+ * <p>
  * Module class for dom operation. Methods in this class will run in dom thread by default.
  * Actually, methods in this class are wrapper classes, they just wrap method call info, and hand
  * the wrapped info to the {@link WXDomHandler} for further process. This class is also singleton
  * in the {@link com.taobao.weex.WXSDKInstance}
+ * </p>
+ * <p>
+ *   This module is work different with other regular module, method is invoked directly, without reflection.
+ * </p>
  */
 public final class WXDomModule extends WXModule {
 
