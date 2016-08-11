@@ -217,10 +217,15 @@ import java.util.ArrayList;
 
 
 /**
+ * <p>
  * Module class for dom operation. Methods in this class will run in dom thread by default.
  * Actually, methods in this class are wrapper classes, they just wrap method call info, and hand
  * the wrapped info to the {@link WXDomHandler} for further process. This class is also singleton
  * in the {@link com.taobao.weex.WXSDKInstance}
+ * </p>
+ * <p>
+ *   This module is work different with other regular module, method is invoked directly, without reflection.
+ * </p>
  */
 public final class WXDomModule extends WXModule {
 
@@ -228,16 +233,16 @@ public final class WXDomModule extends WXModule {
   // method
   static final String CREATE_BODY = "createBody";
   static final String UPDATE_ATTRS = "updateAttrs";
-  static final String  UPDATE_STYLE = "updateStyle";
+  static final String UPDATE_STYLE = "updateStyle";
   static final String REMOVE_ELEMENT = "removeElement";
-  static final String  ADD_ELEMENT = "addElement";
+  static final String ADD_ELEMENT = "addElement";
   static final String MOVE_ELEMENT = "moveElement";
   static final String ADD_EVENT = "addEvent";
-  static final String  REMOVE_EVENT = "removeEvent";
-  static final String  CREATE_FINISH = "createFinish";
-  static final String  REFRESH_FINISH = "refreshFinish";
-  static final String  UPDATE_FINISH = "updateFinish";
-  static final String SCROLL_TO_ELEMENT  = "scrollToElement";
+  static final String REMOVE_EVENT = "removeEvent";
+  static final String CREATE_FINISH = "createFinish";
+  static final String REFRESH_FINISH = "refreshFinish";
+  static final String UPDATE_FINISH = "updateFinish";
+  static final String SCROLL_TO_ELEMENT = "scrollToElement";
   static final String ADD_RULE = "addRule";
 
   // args
@@ -246,64 +251,68 @@ public final class WXDomModule extends WXModule {
   public static final String METHOD = "method";
   public static final String ARGS = "args";
 
+  public static final String[] METHODS = {CREATE_BODY, UPDATE_ATTRS, UPDATE_STYLE,
+      REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
+      REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE};
+
   public void callDomMethod(JSONObject task) {
-    if( task == null ) {
+    if (task == null) {
       return;
     }
 
     String method = (String) task.get(METHOD);
     JSONArray args = (JSONArray) task.get(ARGS);
 
-    if(method == null){
+    if (method == null) {
       return;
     }
 
     try {
       switch (method) {
         case CREATE_BODY:
-          if(args == null){
+          if (args == null) {
             return;
           }
           createBody((JSONObject) args.get(0));
           break;
         case UPDATE_ATTRS:
-          if(args == null){
+          if (args == null) {
             return;
           }
           updateAttrs((String) args.get(0), (JSONObject) args.get(1));
           break;
         case UPDATE_STYLE:
-          if(args == null){
+          if (args == null) {
             return;
           }
           updateStyle((String) args.get(0), (JSONObject) args.get(1));
           break;
         case REMOVE_ELEMENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           removeElement((String) args.get(0));
           break;
         case ADD_ELEMENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           addElement((String) args.get(0), (JSONObject) args.get(1), (Integer) args.get(2));
           break;
         case MOVE_ELEMENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           moveElement((String) args.get(0), (String) args.get(1), (Integer) args.get(2));
           break;
         case ADD_EVENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           addEvent((String) args.get(0), (String) args.get(1));
           break;
         case REMOVE_EVENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           removeEvent((String) args.get(0), (String) args.get(1));
@@ -318,18 +327,19 @@ public final class WXDomModule extends WXModule {
           updateFinish();
           break;
         case SCROLL_TO_ELEMENT:
-          if(args == null){
+          if (args == null) {
             return;
           }
           scrollToElement((String) args.get(0), (JSONObject) args.get(1));
           break;
         case ADD_RULE:
-          if (args == null)
+          if (args == null) {
             return;
+          }
           addRule((String) args.get(0), (JSONObject) args.get(1));
       }
 
-    }catch (IndexOutOfBoundsException e){
+    } catch (IndexOutOfBoundsException e) {
       // no enougn args
       e.printStackTrace();
       WXLogUtils.e("Dom module call miss arguments.");
