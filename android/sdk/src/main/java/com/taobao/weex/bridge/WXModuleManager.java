@@ -256,7 +256,7 @@ public class WXModuleManager {
       return false;
     }
 
-    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+    WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
         if (sModuleFactoryMap.containsKey(moduleName)) {

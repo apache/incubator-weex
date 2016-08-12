@@ -205,6 +205,7 @@
 package com.taobao.weex.bridge;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
@@ -213,6 +214,8 @@ import com.taobao.weex.utils.WXLogUtils;
  * Communication interface for Java code and JavaScript code.
  */
 class WXBridge implements IWXBridge {
+
+  public static final String TAG = "WXBridge";
 
   /**
    * Init JSFrameWork
@@ -240,16 +243,26 @@ class WXBridge implements IWXBridge {
    */
   public int callNative(String instanceId, String tasks, String callback) {
     long start = System.currentTimeMillis();
-    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(instanceId).firstScreenCreateInstanceTime(start);
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
     }
-    int errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        e.printStackTrace();
+        WXLogUtils.e(TAG,"callNative throw expection:"+e.getMessage());
+      }
+    }
 
-    if(WXSDKManager.getInstance().getSDKInstance(instanceId)!=null) {
-      WXSDKManager.getInstance().getSDKInstance(instanceId).callNativeTime(System.currentTimeMillis() - start);
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
     }
     if(WXEnvironment.isApkDebugable()){
-      if(errorCode == WXBridgeManager.DESTROY_INSTANCE){
+      if(errorCode == IWXBridge.DESTROY_INSTANCE){
         WXLogUtils.w("destroyInstance :"+instanceId+" JSF must stop callNative");
       }
     }
