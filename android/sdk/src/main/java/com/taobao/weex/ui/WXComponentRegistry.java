@@ -234,7 +234,7 @@ public class WXComponentRegistry {
     componentInfo.put("type",type);
     final Map<String, String> registerInfo = componentInfo;
     //execute task in js thread to make sure register order is same as the order invoke register method.
-    WXBridgeManager.getInstance().getJSHandler()
+    WXBridgeManager.getInstance()
     .post(new Runnable() {
       @Override
       public void run() {
@@ -274,7 +274,7 @@ public class WXComponentRegistry {
   }
 
   public static void reload(){
-    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+    WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
         try {

@@ -212,6 +212,10 @@ import com.taobao.weex.bridge.WXParams;
  */
 public interface IWXBridge extends IWXObject {
 
+  int DESTROY_INSTANCE = -1;
+  int INSTANCE_RENDERING = 1;
+  int INSTANCE_RENDERING_ERROR = 0;
+
   /**
    * init Weex
    *
