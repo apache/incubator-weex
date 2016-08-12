@@ -143,6 +143,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
@@ -218,7 +219,7 @@ public class WXSDKManager {
   }
 
   public void postOnUiThread(Runnable runnable, long delayMillis) {
-    mWXRenderManager.postOnUiThread(runnable, delayMillis);
+    mWXRenderManager.postOnUiThread(WXThread.secure(runnable), delayMillis);
   }
 
   public void destroy() {

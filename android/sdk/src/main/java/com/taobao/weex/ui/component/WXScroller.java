@@ -218,6 +218,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
@@ -297,6 +298,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * @return ScrollView
    */
   public ViewGroup getInnerView() {
+    if(mHost == null)
+      return null;
     if (mHost instanceof BounceScrollerView) {
       return ((BounceScrollerView) mHost).getInnerView();
     } else {
@@ -360,24 +363,24 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if (child instanceof WXRefresh) {
       ((BaseBounceView)mHost).setOnRefreshListener((WXRefresh)child);
       final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
+      Runnable runnable = WXThread.secure(new Runnable(){
         @Override
         public void run() {
           ((BaseBounceView)mHost).setHeaderView(temp.getHostView());
         }
-      };
+      });
       handler.postDelayed(runnable,100);
     }
 
     if (child instanceof WXLoading) {
       ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
       final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
+      Runnable runnable= WXThread.secure(new Runnable(){
         @Override
         public void run() {
           ((BaseBounceView)mHost).setFooterView(temp.getHostView());
         }
-      };
+      });
       handler.postDelayed(runnable,100);
     }
   }
@@ -519,6 +522,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
   public void setShowScrollbar(boolean show) {
+    if(getInnerView()==null){
+      return;
+    }
     if (mOrientation == VERTICAL) {
       getInnerView().setVerticalScrollBarEnabled(show);
     } else {
@@ -584,8 +590,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindAppearEvent(WXComponent component) {
+    View view = getInnerView();
+    if(view == null)
+      return;
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getInnerView());
+        .get(view);
     if (appearMap == null) {
       return;
     }
@@ -604,8 +613,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindDisappearEvent(WXComponent component) {
+    View view = getInnerView();
+    if(view == null)
+      return;
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getInnerView());
+        .get(view);
     if (appearMap == null) {
       return;
     }
@@ -643,6 +655,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
       @Override
       public void run() {
+        if(getInnerView()==null){
+          return;
+        }
         if(mOrientation==VERTICAL){
           ((WXScrollView) getInnerView()).smoothScrollBy(0, y);
         }else{
@@ -684,8 +699,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     AppearData appearData;
     if (mScrollRect == null) {
       mScrollRect = new Rect();
-      getInnerView().getHitRect(mScrollRect);
-    }
+        getInnerView().getHitRect(mScrollRect);
+      }
     while (iterator.hasNext()) {
       entry = iterator.next();
       appearData = entry.getValue();

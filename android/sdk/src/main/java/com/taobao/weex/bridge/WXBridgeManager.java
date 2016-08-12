@@ -283,10 +283,6 @@ public class WXBridgeManager implements Callback {
   private static final String UNDEFINED = "-1";
   private static final int INIT_FRAMEWORK_OK = 1;
 
-  public static final int DESTROY_INSTANCE = -1;
-  public static final int INSTANCE_RENDERING = 1;
-  public static final int INSTANCE_RENDERING_ERROR = 0;
-
   private static long LOW_MEM_VALUE = 80;
 
   static WXBridgeManager mBridgeManager;
@@ -369,16 +365,6 @@ public class WXBridgeManager implements Callback {
   }
 
   /**
-   * Get Handler for JS Thread.
-   * careful with this method, inappropriate using of JS handler may cause
-   * significant performance penalty.
-   * @return Handler the handler in JS thread.
-   */
-  public Handler getJSHandler() {
-    return mJSHandler;
-  }
-
-  /**
    * Model switch. For now, debug model and release model are supported
    */
   public void restart() {
@@ -403,12 +389,20 @@ public class WXBridgeManager implements Callback {
     }, instanceId);
   }
 
-  private void post(Runnable r, Object token) {
+  public void post(Runnable r){
+    if (mJSHandler == null){
+      return;
+    }
+
+    mJSHandler.post(WXThread.secure(r));
+  }
+
+  public void post(Runnable r, Object token) {
     if (mJSHandler == null) {
       return;
     }
 
-    Message m = Message.obtain(mJSHandler, r);
+    Message m = Message.obtain(mJSHandler, WXThread.secure(r));
     m.obj = token;
     m.sendToTarget();
   }
@@ -454,7 +448,7 @@ public class WXBridgeManager implements Callback {
       WXErrorCode errorCode=WXErrorCode.WX_ERR_INVOKE_NATIVE;
       errorCode.appendErrMsg("[WXBridgeManager] callNative: call Native tasks is null");
       commitJSBridgeAlarmMonitor(instanceId, errorCode);
-      return INSTANCE_RENDERING_ERROR;
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
     if (WXEnvironment.isApkDebugable()) {
@@ -466,7 +460,7 @@ public class WXBridgeManager implements Callback {
 
     if(mDestroyedInstanceId!=null &&mDestroyedInstanceId.contains(instanceId)){
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
-      return DESTROY_INSTANCE;
+      return IWXBridge.DESTROY_INSTANCE;
     }
 
 
@@ -503,11 +497,11 @@ public class WXBridgeManager implements Callback {
 
     if (UNDEFINED.equals(callback)) {
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
-      return INSTANCE_RENDERING_ERROR;
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick
     getNextTick(instanceId, callback);
-    return INSTANCE_RENDERING;
+    return IWXBridge.INSTANCE_RENDERING;
   }
 
   private void getNextTick(final String instanceId, final String callback) {
@@ -517,7 +511,7 @@ public class WXBridgeManager implements Callback {
 
 
   private void addJSTask(final String method, final String instanceId, final Object... args) {
-    mJSHandler.post(new Runnable() {
+    post(new Runnable() {
       @Override
       public void run() {
         if (args == null || args.length == 0) {
@@ -632,7 +626,7 @@ public class WXBridgeManager implements Callback {
     if (TextUtils.isEmpty(instanceId) || jsonData == null) {
       return;
     }
-    mJSHandler.postDelayed((new Runnable() {
+    mJSHandler.postDelayed(WXThread.secure(new Runnable() {
       @Override
       public void run() {
         invokeRefreshInstance(instanceId, jsonData);
@@ -1137,7 +1131,6 @@ public class WXBridgeManager implements Callback {
       // TODO add errCode
       instance.onJSException(null, function, exception);
     }
-    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(exception);
     commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
   }
 

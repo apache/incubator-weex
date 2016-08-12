@@ -708,16 +708,21 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     @Override
     public void remove(WXComponent child, boolean destroy) {
-        int index = mChildren.indexOf(child);
-        if (destroy) {
-            child.detachViewAndClearPreInfo();
-        }
-        unBindViewType(child);
-        getHostView().getAdapter().notifyItemRemoved(index);
-        if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, "removeChild child at " + index);
-        }
-        super.remove(child, destroy);
+      int index = mChildren.indexOf(child);
+      if (destroy) {
+        child.detachViewAndClearPreInfo();
+      }
+      unBindViewType(child);
+
+      BounceRecyclerView view = getHostView();
+      if(view == null){
+        return;
+      }
+      view.getAdapter().notifyItemRemoved(index);
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "removeChild child at " + index);
+      }
+      super.remove(child, destroy);
     }
 
     @Override
