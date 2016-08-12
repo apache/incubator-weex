@@ -97,10 +97,6 @@ Component.prototype = {
       this._parentScroller = parent
       return true
     }
-    if (!parent) {
-      console && console.warn('[h5-render] isInScrollable - parent not exist.')
-      return
-    }
   },
 
   // dispatch a specified event on this.node

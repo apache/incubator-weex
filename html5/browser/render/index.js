@@ -51,11 +51,27 @@ function noop () {}
 
   // set global 'debug' config to true if there's a debug flag in current url.
   const debug = params['debug']
-  if (debug === true || debug === 'true') {
-    config.debug = true
-  }
+  config.debug = debug === true || debug === 'true'
 
   !config.debug && (console.debug = noop)
+
+  // config for the 'downgrade'.
+  for (let key in params) {
+    if (params.hasOwnProperty(key)) {
+      const match = key.match(/^downgrade_(\w+)$/)
+      if (!match || !match[1]) {
+        continue
+      }
+      const dk = match[1]
+      // downgrade in the config file has the highest priority.
+      if (typeof config.downgrade[dk] === 'boolean') {
+        continue
+      }
+      const dr = params[`downgrade_${dk}`]
+      config.downgrade[dk] = dr === true || dr === 'true'
+    }
+  }
+
 })()
 
 export default function Weex (options) {
