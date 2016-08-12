@@ -238,12 +238,15 @@ abstract class BorderCorner {
   }
 
   boolean hasOuterCorner() {
-    return !FloatUtil.floatsEqual(0, getOuterCornerRadius());
+    return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
   }
 
   boolean hasInnerCorner() {
-    return (getOuterCornerRadius() - getPreBorderWidth() > 0) &&
-           (getOuterCornerRadius() - getPostBorderWidth() > 0);
+    return hasOuterCorner() &&
+           (getPreBorderWidth() >= 0) &&
+           (getPostBorderWidth() >= 0) &&
+           (getOuterCornerRadius() > getPreBorderWidth()) &&
+           (getOuterCornerRadius() > getPostBorderWidth());
   }
 
   @NonNull
