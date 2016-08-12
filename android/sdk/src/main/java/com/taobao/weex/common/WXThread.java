@@ -207,6 +207,7 @@ package com.taobao.weex.common;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
+import android.os.Message;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -241,6 +242,32 @@ public class WXThread extends HandlerThread {
     }
   }
 
+  static class SafeCallback implements Callback {
+    static final String TAG = "SafeCallback";
+
+    final Callback mCallback;
+    SafeCallback(Callback cb){
+      mCallback = cb;
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+      boolean result = false;
+      try{
+        if(mCallback != null){
+          result = mCallback.handleMessage(msg);
+        }
+      }catch (Throwable e){
+        //catch everything may throw from exection.
+        if(WXEnvironment.isApkDebugable()){
+          WXLogUtils.e(TAG,"SafeCallback handleMessage throw expection:"+e.getMessage());
+          throw e;
+        }
+      }
+      return result;
+    }
+  }
+
   /**
    * Secure Runnable to prevent throw during execution.
    * @param runnable
@@ -251,6 +278,14 @@ public class WXThread extends HandlerThread {
       return runnable;
     }
     return new SafeRunnable(runnable);
+  }
+
+  public static Callback secure(Callback callback){
+    if(callback == null || callback instanceof SafeCallback){
+      return callback;
+    }
+
+    return new SafeCallback(callback);
   }
 
   /**
@@ -266,7 +301,7 @@ public class WXThread extends HandlerThread {
   public WXThread(String name, Callback callback) {
     super(name);
     start();
-    mHandler = new Handler(getLooper(), callback);
+    mHandler = new Handler(getLooper(), secure(callback));
   }
 
   /**
@@ -277,7 +312,7 @@ public class WXThread extends HandlerThread {
   public WXThread(String name, int priority, Callback callback) {
     super(name, priority);
     start();
-    mHandler = new Handler(getLooper(), callback);
+    mHandler = new Handler(getLooper(), secure(callback));
   }
 
   /**
