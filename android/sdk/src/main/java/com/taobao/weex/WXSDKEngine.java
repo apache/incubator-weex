@@ -220,7 +220,7 @@ public class WXSDKEngine {
     WXEnvironment.sApplication = application;
     WXEnvironment.JsFrameworkInit = false;
 
-    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+    WXBridgeManager.getInstance().post(new Runnable() {
       @Override
       public void run() {
         long start = System.currentTimeMillis();

@@ -207,6 +207,8 @@ package com.taobao.weex.common;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.HandlerThread;
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Thread used in weex
@@ -214,6 +216,42 @@ import android.os.HandlerThread;
 public class WXThread extends HandlerThread {
 
   private Handler mHandler;
+
+  static class SafeRunnable implements Runnable {
+
+    static final String TAG = "SafeRunnable";
+
+    final Runnable mTask;
+    SafeRunnable(Runnable task){
+      mTask = task;
+    }
+
+    @Override
+    public void run() {
+      try {
+        if(mTask != null)
+          mTask.run();
+      }catch (Throwable e){
+        //catch everything may throw from exection.
+        if(WXEnvironment.isApkDebugable()){
+          e.printStackTrace();
+          WXLogUtils.e(TAG,"SafeRunnable run throw expection:"+e.getMessage());
+        }
+      }
+    }
+  }
+
+  /**
+   * Secure Runnable to prevent throw during execution.
+   * @param runnable
+   * @return
+   */
+  public static Runnable secure(Runnable runnable){
+    if(runnable == null || runnable instanceof SafeRunnable){
+      return runnable;
+    }
+    return new SafeRunnable(runnable);
+  }
 
   /**
    * @param name name of thread

@@ -148,7 +148,7 @@ public class DebugBridge implements IWXBridge {
         if (mJsManager != null) {
             return  mJsManager.callNative(instanceId, tasks, callback);
         }else{
-            return WXBridgeManager.INSTANCE_RENDERING_ERROR;
+            return IWXBridge.INSTANCE_RENDERING_ERROR;
         }
     }
 

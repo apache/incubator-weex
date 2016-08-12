@@ -288,7 +288,7 @@ public final class WXDomManager {
         || mDomThread.getLooper() == null) {
       return;
     }
-    mDomHandler.post(task);
+    mDomHandler.post(WXThread.secure(task));
   }
 
   /**

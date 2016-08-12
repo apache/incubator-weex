@@ -218,6 +218,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
@@ -362,24 +363,24 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if (child instanceof WXRefresh) {
       ((BaseBounceView)mHost).setOnRefreshListener((WXRefresh)child);
       final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
+      Runnable runnable = WXThread.secure(new Runnable(){
         @Override
         public void run() {
           ((BaseBounceView)mHost).setHeaderView(temp.getHostView());
         }
-      };
+      });
       handler.postDelayed(runnable,100);
     }
 
     if (child instanceof WXLoading) {
       ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
       final WXComponent temp = child;
-      Runnable runnable=new Runnable(){
+      Runnable runnable=WXThread.secure(new Runnable(){
         @Override
         public void run() {
           ((BaseBounceView)mHost).setFooterView(temp.getHostView());
         }
-      };
+      });
       handler.postDelayed(runnable,100);
     }
   }
