@@ -234,8 +234,8 @@ public class WXThread extends HandlerThread {
       }catch (Throwable e){
         //catch everything may throw from exection.
         if(WXEnvironment.isApkDebugable()){
-          e.printStackTrace();
           WXLogUtils.e(TAG,"SafeRunnable run throw expection:"+e.getMessage());
+          throw e;
         }
       }
     }
