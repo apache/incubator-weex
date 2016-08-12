@@ -486,16 +486,18 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       view.postDelayed(new Runnable() {
         @Override
         public void run() {
-          if(mOrientation == VERTICAL){
-            int scrollY = cellComp.getHostView().getTop()+offset;
-            view.smoothScrollBy(0,scrollY );
-          }else{
-            int  scrollX = cellComp.getHostView().getLeft()+offset;
-            view.smoothScrollBy(scrollX,0);
+          if (cellComp.getHostView() != null) {
+            View cellView = cellComp.getHostView();
+            if (mOrientation == VERTICAL) {
+              int scrollY = cellView.getTop() + offset;
+              view.smoothScrollBy(0, scrollY);
+            } else {
+              int scrollX = cellView.getLeft() + offset;
+              view.smoothScrollBy(scrollX, 0);
+            }
           }
         }
-      },50);
-
+      }, 50);
       onPostScrollToPosition(pos);
     }
 
