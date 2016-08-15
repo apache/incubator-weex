@@ -41,7 +41,7 @@ checkstyle {
     toolVersion = '6.9'
 }
 
-version = "1.5.2.4"
+version = "0.7.0"
 
 android {
     compileSdkVersion 23
@@ -49,6 +49,7 @@ android {
     resourcePrefix "weex"
 
     defaultConfig {
+        buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion 14
         targetSdkVersion 19
         versionCode 1
