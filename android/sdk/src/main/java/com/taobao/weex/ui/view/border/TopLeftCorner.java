@@ -225,7 +225,7 @@ class TopLeftCorner extends BorderCorner {
     return new RectF(getPreBorderWidth() / 2,
                      getPostBorderWidth() / 2,
                      2 * getOuterCornerRadius() - getPreBorderWidth() / 2,
-                     2 * getOuterCornerRadius() - getPreBorderWidth() / 2);
+                     2 * getOuterCornerRadius() - getPostBorderWidth() / 2);
   }
 
   @NonNull
