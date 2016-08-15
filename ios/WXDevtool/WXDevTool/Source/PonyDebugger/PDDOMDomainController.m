@@ -49,6 +49,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 @property (nonatomic, strong) NSMutableDictionary *objectsForComponentRefs;
 @property (nonatomic, strong) NSMutableDictionary *instanceIdForRoot;
 @property (nonatomic, strong) NSMutableDictionary *instancesDic;
+@property (nonatomic, strong) NSMutableDictionary *componentForRefs;
 @end
 
 #pragma mark - Implementation
@@ -124,13 +125,17 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         method_exchangeImplementations(original, swizzle);
         
         Class WXSDKInstanceClass = [WXSDKInstance class];
-        original = class_getInstanceMethod(WXSDKInstanceClass, @selector(finishPerformance));
-        swizzle = class_getInstanceMethod(WXSDKInstanceClass, sel_registerName("devtool_swizzled_finishPerformance"));
+        original = class_getInstanceMethod(WXSDKInstanceClass, @selector(creatFinish));
+        swizzle = class_getInstanceMethod(WXSDKInstanceClass, sel_registerName("devtool_swizzled_creatFinish"));
         method_exchangeImplementations(original, swizzle);
         
         Class viewClass = [UIView class];
         original = class_getInstanceMethod(viewClass, @selector(addSubview:));
         swizzle = class_getInstanceMethod(viewClass, sel_registerName("devtool_swizzled_addSubview:"));
+        method_exchangeImplementations(original, swizzle);
+        
+        original = class_getInstanceMethod(viewClass, @selector(insertSubview:atIndex:));
+        swizzle = class_getInstanceMethod(viewClass, sel_registerName("devtool_swizzled_insertSubview:atIndex:"));
         method_exchangeImplementations(original, swizzle);
         
         original = class_getInstanceMethod(viewClass, @selector(removeFromSuperview));
@@ -266,9 +271,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 {
 #if VDom
     NSInteger transformNodeId = nodeId.integerValue;
-    if (transformNodeId > 2) {
-        transformNodeId -= 2;
-    }
     NSString *nodeKey = [NSString stringWithFormat:@"%ld",transformNodeId];
     id objectForNodeId = [self.objectsForComponentRefs objectForKey:nodeKey];
 #else
@@ -836,9 +838,13 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (NSArray *)virtualNodes
 {
     NSMutableArray *domNodes = [NSMutableArray array];
-    for (id component in self.rootComponent.subcomponents) {
+    if (!self.componentForRefs) {
+        self.componentForRefs = [[NSMutableDictionary alloc] init];
+    }
+    NSArray *subcomponentAry = [NSArray arrayWithArray:self.rootComponent.subcomponents];
+    for (id component in subcomponentAry) {
         WXComponent *transComponent = (WXComponent *)component;
-        PDDOMNode *elementNode = [self nodeForComponent:component];
+        PDDOMNode *elementNode = [self nodeForComponent:transComponent];
         [domNodes addObject:elementNode];
     }
     return domNodes;
@@ -850,6 +856,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     NSMutableArray *childComponents = [[NSMutableArray alloc] initWithCapacity:component.subcomponents.count];
     for (WXComponent *subComponent in [component.subcomponents reverseObjectEnumerator]) {
         PDDOMNode *childComponent = [self nodeForComponent:subComponent];
+        [self.componentForRefs setObject:subComponent forKey:subComponent.ref];
         if (childComponent) {
             [childComponents addObject:childComponent];
         }
@@ -867,7 +874,8 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     elementNode.children = children;
     elementNode.childNodeCount = @([children count]);
     elementNode.nodeId = [NSNumber numberWithFloat:[component.ref integerValue] + 2];
-    elementNode.attributes = [self attributesArrayForObject:[self.objectsForComponentRefs objectForKey:component.ref]];
+    NSString *ref = [NSString stringWithFormat:@"%ld",[component.ref integerValue] + 2];
+    elementNode.attributes = [self attributesArrayForObject:[self.objectsForComponentRefs objectForKey:ref]];
     return elementNode;
 }
 #pragma mark - WeexSDKMethod
@@ -925,7 +933,8 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
                 if ([key isEqualToString:@"_root"]) {
                     [self.objectsForComponentRefs setObject:parentView forKey:@"2"];
                 }else {
-                   [self.objectsForComponentRefs setObject:parentView forKey:key];
+                    NSString *newKey = [NSString stringWithFormat:@"%ld",[key integerValue] + 2];
+                   [self.objectsForComponentRefs setObject:parentView forKey:newKey];
                 }
 //                [self startTrackingView:parentView];
             }
@@ -941,6 +950,11 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (PDDOMNode *)rootComponentNode
 {
     return self.rootDomNode;
+}
+
+- (NSDictionary *)getObjectsForComponentRefs
+{
+    return self.objectsForComponentRefs;
 }
 
 - (PDDOMNode *)rootNode;
@@ -1062,6 +1076,9 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         return;
     }
     WXComponent *corrComponent = [self _getComponentFromRef:ref];
+    if (!corrComponent) {
+        return;
+    }
     WXComponent *parentComponent = corrComponent.supercomponent;
     WXComponent *previousComponent = nil;
     NSNumber *parentNodeId = [NSNumber numberWithFloat:[parentComponent.ref integerValue]];
@@ -1092,6 +1109,70 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     if (self.instancesDic[instanceId]) {
         [self.instancesDic removeObjectForKey:instanceId];
     }
+}
+
+- (void)addVDomTreeWithView:(UIView *)view
+{
+    if (view.wx_ref) {
+        NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
+        if (![viewRefs objectForKey:view.wx_ref]) {
+            NSNumber *nodeId = nil;
+            if ([view.wx_ref isEqualToString:@"_root"]) {
+                nodeId = @(2);
+            }else {
+                nodeId = [NSNumber numberWithInteger:[view.wx_ref integerValue] + 2];
+            }
+            [viewRefs setObject:view forKey:[NSString stringWithFormat:@"%ld",[nodeId integerValue]]];
+            NSArray *attributes = [self attributesArrayForObject:view];
+            for (int i = 0; i < attributes.count; i++) {
+                if (i % 2 == 0) {
+                    NSString *newValue = attributes[i + 1];
+                    [self.domain attributeModifiedWithNodeId:nodeId name:attributes[i] value:newValue];
+                }
+            }
+        }
+        if (self.componentForRefs.count > 0) {
+            if (![self.componentForRefs objectForKey:view.wx_ref]) {
+                [self addWXComponentRef:view.wx_ref withInstanceId:nil];
+            }
+        }
+    }
+}
+
+- (void)removeVDomTreeWithView:(UIView *)view
+{
+    NSString *ref = view.wx_ref;
+    NSNumber *nodeId = nil;
+    if ([ref isEqualToString:@"_root"]) {
+        nodeId = @(2);
+    }else {
+        nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
+    }
+    if (ref) {
+        NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
+        ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
+        if ([viewRefs objectForKey:ref]) {
+            [viewRefs removeObjectForKey:ref];
+            NSArray *attributes = @[@"class", @"frame", @"hidden", @"alpha", @"opaque"];
+            for (NSString *key in attributes) {
+                [self.domain attributeRemovedWithNodeId:nodeId name:key];
+            }
+        }
+        if (self.componentForRefs.count > 0) {
+            if ([self.componentForRefs objectForKey:ref]) {
+                [self addWXComponentRef:ref withInstanceId:nil];
+            }
+        }
+    }
+}
+
+- (BOOL)diffWithRootComponent
+{
+    WXComponent *newRootComponent = [self _getRootComponentWithInstance:nil];
+    if (self.rootComponent.subcomponents.count != newRootComponent.subcomponents.count) {
+        return YES;
+    }
+    return NO;
 }
 
 #pragma mark - Attribute Generation
@@ -1294,6 +1375,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (void)devtool_swizzled_destroyInstance:(NSString *)instance
 {
     [self devtool_swizzled_destroyInstance:instance];
+    [[PDDOMDomainController defaultInstance].componentForRefs removeAllObjects];
     [[PDDOMDomainController defaultInstance] removeWXComponentRef:@"_root" withInstanceId:instance];
     [[PDDOMDomainController defaultInstance] removeInstanceDicWithInstance:instance];
 }
@@ -1302,9 +1384,9 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 
 @implementation WXSDKInstance (hackery)
 
-- (void)devtool_swizzled_finishPerformance
+- (void)devtool_swizzled_creatFinish
 {
-    [self devtool_swizzled_finishPerformance];
+    [self devtool_swizzled_creatFinish];
     [[PDDOMDomainController defaultInstance] removeWXComponentRef:@"_root" withInstanceId:self.instanceId];
     [[PDDOMDomainController defaultInstance] addWXComponentRef:@"_root" withInstanceId:self.instanceId];
 }
@@ -1320,38 +1402,19 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (void)devtool_swizzled_addSubview:(UIView *)subview
 {
     [self devtool_swizzled_addSubview:subview];
-    if (subview.wx_ref) {
-        PDDOMDomainController *domDomain = [PDDOMDomainController defaultInstance];
-        NSMutableDictionary *viewRefs =  domDomain.objectsForComponentRefs;
-        if (![viewRefs objectForKey:subview.wx_ref]) {
-            [viewRefs setObject:self forKey:subview.wx_ref];
-            NSNumber *nodeId = [NSNumber numberWithInteger:[subview.wx_ref integerValue] + 2];
-            NSArray *attributes = [domDomain attributesArrayForObject:subview];
-            for (int i = 0; i < attributes.count; i++) {
-                if (i % 2 == 0) {
-                    NSString *newValue = attributes[i + 1];
-                    [domDomain.domain attributeModifiedWithNodeId:nodeId name:attributes[i] value:newValue];
-                }
-            }
-        }
-    }
+    [[PDDOMDomainController defaultInstance] addVDomTreeWithView:subview];
+}
+
+- (void)devtool_swizzled_insertSubview:(UIView *)view atIndex:(NSInteger)index;
+{
+    [self devtool_swizzled_insertSubview:view atIndex:index];
+    [[PDDOMDomainController defaultInstance] addVDomTreeWithView:view];
 }
 
 - (void)devtool_swizzled_removeFromSuperview
 {
     [self devtool_swizzled_removeFromSuperview];
-    if (self.wx_ref) {
-        PDDOMDomainController *domDomain = [PDDOMDomainController defaultInstance];
-        NSMutableDictionary *viewRefs =  domDomain.objectsForComponentRefs;
-        if ([viewRefs objectForKey:self.wx_ref]) {
-            [viewRefs removeObjectForKey:self.wx_ref];
-            NSNumber *nodeId = [NSNumber numberWithInteger:[self.wx_ref integerValue] + 2];
-            NSArray *attributes = @[@"class", @"frame", @"hidden", @"alpha", @"opaque"];
-            for (NSString *key in attributes) {
-                [domDomain.domain attributeRemovedWithNodeId:nodeId name:key];
-            }
-        }
-    }
+    [[PDDOMDomainController defaultInstance] removeVDomTreeWithView:self];
 }
 
 - (void)pd_swizzled_addSubview:(UIView *)subview;

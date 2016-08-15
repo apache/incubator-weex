@@ -70,7 +70,7 @@
     
     NSArray *inherited = @[];
     NSArray *pseudoElements = @[];
-    
+    /*
     //assembling object of rule
     PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
@@ -82,26 +82,35 @@
             return;
         }
     }
+     */
+    
+    NSInteger transformNodeId = nodeId.integerValue;
+    if (transformNodeId > 2) {
+        transformNodeId -= 2;
+    }
+    NSString *nodeKey = [NSString stringWithFormat:@"%ld",transformNodeId];
+    NSString *nodeName = nil;
     
     /********actual********/
+    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:nodeKey];
+    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    
     PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
-    selectorData.text = node.nodeName;
-    selectorData.selectors = @[@{@"text":node.nodeName},@{@"text":@"actual value"}];
     //assembling object of cssStyle
     PDCSSCSSStyle *style = [[PDCSSCSSStyle alloc] init];
     NSMutableArray *cssProperties = [NSMutableArray array];
     NSMutableString *cssText = [[NSMutableString alloc] init];
-    for (int i = 0; i < node.attributes.count; i++) {
+    for (int i = 0; i < actualAttrs.count; i++) {
         if (i & 1) {
-            if (![node.attributes[i-1] isEqualToString:@"frame"]) {
+            if (![actualAttrs[i-1] isEqualToString:@"frame"]) {
                 PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
-                [cssText appendFormat:@"%@;",node.attributes[i]];
-                cssProperty.name = node.attributes[i-1];
-                cssProperty.value = node.attributes[i];
+                [cssText appendFormat:@"%@;",actualAttrs[i]];
+                cssProperty.name = actualAttrs[i-1];
+                cssProperty.value = actualAttrs[i];
                 [cssProperties addObject:[cssProperty PD_JSONObject]];
             }else {
                 NSArray *names = @[@"width",@"height",@"top",@"left"];
-                NSArray *position = [self p_formateFrame:node.attributes[i]];
+                NSArray *position = [self p_formateFrame:actualAttrs[i]];
                 if (position.count == 4) {
                     NSDictionary *property = @{@"left":position[0],
                                                @"top":position[1],
@@ -117,11 +126,16 @@
                 }
             }
         }else {
-            if (![node.attributes[i] isEqualToString:@"frame"]) {
-                [cssText appendFormat:@"%@:",node.attributes[i]];
+            if (![actualAttrs[i] isEqualToString:@"frame"]) {
+                [cssText appendFormat:@"%@:",actualAttrs[i]];
+                if ([actualAttrs[i] isEqualToString:@"class"]) {
+                    nodeName = actualAttrs[i+1];
+                }
             }
         }
     }
+    selectorData.text = nodeName ? : @"";
+    selectorData.selectors = @[@{@"text":nodeName ? : @""},@{@"text":@"actual value"}];
     style.shorthandEntries = @[];
     style.cssText = cssText;
     style.cssProperties = [NSArray arrayWithArray:cssProperties];
@@ -132,17 +146,12 @@
     rule.style = style;
     /********vdom********/
     PDCSSSelectorListData *vdomSelectorData = [[PDCSSSelectorListData alloc] init];
-    vdomSelectorData.text = node.nodeName;
-    vdomSelectorData.selectors = @[@{@"text":node.nodeName},@{@"text":@"vdom value"}];
+    vdomSelectorData.text = nodeName ? : @"";
+    vdomSelectorData.selectors = @[@{@"text":nodeName ? : @""},@{@"text":@"vdom value"}];
     //assembling object of cssStyle
     PDCSSCSSStyle *vdomStyle = [[PDCSSCSSStyle alloc] init];
     NSMutableArray *vdomCssProperties = [NSMutableArray array];
     NSMutableString *vdomCssText = [[NSMutableString alloc] init];
-    NSInteger transformNodeId = nodeId.integerValue;
-    if (transformNodeId > 2) {
-        transformNodeId -= 2;
-    }
-    NSString *nodeKey = [NSString stringWithFormat:@"%ld",transformNodeId];
     WXComponent *component = [[PDDOMDomainController defaultInstance] _getComponentFromRef:nodeKey];
     if (component) {
         NSDictionary *vdomStyles = component.styles;

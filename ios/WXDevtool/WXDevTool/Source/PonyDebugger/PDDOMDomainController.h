@@ -41,5 +41,7 @@
 - (void)removeInstanceDicWithInstance:(NSString *)instanceId;
 
 - (id)_getComponentFromRef:(NSString *)subRef;
+- (NSDictionary *)getObjectsForComponentRefs;
+- (NSArray *)attributesArrayForObject:(id)object;
 
 @end

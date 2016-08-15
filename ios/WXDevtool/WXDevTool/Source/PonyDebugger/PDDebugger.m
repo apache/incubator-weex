@@ -183,6 +183,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     _socket.delegate = nil;
     _socket = nil;
     _isConnect = NO;
+    [self _addOvertimeMonitor];
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
@@ -190,6 +191,21 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSLog(@"Debugger failed with web socket error: %@", [error localizedDescription]);
     _socket.delegate = nil;
     _socket = nil;
+}
+
+#pragma mark - timer
+- (void)_addOvertimeMonitor
+{
+    NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(_webSocketOvertime) userInfo:nil repeats:NO];
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+}
+- (void)_webSocketOvertime
+{
+    if ([WXDevToolType isDebug]) {
+        [WXDevToolType setDebug:NO];
+        [WXSDKEngine restart];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
+    }
 }
 
 #pragma mark - NSNetServiceBrowserDelegate
@@ -586,7 +602,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
             return;
         }
         //call native
-        WXLogDebug(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
+        WXLogInfo(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
         _nativeCallBlock(instanceId, methods, callbackId);
     }
     
