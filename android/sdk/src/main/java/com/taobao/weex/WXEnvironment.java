@@ -257,7 +257,7 @@ public class WXEnvironment {
   /** from init to sdk-ready **/
   public static long sSDKInitTime =0;
 
-  public static LogLevel sLogLevel= LogLevel.DEBUG;
+  public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   private static boolean isPerf = false;
 
