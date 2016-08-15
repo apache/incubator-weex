@@ -137,7 +137,7 @@ public class WXLogUtils {
   }
 
   public static void d(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       Log.d(WEEX_TAG, msg);
       writeConsoleLog("debug", msg);
       sendLog(LogLevel.DEBUG, msg);
@@ -145,7 +145,7 @@ public class WXLogUtils {
   }
 
   public static void info(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.INFO) >= 0) {
       Log.i(WEEX_TAG, msg);
       writeConsoleLog("info", msg);
       sendLog(LogLevel.INFO,msg);
@@ -153,7 +153,7 @@ public class WXLogUtils {
   }
 
   public static void v(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.VERBOSE) >= 0) {
       Log.v(WEEX_TAG, msg);
       writeConsoleLog("verbose", msg);
       sendLog(LogLevel.VERBOSE, msg);
@@ -161,7 +161,7 @@ public class WXLogUtils {
   }
 
   public static void w(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.WARN) >= 0) {
       Log.w(WEEX_TAG, msg);
       writeConsoleLog("warning", msg);
       sendLog(LogLevel.WARN, msg);
@@ -169,7 +169,7 @@ public class WXLogUtils {
   }
 
   public static void e(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.ERROR) >= 0) {
       Log.e(WEEX_TAG, msg);
       writeConsoleLog("error", msg);
       sendLog(LogLevel.ERROR, msg);
@@ -177,7 +177,7 @@ public class WXLogUtils {
   }
 
   public static void d(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg)) {
+    if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       Log.d(tag, msg);
       writeConsoleLog("debug", tag + ":" + msg);
       if(msg.contains(" | __")){
@@ -210,7 +210,7 @@ public class WXLogUtils {
   }
 
   public static void i(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.INFO) >= 0) {
       Log.i(tag, msg);
       writeConsoleLog("info", tag + ":" + msg);
       sendLog(LogLevel.INFO, tag+":"+msg);
@@ -218,7 +218,7 @@ public class WXLogUtils {
   }
 
   public static void v(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.VERBOSE) >= 0) {
       Log.v(tag, msg);
       writeConsoleLog("verbose", tag + ":" + msg);
       sendLog(LogLevel.VERBOSE, tag+":"+msg);
@@ -226,7 +226,7 @@ public class WXLogUtils {
   }
 
   public static void w(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.WARN) >= 0) {
       Log.w(tag, msg);
       writeConsoleLog("warning", tag + ":" + msg);
       sendLog(LogLevel.WARN, tag+":"+msg);
@@ -234,7 +234,7 @@ public class WXLogUtils {
   }
 
   public static void e(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.ERROR) >= 0) {
       Log.e(tag, msg);
       writeConsoleLog("error", tag + ":" + msg);
       sendLog(LogLevel.ERROR, tag+":"+msg);
@@ -242,7 +242,7 @@ public class WXLogUtils {
   }
 
   public static void p(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null) {
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       Log.d(WEEX_PERF_TAG, msg);
       writeConsoleLog("debug", msg);
     }
@@ -326,7 +326,7 @@ public class WXLogUtils {
         Method m = cls.getMethod("log", String.class, String.class);
         m.invoke(cls, level, message);
       } catch (Exception e) {
-        Log.d(WEEX_TAG, "WXDebugTool not found!");
+        Log.d(WEEX_TAG, "LogUtil not found!");
       }
     }
   }
