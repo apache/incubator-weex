@@ -12,7 +12,7 @@ description = """weex_sdk"""
 try {
     if ('' != deployVersion) {
         version = deployVersion
-        println "version: " + version
+        println " weex-build-version: " + version
     }
 
 } catch (java.lang.Exception e) {
@@ -44,6 +44,7 @@ android {
 
     def jniDir = projectDir.path + "/src/main/jni/"
     defaultConfig {
+        buildConfigField "String", "buildVersion", "\"${version}\""
         ndk {
             // moduleName "weexcore"
             // cFlags "-I" + file(jniDir+"v8core").absolutePath

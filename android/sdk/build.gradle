@@ -32,6 +32,7 @@ android {
     resourcePrefix "weex"
 
     defaultConfig {
+        buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion 14
         targetSdkVersion 19
         versionCode 1
