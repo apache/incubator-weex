@@ -88,9 +88,9 @@
         id argument;
         if (!strcmp(parameterType, blockType)) {
             // callback
-            argument = [^void(NSString *result) {
+            argument = [^void(NSString *result, BOOL keepAlive) {
                 NSString* instanceId = method.instance;
-                [[WXSDKManager bridgeMgr] callBack:instanceId funcId:(NSString *)obj params:result];
+                [[WXSDKManager bridgeMgr]callBack:instanceId funcId:(NSString *)obj params:result keepAlive:keepAlive];
             } copy];
             CFBridgingRetain(argument);
             [invocation setArgument:&argument atIndex:i + 2];
