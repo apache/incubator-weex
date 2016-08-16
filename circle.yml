@@ -5,7 +5,7 @@ test:
   override:
     #- npm run test
     - cd android/playground && ./gradlew assembleDebug
-    - cd android/sdk && ./gradlew checkstyle testDebugUnitTest jacocoTestReportDebug
+    - cd android/sdk && ./gradlew testDebugUnitTest jacocoTestReportDebug
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS # playground artifacts
     - cp -r android/sdk/build/outputs/ $CIRCLE_ARTIFACTS # sdk artifacts
