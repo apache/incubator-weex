@@ -207,7 +207,6 @@ package com.taobao.weex.ui.view.border;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.taobao.weex.dom.flex.FloatUtil;
 
@@ -219,11 +218,25 @@ abstract class BorderCorner {
   private final float mPostBorderWidth;
   private final RectF mBorderBox;
 
-  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF borderBox) {
+  BorderCorner(float cornerRadius, float preBorderWidth, float postBorderWidth, @NonNull RectF
+      borderBox) {
     mCornerRadius = cornerRadius;
     mPreBorderWidth = preBorderWidth;
     mPostBorderWidth = postBorderWidth;
     mBorderBox = borderBox;
+  }
+
+  /**
+   * Tell whether this corner has a rounded inner corner.
+   * If a corner has a rounded inner corner, it has an outer corner as well.
+   * @return true for a rounded inner corner, otherwise false.
+   */
+  boolean hasInnerCorner() {
+    return hasOuterCorner()
+           && (getPreBorderWidth() >= 0)
+           && (getPostBorderWidth() >= 0)
+           && (getOuterCornerRadius() > getPreBorderWidth())
+           && (getOuterCornerRadius() > getPostBorderWidth());
   }
 
   /**
@@ -234,17 +247,16 @@ abstract class BorderCorner {
     return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
   }
 
-  /**
-   * Tell whether this corner has a rounded inner corner.
-   * If a corner has a rounded inner corner, it has an outer corner as well.
-   * @return  true for a rounded inner corner, otherwise false.
-   */
-  boolean hasInnerCorner() {
-    return hasOuterCorner() &&
-           (getPreBorderWidth() >= 0) &&
-           (getPostBorderWidth() >= 0) &&
-           (getOuterCornerRadius() > getPreBorderWidth()) &&
-           (getOuterCornerRadius() > getPostBorderWidth());
+  protected float getPreBorderWidth() {
+    return mPreBorderWidth;
+  }
+
+  protected float getPostBorderWidth() {
+    return mPostBorderWidth;
+  }
+
+  protected float getOuterCornerRadius() {
+    return mCornerRadius;
   }
 
   /**
@@ -262,6 +274,12 @@ abstract class BorderCorner {
     return lineStart;
   }
 
+  @NonNull
+  abstract protected PointF getRoundCornerStart();
+
+  @NonNull
+  abstract protected PointF getSharpCornerVertex();
+
   /**
    * Get the ending point of the corner.
    * @return the ending point of the corner.
@@ -277,16 +295,10 @@ abstract class BorderCorner {
     return lineEnd;
   }
 
-  abstract protected float getAngleBisectorDegree();
-
-  @NonNull
-  abstract protected PointF getRoundCornerStart();
-
   @NonNull
   abstract protected PointF getRoundCornerEnd();
 
-  @NonNull
-  abstract protected PointF getSharpCornerVertex();
+  abstract protected float getAngleBisectorDegree();
 
   @NonNull
   abstract protected PointF getSharpCornerStart();
@@ -300,19 +312,7 @@ abstract class BorderCorner {
   @NonNull
   abstract protected RectF getOvalIfInnerCornerNotExist();
 
-  protected float getPreBorderWidth() {
-    return mPreBorderWidth;
-  }
-
-  protected float getPostBorderWidth() {
-    return mPostBorderWidth;
-  }
-
   protected RectF getBorderBox() {
     return mBorderBox;
-  }
-
-  protected float getOuterCornerRadius() {
-    return mCornerRadius;
   }
 }

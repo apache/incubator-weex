@@ -205,11 +205,9 @@
 package com.taobao.weex.ui.view.border;
 
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.PathEffect;
 import android.graphics.Shader;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.taobao.weex.dom.flex.Spacing;
