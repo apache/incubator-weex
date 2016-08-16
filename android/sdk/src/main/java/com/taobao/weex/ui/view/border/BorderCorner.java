@@ -226,6 +226,31 @@ abstract class BorderCorner {
     mBorderBox = borderBox;
   }
 
+  /**
+   * Tell whether this corner has a rounded outer corner.
+   * @return true for a rounded outer corner, otherwise false.
+   */
+  boolean hasOuterCorner() {
+    return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
+  }
+
+  /**
+   * Tell whether this corner has a rounded inner corner.
+   * If a corner has a rounded inner corner, it has an outer corner as well.
+   * @return  true for a rounded inner corner, otherwise false.
+   */
+  boolean hasInnerCorner() {
+    return hasOuterCorner() &&
+           (getPreBorderWidth() >= 0) &&
+           (getPostBorderWidth() >= 0) &&
+           (getOuterCornerRadius() > getPreBorderWidth()) &&
+           (getOuterCornerRadius() > getPostBorderWidth());
+  }
+
+  /**
+   * Get the staring point of the corner.
+   * @return the starting point of the corner.
+   */
   @NonNull
   PointF getCornerStart() {
     PointF lineStart;
@@ -237,18 +262,10 @@ abstract class BorderCorner {
     return lineStart;
   }
 
-  boolean hasOuterCorner() {
-    return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
-  }
-
-  boolean hasInnerCorner() {
-    return hasOuterCorner() &&
-           (getPreBorderWidth() >= 0) &&
-           (getPostBorderWidth() >= 0) &&
-           (getOuterCornerRadius() > getPreBorderWidth()) &&
-           (getOuterCornerRadius() > getPostBorderWidth());
-  }
-
+  /**
+   * Get the ending point of the corner.
+   * @return the ending point of the corner.
+   */
   @NonNull
   PointF getCornerEnd() {
     PointF lineEnd;

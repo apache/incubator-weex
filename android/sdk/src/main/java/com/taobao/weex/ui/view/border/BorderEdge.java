@@ -214,6 +214,10 @@ import android.support.annotation.Nullable;
 
 import com.taobao.weex.dom.flex.Spacing;
 
+/**
+ * Edge for border. Every border has four edges, and each edge has a previous corner and a post
+ * corner.
+ */
 class BorderEdge {
 
   private
@@ -234,6 +238,11 @@ class BorderEdge {
     mBorderWidth = borderWidth;
   }
 
+  /**
+   * Draw the edge on the canvas with the specified paint.
+   * @param canvas the canvas where the edge will be drawn.
+   * @param paint the paint which is used to draw.
+   */
   void drawEdge(@NonNull Canvas canvas, @NonNull Paint paint) {
     PointF lineStart = mPreCorner.getCornerEnd();
     Path path;
@@ -278,6 +287,11 @@ class BorderEdge {
     }
   }
 
+  /**
+   * The index of the edge
+   * @return index of edge. May be one of
+   * {@link Spacing#TOP},{@link Spacing#BOTTOM},{@link Spacing#RIGHT},{@link Spacing#LEFT}.
+   */
   public int getEdge() {
     return mEdge;
   }

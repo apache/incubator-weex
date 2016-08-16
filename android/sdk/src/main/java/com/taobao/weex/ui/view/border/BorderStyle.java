@@ -219,6 +219,15 @@ enum BorderStyle {
   DASHED,
   DOTTED;
 
+  /**
+   * Use {@link LinearGradient} to replace {@link PathEffect}
+   * for implementing {@link #DASHED} or {@link #DASHED}
+   * @param borderWidth width of the edge
+   * @param borderColor color of the edge
+   * @param edge the index of the ede. See {@link Spacing}
+   * @return An object of {@link LinearGradient} without color transitions for {@link #DOTTED}
+   * or {@link #DASHED}, null otherwise
+   */
   @Nullable
   Shader getLineShader(float borderWidth, int borderColor, int edge) {
     switch (this) {
