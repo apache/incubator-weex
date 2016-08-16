@@ -230,9 +230,10 @@ import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.view.WXBackgroundDrawable;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -294,10 +295,11 @@ public class WXAnimationModule extends WXModule {
       ObjectAnimator animator;
       List<PropertyValuesHolder> holders =style.getHolders();
       if (!TextUtils.isEmpty(style.backgroundColor)) {
-        if (target.getBackground() instanceof WXBackgroundDrawable) {
+        BorderDrawable borderDrawable;
+        if ((borderDrawable=WXViewUtils.getBorderDrawable(target))!=null) {
           holders.add(PropertyValuesHolder.ofObject(
               WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
-              ((WXBackgroundDrawable) target.getBackground()).getColor(),
+              borderDrawable.getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         } else if (target.getBackground() instanceof ColorDrawable) {
           holders.add(PropertyValuesHolder.ofObject(

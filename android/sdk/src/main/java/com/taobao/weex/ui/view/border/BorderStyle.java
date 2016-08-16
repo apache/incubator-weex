@@ -202,295 +202,51 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.utils;
+package com.taobao.weex.ui.view.border;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
-import android.os.Build;
-import android.support.annotation.NonNull;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.PathEffect;
+import android.graphics.Shader;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.ui.view.border.BorderDrawable;
+import com.taobao.weex.dom.flex.Spacing;
 
-/**
- * Utility class for views
- */
-public class WXViewUtils {
+enum BorderStyle {
+  SOLID,
+  DASHED,
+  DOTTED;
 
   /**
-   * System chooses a format that supports translucency (many alpha bits)
+   * Use {@link LinearGradient} to replace {@link PathEffect}
+   * for implementing {@link #DASHED} or {@link #DASHED}
+   * @param borderWidth width of the edge
+   * @param borderColor color of the edge
+   * @param edge the index of the ede. See {@link Spacing}
+   * @return An object of {@link LinearGradient} without color transitions for {@link #DOTTED}
+   * or {@link #DASHED}, null otherwise
    */
-  public static final int TRANSLUCENT = -3;
-
-  /**
-   * System chooses a format that supports transparency (at least 1 alpha bit)
-   */
-  public static final int TRANSPARENT = -2;
-  /**
-   * System chooses an opaque format (no alpha bits required)
-   */
-  public static final int OPAQUE = -1;
-  private static final boolean mUseWebPx = false;
-
-  public static int getWeexHeight(String instanceId) {
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      int weexHeight = instance.getWeexHeight();
-      if (weexHeight >= 0 || weexHeight == -2) {
-        return weexHeight;
-      }
-      return getScreenHeight(WXEnvironment.sApplication);
-    }
-    return -3;
-  }
-
-  @Deprecated
-  public static int getScreenHeight() {
-    if(WXEnvironment.sApplication!=null){
-      return WXEnvironment.sApplication.getResources()
-              .getDisplayMetrics()
-              .heightPixels;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-  }
-
-  public static int getScreenHeight(Context cxt) {
-    if(cxt!=null){
-      return cxt.getResources().getDisplayMetrics().heightPixels;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-
-  }
-
-  public static int getWeexWidth(String instanceId) {
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
-      int weexWidth = instance.getWeexWidth();
-      if (weexWidth >= 0 || weexWidth == -2) {
-        return weexWidth;
-      }
-      return getScreenWidth(WXEnvironment.sApplication);
-    }
-    return -3;
-  }
-
-  @Deprecated
-  public static int getScreenWidth( ) {
-    if(WXEnvironment.sApplication!=null) {
-      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
-
-      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = WXEnvironment.sApplication.getResources()
-                .getDisplayMetrics()
-                .heightPixels;
-        width = height > width ?width:height;
-      }
-      return width;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-  }
-
-  public static int getScreenWidth(Context cxt) {
-    if(cxt!=null){
-      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
-
-      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = WXEnvironment.sApplication.getResources()
-                .getDisplayMetrics()
-                .heightPixels;
-        width = height > width ?width:height;
-      }
-      return width;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-  }
-
-  /**
-   * Convert distance from JS,CSS to native. As the JS considers the width of the screen is 750px.
-   * There must be a transform when accessing distance from JS,CSS and use it.
-   * Basically, this method calculates a scale factor(ScreenWidth/750) and use apply this scale
-   * factor to JS,CSS distance.
-   * @param pxValue the raw distance from JS or CSS. The result will be rounded to a closet int.
-   * @return the actual distance in the screen.
-   */
-  public static float getRealPxByWidth(float pxValue) {
-    if (Float.isNaN(pxValue)) {
-      return pxValue;
-    }
-    if (mUseWebPx) {
-      return (float) Math.rint(pxValue);
-    } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
-      return realPx > 0.005 && realPx < 1 ? 1 : (float) Math.rint(realPx);
-    }
-  }
-
-  public static float getRealSubPxByWidth(float pxValue) {
-    if (Float.isNaN(pxValue)) {
-      return pxValue;
-    }
-    if (mUseWebPx) {
-      return (float) Math.rint(pxValue);
-    } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
-      return realPx > 0.005 && realPx < 1 ? 1 : realPx;
-    }
-  }
-
-  /**
-   *  Internal interface that just for debug, you should never call this method because of accuracy loss obviously
-   */
-  public static float getWeexPxByReal(float pxValue) {
-    if (Float.isNaN(pxValue)) {
-      return pxValue;
-    }
-    if (mUseWebPx) {
-      return (float) Math.rint(pxValue);
-    } else {
-      return pxValue * WXEnvironment.sDefaultWidth / getScreenWidth();
-    }
-  }
-
-  public static int getRealPxByWidth2(float pxValue) {
-    if (mUseWebPx) {
-      return (int) pxValue;
-    } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
-      return realPx > 0.005 && realPx < 1 ? 1 : (int) realPx - 1;
-    }
-  }
-
-  /**
-   * Convert distance from native to JS,CSS. As the JS considers the width of the screen is 750px.
-   * There must be a transform when return distance to JS,CSS.
-   * Basically, this method calculates a scale factor(ScreenWidth/750) and use apply this scale
-   * factor to native distance.
-   * @param pxValue the raw distance of native. The result will be rounded to a closet int.
-   * @return the distance in JS,CSS where the screenWidth is 750 px.
-   */
-  public static float getWebPxByWidth(float pxValue) {
-    if (pxValue < -1.9999 && pxValue > -2.005) {
-      return Float.NaN;
-    }
-    if (mUseWebPx) {
-      return pxValue;
-    } else {
-      float realPx = (pxValue * WXEnvironment.sDefaultWidth / getScreenWidth());
-      return realPx > 0.005 && realPx < 1 ? 1 : realPx;
-    }
-  }
-
-
-  /**
-   * Convert dp to px
-   * @param dpValue the dp value to be converted
-   * @return the px value
-   */
-  public static int dip2px(float dpValue) {
-    float scale = 2;
-    try {
-      scale = WXEnvironment.getApplication().getResources()
-          .getDisplayMetrics().density;
-    } catch (Exception e) {
-      WXLogUtils.e("[WXViewUtils] dip2px:", e);
-    }
-    float finalPx = (dpValue * scale + 0.5f);
-    return finalPx > 0 && finalPx < 1 ? 1 : (int) finalPx;
-  }
-
-  public static boolean onScreenArea(View view) {
-    if (view == null || view.getVisibility() != View.VISIBLE) {
-      return false;
-    }
-
-    int[] p = new int[2];
-    view.getLocationOnScreen(p);
-    LayoutParams lp = view.getLayoutParams();
-    int viewH = 0;
-    if (lp != null) {
-      viewH = lp.height;
-    } else {
-      viewH = view.getHeight();
-    }
-
-    return (p[1] > 0 && (p[1] - WXViewUtils.getScreenHeight(WXEnvironment.sApplication) < 0))
-           || (viewH + p[1] > 0 && p[1] <= 0);
-  }
-
-  /**
-   * Multiplies the color with the given alpha.
-   *
-   * @param color color to be multiplied
-   * @param alpha value between 0 and 255
-   * @return multiplied color
-   */
-  public static int multiplyColorAlpha(int color, int alpha) {
-    if (alpha == 255) {
-      return color;
-    }
-    if (alpha == 0) {
-      return color & 0x00FFFFFF;
-    }
-    alpha = alpha + (alpha >> 7); // make it 0..256
-    int colorAlpha = color >>> 24;
-    int multipliedAlpha = colorAlpha * alpha >> 8;
-    return (multipliedAlpha << 24) | (color & 0x00FFFFFF);
-  }
-
-  public static int getOpacityFromColor(int color) {
-    int colorAlpha = color >>> 24;
-    if (colorAlpha == 255) {
-      return OPAQUE;
-    } else if (colorAlpha == 0) {
-      return TRANSPARENT;
-    } else {
-      return TRANSLUCENT;
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  public static void setBackGround(View view, Drawable drawable){
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN){
-      view.setBackgroundDrawable(drawable);
-    }
-    else{
-      view.setBackground(drawable);
-    }
-  }
-
-  public static @Nullable
-  BorderDrawable getBorderDrawable(@NonNull View view){
-    Drawable drawable=view.getBackground();
-    if(drawable instanceof BorderDrawable){
-      return (BorderDrawable) drawable;
-    }
-    else if(drawable instanceof LayerDrawable){
-      if(((LayerDrawable) drawable).getNumberOfLayers()>1) {
-        Drawable innerDrawable=((LayerDrawable) drawable).getDrawable(0);
-        if(innerDrawable instanceof BorderDrawable){
-          return (BorderDrawable) innerDrawable;
+  @Nullable
+  Shader getLineShader(float borderWidth, int borderColor, int edge) {
+    switch (this) {
+      case DOTTED:
+        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
+          return new LinearGradient(0, 0, 0, borderWidth * 2, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
+          return new LinearGradient(0, 0, borderWidth * 2, 0, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
         }
-      }
+      case DASHED:
+        if (edge == Spacing.LEFT || edge == Spacing.RIGHT) {
+          return new LinearGradient(0, 0, 0, borderWidth * 6, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        } else if (edge == Spacing.TOP || edge == Spacing.BOTTOM) {
+          return new LinearGradient(0, 0, borderWidth * 6, 0, new int[]{borderColor, Color
+              .TRANSPARENT}, new float[]{0.5f, 0.5f}, Shader.TileMode.REPEAT);
+        }
+      default:
+        return null;
     }
-    return null;
   }
 }

@@ -238,6 +238,10 @@ public class Constants {
     String BORDER_TOP_RIGHT_RADIUS = "borderTopRightRadius";
     String BORDER_BOTTOM_RIGHT_RADIUS = "borderBottomRightRadius";
     String BORDER_BOTTOM_LEFT_RADIUS = "borderBottomLeftRadius";
+    String BORDER_RIGHT_STYLE = "borderRightStyle";
+    String BORDER_BOTTOM_STYLE = "borderBottomStyle";
+    String BORDER_LEFT_STYLE = "borderLeftStyle";
+    String BORDER_TOP_STYLE = "borderTopStyle";
     String MARGIN = "margin";
     String MARGIN_TOP = "marginTop";
     String MARGIN_LEFT = "marginLeft";
