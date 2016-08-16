@@ -119,13 +119,36 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 public class WXLogUtils {
 
-  public static String WEEX_TAG = "weex";
-  public static String WEEX_PERF_TAG = "weex_perf";
+  public static final String WEEX_TAG = "weex";
+  public static final String WEEX_PERF_TAG = "weex_perf";
+
+  private static final String CLAZZ_NAME_DEBUG_TOOL = "com.taobao.weex.WXDebugTool";
+  private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
 
   private static StringBuilder builder = new StringBuilder(50);
+  private static HashMap<String, Class> clazzMaps = new HashMap<String, Class>(2);
+
+  static {
+    clazzMaps.put(CLAZZ_NAME_DEBUG_TOOL, loadClass(CLAZZ_NAME_DEBUG_TOOL));
+    clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
+  }
+
+  private static Class loadClass(String clazzName) {
+    Class<?> clazz = null;
+    try {
+      clazz = Class.forName(clazzName);
+      if (clazz != null) {
+        clazzMaps.put(clazzName, clazz);
+      }
+    } catch (ClassNotFoundException e) {
+      // ignore
+    }
+    return clazz;
+  }
 
   public static void renderPerformanceLog(String type, long time) {
     if (WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) {
@@ -322,9 +345,11 @@ public class WXLogUtils {
   private static void writeConsoleLog(String level, String message) {
     if (WXEnvironment.isApkDebugable()) {
       try {
-        Class<?> cls = Class.forName("com.taobao.weex.devtools.common.LogUtil");
-        Method m = cls.getMethod("log", String.class, String.class);
-        m.invoke(cls, level, message);
+        Class<?> clazz = clazzMaps.get(CLAZZ_NAME_LOG_UTIL);
+        if (clazz != null) {
+          Method m = clazz.getMethod("log", String.class, String.class);
+          m.invoke(clazz, level, message);
+        }
       } catch (Exception e) {
         Log.d(WEEX_TAG, "LogUtil not found!");
       }
@@ -334,11 +359,13 @@ public class WXLogUtils {
   private static void sendLog(LogLevel level, String msg) {
     if(WXEnvironment.isApkDebugable()){
       try {
-        Class<?> cls = Class.forName("com.taobao.weex.WXDebugTool");
-        Method m = cls.getMethod("sendLog", LogLevel.class,String.class);
-        m.invoke(cls, level,msg);
+        Class<?> clazz = clazzMaps.get(CLAZZ_NAME_DEBUG_TOOL);
+        if (clazz != null) {
+          Method m = clazz.getMethod("sendLog", LogLevel.class,String.class);
+          m.invoke(clazz, level,msg);
+        }
       } catch (Exception e) {
-        Log.d("weex","WXDebugTool not found!");
+        Log.d(WEEX_TAG, "WXDebugTool not found!");
       }
     }
   }
