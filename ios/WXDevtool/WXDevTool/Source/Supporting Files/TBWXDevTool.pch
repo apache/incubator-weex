@@ -18,4 +18,4 @@
 # define NSLog(...)
 #endif
 
-#define VDom 0
+#define VDom 1
