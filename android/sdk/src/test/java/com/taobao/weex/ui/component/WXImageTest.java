@@ -122,7 +122,7 @@ import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXImageView;
-import com.taobao.weex.ui.view.WXShapeFeature;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.WXResourceUtils;
 
 import org.junit.Before;
@@ -179,15 +179,10 @@ public class WXImageTest {
     WXImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
-    WXShapeFeature feature = PowerMockito.mock(WXShapeFeature.class);
-    PowerMockito.whenNew(WXShapeFeature.class).withArguments(mInstance.getContext(), imageView, mDomObject).thenReturn(feature);
-    ColorDrawable colorDrawable = new ColorDrawable((WXResourceUtils.getColor("#FFFFFF")));
-    PowerMockito.when(feature.wrapDrawable(colorDrawable)).thenReturn(colorDrawable);
-
     mWXImage.setBackgroundColor("#FFFFFF");
 
     Drawable drawable = mWXImage.getHostView().getBackground();
-    assertEquals(drawable instanceof ColorDrawable, true);
+    assertEquals(drawable instanceof BorderDrawable, true);
   }
 
 

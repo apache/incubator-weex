@@ -251,6 +251,10 @@ public final class WXDomModule extends WXModule {
   public static final String METHOD = "method";
   public static final String ARGS = "args";
 
+
+  /**
+   * Methods expose to js. Every method which will be called in js should add to this array.
+   */
   public static final String[] METHODS = {CREATE_BODY, UPDATE_ATTRS, UPDATE_STYLE,
       REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
       REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE};

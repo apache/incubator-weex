@@ -128,7 +128,11 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -154,7 +158,7 @@ import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.WXBackgroundDrawable;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -192,7 +196,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected int mAbsoluteY = 0;
   protected int mAbsoluteX = 0;
   protected Set<String> mGestureType;
-  private WXBorder mBorder;
+  private BorderDrawable mBackgroundDrawable;
   private boolean mLazy;
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
@@ -245,7 +249,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
-      getOrCreateBorder().attachView(mHost);
       setLayout(component.mDomObj);
       setPadding(component.mDomObj.getPadding(), component.mDomObj.getBorder());
       addEvents();
@@ -288,11 +291,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  protected WXBorder getOrCreateBorder() {
-    if (mBorder == null) {
-      mBorder = new WXBorder();
+  protected BorderDrawable getOrCreateBorder() {
+    if (mBackgroundDrawable == null) {
+      Drawable backgroundDrawable = mHost.getBackground();
+      WXViewUtils.setBackGround(mHost,null);
+      mBackgroundDrawable = new BorderDrawable();
+      if (backgroundDrawable == null) {
+        WXViewUtils.setBackGround(mHost,mBackgroundDrawable);
+      } else {
+        //TODO Not strictly clip according to background-clip:border-box
+        WXViewUtils.setBackGround(mHost,new LayerDrawable(new Drawable[]{
+            mBackgroundDrawable,backgroundDrawable}));
+      }
     }
-    return mBorder;
+    return mBackgroundDrawable;
   }
 
   /**
@@ -542,9 +554,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           setBorderWidth(key,width);
         return true;
       case Constants.Name.BORDER_STYLE:
+      case Constants.Name.BORDER_RIGHT_STYLE:
+      case Constants.Name.BORDER_BOTTOM_STYLE:
+      case Constants.Name.BORDER_LEFT_STYLE:
+      case Constants.Name.BORDER_TOP_STYLE:
         String border_style = WXUtils.getString(param,null);
         if (border_style != null)
-          setBorderStyle(border_style);
+          setBorderStyle(key, border_style);
         return true;
       case Constants.Name.BORDER_COLOR:
       case Constants.Name.BORDER_TOP_COLOR:
@@ -715,7 +731,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (parent != null) {
         parent.addSubView(mHost, index);
       }
-      getOrCreateBorder().attachView(mHost);
     }else{
       WXLogUtils.e("createViewImpl","Context is null");
     }
@@ -852,10 +867,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void setBackgroundColor(String color) {
-    if (!TextUtils.isEmpty(color)) {
+    if (!TextUtils.isEmpty(color)&& mHost!=null) {
       int colorInt = WXResourceUtils.getColor(color);
-      if (colorInt != Integer.MIN_VALUE) {
-        getOrCreateBorder().setBackgroundColor(colorInt);
+      if (!(colorInt == Color.TRANSPARENT && mBackgroundDrawable == null)){
+          getOrCreateBorder().setColor(colorInt);
       }
     }
   }
@@ -870,19 +885,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderRadius >= 0) {
       switch (key) {
         case Constants.Name.BORDER_RADIUS:
-          getOrCreateBorder().setBorderRadius(WXViewUtils.getRealPxByWidth(borderRadius));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_RADIUS_ALL, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
         case Constants.Name.BORDER_TOP_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(WXBackgroundDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealPxByWidth(borderRadius));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
         case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(WXBackgroundDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealPxByWidth(borderRadius));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
         case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(WXBackgroundDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealPxByWidth(borderRadius));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
         case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(WXBackgroundDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealPxByWidth(borderRadius));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius));
           break;
       }
     }
@@ -892,26 +907,44 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.ALL, borderWidth);
+          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealPxByWidth(borderWidth));
+          getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
         case Constants.Name.BORDER_RIGHT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(borderWidth));
+          getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
         case Constants.Name.BORDER_BOTTOM_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(borderWidth));
+          getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
         case Constants.Name.BORDER_LEFT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealPxByWidth(borderWidth));
+          getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth));
           break;
       }
     }
   }
 
-  public void setBorderStyle(String borderStyle) {
-    getOrCreateBorder().setBorderStyle(borderStyle);
+  public void setBorderStyle(String key, String borderStyle) {
+    if(!TextUtils.isEmpty(borderStyle)){
+      switch (key){
+        case Constants.Name.BORDER_STYLE:
+          getOrCreateBorder().setBorderStyle(Spacing.ALL,borderStyle);
+          break;
+        case Constants.Name.BORDER_RIGHT_STYLE:
+          getOrCreateBorder().setBorderStyle(Spacing.RIGHT,borderStyle);
+          break;
+        case Constants.Name.BORDER_BOTTOM_STYLE:
+          getOrCreateBorder().setBorderStyle(Spacing.BOTTOM,borderStyle);
+          break;
+        case Constants.Name.BORDER_LEFT_STYLE:
+          getOrCreateBorder().setBorderStyle(Spacing.LEFT,borderStyle);
+          break;
+        case Constants.Name.BORDER_TOP_STYLE:
+          getOrCreateBorder().setBorderStyle(Spacing.TOP,borderStyle);
+          break;
+      }
+    }
   }
 
   public void setBorderColor(String key, String borderColor) {
@@ -1019,9 +1052,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   public View detachViewAndClearPreInfo() {
     View original = mHost;
-    if (mBorder != null) {
-      mBorder.detachView();
-    }
     mPreRealLeft = 0;
     mPreRealWidth = 0;
     mPreRealHeight = 0;
