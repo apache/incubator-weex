@@ -1113,15 +1113,18 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 
 - (void)addVDomTreeWithView:(UIView *)view
 {
-    if (view.wx_ref) {
+    NSString *ref = view.wx_ref;
+    if (ref) {
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
-        if (![viewRefs objectForKey:view.wx_ref]) {
-            NSNumber *nodeId = nil;
-            if ([view.wx_ref isEqualToString:@"_root"]) {
-                nodeId = @(2);
-            }else {
-                nodeId = [NSNumber numberWithInteger:[view.wx_ref integerValue] + 2];
-            }
+        NSNumber *nodeId = nil;
+        if ([ref isEqualToString:@"_root"]) {
+            nodeId = @(2);
+        }else {
+            nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
+        }
+        NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
+        NSLog(@"andVdomRef:%@",nodeIdKey);
+        if (![viewRefs objectForKey:nodeIdKey]) {
             [viewRefs setObject:view forKey:[NSString stringWithFormat:@"%ld",[nodeId integerValue]]];
             NSArray *attributes = [self attributesArrayForObject:view];
             for (int i = 0; i < attributes.count; i++) {
@@ -1132,8 +1135,8 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
             }
         }
         if (self.componentForRefs.count > 0) {
-            if (![self.componentForRefs objectForKey:view.wx_ref]) {
-                [self addWXComponentRef:view.wx_ref withInstanceId:nil];
+            if (![self.componentForRefs objectForKey:ref]) {
+                [self addWXComponentRef:nodeIdKey withInstanceId:nil];
             }
         }
     }
@@ -1148,7 +1151,9 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     }else {
         nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
     }
+    NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
     if (ref) {
+        NSLog(@"removeVdomRef:%@",nodeIdKey);
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
         ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
         if ([viewRefs objectForKey:ref]) {
@@ -1160,7 +1165,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         }
         if (self.componentForRefs.count > 0) {
             if ([self.componentForRefs objectForKey:ref]) {
-                [self addWXComponentRef:ref withInstanceId:nil];
+                [self addWXComponentRef:nodeIdKey withInstanceId:nil];
             }
         }
     }

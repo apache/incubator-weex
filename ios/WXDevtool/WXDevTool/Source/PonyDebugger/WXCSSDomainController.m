@@ -92,7 +92,7 @@
     NSString *nodeName = nil;
     
     /********actual********/
-    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:nodeKey];
+    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
     NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
     
     PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
@@ -207,6 +207,7 @@
 }
 
 - (void)domain:(PDCSSDomain *)domain getComputedStyleForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(NSArray *computedStyle, id error))callback {
+    /*
     PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     
@@ -217,6 +218,18 @@
             position = [self p_formateFrame:node.attributes[idx + 1]];
         }
     }];
+     */
+    
+    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
+    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    __block NSArray *position;
+    [actualAttrs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isEqualToString:@"frame"]) {
+            *stop = YES;
+            position = [self p_formateFrame:actualAttrs[idx + 1]];
+        }
+    }];
+    
     NSString *width = @"";
     NSString *height = @"";
     NSString *top = @"";
