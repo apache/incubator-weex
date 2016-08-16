@@ -561,31 +561,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 
 - (void)removeView:(UIView *)view
 {
-    /*
-    if ([self shouldIgnoreView:view] || !self.objectsForComponentRefs) {
-        return;
-    }
-    NSValue *value = nil;
-    @try {
-        value = [view valueForKeyPath:@"wx_ref"];
-        if (value) {
-            NSString *key = [self stringForValue:value atKeyPath:@"wx_ref" onObject:view];
-            WXComponent *corrComponent = [self _getComponentFromRef:key];
-            NSNumber *parentNodeId = nil;
-            NSNumber *corrNodeId = [NSNumber numberWithFloat:[corrComponent.ref floatValue]];
-            if (corrComponent.supercomponent) {
-                parentNodeId = [NSNumber numberWithFloat:[corrComponent.supercomponent.ref floatValue]];
-            } else if ([corrComponent.ref isEqualToString:@"_root"]) {
-                // Windows are always children of the root element node
-                parentNodeId = @(1);
-                corrNodeId = @(2);
-            }
-            [self.domain childNodeRemovedWithParentNodeId:parentNodeId nodeId:corrNodeId];
-        }
-    } @catch (NSException *exception) {
-        
-    }
-*/
     // Bail early if we're ignoring this view or if the document hasn't been requested yet
     if ([self shouldIgnoreView:view] || !self.objectsForNodeIds) {
         return;
@@ -1119,13 +1094,12 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         NSNumber *nodeId = nil;
         if ([ref isEqualToString:@"_root"]) {
             nodeId = @(2);
-        }else {
+        } else {
             nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
         }
         NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
         NSLog(@"andVdomRef:%@",nodeIdKey);
         if (![viewRefs objectForKey:nodeIdKey]) {
-            [viewRefs setObject:view forKey:[NSString stringWithFormat:@"%ld",[nodeId integerValue]]];
             NSArray *attributes = [self attributesArrayForObject:view];
             for (int i = 0; i < attributes.count; i++) {
                 if (i % 2 == 0) {
@@ -1134,6 +1108,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
                 }
             }
         }
+        [viewRefs setObject:view forKey:[NSString stringWithFormat:@"%ld",[nodeId integerValue]]];
         if (self.componentForRefs.count > 0) {
             if (![self.componentForRefs objectForKey:ref]) {
                 [self addWXComponentRef:nodeIdKey withInstanceId:nil];
@@ -1156,7 +1131,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         NSLog(@"removeVdomRef:%@",nodeIdKey);
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
         ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
-        if ([viewRefs objectForKey:ref]) {
+        if ([viewRefs objectForKey:ref] && [viewRefs objectForKey:ref] == view) {
             [viewRefs removeObjectForKey:ref];
             NSArray *attributes = @[@"class", @"frame", @"hidden", @"alpha", @"opaque"];
             for (NSString *key in attributes) {
@@ -1422,6 +1397,7 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     [[PDDOMDomainController defaultInstance] removeVDomTreeWithView:self];
 }
 
+#pragma mark -
 - (void)pd_swizzled_addSubview:(UIView *)subview;
 {
     [[PDDOMDomainController defaultInstance] removeView:subview];
