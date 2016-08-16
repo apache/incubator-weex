@@ -10,6 +10,7 @@ test:
 
     - cd android/sdk && ./gradlew checkstyle testDebugUnitTest jacocoTestReportDebug
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/reports 
+    - bash <(curl -s https://codecov.io/bash)
 
 dependencies:
   cache_directories:
