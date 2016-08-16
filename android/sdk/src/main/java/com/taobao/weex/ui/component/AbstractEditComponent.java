@@ -221,6 +221,7 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.WXTextDomObject;
@@ -430,7 +431,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       return;
     }
     mAutoFocus = autofocus;
-    EditText inputView = (EditText) mHost;
+    EditText inputView = mHost;
     if (mAutoFocus) {
       inputView.setFocusable(true);
       inputView.requestFocus();
@@ -449,6 +450,15 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }
       }, 16);
     }
+  }
+
+  @WXComponentProp(name = Constants.Name.VALUE)
+  public void setValue(String value){
+    if(mHost == null){
+      return;
+    }
+
+    mHost.setText(value);
   }
 
   @WXComponentProp(name = Constants.Name.COLOR)
