@@ -41,7 +41,7 @@ public  class ScreenShot {
             allViews = ViewUtil.getAllChildViews(rootView);
             for (View view:allViews
                  ) {
-                if(view instanceof android.widget.ScrollView){
+                if(view instanceof ScrollView){
                     firstScrollView = view;
                     break;
                 }
@@ -311,7 +311,7 @@ public  class ScreenShot {
         Window window = activity.getWindow();
         if (window != null) {
             window.getDecorView().getWindowVisibleDisplayFrame(rect);
-            android.view.View v = window.findViewById(Window.ID_ANDROID_CONTENT);
+            View v = window.findViewById(Window.ID_ANDROID_CONTENT);
 
             android.view.Display display = ((android.view.WindowManager) activity.getSystemService(activity.WINDOW_SERVICE)).getDefaultDisplay();
 

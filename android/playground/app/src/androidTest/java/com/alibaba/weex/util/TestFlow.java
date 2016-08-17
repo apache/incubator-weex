@@ -75,6 +75,9 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         setViewGroup(mViewGroup);
         // 根据TC 获取TC 列表,默认“"TC_"”
         mCaseListIndexView = ViewUtil.findViewWithText(mViewGroup, "AG_");
+
+        addAllTargetView("AG_");
+
         Thread.sleep(3000);
     }
 
@@ -305,5 +308,38 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
     public HashMap getTestMap(){
         return testMap;
+    }
+
+    /**
+     *
+     */
+    public void setUpToFindComponet(String targert){
+        int max = 60;
+        int count = 0;
+        while(mCaseListIndexView.size() == 0){
+
+            if (count < max){
+                TouchUtils.dragQuarterScreenUp(this, this.getActivity());
+                mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
+                mCaseListIndexView = ViewUtil.findViewWithText(mViewGroup, targert);
+                count ++;
+            }
+            else{
+                break;
+            }
+
+        }
+    }
+
+    public void addAllTargetView(String target){
+        int max = 6;
+        int count =0 ;
+        while (count < max){
+            TouchUtils.dragQuarterScreenUp(this, this.getActivity());
+            mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
+            mCaseListIndexView = ViewUtil.findViewWithText(mViewGroup, target);
+            mCaseListIndexView.addAll(mCaseListIndexView);
+            count ++;
+        }
     }
 }
