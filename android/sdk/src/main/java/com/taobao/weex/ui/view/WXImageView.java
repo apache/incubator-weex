@@ -263,6 +263,9 @@ public class WXImageView extends ImageView implements WXGestureObservable {
         }
 
         Bitmap bitmap = ((BitmapDrawable) mOriginal).getBitmap();
+        if(bitmap == null){
+          return;
+        }
         Matrix matrix = new Matrix();
         matrix.setScale(bounds.width() / bitmap.getWidth(),
                         bounds.height() / bitmap.getHeight());
