@@ -360,7 +360,7 @@ public final class WXDomManager {
    * Invoke {@link WXDomStatement} for removing the specified {@link WXDomObject}.
    *
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   * @param ref {@link WXDomObject#ref} of the dom.
+   * @param ref of the dom.
    */
   //removeElement(ref:String)
   void removeDom(String instanceId, String ref) {
@@ -379,8 +379,8 @@ public final class WXDomManager {
    * Invoke {@link WXDomStatement} for moving the specific {@link WXDomObject} to a new parent.
    *
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   * @param ref {@link WXDomObject#ref} of the dom to be moved.
-   * @param parentRef {@link WXDomObject#ref} of the new parent DOM node
+   * @param ref of the dom to be moved.
+   * @param parentRef of the new parent DOM node
    * @param index the index of the dom to be inserted in the new parent.
    */
   void moveDom(String instanceId, String ref, String parentRef, int index) {
@@ -399,7 +399,7 @@ public final class WXDomManager {
    * given attribute.
    *
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   * @param ref {@link WXDomObject#ref} of the dom.
+   * @param ref of the dom.
    * @param attr the new attribute. This attribute is only a part of the full attribute, and will be
    *             merged into {@link WXDomObject#attr}
    */
@@ -437,7 +437,7 @@ public final class WXDomManager {
    * WXDomObject}.
    *
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   * @param ref {@link WXDomObject#ref} of the dom.
+   * @param ref of the dom.
    * @param type the type of the event, this may be a plain event defined in
    * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
@@ -457,7 +457,7 @@ public final class WXDomManager {
    * Invoke the {@link WXDomStatement} for removing the event listener of the corresponding {@link
    * WXDomObject}.
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   * @param ref {@link WXDomObject#ref} of the dom.
+   * @param ref of the dom.
    * @param type the type of the event, this may be a plain event defined in
    * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
@@ -477,7 +477,7 @@ public final class WXDomManager {
    * Invoke the {@link WXDomStatement} for scrolling the given view to the specified position.
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance to
    *                                                                    scroll.
-   * @param ref {@link WXDomObject#ref} of the dom.
+   * @param ref of the dom.
    * @param options the specified position
    */
   void scrollToDom(String instanceId, String ref, JSONObject options) {

@@ -204,12 +204,16 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.ui.component.WXBasicComponentType;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -228,15 +232,37 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
+  public static final String GOD = "god";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
-  public AtomicBoolean sDestroy = new AtomicBoolean();
+  private AtomicBoolean sDestroy = new AtomicBoolean();
+
+  /** Use {@link #getRef()} instead. This field will be removed soon. **/
+  @Deprecated
   public String ref = ROOT;
-  public String type = WXBasicComponentType.SCROLLER;
+
+  /** Use {@link #getType()} instead. This field will be removed soon. **/
+  @Deprecated
+  public String type = WXBasicComponentType.DIV;
+
+  /** Use {@link #getStyles()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXStyle style;
+
+  /** Use {@link #getAttrs()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXAttr attr;
+
+  /** Use {@link #getEvents()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXEvent event;
+
+  /** Do not access this field directly. This field will be removed soon. **/
+  @Deprecated
   public List<WXDomObject> children;
+
+  /** Do not access this field directly. This field will be removed soon. **/
+  @Deprecated
   public WXDomObject parent;
 
   private ArrayList<String> fixedStyleRefs;
@@ -257,6 +283,96 @@ public class WXDomObject extends CSSNode implements Cloneable {
   public boolean isModifyWidth() {
     return isModifyWidth;
   }
+
+  public String getRef(){
+    return ref;
+  }
+
+  public String getType(){
+    return type;
+  }
+
+  public @NonNull WXStyle getStyles(){
+    if(style == null ){
+      style = new WXStyle();
+    }
+    return style;
+  }
+
+  public @NonNull WXAttr getAttrs(){
+    if(attr == null){
+      attr = new WXAttr();
+    }
+    return attr;
+  }
+
+  public @NonNull WXEvent getEvents(){
+    if(event == null){
+      event = new WXEvent();
+    }
+
+    return event;
+  }
+
+  public static void prepareRoot(WXDomObject obj) {
+    obj.ref = WXDomObject.ROOT;
+  }
+
+  public static void prepareGod(WXDomObject obj) {
+    obj.ref = GOD;
+    obj.type = WXBasicComponentType.DIV;
+  }
+
+  protected final void copyFields(WXDomObject dest) {
+    dest.cssstyle.copy(this.cssstyle);
+    dest.setModifyHeight(isModifyHeight);
+    dest.setModifyWidth(isModifyWidth);
+    dest.ref = ref;
+    dest.type = type;
+    dest.style = style;//mStyles == null ? null : mStyles.clone();
+    dest.attr = attr;//mAttrs == null ? null : mAttrs.clone();
+    dest.event = event == null ? null : event.clone();
+    dest.csslayout.copy(this.csslayout);
+  }
+
+  /**
+   * Parse the jsonObject to {@link WXDomObject} recursively
+   * @param map the original JSONObject
+   * @return Dom Object corresponding to the JSONObject.
+   */
+  public void parseFromJson(JSONObject map){
+    if (map == null || map.size() <= 0) {
+      return;
+    }
+
+    String type = (String) map.get("type");
+    this.type = type;
+    this.ref = (String) map.get("ref");
+    Object style = map.get("style");
+    if (style != null && style instanceof JSONObject) {
+      WXStyle styles = new WXStyle();
+      WXJsonUtils.putAll(styles, (JSONObject) style);
+      this.style = styles;
+    }
+    Object attr = map.get("attr");
+    if (attr != null && attr instanceof JSONObject) {
+      WXAttr attrs = new WXAttr();
+      WXJsonUtils.putAll(attrs, (JSONObject) attr);
+      this.attr = attrs;
+    }
+    Object event = map.get("event");
+    if (event != null && event instanceof JSONArray) {
+      WXEvent events = new WXEvent();
+      JSONArray eventArray = (JSONArray) event;
+      int count = eventArray.size();
+      for (int i = 0; i < count; ++i) {
+        events.add(eventArray.getString(i));
+      }
+      this.event = events;
+    }
+
+  }
+
 
   public void setModifyWidth(boolean isModifyWidth) {
     this.isModifyWidth = isModifyWidth;
@@ -493,22 +609,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
     WXDomObject dom = null;
     try {
       dom = new WXDomObject();
-      if (this.cssstyle != null) {
-        dom.cssstyle.copy(this.cssstyle);
-      }
-
-      dom.setModifyHeight(isModifyHeight);
-      dom.setModifyWidth(isModifyWidth);
-      dom.ref = ref;
-      dom.type = type;
-      dom.style = style;//style == null ? null : style.clone();
-      dom.attr = attr;//attr == null ? null : attr.clone();
-      dom.event = event == null ? null : event.clone();
-      if (this.csslayout != null) {
-        dom.csslayout.copy(this.csslayout);
-      }
-
-
+      copyFields(dom);
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("WXDomObject clone error: ", e);

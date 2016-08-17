@@ -689,7 +689,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
 
     ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(mDomObj.ref);
+        .get(mDomObj.getRef());
     if (appearMap == null) {
       return;
     }
@@ -767,7 +767,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
 
         if (mContentHeight != contentH) {
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), WXEventType.LIST_LOAD_MORE);
           mContentHeight = contentH;
         }
       }

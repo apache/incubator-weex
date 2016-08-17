@@ -903,7 +903,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private int generateViewType(WXComponent component) {
         long id;
         try {
-            id = Integer.parseInt(component.getDomObject().ref);
+            id = Integer.parseInt(component.getDomObject().getRef());
             String type = component.getDomObject().attr.getScope();
 
             if (!TextUtils.isEmpty(type)) {
@@ -947,7 +947,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     public long getItemId(int position) {
         long id;
         try {
-            id = Long.parseLong(getChild(position).getDomObject().ref);
+            id = Long.parseLong(getChild(position).getDomObject().getRef());
         } catch (RuntimeException e) {
             WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
             id = RecyclerView.NO_ID;
@@ -969,7 +969,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), WXEventType.LIST_LOAD_MORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }
