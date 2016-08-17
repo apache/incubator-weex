@@ -911,7 +911,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
                     NSString *newKey = [NSString stringWithFormat:@"%ld",[key integerValue] + 2];
                    [self.objectsForComponentRefs setObject:parentView forKey:newKey];
                 }
-//                [self startTrackingView:parentView];
             }
         } @catch (NSException *exception) {
             
@@ -1098,7 +1097,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
             nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
         }
         NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
-        NSLog(@"andVdomRef:%@",nodeIdKey);
         if (![viewRefs objectForKey:nodeIdKey]) {
             NSArray *attributes = [self attributesArrayForObject:view];
             for (int i = 0; i < attributes.count; i++) {
@@ -1128,7 +1126,6 @@ static NSString *const kPDDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     }
     NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
     if (ref) {
-        NSLog(@"removeVdomRef:%@",nodeIdKey);
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
         ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
         if ([viewRefs objectForKey:ref] && [viewRefs objectForKey:ref] == view) {

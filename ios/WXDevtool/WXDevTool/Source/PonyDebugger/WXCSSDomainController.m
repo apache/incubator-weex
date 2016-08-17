@@ -11,6 +11,7 @@
 #import "PDCSSTypes.h"
 #import <WeexSDK/WXComponent.h>
 #import <WeexSDK/WXSDKInstance.h>
+#import <WeexSDK/WXUtility.h>
 
 @implementation WXCSSDomainController
 @dynamic domain;
@@ -239,6 +240,8 @@
         height = position[3];
         top = position[1];
         left = position[0];
+        width = [NSString stringWithFormat:@"%lf",[width floatValue]/WXScreenResizeRadio()];
+        height = [NSString stringWithFormat:@"%lf",[height floatValue]/WXScreenResizeRadio()];
     }
     NSMutableArray *computedStyles = [[NSMutableArray alloc] init];
     NSArray *layout = @[@{@"name":@"width",@"value":width},
