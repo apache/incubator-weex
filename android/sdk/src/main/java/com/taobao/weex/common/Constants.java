@@ -290,6 +290,7 @@ public class Constants {
     String AUTOFOCUS = "autofocus";
     String SINGLELINE = "singleline";
     String MAX_LENGTH = "maxLength";
+    String MAXLENGTH ="maxlength";
     String ROWS = "rows";
     String CHECKED = "checked";
     String VISIBILITY = "visibility";
