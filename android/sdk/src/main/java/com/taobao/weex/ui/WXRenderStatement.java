@@ -365,7 +365,11 @@ class WXRenderStatement {
     parent.addChild(component, index);
   }
 
-  WXComponent createComponentOnDomThread(WXDomObject dom, String parentRef, int index) {
+  @Nullable WXComponent createComponentOnDomThread(WXDomObject dom, String parentRef, int index) {
+    WXComponent comp = mRegistry.get(parentRef);
+    if(comp == null || !(comp instanceof WXVContainer)){
+      return null;
+    }
     return generateComponentTree(dom, (WXVContainer) mRegistry.get(parentRef));
   }
 
