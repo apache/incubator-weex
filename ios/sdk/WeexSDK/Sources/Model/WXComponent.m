@@ -201,13 +201,9 @@
         
         if (_lazyCreateView) {
             if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
-                NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;
+                NSArray *subcomponents = [((WXComponent *)self.supercomponent).subcomponents copy];
                 
-                NSInteger index;
-                pthread_mutex_lock(&_propertyMutex);
-                index = [subcomponents indexOfObject:self];
-                pthread_mutex_unlock(&_propertyMutex);
-                
+                NSInteger index = [subcomponents indexOfObject:self];
                 if (index != NSNotFound) {
                     [((WXComponent *)self.supercomponent).view insertSubview:_view atIndex:index];
                 }
