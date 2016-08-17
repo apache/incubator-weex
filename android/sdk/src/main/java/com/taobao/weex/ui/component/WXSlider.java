@@ -215,7 +215,7 @@ import android.widget.FrameLayout;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
@@ -232,10 +232,6 @@ import java.util.Map;
 
 public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeListener {
 
-  public static final String INDEX = "index";
-  public static final String SHOW_INDICATORS = "showIndicators";
-  public static final String AUTO_PLAY = "autoPlay";
-  public static final String INTERVAL = "interval";
   Map<String, Object> params = new HashMap<>();
 
   public static class Ceator implements ComponentCreator {
@@ -247,7 +243,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   /**
    * Scrollable sliderview
    */
-  private WXCircleViewPager mViewPager;
+  /** package **/ WXCircleViewPager mViewPager;
   /**
    * Circle indicator
    */
@@ -378,31 +374,31 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SLIDER_VALUE:
+      case Constants.Name.VALUE:
         String value = WXUtils.getString(param, null);
         if (value != null) {
           setValue(value);
         }
         return true;
-      case AUTO_PLAY:
+      case Constants.Name.AUTO_PLAY:
         String aotu_play = WXUtils.getString(param, null);
         if (aotu_play != null) {
           setAutoPlay(aotu_play);
         }
         return true;
-      case SHOW_INDICATORS:
+      case Constants.Name.SHOW_INDICATORS:
         String indicators = WXUtils.getString(param, null);
         if (indicators != null) {
           setShowIndicators(indicators);
         }
         return true;
-      case INTERVAL:
+      case Constants.Name.INTERVAL:
         Integer interval = WXUtils.getInteger(param, null);
         if (interval != null) {
           setInterval(interval);
         }
         return true;
-      case INDEX:
+      case Constants.Name.INDEX:
         Integer index = WXUtils.getInteger(param, null);
         if (index != null) {
           setIndex(index);
@@ -412,7 +408,8 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SLIDER_VALUE)
+  @Deprecated
+  @WXComponentProp(name = Constants.Name.VALUE)
   public void setValue(String value) {
     if (value == null || mHost == null) {
       return;
@@ -428,7 +425,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     mViewPager.setCurrentItem(i);
   }
 
-  @WXComponentProp(name = AUTO_PLAY)
+  @WXComponentProp(name = Constants.Name.AUTO_PLAY)
   public void setAutoPlay(String autoPlay) {
     if (TextUtils.isEmpty(autoPlay) || autoPlay.equals("false")) {
       mViewPager.stopAutoScroll();
@@ -438,7 +435,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     }
   }
 
-  @WXComponentProp(name = SHOW_INDICATORS)
+  @WXComponentProp(name = Constants.Name.SHOW_INDICATORS)
   public void setShowIndicators(String show) {
     if (TextUtils.isEmpty(show) || show.equals("false")) {
       mShowIndicators = false;
@@ -457,16 +454,19 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
 
   }
 
-  @WXComponentProp(name = INTERVAL)
+  @WXComponentProp(name = Constants.Name.INTERVAL)
   public void setInterval(int intervalMS) {
     if (mViewPager != null && intervalMS > 0) {
       mViewPager.setIntervalTime(intervalMS);
     }
   }
 
-  @WXComponentProp(name = INDEX)
+  @WXComponentProp(name = Constants.Name.INDEX)
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
+      if(index >= mAdapter.getRealCount() || index < 0){
+        return;
+      }
       index = index % mAdapter.getRealCount();
       mViewPager.setCurrentItem(index);
     }

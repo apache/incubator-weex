@@ -208,4 +208,8 @@ package com.taobao.weex.dom;
  * Created by sospartan on 7/27/16.
  */
 public class TestDomObject extends WXDomObject {
+  public TestDomObject(){
+    style = new WXStyle();
+    attr = new WXAttr();
+  }
 }

@@ -210,7 +210,7 @@ import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXUtils;
@@ -268,7 +268,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SWITCH_CHECKED:
+      case Constants.Name.CHECKED:
         Boolean result = WXUtils.getBoolean(param,null);
         if (result != null)
           setChecked(result);
@@ -277,7 +277,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SWITCH_CHECKED)
+  @WXComponentProp(name = Constants.Name.CHECKED)
   public void setChecked(boolean checked) {
     getHostView().setChecked(checked);
   }

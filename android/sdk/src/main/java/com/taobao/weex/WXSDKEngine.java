@@ -266,7 +266,7 @@ public class WXSDKEngine {
         WXText.class,
         new SimpleComponentHolder(
           WXText.class,
-          new WXText.Ceator()
+          new WXText.Creator()
         ),
         false,
         WXBasicComponentType.TEXT

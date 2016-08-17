@@ -210,7 +210,7 @@ import android.view.View;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -260,17 +260,17 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_ITEM_COLOR:
+      case Constants.Name.ITEM_COLOR:
         String item_color = WXUtils.getString(param,null);
         if (item_color != null)
           setItemColor(item_color);
         return true;
-      case WXDomPropConstant.WX_ATTR_ITEM_SELECTED_COLOR:
+      case Constants.Name.ITEM_SELECTED_COLOR:
         String selected_color = WXUtils.getString(param,null);
         if (selected_color != null)
           setItemSelectedColor(selected_color);
         return true;
-      case WXDomPropConstant.WX_ATTR_ITEM_SIZE:
+      case Constants.Name.ITEM_SIZE:
         Integer item_size = WXUtils.getInteger(param,null);
         if (item_size != null)
           setItemSize(item_size);
@@ -280,7 +280,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
   }
 
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_ITEM_COLOR)
+  @WXComponentProp(name = Constants.Name.ITEM_COLOR)
   public void setItemColor(String itemColor) {
     if (!TextUtils.isEmpty(itemColor)) {
       int colorInt = WXResourceUtils.getColor(itemColor);
@@ -292,7 +292,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_ITEM_SELECTED_COLOR)
+  @WXComponentProp(name = Constants.Name.ITEM_SELECTED_COLOR)
   public void setItemSelectedColor(String itemSelectedColor) {
     if (!TextUtils.isEmpty(itemSelectedColor)) {
       int colorInt = WXResourceUtils.getColor(itemSelectedColor);
@@ -304,7 +304,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
     }
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_ITEM_SIZE)
+  @WXComponentProp(name = Constants.Name.ITEM_SIZE)
   public void setItemSize(int itemSize) {
     if (itemSize < 0) {
       return;

@@ -227,7 +227,7 @@ public class WXText extends WXComponent<WXTextView>{
    **/
   public static final int sDEFAULT_SIZE = 32;
 
-  public static class Ceator implements ComponentCreator{
+  public static class Creator implements ComponentCreator{
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXText(instance,node,parent,lazy);
     }

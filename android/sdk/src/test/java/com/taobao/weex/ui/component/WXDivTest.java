@@ -206,6 +206,8 @@ package com.taobao.weex.ui.component;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 
@@ -228,6 +230,13 @@ public class WXDivTest {
 
     private WXDiv mWXDiv;
     private WXText child2;
+
+
+    public static WXDiv create(){
+        WXDiv div = new WXDiv(WXSDKInstanceTest.createInstance(),new TestDomObject(),null,false);
+        return div;
+    }
+
 
     @Before
     public void setUp() throws Exception {

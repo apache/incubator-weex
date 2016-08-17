@@ -212,6 +212,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
 
+import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
@@ -230,9 +231,9 @@ public class WXEnvironment {
    * Global config
    ***************************/
 
-  public static String JS_LIB_SDK_VERSION = "v0.15.2";
+  public static String JS_LIB_SDK_VERSION = BuildConfig.buildJavascriptFrameworkVersion;
 
-  public static String WXSDK_VERSION = "0.7.0.3";
+  public static String WXSDK_VERSION = BuildConfig.buildVersion;
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
   public static int sDefaultWidth = 750;
@@ -256,7 +257,7 @@ public class WXEnvironment {
   /** from init to sdk-ready **/
   public static long sSDKInitTime =0;
 
-  public static LogLevel sLogLevel= LogLevel.DEBUG;
+  public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   private static boolean isPerf = false;
 
