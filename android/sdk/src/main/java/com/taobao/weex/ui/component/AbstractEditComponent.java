@@ -430,7 +430,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       return;
     }
     mAutoFocus = autofocus;
-    EditText inputView = (EditText) mHost;
+    EditText inputView = mHost;
     if (mAutoFocus) {
       inputView.setFocusable(true);
       inputView.requestFocus();
@@ -449,6 +449,16 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }
       }, 16);
     }
+  }
+
+
+  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_VALUE)
+  public void setValue(String value){
+    if(mHost == null){
+      return;
+    }
+
+    ((WXEditText) mHost).setText(value);
   }
 
   @WXComponentProp(name = WXDomPropConstant.WX_COLOR)
