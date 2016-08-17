@@ -19,6 +19,17 @@ try {
 
 }
 
+def jsfmVersion = "0.15.2"
+    try{
+        def line
+        new File("assets/main.js").withReader { line = it.readLine() }
+        def m = line =~ /[A-Z\s]+\:\s+([0-9\.]+)\s+Build\s+[0-9]+/;
+        jsfmVersion = m[0][1]
+        println "weex-build-jsfm-version" + jsfmVersion
+    } catch (java.lang.Exception e) {
+
+    }
+
 buildscript {
     repositories {
         maven {
@@ -44,6 +55,7 @@ android {
 
     def jniDir = projectDir.path + "/src/main/jni/"
     defaultConfig {
+        buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
         ndk {
             // moduleName "weexcore"
