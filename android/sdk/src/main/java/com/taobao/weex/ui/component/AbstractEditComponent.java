@@ -502,12 +502,25 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     getHostView().setLines(lines);
   }
 
+  /**
+   * Compatible with both 'max-length' and 'maxlength'
+   * @param maxLength
+   */
   @WXComponentProp(name = Constants.Name.MAX_LENGTH)
   public void setMaxLength(int maxLength) {
     if (getHostView() == null) {
       return;
     }
     getHostView().setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
+  }
+
+  /**
+   * Compatible with both 'max-length' and 'maxlength'
+   * @param maxLength
+   */
+  @WXComponentProp(name = Constants.Name.MAXLENGTH)
+  public void setMaxlength(int maxLength) {
+    setMaxLength(maxLength);
   }
 
   @Override
