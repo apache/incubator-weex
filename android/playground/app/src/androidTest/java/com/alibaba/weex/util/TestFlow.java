@@ -76,7 +76,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         // 根据TC 获取TC 列表,默认“"TC_"”
         mCaseListIndexView = ViewUtil.findViewWithText(mViewGroup, "AG_");
 
-        addAllTargetView("AG_");
+//        addAllTargetView("AG_");
 
         Thread.sleep(3000);
     }
