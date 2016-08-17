@@ -208,7 +208,7 @@ package com.taobao.weex.utils;
  * Created by lixinke on 16/5/11.
  */
 public enum LogLevel {
-  ERROR("error", 0), WARN("warn", 1), INFO("info", 2), DEBUG("debug", 3), VERBOSE("verbose", 4), ALL("all", 5);
+  ERROR("error", 0), WARN("warn", 1), INFO("info", 2), DEBUG("debug", 3), VERBOSE("verbose", 4), ALL("debug", 5),OFF("off",6);
   String name;
   int value;
 

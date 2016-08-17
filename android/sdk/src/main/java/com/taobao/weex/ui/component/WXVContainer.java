@@ -286,7 +286,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   @Override
   public void createViewImpl(WXVContainer parent, int index) {
     super.createViewImpl(parent, index);
-    getOrCreateBorder().attachView(mHost);
     int count = childCount();
     for (int i = 0; i < count; ++i) {
       getChild(i).createViewImpl(this, i);

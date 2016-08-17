@@ -3,13 +3,14 @@ machine:
     version: 5
 test:
   override:
-    - npm run test
+    #- npm run test
     - cd android/playground && ./gradlew assembleDebug
+    - cd android/sdk && ./gradlew testDebugUnitTest jacocoTestReportDebug
+  post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS # playground artifacts
     - cp -r android/sdk/build/outputs/ $CIRCLE_ARTIFACTS # sdk artifacts
-
-    - cd android/playground && ./gradlew testDebugUnitTest jacocoTestReportDebug
-    - cp -r android/sdk/build/reports/ $CIRCLE_ARTIFACTS/reports
+    - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/reports 
+    - cd android/sdk && bash <(curl -s https://codecov.io/bash)
 
 dependencies:
   cache_directories:

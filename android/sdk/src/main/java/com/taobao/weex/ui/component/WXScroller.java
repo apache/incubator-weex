@@ -217,7 +217,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
@@ -375,7 +375,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if (child instanceof WXLoading) {
       ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
       final WXComponent temp = child;
-      Runnable runnable=WXThread.secure(new Runnable(){
+      Runnable runnable= WXThread.secure(new Runnable(){
         @Override
         public void run() {
           ((BaseBounceView)mHost).setFooterView(temp.getHostView());
@@ -511,7 +511,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
-      case WXDomPropConstant.WX_ATTR_SHOWSCROLLBAR:
+      case Constants.Name.SHOW_SCROLLBAR:
         Boolean result = WXUtils.getBoolean(param,null);
         if (result != null)
           setShowScrollbar(result);
@@ -520,7 +520,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return super.setProperty(key, param);
   }
 
-  @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SHOWSCROLLBAR)
+  @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
   public void setShowScrollbar(boolean show) {
     if(getInnerView()==null){
       return;

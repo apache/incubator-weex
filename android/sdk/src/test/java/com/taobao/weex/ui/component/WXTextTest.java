@@ -207,7 +207,7 @@ package com.taobao.weex.ui.component;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -323,13 +323,13 @@ public class WXTextTest {
     public void testUpdateProperties(){
         testBind();
         Map<String, Object> prop = new HashMap<>();
-        prop.put(WXDomPropConstant.WX_ATTR_DISABLED, "false");
-        prop.put(WXDomPropConstant.WX_OPACITY, 0.8f);
+        prop.put(Constants.Name.DISABLED, "false");
+        prop.put(Constants.Name.OPACITY, 0.8f);
         mWXText.updateProperties(prop);
         assertTrue(mWXText.getHostView().isEnabled());
         assertTrue(mWXText.getHostView().getAlpha()>=0.799 && mWXText.getHostView().getAlpha()<=0.811);
 
-        prop.put(WXDomPropConstant.WX_ATTR_DISABLED, "true");
+        prop.put(Constants.Name.DISABLED, "true");
         mWXText.updateProperties(prop);
         assertFalse(mWXText.getHostView().isEnabled());
     }

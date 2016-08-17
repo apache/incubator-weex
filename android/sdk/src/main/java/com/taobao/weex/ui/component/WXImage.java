@@ -213,13 +213,12 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.Component;
-import com.taobao.weex.common.WXDomPropConstant;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
-import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -251,64 +250,25 @@ public class WXImage extends WXComponent<ImageView> {
 
     @Override
     protected WXImageView initComponentHostView(Context context) {
-        WXImageView view = new WXImageView(mContext, mDomObj);
+        WXImageView view = new WXImageView(mContext);
         view.setScaleType(ScaleType.FIT_XY);
         return view;
     }
 
     @Override
-    public void setBackgroundColor(String color) {
-        if (!TextUtils.isEmpty(color)) {
-            int colorInt = WXResourceUtils.getColor(color);
-            if (colorInt != Integer.MIN_VALUE) {
-                mHost.setBackgroundColor(colorInt);
-            }
-        }
-    }
-
-
-    /**
-     * Image is not support border.
-     */
-    @Override
-    public void setBorderRadius(String key, float borderRadius) {
-    }
-
-    /**
-     * Image is not support border.
-     */
-    @Override
-    public void setBorderWidth(String key, float borderWidth) {
-    }
-
-    /**
-     * Image is not support border.
-     */
-    @Override
-    public void setBorderStyle(String borderStyle) {
-    }
-
-    /**
-     * Image is not support border.
-     */
-    @Override
-    public void setBorderColor(String key, String borderColor) {
-    }
-
-    @Override
     protected boolean setProperty(String key, Object param) {
         switch (key) {
-            case WXDomPropConstant.WX_RESIZE_MODE:
+            case Constants.Name.RESIZE_MODE:
                 String resize_mode = WXUtils.getString(param,null);
                 if (resize_mode != null)
                     setResizeMode(resize_mode);
                 return true;
-            case WXDomPropConstant.WX_RESIZE:
+            case Constants.Name.RESIZE:
                 String resize = WXUtils.getString(param,null);
                 if (resize != null)
                     setResize(resize);
                 return true;
-            case WXDomPropConstant.WX_ATTR_SRC:
+            case Constants.Name.SRC:
                 String src = WXUtils.getString(param,null);
                 if (src != null)
                     setSrc(src);
@@ -317,7 +277,7 @@ public class WXImage extends WXComponent<ImageView> {
         return super.setProperty(key, param);
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE_MODE)
+    @WXComponentProp(name = Constants.Name.RESIZE_MODE)
     public void setResizeMode(String resizeMode) {
         ((ImageView) getHostView()).setScaleType(getResizeMode(resizeMode));
     }
@@ -344,12 +304,12 @@ public class WXImage extends WXComponent<ImageView> {
         return scaleType;
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_RESIZE)
+    @WXComponentProp(name = Constants.Name.RESIZE)
     public void setResize(String resize) {
         ((ImageView) getHostView()).setScaleType(getResizeMode(resize));
     }
 
-    @WXComponentProp(name = WXDomPropConstant.WX_ATTR_SRC)
+    @WXComponentProp(name = Constants.Name.SRC)
     public void setSrc(String src) {
 
         WXImageStrategy imageStrategy = new WXImageStrategy();
@@ -372,8 +332,8 @@ public class WXImage extends WXComponent<ImageView> {
             }
         });
 
-        if(mDomObj.attr!=null && mDomObj.attr.containsKey(WXDomPropConstant.WX_ATTR_PLACE_HOLDER)){
-            String placeHolder= (String) mDomObj.attr.get(WXDomPropConstant.WX_ATTR_PLACE_HOLDER);
+        if(mDomObj.attr!=null && mDomObj.attr.containsKey(Constants.Name.PLACE_HOLDER)){
+            String placeHolder= (String) mDomObj.attr.get(Constants.Name.PLACE_HOLDER);
             imageStrategy.placeHolder=placeHolder;
         }
 
