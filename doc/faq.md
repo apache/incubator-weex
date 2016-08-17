@@ -91,3 +91,15 @@ else {
   }
 </script>
 ```
+
+## Transfer data between pages
+
+If you have 2 pages, A and B.
+
+0. A -> B, use [getConfig api](http://alibaba.github.io/weex/doc/references/api.html#getconfig) or [storage module](http://alibaba.github.io/weex/doc/modules/storage.html) to transfer data
+0. B -> A, use [storage module](http://alibaba.github.io/weex/doc/modules/storage.html) to transfer data
+
+
+
+
+
