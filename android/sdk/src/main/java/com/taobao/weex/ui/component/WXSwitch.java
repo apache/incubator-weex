@@ -251,7 +251,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
           Map<String, Object> attrsChanges = new HashMap<>();
           attrsChanges.put("checked",Boolean.toString(isChecked));
           domChanges.put("attrs",attrsChanges);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.CHANGE, params,domChanges);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), WXEventType.CHANGE, params,domChanges);
         }
       });
     }

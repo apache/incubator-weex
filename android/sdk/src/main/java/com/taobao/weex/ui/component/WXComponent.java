@@ -311,7 +311,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * layout view
    */
   public final void setLayout(WXDomObject domObject) {
-    if (mParent == null || domObject == null || TextUtils.isEmpty(mDomObj.ref)) {
+    if (mParent == null || domObject == null || TextUtils.isEmpty(mDomObj.getRef())) {
       return;
     }
 
@@ -598,7 +598,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           params.put("width", mDomObj.getCSSLayoutWidth());
           params.put("height", mDomObj.getCSSLayoutHeight());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
-              mDomObj.ref,
+              mDomObj.getRef(),
               WXEventType.CLICK,
               params);
         }
@@ -612,7 +612,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
-                                               mDomObj.ref,
+                                               mDomObj.getRef(),
                                                hasFocus ? WXEventType.FOCUS : WXEventType.BLUR, params);
         }
       });
@@ -705,7 +705,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (mDomObj == null) {
       return null;
     }
-    return mDomObj.ref;
+    return mDomObj.getRef();
   }
 
   /**

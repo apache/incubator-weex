@@ -337,7 +337,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       attrsChanges.put("value", value);
       domChanges.put("attrs", attrsChanges);
 
-      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, event, params, domChanges);
+      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), event, params, domChanges);
     }
   }
 
