@@ -822,6 +822,11 @@ public class WXBridgeManager implements Callback {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("destroyInstance >>>> instanceId:" + instanceId);
       }
+
+      if(sDomModule!=null){
+        sDomModule.mWXSDKInstance=null;
+      }
+
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
                                                 instanceId);
       WXJSObject[] args = {instanceIdObj};
