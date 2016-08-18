@@ -246,13 +246,13 @@ public class WXTextTest {
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
 
-        mParentDomObj = Mockito.mock(WXDomObject.class);
+        mParentDomObj = Mockito.spy(new WXDomObject());
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.getBorder()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.clone()).thenReturn(mParentDomObj);
         mParentDomObj.ref = "_root";
 
-        mDomObject = Mockito.mock(WXTextDomObject.class);
+        mDomObject = Mockito.spy(new WXTextDomObject());
         mDomObject.ref = "1";
         mDomObject.addEvent(WXEventType.CLICK);
         Mockito.when(mDomObject.clone()).thenReturn(mDomObject);
