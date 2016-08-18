@@ -392,7 +392,6 @@ public final class WXDomModule extends WXModule {
   }
 
   /**
-
    * Update DOM style.
    * @param ref DOM reference
    * @param style the expected style
@@ -414,7 +413,7 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Remove a node for the node tree.
-   * @param ref {@link WXDomObject#ref} of the node to be removed.
+   * @param ref reference of the node to be removed.
    */
   public void removeElement(String ref) {
     if (TextUtils.isEmpty(ref)) {
@@ -432,7 +431,7 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Add a {@link WXDomObject} to the specified parent as its given n-th child.
-   * @param parentRef {@link WXDomObject#ref} of the parent.
+   * @param parentRef reference of the parent.
    * @param element the node to be added
    * @param index the expected index that the new dom in its new parent
    */
@@ -455,8 +454,8 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Move the DomElement to the specified parent as its given n-th child.
-   * @param ref {@link WXDomObject#ref} of the node to be moved.
-   * @param parentRef {@link WXDomObject#ref} of the parent.
+   * @param ref reference of the node to be moved.
+   * @param parentRef reference of the parent.
    * @param index the expected index that the dom in its new parent
    */
   public void moveElement(String ref, String parentRef, Integer index) {
@@ -478,7 +477,7 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Add eventListener for the specified {@link WXDomObject}
-   * @param ref {@link WXDomObject#ref} of the node
+   * @param ref reference of the node
    * @param type the type of the event listener to be added.
    */
   public void addEvent(String ref, String type) {
@@ -498,7 +497,7 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Remove eventListener for the specified {@link WXDomObject}
-   * @param ref {@link WXDomObject#ref} of the node
+   * @param ref reference of the node
    * @param type the type of the event listener to be removed.
    */
   public void removeEvent(String ref, String type) {
@@ -554,7 +553,7 @@ public final class WXDomModule extends WXModule {
 
   /**
    * Scroll the specified {@link WXDomObject} to given offset in given duration
-   * @param ref {@link WXDomObject#ref} of specified dom object
+   * @param ref reference of specified dom object
    * @param options scroll option, like {offset:0, duration:300}
    */
   public void scrollToElement(String ref, JSONObject options) {

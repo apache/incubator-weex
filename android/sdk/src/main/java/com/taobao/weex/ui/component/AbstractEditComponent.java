@@ -337,7 +337,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       attrsChanges.put("value", value);
       domChanges.put("attrs", attrsChanges);
 
-      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, event, params, domChanges);
+      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), event, params, domChanges);
     }
   }
 
@@ -466,7 +466,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (mHost != null && !TextUtils.isEmpty(color)) {
       int colorInt = WXResourceUtils.getColor(color);
       if (colorInt != Integer.MIN_VALUE) {
-        ((WXEditText) mHost).setTextColor(colorInt);
+        mHost.setTextColor(colorInt);
       }
     }
   }
@@ -482,7 +482,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   public void setTextAlign(String textAlign) {
     int align = getTextAlign(textAlign);
     if (align > 0) {
-      ((EditText) mHost).setGravity(align | Gravity.CENTER_VERTICAL);
+      mHost.setGravity(align | Gravity.CENTER_VERTICAL);
     }
   }
 
@@ -491,7 +491,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (mHost == null) {
       return;
     }
-    ((WXEditText) mHost).setSingleLine(singleLine);
+    mHost.setSingleLine(singleLine);
   }
 
   @WXComponentProp(name = Constants.Name.LINES)
@@ -502,12 +502,25 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     getHostView().setLines(lines);
   }
 
+  /**
+   * Compatible with both 'max-length' and 'maxlength'
+   * @param maxLength
+   */
   @WXComponentProp(name = Constants.Name.MAX_LENGTH)
   public void setMaxLength(int maxLength) {
     if (getHostView() == null) {
       return;
     }
     getHostView().setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
+  }
+
+  /**
+   * Compatible with both 'max-length' and 'maxlength'
+   * @param maxLength
+   */
+  @WXComponentProp(name = Constants.Name.MAXLENGTH)
+  public void setMaxlength(int maxLength) {
+    setMaxLength(maxLength);
   }
 
   @Override

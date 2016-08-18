@@ -489,8 +489,8 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     if (getDomObject().getEvents().size() == 0) {
       return;
     }
-    WXEvent event = getDomObject().event;
-    String ref = getDomObject().ref;
+    WXEvent event = getDomObject().getEvents();
+    String ref = getDomObject().getRef();
     if (event.contains(WXEventType.SLIDER_CHANGE) && WXViewUtils.onScreenArea(mHost)) {
       params.put("index", realPosition);
 

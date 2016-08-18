@@ -204,13 +204,17 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -230,15 +234,37 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
+  public static final String GOD = "god";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
-  public AtomicBoolean sDestroy = new AtomicBoolean();
+  private AtomicBoolean sDestroy = new AtomicBoolean();
+
+  /** Use {@link #getRef()} instead. This field will be removed soon. **/
+  @Deprecated
   public String ref = ROOT;
-  public String type = WXBasicComponentType.SCROLLER;
+
+  /** Use {@link #getType()} instead. This field will be removed soon. **/
+  @Deprecated
+  public String type = WXBasicComponentType.DIV;
+
+  /** Use {@link #getStyles()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXStyle style;
+
+  /** Use {@link #getAttrs()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXAttr attr;
+
+  /** Use {@link #getEvents()} instead. This field will be removed soon. **/
+  @Deprecated
   public WXEvent event;
+
+  /** Do not access this field directly. This field will be removed soon. **/
+  @Deprecated
   public List<WXDomObject> children;
+
+  /** Do not access this field directly. This field will be removed soon. **/
+  @Deprecated
   public WXDomObject parent;
 
   private ArrayList<String> fixedStyleRefs;
@@ -632,22 +658,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
     WXDomObject dom = null;
     try {
       dom = new WXDomObject();
-      if (this.cssstyle != null) {
-        dom.cssstyle.copy(this.cssstyle);
-      }
-
-      dom.setModifyHeight(isModifyHeight);
-      dom.setModifyWidth(isModifyWidth);
-      dom.ref = ref;
-      dom.type = type;
-      dom.style = style;//style == null ? null : style.clone();
-      dom.attr = attr;//attr == null ? null : attr.clone();
-      dom.event = event == null ? null : event.clone();
-      if (this.csslayout != null) {
-        dom.csslayout.copy(this.csslayout);
-      }
-
-
+      copyFields(dom);
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("WXDomObject clone error: ", e);
