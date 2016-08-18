@@ -224,11 +224,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.Scrollable;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
@@ -308,7 +304,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
     protected int getOrientation(){
-        return VERTICAL;
+        return Constants.Orientation.VERTICAL;
     }
 
     @Override
@@ -369,7 +365,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                 WXLogUtils.e(TAG, "Invaild transform expression:" + match);
             }
         }
-        return new TransformItemDecoration(getOrientation() == VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
+        return new TransformItemDecoration(getOrientation() == Constants.Orientation.VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
     }
 
     @Override
@@ -486,7 +482,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       view.postDelayed(new Runnable() {
         @Override
         public void run() {
-          if(mOrientation == VERTICAL){
+          if(getOrientation() == Constants.Orientation.VERTICAL){
             int scrollY = cellComp.getHostView().getTop()+offset;
             view.smoothScrollBy(0,scrollY );
           }else{

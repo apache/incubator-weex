@@ -180,8 +180,6 @@ import java.util.Map.Entry;
  */
 public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener {
 
-  public static final int HORIZONTAL = 0;
-  public static final int VERTICAL = 1;
   public static int mComponentNum = 0;
   public T mHost;
 
@@ -196,7 +194,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public String mInstanceId;
   public boolean registerAppearEvent = false;
   public boolean appearState = false;
-  protected int mOrientation = VERTICAL;
+
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   protected WXSDKInstance mInstance;

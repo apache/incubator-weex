@@ -250,6 +250,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewListener,Scrollable {
 
+  protected int mOrientation = Constants.Orientation.VERTICAL;
+
   public static class Ceator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       return new WXScroller(instance,node,parent,lazy);
@@ -402,7 +404,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   protected MeasureOutput measure(int width, int height) {
     MeasureOutput measureOutput = new MeasureOutput();
-    if (this.mOrientation == WXVContainer.HORIZONTAL) {
+    if (this.mOrientation == Constants.Orientation.HORIZONTAL) {
       int screenW = WXViewUtils.getScreenWidth(WXEnvironment.sApplication);
       int weexW = WXViewUtils.getWeexWidth(mInstanceId);
       measureOutput.width = width > (weexW >= screenW ? screenW : weexW) ? FrameLayout.LayoutParams.MATCH_PARENT
@@ -429,7 +431,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
     ViewGroup host;
     if(("horizontal").equals(scroll)){
-      mOrientation = HORIZONTAL;
+      mOrientation = Constants.Orientation.HORIZONTAL;
       WXHorizontalScrollView scrollView = new WXHorizontalScrollView(mContext);
       mRealView = new FrameLayout(mContext);
       scrollView.setScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
@@ -445,7 +447,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
       host = scrollView;
     }else{
-      mOrientation = VERTICAL;
+      mOrientation = Constants.Orientation.VERTICAL;
       BounceScrollerView scrollerView = new BounceScrollerView(mContext, mOrientation, this);
       mRealView = new FrameLayout(mContext);
       WXScrollView innerView = scrollerView.getInnerView();
@@ -525,7 +527,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     if(getInnerView()==null){
       return;
     }
-    if (mOrientation == VERTICAL) {
+    if (mOrientation == Constants.Orientation.VERTICAL) {
       getInnerView().setVerticalScrollBarEnabled(show);
     } else {
       getInnerView().setHorizontalScrollBarEnabled(show);
@@ -658,7 +660,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         if(getInnerView()==null){
           return;
         }
-        if(mOrientation==VERTICAL){
+        if(mOrientation== Constants.Orientation.VERTICAL){
           ((WXScrollView) getInnerView()).smoothScrollBy(0, y);
         }else{
           ((WXHorizontalScrollView)getInnerView()).smoothScrollBy(x,0);
@@ -681,9 +683,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
                           int oldy) {
 
     String direction="";
-    if(mOrientation==VERTICAL){
+    if(mOrientation== Constants.Orientation.VERTICAL){
        direction=y-oldy>0?"up":"down";
-    }else if(mOrientation==HORIZONTAL){
+    }else if(mOrientation== Constants.Orientation.HORIZONTAL){
       direction= x-oldx>0?"right":"left";
     }
 
