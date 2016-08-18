@@ -108,8 +108,12 @@
             _disabled = [attributes[@"disabled"] boolValue];
         }
         if (attributes[@"placeholder"]) {
-            _placeholderString = attributes[@"placeholder"];
-        } else {
+            NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
+            if (placeHolder) {
+                _placeholderString = placeHolder;
+            }
+        }
+        if (!_placeholderString) {
             _placeholderString = @"";
         }
         if (styles[@"placeholderColor"]) {
@@ -119,7 +123,10 @@
         }
         
         if (attributes[@"value"]) {
-            _textValue = attributes[@"value"];
+            NSString * value = [WXConvert NSString:attributes[@"value"]];
+            if (value) {
+                _textValue = value;
+            }
         }
         
         if (styles[@"color"]) {
@@ -268,7 +275,10 @@
 
     }
     if (attributes[@"value"]) {
-        _textValue = attributes[@"value"];
+        NSString * value = [WXConvert NSString:attributes[@"value"]];
+        if (value) {
+            _textValue = value;
+        }
     }
 }
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -286,8 +296,11 @@
         [self setPlaceholderAttributedString];
     }
     if (attributes[@"value"]) {
-        _textValue = attributes[@"value"];
-        _textView.text = _textValue;
+        NSString * value = [WXConvert NSString:attributes[@"value"]];
+        if (value) {
+            _textValue = value;
+            _textView.text = _textValue;
+        }
     }
 }
 

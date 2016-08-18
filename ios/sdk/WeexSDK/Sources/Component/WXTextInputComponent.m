@@ -93,7 +93,10 @@
         
         _inputView = [[WXTextInputView alloc] init];
         if (attributes[@"type"]) {
-            [self setType: attributes[@"type"]];
+            NSString *type = [WXConvert NSString:attributes[@"type"]];
+            if (type) {
+                [self setType: type];
+            }
         }
         
         if (attributes[@"autofocus"]) {
@@ -102,15 +105,23 @@
         if (attributes[@"disabled"]) {
             [_inputView setEnabled:[attributes[@"disabled"] boolValue]];
         }
+        
+        if (attributes[@"value"]) {
+            NSString* value = [WXConvert NSString:attributes[@"value"]];
+            if (value) {
+                _inputView.text = value;
+            }
+        }
         if (attributes[@"placeholder"]) {
-            _placeholder = attributes[@"placeholder"];
-            _inputView.placeholder = _placeholder;
-        } else {
+            NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
+            if (placeHolder) {
+                _placeholder = placeHolder;
+            }
+        }
+        if (!_placeholder) {
             _placeholder = @"";
         }
-        if (attributes[@"value"]) {
-            _inputView.text = attributes[@"value"];
-        }
+        
         if (attributes[@"maxlength"]) {
             _maxLength = [attributes[@"maxlength"] integerValue];
         } else {
@@ -232,7 +243,10 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"type"]) {
-        [self setType: attributes[@"type"]];
+        NSString *type = [WXConvert NSString:attributes[@"type"]];
+        if (type) {
+            [self setType: type];
+        }
     }
     if (attributes[@"autofocus"]) {
         [self setAutofocus:[attributes[@"autofocus"] boolValue]];
@@ -245,11 +259,18 @@
     }
     
     if (attributes[@"placeholder"]) {
-        _placeholder = attributes[@"placeholder"];
-        _inputView.placeholder = _placeholder;
+        NSString* placeholder = [WXConvert NSString:attributes[@"placeholder"]];
+        if (placeholder) {
+            _inputView.placeholder = _placeholder;
+            _placeholder = placeholder;
+        }
     }
+    
     if (attributes[@"value"]) {
-        _inputView.text = attributes[@"value"];
+        NSString* value = [WXConvert NSString:attributes[@"value"]];
+        if (value) {
+            _inputView.text = value;
+        }
     }
     
     [self setPlaceholderAttributedString];
@@ -272,7 +293,7 @@
         _fontStyle = [WXConvert WXTextStyle:styles[@"fontStyle"]];
     }
     if (styles[@"fontFamily"]) {
-        _fontFamily = styles[@"fontFamily"];
+        _fontFamily = [WXConvert NSString:styles[@"fontFamily"]];
     }
     if (styles[@"textAlign"]) {
         [_inputView setTextAlignment:[WXConvert NSTextAlignment:styles[@"textAlign"]]] ;
