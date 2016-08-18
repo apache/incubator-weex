@@ -256,26 +256,26 @@ public class BasicEditTextDomObject extends WXDomObject {
   }
 
   protected void updateStyleAndAttrs() {
-    if (style != null) {
+    if (getStyles().size() > 0) {
       int fontSize = UNSET, fontStyle = UNSET, fontWeight = UNSET;
       String fontFamily = null;
-      if (style.containsKey(Constants.Name.FONT_SIZE)) {
-        fontSize = WXStyle.getFontSize(style);
+      if (getStyles().containsKey(Constants.Name.FONT_SIZE)) {
+        fontSize = WXStyle.getFontSize(getStyles());
       }
 
-      if (style.containsKey(Constants.Name.FONT_FAMILY)) {
-        fontFamily = WXStyle.getFontFamily(style);
+      if (getStyles().containsKey(Constants.Name.FONT_FAMILY)) {
+        fontFamily = WXStyle.getFontFamily(getStyles());
       }
 
-      if (style.containsKey(Constants.Name.FONT_STYLE)) {
-        fontStyle = WXStyle.getFontStyle(style);
+      if (getStyles().containsKey(Constants.Name.FONT_STYLE)) {
+        fontStyle = WXStyle.getFontStyle(getStyles());
       }
 
-      if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
-        fontWeight = WXStyle.getFontWeight(style);
+      if (getStyles().containsKey(Constants.Name.FONT_WEIGHT)) {
+        fontWeight = WXStyle.getFontWeight(getStyles());
       }
 
-      int lineHeight = WXStyle.getLineHeight(style);
+      int lineHeight = WXStyle.getLineHeight(getStyles());
       if (lineHeight != UNSET)
         mLineHeight = lineHeight;
 
@@ -287,7 +287,6 @@ public class BasicEditTextDomObject extends WXDomObject {
       }
 
       this.dirty();
-
     }
   }
 

@@ -486,7 +486,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
       return;
     }
 
-    if (getDomObject().event == null || getDomObject().event.size() == 0) {
+    if (getDomObject().getEvents().size() == 0) {
       return;
     }
     WXEvent event = getDomObject().event;

@@ -259,7 +259,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    * @param editText
    */
   protected void appleStyleAfterCreated(WXEditText editText) {
-    String alignStr = (String) mDomObj.style.get(Constants.Name.TEXT_ALIGN);
+    String alignStr = (String) mDomObj.getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
       textAlign = Gravity.LEFT;
@@ -270,8 +270,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       editText.setHintTextColor(colorInt);
     }
 
-    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
-    editText.setText((String) mDomObj.attr.get("value"));
+    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.getStyles()));
+    editText.setText((String) mDomObj.getAttrs().get("value"));
   }
 
 
@@ -294,7 +294,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           if (!hasFocus && !newValue.equals(mLastValue)) {
             mLastValue = newValue;
 
-            String event = mDomObj.event.contains(WXEventType.INPUT_CHANGE) ? WXEventType.INPUT_CHANGE : null;
+            String event = mDomObj.getEvents().contains(WXEventType.INPUT_CHANGE) ? WXEventType.INPUT_CHANGE : null;
             fireEvent(event, newValue.toString());
           }
         }
@@ -312,7 +312,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
             return;
           }
 
-          String event = mDomObj.event.contains(WXEventType.INPUT) ? WXEventType.INPUT : null;
+          String event = mDomObj.getEvents().contains(WXEventType.INPUT) ? WXEventType.INPUT : null;
           fireEvent(event, s.toString());
 
           mBeforeText = s.toString();
@@ -473,8 +473,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
-    if (mHost != null && fontSize != null && mDomObj.style != null) {
-      ((WXEditText) mHost).setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
+    if (mHost != null && fontSize != null ) {
+      mHost.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.getStyles()));
     }
   }
 

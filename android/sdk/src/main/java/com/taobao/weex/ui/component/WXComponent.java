@@ -285,8 +285,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
-      updateProperties(component.mDomObj.style);
-      updateProperties(component.mDomObj.attr);
+      updateProperties(component.mDomObj.getStyles());
+      updateProperties(component.mDomObj.getAttrs());
       updateExtra(component.mDomObj.getExtra());
     }
   }
@@ -391,7 +391,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + realLeft + " " + realTop + " " + realWidth + " " + realHeight);
-        WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + mDomObj.style.getLeft() + " " + (int) mDomObj.style.getTop());
+        WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + mDomObj.getStyles().getLeft() + " " + (int) mDomObj.getStyles().getTop());
       }
       return;
     }
@@ -455,9 +455,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 //  }
 
   private void addEvents() {
-    int count = mDomObj.event == null ? 0 : mDomObj.event.size();
+    int count = mDomObj.getEvents().size();
     for (int i = 0; i < count; ++i) {
-      addEvent(mDomObj.event.get(i));
+      addEvent(mDomObj.getEvents().get(i));
     }
   }
 
@@ -818,13 +818,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public final void removeAllEvent() {
-    if (mDomObj == null || mDomObj.event == null || mDomObj.event.size() < 1) {
+    if (mDomObj == null || mDomObj.getEvents().size() < 1) {
       return;
     }
-    for (String event : mDomObj.event) {
+    for (String event : mDomObj.getEvents()) {
       removeEventFromView(event);
     }
-    mDomObj.event.clear();
+    mDomObj.clearEvents();
     mGestureType.clear();
     wxGesture = null;
     if (getRealView() != null &&
@@ -834,7 +834,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public final void removeStickyStyle() {
-    if (mDomObj == null || mDomObj.style == null) {
+    if (mDomObj == null ) {
       return;
     }
 
@@ -847,7 +847,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public boolean isSticky() {
-    return mDomObj.style == null ? false : mDomObj.style.isSticky();
+    return mDomObj.getStyles().isSticky();
   }
 
   public void setDisabled(boolean disabled) {
@@ -976,7 +976,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   @Nullable
   String getVisibility() {
     try {
-      return (String) getDomObject().style.get(Constants.Name.VISIBILITY);
+      return (String) getDomObject().getStyles().get(Constants.Name.VISIBILITY);
     } catch (Exception e) {
       return Constants.Value.VISIBLE;
     }

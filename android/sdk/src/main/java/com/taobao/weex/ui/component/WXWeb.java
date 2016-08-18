@@ -249,7 +249,7 @@ public class WXWeb extends WXComponent {
         mWebView.setOnPageListener(new IWebView.OnPageListener() {
             @Override
             public void onReceivedTitle(String title) {
-                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_RECEIVEDTITLE)) {
+                if (mDomObj.getEvents().contains(WXEventType.WEBVIEW_RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
                     WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_RECEIVEDTITLE, params);
@@ -258,7 +258,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageStart(String url) {
-                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGESTART)) {
+                if ( mDomObj.getEvents().contains(WXEventType.WEBVIEW_PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.WEBVIEW_PAGESTART, params);
@@ -267,7 +267,7 @@ public class WXWeb extends WXComponent {
 
             @Override
             public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
-                if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_PAGEFINISH)) {
+                if ( mDomObj.getEvents().contains(WXEventType.WEBVIEW_PAGEFINISH)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
@@ -331,7 +331,7 @@ public class WXWeb extends WXComponent {
     }
 
     private void fireEvent(String type, Object message) {
-        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.WEBVIEW_ERROR)) {
+        if (mDomObj.getEvents().contains(WXEventType.WEBVIEW_ERROR)) {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);

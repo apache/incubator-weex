@@ -376,7 +376,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     protected BounceRecyclerView initComponentHostView(Context context) {
         bounceRecyclerView = new BounceRecyclerView(context, getOrientation());
 
-        String transforms = (String) mDomObj.attr.get(TRANSFORM);
+        String transforms = (String) mDomObj.getAttrs().get(TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
@@ -901,8 +901,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private int generateViewType(WXComponent component) {
         long id;
         try {
-            id = Integer.parseInt(component.getDomObject().ref);
-            String type = component.getDomObject().attr.getScope();
+            id = Integer.parseInt(component.getDomObject().getRef());
+            String type = component.getDomObject().getAttrs().getScope();
 
             if (!TextUtils.isEmpty(type)) {
                 if (mRefToViewType == null) {
@@ -956,14 +956,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     @Override
     public void onLoadMore(int offScreenY) {
       try {
-        String offset = mDomObj.attr.getLoadMoreOffset();
+        String offset = mDomObj.getAttrs().getLoadMoreOffset();
 
             if (TextUtils.isEmpty(offset)) {
                 offset="0";
             }
 
         if (offScreenY < Integer.parseInt(offset)) {
-          String loadMoreRetry = mDomObj.attr.getLoadMoreRetry();
+          String loadMoreRetry = mDomObj.getAttrs().getLoadMoreRetry();
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {

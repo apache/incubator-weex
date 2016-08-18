@@ -234,7 +234,7 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
 
   @Override
   public void onLoading() {
-    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.ONLOADING)) {
+    if (mDomObj.getEvents().contains(WXEventType.ONLOADING)) {
       WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.ONLOADING);
     }
   }

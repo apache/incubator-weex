@@ -315,7 +315,7 @@ public class WXImage extends WXComponent<ImageView> {
         WXImageStrategy imageStrategy = new WXImageStrategy();
         imageStrategy.isClipping = true;
 
-        WXImageSharpen imageSharpen = mDomObj.attr.getImageSharpen();
+        WXImageSharpen imageSharpen = mDomObj.getAttrs().getImageSharpen();
         imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
         imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
@@ -332,15 +332,15 @@ public class WXImage extends WXComponent<ImageView> {
             }
         });
 
-        if(mDomObj.attr!=null && mDomObj.attr.containsKey(Constants.Name.PLACE_HOLDER)){
-            String placeHolder= (String) mDomObj.attr.get(Constants.Name.PLACE_HOLDER);
+        if( mDomObj.getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+            String placeHolder= (String) mDomObj.getAttrs().get(Constants.Name.PLACE_HOLDER);
             imageStrategy.placeHolder=placeHolder;
         }
 
         IWXImgLoaderAdapter imgLoaderAdapter = mInstance.getImgLoaderAdapter();
         if (imgLoaderAdapter != null) {
             imgLoaderAdapter.setImage(src, getHostView(),
-                    mDomObj.attr.getImageQuality(), imageStrategy);
+                    mDomObj.getAttrs().getImageQuality(), imageStrategy);
         }
     }
 }

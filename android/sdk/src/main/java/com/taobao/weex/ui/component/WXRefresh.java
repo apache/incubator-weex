@@ -239,7 +239,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
 
   @Override
   public void onRefresh() {
-    if (mDomObj.event != null && mDomObj.event.contains(WXEventType.ONREFRESH)) {
+    if (mDomObj.getEvents().contains(WXEventType.ONREFRESH)) {
       WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), WXEventType.ONREFRESH);
     }
   }
