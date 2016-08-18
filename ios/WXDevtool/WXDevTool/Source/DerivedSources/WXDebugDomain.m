@@ -20,9 +20,15 @@
 - (void)handleMethodWithName:(NSString *)methodName parameters:(NSDictionary *)params responseCallback:(PDResponseCallback)responseCallback {
     if ([methodName isEqualToString:@"enable"] && [self.delegate respondsToSelector:@selector(domain:enableWithCallback:)]) {
         [self.delegate domain:self enableWithCallback:^(id error) {
-            NSMutableDictionary *params = [[NSMutableDictionary alloc] initWithCapacity:2];
-            [params setObject:[NSNumber numberWithBool:YES] forKey:@"WXDebug_result"];
-            responseCallback(params, error);
+            responseCallback(nil, error);
+        }];
+    } else if ([methodName isEqualToString:@"setLogLevel"] && [self.delegate respondsToSelector:@selector(domain:sendLogLevel:WithCallback:)]) {
+        [self.delegate domain:self sendLogLevel:[params objectForKey:@"logLevel"] WithCallback:^(id error) {
+            responseCallback(nil,error);
+        }];
+    } else if ([methodName isEqualToString:@"disable"] && [self.delegate respondsToSelector:@selector(domain:disableWithCallback:)]) {
+        [self.delegate domain:self disableWithCallback:^(id error) {
+            responseCallback(nil,error);
         }];
     }
 }

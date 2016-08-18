@@ -147,12 +147,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
         if (result) {
             NSMutableDictionary *newResult = [[NSMutableDictionary alloc] initWithCapacity:result.count];
             [result enumerateKeysAndObjectsUsingBlock:^(id key, id val, BOOL *stop) {
-                if ([key isEqualToString:@"WXDebug_result"]) {
-                    [WXDevToolType setDebug:YES];
-                    [WXSDKEngine restart];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
-                    return;
-                }
                 [newResult setObject:[val PD_JSONObjectCopy] forKey:key];
             }];
             [response setObject:newResult forKey:@"result"];
@@ -329,10 +323,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)connectToURL:(NSURL *)url;
 {
     NSLog(@"Connecting to %@", url);
-    if ([WXDevToolType isDebug]) {
-        [WXDevToolType setDebug:NO];
-        [WXSDKEngine restart];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
+    if (_socket && _isConnect) {
+        return;
     }
     _msgAry = nil;
     _msgAry = [NSMutableArray array];
@@ -663,7 +655,13 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 
 - (void)_registerDeviceWithParams:(id)params {
-    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:@"WxDebug.registerDevice", @"method", [params PD_JSONObject], @"params",[NSNumber numberWithInt:0],@"id",nil];
+    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:
+                         @"WxDebug.registerDevice", @"method",
+                         [params PD_JSONObject], @"params",
+                         [NSNumber numberWithInt:0],@"id",
+                         [WXLog logLevelString] ?: @"error",@"logLevel",
+                         [NSNumber numberWithBool:[WXDevToolType isDebug]],@"remoteDebug",
+                         nil];
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
     NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
