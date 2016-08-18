@@ -7,7 +7,7 @@
 
 A core component which provides the most popular features for using a list of items.  
 
-It can provide better experience and performace with smooth scrolling and memory reusing.
+It can provide better experience and performance with smooth scrolling and memory reusing.
 
 ### Child Components
 
@@ -47,6 +47,11 @@ Other attributes please check out the [common attributes](../references/common-a
 ### API
 
 All cells or cell's subcomponents in list support the `scrollToElement` API in [dom module](../modules/dom.md)
+
+### Restriction
+Nested lists or scrollers within the same direction are **not** supported. In other words. nested lists/scroller must have different directions.
+
+For example, a vertical list nested in a vertical list or scroller is ** not ** allowed. However, a vertical list nested in a horizontal list or scroller is legal.
 
 ### Example
 
