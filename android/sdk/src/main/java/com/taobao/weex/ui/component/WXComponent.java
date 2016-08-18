@@ -168,12 +168,8 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * abstract component
@@ -205,6 +201,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private WXGesture wxGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
+  private List<OnClickListener> mHostClickListeners;
+  private List<OnFocusChangeListener> mFocusChangeListeners;
+
+  interface OnClickListener{
+    void onHostViewClick();
+  }
+
+  interface OnFocusChangeListener{
+    void onFocusChange(boolean hasFocus);
+  }
 
   @Deprecated
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -250,6 +256,52 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       addEvents();
 
     }
+  }
+
+  protected final void addFocusChangeListener(OnFocusChangeListener l){
+    View view;
+    if(l != null && (view = getRealView()) != null) {
+      if( mFocusChangeListeners == null){
+        mFocusChangeListeners = new ArrayList<>();
+        view.setFocusable(true);
+        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+          @Override
+          public void onFocusChange(View v, boolean hasFocus) {
+            for (OnFocusChangeListener listener : mFocusChangeListeners){
+              if(listener != null){
+                listener.onFocusChange(hasFocus);
+              }
+            }
+          }
+        });
+      }
+      mFocusChangeListeners.add(l);
+    }
+  }
+
+  protected final void addClickListener(OnClickListener l){
+    View view;
+    if(l != null && (view = getRealView()) != null) {
+      if(mHostClickListeners == null){
+        mHostClickListeners = new ArrayList<>();
+        view.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            for (OnClickListener listener : mHostClickListeners){
+              if(listener != null) {
+                listener.onHostViewClick();
+              }
+            }
+          }
+        });
+      }
+      mHostClickListeners.add(l);
+
+    }
+  }
+
+  protected final void removeClickListener(OnClickListener l){
+    mHostClickListeners.remove(l);
   }
 
   public void bindData(WXComponent component){
@@ -562,12 +614,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
                                                params);
         }
       });
-    } else if ((type.equals(WXEventType.FOCUS) || type.equals(WXEventType.BLUR)) && getRealView()
-                                                                                    != null) {
-      getRealView().setFocusable(true);
-      getRealView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    } else if ((type.equals(WXEventType.FOCUS) || type.equals(WXEventType.BLUR)) ) {
+      addFocusChangeListener(new OnFocusChangeListener() {
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
+        public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
