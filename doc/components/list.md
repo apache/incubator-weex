@@ -13,10 +13,12 @@ It can provide better experience and performace with smooth scrolling and memory
 
 **Notes:** The `list`'s subcomponents can only contain `cell`, `header`, `refresh`, `loading` or fixed-position components. Other kind of components will not be displayed correctly.
 
-* `cell` defines the attributes and behavior of the cells that appear in list. 
-* `header` <sup class="wx-v">0.6.1</sup> header which will stick to the top when it reaches the top of the screen. 
-* `refresh` component can be used inside list to add pull to refresh functionality.
-* `loading` component can be used inside list to add loading view at the bottom of scroller.
+* `cell` defines the attributes and behavior of the cells that appear in list.
+* `header` <sup class="wx-v">0.6.1</sup> header which will stick to the top when it reaches the top of the screen.
+* `refresh` component can be used inside list to add pull down to refresh functionality.
+* `loading` component can be used inside list to add pull up to loadmore functionality.
+
+* `refresh` and `loading` please check out the [refresh-loading](refresh-loading.md).
 
 ### Attributes
 
@@ -41,8 +43,6 @@ Other attributes please check out the [common attributes](../references/common-a
 
 - support `click` event. Check out [common events](../references/common-event.md)
 - support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
-- support `refresh` event  <sup class="wx-v">0.5</sup>.  If a refresh component is inside scroller, this event will be triggered when the scroller is swiping down.
-- support `loading` event .  If a loading component is inside scroller, this event will be triggered when user scrolling to the bottom.
 
 ### API
 

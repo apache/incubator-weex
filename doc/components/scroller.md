@@ -12,6 +12,11 @@ A vertical scroller which can have multiple child components arranged in one col
 
 It supports all kinds of weex components as its child components.
 
+* `refresh` component can be used inside scroller to add pull down to refresh functionality.
+* `loading` component can be used inside scroller to add pull up to loadmore functionality.
+
+* `refresh` and `loading` please check out the [refresh-loading](refresh-loading.md).
+
 ### Attributes
 
 - `show-scrollbar`: &lt;boolean&gt; `true` | `false`. This value determines whether the scrollbar show. The default value is `true`.
@@ -59,6 +64,3 @@ Other attributes please check out the [common attributes](../references/common-a
   }
 </script>
 ```
-
-
-
