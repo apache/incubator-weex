@@ -201,15 +201,17 @@
         
         if (_lazyCreateView) {
             if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
-                NSArray *subcomponents = [((WXComponent *)self.supercomponent).subcomponents copy];
+                NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;
                 
                 NSInteger index = [subcomponents indexOfObject:self];
                 if (index != NSNotFound) {
                     [((WXComponent *)self.supercomponent).view insertSubview:_view atIndex:index];
                 }
             }
-            for (int i = 0; i < self.subcomponents.count; i++) {
-                WXComponent *subcomponent = self.subcomponents[i];
+            
+            NSArray *subcomponents = self.subcomponents;
+            for (int i = 0; i < subcomponents.count; i++) {
+                WXComponent *subcomponent = subcomponents[i];
                 [self insertSubview:subcomponent atIndex:i];
             }
         }
@@ -253,7 +255,7 @@
 {
     NSArray<WXComponent *> *subcomponents;
     pthread_mutex_lock(&_propertyMutex);
-    subcomponents = _subcomponents;
+    subcomponents = [_subcomponents copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return subcomponents;
