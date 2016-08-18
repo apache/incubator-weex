@@ -132,7 +132,6 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -586,7 +585,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
     mDomObj.addEvent(type);
-    if (type.equals(WXEventType.CLICK) && getRealView() != null) {
+    if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
       addClickListener(new OnClickListener() {
         @Override
         public void onHostViewClick() {
@@ -599,11 +598,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           params.put("height", mDomObj.getCSSLayoutHeight());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
               mDomObj.getRef(),
-              WXEventType.CLICK,
+              Constants.Event.CLICK,
               params);
         }
       });
-    } else if ((type.equals(WXEventType.FOCUS) || type.equals(WXEventType.BLUR)) && getRealView()
+    } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR)) && getRealView()
                                                                                     != null) {
       getRealView().setFocusable(true);
       getRealView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -613,7 +612,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           params.put("timeStamp", System.currentTimeMillis());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
                                                mDomObj.getRef(),
-                                               hasFocus ? WXEventType.FOCUS : WXEventType.BLUR, params);
+                                               hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
     } else if (getRealView() != null &&
@@ -630,17 +629,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
     } else {
       Scrollable scroller = getParentScroller();
-      if (type.equals(WXEventType.APPEAR) && scroller != null) {
+      if (type.equals(Constants.Event.APPEAR) && scroller != null) {
         scroller.bindAppearEvent(this);
       }
-      if (type.equals(WXEventType.DISAPPEAR) && scroller != null) {
+      if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
         scroller.bindDisappearEvent(this);
       }
 
-      if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
+      if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
         registerAppearEvent=true;
       }
-      if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
+      if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
         registerAppearEvent=true;
       }
 
@@ -796,22 +795,22 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   protected void removeEventFromView(String type) {
-    if (type.equals(WXEventType.CLICK) && getRealView() != null) {
+    if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
       getRealView().setOnClickListener(null);
     }
     Scrollable scroller = getParentScroller();
-    if (type.equals(WXEventType.APPEAR) && scroller != null) {
+    if (type.equals(Constants.Event.APPEAR) && scroller != null) {
       scroller.unbindAppearEvent(this);
     }
-    if (type.equals(WXEventType.DISAPPEAR) && scroller != null) {
+    if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
       scroller.unbindDisappearEvent(this);
     }
 
-    if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
+    if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
       ((WXListComponent)getParent()).unbindAppearComponents(this);
       registerAppearEvent=false;
     }
-    if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
+    if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
       ((WXListComponent)getParent()).unbindAppearComponents(this);
       registerAppearEvent=false;
     }
@@ -1080,7 +1079,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void notifyAppearStateChange(String wxEventType,String direction){
-    if(getDomObject().containsEvent(WXEventType.APPEAR) || getDomObject().containsEvent(WXEventType.DISAPPEAR)) {
+    if(getDomObject().containsEvent(Constants.Event.APPEAR) || getDomObject().containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
       WXBridgeManager.getInstance().fireEvent(mInstanceId, getRef(), wxEventType, params,null);

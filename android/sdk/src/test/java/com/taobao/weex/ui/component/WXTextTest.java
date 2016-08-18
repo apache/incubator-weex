@@ -254,7 +254,7 @@ public class WXTextTest {
 
         mDomObject = Mockito.spy(new WXTextDomObject());
         mDomObject.ref = "1";
-        mDomObject.addEvent(WXEventType.CLICK);
+        mDomObject.addEvent(Constants.Event.CLICK);
         Mockito.when(mDomObject.clone()).thenReturn(mDomObject);
         Mockito.when(mDomObject.getPadding()).thenReturn(new Spacing());
         Mockito.when(mDomObject.getBorder()).thenReturn(new Spacing());
@@ -314,7 +314,7 @@ public class WXTextTest {
     @Test
     public void testAddEvent(){
         testBind();
-        mWXText.addEvent(WXEventType.CLICK);
+        mWXText.addEvent(Constants.Event.CLICK);
         assertTrue(mWXText.getHostView().isEnabled());
         mWXText.getHostView().performClick();
     }

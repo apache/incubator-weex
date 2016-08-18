@@ -491,7 +491,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     }
     WXEvent event = getDomObject().getEvents();
     String ref = getDomObject().getRef();
-    if (event.contains(WXEventType.SLIDER_CHANGE) && WXViewUtils.onScreenArea(mHost)) {
+    if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(mHost)) {
       params.put("index", realPosition);
 
       Map<String, Object> domChanges = new HashMap<>();
@@ -499,7 +499,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
       attrsChanges.put("value", realPosition);
       domChanges.put("attrs", attrsChanges);
       WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
-          WXEventType.SLIDER_CHANGE, params, domChanges);
+          Constants.Event.CHANGE, params, domChanges);
     }
   }
 

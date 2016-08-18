@@ -324,10 +324,10 @@ public class WXImage extends WXComponent<ImageView> {
                 if(!result && imageView!=null){
                     imageView.setImageDrawable(null);
                 }
-                if(getDomObject()!=null && getDomObject().containsEvent(WXEventType.ONLOAD)){
+                if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(),WXEventType.ONLOAD,params);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(), Constants.Event.ONLOAD,params);
                 }
             }
         });

@@ -220,12 +220,12 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -664,7 +664,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     private boolean hasAppearAndDisappearEvent(WXComponent child) {
 
-    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
+    if(child.getDomObject().containsEvent(Constants.Event.APPEAR) || child.getDomObject().containsEvent(Constants.Event.DISAPPEAR)){
       return true;
     }else if(child instanceof WXVContainer){
       WXVContainer container=(WXVContainer)child;
@@ -967,7 +967,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), WXEventType.LIST_LOAD_MORE);
+            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }
@@ -991,11 +991,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             }
             if (key >= firstVisible && key <= lastVisible && !value.appearState) {
               String direction=directionY>0?"up":"down";
-                value.notifyAppearStateChange(WXEventType.APPEAR,direction);
+                value.notifyAppearStateChange(Constants.Event.APPEAR,direction);
                 value.appearState = true;
             } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
               String direction=directionY>0?"up":"down";
-              value.notifyAppearStateChange(WXEventType.DISAPPEAR,direction);
+              value.notifyAppearStateChange(Constants.Event.DISAPPEAR,direction);
               value.appearState = false;
             }
         }

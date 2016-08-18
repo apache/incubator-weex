@@ -709,7 +709,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         if (appearData.hasAppear) {
           Map<String, Object> params = new HashMap<>();
           params.put("direction", direction);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), WXEventType.APPEAR, params);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), Constants.Event.APPEAR, params);
         }
 
       }else if(appearData.mAppear && !appearData.mAppearComponent.getHostView().getLocalVisibleRect(mScrollRect)){
@@ -717,7 +717,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         if (appearData.hasDisappear) {
           Map<String, Object> params = new HashMap<>();
           params.put("direction", direction);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), WXEventType.DISAPPEAR, params);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), Constants.Event.DISAPPEAR, params);
         }
       }
     }
@@ -767,7 +767,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
 
         if (mContentHeight != contentH) {
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), WXEventType.LIST_LOAD_MORE);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.LOADMORE);
           mContentHeight = contentH;
         }
       }

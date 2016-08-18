@@ -221,7 +221,6 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.WXTextDomObject;
@@ -283,7 +282,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
     final TextView text = (WXEditText) mHost;
 
-    if (type.equals(WXEventType.INPUT_CHANGE)) {
+    if (type.equals(Constants.Event.CHANGE)) {
       text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
         CharSequence mLastValue = text.getText();
 
@@ -294,12 +293,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           if (!hasFocus && !newValue.equals(mLastValue)) {
             mLastValue = newValue;
 
-            String event = mDomObj.getEvents().contains(WXEventType.INPUT_CHANGE) ? WXEventType.INPUT_CHANGE : null;
+            String event = mDomObj.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
             fireEvent(event, newValue.toString());
           }
         }
       });
-    } else if (type.equals(WXEventType.INPUT)) {
+    } else if (type.equals(Constants.Event.INPUT)) {
       text.addTextChangedListener(new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -312,7 +311,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
             return;
           }
 
-          String event = mDomObj.getEvents().contains(WXEventType.INPUT) ? WXEventType.INPUT : null;
+          String event = mDomObj.getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
           fireEvent(event, s.toString());
 
           mBeforeText = s.toString();
