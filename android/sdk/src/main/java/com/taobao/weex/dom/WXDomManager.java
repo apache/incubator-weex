@@ -395,13 +395,13 @@ public final class WXDomManager {
   }
 
   /**
-   * Invoke {@link WXDomStatement} for updating the {@link WXDomObject#attr} according to the
+   * Invoke {@link WXDomStatement} for updating the attributes according to the
    * given attribute.
    *
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
    * @param ref of the dom.
    * @param attr the new attribute. This attribute is only a part of the full attribute, and will be
-   *             merged into {@link WXDomObject#attr}
+   *             merged into attributes
    */
   void updateAttrs(String instanceId, String ref, JSONObject attr) {
     if (!isDomThread()) {

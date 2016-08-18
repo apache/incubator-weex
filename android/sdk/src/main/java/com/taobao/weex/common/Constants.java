@@ -337,4 +337,28 @@ public class Constants {
     String STOP = "stop";
   }
 
+  public interface Event {
+
+    String CLICK = "click";
+    String APPEAR = "appear";
+    String DISAPPEAR = "disappear";
+    String LOADMORE = "loadmore";
+    String FOCUS = "focus";
+    String BLUR = "blur";
+    String INPUT = "input";
+    String VIEWAPPEAR = "viewappear";
+    String VIEWDISAPPEAR = "viewdisappear";
+    String START = "start";
+    String PAUSE = "pause";
+    String FINISH = "finish";
+    String FAIL = "fail";
+    String ERROR = "error";
+    String RECEIVEDTITLE = "receivedtitle";
+    String PAGEFINISH = "pagefinish";
+    String PAGESTART = "pagestart";
+    String ONREFRESH = "refresh";
+    String ONLOADING = "loading";
+    String ONLOAD = "load";
+    String CHANGE = "change";
+  }
 }

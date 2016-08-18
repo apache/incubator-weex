@@ -219,7 +219,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.view.gesture.WXGestureType.GestureInfo;
 import com.taobao.weex.ui.view.gesture.WXGestureType.HighLevelGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureType.LowLevelGesture;
@@ -288,7 +287,7 @@ public class WXGesture implements OnTouchListener {
 
   /**
    * Handle low-level gesture
-   * @param WXGestureType possible low-level gesture, defined in {@link WXEventType}
+   * @param WXGestureType possible low-level gesture, defined in {@link com.taobao.weex.common.Constants.Event}
    * @param motionEvent motionEvent, which contains all pointers event in a period of time
    * @return true if this event is handled, otherwise false.
    */

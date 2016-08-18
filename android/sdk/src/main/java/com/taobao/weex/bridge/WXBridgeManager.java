@@ -352,6 +352,10 @@ public class WXBridgeManager implements Callback {
           mWxDebugProxy.start();
           if (remoteDebug) {
             mWXBridge = mWxDebugProxy.getWXBridge();
+          } else {
+            if (mWXBridge != null && !(mWXBridge instanceof WXBridge)) {
+              mWXBridge = null;
+            }
           }
         }
       } catch (HackAssertionException e) {
