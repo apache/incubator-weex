@@ -280,14 +280,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (mHost == null || TextUtils.isEmpty(type)) {
       return;
     }
-    final TextView text = (WXEditText) mHost;
+    final TextView text = mHost;
 
     if (type.equals(WXEventType.INPUT_CHANGE)) {
-      text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+      addFocusChangeListener(new OnFocusChangeListener() {
         CharSequence mLastValue = text.getText();
-
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
+        public void onFocusChange(boolean hasFocus) {
           CharSequence newValue = text.getText();
           newValue = newValue == null ? "" : newValue;
           if (!hasFocus && !newValue.equals(mLastValue)) {
