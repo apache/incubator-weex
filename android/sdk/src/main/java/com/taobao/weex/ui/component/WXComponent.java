@@ -205,9 +205,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
+  private List<OnFocusChangeListener> mFocusChangeListeners;
 
   interface OnClickListener{
     void onHostViewClick();
+  }
+
+  interface OnFocusChangeListener{
+    void onFocusChange(boolean hasFocus);
   }
 
   @Deprecated
@@ -255,11 +260,33 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  protected final void addFocusChangeListener(OnFocusChangeListener l){
+    View view;
+    if(l != null && (view = getRealView()) != null) {
+      if( mFocusChangeListeners == null){
+        mFocusChangeListeners = new ArrayList<>();
+        view.setFocusable(true);
+        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+          @Override
+          public void onFocusChange(View v, boolean hasFocus) {
+            for (OnFocusChangeListener listener : mFocusChangeListeners){
+              if(listener != null){
+                listener.onFocusChange(hasFocus);
+              }
+            }
+          }
+        });
+      }
+      mFocusChangeListeners.add(l);
+    }
+  }
+
   protected final void addClickListener(OnClickListener l){
-    if(l != null && mHost != null) {
+    View view;
+    if(l != null && (view = getRealView()) != null) {
       if(mHostClickListeners == null){
         mHostClickListeners = new ArrayList<>();
-        mHost.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
             for (OnClickListener listener : mHostClickListeners){
@@ -602,17 +629,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
               params);
         }
       });
-    } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR)) && getRealView()
-                                                                                    != null) {
-      getRealView().setFocusable(true);
-      getRealView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR)) ) {
+      addFocusChangeListener(new OnFocusChangeListener() {
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
+        public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
-                                               mDomObj.getRef(),
-                                               hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
+              mDomObj.getRef(),
+              hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
     } else if (getRealView() != null &&
@@ -654,7 +679,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * Judge whether need to set an onTouchListener.<br>
    * As there is only one onTouchListener in each view, so all the gesture that use onTouchListener should put there.
    *
-   * @param type eventType {@link WXEventType}
+   * @param type eventType {@link com.taobao.weex.common.Constants.Event}
    * @return true for set an onTouchListener, otherwise false
    */
   private boolean needGestureDetector(String type) {
