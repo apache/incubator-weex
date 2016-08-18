@@ -184,13 +184,24 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public static final int VERTICAL = 1;
   public static int mComponentNum = 0;
   public T mHost;
+
+  /** Use {@link #getParent()} instead.  Do not access this field outside of this class which will be removed soon.**/
+  @Deprecated
   public volatile WXVContainer mParent;
+  /** Use {@link #getDOM()} instead.  Do not access this field outside of this class which will be removed soon.**/
+  @Deprecated
   public volatile WXDomObject mDomObj;
+  /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
+  @Deprecated
   public String mInstanceId;
-  public boolean registerAppearEvent=false;
-  public boolean appearState=false;
+  public boolean registerAppearEvent = false;
+  public boolean appearState = false;
   protected int mOrientation = VERTICAL;
+  /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
+  @Deprecated
   protected WXSDKInstance mInstance;
+  /** Use {@link #getContext()} instead. Do not access this field outside of this class which will be removed soon.**/
+  @Deprecated
   protected Context mContext;
   protected int mAbsoluteY = 0;
   protected int mAbsoluteX = 0;
@@ -233,6 +244,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void bindHolder(IFComponentHolder holder){
     mHolder = holder;
+  }
+
+
+  public WXSDKInstance getInstance(){
+    return mInstance;
+  }
+
+  public Context getContext(){
+    return mContext;
+  }
+
+  public WXDomObject getDOM(){
+    return mDomObj;
   }
 
   /**
