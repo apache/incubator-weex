@@ -212,9 +212,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -312,6 +314,12 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
 
     return event;
+  }
+
+  public void clearEvents(){
+    if(event != null){
+      event.clear();
+    }
   }
 
   public static void prepareRoot(WXDomObject obj) {
@@ -579,6 +587,47 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
     style.putAll(styles);
     super.dirty();
+  }
+
+  public void applyStyleToNode() {
+    WXStyle stylesMap = getStyles();
+    if (!stylesMap.isEmpty()) {
+      setAlignItems(stylesMap.getAlignItems());
+      setAlignSelf(stylesMap.getAlignSelf());
+      setFlex(stylesMap.getFlex());
+      setFlexDirection(stylesMap.getFlexDirection());
+      setJustifyContent(stylesMap.getJustifyContent());
+      setWrap(stylesMap.getCSSWrap());
+
+      setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth()));
+      setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth()));
+      setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight()));
+      setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight()));
+
+      setMargin(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginLeft()));
+      setMargin(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getMarginTop()));
+      setMargin(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginRight()));
+      setMargin(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getMarginBottom()));
+
+      setPadding(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingLeft()));
+      setPadding(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingTop()));
+      setPadding(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingRight()));
+      setPadding(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingBottom()));
+
+      setPositionType(stylesMap.getPosition());
+      setPositionLeft(WXViewUtils.getRealPxByWidth(stylesMap.getLeft()));
+      setPositionTop(WXViewUtils.getRealPxByWidth(stylesMap.getTop()));
+      setPositionRight(WXViewUtils.getRealPxByWidth(stylesMap.getRight()));
+      setPositionBottom(WXViewUtils.getRealPxByWidth(stylesMap.getBottom()));
+
+      setBorder(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getBorderTopWidth()));
+      setBorder(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderRightWidth()));
+      setBorder(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getBorderBottomWidth()));
+      setBorder(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderLeftWidth()));
+
+      setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.getHeight()));
+      setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.getWidth()));
+    }
   }
 
   public int childCount() {

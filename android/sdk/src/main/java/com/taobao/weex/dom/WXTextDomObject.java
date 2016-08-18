@@ -240,10 +240,8 @@ public class WXTextDomObject extends WXDomObject {
    * Update style and text.
    */
   private void updateStyleAndText() {
-    updateStyleImp(style);
-    if (attr != null) {
-      mText = WXAttr.getValue(attr);
-    }
+    updateStyleImp(getStyles());
+    mText = WXAttr.getValue(getAttrs());
   }
 
   /**
@@ -368,7 +366,7 @@ public class WXTextDomObject extends WXDomObject {
   }
 
   /**
-   * Update {@link #spanned} according to the give charSequence and {@link #style}
+   * Update {@link #spanned} according to the give charSequence and styles
    * @param text the give raw text.
    * @return an Spanned contains text and spans
    */

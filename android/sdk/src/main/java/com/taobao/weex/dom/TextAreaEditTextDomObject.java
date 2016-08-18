@@ -223,23 +223,21 @@ public class TextAreaEditTextDomObject extends BasicEditTextDomObject {
   @Override
   protected void updateStyleAndAttrs() {
     super.updateStyleAndAttrs();
-    if (attr != null) {
-      Object raw = attr.get(Constants.Name.ROWS);
-      if( raw == null){
-        return;
-      }else if(raw instanceof  String) {
-        String rowsStr = (String) raw;
-        try {
-          int lines = Integer.parseInt(rowsStr);
-          if (lines > 0) {
-            mNumberOfLines = lines;
-          }
-        } catch (NumberFormatException e) {
-          e.printStackTrace();
+    Object raw = getAttrs().get(Constants.Name.ROWS);
+    if (raw == null) {
+      return;
+    } else if (raw instanceof String) {
+      String rowsStr = (String) raw;
+      try {
+        int lines = Integer.parseInt(rowsStr);
+        if (lines > 0) {
+          mNumberOfLines = lines;
         }
-      }else if( raw instanceof Integer){
-        mNumberOfLines = (Integer) raw;
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
       }
+    } else if (raw instanceof Integer) {
+      mNumberOfLines = (Integer) raw;
     }
   }
 

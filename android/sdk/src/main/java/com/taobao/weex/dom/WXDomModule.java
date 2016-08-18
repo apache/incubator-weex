@@ -372,7 +372,7 @@ public final class WXDomModule extends WXModule {
   }
 
   /**
-   * Update {@link WXDomObject#attr}
+   * Update attributes
    * @param ref
    * @param attr the expected attr
    */
@@ -392,8 +392,8 @@ public final class WXDomModule extends WXModule {
   }
 
   /**
-   * Update {@link WXDomObject#style}
-   * @param ref
+   * Update DOM style.
+   * @param ref DOM reference
    * @param style the expected style
    */
   public void updateStyle(String ref, JSONObject style) {

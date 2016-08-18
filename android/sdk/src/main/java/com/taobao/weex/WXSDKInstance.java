@@ -231,7 +231,6 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
@@ -648,7 +647,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onViewDisappear(){
     WXComponent comp = getRootCom();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), WXEventType.VIEWDISAPPEAR, null, null);
+      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWDISAPPEAR, null, null);
       //call disappear of nested instances
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onDisappear();
@@ -659,7 +658,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onViewAppear(){
     WXComponent comp = getRootCom();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), WXEventType.VIEWAPPEAR,null, null);
+      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onAppear();
       }

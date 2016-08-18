@@ -505,18 +505,18 @@ class WXDomStatement {
       return;
     }
     Map<String, Object> style = new HashMap<>(5);
-    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.FLEX_DIRECTION)) {
+    if (!domObject.getStyles().containsKey(Constants.Name.FLEX_DIRECTION)) {
       style.put(Constants.Name.FLEX_DIRECTION, "column");
     }
-    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.BACKGROUND_COLOR)) {
+    if (!domObject.getStyles().containsKey(Constants.Name.BACKGROUND_COLOR)) {
       style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
     }
     //If there is height or width in JS, then that value will override value here.
-    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.WIDTH)) {
+    if ( !domObject.getStyles().containsKey(Constants.Name.WIDTH)) {
       style.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
       domObject.setModifyWidth(true);
     }
-    if (domObject.style == null || !domObject.style.containsKey(Constants.Name.HEIGHT)) {
+    if ( !domObject.getStyles().containsKey(Constants.Name.HEIGHT)) {
       style.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)));
       domObject.setModifyHeight(true);
     }
@@ -820,11 +820,11 @@ class WXDomStatement {
   }
 
   /**
-   * Update the {@link WXDomObject#attr} according to the given attribute. Then creating a
+   * Update the attributes according to the given attribute. Then creating a
    * command object for updating corresponding view and put the command object in the queue.
    * @param ref Reference of the dom.
    * @param attrs the new style. This style is only a part of the full attribute set, and will be
-   *              merged into {@link WXDomObject#attr}
+   *              merged into attributes
    * @see #updateStyle(String, JSONObject)
    */
   void updateAttrs(String ref, final JSONObject attrs) {
@@ -862,11 +862,11 @@ class WXDomStatement {
   }
 
   /**
-   * Update the {@link WXDomObject#style} according to the given style. Then creating a
+   * Update styles according to the given style. Then creating a
    * command object for updating corresponding view and put the command object in the queue.
    * @param ref Reference of the dom.
    * @param style the new style. This style is only a part of the full style, and will be merged
-   *              into {@link WXDomObject#style}
+   *              into styles
    * @see #updateAttrs(String, JSONObject)
    */
   void updateStyle(String ref, JSONObject style) {
@@ -1242,8 +1242,8 @@ class WXDomStatement {
    * Creating the mapping between Reference to {@link WXDomObject}
    * and store the mapping in {@link #mRegistry}.
    * Then, parse and copy style
-   * from {@link WXDomObject#style} to {@link com.taobao.weex.dom.flex.CSSNode}.
-   * Finally, {@link WXDomObject#children} is also added to
+   * from DOM to {@link com.taobao.weex.dom.flex.CSSNode}.
+   * Finally, DOM's children are also added to
    * {@link com.taobao.weex.dom.flex.CSSNode#mChildren} if added is true.
    * The above procedure will be done recursively.
    * @param dom the original DOM Object
@@ -1261,10 +1261,7 @@ class WXDomStatement {
       mRegistry.put(dom.getRef(), dom);
     }
 
-    if(dom.style == null){
-      dom.style = new WXStyle();
-    }
-    WXStyle style = dom.style;
+    WXStyle style = dom.getStyles();
 
     /** merge default styles **/
     Map<String,String> defaults = dom.getDefaultStyle();
@@ -1278,8 +1275,8 @@ class WXDomStatement {
       }
     }
 
-    if (dom.style.size() > 0) {
-      CSSTransformFromStyle.transformStyle(dom);
+    if (dom.getStyles().size() > 0) {
+      dom.applyStyleToNode();
     }
 
     int count = dom.childCount();
