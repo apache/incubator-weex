@@ -1286,9 +1286,6 @@ class WXDomStatement {
     WXDomObject child;
     for (int i = 0; i < count; ++i) {
       child = dom.getChild(i);
-      if (isAdd) {
-        dom.add2Dom(child, i);
-      }
       transformStyle(child, isAdd);
     }
   }
