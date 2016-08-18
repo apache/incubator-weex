@@ -823,7 +823,7 @@ public class WXBridgeManager implements Callback {
         WXLogUtils.d("destroyInstance >>>> instanceId:" + instanceId);
       }
 
-      if(sDomModule!=null){
+      if(sDomModule!=null && sDomModule.mWXSDKInstance!=null && TextUtils.equals(instanceId,sDomModule.mWXSDKInstance.getInstanceId())){
         sDomModule.mWXSDKInstance=null;
       }
 
