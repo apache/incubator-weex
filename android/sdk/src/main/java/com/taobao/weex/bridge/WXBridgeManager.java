@@ -585,31 +585,46 @@ public class WXBridgeManager implements Callback {
 
 
   /**
-   * Invoke JavaScript callback
+   * Invoke JavaScript callback. Use {@link JSCallback} instead.
    * @see #callback(String, String, String)
    */
+  @Deprecated
   public void callback(String instanceId, String callback,String data) {
     callback(instanceId, callback,data,false);
   }
 
   /**
-   * Invoke JavaScript callback
+   * Invoke JavaScript callback. Use {@link JSCallback} instead.
    * @see #callback(String, String, Map<String, Object>)
    */
+  @Deprecated
   public void callback(final String instanceId, final String callback,
                        final Map<String, Object> data){
     callback(instanceId,callback,data,false);
   }
 
   /**
-   *
+   * Use {@link JSCallback} instead.
    * @param instanceId Weex Instance Id
    * @param callback  callback referenece handle
    * @param data callback data
    * @param keepAlive if keep callback instance alive for later use
      */
+  @Deprecated
   public void callback(final String instanceId, final String callback,
                        final Object data,boolean keepAlive) {
+    callbackJavascript(instanceId,callback,data,keepAlive);
+  }
+
+  /**
+   * Callback to Javascript function.
+   * @param instanceId Weex Instance Id
+   * @param callback  callback referenece handle
+   * @param data callback data
+   * @param keepAlive if keep callback instance alive for later use
+   */
+  void callbackJavascript(final String instanceId, final String callback,
+                          final Object data, boolean keepAlive) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
         || mJSHandler == null) {
       return;

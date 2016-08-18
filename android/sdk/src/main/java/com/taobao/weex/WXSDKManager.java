@@ -228,6 +228,7 @@ public class WXSDKManager {
     }
   }
 
+  @Deprecated
   public void callback(String instanceId, String funcId, Map<String, Object> data) {
     mBridgeManager.callback(instanceId, funcId, data);
   }
