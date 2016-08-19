@@ -54,7 +54,7 @@
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;
 @property (nonatomic, strong) NSString *placeholder;
-@property (nonatomic) NSUInteger maxLength;
+@property (nonatomic) NSNumber *maxLength;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -123,9 +123,7 @@
         }
         
         if (attributes[@"maxlength"]) {
-            _maxLength = [attributes[@"maxlength"] integerValue];
-        } else {
-            _maxLength = 0;
+            _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
         if (styles[@"color"]) {
@@ -255,7 +253,7 @@
         [_inputView setEnabled:[attributes[@"disabled"] boolValue]];
     }
     if (attributes[@"maxlength"]) {
-        _maxLength = [attributes[@"maxlength"] integerValue];
+        _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
     
     if (attributes[@"placeholder"]) {
@@ -372,7 +370,7 @@
         
         NSUInteger newLength = oldLength - rangeLength + replacementLength;
         
-        return newLength <= _maxLength ;
+        return newLength <= [_maxLength integerValue] ;
     }
     return YES;
 }
