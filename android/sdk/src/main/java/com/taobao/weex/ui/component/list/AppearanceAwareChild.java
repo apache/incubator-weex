@@ -7,16 +7,16 @@ import com.taobao.weex.ui.component.WXComponent;
  */
 class AppearanceAwareChild {
 
-  final WXComponent mListDirectChild;
-  final WXComponent mAwareChild;
+  private final WXComponent mListDirectChild;
+  private final WXComponent mAwareChild;
 
   private boolean isAppear = false;
+
   /**
-   *
-   * @param listDirectChild  direct child of list,for locate index.
-   * @param awareChild  child to notify when appearance changed.
+   * @param listDirectChild direct child of list,for locate index.
+   * @param awareChild      child to notify when appearance changed.
    */
-  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild){
+  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild) {
     mListDirectChild = listDirectChild;
     mAwareChild = awareChild;
   }
