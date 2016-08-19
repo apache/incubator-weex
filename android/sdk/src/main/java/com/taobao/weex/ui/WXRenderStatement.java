@@ -227,6 +227,7 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -492,11 +493,15 @@ class WXRenderStatement {
       return;
     }
 
-    int offsetInt = 0;
+    float offsetFloat = 0;
     if (options != null) {
       String offset = options.get("offset") == null ? "0" : options.get("offset").toString();
       if (offset != null) {
-        offsetInt = Integer.parseInt(offset);
+        try {
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset));
+        }catch (Exception e ){
+           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
+        }
       }
     }
 
@@ -504,7 +509,7 @@ class WXRenderStatement {
     if (scroller == null) {
       return;
     }
-    scroller.scrollTo(component,offsetInt);
+    scroller.scrollTo(component,(int)offsetFloat);
   }
 
   /**
