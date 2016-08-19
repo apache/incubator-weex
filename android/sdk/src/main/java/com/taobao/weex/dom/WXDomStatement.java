@@ -988,7 +988,7 @@ class WXDomStatement {
    * WXDomObject} and put the command event in the queue.
    * @param ref Reference of the dom.
    * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
+   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
    */
   void removeEvent(final String ref, final String type) {
