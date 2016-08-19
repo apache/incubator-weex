@@ -10,6 +10,7 @@
 #import "WXComponent_internal.h"
 #import "WXTransform.h"
 #import "WXAssert.h"
+#import "WXComponent_internal.h"
 
 @implementation WXComponent (Layout)
 
@@ -82,7 +83,7 @@
 
 - (NSUInteger)_childrenCountForLayout
 {
-    NSArray *subcomponents = self.subcomponents;
+    NSArray *subcomponents = _subcomponents;
     NSUInteger count = subcomponents.count;
     for (WXComponent *component in subcomponents) {
         if (!component->_isNeedJoinLayoutSystem) {
@@ -135,7 +136,7 @@
     
     [self _frameDidCalculated:isFrameChanged];
     
-    for (WXComponent *subcomponent in self.subcomponents) {
+    for (WXComponent *subcomponent in _subcomponents) {
         [subcomponent _calculateFrameWithSuperAbsolutePosition:newAboslutePosition gatherDirtyComponents:dirtyComponents];
     }
 }
@@ -247,7 +248,7 @@ static void cssNodePrint(void *context)
 static css_node_t * cssNodeGetChild(void *context, int i)
 {
     WXComponent *component = (__bridge WXComponent *)context;
-    NSArray *subcomponents = component.subcomponents;
+    NSArray *subcomponents = component->_subcomponents;
     for (int j = 0; j <= i && j < subcomponents.count; j++) {
         WXComponent *child = subcomponents[j];
         if (!child->_isNeedJoinLayoutSystem) {

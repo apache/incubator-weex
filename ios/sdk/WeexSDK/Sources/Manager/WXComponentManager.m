@@ -204,7 +204,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 {
      WXComponent *component = [self _buildComponentForData:componentData];
     
-    index = (index == -1 ? supercomponent.subcomponents.count : index);
+    index = (index == -1 ? supercomponent->_subcomponents.count : index);
     
     [supercomponent _insertSubcomponent:component atIndex:index];
     

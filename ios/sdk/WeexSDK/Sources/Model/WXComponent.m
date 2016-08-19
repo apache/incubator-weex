@@ -42,7 +42,6 @@
     pthread_mutex_t _propertyMutex;
     pthread_mutexattr_t _propertMutexAttr;
     
-    NSMutableArray *_subcomponents;
     __weak WXComponent *_supercomponent;
     __weak id<WXScrollerProtocol> _ancestorScroller;
     __weak WXSDKInstance *_weexInstance;
