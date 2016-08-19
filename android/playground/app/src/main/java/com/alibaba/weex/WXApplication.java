@@ -50,6 +50,7 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("event", WXEventModule.class);
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
+      //override default image tag
       WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
 
     } catch (WXException e) {

@@ -206,13 +206,10 @@ package com.alibaba.weex.commons.adapter;
 
 import android.content.Context;
 import android.widget.ImageView;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.WXImageView;
 
 /**
  * Created by sospartan on 8/19/16.
@@ -228,9 +225,6 @@ public class FrescoImageComponent extends WXImage {
     FrescoImageView view = new FrescoImageView(mContext);
     view.setScaleType(ImageView.ScaleType.FIT_XY);
 
-    DraweeController controller = Fresco.newDraweeControllerBuilder()
-        .setAutoPlayAnimations(true)
-    .build();
     return view;
   }
 }
