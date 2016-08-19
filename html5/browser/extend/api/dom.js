@@ -3,7 +3,7 @@
 import scroll from 'scroll-to'
 
 const dom = {
-	/**
+  /**
    * scrollToElement
    * @param  {string} ref
    * @param  {obj} options {offset:Number}
