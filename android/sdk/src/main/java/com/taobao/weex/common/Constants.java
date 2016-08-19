@@ -205,6 +205,10 @@
 package com.taobao.weex.common;
 
 public class Constants {
+  public interface Orientation{
+    int HORIZONTAL = 0;
+    int VERTICAL = 1;
+  }
 
   public interface Name {
 

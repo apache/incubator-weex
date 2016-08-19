@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component.list;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXVContainer;
 
@@ -218,6 +219,6 @@ public class HorizontalListComponent extends WXListComponent {
 
   @Override
   protected int getOrientation() {
-    return HORIZONTAL;
+    return Constants.Orientation.HORIZONTAL;
   }
 }
