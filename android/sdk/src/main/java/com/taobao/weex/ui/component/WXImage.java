@@ -249,7 +249,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
 
     @Override
-    protected WXImageView initComponentHostView(Context context) {
+    protected ImageView initComponentHostView(Context context) {
         WXImageView view = new WXImageView(mContext);
         view.setScaleType(ScaleType.FIT_XY);
         return view;
