@@ -60,8 +60,12 @@ static NSThread *WXComponentThread;
         _fixedComponents = [NSMutableArray wx_mutableArrayUsingWeakReferences];
         _uiTaskQueue = [NSMutableArray array];
         _isValid = YES;
-        
         [self _startDisplayLink];
+//        __weak typeof(self) weakSelf = self;
+//        WXPerformBlockOnComponentThread(^{
+//            __strong typeof(self) strongSelf = weakSelf;
+//            [strongSelf _startDisplayLink];
+//        });
     }
     
     return self;
@@ -207,7 +211,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     index = (index == -1 ? supercomponent.subcomponents.count : index);
     
     [supercomponent _insertSubcomponent:component atIndex:index];
-    
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -275,6 +278,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 {
     NSDictionary *dict = [_indexDict copy];
     return [dict objectForKey:ref];
+}
+
+- (WXComponent *)componentForRoot
+{
+    return _rootComponent;
 }
 
 - (NSUInteger)numberOfComponents
@@ -397,6 +405,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
+            [instance creatFinish];
             instance.renderFinish(rootView);
         }
     }];

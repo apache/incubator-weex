@@ -358,6 +358,11 @@ static NSArray *prettyStringPrinters = nil;
                 continue;
             }
             
+            //Temporarily filter classes beginning FBSDK
+            if([NSStringFromClass(class) rangeOfString:@"FBSDK"].location != NSNotFound) {
+                continue;
+            }
+            
             if (![class isSubclassOfClass:[NSObject class]]) {
                 continue;
             }

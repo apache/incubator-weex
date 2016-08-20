@@ -9,6 +9,9 @@
 #import "WXCSSDomainController.h"
 #import "PDDOMDomainController.h"
 #import "PDCSSTypes.h"
+#import <WeexSDK/WXComponent.h>
+#import <WeexSDK/WXSDKInstance.h>
+#import <WeexSDK/WXUtility.h>
 
 @implementation WXCSSDomainController
 @dynamic domain;
@@ -68,37 +71,47 @@
     
     NSArray *inherited = @[];
     NSArray *pseudoElements = @[];
-    
+    /*
     //assembling object of rule
-    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
+    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     if (!node) {
-        rootDomNode = [PDDOMDomainController defaultInstance].rootNode;
+        rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
         node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
         if (!node) {
             callback(nil,pseudoElements,inherited,nil);
             return;
         }
     }
-    PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
-    selectorData.text = node.nodeName;
-    selectorData.selectors = @[@{@"text":node.nodeName}];
+     */
     
+    NSInteger transformNodeId = nodeId.integerValue;
+    if (transformNodeId > 2) {
+        transformNodeId -= 2;
+    }
+    NSString *nodeKey = [NSString stringWithFormat:@"%ld",transformNodeId];
+    NSString *nodeName = nil;
+    
+    /********actual********/
+    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
+    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    
+    PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
     //assembling object of cssStyle
     PDCSSCSSStyle *style = [[PDCSSCSSStyle alloc] init];
     NSMutableArray *cssProperties = [NSMutableArray array];
     NSMutableString *cssText = [[NSMutableString alloc] init];
-    for (int i = 0; i < node.attributes.count; i++) {
+    for (int i = 0; i < actualAttrs.count; i++) {
         if (i & 1) {
-            if (![node.attributes[i-1] isEqualToString:@"frame"]) {
+            if (![actualAttrs[i-1] isEqualToString:@"frame"]) {
                 PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
-                [cssText appendFormat:@"%@;",node.attributes[i]];
-                cssProperty.name = node.attributes[i-1];
-                cssProperty.value = node.attributes[i];
+                [cssText appendFormat:@"%@;",actualAttrs[i]];
+                cssProperty.name = actualAttrs[i-1];
+                cssProperty.value = actualAttrs[i];
                 [cssProperties addObject:[cssProperty PD_JSONObject]];
             }else {
                 NSArray *names = @[@"width",@"height",@"top",@"left"];
-                NSArray *position = [self p_formateFrame:node.attributes[i]];
+                NSArray *position = [self p_formateFrame:actualAttrs[i]];
                 if (position.count == 4) {
                     NSDictionary *property = @{@"left":position[0],
                                                @"top":position[1],
@@ -114,23 +127,65 @@
                 }
             }
         }else {
-            if (![node.attributes[i] isEqualToString:@"frame"]) {
-                [cssText appendFormat:@"%@:",node.attributes[i]];
+            if (![actualAttrs[i] isEqualToString:@"frame"]) {
+                [cssText appendFormat:@"%@:",actualAttrs[i]];
+                if ([actualAttrs[i] isEqualToString:@"class"]) {
+                    nodeName = actualAttrs[i+1];
+                }
             }
         }
     }
+    selectorData.text = nodeName ? : @"";
+    selectorData.selectors = @[@{@"text":nodeName ? : @""},@{@"text":@"actual value"}];
     style.shorthandEntries = @[];
     style.cssText = cssText;
     style.cssProperties = [NSArray arrayWithArray:cssProperties];
-    
     PDCSSCSSRule *rule = [[PDCSSCSSRule alloc] init];
     rule.media = @[];
     rule.origin = @"inspector";
     rule.selectorList = selectorData;
     rule.style = style;
-    if ([rule PD_JSONObject]) {
+    /********vdom********/
+    PDCSSSelectorListData *vdomSelectorData = [[PDCSSSelectorListData alloc] init];
+    vdomSelectorData.text = nodeName ? : @"";
+    vdomSelectorData.selectors = @[@{@"text":nodeName ? : @""},@{@"text":@"vdom value"}];
+    //assembling object of cssStyle
+    PDCSSCSSStyle *vdomStyle = [[PDCSSCSSStyle alloc] init];
+    NSMutableArray *vdomCssProperties = [NSMutableArray array];
+    NSMutableString *vdomCssText = [[NSMutableString alloc] init];
+    WXComponent *component = [[PDDOMDomainController defaultInstance] _getComponentFromRef:nodeKey];
+    if (component) {
+        NSDictionary *vdomStyles = component.styles;
+        if (vdomStyles.allKeys > 0) {
+            for (NSString *key in vdomStyles.allKeys) {
+                PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
+                cssProperty.name = key;
+                if ([[vdomStyles objectForKey:key] isKindOfClass:[NSString class]]) {
+                    cssProperty.value = [vdomStyles objectForKey:key];
+                }else {
+                    cssProperty.value = [NSString stringWithFormat:@"%@",[vdomStyles objectForKey:key]];
+                }
+                [vdomCssText appendString:[NSString stringWithFormat:@"%@:%@;",cssProperty.name,cssProperty.value]];
+                [vdomCssProperties addObject:[cssProperty PD_JSONObject]];
+            }
+        }
+    }
+    
+    vdomStyle.shorthandEntries = @[];
+    vdomStyle.cssText = vdomCssText;
+    vdomStyle.cssProperties = [NSArray arrayWithArray:vdomCssProperties];
+    
+    PDCSSCSSRule *vdomRule = [[PDCSSCSSRule alloc] init];
+    vdomRule.media = @[];
+    vdomRule.origin = @"inspector";
+    vdomRule.selectorList = vdomSelectorData;
+    vdomRule.style = vdomStyle;
+    
+    
+    if ([rule PD_JSONObject] && [vdomRule PD_JSONObject]) {
         NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
-        NSArray *matchCSSRules = @[ruleMatch];
+        NSDictionary *vdomRuleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[vdomRule PD_JSONObject]};
+        NSArray *matchCSSRules = @[ruleMatch, vdomRuleMatch];
         callback(matchCSSRules,pseudoElements,inherited,nil);
     }else {
         callback(nil,pseudoElements,inherited,nil);
@@ -153,6 +208,7 @@
 }
 
 - (void)domain:(PDCSSDomain *)domain getComputedStyleForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(NSArray *computedStyle, id error))callback {
+    /*
     PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
     PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     
@@ -163,6 +219,18 @@
             position = [self p_formateFrame:node.attributes[idx + 1]];
         }
     }];
+     */
+    
+    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
+    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    __block NSArray *position;
+    [actualAttrs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isEqualToString:@"frame"]) {
+            *stop = YES;
+            position = [self p_formateFrame:actualAttrs[idx + 1]];
+        }
+    }];
+    
     NSString *width = @"";
     NSString *height = @"";
     NSString *top = @"";
@@ -172,6 +240,8 @@
         height = position[3];
         top = position[1];
         left = position[0];
+        width = [NSString stringWithFormat:@"%lf",[width floatValue]/WXScreenResizeRadio()];
+        height = [NSString stringWithFormat:@"%lf",[height floatValue]/WXScreenResizeRadio()];
     }
     NSMutableArray *computedStyles = [[NSMutableArray alloc] init];
     NSArray *layout = @[@{@"name":@"width",@"value":width},

@@ -43,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, strong) NSString *ref;
 
 /**
+ *  @abstract The component's type string.
+ */
+@property (nonatomic, readonly, copy) NSString *type;
+
+/**
  *  @abstract The component's styles.
  */
 @property (nonatomic, readonly, strong) NSDictionary *styles;
@@ -315,6 +320,8 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
 @interface UIView (WXComponent)
 
 @property (nonatomic, weak) WXComponent *wx_component;
+
+@property (nonatomic, weak) NSString *wx_ref;
 
 @end
 
