@@ -35,6 +35,7 @@
     
     if(self){
         _jsContext = [[JSContext alloc] init];
+        _jsContext.name = @"Weex Context";
         
         __weak typeof(self) weakSelf = self;
         
@@ -104,7 +105,7 @@
 - (void)executeJSFramework:(NSString *)frameworkScript
 {
     WXAssertParam(frameworkScript);
-    [_jsContext evaluateScript:frameworkScript];
+    [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args
