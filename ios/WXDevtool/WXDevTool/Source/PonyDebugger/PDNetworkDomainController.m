@@ -333,7 +333,7 @@ static NSArray *prettyStringPrinters = nil;
     }
     
     swizzled = YES;
-
+    
     // Swizzle any classes that implement one of these selectors.
     const SEL selectors[] = {
         @selector(connectionDidFinishLoading:),
@@ -403,6 +403,10 @@ static NSArray *prettyStringPrinters = nil;
         protocol = @protocol(NSURLConnectionDelegate);
     }
     
+    if (![cls conformsToProtocol:protocol]) {
+        return;
+    }
+    
     struct objc_method_description methodDescription = protocol_getMethodDescription(protocol, selector, NO, YES);
     
     typedef NSURLRequest *(^NSURLConnectionWillSendRequestBlock)(id <NSURLConnectionDelegate> slf, NSURLConnection *connection, NSURLRequest *request, NSURLResponse *response);
@@ -435,6 +439,10 @@ static NSArray *prettyStringPrinters = nil;
         protocol = @protocol(NSURLConnectionDelegate);
     }
     
+    if (![cls conformsToProtocol:protocol]) {
+        return;
+    }
+    
     struct objc_method_description methodDescription = protocol_getMethodDescription(protocol, selector, NO, YES);
     
     typedef void (^NSURLConnectionDidReceiveResponseBlock)(id <NSURLConnectionDelegate> slf, NSURLConnection *connection, NSURLResponse *response);
@@ -462,6 +470,10 @@ static NSArray *prettyStringPrinters = nil;
     Protocol *protocol = @protocol(NSURLConnectionDataDelegate);
     if (!protocol) {
         protocol = @protocol(NSURLConnectionDelegate);
+    }
+    
+    if (![cls conformsToProtocol:protocol]) {
+        return;
     }
     
     struct objc_method_description methodDescription = protocol_getMethodDescription(protocol, selector, NO, YES);
@@ -493,6 +505,10 @@ static NSArray *prettyStringPrinters = nil;
         protocol = @protocol(NSURLConnectionDelegate);
     }
     
+    if (![cls conformsToProtocol:protocol]) {
+        return;
+    }
+    
     struct objc_method_description methodDescription = protocol_getMethodDescription(protocol, selector, NO, YES);
     
     typedef void (^NSURLConnectionDidFinishLoadingBlock)(id <NSURLConnectionDelegate> slf, NSURLConnection *connection);
@@ -518,6 +534,11 @@ static NSArray *prettyStringPrinters = nil;
     SEL swizzledSelector = [self swizzledSelectorForSelector:selector];
     
     Protocol *protocol = @protocol(NSURLConnectionDelegate);
+    
+    if (![cls conformsToProtocol:protocol]) {
+        return;
+    }
+    
     struct objc_method_description methodDescription = protocol_getMethodDescription(protocol, selector, NO, YES);
     
     typedef void (^NSURLConnectionDidFailWithErrorBlock)(id <NSURLConnectionDelegate> slf, NSURLConnection *connection, NSError *error);

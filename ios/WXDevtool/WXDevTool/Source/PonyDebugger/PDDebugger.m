@@ -609,7 +609,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)_executionDebugAry {
     if (!_isConnect) return;
     
-    for (NSString *msg in _debugAry) {
+    NSArray *templateContainers = [NSArray arrayWithArray:_debugAry];
+    for (NSString *msg in templateContainers) {
         [_socket send:msg];
     }
     [_debugAry removeAllObjects];
@@ -618,7 +619,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)_executionMsgAry {
     if (!_isConnect) return;
     
-    for (NSString *msg in _msgAry) {
+    NSArray *templateContainers = [NSArray arrayWithArray:_msgAry];
+    for (NSString *msg in templateContainers) {
         [_socket send:msg];
     }
     [_msgAry removeAllObjects];
