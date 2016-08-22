@@ -86,6 +86,10 @@
 @protocol PDDOMCommandDelegate <PDCommandDelegate>
 @optional
 
+// Returns the root VDOM node to the caller.
+// Callback Param root: Resulting node.
+- (void)domain:(PDDOMDomain *)domain getVirtualDocumentWithCallback:(void (^)(PDDOMNode *root, id error))callback;
+
 // Returns the root DOM node to the caller.
 // Callback Param root: Resulting node.
 - (void)domain:(PDDOMDomain *)domain getDocumentWithCallback:(void (^)(PDDOMNode *root, id error))callback;

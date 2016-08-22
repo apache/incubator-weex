@@ -201,4 +201,6 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 - (void)reloadData:(id)data  DEPRECATED_MSG_ATTRIBUTE("Use refreshInstance: method instead.");
 
+- (void)creatFinish;
+
 @end

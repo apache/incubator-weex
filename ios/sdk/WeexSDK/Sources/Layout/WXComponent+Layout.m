@@ -10,6 +10,7 @@
 #import "WXComponent_internal.h"
 #import "WXTransform.h"
 #import "WXAssert.h"
+#import "WXComponent_internal.h"
 
 @implementation WXComponent (Layout)
 
@@ -82,8 +83,9 @@
 
 - (NSUInteger)_childrenCountForLayout
 {
-    NSUInteger count = self.subcomponents.count;
-    for (WXComponent *component in self.subcomponents) {
+    NSArray *subcomponents = _subcomponents;
+    NSUInteger count = subcomponents.count;
+    for (WXComponent *component in subcomponents) {
         if (!component->_isNeedJoinLayoutSystem) {
             count--;
         }
@@ -134,7 +136,7 @@
     
     [self _frameDidCalculated:isFrameChanged];
     
-    for (WXComponent *subcomponent in self.subcomponents) {
+    for (WXComponent *subcomponent in _subcomponents) {
         [subcomponent _calculateFrameWithSuperAbsolutePosition:newAboslutePosition gatherDirtyComponents:dirtyComponents];
     }
 }
@@ -227,7 +229,8 @@ do {\
 - (void)_fillAbsolutePositions
 {
     CGPoint absolutePosition = self.absolutePosition;
-    for (WXComponent *subcomponent in self.subcomponents) {
+    NSArray *subcomponents = self.subcomponents;
+    for (WXComponent *subcomponent in subcomponents) {
         subcomponent.absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
         [subcomponent _fillAbsolutePositions];
     }
@@ -245,16 +248,16 @@ static void cssNodePrint(void *context)
 static css_node_t * cssNodeGetChild(void *context, int i)
 {
     WXComponent *component = (__bridge WXComponent *)context;
-    
-    for (int j = 0; j <= i && j < component.subcomponents.count; j++) {
-        WXComponent *child = component.subcomponents[j];
+    NSArray *subcomponents = component->_subcomponents;
+    for (int j = 0; j <= i && j < subcomponents.count; j++) {
+        WXComponent *child = subcomponents[j];
         if (!child->_isNeedJoinLayoutSystem) {
             i++;
         }
     }
     
-    if(i >= 0 && i < component.subcomponents.count){
-        WXComponent *child = component.subcomponents[i];
+    if(i >= 0 && i < subcomponents.count){
+        WXComponent *child = subcomponents[i];
         return child->_cssNode;
     }
     
