@@ -11,8 +11,16 @@
 #import "PDDebugger.h"
 #import "WXDevtool.h"
 
+@protocol WXDebugCommandDelegate;
+
 @interface WXDebugDomain : PDDynamicDebuggerDomain
 
-@property (nonatomic, assign) id <PDCommandDelegate>delegate;
+@property (nonatomic, assign) id <WXDebugCommandDelegate, PDCommandDelegate>delegate;
+
+@end
+
+@protocol WXDebugCommandDelegate <PDCommandDelegate>
+@optional
+- (void)domain:(WXDebugDomain *)domain sendLogLevel:(NSString *)level WithCallback:(void (^)(id error))callback;
 
 @end

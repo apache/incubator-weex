@@ -147,12 +147,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
         if (result) {
             NSMutableDictionary *newResult = [[NSMutableDictionary alloc] initWithCapacity:result.count];
             [result enumerateKeysAndObjectsUsingBlock:^(id key, id val, BOOL *stop) {
-                if ([key isEqualToString:@"WXDebug_result"]) {
-                    [WXDevToolType setDebug:YES];
-                    [WXSDKEngine restart];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
-                    return;
-                }
                 [newResult setObject:[val PD_JSONObjectCopy] forKey:key];
             }];
             [response setObject:newResult forKey:@"result"];
@@ -183,6 +177,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     _socket.delegate = nil;
     _socket = nil;
     _isConnect = NO;
+    [self _addOvertimeMonitor];
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
@@ -190,6 +185,21 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     NSLog(@"Debugger failed with web socket error: %@", [error localizedDescription]);
     _socket.delegate = nil;
     _socket = nil;
+}
+
+#pragma mark - timer
+- (void)_addOvertimeMonitor
+{
+    NSTimer *timer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(_webSocketOvertime) userInfo:nil repeats:NO];
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+}
+- (void)_webSocketOvertime
+{
+    if ([WXDevToolType isDebug]) {
+        [WXDevToolType setDebug:NO];
+        [WXSDKEngine restart];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
+    }
 }
 
 #pragma mark - NSNetServiceBrowserDelegate
@@ -313,10 +323,8 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 - (void)connectToURL:(NSURL *)url;
 {
     NSLog(@"Connecting to %@", url);
-    if ([WXDevToolType isDebug]) {
-        [WXDevToolType setDebug:NO];
-        [WXSDKEngine restart];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
+    if (_socket && _isConnect) {
+        return;
     }
     _msgAry = nil;
     _msgAry = [NSMutableArray array];
@@ -423,7 +431,11 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
     // Choosing frame, alpha, and hidden as the default key paths to display
     [[PDDOMDomainController defaultInstance] setViewKeyPathsToDisplay:@[@"frame", @"alpha", @"hidden"]];
     
+#if VDom
+    [PDDOMDomainController startMonitoringWeexComponentChanges];
+#else
     [PDDOMDomainController startMonitoringUIViewChanges];
+#endif
 }
 
 - (void)setDisplayedViewAttributeKeyPaths:(NSArray *)keyPaths;
@@ -471,15 +483,12 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 #pragma mark - WXBridgeProtocol
 - (void)executeJSFramework:(NSString *)frameworkScript {
-    //WXLogInfo(@"======yangshengtao 0:jsThread:%@,currentThread:%@",_bridgeThread,[NSThread currentThread]);
-//    [self _initBridgeThread];
     NSDictionary *WXEnvironment = @{@"WXEnvironment":[WXUtility getEnvironment]};
     NSDictionary *args = @{@"source":frameworkScript, @"env":WXEnvironment};
     [self callJSMethod:@"WxDebug.initJSRuntime" params:args];
 }
 
 - (void)callJSMethod:(NSString *)method params:(NSDictionary*)params {
-//    [self _initBridgeThread];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     [dict setObject:method forKey:@"method"];
     [dict setObject:params forKey:@"params"];
@@ -488,8 +497,6 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args {
-//    WXLogInfo(@"======yangshengtao 0:jsThread:%@,currentThread:%@",_bridgeThread,[NSThread currentThread]);
-//    [self _initBridgeThread];
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
     [params setObject:method forKey:@"method"];
     [params setObject:args forKey:@"args"];
@@ -587,7 +594,7 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
             return;
         }
         //call native
-        WXLogDebug(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
+        WXLogInfo(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
         _nativeCallBlock(instanceId, methods, callbackId);
     }
     
@@ -648,7 +655,13 @@ void _PDLogObjectsImpl(NSString *severity, NSArray *arguments)
 
 
 - (void)_registerDeviceWithParams:(id)params {
-    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:@"WxDebug.registerDevice", @"method", [params PD_JSONObject], @"params",[NSNumber numberWithInt:0],@"id",nil];
+    NSDictionary *obj = [[NSDictionary alloc] initWithObjectsAndKeys:
+                         @"WxDebug.registerDevice", @"method",
+                         [params PD_JSONObject], @"params",
+                         [NSNumber numberWithInt:0],@"id",
+                         [WXLog logLevelString] ?: @"error",@"logLevel",
+                         [NSNumber numberWithBool:[WXDevToolType isDebug]],@"remoteDebug",
+                         nil];
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
     NSString *encodedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];

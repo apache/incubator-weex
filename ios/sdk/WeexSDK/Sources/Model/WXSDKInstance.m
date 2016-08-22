@@ -295,6 +295,11 @@ NSTimeInterval JSLibInitTime = 0;
     //deperacated
 }
 
+- (void)creatFinish
+{
+    
+}
+
 #pragma mark Private Methods
 
 - (void)addObservers

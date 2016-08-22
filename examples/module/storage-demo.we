@@ -77,7 +77,6 @@ module.exports = {
       me.getAllKeysResult = JSON.stringify(e.data);
       //me.getAllKeysResult +=' '+ typeof e.data
     });
-
     //removeItem
     storage.removeItem('foo',function(e){
       console.log('remove foo:'+JSON.stringify(e));

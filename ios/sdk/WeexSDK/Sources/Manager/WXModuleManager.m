@@ -77,10 +77,12 @@
     NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
     invocation.target = module;
     invocation.selector = selector;
+    NSString* instanceId = method.instance;
     
     void **freeList = NULL;
     WX_ALLOC_FLIST(freeList, arguments.count);
     
+    NSMutableArray *blockArray = [NSMutableArray array];
     for (int i = 0; i < arguments.count; i++) {
         id obj = arguments[i];
         const char *parameterType = [signature getArgumentTypeAtIndex:i + 2];
@@ -92,7 +94,9 @@
                 NSString* instanceId = method.instance;
                 [[WXSDKManager bridgeMgr]callBack:instanceId funcId:(NSString *)obj params:result keepAlive:keepAlive];
             } copy];
-            CFBridgingRetain(argument);
+            
+            // retain block
+            [blockArray addObject:argument];
             [invocation setArgument:&argument atIndex:i + 2];
         } else {
             argument = obj;

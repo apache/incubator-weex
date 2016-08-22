@@ -93,7 +93,7 @@
         
         if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
             // solve iOS7 memory problem
-            _jsContext[@"__weex_set_polyfill__"] = [WXPolyfillSet class];
+            _jsContext[@"nativeSet"] = [WXPolyfillSet class];
         }
     }
     return self;
