@@ -21,6 +21,7 @@
 {
 @package
     NSString *_type;
+    NSMutableArray *_subcomponents;
     /**
      *  Layout
      */

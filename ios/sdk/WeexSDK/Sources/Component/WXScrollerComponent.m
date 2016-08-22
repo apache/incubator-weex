@@ -27,13 +27,6 @@
 
 @end
 
-@interface WXScrollView_new : UIScrollView
-
-@end
-
-@implementation WXScrollView_new
-
-@end
 
 @interface WXScrollerComponent()
 
