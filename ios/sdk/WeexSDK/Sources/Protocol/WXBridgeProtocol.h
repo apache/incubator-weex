@@ -22,4 +22,6 @@ typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString
 
 - (void)resetEnvironment;
 
+- (void)garbageCollect;
+
 @end

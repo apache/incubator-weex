@@ -202,6 +202,10 @@ _Pragma("clang diagnostic pop") \
     }
     
     [self callJSMethod:@"destroyInstance" args:@[instance]];
+    
+#ifdef DEBUG
+    [self.jsBridge garbageCollect];
+#endif
 }
 
 - (void)refreshInstance:(NSString *)instance

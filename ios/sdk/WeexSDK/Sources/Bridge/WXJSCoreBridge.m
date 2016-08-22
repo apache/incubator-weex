@@ -138,6 +138,13 @@
     _jsContext[@"WXEnvironment"] = data;
 }
 
+JS_EXPORT void JSSynchronousGarbageCollectForDebugging(JSContextRef ctx);
+
+- (void)garbageCollect
+{
+    JSSynchronousGarbageCollectForDebugging(_jsContext.JSGlobalContextRef);
+}
+
 #pragma mark - Private
 
 - (void)triggerTimeout:(void(^)())block

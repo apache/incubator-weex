@@ -142,6 +142,11 @@
     [self _initEnvironment];
 }
 
+- (void)garbageCollect
+{
+    
+}
+
 - (void)executeBridgeThead:(dispatch_block_t)block
 {
     if([NSThread currentThread] == _curThread){
