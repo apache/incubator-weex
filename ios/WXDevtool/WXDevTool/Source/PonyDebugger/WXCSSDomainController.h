@@ -7,12 +7,12 @@
  */
 
 #import "PonyDebugger.h"
-#import "PDCSSDomain.h"
+#import "WXCSSDomain.h"
 
-@interface WXCSSDomainController : PDDomainController<PDCSSCommandDelegate>
+@interface WXCSSDomainController : WXDomainController<WXCSSCommandDelegate>
 
 + (WXCSSDomainController *)defaultInstance;
 
-@property (nonatomic, strong) PDCSSDomain *domain;
+@property (nonatomic, strong) WXCSSDomain *domain;
 
 @end

@@ -41,15 +41,15 @@
     return logLevelEnumToString;
 }
 
-#pragma mark - PDCommandDelegate
-- (void)domain:(PDDynamicDebuggerDomain *)domain enableWithCallback:(void (^)(id error))callback {
+#pragma mark - WXCommandDelegate
+- (void)domain:(WXDynamicDebuggerDomain *)domain enableWithCallback:(void (^)(id error))callback {
     [WXDevToolType setDebug:YES];
     [WXSDKEngine restart];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
     callback(nil);
 }
 
-- (void)domain:(PDDynamicDebuggerDomain *)domain disableWithCallback:(void (^)(id error))callback {
+- (void)domain:(WXDynamicDebuggerDomain *)domain disableWithCallback:(void (^)(id error))callback {
     [WXDevToolType setDebug:NO];
     [WXSDKEngine restart];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];

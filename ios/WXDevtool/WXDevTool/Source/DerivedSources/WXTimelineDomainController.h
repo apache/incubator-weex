@@ -7,12 +7,12 @@
  */
 
 #import "PonyDebugger.h"
-#import "PDTimelineDomain.h"
+#import "WXTimelineDomain.h"
 
-@interface WXTimelineDomainController : PDDomainController
+@interface WXTimelineDomainController : WXDomainController
 
 +(WXTimelineDomainController *)defaultInstance;
 
-@property (nonatomic, strong) PDTimelineDomain *domain;
+@property (nonatomic, strong) WXTimelineDomain *domain;
 
 @end

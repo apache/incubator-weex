@@ -10,15 +10,15 @@
 //
 
 #import "PonyDebugger.h"
-#import "PDDOMDomain.h"
-#import "PDDOMTypes.h"
+#import "WXDOMDomain.h"
+#import "WXDOMTypes.h"
 #import <UIKit/UIKit.h>
 
-@interface PDDOMDomainController : PDDomainController <PDDOMCommandDelegate>
+@interface PDDOMDomainController : WXDomainController <WXDOMCommandDelegate>
 
-@property (nonatomic, strong) PDDOMDomain *domain;
+@property (nonatomic, strong) WXDOMDomain *domain;
 
-@property (nonatomic, strong) PDDOMNode *rootDomNode;
+@property (nonatomic, strong) WXDOMNode *rootDomNode;
 
 + (PDDOMDomainController *)defaultInstance;
 + (void)startMonitoringUIViewChanges;

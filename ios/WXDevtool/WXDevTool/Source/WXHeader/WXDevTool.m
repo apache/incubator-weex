@@ -8,7 +8,7 @@
 
 #import "WXDevTool.h"
 #import <WeexSDK/WXSDKEngine.h>
-#import "PDDebugger.h"
+#import "WXDebugger.h"
 
 static BOOL WXIsConnect;
 
@@ -24,7 +24,7 @@ static BOOL WXIsConnect;
 
 #pragma mark weex devtool
 + (void)launchDevToolDebugWithUrl:(NSString *)url {
-    PDDebugger *debugger = [[PDDebugger alloc] init];
+    WXDebugger *debugger = [[WXDebugger alloc] init];
     //    [debugger serverStartWithHost:@"localhost" port:9009];
     
     // Enable Network debugging, and automatically track network traffic that comes through any classes that implement either NSURLConnectionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate or NSURLSessionDataDelegate methods.
@@ -40,7 +40,7 @@ static BOOL WXIsConnect;
     [debugger enableViewHierarchyDebugging];
     [debugger setDisplayedViewAttributeKeyPaths:@[@"frame", @"hidden", @"alpha", @"opaque", @"accessibilityLabel", @"text"]];
     
-    // Enable remote logging to the DevTools Console via PDLog()/PDLogObjects().
+    // Enable remote logging to the DevTools Console via WXLog()/WXLogObjects().
     [debugger enableRemoteLogging];
     
     // Enable remote logging to the DevTools source.

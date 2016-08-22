@@ -7,8 +7,8 @@
  */
 
 #import "WXCSSDomainController.h"
-#import "PDDOMDomainController.h"
-#import "PDCSSTypes.h"
+#import "WXDOMDomainController.h"
+#import "WXCSSTypes.h"
 #import <WeexSDK/WXComponent.h>
 #import <WeexSDK/WXSDKInstance.h>
 #import <WeexSDK/WXUtility.h>
@@ -26,11 +26,11 @@
 }
 
 + (Class)domainClass {
-    return [PDCSSDomain class];
+    return [WXCSSDomain class];
 }
 
 #pragma mark - private method
-- (PDDOMNode *)p_getNodeFromNodeId:(NSNumber *)nodeId rootNode:(PDDOMNode *)rootNode{
+- (WXDOMNode *)p_getNodeFromNodeId:(NSNumber *)nodeId rootNode:(WXDOMNode *)rootNode{
     if (!rootNode) {
         return nil;
     }
@@ -38,11 +38,11 @@
         return rootNode;
     }
     if (rootNode.children.count > 0) {
-        for (PDDOMNode *node in rootNode.children) {
+        for (WXDOMNode *node in rootNode.children) {
             if ([node.nodeId longValue] == [nodeId longValue]) {
                 return node;
             }else {
-                PDDOMNode *returnNode = [self p_getNodeFromNodeId:nodeId rootNode:node];
+                WXDOMNode *returnNode = [self p_getNodeFromNodeId:nodeId rootNode:node];
                 if (returnNode) {
                     return returnNode;
                 }
@@ -66,17 +66,17 @@
     return position;
 }
 
-#pragma mark - PDCSSCommandDelegate
-- (void)domain:(PDCSSDomain *)domain getMatchedStylesForNodeWithNodeId:(NSNumber *)nodeId includePseudo:(NSNumber *)includePseudo includeInherited:(NSNumber *)includeInherited callback:(void (^)(NSArray *matchedCSSRules, NSArray *pseudoElements, NSArray *inherited, id error))callback {
+#pragma mark - WXCSSCommandDelegate
+- (void)domain:(WXCSSDomain *)domain getMatchedStylesForNodeWithNodeId:(NSNumber *)nodeId includePseudo:(NSNumber *)includePseudo includeInherited:(NSNumber *)includeInherited callback:(void (^)(NSArray *matchedCSSRules, NSArray *pseudoElements, NSArray *inherited, id error))callback {
     
     NSArray *inherited = @[];
     NSArray *pseudoElements = @[];
     /*
     //assembling object of rule
-    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
-    PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
+    WXDOMNode *rootDomNode = [WXDOMDomainController defaultInstance].rootComponentNode;
+    WXDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     if (!node) {
-        rootDomNode = [PDDOMDomainController defaultInstance].rootComponentNode;
+        rootDomNode = [WXDOMDomainController defaultInstance].rootComponentNode;
         node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
         if (!node) {
             callback(nil,pseudoElements,inherited,nil);
@@ -93,22 +93,22 @@
     NSString *nodeName = nil;
     
     /********actual********/
-    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
-    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    UIView *selectedView = [[[WXDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
+    NSArray *actualAttrs = [[WXDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
     
-    PDCSSSelectorListData *selectorData = [[PDCSSSelectorListData alloc] init];
+    WXCSSSelectorListData *selectorData = [[WXCSSSelectorListData alloc] init];
     //assembling object of cssStyle
-    PDCSSCSSStyle *style = [[PDCSSCSSStyle alloc] init];
+    WXCSSCSSStyle *style = [[WXCSSCSSStyle alloc] init];
     NSMutableArray *cssProperties = [NSMutableArray array];
     NSMutableString *cssText = [[NSMutableString alloc] init];
     for (int i = 0; i < actualAttrs.count; i++) {
         if (i & 1) {
             if (![actualAttrs[i-1] isEqualToString:@"frame"]) {
-                PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
+                WXCSSCSSProperty *cssProperty = [[WXCSSCSSProperty alloc] init];
                 [cssText appendFormat:@"%@;",actualAttrs[i]];
                 cssProperty.name = actualAttrs[i-1];
                 cssProperty.value = actualAttrs[i];
-                [cssProperties addObject:[cssProperty PD_JSONObject]];
+                [cssProperties addObject:[cssProperty WX_JSONObject]];
             }else {
                 NSArray *names = @[@"width",@"height",@"top",@"left"];
                 NSArray *position = [self p_formateFrame:actualAttrs[i]];
@@ -118,11 +118,11 @@
                                                @"width":position[2],
                                                @"height":position[3]};
                     for (int i = 0; i < property.count; i++) {
-                        PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
+                        WXCSSCSSProperty *cssProperty = [[WXCSSCSSProperty alloc] init];
                         cssProperty.name = names[i];
                         cssProperty.value = property[names[i]];
                         [cssText appendString:[NSString stringWithFormat:@"%@:%@;",cssProperty.name,cssProperty.value]];
-                        [cssProperties addObject:[cssProperty PD_JSONObject]];
+                        [cssProperties addObject:[cssProperty WX_JSONObject]];
                     }
                 }
             }
@@ -140,25 +140,25 @@
     style.shorthandEntries = @[];
     style.cssText = cssText;
     style.cssProperties = [NSArray arrayWithArray:cssProperties];
-    PDCSSCSSRule *rule = [[PDCSSCSSRule alloc] init];
+    WXCSSCSSRule *rule = [[WXCSSCSSRule alloc] init];
     rule.media = @[];
     rule.origin = @"inspector";
     rule.selectorList = selectorData;
     rule.style = style;
     /********vdom********/
-    PDCSSSelectorListData *vdomSelectorData = [[PDCSSSelectorListData alloc] init];
+    WXCSSSelectorListData *vdomSelectorData = [[WXCSSSelectorListData alloc] init];
     vdomSelectorData.text = nodeName ? : @"";
     vdomSelectorData.selectors = @[@{@"text":nodeName ? : @""},@{@"text":@"vdom value"}];
     //assembling object of cssStyle
-    PDCSSCSSStyle *vdomStyle = [[PDCSSCSSStyle alloc] init];
+    WXCSSCSSStyle *vdomStyle = [[WXCSSCSSStyle alloc] init];
     NSMutableArray *vdomCssProperties = [NSMutableArray array];
     NSMutableString *vdomCssText = [[NSMutableString alloc] init];
-    WXComponent *component = [[PDDOMDomainController defaultInstance] _getComponentFromRef:nodeKey];
+    WXComponent *component = [[WXDOMDomainController defaultInstance] _getComponentFromRef:nodeKey];
     if (component) {
         NSDictionary *vdomStyles = component.styles;
         if (vdomStyles.allKeys > 0) {
             for (NSString *key in vdomStyles.allKeys) {
-                PDCSSCSSProperty *cssProperty = [[PDCSSCSSProperty alloc] init];
+                WXCSSCSSProperty *cssProperty = [[WXCSSCSSProperty alloc] init];
                 cssProperty.name = key;
                 if ([[vdomStyles objectForKey:key] isKindOfClass:[NSString class]]) {
                     cssProperty.value = [vdomStyles objectForKey:key];
@@ -166,7 +166,7 @@
                     cssProperty.value = [NSString stringWithFormat:@"%@",[vdomStyles objectForKey:key]];
                 }
                 [vdomCssText appendString:[NSString stringWithFormat:@"%@:%@;",cssProperty.name,cssProperty.value]];
-                [vdomCssProperties addObject:[cssProperty PD_JSONObject]];
+                [vdomCssProperties addObject:[cssProperty WX_JSONObject]];
             }
         }
     }
@@ -175,16 +175,16 @@
     vdomStyle.cssText = vdomCssText;
     vdomStyle.cssProperties = [NSArray arrayWithArray:vdomCssProperties];
     
-    PDCSSCSSRule *vdomRule = [[PDCSSCSSRule alloc] init];
+    WXCSSCSSRule *vdomRule = [[WXCSSCSSRule alloc] init];
     vdomRule.media = @[];
     vdomRule.origin = @"inspector";
     vdomRule.selectorList = vdomSelectorData;
     vdomRule.style = vdomStyle;
     
     
-    if ([rule PD_JSONObject] && [vdomRule PD_JSONObject]) {
-        NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule PD_JSONObject]};
-        NSDictionary *vdomRuleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[vdomRule PD_JSONObject]};
+    if ([rule WX_JSONObject] && [vdomRule WX_JSONObject]) {
+        NSDictionary *ruleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[rule WX_JSONObject]};
+        NSDictionary *vdomRuleMatch = @{@"matchingSelectors":@[[NSNumber numberWithInteger:0]],@"rule":[vdomRule WX_JSONObject]};
         NSArray *matchCSSRules = @[ruleMatch, vdomRuleMatch];
         callback(matchCSSRules,pseudoElements,inherited,nil);
     }else {
@@ -192,13 +192,13 @@
     }
 }
 
-- (void)domain:(PDCSSDomain *)domain getInlineStylesForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(PDCSSCSSStyle *inlineStyle, PDCSSCSSStyle *attributesStyle, id error))callback {
-    PDCSSCSSStyle *inlineStyle = [[PDCSSCSSStyle alloc] init];
+- (void)domain:(WXCSSDomain *)domain getInlineStylesForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(WXCSSCSSStyle *inlineStyle, WXCSSCSSStyle *attributesStyle, id error))callback {
+    WXCSSCSSStyle *inlineStyle = [[WXCSSCSSStyle alloc] init];
     inlineStyle.styleSheetId = @"22222.2";
     inlineStyle.cssProperties = @[];
     inlineStyle.cssText = @"";
     inlineStyle.shorthandEntries = @[];
-    PDCSSSourceRange *range = [[PDCSSSourceRange alloc] init];
+    WXCSSSourceRange *range = [[WXCSSSourceRange alloc] init];
     range.startLine = [NSNumber numberWithInt:0];
     range.endLine = [NSNumber numberWithInt:0];
     range.startColumn = [NSNumber numberWithInt:0];
@@ -207,10 +207,10 @@
     callback(inlineStyle,nil,nil);
 }
 
-- (void)domain:(PDCSSDomain *)domain getComputedStyleForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(NSArray *computedStyle, id error))callback {
+- (void)domain:(WXCSSDomain *)domain getComputedStyleForNodeWithNodeId:(NSNumber *)nodeId callback:(void (^)(NSArray *computedStyle, id error))callback {
     /*
-    PDDOMNode *rootDomNode = [PDDOMDomainController defaultInstance].rootDomNode;
-    PDDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
+    WXDOMNode *rootDomNode = [WXDOMDomainController defaultInstance].rootDomNode;
+    WXDOMNode *node = [self p_getNodeFromNodeId:nodeId rootNode:rootDomNode];
     
     __block NSArray *position;
     [node.attributes enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -221,8 +221,8 @@
     }];
      */
     
-    UIView *selectedView = [[[PDDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
-    NSArray *actualAttrs = [[PDDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
+    UIView *selectedView = [[[WXDOMDomainController defaultInstance] getObjectsForComponentRefs] objectForKey:[NSString stringWithFormat:@"%ld",nodeId.integerValue]];
+    NSArray *actualAttrs = [[WXDOMDomainController defaultInstance] attributesArrayForObject:selectedView];
     __block NSArray *position;
     [actualAttrs enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([obj isEqualToString:@"frame"]) {
@@ -263,17 +263,17 @@
                         @{@"name":@"left",@"value":left},
                         @{@"name":@"bottom",@"value":@"0px"}];
     for (int i = 0; i < layout.count; i++) {
-        PDCSSCSSComputedStyleProperty *computedStyleProperty = [[PDCSSCSSComputedStyleProperty alloc] init];
+        WXCSSCSSComputedStyleProperty *computedStyleProperty = [[WXCSSCSSComputedStyleProperty alloc] init];
         computedStyleProperty.name = layout[i][@"name"];
         computedStyleProperty.value = layout[i][@"value"];
-        [computedStyles addObject:[computedStyleProperty PD_JSONObject]];
+        [computedStyles addObject:[computedStyleProperty WX_JSONObject]];
     }
     
     callback(computedStyles,nil);
 }
 
-- (void)domain:(PDCSSDomain *)domain getSupportedCSSPropertiesWithCallback:(void (^)(NSArray *cssProperties, id error))callback {
-    PDCSSCSSPropertyInfo *cssPropertyInfo = [[PDCSSCSSPropertyInfo alloc] init];
+- (void)domain:(WXCSSDomain *)domain getSupportedCSSPropertiesWithCallback:(void (^)(NSArray *cssProperties, id error))callback {
+    WXCSSCSSPropertyInfo *cssPropertyInfo = [[WXCSSCSSPropertyInfo alloc] init];
     cssPropertyInfo.name = @"width";
     cssPropertyInfo.longhands = @[];
     NSArray *cssProperties = @[cssPropertyInfo];
