@@ -183,16 +183,16 @@ static id<WXLogProtocol> _externalLog;
         va_end(args);
         
         NSArray *messageAry = [NSArray arrayWithObjects:message, nil];
-        Class PDLogClass = NSClassFromString(@"PDDebugger");
-        if (PDLogClass) {
+        Class WXLogClass = NSClassFromString(@"WXDebugger");
+        if (WXLogClass) {
             SEL selector = NSSelectorFromString(@"coutLogWithLevel:arguments:");
-            NSMethodSignature *methodSignature = [PDLogClass instanceMethodSignatureForSelector:selector];
+            NSMethodSignature *methodSignature = [WXLogClass instanceMethodSignatureForSelector:selector];
             if (methodSignature == nil) {
                 NSString *info = [NSString stringWithFormat:@"%@ not found", NSStringFromSelector(selector)];
                 [NSException raise:@"Method invocation appears abnormal" format:info, nil];
             }
             NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-            [invocation setTarget:[PDLogClass alloc]];
+            [invocation setTarget:[WXLogClass alloc]];
             [invocation setSelector:selector];
             [invocation setArgument:&flagString atIndex:2];
             [invocation setArgument:&messageAry atIndex:3];

@@ -104,7 +104,7 @@ do {                                    \
 } while(0)
 
 
-extern void _PDLogObjectsImpl(NSString *severity, NSArray *arguments);
+extern void _WXLogObjectsImpl(NSString *severity, NSArray *arguments);
 
 #ifdef DEBUG
 #define WXLog(format,...)               WX_LOG(WXLogFlagLog, format, ##__VA_ARGS__)
