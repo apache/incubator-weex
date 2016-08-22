@@ -33,7 +33,7 @@
   "scripts": {
     "postinstall": "bash ./bin/install-hooks.sh",
     "build:config": "node build/config.frameworks.js",
-    "build:browser": "webpack --config build/webpack.browser.config.js",
+    "build:browser": "wwp && webpack --config build/webpack.browser.config.js",
     "build:common": "webpack --config build/webpack.common.config.js",
     "build:native": "webpack --config build/webpack.native.config.js",
     "build:examples": "webpack --config build/webpack.examples.config.js",
@@ -98,6 +98,7 @@
     "style-loader": "^0.13.1",
     "uglify-js": "^2.6.4",
     "webpack": "^1.13.1",
-    "weex-loader": "^0.2.0"
+    "weex-loader": "^0.2.0",
+    "wwp": "^0.1.1"
   }
 }
