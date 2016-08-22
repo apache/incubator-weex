@@ -255,7 +255,7 @@
             
             [section.rows enumerateObjectsUsingBlock:^(WXCellComponent * _Nonnull cell, NSUInteger row, BOOL * _Nonnull stop) {
                 NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:sectionIndex];
-                [self _recomputeCellAbsolutePostion:cell forIndexPath:indexPath];
+                [self _recomputeCellAbsolutePosition:cell forIndexPath:indexPath];
             }];
         }];
     }];
@@ -314,11 +314,11 @@
             }];
         }
         
-        [self _recomputeCellAbsolutePostion:cell forIndexPath:indexPath];
+        [self _recomputeCellAbsolutePosition:cell forIndexPath:indexPath];
     }];
 }
 
-- (void)_recomputeCellAbsolutePostion:(WXCellComponent *)cell forIndexPath:(NSIndexPath *)indexPath
+- (void)_recomputeCellAbsolutePosition:(WXCellComponent *)cell forIndexPath:(NSIndexPath *)indexPath
 {
     CGRect cellRect = [_tableView rectForRowAtIndexPath:indexPath];
     cell.absolutePosition = CGPointMake(self.absolutePosition.x + cellRect.origin.x,
