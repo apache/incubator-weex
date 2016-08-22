@@ -91,7 +91,6 @@
         if (!strcmp(parameterType, blockType)) {
             // callback
             argument = [^void(NSString *result, BOOL keepAlive) {
-                NSString* instanceId = method.instance;
                 [[WXSDKManager bridgeMgr]callBack:instanceId funcId:(NSString *)obj params:result keepAlive:keepAlive];
             } copy];
             
