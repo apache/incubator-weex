@@ -224,7 +224,6 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -259,6 +258,7 @@ class WXDomStatement {
 
   public static final String CHILDREN = "children";
   public static final String TYPE = "type";
+  public static final String DOM_MODULE = "domModule";
   private final ConcurrentHashMap<String, WXDomObject> mRegistry;
   private String mInstanceId;
   private WXRenderManager mWXRenderManager;
@@ -495,7 +495,7 @@ class WXDomStatement {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (element == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_CREATEBODY);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_CREATEBODY);
       }
       return;
     }
@@ -555,7 +555,7 @@ class WXDomStatement {
       mDirty = true;
 
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
       }
     }catch (Exception e){
 
@@ -622,7 +622,7 @@ class WXDomStatement {
 
     if (parent == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDELEMENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDELEMENT);
       }
       return;
     }
@@ -633,7 +633,7 @@ class WXDomStatement {
         WXLogUtils.e("[WXDomStatement] addDom error!!");
       }
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDELEMENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDELEMENT);
       }
       return;
     }
@@ -679,7 +679,7 @@ class WXDomStatement {
     mDirty = true;
 
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -729,7 +729,7 @@ class WXDomStatement {
     if (domObject == null || domObject.parent == null
         || parentObject == null || parentObject.hasNewLayout()) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
       }
       return;
     }
@@ -754,7 +754,7 @@ class WXDomStatement {
 
     mDirty = true;
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -772,14 +772,14 @@ class WXDomStatement {
     WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
       }
       return;
     }
     WXDomObject parent = domObject.parent;
     if (parent == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
       }
       return;
     }
@@ -802,7 +802,7 @@ class WXDomStatement {
 
     mDirty = true;
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -835,7 +835,7 @@ class WXDomStatement {
     final WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATEATTRS);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATEATTRS);
       }
       return;
     }
@@ -857,7 +857,7 @@ class WXDomStatement {
     mDirty = true;
 
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -877,7 +877,7 @@ class WXDomStatement {
     WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATESTYLE);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATESTYLE);
       }
       return;
     }
@@ -895,7 +895,7 @@ class WXDomStatement {
     mDirty = true;
 
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -959,7 +959,7 @@ class WXDomStatement {
     WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDEVENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDEVENT);
       }
       return;
     }
@@ -979,7 +979,7 @@ class WXDomStatement {
 
     mDirty = true;
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -999,7 +999,7 @@ class WXDomStatement {
     WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
-        instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEEVENT);
+        instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEEVENT);
       }
       return;
     }
@@ -1019,7 +1019,7 @@ class WXDomStatement {
 
     mDirty = true;
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -1049,7 +1049,7 @@ class WXDomStatement {
 
     mDirty = true;
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -1081,7 +1081,7 @@ class WXDomStatement {
     mDirty = true;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -1112,7 +1112,7 @@ class WXDomStatement {
     mDirty = true;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
@@ -1169,7 +1169,7 @@ class WXDomStatement {
     mDirty = true;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
-      instance.commitUTStab(WXConst.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+      instance.commitUTStab(DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 

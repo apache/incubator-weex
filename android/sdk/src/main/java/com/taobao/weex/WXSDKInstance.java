@@ -234,7 +234,6 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
-import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -254,6 +253,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class WXSDKInstance implements IWXActivityStateListener {
 
+  //Performance
+  public static final String LOAD = "load";
   public boolean mEnd = false;
   public static final String BUNDLE_URL = "bundleUrl";
   protected IWXUserTrackAdapter mUserTrackAdapter;
@@ -762,7 +763,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
             if (mUserTrackAdapter != null) {
-              mUserTrackAdapter.commit(mContext, null, WXConst.LOAD, mWXPerformance, null);
+              mUserTrackAdapter.commit(mContext, null, LOAD, mWXPerformance, null);
             }
           }
         }
