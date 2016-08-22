@@ -5,7 +5,7 @@
   "plugins": [
       "header",
       "disqus",
-      "anchors"
+      "heading-anchors"
   ],
   "pluginsConfig": {
     "disqus": {
