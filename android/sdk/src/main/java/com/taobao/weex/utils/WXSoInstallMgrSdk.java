@@ -208,6 +208,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
@@ -555,9 +556,9 @@ public class WXSoInstallMgrSdk {
       WXPerformance p = new WXPerformance();
       p.errCode = errCode;
       p.errMsg = errMsg;
-      utAdapter.commit(null, null, WXConst.ENVIRONMENT, p, null);
+      utAdapter.commit(null, null, WXEnvironment.ENVIRONMENT, p, null);
     } else {
-      utAdapter.commit(null, null, WXConst.ENVIRONMENT, null, null);
+      utAdapter.commit(null, null, WXEnvironment.ENVIRONMENT, null, null);
 
     }
   }
