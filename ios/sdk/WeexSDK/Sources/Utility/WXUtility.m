@@ -15,6 +15,7 @@
 #import <sys/utsname.h>
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
+#import <CommonCrypto/CommonCrypto.h>
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
@@ -210,6 +211,20 @@ static BOOL WXNotStat;
     return obj;
 }
 
++ (id)JSONObject:(NSData*)data error:(NSError **)error
+{
+    if (!data) return nil;
+    id jsonObj = nil;
+    @try {
+        jsonObj = [NSJSONSerialization JSONObjectWithData:data
+                                                  options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                    error:error];
+    } @catch (NSException *exception) {
+        *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+    }
+    return jsonObj;
+}
+
 + (NSString *)JSONString:(id)object
 {
     if(!object) return nil;
@@ -313,8 +328,11 @@ static BOOL WXNotStat;
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
     traits = (textWeight == WXTextWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
     fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
-    font = [UIFont fontWithDescriptor:fontD size:0];
-    
+    UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
+    if (tempFont) {
+        font = tempFont;
+    }
+
     return font;
 }
 
