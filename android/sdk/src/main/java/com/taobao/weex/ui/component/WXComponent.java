@@ -186,14 +186,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** Use {@link #getParent()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXVContainer mParent;
-  /** Use {@link #getDOM()} instead.  Do not access this field outside of this class which will be removed soon.**/
+  /** Use {@link #getDomObject()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXDomObject mDomObj;
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public String mInstanceId;
-  public boolean registerAppearEvent = false;
-  public boolean appearState = false;
 
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
@@ -204,6 +202,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected int mAbsoluteY = 0;
   protected int mAbsoluteX = 0;
   protected Set<String> mGestureType;
+
   private BorderDrawable mBackgroundDrawable;
   private boolean mLazy;
   private int mPreRealWidth = 0;
@@ -251,10 +250,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public Context getContext(){
     return mContext;
-  }
-
-  public WXDomObject getDOM(){
-    return mDomObj;
   }
 
   /**
@@ -683,13 +678,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         scroller.bindDisappearEvent(this);
       }
 
-      if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
-      }
-      if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
-      }
-
     }
   }
 
@@ -851,15 +839,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
       scroller.unbindDisappearEvent(this);
-    }
-
-    if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
-    }
-    if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
     }
   }
 
