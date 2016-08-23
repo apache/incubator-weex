@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -147,7 +148,7 @@ public  class ScreenShot {
     private static Bitmap takeScreenShot(Activity activity) {
 
         Context ctx = activity.getApplicationContext();
-        getDiskCacheDir(ctx);
+        String screenShotDir = getWeexScreenShotDir(ctx);
 
         View view = activity.getWindow().getDecorView();
 
@@ -238,7 +239,9 @@ public  class ScreenShot {
     public static void shoot(Activity activity, String pathName) throws IOException {
 
         if(SdCardHelper.isHasSdcard()){
-            ScreenShot.saveToSD(ScreenShot.takeScreenShot(activity), SdCardHelper.SDCardRoot + "WeexTest/ScreenShot/", pathName /*+System.currentTimeMillis()*/ + ".png");
+//            ScreenShot.saveToSD(ScreenShot.takeScreenShot(activity), SdCardHelper.SDCardRoot + "WeexTest/ScreenShot/", pathName /*+System.currentTimeMillis()*/ + ".png");
+            ScreenShot.saveToSD(ScreenShot.takeScreenShot(activity),
+                    getWeexScreenShotDir(activity.getApplicationContext()) + File.separator , pathName /*+System.currentTimeMillis()*/ + ".png");
 
         }
 
@@ -253,12 +256,13 @@ public  class ScreenShot {
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
 
-            File dir = new File(SdCardHelper.SDCardRoot +"WeexTest/ScreenShot/");
+            File dir = new File(getWeexScreenShotDir(activity.getApplicationContext()) );
             if(!dir.exists()){
                 dir.mkdirs();
             }
 
-            File filePic = new File(SdCardHelper.SDCardRoot + "WeexTest/ScreenShot/"+ file + ".png");
+            File filePic = new File(getWeexScreenShotDir(activity.getApplicationContext())  +
+                    File.separator + file + ".png");
             if (!filePic.exists()) {
                 try {
                     filePic.createNewFile();
@@ -337,16 +341,26 @@ public  class ScreenShot {
      * @param context
      * @return
      */
-    public static String getDiskCacheDir(Context context) {
+    @Nullable
+    public static String getWeexScreenShotDir(Context context) {
         if (context == null) {
             return null;
         }
         String cachePath;
         String extDir = "" ;
+
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {
             cachePath = context.getExternalCacheDir().getPath();
-            extDir = Environment.getExternalStorageDirectory().getPath();
+            extDir  = context.getExternalFilesDir(null).getPath();
+            File screenShotFileDir = new File(extDir, "WeexTest" + File.separator + "ScreenShot");
+            if (!screenShotFileDir.exists()){
+                screenShotFileDir.mkdirs();
+            }
+            return screenShotFileDir.getPath();
+//            File file = new File(context.getExternalFilesDir(null), "DemoFile.jpg");
+
+
         } else {
             cachePath = context.getCacheDir().getPath();
         }
