@@ -107,7 +107,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 final WXTextView inputView = (WXTextView) caseView;
 
                 // handle if the view is INVISIBLE then scrollToBottom
-                int maxStep = 50;
+                int maxStep = 8;
                 int scrollCount = 0;
                 if(inputView.getVisibility() == View.INVISIBLE){
                     while(scrollCount <maxStep){
@@ -181,10 +181,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                         }
                     });
 
-//                    sleep(3000);
-//                    Log.e(TAG, childCaseName + " snap!");
-//                    screenShot(childCaseName + "_0" + stepCountFlag +  "_init");
-//                    sleep(3000);
+                    sleep(3000);
                 }
 
                 HashMap testStepMap = new HashMap();
@@ -194,12 +191,16 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 testStepMap.remove("testChildCaseInit");
 
                 Iterator iter = testStepMap.entrySet().iterator();
+                Log.e(TAG,"testStepMap keyset==" + testStepMap.keySet().toString());
 
                 while (iter.hasNext()) {
                     stepCountFlag ++;
                     HashMap.Entry entry = (HashMap.Entry) iter.next();
                     Object testStepkey = entry.getKey();
+                    Log.e(TAG,"testStepMap testStepkey==" + testStepkey.toString());
+
                     Object testStepValue = entry.getValue();
+                    Log.e(TAG,"testStepMap testStepValue==" + testStepValue.toString());
 
                     testStep(testStepkey, testStepValue);
 
@@ -214,11 +215,16 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
         HashMap testSteps = (HashMap) testStepValue;
         Iterator iter = testSteps.entrySet().iterator();
+        Log.e(TAG,"testSteps keyset==" + testSteps.keySet().toString());
 
         while (iter.hasNext()) {
             HashMap.Entry entry = (HashMap.Entry) iter.next();
             Object testStepAction = entry.getKey();
+            Log.e(TAG,"testSteps testStepAction==" + testStepAction.toString());
+
             Object testStepActionValue = entry.getValue();
+            Log.e(TAG,"testSteps testStepActionValue==" + testStepActionValue.toString());
+
             testAction(testStepAction, testStepActionValue);
         }
 
@@ -245,28 +251,42 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
     }
     private void doClickAction(String action, String actionValue){
         setActivity(WXPageActivity.wxPageActivityInstance);
-        activity2 = getActivity();
+        Activity activity2 = getActivity();
         Log.e(TAG, "activity2 = " + activity2.toString());
 
         ViewGroup myGroup = (ViewGroup) (activity2.findViewById(R.id.container));
         ArrayList<View> inputListView11 = new ArrayList<View>();
-        sleep(3000);
+        sleep(1000);
 
         inputListView11 = ViewUtil.getAllChildViews(myGroup);
 
         for (View view : inputListView11) {
             if (view instanceof WXTextView) {
-                if (((WXTextView) view).getText().toString().contains((String)actionValue)) {
-                    final FrameLayout aView = (FrameLayout) view.getParent();
-                    mInstrumentation.runOnMainSync(new Runnable() {
-                        @Override
-                        public void run() {
-                            aView.requestFocus();
-                            aView.performClick();
-                            Log.e(TAG,  "do click ");
+                String text = ((WXTextView) view).getText().toString();
+                Log.e(TAG, " doClickAction text===" + text);
+                if (text.contains(actionValue)) {
+                    float viewY= view.getY();
+                    float viewX = view.getX();
+                    Log.e(TAG,"viewY==" + viewY);
+                    Log.e(TAG,"viewX==" + viewX);
 
-                        }
-                    });
+                    TouchUtils.clickView(this, view);
+                    Log.e(TAG,"clickView==" );
+
+
+//                    final FrameLayout aView = (FrameLayout) view.getParent();
+//                    TouchUtils.clickView(this, aView);
+//                    Log.e(TAG,"clickaView==" );
+//
+//                    mInstrumentation.runOnMainSync(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            aView.requestFocus();
+//                            aView.performClick();
+//                            Log.e(TAG,  "do click ");
+//
+//                        }
+//                    });
 
                     break;
                 }
