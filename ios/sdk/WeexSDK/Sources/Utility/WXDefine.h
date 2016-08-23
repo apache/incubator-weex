@@ -69,6 +69,8 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 
 #define WX_BRIDGE_THREAD_NAME @"com.taobao.weex.bridge"
 
+#define WX_FONT_DOWNLOAD_DIR @"wxdownload"
+
 /**
  *  @abstract Compared with system version of current device 
  *  
