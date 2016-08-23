@@ -10,16 +10,14 @@
 #import "WXLog.h"
 #import "WXSDKEngine.h"
 #import "WXAppConfiguration.h"
+#import "WXThreadSafeMutableDictionary.h"
+#import "WXRuleManager.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <sys/utsname.h>
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import "WXNetworkProtocol.h"
-#import "WXHandlerFactory.h"
-#import "WXThreadSafeMutableDictionary.h"
-#import "WXRuleManager.h"
 #import <coreText/CoreText.h>
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
@@ -321,7 +319,7 @@ static BOOL WXNotStat;
     WXThreadSafeMutableDictionary *fontFace = [[WXRuleManager sharedInstance] getRule:@"fontFace"];
     WXThreadSafeMutableDictionary *fontFamilyDic = fontFace[fontFamily];
     if (fontFamilyDic[@"localSrc"]){
-        NSString *fpath = [fontFamilyDic[@"localSrc"] path];
+        NSString *fpath = [((NSURL*)fontFamilyDic[@"localSrc"]) path];
         CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename([fpath UTF8String]);
         CGFontRef customfont = CGFontCreateWithDataProvider(fontDataProvider);
         
