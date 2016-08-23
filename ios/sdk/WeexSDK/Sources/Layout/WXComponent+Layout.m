@@ -140,6 +140,7 @@
 {
     // Not need absolutePosition any more
  //   [self _computeNewAbsolutePosition:superAbsolutePosition];
+    return superAbsolutePosition;
 }
 
 - (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
