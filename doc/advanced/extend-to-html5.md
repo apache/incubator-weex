@@ -12,7 +12,7 @@ Second, you should always implement a extension for all the three platforms (and
 
 You should publish your extensions somewhere weex developers can easily find, somewhere popular, independent and easy to search and use, such as, npm. Npm is what we strongly recommended.
 
-The most important thing is, you'd better name your extension appropriately: it should begin with a `weex-` if it is a weex extension, and it should be en d up with a `-<platform>` as a platform mark. If your package is wrapped up with all the three platforms you can ignore it through. Here is a demonstrating component [`<weex-hello-web>`](https://github.com/MrRaindrop/weex-hello-web) to show how to define your own component.
+The most important thing is, you'd better name your extension appropriately: it should begin with a `weex-` if it is a weex extension, and it should end up with a `-<platform>` as a platform mark. If your package is wrapped up with all the three platforms you can ignore it through. Here is a demonstrating component [`<weex-hello-web>`](https://github.com/MrRaindrop/weex-hello-web) to show how to define your own component.
 
 ### Create a new component
 
