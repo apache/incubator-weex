@@ -219,13 +219,12 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Store value of component style
  *
  */
-public class WXStyle extends ConcurrentHashMap<String, Object> {
+public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
 
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;

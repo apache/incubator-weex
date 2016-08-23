@@ -311,6 +311,7 @@ public class Constants {
     String INDEX = "index";
     String INTERVAL = "interval";
     String PLAY_STATUS = "playStatus";
+    String FONT_FACE = "fontFace";
   }
 
   public interface Value {
@@ -364,5 +365,12 @@ public class Constants {
     String ONLOADING = "loading";
     String ONLOAD = "load";
     String CHANGE = "change";
+  }
+
+  public interface Scheme{
+    String FILE = "file";
+    String HTTPS = "https";
+    String HTTP = "http";
+    String LOCAL = "local";
   }
 }

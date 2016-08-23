@@ -213,12 +213,12 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
-import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.Iterator;
@@ -439,7 +439,7 @@ public final class WXDomManager {
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
    * @param ref of the dom.
    * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
+   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
    */
   void addEvent(String instanceId, String ref, String type) {
@@ -459,7 +459,7 @@ public final class WXDomManager {
    * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
    * @param ref of the dom.
    * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
+   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
    */
   void removeEvent(String instanceId, String ref, String type) {
@@ -554,7 +554,7 @@ public final class WXDomManager {
   }
 
   public void addRule(final String type,final JSONObject jsonObject) {
-    if (WXConst.FONT_FACE.equals(type)) {
+    if (Constants.Name.FONT_FACE.equals(type)) {
       FontDO fontDO = parseFontDO(jsonObject);
       if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
         FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
@@ -572,8 +572,8 @@ public final class WXDomManager {
     if(jsonObject == null) {
       return null;
     }
-    String src = jsonObject.getString(WXConst.FONT_SRC);
-    String name = jsonObject.getString(WXConst.FONT_FAMILY);
+    String src = jsonObject.getString(Constants.Name.SRC);
+    String name = jsonObject.getString(Constants.Name.FONT_FAMILY);
     return new FontDO(name, src);
   }
 }

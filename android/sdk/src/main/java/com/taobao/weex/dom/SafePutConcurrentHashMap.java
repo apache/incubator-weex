@@ -202,54 +202,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.taobao.weex.dom;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- *
+ * Created by sospartan on 8/23/16.
  */
-package com.taobao.weex.utils;
+public class SafePutConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
 
 
-public class WXConst {
+  @Override
+  public void putAll(Map<? extends K, ? extends V> m) {
+    Iterator<? extends Entry<? extends K, ? extends V>> iterator = m.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Entry<? extends K, ? extends V> item = iterator.next();
+      if (item.getKey() == null || item.getValue() == null) {
+        iterator.remove();
+      }
+    }
 
-  public static final String MODULE_NAME = "weex";
+    super.putAll(m);
+  }
 
-  //Performance
-  public static final String LOAD = "load";
-
-  //Alert
-  public static final String JS_FRAMEWORK = "jsFramework";
-  public static final String JS_DOWNLOAD = "jsDownload";
-  public static final String DOM_MODULE = "domModule";
-  public static final String JS_BRIDGE = "jsBridge";
-  public static final String ENVIRONMENT = "environment";
-  public static final String STREAM_MODULE = "streamModule";
-
-  public static final String KEY_MODULE = "module";
-  public static final String KEY_METHOD = "method";
-  public static final String KEY_ARGS = "args";
-  public static final String KEY_PRIORITY = "priority";
-
-  public static final String OK = "OK";
-  public static final String CANCEL = "Cancel";
-  public static final String RESULT = "result";
-  public static final String DATA = "data";
-  public static final String MESSAGE = "message";
-  public static final String DURATION = "duration";
-  public static final String OK_TITLE = "okTitle";
-  public static final String CANCEL_TITLE = "cancelTitle";
-
-  public static final String MSG_SUCCESS = "WX_SUCCESS";
-
-  public static final String MSG_FAILED = "MSG_FAILED";
-
-  public static final String MSG_PARAM_ERR = "MSG_PARAM_ERR";
-
-  //font
-  public static final String FONT_FACE = "font-face";
-  public static final String FONT_SRC = "src";
-  public static final String FONT_FAMILY = "font-family";
-  public static final String SCHEME_FILE = "file";
-  public static final String SCHEME_HTTPS = "https";
-  public static final String SCHEME_HTTP = "http";
-  public static final String FONT_CACHE_DIR_NAME = "font-family";
+  @Override
+  public V put(K key, V value) {
+    if (key == null || value == null) {
+      return null;
+    }
+    return super.put(key, value);
+  }
 }
-
