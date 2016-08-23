@@ -209,13 +209,12 @@ import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * store value of component attribute
  *
  */
-public class WXAttr extends ConcurrentHashMap<String, Object> {
+public class WXAttr extends SafePutConcurrentHashMap<String, Object> {
 
   private static final long serialVersionUID = -2619357510079360946L;
 
