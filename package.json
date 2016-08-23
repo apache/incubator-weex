@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/alibaba/weex/issues"
   },
-  "private": "true",
+  "private": true,
   "keywords": [
     "weex",
     "hybrid",
