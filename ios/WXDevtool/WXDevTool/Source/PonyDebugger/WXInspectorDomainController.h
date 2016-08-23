@@ -9,7 +9,7 @@
 //  which Square, Inc. licenses this file to you.
 //
 
-#import "PonyDebugger.h"
+#import "WXPonyDebugger.h"
 #import "WXInspectorDomain.h"
 
 @interface WXInspectorDomainController : WXDomainController

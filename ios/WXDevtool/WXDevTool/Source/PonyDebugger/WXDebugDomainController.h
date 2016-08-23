@@ -7,7 +7,7 @@
  */
 
 #import "WXDevtool.h"
-#import "PonyDebugger.h"
+#import "WXPonyDebugger.h"
 #import "WXDebugDomain.h"
 #import "WXDynamicDebuggerDomain.h"
 
