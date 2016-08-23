@@ -74,7 +74,8 @@
 {
     if (!_isConnect) return;
     
-    for (NSString *msg in _msgAry) {
+    NSArray *templateContainers = [NSArray arrayWithArray:_msgAry];
+    for (NSString *msg in templateContainers) {
         [_webSocket send:msg];
     }
     [_msgAry removeAllObjects];
