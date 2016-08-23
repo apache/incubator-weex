@@ -69,7 +69,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         launchActivityWithIntent("com.alibaba.weex", WXPageActivity.class, intent);
         waTestPageActivity = getActivity();
         Log.e(TAG, "activity1=" + waTestPageActivity.toString());
-        Thread.sleep(3000);
+        Thread.sleep(1000);
 
         mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
         setViewGroup(mViewGroup);
@@ -78,7 +78,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
 //        addAllTargetView("AG_");
 
-        Thread.sleep(3000);
+        Thread.sleep(1000);
     }
 
     /**
@@ -107,7 +107,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 final WXTextView inputView = (WXTextView) caseView;
 
                 // handle if the view is INVISIBLE then scrollToBottom
-                int maxStep = 8;
+                int maxStep = 10;
                 int scrollCount = 0;
                 if(inputView.getVisibility() == View.INVISIBLE){
                     while(scrollCount <maxStep){
@@ -126,7 +126,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     }
                 });
 
-                sleep(2000);
+                sleep(1000);
 
                 setActivity(WXPageActivity.wxPageActivityInstance);
                 Activity activity2 = getActivity();
@@ -152,11 +152,11 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     if(findCount< maxStep){
                         Log.e(TAG, "inputListView size=" + inputListView.size()+"," + "findCount=" + findCount);
                         TouchUtils.dragQuarterScreenUp(this, this.getActivity());
-                        sleep(2000);
+                        sleep(1000);
                         myGroup = (ViewGroup) (activity2.findViewById(R.id.container));
                         inputListView = ViewUtil.findViewWithText(myGroup,
                                 childCaseName);
-                        sleep(2000);
+                        sleep(1000);
 
                         findCount ++ ;
                     }
@@ -181,7 +181,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                         }
                     });
 
-                    sleep(3000);
+                    sleep(1000);
                 }
 
                 HashMap testStepMap = new HashMap();
@@ -245,9 +245,9 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
     }
     private void doScreenShotAction (String name){
-        sleep(2000);
+        sleep(1000);
         screenShot(name);
-        sleep(2000);
+        sleep(1000);
     }
     private void doClickAction(String action, String actionValue){
         setActivity(WXPageActivity.wxPageActivityInstance);
