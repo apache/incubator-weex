@@ -2,6 +2,8 @@ package com.alibaba.weex;
 
 import android.app.Application;
 
+import com.alibaba.weex.commons.adapter.FrescoImageAdapter;
+import com.alibaba.weex.commons.adapter.FrescoImageComponent;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
 import com.alibaba.weex.extend.component.RichText;
@@ -9,21 +11,38 @@ import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.listener.RequestListener;
+import com.facebook.imagepipeline.listener.RequestLoggingListener;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class WXApplication extends Application {
 
   @Override
   public void onCreate() {
     super.onCreate();
+
+    /**
+     * Set up for fresco usage.
+     * Set<RequestListener> requestListeners = new HashSet<>();
+     * requestListeners.add(new RequestLoggingListener());
+     * ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+     *     .setRequestListeners(requestListeners)
+     *     .build();
+     * Fresco.initialize(this,config);
+     **/
 //    initDebugEnvironment(false, "DEBUG_SERVER_HOST");
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
                            new InitConfig.Builder()
+                               //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
                                .setImgAdapter(new ImageAdapter())
                                .setDebugAdapter(new PlayDebugAdapter())
                                .build()
@@ -36,6 +55,11 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("event", WXEventModule.class);
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
+      /**
+       * override default image tag
+       * WXSDKEngine.registerComponent("image", FrescoImageComponent.class);
+       */
+
 
     } catch (WXException e) {
       e.printStackTrace();
