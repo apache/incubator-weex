@@ -218,27 +218,18 @@ public class WXScrollerDomObject extends WXDomObject {
 
         boolean isVertical = true;
         if (parent != null) {
-            String direction = (String) parent.attr.get(Constants.Name.SCROLL_DIRECTION);
+            String direction = (String) parent.getAttrs().get(Constants.Name.SCROLL_DIRECTION);
             if (direction != null && direction.equals("horizontal")) {
                 isVertical = false;
             }
         }
 
-        if (isVertical) {
-            if (style != null) {
-                if (style.get(Constants.Name.HEIGHT) == null &&
-                        style.get(Constants.Name.FLEX) == null) {
-                    map.put(Constants.Name.FLEX, "1");
-                }
-            }
-        } else {
-            if (style != null) {
-                if (style.get(Constants.Name.WIDTH) == null &&
-                        style.get(Constants.Name.FLEX) == null) {
-                    map.put(Constants.Name.FLEX, "1");
-                }
-            }
+        String prop = isVertical?Constants.Name.HEIGHT:Constants.Name.WIDTH;
+        if (getStyles().get(prop) == null &&
+            getStyles().get(Constants.Name.FLEX) == null) {
+            map.put(Constants.Name.FLEX, "1");
         }
+
         return map;
     }
 }

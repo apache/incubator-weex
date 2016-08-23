@@ -343,7 +343,7 @@ public class WXRenderManager {
     statement.addComponent(dom, parentRef, index);
   }
 
-  public WXComponent createComponentOnDomThread(String instanceId, WXDomObject dom, String parentRef, int index) {
+  public @Nullable WXComponent createComponentOnDomThread(String instanceId, WXDomObject dom, String parentRef, int index) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
       return null;

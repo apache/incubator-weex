@@ -249,7 +249,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
 
     @Override
-    protected WXImageView initComponentHostView(Context context) {
+    protected ImageView initComponentHostView(Context context) {
         WXImageView view = new WXImageView(mContext);
         view.setScaleType(ScaleType.FIT_XY);
         return view;
@@ -315,7 +315,7 @@ public class WXImage extends WXComponent<ImageView> {
         WXImageStrategy imageStrategy = new WXImageStrategy();
         imageStrategy.isClipping = true;
 
-        WXImageSharpen imageSharpen = mDomObj.attr.getImageSharpen();
+        WXImageSharpen imageSharpen = mDomObj.getAttrs().getImageSharpen();
         imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
         imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
@@ -324,23 +324,23 @@ public class WXImage extends WXComponent<ImageView> {
                 if(!result && imageView!=null){
                     imageView.setImageDrawable(null);
                 }
-                if(getDomObject()!=null && getDomObject().containsEvent(WXEventType.ONLOAD)){
+                if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(),WXEventType.ONLOAD,params);
+                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(), Constants.Event.ONLOAD,params);
                 }
             }
         });
 
-        if(mDomObj.attr!=null && mDomObj.attr.containsKey(Constants.Name.PLACE_HOLDER)){
-            String placeHolder= (String) mDomObj.attr.get(Constants.Name.PLACE_HOLDER);
+        if( mDomObj.getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+            String placeHolder= (String) mDomObj.getAttrs().get(Constants.Name.PLACE_HOLDER);
             imageStrategy.placeHolder=placeHolder;
         }
 
         IWXImgLoaderAdapter imgLoaderAdapter = mInstance.getImgLoaderAdapter();
         if (imgLoaderAdapter != null) {
             imgLoaderAdapter.setImage(src, getHostView(),
-                    mDomObj.attr.getImageQuality(), imageStrategy);
+                    mDomObj.getAttrs().getImageQuality(), imageStrategy);
         }
     }
 }

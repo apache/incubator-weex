@@ -209,12 +209,17 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.dom.flex.Spacing;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -224,8 +229,8 @@ import static org.junit.Assert.*;
 /**
  * Created by gulin on 16/2/24.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
 public class WXDivTest {
 
     private WXDiv mWXDiv;
@@ -243,9 +248,11 @@ public class WXDivTest {
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
         Mockito.when(instance.getContext()).thenReturn(RuntimeEnvironment.application);
 
-        WXDomObject divDom = Mockito.mock(WXDomObject.class);
-        Mockito.when(divDom.getPadding()).thenReturn(new Spacing());
-        Mockito.when(divDom.clone()).thenReturn(divDom);
+        WXDomObject divDom = new WXDomObject();
+        WXDomObject spy = Mockito.spy(divDom);
+        Mockito.when(spy.getPadding()).thenReturn(new Spacing());
+        Mockito.when(spy.getEvents()).thenReturn(new WXEvent());
+        Mockito.when(spy.clone()).thenReturn(divDom);
         divDom.ref = "1";
 
         mWXDiv = new WXDiv(instance, divDom, null, false);
@@ -268,7 +275,7 @@ public class WXDivTest {
 
         assertEquals(1, mWXDiv.childCount());
 
-        WXDomObject testDom2 = Mockito.mock(WXDomObject.class);
+        WXDomObject testDom2 = Mockito.spy(new WXDomObject());
         Mockito.when(testDom2.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom2.clone()).thenReturn(testDom2);
         testDom2.ref = "3";

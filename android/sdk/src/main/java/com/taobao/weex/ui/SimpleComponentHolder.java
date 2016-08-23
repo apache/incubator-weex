@@ -229,7 +229,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
   public static final String TAG = "SimpleComponentHolder";
   private final Class<? extends WXComponent> mClz;
   private Map<String, Invoker> mMethods;
-  private ComponentCreator mCeator;
+  private ComponentCreator mCreator;
 
   static class ClazzComponentCreator implements ComponentCreator{
 
@@ -272,7 +272,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
   public SimpleComponentHolder(Class<? extends WXComponent> clz,ComponentCreator customCreator) {
     this.mClz = clz;
-    this.mCeator = customCreator;
+    this.mCreator = customCreator;
   }
 
   @Override
@@ -325,7 +325,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
   @Override
   public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCeator.createInstance(instance,node,parent,lazy);
+    WXComponent component = mCreator.createInstance(instance,node,parent,lazy);
 
     component.bindHolder(this);
     return component;

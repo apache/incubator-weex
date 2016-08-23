@@ -240,7 +240,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (type != null && type.equals(WXEventType.CHANGE) && getHostView() != null) {
+    if (type != null && type.equals(Constants.Event.CHANGE) && getHostView() != null) {
       getHostView().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -251,7 +251,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
           Map<String, Object> attrsChanges = new HashMap<>();
           attrsChanges.put("checked",Boolean.toString(isChecked));
           domChanges.put("attrs",attrsChanges);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.CHANGE, params,domChanges);
+          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.CHANGE, params,domChanges);
         }
       });
     }

@@ -189,19 +189,9 @@ public class WXTextDomObject extends WXDomObject {
     WXTextDomObject dom = null;
     try {
       dom = new WXTextDomObject();
-      if (this.cssstyle != null) {
-        dom.cssstyle.copy(this.cssstyle);
-      }
-      dom.ref = ref;
-      dom.type = type;
-      dom.style = style;
-      dom.attr = attr;
-      dom.event = event == null ? null : event.clone();
+      copyFields(dom);
       dom.hasBeenMeasured = hasBeenMeasured;
       dom.atomicReference = atomicReference;
-      if (this.csslayout != null) {
-        dom.csslayout.copy(this.csslayout);
-      }
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("WXTextDomObject clone error: ", e);
@@ -250,10 +240,8 @@ public class WXTextDomObject extends WXDomObject {
    * Update style and text.
    */
   private void updateStyleAndText() {
-    updateStyleImp(style);
-    if (attr != null) {
-      mText = WXAttr.getValue(attr);
-    }
+    updateStyleImp(getStyles());
+    mText = WXAttr.getValue(getAttrs());
   }
 
   /**
@@ -378,7 +366,7 @@ public class WXTextDomObject extends WXDomObject {
   }
 
   /**
-   * Update {@link #spanned} according to the give charSequence and {@link #style}
+   * Update {@link #spanned} according to the give charSequence and styles
    * @param text the give raw text.
    * @return an Spanned contains text and spans
    */

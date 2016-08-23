@@ -220,15 +220,11 @@ import android.widget.ImageView;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.Scrollable;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXRefresh;
-import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.IOnLoadMoreListener;
@@ -308,7 +304,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
     protected int getOrientation(){
-        return VERTICAL;
+        return Constants.Orientation.VERTICAL;
     }
 
     @Override
@@ -369,14 +365,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                 WXLogUtils.e(TAG, "Invaild transform expression:" + match);
             }
         }
-        return new TransformItemDecoration(getOrientation() == VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
+        return new TransformItemDecoration(getOrientation() == Constants.Orientation.VERTICAL, opacity, translateX, translateY, rotate, scaleX, scaleY);
     }
 
     @Override
     protected BounceRecyclerView initComponentHostView(Context context) {
         bounceRecyclerView = new BounceRecyclerView(context, getOrientation());
 
-        String transforms = (String) mDomObj.attr.get(TRANSFORM);
+        String transforms = (String) mDomObj.getAttrs().get(TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
@@ -486,7 +482,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       view.postDelayed(new Runnable() {
         @Override
         public void run() {
-          if(mOrientation == VERTICAL){
+          if(getOrientation() == Constants.Orientation.VERTICAL){
             int scrollY = cellComp.getHostView().getTop()+offset;
             view.smoothScrollBy(0,scrollY );
           }else{
@@ -664,7 +660,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     private boolean hasAppearAndDisappearEvent(WXComponent child) {
 
-    if(child.getDomObject().containsEvent(WXEventType.APPEAR) || child.getDomObject().containsEvent(WXEventType.DISAPPEAR)){
+    if(child.getDomObject().containsEvent(Constants.Event.APPEAR) || child.getDomObject().containsEvent(Constants.Event.DISAPPEAR)){
       return true;
     }else if(child instanceof WXVContainer){
       WXVContainer container=(WXVContainer)child;
@@ -901,8 +897,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private int generateViewType(WXComponent component) {
         long id;
         try {
-            id = Integer.parseInt(component.getDomObject().ref);
-            String type = component.getDomObject().attr.getScope();
+            id = Integer.parseInt(component.getDomObject().getRef());
+            String type = component.getDomObject().getAttrs().getScope();
 
             if (!TextUtils.isEmpty(type)) {
                 if (mRefToViewType == null) {
@@ -945,7 +941,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     public long getItemId(int position) {
         long id;
         try {
-            id = Long.parseLong(getChild(position).getDomObject().ref);
+            id = Long.parseLong(getChild(position).getDomObject().getRef());
         } catch (RuntimeException e) {
             WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
             id = RecyclerView.NO_ID;
@@ -956,18 +952,18 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     @Override
     public void onLoadMore(int offScreenY) {
       try {
-        String offset = mDomObj.attr.getLoadMoreOffset();
+        String offset = mDomObj.getAttrs().getLoadMoreOffset();
 
             if (TextUtils.isEmpty(offset)) {
                 offset="0";
             }
 
         if (offScreenY < Integer.parseInt(offset)) {
-          String loadMoreRetry = mDomObj.attr.getLoadMoreRetry();
+          String loadMoreRetry = mDomObj.getAttrs().getLoadMoreRetry();
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, WXEventType.LIST_LOAD_MORE);
+            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }
@@ -991,11 +987,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             }
             if (key >= firstVisible && key <= lastVisible && !value.appearState) {
               String direction=directionY>0?"up":"down";
-                value.notifyAppearStateChange(WXEventType.APPEAR,direction);
+                value.notifyAppearStateChange(Constants.Event.APPEAR,direction);
                 value.appearState = true;
             } else if ((key < firstVisible || key > lastVisible) && value.appearState) {
               String direction=directionY>0?"up":"down";
-              value.notifyAppearStateChange(WXEventType.DISAPPEAR,direction);
+              value.notifyAppearStateChange(Constants.Event.DISAPPEAR,direction);
               value.appearState = false;
             }
         }

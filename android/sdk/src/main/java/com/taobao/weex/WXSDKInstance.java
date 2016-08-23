@@ -231,11 +231,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXEventType;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
-import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -255,6 +253,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class WXSDKInstance implements IWXActivityStateListener {
 
+  //Performance
+  public static final String LOAD = "load";
   public boolean mEnd = false;
   public static final String BUNDLE_URL = "bundleUrl";
   protected IWXUserTrackAdapter mUserTrackAdapter;
@@ -648,7 +648,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onViewDisappear(){
     WXComponent comp = getRootCom();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), WXEventType.VIEWDISAPPEAR, null, null);
+      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWDISAPPEAR, null, null);
       //call disappear of nested instances
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onDisappear();
@@ -659,7 +659,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void onViewAppear(){
     WXComponent comp = getRootCom();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), WXEventType.VIEWAPPEAR,null, null);
+      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onAppear();
       }
@@ -763,7 +763,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
             if (mUserTrackAdapter != null) {
-              mUserTrackAdapter.commit(mContext, null, WXConst.LOAD, mWXPerformance, null);
+              mUserTrackAdapter.commit(mContext, null, LOAD, mWXPerformance, null);
             }
           }
         }

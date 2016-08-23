@@ -221,7 +221,6 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.WXTextDomObject;
@@ -259,7 +258,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    * @param editText
    */
   protected void appleStyleAfterCreated(WXEditText editText) {
-    String alignStr = (String) mDomObj.style.get(Constants.Name.TEXT_ALIGN);
+    String alignStr = (String) mDomObj.getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
       textAlign = Gravity.LEFT;
@@ -270,8 +269,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       editText.setHintTextColor(colorInt);
     }
 
-    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
-    editText.setText((String) mDomObj.attr.get("value"));
+    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.getStyles()));
+    editText.setText((String) mDomObj.getAttrs().get("value"));
   }
 
 
@@ -281,25 +280,24 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (mHost == null || TextUtils.isEmpty(type)) {
       return;
     }
-    final TextView text = (WXEditText) mHost;
+    final TextView text = mHost;
 
-    if (type.equals(WXEventType.INPUT_CHANGE)) {
-      text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    if (type.equals(Constants.Event.CHANGE)) {
+      addFocusChangeListener(new OnFocusChangeListener() {
         CharSequence mLastValue = text.getText();
-
         @Override
-        public void onFocusChange(View v, boolean hasFocus) {
+        public void onFocusChange(boolean hasFocus) {
           CharSequence newValue = text.getText();
           newValue = newValue == null ? "" : newValue;
           if (!hasFocus && !newValue.equals(mLastValue)) {
             mLastValue = newValue;
 
-            String event = mDomObj.event.contains(WXEventType.INPUT_CHANGE) ? WXEventType.INPUT_CHANGE : null;
+            String event = mDomObj.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
             fireEvent(event, newValue.toString());
           }
         }
       });
-    } else if (type.equals(WXEventType.INPUT)) {
+    } else if (type.equals(Constants.Event.INPUT)) {
       text.addTextChangedListener(new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -312,7 +310,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
             return;
           }
 
-          String event = mDomObj.event.contains(WXEventType.INPUT) ? WXEventType.INPUT : null;
+          String event = mDomObj.getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
           fireEvent(event, s.toString());
 
           mBeforeText = s.toString();
@@ -337,7 +335,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       attrsChanges.put("value", value);
       domChanges.put("attrs", attrsChanges);
 
-      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.ref, event, params, domChanges);
+      WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), event, params, domChanges);
     }
   }
 
@@ -473,8 +471,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
-    if (mHost != null && fontSize != null && mDomObj.style != null) {
-      mHost.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.style));
+    if (mHost != null && fontSize != null ) {
+      mHost.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(mDomObj.getStyles()));
     }
   }
 
