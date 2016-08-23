@@ -9,7 +9,7 @@
 #import "WXRuleManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXUtility.h"
-#import "WXUtility.h"
+#import "WXConvert.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
@@ -35,6 +35,10 @@ static WXRuleManager *_sharedInstance = nil;
     
     if ([type isEqualToString:@"fontFace"] && [rule[@"src"] isKindOfClass:[NSString class]]) {
         if (rule[@"src"] && rule[@"fontFamily"]) {
+            NSString *ruleSrc = [WXConvert NSString:rule[@"src"]];
+            if (!ruleSrc) {
+                WXLogError(@"%@ is illegal for font src",rule[@"src"]);
+            }
             NSUInteger start = [rule[@"src"] rangeOfString:@"url('"].location + @"url('".length;
             NSUInteger end  = [rule[@"src"] rangeOfString:@"')" options:NSBackwardsSearch].location;
             if (end <= start) {
