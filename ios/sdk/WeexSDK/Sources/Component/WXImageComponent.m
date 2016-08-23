@@ -53,12 +53,12 @@ static dispatch_queue_t WXImageUpdateQueue;
             WXImageUpdateQueue = dispatch_queue_create("com.taobao.weex.ImageUpdateQueue", DISPATCH_QUEUE_SERIAL);
         }
         if (attributes[@"src"]) {
-            _imageSrc = [WXConvert NSString:attributes[@"src"]];
+            _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         } else {
             WXLogWarning(@"image src is nil");
         }
         if (attributes[@"placeHolder"]) {
-            _placeholdSrc = [WXConvert NSString:attributes[@"placeHolder"]];
+            _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         }
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
@@ -102,11 +102,11 @@ static dispatch_queue_t WXImageUpdateQueue;
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
-        _imageSrc = [WXConvert NSString:attributes[@"src"]];
+        _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
     if (attributes[@"placeHolder"]) {
-        _placeholdSrc = [WXConvert NSString:attributes[@"placeHolder"]];
+        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     }
     
     if (attributes[@"resize"]) {
