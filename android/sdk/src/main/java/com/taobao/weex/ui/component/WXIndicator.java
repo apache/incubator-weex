@@ -213,6 +213,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -332,9 +333,12 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
 
     @Override
     protected Map<String, String> getDefaultStyle() {
+      WXStyle pendingStyles = getStyles();
       Map<String,String> map = new HashMap<>();
-      map.put("left","0");
-      map.put("top","0");
+      if(!pendingStyles.containsKey(Constants.Name.RIGHT))
+        map.put(Constants.Name.LEFT,"0");
+      if(!pendingStyles.containsKey(Constants.Name.BOTTOM))
+        map.put(Constants.Name.TOP,"0");
       return map;
     }
   }

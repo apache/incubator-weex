@@ -167,7 +167,7 @@ public class WXImageTest {
   @PrepareForTest(WXImageView.class)
   public void testInitComponentHostView() throws Exception {
 
-    WXImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(null);
     assertEquals(imageView.getClass(), WXImageView.class);
 
   }
@@ -176,7 +176,7 @@ public class WXImageTest {
   @PrepareForTest(WXImageView.class)
   public void testSetBackgroundColor() throws Exception {
 
-    WXImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
     mWXImage.setBackgroundColor("#FFFFFF");
@@ -189,7 +189,7 @@ public class WXImageTest {
   @Test
   public void testSetProperty() throws Exception {
 
-    WXImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
     mWXImage.setProperty(Constants.Name.RESIZE_MODE, "cover");
@@ -203,7 +203,7 @@ public class WXImageTest {
   @Test
   public void testSetResizeMode() throws Exception {
 
-    WXImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
     mWXImage.setResizeMode("cover");
@@ -214,7 +214,7 @@ public class WXImageTest {
 
   @Test
   public void testSetResize() throws Exception {
-    WXImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(null);
     mWXImage.mHost = imageView;
 
     mWXImage.setResize("cover");
@@ -224,7 +224,7 @@ public class WXImageTest {
 
   @Test
   public void testSetSrc() throws Exception {
-    mWXImage.mDomObj = PowerMockito.mock(WXDomObject.class);
+    mWXImage.mDomObj = new WXDomObject();
     mWXImage.mDomObj.attr = PowerMockito.mock(WXAttr.class);
     PowerMockito.when(mWXImage.mDomObj.attr.getImageSharpen()).thenReturn(WXImageSharpen.SHARPEN);
     mWXImage.setSrc("");

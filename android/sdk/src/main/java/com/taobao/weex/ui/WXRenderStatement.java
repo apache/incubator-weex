@@ -301,8 +301,7 @@ class WXRenderStatement {
       return null;
     }
     WXDomObject domObject = new WXDomObject();
-    domObject.type = WXBasicComponentType.DIV;
-    domObject.ref = "god";
+    WXDomObject.prepareGod(domObject);
     mGodComponent = (WXVContainer) WXComponentFactory.newInstance(mWXSDKInstance, domObject, null);
     mGodComponent.createView(null, -1);
     if (mGodComponent == null) {
@@ -365,7 +364,11 @@ class WXRenderStatement {
     parent.addChild(component, index);
   }
 
-  WXComponent createComponentOnDomThread(WXDomObject dom, String parentRef, int index) {
+  @Nullable WXComponent createComponentOnDomThread(WXDomObject dom, String parentRef, int index) {
+    WXComponent comp = mRegistry.get(parentRef);
+    if(comp == null || !(comp instanceof WXVContainer)){
+      return null;
+    }
     return generateComponentTree(dom, (WXVContainer) mRegistry.get(parentRef));
   }
 
@@ -407,7 +410,7 @@ class WXRenderStatement {
    * Clear registry information that current instance contains.
    */
   private void clearRegistryForComponent(WXComponent component) {
-    WXComponent removedComponent = mRegistry.remove(component.getDomObject().ref);
+    WXComponent removedComponent = mRegistry.remove(component.getDomObject().getRef());
     if (removedComponent != null) {
       removedComponent.removeAllEvent();
       removedComponent.removeStickyStyle();
@@ -542,7 +545,7 @@ class WXRenderStatement {
     WXComponent component = WXComponentFactory.newInstance(mWXSDKInstance, dom,
                                                            parent, parent.isLazy());
 
-    mRegistry.put(dom.ref, component);
+    mRegistry.put(dom.getRef(), component);
     if (component instanceof WXVContainer) {
       WXVContainer parentC = (WXVContainer) component;
       int count = dom.childCount();

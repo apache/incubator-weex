@@ -231,7 +231,6 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
-import com.taobao.weex.utils.WXConst;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXHack;
 import com.taobao.weex.utils.WXHack.HackDeclaration.HackAssertionException;
@@ -280,6 +279,12 @@ public class WXBridgeManager implements Callback {
   public static final String METHOD_FIRE_EVENT = "fireEvent";
   public static final String METHOD_CALLBACK = "callback";
   public static final String METHOD_REFRESH_INSTANCE = "refreshInstance";
+
+  public static final String KEY_METHOD = "method";
+  public static final String KEY_ARGS = "args";
+  public static final String JS_BRIDGE = "jsBridge";
+  //Alert
+  public static final String JS_FRAMEWORK = "jsFramework";
   private static final String UNDEFINED = "-1";
   private static final int INIT_FRAMEWORK_OK = 1;
 
@@ -352,6 +357,10 @@ public class WXBridgeManager implements Callback {
           mWxDebugProxy.start();
           if (remoteDebug) {
             mWXBridge = mWxDebugProxy.getWXBridge();
+          } else {
+            if (mWXBridge != null && !(mWXBridge instanceof WXBridge)) {
+              mWXBridge = null;
+            }
           }
         }
       } catch (HackAssertionException e) {
@@ -524,8 +533,8 @@ public class WXBridgeManager implements Callback {
         }
 
         WXHashMap<String, Object> task = new WXHashMap<>();
-        task.put(WXConst.KEY_METHOD, method);
-        task.put(WXConst.KEY_ARGS, argsList);
+        task.put(KEY_METHOD, method);
+        task.put(KEY_ARGS, argsList);
 
         if (mNextTickTasks.get(instanceId) == null) {
           ArrayList<WXHashMap<String, Object>> list = new ArrayList<>();
@@ -585,31 +594,46 @@ public class WXBridgeManager implements Callback {
 
 
   /**
-   * Invoke JavaScript callback
+   * Invoke JavaScript callback. Use {@link JSCallback} instead.
    * @see #callback(String, String, String)
    */
+  @Deprecated
   public void callback(String instanceId, String callback,String data) {
     callback(instanceId, callback,data,false);
   }
 
   /**
-   * Invoke JavaScript callback
+   * Invoke JavaScript callback. Use {@link JSCallback} instead.
    * @see #callback(String, String, Map<String, Object>)
    */
+  @Deprecated
   public void callback(final String instanceId, final String callback,
                        final Map<String, Object> data){
     callback(instanceId,callback,data,false);
   }
 
   /**
-   *
+   * Use {@link JSCallback} instead.
    * @param instanceId Weex Instance Id
    * @param callback  callback referenece handle
    * @param data callback data
    * @param keepAlive if keep callback instance alive for later use
      */
+  @Deprecated
   public void callback(final String instanceId, final String callback,
                        final Object data,boolean keepAlive) {
+    callbackJavascript(instanceId,callback,data,keepAlive);
+  }
+
+  /**
+   * Callback to Javascript function.
+   * @param instanceId Weex Instance Id
+   * @param callback  callback referenece handle
+   * @param data callback data
+   * @param keepAlive if keep callback instance alive for later use
+   */
+  void callbackJavascript(final String instanceId, final String callback,
+                          final Object data, boolean keepAlive) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(callback)
         || mJSHandler == null) {
       return;
@@ -678,7 +702,7 @@ public class WXBridgeManager implements Callback {
     if (instance == null) {
       return;
     }
-    instance.commitUTStab(WXConst.JS_BRIDGE, errCode);
+    instance.commitUTStab(JS_BRIDGE, errCode);
   }
 
   public void commitAlert(final String type, final WXErrorCode errorCode) {
@@ -822,6 +846,11 @@ public class WXBridgeManager implements Callback {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("destroyInstance >>>> instanceId:" + instanceId);
       }
+
+      if(sDomModule!=null && sDomModule.mWXSDKInstance!=null && TextUtils.equals(instanceId,sDomModule.mWXSDKInstance.getInstanceId())){
+        sDomModule.mWXSDKInstance=null;
+      }
+
       WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
                                                 instanceId);
       WXJSObject[] args = {instanceIdObj};
@@ -892,8 +921,8 @@ public class WXBridgeManager implements Callback {
     argsList.add(new HashMap<>());
     argsList.add(keepAlive);
     WXHashMap<String, Object> task = new WXHashMap<>();
-    task.put(WXConst.KEY_METHOD, METHOD_CALLBACK);
-    task.put(WXConst.KEY_ARGS, argsList);
+    task.put(KEY_METHOD, METHOD_CALLBACK);
+    task.put(KEY_ARGS, argsList);
     Object[] tasks={task};
     return new WXJSObject[]{
         new WXJSObject(WXJSObject.String, String.valueOf(instanceId)),
@@ -925,7 +954,7 @@ public class WXBridgeManager implements Callback {
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
         errorCode.appendErrMsg("JS Framework is empty!");
-        commitAlert(WXConst.JS_FRAMEWORK, errorCode);
+        commitAlert(JS_FRAMEWORK, errorCode);
         return;
       }
       try {
@@ -939,16 +968,16 @@ public class WXBridgeManager implements Callback {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
-          commitAlert(WXConst.JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
+          commitAlert(JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
           errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          commitAlert(WXConst.JS_FRAMEWORK, errorCode);
+          commitAlert(JS_FRAMEWORK, errorCode);
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
         errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework exception!");
-        commitAlert(WXConst.JS_FRAMEWORK, errorCode);
+        commitAlert(JS_FRAMEWORK, errorCode);
       }
     }
   }
@@ -986,7 +1015,7 @@ public class WXBridgeManager implements Callback {
 
     } catch (Throwable e) {
       WXLogUtils.e("WXBridgeManager", e);
-      commitAlert(WXConst.JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
+      commitAlert(JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
     }
 
     // If task is not empty, loop until it is empty

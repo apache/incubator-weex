@@ -288,8 +288,8 @@ public class WXVideo extends WXComponent<FrameLayout> {
         mPrepared = false;
         mError = true;
 
-        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_FAIL)) {
-          WXVideo.this.notify(WXEventType.VIDEO_FAIL, Constants.Value.STOP);
+        if ( mDomObj.getEvents().contains(Constants.Event.FAIL)) {
+          WXVideo.this.notify(Constants.Event.FAIL, Constants.Value.STOP);
         }
         return true;
       }
@@ -324,8 +324,8 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onCompletion");
         }
-        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_FINISH)) {
-          WXVideo.this.notify(WXEventType.VIDEO_FINISH, Constants.Value.STOP);
+        if ( mDomObj.getEvents().contains(Constants.Event.FINISH)) {
+          WXVideo.this.notify(Constants.Event.FINISH, Constants.Value.STOP);
         }
       }
     });
@@ -337,8 +337,8 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onPause");
         }
-        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_PAUSE)) {
-          WXVideo.this.notify(WXEventType.VIDEO_PAUSE, Constants.Value.PAUSE);
+        if ( mDomObj.getEvents().contains(Constants.Event.PAUSE)) {
+          WXVideo.this.notify(Constants.Event.PAUSE, Constants.Value.PAUSE);
         }
       }
 
@@ -348,8 +348,8 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onStart");
         }
 
-        if (mDomObj.event != null && mDomObj.event.contains(WXEventType.VIDEO_START)) {
-          WXVideo.this.notify(WXEventType.VIDEO_START, Constants.Value.PLAY);
+        if ( mDomObj.getEvents().contains(Constants.Event.START)) {
+          WXVideo.this.notify(Constants.Event.START, Constants.Value.PLAY);
         }
       }
     });

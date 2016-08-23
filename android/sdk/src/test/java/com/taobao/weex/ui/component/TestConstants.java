@@ -204,20 +204,19 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.dom.WXEvent;
+import com.taobao.weex.common.Constants;
 
 /**
  * Created by sospartan on 8/9/16.
  */
 public class TestConstants {
   public static final String Events[] = {"", null,
-      WXEventType.INPUT,
-      WXEventType.INPUT_CHANGE,
-      WXEventType.APPEAR,
-      WXEventType.BLUR,
-      WXEventType.CLICK,
-      WXEventType.CHANGE,
-      WXEventType.FOCUS,
-      WXEventType.DISAPPEAR,
+      Constants.Event.INPUT,
+      Constants.Event.APPEAR,
+      Constants.Event.BLUR,
+      Constants.Event.CLICK,
+      Constants.Event.CHANGE,
+      Constants.Event.FOCUS,
+      Constants.Event.DISAPPEAR,
   };
 }

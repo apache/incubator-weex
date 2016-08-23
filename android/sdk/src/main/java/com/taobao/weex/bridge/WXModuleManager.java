@@ -447,12 +447,12 @@ public class WXModuleManager {
 
     @Override
     public void invoke(Object data) {
-      WXBridgeManager.getInstance().callback(mInstanceId,mCallbackId,data,false);
+      WXBridgeManager.getInstance().callbackJavascript(mInstanceId,mCallbackId,data,false);
     }
 
     @Override
     public void invokeAndKeepAlive(Object data) {
-      WXBridgeManager.getInstance().callback(mInstanceId,mCallbackId,data,true);
+      WXBridgeManager.getInstance().callbackJavascript(mInstanceId,mCallbackId,data,true);
     }
   }
 
