@@ -1,11 +1,13 @@
 package com.alibaba.weex.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -143,6 +145,9 @@ public  class ScreenShot {
     }
     // Gets the Activity screenshots, save to png file
     private static Bitmap takeScreenShot(Activity activity) {
+
+        Context ctx = activity.getApplicationContext();
+        getDiskCacheDir(ctx);
 
         View view = activity.getWindow().getDecorView();
 
@@ -325,5 +330,29 @@ public  class ScreenShot {
         }
         return result;
 
+    }
+
+    /**
+     * getDiskCacheDir
+     * @param context
+     * @return
+     */
+    public static String getDiskCacheDir(Context context) {
+        if (context == null) {
+            return null;
+        }
+        String cachePath;
+        String extDir = "" ;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                || !Environment.isExternalStorageRemovable()) {
+            cachePath = context.getExternalCacheDir().getPath();
+            extDir = Environment.getExternalStorageDirectory().getPath();
+        } else {
+            cachePath = context.getCacheDir().getPath();
+        }
+        Log.e("weex_test","cachePath==" + cachePath);
+        Log.e("weex_test","extDir==" + extDir);
+
+        return cachePath;
     }
 }
