@@ -94,12 +94,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, assign) BOOL isViewFrameSyncWithCalculated;
 
-/**
- * @abstract Return the calculated absolute position.
- *
- * @warning Subclasses must not override this.
- */
-@property(nonatomic, assign) CGPoint absolutePosition;
+///**
+// * @abstract Return the calculated absolute position.
+// *
+// * @warning Subclasses must not override this.
+// */
+//@property(nonatomic, assign) CGPoint absolutePosition;
 
 /**
  * @abstract Return the css node used to layout.

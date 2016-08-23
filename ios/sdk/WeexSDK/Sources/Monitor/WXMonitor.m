@@ -64,6 +64,17 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     performanceDict[@(tag)] = dict;
 }
 
++ (BOOL)performancePoint:(WXPerformanceTag)tag isRecordedWithInstance:(WXSDKInstance *)instance
+{
+    NSMutableDictionary *performanceDict = [self performanceDictForInstance:instance];
+    if (!performanceDict) {
+        return NO;
+    }
+    
+    NSMutableDictionary *dict = performanceDict[@(tag)];
+    return dict && dict[kStartKey] && dict[kEndKey];
+}
+
 + (void)performanceFinish:(WXSDKInstance *)instance
 {
     static NSDictionary *commitKeyDict;

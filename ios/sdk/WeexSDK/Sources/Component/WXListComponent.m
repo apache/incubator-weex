@@ -244,20 +244,6 @@
         // trigger section header update
         [_tableView beginUpdates];
         [_tableView endUpdates];
-        
-        __block BOOL needCompute;
-        [_completedSections enumerateObjectsUsingBlock:^(WXSection * _Nonnull section, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
-            if (header == section.header) {
-                needCompute = YES ;
-            } else if (!needCompute) {
-                return ;
-            }
-            
-            [section.rows enumerateObjectsUsingBlock:^(WXCellComponent * _Nonnull cell, NSUInteger row, BOOL * _Nonnull stop) {
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:sectionIndex];
-                [self _recomputeCellAbsolutePosition:cell forIndexPath:indexPath];
-            }];
-        }];
     }];
     
 }
@@ -313,22 +299,17 @@
                 [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
             }];
         }
-        
-        [self _recomputeCellAbsolutePosition:cell forIndexPath:indexPath];
     }];
-}
-
-- (void)_recomputeCellAbsolutePosition:(WXCellComponent *)cell forIndexPath:(NSIndexPath *)indexPath
-{
-    CGRect cellRect = [_tableView rectForRowAtIndexPath:indexPath];
-    cell.absolutePosition = CGPointMake(self.absolutePosition.x + cellRect.origin.x,
-                                        self.absolutePosition.y + cellRect.origin.y);
-    [cell _fillAbsolutePositions];
 }
 
 - (void)cellDidRendered:(WXCellComponent *)cell
 {
     WXAssertMainThread();
+    
+    if (WX_MONITOR_INSTANCE_PERF_IS_RECORDED(WXPTFirstScreenRender, self.weexInstance) && !self.weexInstance.onRenderProgress) {
+        // improve performance
+        return;
+    }
     
     NSIndexPath *indexPath = [self indexPathForCell:cell sections:_completedSections];
     if (!indexPath || indexPath.section >= [_tableView numberOfSections] ||
@@ -343,10 +324,7 @@
     }
     
     if (self.weexInstance.onRenderProgress) {
-        CGRect renderRect = CGRectMake(self.absolutePosition.x + cellRect.origin.x,
-                                       self.absolutePosition.y + cellRect.origin.y,
-                                       cellRect.size.width, cellRect.size.height);
-        
+        CGRect renderRect = [_tableView convertRect:cellRect toView:self.weexInstance.rootView];
         self.weexInstance.onRenderProgress(renderRect);
     }
 

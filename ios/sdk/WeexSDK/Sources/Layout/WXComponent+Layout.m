@@ -122,12 +122,7 @@
         [dirtyComponents addObject:self];
     }
     
-    CGPoint newAboslutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
-                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
-    
-    if(!CGPointEqualToPoint(_absolutePosition, newAboslutePosition)){
-        _absolutePosition = newAboslutePosition;
-    }
+    CGPoint newAbsolutePosition = [self computeNewAbsolutePosition:superAbsolutePosition];
     
     _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
     _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
@@ -137,8 +132,26 @@
     [self _frameDidCalculated:isFrameChanged];
     
     for (WXComponent *subcomponent in _subcomponents) {
-        [subcomponent _calculateFrameWithSuperAbsolutePosition:newAboslutePosition gatherDirtyComponents:dirtyComponents];
+        [subcomponent _calculateFrameWithSuperAbsolutePosition:newAbsolutePosition gatherDirtyComponents:dirtyComponents];
     }
+}
+
+- (CGPoint)computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
+{
+    // Not need absolutePosition any more
+ //   [self _computeNewAbsolutePosition:superAbsolutePosition];
+}
+
+- (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
+{
+    CGPoint newAbsolutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
+                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
+    
+    if(!CGPointEqualToPoint(_absolutePosition, newAbsolutePosition)){
+        _absolutePosition = newAbsolutePosition;
+    }
+    
+    return newAbsolutePosition;
 }
 
 - (void)_layoutDidFinish
@@ -228,10 +241,10 @@ do {\
 
 - (void)_fillAbsolutePositions
 {
-    CGPoint absolutePosition = self.absolutePosition;
+    CGPoint absolutePosition = _absolutePosition;
     NSArray *subcomponents = self.subcomponents;
     for (WXComponent *subcomponent in subcomponents) {
-        subcomponent.absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
+        subcomponent->_absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
         [subcomponent _fillAbsolutePositions];
     }
 }
