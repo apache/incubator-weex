@@ -12,7 +12,7 @@ Second, you should always implement a extension for all the three platforms (and
 
 You should publish your extensions somewhere weex developers can easily find, somewhere popular, independent and easy to search and use, such as, npm. Npm is what we strongly recommended.
 
-The most important thing is, you'd better name your extension appropriately: it should begin with a 'weex-' if it is a weex extension. Here is a demonstrating component [`<weex-hello>`](https://github.com/MrRaindrop/weex-hello) to show how to define your own component.
+The most important thing is, you'd better name your extension appropriately: it should begin with a `weex-` if it is a weex extension, and it should be en d up with a `-<platform>` as a platform mark. If your package is wrapped up with all the three platforms you can ignore it through. Here is a demonstrating component [`<weex-hello-web>`](https://github.com/MrRaindrop/weex-hello-web) to show how to define your own component.
 
 ### Create a new component
 
@@ -62,7 +62,7 @@ function init (Weex) {
 export default { init }
 ```
 
-The code above is extracted from [weex-hello/src/index.js](https://github.com/MrRaindrop/weex-hello/blob/master/src/index.js#L46-L65).
+The code above is extracted from [weex-hello-web/src/index.js](https://github.com/MrRaindrop/weex-hello-web/blob/master/src/index.js#L46-L65).
 
 This demo has overrided the `create` method of the base class `Component`. You can also override other methods to customize your component's behavior. The typical methods of class `Component` you may override are:
 
@@ -80,14 +80,14 @@ Important! To register your component in the `init` method, use `Weex.registerCo
 Weex.registerComponent('weex-hello', Hello)
 ```
 
-The code above is from [weex-hello/src/index.js](https://github.com/MrRaindrop/weex-hello/blob/master/src/index.js#L62)
+The code above is from [weex-hello-web/src/index.js](https://github.com/MrRaindrop/weex-hello-web/blob/master/src/index.js#L62)
 
 Install the component using `Weex.install`.
 
 ```javascript
 // import the original weex-html5.
 import weex from 'weex-html5'
-import hello from 'weex-hello'
+import hello from 'weex-hello-web'
 // install the component.
 weex.install(hello)
 ```
