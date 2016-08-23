@@ -9,17 +9,16 @@
 #import "WXDevTool.h"
 #import <WeexSDK/WXSDKEngine.h>
 #import "WXDebugger.h"
-
-static BOOL WXIsConnect;
+#import "WXDevToolType.h"
 
 @implementation WXDevTool
 
 + (void)setDebug:(BOOL)isDebug {
-    WXIsConnect = isDebug;
+    [WXDevToolType setDebug:isDebug];
 }
 
 + (BOOL)isDebug {
-    return WXIsConnect;
+    return [WXDevToolType isDebug];
 }
 
 #pragma mark weex devtool

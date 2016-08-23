@@ -122,6 +122,8 @@ void _WXLogObjectsImpl(NSString *severity, NSArray *arguments)
         machine, @"model",
         [WXSDKEngine SDKEngineVersion],@"weexVersion",
         appName, @"name",
+        [WXLog logLevelString] ?: @"error",@"logLevel",
+        [NSNumber numberWithBool:[WXDevToolType isDebug]],@"remoteDebug",
         nil];
     [self _registerDeviceWithParams:parameters];
 }
@@ -661,8 +663,6 @@ void _WXLogObjectsImpl(NSString *severity, NSArray *arguments)
                          @"WxDebug.registerDevice", @"method",
                          [params WX_JSONObject], @"params",
                          [NSNumber numberWithInt:0],@"id",
-                         [WXLog logLevelString] ?: @"error",@"logLevel",
-                         [NSNumber numberWithBool:[WXDevToolType isDebug]],@"remoteDebug",
                          nil];
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];

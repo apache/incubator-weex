@@ -9,17 +9,14 @@
 #import "WXDevToolType.h"
 #import <WeexSDK/WXDebugTool.h>
 
-static BOOL WXDebug;
-
 @implementation WXDevToolType
 
 + (void)setDebug:(BOOL)isDebug {
-    WXDebug = isDebug;
     [WXDebugTool setDevToolDebug:isDebug];
 }
 
 + (BOOL)isDebug {
-    return WXDebug;
+    return [WXDebugTool isDevToolDebug];
 }
 
 @end
