@@ -223,7 +223,6 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
-import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -519,11 +518,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @WXComponentProp(name = Constants.Name.MAXLENGTH)
   public void setMaxlength(int maxLength) {
     setMaxLength(maxLength);
-  }
-
-  @Override
-  public WXTextDomObject getDomObject() {
-    return (WXTextDomObject) super.getDomObject();
   }
 
   private int getInputType(String type) {
