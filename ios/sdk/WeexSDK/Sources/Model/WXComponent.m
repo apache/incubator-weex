@@ -234,7 +234,7 @@
     }
     
     CGPoint absolutePosition = [self.supercomponent.view convertPoint:_view.frame.origin toView:_weexInstance.rootView];
-    if (absolutePosition.y > self.weexInstance.rootView.frame.size.height) {
+    if (absolutePosition.y + _view.frame.size.height > self.weexInstance.rootView.frame.size.height + 1) {
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, self.weexInstance);
     }
 }
