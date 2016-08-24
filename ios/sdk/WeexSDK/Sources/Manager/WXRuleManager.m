@@ -34,7 +34,7 @@ static WXRuleManager *_sharedInstance = nil;
 - (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
     
     if ([type isEqualToString:@"fontFace"] && [rule[@"src"] isKindOfClass:[NSString class]]) {
-        if (rule[@"src"] && rule[@"fontFamily"]) {
+        if (rule[@"src"] && rule[@"fontFamily"] && ![WXUtility isBlankString:rule[@"src"]]) {
             NSString *ruleSrc = [WXConvert NSString:rule[@"src"]];
             if (!ruleSrc) {
                 WXLogError(@"%@ is illegal for font src",rule[@"src"]);
@@ -42,13 +42,14 @@ static WXRuleManager *_sharedInstance = nil;
             }
             NSUInteger start = [rule[@"src"] rangeOfString:@"url('"].location + @"url('".length;
             NSUInteger end  = [rule[@"src"] rangeOfString:@"')" options:NSBackwardsSearch].location;
-            if (end <= start) {
+            if (end <= start || start == NSNotFound || end == NSNotFound) {
                 WXLogWarning(@"font url is not specified");
                 return;
             }
             NSString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
             NSMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
-            if (fontFamily || fontFamily[fontSrc]) {
+            if (fontFamily && [fontFamily[@"src"] isEqualToString:fontSrc]) {
+                // if the new src is same as src in dictionary , ignore it, or update it
                 return;
             }
             if (!fontFamily) {
@@ -56,6 +57,7 @@ static WXRuleManager *_sharedInstance = nil;
             }
             NSURL *fontURL = [NSURL URLWithString:fontSrc];
             if (!fontURL) {
+                // if the fontSrc string is illegal, the fontURL will be nil
                 return;
             }
             [fontFamily setObject:fontSrc forKey:@"src"];
@@ -63,13 +65,14 @@ static WXRuleManager *_sharedInstance = nil;
                 // local font file will be added directly if existed
                 if ([WXUtility isFileExist:[fontURL path]]) {
                     [fontFamily setObject:fontURL forKey:@"localSrc"];
-                }else {
+                    [_fontStorage setObject:fontFamily forKey:rule[@"fontFamily"]];
+                } else {
                     WXLogWarning(@"font file %@ is not exist", fontSrc);
                 }
                 return;
             }
             // remote font file
-            NSString* fontfile = [[WXUtility documentDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:fontURL.path]]];
+            NSString *fontfile = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:fontURL.path]];
             if ([WXUtility isFileExist:fontfile]) {
                 // if has been cached, load directly
                 [fontFamily setObject:[NSURL fileURLWithPath:fontfile] forKey:@"localSrc"];
@@ -81,11 +84,13 @@ static WXRuleManager *_sharedInstance = nil;
             
             __weak typeof(self) weakSelf = self;
             [WXUtility getIconfont:fontURL completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
-                if (!error) {
+                if (!error && !url) {
+                    // load success
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
                     [weakSelf.fontStorage setObject:url forKey: dictForFontFamily];
                 } else {
+                     //there was some errors during loading
                     WXLogError(@"load font failed %@",error.description);
                 }
             }];

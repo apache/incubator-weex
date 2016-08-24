@@ -365,17 +365,18 @@ static BOOL WXNotStat;
     NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSURL * downloadPath = nil;
         if (!error && location) {
-            NSString *file = [[WXUtility documentDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url path]]]];
+            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url path]]];
             
             downloadPath = [NSURL fileURLWithPath:file];
             NSFileManager *mgr = [NSFileManager defaultManager];
             NSError * error ;
             if (![mgr fileExistsAtPath:[file stringByDeletingLastPathComponent]]) {
+                // create font cache directory and its parent if not exist
                 [mgr createDirectoryAtPath:[file stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
             }
             BOOL result = [mgr moveItemAtURL:location toURL:downloadPath error:&error];
             if (!result) {
-                completionBlock(nil, error);
+                downloadPath = nil;
             }
         }
         completionBlock(downloadPath, error);
