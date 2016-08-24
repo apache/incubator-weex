@@ -128,11 +128,7 @@ import com.taobao.weex.appfram.storage.WXStorageModule;
 import com.taobao.weex.bridge.ModuleFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
-import com.taobao.weex.common.Destroyable;
-import com.taobao.weex.common.TypeModuleFactory;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXInstanceWrap;
-import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.*;
 import com.taobao.weex.dom.*;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
@@ -148,6 +144,7 @@ import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.utils.batch.BatchOperationHelper;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -262,52 +259,53 @@ public class WXSDKEngine {
 
   private static void register() {
     try {
+      BatchOperationHelper batchHelper = new BatchOperationHelper(WXBridgeManager.getInstance());
       registerComponent(
-        WXText.class,
-        new SimpleComponentHolder(
           WXText.class,
-          new WXText.Creator()
-        ),
-        false,
-        WXBasicComponentType.TEXT
+          new SimpleComponentHolder(
+              WXText.class,
+              new WXText.Creator()
+          ),
+          false,
+          WXBasicComponentType.TEXT
       );
       registerComponent(
-        WXDiv.class,
-        new SimpleComponentHolder(
           WXDiv.class,
-          new WXDiv.Ceator()
-        ),
-        false,
-        WXBasicComponentType.CONTAINER,
-        WXBasicComponentType.DIV,
-        WXBasicComponentType.HEADER,
-        WXBasicComponentType.FOOTER
+          new SimpleComponentHolder(
+              WXDiv.class,
+              new WXDiv.Ceator()
+          ),
+          false,
+          WXBasicComponentType.CONTAINER,
+          WXBasicComponentType.DIV,
+          WXBasicComponentType.HEADER,
+          WXBasicComponentType.FOOTER
       );
       registerComponent(
-        WXImage.class,
-        new SimpleComponentHolder(
           WXImage.class,
-          new WXImage.Ceator()
-        ),
-        false,
-        WXBasicComponentType.IMAGE,
-        WXBasicComponentType.IMG
+          new SimpleComponentHolder(
+              WXImage.class,
+              new WXImage.Ceator()
+          ),
+          false,
+          WXBasicComponentType.IMAGE,
+          WXBasicComponentType.IMG
       );
       registerComponent( WXScroller.class,
-        new SimpleComponentHolder(
-          WXScroller.class,
-          new WXScroller.Ceator()
-        ),
-        false,
-        WXBasicComponentType.SCROLLER
+          new SimpleComponentHolder(
+              WXScroller.class,
+              new WXScroller.Ceator()
+          ),
+          false,
+          WXBasicComponentType.SCROLLER
       );
       registerComponent( WXSlider.class,
-        new SimpleComponentHolder(
-          WXSlider.class,
-          new WXSlider.Ceator()
-        ),
-        true,
-        WXBasicComponentType.SLIDER
+          new SimpleComponentHolder(
+              WXSlider.class,
+              new WXSlider.Ceator()
+          ),
+          true,
+          WXBasicComponentType.SLIDER
       );
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
@@ -324,6 +322,7 @@ public class WXSDKEngine {
       registerComponent(WXBasicComponentType.LOADING, WXLoading.class);
       registerComponent(WXBasicComponentType.LOADING_INDICATOR, WXLoadingIndicator.class);
       registerComponent(WXBasicComponentType.HEADER, WXHeader.class);
+
 
       registerModule("modal", WXModalUIModule.class, false);
       registerModule("instanceWrap", WXInstanceWrap.class, true);
@@ -344,6 +343,8 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
+
+      batchHelper.flush();
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
