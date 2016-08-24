@@ -107,7 +107,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 final WXTextView inputView = (WXTextView) caseView;
 
                 // handle if the view is INVISIBLE then scrollToBottom
-                int maxStep = 10;
+                int maxStep = 12;
                 int scrollCount = 0;
                 if(inputView.getVisibility() == View.INVISIBLE){
                     while(scrollCount <maxStep){
@@ -157,8 +157,10 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                         inputListView = ViewUtil.findViewWithText(myGroup,
                                 childCaseName);
                         sleep(1000);
-
                         findCount ++ ;
+
+                    }else{
+                        break;
                     }
                 }
 //                else{
@@ -271,6 +273,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     Log.e(TAG,"viewX==" + viewX);
 
                     TouchUtils.clickView(this, view);
+                    sleep(2000);
                     Log.e(TAG,"clickView==" );
 
 
@@ -316,7 +319,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
      */
     public void screenShot(String shotName) {
         try {
-            ScreenShot.shoot(WXPageActivity.wxPageActivityInstance, shotName);
+            ScreenShot.shoot(getActivity(), shotName);
         } catch (IOException e) {
             e.printStackTrace();
         }

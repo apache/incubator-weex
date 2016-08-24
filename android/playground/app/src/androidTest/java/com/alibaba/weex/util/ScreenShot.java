@@ -31,7 +31,7 @@ import java.util.ArrayList;
  */
 public  class ScreenShot {
 
-    public  static View rootView;
+    public static View rootView;
     public static ArrayList<View> allViews = new ArrayList<View>();
     public static View firstScrollView = null;
     public static View firstListView = null;
