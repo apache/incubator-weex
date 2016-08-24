@@ -230,6 +230,7 @@ import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.http.WXHttpUtil;
+import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
@@ -266,6 +267,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
   private float refreshMargin = 0;
+  private NestedInstanceInterceptor mNestedInstanceInterceptor;
 
   /**
    * Render strategy.
@@ -315,6 +317,18 @@ public class WXSDKInstance implements IWXActivityStateListener {
       return null;
     else
       return ((WXVContainer) (this.getGodCom())).getChild(0);
+  }
+
+  public void setNestedInstanceInterceptor(NestedInstanceInterceptor interceptor){
+    mNestedInstanceInterceptor = interceptor;
+  }
+
+  public WXSDKInstance createNestedInstance(NestedContainer container){
+    WXSDKInstance sdkInstance = new WXSDKInstance(mContext);
+    if(mNestedInstanceInterceptor != null){
+      mNestedInstanceInterceptor.onCreateNestInstance(sdkInstance,container);
+    }
+    return sdkInstance;
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
@@ -1084,5 +1098,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
       }
 
     }
+  }
+
+  public interface NestedInstanceInterceptor {
+    void onCreateNestInstance(WXSDKInstance instance, NestedContainer container);
   }
 }
