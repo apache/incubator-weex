@@ -468,7 +468,6 @@ public class WXBridgeManager implements Callback {
     }
 
     if(mDestroyedInstanceId!=null &&mDestroyedInstanceId.contains(instanceId)){
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
       return IWXBridge.DESTROY_INSTANCE;
     }
 
@@ -505,7 +504,6 @@ public class WXBridgeManager implements Callback {
     }
 
     if (UNDEFINED.equals(callback)) {
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick
