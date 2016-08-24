@@ -371,7 +371,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && mAbsoluteY+realHeight >= mInstance.getWeexHeight()) {
+    if (!mInstance.mEnd && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
       mInstance.firstScreenRenderFinished();
     }
 
