@@ -7,11 +7,11 @@
  */
 
 #import "WXDevtool.h"
-#import "PonyDebugger.h"
+#import "WXPonyDebugger.h"
 #import "WXDebugDomain.h"
-#import "PDDynamicDebuggerDomain.h"
+#import "WXDynamicDebuggerDomain.h"
 
-@interface WXDebugDomainController : PDDomainController <PDCommandDelegate>
+@interface WXDebugDomainController : WXDomainController <WXCommandDelegate>
 
 @property (nonatomic, strong) WXDebugDomain *domain;
 

@@ -6,13 +6,13 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PonyDebugger.h"
-#import "PDDebuggerDomain.h"
-#import "PDDynamicDebuggerDomain.h"
+#import "WXPonyDebugger.h"
+#import "WXDebuggerDomain.h"
+#import "WXDynamicDebuggerDomain.h"
 
-@interface WXSourceDebuggerDomainController : PDDomainController <PDDebuggerCommandDelegate>
+@interface WXSourceDebuggerDomainController : WXDomainController <WXDebuggerCommandDelegate>
 
-@property (nonatomic, strong) PDDebuggerDomain *domain;
+@property (nonatomic, strong) WXDebuggerDomain *domain;
 
 + (WXSourceDebuggerDomainController *)defaultInstance;
 
