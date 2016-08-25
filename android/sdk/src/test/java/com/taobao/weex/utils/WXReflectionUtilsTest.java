@@ -214,6 +214,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -284,6 +285,11 @@ public class WXReflectionUtilsTest {
     assertTrue(value instanceof String[]);
     assertEquals(((String[])value)[0],"b");
     assertEquals(((String[])value)[1],"23");
+
+    value = WXReflectionUtils.parseArgument(List.class, JSON.toJSONString(k));
+    assertTrue(value instanceof List);
+    assertEquals(((List)value).get(0),"b");
+    assertEquals(((List)value).get(1),23);
 
     k = new JSONArray();
     k.add(1);
