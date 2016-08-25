@@ -16,6 +16,7 @@
 #import "WXNavigationDefaultImpl.h"
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
+#import "WXMonitor.h"
 #import "WXSimulatorShortcutMananger.h"
 #import "WXAssert.h"
 #import "WXLog.h"
@@ -36,6 +37,8 @@
     [self registerModule:@"webview" withClass:NSClassFromString(@"WXWebViewModule")];
     [self registerModule:@"instanceWrap" withClass:NSClassFromString(@"WXInstanceWrap")];
     [self registerModule:@"timer" withClass:NSClassFromString(@"WXTimerModule")];
+    [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
+    [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -60,6 +63,7 @@
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
     
+    [self registerComponent:@"header" withClass:NSClassFromString(@"WXHeaderComponent")];
     [self registerComponent:@"cell" withClass:NSClassFromString(@"WXCellComponent")];
     [self registerComponent:@"embed" withClass:NSClassFromString(@"WXEmbedComponent")];
     [self registerComponent:@"a" withClass:NSClassFromString(@"WXAComponent")];
@@ -74,6 +78,7 @@
     [self registerComponent:@"loading" withClass:NSClassFromString(@"WXLoadingComponent")];
     [self registerComponent:@"loading-indicator" withClass:NSClassFromString(@"WXLoadingIndicator")];
     [self registerComponent:@"refresh" withClass:NSClassFromString(@"WXRefreshComponent")];
+    [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
@@ -89,7 +94,7 @@
     
     WXAssert(name && clazz, @"Fail to register the component, please check if the parameters are correct ！");
     
-    [WXComponentFactory registerComponent:name withClass:clazz];
+    [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
     
     if (properties) {
         NSMutableDictionary *props = [properties mutableCopy];
@@ -120,9 +125,14 @@
 
 + (void)initSDKEnviroment
 {
+    WX_MONITOR_PERF_START(WXPTInitalize)
+    WX_MONITOR_PERF_START(WXPTInitalizeSync)
+    
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnviroment:script];
+    
+    WX_MONITOR_PERF_END(WXPTInitalizeSync)
     
 #if TARGET_OS_SIMULATOR
     static dispatch_once_t onceToken;
@@ -153,7 +163,7 @@
 + (void)initSDKEnviroment:(NSString *)script
 {
     if (!script || script.length <= 0) {
-        [WXSDKError monitorAlarm:NO errorCode:WX_ERR_LOAD_JSLIB msg:@"framework loading is failure!"];
+        WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
     
@@ -162,8 +172,6 @@
     [self _registerDefaultHandlers];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
-    
-    [WXUtility addStatTrack:[WXAppConfiguration appName]];
 }
 
 + (NSString*)SDKEngineVersion
@@ -171,16 +179,75 @@
     return WX_SDK_VERSION;
 }
 
++ (WXSDKInstance *)topInstance
+{
+    return [WXSDKManager bridgeMgr].topInstance;
+}
+
 # pragma mark Debug
 
 + (void)unload
 {
-    [[WXSDKManager bridgeMgr] unload];
+    [WXSDKManager unload];
+    [WXComponentFactory unregisterAllComponents];
+}
+
++ (void)restart
+{
+    NSDictionary *components = [WXComponentFactory componentConfigs];
+    NSDictionary *modules = [WXModuleFactory moduleConfigs];
+    NSDictionary *handlers = [WXHandlerFactory handlerConfigs];
+    [WXSDKManager unload];
+    [WXComponentFactory unregisterAllComponents];
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
+    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+    
+    [self _originalRegisterComponents:components];
+    [self _originalRegisterModules:modules];
+    [self _originalRegisterHandlers:handlers];
+    
+    [[WXSDKManager bridgeMgr] executeJsFramework:script];
 }
 
 + (void)connectDebugServer:(NSString*)URL
 {
     [[WXSDKManager bridgeMgr] connectToWebSocket:[NSURL URLWithString:URL]];
+}
+
++ (void)connectDevToolServer:(NSString *)URL
+{
+    [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
+
+}
+
++ (void)_originalRegisterComponents:(NSDictionary *)components {
+    void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        
+        NSString *name = mObj[@"name"];
+        NSString *componentClass = mObj[@"clazz"];
+        NSDictionary *pros = nil;
+        if (mObj[@"pros"]) {
+            pros = mObj[@""];
+        }
+        [self registerComponent:name withClass:NSClassFromString(componentClass) withProperties:pros];
+    };
+    [components enumerateKeysAndObjectsUsingBlock:componentBlock];
+    
+}
+
++ (void)_originalRegisterModules:(NSDictionary *)modules {
+    void (^moduleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        
+        [self registerModule:mKey withClass:NSClassFromString(mObj)];
+    };
+    [modules enumerateKeysAndObjectsUsingBlock:moduleBlock];
+}
+
++ (void)_originalRegisterHandlers:(NSDictionary *)handlers {
+    void (^handlerBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        [self registerHandler:mObj withProtocol:NSProtocolFromString(mKey)];
+    };
+    [handlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
 }
 
 @end

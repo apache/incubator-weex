@@ -128,7 +128,7 @@
 
 - (void)_drawBorderWithContext:(CGContextRef)context size:(CGSize)size;
 
-- (void)_frameDidCalculated;
+- (void)_frameDidCalculated:(BOOL)isChanged;
 
 - (NSUInteger)_childrenCountForLayout;
 
@@ -159,5 +159,7 @@
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
 
 - (void)_updateNavBarAttributes:(NSDictionary *)attributes;
+
+- (void)_handleFirstScreenTime;
 
 @end

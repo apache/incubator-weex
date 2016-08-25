@@ -58,8 +58,16 @@
         [self addSubview:_scrollView];
         
         _itemViews = [NSMutableArray array];
+        _currentIndex = -1;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    if (_scrollView) {
+        _scrollView.delegate = nil;
+    }
 }
 
 - (void)setIndicator:(WXIndicatorView *)indicator
@@ -153,6 +161,7 @@
     self.scrollView.contentSize = CGSizeMake(self.itemViews.count * self.frame.size.width, self.frame.size.height);
     
     [self _resortItemViews];
+    [self _resetItemFrames];
     [self _scroll2Center];
     [self setNeedsLayout];
 }
@@ -165,10 +174,16 @@
     
     NSInteger center = [self _centerItemIndex];
     NSInteger index = 0;
-    if (self.currentIndex > center) {
-        index = self.currentIndex - center;
-    } else {
-        index = self.currentIndex + self.itemViews.count - center;
+    
+    if (self.currentIndex >= 0) {
+        if (self.currentIndex > center) {
+            index = self.currentIndex - center;
+        } else {
+            index = self.currentIndex + self.itemViews.count - center;
+        }
+    }
+    else {
+        index = self.itemViews.count - center;
     }
     
     __weak typeof(self) weakSelf = self;
@@ -196,6 +211,8 @@
         itemView.frame = frame;
         xOffset += frame.size.width;
     }
+    
+    
 }
 
 - (NSInteger)_centerItemIndex
@@ -270,6 +287,8 @@
 @property (nonatomic, strong) NSTimer *autoTimer;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic, assign) BOOL  autoPlay;
+@property (nonatomic, assign) NSUInteger interval;
+@property (nonatomic, assign) NSInteger index;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, strong) NSMutableArray *childrenView;
 
@@ -286,10 +305,19 @@
 {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         _sliderChangeEvent = NO;
+        _interval = 3000;
         _childrenView = [NSMutableArray new];
         
         if (attributes[@"autoPlay"]) {
             _autoPlay = [attributes[@"autoPlay"] boolValue];
+        }
+        
+        if (attributes[@"interval"]) {
+            _interval = [attributes[@"interval"] integerValue];
+        }
+        
+        if (attributes[@"index"]) {
+            _index = [attributes[@"index"] integerValue];
         }
         
         self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
@@ -316,6 +344,11 @@
     } else {
         [self _stopAutoPlayTimer];
     }
+}
+
+- (void)layoutDidFinish
+{
+    _sliderView.currentIndex = _index;
 }
 
 - (void)viewDidUnload
@@ -351,6 +384,8 @@
             return;
         }
         
+        subcomponent.isViewFrameSyncWithCalculated = NO;
+        
         if (index == -1) {
             [sliderView insertItemView:view atIndex:index];
         } else {
@@ -378,6 +413,23 @@
         } else {
             [self _stopAutoPlayTimer];
         }
+    }
+    
+    if (attributes[@"interval"]) {
+        _interval = [attributes[@"interval"] integerValue];
+        
+        [self _stopAutoPlayTimer];
+        
+        if (_autoPlay) {
+            [self _startAutoPlayTimer];
+        } 
+    }
+    
+    if (attributes[@"index"]) {
+        _index = [attributes[@"index"] integerValue];
+        
+        self.currentIndex = _index;
+        [_sliderView scroll2ItemView:self.currentIndex animated:YES];
     }
 }
 
@@ -409,7 +461,7 @@
 {
     if (!self.autoTimer || ![self.autoTimer isValid]) {
         __weak __typeof__(self) weakSelf = self;
-        self.autoTimer = [NSTimer wx_scheduledTimerWithTimeInterval:3 block:^() {
+        self.autoTimer = [NSTimer wx_scheduledTimerWithTimeInterval:_interval/1000.0f block:^() {
             [weakSelf _autoPlayOnTimer];
         } repeats:YES];
         [[NSRunLoop currentRunLoop] addTimer:self.autoTimer forMode:NSRunLoopCommonModes];
@@ -427,8 +479,16 @@
 - (void)_autoPlayOnTimer
 {
     WXSliderView *sliderView = (WXSliderView *)self.view;
-    if (self.currentIndex < self.childrenView.count - 1) {
-        self.currentIndex ++;
+
+    int indicatorCnt = 0;
+    for (int i = 0; i < [self.childrenView count]; ++i) {
+        if ([self.childrenView[i] isKindOfClass:[WXIndicatorView class]]) {
+            indicatorCnt++;
+        }
+    }
+    
+    self.currentIndex ++;
+    if (self.currentIndex < self.childrenView.count - indicatorCnt) {
         [sliderView scroll2ItemView:self.currentIndex animated:YES];
     } else {
         self.currentIndex = 0;
@@ -441,7 +501,7 @@
     self.currentIndex = index;
     
     if (_sliderChangeEvent) {
-        [self fireEvent:@"change" params:@{@"index":@(index)}];
+        [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
 }
 

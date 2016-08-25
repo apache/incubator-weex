@@ -1,5 +1,7 @@
 # &lt;switch&gt;
 <span class="weex-version">0.4</span>
+<a href="https://github.com/weexteam/article/issues/46"  class="weex-translate">cn</a>
+
 
 ### Summary
 

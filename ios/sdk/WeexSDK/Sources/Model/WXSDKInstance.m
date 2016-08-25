@@ -9,6 +9,8 @@
 #import "WXSDKInstance.h"
 #import "WXSDKInstance_private.h"
 #import "WXSDKManager.h"
+#import "WXSDKError.h"
+#import "WXMonitor.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXNetworkProtocol.h"
 #import "WXModuleFactory.h"
@@ -17,6 +19,7 @@
 #import "WXUtility.h"
 #import "WXLog.h"
 #import "WXView.h"
+#import "WXThreadSafeMutableDictionary.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -50,8 +53,8 @@ NSTimeInterval JSLibInitTime = 0;
         
         _bizType = @"";
         _pageName = @"";
-        _screenRenderTime = 0;
 
+        _performanceDict = [WXThreadSafeMutableDictionary new];
         _moduleInstances = [NSMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
@@ -70,7 +73,6 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data
 {
-    WXLogInfo(@"Render URL: %@", url);
     if (!url) {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
@@ -81,7 +83,7 @@ NSTimeInterval JSLibInitTime = 0;
     newOptions[bundleUrlOptionKey] = url.absoluteString;
     
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = url.absoluteString ? : @"";
+        self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
     }
     
     __weak typeof(self) weakSelf = self;
@@ -101,7 +103,8 @@ NSTimeInterval JSLibInitTime = 0;
             [weakSelf renderView:script options:newOptions data:data];
         });
     } else {
-        NSDate *networkStart = [NSDate date];
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
+        
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
         
@@ -118,12 +121,14 @@ NSTimeInterval JSLibInitTime = 0;
             //TODO 304
             if (!error && [urlResponse isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)urlResponse).statusCode != 200) {
                 error = [NSError errorWithDomain:WX_ERROR_DOMAIN
-                                                     code:((NSHTTPURLResponse *)urlResponse).statusCode
-                                                 userInfo:@{@"message":@"status code error."}];
+                                            code:((NSHTTPURLResponse *)urlResponse).statusCode
+                                        userInfo:@{@"message":@"status code error."}];
             }
             
             if (error) {
-                WXLogError(@"Connection to %@ occurs an error:%@", request.URL, error);
+                NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ occurs an error:%@", request.URL, error.localizedDescription];
+                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+                
                 if (weakSelf.onFailed) {
                     weakSelf.onFailed(error);
                 }
@@ -131,15 +136,24 @@ NSTimeInterval JSLibInitTime = 0;
             }
                        
             if (!totalData) {
-                WXLogError(@"Connection to %@ but no data return", request.URL);
+                NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ but no data return", request.URL];
+                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+                
                 if (weakSelf.onFailed) {
                     weakSelf.onFailed(error);
                 }
                 return;
             }
-                   
+                       
             NSString *script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
-            weakSelf.networkTime = -[networkStart timeIntervalSinceNow];
+            if (!script) {
+                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", weakSelf.pageName)
+                return;
+            }
+            
+            WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, weakSelf.pageName);
+            WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, weakSelf);
+
             [weakSelf renderView:script options:newOptions data:data];
         }];
     }
@@ -147,17 +161,24 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
 {
-    WXLogVerbose(@"Render view: %@, data:%@", self, [WXUtility JSONString:data]);
+    WXLogDebug(@"Render view: %@, data:%@", self, [WXUtility JSONString:data]);
     
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
     }
     
-    _renderStartDate = [NSDate new];
+    if (self.pageName && ![self.pageName isEqualToString:@""]) {
+        WXLog(@"Start rendering page:%@", self.pageName);
+    } else {
+        WXLogWarning(@"WXSDKInstance's pageName should be specified.");
+    }
+    
+    WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
+    WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
     
     NSMutableDictionary *dictionary = [options mutableCopy];
-    if ([WXLog logLevel] >= WXLogLevelVerbose) {
+    if ([WXLog logLevel] >= WXLogLevelLog) {
         dictionary[@"debug"] = @(YES);
     }
     
@@ -172,16 +193,25 @@ NSTimeInterval JSLibInitTime = 0;
             self.onCreate(self.rootView);
         }
     });
-    
+
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:source options:dictionary data:data];
-    
-    self.JSTemplateSize = [source lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+
+    WX_MONITOR_PERF_SET(WXPTBundleSize, [source lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
 - (void)setFrame:(CGRect)frame
 {
-    _frame = frame;
-//    [self.componentManager changeRootFrame];
+    if (!CGRectEqualToRect(frame, _frame)) {
+        _frame = frame;
+        WXPerformBlockOnMainThread(^{
+            if (self.rootView) {
+                self.rootView.frame = frame;
+                WXPerformBlockOnComponentThread(^{
+                    [self.componentManager rootViewFrameDidChange:frame];
+                });
+            }
+        });
+    }
 }
 
 - (void)reloadData:(id)data
@@ -191,7 +221,7 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (void)refreshInstance:(id)data
 {
-    WXLogVerbose(@"refresh instance: %@, data:%@", self, [WXUtility JSONString:data]);
+    WXLogDebug(@"refresh instance: %@, data:%@", self, [WXUtility JSONString:data]);
     
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -209,12 +239,13 @@ NSTimeInterval JSLibInitTime = 0;
     }
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-    
+
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
-        [weakSelf.componentManager unload];
+        __strong typeof(self) strongSelf = weakSelf;
+        [strongSelf.componentManager unload];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [WXSDKManager removeInstanceforID:weakSelf.instanceId];
+            [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         });
     });
 }
@@ -227,8 +258,10 @@ NSTimeInterval JSLibInitTime = 0;
     }
     
     NSMutableDictionary *data = [NSMutableDictionary dictionary];
-    [data setObject:[NSNumber numberWithLong:state] forKey:@"state"];
-    [[WXSDKManager bridgeMgr] updateState:self.instanceId data:data];
+    [data setObject:[NSString stringWithFormat:@"%ld",(long)state] forKey:@"state"];
+    //[[WXSDKManager bridgeMgr] updateState:self.instanceId data:data];
+    
+    [[NSNotificationCenter defaultCenter]postNotificationName:WX_INSTANCE_NOTIFICATION_UPDATE_STATE object:self userInfo:data];
 }
 
 - (id)moduleForClass:(Class)moduleClass
@@ -249,48 +282,29 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (WXComponent *)componentForRef:(NSString *)ref
 {
-    return [self.componentManager componentForRef:ref];
+    return [_componentManager componentForRef:ref];
+}
+
+- (NSUInteger)numberOfComponents
+{
+    return [_componentManager numberOfComponents];
 }
 
 - (void)finishPerformance
 {
-    NSTimeInterval totalTime = 0;
-    if (_renderStartDate) {
-        totalTime = [[NSDate new] timeIntervalSinceDate:_renderStartDate];
-    }
-    else {
-        NSAssert(NO, @"");
-    }
-    
-    NSDictionary* dict = @{BIZTYPE:self.bizType,
-                           PAGENAME:self.pageName,
-                           WXSDKVERSION:WX_SDK_VERSION,
-                           JSLIBVERSION:WX_JS_FRAMEWORK_VERSION,
-                           NETWORKTIME:@(_networkTime * 1000),
-                           COMMUNICATETIME:[NSNumber numberWithDouble:_communicateTime * 1000],
-                           JSLIBINITTIME:[NSNumber numberWithDouble:JSLibInitTime * 1000],
-                           JSTEMPLATESIZE:@(self.JSTemplateSize),
-                           SCREENRENDERTIME:[NSNumber numberWithDouble:(_screenRenderTime > 0 ? _screenRenderTime : totalTime) * 1000],
-                           TOTALTIME:[NSNumber numberWithDouble:totalTime * 1000]
-                           };
-    WXLogInfo(@"Performance: %@", dict);
-    
-    id<WXAppMonitorProtocol> appMonitor = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
-    if (appMonitor && [appMonitor respondsToSelector:@selector(commitAppMonitorArgs:)]){
-        [appMonitor commitAppMonitorArgs:dict];
-    }
+    //deperacated
 }
 
 #pragma mark Private Methods
 
 - (void)addObservers
 {
-//    [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
+    [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)removeObservers
 {
-//    [self removeObserver:self forKeyPath:@"state"];
+    [self removeObserver:self forKeyPath:@"state"];
 }
 
 - (WXComponentManager *)componentManager

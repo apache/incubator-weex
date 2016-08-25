@@ -228,7 +228,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WXStyle extends ConcurrentHashMap<String, Object> {
 
   private static final long serialVersionUID = 611132641365274134L;
-  static final int UNSET = -1;
+  public static final int UNSET = -1;
   /*
    * text-decoration
    **/

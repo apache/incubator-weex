@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.http;
 
+import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -212,6 +213,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.*;
+import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -239,7 +241,7 @@ public class WXStreamModule extends WXModule {
   /**
    * send HTTP request
    *
-   * @param params   {method:POST/GET,url:http://xxx,header:{key:value},
+   * @param params   {method:POST/GET/PUT/DELETE/HEAD/PATCH,url:http://xxx,header:{key:value},
    *                 body:{key:value}}
    * @param callback formate：handler(err, response)
    */
@@ -252,11 +254,18 @@ public class WXStreamModule extends WXModule {
     String url = paramsObj.getString("url");
     JSONObject headers = paramsObj.getJSONObject("header");
     String body = paramsObj.getString("body");
+    int timeout = paramsObj.getIntValue("timeout");
 
     Options.Builder builder = new Options.Builder()
-            .setMethod(!"GET".equals(method)&&!"POST".equals(method)?"GET":method)
+            .setMethod(!"GET".equals(method)
+                    &&!"POST".equals(method)
+                    &&!"PUT".equals(method)
+                    &&!"DELETE".equals(method)
+                    &&!"HEAD".equals(method)
+                    &&!"PATCH".equals(method)?"GET":method)
             .setUrl(url)
-            .setBody(body);
+            .setBody(body)
+            .setTimeout(timeout);
 
     extractHeaders(headers,builder);
     sendRequest(builder.createOptions(), new ResponseCallback() {
@@ -266,7 +275,7 @@ public class WXStreamModule extends WXModule {
           WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback,
             (response == null || response.originalData == null) ? "{}" :
               readAsString(response.originalData,
-                headers!=null?headers.get("Content-Type"):""
+                headers!=null?getHeader(headers,"Content-Type"):""
               ));
       }
     }, null);
@@ -275,7 +284,7 @@ public class WXStreamModule extends WXModule {
   /**
    *
    * @param optionsStr request options include:
-   *  method: GET 、POST
+   *  method: GET 、POST、PUT、DELETE、HEAD、PATCH
    *  headers：object，请求header
    *  url:
    *  body: "Any body that you want to add to your request"
@@ -301,7 +310,7 @@ public class WXStreamModule extends WXModule {
     try {
       optionsObj = JSON.parseObject(optionsStr);
     }catch (JSONException e){
-      e.printStackTrace();
+      WXLogUtils.e("", e);
     }
 
     boolean invaildOption = optionsObj==null || optionsObj.getString("url")==null;
@@ -319,15 +328,23 @@ public class WXStreamModule extends WXModule {
     JSONObject headers = optionsObj.getJSONObject("headers");
     String body = optionsObj.getString("body");
     String type = optionsObj.getString("type");
+    int timeout = optionsObj.getIntValue("timeout");
 
     Options.Builder builder = new Options.Builder()
-            .setMethod(!"GET".equals(method)&&!"POST".equals(method)?"GET":method)
+            .setMethod(!"GET".equals(method)
+                    &&!"POST".equals(method)
+                    &&!"PUT".equals(method)
+                    &&!"DELETE".equals(method)
+                    &&!"HEAD".equals(method)
+                    &&!"PATCH".equals(method)?"GET":method)
             .setUrl(url)
             .setBody(body)
-            .setType(type);
+            .setType(type)
+            .setTimeout(timeout);
 
     extractHeaders(headers,builder);
-    sendRequest(builder.createOptions(), new ResponseCallback() {
+    final Options options = builder.createOptions();
+    sendRequest(options, new ResponseCallback() {
       @Override
       public void onResponse(WXResponse response, Map<String, String> headers) {
         if(callback != null) {
@@ -342,10 +359,10 @@ public class WXStreamModule extends WXModule {
             if (response.originalData == null) {
               resp.put("data", null);
             } else {
-              resp.put("data",
-                readAsString(response.originalData,
-                  headers!=null?headers.get("Content-Type"):""
-                ));
+              String respData = readAsString(response.originalData,
+                headers!=null?getHeader(headers,"Content-Type"):""
+              );
+              resp.put("data",parseJson(respData,options.getType()));
             }
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
@@ -355,6 +372,39 @@ public class WXStreamModule extends WXModule {
       }
     }, progressCallback);
   }
+
+  Object parseJson(String data,Options.Type type){
+    if( type == Options.Type.json){
+      return JSONObject.parse(data);
+    }else if( type == Options.Type.jsonp){
+      if(data == null || data.isEmpty()) {
+        return new JSONObject();
+      }
+      int b = data.indexOf("(")+1;
+      int e = data.lastIndexOf(")");
+      if(b ==0 || b >= e || e <= 0){
+        return new JSONObject();
+      }
+
+      data = data.substring(b,e);
+      return JSONObject.parse(data);
+    }else {
+      return data;
+    }
+  }
+
+  static String getHeader(Map<String,String> headers,String key){
+    if(headers == null||key == null){
+      return null;
+    }
+    if(headers.containsKey(key)){
+      return headers.get(key);
+    }else{
+      return headers.get(key.toLowerCase());
+    }
+  }
+
+
 
   static String readAsString(byte[] data,String cType){
     String charset = "utf-8";
@@ -367,7 +417,7 @@ public class WXStreamModule extends WXModule {
     try {
       return new String(data,charset);
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      WXLogUtils.e("", e);
       return new String(data);
     }
   }
@@ -389,6 +439,7 @@ public class WXStreamModule extends WXModule {
     wxRequest.method = options.getMethod();
     wxRequest.url = options.getUrl();
     wxRequest.body = options.getBody();
+    wxRequest.timeoutMs = options.getTimeout();
 
     if(options.getHeaders()!=null)
     if (wxRequest.paramMap == null) {

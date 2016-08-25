@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class WXSDKInstance;
+
 @interface WXSDKEngine : NSObject
 
 /**
@@ -73,17 +75,36 @@
 + (void)unload;
 
 /**
+ * @abstract restart Weex Engine.
+ **/
++ (void)restart;
+
+/**
  * @abstract Returns the version of SDK
  *
  **/
 + (NSString*)SDKEngineVersion;
 
 /**
- * @abstract Connects to websocket for debugging
+ * @abstract The Instance at the top of the rendering stack. 
+ *
+ **/
++ (WXSDKInstance *)topInstance;
+
+/**
+ * @abstract Connects to websocket for collecting log
  *
  * @param URL The URL of websocket to connect
  *
  */
 + (void)connectDebugServer:(NSString*)URL;
+
+/**
+ * @abstract Connects to websocket for devtool debug
+ *
+ * @param URL The URL of websocket to connect
+ *
+ */
++ (void)connectDevToolServer:(NSString *)URL;
 
 @end

@@ -215,12 +215,27 @@ import java.util.ArrayList;
 /**
  * All container components must implement this class
  */
-public abstract class WXVContainer extends WXComponent {
+public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
-  protected ArrayList<WXComponent> mChildren;
+  private static final String TAG="WXVContainer";
+  protected ArrayList<WXComponent> mChildren = new ArrayList<>();
+
+  @Deprecated
+  public WXVContainer(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
+    this(instance,dom,parent,isLazy);
+  }
 
   public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
+  }
+
+  /**
+   * use {@link #getHostView()} instead
+   * @return
+   */
+  @Deprecated
+  public ViewGroup getView(){
+    return mHost;
   }
 
   @Override
@@ -276,14 +291,9 @@ public abstract class WXVContainer extends WXComponent {
     for (int i = 0; i < count; ++i) {
       getChild(i).createViewImpl(this, i);
     }
-    if(getView()!=null){
-       getView().setClipToPadding(false);
+    if(getHostView()!=null){
+       getHostView().setClipToPadding(false);
     }
-  }
-
-  @Override
-  public ViewGroup getView() {
-    return (ViewGroup) super.getView();
   }
 
   @Override
@@ -318,6 +328,10 @@ public abstract class WXVContainer extends WXComponent {
     return mChildren.get(index);
   }
 
+  public int getChildCount() {
+    return mChildren.size();
+  }
+
   public void addChild(WXComponent child) {
     addChild(child, -1);
   }
@@ -325,9 +339,6 @@ public abstract class WXVContainer extends WXComponent {
   public void addChild(WXComponent child, int index) {
     if (child == null || index < -1) {
       return;
-    }
-    if (mChildren == null) {
-      mChildren = new ArrayList<>();
     }
     int count = mChildren.size();
     index = index >= count ? -1 : index;
@@ -365,12 +376,26 @@ public abstract class WXVContainer extends WXComponent {
     if(mInstance!=null
             &&mInstance.getRootView()!=null
             && child.mDomObj.isFixed()){
-      mInstance.getRootView().removeView(child.getView());
+      mInstance.getRootView().removeView(child.getHostView());
     }else if(getRealView() != null) {
-      getRealView().removeView(child.getView());
+      getRealView().removeView(child.getHostView());
     }
     if(destroy) {
       child.destroy();
+    }
+  }
+
+  @Override
+  public void notifyAppearStateChange(String wxEventType, String direction) {
+    super.notifyAppearStateChange(wxEventType, direction);
+    if(getHostView()==null || mChildren==null){
+      return;
+    }
+    for(WXComponent component:mChildren){
+      if(component.getHostView()!=null && !(component.getHostView().getVisibility()==View.VISIBLE)){
+        wxEventType=WXEventType.DISAPPEAR;
+      }
+      component.notifyAppearStateChange(wxEventType,direction);
     }
   }
 }

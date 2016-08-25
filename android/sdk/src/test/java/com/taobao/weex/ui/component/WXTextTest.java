@@ -212,7 +212,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 
-import com.taobao.weex.ui.ComponentHolder;
+import com.taobao.weex.ui.SimpleComponentHolder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -265,33 +265,33 @@ public class WXTextTest {
         mParent = new WXDiv(instance, mParentDomObj, null, false);
         mParent.createView(null, -1);
         mWXText = new WXText(instance, mDomObject, mParent, false);
-        mWXText.setHolder(new ComponentHolder(WXText.class));
+        mWXText.bindHolder(new SimpleComponentHolder(WXText.class));
         assertNotNull(instance.getContext());
     }
 
     @Test
     public void testCreateView(){
         mWXText.createView(mParent, -1);
-        assertNotNull(mWXText.getView());
+        assertNotNull(mWXText.getHostView());
     }
 
     @Test
     public void testSetLayout(){
         testCreateView();
         mWXText.setLayout(mDomObject);
-        assertNotNull(mWXText.getView().getLayoutParams());
-        assertEquals(100, mWXText.getView().getLayoutParams().height);
-        assertEquals(100, mWXText.getView().getLayoutParams().width);
+        assertNotNull(mWXText.getHostView().getLayoutParams());
+        assertEquals(100, mWXText.getHostView().getLayoutParams().height);
+        assertEquals(100, mWXText.getHostView().getLayoutParams().width);
     }
 
     @Test
     public void testSetPadding(){
         testCreateView();
         mWXText.setPadding(mDomObject.getPadding(), mDomObject.getBorder());
-        assertEquals(0, mWXText.getView().getPaddingLeft());
-        assertEquals(0, mWXText.getView().getPaddingTop());
-        assertEquals(0, mWXText.getView().getPaddingRight());
-        assertEquals(0, mWXText.getView().getPaddingBottom());
+        assertEquals(0, mWXText.getHostView().getPaddingLeft());
+        assertEquals(0, mWXText.getHostView().getPaddingTop());
+        assertEquals(0, mWXText.getHostView().getPaddingRight());
+        assertEquals(0, mWXText.getHostView().getPaddingBottom());
     }
 
     @Test
@@ -301,22 +301,22 @@ public class WXTextTest {
         mWXText.applyLayoutAndEvent(mWXText);
         mWXText.bindData(mWXText);
 
-        assertNotNull(mWXText.getView().getLayoutParams());
-        assertEquals(100, mWXText.getView().getLayoutParams().height);
-        assertEquals(100, mWXText.getView().getLayoutParams().width);
+        assertNotNull(mWXText.getHostView().getLayoutParams());
+        assertEquals(100, mWXText.getHostView().getLayoutParams().height);
+        assertEquals(100, mWXText.getHostView().getLayoutParams().width);
 
-        assertEquals(0, mWXText.getView().getPaddingLeft());
-        assertEquals(0, mWXText.getView().getPaddingTop());
-        assertEquals(0, mWXText.getView().getPaddingRight());
-        assertEquals(0, mWXText.getView().getPaddingBottom());
+        assertEquals(0, mWXText.getHostView().getPaddingLeft());
+        assertEquals(0, mWXText.getHostView().getPaddingTop());
+        assertEquals(0, mWXText.getHostView().getPaddingRight());
+        assertEquals(0, mWXText.getHostView().getPaddingBottom());
     }
 
     @Test
     public void testAddEvent(){
         testBind();
         mWXText.addEvent(WXEventType.CLICK);
-        assertTrue(mWXText.getView().isEnabled());
-        mWXText.getView().performClick();
+        assertTrue(mWXText.getHostView().isEnabled());
+        mWXText.getHostView().performClick();
     }
 
     @Test
@@ -326,11 +326,11 @@ public class WXTextTest {
         prop.put(WXDomPropConstant.WX_ATTR_DISABLED, "false");
         prop.put(WXDomPropConstant.WX_OPACITY, 0.8f);
         mWXText.updateProperties(prop);
-        assertTrue(mWXText.getView().isEnabled());
-        assertTrue(mWXText.getView().getAlpha()>=0.799 && mWXText.getView().getAlpha()<=0.811);
+        assertTrue(mWXText.getHostView().isEnabled());
+        assertTrue(mWXText.getHostView().getAlpha()>=0.799 && mWXText.getHostView().getAlpha()<=0.811);
 
         prop.put(WXDomPropConstant.WX_ATTR_DISABLED, "true");
         mWXText.updateProperties(prop);
-        assertFalse(mWXText.getView().isEnabled());
+        assertFalse(mWXText.getHostView().isEnabled());
     }
 }

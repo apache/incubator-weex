@@ -13,6 +13,9 @@
 #import "WXUtility.h"
 #import "WXSDKEngine.h"
 #import "WXSDKError.h"
+#import "WXMonitor.h"
+#import "WXAppMonitorProtocol.h"
+#import "WXHandlerFactory.h"
 #import <sys/utsname.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
@@ -37,21 +40,23 @@
         _jsContext[@"WXEnvironment"] = data;
         
         _jsContext[@"setTimeout"] = ^(JSValue* function, JSValue* timeout) {
+            // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
             [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
                 [function callWithArguments:@[]];
             } afterDelay:[timeout toDouble] / 1000];
         };
-
+    
         _jsContext[@"nativeLog"] = ^() {
             static NSDictionary *levelMap;
             static dispatch_once_t onceToken;
             dispatch_once(&onceToken, ^{
                 levelMap = @{
-                             @"__ERROR":@(WXLogFlagError),
+                             @"__ERROR": @(WXLogFlagError),
                              @"__WARN": @(WXLogFlagWarning),
+                             @"__LOG": @(WXLogFlagInfo),
                              @"__INFO": @(WXLogFlagInfo),
                              @"__DEBUG": @(WXLogFlagDebug),
-                             @"__VERBOSE": @(WXLogFlagVerbose)
+                             @"__LOG": @(WXLogFlagLog)
                              };
             });
             
@@ -63,6 +68,12 @@
                 if (idx == args.count - 1) {
                     NSNumber *flag = levelMap[[jsVal toString]];
                     if (flag) {
+                        if ([flag isEqualToNumber:[NSNumber numberWithInteger:WXLogFlagWarning]]) {
+                            id<WXAppMonitorProtocol> appMonitorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
+                            if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
+                                [appMonitorHandler commitAppMonitorAlarm:[WXSDKEngine topInstance].pageName monitorPoint:@"jswarning" success:FALSE errorCode:@"99999" errorMsg:string arg:@"weex"];
+                            }
+                        }
                         WX_LOG([flag unsignedIntegerValue], @"%@", string);
                     } else {
                         [string appendFormat:@"%@ ", jsVal];
@@ -77,7 +88,7 @@
             context.exception = exception;
             NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:WX_JS_ERROR_NOTIFICATION_NAME object:weakSelf userInfo:message ? @{@"message":message} : nil];
+            WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
         };
     }
     return self;
@@ -88,25 +99,24 @@
 - (void)executeJSFramework:(NSString *)frameworkScript
 {
     WXAssertParam(frameworkScript);
-    
     [_jsContext evaluateScript:frameworkScript];
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args
 {
-    WXLogVerbose(@"Calling JS... method:%@, args:%@", method, args);
-    
+    WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
     [[_jsContext globalObject] invokeMethod:method withArguments:args];
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
 {
-    void (^callNativeBlock)(JSValue *, JSValue *, JSValue *) = ^(JSValue *instance, JSValue *tasks, JSValue *callback){
+    NSInteger (^callNativeBlock)(JSValue *, JSValue *, JSValue *) = ^(JSValue *instance, JSValue *tasks, JSValue *callback){
         NSString *instanceId = [instance toString];
         NSArray *tasksArray = [tasks toArray];
         NSString *callbackId = [callback toString];
-        WXLogVerbose(@"Calling native... instance:%@, tasks:%@, callback:%@", instanceId, tasksArray, callbackId);
-        callNative(instanceId, tasksArray, callbackId);
+        
+        WXLogDebug(@"Calling native... instance:%@, tasks:%@, callback:%@", instanceId, tasksArray, callbackId);
+        return callNative(instanceId, tasksArray, callbackId);
     };
     
     _jsContext[@"callNative"] = callNativeBlock;
