@@ -202,37 +202,64 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.list;
 
-import android.view.ViewGroup;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
- * Created by sospartan on 7/5/16.
+ * Created by sospartan on 8/19/16.
  */
-public interface Scrollable {
+class AppearanceAwareChild {
 
-  void bindStickStyle(WXComponent component);
+  private final WXComponent mListDirectChild;
+  private final WXComponent mAwareChild;
 
-  void unbindStickStyle(WXComponent component);
+  private boolean mAppearStatus = false;
+  private boolean[] mWatchFlags = {false,false};
 
-  void bindAppearEvent(WXComponent component);
+  public static final int APPEAR = 0;
+  public static final int DISAPPEAR = 1;
 
-  void bindDisappearEvent(WXComponent component);
+  /**
+   * @param listDirectChild direct child of list,for locate index.
+   * @param awareChild      child to notify when appearance changed.
+   */
+  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild) {
+    mListDirectChild = listDirectChild;
+    mAwareChild = awareChild;
+  }
 
-  void unbindAppearEvent(WXComponent component);
+  /**
+   *
+   * @param event  {@link #APPEAR} and {@link #DISAPPEAR}
+   * @param enable
+   */
+  public void setEnableEvent(int event,boolean enable){
+      mWatchFlags[event] = enable;
+  }
 
-  void unbindDisappearEvent(WXComponent component);
+  /**
+   *
+   * @param event
+   * @return
+   */
+  public boolean isWatch(int event){
+    return mWatchFlags[event];
+  }
 
-  ViewGroup getView();
+  public WXComponent getListDirectChild() {
+    return mListDirectChild;
+  }
 
-  void scrollTo(WXComponent component, int offset);
+  public WXComponent getAwareChild() {
+    return mAwareChild;
+  }
 
-  String getRef();
+  public boolean isAppear() {
+    return mAppearStatus;
+  }
 
-  int getScrollY();
-
-  int getScrollX();
+  public void setAppearStatus(boolean appearStatus) {
+    this.mAppearStatus = appearStatus;
+  }
 }
