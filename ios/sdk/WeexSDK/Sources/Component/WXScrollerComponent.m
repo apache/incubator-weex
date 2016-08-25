@@ -471,13 +471,23 @@
 - (void)scrollToTarget:(WXScrollToTarget *)target scrollRect:(CGRect)rect
 {
     WXComponent *component = target.target;
-    CGFloat ctop = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].y;
+    
+    CGFloat ctop;
+    if (component.supercomponent) {
+        ctop = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].y;
+    } else {
+        ctop = 0.0;
+    }
     CGFloat cbottom = ctop + CGRectGetHeight(component.calculatedFrame);
-    CGFloat cleft = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].x;
+    CGFloat cleft;
+    if (component.supercomponent) {
+        cleft = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].x;
+    } else {
+        cleft = 0.0;
+    }
     CGFloat cright = cleft + CGRectGetWidth(component.calculatedFrame);
     
     CGFloat vtop = CGRectGetMinY(rect), vbottom = CGRectGetMaxY(rect), vleft = CGRectGetMinX(rect), vright = CGRectGetMaxX(rect);
-    
     if(cbottom > vtop && ctop <= vbottom && cleft <= vright && cright > vleft){
         if(!target.hasAppear && component){
             target.hasAppear = YES;
@@ -543,7 +553,9 @@
         _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
         
         layoutNode(_scrollerCSSNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-//        print_css_node(_scrollerCSSNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+        if ([WXLog logLevel] >= WXLogLevelDebug) {
+            print_css_node(_scrollerCSSNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+        }
         CGSize size = {
             WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_WIDTH]),
             WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_HEIGHT])

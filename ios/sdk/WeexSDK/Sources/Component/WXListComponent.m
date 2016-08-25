@@ -190,6 +190,35 @@
     // Do Nothing， firstScreenTime is set by cellDidRendered:
 }
 
+- (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset
+{
+    CGPoint contentOffset = _tableView.contentOffset;
+    CGFloat contentOffsetY = 0;
+    
+    WXComponent *cellComponent = component;
+    while (cellComponent) {
+        if ([cellComponent isKindOfClass:[WXCellComponent class]]) {
+            break;
+        }
+        contentOffsetY += cellComponent.calculatedFrame.origin.y;
+        cellComponent = cellComponent.supercomponent;
+    }
+    
+    NSIndexPath *toIndexPath = [self indexPathForCell:cellComponent sections:_completedSections];
+    CGRect cellRect = [_tableView rectForRowAtIndexPath:toIndexPath];
+    contentOffsetY += cellRect.origin.y;
+    contentOffsetY += offset * WXScreenResizeRadio();
+    
+    if (contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
+        contentOffset.y = _tableView.contentSize.height - _tableView.frame.size.height;
+    } else {
+        contentOffset.y = contentOffsetY;
+    }
+    
+    [_tableView setContentOffset:contentOffset animated:YES];
+}
+
+
 #pragma mark - Inheritance
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
