@@ -134,6 +134,7 @@ import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.*;
+import com.taobao.weex.ui.IExternalComponentGetter;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -362,6 +363,10 @@ public class WXSDKEngine {
     return registerComponent(clazz, appendTree,type);
   }
 
+  public static boolean registerComponent(String type, IExternalComponentGetter componentGetter, boolean appendTree) throws WXException {
+    return registerComponent(componentGetter.getExternalComponentClass(type), appendTree,type);
+  }
+
   /**
    *
    * Register component. The registration is singleton in {@link WXSDKEngine} level
@@ -378,6 +383,7 @@ public class WXSDKEngine {
     SimpleComponentHolder holder = new SimpleComponentHolder(clazz);
     return registerComponent(clazz,holder,appendTree,names);
   }
+
 
   static boolean registerComponent(Class<? extends WXComponent> clazz, IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
     boolean result =  true;
