@@ -855,15 +855,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
       scroller.unbindDisappearEvent(this);
     }
-
-    if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
-    }
-    if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
-    }
   }
 
   public final void removeAllEvent() {

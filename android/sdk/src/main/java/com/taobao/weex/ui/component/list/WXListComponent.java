@@ -263,7 +263,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
     private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
-    private List<WXComponent> mAppearComponents = new ArrayList<>();
+    private Map<String,AppearanceAwareChild> mAppearComponents = new HashMap<>();
     private ArrayMap<String, Long> mRefToViewType;
     private SparseArray<ArrayList<WXComponent>> mViewTypes;
 
@@ -1006,6 +1006,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         item.setAppearStatus(false);
       }
     }
+  }
 
     private void recycleImage(View view) {
         if (view instanceof ImageView) {
