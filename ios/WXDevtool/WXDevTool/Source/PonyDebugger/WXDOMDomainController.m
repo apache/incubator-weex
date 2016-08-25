@@ -1133,14 +1133,8 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 - (void)removeVDomTreeWithView:(UIView *)view
 {
     NSString *ref = view.wx_ref;
-    NSNumber *nodeId = nil;
-    if ([ref isEqualToString:@"_root"]) {
-        nodeId = @(2);
-    }else {
-        nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
-    }
-//    NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
     if (ref) {
+        NSNumber *nodeId = [self _getRealNodeIdWithComponentRef:ref];
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
         ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
         if ([viewRefs objectForKey:ref] && [viewRefs objectForKey:ref] == view) {
@@ -1152,7 +1146,7 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         }
         if (self.componentForRefs.count > 0) {
             if ([self.componentForRefs objectForKey:ref]) {
-                [self addWXComponentRef:ref withInstanceId:nil];
+                [self removeWXComponentRef:ref withInstanceId:nil];
             }
         }
     }
