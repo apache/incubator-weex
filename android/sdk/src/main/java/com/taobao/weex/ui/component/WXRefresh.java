@@ -218,6 +218,9 @@ import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * div component
  */
@@ -241,6 +244,17 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   public void onRefresh() {
     if (mDomObj.getEvents().contains(Constants.Event.ONREFRESH)) {
       WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.ONREFRESH);
+    }
+  }
+
+  @Override
+  public void onPullingDown(float dy, int headerHeight, float maxHeight) {
+    if (mDomObj.event != null && mDomObj.event.contains(Constants.Event.ONPULLING_DOWN)) {
+      Map<String, Object> data = new HashMap<>();
+      data.put("dy", dy);
+      data.put("headerHeight", headerHeight);
+      data.put("maxHeight", maxHeight);
+      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.ONPULLING_DOWN, data);
     }
   }
 
