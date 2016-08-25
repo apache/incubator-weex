@@ -998,11 +998,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       int key = mChildren.indexOf(directChild);
       if (key >= firstVisible && key <= lastVisible && !item.isAppear()) {
         String direction = directionY > 0 ? "up" : "down";
-        awareChild.notifyAppearStateChange(Constants.Event.APPEAR, direction);
+        awareChild.notifyAppearStateChange(WXEventType.APPEAR, direction);
         item.setAppearStatus(true);
       } else if ((key < firstVisible || key > lastVisible) && item.isAppear()) {
         String direction = directionY > 0 ? "up" : "down";
-        awareChild.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
+        awareChild.notifyAppearStateChange(WXEventType.DISAPPEAR, direction);
         item.setAppearStatus(false);
       }
     }
