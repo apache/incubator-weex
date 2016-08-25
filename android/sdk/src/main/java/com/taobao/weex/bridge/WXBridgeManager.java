@@ -480,6 +480,7 @@ public class WXBridgeManager implements Callback {
             if (TextUtils.equals(WXDomModule.WXDOM, (String) task.get(WXDomModule.MODULE))) {
               sDomModule = getDomModule(instanceId);
               sDomModule.callDomMethod(task);
+              sDomModule.mWXSDKInstance = null;
             } else {
               WXModuleManager.callModuleMethod(instanceId, (String) task.get(WXDomModule.MODULE),
                       (String) task.get(WXDomModule.METHOD), (JSONArray) task.get(WXDomModule.ARGS));
