@@ -208,8 +208,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -225,7 +225,6 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.component.helper.WXStickyHelper;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
@@ -264,7 +263,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
-  private List<AppearanceAwareChild> mAppearComponents = new ArrayList<>();
+  private Map<String,AppearanceAwareChild> mAppearComponents = new HashMap<>();
   private ArrayMap<String, Long> mRefToViewType;
   private SparseArray<ArrayList<WXComponent>> mViewTypes;
 
@@ -441,24 +440,56 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       stickyHelper.unbindStickStyle(component,mStickyMap);
   }
 
-  @Override
-  public void bindAppearEvent(WXComponent component) {
-//TODO
+  private @Nullable WXComponent findDirectListChild(WXComponent comp){
+    WXComponent parent;
+    if(comp == null || (parent = comp.getParent()) == null){
+      return null;
+    }
+
+    if(parent instanceof WXListComponent){
+      return comp;
+    }
+
+    return findDirectListChild(parent);
+  }
+
+  private void setAppearanceWatch(WXComponent component, int event, boolean enable){
+    AppearanceAwareChild item = mAppearComponents.get(component.getRef());
+    if(item != null){
+      item.setEnableEvent(event,enable);
+    }else if(!enable){
+      //Do nothing if disable target not exist.
+      return;
+    } else {
+      WXComponent dChild = findDirectListChild(component);
+      if (dChild != null) {
+        item = new AppearanceAwareChild(dChild, component);
+        item.setEnableEvent(event,enable);
+        mAppearComponents.put(component.getRef(), item);
+      }
+    }
   }
 
   @Override
+  public void bindAppearEvent(WXComponent component) {
+    setAppearanceWatch(component,AppearanceAwareChild.APPEAR,true);
+  }
+
+
+
+  @Override
   public void bindDisappearEvent(WXComponent component) {
-//TODO
+    setAppearanceWatch(component,AppearanceAwareChild.DISAPPEAR,true);
   }
 
   @Override
   public void unbindAppearEvent(WXComponent component) {
-//TODO
+    setAppearanceWatch(component,AppearanceAwareChild.APPEAR,false);
   }
 
   @Override
   public void unbindDisappearEvent(WXComponent component) {
-//TODO
+    setAppearanceWatch(component,AppearanceAwareChild.DISAPPEAR,false);
   }
 
   @Override
@@ -620,11 +651,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     if(view != null) {
       view.getAdapter().notifyItemInserted(adapterPosition);
     }
-
-    WXComponent awareChild;
-    if((awareChild = findAppearAwareChild(child)) != null){
-      mAppearComponents.add(new AppearanceAwareChild(child,awareChild));
-    }
   }
 
     /**
@@ -659,23 +685,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
         return false;
     }
-
-
-  private WXComponent findAppearAwareChild(WXComponent child) {
-    if (child.getDomObject().containsEvent(Constants.Event.APPEAR)
-        || child.getDomObject().containsEvent(Constants.Event.DISAPPEAR)) {
-      return child;
-    } else if (child instanceof WXVContainer) {
-      WXVContainer container = (WXVContainer) child;
-      for (int i = 0; i < container.childCount(); i++) {
-        WXComponent component = container.getChild(i);
-        return findAppearAwareChild(component);
-      }
-    }
-
-    return null;
-  }
-
 
     /**
      * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,
@@ -977,15 +986,13 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
     //notify appear state
-    Iterator<AppearanceAwareChild> it = mAppearComponents.iterator();
+    Iterator<AppearanceAwareChild> it = mAppearComponents.values().iterator();
     while (it.hasNext()) {
       AppearanceAwareChild item = it.next();
       WXComponent directChild = item.getListDirectChild();
       WXComponent awareChild = item.getAwareChild();
 
-      WXEvent events = awareChild.getDomObject().getEvents();
-      if (!events.contains(Constants.Event.APPEAR) && !events.contains(Constants.Event.DISAPPEAR)) {
-        it.remove();
+      if (!item.isWatch(AppearanceAwareChild.APPEAR) && !item.isWatch(AppearanceAwareChild.DISAPPEAR)) {
         continue;
       }
 
@@ -993,18 +1000,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       if (key >= firstVisible && key <= lastVisible && !item.isAppear()) {
         String direction = directionY > 0 ? "up" : "down";
         awareChild.notifyAppearStateChange(Constants.Event.APPEAR, direction);
-        item.setAppear(true);
+        item.setAppearStatus(true);
       } else if ((key < firstVisible || key > lastVisible) && item.isAppear()) {
         String direction = directionY > 0 ? "up" : "down";
         awareChild.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
-        item.setAppear(false);
+        item.setAppearStatus(false);
       }
     }
   }
-
-  public void unbindAppearComponents(WXComponent component) {
-        mAppearComponents.remove(component);
-    }
 
     private void recycleImage(View view) {
         if (view instanceof ImageView) {
