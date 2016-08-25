@@ -184,9 +184,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public volatile WXVContainer mParent;
   public volatile WXDomObject mDomObj;
   public String mInstanceId;
-  public boolean registerAppearEvent=false;
-  public boolean appearState=false;
   protected int mOrientation = VERTICAL;
+
   protected WXSDKInstance mInstance;
   protected Context mContext;
   protected int mAbsoluteY = 0;
@@ -230,6 +229,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void bindHolder(IFComponentHolder holder){
     mHolder = holder;
+  }
+
+
+  public WXSDKInstance getInstance(){
+    return mInstance;
+  }
+
+  public Context getContext(){
+    return mContext;
   }
 
   /**
@@ -646,13 +654,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         scroller.bindDisappearEvent(this);
       }
 
-      if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
-      }
-      if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
-      }
-
     }
   }
 
@@ -817,15 +818,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     if (type.equals(WXEventType.DISAPPEAR) && scroller != null) {
       scroller.unbindDisappearEvent(this);
-    }
-
-    if(type.equals(WXEventType.APPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
-    }
-    if(type.equals(WXEventType.DISAPPEAR) && getParent() instanceof WXListComponent){
-      ((WXListComponent)getParent()).unbindAppearComponents(this);
-      registerAppearEvent=false;
     }
   }
 
