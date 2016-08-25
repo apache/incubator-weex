@@ -215,6 +215,23 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
 
+  private OnClickListener mClickEventListener = new OnClickListener() {
+    @Override
+    public void onHostViewClick() {
+      Map<String, Object> params = new HashMap<>();
+      int[] location = new int[2];
+      mHost.getLocationOnScreen(location);
+      params.put("x", location[0]);
+      params.put("y", location[1]);
+      params.put("width", mDomObj.getCSSLayoutWidth());
+      params.put("height", mDomObj.getCSSLayoutHeight());
+      WXSDKManager.getInstance().fireEvent(mInstanceId,
+          mDomObj.getRef(),
+          Constants.Event.CLICK,
+          params);
+    }
+  };
+
   interface OnClickListener{
     void onHostViewClick();
   }
@@ -630,22 +647,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     mDomObj.addEvent(type);
     if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
-      addClickListener(new OnClickListener() {
-        @Override
-        public void onHostViewClick() {
-          Map<String, Object> params = new HashMap<>();
-          int[] location = new int[2];
-          mHost.getLocationOnScreen(location);
-          params.put("x", location[0]);
-          params.put("y", location[1]);
-          params.put("width", mDomObj.getCSSLayoutWidth());
-          params.put("height", mDomObj.getCSSLayoutHeight());
-          WXSDKManager.getInstance().fireEvent(mInstanceId,
-              mDomObj.getRef(),
-              Constants.Event.CLICK,
-              params);
-        }
-      });
+      addClickListener(mClickEventListener);
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR)) ) {
       addFocusChangeListener(new OnFocusChangeListener() {
         @Override
@@ -830,8 +832,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   protected void removeEventFromView(String type) {
-    if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
-      getRealView().setOnClickListener(null);
+    if (type.equals(Constants.Event.CLICK) && getRealView() != null && mHostClickListeners != null) {
+      mHostClickListeners.remove(mClickEventListener);
+      //click event only remove from listener array
     }
     Scrollable scroller = getParentScroller();
     if (type.equals(Constants.Event.APPEAR) && scroller != null) {
