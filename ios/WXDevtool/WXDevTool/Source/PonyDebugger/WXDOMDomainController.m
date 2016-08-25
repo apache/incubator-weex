@@ -819,6 +819,7 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     NSArray *subcomponentAry = [NSArray arrayWithArray:self.rootComponent.subcomponents];
     for (id component in subcomponentAry) {
         WXComponent *transComponent = (WXComponent *)component;
+        [self.componentForRefs setObject:transComponent forKey:transComponent.ref];
         WXDOMNode *elementNode = [self nodeForComponent:transComponent];
         [domNodes addObject:elementNode];
     }
@@ -830,8 +831,8 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     // Build the child nodes by recursing on this component's subcomponents
     NSMutableArray *childComponents = [[NSMutableArray alloc] initWithCapacity:component.subcomponents.count];
     for (WXComponent *subComponent in [component.subcomponents reverseObjectEnumerator]) {
-        WXDOMNode *childComponent = [self nodeForComponent:subComponent];
         [self.componentForRefs setObject:subComponent forKey:subComponent.ref];
+        WXDOMNode *childComponent = [self nodeForComponent:subComponent];
         if (childComponent) {
             [childComponents addObject:childComponent];
         }
@@ -877,6 +878,17 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     WXSDKInstance *currentInstance = [WXSDKManager instanceForID:instanceId];
     WXComponent *currentComponent = [currentInstance componentForRef:subRef];
     return currentComponent;
+}
+
+- (NSNumber *)_getRealNodeIdWithComponentRef:(NSString *)ref
+{
+    NSNumber *nodeId = nil;
+    if ([ref isEqualToString:@"_root"]) {
+        nodeId = @(2);
+    } else {
+        nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
+    }
+    return nodeId;
 }
 
 
@@ -1036,10 +1048,9 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         if (corrNodeId) {
             [self.objectsForComponentRefs removeAllObjects];
             [self.instanceIdForRoot removeAllObjects];
+        } else {
+            return;
         }
-    }
-    if (corrNodeId == nil) {
-        return;
     }
     [self.domain childNodeRemovedWithParentNodeId:parentNodeId nodeId:corrNodeId];
 }
@@ -1055,14 +1066,14 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     }
     WXComponent *parentComponent = corrComponent.supercomponent;
     WXComponent *previousComponent = nil;
-    NSNumber *parentNodeId = [NSNumber numberWithFloat:[parentComponent.ref integerValue]];
+    NSNumber *parentNodeId = [self _getRealNodeIdWithComponentRef:parentComponent.ref];
     NSNumber *previousNodeId = nil;
-    if (parentComponent && [self.objectsForComponentRefs objectForKey:parentComponent.ref]) {
+    if (parentComponent && [self.objectsForComponentRefs objectForKey:[NSString stringWithFormat:@"%ld",parentNodeId.integerValue]]) {
         WXDOMNode *node = [self nodeForComponent:corrComponent];
         NSUInteger indexOfComponent = [parentComponent.subcomponents indexOfObject:corrComponent];
         if (indexOfComponent <[parentComponent.subcomponents count] - 1) {
             previousComponent = [parentComponent.subcomponents objectAtIndex:indexOfComponent + 1];
-            previousNodeId = [NSNumber numberWithFloat:[previousComponent.ref integerValue]];
+            previousNodeId = [self _getRealNodeIdWithComponentRef:previousComponent.ref];
         }
         [self.domain childNodeInsertedWithParentNodeId:parentNodeId previousNodeId:previousNodeId node:node];
     } else if ([corrComponent.ref isEqualToString:@"_root"]) {
@@ -1089,7 +1100,7 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
 {
     NSString *ref = view.wx_ref;
     if (ref) {
-        NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
+        NSMutableDictionary *viewRefs = self.objectsForComponentRefs;
         NSNumber *nodeId = nil;
         if ([ref isEqualToString:@"_root"]) {
             nodeId = @(2);
@@ -1109,7 +1120,11 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         [viewRefs setObject:view forKey:[NSString stringWithFormat:@"%ld",[nodeId integerValue]]];
         if (self.componentForRefs.count > 0) {
             if (![self.componentForRefs objectForKey:ref]) {
-                [self addWXComponentRef:nodeIdKey withInstanceId:nil];
+                WXComponent *component = [self _getComponentFromRef:ref];
+                if (component) {
+                    [self.componentForRefs setObject:component forKey:ref];
+                    [self addWXComponentRef:ref withInstanceId:nil];
+                }
             }
         }
     }
@@ -1124,7 +1139,7 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
     }else {
         nodeId = [NSNumber numberWithInteger:[ref integerValue] + 2];
     }
-    NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
+//    NSString *nodeIdKey = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
     if (ref) {
         NSMutableDictionary *viewRefs =  self.objectsForComponentRefs;
         ref = [NSString stringWithFormat:@"%ld",[nodeId integerValue]];
@@ -1137,7 +1152,7 @@ static NSString *const kWXDOMAttributeParsingRegex = @"[\"'](.*)[\"']";
         }
         if (self.componentForRefs.count > 0) {
             if ([self.componentForRefs objectForKey:ref]) {
-                [self addWXComponentRef:nodeIdKey withInstanceId:nil];
+                [self addWXComponentRef:ref withInstanceId:nil];
             }
         }
     }
