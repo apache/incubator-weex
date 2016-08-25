@@ -220,8 +220,8 @@ public class ComponentTest {
   static void create(WXComponent comp){
     TestDomObject domObject = new TestDomObject();
     WXDiv parent = WXDivTest.create();
-    comp.setLayout(domObject);
     comp.createView(parent,1);
+    comp.setLayout(domObject);
 
     domObject = new TestDomObject();
     comp.updateDom(domObject);
