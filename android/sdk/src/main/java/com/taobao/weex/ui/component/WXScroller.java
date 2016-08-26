@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
@@ -236,11 +235,9 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 //import com.taobao.weex.ui.WXRecycleImageManager;
 
@@ -250,6 +247,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewListener,Scrollable {
 
+  public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
 
   public static class Ceator implements ComponentCreator {
@@ -260,16 +258,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   /**
    * Map for storing appear information
    **/
-  private Map<String, ConcurrentHashMap<String, AppearData>> mAppearMap = new ConcurrentHashMap<>();
+  private Map<String,AppearanceHelper> mAppearanceComponents = new HashMap<>();
+
   /**
    * Map for storing component that is sticky.
    **/
   private Map<String, HashMap<String, WXComponent>> mStickyMap = new HashMap<>();
   private FrameLayout mRealView;
-  /**
-   * Location of scrollView
-   **/
-  private Rect mScrollRect;
 
   private int mContentHeight = 0;
 
@@ -390,8 +385,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   public void destroy() {
     super.destroy();
-    if (mAppearMap != null) {
-      mAppearMap.clear();
+    if (mAppearanceComponents != null) {
+      mAppearanceComponents.clear();
     }
     if (mStickyMap != null) {
       mStickyMap.clear();
@@ -437,7 +432,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       scrollView.setScrollViewListener(new WXHorizontalScrollView.ScrollViewListener() {
         @Override
         public void onScrollChanged(WXHorizontalScrollView scrollView, int x, int y, int oldx, int oldy) {
-          procAppear(scrollView,x,y,oldx,oldy);
+          procAppear(x,y,oldx,oldy);
         }
       });
       FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
@@ -550,20 +545,19 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void bindAppearEvent(WXComponent component) {
-    ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getRef());
-    if (appearMap == null) {
-      appearMap = new ConcurrentHashMap<>();
+    setWatch(AppearanceHelper.APPEAR,component,true);
+  }
+
+  private void setWatch(int event,WXComponent component,boolean isWatch){
+    AppearanceHelper item = mAppearanceComponents.get(component.getRef());
+    if (item == null) {
+      item = new AppearanceHelper(component);
+      mAppearanceComponents.put(component.getRef(),item);
     }
 
-    AppearData appearData = appearMap.get(component.getRef());
-    if (appearData == null) {
-      appearData = new AppearData();
-    }
-    appearData.mAppearComponent = component;
-    appearData.hasAppear = true;
-    appearMap.put(component.getRef(), appearData);
-    mAppearMap.put(getRef(), appearMap);
+    item.setWatchEvent(event,isWatch);
+
+    procAppear(1,1,0,0);//check current components appearance status.
   }
 
   /**
@@ -571,20 +565,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void bindDisappearEvent(WXComponent component) {
-    ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(getRef());
-    if (appearMap == null) {
-      appearMap = new ConcurrentHashMap<>();
-    }
-
-    AppearData appearData = appearMap.get(component.getRef());
-    if (appearData == null) {
-      appearData = new AppearData();
-    }
-    appearData.mAppearComponent = component;
-    appearData.hasDisappear = true;
-    appearMap.put(component.getRef(), appearData);
-    mAppearMap.put(getRef(), appearMap);
+    setWatch(AppearanceHelper.DISAPPEAR,component,true);
   }
 
   /**
@@ -592,22 +573,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindAppearEvent(WXComponent component) {
-    View view = getInnerView();
-    if(view == null)
-      return;
-    ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(view);
-    if (appearMap == null) {
-      return;
-    }
-    AppearData appearData = appearMap.get(component.getRef());
-    if (appearData == null) {
-      return;
-    }
-    appearData.hasAppear = false;
-    if (!appearData.hasDisappear) {
-      appearMap.remove(component.getRef());
-    }
+    setWatch(AppearanceHelper.APPEAR,component,false);
   }
 
   /**
@@ -615,22 +581,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   @Override
   public void unbindDisappearEvent(WXComponent component) {
-    View view = getInnerView();
-    if(view == null)
-      return;
-    ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(view);
-    if (appearMap == null) {
-      return;
-    }
-    AppearData appearData = appearMap.get(component.getRef());
-    if (appearData == null) {
-      return;
-    }
-    appearData.hasDisappear = false;
-    if (!appearData.hasAppear) {
-      appearMap.remove(component.getRef());
-    }
+    setWatch(AppearanceHelper.DISAPPEAR,component,false);
   }
 
   @Override
@@ -673,54 +624,30 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   @Override
   public void onScrollChanged(WXScrollView scrollView, int x, int y,
                               int oldx, int oldy) {
-    procAppear(scrollView, x, y, oldx, oldy);
+    procAppear( x, y, oldx, oldy);
   }
 
   /**
    * Process event like appear and disappear
    */
-  private void procAppear(View scrollView, int x, int y, int oldx,
+  private void procAppear(int x, int y, int oldx,
                           int oldy) {
-
-    String direction="";
-    if(mOrientation== Constants.Orientation.VERTICAL){
-       direction=y-oldy>0?"up":"down";
-    }else if(mOrientation== Constants.Orientation.HORIZONTAL){
-      direction= x-oldx>0?"right":"left";
+    String direction = y - oldy > 0 ? "up" : "down";
+    if (mOrientation == Constants.Orientation.HORIZONTAL) {
+      direction = x - oldx > 0 ? "right" : "left";
     }
 
+    for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {
+      AppearanceHelper helper = item.getValue();
 
-    ConcurrentHashMap<String, AppearData> appearMap = mAppearMap
-        .get(mDomObj.getRef());
-    if (appearMap == null) {
-      return;
-    }
-    Iterator<Entry<String, AppearData>> iterator = appearMap.entrySet()
-        .iterator();
-    Entry<String, AppearData> entry = null;
-    AppearData appearData;
-    if (mScrollRect == null) {
-      mScrollRect = new Rect();
-        getInnerView().getHitRect(mScrollRect);
+      if (!helper.isWatch()) {
+        continue;
       }
-    while (iterator.hasNext()) {
-      entry = iterator.next();
-      appearData = entry.getValue();
-      if (!appearData.mAppear && appearData.mAppearComponent.getHostView().getLocalVisibleRect(mScrollRect)) {
-        appearData.mAppear = true;
-        if (appearData.hasAppear) {
-          Map<String, Object> params = new HashMap<>();
-          params.put("direction", direction);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), Constants.Event.APPEAR, params);
-        }
+      boolean visible = helper.isViewVisible();
 
-      }else if(appearData.mAppear && !appearData.mAppearComponent.getHostView().getLocalVisibleRect(mScrollRect)){
-        appearData.mAppear=false;
-        if (appearData.hasDisappear) {
-          Map<String, Object> params = new HashMap<>();
-          params.put("direction", direction);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, appearData.mAppearComponent.getRef(), Constants.Event.DISAPPEAR, params);
-        }
+      int result = helper.setAppearStatus(visible);
+      if (result != AppearanceHelper.RESULT_NO_CHANGE) {
+        helper.getAwareChild().notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
       }
     }
   }
@@ -732,11 +659,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @Override
   public void onScrollStopped(WXScrollView scrollView, int x, int y) {
-//    WXRecycleImageManager recycleImageManager = mInstance
-//        .getRecycleImageManager();
-//    if (recycleImageManager != null) {
-//      recycleImageManager.loadImage();
-//    }
   }
 
   @Override
@@ -779,11 +701,4 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   }
 
-  static class AppearData {
-
-    public WXComponent mAppearComponent;
-    public boolean hasAppear;
-    public boolean hasDisappear;
-    public boolean mAppear;
-  }
 }

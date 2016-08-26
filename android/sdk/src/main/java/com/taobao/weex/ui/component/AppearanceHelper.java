@@ -202,54 +202,64 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component.list;
+package com.taobao.weex.ui.component;
 
-import com.taobao.weex.ui.component.WXComponent;
+import android.graphics.Rect;
+import android.view.View;
+
 
 /**
  * Created by sospartan on 8/19/16.
  */
-class AppearanceAwareChild {
+public class AppearanceHelper {
 
-  private final WXComponent mListDirectChild;
   private final WXComponent mAwareChild;
 
   private boolean mAppearStatus = false;
-  private boolean[] mWatchFlags = {false,false};
+  private boolean[] mWatchFlags = {false, false};
 
   public static final int APPEAR = 0;
   public static final int DISAPPEAR = 1;
 
+  public static final int RESULT_APPEAR = 1;
+  public static final int RESULT_DISAPPEAR = -1;
+  public static final int RESULT_NO_CHANGE = 0;
+
+  Rect mVisibleRect = new Rect();
+
+  private final int mCellPositionInScrollable;
+
   /**
-   * @param listDirectChild direct child of list,for locate index.
-   * @param awareChild      child to notify when appearance changed.
+   * @param awareChild child to notify when appearance changed.
    */
-  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild) {
-    mListDirectChild = listDirectChild;
+  public AppearanceHelper(WXComponent awareChild) {
+    this(awareChild, 0);
+  }
+
+  public AppearanceHelper(WXComponent awareChild, int cellPositionInScrollable) {
     mAwareChild = awareChild;
+    mCellPositionInScrollable = cellPositionInScrollable;
+  }
+
+  public int getCellPositionINScollable() {
+    return mCellPositionInScrollable;
   }
 
   /**
-   *
    * @param event  {@link #APPEAR} and {@link #DISAPPEAR}
    * @param enable
    */
-  public void setEnableEvent(int event,boolean enable){
-      mWatchFlags[event] = enable;
+  public void setWatchEvent(int event, boolean enable) {
+    mWatchFlags[event] = enable;
   }
 
   /**
-   *
-   * @param event
    * @return
    */
-  public boolean isWatch(int event){
-    return mWatchFlags[event];
+  public boolean isWatch() {
+    return mWatchFlags[APPEAR] || mWatchFlags[DISAPPEAR];
   }
 
-  public WXComponent getListDirectChild() {
-    return mListDirectChild;
-  }
 
   public WXComponent getAwareChild() {
     return mAwareChild;
@@ -259,7 +269,21 @@ class AppearanceAwareChild {
     return mAppearStatus;
   }
 
-  public void setAppearStatus(boolean appearStatus) {
-    this.mAppearStatus = appearStatus;
+  public int setAppearStatus(boolean newIsAppear) {
+    if (mAppearStatus != newIsAppear) {
+      mAppearStatus = newIsAppear;
+      return newIsAppear ? RESULT_APPEAR : RESULT_DISAPPEAR;
+    }
+
+    return RESULT_NO_CHANGE;
+  }
+
+  public boolean isViewVisible() {
+    View view = mAwareChild.getHostView();
+    if (view == null) {
+      return false;
+    }
+
+    return view.getGlobalVisibleRect(mVisibleRect);
   }
 }
