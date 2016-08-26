@@ -666,6 +666,10 @@ class WXDomStatement {
 
     //Create component in dom thread
     final WXComponent component = mWXRenderManager.createComponentOnDomThread(mInstanceId, domObject, parentRef, index);
+    if(component == null){
+      //stop redner, some fatal happened.
+      return;
+    }
     AddDomInfo addDomInfo = new AddDomInfo();
     addDomInfo.component = component;
     mAddDom.put(domObject.ref, addDomInfo);
