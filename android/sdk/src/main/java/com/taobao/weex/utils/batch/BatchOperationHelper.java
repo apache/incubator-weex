@@ -202,112 +202,55 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.utils;
+package com.taobao.weex.utils.batch;
 
-import android.text.TextUtils;
-import com.alibaba.fastjson.JSON;
-import com.taobao.weex.common.IWXObject;
+import com.taobao.weex.utils.batch.BactchExecutor;
+import com.taobao.weex.utils.batch.Interceptor;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-public class WXReflectionUtils {
+/**
+ * Created by sospartan on 8/24/16.
+ */
+public class BatchOperationHelper implements Interceptor {
 
-  public static Object parseArgument(Type paramClazz, Object value) {
-    if (paramClazz == String.class) {
-      return value instanceof String ? value : JSON.toJSONString(value);
-    } else if (paramClazz == int.class) {
-      return value.getClass().isAssignableFrom(int.class) ? value : WXUtils.getInt(value);
-    } else if (paramClazz == long.class) {
-      return value.getClass().isAssignableFrom(long.class) ? value : WXUtils.getLong(value);
-    } else if (paramClazz == double.class) {
-      return value.getClass().isAssignableFrom(double.class) ? value : WXUtils.getDouble(value);
-    } else if (paramClazz == float.class) {
-      return value.getClass().isAssignableFrom(float.class) ? value : WXUtils.getFloat(value);
-    } else {
-      return JSON.parseObject(value instanceof String ? (String) value : JSON.toJSONString(value), paramClazz);
-    }
+
+  private BactchExecutor mExecutor;
+  private ArrayList<Runnable> sRegisterTasks = new ArrayList<>();
+  private boolean isCollecting = false;
+
+  public BatchOperationHelper(BactchExecutor executor){
+    mExecutor = executor;
+    executor.setInterceptor(this);
+    isCollecting = true;
   }
 
-  public static void setValue(Object obj, String fieldName, Object value) {
-    if (obj == null || TextUtils.isEmpty(fieldName)) {
-      return;
+  @Override
+  public boolean take(Runnable runnable) {
+    if(isCollecting){
+      sRegisterTasks.add(runnable);
+      return true;
     }
-
-    try {
-      // Field field = obj.getClass().getDeclaredField(fieldName);
-      Field field = getDeclaredField(obj, fieldName);
-
-      Object realValue = value;
-      if (value instanceof BigDecimal || value instanceof Number || value instanceof String) {
-        if (field.getType() == Float.class || field.getType() == float.class) {
-          realValue = Float.parseFloat(value.toString());
-        } else if (field.getType() == Double.class || field.getType() == double.class) {
-          realValue = Double.parseDouble(value.toString());
-        } else if (field.getType() == Integer.class || field.getType() == int.class) {
-          realValue = (int) Double.parseDouble(value.toString());
-        } else if (field.getType() == Boolean.class || field.getType() == boolean.class) {
-          realValue = Boolean.valueOf(value.toString());
-        }
-      }
-
-      if (field.getType() == boolean.class || field.getType() == Boolean.class) {
-        if (value != null) {
-          realValue = Boolean.valueOf(value.toString());
-        }
-      }
-
-      setProperty(obj, field, realValue);
-    } catch (Exception e) {
-      return;
-    }
+    return false;
   }
 
   /**
-   * get field form object and it's parent
+   * Post all tasks to executor. Can only be called once.
    */
-  public static Field getDeclaredField(Object object, String fieldName) {
-    Field field = null;
-
-    Class<?> clazz = object.getClass();
-
-    for (; clazz != Object.class; clazz = clazz.getSuperclass()) {
-      try {
-        field = clazz.getDeclaredField(fieldName);
-        return field;
-      } catch (Exception e) {
-
+  public void flush(){
+    isCollecting = false;
+    mExecutor.post(new Runnable() {
+      @Override
+      public void run() {
+        Iterator<Runnable> iterator = sRegisterTasks.iterator();
+        while(iterator.hasNext()){
+          Runnable item = iterator.next();
+          item.run();
+          iterator.remove();
+        }
       }
-    }
-
-    return null;
-  }
-
-  /**
-   * Set property(field) of the specified object.
-   * @param bean The object which has the given property
-   * @param field The field to be set
-   * @param value The value to be set to the field
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws NoSuchMethodException
-   */
-  public static void setProperty(Object bean, Field field, Object value) throws IllegalAccessException,
-                                                                                InvocationTargetException,
-                                                                                NoSuchMethodException {
-
-    if (bean == null || field == null) {
-      return;
-    }
-
-    try {
-      field.setAccessible(true);
-      field.set(bean, value);
-    } catch (Exception e) {
-    }
-
+    });
+    mExecutor.setInterceptor(null);
   }
 }

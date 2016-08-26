@@ -202,64 +202,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component.list;
-
-import com.taobao.weex.ui.component.WXComponent;
+package com.taobao.weex.utils.batch;
 
 /**
- * Created by sospartan on 8/19/16.
+ * Created by sospartan on 8/24/16.
  */
-class AppearanceAwareChild {
+public interface BactchExecutor {
+  void post(Runnable runnable);
 
-  private final WXComponent mListDirectChild;
-  private final WXComponent mAwareChild;
-
-  private boolean mAppearStatus = false;
-  private boolean[] mWatchFlags = {false,false};
-
-  public static final int APPEAR = 0;
-  public static final int DISAPPEAR = 1;
-
-  /**
-   * @param listDirectChild direct child of list,for locate index.
-   * @param awareChild      child to notify when appearance changed.
-   */
-  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild) {
-    mListDirectChild = listDirectChild;
-    mAwareChild = awareChild;
-  }
-
-  /**
-   *
-   * @param event  {@link #APPEAR} and {@link #DISAPPEAR}
-   * @param enable
-   */
-  public void setEnableEvent(int event,boolean enable){
-      mWatchFlags[event] = enable;
-  }
-
-  /**
-   *
-   * @param event
-   * @return
-   */
-  public boolean isWatch(int event){
-    return mWatchFlags[event];
-  }
-
-  public WXComponent getListDirectChild() {
-    return mListDirectChild;
-  }
-
-  public WXComponent getAwareChild() {
-    return mAwareChild;
-  }
-
-  public boolean isAppear() {
-    return mAppearStatus;
-  }
-
-  public void setAppearStatus(boolean appearStatus) {
-    this.mAppearStatus = appearStatus;
-  }
+  void setInterceptor(Interceptor interceptor);
 }

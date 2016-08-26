@@ -218,11 +218,8 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Manager class for weex module. There are two types of modules in weex, one is instance-level module,
@@ -256,7 +253,9 @@ public class WXModuleManager {
       return false;
     }
 
-    WXBridgeManager.getInstance().post(new Runnable() {
+    //execute task in js thread to make sure register order is same as the order invoke register method.
+    WXBridgeManager.getInstance()
+        .post(new Runnable() {
       @Override
       public void run() {
         if (sModuleFactoryMap.containsKey(moduleName)) {

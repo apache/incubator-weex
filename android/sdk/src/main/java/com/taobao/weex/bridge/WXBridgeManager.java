@@ -219,26 +219,14 @@ import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IWXDebugProxy;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXJSBridgeMsgType;
-import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXRefreshData;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
+import com.taobao.weex.common.*;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
-import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXHack;
+import com.taobao.weex.utils.*;
 import com.taobao.weex.utils.WXHack.HackDeclaration.HackAssertionException;
 import com.taobao.weex.utils.WXHack.HackedClass;
-import com.taobao.weex.utils.WXJsonUtils;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.utils.batch.BactchExecutor;
+import com.taobao.weex.utils.batch.Interceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -268,7 +256,7 @@ import java.util.Stack;
  *   </li>
  * </ol>
  */
-public class WXBridgeManager implements Callback {
+public class WXBridgeManager implements Callback,BactchExecutor {
 
   public static final String METHOD_CREATE_INSTANCE = "createInstance";
   public static final String METHOD_DESTROY_INSTANCE = "destroyInstance";
@@ -323,6 +311,8 @@ public class WXBridgeManager implements Callback {
   private List<String> mDestroyedInstanceId = new ArrayList<>();
 
   private StringBuilder mLodBuilder = new StringBuilder(50);
+
+  private Interceptor mInterceptor;
 
   private WXBridgeManager() {
     launchInspector(WXEnvironment.sRemoteDebugMode);
@@ -398,12 +388,22 @@ public class WXBridgeManager implements Callback {
     }, instanceId);
   }
 
+  @Override
   public void post(Runnable r){
+    if(mInterceptor != null && mInterceptor.take(r)){
+      //task is token by the interceptor
+      return;
+    }
     if (mJSHandler == null){
       return;
     }
 
     mJSHandler.post(WXThread.secure(r));
+  }
+
+  @Override
+  public void setInterceptor(Interceptor interceptor) {
+    mInterceptor = interceptor;
   }
 
   public void post(Runnable r, Object token) {

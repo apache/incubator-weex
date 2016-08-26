@@ -212,17 +212,19 @@ public class WXTextDomObject extends WXDomObject {
     float leftPadding, rightPadding, leftBorder, rightBorder;
     Spacing padding = getPadding();
     Spacing border = getBorder();
-    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
-      rawWidth -= leftBorder;
-    }
+
     if (!CSSConstants.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
       rawWidth -= leftPadding;
     }
-    if (!CSSConstants.isUndefined(rightBorder = padding.get(Spacing.RIGHT))) {
-      rawWidth -= rightBorder;
-    }
     if (!CSSConstants.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
       rawWidth -= rightPadding;
+    }
+
+    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
+      rawWidth -= leftBorder;
+    }
+    if (!CSSConstants.isUndefined(rightBorder = border.get(Spacing.RIGHT))) {
+      rawWidth -= rightBorder;
     }
     return rawWidth;
   }
