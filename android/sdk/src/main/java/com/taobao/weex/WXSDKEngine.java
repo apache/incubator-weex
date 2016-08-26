@@ -134,12 +134,9 @@ import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.*;
-import com.taobao.weex.ui.IExternalComponentGetter;
+import com.taobao.weex.ui.*;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
-import com.taobao.weex.ui.IFComponentHolder;
-import com.taobao.weex.ui.SimpleComponentHolder;
-import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.*;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
@@ -264,7 +261,6 @@ public class WXSDKEngine {
   private static void register() {
     try {
       registerComponent(
-        WXText.class,
         new SimpleComponentHolder(
           WXText.class,
           new WXText.Ceator()
@@ -273,7 +269,6 @@ public class WXSDKEngine {
         WXBasicComponentType.TEXT
       );
       registerComponent(
-        WXDiv.class,
         new SimpleComponentHolder(
           WXDiv.class,
           new WXDiv.Ceator()
@@ -285,7 +280,6 @@ public class WXSDKEngine {
         WXBasicComponentType.FOOTER
       );
       registerComponent(
-        WXImage.class,
         new SimpleComponentHolder(
           WXImage.class,
           new WXImage.Ceator()
@@ -294,7 +288,7 @@ public class WXSDKEngine {
         WXBasicComponentType.IMAGE,
         WXBasicComponentType.IMG
       );
-      registerComponent( WXScroller.class,
+      registerComponent(
         new SimpleComponentHolder(
           WXScroller.class,
           new WXScroller.Ceator()
@@ -302,7 +296,7 @@ public class WXSDKEngine {
         false,
         WXBasicComponentType.SCROLLER
       );
-      registerComponent( WXSlider.class,
+      registerComponent(
         new SimpleComponentHolder(
           WXSlider.class,
           new WXSlider.Ceator()
@@ -364,7 +358,7 @@ public class WXSDKEngine {
   }
 
   public static boolean registerComponent(String type, IExternalComponentGetter componentGetter, boolean appendTree) throws WXException {
-    return registerComponent(componentGetter.getExternalComponentClass(type), appendTree,type);
+    return registerComponent(new ExternalLoaderComponentHolder(type,componentGetter), appendTree,type);
   }
 
   /**
@@ -381,11 +375,11 @@ public class WXSDKEngine {
       return false;
     }
     SimpleComponentHolder holder = new SimpleComponentHolder(clazz);
-    return registerComponent(clazz,holder,appendTree,names);
+    return registerComponent(holder,appendTree,names);
   }
 
 
-  static boolean registerComponent(Class<? extends WXComponent> clazz, IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
+  static boolean registerComponent(IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
     boolean result =  true;
     Map<String, String> componentInfo = new HashMap<>();
     if (appendTree) {
