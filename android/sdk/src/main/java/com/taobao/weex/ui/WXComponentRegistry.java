@@ -223,7 +223,7 @@ public class WXComponentRegistry {
   private static Map<String, IFComponentHolder> sTypeComponentMap = new HashMap<>();
   private static ArrayList<Map<String, String>> sComponentInfos=new ArrayList<>();
 
-  public static boolean registerComponent(final String type, final IFComponentHolder holder, Map<String, String> componentInfo) throws WXException {
+  public static boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, String> componentInfo) throws WXException {
     if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }
