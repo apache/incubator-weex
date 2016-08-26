@@ -1020,7 +1020,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   /*Global Event*/
   private HashMap<String, List<String>> mGlobalEvents = new HashMap<>();
 
-  public void fireGloalEventCallback(String eventName, Map<String,Object> params){
+  public void fireGlobalEventCallback(String eventName, Map<String,Object> params){
     List<String> callbacks=mGlobalEvents.get(eventName);
     if(callbacks!=null){
       for(String callback:callbacks){
