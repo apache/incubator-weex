@@ -14,14 +14,30 @@ typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString
 
 @property (nonatomic, readonly) JSValue* exception;
 
+/**
+ * Executes the js framework code in javascript engine
+ * You can do some setup in this method
+ */
 - (void)executeJSFramework:(NSString *)frameworkScript;
 
+/**
+ * Executes global js method with specific arguments
+ */
 - (void)callJSMethod:(NSString *)method args:(NSArray*)args;
 
+/**
+ * Register callback when call native tasks occur
+ */
 - (void)registerCallNative:(WXJSCallNative)callNative;
 
+/**
+ * Reset js engine environment, called when any environment variable is changed.
+ */
 - (void)resetEnvironment;
 
+/**
+ * Called when garbage collection is wanted by sdk.
+ */
 - (void)garbageCollect;
 
 @end
