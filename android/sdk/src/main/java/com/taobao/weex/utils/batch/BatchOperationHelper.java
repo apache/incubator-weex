@@ -202,257 +202,55 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.bridge;
+package com.taobao.weex.utils.batch;
 
-import android.text.TextUtils;
+import com.taobao.weex.utils.batch.BactchExecutor;
+import com.taobao.weex.utils.batch.Interceptor;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.Destroyable;
-import com.taobao.weex.common.WXException;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.ui.module.WXTimerModule;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXReflectionUtils;
-
-import java.lang.reflect.Type;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
- * Manager class for weex module. There are two types of modules in weex, one is instance-level module,
- * the other is global-level module. Instance-level module will be created every time an instance
- * is created, while global-level module will be singleton in {@link com.taobao.weex.WXSDKEngine}.
+ * Created by sospartan on 8/24/16.
  */
-public class WXModuleManager {
+public class BatchOperationHelper implements Interceptor {
 
-  /**
-   * module class object dictionary
-   */
-  private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
-  private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
 
-  /**
-   * module object dictionary
-   * K : instanceId, V : Modules
-   */
-  private static Map<String, HashMap<String, WXModule>> sInstanceModuleMap = new HashMap<>();
+  private BactchExecutor mExecutor;
+  private ArrayList<Runnable> sRegisterTasks = new ArrayList<>();
+  private boolean isCollecting = false;
 
-  /**
-   * Register module to JavaScript and Android
-   */
-  public static boolean registerModule(final String moduleName, final ModuleFactory factory, final boolean global) throws WXException {
-    if (moduleName == null || factory == null) {
-      return false;
+  public BatchOperationHelper(BactchExecutor executor){
+    mExecutor = executor;
+    executor.setInterceptor(this);
+    isCollecting = true;
+  }
+
+  @Override
+  public boolean take(Runnable runnable) {
+    if(isCollecting){
+      sRegisterTasks.add(runnable);
+      return true;
     }
+    return false;
+  }
 
-    if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
-      WXLogUtils.e("Connot registered module name is dom.");
-      return false;
-    }
-
-    //execute task in js thread to make sure register order is same as the order invoke register method.
-    WXBridgeManager.getInstance()
-        .post(new Runnable() {
+  /**
+   * Post all tasks to executor. Can only be called once.
+   */
+  public void flush(){
+    isCollecting = false;
+    mExecutor.post(new Runnable() {
       @Override
       public void run() {
-        if (sModuleFactoryMap.containsKey(moduleName)) {
-          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+        Iterator<Runnable> iterator = sRegisterTasks.iterator();
+        while(iterator.hasNext()){
+          Runnable item = iterator.next();
+          item.run();
+          iterator.remove();
         }
-
-        if (global) {
-          try {
-            WXModule wxModule = factory.buildInstance();
-            sGlobalModuleMap.put(moduleName, wxModule);
-          } catch (Exception e) {
-            WXLogUtils.e(moduleName + " class must have a default constructor without params. ", e);
-          }
-        }
-
-        try {
-          registerNativeModule(moduleName, factory);
-        } catch (WXException e) {
-          WXLogUtils.e("", e);
-        }
-        registerJSModule(moduleName, factory);
       }
     });
-    return true;
-
+    mExecutor.setInterceptor(null);
   }
-
-  static boolean registerNativeModule(String moduleName, ModuleFactory factory) throws WXException {
-    if (factory == null) {
-      return false;
-    }
-
-    try {
-      sModuleFactoryMap.put(moduleName, factory);
-    }catch (ArrayStoreException e){
-      e.printStackTrace();
-      //ignore:
-      //may throw this exception:
-      //java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
-    }
-    return true;
-  }
-
-  static boolean registerJSModule(String moduleName, ModuleFactory factory) {
-    Map<String, Object> modules = new HashMap<>();
-    modules.put(moduleName, factory.getMethodNames());
-    WXSDKManager.getInstance().registerModules(modules);
-    return true;
-  }
-
-  static boolean callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
-    ModuleFactory factory = sModuleFactoryMap.get(moduleStr);
-    if(factory == null){
-      WXLogUtils.e("[WXModuleManager] module factory not found.");
-      return false;
-    }
-    final WXModule wxModule = findModule(instanceId, moduleStr,factory);
-    if (wxModule == null) {
-      return false;
-    }
-    wxModule.mWXSDKInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-
-    Map<String, Invoker> methodsMap = factory.getMethodMap();
-    if (methodsMap == null) {
-      WXLogUtils.e("[WXModuleManager] callModuleMethod methodsMap is null.");
-      return false;
-    }
-    final Invoker invoker = methodsMap.get(methodStr);
-    try {
-      Type[] paramClazzs = invoker.getParameterTypes();
-      final Object[] params = new Object[paramClazzs.length];
-      Object value;
-      Type paramClazz;
-      for (int i = 0; i < paramClazzs.length; i++) {
-        paramClazz = paramClazzs[i];
-        if(i>=args.size()){
-          if(!paramClazz.getClass().isPrimitive()) {
-            params[i] = null;
-            continue;
-          }else {
-            WXLogUtils.e("[WXModuleManager] module method argument list not match.");
-            return false;
-          }
-        }
-        value = args.get(i);
-
-        if (paramClazz == JSONObject.class) {
-          params[i] = value;
-        } else if(JSCallback.class == paramClazz){
-          if(value instanceof String){
-            params[i] = new SimpleJSCallback(instanceId,(String)value);
-          }else{
-            throw new Exception("Parameter type not match.");
-          }
-        } else {
-          params[i] = WXReflectionUtils.parseArgument(paramClazz,value);
-        }
-      }
-      if (invoker.isRunInUIThread()) {
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              invoker.invoke(wxModule, params);
-            } catch (Exception e) {
-              WXLogUtils.e("callModuleMethod >>> invoke module:", e);
-            }
-          }
-        }, 0);
-      } else {
-        invoker.invoke(wxModule, params);
-      }
-    } catch (Exception e) {
-      WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
-      return false;
-    } finally {
-      if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
-        wxModule.mWXSDKInstance = null;
-      }
-    }
-    return true;
-  }
-
-
-
-  private static WXModule findModule(String instanceId, String moduleStr,ModuleFactory factory) {
-    // find WXModule
-    WXModule wxModule = sGlobalModuleMap.get(moduleStr);
-
-    //not global module
-    if (wxModule == null) {
-      HashMap<String, WXModule> moduleMap = sInstanceModuleMap.get(instanceId);
-      if (moduleMap == null) {
-        moduleMap = new HashMap<>();
-        sInstanceModuleMap.put(instanceId, moduleMap);
-      }
-      // if cannot find the Module, create a new Module and save it
-      wxModule = moduleMap.get(moduleStr);
-      if (wxModule == null) {
-        try {
-          wxModule = factory.buildInstance();
-        } catch (Exception e) {
-          WXLogUtils.e(moduleStr + " module build instace failed.", e);
-          return null;
-        }
-        moduleMap.put(moduleStr, wxModule);
-      }
-    }
-
-    return wxModule;
-  }
-
-  public static void destroyInstanceModules(String instanceId) {
-    HashMap<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
-    if (moduleMap == null || moduleMap.size() < 1) {
-      return;
-    }
-    Iterator<Entry<String, WXModule>> iterator = moduleMap.entrySet().iterator();
-    Entry<String, WXModule> entry;
-    while (iterator.hasNext()) {
-      entry = iterator.next();
-      WXModule module = entry.getValue();
-      if(module instanceof Destroyable){
-        ((Destroyable)module).destroy();
-      }
-
-    }
-  }
-
-  public static void reload(){
-    if(sModuleFactoryMap!=null){
-      Set<String> keys=sModuleFactoryMap.keySet();
-      for(String key:keys){
-        registerJSModule(key,sModuleFactoryMap.get(key));
-      }
-    }
-  }
-
-  private static class SimpleJSCallback implements JSCallback{
-    String mInstanceId;
-    String mCallbackId;
-
-    SimpleJSCallback(String instanceId,String callbackId){
-      this.mCallbackId = callbackId;
-      this.mInstanceId = instanceId;
-    }
-
-
-    @Override
-    public void invoke(Object data) {
-      WXBridgeManager.getInstance().callbackJavascript(mInstanceId,mCallbackId,data,false);
-    }
-
-    @Override
-    public void invokeAndKeepAlive(Object data) {
-      WXBridgeManager.getInstance().callbackJavascript(mInstanceId,mCallbackId,data,true);
-    }
-  }
-
 }
