@@ -204,7 +204,7 @@
         cellComponent = cellComponent.supercomponent;
     }
     
-    NSIndexPath *toIndexPath = [self indexPathForCell:cellComponent sections:_completedSections];
+    NSIndexPath *toIndexPath = [self indexPathForCell:(WXCellComponent*)cellComponent sections:_completedSections];
     CGRect cellRect = [_tableView rectForRowAtIndexPath:toIndexPath];
     contentOffsetY += cellRect.origin.y;
     contentOffsetY += offset * WXScreenResizeRadio();
