@@ -35,6 +35,7 @@ NSTimeInterval JSLibInitTime = 0;
 - (void) dealloc
 {
     [self removeObservers];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (instancetype)init
@@ -299,6 +300,16 @@ NSTimeInterval JSLibInitTime = 0;
 - (void)creatFinish
 {
     
+}
+
+- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params keepAlive:(BOOL)keepAlive
+{
+    NSDictionary * userInfo = @{
+            @"weexInstance":self,
+            @"param":params,
+            @"keepAlive": @(keepAlive)
+    };
+    [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
 #pragma mark Private Methods

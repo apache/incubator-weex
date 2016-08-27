@@ -186,6 +186,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (NSUInteger)numberOfComponents;
 
 /**
+ * fire global event
+ */
+- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params keepAlive:(BOOL)keepAlive;
+
+/**
  * application performance statistics
  */
 @property (nonatomic, strong) NSString *bizType;
