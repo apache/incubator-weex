@@ -137,7 +137,7 @@
 
 - (void)viewWillUnload
 {
-    ((UIScrollView *)(self.view)).delegate = nil;
+    ((UIScrollView *)_view).delegate = nil;
 }
 
 - (void)dealloc
