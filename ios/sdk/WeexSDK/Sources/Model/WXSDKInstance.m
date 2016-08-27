@@ -107,6 +107,7 @@ NSTimeInterval JSLibInitTime = 0;
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:@"weex" forHTTPHeaderField:@"r-refer"];
         
         id<WXNetworkProtocol> networkHandler = [self networkHandler];
         
