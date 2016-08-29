@@ -524,6 +524,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         return YES;
     }
     
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+        return YES;
+    }
+    
 //#ifdef DEBUG
 //    if ([gestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]
 //        || [otherGestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]) {
