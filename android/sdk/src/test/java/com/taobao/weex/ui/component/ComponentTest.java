@@ -217,7 +217,7 @@ import java.util.Map;
  * Created by sospartan on 8/3/16.
  */
 public class ComponentTest {
-  static void create(WXComponent comp){
+  public static void create(WXComponent comp){
     TestDomObject domObject = new TestDomObject();
     WXDiv parent = WXDivTest.create();
     comp.createView(parent,1);
@@ -231,7 +231,7 @@ public class ComponentTest {
   }
 
 
-  static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
+  public static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
     Map<String, Object> props = new HashMap<>();
     int len = propNames.length;
 
@@ -247,18 +247,18 @@ public class ComponentTest {
     }
   }
 
-  static void addEvent(WXComponent comp){
+  public static void addEvent(WXComponent comp){
     for (String event :
         TestConstants.Events) {
       comp.addEvent(event);
     }
   }
 
-  static void destory(WXComponent comp){
+  public static void destory(WXComponent comp){
     comp.destroy();
   }
 
-  static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+  public static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
      return type
          .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
         .newInstance(parent.mInstance,dom,parent,false);
