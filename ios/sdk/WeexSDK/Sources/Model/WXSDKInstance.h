@@ -52,6 +52,7 @@ typedef NS_ENUM(NSInteger, WXState) {//state.code
     WeexInstanceForeground,
     WeexInstanceBackground,
     WeexInstanceMemoryWarning,
+    WeexInstanceBindChanged,
     WeexInstanceDestroy
 };
 
