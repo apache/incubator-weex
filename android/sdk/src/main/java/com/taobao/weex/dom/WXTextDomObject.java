@@ -233,9 +233,12 @@ public class WXTextDomObject extends WXDomObject {
    * RecalculateLayout.
    */
   private void recalculateLayout() {
-    spanned = createSpanned(mText);
-    layout = createLayout(getTextContentWidth(), true, layout);
-    previousWidth = layout.getWidth();
+    float contentWidth = getTextContentWidth();
+    if (contentWidth > 0) {
+      spanned = createSpanned(mText);
+      layout = createLayout(contentWidth, true, layout);
+      previousWidth = layout.getWidth();
+    }
   }
 
   /**

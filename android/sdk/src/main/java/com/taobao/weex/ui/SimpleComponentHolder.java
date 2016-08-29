@@ -233,27 +233,35 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
   static class ClazzComponentCreator implements ComponentCreator{
 
-    private final Constructor<? extends WXComponent> mConstructor;
+    private Constructor<? extends WXComponent> mConstructor;
+    private final Class<? extends WXComponent> mCompClz;
 
     ClazzComponentCreator(Class<? extends WXComponent> c){
+      mCompClz = c;
+    }
+
+    private void loadConstructor(){
+      Class<? extends WXComponent> c = mCompClz;
       Constructor<? extends WXComponent> constructor;
       try {
         constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
       } catch (NoSuchMethodException e) {
+        WXLogUtils.d("ClazzComponentCreator","Use deprecated component constructor");
         try {
           //compatible deprecated constructor
           constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
         } catch (NoSuchMethodException e1) {
-          e1.printStackTrace();
           throw new WXRuntimeException("Can't find constructor of component.");
         }
-        e.printStackTrace();
       }
       mConstructor = constructor;
     }
 
     @Override
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      if(mConstructor == null){
+        loadConstructor();
+      }
       int parameters = mConstructor.getParameterTypes().length;
       WXComponent component;
       if(parameters == 4){
