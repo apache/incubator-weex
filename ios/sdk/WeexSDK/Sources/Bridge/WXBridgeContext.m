@@ -204,7 +204,9 @@ _Pragma("clang diagnostic pop") \
     [self callJSMethod:@"destroyInstance" args:@[instance]];
     
 #ifdef DEBUG
-    [self.jsBridge garbageCollect];
+    if ([self.jsBridge respondsToSelector:@selector(garbageCollect)]) {
+         [self.jsBridge garbageCollect];
+    }
 #endif
 }
 

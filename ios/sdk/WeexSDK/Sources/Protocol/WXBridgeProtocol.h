@@ -35,6 +35,8 @@ typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString
  */
 - (void)resetEnvironment;
 
+@optional
+
 /**
  * Called when garbage collection is wanted by sdk.
  */
