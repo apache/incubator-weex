@@ -146,6 +146,7 @@ import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.utils.batch.BatchOperationHelper;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -259,6 +260,7 @@ public class WXSDKEngine {
   }
 
   private static void register() {
+    BatchOperationHelper batchHelper = new BatchOperationHelper(WXBridgeManager.getInstance());
     try {
       registerComponent(
         new SimpleComponentHolder(
@@ -342,6 +344,7 @@ public class WXSDKEngine {
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }
+    batchHelper.flush();
   }
 
   /**

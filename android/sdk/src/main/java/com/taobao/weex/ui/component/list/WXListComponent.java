@@ -263,7 +263,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
-  private Map<String,AppearanceAwareChild> mAppearComponents = new HashMap<>();
+  private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
+
   private ArrayMap<String, Long> mRefToViewType;
   private SparseArray<ArrayList<WXComponent>> mViewTypes;
 
@@ -278,7 +279,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
    **/
   private Map<String, HashMap<String, WXComponent>> mStickyMap = new HashMap<>();
   private WXStickyHelper stickyHelper;
-
 
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -453,19 +453,18 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     return findDirectListChild(parent);
   }
 
-
-  private void setAppearanceWatch(WXComponent component, int event, boolean enable){
-    AppearanceAwareChild item = mAppearComponents.get(component.getRef());
-    if(item != null){
-      item.setEnableEvent(event,enable);
-    }else if(!enable){
+  private void setAppearanceWatch(WXComponent component, int event, boolean enable) {
+    AppearanceHelper item = mAppearComponents.get(component.getRef());
+    if (item != null) {
+      item.setWatchEvent(event, enable);
+    } else if (!enable) {
       //Do nothing if disable target not exist.
-      return;
     } else {
       WXComponent dChild = findDirectListChild(component);
-      if (dChild != null) {
-        item = new AppearanceAwareChild(dChild, component);
-        item.setEnableEvent(event,enable);
+      int index = mChildren.indexOf(dChild);
+      if (index != -1) {
+        item = new AppearanceHelper(component, index);
+        item.setWatchEvent(event, true);
         mAppearComponents.put(component.getRef(), item);
       }
     }
@@ -473,25 +472,22 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
   @Override
   public void bindAppearEvent(WXComponent component) {
-    setAppearanceWatch(component,AppearanceAwareChild.APPEAR,true);
+    setAppearanceWatch(component, AppearanceHelper.APPEAR,true);
   }
-
-
 
   @Override
   public void bindDisappearEvent(WXComponent component) {
-    setAppearanceWatch(component,AppearanceAwareChild.DISAPPEAR,true);
+    setAppearanceWatch(component, AppearanceHelper.DISAPPEAR,true);
   }
 
   @Override
   public void unbindAppearEvent(WXComponent component) {
-    setAppearanceWatch(component,AppearanceAwareChild.APPEAR,false);
+    setAppearanceWatch(component, AppearanceHelper.APPEAR,false);
   }
 
   @Override
   public void unbindDisappearEvent(WXComponent component) {
-
-    setAppearanceWatch(component,AppearanceAwareChild.DISAPPEAR,false);
+    setAppearanceWatch(component, AppearanceHelper.DISAPPEAR,false);
   }
 
   @Override
@@ -526,7 +522,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             view.smoothScrollBy(scrollX,0);
           }
         }
-      }, 50);
+      },50);
+
       onPostScrollToPosition(pos);
     }
 
@@ -987,26 +984,35 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   @Override
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
     //notify appear state
-    Iterator<AppearanceAwareChild> it = mAppearComponents.values().iterator();
-    while (it.hasNext()) {
-      AppearanceAwareChild item = it.next();
-      WXComponent directChild = item.getListDirectChild();
-      WXComponent awareChild = item.getAwareChild();
+    Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
+    String direction = directionY > 0 ? "up" : "down";
+    if (getOrientation() == Constants.Orientation.HORIZONTAL) {
+      direction = directionX > 0 ? "left" : "right";
+    }
 
-      if (!item.isWatch(AppearanceAwareChild.APPEAR) && !item.isWatch(AppearanceAwareChild.DISAPPEAR)) {
+    while (it.hasNext()) {
+      AppearanceHelper item = it.next();
+      WXComponent component = item.getAwareChild();
+
+      if (!item.isWatch()) {
         continue;
       }
 
-      int key = mChildren.indexOf(directChild);
-      if (key >= firstVisible && key <= lastVisible && !item.isAppear()) {
-        String direction = directionY > 0 ? "up" : "down";
-        awareChild.notifyAppearStateChange(Constants.Event.APPEAR, direction);
-        item.setAppearStatus(true);
-      } else if ((key < firstVisible || key > lastVisible) && item.isAppear()) {
-        String direction = directionY > 0 ? "up" : "down";
-        awareChild.notifyAppearStateChange(Constants.Event.DISAPPEAR, direction);
-        item.setAppearStatus(false);
+      boolean outOfVisibleRange = item.getCellPositionINScollable() < firstVisible || item.getCellPositionINScollable() > lastVisible;
+
+      View view = component.getHostView();
+      if (view == null) {
+        continue;
       }
+
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
+
+      int result = item.setAppearStatus(visible);
+      WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+      if (result == AppearanceHelper.RESULT_NO_CHANGE) {
+        continue;
+      }
+      component.notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
     }
   }
 
