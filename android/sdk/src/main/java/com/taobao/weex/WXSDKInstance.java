@@ -939,6 +939,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mActivityStateListeners = null;
     }
 
+    rootView = null;
+    mScrollView = null;
     mContext = null;
     mRenderListener = null;
   }

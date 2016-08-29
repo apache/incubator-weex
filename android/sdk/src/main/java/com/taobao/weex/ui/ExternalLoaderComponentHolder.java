@@ -202,237 +202,73 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.ui;
 
-import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.bridge.MethodInvoker;
+import com.taobao.weex.common.Component;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
+import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXLogUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXPerformance {
-
-  public static final String DEFAULT = "default";
-
-  /**
-   * Business unit, mandatory. If no business unit can be provided, set the field as default
-   */
-  public String bizType = "weex";
-
-  /**
-   * URL used for rendering view, optional
-   */
-  public String templateUrl;
-
-  /**
-   * Time spent for reading, time unit is ms.
-   */
-  public double localReadTime;
-
-  /**
-   * Name of the page
-   */
-  public String pageName = DEFAULT;
-
-  /**
-   * Size of JavaScript framework, the unit is KB
-   */
-  public double JSLibSize;
-
-  /**
-   * Time of initial JavaScript library
-   */
-  public long JSLibInitTime;
-
-  /**
-   * Size of JavaScript template
-   */
-  public double JSTemplateSize;
-
-  public long templateLoadTime;
-
-  /**
-   * Time used for
-   * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
-   */
-  public long communicateTime;
-
-  /**
-   * Time spent when rendering first screen
-   */
-  public long screenRenderTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long callNativeTime;
-
-  /**
-   * Create Instance Time spent when rendering first screen
-   */
-  public long firstScreenJSFExecuteTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long batchTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long parseJsonTime;
-
-  /**
-   *  UpdateDomObj Time spent when rendering first screen
-   */
-  public long updateDomObjTime;
-
-  /**
-   *  ApplyUpdate Time spent when rendering first screen
-   */
-  public long applyUpdateTime;
+/**
+ * Created by sospartan on 8/26/16.
+ */
+public class ExternalLoaderComponentHolder implements IFComponentHolder {
+  public static final String TAG = "SimpleComponentHolder";
+  private Map<String, Invoker> mMethods;
+  private final IExternalComponentGetter mClzGetter;
+  private final String mType;
+  private Class mClass;
 
 
-  /**
-   *  CssLayout Time spent when rendering first screen
-   */
-  public long cssLayoutTime;
-
-  /**
-   * Time spent, the unit is micro second
-   */
-  public double totalTime;
-
-  /**
-   * load bundle js time, unite ms
-   */
-  public long networkTime;
-
-  /**
-   * pure network time;
-   */
-  public long pureNetworkTime;
-
-  public long actualNetworkTime;
-  public long packageSpendTime;
-  public long syncTaskTime;
-
-  /**
-   * component Count
-   */
-  public long componentCount;
-
-  /**
-   * Version of JavaScript libraray
-   */
-  public String JSLibVersion = WXEnvironment.JS_LIB_SDK_VERSION;
-
-  /**
-   * Version of Weex SDK
-   */
-  public String WXSDKVersion = WXEnvironment.WXSDK_VERSION;
-
-  /**
-   * The detail message of render failure
-   */
-  public String renderFailedDetail;
-
-  /**
-   * Error code
-   */
-  public String errCode;
-
-  /**
-   * Error message
-   */
-  public String errMsg;
-
-  public String connectionType;
-  public String requestType;
-
-  public Map<String,Double> getMeasureMap(){
-    Map<String,Double> quotas = new HashMap<>();
-    quotas.put("JSTemplateSize", JSTemplateSize);
-    quotas.put("JSLibSize", JSLibSize);
-    quotas.put("communicateTime", (double)communicateTime);
-    quotas.put("screenRenderTime", (double)screenRenderTime);
-    quotas.put("totalTime", totalTime);
-    quotas.put("localReadTime", localReadTime);
-    quotas.put("JSLibInitTime", (double)JSLibInitTime);
-    quotas.put("networkTime", (double)networkTime);
-    quotas.put("templateLoadTime", (double)templateLoadTime);
-    quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
-    quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
-    quotas.put("firstScreenJSFExecuteTime",(double) firstScreenJSFExecuteTime);
-    quotas.put("componentCount",(double)componentCount);
-    quotas.put("actualNetworkTime",(double)actualNetworkTime);
-    quotas.put("pureNetworkTime",(double)pureNetworkTime);
-    quotas.put("syncTaskTime",(double)syncTaskTime);
-    quotas.put("packageSpendTime",(double)packageSpendTime);
-    quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
-    return quotas;
-  }
-
-  public Map<String,String> getDimensionMap(){
-    Map<String,String> quotas = new HashMap<>();
-    quotas.put("bizType", bizType);
-    quotas.put("templateUrl", templateUrl);
-    quotas.put("pageName", pageName);
-    quotas.put("JSLibVersion", JSLibVersion);
-    quotas.put("WXSDKVersion", WXSDKVersion);
-    quotas.put("connectionType",connectionType);
-    quotas.put("requestType",requestType);
-
-    return quotas;
-  }
-
-  public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"};
-  }
-
-  public static String[] getMeasures(){
-    return new String[]{"JSTemplateSize",
-        "JSLibSize",
-        "communicateTime",
-        "screenRenderTime",
-        "totalTime",
-        "localReadTime",
-        "JSLibInitTime",
-        "networkTime",
-        "componentCount",
-        "templateLoadTime",
-        "SDKInitInvokeTime",
-        "SDKInitExecuteTime",
-        "SDKInitTime",
-        "packageSpendTime",
-        "syncTaskTime",
-        "pureNetworkTime",
-        "actualNetworkTime",
-        "firstScreenJSFExecuteTime"};
+  public ExternalLoaderComponentHolder(String type,IExternalComponentGetter clzGetter) {
+    this.mClzGetter = clzGetter;
+    mType = type;
   }
 
   @Override
-  public String toString() {
-    if (WXEnvironment.isApkDebugable()) {
-      return "bizType:" + bizType + ",pageName:" + pageName + ",templateLoadTime" + templateLoadTime
-             + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
-             + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
-             + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
-             + ",screenRenderTime:" + screenRenderTime
-             + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-             + ",componentCount:" + componentCount
-             + ",syncTaskTime:" + syncTaskTime
-             + ",pureNetworkTime:" + pureNetworkTime
-             + ",networkTime:" + networkTime
-             + ",actualNetworkTime:" + actualNetworkTime
-             + ",packageSpendTime:" + packageSpendTime
-             + ",connectionType:" + connectionType
-             + ",requestType:" + requestType
-             + ",initInvokeTime:"+WXEnvironment.sSDKInitInvokeTime+",initExecuteTime:"+WXEnvironment.sSDKInitExecuteTime
-             + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
-             + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
-             + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
-             + ",errMsg:" + errMsg;
+  public void loadIfNonLazy() {
+  }
+
+  private synchronized void generate(){
+    Class clz = mClzGetter.getExternalComponentClass(mType);
+    mClass = clz;
+
+    mMethods = SimpleComponentHolder.getMethods(clz);
+  }
+
+
+
+  @Override
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    if(mClass == null){
+      mClass = mClzGetter.getExternalComponentClass(mType);
     }
-    return super.toString();
+    ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
+    WXComponent component = creator.createInstance(instance,node,parent,lazy);
+
+    component.bindHolder(this);
+    return component;
+  }
+
+  @Override
+  public synchronized Invoker getMethod(String name){
+    if (mMethods == null) {
+      generate();
+    }
+
+    return mMethods.get(name);
   }
 }

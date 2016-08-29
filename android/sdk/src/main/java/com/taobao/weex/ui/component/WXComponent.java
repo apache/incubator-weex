@@ -416,7 +416,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
+
+    if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
       mInstance.firstScreenRenderFinished();
     }
 
@@ -651,6 +652,22 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     } else if ((type.equals(Constants.Event.FOCUS) || type.equals(Constants.Event.BLUR)) ) {
       addFocusChangeListener(new OnFocusChangeListener() {
         @Override
+        public void onFocusChange(boolean hasFocus) {
+          Map<String, Object> params = new HashMap<>();
+          int[] location = new int[2];
+          mHost.getLocationOnScreen(location);
+          params.put("x",location[0]);
+          params.put("y",location[1]);
+          params.put("width",mDomObj.getCSSLayoutWidth());
+          params.put("height",mDomObj.getCSSLayoutHeight());
+          WXSDKManager.getInstance().fireEvent(mInstanceId,
+                                               mDomObj.ref,
+                                               Constants.Event.CLICK,
+                                               params);
+        }
+      });
+    } else if ((type.equals( Constants.Event.FOCUS) || type.equals( Constants.Event.BLUR)) ) {
+      addFocusChangeListener(new OnFocusChangeListener() {
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());

@@ -202,237 +202,65 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.ui.component.list;
 
-import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.ui.component.WXComponent;
 
-import java.util.HashMap;
-import java.util.Map;
+/**
+ * Created by sospartan on 8/19/16.
+ */
+class AppearanceAwareChild {
 
-public class WXPerformance {
+  final WXComponent mListDirectChild;
+  final WXComponent mAwareChild;
 
-  public static final String DEFAULT = "default";
+  private boolean mAppearStatus = false;
+  private boolean[] mWatchFlags = {false,false};
 
-  /**
-   * Business unit, mandatory. If no business unit can be provided, set the field as default
-   */
-  public String bizType = "weex";
-
-  /**
-   * URL used for rendering view, optional
-   */
-  public String templateUrl;
+  public static final int APPEAR = 0;
+  public static final int DISAPPEAR = 1;
 
   /**
-   * Time spent for reading, time unit is ms.
+   *
+   * @param listDirectChild  direct child of list,for locate index.
+   * @param awareChild  child to notify when appearance changed.
    */
-  public double localReadTime;
-
-  /**
-   * Name of the page
-   */
-  public String pageName = DEFAULT;
-
-  /**
-   * Size of JavaScript framework, the unit is KB
-   */
-  public double JSLibSize;
-
-  /**
-   * Time of initial JavaScript library
-   */
-  public long JSLibInitTime;
-
-  /**
-   * Size of JavaScript template
-   */
-  public double JSTemplateSize;
-
-  public long templateLoadTime;
-
-  /**
-   * Time used for
-   * {@link com.taobao.weex.bridge.WXBridgeManager#createInstance(String, String, Map, String)}
-   */
-  public long communicateTime;
-
-  /**
-   * Time spent when rendering first screen
-   */
-  public long screenRenderTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long callNativeTime;
-
-  /**
-   * Create Instance Time spent when rendering first screen
-   */
-  public long firstScreenJSFExecuteTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long batchTime;
-
-  /**
-   * Call native Time spent when rendering first screen
-   */
-  public long parseJsonTime;
-
-  /**
-   *  UpdateDomObj Time spent when rendering first screen
-   */
-  public long updateDomObjTime;
-
-  /**
-   *  ApplyUpdate Time spent when rendering first screen
-   */
-  public long applyUpdateTime;
-
-
-  /**
-   *  CssLayout Time spent when rendering first screen
-   */
-  public long cssLayoutTime;
-
-  /**
-   * Time spent, the unit is micro second
-   */
-  public double totalTime;
-
-  /**
-   * load bundle js time, unite ms
-   */
-  public long networkTime;
-
-  /**
-   * pure network time;
-   */
-  public long pureNetworkTime;
-
-  public long actualNetworkTime;
-  public long packageSpendTime;
-  public long syncTaskTime;
-
-  /**
-   * component Count
-   */
-  public long componentCount;
-
-  /**
-   * Version of JavaScript libraray
-   */
-  public String JSLibVersion = WXEnvironment.JS_LIB_SDK_VERSION;
-
-  /**
-   * Version of Weex SDK
-   */
-  public String WXSDKVersion = WXEnvironment.WXSDK_VERSION;
-
-  /**
-   * The detail message of render failure
-   */
-  public String renderFailedDetail;
-
-  /**
-   * Error code
-   */
-  public String errCode;
-
-  /**
-   * Error message
-   */
-  public String errMsg;
-
-  public String connectionType;
-  public String requestType;
-
-  public Map<String,Double> getMeasureMap(){
-    Map<String,Double> quotas = new HashMap<>();
-    quotas.put("JSTemplateSize", JSTemplateSize);
-    quotas.put("JSLibSize", JSLibSize);
-    quotas.put("communicateTime", (double)communicateTime);
-    quotas.put("screenRenderTime", (double)screenRenderTime);
-    quotas.put("totalTime", totalTime);
-    quotas.put("localReadTime", localReadTime);
-    quotas.put("JSLibInitTime", (double)JSLibInitTime);
-    quotas.put("networkTime", (double)networkTime);
-    quotas.put("templateLoadTime", (double)templateLoadTime);
-    quotas.put("SDKInitInvokeTime",(double)WXEnvironment.sSDKInitInvokeTime);
-    quotas.put("SDKInitExecuteTime",(double)WXEnvironment.sSDKInitExecuteTime);
-    quotas.put("firstScreenJSFExecuteTime",(double) firstScreenJSFExecuteTime);
-    quotas.put("componentCount",(double)componentCount);
-    quotas.put("actualNetworkTime",(double)actualNetworkTime);
-    quotas.put("pureNetworkTime",(double)pureNetworkTime);
-    quotas.put("syncTaskTime",(double)syncTaskTime);
-    quotas.put("packageSpendTime",(double)packageSpendTime);
-    quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
-    return quotas;
+  AppearanceAwareChild(WXComponent listDirectChild, WXComponent awareChild){
+    mListDirectChild = listDirectChild;
+    mAwareChild = awareChild;
   }
 
-  public Map<String,String> getDimensionMap(){
-    Map<String,String> quotas = new HashMap<>();
-    quotas.put("bizType", bizType);
-    quotas.put("templateUrl", templateUrl);
-    quotas.put("pageName", pageName);
-    quotas.put("JSLibVersion", JSLibVersion);
-    quotas.put("WXSDKVersion", WXSDKVersion);
-    quotas.put("connectionType",connectionType);
-    quotas.put("requestType",requestType);
-
-    return quotas;
+  /**
+   *
+   * @param event  {@link #APPEAR} and {@link #DISAPPEAR}
+   * @param enable
+   */
+  public void setEnableEvent(int event,boolean enable){
+      mWatchFlags[event] = enable;
   }
 
-  public static String[] getDimensions(){
-    return new String[]{"bizType","templateUrl","pageName","JSLibVersion","WXSDKVersion","connectionType","requestType"};
+  /**
+   *
+   * @param event
+   * @return
+   */
+  public boolean isWatch(int event){
+    return mWatchFlags[event];
   }
 
-  public static String[] getMeasures(){
-    return new String[]{"JSTemplateSize",
-        "JSLibSize",
-        "communicateTime",
-        "screenRenderTime",
-        "totalTime",
-        "localReadTime",
-        "JSLibInitTime",
-        "networkTime",
-        "componentCount",
-        "templateLoadTime",
-        "SDKInitInvokeTime",
-        "SDKInitExecuteTime",
-        "SDKInitTime",
-        "packageSpendTime",
-        "syncTaskTime",
-        "pureNetworkTime",
-        "actualNetworkTime",
-        "firstScreenJSFExecuteTime"};
+  public WXComponent getListDirectChild() {
+    return mListDirectChild;
   }
 
-  @Override
-  public String toString() {
-    if (WXEnvironment.isApkDebugable()) {
-      return "bizType:" + bizType + ",pageName:" + pageName + ",templateLoadTime" + templateLoadTime
-             + ",localReadTime:" + localReadTime + ",JSLibInitTime:" + JSLibInitTime
-             + ",JSLibSize:" + JSLibSize + ",templateUrl" + templateUrl
-             + ",JSTemplateSize:" + JSTemplateSize + ",communicateTime:" + communicateTime
-             + ",screenRenderTime:" + screenRenderTime
-             + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-             + ",componentCount:" + componentCount
-             + ",syncTaskTime:" + syncTaskTime
-             + ",pureNetworkTime:" + pureNetworkTime
-             + ",networkTime:" + networkTime
-             + ",actualNetworkTime:" + actualNetworkTime
-             + ",packageSpendTime:" + packageSpendTime
-             + ",connectionType:" + connectionType
-             + ",requestType:" + requestType
-             + ",initInvokeTime:"+WXEnvironment.sSDKInitInvokeTime+",initExecuteTime:"+WXEnvironment.sSDKInitExecuteTime
-             + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
-             + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
-             + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
-             + ",errMsg:" + errMsg;
-    }
-    return super.toString();
+  public WXComponent getAwareChild() {
+    return mAwareChild;
+  }
+
+  public boolean isAppear() {
+    return mAppearStatus;
+  }
+
+  public void setAppearStatus(boolean appearStatus) {
+    this.mAppearStatus = appearStatus;
   }
 }
