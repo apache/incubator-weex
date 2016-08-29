@@ -204,63 +204,22 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.component.list.WXListComponent;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/29/16.
  */
-public class ComponentTest {
-  public static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXVContainer parent = comp.getParent() == null?WXDivTest.create():comp.getParent();
-    comp.createView(parent,1);
-    comp.setLayout(domObject);
+public class WXHeaderTest {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
-
-    addEvent(comp);
+  public static WXHeader create(WXVContainer parent) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXHeader) new SimpleComponentHolder(WXHeader.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), parent, false);
   }
 
-
-  public static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
-  }
-
-  public static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
-  }
-
-  public static void destory(WXComponent comp){
-    comp.destroy();
-  }
-
-  public static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
-  }
 }
