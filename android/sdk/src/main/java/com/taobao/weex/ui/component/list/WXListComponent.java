@@ -516,16 +516,17 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         public void run() {
         if (cellComp.getHostView() != null) {
             View cellView = cellComp.getHostView();
-          if(getOrientation() == Constants.Orientation.VERTICAL){
-            int scrollY = cellView.getTop()+offset;
-            view.smoothScrollBy(0,scrollY );
-          }else{
-            int  scrollX = cellView.getLeft()+offset;
-            view.smoothScrollBy(scrollX,0);
-          }
+            if(getOrientation() == Constants.Orientation.VERTICAL){
+                int scrollY = cellView.getTop()+offset;
+                view.smoothScrollBy(0,scrollY );
+            }else{
+                int  scrollX = cellView.getLeft()+offset;
+                view.smoothScrollBy(scrollX,0);
+            }
           }
         }
-      }, 50);
+      },50);
+
       onPostScrollToPosition(pos);
     }
 

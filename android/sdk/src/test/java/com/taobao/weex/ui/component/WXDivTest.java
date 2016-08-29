@@ -238,7 +238,11 @@ public class WXDivTest {
 
 
     public static WXDiv create(){
-        WXDiv div = new WXDiv(WXSDKInstanceTest.createInstance(),new TestDomObject(),null,false);
+        return create(null);
+    }
+
+    public static WXDiv create(WXVContainer parent){
+        WXDiv div = new WXDiv(WXSDKInstanceTest.createInstance(),new TestDomObject(),parent,false);
         return div;
     }
 

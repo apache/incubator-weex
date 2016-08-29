@@ -939,6 +939,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mActivityStateListeners = null;
     }
 
+    rootView = null;
+    mScrollView = null;
     mContext = null;
     mRenderListener = null;
   }
@@ -1017,9 +1019,42 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
-  /**
-   * load bundle js listener
-   */
+  /*Global Event*/
+  private HashMap<String, List<String>> mGlobalEvents = new HashMap<>();
+
+  public void fireGlobalEventCallback(String eventName, Map<String,Object> params){
+    List<String> callbacks=mGlobalEvents.get(eventName);
+    if(callbacks!=null){
+      for(String callback:callbacks){
+        WXSDKManager.getInstance().callback(mInstanceId,callback,params);
+      }
+    }
+  }
+
+  protected void addEventListener(String eventName, String callback) {
+    if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(callback)) {
+      return;
+    }
+    List<String> callbacks = mGlobalEvents.get(eventName);
+    if (callbacks == null) {
+      callbacks = new ArrayList<>();
+      mGlobalEvents.put(eventName, callbacks);
+    }
+    callbacks.add(callback);
+  }
+  protected void removeEventListener(String eventName, String callback) {
+    if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(callback)) {
+      return;
+    }
+    List<String> callbacks = mGlobalEvents.get(eventName);
+    if (callbacks != null) {
+      callbacks.remove(callback);
+    }
+  }
+
+    /**
+     * load bundle js listener
+     */
   class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
 
     private String pageName;

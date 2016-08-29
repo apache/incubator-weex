@@ -265,7 +265,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   public static class ClickToReloadListener implements OnNestedInstanceEventListener {
     @Override
     public void onException(NestedContainer container, String errCode, String msg) {
-      if (TextUtils.equals(msg, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
+      if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
         final WXEmbed comp = ((WXEmbed)container);
         final ImageView imageView = new ImageView(comp.getContext());
         imageView.setImageResource(R.drawable.error);
@@ -366,6 +366,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if (TextUtils.equals(getVisibility(), Constants.Value.VISIBLE)) {
       loadInstance();
     }
+  }
+  public String getSrc() {
+    return src;
   }
 
   void loadInstance(){

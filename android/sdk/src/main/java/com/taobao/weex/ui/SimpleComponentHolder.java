@@ -299,12 +299,17 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
   private synchronized void generate(){
     WXLogUtils.d(TAG,"Generate Component:"+mClz.getSimpleName());
+
+    mMethods = getMethods(mClz);
+  }
+
+  static Map<String,Invoker> getMethods(Class clz){
     HashMap<String, Invoker> methods = new HashMap<>();
 
     Annotation[] annotations;
     Annotation anno;
     try {
-      for (Method method : mClz.getMethods()) {
+      for (Method method : clz.getMethods()) {
         try {
           annotations = method.getDeclaredAnnotations();
           for (int i = 0, annotationsCount = annotations.length;
@@ -325,8 +330,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
       e.printStackTrace();
       //ignore: getMethods may throw this
     }
-
-    mMethods = methods;
+    return methods;
   }
 
 

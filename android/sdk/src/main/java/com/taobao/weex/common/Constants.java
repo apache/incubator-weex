@@ -365,6 +365,7 @@ public class Constants {
     String ONLOADING = "loading";
     String ONLOAD = "load";
     String CHANGE = "change";
+    String ONPULLING_DOWN = "pullingdown";
   }
 
   public interface Scheme{

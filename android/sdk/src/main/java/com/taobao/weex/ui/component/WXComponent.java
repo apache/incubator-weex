@@ -186,14 +186,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** Use {@link #getParent()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXVContainer mParent;
-  /** Use {@link #getDOM()} instead.  Do not access this field outside of this class which will be removed soon.**/
+  /** Use {@link #getDomObject()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXDomObject mDomObj;
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public String mInstanceId;
-  public boolean registerAppearEvent = false;
-  public boolean appearState = false;
 
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
@@ -204,6 +202,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected int mAbsoluteY = 0;
   protected int mAbsoluteX = 0;
   protected Set<String> mGestureType;
+
   private BorderDrawable mBackgroundDrawable;
   private boolean mLazy;
   private int mPreRealWidth = 0;
@@ -268,10 +267,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public Context getContext(){
     return mContext;
-  }
-
-  public WXDomObject getDOM(){
-    return mDomObj;
   }
 
   /**
@@ -421,7 +416,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
 
     //calculate first screen time
-    if (!mInstance.mEnd && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
+
+    if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
       mInstance.firstScreenRenderFinished();
     }
 
@@ -658,6 +654,22 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         @Override
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
+          int[] location = new int[2];
+          mHost.getLocationOnScreen(location);
+          params.put("x",location[0]);
+          params.put("y",location[1]);
+          params.put("width",mDomObj.getCSSLayoutWidth());
+          params.put("height",mDomObj.getCSSLayoutHeight());
+          WXSDKManager.getInstance().fireEvent(mInstanceId,
+                                               mDomObj.ref,
+                                               Constants.Event.CLICK,
+                                               params);
+        }
+      });
+    } else if ((type.equals( Constants.Event.FOCUS) || type.equals( Constants.Event.BLUR)) ) {
+      addFocusChangeListener(new OnFocusChangeListener() {
+        public void onFocusChange(boolean hasFocus) {
+          Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
           WXSDKManager.getInstance().fireEvent(mInstanceId,
               mDomObj.getRef(),
@@ -683,13 +695,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
       if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
         scroller.bindDisappearEvent(this);
-      }
-
-      if(type.equals(Constants.Event.APPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
-      }
-      if(type.equals(Constants.Event.DISAPPEAR) && getParent() instanceof WXListComponent){
-        registerAppearEvent=true;
       }
 
     }
