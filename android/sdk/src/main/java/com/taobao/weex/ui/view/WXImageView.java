@@ -208,7 +208,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -219,7 +218,6 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -247,33 +245,34 @@ public class WXImageView extends ImageView implements WXGestureObservable {
     @Override
     public void draw(Canvas canvas) {
       if(mOriginal instanceof BitmapDrawable){
-        Path path;
-        RectF bounds = new RectF(ImageClipDrawable.this.getBounds());
-        BorderDrawable borderDrawable;
-        if ((borderDrawable= WXViewUtils.getBorderDrawable(WXImageView.this)) != null) {
-          path = borderDrawable.getContentPath(getPaddingTop(),
-                                               getPaddingRight(),
-                                               getPaddingBottom(),
-                                               getPaddingLeft());
-          path.offset(-getPaddingLeft(), -getPaddingTop());
-        }
-        else{
-          path=new Path();
-          path.addRect(bounds, Path.Direction.CW);
-        }
-
         Bitmap bitmap = ((BitmapDrawable) mOriginal).getBitmap();
         if(bitmap == null){
-          return;
+          //TODO Not strictly clip according to background-clip:border-box
+          mOriginal.draw(canvas);
         }
-        Matrix matrix = new Matrix();
-        matrix.setScale(bounds.width() / bitmap.getWidth(),
-                        bounds.height() / bitmap.getHeight());
-        BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        bitmapShader.setLocalMatrix(matrix);
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setShader(bitmapShader);
-        canvas.drawPath(path, mPaint);
+        else {
+          Path path;
+          RectF bounds = new RectF(ImageClipDrawable.this.getBounds());
+          BorderDrawable borderDrawable;
+          if ((borderDrawable = WXViewUtils.getBorderDrawable(WXImageView.this)) != null) {
+            path = borderDrawable.getContentPath(getPaddingTop(),
+                                                 getPaddingRight(),
+                                                 getPaddingBottom(),
+                                                 getPaddingLeft());
+            path.offset(-getPaddingLeft(), -getPaddingTop());
+          } else {
+            path = new Path();
+            path.addRect(bounds, Path.Direction.CW);
+          }
+          Matrix matrix = new Matrix();
+          matrix.setScale(bounds.width() / bitmap.getWidth(),
+                          bounds.height() / bitmap.getHeight());
+          BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+          bitmapShader.setLocalMatrix(matrix);
+          mPaint.setStyle(Paint.Style.FILL);
+          mPaint.setShader(bitmapShader);
+          canvas.drawPath(path, mPaint);
+        }
       }
       else{
         //TODO Not strictly clip according to background-clip:border-box
