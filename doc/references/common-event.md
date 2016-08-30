@@ -16,7 +16,7 @@ If a `click` event is bound to a component, the event will be triggered when the
 
 ## Longpress event      
 
-If a `longpree` event is bound to a component, the event will be triggered when the user long press on it.
+If a `longpress` event is bound to a component, the event will be triggered when the user long press on it.
 
 **Notes:** The component `input` and `switch` do not currently support this event, please use `change` or `input` event instead.
 
