@@ -12,10 +12,5 @@
 
 #endif /* TBWXDevTool_pch */
 
-#ifdef DEBUG
-# define NSLog(...) NSLog(__VA_ARGS__)
-#else
-# define NSLog(...)
-#endif
-
 #define VDom 1
+
