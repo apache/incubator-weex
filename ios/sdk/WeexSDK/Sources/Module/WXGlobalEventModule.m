@@ -8,6 +8,7 @@
 
 #import "WXGlobalEventModule.h"
 #import "WXThreadSafeMutableDictionary.h"
+#import "WXThreadSafeMutableArray.h"
 
 @interface WXGlobalEventModule()
 @property WXThreadSafeMutableDictionary *eventCallback;
@@ -28,8 +29,15 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 
 - (void)addEventListener:(NSString *)event callback:(WXModuleKeepAliveCallback)callback
 {
-    _eventCallback[event] = callback;
-    [[NSNotificationCenter defaultCenter] addObserver:weexInstance selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
+    WXThreadSafeMutableArray * array = nil;
+    if (_eventCallback[event]) {
+        [_eventCallback[event] addObject:callback];
+    } else {
+        array = [[WXThreadSafeMutableArray alloc] init];
+        [array addObject:callback];
+        _eventCallback[event] = array;
+        [[NSNotificationCenter defaultCenter] addObserver:weexInstance selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
+    }
 }
 
 - (void)removeEventListener:(NSString *)event
@@ -43,10 +51,11 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
     NSDictionary * userInfo = notification.userInfo;
     WXSDKInstance * userWeexInstance = userInfo[@"weexInstance"];
     NSDictionary * param = userInfo[@"param"];
-    bool keepAlive = [userInfo[@"keepAlive"] boolValue];
     if (userWeexInstance == weexInstance) {
-        WXModuleKeepAliveCallback callback = _eventCallback[notification.name];
-        callback(param, keepAlive);
+        for (WXModuleKeepAliveCallback callback in _eventCallback[notification.name]) {
+            callback(param, true);
+        }
+        
     }
 }
 

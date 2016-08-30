@@ -302,12 +302,11 @@ NSTimeInterval JSLibInitTime = 0;
     
 }
 
-- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params keepAlive:(BOOL)keepAlive
+- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params
 {
     NSDictionary * userInfo = @{
             @"weexInstance":self,
-            @"param":params,
-            @"keepAlive": @(keepAlive)
+            @"param":params
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
