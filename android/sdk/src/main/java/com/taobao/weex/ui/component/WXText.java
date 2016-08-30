@@ -258,6 +258,14 @@ public class WXText extends WXComponent<WXTextView>{
     }
   }
 
+  @Override
+  public void refreshData(WXComponent component) {
+    super.refreshData(component);
+    if(component instanceof WXText ) {
+      updateExtra(component.getDomObject().getExtra());
+    }
+  }
+
   /**
    * Flush view no matter what height and width the {@link WXDomObject} specifies.
    * @param extra must be a {@link Layout} object, otherwise, nothing will happen.

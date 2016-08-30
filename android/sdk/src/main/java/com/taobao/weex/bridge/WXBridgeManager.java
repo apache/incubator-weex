@@ -1157,14 +1157,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                    + ", exception function:" + function + ", exception:"
                    + exception);
     }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(
-        instanceId);
+    WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_EXECUTE;
+    StringBuilder errorMsg=new StringBuilder();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
       // TODO add errCode
       instance.onJSException(null, function, exception);
+      errorMsg.append("bundleUrl:"+instance.getBundleUrl());
+    }else{
+      errorMsg.append(" bundleUrl:instance is null!");
     }
-    WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_EXECUTE;
-    errorCode.appendErrMsg(exception);
+    errorMsg.append(" exception function:"+function);
+    errorMsg.append(" exception:"+exception);
+    errorCode.appendErrMsg(errorMsg.toString());
     commitJSBridgeAlarmMonitor(instanceId,errorCode);
   }
 

@@ -287,8 +287,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
-      setLayout(component.mDomObj);
-      setPadding(component.mDomObj.getPadding(), component.mDomObj.getBorder());
+      setLayout(component.getDomObject());
+      setPadding(component.getDomObject().getPadding(), component.getDomObject().getBorder());
       addEvents();
 
     }
@@ -345,10 +345,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
-      updateProperties(component.mDomObj.getStyles());
-      updateProperties(component.mDomObj.getAttrs());
-      updateExtra(component.mDomObj.getExtra());
+      updateProperties(component.getDomObject().getStyles());
+      updateProperties(component.getDomObject().getAttrs());
+      updateExtra(component.getDomObject().getExtra());
     }
+  }
+
+  public void refreshData(WXComponent component){
+
   }
 
   protected BorderDrawable getOrCreateBorder() {

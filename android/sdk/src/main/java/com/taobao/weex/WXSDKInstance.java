@@ -268,6 +268,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private WXRefreshData mLastRefreshData;
   private float refreshMargin = 0;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
+  private String mBundleUrl = "";
 
   /**
    * Render strategy.
@@ -470,6 +471,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
     mInstanceId = WXSDKManager.getInstance().generateInstanceId();
     WXSDKManager.getInstance().createInstance(this, template, options, jsonInitData);
     mRendered = true;
+
+    if(TextUtils.isEmpty(mBundleUrl)){
+      mBundleUrl=pageName;
+    }
   }
 
   /**
@@ -485,6 +490,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void renderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final int width, final int height, final WXRenderStrategy flag) {
 
     pageName = wrapPageName(pageName, url);
+    mBundleUrl = url;
 
     if (options == null) {
       options = new HashMap<String, Object>();
@@ -943,6 +949,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
     mScrollView = null;
     mContext = null;
     mRenderListener = null;
+  }
+
+  public String getBundleUrl() {
+    return mBundleUrl;
   }
 
   public ViewGroup getRootView() {
