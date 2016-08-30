@@ -34,7 +34,7 @@
 - (void)addView:(UIView *)view;
 - (void)stopTrackingAllViews;
 
-//- (WXDOMNode *)rootNode;
+- (WXDOMNode *)rootNode;
 - (WXDOMNode *)rootComponentNode;
 - (void)removeWXComponentRef:(NSString *)ref withInstanceId:(NSString *)instanceId;
 - (void)addWXComponentRef:(NSString *)ref withInstanceId:(NSString *)instanceId;
