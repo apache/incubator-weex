@@ -6,13 +6,13 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PonyDebugger.h"
-#import "PDCSSDomain.h"
+#import "WXPonyDebugger.h"
+#import "WXCSSDomain.h"
 
-@interface WXCSSDomainController : PDDomainController<PDCSSCommandDelegate>
+@interface WXCSSDomainController : WXDomainController<WXCSSCommandDelegate>
 
 + (WXCSSDomainController *)defaultInstance;
 
-@property (nonatomic, strong) PDCSSDomain *domain;
+@property (nonatomic, strong) WXCSSDomain *domain;
 
 @end

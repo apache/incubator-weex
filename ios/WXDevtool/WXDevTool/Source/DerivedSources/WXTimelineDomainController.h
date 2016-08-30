@@ -6,13 +6,13 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PonyDebugger.h"
-#import "PDTimelineDomain.h"
+#import "WXPonyDebugger.h"
+#import "WXTimelineDomain.h"
 
-@interface WXTimelineDomainController : PDDomainController
+@interface WXTimelineDomainController : WXDomainController
 
 +(WXTimelineDomainController *)defaultInstance;
 
-@property (nonatomic, strong) PDTimelineDomain *domain;
+@property (nonatomic, strong) WXTimelineDomain *domain;
 
 @end

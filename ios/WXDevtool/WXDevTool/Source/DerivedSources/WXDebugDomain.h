@@ -6,20 +6,20 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "PDDynamicDebuggerDomain.h"
-#import "PDObject.h"
-#import "PDDebugger.h"
+#import "WXDynamicDebuggerDomain.h"
+#import "WXObject.h"
+#import "WXDebugger.h"
 #import "WXDevtool.h"
 
 @protocol WXDebugCommandDelegate;
 
-@interface WXDebugDomain : PDDynamicDebuggerDomain
+@interface WXDebugDomain : WXDynamicDebuggerDomain
 
-@property (nonatomic, assign) id <WXDebugCommandDelegate, PDCommandDelegate>delegate;
+@property (nonatomic, assign) id <WXDebugCommandDelegate, WXCommandDelegate>delegate;
 
 @end
 
-@protocol WXDebugCommandDelegate <PDCommandDelegate>
+@protocol WXDebugCommandDelegate <WXCommandDelegate>
 @optional
 - (void)domain:(WXDebugDomain *)domain sendLogLevel:(NSString *)level WithCallback:(void (^)(id error))callback;
 

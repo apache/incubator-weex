@@ -66,7 +66,7 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"PDDebugger") : [WXJSCoreBridge class];
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
     
     if (_jsBridge && [_jsBridge isKindOfClass:bridgeClass]) {
         return _jsBridge;
@@ -77,7 +77,7 @@ _Pragma("clang diagnostic pop") \
         _frameworkLoadFinished = NO;
     }
     
-    _jsBridge = _debugJS ? [NSClassFromString(@"PDDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
      __weak typeof(self) weakSelf = self;
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
@@ -313,7 +313,7 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToDevToolWithUrl:(NSURL *)url
 {
-    id webSocketBridge = [NSClassFromString(@"PDDebugger") alloc];
+    id webSocketBridge = [NSClassFromString(@"WXDebugger") alloc];
     if(!webSocketBridge || ![webSocketBridge respondsToSelector:NSSelectorFromString(@"connectToURL:")]) {
         return;
     } else {

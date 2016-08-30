@@ -17,7 +17,7 @@
 }
 
 #pragma mark - Public Method
-- (void)handleMethodWithName:(NSString *)methodName parameters:(NSDictionary *)params responseCallback:(PDResponseCallback)responseCallback {
+- (void)handleMethodWithName:(NSString *)methodName parameters:(NSDictionary *)params responseCallback:(WXResponseCallback)responseCallback {
     if ([methodName isEqualToString:@"enable"] && [self.delegate respondsToSelector:@selector(domain:enableWithCallback:)]) {
         [self.delegate domain:self enableWithCallback:^(id error) {
             responseCallback(nil, error);
