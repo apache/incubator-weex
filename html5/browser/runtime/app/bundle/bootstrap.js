@@ -1,6 +1,4 @@
-// import semver from 'semver'
 import Vm from '../../../../default/vm'
-// import * as downgrade from '../downgrade'
 import { isPlainObject } from '../../../utils'
 import {
   isWeexComponent,
@@ -32,30 +30,7 @@ export function bootstrap (app, name, config, data) {
   config = isPlainObject(config) ? config : {}
 
   console.log(`transformerVersion: ${config.transformerVersion}, `
-    + `available transformerVersion: ${global.transformerVersion}`)
-
-  // if (typeof config.transformerVersion === 'string' &&
-  //   typeof global.transformerVersion === 'string' &&
-  //   !semver.satisfies(config.transformerVersion,
-  //     global.transformerVersion)) {
-  //   return new Error(`JS Bundle version: ${config.transformerVersion} ` +
-  //     `not compatible with ${global.transformerVersion}`)
-  // }
-
-  // const _checkDowngrade = downgrade.check(config.downgrade)
-  /* istanbul ignore if */
-  // if (_checkDowngrade.isDowngrade) {
-  //   app.callTasks([{
-  //     module: 'instanceWrap',
-  //     method: 'error',
-  //     args: [
-  //       _checkDowngrade.errorType,
-  //       _checkDowngrade.code,
-  //       _checkDowngrade.errorMessage
-  //     ]
-  //   }])
-  //   return new Error(`Downgrade[${_checkDowngrade.code}]: ${_checkDowngrade.errorMessage}`)
-  // }
+    + `available transformerVersion: ${global.transformVersion}`)
 
   app.vm = new Vm(cleanName, null, { _app: app }, null, data)
 }
