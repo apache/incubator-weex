@@ -100,7 +100,7 @@
             [self setAutofocus:[attributes[@"autofocus"] boolValue]];
         }
         if (attributes[@"disabled"]) {
-            [_inputView setEnabled:[attributes[@"disabled"] boolValue]];
+            [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
         }
         if (attributes[@"placeholder"]) {
             _placeholder = attributes[@"placeholder"];
@@ -238,7 +238,7 @@
         [self setAutofocus:[attributes[@"autofocus"] boolValue]];
     }
     if (attributes[@"disabled"]) {
-        [_inputView setEnabled:[attributes[@"disabled"] boolValue]];
+        [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
     }
     if (attributes[@"maxlength"]) {
         _maxLength = [attributes[@"maxlength"] integerValue];
@@ -293,6 +293,8 @@
     if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
         [self setBorder:border];
     }
+    
+    [self setTextFont];
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -358,7 +360,7 @@
 {
     if (_changeEvent) {
         if (![[textField text] isEqualToString:_changeEventString]) {
-            [self fireEvent:@"change" params:@{@"value":[textField text]} domChanges:@{@"value":[textField text]}];
+            [self fireEvent:@"change" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
         }
     }
     if (_blurEvent) {
@@ -394,8 +396,7 @@
 {
     if (b) {
         [_inputView becomeFirstResponder];
-    }
-    else {
+    } else {
         [_inputView resignFirstResponder];
     }
 }
