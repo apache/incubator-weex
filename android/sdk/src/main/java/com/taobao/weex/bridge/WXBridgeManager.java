@@ -1159,7 +1159,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       // TODO add errCode
       instance.onJSException(null, function, exception);
     }
-    commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
+    WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_EXECUTE;
+    errorCode.appendErrMsg(exception);
+    commitJSBridgeAlarmMonitor(instanceId,errorCode);
   }
 
   public static class TimerInfo {
