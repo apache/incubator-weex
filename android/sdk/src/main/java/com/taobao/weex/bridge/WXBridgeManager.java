@@ -291,7 +291,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    * JSThread
    */
   private WXThread mJSThread;
-  private Handler mJSHandler;
+  /** package **/ Handler mJSHandler;
   private IWXBridge mWXBridge;
   private IWXDebugProxy mWxDebugProxy;
 

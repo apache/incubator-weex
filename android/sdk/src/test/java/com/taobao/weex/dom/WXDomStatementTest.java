@@ -202,65 +202,226 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
+import com.taobao.weex.ui.WXRenderManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/29/16.
  */
-public class ComponentTest {
-  public static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXVContainer parent = comp.getParent() == null?WXDivTest.create():comp.getParent();
-    comp.createView(parent,1);
-    comp.setLayout(domObject);
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomStatementTest {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
+  WXDomStatement stmt;
+  WXRenderManager rednerManager;
+  WXSDKInstance instance;
 
-    addEvent(comp);
+  @Before
+  public void setUp() throws Exception {
+    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+    ShadowLooper looper = WXBridgeManagerTest.getLooper();
+    looper.idle();
+    ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+    instance = WXSDKInstanceTest.createInstance();
+    rednerManager = new WXRenderManager();
+    rednerManager.registerInstance(instance);//
+    stmt = new WXDomStatement(instance.getInstanceId(),rednerManager );
   }
 
-
-  public static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
+  @After
+  public void tearDown() throws Exception {
+    stmt.destroy();
   }
 
-  public static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
+  void createBody(){
+    JSONObject body = new JSONObject();
+    body.put("type","div");
+    body.put("ref",WXDomObject.ROOT);
+    stmt.createBody(body);
   }
 
-  public static void destory(WXComponent comp){
-    comp.destroy();
+  @Test
+  public void testCreateBody() throws Exception {
+    createBody();
+
+    stmt.batch();
   }
 
-  public static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
+  @Test
+  public void testAddDom() throws Exception {
+    createBody();
+
+    JSONObject obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testMoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.moveDom("100",WXDomObject.ROOT,1);
+    stmt.batch();
+  }
+
+  @Test
+  public void testRemoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.removeDom("101");
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateAttrs() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+
+    stmt.updateAttrs("100",new JSONObject());
+    stmt.updateAttrs("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateStyle() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.updateStyle("100",new JSONObject());
+    stmt.updateStyle("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testAddEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.addEvent("100","click");
+    stmt.addEvent("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testRemoveEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.removeEvent("100",null);
+    stmt.addEvent("100","click");
+    stmt.removeEvent("100","click");
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testScrollToDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.scrollToDom("100",null);
+    stmt.batch();
+  }
+
+  @Test
+  public void testCreateFinish() throws Exception {
+    createBody();
+    stmt.createFinish();
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testRefreshFinish() throws Exception {
+    createBody();
+    stmt.refreshFinish();
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateFinish() throws Exception {
+    createBody();
+
+    stmt.updateFinish();
+    stmt.batch();
+  }
+
+  @Test
+  public void testStartAnimation() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+    stmt.startAnimation("100","",null);
   }
 }

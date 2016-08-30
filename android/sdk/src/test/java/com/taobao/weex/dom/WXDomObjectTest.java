@@ -202,65 +202,93 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/29/16.
  */
-public class ComponentTest {
-  public static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXVContainer parent = comp.getParent() == null?WXDivTest.create():comp.getParent();
-    comp.createView(parent,1);
-    comp.setLayout(domObject);
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomObjectTest {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
+  WXDomObject dom;
 
-    addEvent(comp);
+  @Before
+  public void setUp() throws Exception {
+    dom = new TestDomObject();
   }
 
-
-  public static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
+  @After
+  public void tearDown() throws Exception {
+    dom.destroy();
   }
 
-  public static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
+  @Test
+  public void testParseFromJson() throws Exception {
+    dom.parseFromJson(JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}"));
+    assertEquals(dom.getRef(),"100");
+    assertEquals(dom.getType(),"div");
+
+    dom.applyStyleToNode();
   }
 
-  public static void destory(WXComponent comp){
-    comp.destroy();
+  @Test
+  public void testAdd() throws Exception {
+    JSONObject obj = new JSONObject();
+    obj.put("ref","100");
+    obj.put("type","div");
+    dom.parseFromJson(obj);
+
+    JSONObject child = new JSONObject();
+    child.put("ref","101");
+    child.put("type","test");
+    WXDomObject childDom = new WXDomObject();
+    childDom.parseFromJson(child);
+
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
+
+    dom.removeChildAt(0);
+    assertEquals(dom.getChildCount(),0);
+
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
+
+    dom.remove(childDom);
+
   }
 
-  public static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
+  @Test
+  public void testClone() throws Exception {
+    JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}");
+    JSONObject obj = new JSONObject();
+    obj.put("ref","101");
+    obj.put("type","test");
+
+    JSONArray event = new JSONArray();
+    event.add("click");
+    obj.put("event",event);
+    dom.parseFromJson(obj);
+
+    WXDomObject clone = dom.clone();
+    assertEquals(clone.getRef(),"101");
+    assertEquals(clone.getType(),"test");
+
   }
 }

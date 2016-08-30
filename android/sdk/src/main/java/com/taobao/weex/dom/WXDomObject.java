@@ -511,6 +511,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
     child.parent = this;
   }
 
+  @Deprecated
   public void add2Dom(WXDomObject child, int index) {
     if (child == null || index < -1 || sDestroy.get()) {
       return;

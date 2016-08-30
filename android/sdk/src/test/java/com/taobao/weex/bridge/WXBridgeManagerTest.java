@@ -216,12 +216,18 @@ import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowLooper;
 
 /**
  * Created by lixinke on 16/2/24.
  */
 @RunWith(RobolectricTestRunner.class)
 public class WXBridgeManagerTest extends TestCase {
+
+    public static ShadowLooper getLooper(){
+        return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
+    }
 
     public static void setBridgeManager(WXBridgeManager bridge){
         WXBridgeManager.mBridgeManager = bridge;

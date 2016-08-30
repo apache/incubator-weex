@@ -202,65 +202,88 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.list;
 
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import junit.framework.TestFailure;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.component.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 8/3/16.
+ * Created by sospartan on 8/29/16.
  */
-public class ComponentTest {
-  public static void create(WXComponent comp){
-    TestDomObject domObject = new TestDomObject();
-    WXVContainer parent = comp.getParent() == null?WXDivTest.create():comp.getParent();
-    comp.createView(parent,1);
-    comp.setLayout(domObject);
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXListComponentTest {
 
-    domObject = new TestDomObject();
-    comp.updateDom(domObject);
-    comp.applyLayoutAndEvent(comp);
+  WXListComponent component;
 
-    addEvent(comp);
+
+  public static WXListComponent create(WXVContainer parent) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXListComponent) new SimpleComponentHolder(WXListComponent.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), parent, false);
   }
 
+  @Before
+  public void setUp() throws Exception {
+    WXDiv div = WXDivTest.create();
+    ComponentTest.create(div);
+    component = create(div);
+    ComponentTest.create(component);
 
-  public static void setProperty(WXComponent comp,String[] propNames,Object[][] valueGroups){
-    Map<String, Object> props = new HashMap<>();
-    int len = propNames.length;
-
-    if(propNames.length != valueGroups.length){
-      throw new RuntimeException("Property name and value group length not match");
-    }
-    for (int i=0;i<len;i++){
-      for (Object obj:valueGroups[i]){
-        props.put(propNames[i],obj);
-        comp.updateProperties(props);
-      }
-
-    }
   }
 
-  public static void addEvent(WXComponent comp){
-    for (String event :
-        TestConstants.Events) {
-      comp.addEvent(event);
-    }
+  @Test
+  public void testAddChild() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    child = WXHeaderTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
   }
 
-  public static void destory(WXComponent comp){
-    comp.destroy();
+  @Test
+  public void testScrollTo() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    child = WXHeaderTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    component.scrollTo(child,0);
   }
 
-  public static <T> T createComponent(WXDomObject dom, WXVContainer parent, Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-     return type
-         .getConstructor(WXSDKInstance.class,WXDomObject.class,WXVContainer.class,boolean.class)
-        .newInstance(parent.mInstance,dom,parent,false);
+  @Test
+  public void testAppear() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    component.bindAppearEvent(child);
+
+    component.notifyAppearStateChange(0,0,0,10);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    component.destroy();
   }
 }
