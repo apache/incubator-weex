@@ -34,7 +34,8 @@ function init (Weex) {
     if (!nodeType) {
       console.warn(`[h5-render] no nodeType is specified, construct Root use 'div' by default.`)
       nodeType = 'div'
-    } else if (config.validRoots.indexOf(nodeType) === -1) {
+    }
+    else if (config.validRoots.indexOf(nodeType) === -1) {
       console.warn(`[h5-render] the root component type '${nodeType}' is not one of
 the types in [${config.validRoots}] list. It is auto downgraded
 to 'div'.`)

@@ -56,7 +56,7 @@ function noop () {}
   !config.debug && (console.debug = noop)
 
   // config for the 'downgrade'.
-  for (let key in params) {
+  for (const key in params) {
     if (params.hasOwnProperty(key)) {
       const match = key.match(/^downgrade_(\w+)$/)
       if (!match || !match[1]) {
@@ -71,7 +71,6 @@ function noop () {}
       config.downgrade[dk] = dr === true || dr === 'true'
     }
   }
-
 })()
 
 export default function Weex (options) {
