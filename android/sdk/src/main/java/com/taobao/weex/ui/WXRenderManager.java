@@ -288,7 +288,7 @@ public class WXRenderManager {
     }));
   }
 
-  public void createInstance(WXSDKInstance instance) {
+  public void registerInstance(WXSDKInstance instance) {
     mRegistries.put(instance.getInstanceId(), new WXRenderStatement(instance));
   }
 

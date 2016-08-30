@@ -242,7 +242,7 @@ public class WXDomStatementTest {
     ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
     instance = WXSDKInstanceTest.createInstance();
     rednerManager = new WXRenderManager();
-    rednerManager.createInstance(instance);//
+    rednerManager.registerInstance(instance);//
     stmt = new WXDomStatement(instance.getInstanceId(),rednerManager );
   }
 
