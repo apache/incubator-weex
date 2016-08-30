@@ -202,122 +202,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex;
 
-import android.text.TextUtils;
-
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-
+import com.taobao.weex.ui.WXRenderManager;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 8/30/16.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
+public class WXSDKManagerTest {
 
-    WXRenderStatement mWXRenderStatement;
+  public static void setRenderManager(WXRenderManager rm){
+    WXSDKManager.getInstance().mWXRenderManager = rm;
+  }
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new WXRenderStatement(instance);
-    }
+  @Before
+  public void setUp() throws Exception {
 
-    public void testCreateBody() throws Exception {
+  }
 
-    }
+  @After
+  public void tearDown() throws Exception {
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
-    }
-
-    public void testSetPadding() throws Exception {
-
-    }
-
-    public void testSetLayout() throws Exception {
-
-    }
-
-    public void testSetExtra() throws Exception {
-
-    }
-
-    public void testAddComponent() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
-
-
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
-    }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
+  }
 }

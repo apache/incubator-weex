@@ -273,6 +273,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String JS_BRIDGE = "jsBridge";
   //Alert
   public static final String JS_FRAMEWORK = "jsFramework";
+  // args
+  public static final String MODULE = "module";
+  public static final String METHOD = "method";
+  public static final String ARGS = "args";
   private static final String UNDEFINED = "-1";
   private static final int INIT_FRAMEWORK_OK = 1;
 
@@ -486,13 +490,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         for (int i = 0; i < size; ++i) {
           task = (JSONObject) array.get(i);
           if (task != null && WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-            if (TextUtils.equals(WXDomModule.WXDOM, (String) task.get(WXDomModule.MODULE))) {
+            if (TextUtils.equals(WXDomModule.WXDOM, (String) task.get(MODULE))) {
               sDomModule = getDomModule(instanceId);
               sDomModule.callDomMethod(task);
               sDomModule.mWXSDKInstance = null;
             } else {
-              WXModuleManager.callModuleMethod(instanceId, (String) task.get(WXDomModule.MODULE),
-                      (String) task.get(WXDomModule.METHOD), (JSONArray) task.get(WXDomModule.ARGS));
+              WXModuleManager.callModuleMethod(instanceId, (String) task.get(MODULE),
+                      (String) task.get(METHOD), (JSONArray) task.get(ARGS));
             }
           }
         }

@@ -163,7 +163,7 @@ public class WXSDKManager {
   private static AtomicInteger sInstanceId = new AtomicInteger(0);
   private final WXDomManager mWXDomManager;
   private WXBridgeManager mBridgeManager;
-  private WXRenderManager mWXRenderManager;
+  /** package **/ WXRenderManager mWXRenderManager;
 
   private IWXUserTrackAdapter mIWXUserTrackAdapter;
   private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
