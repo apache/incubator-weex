@@ -202,117 +202,226 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.bridge;
+package com.taobao.weex.dom;
 
-import android.os.Handler;
-
-import android.os.HandlerThread;
-import android.os.Looper;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
-import junit.framework.TestCase;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
+import com.taobao.weex.ui.WXRenderManager;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
 /**
- * Created by lixinke on 16/2/24.
+ * Created by sospartan on 8/29/16.
  */
-@RunWith(RobolectricTestRunner.class)
-public class WXBridgeManagerTest extends TestCase {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomStatementTest {
 
-    public static ShadowLooper getLooper(){
-        return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
-    }
+  WXDomStatement stmt;
+  WXRenderManager rednerManager;
+  WXSDKInstance instance;
 
-    public static void setBridgeManager(WXBridgeManager bridge){
-        WXBridgeManager.mBridgeManager = bridge;
-    }
+  @Before
+  public void setUp() throws Exception {
+    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+    ShadowLooper looper = WXBridgeManagerTest.getLooper();
+    looper.idle();
+    ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+    instance = WXSDKInstanceTest.createInstance();
+    rednerManager = new WXRenderManager();
+    rednerManager.createInstance(instance);//
+    stmt = new WXDomStatement(instance.getInstanceId(),rednerManager );
+  }
 
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+  @After
+  public void tearDown() throws Exception {
+    stmt.destroy();
+  }
 
-    @Test
-    public void testGetJSHander() throws Exception {
-//        Handler handler=WXBridgeManager.getInstance().getJSHandler();
-//        assertNotNull(handler);
+  void createBody(){
+    JSONObject body = new JSONObject();
+    body.put("type","div");
+    body.put("ref",WXDomObject.ROOT);
+    stmt.createBody(body);
+  }
 
-    }
+  @Test
+  public void testCreateBody() throws Exception {
+    createBody();
 
-    public void testGetInstance() throws Exception {
+    stmt.batch();
+  }
 
-        WXBridgeManager instance = WXBridgeManager.getInstance();
-        assertNotNull(instance);
+  @Test
+  public void testAddDom() throws Exception {
+    createBody();
 
-    }
+    JSONObject obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
 
-    public void testRestart() throws Exception {
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    }
+    stmt.batch();
+  }
 
-    public void testSetStackTopInstance() throws Exception {
+  @Test
+  public void testMoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-        WXBridgeManager.getInstance().setStackTopInstance("");
-    }
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    public void testCallNative() throws Exception {
+    stmt.moveDom("100",WXDomObject.ROOT,1);
+    stmt.batch();
+  }
 
-    }
+  @Test
+  public void testRemoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    public void testInitScriptsFramework() throws Exception {
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    }
+    stmt.removeDom("101");
 
-    public void testFireEvent() throws Exception {
+    stmt.batch();
+  }
 
-    }
+  @Test
+  public void testUpdateAttrs() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    public void testCallback() throws Exception {
 
-    }
+    stmt.updateAttrs("100",new JSONObject());
+    stmt.updateAttrs("100",null);
 
-    public void testCallback1() throws Exception {
+    stmt.batch();
+  }
 
-    }
+  @Test
+  public void testUpdateStyle() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    public void testRefreshInstance() throws Exception {
+    stmt.updateStyle("100",new JSONObject());
+    stmt.updateStyle("100",null);
 
-    }
+    stmt.batch();
+  }
 
-    public void testCreateInstance() throws Exception {
+  @Test
+  public void testAddEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    }
+    stmt.addEvent("100","click");
+    stmt.addEvent("100",null);
 
-    public void testDestroyInstance() throws Exception {
+    stmt.batch();
+  }
 
-    }
+  @Test
+  public void testRemoveEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    public void testRegisterComponents() throws Exception {
+    stmt.removeEvent("100",null);
+    stmt.addEvent("100","click");
+    stmt.removeEvent("100","click");
 
-    }
+    stmt.batch();
+  }
 
-    public void testRegisterModules() throws Exception {
+  @Test
+  public void testScrollToDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    }
+    stmt.scrollToDom("100",null);
+    stmt.batch();
+  }
 
-    public void testHandleMessage() throws Exception {
+  @Test
+  public void testCreateFinish() throws Exception {
+    createBody();
+    stmt.createFinish();
 
-    }
+    stmt.batch();
+  }
 
-    public void testDestroy() throws Exception {
+  @Test
+  public void testRefreshFinish() throws Exception {
+    createBody();
+    stmt.refreshFinish();
 
-    }
+    stmt.batch();
+  }
 
-    public void testReportJSException() throws Exception {
+  @Test
+  public void testUpdateFinish() throws Exception {
+    createBody();
 
-    }
+    stmt.updateFinish();
+    stmt.batch();
+  }
 
-    public void testCommitJSBridgeAlarmMonitor() throws Exception {
-
-    }
+  @Test
+  public void testStartAnimation() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+    stmt.startAnimation("100","",null);
+  }
 }

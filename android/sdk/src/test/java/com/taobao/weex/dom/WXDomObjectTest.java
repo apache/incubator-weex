@@ -202,117 +202,93 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.bridge;
+package com.taobao.weex.dom;
 
-import android.os.Handler;
-
-import android.os.HandlerThread;
-import android.os.Looper;
-import com.taobao.weex.WXSDKInstance;
-import junit.framework.TestCase;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
-import org.robolectric.shadows.ShadowLooper;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by lixinke on 16/2/24.
+ * Created by sospartan on 8/29/16.
  */
-@RunWith(RobolectricTestRunner.class)
-public class WXBridgeManagerTest extends TestCase {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomObjectTest {
 
-    public static ShadowLooper getLooper(){
-        return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
-    }
+  WXDomObject dom;
 
-    public static void setBridgeManager(WXBridgeManager bridge){
-        WXBridgeManager.mBridgeManager = bridge;
-    }
+  @Before
+  public void setUp() throws Exception {
+    dom = new TestDomObject();
+  }
 
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+  @After
+  public void tearDown() throws Exception {
+    dom.destroy();
+  }
 
-    @Test
-    public void testGetJSHander() throws Exception {
-//        Handler handler=WXBridgeManager.getInstance().getJSHandler();
-//        assertNotNull(handler);
+  @Test
+  public void testParseFromJson() throws Exception {
+    dom.parseFromJson(JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}"));
+    assertEquals(dom.getRef(),"100");
+    assertEquals(dom.getType(),"div");
 
-    }
+    dom.applyStyleToNode();
+  }
 
-    public void testGetInstance() throws Exception {
+  @Test
+  public void testAdd() throws Exception {
+    JSONObject obj = new JSONObject();
+    obj.put("ref","100");
+    obj.put("type","div");
+    dom.parseFromJson(obj);
 
-        WXBridgeManager instance = WXBridgeManager.getInstance();
-        assertNotNull(instance);
+    JSONObject child = new JSONObject();
+    child.put("ref","101");
+    child.put("type","test");
+    WXDomObject childDom = new WXDomObject();
+    childDom.parseFromJson(child);
 
-    }
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
 
-    public void testRestart() throws Exception {
+    dom.removeChildAt(0);
+    assertEquals(dom.getChildCount(),0);
 
-    }
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
 
-    public void testSetStackTopInstance() throws Exception {
+    dom.remove(childDom);
 
-        WXBridgeManager.getInstance().setStackTopInstance("");
-    }
+  }
 
-    public void testCallNative() throws Exception {
+  @Test
+  public void testClone() throws Exception {
+    JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}");
+    JSONObject obj = new JSONObject();
+    obj.put("ref","101");
+    obj.put("type","test");
 
-    }
+    JSONArray event = new JSONArray();
+    event.add("click");
+    obj.put("event",event);
+    dom.parseFromJson(obj);
 
-    public void testInitScriptsFramework() throws Exception {
+    WXDomObject clone = dom.clone();
+    assertEquals(clone.getRef(),"101");
+    assertEquals(clone.getType(),"test");
 
-    }
-
-    public void testFireEvent() throws Exception {
-
-    }
-
-    public void testCallback() throws Exception {
-
-    }
-
-    public void testCallback1() throws Exception {
-
-    }
-
-    public void testRefreshInstance() throws Exception {
-
-    }
-
-    public void testCreateInstance() throws Exception {
-
-    }
-
-    public void testDestroyInstance() throws Exception {
-
-    }
-
-    public void testRegisterComponents() throws Exception {
-
-    }
-
-    public void testRegisterModules() throws Exception {
-
-    }
-
-    public void testHandleMessage() throws Exception {
-
-    }
-
-    public void testDestroy() throws Exception {
-
-    }
-
-    public void testReportJSException() throws Exception {
-
-    }
-
-    public void testCommitJSBridgeAlarmMonitor() throws Exception {
-
-    }
+  }
 }

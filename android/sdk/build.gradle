@@ -48,6 +48,8 @@ android {
     buildToolsVersion "23.0.2"
     resourcePrefix "weex"
 
+    useLibrary 'org.apache.http.legacy'
+
     def jsfmVersion = "0.15.2"
     try{
         def line
@@ -129,7 +131,8 @@ dependencies {
     testCompile 'org.powermock:powermock-module-testng:1.6.4'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    testCompile 'org.robolectric:robolectric:3.0-rc3'
+    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile "org.robolectric:shadows-httpclient:3.0"
     testCompile 'org.json:json:20160212'
 }
 

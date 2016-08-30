@@ -259,7 +259,7 @@ class WXDomStatement {
   public static final String CHILDREN = "children";
   public static final String TYPE = "type";
   public static final String DOM_MODULE = "domModule";
-  private final ConcurrentHashMap<String, WXDomObject> mRegistry;
+  /** package **/ final ConcurrentHashMap<String, WXDomObject> mRegistry;
   private String mInstanceId;
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
@@ -870,7 +870,7 @@ class WXDomStatement {
    * @see #updateAttrs(String, JSONObject)
    */
   void updateStyle(String ref, JSONObject style) {
-    if (mDestroy) {
+    if (mDestroy || style == null) {
       return;
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
@@ -948,7 +948,7 @@ class WXDomStatement {
    *
    * @param ref Reference of the dom.
    * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.ui.component.WXEventType} or a gesture defined in {@link com.taobao
+   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
    * .weex.ui.view.gesture.WXGestureType}
    */
   void addEvent(final String ref, final String type) {
