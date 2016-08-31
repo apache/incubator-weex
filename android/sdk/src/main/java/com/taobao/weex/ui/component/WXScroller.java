@@ -356,14 +356,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * Setting refresh view and loading view
    * @param child the refresh_view or loading_view
    */
-  private void checkRefreshOrLoading(WXComponent child) {
+  private void checkRefreshOrLoading(final WXComponent child) {
     if (child instanceof WXRefresh) {
       ((BaseBounceView)mHost).setOnRefreshListener((WXRefresh)child);
-      final WXComponent temp = child;
       Runnable runnable = WXThread.secure(new Runnable(){
         @Override
         public void run() {
-          ((BaseBounceView)mHost).setHeaderView(temp.getHostView());
+          ((BaseBounceView)mHost).setHeaderView(child);
         }
       });
       handler.postDelayed(runnable,100);
@@ -371,11 +370,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
     if (child instanceof WXLoading) {
       ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
-      final WXComponent temp = child;
       Runnable runnable= WXThread.secure(new Runnable(){
         @Override
         public void run() {
-          ((BaseBounceView)mHost).setFooterView(temp.getHostView());
+          ((BaseBounceView)mHost).setFooterView(child);
         }
       });
       handler.postDelayed(runnable,100);
