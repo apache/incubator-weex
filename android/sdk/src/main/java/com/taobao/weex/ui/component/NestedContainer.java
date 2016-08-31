@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.view.ViewGroup;
+import com.taobao.weex.WXSDKInstance;
 
 /**
  * Created by sospartan on 8/24/16.
@@ -214,7 +215,19 @@ public interface NestedContainer {
 
   ViewGroup getViewContainer();
 
+  void renderNewURL(String url);
+
   interface OnNestedInstanceEventListener {
     void onException(NestedContainer comp, String errCode, String msg);
+
+    /**
+     *
+     * @param comp
+     * @param src
+     * @return true if keep load
+     */
+    boolean onPreCreate(NestedContainer comp, String src);
+
+    void onCreated(NestedContainer comp, WXSDKInstance nestedInstance);
   }
 }
