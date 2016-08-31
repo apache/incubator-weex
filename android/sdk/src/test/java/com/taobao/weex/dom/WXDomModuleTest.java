@@ -209,6 +209,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManager;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -269,6 +270,11 @@ public class WXDomModuleTest {
     module.mWXSDKInstance = WXSDKInstanceTest.createInstance();
   }
 
+  @After
+  public void tearDown() throws Exception {
+    WXDomManagerTest.getLooper().idle();
+  }
+
   @Test
   public void testCallDomMethod() throws Exception {
     module.callDomMethod(null);
@@ -302,48 +308,5 @@ public class WXDomModuleTest {
     }
   }
 
-  @Test
-  public void testCreateBody() throws Exception {
 
-  }
-
-  @Test
-  public void testUpdateAttrs() throws Exception {
-
-  }
-
-  @Test
-  public void testUpdateStyle() throws Exception {
-
-  }
-
-  @Test
-  public void testRemoveElement() throws Exception {
-
-  }
-
-  @Test
-  public void testAddElement() throws Exception {
-
-  }
-
-  @Test
-  public void testMoveElement() throws Exception {
-
-  }
-
-  @Test
-  public void testAddEvent() throws Exception {
-
-  }
-
-  @Test
-  public void testRemoveEvent() throws Exception {
-
-  }
-
-  @Test
-  public void testScrollToElement() throws Exception {
-
-  }
 }

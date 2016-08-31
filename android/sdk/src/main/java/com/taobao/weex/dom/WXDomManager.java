@@ -235,7 +235,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class WXDomManager {
 
   private WXThread mDomThread;
-  private Handler mDomHandler;
+  /** package **/ Handler mDomHandler;
   private WXRenderManager mWXRenderManager;
   private ConcurrentHashMap<String, WXDomStatement> mDomRegistries;
 
