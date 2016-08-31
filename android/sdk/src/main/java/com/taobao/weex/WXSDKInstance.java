@@ -1062,6 +1062,13 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
+  protected void removeEventListener(String eventName) {
+    if (TextUtils.isEmpty(eventName)) {
+      return;
+    }
+    mGlobalEvents.remove(eventName);
+  }
+
     /**
      * load bundle js listener
      */

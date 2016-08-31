@@ -124,8 +124,12 @@ public class GlobalEventModule extends WXModule {
     mWXSDKInstance.addEventListener(eventName,callback);
   }
 
-  @WXModuleAnno
   public void removeEventListener(String eventName, String callback) {
     mWXSDKInstance.removeEventListener(eventName,callback);
+  }
+
+  @WXModuleAnno
+  public void removeEventListener(String eventName){
+    mWXSDKInstance.removeEventListener(eventName);
   }
 }
