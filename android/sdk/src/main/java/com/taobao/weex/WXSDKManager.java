@@ -151,6 +151,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -237,7 +238,7 @@ public class WXSDKManager {
     mBridgeManager.initScriptsFramework(framework);
   }
 
-  public void registerComponents(ArrayList<Map<String, String>> components) {
+  public void registerComponents(List<Map<String, String>> components) {
     mBridgeManager.registerComponents(components);
   }
 

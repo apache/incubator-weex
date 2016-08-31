@@ -309,7 +309,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mInit;
   }
 
-  private List<ArrayList<Map<String, String>>> mRegisterComponentFailList = new ArrayList<>(8);
+  private List<List<Map<String, String>>> mRegisterComponentFailList = new ArrayList<>(8);
   private List<Map<String, Object>> mRegisterModuleFailList = new ArrayList<>(8);
 
   private List<String> mDestroyedInstanceId = new ArrayList<>();
@@ -569,6 +569,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     msg.sendToTarget();
   }
 
+  @Deprecated
   public void fireEvent(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data){
     this.fireEvent(instanceId, ref, type, data, null);
@@ -883,15 +884,24 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         break;
       case WXJSBridgeMsgType.SET_TIMEOUT:
         TimerInfo timerInfo = (TimerInfo) msg.obj;
+        if(timerInfo == null){
+          break;
+        }
         WXJSObject obj = new WXJSObject(WXJSObject.String, timerInfo.callbackId);
         WXJSObject[] args = {obj};
         invokeExecJS("", null, METHOD_SET_TIMEOUT, args);
         break;
       case WXJSBridgeMsgType.MODULE_TIMEOUT:
+        if(msg.obj == null){
+          break;
+        }
         args = createTimerArgs(msg.arg1, (Integer) msg.obj, false);
         invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
         break;
       case WXJSBridgeMsgType.MODULE_INTERVAL:
+        if(msg.obj == null){
+          break;
+        }
         WXTimerModule.setInterval((Integer) msg.obj, msg.arg2, msg.arg1);
         args = createTimerArgs(msg.arg1, (Integer) msg.obj, true);
         invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
@@ -1087,7 +1097,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   /**
    * Registered component
    */
-  public void registerComponents(final ArrayList<Map<String, String>> components) {
+  public void registerComponents(final List<Map<String, String>> components) {
     if ( mJSHandler == null || components == null
         || components.size() == 0) {
       return;
@@ -1118,7 +1128,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  private void invokeRegisterComponents(ArrayList<Map<String, String>> components) {
+  private void invokeRegisterComponents(List<Map<String, String>> components) {
     if (components == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
         WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");

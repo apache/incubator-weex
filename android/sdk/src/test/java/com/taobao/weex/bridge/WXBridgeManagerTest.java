@@ -204,35 +204,26 @@
  */
 package com.taobao.weex.bridge;
 
-import android.os.Handler;
-
-import android.os.HandlerThread;
-import android.os.Looper;
-import com.alibaba.fastjson.JSONArray;
+import android.os.Message;
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstance;
-
-import static junit.framework.Assert.*;
-
-import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.WXSDKManagerTest;
+import com.taobao.weex.*;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.WXRenderManager;
-import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.*;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
-import static org.powermock.api.mockito.PowerMockito.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertNotNull;
 
 
 /**
@@ -260,10 +251,17 @@ public class WXBridgeManagerTest {
 
   @Before
   public void setUp() throws Exception {
+    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
     instance = WXSDKInstanceTest.createInstance();
     WXRenderManager rednerManager = new WXRenderManager();
     rednerManager.registerInstance(instance);//
     WXSDKManagerTest.setRenderManager(rednerManager);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    getLooper().idle();
+    getInstance().destroy();
   }
 
   @Test
@@ -296,55 +294,55 @@ public class WXBridgeManagerTest {
 
   }
 
+  @Test
   public void testInitScriptsFramework() throws Exception {
-
+    getInstance().initScriptsFramework("");
   }
 
+  @Test
   public void testFireEvent() throws Exception {
-
+    getInstance().fireEvent(instance.getInstanceId(),"100", Constants.Event.CLICK,null,null);
   }
 
+  @Test
   public void testCallback() throws Exception {
-
+    getInstance().callbackJavascript(instance.getInstanceId(),"test",null,false);
   }
 
-  public void testCallback1() throws Exception {
-
-  }
-
+  @Test
   public void testRefreshInstance() throws Exception {
-
+    getInstance().refreshInstance(instance.getInstanceId(),null);
   }
 
+  @Test
   public void testCreateInstance() throws Exception {
-
+    getInstance().createInstance(instance.getInstanceId(),"",null,null);
   }
 
+  @Test
   public void testDestroyInstance() throws Exception {
-
+    getInstance().destroyInstance(instance.getInstanceId());
   }
 
-  public void testRegisterComponents() throws Exception {
-
-  }
-
-  public void testRegisterModules() throws Exception {
-
-  }
-
+  @Test
   public void testHandleMessage() throws Exception {
-
+    int[] msgs = {
+        WXJSBridgeMsgType.INIT_FRAMEWORK,
+        WXJSBridgeMsgType.CALL_JS_BATCH,
+        WXJSBridgeMsgType.SET_TIMEOUT,
+        WXJSBridgeMsgType.MODULE_INTERVAL,
+        WXJSBridgeMsgType.MODULE_TIMEOUT
+    };
+    Message msg = new Message();
+    for(int w:msgs) {
+      msg.what = w;
+      getInstance().handleMessage(msg);
+    }
   }
 
-  public void testDestroy() throws Exception {
-
-  }
-
+  @Test
   public void testReportJSException() throws Exception {
-
+    getInstance().reportJSException(instance.getInstanceId(),"test","test exception");
   }
 
-  public void testCommitJSBridgeAlarmMonitor() throws Exception {
-
-  }
 }
