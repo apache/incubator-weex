@@ -251,21 +251,12 @@ public class WXUtils {
     }
 
     try {
-      return (Float) value;
-    } catch (ClassCastException cce) {
       String temp = value.toString().trim();
-      if (temp.endsWith("px")) {
-        temp = temp.substring(0, temp.indexOf("px"));
-      }
-      try {
-        return Float.parseFloat(temp);
-      } catch (NumberFormatException nfe) {
-        WXLogUtils.e("Argument format error!");
-      } catch (Exception e) {
-        WXLogUtils.e("Argument error!");
-      }
+      temp = temp.replace("px","");
+      return Float.parseFloat(temp);
+    } catch (Exception cce) {
+      WXLogUtils.e("Argument error!");
     }
-
     return df;
   }
 
