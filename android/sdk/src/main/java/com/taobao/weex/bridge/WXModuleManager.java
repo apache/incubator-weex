@@ -249,7 +249,7 @@ public class WXModuleManager {
     }
 
     if (TextUtils.equals(moduleName,WXDomModule.WXDOM)) {
-      WXLogUtils.e("Connot registered module name is dom.");
+      WXLogUtils.e("Cannot registered module with name 'dom'.");
       return false;
     }
 

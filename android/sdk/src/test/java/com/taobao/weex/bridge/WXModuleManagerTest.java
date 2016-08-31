@@ -202,28 +202,90 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.bridge;
 
+import com.alibaba.fastjson.JSONArray;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.TestModule;
+import com.taobao.weex.common.TypeModuleFactory;
+import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXModuleAnno;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 7/27/16.
+ * Created by sospartan on 8/31/16.
  */
-public class TestModule extends WXSDKEngine.DestroyableModule {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
+public class WXModuleManagerTest {
 
-  @WXModuleAnno
-  public void testMethod(String arg){
+  WXSDKInstance instance;
+
+  @Before
+  public void setUp() throws Exception {
+    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+    instance = WXSDKInstanceTest.createInstance();
+    WXModuleManager.registerModule("test",null,false);
+    WXModuleManager.registerModule("test1",new TypeModuleFactory<>(TestModule.class),true);
+    WXModuleManager.registerModule("test2",new TypeModuleFactory<>(TestModule.class),false);
+    WXBridgeManagerTest.getLooper().idle();
+  }
+
+  @After
+  public void tearDown() throws Exception {
 
   }
 
-  @WXModuleAnno(runOnUIThread=true)
-  public void testCallbackMethod(String arg, JSCallback callback){
-
+  @Test
+  public void testCallModuleMethod() throws Exception {
+    WXModuleManager.callModuleMethod(instance.getInstanceId(),"test1","testMethod",null);
+    WXModuleManager.callModuleMethod(instance.getInstanceId(),"test2","testMethod",null);
   }
 
-  @Override
-  public void destroy() {
+  @Test
+  public void testCallModuleMethod2() throws Exception {
+    JSONArray args = new JSONArray();
+    args.add("testarg");
+    WXModuleManager.callModuleMethod(instance.getInstanceId(),"test1","testMethod",args);
+  }
 
+  @Test
+  public void testCallModuleMethod3() throws Exception {
+    JSONArray args = new JSONArray();
+    args.add("testarg");
+    args.add(null);
+    WXModuleManager.callModuleMethod(instance.getInstanceId(),"test1","testCallbackMethod",args);
+  }
+
+  @Test
+  public void testCallModuleMethod4() throws Exception {
+    JSONArray args = new JSONArray();
+    args.add("testarg");
+    args.add("testcallbackId");
+    WXModuleManager.callModuleMethod(instance.getInstanceId(),"test1","testCallbackMethod",args);
+  }
+
+  @Test
+  public void testDestroyInstanceModules() throws Exception {
+    testCallModuleMethod();//module instance is lazy create.
+    WXModuleManager.destroyInstanceModules(instance.getInstanceId());
+  }
+
+  @Test
+  public void testReload() throws Exception {
+    WXModuleManager.reload();
   }
 }
