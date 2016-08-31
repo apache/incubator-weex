@@ -39,6 +39,7 @@
     [self registerModule:@"timer" withClass:NSClassFromString(@"WXTimerModule")];
     [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
     [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
+    [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz

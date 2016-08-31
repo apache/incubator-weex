@@ -36,7 +36,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
         array = [[WXThreadSafeMutableArray alloc] init];
         [array addObject:callback];
         _eventCallback[event] = array;
-        [[NSNotificationCenter defaultCenter] addObserver:weexInstance selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
     }
 }
 
