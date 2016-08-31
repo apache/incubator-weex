@@ -7,6 +7,8 @@
 import frameUpdater from './frameUpdater'
 export { frameUpdater }
 
+import '../../shared/objectAssign'
+
 export {
   extend,
   def,
