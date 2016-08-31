@@ -208,6 +208,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.bridge.WXBridgeManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -217,10 +218,6 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static com.taobao.weex.dom.WXDomModule.*;
-
-import static org.junit.Assert.*;
-
-import static org.mockito.Mockito.*;
 
 /**
  * Created by sospartan on 7/29/16.
@@ -279,7 +276,7 @@ public class WXDomModuleTest {
     JSONObject obj = new JSONObject();
     for (String m :
       METHODS) {
-      obj.put(WXDomModule.METHOD,m);
+      obj.put(WXBridgeManager.METHOD,m);
       module.callDomMethod(obj);
     }
 
@@ -296,10 +293,10 @@ public class WXDomModuleTest {
           ary.add(arg);
         }
       }
-      obj.put(WXDomModule.ARGS,ary);
+      obj.put(WXBridgeManager.ARGS,ary);
       for (String m :
         METHODS) {
-        obj.put(WXDomModule.METHOD,m);
+        obj.put(WXBridgeManager.METHOD,m);
         module.callDomMethod(obj);
       }
     }

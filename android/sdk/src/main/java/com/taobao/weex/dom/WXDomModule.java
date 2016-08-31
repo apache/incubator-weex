@@ -210,6 +210,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -245,11 +246,7 @@ public final class WXDomModule extends WXModule {
   static final String SCROLL_TO_ELEMENT = "scrollToElement";
   static final String ADD_RULE = "addRule";
 
-  // args
-  public static final String MODULE = "module";
   public static final String WXDOM = "dom";
-  public static final String METHOD = "method";
-  public static final String ARGS = "args";
 
 
   /**
@@ -264,8 +261,8 @@ public final class WXDomModule extends WXModule {
       return;
     }
 
-    String method = (String) task.get(METHOD);
-    JSONArray args = (JSONArray) task.get(ARGS);
+    String method = (String) task.get(WXBridgeManager.METHOD);
+    JSONArray args = (JSONArray) task.get(WXBridgeManager.ARGS);
 
     if (method == null) {
       return;

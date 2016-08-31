@@ -208,111 +208,143 @@ import android.os.Handler;
 
 import android.os.HandlerThread;
 import android.os.Looper;
+import com.alibaba.fastjson.JSONArray;
+import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
-import junit.framework.TestCase;
+
+import static junit.framework.Assert.*;
+
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.WXSDKManagerTest;
+import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.ui.WXRenderManager;
+import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.robolectric.*;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
+
+import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.*;
+
 
 /**
  * Created by lixinke on 16/2/24.
  */
-@RunWith(RobolectricTestRunner.class)
-public class WXBridgeManagerTest extends TestCase {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+@PrepareForTest(WXModuleManager.class)
+public class WXBridgeManagerTest {
 
-    public static ShadowLooper getLooper(){
-        return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
-    }
+  WXSDKInstance instance;
 
-    public static void setBridgeManager(WXBridgeManager bridge){
-        WXBridgeManager.mBridgeManager = bridge;
-    }
+  public static ShadowLooper getLooper() {
+    return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
+  }
 
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+  public static void setBridgeManager(WXBridgeManager bridge) {
+    WXBridgeManager.mBridgeManager = bridge;
+  }
 
-    @Test
-    public void testGetJSHander() throws Exception {
-//        Handler handler=WXBridgeManager.getInstance().getJSHandler();
-//        assertNotNull(handler);
+  private WXBridgeManager getInstance() {
+    return WXBridgeManager.getInstance();
+  }
 
-    }
+  @Before
+  public void setUp() throws Exception {
+    instance = WXSDKInstanceTest.createInstance();
+    WXRenderManager rednerManager = new WXRenderManager();
+    rednerManager.registerInstance(instance);//
+    WXSDKManagerTest.setRenderManager(rednerManager);
+  }
 
-    public void testGetInstance() throws Exception {
+  @Test
+  public void testGetInstance() throws Exception {
+    WXBridgeManager instance = WXBridgeManager.getInstance();
+    assertNotNull(instance);
+  }
 
-        WXBridgeManager instance = WXBridgeManager.getInstance();
-        assertNotNull(instance);
+  @Test
+  public void testRestart() throws Exception {
+    getInstance().restart();
+  }
 
-    }
+  @Test
+  public void testSetStackTopInstance() throws Exception {
+    getInstance().setStackTopInstance("");
+  }
 
-    public void testRestart() throws Exception {
+  @Test
+  public void testCallNative() throws Exception {
+    getInstance()
+        .callNative(instance.getInstanceId(),
+            "[{\"module\":\"testModule\",\"method\":\"test\"}]",
+            null);
 
-    }
+    getInstance()
+        .callNative(instance.getInstanceId(),
+            "[{\"module\":\""+WXDomModule.WXDOM+"\",\"method\":\"test\"}]",
+            null);
 
-    public void testSetStackTopInstance() throws Exception {
+  }
 
-        WXBridgeManager.getInstance().setStackTopInstance("");
-    }
+  public void testInitScriptsFramework() throws Exception {
 
-    public void testCallNative() throws Exception {
+  }
 
-    }
+  public void testFireEvent() throws Exception {
 
-    public void testInitScriptsFramework() throws Exception {
+  }
 
-    }
+  public void testCallback() throws Exception {
 
-    public void testFireEvent() throws Exception {
+  }
 
-    }
+  public void testCallback1() throws Exception {
 
-    public void testCallback() throws Exception {
+  }
 
-    }
+  public void testRefreshInstance() throws Exception {
 
-    public void testCallback1() throws Exception {
+  }
 
-    }
+  public void testCreateInstance() throws Exception {
 
-    public void testRefreshInstance() throws Exception {
+  }
 
-    }
+  public void testDestroyInstance() throws Exception {
 
-    public void testCreateInstance() throws Exception {
+  }
 
-    }
+  public void testRegisterComponents() throws Exception {
 
-    public void testDestroyInstance() throws Exception {
+  }
 
-    }
+  public void testRegisterModules() throws Exception {
 
-    public void testRegisterComponents() throws Exception {
+  }
 
-    }
+  public void testHandleMessage() throws Exception {
 
-    public void testRegisterModules() throws Exception {
+  }
 
-    }
+  public void testDestroy() throws Exception {
 
-    public void testHandleMessage() throws Exception {
+  }
 
-    }
+  public void testReportJSException() throws Exception {
 
-    public void testDestroy() throws Exception {
+  }
 
-    }
+  public void testCommitJSBridgeAlarmMonitor() throws Exception {
 
-    public void testReportJSException() throws Exception {
-
-    }
-
-    public void testCommitJSBridgeAlarmMonitor() throws Exception {
-
-    }
+  }
 }
