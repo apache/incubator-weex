@@ -597,6 +597,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         }
     }
 
+
   @Override
   public int getScrollY() {
     return bounceRecyclerView == null?0:bounceRecyclerView.getInnerView().getScrollY();
@@ -663,7 +664,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             mHost.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setHeaderView(temp.getView());
+                    mHost.setHeaderView(temp.getHostView());
                 }
             },100);
             return true;
@@ -675,7 +676,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             mHost.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setFooterView(temp.getView());
+                    mHost.setFooterView(temp.getHostView());
                 }
             },100);
             return true;
