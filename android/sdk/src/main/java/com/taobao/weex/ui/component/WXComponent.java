@@ -476,6 +476,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost.setLayoutParams(params);
     } else if(mParent.getRealView() instanceof BaseBounceView && this instanceof WXBaseRefresh) {
       LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(realWidth,realHeight);
+      realTop = (int) (parentPadding.get(Spacing.TOP) - parentBorder.get(Spacing.TOP));
+      params.setMargins(realLeft, realTop, realRight, realBottom);
       mHost.setLayoutParams(params);
     } else if (mParent.getRealView() instanceof FrameLayout) {
       FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(realWidth, realHeight);
