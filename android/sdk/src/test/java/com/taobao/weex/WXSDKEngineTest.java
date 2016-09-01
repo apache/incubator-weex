@@ -208,6 +208,7 @@ import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.test.mock.MockApplication;
 import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.common.TestModule;
 import com.taobao.weex.common.TestModuleFactory;
 import com.taobao.weex.dom.TestDomObject;
@@ -215,6 +216,7 @@ import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.component.TestComponent;
 import com.taobao.weex.ui.component.WXComponent;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -238,6 +240,11 @@ public class WXSDKEngineTest {
   @Before
   public void setUp() throws Exception {
 
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    WXBridgeManagerTest.getLooper().idle();
   }
 
   @Test

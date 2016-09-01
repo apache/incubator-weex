@@ -276,6 +276,18 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
+  @Override
+  public void refreshData(WXComponent component) {
+      if (component == null) {
+        component = this;
+      }
+      super.refreshData(component);
+      int count = childCount();
+      for (int i = 0; i < count; i++) {
+        getChild(i).refreshData(((WXVContainer)component).getChild(i));
+      }
+  }
+
   /**
    * return real View
    */

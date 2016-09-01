@@ -277,9 +277,17 @@ public class WXImage extends WXComponent<ImageView> {
         return super.setProperty(key, param);
     }
 
+    @Override
+    public void refreshData(WXComponent component) {
+        super.refreshData(component);
+        if(component instanceof WXImage) {
+            setSrc(component.getDomObject().getAttrs().getImageSrc());
+        }
+    }
+
     @WXComponentProp(name = Constants.Name.RESIZE_MODE)
     public void setResizeMode(String resizeMode) {
-        ((ImageView) getHostView()).setScaleType(getResizeMode(resizeMode));
+        (getHostView()).setScaleType(getResizeMode(resizeMode));
     }
 
     private ScaleType getResizeMode(String resizeMode) {
@@ -306,7 +314,7 @@ public class WXImage extends WXComponent<ImageView> {
 
     @WXComponentProp(name = Constants.Name.RESIZE)
     public void setResize(String resize) {
-        ((ImageView) getHostView()).setScaleType(getResizeMode(resize));
+        (getHostView()).setScaleType(getResizeMode(resize));
     }
 
     @WXComponentProp(name = Constants.Name.SRC)
@@ -315,7 +323,7 @@ public class WXImage extends WXComponent<ImageView> {
         WXImageStrategy imageStrategy = new WXImageStrategy();
         imageStrategy.isClipping = true;
 
-        WXImageSharpen imageSharpen = mDomObj.getAttrs().getImageSharpen();
+        WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
         imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
         imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
@@ -327,20 +335,20 @@ public class WXImage extends WXComponent<ImageView> {
                 if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId,getRef(), Constants.Event.ONLOAD,params);
+                    WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(),getRef(), Constants.Event.ONLOAD,params);
                 }
             }
         });
 
-        if( mDomObj.getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
-            String placeHolder= (String) mDomObj.getAttrs().get(Constants.Name.PLACE_HOLDER);
+        if( getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+            String placeHolder= (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
             imageStrategy.placeHolder=placeHolder;
         }
 
-        IWXImgLoaderAdapter imgLoaderAdapter = mInstance.getImgLoaderAdapter();
+        IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
         if (imgLoaderAdapter != null) {
             imgLoaderAdapter.setImage(src, getHostView(),
-                    mDomObj.getAttrs().getImageQuality(), imageStrategy);
+                    getDomObject().getAttrs().getImageQuality(), imageStrategy);
         }
     }
 }

@@ -202,89 +202,88 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.list;
 
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
-
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.component.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static org.junit.Assert.*;
+
 /**
- * Text component
+ * Created by sospartan on 8/29/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXListComponentTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
+  WXListComponent component;
 
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+
+  public static WXListComponent create(WXVContainer parent) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXListComponent) new SimpleComponentHolder(WXListComponent.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), parent, false);
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  @Before
+  public void setUp() throws Exception {
+    WXDiv div = WXDivTest.create();
+    ComponentTest.create(div);
+    component = create(div);
+    ComponentTest.create(component);
+
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  @Test
+  public void testAddChild() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    child = WXHeaderTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
   }
 
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
+  @Test
+  public void testScrollTo() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    child = WXHeaderTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    component.scrollTo(child,0);
   }
 
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @Test
+  public void testAppear() throws Exception {
+    WXComponent child = WXDivTest.create(component);
+    ComponentTest.create(child);
+    component.addChild(child);
+
+    component.bindAppearEvent(child);
+
+    component.notifyAppearStateChange(0,0,0,10);
   }
 
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
-  }
-
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @After
+  public void tearDown() throws Exception {
+    component.destroy();
   }
 }

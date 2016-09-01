@@ -204,9 +204,11 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.view.ViewGroup;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.view.WXScrollView;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -248,6 +250,17 @@ public class WXScrollerTest {
     component.addChild(div);
     ComponentTest.create(div);
 
+  }
+
+  @Test
+  public void testScroll() throws Exception {
+    WXScroller comp = create();
+    WXDiv div = WXDivTest.create(comp);
+    ComponentTest.create(div);
+    comp.addChild(div);
+    ComponentTest.create(comp);
+    WXScrollView view = (WXScrollView) comp.getInnerView();
+    view.scrollTo(100,100);
   }
 
   @After

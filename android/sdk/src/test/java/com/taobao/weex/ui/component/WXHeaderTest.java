@@ -204,87 +204,22 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
-
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.component.list.WXListComponent;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static org.junit.Assert.*;
+
 /**
- * Text component
+ * Created by sospartan on 8/29/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+public class WXHeaderTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
-
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+  public static WXHeader create(WXVContainer parent) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXHeader) new SimpleComponentHolder(WXHeader.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), parent, false);
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
-  }
-
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-  }
-
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
-  }
-
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
-  }
-
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
-  }
-
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
-  }
 }

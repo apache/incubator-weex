@@ -400,7 +400,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                     }
                     recycleViewList.clear();
                 }
-              List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+              List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
               if (listeners != null && listeners.size() > 0) {
                 for (OnWXScrollListener listener : listeners) {
                   if (listener != null) {
@@ -417,7 +417,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                List<OnWXScrollListener> listeners = mInstance.getWXScrollListeners();
+                List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
                 if(listeners!=null && listeners.size()>0){
                     for (OnWXScrollListener listener : listeners) {
                         if (listener != null) {
@@ -744,7 +744,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         long begin=System.currentTimeMillis();
         holder.setComponentUsing(false);
         recycleViewList.add(holder);
-        WXLogUtils.d(TAG, "Recycle holder " +(System.currentTimeMillis()-begin)+"  Thread:"+Thread.currentThread().getName());
+        if(WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(TAG, "Recycle holder " + (System.currentTimeMillis() - begin) + "  Thread:" + Thread.currentThread().getName());
+        }
     }
 
     /**
@@ -761,17 +763,19 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         if ( component == null
                 || (component instanceof WXRefresh)
                 || (component instanceof WXLoading)
-                || (component.mDomObj!=null && component.mDomObj.isFixed())
+                || (component.getDomObject()!=null && component.getDomObject().isFixed())
                 ) {
-
-            WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
+            if(WXEnvironment.isApkDebugable()) {
+                WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
+            }
             return;
         }
 
-        if (component != null
-            && holder.getComponent() != null
+        if (component != null&& holder.getComponent() != null
                 && holder.getComponent() instanceof WXCell) {
-            holder.getComponent().bindData(component);
+
+                holder.getComponent().bindData(component);
+//              holder.getComponent().refreshData(component);
         }
 
     }
@@ -801,7 +805,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                         || component.isUsing()) {
                     continue;
                 }
-                if (component.mDomObj!=null && component.mDomObj.isFixed()) {
+                if (component.getDomObject()!=null && component.getDomObject().isFixed()) {
                     return createVHForFakeComponent(viewType);
                 } else {
                     if (component instanceof WXCell) {
@@ -820,7 +824,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                 }
             }
         }
-        WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
+        if(WXEnvironment.isApkDebugable()) {
+            WXLogUtils.e(TAG, "Cannot find request viewType: " + viewType);
+        }
         return createVHForFakeComponent(viewType);
     }
 
@@ -958,18 +964,18 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     @Override
     public void onLoadMore(int offScreenY) {
       try {
-        String offset = mDomObj.getAttrs().getLoadMoreOffset();
+        String offset = getDomObject().getAttrs().getLoadMoreOffset();
 
             if (TextUtils.isEmpty(offset)) {
                 offset="0";
             }
 
         if (offScreenY < Integer.parseInt(offset)) {
-          String loadMoreRetry = mDomObj.getAttrs().getLoadMoreRetry();
+          String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.LOADMORE);
+            WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(), getDomObject().getRef(), Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }
@@ -1006,7 +1012,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       boolean visible = (!outOfVisibleRange) && item.isViewVisible();
 
       int result = item.setAppearStatus(visible);
-      WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+        if(WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+        }
       if (result == AppearanceHelper.RESULT_NO_CHANGE) {
         continue;
       }
@@ -1016,8 +1024,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     private void recycleImage(View view) {
         if (view instanceof ImageView) {
-            if (mInstance.getImgLoaderAdapter() != null) {
-                mInstance.getImgLoaderAdapter().setImage(null, (ImageView) view,
+            if (getInstance().getImgLoaderAdapter() != null) {
+                getInstance().getImgLoaderAdapter().setImage(null, (ImageView) view,
                         null, null);
             } else {
                 if (WXEnvironment.isApkDebugable()) {
@@ -1035,7 +1043,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     @NonNull
     private ListBaseViewHolder createVHForFakeComponent(int viewType) {
-        FrameLayout view = new FrameLayout(mContext);
+        FrameLayout view = new FrameLayout(getContext());
         view.setBackgroundColor(Color.WHITE);
         view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
         return new ListBaseViewHolder(view, viewType);

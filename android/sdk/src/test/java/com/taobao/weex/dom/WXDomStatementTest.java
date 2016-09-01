@@ -202,89 +202,226 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
-
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
-
-import java.lang.reflect.InvocationTargetException;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
+import com.taobao.weex.ui.WXRenderManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 /**
- * Text component
+ * Created by sospartan on 8/29/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomStatementTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
+  WXDomStatement stmt;
+  WXRenderManager rednerManager;
+  WXSDKInstance instance;
 
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+  @Before
+  public void setUp() throws Exception {
+    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+    ShadowLooper looper = WXBridgeManagerTest.getLooper();
+    looper.idle();
+    ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+    instance = WXSDKInstanceTest.createInstance();
+    rednerManager = new WXRenderManager();
+    rednerManager.registerInstance(instance);//
+    stmt = new WXDomStatement(instance.getInstanceId(),rednerManager );
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  @After
+  public void tearDown() throws Exception {
+    stmt.destroy();
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  void createBody(){
+    JSONObject body = new JSONObject();
+    body.put("type","div");
+    body.put("ref",WXDomObject.ROOT);
+    stmt.createBody(body);
   }
 
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
+  @Test
+  public void testCreateBody() throws Exception {
+    createBody();
+
+    stmt.batch();
   }
 
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @Test
+  public void testAddDom() throws Exception {
+    createBody();
+
+    JSONObject obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.batch();
   }
 
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
+  @Test
+  public void testMoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.moveDom("100",WXDomObject.ROOT,1);
+    stmt.batch();
   }
 
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @Test
+  public void testRemoveDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","101");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.removeDom("101");
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateAttrs() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+
+    stmt.updateAttrs("100",new JSONObject());
+    stmt.updateAttrs("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateStyle() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.updateStyle("100",new JSONObject());
+    stmt.updateStyle("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testAddEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.addEvent("100","click");
+    stmt.addEvent("100",null);
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testRemoveEvent() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.removeEvent("100",null);
+    stmt.addEvent("100","click");
+    stmt.removeEvent("100","click");
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testScrollToDom() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+
+    stmt.scrollToDom("100",null);
+    stmt.batch();
+  }
+
+  @Test
+  public void testCreateFinish() throws Exception {
+    createBody();
+    stmt.createFinish();
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testRefreshFinish() throws Exception {
+    createBody();
+    stmt.refreshFinish();
+
+    stmt.batch();
+  }
+
+  @Test
+  public void testUpdateFinish() throws Exception {
+    createBody();
+
+    stmt.updateFinish();
+    stmt.batch();
+  }
+
+  @Test
+  public void testStartAnimation() throws Exception {
+    createBody();
+    JSONObject obj;
+    obj = new JSONObject();
+    obj.put("type","div");
+    obj.put("ref","100");
+    stmt.addDom(obj,WXDomObject.ROOT,0);
+    stmt.startAnimation("100","",null);
   }
 }

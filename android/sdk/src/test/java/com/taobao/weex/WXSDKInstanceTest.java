@@ -205,9 +205,13 @@
 package com.taobao.weex;
 
 import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.WXDomManager;
+import com.taobao.weex.dom.WXDomManagerTest;
 import com.taobao.weex.utils.WXFileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -254,6 +258,12 @@ public class WXSDKInstanceTest {
 
     mockStatic(WXFileUtils.class);
     when(WXFileUtils.loadAsset(null,null)).thenReturn("{}");
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    WXBridgeManagerTest.getLooper().idle();
+    WXDomManagerTest.getLooper().idle();
   }
 
 

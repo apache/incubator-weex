@@ -202,89 +202,54 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
-
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
+package com.taobao.weex.dom;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.ui.WXRenderManager;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowLooper;
 
-import java.lang.reflect.InvocationTargetException;
+import static org.junit.Assert.*;
 
 /**
- * Text component
+ * Created by sospartan on 8/31/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+@RunWith(RobolectricTestRunner.class)
+public class WXDomManagerTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
-
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+  public static ShadowLooper getLooper() {
+    return Shadows.shadowOf(WXSDKManager.getInstance().getWXDomManager().mDomHandler.getLooper());
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  WXDomManager dm;
+  WXSDKInstance instance;
+
+  @Before
+  public void setUp() throws Exception {
+    WXRenderManager rm = new WXRenderManager();
+    instance =   WXSDKInstanceTest.createInstance();
+    rm.registerInstance(instance);
+    dm = new WXDomManager(rm);
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  @Test
+  public void testRemoveDomStatement() throws Exception {
+      dm.removeDomStatement(instance.getInstanceId());
   }
 
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
+  @After
+  public void tearDown() throws Exception {
+    getLooper().idle();
+    dm.destroy();
   }
 
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
-  }
 
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
-  }
-
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
-  }
 }
