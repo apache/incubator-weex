@@ -278,12 +278,12 @@ public class AppearanceHelper {
     return RESULT_NO_CHANGE;
   }
 
-  public boolean isViewVisible() {
+  public boolean isViewVisible(Rect parentRect) {
     View view = mAwareChild.getHostView();
     if (view == null) {
       return false;
     }
 
-    return view.getGlobalVisibleRect(mVisibleRect);
+    return view.getLocalVisibleRect(parentRect);
   }
 }

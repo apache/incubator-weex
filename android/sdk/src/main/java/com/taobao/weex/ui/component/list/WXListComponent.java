@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
@@ -1009,7 +1010,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         continue;
       }
 
-      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
+      Rect listRect=new Rect();
+      if(getHostView()!=null && getHostView().getInnerView()!=null){
+        getHostView().getInnerView().getHitRect(listRect);
+      }
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible(listRect);
 
       int result = item.setAppearStatus(visible);
         if(WXEnvironment.isApkDebugable()) {
