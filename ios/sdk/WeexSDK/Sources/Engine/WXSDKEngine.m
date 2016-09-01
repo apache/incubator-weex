@@ -40,6 +40,7 @@
     [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
     [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
+	[self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -80,6 +81,7 @@
     [self registerComponent:@"loading-indicator" withClass:NSClassFromString(@"WXLoadingIndicator")];
     [self registerComponent:@"refresh" withClass:NSClassFromString(@"WXRefreshComponent")];
     [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
+	[self registerComponent:@"canvas" withClass:NSClassFromString(@"WXCanvasComponent")];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
