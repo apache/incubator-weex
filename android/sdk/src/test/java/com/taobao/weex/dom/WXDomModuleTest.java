@@ -246,11 +246,17 @@ public class WXDomModuleTest {
     "unknown_method"
   };
 
+  static JSONObject data;
+  static{
+    data = new JSONObject();
+    data.put("a","b");
+  }
+
   static final Object[][] ARGS_CASES = {
     null,
     {new JSONObject()},
     {"",new JSONObject()},
-    {"test",new JSONObject()},
+    {"test",data},
     {"test"},
     {"",new JSONObject(),1},
     {"test",new JSONObject(),1},

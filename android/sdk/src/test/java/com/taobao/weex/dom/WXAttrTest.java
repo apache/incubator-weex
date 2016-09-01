@@ -202,56 +202,99 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
-import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.ui.view.border.BorderDrawable;
+import com.taobao.weex.common.WXImageSharpen;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by sospartan on 7/27/16.
- */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
-public class WXComponentTest {
+import static com.taobao.weex.common.Constants.Name.*;
+import static com.taobao.weex.common.Constants.Value.*;
 
-  WXComponent component;
+/**
+ * Created by sospartan on 8/31/16.
+ */
+public class WXAttrTest {
+
+  WXAttr attr;
 
   @Before
   public void setUp() throws Exception {
-    WXVContainer root = WXDivTest.create();
-    ComponentTest.create(root);
-    component = WXDivTest.create(root);
-    ComponentTest.create(component);
+    attr = new WXAttr();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    attr.clear();
   }
 
   @Test
-  public void testSetProperty() throws Exception {
-    component.setProperty(Constants.Name.POSITION, Constants.Value.FIXED);
-    component.setProperty(Constants.Name.BORDER_RADIUS,0.5f);
-    component.setProperty(Constants.Name.BORDER_RADIUS,null);
-    component.setProperty(Constants.Name.BORDER_WIDTH,null);
-    component.setProperty(Constants.Name.BORDER_WIDTH,10);
-    component.setProperty(Constants.Name.BORDER_STYLE,null);
-    component.setProperty(Constants.Name.BORDER_STYLE, "SOLID");
-    component.setProperty(Constants.Name.BORDER_COLOR,null);
-    component.setProperty(Constants.Name.BORDER_COLOR, "#ff0000");
-    component.setProperty(Constants.Name.VISIBILITY,null);
-    component.setProperty(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
+  public void testGetValue() throws Exception {
+    assertEquals(null,WXAttr.getValue(attr));
+
+    attr.put(VALUE,"test");
+
+    assertEquals("test",WXAttr.getValue(attr));
   }
 
+  @Test
+  public void testGetImageQuality() throws Exception {
+    assertEquals(WXImageQuality.LOW,attr.getImageQuality());
+
+    attr.put(IMAGE_QUALITY,HIGH);
+    assertEquals(WXImageQuality.HIGH,attr.getImageQuality());
+  }
 
   @Test
-  public void testAddEvent() throws Exception {
-    component.addEvent(Constants.Event.FOCUS);
+  public void testGetImageSharpen() throws Exception {
+    assertEquals(WXImageSharpen.UNSHARPEN,attr.getImageSharpen());
+
+  }
+
+  @Test
+  public void testGetImageSrc() throws Exception {
+    assertEquals(null,attr.getImageSrc());
+
+    attr.put(SRC,"test");
+    assertEquals("test",attr.getImageSrc());
+  }
+
+  @Test
+  public void testShowIndicators() throws Exception {
+    assertEquals(true,attr.showIndicators());
+  }
+
+  @Test
+  public void testAutoPlay() throws Exception {
+    assertEquals(false,attr.autoPlay());
+  }
+
+  @Test
+  public void testGetScope() throws Exception {
+    assertEquals(null,attr.getScope());
+  }
+
+  @Test
+  public void testGetLoadMoreRetry() throws Exception {
+    assertEquals(null,attr.getLoadMoreRetry());
+  }
+
+  @Test
+  public void testGetLoadMoreOffset() throws Exception {
+    assertEquals(null,attr.getLoadMoreOffset());
+  }
+
+  @Test
+  public void testGetIsRecycleImage() throws Exception {
+    assertEquals(true,attr.getIsRecycleImage());
+  }
+
+  @Test
+  public void testGetScrollDirection() throws Exception {
+    assertEquals("vertical",attr.getScrollDirection());
   }
 }
