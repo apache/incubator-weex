@@ -23,10 +23,10 @@
 @property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, assign) NSInteger fps;
 @property (nonatomic, strong) WXCanvasModule *canvasModule;
-@property (nonatomic, assign) GLKVector4 fillColor;
-@property (nonatomic, assign) GLKVector4 strokeColor;
-@property (nonatomic, assign) GLfloat lineWidth;
-@property (nonatomic, assign) GLfloat globalAlpha;
+@property (nonatomic, assign) GLKVector4 curFillColor;
+@property (nonatomic, assign) GLKVector4 curStrokeColor;
+@property (nonatomic, assign) GLfloat curLineWidth;
+@property (nonatomic, assign) GLfloat curGlobalAlpha;
 @end
 
 
@@ -68,10 +68,10 @@
     CGSize size = _glkview.frame.size;
     _effect.transform.projectionMatrix = GLKMatrix4MakeOrtho(0, size.width, 0, size.height, -1024, 1024);
     _effect.transform.modelviewMatrix = GLKMatrix4Multiply(GLKMatrix4MakeTranslation(0, size.height, 0), GLKMatrix4MakeScale(1, -1, 1));
-    _strokeColor = GLKVector4Make(1, 1, 1, 1);
-    _fillColor = GLKVector4Make(1, 1, 1, 1);
-    _globalAlpha = 1;
-    _lineWidth = 1;
+    _curStrokeColor = GLKVector4Make(1, 1, 1, 1);
+    _curFillColor = GLKVector4Make(1, 1, 1, 1);
+    _curGlobalAlpha = 1;
+    _curLineWidth = 1;
 }
 
 - (void) viewDidUnload
@@ -243,8 +243,8 @@
     }
 
     glEnable(GL_BLEND);
-    if (_globalAlpha != 1) {
-        glBlendColor(1, 1, 1, _globalAlpha);
+    if (_curGlobalAlpha != 1) {
+        glBlendColor(1, 1, 1, _curGlobalAlpha);
         glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
     } else {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -267,7 +267,7 @@
 - (void) setGlobalAlpha:(NSArray *)params
 {
     WX_CANVAS_PARAMS_CHECK(1);
-    _globalAlpha = [WXConvert CGFloat:params[0]];
+    _curGlobalAlpha = [WXConvert CGFloat:params[0]];
 }
 
 
@@ -305,13 +305,13 @@
     UIColor *color = [WXConvert UIColor:params[0]];
     CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha =0.0;
     [color getRed:&red green:&green blue:&blue alpha:&alpha];
-    _strokeColor = GLKVector4Make(red, green, blue, alpha);
+    _curStrokeColor = GLKVector4Make(red, green, blue, alpha);
 }
 
 - (void) setLineWidth:(NSArray *)params
 {
     WX_CANVAS_PARAMS_CHECK(1);
-    _lineWidth = [WXConvert WXPixelType:params[0]];
+    _curLineWidth = [WXConvert WXPixelType:params[0]];
 }
 
 // ["M", 0, 0, "L", 100, 100, "L", 0, 100, "L", 0, 0] it made a triangle
@@ -352,14 +352,14 @@
     }
 
     _effect.useConstantColor = GL_TRUE;
-    _effect.constantColor = _strokeColor;
+    _effect.constantColor = _curStrokeColor;
     _effect.texture2d0.enabled = NO;
     [_effect prepareToDraw];
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnableVertexAttribArray(GLKVertexAttribPosition);
 
-    glLineWidth(_lineWidth);
+    glLineWidth(_curLineWidth);
 
     glVertexAttribPointer(GLKVertexAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, &points);
     glDrawElements(GL_LINES, lineIndex, GL_UNSIGNED_INT, indices);
@@ -374,7 +374,7 @@
     WX_CANVAS_PIXEL(h, 3)
 
     _effect.useConstantColor = GL_TRUE;
-    _effect.constantColor = _strokeColor;
+    _effect.constantColor = _curStrokeColor;
     _effect.texture2d0.enabled = NO;
     [_effect prepareToDraw];
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -388,7 +388,7 @@
         x + w, y,
         x, y
     };
-    glLineWidth(_lineWidth);
+    glLineWidth(_curLineWidth);
 
     glVertexAttribPointer(GLKVertexAttribPosition, 2, GL_FLOAT, GL_FALSE, 0, &points);
     glDrawArrays(GL_LINE_STRIP, 0, 5);
@@ -401,7 +401,7 @@
     UIColor *color = [WXConvert UIColor:params[0]];
     CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha =0.0;
     [color getRed:&red green:&green blue:&blue alpha:&alpha];
-    _fillColor = GLKVector4Make(red, green, blue, alpha);
+    _curFillColor = GLKVector4Make(red, green, blue, alpha);
 }
 
 - (void) fillRect:(NSArray *)params
@@ -413,7 +413,7 @@
     WX_CANVAS_PIXEL(h, 3)
 
     _effect.useConstantColor = GL_TRUE;
-    _effect.constantColor = _fillColor;
+    _effect.constantColor = _curFillColor;
     _effect.texture2d0.enabled = NO;
     [_effect prepareToDraw];
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
