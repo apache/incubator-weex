@@ -202,89 +202,99 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXImageSharpen;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
+import static org.junit.Assert.*;
 
-import java.lang.reflect.InvocationTargetException;
+import static com.taobao.weex.common.Constants.Name.*;
+import static com.taobao.weex.common.Constants.Value.*;
 
 /**
- * Text component
+ * Created by sospartan on 8/31/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+public class WXAttrTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
+  WXAttr attr;
 
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+  @Before
+  public void setUp() throws Exception {
+    attr = new WXAttr();
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  @After
+  public void tearDown() throws Exception {
+    attr.clear();
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  @Test
+  public void testGetValue() throws Exception {
+    assertEquals(null,WXAttr.getValue(attr));
+
+    attr.put(VALUE,"test");
+
+    assertEquals("test",WXAttr.getValue(attr));
   }
 
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
+  @Test
+  public void testGetImageQuality() throws Exception {
+    assertEquals(WXImageQuality.LOW,attr.getImageQuality());
+
+    attr.put(IMAGE_QUALITY,HIGH);
+    assertEquals(WXImageQuality.HIGH,attr.getImageQuality());
   }
 
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @Test
+  public void testGetImageSharpen() throws Exception {
+    assertEquals(WXImageSharpen.UNSHARPEN,attr.getImageSharpen());
+
   }
 
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
+  @Test
+  public void testGetImageSrc() throws Exception {
+    assertEquals(null,attr.getImageSrc());
+
+    attr.put(SRC,"test");
+    assertEquals("test",attr.getImageSrc());
   }
 
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+  @Test
+  public void testShowIndicators() throws Exception {
+    assertEquals(true,attr.showIndicators());
+  }
+
+  @Test
+  public void testAutoPlay() throws Exception {
+    assertEquals(false,attr.autoPlay());
+  }
+
+  @Test
+  public void testGetScope() throws Exception {
+    assertEquals(null,attr.getScope());
+  }
+
+  @Test
+  public void testGetLoadMoreRetry() throws Exception {
+    assertEquals(null,attr.getLoadMoreRetry());
+  }
+
+  @Test
+  public void testGetLoadMoreOffset() throws Exception {
+    assertEquals(null,attr.getLoadMoreOffset());
+  }
+
+  @Test
+  public void testGetIsRecycleImage() throws Exception {
+    assertEquals(true,attr.getIsRecycleImage());
+  }
+
+  @Test
+  public void testGetScrollDirection() throws Exception {
+    assertEquals("vertical",attr.getScrollDirection());
   }
 }

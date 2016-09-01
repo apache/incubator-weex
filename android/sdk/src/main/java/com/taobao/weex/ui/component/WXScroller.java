@@ -249,6 +249,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
+  private List<WXComponent> mRefreshs=new ArrayList<>();
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -290,6 +291,16 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return mRealView;
   }
 
+
+  @Override
+  public void createViewImpl(WXVContainer parent, int index) {
+    super.createViewImpl(parent, index);
+    for (int i = 0; i < mRefreshs.size(); i++) {
+      WXComponent component = mRefreshs.get(i);
+      component.createViewImpl(null, -1);
+      checkRefreshOrLoading(component);
+    }
+  }
 
   /**
    * @return ScrollView
@@ -335,8 +346,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       return;
     }
 
-    checkRefreshOrLoading(child);
     if (child instanceof WXBaseRefresh) {
+      if (!checkRefreshOrLoading(child)) {
+        mRefreshs.add(child);
+      }
       return;
     }
 
@@ -356,9 +369,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * Setting refresh view and loading view
    * @param child the refresh_view or loading_view
    */
-  private void checkRefreshOrLoading(final WXComponent child) {
-    if (child instanceof WXRefresh) {
-      ((BaseBounceView)mHost).setOnRefreshListener((WXRefresh)child);
+
+  private boolean checkRefreshOrLoading(final WXComponent child) {
+    boolean result = false;
+    if (child instanceof WXRefresh && mHost != null) {
+      ((BaseBounceView) mHost).setOnRefreshListener((WXRefresh) child);
       Runnable runnable = WXThread.secure(new Runnable(){
         @Override
         public void run() {
@@ -368,7 +383,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       handler.postDelayed(runnable,100);
     }
 
-    if (child instanceof WXLoading) {
+    if (child instanceof WXLoading && mHost!=null) {
       ((BaseBounceView)mHost).setOnLoadingListener((WXLoading)child);
       Runnable runnable= WXThread.secure(new Runnable(){
         @Override
@@ -376,8 +391,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
           ((BaseBounceView)mHost).setFooterView(child);
         }
       });
-      handler.postDelayed(runnable,100);
+      handler.postDelayed(runnable, 100);
+      result = true;
     }
+    return result;
   }
 
   @Override

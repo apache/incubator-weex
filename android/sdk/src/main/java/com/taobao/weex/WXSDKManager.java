@@ -151,6 +151,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -163,7 +164,7 @@ public class WXSDKManager {
   private static AtomicInteger sInstanceId = new AtomicInteger(0);
   private final WXDomManager mWXDomManager;
   private WXBridgeManager mBridgeManager;
-  private WXRenderManager mWXRenderManager;
+  /** package **/ WXRenderManager mWXRenderManager;
 
   private IWXUserTrackAdapter mIWXUserTrackAdapter;
   private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
@@ -237,7 +238,7 @@ public class WXSDKManager {
     mBridgeManager.initScriptsFramework(framework);
   }
 
-  public void registerComponents(ArrayList<Map<String, String>> components) {
+  public void registerComponents(List<Map<String, String>> components) {
     mBridgeManager.registerComponents(components);
   }
 
@@ -264,7 +265,7 @@ public class WXSDKManager {
   }
 
   void createInstance(WXSDKInstance instance, String code, Map<String, Object> options, String jsonInitData) {
-    mWXRenderManager.createInstance(instance);
+    mWXRenderManager.registerInstance(instance);
     mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);
   }
 

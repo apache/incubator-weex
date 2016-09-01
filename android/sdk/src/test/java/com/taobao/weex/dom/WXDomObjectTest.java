@@ -202,89 +202,93 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.dom;
 
-import android.content.Context;
-import android.text.Layout;
-import android.view.ViewGroup;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weappplus_sdk.BuildConfig;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXTextView;
-
-import java.lang.reflect.InvocationTargetException;
+import static org.junit.Assert.*;
 
 /**
- * Text component
+ * Created by sospartan on 8/29/16.
  */
-@Component(lazyload = false)
-public class WXText extends WXComponent<WXTextView>{
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXDomObjectTest {
 
-  /**
-   * The default text size
-   **/
-  public static final int sDEFAULT_SIZE = 32;
+  WXDomObject dom;
 
-  public static class Creator implements ComponentCreator{
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXText(instance,node,parent,lazy);
-    }
+  @Before
+  public void setUp() throws Exception {
+    dom = new TestDomObject();
   }
 
-  @Deprecated
-  public WXText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+  @After
+  public void tearDown() throws Exception {
+    dom.destroy();
   }
 
-  public WXText(WXSDKInstance instance, WXDomObject node,
-                WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  @Test
+  public void testParseFromJson() throws Exception {
+    dom.parseFromJson(JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}"));
+    assertEquals(dom.getRef(),"100");
+    assertEquals(dom.getType(),"div");
+
+    dom.applyStyleToNode();
   }
 
-  @Override
-  protected WXTextView initComponentHostView(Context context) {
-    return new WXTextView(context);
+  @Test
+  public void testAdd() throws Exception {
+    JSONObject obj = new JSONObject();
+    obj.put("ref","100");
+    obj.put("type","div");
+    dom.parseFromJson(obj);
+
+    JSONObject child = new JSONObject();
+    child.put("ref","101");
+    child.put("type","test");
+    WXDomObject childDom = new WXDomObject();
+    childDom.parseFromJson(child);
+
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
+
+    dom.removeChildAt(0);
+    assertEquals(dom.getChildCount(),0);
+
+    dom.add(childDom,0);
+    assertEquals(dom.getChildCount(),1);
+    assertEquals(dom.getChild(0),childDom);
+
+    dom.remove(childDom);
+
   }
 
-  @Override
-  public void updateExtra(Object extra) {
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())) {
-      final Layout layout = (Layout) extra;
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
-  }
+  @Test
+  public void testClone() throws Exception {
+    JSONObject.parseObject("{\"ref\":\"100\",\"type\":\"div\",\"attr\":{},\"style\":{\"backgroundColor\":\"rgb(40,96,144)\",\"fontSize\":40,\"color\":\"#ffffff\",\"paddingRight\":30,\"paddingLeft\":30,\"paddingBottom\":20,\"paddingTop\":20}}");
+    JSONObject obj = new JSONObject();
+    obj.put("ref","101");
+    obj.put("type","test");
 
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if(component instanceof WXText ) {
-      updateExtra(component.getDomObject().getExtra());
-    }
-  }
+    JSONArray event = new JSONArray();
+    event.add("click");
+    obj.put("event",event);
+    dom.parseFromJson(obj);
 
-  /**
-   * Flush view no matter what height and width the {@link WXDomObject} specifies.
-   * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
-   */
-  private void flushView(Object extra){
-    if(extra instanceof Layout &&
-       getHostView()!=null && !extra.equals(getHostView().getTextLayout())){
-      final Layout layout = (Layout) extra;
-      /**The following if block change the height of the width of the textView.
-       * other part of the code is the same to updateExtra
-       */
-      ViewGroup.LayoutParams layoutParams= getHostView().getLayoutParams();
-      if(layoutParams!=null){
-        layoutParams.height=layout.getHeight();
-        layoutParams.width=layout.getWidth();
-        getHostView().setLayoutParams(layoutParams);
-      }
-      getHostView().setTextLayout(layout);
-      getHostView().invalidate();
-    }
+    WXDomObject clone = dom.clone();
+    assertEquals(clone.getRef(),"101");
+    assertEquals(clone.getType(),"test");
+
   }
 }
