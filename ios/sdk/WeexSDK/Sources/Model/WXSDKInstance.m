@@ -304,6 +304,9 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params
 {
+    if (!params){
+        params = [NSDictionary dictionary];
+    }
     NSDictionary * userInfo = @{
             @"weexInstance":self,
             @"param":params
