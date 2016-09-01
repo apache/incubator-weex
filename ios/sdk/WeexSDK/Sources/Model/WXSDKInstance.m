@@ -302,7 +302,7 @@ NSTimeInterval JSLibInitTime = 0;
     
 }
 
-- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params
+- (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params
 {
     NSDictionary * userInfo = @{
             @"weexInstance":self,

@@ -55,7 +55,6 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
         for (WXModuleKeepAliveCallback callback in _eventCallback[notification.name]) {
             callback(param, true);
         }
-        
     }
 }
 

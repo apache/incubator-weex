@@ -189,7 +189,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  * fire global event
  */
-- (void)fireGlobalEventCallback:(NSString *)eventName params:(NSDictionary *)params;
+- (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params;
 
 /**
  * application performance statistics
