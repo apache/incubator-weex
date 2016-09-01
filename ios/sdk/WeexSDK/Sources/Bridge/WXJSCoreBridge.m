@@ -53,10 +53,14 @@
             } afterDelay:[timeout toDouble] / 1000];
         };
         
-        _jsContext[@"callAddElement"] = ^(JSValue *instanceId, JSValue *parentRef, JSValue *element, JSValue *index, JSValue *ifCallback) {
+        _jsContext[@"callAddElement"] = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
             
             // Temporary here , in order to improve performance, will be refactored next version.
+            WXLogDebug(@"callAddElement...%@, %@, %@, %@", instanceId, ref, element, index);
             WXSDKInstance *instance = [WXSDKManager instanceForID:[instanceId toString]];
+            NSDictionary *componentData = [element toDictionary];
+            NSString *parentRef = [ref toString];
+            NSInteger insertIndex = [[index toNumber] integerValue];
             
             WXPerformBlockOnComponentThread(^{
                 WXComponentManager *manager = instance.componentManager;
@@ -64,7 +68,7 @@
                     return;
                 }
                 [manager startComponentTasks];
-                [manager addComponent:[element toDictionary] toSupercomponent:[parentRef toString] atIndex:[[index toNumber] integerValue]appendingInTree:NO];
+                [manager addComponent:componentData toSupercomponent:parentRef atIndex:insertIndex appendingInTree:NO];
             });
         };
     
