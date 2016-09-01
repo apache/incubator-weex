@@ -61,11 +61,6 @@ static NSThread *WXComponentThread;
         _uiTaskQueue = [NSMutableArray array];
         _isValid = YES;
         [self _startDisplayLink];
-//        __weak typeof(self) weakSelf = self;
-//        WXPerformBlockOnComponentThread(^{
-//            __strong typeof(self) strongSelf = weakSelf;
-//            [strongSelf _startDisplayLink];
-//        });
     }
     
     return self;
