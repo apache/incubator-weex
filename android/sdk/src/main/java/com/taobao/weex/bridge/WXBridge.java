@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.bridge;
 
+import android.text.TextUtils;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -282,5 +284,11 @@ class WXBridge implements IWXBridge {
 
   public void setTimeoutNative(String callbackId, String time) {
     WXBridgeManager.getInstance().setTimeout(callbackId, time);
+  }
+
+  public void setJSFrmVersion(String version) {
+    if(!TextUtils.isEmpty(version)) {
+      WXEnvironment.JS_LIB_SDK_VERSION = version;
+    }
   }
 }
