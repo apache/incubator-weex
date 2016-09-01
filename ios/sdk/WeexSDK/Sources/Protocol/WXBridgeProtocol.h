@@ -23,7 +23,7 @@ typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString
 /**
  * Executes global js method with specific arguments
  */
-- (void)callJSMethod:(NSString *)method args:(NSArray*)args;
+- (JSValue *)callJSMethod:(NSString *)method args:(NSArray*)args;
 
 /**
  * Register callback when call native tasks occur

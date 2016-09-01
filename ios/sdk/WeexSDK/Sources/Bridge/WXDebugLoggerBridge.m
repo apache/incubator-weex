@@ -113,7 +113,7 @@
     [self callJSMethod:@"evalFramework" args:@[frameworkScript]];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args
+- (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     if (![method isEqualToString:@"__logger"]) {
         // prevent recursion
@@ -126,6 +126,8 @@
     
     [_msgAry addObject:[WXUtility JSONString:dict]];
     [self _executionMsgAry];
+    
+    return nil;
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
