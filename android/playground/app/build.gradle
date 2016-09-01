@@ -90,5 +90,5 @@ dependencies {
     compile 'com.android.support:support-annotations:23.2.1'
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
-    compile 'com.taobao.android:weex_inspector:0.0.2.7'
+    compile 'com.taobao.android:weex_inspector:0.0.7.1'
 }
