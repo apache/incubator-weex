@@ -89,6 +89,12 @@ export default function Weex (options) {
   this.loader = options.loader
   this.embed = options.embed
 
+  // downgrade options.
+  const dg = options.downgrade || []
+  dg.forEach(function (comp) {
+    config.downgrade[comp] = true
+  })
+
   this.data = options.data
   this.scale = this.width / this.designWidth
   receiver.init(this)
