@@ -15,7 +15,7 @@ const proto = {
     window.addEventListener('scroll', function (e) {
       // fire loadmore event.
       const body = document.body
-      const leftDist = body.scrollHeight - body.getBoundingClientRect().height - body.scrollTop
+      const leftDist = body.scrollHeight - window.innerHeight - body.scrollTop
       if (leftDist <= this.loadmoreoffset && this.isAvailableToFireloadmore) {
         this.isAvailableToFireloadmore = false
         this.dispatchEvent('loadmore')
