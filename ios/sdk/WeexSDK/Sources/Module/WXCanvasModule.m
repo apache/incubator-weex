@@ -24,19 +24,22 @@
 WX_EXPORT_METHOD(@selector(addDrawActions:actions:))
 WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
 
-- (instancetype) init {
+- (instancetype) init
+{
     _cacheMap = [NSMutableDictionary new];
     _glcontext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     [EAGLContext setCurrentContext:_glcontext];
     return [super init];
 }
 
-- (void) dealloc {
+- (void) dealloc
+{
     [_cacheMap removeAllObjects];
     _cacheMap = nil;
 }
 
-- (void)performBlockWithCanvas:(NSString *)elemRef block:(void (^)(WXCanvasComponent *))block {
+- (void)performBlockWithCanvas:(NSString *)elemRef block:(void (^)(WXCanvasComponent *))block
+{
     if (!elemRef) {
         return;
     }
@@ -56,11 +59,13 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
 }
 
 
-- (void)doBlock:(void (^)())block {
+- (void)doBlock:(void (^)())block
+{
     block();
 }
 
-- (void)addDrawActions:(NSString *)elemRef actions:(NSArray *)actions {
+- (void)addDrawActions:(NSString *)elemRef actions:(NSArray *)actions
+{
     [self performBlockWithCanvas:elemRef block:^(WXCanvasComponent *canvas) {
         [canvas addDrawActions:actions canvasModule:self];
     }];
@@ -80,7 +85,8 @@ WX_EXPORT_METHOD(@selector(initTexture:callbackId:))
     return image;
 }
 
--(void) initTexture:(NSString *)imgURL callbackId:(NSInteger)callbackId {
+-(void) initTexture:(NSString *)imgURL callbackId:(NSInteger)callbackId
+{
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         UIImage *image = [weakSelf getImage:imgURL];

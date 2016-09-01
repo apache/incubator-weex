@@ -52,7 +52,7 @@
 - (UIView *)loadView
 {
     _glkview = [[GLKView alloc] init];
-    EAGLContext * context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     _glkview.context = context;
     _glkview.delegate = self;
     _glkview.enableSetNeedsDisplay = NO;
@@ -60,7 +60,8 @@
     return _glkview;
 }
 
-- (void) viewDidLoad {
+- (void) viewDidLoad
+{
     [super viewDidLoad];
     _drawActionList = [[NSMutableArray alloc] init];
     _effect = [[GLKBaseEffect alloc] init];
@@ -73,7 +74,8 @@
     _lineWidth = 1;
 }
 
-- (void) viewDidUnload {
+- (void) viewDidUnload
+{
     [_displayLink invalidate];
     _displayLink = nil;
     [_drawActionList removeAllObjects];
@@ -85,7 +87,8 @@
     [super viewDidUnload];
 }
 
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect {
+- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+{
     NSInteger count = [_drawActionList count];
     for (NSInteger i = 0; i < count; i++) {
         NSArray *action = (NSArray *)_drawActionList[i];
@@ -115,7 +118,8 @@
 //      [fillRect, [0, 0, 750, 750]],
 //      [drawImages, [imgURL, [[sx, sy, sw, sh, dx, dy, dw, dh], [sx, sy, sw, sh, dx, dy, dw, dh]]]],
 // ]
-- (void) addDrawActions:(NSArray *)actions canvasModule:(WXCanvasModule*)canvasModule {
+- (void) addDrawActions:(NSArray *)actions canvasModule:(WXCanvasModule*)canvasModule
+{
     [_drawActionList removeAllObjects];
     [_drawActionList addObjectsFromArray:actions];
     _canvasModule = canvasModule;
@@ -123,7 +127,8 @@
 }
 
 
--(GLKTextureInfo *) getTexture:(NSString *)imageURL {
+-(GLKTextureInfo *) getTexture:(NSString *)imageURL
+{
     NSString *key = [NSString stringWithFormat:@"texture~%@", imageURL];
     if ([_cacheMap objectForKey:key]) {
         return (GLKTextureInfo *)[_cacheMap objectForKey:key];
@@ -143,11 +148,13 @@
     return texture;
 }
 
--(void) handleDisplayLink {
+-(void) handleDisplayLink
+{
     [self fireEvent:@"tick" params:nil];
 }
 
-- (void)addEvent:(NSString *)eventName {
+- (void)addEvent:(NSString *)eventName
+{
     if ([eventName isEqualToString:@"tick"]) {
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(handleDisplayLink)];
         float i = 60.0 / _fps;
@@ -164,7 +171,8 @@
 
 
 // [imageURL, [[sx, sy, sw, sh, dx, dy, dw, dh], [sx, sy, sw, sh, dx, dy, dw, dh, m00, m01, m02, m10, m11, m12, m20, m21, m22]]]
-- (void) drawImages:(NSArray *)params {
+- (void) drawImages:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(2);
     GLKTextureInfo *textureInfo = [self getTexture:[WXConvert NSString:params[0]]];
     CGFloat textureWidth = textureInfo.width;
@@ -256,14 +264,16 @@
     glDrawElements(GL_TRIANGLES, indexLen, GL_UNSIGNED_INT, indices);
 }
 
-- (void) setGlobalAlpha:(NSArray *)params {
+- (void) setGlobalAlpha:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(1);
     _globalAlpha = [WXConvert CGFloat:params[0]];
 }
 
 
 // use rgba(0, 0, 0, 0) to fill the rect
-- (void) clearRect:(NSArray *)params {
+- (void) clearRect:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(4);
     WX_CANVAS_PIXEL(x, 0)
     WX_CANVAS_PIXEL(y, 1)
@@ -289,7 +299,8 @@
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-- (void) setStrokeStyle:(NSArray *)params {
+- (void) setStrokeStyle:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(1);
     UIColor *color = [WXConvert UIColor:params[0]];
     CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha =0.0;
@@ -297,13 +308,15 @@
     _strokeColor = GLKVector4Make(red, green, blue, alpha);
 }
 
-- (void) setLineWidth:(NSArray *)params {
+- (void) setLineWidth:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(1);
     _lineWidth = [WXConvert WXPixelType:params[0]];
 }
 
 // ["M", 0, 0, "L", 100, 100, "L", 0, 100, "L", 0, 0] it made a triangle
-- (void) strokeLines:(NSArray *)params {
+- (void) strokeLines:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(1);
     const GLint pointsCount = floor([params count] / 3);
     GLKVector2 points[pointsCount];
@@ -352,7 +365,8 @@
     glDrawElements(GL_LINES, lineIndex, GL_UNSIGNED_INT, indices);
 }
 
-- (void) strokeRect:(NSArray *)params {
+- (void) strokeRect:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(4);
     WX_CANVAS_PIXEL(x, 0)
     WX_CANVAS_PIXEL(y, 1)
@@ -381,7 +395,8 @@
 }
 
 // only support color, such as red, rgb(100, 100, 100), rgba(0, 0, 0, 1), #cccccc
--(void) setFillStyle:(NSArray *)params {
+-(void) setFillStyle:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(1);
     UIColor *color = [WXConvert UIColor:params[0]];
     CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha =0.0;
@@ -389,7 +404,8 @@
     _fillColor = GLKVector4Make(red, green, blue, alpha);
 }
 
-- (void) fillRect:(NSArray *)params {
+- (void) fillRect:(NSArray *)params
+{
     WX_CANVAS_PARAMS_CHECK(4);
     WX_CANVAS_PIXEL(x, 0)
     WX_CANVAS_PIXEL(y, 1)
