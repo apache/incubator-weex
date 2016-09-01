@@ -658,15 +658,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      * Setting refresh view and loading view
      * @param child the refresh_view or loading_view
      */
-    private boolean checkRefreshOrLoading(WXComponent child) {
+    private boolean checkRefreshOrLoading(final WXComponent child) {
 
         if (child instanceof WXRefresh) {
             mHost.setOnRefreshListener((WXRefresh)child);
-            final WXComponent temp = child;
             mHost.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setHeaderView(temp.getView());
+                    mHost.setHeaderView(child);
                 }
             },100);
             return true;
@@ -674,11 +673,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
         if (child instanceof WXLoading) {
             mHost.setOnLoadingListener((WXLoading)child);
-            final WXComponent temp = child;
             mHost.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setFooterView(temp.getView());
+                    mHost.setFooterView(child);
                 }
             },100);
             return true;

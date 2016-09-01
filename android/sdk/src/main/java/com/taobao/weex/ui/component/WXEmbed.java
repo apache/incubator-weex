@@ -229,7 +229,7 @@ import com.taobao.weex.utils.WXViewUtils;
 public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   private String src;
-  private WXSDKInstance instance;
+  private WXSDKInstance mNestedInstance;
   private final static int ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270);
   private final static int ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260);
 
@@ -287,6 +287,16 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         hostView.addView(imageView);
         WXLogUtils.e("WXEmbed", "NetWork failure :" + errCode + ",\n error message :" + msg);
       }
+    }
+
+    @Override
+    public boolean onPreCreate(NestedContainer comp, String src) {
+      return true;
+    }
+
+    @Override
+    public void onCreated(NestedContainer comp, WXSDKInstance nestedInstance) {
+
     }
   }
 
@@ -356,12 +366,18 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     return super.setProperty(key, param);
   }
 
+  @Override
+  public void renderNewURL(String url) {
+    src = url;
+    loadInstance();
+  }
+
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
     this.src = src;
-    if (instance != null) {
-      instance.destroy();
-      instance = null;
+    if (mNestedInstance != null) {
+      mNestedInstance.destroy();
+      mNestedInstance = null;
     }
     if (TextUtils.equals(getVisibility(), Constants.Value.VISIBLE)) {
       loadInstance();
@@ -372,13 +388,27 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   void loadInstance(){
-    instance = createInstance();
+    mNestedInstance = createInstance();
+    if(mListener != null && mListener.mEventListener != null){
+      if(!mListener.mEventListener.onPreCreate(this,src)){
+        //cancel render
+        mListener.mEventListener.onCreated(this, mNestedInstance);
+      }
+    }
   }
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
     mInstance.addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
+
+    if(mListener != null && mListener.mEventListener != null){
+      if(!mListener.mEventListener.onPreCreate(this,src)){
+        //cancel render
+        return null;
+      }
+    }
+
     ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
                             src,
@@ -393,16 +423,16 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     super.setVisibility(visibility);
     boolean visible = TextUtils.equals(getVisibility(), Constants.Value.VISIBLE);
     if (!TextUtils.isEmpty(src) && visible) {
-      if (instance == null) {
-        instance = createInstance();
+      if (mNestedInstance == null) {
+        loadInstance();
       } else {
-        instance.onViewAppear();
+        mNestedInstance.onViewAppear();
       }
     }
 
     if (!visible) {
-      if (instance != null) {
-        instance.onViewDisappear();
+      if (mNestedInstance != null) {
+        mNestedInstance.onViewDisappear();
       }
     }
     mIsVisible = visible;
@@ -411,9 +441,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   public void destroy() {
     super.destroy();
-    if (instance != null) {
-      instance.destroy();
-      instance = null;
+    if (mNestedInstance != null) {
+      mNestedInstance.destroy();
+      mNestedInstance = null;
     }
     src = null;
   }
@@ -421,20 +451,20 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   public void onAppear() {
     //appear event from root instance will not trigger visibility change
-    if(mIsVisible && instance != null){
-      WXComponent comp = instance.getRootCom();
+    if(mIsVisible && mNestedInstance != null){
+      WXComponent comp = mNestedInstance.getRootCom();
       if(comp != null)
-        WXBridgeManager.getInstance().fireEvent(instance.getInstanceId(), comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
+        WXBridgeManager.getInstance().fireEvent(mNestedInstance.getInstanceId(), comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
     }
   }
 
   @Override
   public void onDisappear() {
     //appear event from root instance will not trigger visibility change
-    if(mIsVisible && instance != null){
-      WXComponent comp = instance.getRootCom();
+    if(mIsVisible && mNestedInstance != null){
+      WXComponent comp = mNestedInstance.getRootCom();
       if(comp != null)
-        WXBridgeManager.getInstance().fireEvent(instance.getInstanceId(), comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
+        WXBridgeManager.getInstance().fireEvent(mNestedInstance.getInstanceId(), comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
     }
   }
 }
