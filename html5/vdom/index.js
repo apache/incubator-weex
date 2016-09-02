@@ -2,23 +2,22 @@
  * @fileOverview
  * A simple virtual dom implementation
  */
-
-import Listener from './listener'
-import { extend } from '../shared'
+// import { extend } from '../shared'
+import { extend } from '../shared/utils'
 
 const DEFAULT_TAG_NAME = 'div'
 
 export const instanceMap = {}
 let nextNodeRef = 1
 
-export function Document (id, url, handler) {
+export function Document (id, url, handler, Listener) {
   id = id ? id.toString() : ''
   this.id = id
   this.URL = url
 
   instanceMap[id] = this
   this.nodeMap = {}
-  this.listener = new Listener(id, handler || genCallTasks(id))
+  Listener && (this.listener = new Listener(id, handler || genCallTasks(id)))
   this.createDocumentElement()
 }
 
@@ -444,7 +443,7 @@ function removeIndex (target, list, changeSibling) {
 }
 
 Element.prototype.setAttr = function (key, value, silent) {
-  if (this.attr[key] === value) {
+  if (this.attr[key] === value && silent !== false) {
     return
   }
   this.attr[key] = value
@@ -455,7 +454,7 @@ Element.prototype.setAttr = function (key, value, silent) {
 }
 
 Element.prototype.setStyle = function (key, value, silent) {
-  if (this.style[key] === value) {
+  if (this.style[key] === value && silent !== false) {
     return
   }
   this.style[key] = value
@@ -465,8 +464,15 @@ Element.prototype.setStyle = function (key, value, silent) {
   }
 }
 
+Element.prototype.resetClassStyle = function () {
+  for (const key in this.classStyle) {
+    this.classStyle[key] = ''
+  }
+}
+
 Element.prototype.setClassStyle = function (classStyle) {
-  this.classStyle = classStyle
+  this.resetClassStyle()
+  extend(this.classStyle, classStyle)
   if (this.docId) {
     const listener = instanceMap[this.docId].listener
     listener.setStyles(this.ref, this.toStyle())

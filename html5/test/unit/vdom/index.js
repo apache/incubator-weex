@@ -13,11 +13,13 @@ import {
   Comment
 } from '../../../vdom'
 
+import Listener from '../../../vdom/listener'
+
 global.callNative = function () {}
 
 describe('document constructor', () => {
   it('create & destroy document', () => {
-    const doc = new Document('foo', 'http://path/to/url')
+    const doc = new Document('foo', 'http://path/to/url', null, Listener)
     expect(doc).is.an.object
     expect(doc.id).eql('foo')
     expect(doc.URL).eql('http://path/to/url')
@@ -33,7 +35,7 @@ describe('document methods', () => {
   let doc
 
   beforeEach(() => {
-    doc = new Document('foo')
+    doc = new Document('foo', null, null, Listener)
   })
 
   afterEach(() => {
@@ -98,7 +100,7 @@ describe('Element in document methods', () => {
   let doc, el, el2, el3
 
   beforeEach(() => {
-    doc = new Document('foo')
+    doc = new Document('foo', null, null, Listener)
     el = new Element('bar', {
       attr: { a: 11, b: 12 },
       style: { c: 13, d: 14 },
@@ -317,14 +319,18 @@ describe('Element in document methods', () => {
     expect(el.toJSON().attr).eql({ a: 21, b: 12 })
     el.setAttr('a', 22, true)
     expect(el.toJSON().attr).eql({ a: 22, b: 12 })
+    el.setAttr('a', 23, false)
+    expect(el.toJSON().attr).eql({ a: 23, b: 12 })
 
     el.setStyle('c', 21)
     expect(el.toJSON().style).eql({ a: 211, c: 21, d: 14 })
     el.setStyle('c', 22, true)
     expect(el.toJSON().style).eql({ a: 211, c: 22, d: 14 })
+    el.setStyle('c', 23, false)
+    expect(el.toJSON().style).eql({ a: 211, c: 23, d: 14 })
 
     el.setClassStyle({ a: 311, c: 313 })
-    expect(el.toJSON().style).eql({ a: 311, c: 22, d: 14 })
+    expect(el.toJSON().style).eql({ a: 311, c: 23, d: 14 })
 
     const handler = function () {}
     el.addEvent('click', handler)
@@ -340,7 +346,7 @@ describe('Node', () => {
 
   beforeEach(() => {
     spy = sinon.spy()
-    doc = new Document('foo', '', spy)
+    doc = new Document('foo', '', spy, Listener)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     el = new Element('bar')
@@ -419,7 +425,7 @@ describe('complicated situations', () => {
 
   beforeEach(() => {
     spy = sinon.spy()
-    doc = new Document('foo', '', spy)
+    doc = new Document('foo', '', spy, Listener)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     el = new Element('bar', null, doc)
