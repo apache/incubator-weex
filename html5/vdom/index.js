@@ -4,13 +4,14 @@
  */
 // import { extend } from '../shared'
 import { extend } from '../shared/utils'
+import Listener from './listener'
 
 const DEFAULT_TAG_NAME = 'div'
 
 export const instanceMap = {}
 let nextNodeRef = 1
 
-export function Document (id, url, handler, Listener) {
+export function Document (id, url, handler) {
   id = id ? id.toString() : ''
   this.id = id
   this.URL = url
