@@ -340,6 +340,7 @@ do {\
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
+    [super _frameDidCalculated:isChanged];
     [self syncTextStorageForView];
 }
 
