@@ -51,6 +51,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 layer.backgroundColor = [WXConvert CGColor:styles[property]];
             } else if ([property isEqualToString:@"opacity"]) {
                 layer.opacity = [styles[property] floatValue];
+            } else if ([property isEqualToString:@"width"]) {
+                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, [WXConvert CGFloat:styles[property]], layer.frame.size.height);
+            } else if ([property isEqualToString:@"height"]) {
+                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, layer.frame.size.width, [WXConvert CGFloat:styles[property]]);
             }
         }
     } completion:^(BOOL finished) {
