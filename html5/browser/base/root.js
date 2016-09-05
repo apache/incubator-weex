@@ -32,19 +32,19 @@ function init (Weex) {
     // The root component should be implemented as a div component, as the scrollable
     // components have performance issue compare to the original body scroll.
     if (!nodeType) {
-      console.warn(`[h5-render] no nodeType is specified, construct Root use 'div' by default.`)
-      nodeType = 'div'
+      console.warn(`[h5-render] no nodeType is specified, construct Root use 'droot' by default.`)
+      nodeType = 'droot'
     }
     else if (config.validRoots.indexOf(nodeType) === -1) {
       console.warn(`[h5-render] the root component type '${nodeType}' is not one of
 the types in [${config.validRoots}] list. It is auto downgraded
-to 'div'.`)
-      nodeType = 'div'
+to 'droot'.`)
+      nodeType = 'droot'
     }
     else if (config.downgrade.root) {
-      console.warn(`[h5-render] the root is downgrade to div due to the downgrade
+      console.warn(`[h5-render] the root is downgrade to 'droot' due to the downgrade
 configuration of weex.`)
-      nodeType = 'div'
+      nodeType = 'droot'
     }
     else {
       if (!global.weex.getInstance(data.instanceId).embed) {
@@ -54,8 +54,11 @@ configuration of weex.`)
       }
     }
 
-    if (nodeType === 'div') {
+    if (nodeType === 'droot') {
       data.style.height = ''
+    }
+    else if (nodeType === 'div') {
+      // do nothing.
     }
     else {
       !data.style.height && (data.style.height = '100%')
