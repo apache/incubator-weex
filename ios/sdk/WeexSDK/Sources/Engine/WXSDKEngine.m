@@ -82,6 +82,7 @@
     [self registerComponent:@"refresh" withClass:NSClassFromString(@"WXRefreshComponent")];
     [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
 	[self registerComponent:@"canvas" withClass:NSClassFromString(@"WXCanvasComponent")];
+    [self registerComponent:@"slider-neighbor" withClass:NSClassFromString(@"WXSliderNeighborComponent")];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
