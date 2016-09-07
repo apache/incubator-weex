@@ -250,11 +250,11 @@
 {
     //set item width
     if (!_itemWidth) {
-        _itemWidth = _vertical? view.frame.size.height: view.frame.size.width;
+        _itemWidth = _vertical? view.bounds.size.height: view.bounds.size.width;
     }
     
     //set container frame
-    CGRect frame = view.frame;
+    CGRect frame = view.bounds;
     frame.size.width = _vertical? frame.size.width: _itemWidth;
     frame.size.height = _vertical? _itemWidth: frame.size.height;
     UIView *containerView = [[UIView alloc] initWithFrame:frame];
@@ -1098,8 +1098,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 - (NSInteger)indexOfItemViewOrSubview:(UIView *)view
 {
     NSInteger index = [self indexOfItemView:view];
-    if (index == NSNotFound && view != nil && view != _contentView)
-    {
+    if (index == NSNotFound && view != nil && view != _contentView) {
         return [self indexOfItemViewOrSubview:view.superview];
     }
     return index;
@@ -1109,8 +1108,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 {
     for (UIView *view in [[[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))sliderNeighorCompareViewDepth context:(__bridge void *)self] reverseObjectEnumerator])
     {
-        if ([view.superview.layer hitTest:point])
-        {
+        if ([view.superview.layer hitTest:point]) {
             return view;
         }
     }
@@ -1128,12 +1126,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     for (NSNumber *number in [self indexesForVisibleItems])
     {
         NSInteger i = [number integerValue];
-        if (i < index)
-        {
+        if (i < index) {
             newItemViews[number] = _itemViews[number];
-        }
-        else if (i > index)
-        {
+        } else if (i > index) {
             newItemViews[@(i - 1)] = _itemViews[number];
         }
     }
@@ -1147,17 +1142,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     for (NSNumber *number in [self indexesForVisibleItems])
     {
         NSInteger i = [number integerValue];
-        if (i < index)
-        {
+        if (i < index) {
             newItemViews[number] = _itemViews[number];
-        }
-        else
-        {
+        } else {
             newItemViews[@(i + 1)] = _itemViews[number];
         }
     }
-    if (view)
-    {
+    if (view) {
         [self setItemView:view forIndex:index];
     }
     self.itemViews = newItemViews;
@@ -1513,9 +1504,16 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             [self _startAutoPlayTimer];
         }
     }
-    [self setNeighborAlpha:attributes];
-    [self setNeighborSpace:attributes];
-    [self setNeighborScale:attributes];
+    if (attributes[@"neighborSpace"]) {
+        [self setNeighborScale:attributes];
+    }
+    if (attributes[@"neighborAlpha"]) {
+        [self setNeighborAlpha:attributes];
+    }
+    
+    if (attributes[@"neighborSpace"]) {
+        [self setNeighborSpace:attributes];
+    }
     
     [self.sliderView setCurrentItemIndex:_index];
 }
@@ -1572,6 +1570,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         self->neighborScale = [WXConvert CGFloat:attributes[@"neighborScale"]];
         self->neighborScale = self->neighborScale >= 0? self->neighborScale : 0;
         self->neighborScale = self->neighborScale <= 1? self->neighborScale :1;
+        if (self->neighborScale == 0) {
+            self->neighborScale = 0.01;
+        }
     } else {
         self->neighborScale = 0.8;
     }
@@ -1616,7 +1617,8 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     [sliderNeighborView scroll2ItemViewAtIndex:self.currentIndex animated:YES];
 }
 
-#pragma sliderNeighbor Delegate && dataSource
+#pragma mark sliderNeighbor Delegate && dataSource
+
 - (NSInteger)numberOfItemsInSliderNeighbor:(WXSliderNeighborView *)sliderNeighbor {
     return [self.items count];
 }
@@ -1687,7 +1689,8 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     }
 }
 
-- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor from:(NSInteger)from to:(NSInteger)to {
+- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor from:(NSInteger)from to:(NSInteger)to
+{
     UIView * currentView  = ((UIView*)sliderNeighbor.itemViews[[NSNumber numberWithInteger:to]]);
     UIView * preView  = ((UIView*)sliderNeighbor.itemViews[[NSNumber numberWithInteger:from]]);
     
@@ -1695,6 +1698,8 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     currentView.transform = CGAffineTransformMakeScale(1.0, 1.0);
     preView.alpha = self->neighborAlpha;
     preView.transform = CGAffineTransformMakeScale(self->neighborScale, self->neighborScale);
+    [preView setNeedsDisplay];
+    [currentView setNeedsDisplay];
 }
 
 @end
