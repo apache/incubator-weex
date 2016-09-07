@@ -179,11 +179,11 @@
     CGFloat textureHeight = textureInfo.height;
 
     NSArray *drawParams = (NSArray *)params[1];
-    const GLint count = [drawParams count] * 4;
+    const GLint count = (GLint)[drawParams count] * 4;
     GLKVector3 geometrys[count];
     GLKVector3 textures[count];
 
-    const GLint indexLen = drawParams.count * 6;
+    const GLint indexLen = (GLint)drawParams.count * 6;
     GLuint indices[indexLen];
 
     for (GLint i = 0; i < drawParams.count; i++) {
