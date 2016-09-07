@@ -40,9 +40,17 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     //    CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     UIViewAnimationOptions timingFunction = [WXConvert UIViewAnimationTimingFunction:args[@"timingFunction"]];
     
+    /**
+       UIView-style animation functions support the standard timing functions,
+       but they don’t allow you to specify your own cubic Bézier curve. 
+       CATransaction can be used instead to force these animations to use the supplied CAMediaTimingFunction to pace animations.
+     **/
+    [CATransaction begin];
+    [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
+    
     // Rotate 360 not work , have not found any solution
     // http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
-    [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction | timingFunction animations:^{
+    [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction  animations:^{
         for (NSString *property in styles) {
             if ([property isEqualToString:@"transform"]) {
                 NSString *transformOrigin = styles[@"transformOrigin"];
@@ -62,6 +70,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             callback(finished ? @"SUCCESS" : @"FAIL");
         }
     }];
+
+    [CATransaction commit];
 }
 
 @end
