@@ -25,6 +25,10 @@ apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'com.vanniktech.android.junit.jacoco'
 apply plugin: 'checkstyle'
 
+junitJacoco {
+    excludes = ['com/taobao/weex/dom/flex/**']
+}
+
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
     // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
