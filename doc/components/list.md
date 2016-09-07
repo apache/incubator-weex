@@ -1,6 +1,6 @@
 # &lt;list&gt;
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/74"  class="weex-translate incomplete">cn</a>
+<a href="https://github.com/weexteam/article/issues/74"  class="weex-translate">cn</a>
 
 
 ### Summary
