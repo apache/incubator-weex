@@ -32,34 +32,34 @@ typedef NS_ENUM(NSInteger, WXSliderNeighborOption)
 @protocol WXSliderNeighborDelegate <NSObject>
 @optional
 
-- (void)sliderNeighborWillBeginScrollingAnimation:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborDidEndScrollingAnimation:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborDidScroll:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborDidEndDragging:(WXSliderNeighborView *)sliderNeighbor willDecelerate:(BOOL)decelerate;
-- (void)sliderNeighborWillBeginDecelerating:(WXSliderNeighborView *)sliderNeighbor;
-- (void)sliderNeighborDidEndDecelerating:(WXSliderNeighborView *)sliderNeighbor;
+- (void)sliderNeighborWillBeginScrollingAnimation:(WXSliderNeighborView * _Nonnull )sliderNeighbor;
+- (void)sliderNeighborDidEndScrollingAnimation:(WXSliderNeighborView *_Nonnull)sliderNeighbor;
+- (void)sliderNeighborDidScroll:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (void)sliderNeighborDidEndDragging:(WXSliderNeighborView * _Nonnull)sliderNeighbor willDecelerate:(BOOL)decelerate;
+- (void)sliderNeighborWillBeginDecelerating:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (void)sliderNeighborDidEndDecelerating:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
 
-- (BOOL)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor shouldSelectItemAtIndex:(NSInteger)index;
-- (void)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor didSelectItemAtIndex:(NSInteger)index;
-- (void)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor didScrollToItemAtIndex:(NSInteger)index;
+- (BOOL)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor shouldSelectItemAtIndex:(NSInteger)index;
+- (void)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor didSelectItemAtIndex:(NSInteger)index;
+- (void)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor didScrollToItemAtIndex:(NSInteger)index;
 
-- (CGFloat)sliderNeighborItemWidth:(WXSliderNeighborView *)sliderNeighbor;
-- (CATransform3D)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor itemTransformForOffset:(CGFloat)offset baseTransform:(CATransform3D)transform;
-- (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value;
+- (CGFloat)sliderNeighborItemWidth:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (CATransform3D)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor itemTransformForOffset:(CGFloat)offset baseTransform:(CATransform3D)transform;
+- (CGFloat)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value;
 
 @end
 
 @protocol WXSliderNeighborDataSource <NSObject>
 
-- (NSInteger)numberOfItemsInSliderNeighbor:(WXSliderNeighborView *)sliderNeighbor;
-- (UIView *)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor viewForItemAtIndex:(NSInteger)index reusingView:(nullable UIView *)view;
+- (NSInteger)numberOfItemsInSliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (UIView * _Nonnull)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor viewForItemAtIndex:(NSInteger)index reusingView:( UIView * _Nonnull)view;
 
 @optional
 
-- (NSInteger)numberOfPlaceholdersInsliderNeighbor:(WXSliderNeighborView *)sliderNeighbor;
-- (UIView *)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor placeholderViewAtIndex:(NSInteger)index reusingView:(nullable UIView *)view;
+- (NSInteger)numberOfPlaceholdersInsliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (UIView * _Nonnull)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor placeholderViewAtIndex:(NSInteger)index reusingView:( UIView * _Nonnull)view;
 
 @end
 

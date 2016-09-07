@@ -63,7 +63,6 @@
 @property (nonatomic, assign) CGFloat bounceDistance;
 @property (nonatomic, assign) BOOL stopAtItemBoundary;
 @property (nonatomic, assign) BOOL scrollToItemBoundary;
-@property (nonatomic, assign) BOOL ignorePerpendicularSwipes;
 @property (nonatomic, assign) BOOL centerItemWhenSelected;
 @property (nonatomic, assign) NSTimeInterval scrollDuration;
 @property (nonatomic, readonly, getter = isWrapEnabled) BOOL wrapEnabled;
@@ -94,7 +93,6 @@
     _bounceDistance = 1.0;
     _stopAtItemBoundary = YES;
     _scrollToItemBoundary = YES;
-    _ignorePerpendicularSwipes = YES;
     _centerItemWhenSelected = YES;
     
     _contentView = [[UIView alloc] initWithFrame:self.bounds];
@@ -156,6 +154,8 @@
     }
 }
 
+#pragma clang diagnostic push
+#pragma GCC diagnostic ignored "-Wundeclared-selector"
 - (void)setCurrentItemIndex:(NSInteger)currentItemIndex
 {
     if ([self currentItemIndex] == currentItemIndex) return;
@@ -171,21 +171,17 @@
     [self scroll2ItemViewAtIndex:currentItemIndex animated:YES];
     
 }
+#pragma clang diagnostic pop
 
 - (void)updateItemWidth
 {
     _itemWidth = [_delegate sliderNeighborItemWidth:self] ?: _itemWidth;
-    if (_numberOfItems > 0)
-    {
-        if ([_itemViews count] == 0)
-        {
+    if (_numberOfItems > 0) {
+        if ([_itemViews count] == 0) {
             [self loadViewAtIndex:0];
         }
-    }
-    else if (_numberOfPlaceholders > 0)
-    {
-        if ([_itemViews count] == 0)
-        {
+    } else if (_numberOfPlaceholders > 0) {
+        if ([_itemViews count] == 0) {
             [self loadViewAtIndex:-1];
         }
     }
@@ -217,14 +213,10 @@
 {
     //calculate relative position
     CGFloat offset = index - _scrollOffset;
-    if (_wrapEnabled)
-    {
-        if (offset > _numberOfItems/2.0)
-        {
+    if (_wrapEnabled) {
+        if (offset > _numberOfItems/2.0) {
             offset -= _numberOfItems;
-        }
-        else if (offset < -_numberOfItems/2.0)
-        {
+        } else if (offset < -_numberOfItems/2.0) {
             offset += _numberOfItems;
         }
     }
@@ -244,12 +236,9 @@
     fadeMinAlpha = [self valueForOption:WXSliderNeighborOptionFadeMinAlpha withDefault:fadeMinAlpha];
     
     CGFloat factor = 0.0;
-    if (offset > fadeMax)
-    {
+    if (offset > fadeMax) {
         factor = offset - fadeMax;
-    }
-    else if (offset < fadeMin)
-    {
+    } else if (offset < fadeMin) {
         factor = fadeMin - offset;
     }
     return 1.0 - MIN(factor, fadeRange) / fadeRange * (1.0 - fadeMinAlpha);
@@ -1668,6 +1657,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
 
 - (BOOL)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor shouldSelectItemAtIndex:(NSInteger)index {
     
+    return YES;
 }
 
 - (UIView *)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor placeholderViewAtIndex:(NSInteger)index reusingView:(UIView *)view
@@ -1708,6 +1698,20 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
+}
+
+- (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
+{
+    switch (option) {
+        case WXSliderNeighborOptionFadeMinAlpha:
+            return value ? value* self->neighborAlpha: self->neighborAlpha;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return value;
 }
 
 @end
