@@ -37,8 +37,41 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
     NSTimeInterval duration = [args[@"duration"] doubleValue] / 1000;
     NSTimeInterval delay = [args[@"delay"] doubleValue] / 1000;
-    //    CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
-    UIViewAnimationOptions timingFunction = [WXConvert UIViewAnimationTimingFunction:args[@"timingFunction"]];
+
+    CATransform3D transform;BOOL isAnimateTransform;
+    CGColorRef backgroundColor;BOOL isAnimateBackgroundColor;
+    float opacity;BOOL isAnimateOpacity;
+    CGRect newFrame = layer.frame;BOOL isAnimateFrame;
+    CGFloat rotateAngle; BOOL isUsingCAAnimation;
+    
+    for (NSString *property in styles) {
+        if ([property isEqualToString:@"transform"]) {
+            NSString *transformOrigin = styles[@"transformOrigin"];
+            WXTransform *wxTransform = [WXTransform new];
+            transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin];
+            rotateAngle = [wxTransform getRotateAngle];
+            if (rotateAngle != 0) {
+                /**
+                 Rotate 360 not working on UIView block animation, have not found any more elegant solution than using CAAnimation
+                 See http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
+                 **/
+                isUsingCAAnimation = YES;
+            }
+            isAnimateTransform = YES;
+        } else if ([property isEqualToString:@"backgroundColor"]) {
+            backgroundColor = [WXConvert CGColor:styles[property]];
+            isAnimateBackgroundColor = YES;
+        } else if ([property isEqualToString:@"opacity"]) {
+            opacity = [styles[property] floatValue];
+            isAnimateOpacity = YES;
+        } else if ([property isEqualToString:@"width"]) {
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, [WXConvert CGFloat:styles[property]], newFrame.size.height);
+            isAnimateFrame = YES;
+        } else if ([property isEqualToString:@"height"]) {
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, newFrame.size.width, [WXConvert CGFloat:styles[property]]);
+            isAnimateFrame = YES;
+        }
+    }
     
     /**
        UIView-style animation functions support the standard timing functions,
@@ -47,29 +80,45 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
      **/
     [CATransaction begin];
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
-    
-    // Rotate 360 not work , have not found any solution
-    // http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
-    [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction  animations:^{
-        for (NSString *property in styles) {
-            if ([property isEqualToString:@"transform"]) {
-                NSString *transformOrigin = styles[@"transformOrigin"];
-                layer.transform = [[WXTransform new] getTransform:styles[property] withView:view withOrigin:transformOrigin];
-            } else if ([property isEqualToString:@"backgroundColor"]) {
-                layer.backgroundColor = [WXConvert CGColor:styles[property]];
-            } else if ([property isEqualToString:@"opacity"]) {
-                layer.opacity = [styles[property] floatValue];
-            } else if ([property isEqualToString:@"width"]) {
-                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, [WXConvert CGFloat:styles[property]], layer.frame.size.height);
-            } else if ([property isEqualToString:@"height"]) {
-                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, layer.frame.size.width, [WXConvert CGFloat:styles[property]]);
-            }
-        }
-    } completion:^(BOOL finished) {
+    [CATransaction setCompletionBlock:^{
         if (callback) {
-            callback(finished ? @"SUCCESS" : @"FAIL");
+            callback(@"SUCCESS");
         }
     }];
+    
+    if (isUsingCAAnimation) {
+        CABasicAnimation* rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.toValue = [NSNumber numberWithFloat: rotateAngle];
+        rotationAnimation.duration = duration;
+        rotationAnimation.cumulative = YES;
+        rotationAnimation.fillMode = kCAFillModeForwards;
+        rotationAnimation.removedOnCompletion = NO;
+        
+        [layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    }
+    
+    /**
+       Using UIView block animation (UIView animateWithDuration:completion: and it's relatives) instead of using CAAnimation objects. 
+       Those methods actually move the view to it's new position, so that it responds to user interaction at the final location once the animation is complete.
+     **/
+    if (isAnimateTransform || isAnimateFrame || isAnimateBackgroundColor || isAnimateOpacity) {
+        [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction  animations:^{
+            if (isAnimateTransform && !CATransform3DEqualToTransform(transform, layer.transform)) {
+                layer.transform = transform;
+            }
+            if (isAnimateBackgroundColor) {
+                layer.backgroundColor = backgroundColor;
+            }
+            if (isAnimateOpacity) {
+                layer.opacity = opacity;
+            }
+            if (isAnimateFrame) {
+                layer.frame = newFrame;
+            }
+        } completion:nil];
+    }
+    
 
     [CATransaction commit];
 }

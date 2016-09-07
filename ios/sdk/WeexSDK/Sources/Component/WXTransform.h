@@ -16,5 +16,6 @@
 - (CATransform3D)getTransform:(NSString *)cssValue;
 - (CATransform3D)getTransform:(NSString *)cssValue withView:(UIView *)view;
 - (CATransform3D)getTransform:(NSString *)cssValue withView:(UIView *)view withOrigin:(NSString *)origin;
+- (float)getRotateAngle;
 
 @end

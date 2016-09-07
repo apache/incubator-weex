@@ -13,6 +13,7 @@
 @interface WXTransform()
 
 @property (nonatomic, weak) UIView *view;
+@property (nonatomic, assign) float rotateAngle;
 
 @end
 
@@ -163,7 +164,13 @@
 
 - (void)doRotate:(NSArray *)value
 {
-    _transform = CGAffineTransformRotate(_transform, [self getAngle:value[0]]);
+    float rotateAngle = [self getAngle:value[0]];
+    _rotateAngle += rotateAngle;
+}
+
+- (float)getRotateAngle
+{
+    return _rotateAngle;
 }
 
 - (void)doScale:(NSArray *)value
