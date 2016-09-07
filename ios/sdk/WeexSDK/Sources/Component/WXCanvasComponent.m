@@ -318,7 +318,7 @@
 - (void) strokeLines:(NSArray *)params
 {
     WX_CANVAS_PARAMS_CHECK(1);
-    const GLint pointsCount = floor([params count] / 3);
+    const NSInteger pointsCount = floor([params count] / 3);
     GLKVector2 points[pointsCount];
     GLint indices[pointsCount * 2];
     GLint pointIndex = 0;
