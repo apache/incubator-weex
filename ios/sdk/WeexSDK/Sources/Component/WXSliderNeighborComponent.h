@@ -35,7 +35,7 @@ typedef NS_ENUM(NSInteger, WXSliderNeighborOption)
 - (void)sliderNeighborWillBeginScrollingAnimation:(WXSliderNeighborView * _Nonnull )sliderNeighbor;
 - (void)sliderNeighborDidEndScrollingAnimation:(WXSliderNeighborView *_Nonnull)sliderNeighbor;
 - (void)sliderNeighborDidScroll:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
-- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
+- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView * _Nonnull)sliderNeighbor from:(NSInteger) from to:(NSInteger)to;
 - (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
 - (void)sliderNeighborDidEndDragging:(WXSliderNeighborView * _Nonnull)sliderNeighbor willDecelerate:(BOOL)decelerate;
 - (void)sliderNeighborWillBeginDecelerating:(WXSliderNeighborView * _Nonnull)sliderNeighbor;

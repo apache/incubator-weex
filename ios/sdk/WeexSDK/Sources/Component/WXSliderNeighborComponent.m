@@ -163,8 +163,6 @@
     [self setScrollOffset:currentItemIndex];
     [self.indicator setCurrentPoint:currentItemIndex];
     
-    [self setNeedsLayout];
-    
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:didScrollToItemAtIndex:)]) {
         [self.delegate sliderNeighbor:self didScrollToItemAtIndex:currentItemIndex];
     }
@@ -202,7 +200,10 @@
 {
     //get number of visible items
     //based on count value
-    _numberOfVisibleItems = [self circularCarouselItemCount];
+    CGFloat spacing = [self valueForOption:WXSliderNeighborOptionSpacing withDefault:1.0];
+    CGFloat width = _vertical ? self.bounds.size.height: self.bounds.size.width;
+    CGFloat itemWidth = _itemWidth * spacing;
+    _numberOfVisibleItems = ceil(width / itemWidth) + 2;
     _numberOfVisibleItems = MIN(MAX_VISIBLE_ITEMS, _numberOfVisibleItems);
     _numberOfVisibleItems = [self valueForOption:WXSliderNeighborOptionVisibleItems withDefault:_numberOfVisibleItems];
     _numberOfVisibleItems = MAX(0, MIN(_numberOfVisibleItems, _numberOfItems + _numberOfPlaceholdersToShow));
@@ -287,16 +288,11 @@
     transform = CATransform3DTranslate(transform, -_viewpointOffset.width, -_viewpointOffset.height, 0.0);
     
     //perform transform
-    CGFloat count = [self circularCarouselItemCount];
     CGFloat spacing = [self valueForOption:WXSliderNeighborOptionSpacing withDefault:1.0];
-    CGFloat arc = [self valueForOption:WXSliderNeighborOptionArc withDefault:M_PI * 2.0];
-    CGFloat radius = [self valueForOption:WXSliderNeighborOptionRadius withDefault:MAX(_itemWidth * spacing / 2.0, _itemWidth * spacing / 2.0 / tanf(arc/2.0/count))];
-    CGFloat angle = [self valueForOption:WXSliderNeighborOptionAngle withDefault:offset / count * arc];
-    
     if (_vertical) {
-        return CATransform3DTranslate(transform, 0.0, radius * sin(angle), radius * cos(angle) - radius);
+        return CATransform3DTranslate(transform, 0.0, offset * _itemWidth * spacing, 0.0);
     } else {
-        return CATransform3DTranslate(transform, radius * sin(angle), 0.0, radius * cos(angle) - radius);
+        return CATransform3DTranslate(transform, offset * _itemWidth * spacing, 0.0, 0.0);
     }
 }
 
@@ -320,17 +316,12 @@
     
     [view layoutIfNeeded];
     
-    //special-case logic for WXSliderNeighborTypeCoverFlow2
     CGFloat clampedOffset = MAX(-1.0, MIN(1.0, offset));
     if (_decelerating || (_scrolling && !_dragging && !_didDrag) || (_autoscroll && !_dragging) ||
-        (!_wrapEnabled && (_scrollOffset < 0 || _scrollOffset >= _numberOfItems - 1)))
-    {
-        if (offset > 0)
-        {
+        (!_wrapEnabled && (_scrollOffset < 0 || _scrollOffset >= _numberOfItems - 1))) {
+        if (offset > 0) {
             _toggle = (offset <= 0.5)? -clampedOffset: (1.0 - clampedOffset);
-        }
-        else
-        {
+        } else {
             _toggle = (offset > -0.5)? -clampedOffset: (- 1.0 - clampedOffset);
         }
     }
@@ -343,8 +334,7 @@
     
     //backface culling
     BOOL showBackfaces = view.layer.doubleSided;
-    if (showBackfaces)
-    {
+    if (showBackfaces) {
         showBackfaces = YES;
     }
     showBackfaces = !![self valueForOption:WXSliderNeighborOptionShowBackfaces withDefault:showBackfaces];
@@ -354,7 +344,7 @@
     view.superview.hidden = !(showBackfaces ?: (transform.m33 > 0.0));
 }
 
-NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighborView *self)
+NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, WXSliderNeighborView *self)
 {
     //compare depths
     CATransform3D t1 = view1.superview.layer.transform;
@@ -383,7 +373,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
 
 - (void)depthSortViews
 {
-    for (UIView *view in [[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))compareViewDepth context:(__bridge void *)self])
+    for (UIView *view in [[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))sliderNeighorCompareViewDepth context:(__bridge void *)self])
     {
         [_contentView bringSubviewToFront:(UIView *__nonnull)view.superview];
     }
@@ -392,8 +382,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
 - (void)layOutItemViews
 {
     //bail out if not set up yet
-    if (!_dataSource || !_contentView)
-    {
+    if (!_dataSource || !_contentView) {
         return;
     }
     
@@ -609,7 +598,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     //check for tapped view
     NSInteger index = [self indexOfItemView:[self itemViewAtPoint:[tapGesture locationInView:_contentView]]];
     if (index != NSNotFound) {
-        if (_delegate || [_delegate sliderNeighbor:self shouldSelectItemAtIndex:index]) {
+        if (!_delegate || [_delegate sliderNeighbor:self shouldSelectItemAtIndex:index]) {
             if ((index != self.currentItemIndex && _centerItemWhenSelected) ||
                 (index == self.currentItemIndex && _scrollToItemBoundary)) {
                 [self scroll2ItemViewAtIndex:index animated:YES];
@@ -1042,7 +1031,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     if (_previousItemIndex != self.currentItemIndex)
     {
         [self pushAnimationState:YES];
-        [_delegate sliderNeighborCurrentItemIndexDidChange:self];
+        [_delegate sliderNeighborCurrentItemIndexDidChange:self from:_previousItemIndex to:self.currentItemIndex];
         [self popAnimationState];
     }
     
@@ -1118,7 +1107,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
 
 - (UIView *)itemViewAtPoint:(CGPoint)point
 {
-    for (UIView *view in [[[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))compareViewDepth context:(__bridge void *)self] reverseObjectEnumerator])
+    for (UIView *view in [[[_itemViews allValues] sortedArrayUsingFunction:(NSInteger (*)(id, id, void *))sliderNeighorCompareViewDepth context:(__bridge void *)self] reverseObjectEnumerator])
     {
         if ([view.superview.layer hitTest:point])
         {
@@ -1340,8 +1329,8 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    _contentView.frame = self.bounds;
     [self layOutItemViews];
-    _contentView.frame = [[self.itemViews objectForKey:@0] bounds];
 }
 
 @end
@@ -1505,7 +1494,6 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     if (attributes[@"index"]) {
         _index = [attributes[@"index"] integerValue];
         _currentIndex = _index;
-        [self.sliderView setCurrentItemIndex:_index];
     }
     if (attributes[@"autoPlay"]) {
         _autoPlay = [attributes[@"autoPlay"] boolValue];
@@ -1528,6 +1516,8 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     [self setNeighborAlpha:attributes];
     [self setNeighborSpace:attributes];
     [self setNeighborScale:attributes];
+    
+    [self.sliderView setCurrentItemIndex:_index];
 }
 
 #pragma mark styles update
@@ -1550,37 +1540,38 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     }
 }
 
-- (void)setNeighborSpace:(NSDictionary *)attributes{
-    if (attributes[@"neighborSpace"]) {
-        self->neighborSpace = [WXConvert WXPixelType:attributes[@"neighborSpace"]];
-        self->neighborSpace = self->neighborSpace > 0 ?:0;
-        self->neighborSpace = self->neighborSpace < WXScreenSize().width/2 ?: WXScreenSize().width/2;
-    } else {
-        self->neighborSpace = [WXConvert WXPixelType:@"150"];
-    }
-}
-
 - (void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
     NSAssert(_sliderView, @"");
     [_sliderView setIndicator:indicatorView];
 }
 
+- (void)setNeighborSpace:(NSDictionary *)attributes{
+    if (attributes[@"neighborSpace"]) {
+        self->neighborSpace = [WXConvert WXPixelType:attributes[@"neighborSpace"]];
+        self->neighborSpace = self->neighborSpace >= 0 ? self->neighborSpace :0;
+        self->neighborSpace = self->neighborSpace <= WXScreenSize().width/2 ? self->neighborSpace : WXScreenSize().width/2;
+    } else {
+        self->neighborSpace = [WXConvert WXPixelType:@"150"];
+    }
+}
+
 - (void)setNeighborAlpha:(NSDictionary *)attributes {
     if (attributes[@"neighborAlpha"]) {
         self->neighborAlpha = [WXConvert CGFloat:attributes[@"neighborAlpha"]];
-        self->neighborAlpha = self->neighborAlpha > 0 ?: 0;
-        self->neighborAlpha = self->neighborAlpha < 1 ?: 1;
+        self->neighborAlpha = self->neighborAlpha >= 0 ? self->neighborAlpha : 0;
+        self->neighborAlpha = self->neighborAlpha <= 1 ? self->neighborAlpha: 1;
     } else {
         self->neighborAlpha = 0.6;
     }
 }
 
-- (void)setNeighborScale:(NSDictionary *)attributes {
+- (void)setNeighborScale:(NSDictionary *)attributes
+{
     if (attributes[@"neighborScale"]) {
         self->neighborScale = [WXConvert CGFloat:attributes[@"neighborScale"]];
-        self->neighborScale = self->neighborScale > 0?:0;
-        self->neighborScale = self->neighborScale < 1?:1;
+        self->neighborScale = self->neighborScale >= 0? self->neighborScale : 0;
+        self->neighborScale = self->neighborScale <= 1? self->neighborScale :1;
     } else {
         self->neighborScale = 0.8;
     }
@@ -1634,16 +1625,6 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     return 2;
 }
 
-- (void)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor didSelectItemAtIndex:(NSInteger)index {
-    NSNumber *item = (self.items)[(NSUInteger)index];
-    NSLog(@"Tapped view number: %@", item);
-}
-
-- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor
-{
-    NSLog(@"now changed %@", sliderNeighbor);
-}
-
 - (UIView *)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
     
     if (!view) {
@@ -1651,7 +1632,12 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     } else {
         view.tag = 1;
     }
-    view.transform = CGAffineTransformMakeScale(self->neighborScale, 1.0);
+    
+    if (index != [self.sliderView currentItemIndex]) {
+        view.transform = CGAffineTransformMakeScale(self->neighborScale, self->neighborScale);
+        view.alpha = self->neighborAlpha;
+    }
+    
     return view;
 }
 
@@ -1666,20 +1652,28 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     return view;
 }
 
-- (CATransform3D)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor itemTransformForOffset:(CGFloat)offset baseTransform:(CATransform3D)transform
+- (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
 {
+    switch (option) {
+        case WXSliderNeighborOptionSpacing:
+            return (1+self->neighborSpace/self.sliderView.itemWidth);
+            break;
+            
+        default:
+            break;
+    }
     
-    transform = CATransform3DRotate(transform, M_PI / 8.0f, 0.0f, 1.0f, 0.0f);
-    return CATransform3DTranslate(transform, 0.0f, 0.0f, offset * self.sliderView.itemWidth);
+    return value;
 }
 
-- (void)sliderNeighborView:(WXSliderNeighborView *)sliderView didScrollToItemAtIndex:(NSInteger)index
+- (void)sliderNeighbor:(WXSliderNeighborView *)sliderView didScrollToItemAtIndex:(NSInteger)index
 {
     self.currentIndex = index;
     
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
+   
 }
 
 - (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView *)sliderNeighbor
@@ -1693,25 +1687,14 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, WXSliderNeighb
     }
 }
 
-- (void)sliderNeighbor:(WXSliderNeighborView *)sliderView didScrollToItemAtIndex:(NSInteger)index
-{
-    if (_sliderChangeEvent) {
-        [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
-    }
-}
-
-- (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
-{
-    switch (option) {
-        case WXSliderNeighborOptionFadeMinAlpha:
-            return value ? value* self->neighborAlpha: self->neighborAlpha;
-            break;
-            
-        default:
-            break;
-    }
+- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor from:(NSInteger)from to:(NSInteger)to {
+    UIView * currentView  = ((UIView*)sliderNeighbor.itemViews[[NSNumber numberWithInteger:to]]);
+    UIView * preView  = ((UIView*)sliderNeighbor.itemViews[[NSNumber numberWithInteger:from]]);
     
-    return value;
+    currentView.alpha = 1.0;
+    currentView.transform = CGAffineTransformMakeScale(1.0, 1.0);
+    preView.alpha = self->neighborAlpha;
+    preView.transform = CGAffineTransformMakeScale(self->neighborScale, self->neighborScale);
 }
 
 @end
