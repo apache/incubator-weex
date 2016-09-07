@@ -38,11 +38,16 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     NSTimeInterval duration = [args[@"duration"] doubleValue] / 1000;
     NSTimeInterval delay = [args[@"delay"] doubleValue] / 1000;
 
-    CATransform3D transform;BOOL isAnimateTransform;
-    CGColorRef backgroundColor;BOOL isAnimateBackgroundColor;
-    float opacity;BOOL isAnimateOpacity;
-    CGRect newFrame = layer.frame;BOOL isAnimateFrame;
-    CGFloat rotateAngle; BOOL isUsingCAAnimation;
+    __block CATransform3D transform;
+    BOOL isAnimateTransform = NO;
+    __block CGColorRef backgroundColor;
+    BOOL isAnimateBackgroundColor = NO;
+    float opacity = 0.0;
+    BOOL isAnimateOpacity = NO;
+    CGRect newFrame = layer.frame;
+    BOOL isAnimateFrame = NO;
+    CGFloat rotateAngle = 0.0;
+    BOOL isUsingCAAnimation = NO;
     
     for (NSString *property in styles) {
         if ([property isEqualToString:@"transform"]) {
