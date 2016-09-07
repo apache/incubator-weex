@@ -148,8 +148,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
@@ -157,8 +157,8 @@ import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.WXCircleIndicator;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
@@ -171,8 +171,12 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * abstract component
@@ -545,14 +549,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return measureOutput;
   }
 
+
   public void updateProperties(Map<String, Object> props) {
-    if (props == null||props.isEmpty() || mHost == null) {
+    if (props == null|| props.isEmpty() || mHost == null) {
       return;
     }
 
-    Iterator<Entry<String, Object>> iterator = props.entrySet().iterator();
-    while (iterator.hasNext()) {
-      String key = iterator.next().getKey();
+    for (String key : props.keySet()){
       Object param = props.get(key);
       if (!setProperty(key, param)) {
         Invoker invoker = mHolder.getMethod(key);
