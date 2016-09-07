@@ -350,12 +350,14 @@ static BOOL WXNotStat;
     UIFontDescriptorSymbolicTraits traits = 0;
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
     traits = (textWeight == WXTextWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
-    fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
-    UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
-    if (tempFont) {
-        font = tempFont;
+    if (traits != 0) {
+        fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+        UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
+        if (tempFont) {
+            font = tempFont;
+        }
     }
-
+    
     return font;
 }
 

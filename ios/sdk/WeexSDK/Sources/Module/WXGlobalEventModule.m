@@ -1,10 +1,10 @@
-//
-//  WXGlobalEventModule.m
-//  WeexSDK
-//
-//  Created by zifan.zx on 8/25/16.
-//  Copyright © 2016 taobao. All rights reserved.
-//
+/**
+ * Created by Weex.
+ * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+ *
+ * This source code is licensed under the Apache Licence 2.0.
+ * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ */
 
 #import "WXGlobalEventModule.h"
 #import "WXThreadSafeMutableDictionary.h"
@@ -36,7 +36,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
         array = [[WXThreadSafeMutableArray alloc] init];
         [array addObject:callback];
         _eventCallback[event] = array;
-        [[NSNotificationCenter defaultCenter] addObserver:weexInstance selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fireGlobalEvent:) name:event object:weexInstance];
     }
 }
 
@@ -55,7 +55,6 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
         for (WXModuleKeepAliveCallback callback in _eventCallback[notification.name]) {
             callback(param, true);
         }
-        
     }
 }
 

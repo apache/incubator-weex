@@ -13,6 +13,7 @@
 #import "WXHandlerFactory.h"
 #import "WXLog.h"
 #import "WXThreadSafeMutableDictionary.h"
+#import "WXAppConfiguration.h"
 
 NSString *const kStartKey = @"start";
 NSString *const kEndKey = @"end";
@@ -98,7 +99,7 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     commitDict[BIZTYPE] = instance.bizType ?: @"";
     commitDict[PAGENAME] = instance.pageName ?: @"";
     commitDict[WXSDKVERSION] = WX_SDK_VERSION;
-    commitDict[JSLIBVERSION] = WX_JS_FRAMEWORK_VERSION;
+    commitDict[JSLIBVERSION] = [WXAppConfiguration JSFrameworkVersion];
 #if DEBUG
     commitDict[@"componentCount"] = @([instance numberOfComponents]);
 #endif

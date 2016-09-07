@@ -24,6 +24,7 @@
 #import "WXModuleManager.h"
 #import "WXSDKInstance_private.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXAppConfiguration.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -246,6 +247,8 @@ _Pragma("clang diagnostic pop") \
         //the JSFramework has been load successfully.
         self.frameworkLoadFinished = YES;
         
+        NSString *frameworkVersion = [[self.jsBridge callJSMethod:@"getJSFMVersion" args:nil] toString];
+        [WXAppConfiguration setJSFrameworkVersion:frameworkVersion];
         //execute methods which has been stored in methodQueue temporarily.
         for (NSDictionary *method in _methodQueue) {
             [self callJSMethod:method[@"method"] args:method[@"args"]];

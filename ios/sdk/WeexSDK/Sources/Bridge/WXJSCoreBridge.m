@@ -131,10 +131,10 @@
     [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args
+- (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-    [[_jsContext globalObject] invokeMethod:method withArguments:args];
+    return [[_jsContext globalObject] invokeMethod:method withArguments:args];
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative

@@ -21,6 +21,7 @@
 #import "WXAssert.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXTransform.h"
 #import <pthread/pthread.h>
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
@@ -185,6 +186,10 @@
             _layer.cornerRadius = _borderTopLeftRadius;
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
+        }
+        
+        if (_transform) {
+            _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
         }
         
         _view.wx_component = self;

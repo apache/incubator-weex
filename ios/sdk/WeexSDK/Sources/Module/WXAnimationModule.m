@@ -40,9 +40,17 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     //    CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     UIViewAnimationOptions timingFunction = [WXConvert UIViewAnimationTimingFunction:args[@"timingFunction"]];
     
+    /**
+       UIView-style animation functions support the standard timing functions,
+       but they don’t allow you to specify your own cubic Bézier curve. 
+       CATransaction can be used instead to force these animations to use the supplied CAMediaTimingFunction to pace animations.
+     **/
+    [CATransaction begin];
+    [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
+    
     // Rotate 360 not work , have not found any solution
     // http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
-    [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction | timingFunction animations:^{
+    [UIView animateWithDuration:duration delay:delay options:UIViewAnimationOptionAllowUserInteraction  animations:^{
         for (NSString *property in styles) {
             if ([property isEqualToString:@"transform"]) {
                 NSString *transformOrigin = styles[@"transformOrigin"];
@@ -51,6 +59,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 layer.backgroundColor = [WXConvert CGColor:styles[property]];
             } else if ([property isEqualToString:@"opacity"]) {
                 layer.opacity = [styles[property] floatValue];
+            } else if ([property isEqualToString:@"width"]) {
+                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, [WXConvert CGFloat:styles[property]], layer.frame.size.height);
+            } else if ([property isEqualToString:@"height"]) {
+                layer.frame = CGRectMake(layer.frame.origin.x, layer.frame.origin.y, layer.frame.size.width, [WXConvert CGFloat:styles[property]]);
             }
         }
     } completion:^(BOOL finished) {
@@ -58,6 +70,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             callback(finished ? @"SUCCESS" : @"FAIL");
         }
     }];
+
+    [CATransaction commit];
 }
 
 @end

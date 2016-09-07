@@ -11,6 +11,7 @@
 #import "WXTransform.h"
 #import "WXAssert.h"
 #import "WXComponent_internal.h"
+#import "WXSDKInstance_private.h"
 
 @implementation WXComponent (Layout)
 
@@ -96,6 +97,18 @@
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
     WXAssertComponentThread();
+    
+    if ([self isViewLoaded] && isChanged && [self isViewFrameSyncWithCalculated]) {
+        
+        [self.weexInstance.componentManager _addUITask:^{
+            self.view.frame = _calculatedFrame;
+            if (_transform) {
+                _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            }
+            
+            [_layer setNeedsDisplay];
+        }];
+    }
 }
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
@@ -158,16 +171,6 @@
 - (void)_layoutDidFinish
 {
     WXAssertMainThread();
-    
-    if ([self isViewLoaded] && !CGRectEqualToRect(_calculatedFrame, self.view.frame)
-        && [self isViewFrameSyncWithCalculated]) {
-        self.view.frame = _calculatedFrame;
-        // transform does not belong to layout, move it to other place hopefully
-        if (_transform) {
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:self.view withOrigin:_transformOrigin];
-        }
-        [_layer setNeedsDisplay];
-    }
     
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
