@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,199 +202,55 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.taobao.weex.ui.animation;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ArgbEvaluator;
 import android.animation.IntEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.os.Message;
+import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.animation.PathInterpolatorCompat;
-import android.text.TextUtils;
-import android.util.Pair;
+import android.support.v4.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
-import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.WXDomTask;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.view.border.BorderDrawable;
-import com.taobao.weex.utils.SingleFunctionParser;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXResourceUtils;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+public class DimensionUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+  private View view;
+  private Pair<Integer, Integer> width;
+  private Pair<Integer, Integer> height;
+  private IntEvaluator intEvaluator;
 
-public class WXAnimationModule extends WXModule {
-
-  @WXModuleAnno
-  public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
-    if(!TextUtils.isEmpty(ref)&&!TextUtils.isEmpty(animation)) {
-      Message msg = Message.obtain();
-      WXDomTask task = new WXDomTask();
-      task.instanceId = mWXSDKInstance.getInstanceId();
-      task.args = new ArrayList<>();
-      task.args.add(ref);
-      task.args.add(animation);
-      task.args.add(callBack);
-      msg.what = WXDomHandler.MsgType.WX_ANIMATION;
-      msg.obj = task;
-      WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-    }
+  DimensionUpdateListener(@NonNull View view) {
+    this.view = view;
+    intEvaluator = new IntEvaluator();
   }
 
-  public static void startAnimation(WXSDKInstance mWXSDKInstance, WXComponent component,
-                                    @NonNull WXAnimationBean animationBean, @Nullable String callback) {
-    if(component == null){
-      return;
-    }
-    try {
-      Animator animator = createAnimator(animationBean, component.getHostView());
-      if (animator != null) {
-        Animator.AnimatorListener animatorCallback = createAnimatorListener(mWXSDKInstance, callback);
-        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.JELLY_BEAN_MR2) {
-          component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        }
-        Interpolator interpolator = createTimeInterpolator(animationBean);
-        if (animatorCallback != null) {
-          animator.addListener(animatorCallback);
-        }
-        if (interpolator != null) {
-          animator.setInterpolator(interpolator);
-        }
-        animator.setDuration(animationBean.duration);
-        animator.start();
-      }
-    } catch (RuntimeException e) {
-      e.printStackTrace();
-      WXLogUtils.e("", e);
-    }
+  void setWidth(int from, int to) {
+    width = new Pair<>(from, to);
   }
 
-  private static @Nullable
-  ObjectAnimator createAnimator(@NonNull WXAnimationBean animation, final View target) {
-    if(target == null){
-      return null;
-    }
-    WXAnimationBean.Style style = animation.styles;
-    if (style != null) {
-      ObjectAnimator animator;
-      List<PropertyValuesHolder> holders =style.getHolders();
-      if (!TextUtils.isEmpty(style.backgroundColor)) {
-        BorderDrawable borderDrawable;
-        if ((borderDrawable=WXViewUtils.getBorderDrawable(target))!=null) {
-          holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
-              borderDrawable.getColor(),
-              WXResourceUtils.getColor(style.backgroundColor)));
-        } else if (target.getBackground() instanceof ColorDrawable) {
-          holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
-              ((ColorDrawable) target.getBackground()).getColor(),
-              WXResourceUtils.getColor(style.backgroundColor)));
-        }
-      }
-      if (style.getPivot() != null) {
-        Pair<Float, Float> pair = style.getPivot();
-        target.setPivotX(pair.first);
-        target.setPivotY(pair.second);
-      }
-      animator = ObjectAnimator.ofPropertyValuesHolder(
-          target, holders.toArray(new PropertyValuesHolder[holders.size()]));
-      animator.setStartDelay(animation.delay);
-      final IntEvaluator intEvaluator=new IntEvaluator();
-      if (target.getLayoutParams() != null &&
-          (!TextUtils.isEmpty(style.width) || !TextUtils.isEmpty(style.height))) {
-        DimensionUpdateListener listener = new DimensionUpdateListener(target);
-        ViewGroup.LayoutParams layoutParams = target.getLayoutParams();
-        if (!TextUtils.isEmpty(style.width)) {
-          listener.setWidth(layoutParams.width,
-                            (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.width)));
-        }
-        if (!TextUtils.isEmpty(style.height)) {
-          listener.setHeight(layoutParams.height,
-                             (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.height)));
-        }
-        animator.addUpdateListener(listener);
-      }
-      return animator;
-    } else {
-      return null;
-    }
+  void setHeight(int from, int to) {
+    height = new Pair<>(from, to);
   }
 
-  public static
-  @Nullable
-  Animator.AnimatorListener createAnimatorListener(final WXSDKInstance mWXSDKInstance, @Nullable final String callBack) {
-    if (!TextUtils.isEmpty(callBack)) {
-      return new AnimatorListenerAdapter() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-          if (mWXSDKInstance == null) {
-            WXLogUtils.e("WXRenderStatement-onAnimationEnd mWXSDKInstance == null NPE");
-          } else {
-            WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(),
-                                                callBack,
-                                                new HashMap<String, Object>());
-          }
-        }
-      };
-    } else {
-      return null;
-    }
-  }
-
-  private static @Nullable
-  Interpolator createTimeInterpolator(@NonNull WXAnimationBean animation) {
-    String interpolator = animation.timingFunction;
-    if (!TextUtils.isEmpty(interpolator)) {
-      switch (interpolator) {
-        case WXAnimationBean.EASE_IN:
-          return new AccelerateInterpolator();
-        case WXAnimationBean.EASE_OUT:
-          return new DecelerateInterpolator();
-        case WXAnimationBean.EASE_IN_OUT:
-          return new AccelerateDecelerateInterpolator();
-        case WXAnimationBean.LINEAR:
-          return new LinearInterpolator();
-        case WXAnimationBean.CUBIC_BEZIER:
-          SingleFunctionParser<Float> parser = new SingleFunctionParser<>(
-              animation.timingFunction,
-              new SingleFunctionParser.FlatMapper<Float>() {
-                @Override
-                public Float map(String raw) {
-                  return Float.parseFloat(raw);
-                }
-              });
-          List<Float> params = parser.parse(WXAnimationBean.CUBIC_BEZIER);
-          if (params != null && params.size() == WXAnimationBean.NUM_CUBIC_PARAM) {
-            return PathInterpolatorCompat.create(
-                params.get(0), params.get(1), params.get(2), params.get(3));
-          } else {
-            return null;
-          }
+  @Override
+  public void onAnimationUpdate(ValueAnimator animation) {
+    if (view.getLayoutParams() != null) {
+      ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+      TimeInterpolator interpolator = animation.getInterpolator();
+      float fraction = animation.getAnimatedFraction();
+      if (width != null) {
+        layoutParams.width = intEvaluator.evaluate(interpolator.getInterpolation(fraction),
+                                                   width.first,
+                                                   width.second);
       }
+      if (height != null) {
+        layoutParams.height = intEvaluator.evaluate(interpolator.getInterpolation(fraction),
+                                                    height.first,
+                                                    height.second);
+      }
+      view.requestLayout();
     }
-    return null;
   }
 
 }
