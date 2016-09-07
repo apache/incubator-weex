@@ -205,6 +205,10 @@
 package com.taobao.weex.ui.view;
 
 import android.app.Activity;
+import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.TestActivity;
 import org.junit.After;
@@ -214,7 +218,10 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.internal.Shadow;
+import org.robolectric.shadows.ShadowWebView;
 
 import static org.junit.Assert.*;
 
@@ -227,11 +234,15 @@ import static org.junit.Assert.*;
 public class WXWebViewTest {
 
   IWebView view;
+  WebView webView;
+  ShadowWebView shadow;
 
   @Before
   public void setUp() throws Exception {
     Activity activity = Robolectric.setupActivity(TestActivity.class);
     view = new WXWebView(activity);
+    webView = (WebView)((ViewGroup)view.getView()).getChildAt(0);//first child
+    shadow = Shadows.shadowOf(webView);
   }
 
   @After
@@ -246,12 +257,22 @@ public class WXWebViewTest {
 
   @Test
   public void testGetView() throws Exception {
-    assertNotNull(view.getView());
+    assertNotNull(view);
   }
 
   @Test
   public void testLoadUrl() throws Exception {
-    view.loadUrl("http://www.taobao.com");
+    String url = "http://www.taobao.com";
+    view.loadUrl(url);
+    WebViewClient client = shadow.getWebViewClient();
+    client.onPageStarted(webView,url,null);
+    client.onPageFinished(webView,url);
+
+    WebChromeClient chromeClient = shadow.getWebChromeClient();
+    chromeClient.onProgressChanged(webView,10);
+    chromeClient.onProgressChanged(webView,100);
+    chromeClient.onReceivedTitle(webView,"test");
+
   }
 
   @Test
