@@ -226,6 +226,7 @@ class WXBridge implements IWXBridge {
    */
   public native int initFramework(String framework, WXParams params);
 
+
   /**
    * Execute JavaScript function
    *
@@ -252,6 +253,36 @@ class WXBridge implements IWXBridge {
     int errorCode = IWXBridge.INSTANCE_RENDERING;
     try {
       errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        e.printStackTrace();
+        WXLogUtils.e(TAG,"callNative throw expection:"+e.getMessage());
+      }
+    }
+
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    if(WXEnvironment.isApkDebugable()){
+      if(errorCode == IWXBridge.DESTROY_INSTANCE){
+        WXLogUtils.w("destroyInstance :"+instanceId+" JSF must stop callNative");
+      }
+    }
+    return errorCode;
+  }
+
+  public int callAddElement(String instanceId, String ref,String dom,String index, String callback) {
+
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+
+    try {
+      errorCode = WXBridgeManager.getInstance().callAddElement(instanceId, ref,dom,index, callback);
     }catch (Throwable e){
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
