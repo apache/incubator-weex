@@ -53,11 +53,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         if ([property isEqualToString:@"transform"]) {
             NSString *transformOrigin = styles[@"transformOrigin"];
             WXTransform *wxTransform = [WXTransform new];
-            transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin];
+            transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin isTransformRotate:NO];
             rotateAngle = [wxTransform getRotateAngle];
             if (rotateAngle != 0) {
                 /**
-                 Rotate 360 not working on UIView block animation, have not found any more elegant solution than using CAAnimation
+                 Rotate >= 180 degree not working on UIView block animation, have not found any more elegant solution than using CAAnimation
                  See http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
                  **/
                 isUsingCAAnimation = YES;

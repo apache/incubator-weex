@@ -14,15 +14,28 @@
 
 @property (nonatomic, weak) UIView *view;
 @property (nonatomic, assign) float rotateAngle;
+@property (nonatomic, assign) BOOL isTransformRotate;
 
 @end
 
 @implementation WXTransform
 
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _isTransformRotate = YES;
+        _rotateAngle = 0.0;
+    }
+    
+    return self;
+}
+
 - (CATransform3D)getTransform:(NSString *)cssValue
 {
+    //CATransform3D transform3D = _view.layer.transform;
+    //_transform = _view ? CGAffineTransformMake(transform3D.m11, transform3D.m12, transform3D.m21, transform3D.m22, transform3D.m41, transform3D.m42) : CGAffineTransformIdentity;
+    
     _transform = CGAffineTransformIdentity;
-
     if (!cssValue || cssValue.length == 0 || [cssValue isEqualToString:@"none"]) {
         return CATransform3DMakeAffineTransform(_transform);
     }
@@ -69,6 +82,12 @@
     }
     
     return [self getTransform:cssValue withView:view];
+}
+
+- (CATransform3D)getTransform:(NSString *)cssValue withView:(UIView *)view withOrigin:(NSString *)origin isTransformRotate:(BOOL)isTransformRotate
+{
+    _isTransformRotate = isTransformRotate;
+    return [self getTransform:cssValue withView:view withOrigin:origin];
 }
 
 - (CGPoint)getTransformOrigin:(NSString *)cssValue withView:(UIView *)view
@@ -165,6 +184,11 @@
 - (void)doRotate:(NSArray *)value
 {
     float rotateAngle = [self getAngle:value[0]];
+    
+    if (_isTransformRotate) {
+        _transform = CGAffineTransformRotate(_transform, rotateAngle);
+    }
+
     _rotateAngle += rotateAngle;
 }
 
