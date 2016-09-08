@@ -674,7 +674,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if ([self currentItemIndex] == 0) {
         return _numberOfItems - 1;
     }
-    return ((NSInteger)round(fabs([self currentItemIndex] -1))) % _numberOfItems;
+    return ((NSInteger)round(abs((int)[self currentItemIndex] - 1))) % _numberOfItems;
 }
 
 - (NSInteger)minScrollDistanceFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex
@@ -1367,7 +1367,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 @end
 
-typedef void (^WXSliderNeighborRestore)();
 @interface WXSliderNeighborComponent() {
     WXPixelType neighborSpace;
     CGFloat neighborAlpha;
@@ -1381,7 +1380,7 @@ typedef void (^WXSliderNeighborRestore)();
 @property (nonatomic, strong) NSTimer *autoTimer;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) NSInteger currentIndex;
-@property (nonatomic) WXSliderNeighborRestore restore;
+@property (nonatomic) CGRect itemRect;
 @end
 
 @implementation WXSliderNeighborComponent
@@ -1397,7 +1396,8 @@ typedef void (^WXSliderNeighborRestore)();
         [self setNeighborAlpha:attributes];
         [self setNeighborScale:attributes];
         _items = [NSMutableArray array];
-
+        _itemRect = CGRectNull;
+        
         if (attributes[@"autoPlay"]) {
             _autoPlay = [attributes[@"autoPlay"] boolValue];
         }
@@ -1652,8 +1652,11 @@ typedef void (^WXSliderNeighborRestore)();
         view.tag = 1;
     }
 //
+    if (CGRectIsNull(_itemRect)) {
+        _itemRect = view.frame;
+    }
     CGAffineTransform transfrom = CGAffineTransformIdentity;
-    transfrom = CGAffineTransformMakeScale(1-self->neighborSpace*2/view.frame.size.width, 1.0);
+    transfrom = CGAffineTransformMakeScale(1-self->neighborSpace*2/_itemRect.size.width, 1.0);
     
     if (index != [self.sliderView currentItemIndex]) {
         transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(self->neighborScale, self->neighborScale));
@@ -1705,30 +1708,25 @@ typedef void (^WXSliderNeighborRestore)();
     if (_autoPlay) {
         [self _startAutoPlayTimer];
     }
-}
-
-- (void)sliderNeighborDidEndScrollingAnimation:(WXSliderNeighborView *)sliderNeighbor {
-    
-}
-
-- (void)sliderNeighborCurrentItemIndexDidChange:(WXSliderNeighborView *)sliderNeighbor from:(NSInteger)from to:(NSInteger)to
-{
     UIView * currentView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor currentItemIndex]];
     UIView * lastView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor lastItemIndex]];
-    
-    [UIView animateWithDuration:0.2 animations:^{
-        CGAffineTransform transfrom = CGAffineTransformIdentity;
-        currentView.alpha = 1.0;
-        currentView.transform = transfrom;
-        lastView.transform = transfrom;
-        
-        transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(1-self->neighborSpace*2/currentView.frame.size.width, 1.0));
-        currentView.transform = transfrom;
-        
-        transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(self->neighborScale, self->neighborScale));
-        lastView.alpha = self->neighborAlpha;
-        lastView.transform = transfrom;
-        
+    UIView * nextView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor nextItemIndex]];
+    __block CGAffineTransform transfrom = CGAffineTransformIdentity;
+    __weak typeof(self) weakSelf = self;
+    [UIView animateWithDuration:0.4 animations:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        if (strongSelf) {
+            currentView.alpha = 1.0;
+            
+            transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(1-strongSelf->neighborSpace*2/_itemRect.size.width, 1.0));
+            currentView.transform = transfrom;
+            
+            transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
+            lastView.alpha = strongSelf->neighborAlpha;
+            lastView.transform = transfrom;
+            nextView.alpha = strongSelf->neighborAlpha;
+            nextView.transform = transfrom;
+        }
     }];
 }
 
