@@ -9,6 +9,7 @@
 #import "WXGlobalEventModule.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXLog.h"
 
 @interface WXGlobalEventModule()
 @property WXThreadSafeMutableDictionary *eventCallback;
@@ -42,8 +43,12 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 
 - (void)removeEventListener:(NSString *)event
 {
-    [_eventCallback removeObjectForKey:event];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:event object:weexInstance];
+    if (_eventCallback[event]) {
+        [_eventCallback removeObjectForKey:event];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:event object:weexInstance];
+    } else {
+        WXLogWarning(@"eventName \"%@\" doesn't exist", event);
+    }
 }
 
 - (void)fireGlobalEvent:(NSNotification *)notification
