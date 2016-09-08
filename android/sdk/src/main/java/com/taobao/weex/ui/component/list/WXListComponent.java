@@ -1011,15 +1011,12 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       }
 
       Rect listRect=new Rect();
-      if(getHostView()!=null && getHostView().getInnerView()!=null){
-        getHostView().getInnerView().getHitRect(listRect);
-      }
       boolean visible = (!outOfVisibleRange) && item.isViewVisible(listRect);
 
       int result = item.setAppearStatus(visible);
-        if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
-        }
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+      }
       if (result == AppearanceHelper.RESULT_NO_CHANGE) {
         continue;
       }

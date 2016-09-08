@@ -321,8 +321,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
               break;
             }
           }
-        } catch (ArrayIndexOutOfBoundsException e) {
-          e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException | IncompatibleClassChangeError e) {
           //ignore: getDeclaredAnnotations may throw this
         }
       }

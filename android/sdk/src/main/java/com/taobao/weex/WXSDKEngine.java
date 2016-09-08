@@ -331,6 +331,7 @@ public class WXSDKEngine {
       registerModule("timer", WXTimerModule.class, true);
       registerModule("storage", WXStorageModule.class, true);
       registerModule("clipboard", WXClipboardModule.class, true);
+      registerModule("globalEvent",WXGlobalEventModule.class);
 
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);

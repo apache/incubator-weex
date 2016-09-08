@@ -116,7 +116,7 @@ import com.taobao.weex.common.WXModuleAnno;
 /**
  * Created by lixinke on 16/8/25.
  */
-public class GlobalEventModule extends WXModule {
+public class WXGlobalEventModule extends WXModule {
 
 
   @WXModuleAnno
