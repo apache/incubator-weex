@@ -11,7 +11,7 @@ Use elements' panel to inspect the layout and design of the weex-html5 page, and
 
 ## Console
 
-You can use `console.log` to log infomation on console, but it's hightly recommended to use `nativeLog` instead, since nativeLog can run on a native platform besides on a browser. The defect of `nativeLog` is that it's not supported to trace it from the console to the source file which the `nativeLog` is called in, therefore in this situation you'd better use `console.log`, and you should make sure this code will not run on native platform (otherwise a exception or a crash will be caused).
+You can use `console.log` to log information on console, but it's hightly recommended to use `nativeLog` instead, since nativeLog can run on a native platform besides on a browser. The defect of `nativeLog` is that it's not supported to trace it from the console to the source file which the `nativeLog` is called in, therefore in this situation you'd better use `console.log`, and you should make sure this code will not run on native platform (otherwise a exception or a crash will be caused).
 
 ## Breakpoints
 
