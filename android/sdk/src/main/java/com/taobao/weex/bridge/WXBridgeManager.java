@@ -244,7 +244,7 @@ import java.util.Stack;
  *       <li>{@link #destroyInstance(String)}</li>
  *       <li>{@link #refreshInstance(String, WXRefreshData)}</li>
  *       <li>{@link #registerModules(Map)}</li>
- *       <li>{@link #registerComponents(List)} (ArrayList)}</li>
+ *       <li>{@link #registerComponents(List)}</li>
  *       <li>{@link #invokeCallJSBatch(Message)}</li>
  *     </ul>
  *   </li>
@@ -270,9 +270,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
-//  public static final String JS_BRIDGE = "jsBridge";
-  //Alert
-//  public static final String JS_FRAMEWORK = "jsFramework";
+  
   // args
   public static final String MODULE = "module";
   public static final String METHOD = "method";
