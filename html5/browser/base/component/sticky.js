@@ -36,7 +36,8 @@ function setSticky (sticky) {
   element.classList.add('weex-sticky')
   sticky.preMarginTop = element.style.marginTop
   sticky.preTop = element.style.top
-  element.style.marginTop = sticky.top + 'px'
+  element.style.marginTop = sticky.top || '0' + 'px'
+
   element.parentNode.insertBefore(
     comp.stickyPlaceholder, element)
   element.style.position = 'fixed'
