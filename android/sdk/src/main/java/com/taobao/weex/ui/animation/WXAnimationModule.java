@@ -376,20 +376,26 @@ public class WXAnimationModule extends WXModule {
           return new AccelerateDecelerateInterpolator();
         case WXAnimationBean.LINEAR:
           return new LinearInterpolator();
-        case WXAnimationBean.CUBIC_BEZIER:
-          SingleFunctionParser<Float> parser = new SingleFunctionParser<>(
-              animation.timingFunction,
-              new SingleFunctionParser.FlatMapper<Float>() {
-                @Override
-                public Float map(String raw) {
-                  return Float.parseFloat(raw);
-                }
-              });
-          List<Float> params = parser.parse(WXAnimationBean.CUBIC_BEZIER);
-          if (params != null && params.size() == WXAnimationBean.NUM_CUBIC_PARAM) {
-            return PathInterpolatorCompat.create(
-                params.get(0), params.get(1), params.get(2), params.get(3));
-          } else {
+        default:
+          //Parse cubic-bezier
+          try {
+            SingleFunctionParser<Float> parser = new SingleFunctionParser<>(
+                animation.timingFunction,
+                new SingleFunctionParser.FlatMapper<Float>() {
+                  @Override
+                  public Float map(String raw) {
+                    return Float.parseFloat(raw);
+                  }
+                });
+            List<Float> params = parser.parse(WXAnimationBean.CUBIC_BEZIER);
+            if (params != null && params.size() == WXAnimationBean.NUM_CUBIC_PARAM) {
+              return PathInterpolatorCompat.create(
+                  params.get(0), params.get(1), params.get(2), params.get(3));
+            }
+            else {
+              return null;
+            }
+          }catch (RuntimeException e){
             return null;
           }
       }
