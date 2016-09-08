@@ -214,7 +214,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
-  private String mCurrentRef = mDomObj.getRef();
+  private String mCurrentRef;
 
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
@@ -252,6 +252,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mDomObj = dom.clone();
     mInstanceId = instance.getInstanceId();
     mLazy = isLazy;
+    mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
   }
