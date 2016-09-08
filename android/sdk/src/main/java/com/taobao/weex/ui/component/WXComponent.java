@@ -218,6 +218,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
+  private String mCurrentRef = mDomObj.getRef();
 
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
@@ -229,8 +230,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.put("y", location[1]);
       params.put("width", mDomObj.getCSSLayoutWidth());
       params.put("height", mDomObj.getCSSLayoutHeight());
-      WXSDKManager.getInstance().fireEvent(mInstanceId,
-          mDomObj.getRef(),
+      WXSDKManager.getInstance().fireEvent(mInstanceId, mCurrentRef,
           Constants.Event.CLICK,
           params);
     }
@@ -349,7 +349,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
-      mDomObj.ref = component.getDomObject().getRef();
+      mCurrentRef = component.getDomObject().getRef();
       updateProperties(component.getDomObject().getStyles());
       updateProperties(component.getDomObject().getAttrs());
       updateExtra(component.getDomObject().getExtra());
@@ -380,7 +380,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * layout view
    */
   public final void setLayout(WXDomObject domObject) {
-    if (mParent == null || domObject == null || TextUtils.isEmpty(mDomObj.getRef())) {
+    if (mParent == null || domObject == null || TextUtils.isEmpty(mCurrentRef)) {
       return;
     }
 
@@ -663,8 +663,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          WXSDKManager.getInstance().fireEvent(mInstanceId,
-              mDomObj.getRef(),
+          WXSDKManager.getInstance().fireEvent(mInstanceId, mCurrentRef,
               hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
@@ -750,7 +749,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (mDomObj == null) {
       return null;
     }
-    return mDomObj.getRef();
+    return mCurrentRef;
   }
 
   /**
