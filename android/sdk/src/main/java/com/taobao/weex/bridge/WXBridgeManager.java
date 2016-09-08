@@ -244,7 +244,7 @@ import java.util.Stack;
  *       <li>{@link #destroyInstance(String)}</li>
  *       <li>{@link #refreshInstance(String, WXRefreshData)}</li>
  *       <li>{@link #registerModules(Map)}</li>
- *       <li>{@link #registerComponents(ArrayList)}</li>
+ *       <li>{@link #registerComponents(List)} (ArrayList)}</li>
  *       <li>{@link #invokeCallJSBatch(Message)}</li>
  *     </ul>
  *   </li>
@@ -270,9 +270,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
-  public static final String JS_BRIDGE = "jsBridge";
+//  public static final String JS_BRIDGE = "jsBridge";
   //Alert
-  public static final String JS_FRAMEWORK = "jsFramework";
+//  public static final String JS_FRAMEWORK = "jsFramework";
   // args
   public static final String MODULE = "module";
   public static final String METHOD = "method";
@@ -706,7 +706,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instance == null) {
       return;
     }
-    instance.commitUTStab(JS_BRIDGE, errCode);
+    instance.commitUTStab(IWXUserTrackAdapter.JS_BRIDGE, errCode);
   }
 
   public void commitAlert(final String type, final WXErrorCode errorCode) {
@@ -967,7 +967,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
         errorCode.appendErrMsg("JS Framework is empty!");
-        commitAlert(JS_FRAMEWORK, errorCode);
+        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
         return;
       }
       try {
@@ -981,16 +981,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
-          commitAlert(JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
+          commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
           errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          commitAlert(JS_FRAMEWORK, errorCode);
+          commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
         errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework exception!");
-        commitAlert(JS_FRAMEWORK, errorCode);
+        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
       }
     }
   }
@@ -1028,7 +1028,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     } catch (Throwable e) {
       WXLogUtils.e("WXBridgeManager", e);
-      commitAlert(JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
+      commitAlert(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
     }
 
     // If task is not empty, loop until it is empty

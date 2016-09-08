@@ -255,7 +255,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class WXSDKInstance implements IWXActivityStateListener {
 
   //Performance
-  public static final String LOAD = "load";
   public boolean mEnd = false;
   public static final String BUNDLE_URL = "bundleUrl";
   protected IWXUserTrackAdapter mUserTrackAdapter;
@@ -783,7 +782,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
             if (mUserTrackAdapter != null) {
-              mUserTrackAdapter.commit(mContext, null, LOAD, mWXPerformance, null);
+              mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, null);
             }
           }
         }
