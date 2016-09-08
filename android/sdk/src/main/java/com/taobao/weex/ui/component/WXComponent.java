@@ -349,6 +349,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
+      mDomObj.ref = component.getDomObject().getRef();
       updateProperties(component.getDomObject().getStyles());
       updateProperties(component.getDomObject().getAttrs());
       updateExtra(component.getDomObject().getExtra());
