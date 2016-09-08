@@ -300,12 +300,16 @@
     [self setNeedsLayout];
 }
 
-- (void)_removeFromSupercomponent
+- (void)_removeSubcomponent:(WXComponent *)subcomponent
 {
     pthread_mutex_lock(&_propertyMutex);
-    [self.supercomponent->_subcomponents removeObject:self];
+    [_subcomponents removeObject:subcomponent];
     pthread_mutex_unlock(&_propertyMutex);
-    
+}
+
+- (void)_removeFromSupercomponent
+{
+    [self.supercomponent _removeSubcomponent:self];
     [self.supercomponent _recomputeCSSNodeChildren];
     [self.supercomponent setNeedsLayout];
     
