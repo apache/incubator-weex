@@ -43,7 +43,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 - (void)removeEventListener:(NSString *)event
 {
     [_eventCallback removeObjectForKey:event];
-    [[NSNotificationCenter defaultCenter] removeObserver:weexInstance forKeyPath:event];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)fireGlobalEvent:(NSNotification *)notification
