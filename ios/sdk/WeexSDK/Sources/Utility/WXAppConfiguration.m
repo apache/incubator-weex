@@ -72,7 +72,7 @@
 
 + (NSString *)JSFrameworkVersion
 {
-    return [WXAppConfiguration sharedConfiguration].JSFrameworkVersion;
+    return [WXAppConfiguration sharedConfiguration].JSFrameworkVersion ?: @"";
 }
 
 + (void)setJSFrameworkVersion:(NSString *)JSFrameworkVersion
