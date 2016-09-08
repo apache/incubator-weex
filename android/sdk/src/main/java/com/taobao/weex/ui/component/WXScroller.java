@@ -660,9 +660,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         continue;
       }
       Rect scrollerRect=new Rect();
-      if(getInnerView()!=null){
-        getInnerView().getHitRect(scrollerRect);
-      }
       boolean visible = helper.isViewVisible(scrollerRect);
 
       int result = helper.setAppearStatus(visible);

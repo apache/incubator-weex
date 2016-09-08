@@ -1010,10 +1010,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         continue;
       }
 
-      Rect listRect = new Rect();
-      if (getHostView() != null && getHostView().getInnerView() != null) {
-        getHostView().getInnerView().getHitRect(listRect);
-      }
+      Rect listRect=new Rect();
       boolean visible = (!outOfVisibleRange) && item.isViewVisible(listRect);
 
       int result = item.setAppearStatus(visible);
