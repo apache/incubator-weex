@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
@@ -658,7 +659,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!helper.isWatch()) {
         continue;
       }
-      boolean visible = helper.isViewVisible();
+      Rect scrollerRect=new Rect();
+      boolean visible = helper.isViewVisible(scrollerRect);
 
       int result = helper.setAppearStatus(visible);
       if (result != AppearanceHelper.RESULT_NO_CHANGE) {

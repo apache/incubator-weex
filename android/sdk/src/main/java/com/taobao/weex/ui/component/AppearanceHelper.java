@@ -206,6 +206,7 @@ package com.taobao.weex.ui.component;
 
 import android.graphics.Rect;
 import android.view.View;
+import com.taobao.weex.utils.WXLogUtils;
 
 
 /**
@@ -278,12 +279,15 @@ public class AppearanceHelper {
     return RESULT_NO_CHANGE;
   }
 
-  public boolean isViewVisible() {
+  public boolean isViewVisible(Rect parentRect) {
     View view = mAwareChild.getHostView();
     if (view == null) {
       return false;
     }
 
-    return view.getGlobalVisibleRect(mVisibleRect);
+    boolean result = view.getLocalVisibleRect(parentRect);
+
+    WXLogUtils.d("AppearanceHelper","result:"+result+" rect:"+parentRect);
+    return result;
   }
 }
