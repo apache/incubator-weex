@@ -82,7 +82,7 @@
     self = [super init];
     if (!self){
     }
-    _decelerationRate = 0.1;
+    _decelerationRate = 0.01;
     _scrollEnabled = YES;
     _bounces = YES;
     _offsetMultiplier = 1.0;
@@ -1679,6 +1679,11 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return view;
 }
 
+- (void)sliderNeighborDidEndScrollingAnimation:(WXSliderNeighborView *)sliderNeighbor
+{
+    [self updateSliderPage];
+}
+
 - (void)sliderNeighbor:(WXSliderNeighborView *)sliderView didScrollToItemAtIndex:(NSInteger)index
 {
     self.currentIndex = index;
@@ -1687,18 +1692,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
     [self updateSliderPage];
-}
-
-- (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
-{
-    switch (option) {
-        case WXSliderNeighborOptionSpacing:
-            return (1+(1-self->neighborScale)/2)*value;
-            break;
-        default:
-            break;
-    }
-    return value;
 }
 
 - (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView *)sliderNeighbor
