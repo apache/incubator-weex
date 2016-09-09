@@ -1533,6 +1533,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     }
     
     [self.sliderView setCurrentItemIndex:_index];
+    [self updateSliderPage];
 }
 
 #pragma mark styles update
@@ -1631,7 +1632,8 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (self.currentIndex >= self.items.count - indicatorCnt) {
         self.currentIndex = 0;
     }
-    [sliderNeighborView scroll2ItemViewAtIndex:self.currentIndex animated:YES];
+    
+    [sliderNeighborView setCurrentItemIndex:self.currentIndex];
 }
 
 #pragma mark sliderNeighbor Delegate && dataSource
@@ -1651,7 +1653,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     } else {
         view.tag = 1;
     }
-//
+    
     if (CGRectIsNull(_itemRect)) {
         _itemRect = view.frame;
     }
@@ -1684,7 +1686,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
-   
+    [self updateSliderPage];
 }
 
 - (CGFloat)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
@@ -1708,9 +1710,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (_autoPlay) {
         [self _startAutoPlayTimer];
     }
-    UIView * currentView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor currentItemIndex]];
-    UIView * lastView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor lastItemIndex]];
-    UIView * nextView  = [sliderNeighbor itemViewAtIndex:[sliderNeighbor nextItemIndex]];
+}
+
+- (void)updateSliderPage
+{
+    UIView * currentView  = [self.sliderView itemViewAtIndex:[_sliderView currentItemIndex]];
+    UIView * lastView  = [self.sliderView itemViewAtIndex:[_sliderView lastItemIndex]];
+    UIView * nextView  = [self.sliderView itemViewAtIndex:[_sliderView nextItemIndex]];
     __block CGAffineTransform transfrom = CGAffineTransformIdentity;
     __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.4 animations:^{
