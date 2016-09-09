@@ -24,7 +24,7 @@ or update that key's value if it already exists.
 ```js
 var storage = require('@weex-module/storage');
 storage.setItem('bar', 'bar-value', function(e) {
-  // callback.'e' is an object that contains 'result' and 'data'. e.result indicate wether `setItem` is succeed.
+  // callback.'e' is an object that contains 'result' and 'data'. e.result indicate whether `setItem` is succeed.
   // e.data will return 'undefined' if success or 'invalid_param' if your key/value is ""/null.
 });
 ```
