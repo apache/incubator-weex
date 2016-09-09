@@ -3,7 +3,7 @@
     <panel title="Basic" type="primary">
       <div
         :style="{
-          width:fullW,
+          width: fullW,
           borderColor: '#333',
           borderWidth: 1,
           borderStyle: 'solid'

@@ -1,6 +1,5 @@
 <template>
   <scroller class="body">
-
     <panel title="auto-play" type="primary">
       <panel title="auto-play = false" padding-body="0">
         <slider class="slider" append="tree"
@@ -10,7 +9,6 @@
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
       <panel title="auto-play = true" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[0].interval"
@@ -20,8 +18,7 @@
         </slider>
       </panel>
     </panel>
-
-    <panel :title="'Event, ' + eventCnt' change'" type="primary">
+    <panel :title="'Event, ' + eventCnt + ' change'" type="primary">
       <slider class="slider" append="tree"
         :interval="sliders[0].interval"
         :autoPlay="sliders[0].autoPlay"
@@ -30,7 +27,6 @@
         <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
       </slider>
     </panel>
-
     <panel title="Indicator" type="primary">
       <panel title="default style" padding-body="0">
         <slider class="slider" append="tree"
@@ -41,7 +37,6 @@
           <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
       <panel title="width & height" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[0].interval"
@@ -50,7 +45,6 @@
           <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
       <panel title="left & top" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
@@ -59,7 +53,6 @@
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
       <panel title="itemColor & itemSelectedColor" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[2].interval"
@@ -68,7 +61,6 @@
           <slider-page v-for="v in sliders[2].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
       <panel title="itemSize" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
@@ -77,11 +69,8 @@
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
-
     </panel>
-
   </scroller>
-
 </template>
 
 <script>
@@ -222,7 +211,7 @@
     },
     components: {
       panel: require('weex-vue-components/panel.vue'),
-      sliderPage: require('./include/slider-page.vue')
+      sliderPage: require('../include/slider-page.vue')
     },
     methods: {
       togglePlay: function() {

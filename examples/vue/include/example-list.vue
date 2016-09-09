@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  var getBaseURL = require('./include/base-url.js').getBaseURL
+  var getBaseURL = require('./base-url.js').getBaseURL
   module.exports = {
     props: {
       dir: {
@@ -20,7 +20,7 @@
       }
     },
     components: {
-      'example-list-item': require('./example-list-item.vue')
+      exampleListItem: require('./example-list-item.vue')
     },
     created: function() {
       var base = getBaseURL(this)

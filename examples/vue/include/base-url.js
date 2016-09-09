@@ -17,7 +17,7 @@ exports.getBaseURL = function (vm) {
     if (matches && matches.length >= 2) {
       host = matches[1];
     }
-    nativeBase = '//' + host + '/' + vm.dir + '/build/';
+    nativeBase = 'http://' + host + '/' + vm.dir + '/build/';
   }
   var h5Base = './index.html?page=./' + vm.dir + '/build/';
   // in Native

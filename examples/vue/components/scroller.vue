@@ -4,7 +4,7 @@
       <div class="header">
         <text class="header-title">{{sec.title}}</text>
       </div>
-      <div v-for="item in items" class="item">
+      <div v-for="item in sec.items" class="item">
         <text class="item-title">row {{item.id}}</text>
       </div>
     </div>
@@ -67,7 +67,6 @@
 
   .item-title {
   }
-
 </style>
 
 <script>
@@ -155,8 +154,8 @@
             {id: 31},
             {id: 32}
           ]
-        },
+        }
       ]
-    },
+    }
   }
 </script>

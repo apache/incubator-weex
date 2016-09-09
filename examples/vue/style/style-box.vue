@@ -63,6 +63,7 @@
   module.exports = {
     components: {
       panel: require('weex-vue-components/panel.vue'),
+      tip: require('weex-vue-components/tip.vue'),
       styleItem: require('./style-item.vue')
     }
   }

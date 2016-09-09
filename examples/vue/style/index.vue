@@ -34,7 +34,8 @@
     components: {
       panel: require('weex-vue-components/panel.vue'),
       styleBox: require('./style-box.vue'),
-      styleFlex: require('./style-flex.vue')
+      styleFlex: require('./style-flex.vue'),
+      styleItem: require('./style-item.vue')
     }
   }
 </script>

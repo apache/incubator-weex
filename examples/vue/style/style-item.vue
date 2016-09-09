@@ -1,6 +1,8 @@
 <template>
-  <text class="item txt" :value="value"
-        :style="{ backgroundColor: bgColor }"></text>
+  <text
+    :value="value"
+    :style="{ backgroundColor: bgColor }"
+    class="item txt"></text>
 </template>
 
 <script>

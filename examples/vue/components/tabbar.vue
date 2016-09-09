@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  var getBaseURL = require('./include/base-url.js').getBaseURL
+  var getBaseURL = require('../include/base-url.js').getBaseURL
   module.exports = {
     data: {
       dir: 'examples',

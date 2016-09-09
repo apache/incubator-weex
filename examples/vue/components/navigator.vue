@@ -21,7 +21,7 @@
 
 <script>
   var navigator = require('@weex-module/navigator')
-  var getBaseURL = require('./include/base-url.js').getBaseURL
+  var getBaseURL = require('../include/base-url.js').getBaseURL
   module.exports = {
     data: {
       navBarHeight: 88,

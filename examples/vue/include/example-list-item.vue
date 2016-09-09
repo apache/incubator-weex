@@ -1,6 +1,6 @@
 <template>
   <list-item v-on:click="redirect">
-    <text class="item-txt">{{ title }}</text>
+    <text class="item-txt">{{title}}</text>
   </list-item>
 </template>
 
@@ -19,7 +19,7 @@
       url: { default: '' }
     },
     components: {
-      'list-item': require('weex-vue-components/list-item.vue')
+      listItem: require('weex-vue-components/list-item.vue')
     },
     methods: {
       redirect: function() {
