@@ -53,15 +53,15 @@
     methods: {
       goback: function() {
         var el = this.$refs.webview
-        webview.goBack(el.ref)
+        webview.goBack(el)
       },
       goforward: function() {
         var el = this.$refs.webview
-        webview.goForward(el.ref)
+        webview.goForward(el)
       },
       refresh: function() {
         var el = this.$refs.webview
-        webview.reload(el.ref)
+        webview.reload(el)
       },
       startload: function(e) {
       },

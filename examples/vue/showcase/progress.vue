@@ -32,9 +32,11 @@
     created: function() {
       var me = this;
       setInterval(function () {
-        if (me.w >= me.fullW) me.w = 0;
+        if (me.w >= me.fullW) {
+          me.w = 0
+        }
         me.w = (me.w + INC >= me.fullW) ? me.fullW : me.w + INC
-      }, 33);
+      }, 1000);
     }
   }
 </script>

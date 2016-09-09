@@ -5,14 +5,14 @@
         @tick="tick($event, 'countdown1')"
         :remain="countdown1.remain"
         style="width: 750; margin-top: 20; margin-bottom: 20;">
-        <text class="ctno1">{{time.D}}</text>
-        <text class="ctno1" style="background-color: #FFF; color: #AAA;">day(s)</text>
-        <text class="ctno1">{{time.hh}}</text>
-        <text class="ctno1" style="background-color: #FFF; color: #AAA;">hour(s)</text>
-        <text class="ctno1">{{time.mm}}</text>
-        <text class="ctno1" style="background-color: #FFF; color: #AAA;">minute(s)</text>
-        <text class="ctno1">{{time.ss}}</text>
-        <text class="ctno1" style="background-color: #FFF; color: #AAA;">second(s)</text>
+        <text class="ctno1">{{countdown1.time.D}}</text>
+        <text class="ctno1" style="background-color: #FFFFFF; color: #AAAAAA;">day(s)</text>
+        <text class="ctno1">{{countdown1.time.hh}}</text>
+        <text class="ctno1" style="background-color: #FFFFFF; color: #AAAAAA;">hour(s)</text>
+        <text class="ctno1">{{countdown1.time.mm}}</text>
+        <text class="ctno1" style="background-color: #FFFFFF; color: #AAAAAA;">minute(s)</text>
+        <text class="ctno1">{{countdown1.time.ss}}</text>
+        <text class="ctno1" style="background-color: #FFFFFF; color: #AAAAAA;">second(s)</text>
       </countdown>
 
       <countdown
@@ -20,7 +20,7 @@
         :remain="countdown2.remain"
         style="width: 600;">
         <text class="ctno2">{{countdown2.time.MM}}</text>
-        <text class="ctno2" style="background-color: #FFF; color: #AAA;">:</text>
+        <text class="ctno2" style="background-color: #FFFFFF; color: #AAAAAA;">:</text>
         <text class="ctno2">{{countdown2.time.ss}}</text>
       </countdown>
     </panel>

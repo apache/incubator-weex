@@ -1,13 +1,13 @@
 <template>
   <scroller>
     <panel title="Toast" type="primary">
-      <button type="primary" @click="toast" value="Toast"></button>
+      <button type="primary" @click.native="toast" value="Toast"></button>
     </panel>
 
     <panel title="Dialog" type="primary">
-      <button type="success" @click="alert" value="Alert" style="margin-bottom: 20px;"></button>
-      <button type="primary" @click="confirm" value="Confirm" style="margin-bottom: 20px;"></button>
-      <button type="warning" @click="prompt" value="Prompt"></button>
+      <button type="success" @click.native="alert" value="Alert" style="margin-bottom: 20px;"></button>
+      <button type="primary" @click.native="confirm" value="Confirm" style="margin-bottom: 20px;"></button>
+      <button type="warning" @click.native="prompt" value="Prompt"></button>
     </panel>
   </scroller>
 </template>

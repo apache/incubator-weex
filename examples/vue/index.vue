@@ -20,17 +20,17 @@
         {name: 'vue/components/slider', title: 'Slider'},
         {name: 'vue/components/a', title: 'A'},
         // {name: 'vue/components/video', title: 'Video'},
-        // {name: 'vue/components/countdown', title: 'Countdown'},
-        // {name: 'vue/components/marquee', title: 'Marquee'},
+        {name: 'vue/components/countdown', title: 'Countdown'},
+        {name: 'vue/components/marquee', title: 'Marquee'},
         {name: 'vue/components/web', title: 'Web'},
         {name: 'vue/components/navigator', title: 'Navigator'},
         {name: 'vue/components/tabbar', title: 'Tabbar'},
 
         // module
         // {name: 'vue/modules/instance-api', title: 'Instance API'},
-        // {name: 'vue/modules/modal', title: 'Modal'},
-        // {name: 'vue/modules/stream', title: 'Stream'},
-        // {name: 'vue/modules/storage',title:'Storage'},
+        {name: 'vue/modules/modal', title: 'Modal'},
+        {name: 'vue/modules/stream', title: 'Stream'},
+        {name: 'vue/modules/storage',title:'Storage'},
         // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
 
         // showcase
