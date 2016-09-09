@@ -34,7 +34,7 @@ clipboard.getString(function(ret) {
 
 ### setString(text)
 
-set the text into clipboard, as the same as copy manully. 
+set the text into clipboard, as the same as copy manually. 
 
 #### Arguments
 
