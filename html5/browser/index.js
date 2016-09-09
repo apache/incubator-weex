@@ -2,19 +2,17 @@
 
 import Weex from './render'
 
-/**
- * install components and APIs
- */
 import root from './base/root'
 import div from './base/div'
 import droot from './base/droot'
-import components from './extend/components'
-import api from './extend/api'
+
+// install the extended apis and components.
+import extensions from './extend'
 
 Weex.install(root)
 Weex.install(div)
 Weex.install(droot)
-Weex.install(components)
-Weex.install(api)
+
+Weex.install(extensions)
 
 export default Weex
