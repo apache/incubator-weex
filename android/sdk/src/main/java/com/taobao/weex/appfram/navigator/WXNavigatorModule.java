@@ -184,6 +184,8 @@ public class WXNavigatorModule extends WXModule {
         }
 
         if (mWXSDKInstance.getContext() instanceof Activity) {
+            WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callbackId,
+                                                   MSG_SUCCESS);
             ((Activity) mWXSDKInstance.getContext()).finish();
         }
     }
