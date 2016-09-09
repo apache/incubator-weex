@@ -55,6 +55,9 @@ modal.toast({message: 'hello'})
 
 We will bring a better syntax design in the future.
 
+## iOS text line-height style is abnormal
+
+`line-height` style in text component is different from h5 and Android,  text value will be placed at bottom of line box because of iOS native api. We are trying to optimize it.
 
 
 ## How to get rid of 750 adaption and calculate width/height in real pixels？
