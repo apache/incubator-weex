@@ -148,10 +148,10 @@ Component.prototype = {
     }
   },
 
-  // element can be both weex component and dom element.
-  fireLazyload (element) {
-    !element && (element = this)
-    fireLazyload(element)
+  // target can be both weex component and dom element.
+  fireLazyload (target) {
+    !target && (target = this)
+    fireLazyload(target)
   },
 
   attr: {}, // attr setters
