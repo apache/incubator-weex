@@ -3,6 +3,7 @@
     class="item" :style="{'background-color': bgColor}"
     v-on:click="click"
     v-on:touchstart="touchstart" v-on:touchend="touchend">
+    <text>Hello</text>
     <slot></slot>
   </div>
 </template>

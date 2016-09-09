@@ -104,8 +104,9 @@
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
     "weex-loader": "^0.3.1",
-    "weex-vue-framework": "^0.1.3",
-    "weex-vue-loader": "^0.1.0",
-    "weex-rx-framework": "^0.0.9"
+    "weex-rx-framework": "^0.0.9",
+    "weex-vue-components": "^0.1.0",
+    "weex-vue-framework": "^0.1.7",
+    "weex-vue-loader": "^0.1.0"
   }
 }

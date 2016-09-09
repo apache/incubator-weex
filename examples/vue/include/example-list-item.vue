@@ -1,7 +1,7 @@
 <template>
-  <wxc-list-item v-on:click="redirect">
-    <text class="item-txt">{{ title }}</text>
-  </wxc-list-item>
+  <list-item v-on:click="redirect">
+    <text class="item-txt">{{title}}</text>
+  </list-item>
 </template>
 
 <style>
@@ -14,16 +14,12 @@
 <script>
   var event = require('@weex-module/event')
   module.exports = {
-    components: {
-      'wxc-list-item': require('./wxc-list-item.vue')
-    },
     props: {
-      title: {
-        default: '456'
-      },
-      url: {
-        default: ''
-      }
+      title: { default: '456' },
+      url: { default: '' }
+    },
+    components: {
+      listItem: require('weex-vue-components/list-item.vue')
     },
     methods: {
       redirect: function() {

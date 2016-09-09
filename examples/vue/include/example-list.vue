@@ -7,10 +7,8 @@
 </template>
 
 <script>
+  var getBaseURL = require('./base-url.js').getBaseURL
   module.exports = {
-    components: {
-      'example-list-item': require('./example-list-item.vue')
-    },
     props: {
       dir: {
         default: 'examples'
@@ -21,44 +19,17 @@
         ]
       }
     },
+    components: {
+      exampleListItem: require('./example-list-item.vue')
+    },
     created: function() {
-      var bundleUrl = this.$getConfig().bundleUrl;
-      console.log('hit', bundleUrl);
-      var nativeBase;
-      var isAndroidAssets = bundleUrl.indexOf('your_current_IP') >= 0 || bundleUrl.indexOf('file://assets/')>=0;
-      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
-      if (isAndroidAssets) {
-        nativeBase = 'file://assets/';
-      }
-      else if (isiOSAssets) {
-        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
-        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
-        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
-      }
-      else {
-        var host = 'localhost:12580';
-        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
-        if (matches && matches.length >= 2) {
-          host = matches[1];
-        }
-        nativeBase = '//' + host + '/' + this.dir + '/build/';
-      }
-      var h5Base = './index.html?page=./' + this.dir + '/build/';
-      // in Native
-      var base = nativeBase;
-      if (typeof window === 'object') {
-        // in Browser or WebView
-        base = h5Base;
-      }
-
+      var base = getBaseURL(this)
       for (var i in this.items) {
         var item = this.items[i];
         if (!item.url) {
           item.url = base + item.name + '.js';
         }
       }
-      // see log in Android Logcat
-      if (this.items.length) console.log('hit', this.items[0].url);
     }
   }
 </script>
