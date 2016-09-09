@@ -32,7 +32,7 @@ Other attributes please check out the [common attributes](../references/common-a
 - support `text-decoration` style.
 - support `text-align` style.
 - support `text-overflow` style.
-- support `line-height`<sup class="wx-v">0.6.1</sup> style. 
+- support `line-height`<sup class="wx-v">0.6.1</sup> style. line-height in iOS is different from h5 and Android, text value will be placed at bottom of line box.
 - not support `flex-direction`, `justify-content`, `align-items` which is active for child nodes, and text has no child nodes.
 
 **common styles**: check out [common styles for components](../references/common-style.md)
