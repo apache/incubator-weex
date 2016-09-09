@@ -1,10 +1,10 @@
-//
-//  WXCanvasComponent.m
-//  WeexSDK
-//
-//  Created by yuankong on 16/6/22.
-//  Copyright © 2016年 taobao. All rights reserved.
-//
+/**
+ * Created by Weex.
+ * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+ *
+ * This source code is licensed under the Apache Licence 2.0.
+ * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ */
 
 #import "WXCanvasComponent.h"
 #import "WXComponent_internal.h"
