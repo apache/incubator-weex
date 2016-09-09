@@ -301,7 +301,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     @Override
     protected MeasureOutput measure(int width, int height) {
         int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
-        int weexH = WXViewUtils.getWeexHeight(mInstanceId);
+        int weexH = WXViewUtils.getWeexHeight(getInstanceId());
         int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
         return super.measure(width, outHeight);
     }
@@ -375,7 +375,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     protected BounceRecyclerView initComponentHostView(Context context) {
         bounceRecyclerView = new BounceRecyclerView(context, getOrientation());
 
-        String transforms = (String) mDomObj.getAttrs().get(TRANSFORM);
+        String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
@@ -659,22 +659,22 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private boolean checkRefreshOrLoading(final WXComponent child) {
 
         if (child instanceof WXRefresh) {
-            mHost.setOnRefreshListener((WXRefresh)child);
-            mHost.postDelayed(new Runnable() {
+            getHostView().setOnRefreshListener((WXRefresh)child);
+            getHostView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setHeaderView(child);
+                    getHostView().setHeaderView(child);
                 }
             },100);
             return true;
         }
 
         if (child instanceof WXLoading) {
-            mHost.setOnLoadingListener((WXLoading)child);
-            mHost.postDelayed(new Runnable() {
+            getHostView().setOnLoadingListener((WXLoading)child);
+            getHostView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setFooterView(child);
+                    getHostView().setFooterView(child);
                 }
             },100);
             return true;

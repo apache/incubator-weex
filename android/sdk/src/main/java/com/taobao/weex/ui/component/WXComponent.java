@@ -193,9 +193,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** Use {@link #getDomObject()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXDomObject mDomObj;
-  /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
+  /** Use {@link #getInstanceId()} ()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
-  public String mInstanceId;
+  public final String mInstanceId;
 
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
@@ -235,6 +235,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           params);
     }
   };
+
+  public String getInstanceId() {
+    return mInstanceId;
+  }
 
   interface OnClickListener{
     void onHostViewClick();

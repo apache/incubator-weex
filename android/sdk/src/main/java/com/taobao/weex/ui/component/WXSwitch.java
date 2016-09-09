@@ -231,7 +231,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
 
   @Override
   protected WXSwitchView initComponentHostView(Context context) {
-    WXSwitchView view = new WXSwitchView(mContext);
+    WXSwitchView view = new WXSwitchView(context);
     view.setTextSize(TypedValue.COMPLEX_UNIT_PX,22);
     return view;
   }
@@ -251,7 +251,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
           Map<String, Object> attrsChanges = new HashMap<>();
           attrsChanges.put("checked",Boolean.toString(isChecked));
           domChanges.put("attrs",attrsChanges);
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mDomObj.getRef(), Constants.Event.CHANGE, params,domChanges);
+          WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), Constants.Event.CHANGE, params,domChanges);
         }
       });
     }

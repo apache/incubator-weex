@@ -30,6 +30,6 @@ public class RichText extends WXComponent<TextView> {
   public void setTelLink(String tel){
     SpannableString spannable=new SpannableString(tel);
     spannable.setSpan(new URLSpan("tel:"+tel),0,tel.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-    ((TextView)mHost).setText(spannable);
+    ((TextView) getHostView()).setText(spannable);
   }
 }

@@ -411,7 +411,7 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
   @Deprecated
   @WXComponentProp(name = Constants.Name.VALUE)
   public void setValue(String value) {
-    if (value == null || mHost == null) {
+    if (value == null || getHostView() == null) {
       return;
     }
     int i;
@@ -491,14 +491,14 @@ public class WXSlider extends WXVContainer<FrameLayout> implements OnPageChangeL
     }
     WXEvent event = getDomObject().getEvents();
     String ref = getDomObject().getRef();
-    if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(mHost)) {
+    if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
       params.put("index", realPosition);
 
       Map<String, Object> domChanges = new HashMap<>();
       Map<String, Object> attrsChanges = new HashMap<>();
       attrsChanges.put("value", realPosition);
       domChanges.put("attrs", attrsChanges);
-      WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
+      WXSDKManager.getInstance().fireEvent(getInstanceId(), ref,
           Constants.Event.CHANGE, params, domChanges);
     }
   }

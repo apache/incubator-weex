@@ -399,7 +399,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
-    mInstance.addOnInstanceVisibleListener(this);
+    getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
 
     if(mListener != null && mListener.mEventListener != null){

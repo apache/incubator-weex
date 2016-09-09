@@ -235,7 +235,7 @@ public class WXWeb extends WXComponent {
     }
 
     protected void  createView(){
-        mWebView = new WXWebView(mContext);
+        mWebView = new WXWebView(getContext());
     }
 
     @Override
@@ -249,30 +249,30 @@ public class WXWeb extends WXComponent {
         mWebView.setOnPageListener(new IWebView.OnPageListener() {
             @Override
             public void onReceivedTitle(String title) {
-                if (mDomObj.getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
+                if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.RECEIVEDTITLE, params);
+                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.RECEIVEDTITLE, params);
                 }
             }
 
             @Override
             public void onPageStart(String url) {
-                if ( mDomObj.getEvents().contains(Constants.Event.PAGESTART)) {
+                if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.PAGESTART, params);
+                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.PAGESTART, params);
                 }
             }
 
             @Override
             public void onPageFinish(String url, boolean canGoBack, boolean canGoForward) {
-                if ( mDomObj.getEvents().contains(Constants.Event.PAGEFINISH)) {
+                if ( getDomObject().getEvents().contains(Constants.Event.PAGEFINISH)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
                     params.put("canGoForward", canGoForward);
-                    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.PAGEFINISH, params);
+                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.PAGEFINISH, params);
                 }
             }
         });
@@ -309,7 +309,7 @@ public class WXWeb extends WXComponent {
 
     @WXComponentProp(name = Constants.Name.SRC)
     public void setUrl(String url) {
-        if (TextUtils.isEmpty(url) || mHost == null) {
+        if (TextUtils.isEmpty(url) || getHostView() == null) {
             return;
         }
         mUrl = url;
@@ -331,11 +331,11 @@ public class WXWeb extends WXComponent {
     }
 
     private void fireEvent(String type, Object message) {
-        if (mDomObj.getEvents().contains(Constants.Event.ERROR)) {
+        if (getDomObject().getEvents().contains(Constants.Event.ERROR)) {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);
-            WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.ERROR, params);
+            WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.ERROR, params);
         }
     }
 

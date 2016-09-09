@@ -250,7 +250,7 @@ public class WXImage extends WXComponent<ImageView> {
 
     @Override
     protected ImageView initComponentHostView(Context context) {
-        WXImageView view = new WXImageView(mContext);
+        WXImageView view = new WXImageView(context);
         view.setScaleType(ScaleType.FIT_XY);
         return view;
     }
@@ -335,7 +335,7 @@ public class WXImage extends WXComponent<ImageView> {
                 if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
-                    WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(),getRef(), Constants.Event.ONLOAD,params);
+                    WXSDKManager.getInstance().fireEvent(getInstanceId(),getDomObject().getRef(), Constants.Event.ONLOAD,params);
                 }
             }
         });

@@ -223,7 +223,7 @@ public class Textarea extends AbstractEditComponent {
   @Override
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
-    String rowsStr = (String) mDomObj.getStyles().get(Constants.Name.ROWS);
+    String rowsStr = (String) getDomObject().getStyles().get(Constants.Name.ROWS);
 
     int rows = TextAreaEditTextDomObject.DEFAULT_ROWS;
     try{
