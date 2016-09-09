@@ -100,7 +100,7 @@ Removes a child. The parameter `preserved` means whether destroy the removed nod
 
 ##### `setAttr(key: string, value: string, silent: boolean?)`
 
-If `silent` is truthy, it won't cause native calls. Used for handling event with virtual-DOM changes.
+If `silent` is true, it won't cause native calls. Used for handling event with virtual-DOM changes.
 
 ##### `setStyle(key: string, value: string, silent: boolean?)`
 
