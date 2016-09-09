@@ -35,7 +35,7 @@ Pod::Spec.new do |s|
 
   s.user_target_xcconfig  = { 'FRAMEWORK_SEARCH_PATHS' => "'$(PODS_ROOT)/WeexSDK'" }
 
-  s.frameworks = CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit'
+  s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit'
 
   s.dependency 'SocketRocket'
 
