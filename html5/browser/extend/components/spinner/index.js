@@ -15,12 +15,15 @@ function getStyleSheet (spinner) {
   /* eslint-disable no-labels */
   outer: for (i = 0, l = styles.length; i < l; i++) {
     const rules = styles[i].rules
+    if (!rules) {
+      continue
+    }
     for (j = 0, m = rules.length; j < m; j++) {
       const item = rules.item(j)
       if (
         (item.type === CSSRule.KEYFRAMES_RULE
           || item.type === CSSRule.WEBKIT_KEYFRAMES_RULE)
-        && item.name === 'spinner') {
+        && item.name === 'weex-spinner') {
         break outer
       }
     }
@@ -37,7 +40,7 @@ function setKeyframeColor (spinner, val) {
     const item = rules.item(i)
     if ((item.type === CSSRule.KEYFRAMES_RULE
           || item.type === CSSRule.WEBKIT_KEYFRAMES_RULE)
-        && item.name === 'spinner') {
+        && item.name === 'weex-spinner') {
       const cssRules = item.cssRules
       for (let j = 0, m = cssRules.length; j < m; j++) {
         const keyframe = cssRules[j]
