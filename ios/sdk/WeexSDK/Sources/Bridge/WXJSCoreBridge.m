@@ -35,7 +35,9 @@
     
     if(self){
         _jsContext = [[JSContext alloc] init];
-        _jsContext.name = @"Weex Context";
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+            _jsContext.name = @"Weex Context";
+        }
         
         __weak typeof(self) weakSelf = self;
         
