@@ -261,6 +261,7 @@ public class WXEnvironment {
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
   private static boolean isPerf = false;
+  private static boolean isShowLineNumber = false;
 
   public static boolean sShow3DLayer=true;
 
@@ -352,6 +353,10 @@ public class WXEnvironment {
 
   public static boolean isPerf() {
     return isPerf;
+  }
+
+  public static boolean isShowLineNumber() {
+    return isShowLineNumber;
   }
 
   private static String getDevId() {
