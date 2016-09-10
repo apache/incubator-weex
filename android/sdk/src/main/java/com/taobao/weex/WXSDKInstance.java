@@ -783,6 +783,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
             }
             if (mUserTrackAdapter != null) {
               mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, null);
+              commitUTStab(IWXUserTrackAdapter.JS_BRIDGE,WXErrorCode.WX_SUCCESS);
             }
           }
         }

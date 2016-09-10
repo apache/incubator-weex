@@ -317,7 +317,7 @@ public enum WXErrorCode {
   /**
    * JS Framework run error
    */
-  WX_ERR_JS_FRAMEWORK("-1002","js framework error");
+  WX_ERR_JS_FRAMEWORK("-1002", "js framework error");
 
   private String errorCode;
   private String errorMsg;
@@ -329,8 +329,9 @@ public enum WXErrorCode {
 
   public void appendErrMsg(String err) {
     if (!TextUtils.isEmpty(err)) {
-      StringBuilder builder = new StringBuilder(errorCode);
-      errorCode = builder.append(err).substring(0);
+      StringBuilder builder = new StringBuilder(errorMsg);
+      builder.append(err);
+      errorMsg = builder.toString();
     }
   }
 
