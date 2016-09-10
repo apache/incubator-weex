@@ -1,19 +1,19 @@
 <template>
   <div>
     <panel title="Transform" type="primary">
-      <button value="Rotate" @click="rotate" type="primary" size="middle"></button>
-      <button value="Scale" @click="scale" type="primary" size="middle" style="margin-top:12px;"></button>
-      <button value="Translate" @click="translate" type="primary" size="middle"
+      <button value="Rotate" @click.native="rotate" type="primary" size="middle"></button>
+      <button value="Scale" @click.native="scale" type="primary" size="middle" style="margin-top:12px;"></button>
+      <button value="Translate" @click.native="translate" type="primary" size="middle"
                  style="margin-top:12px;"></button>
-      <button value="Transform" @click="transform" type="success" size="middle"
+      <button value="Transform" @click.native="transform" type="success" size="middle"
                  style="margin-top:12px;"></button>
     </panel>
 
     <panel title="Others" type="primary">
-      <button value="BgColor" @click="color" type="primary" size="middle"></button>
-      <button value="Opacity" @click="opacity" type="primary" size="middle"
+      <button value="BgColor" @click.native="color" type="primary" size="middle"></button>
+      <button value="Opacity" @click.native="opacity" type="primary" size="middle"
                  style="margin-top:12px;"></button>
-      <button value="All" @click="composite" type="success" size="middle" style="margin-top:12px;"></button>
+      <button value="All" @click.native="composite" type="success" size="middle" style="margin-top:12px;"></button>
     </panel>
 
     <div ref="block" class="block" :style="{ transformOrigin: transformOrigin }">

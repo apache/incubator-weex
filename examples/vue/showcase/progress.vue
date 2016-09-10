@@ -36,7 +36,7 @@
           me.w = 0
         }
         me.w = (me.w + INC >= me.fullW) ? me.fullW : me.w + INC
-      }, 1000);
+      }, 33);
     }
   }
 </script>
