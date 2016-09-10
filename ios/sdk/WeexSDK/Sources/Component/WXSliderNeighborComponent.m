@@ -766,7 +766,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 - (void)scroll2ItemViewAtIndex:(NSInteger)index animated:(BOOL)animated
 {
-    [self scroll2ItemViewAtIndex:index duration:animated? 0.8: 0];
+    [self scroll2ItemViewAtIndex:index duration:animated? 0.6: 0];
 }
 
 - (void)scrollByNumberOfItems:(NSInteger)itemCount duration:(NSTimeInterval)duration
@@ -1521,7 +1521,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             [self _startAutoPlayTimer];
         }
     }
-    if (attributes[@"neighborSpace"]) {
+    if (attributes[@"neighborScale"]) {
         [self setNeighborScale:attributes];
     }
     if (attributes[@"neighborAlpha"]) {
@@ -1588,9 +1588,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         self->neighborScale = [WXConvert CGFloat:attributes[@"neighborScale"]];
         self->neighborScale = self->neighborScale >= 0? self->neighborScale : 0;
         self->neighborScale = self->neighborScale <= 1? self->neighborScale :1;
-        if (self->neighborScale == 0) {
-            self->neighborScale = 0.01;
-        }
+        
     } else {
         self->neighborScale = 0.8;
     }
@@ -1658,10 +1656,14 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         _itemRect = view.frame;
     }
     CGAffineTransform transfrom = CGAffineTransformIdentity;
-    transfrom = CGAffineTransformMakeScale(1-self->neighborSpace*2/_itemRect.size.width, 1.0);
+    if (fabs(self->neighborSpace - 0) > CGFLOAT_MIN) {
+        transfrom = CGAffineTransformMakeScale(1-self->neighborSpace*2/_itemRect.size.width, 1.0);
+    }
     
     if (index != [self.sliderView currentItemIndex]) {
-        transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(self->neighborScale, self->neighborScale));
+        if (fabs(self->neighborScale - 0) > CGFLOAT_MIN) {
+            transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(self->neighborScale, self->neighborScale));
+        }
         view.alpha = self->neighborAlpha;
     }
     view.transform = transfrom;
@@ -1691,7 +1693,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
-    [self updateSliderPage];
 }
 
 - (void)sliderNeighborWillBeginDragging:(WXSliderNeighborView *)sliderNeighbor
@@ -1711,20 +1712,30 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     UIView * lastView  = [self.sliderView itemViewAtIndex:[_sliderView lastItemIndex]];
     UIView * nextView  = [self.sliderView itemViewAtIndex:[_sliderView nextItemIndex]];
     __block CGAffineTransform transfrom = CGAffineTransformIdentity;
+    float duration = 0;
     __weak typeof(self) weakSelf = self;
-    [UIView animateWithDuration:0.4 animations:^{
+    if ((self->neighborScale - 0) > CGFLOAT_MIN) {
+        duration = 0.3;
+    }
+    [UIView animateWithDuration:duration animations:^{
         __strong typeof(self) strongSelf = weakSelf;
         if (strongSelf) {
             currentView.alpha = 1.0;
             
-            transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(1-strongSelf->neighborSpace*2/_itemRect.size.width, 1.0));
+            if (fabs(strongSelf->neighborSpace - 0) > CGFLOAT_MIN) {
+                transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(1-strongSelf->neighborSpace*2/_itemRect.size.width, 1.0));
+            }
+
             currentView.transform = transfrom;
+            if (fabs(strongSelf->neighborScale - 0) > CGFLOAT_MIN) {
+                transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
+            }
             
-            transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
-            lastView.alpha = strongSelf->neighborAlpha;
             lastView.transform = transfrom;
-            nextView.alpha = strongSelf->neighborAlpha;
             nextView.transform = transfrom;
+            lastView.alpha = strongSelf->neighborAlpha;
+            
+            nextView.alpha = strongSelf->neighborAlpha;
         }
     }];
 }
