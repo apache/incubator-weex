@@ -306,7 +306,7 @@ public class WXSDKEngine {
         true,
         WXBasicComponentType.SLIDER
       );
-      registerComponent( WXSliderNeighbor.class,
+      registerComponent(
         new SimpleComponentHolder(
                 WXSliderNeighbor.class,
           new WXSliderNeighbor.Creator()
