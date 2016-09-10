@@ -4,13 +4,14 @@
  */
 // import { extend } from '../shared'
 import { extend } from '../shared/utils'
+import Listener from './listener'
 
 const DEFAULT_TAG_NAME = 'div'
 
 export const instanceMap = {}
 let nextNodeRef = 1
 
-export function Document (id, url, handler, Listener) {
+export function Document (id, url, handler) {
   id = id ? id.toString() : ''
   this.id = id
   this.URL = url
@@ -443,7 +444,7 @@ function removeIndex (target, list, changeSibling) {
 }
 
 Element.prototype.setAttr = function (key, value, silent) {
-  if (this.attr[key] === value) {
+  if (this.attr[key] === value && silent !== false) {
     return
   }
   this.attr[key] = value
@@ -454,7 +455,7 @@ Element.prototype.setAttr = function (key, value, silent) {
 }
 
 Element.prototype.setStyle = function (key, value, silent) {
-  if (this.style[key] === value) {
+  if (this.style[key] === value && silent !== false) {
     return
   }
   this.style[key] = value
@@ -464,8 +465,15 @@ Element.prototype.setStyle = function (key, value, silent) {
   }
 }
 
+Element.prototype.resetClassStyle = function () {
+  for (const key in this.classStyle) {
+    this.classStyle[key] = ''
+  }
+}
+
 Element.prototype.setClassStyle = function (classStyle) {
-  this.classStyle = classStyle
+  this.resetClassStyle()
+  extend(this.classStyle, classStyle)
   if (this.docId) {
     const listener = instanceMap[this.docId].listener
     listener.setStyles(this.ref, this.toStyle())

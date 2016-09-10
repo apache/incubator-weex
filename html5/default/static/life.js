@@ -1,6 +1,14 @@
 import config from '../config'
+import {
+  refresh,
+  destroy
+} from '../app/ctrl'
 import { instanceMap } from './map'
 
+/**
+ * Init config informations for Weex framework
+ * @param  {object} cfg
+ */
 export function init (cfg) {
   config.Document = cfg.Document
   config.Element = cfg.Element
@@ -10,34 +18,33 @@ export function init (cfg) {
 }
 
 /**
- * refresh a Weex instance
+ * Refresh a Weex instance with data.
  *
- * @param  {string} instanceId
+ * @param  {string} id
  * @param  {object} data
  */
-export function refreshInstance (instanceId, data) {
-  const instance = instanceMap[instanceId]
+export function refreshInstance (id, data) {
+  const instance = instanceMap[id]
   let result
   if (instance) {
-    result = instance.refreshData(data)
+    result = refresh(instance, data)
   }
   else {
-    result = new Error(`invalid instance id "${instanceId}"`)
+    result = new Error(`invalid instance id "${id}"`)
   }
   return result
 }
 
 /**
- * destroy a Weex instance
- * @param  {string} instanceId
+ * Destroy a Weex instance.
+ * @param  {string} id
  */
-export function destroyInstance (instanceId) {
-  const instance = instanceMap[instanceId]
+export function destroyInstance (id) {
+  const instance = instanceMap[id]
   if (!instance) {
-    return new Error(`invalid instance id "${instanceId}"`)
+    return new Error(`invalid instance id "${id}"`)
   }
-
-  instance.destroy()
-  delete instanceMap[instanceId]
+  destroy(instance)
+  delete instanceMap[id]
   return instanceMap
 }
