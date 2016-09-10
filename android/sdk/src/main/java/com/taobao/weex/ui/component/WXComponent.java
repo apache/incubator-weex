@@ -132,6 +132,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -794,7 +795,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost = initComponentHostView(mContext);
   }
 
-  protected T initComponentHostView(Context context){
+  protected T initComponentHostView(@NonNull Context context){
     /**
      * compatible old initView
      * TODO: change to abstract method in next V1.0 .

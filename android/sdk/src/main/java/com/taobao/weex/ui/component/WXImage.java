@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -249,7 +250,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
 
     @Override
-    protected ImageView initComponentHostView(Context context) {
+    protected ImageView initComponentHostView(@NonNull Context context) {
         WXImageView view = new WXImageView(context);
         view.setScaleType(ScaleType.FIT_XY);
         return view;

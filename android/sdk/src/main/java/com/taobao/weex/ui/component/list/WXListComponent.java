@@ -372,7 +372,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
     @Override
-    protected BounceRecyclerView initComponentHostView(Context context) {
+    protected BounceRecyclerView initComponentHostView(@NonNull Context context) {
         bounceRecyclerView = new BounceRecyclerView(context, getOrientation());
 
         String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);

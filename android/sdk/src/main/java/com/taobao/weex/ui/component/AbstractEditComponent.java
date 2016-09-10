@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -245,7 +246,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @Override
-  protected WXEditText initComponentHostView(Context context) {
+  protected WXEditText initComponentHostView(@NonNull Context context) {
     WXEditText inputView = new WXEditText(context);
     appleStyleAfterCreated(inputView);
     return inputView;

@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -432,7 +433,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   @Override
-  protected ViewGroup initComponentHostView(Context context) {
+  protected ViewGroup initComponentHostView(@NonNull Context context) {
     String scroll;
     if (getDomObject() == null || getDomObject().getAttrs().isEmpty()) {
       scroll = "vertical";

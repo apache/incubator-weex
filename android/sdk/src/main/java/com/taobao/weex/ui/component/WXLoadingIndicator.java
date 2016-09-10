@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.graphics.Color;
 
+import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
@@ -223,7 +224,7 @@ public class WXLoadingIndicator extends WXComponent<CircleProgressBar> {
 
 
     @Override
-    protected CircleProgressBar initComponentHostView(Context context) {
+    protected CircleProgressBar initComponentHostView(@NonNull Context context) {
         return new CircleProgressBar(context);
     }
 

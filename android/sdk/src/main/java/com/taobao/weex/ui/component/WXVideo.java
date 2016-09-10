@@ -208,6 +208,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -253,7 +254,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
   }
 
   @Override
-  protected FrameLayout initComponentHostView(Context context) {
+  protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout videoRoot = new FrameLayout(context);
     videoRoot.setBackgroundColor(WXResourceUtils.getColor("#ee000000"));
 

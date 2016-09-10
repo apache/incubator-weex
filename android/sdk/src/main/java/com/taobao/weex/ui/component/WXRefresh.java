@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
@@ -236,7 +237,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   }
 
   @Override
-  protected WXFrameLayout initComponentHostView(Context context) {
+  protected WXFrameLayout initComponentHostView(@NonNull Context context) {
     return new WXBaseRefreshLayout(context);
   }
 

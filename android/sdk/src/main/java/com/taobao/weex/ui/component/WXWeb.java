@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import android.view.View;
@@ -239,7 +240,7 @@ public class WXWeb extends WXComponent {
     }
 
     @Override
-    protected View initComponentHostView(Context context) {
+    protected View initComponentHostView(@NonNull Context context) {
         mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
             @Override
             public void onError(String type, Object message) {

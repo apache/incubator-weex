@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -238,7 +239,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
   }
 
   @Override
-  protected WXCircleIndicator initComponentHostView(Context context) {
+  protected WXCircleIndicator initComponentHostView(@NonNull Context context) {
     WXCircleIndicator view = new WXCircleIndicator(context);
     if (getParent() instanceof WXSlider) {
       return view;
