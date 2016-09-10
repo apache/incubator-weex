@@ -1,7 +1,6 @@
 /**
  * @fileOverview The api for invoking with "$" prefix
  */
-import { extend, typof } from '../util'
 
 /**
  * ==========================================================
@@ -117,10 +116,8 @@ export function $transition (id, options, callback) {
  * @property {number} env.deviceHeight
  */
 export function $getConfig (callback) {
-  const config = extend({
-    env: global.WXEnvironment || {}
-  }, this._app.options)
-  if (typof(callback) === 'function') {
+  const config = this._app.options
+  if (typeof callback === 'function') {
     console.warn('[JS Framework] the callback of Vm#$getConfig(callback) is deprecated, ' +
       'this api now can directly RETURN config info.')
     callback(config)

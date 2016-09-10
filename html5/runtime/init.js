@@ -39,8 +39,9 @@ function createInstance (id, code, config, data) {
       info.framework = 'Weex'
     }
     instanceMap[id] = info
-    config = config || {}
+    config = JSON.parse(JSON.stringify(config || {}))
     config.bundleVersion = info.version
+    config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
     return frameworks[info.framework].createInstance(id, code, config, data)
   }

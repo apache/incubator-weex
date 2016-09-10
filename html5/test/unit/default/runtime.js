@@ -142,7 +142,7 @@ describe('framework entry', () => {
       expect(spy.firstCall.args).eql([
         instanceId + '~',
         code,
-        { bundleVersion: '0.3.1' },
+        { bundleVersion: '0.3.1', env: {}},
         undefined
       ])
       delete framework.xxx

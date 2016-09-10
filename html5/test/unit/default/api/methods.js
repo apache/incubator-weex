@@ -108,16 +108,10 @@ describe('built-in methods', () => {
   })
 
   it('$getConfig', () => {
-    global.WXEnvironment = {
-      a: 'b'
-    }
     const config = vm.$getConfig()
     expect(config).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl',
-      env: {
-        a: 'b'
-      }
+      bundleUrl: 'path_to_bundleUrl'
     })
 
     const configSpy = sinon.spy()
@@ -126,10 +120,7 @@ describe('built-in methods', () => {
     expect(configSpy.args.length).eql(1)
     expect(configSpy.args[0][0]).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl',
-      env: {
-        a: 'b'
-      }
+      bundleUrl: 'path_to_bundleUrl'
     })
   })
 

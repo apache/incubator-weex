@@ -562,7 +562,7 @@ describe('test input and output', () => {
     delete allDocs[name]
   })
 
-  it('reset class style case', () => {
+  it.skip('reset class style case', () => {
     const name = 'reset-style'
     const inputCode = readInput(name)
     const outputCode = readOutput(name)
