@@ -275,7 +275,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     // init view pager
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
          LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    mViewPager = new WXCircleViewPager(mContext);
+    mViewPager = new WXCircleViewPager(context);
     mViewPager.setLayoutParams(pagerParams);
 
     // init adapter
@@ -493,11 +493,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
 
-      if (getDomObject().event == null || getDomObject().event.size() == 0) {
+      if (getDomObject().getEvents().size() == 0) {
         return;
       }
-      WXEvent event = getDomObject().event;
-      String ref = getDomObject().ref;
+      WXEvent event = getDomObject().getEvents();
+      String ref = getDomObject().getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
         params.put("index", realPosition);
 
@@ -514,7 +514,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
+    public void onPageScrollStateChanged(int arg0) {
       FrameLayout root = getHostView();
       if(null != root) {
         root.invalidate();
