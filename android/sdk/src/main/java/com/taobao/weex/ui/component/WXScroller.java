@@ -709,7 +709,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         }
 
         if (mContentHeight != contentH) {
-          WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), Constants.Event.LOADMORE);
+          getInstance().fireEvent(getDomObject().getRef(), Constants.Event.LOADMORE);
           mContentHeight = contentH;
         }
       }

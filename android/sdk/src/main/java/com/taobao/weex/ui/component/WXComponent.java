@@ -231,7 +231,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.put("y", location[1]);
       params.put("width", mDomObj.getCSSLayoutWidth());
       params.put("height", mDomObj.getCSSLayoutHeight());
-      WXSDKManager.getInstance().fireEvent(mInstanceId, mCurrentRef,
+      getInstance().fireEvent(mCurrentRef,
           Constants.Event.CLICK,
           params);
     }
@@ -669,7 +669,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          WXSDKManager.getInstance().fireEvent(mInstanceId, mCurrentRef,
+          getInstance().fireEvent(mCurrentRef,
               hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
@@ -1125,7 +1125,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if(getDomObject().containsEvent(Constants.Event.APPEAR) || getDomObject().containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
-      WXBridgeManager.getInstance().fireEvent(mInstanceId, getRef(), wxEventType, params,null);
+      getInstance().fireEvent(getRef(), wxEventType, params,null);
     }
   }
 

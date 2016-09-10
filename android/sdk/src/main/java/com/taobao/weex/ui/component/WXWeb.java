@@ -253,7 +253,7 @@ public class WXWeb extends WXComponent {
                 if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
-                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.RECEIVEDTITLE, params);
+                    getInstance().fireEvent(getRef(), Constants.Event.RECEIVEDTITLE, params);
                 }
             }
 
@@ -262,7 +262,7 @@ public class WXWeb extends WXComponent {
                 if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
-                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.PAGESTART, params);
+                    getInstance().fireEvent(getRef(), Constants.Event.PAGESTART, params);
                 }
             }
 
@@ -273,7 +273,7 @@ public class WXWeb extends WXComponent {
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
                     params.put("canGoForward", canGoForward);
-                    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.PAGEFINISH, params);
+                    getInstance().fireEvent(getRef(), Constants.Event.PAGEFINISH, params);
                 }
             }
         });
@@ -336,7 +336,7 @@ public class WXWeb extends WXComponent {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);
-            WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.ERROR, params);
+            getInstance().fireEvent(getRef(), Constants.Event.ERROR, params);
         }
     }
 

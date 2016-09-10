@@ -252,16 +252,22 @@ public class WXSDKManager {
 
   /**
    * FireEvent back to JS
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
    */
+  @Deprecated
   public void fireEvent(final String instanceId, String ref, String type, Map<String, Object> params){
     fireEvent(instanceId,ref,type,params,null);
   }
 
+  /**
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   **/
+  @Deprecated
   public void fireEvent(final String instanceId, String ref, String type, Map<String, Object> params,Map<String,Object> domChanges) {
     if (WXEnvironment.isApkDebugable() && Looper.getMainLooper().getThread().getId() != Thread.currentThread().getId()) {
       throw new WXRuntimeException("[WXSDKManager]  fireEvent error");
     }
-    mBridgeManager.fireEvent(instanceId, ref, type, params,domChanges);
+    mBridgeManager.fireEventOnNode(instanceId, ref, type, params,domChanges);
   }
 
   void createInstance(WXSDKInstance instance, String code, Map<String, Object> options, String jsonInitData) {

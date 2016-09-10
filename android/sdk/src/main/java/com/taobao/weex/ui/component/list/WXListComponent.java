@@ -976,7 +976,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(), getDomObject().getRef(), Constants.Event.LOADMORE);
+            getInstance().fireEvent(getDomObject().getRef(), Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }

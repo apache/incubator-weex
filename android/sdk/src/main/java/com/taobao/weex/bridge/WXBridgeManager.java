@@ -574,9 +574,23 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   /**
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   * @param instanceId
+   * @param ref
+   * @param type
+   * @param data
+   * @param domChanges
+   */
+  @Deprecated
+  public void fireEvent(final String instanceId, final String ref,
+                        final String type, final Map<String, Object> data,final Map<String, Object> domChanges) {
+    fireEventOnNode(instanceId,ref,type,data,domChanges);
+  }
+
+  /**
    * Notify the JavaScript about the event happened on Android
    */
-  public void fireEvent(final String instanceId, final String ref,
+  public void fireEventOnNode(final String instanceId, final String ref,
                         final String type, final Map<String, Object> data,final Map<String, Object> domChanges) {
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)
         || TextUtils.isEmpty(type) || mJSHandler == null) {

@@ -244,7 +244,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   @Override
   public void onRefresh() {
     if (getDomObject().getEvents().contains(Constants.Event.ONREFRESH)) {
-      WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.ONREFRESH);
+      getInstance().fireEvent(getRef(), Constants.Event.ONREFRESH);
     }
   }
 
@@ -255,7 +255,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
       data.put("dy", dy);
       data.put("headerHeight", headerHeight);
       data.put("maxHeight", maxHeight);
-      WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), Constants.Event.ONPULLING_DOWN, data);
+      getInstance().fireEvent(getRef(), Constants.Event.ONPULLING_DOWN, data);
     }
   }
 
