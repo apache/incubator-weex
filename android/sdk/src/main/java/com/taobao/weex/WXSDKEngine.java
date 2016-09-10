@@ -306,6 +306,14 @@ public class WXSDKEngine {
         true,
         WXBasicComponentType.SLIDER
       );
+      registerComponent(
+        new SimpleComponentHolder(
+                WXSliderNeighbor.class,
+          new WXSliderNeighbor.Creator()
+        ),
+        true,
+        WXBasicComponentType.SLIDER_NEIGHBOR
+      );
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
@@ -331,6 +339,7 @@ public class WXSDKEngine {
       registerModule("timer", WXTimerModule.class, true);
       registerModule("storage", WXStorageModule.class, true);
       registerModule("clipboard", WXClipboardModule.class, true);
+      registerModule("globalEvent",WXGlobalEventModule.class);
 
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
