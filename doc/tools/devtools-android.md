@@ -102,4 +102,4 @@ client.networkInterceptors().add(new OkHttpInterceptor());
   The network inspection only support OKHttpClient right now!!! If you want to use the network inspection to catch your bundle request, you must change your bundle server ip to the real server ip.
   
 #### Known Issues
- You can report issues and bugs [here](https://github.com/weexteam/weex_devtools_android/issues). We will replay as soon as possible.
+ You can report issues and bugs [here](https://github.com/weexteam/weex_devtools_android/issues). We will reply as soon as possible.
