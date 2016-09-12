@@ -127,6 +127,8 @@ public class WXLogUtils {
   public static final String WEEX_TAG = "weex";
   public static final String WEEX_PERF_TAG = "weex_perf";
 
+  public static boolean isShowLineNumber = false;
+
   private static final String CLAZZ_NAME_DEBUG_TOOL = "com.taobao.weex.WXDebugTool";
   private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
 
@@ -160,7 +162,7 @@ public class WXLogUtils {
     }
   }
 
-  private static void log(String msg,LogLevel level,String tag){
+  private static void log(String tag, String msg, LogLevel level){
     if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
       msg = getLineNumber() + msg;
       Log.println(level.getPriority(),tag, msg);
@@ -170,27 +172,27 @@ public class WXLogUtils {
   }
 
   public static void d(String msg) {
-    d(msg,WEEX_TAG);
+    d(WEEX_TAG,msg);
   }
 
   public static void i(String msg) {
-    i(msg,WEEX_TAG);
+    i(WEEX_TAG,msg);
   }
 
   public static void info(String msg) {
-    i(msg,WEEX_TAG);
+    i(WEEX_TAG,msg);
   }
 
   public static void v(String msg) {
-    v(msg,WEEX_TAG);
+    v(WEEX_TAG,msg);
   }
 
   public static void w(String msg) {
-    w(msg,WEEX_TAG);
+    w(WEEX_TAG,msg);
   }
 
   public static void e(String msg) {
-    e(msg,WEEX_TAG);
+    e(WEEX_TAG,msg);
   }
 
   public static void d(String tag, String msg) {
@@ -229,19 +231,19 @@ public class WXLogUtils {
   }
 
   public static void i(String tag, String msg) {
-    log(msg,LogLevel.INFO,tag);
+    log(tag, msg,LogLevel.INFO);
   }
 
   public static void v(String tag, String msg) {
-    log(msg,LogLevel.VERBOSE,tag);
+    log(tag, msg,LogLevel.VERBOSE);
   }
 
   public static void w(String tag, String msg) {
-    log(msg,LogLevel.WARN,tag);
+    log(tag, msg,LogLevel.WARN);
   }
 
   public static void e(String tag, String msg) {
-    log(msg,LogLevel.ERROR,tag);
+    log(tag, msg,LogLevel.ERROR);
   }
 
   /**
@@ -363,7 +365,7 @@ public class WXLogUtils {
    * …… more stack trace element
    * */
   private static String getLineNumber() {
-    if (!WXEnvironment.isShowLineNumber()) {
+    if (!isShowLineNumber) {
       return "";
     }
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
