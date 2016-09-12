@@ -110,6 +110,7 @@
  */
 package com.taobao.weex.utils;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -130,7 +131,7 @@ public class WXLogUtils {
   private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
 
   private static StringBuilder builder = new StringBuilder(50);
-  private static HashMap<String, Class> clazzMaps = new HashMap<String, Class>(2);
+  private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
 
   static {
     clazzMaps.put(CLAZZ_NAME_DEBUG_TOOL, loadClass(CLAZZ_NAME_DEBUG_TOOL));
@@ -159,49 +160,37 @@ public class WXLogUtils {
     }
   }
 
-  public static void d(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
+  private static void log(String msg,LogLevel level,String tag){
+    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
       msg = getLineNumber() + msg;
-      Log.d(WEEX_TAG, msg);
-      writeConsoleLog("debug", msg);
-      sendLog(LogLevel.DEBUG, msg);
+      Log.println(level.getPriority(),tag, msg);
+      writeConsoleLog(level.getName(), msg);
+      sendLog(level, msg);
     }
+  }
+
+  public static void d(String msg) {
+    d(msg,WEEX_TAG);
+  }
+
+  public static void i(String msg) {
+    i(msg,WEEX_TAG);
   }
 
   public static void info(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.INFO) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.i(WEEX_TAG, msg);
-      writeConsoleLog("info", msg);
-      sendLog(LogLevel.INFO,msg);
-    }
+    i(msg,WEEX_TAG);
   }
 
   public static void v(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.VERBOSE) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.v(WEEX_TAG, msg);
-      writeConsoleLog("verbose", msg);
-      sendLog(LogLevel.VERBOSE, msg);
-    }
+    v(msg,WEEX_TAG);
   }
 
   public static void w(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.WARN) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.w(WEEX_TAG, msg);
-      writeConsoleLog("warning", msg);
-      sendLog(LogLevel.WARN, msg);
-    }
+    w(msg,WEEX_TAG);
   }
 
   public static void e(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.ERROR) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.e(WEEX_TAG, msg);
-      writeConsoleLog("error", msg);
-      sendLog(LogLevel.ERROR, msg);
-    }
+    e(msg,WEEX_TAG);
   }
 
   public static void d(String tag, String msg) {
@@ -239,92 +228,75 @@ public class WXLogUtils {
   }
 
   public static void i(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.INFO) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.i(tag, msg);
-      writeConsoleLog("info", tag + ":" + msg);
-      sendLog(LogLevel.INFO, tag+":"+msg);
-    }
+    log(msg,LogLevel.INFO,tag);
   }
 
   public static void v(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.VERBOSE) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.v(tag, msg);
-      writeConsoleLog("verbose", tag + ":" + msg);
-      sendLog(LogLevel.VERBOSE, tag+":"+msg);
-    }
+    log(msg,LogLevel.VERBOSE,tag);
   }
 
   public static void w(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.WARN) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.w(tag, msg);
-      writeConsoleLog("warning", tag + ":" + msg);
-      sendLog(LogLevel.WARN, tag+":"+msg);
-    }
+    log(msg,LogLevel.WARN,tag);
   }
 
   public static void e(String tag, String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.ERROR) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.e(tag, msg);
-      writeConsoleLog("error", tag + ":" + msg);
-      sendLog(LogLevel.ERROR, tag+":"+msg);
-    }
+    log(msg,LogLevel.ERROR,tag);
   }
 
+  /**
+   * 'p' for 'Performance', use {@link #WEEX_PERF_TAG}
+   * @param msg
+   */
   public static void p(String msg) {
-    if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
-      msg = getLineNumber() + msg;
-      Log.d(WEEX_PERF_TAG, msg);
-      writeConsoleLog("debug", msg);
-    }
+    d(WEEX_PERF_TAG,msg);
   }
 
   public static void d(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      d(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      d(prefix + getStackTrace(e));
     }
   }
 
   public static void i(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      info(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      info(prefix + getStackTrace(e));
     }
   }
 
   public static void v(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      v(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      v(prefix + getStackTrace(e));
     }
   }
 
   public static void w(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      w(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      w(prefix + getStackTrace(e));
     }
   }
 
   public static void e(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      e(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      e(prefix + getStackTrace(e));
     }
   }
 
+  /**
+   * 'p' for 'Performance', use {@link #WEEX_PERF_TAG}
+   */
   public static void p(String prefix, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      p(prefix + WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      p(prefix + getStackTrace(e));
     }
   }
 
   public static void eTag(String tag, Throwable e) {
-    if (WXEnvironment.isApkDebugable() && e != null) {
-      e(tag, WXLogUtils.getStackTrace(e));
+    if (WXEnvironment.isApkDebugable()) {
+      e(tag, getStackTrace(e));
     }
   }
 
-  public static String getStackTrace(Throwable e) {
+  public static String getStackTrace(@Nullable Throwable e) {
     if (e == null) {
       return "";
     }
