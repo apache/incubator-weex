@@ -83,6 +83,21 @@ _Pragma("clang diagnostic pop") \
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
     }];
+    [_jsBridge registerCallAddElement:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:[instanceId toString]];
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager addComponent:[element toDictionary] toSupercomponent:[parentRef toString] atIndex:[[index toNumber] integerValue]appendingInTree:NO];
+        });
+        
+        return 0;
+    }];
     
     return _jsBridge;
 }

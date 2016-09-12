@@ -53,25 +53,6 @@
             } afterDelay:[timeout toDouble] / 1000];
         };
         
-        _jsContext[@"callAddElement"] = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
-            
-            // Temporary here , in order to improve performance, will be refactored next version.
-            WXLogDebug(@"callAddElement...%@, %@, %@, %@", instanceId, ref, element, index);
-            WXSDKInstance *instance = [WXSDKManager instanceForID:[instanceId toString]];
-            NSDictionary *componentData = [element toDictionary];
-            NSString *parentRef = [ref toString];
-            NSInteger insertIndex = [[index toNumber] integerValue];
-            
-            WXPerformBlockOnComponentThread(^{
-                WXComponentManager *manager = instance.componentManager;
-                if (!manager.isValid) {
-                    return;
-                }
-                [manager startComponentTasks];
-                [manager addComponent:componentData toSupercomponent:parentRef atIndex:insertIndex appendingInTree:NO];
-            });
-        };
-    
         _jsContext[@"nativeLog"] = ^() {
             static NSDictionary *levelMap;
             static dispatch_once_t onceToken;
@@ -149,6 +130,23 @@
     };
     
     _jsContext[@"callNative"] = callNativeBlock;
+}
+
+- (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
+{
+    id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXLogDebug(@"callAddElement...%@, %@, %@, %@", instanceId, ref, element, index);
+        NSString *instanceIdString = [instanceId toString];
+        NSDictionary *componentData = [element toDictionary];
+        NSString *parentRef = [ref toString];
+        NSInteger insertIndex = [[index toNumber] integerValue];
+        
+        return callAddElement(instanceIdString, parentRef, componentData, insertIndex);
+    };
+
+    _jsContext[@"callAddElement"] = callAddElementBlock;
 }
 
 - (JSValue*)exception
