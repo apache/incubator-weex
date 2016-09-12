@@ -324,6 +324,6 @@ CGPoint WXPixelPointResize(CGPoint value);
  *  @abstract Returns Creates a Universally Unique Identifier (UUID) string.
  *
  */
-+ (NSString *)uuidString;
++ (NSString *_Nullable)uuidString;
 
 @end
