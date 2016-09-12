@@ -279,7 +279,7 @@ static css_node_t * cssNodeGetChild(void *context, int i)
     }
     
     
-    WXAssert(YES, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
+    WXAssert(NO, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
     return NULL;
 }
 
