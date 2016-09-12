@@ -262,8 +262,11 @@ _Pragma("clang diagnostic pop") \
         //the JSFramework has been load successfully.
         self.frameworkLoadFinished = YES;
         
-        NSString *frameworkVersion = [[self.jsBridge callJSMethod:@"getJSFMVersion" args:nil] toString];
-        [WXAppConfiguration setJSFrameworkVersion:frameworkVersion];
+        JSValue *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
+        if (frameworkVersion && [frameworkVersion isString]) {
+            [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
+        }
+        
         //execute methods which has been stored in methodQueue temporarily.
         for (NSDictionary *method in _methodQueue) {
             [self callJSMethod:method[@"method"] args:method[@"args"]];

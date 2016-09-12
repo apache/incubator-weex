@@ -39,7 +39,9 @@
     
     if(self){
         _jsContext = [[JSContext alloc] init];
-        _jsContext.name = @"Weex Context";
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+            _jsContext.name = @"Weex Context";
+        }
         
         __weak typeof(self) weakSelf = self;
         
@@ -109,7 +111,11 @@
 - (void)executeJSFramework:(NSString *)frameworkScript
 {
     WXAssertParam(frameworkScript);
-    [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
+    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
+    }else{
+        [_jsContext evaluateScript:frameworkScript];
+    }
 }
 
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args

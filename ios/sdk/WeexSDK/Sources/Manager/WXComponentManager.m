@@ -438,8 +438,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 {
     WXAssertComponentThread();
     
-    for (NSString *key in _indexDict) {
-        WXComponent *component = [_indexDict objectForKey:key];;
+    NSEnumerator *enumerator = [_indexDict objectEnumerator];
+    WXComponent *component;
+    while ((component = [enumerator nextObject])) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [component _unloadView];
         });
@@ -528,14 +529,16 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_layout
 {
     BOOL needsLayout = NO;
-    for (NSString *ref in _indexDict) {
-        WXComponent *component = [_indexDict objectForKey:ref];
-        
+
+    NSEnumerator *enumerator = [_indexDict objectEnumerator];
+    WXComponent *component;
+    while ((component = [enumerator nextObject])) {
         if ([component needsLayout]) {
             needsLayout = YES;
+            break;
         }
     }
-    
+
     if (!needsLayout) {
         return;
     }

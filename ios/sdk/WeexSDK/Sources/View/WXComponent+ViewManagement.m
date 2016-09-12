@@ -125,9 +125,11 @@
         if (positionType == WXPositionTypeFixed) {
             [self.weexInstance.componentManager addFixedComponent:self];
             _isNeedJoinLayoutSystem = NO;
+            [self _recomputeCSSNodeChildren];
         } else if (_positionType == WXPositionTypeFixed) {
             [self.weexInstance.componentManager removeFixedComponent:self];
             _isNeedJoinLayoutSystem = YES;
+            [self _recomputeCSSNodeChildren];
         }
         
         _positionType = positionType;
