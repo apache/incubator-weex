@@ -660,8 +660,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!helper.isWatch()) {
         continue;
       }
-      Rect scrollerRect=new Rect();
-      boolean visible = helper.isViewVisible(scrollerRect);
+      boolean visible = helper.isViewVisible();
 
       int result = helper.setAppearStatus(visible);
       if (result != AppearanceHelper.RESULT_NO_CHANGE) {
