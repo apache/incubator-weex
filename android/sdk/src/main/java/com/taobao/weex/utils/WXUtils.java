@@ -224,7 +224,7 @@ public class WXUtils {
   }
 
   public static boolean isUndefined(float value) {
-    return Float.compare(value, Float.NaN) == 0;
+    return Float.isNaN(value);
   }
 
   public static float getFloat(Object value) {

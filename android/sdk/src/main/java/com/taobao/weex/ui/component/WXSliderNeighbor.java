@@ -202,185 +202,294 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.component;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.telephony.TelephonyManager;
+import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.utils.LogLevel;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.view.WXCirclePageAdapter;
+import com.taobao.weex.ui.view.WXCircleViewPager;
 import com.taobao.weex.utils.WXUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-public class WXEnvironment {
+/**
+ * Known Issus: In auto play mode, neighbor view not scaled or aplhaed rarely.
+ *
+ * Created by xingjiu on 16/8/18.
+ */
+public class WXSliderNeighbor extends WXSlider {
+    public static final String NEIGHBOR_SPACE = "neighborSpace"; // the neighbor page space width
+    public static final String NEIGHBOR_SCALE = "neighborScale"; // the init scale of neighor page
+    public static final String NEIGHBOR_ALPHA = "neighborAlpha"; // the init alpha of neighor page
 
-  public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
-  public static final String SYS_MODEL = android.os.Build.MODEL;
-  public static final String ENVIRONMENT = "environment";
-  /*********************
-   * Global config
-   ***************************/
+    private static final int DEFAULT_NEIGHBOR_SPACE = 150;
+    private static final float DEFAULT_NEIGHBOR_SCALE = 0.8F;
+    private static final float DEFAULT_NEIGHBOR_ALPHA = 0.6F;
 
-  public static String JS_LIB_SDK_VERSION = BuildConfig.buildJavascriptFrameworkVersion;
+    private float mNerghborScale = DEFAULT_NEIGHBOR_SCALE;
+    private float mNerghborAlpha = DEFAULT_NEIGHBOR_ALPHA;
 
-  public static String WXSDK_VERSION = BuildConfig.buildVersion;
-  public static Application sApplication;
-  public static final String DEV_Id = getDevId();
-  public static int sDefaultWidth = 750;
-  public volatile static boolean JsFrameworkInit = false;
-
-  public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
-
-  public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
-  /**
-   * Debug model
-   */
-  public static boolean sDebugMode = false;
-  public static String sDebugWsUrl = "";
-  public static boolean sRemoteDebugMode = false;
-  public static String sRemoteDebugProxyUrl = "";
-  public static long sJSLibInitTime = 0;
-
-  public static long sSDKInitStart = 0;// init start timestamp
-  public static long sSDKInitInvokeTime = 0;//time cost to invoke init method
-  public static long sSDKInitExecuteTime = 0;//time cost to execute init job
-  /** from init to sdk-ready **/
-  public static long sSDKInitTime =0;
-
-  public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
-  private static boolean isPerf = true;
-
-  public static boolean sShow3DLayer=true;
-
-  private static Map<String, String> options = new HashMap<>();
-
-  /**
-   * dynamic
-   */
-  public static boolean sDynamicMode = false;
-  public static String sDynamicUrl = "";
-
-  /**
-   * Fetch system information.
-   * @return map contains system information.
-   */
-  public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
-    return configs;
-  }
-
-  /**
-   * Get the version of the current app.
-   */
-  private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
-    try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
-    }
-    return versionName;
-  }
-
-  public static void addCustomOptions(String key, String value) {
-    options.put(key, value);
-  }
-
-  public static boolean isSupport() {
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
-    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86()&&excludeX86;
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport()&&!isX86AndExcluded;
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
-    }
-    return isCPUSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
-  }
-
-  public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
+    public WXSliderNeighbor(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
+        super(instance, dom, parent, instanceId, isLazy);
     }
 
-    if (isPerf) {
-      return false;
+    public WXSliderNeighbor(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
+        super(instance, node, parent, lazy);
     }
 
-    if (!isApkDebug) {
-      return false;
+    public static class Creator implements ComponentCreator {
+        public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXSliderNeighbor(instance, node, parent, lazy);
+        }
     }
-    try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
+
+    @Override
+    public void bindData(WXComponent component) {
+        super.bindData(component);
+        mViewPager.setCurrentItem(mAdapter.getRealCount()*50, true);  // WXCirclePageAdapter#getCount default=110, so we are in the middle.
     }
-    return false;
-  }
 
-  public static boolean isPerf() {
-    return isPerf;
-  }
+    @Override
+    protected FrameLayout initComponentHostView(Context context) {
+        FrameLayout view = new FrameLayout(context);
 
-  private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-  }
+        // init view pager
+        FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        pagerParams.gravity = Gravity.CENTER;
+        mViewPager = new WXCircleViewPager(mContext);
+        mViewPager.setLayoutParams(pagerParams);
 
-  public static Application getApplication() {
-    return sApplication;
-  }
+        // init adapter
+        mAdapter = new WXCirclePageAdapter();
+        mViewPager.setAdapter(mAdapter);
 
-  public void initMetrics() {
-    if (sApplication == null) {
-      return;
+        // add to parent
+        view.addView(mViewPager);
+        mViewPager.addOnPageChangeListener(mPageChangeListener);
+
+        // set animation
+        mViewPager.setPageTransformer(true, new ZoomTransformer());
+        mViewPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setClipChildren(false);
+        view.setOnTouchListener(new OnTouchCallback());
+
+        registerActivityStateListener();
+
+        return view;
     }
-  }
 
-  public static String getDiskCacheDir(Context context) {
-    if (context == null) {
-      return null;
+    @Override
+    protected void addSubView(View view, int index) {
+        updateScaleAndAplha(view, mNerghborAlpha, mNerghborScale); // we need to set neighbor view status when added.
+        super.addSubView(view, index);
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
+
+    private void updateScaleAndAplha(View view, float alpha, float scale) {
+        if(null == view) {
+            return;
+        }
+        if(alpha >= 0) {
+            view.setAlpha(alpha);
+        }
+        if(scale >= 0) {
+            view.setScaleX(scale);
+            view.setScaleY(scale);
+        }
     }
-    return cachePath;
-  }
+
+    // WXCirclePageAdapter not expoesd views, So do it in reflect way. Thanks god, it is not proguarded.
+    private void updateAdpaterScaleAndAplha(float alpha, float scale) {
+        try {
+            Field f = mAdapter.getClass().getDeclaredField("views");
+            f.setAccessible(true);
+            List<View> views = (List<View>) f.get(mAdapter);
+            if(null != views && views.size() > 0) {
+                for(View v : views) {
+                    if(mAdapter.getItemPosition(v) != mViewPager.getCurrentItem()) {
+                        updateScaleAndAplha(v, alpha, scale);
+                    }
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            // ignore
+        } catch (IllegalAccessException e) {
+            // ignore
+        }
+    }
+
+    @WXComponentProp(name = NEIGHBOR_SPACE)
+    public void setNeighborSpace(String input) {
+        int neighborSpace = DEFAULT_NEIGHBOR_SPACE;
+        if (!TextUtils.isEmpty(input)) {
+            try {
+                neighborSpace = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        // margin is the space for neighbor views.
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mViewPager.getLayoutParams();
+        lp.leftMargin = neighborSpace;
+        lp.rightMargin = neighborSpace;
+        mViewPager.setLayoutParams(lp);
+    }
+
+    @WXComponentProp(name = NEIGHBOR_SCALE)
+    public void setNeighborScale(String input) {
+        float neighborScale = DEFAULT_NEIGHBOR_SCALE;
+        if (!TextUtils.isEmpty(input)) {
+            try {
+                neighborScale = Float.parseFloat(input);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        // addSubView is called before setProperty, so we need to modify the neighbor view in mAdapter.
+        if(this.mNerghborScale != neighborScale) {
+            this.mNerghborScale = neighborScale;
+            updateAdpaterScaleAndAplha(-1, neighborScale);
+        }
+    }
+
+    @WXComponentProp(name = NEIGHBOR_ALPHA)
+    public void setNeighborAlpha(String input) {
+        float neighborAlpha = DEFAULT_NEIGHBOR_ALPHA;
+        if (!TextUtils.isEmpty(input)) {
+            try {
+                neighborAlpha = Float.parseFloat(input);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        // The same work as setNeighborScale()
+        if(this.mNerghborAlpha != neighborAlpha) {
+            this.mNerghborAlpha = neighborAlpha;
+            updateAdpaterScaleAndAplha(neighborAlpha, -1);
+        }
+    }
+
+    @Override
+    protected boolean setProperty(String key, Object param) {
+        String input = "";
+        switch (key) {
+            case NEIGHBOR_SPACE:
+                input = WXUtils.getString(param, null);
+                if (input != null) {
+                    setNeighborSpace(input);
+                }
+                return true;
+            case NEIGHBOR_SCALE:
+                input = WXUtils.getString(param, null);
+                if (input != null) {
+                    setNeighborScale(input);
+                }
+                return true;
+            case NEIGHBOR_ALPHA:
+                input = WXUtils.getString(param, null);
+                if (input != null) {
+                    setNeighborAlpha(input);
+                }
+                return true;
+        }
+        return super.setProperty(key, param);
+    }
+
+    // Here is the trick.
+    class ZoomTransformer implements ViewPager.PageTransformer {
+        @Override
+        public void transformPage(View page, float position) {
+            //Log.e("333", "transformPage " + mAdapter.getItemPosition(page) + " to " + position + " now is " + mViewPager.getCurrentItem());
+            float alpha, scale;
+            if(position <= (-mAdapter.getRealCount() + 1)) {
+                position = position + mAdapter.getRealCount();
+            }
+            if(position >= mAdapter.getRealCount() - 1) {
+                position = position - mAdapter.getRealCount();
+            }
+
+            if (position >= -1 && position <= 1) {
+                float factor = Math.abs(Math.abs(position) - 1);//0--1
+                scale = (1-mNerghborScale) * factor + mNerghborScale;//0.8---1
+                alpha = (1-mNerghborAlpha) * factor + mNerghborAlpha;//0.6----1
+
+                page.setAlpha(alpha);
+                page.setScaleX(scale);
+                page.setScaleY(scale);
+                //Log.e("333", "transformPage inner set " + mAdapter.getItemPosition(page) + " to alpha " + alpha + " scale " + scale);
+            }
+        }
+    }
+
+    class OnTouchCallback implements View.OnTouchListener {
+        private float downX = -1;
+        private boolean hasMove;
+        private float mScreenWidth;
+
+        public OnTouchCallback() {
+            mScreenWidth = getParent().getDomObject().getLayoutWidth();
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            try {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        downX = event.getX();
+                        hasMove = false;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (downX < 0) {
+                            downX = event.getX();
+                        }
+                        if (Math.abs(event.getX() - downX) > 20) {
+                            hasMove = true;
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (!hasMove) {
+                            hasMove = false;
+                            if (event.getX() < mScreenWidth * 0.25) {
+                                //Log.e("333", "onTouch left  event is " + event.getAction() + " x is " + event.getX() + " next pos is " +  (mViewPager.getCurrentItem() != 0 ? (mViewPager.getCurrentItem() - 1) : mAdapter.getRealCount() - 1)  );
+
+                                if(mViewPager.getCurrentItem() == 0) {
+                                    mViewPager.setCurrentItem(mAdapter.getRealCount() - 1, false);
+                                }else {
+                                    mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, false);
+                                }
+                                return false;
+                            } else if (event.getX() > mScreenWidth * 0.75) {
+                                //Log.e("333", "onTouch right  event is " + event.getAction() + " x is " + event.getX() + " next pos is " + (mViewPager.getCurrentItem() + 1));
+
+                                if(mViewPager.getCurrentItem() == mAdapter.getRealCount()) {
+                                    mViewPager.setCurrentItem(0, false);
+                                }else {
+                                    mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, false);
+                                }
+                                return false;
+                            }
+                        }
+                        hasMove = false;
+                        break;
+                }
+                return mViewPager.dispatchTouchEvent(event);
+            } catch (Exception e) {
+                // do nothing
+                return false;
+            }
+        }
+    }
 
 }
