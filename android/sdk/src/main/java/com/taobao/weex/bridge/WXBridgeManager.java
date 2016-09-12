@@ -456,9 +456,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.e("[WXBridgeManager] callNative: call Native tasks is null");
       }
-      WXErrorCode errorCode=WXErrorCode.WX_ERR_INVOKE_NATIVE;
-      errorCode.appendErrMsg("[WXBridgeManager] callNative: call Native tasks is null");
-      commitJSBridgeAlarmMonitor(instanceId, errorCode);
+      WXErrorCode.WX_ERR_INVOKE_NATIVE.appendErrMsg("[WXBridgeManager] callNative: call Native tasks is null");
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE);
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
@@ -500,9 +499,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
       } catch (Exception e) {
         WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
-        WXErrorCode errorCode=WXErrorCode.WX_ERR_INVOKE_NATIVE;
-        errorCode.appendErrMsg("[WXBridgeManager] callNative exception");
-        commitJSBridgeAlarmMonitor(instanceId, errorCode);
+        WXErrorCode.WX_ERR_INVOKE_NATIVE.appendErrMsg("[WXBridgeManager] callNative exception "+e.getCause());
+        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE);
       }
     }
 
@@ -704,11 +702,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       WXJSObject[] args = {instanceIdObj, dataObj};
       invokeExecJS(instanceId, null, METHOD_REFRESH_INSTANCE, args);
       WXLogUtils.renderPerformanceLog("invokeRefreshInstance", System.currentTimeMillis() - start);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_SUCCESS);
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeRefreshInstance " + e.getCause();
       WXErrorCode.WX_ERR_INVOKE_NATIVE.appendErrMsg(err);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
       WXLogUtils.e(err);
     }
   }
@@ -718,6 +715,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instance == null) {
       return;
     }
+    errCode.appendErrMsg(" url:"+instance.getBundleUrl());
     instance.commitUTStab(IWXUserTrackAdapter.JS_BRIDGE, errCode);
   }
 
@@ -735,6 +733,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           performance = new WXPerformance();
           performance.errCode = errorCode.getErrorCode();
           performance.errMsg = errorCode.getErrorMsg();
+          WXLogUtils.e(performance.toString());
         }
         userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
       }
@@ -815,7 +814,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
             dataObj};
         invokeExecJS(instanceId, null, METHOD_CREATE_INSTANCE, args);
-        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_SUCCESS);
       } catch (Throwable e) {
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
         if (instance != null) {
@@ -871,7 +869,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                                                 instanceId);
       WXJSObject[] args = {instanceIdObj};
       invokeExecJS(instanceId, null, METHOD_DESTROY_INSTANCE, args);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_SUCCESS);
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeDestroyInstance " + e.getCause();
       WXErrorCode.WX_ERR_INVOKE_NATIVE.appendErrMsg(err);
@@ -968,8 +965,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private void initFramework(String framework){
     if (!isJSFrameworkInit()) {
-      WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_FRAMEWORK;
-
       if (TextUtils.isEmpty(framework)) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("weex JS framework from assets");
@@ -978,8 +973,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
       if (TextUtils.isEmpty(framework)) {
         mInit = false;
-        errorCode.appendErrMsg("JS Framework is empty!");
-        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
+        WXErrorCode.WX_ERR_JS_FRAMEWORK.appendErrMsg("JS Framework is empty!");
+        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
         return;
       }
       try {
@@ -996,13 +991,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK,WXErrorCode.WX_SUCCESS);
         }else{
           WXLogUtils.e("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
-          commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
+          WXErrorCode.WX_ERR_JS_FRAMEWORK.appendErrMsg("[WXBridgeManager] invokeInitFramework  ExecuteJavaScript fail");
+          commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-        errorCode.appendErrMsg("[WXBridgeManager] invokeInitFramework exception!");
-        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, errorCode);
+        WXErrorCode.WX_ERR_JS_FRAMEWORK.appendErrMsg("[WXBridgeManager] invokeInitFramework exception!");
+        commitAlert(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK);
       }
     }
   }
@@ -1040,7 +1035,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
     } catch (Throwable e) {
       WXLogUtils.e("WXBridgeManager", e);
-      commitAlert(IWXUserTrackAdapter.JS_BRIDGE, WXErrorCode.WX_ERR_JS_EXECUTE);
+      WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(e.toString());
+      commitJSBridgeAlarmMonitor(message.obj.toString(), WXErrorCode.WX_ERR_JS_EXECUTE);
     }
 
     // If task is not empty, loop until it is empty
@@ -1179,7 +1175,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                    + ", exception function:" + function + ", exception:"
                    + exception);
     }
-    WXErrorCode errorCode=WXErrorCode.WX_ERR_JS_EXECUTE;
     StringBuilder errorMsg=new StringBuilder();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
@@ -1191,8 +1186,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
     errorMsg.append(" exception function:"+function);
     errorMsg.append(" exception:"+exception);
-    errorCode.appendErrMsg(errorMsg.toString());
-    commitJSBridgeAlarmMonitor(instanceId,errorCode);
+    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(errorMsg.toString());
+    commitJSBridgeAlarmMonitor(instanceId,WXErrorCode.WX_ERR_JS_EXECUTE);
   }
 
   public static class TimerInfo {

@@ -213,6 +213,8 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 
+import dalvik.system.PathClassLoader;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -224,8 +226,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-
-import dalvik.system.PathClassLoader;
 
 
 /**
