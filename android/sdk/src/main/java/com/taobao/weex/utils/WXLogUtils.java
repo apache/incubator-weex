@@ -197,6 +197,7 @@ public class WXLogUtils {
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       msg = getLineNumber() + msg;
       Log.d(tag, msg);
+      /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
       writeConsoleLog("debug", tag + ":" + msg);
       if(msg.contains(" | __")){
         String[] msgs=msg.split(" | __");
