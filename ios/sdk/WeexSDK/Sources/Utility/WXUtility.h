@@ -319,4 +319,11 @@ CGPoint WXPixelPointResize(CGPoint value);
  *
  */
 + (NSString *_Nullable)md5:(NSString *_Nullable)string;
+
+/**
+ *  @abstract Returns Creates a Universally Unique Identifier (UUID) string.
+ *
+ */
++ (NSString *)uuidString;
+
 @end

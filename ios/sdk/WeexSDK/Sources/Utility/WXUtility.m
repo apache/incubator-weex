@@ -579,4 +579,15 @@ CGFloat WXScreenResizeRadio(void)
             ];
 }
 
++ (NSString *)uuidString
+{
+    CFUUIDRef uuidRef = CFUUIDCreate(NULL);
+    CFStringRef uuidStringRef= CFUUIDCreateString(NULL, uuidRef);
+    NSString *uuid = [NSString stringWithString:(__bridge NSString *)uuidStringRef];
+    CFRelease(uuidRef);
+    CFRelease(uuidStringRef);
+    
+    return [uuid lowercaseString];
+}
+
 @end
