@@ -21,10 +21,6 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXPolyfillSet.h"
 
-#import "WXComponentManager.h"
-#import "WXSDKManager.h"
-#import "WXSDKInstance_private.h"
-
 @interface WXJSCoreBridge ()
 
 @property (nonatomic, strong)  JSContext *jsContext;
