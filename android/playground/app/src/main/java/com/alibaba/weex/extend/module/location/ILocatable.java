@@ -3,10 +3,14 @@ package com.alibaba.weex.extend.module.location;
 import com.taobao.weex.WXSDKInstance;
 
 /**
- * Created by lixinke on 16/9/10.
  */
 public interface ILocatable {
 
+  int REQUEST_CUR_PERMISSION_CODE = 0x12;
+  int REQUEST_WATCH_PERMISSION_CODE = 0x13;
+
+
+  String REQUEST_PERMISSION_CODE = "REQUEST_PERMISSION_CODE";
   String ERROR_CODE = "errorCode";
   String ERROR_MSG = "errorMsg";
   String COORDS = "coords";
@@ -15,7 +19,7 @@ public interface ILocatable {
 
   interface ErrorCode {
 
-    int SUCCESS=90000;
+    int SUCCESS = 90000;
     int NO_PERMISSION_ERROR = 90001;
     int PARAMS_ERROR = 90002;
     int LOCATION_ERROR = 9003;
@@ -28,23 +32,9 @@ public interface ILocatable {
     String PARAMS_ERROR = "PARAMS_ERROR";
     String LOCATION_ERROR = "LOCATION_FAIL";
     String LOCATION_TIME_OUT = "LOCATION_TIME_OUT";
-    String SUCCESS="SUCCESS";
+    String SUCCESS = "SUCCESS";
 
   }
-
-  //  interface Coords {
-  //
-  //    String LONGITUDE = "longitude";
-  //    String LATITUDE = "latitude";
-  //    String ALTITUDE = "altitude";
-  //    String ACCURACY = "accuracy";
-  //    String HEADING = "heading";
-  //    String SPEED = "speed";
-  //  }
-  //
-  //  interface Address{
-  //
-  //  }
 
   /**
    * 获取当前位置信息，只回调一次。
@@ -60,7 +50,7 @@ public interface ILocatable {
    *
    * @param successCallback 定位成功回调function id.
    * @param errorCallback   错误回调(例如:没有权限等).
-   * @param params          SON格式的参数(例如:准确度等).
+   * @param params          JSON格式的参数(例如:准确度等).
    */
   void watchPosition(String successCallback, String errorCallback, String params);
 
@@ -72,5 +62,7 @@ public interface ILocatable {
   void clearWatch(String registerID);
 
   void setWXSDKInstance(WXSDKInstance instance);
+
+  void destroy();
 
 }

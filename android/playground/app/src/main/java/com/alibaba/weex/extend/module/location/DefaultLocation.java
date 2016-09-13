@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,7 +18,6 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Created by lixinke on 16/9/10.
  */
-public class DefaultLocation implements ILocatable, Destroyable {
+public class DefaultLocation implements ILocatable {
 
   private static final String TAG = "WindvaneLocation";
   private Map<String, LocationListener> mRegisterSucCallbacks = new HashMap<>();
@@ -51,7 +51,7 @@ public class DefaultLocation implements ILocatable, Destroyable {
   }
 
   @Override
-  public void getCurrentPosition(String successCallback, String errorCallback, String params) {
+  public void getCurrentPosition(final String successCallback, final String errorCallback, final String params) {
     WXLogUtils.d(TAG, "into--[getCurrentPosition] successCallback:" + successCallback + " \nerrorCallback:" + errorCallback + " \nparams:" + params);
     if (!TextUtils.isEmpty(params)) {
       try {
@@ -78,24 +78,23 @@ public class DefaultLocation implements ILocatable, Destroyable {
     if (enableHighAcuracy) {
       criteria.setAccuracy(Criteria.ACCURACY_COARSE);
     }
-    String provider = locationManager.getBestProvider(criteria, false);
-//    if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    //String provider = locationManager.getBestProvider(criteria, false);
+    if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
       WeexLocationListener weexLocationListener = new WeexLocationListener(mWXSDKInstance, registerID, sucCallback, errorCallback, enableAddress);
+      locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, weexLocationListener);
       locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, weexLocationListener);
-    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, weexLocationListener);
-
-    return weexLocationListener;
-//    } else {
-//      Map<String, Object> options = new HashMap<>();
-//      options.put(ERROR_CODE, ErrorCode.NO_PERMISSION_ERROR);
-//      options.put(ERROR_MSG, ErrorMsg.NO_PERMISSION_ERROR);
-//      WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallback, options);
-//    }
-//    return null;
+      return weexLocationListener;
+    } else {
+      Map<String, Object> options = new HashMap<>();
+      options.put(ERROR_CODE, ErrorCode.NO_PERMISSION_ERROR);
+      options.put(ERROR_MSG, ErrorMsg.NO_PERMISSION_ERROR);
+      WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallback, options);
+    }
+    return null;
   }
 
   @Override
-  public void watchPosition(String successCallback, String errorCallback, String params) {
+  public void watchPosition(final String successCallback, final String errorCallback, final String params) {
     WXLogUtils.d("into--[watchPosition] successCallback:" + successCallback + " errorCallback:" + errorCallback + "\nparams:" + params);
     if (!TextUtils.isEmpty(params)) {
       try {
@@ -110,33 +109,39 @@ public class DefaultLocation implements ILocatable, Destroyable {
         }
         return;
       } catch (JSONException e) {
-        e.printStackTrace();
+        WXLogUtils.e(TAG, e);
       }
     }
     Map<String, Object> options = new HashMap<>();
     options.put(ERROR_CODE, ErrorCode.PARAMS_ERROR);
     options.put(ERROR_MSG, ErrorMsg.PARAMS_ERROR);
     WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallback, options);
-
   }
 
   @Override
   public void clearWatch(String registerID) {
     WXLogUtils.d("into--[clearWatch] registerID:" + registerID);
     LocationManager locationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
-//    if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        locationManager.removeUpdates(mRegisterSucCallbacks.get(registerID));
+      }
+    } else {
       locationManager.removeUpdates(mRegisterSucCallbacks.get(registerID));
-//    }
+    }
   }
 
   @Override
   public void destroy() {
     WXLogUtils.d("into--[destroy]");
+    if (mWXSDKInstance == null || mWXSDKInstance.getContext() == null) {
+      return;
+    }
     LocationManager locationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
     if (mRegisterSucCallbacks != null && mRegisterSucCallbacks.size() > 0) {
       Collection<LocationListener> values = mRegisterSucCallbacks.values();
-      for (LocationListener listener : values) {
-        if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        for (LocationListener listener : values) {
           locationManager.removeUpdates(listener);
         }
       }
@@ -160,15 +165,16 @@ public class DefaultLocation implements ILocatable, Destroyable {
       this.errorCallbak = errorCallback;
       this.enableAddress = enableAddress;
       mHandler = new Handler(this);
-//      WVThreadPool.getInstance().execute(new Runnable() {
-//        public void run() {
-//          mHandler.sendEmptyMessageDelayed(1, GPS_TIMEOUT);
-//        }
-//      });
+      //      WVThreadPool.getInstance().execute(new Runnable() {
+      //        public void run() {
+      mHandler.sendEmptyMessageDelayed(1, GPS_TIMEOUT);
+      //        }
+      //      });
     }
 
     @Override
     public void onLocationChanged(Location location) {
+      mHandler.removeMessages(1);
       WXLogUtils.d(TAG, "into--[onLocationChanged] location:" + location == null ? "Location is NULL!" : location.toString());
       if (location != null) {
         Map<String, Object> result = new HashMap<>();
@@ -210,7 +216,7 @@ public class DefaultLocation implements ILocatable, Destroyable {
         if (!TextUtils.isEmpty(registerID)) {
           result.put(REGISTER_ID, registerID);
         }
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), sucCallback, result,TextUtils.isEmpty(registerID)?false:true);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), sucCallback, result, TextUtils.isEmpty(registerID) ? false : true);
       } else {
         Map<String, Object> options = new HashMap<>();
         options.put(ERROR_CODE, ErrorCode.LOCATION_ERROR);
@@ -218,13 +224,13 @@ public class DefaultLocation implements ILocatable, Destroyable {
         if (!TextUtils.isEmpty(registerID)) {
           options.put(REGISTER_ID, registerID);
         }
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallbak, options,TextUtils.isEmpty(registerID)?false:true);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallbak, options, TextUtils.isEmpty(registerID) ? false : true);
       }
       if (TextUtils.isEmpty(registerID)) {
         LocationManager locationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
-//        if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
           locationManager.removeUpdates(this);
-//        }
+        }
       }
     }
 
@@ -248,7 +254,7 @@ public class DefaultLocation implements ILocatable, Destroyable {
       if (msg.what == 1) {
         WXLogUtils.d(TAG, "into--[handleMessage] Location Time Out!");
         LocationManager locationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
           locationManager.removeUpdates(this);
         }
         Map<String, Object> options = new HashMap<>();

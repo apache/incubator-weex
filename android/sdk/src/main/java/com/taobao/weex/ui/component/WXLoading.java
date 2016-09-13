@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
@@ -228,14 +229,14 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   }
 
   @Override
-  protected WXFrameLayout initComponentHostView(Context context) {
-    return new WXBaseRefreshLayout(mContext);
+  protected WXFrameLayout initComponentHostView(@NonNull Context context) {
+    return new WXBaseRefreshLayout(context);
   }
 
   @Override
   public void onLoading() {
-    if (mDomObj.getEvents().contains(Constants.Event.ONLOADING)) {
-      WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), Constants.Event.ONLOADING);
+    if (getDomObject().getEvents().contains(Constants.Event.ONLOADING)) {
+      getInstance().fireEvent(getRef(), Constants.Event.ONLOADING);
     }
   }
 

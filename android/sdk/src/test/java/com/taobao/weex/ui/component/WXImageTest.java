@@ -115,6 +115,7 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.TestActivity;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.common.Constants;
@@ -133,6 +134,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -167,7 +169,7 @@ public class WXImageTest {
   @PrepareForTest(WXImageView.class)
   public void testInitComponentHostView() throws Exception {
 
-    ImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
     assertEquals(imageView.getClass(), WXImageView.class);
 
   }
@@ -176,7 +178,7 @@ public class WXImageTest {
   @PrepareForTest(WXImageView.class)
   public void testSetBackgroundColor() throws Exception {
 
-    ImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
     mWXImage.mHost = imageView;
 
     mWXImage.setBackgroundColor("#FFFFFF");
@@ -189,7 +191,7 @@ public class WXImageTest {
   @Test
   public void testSetProperty() throws Exception {
 
-    ImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
     mWXImage.mHost = imageView;
 
     mWXImage.setProperty(Constants.Name.RESIZE_MODE, "cover");
@@ -203,7 +205,7 @@ public class WXImageTest {
   @Test
   public void testSetResizeMode() throws Exception {
 
-    ImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
     mWXImage.mHost = imageView;
 
     mWXImage.setResizeMode("cover");
@@ -214,7 +216,7 @@ public class WXImageTest {
 
   @Test
   public void testSetResize() throws Exception {
-    ImageView imageView = mWXImage.initComponentHostView(null);
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
     mWXImage.mHost = imageView;
 
     mWXImage.setResize("cover");

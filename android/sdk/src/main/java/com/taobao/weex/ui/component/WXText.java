@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.Layout;
 import android.view.ViewGroup;
 
@@ -244,7 +245,7 @@ public class WXText extends WXComponent<WXTextView>{
   }
 
   @Override
-  protected WXTextView initComponentHostView(Context context) {
+  protected WXTextView initComponentHostView(@NonNull Context context) {
     return new WXTextView(context);
   }
 

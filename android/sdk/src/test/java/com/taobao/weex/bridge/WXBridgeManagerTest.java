@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.os.Handler;
 import android.os.Message;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.*;
@@ -238,7 +239,9 @@ public class WXBridgeManagerTest {
   WXSDKInstance instance;
 
   public static ShadowLooper getLooper() {
-    return Shadows.shadowOf(WXBridgeManager.getInstance().mJSHandler.getLooper());
+    WXBridgeManager bridgeManager = WXBridgeManager.getInstance();
+    Handler handler = bridgeManager.mJSHandler;
+    return Shadows.shadowOf(handler.getLooper());
   }
 
   public static void setBridgeManager(WXBridgeManager bridge) {

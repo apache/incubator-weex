@@ -208,6 +208,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -253,11 +254,11 @@ public class WXVideo extends WXComponent<FrameLayout> {
   }
 
   @Override
-  protected FrameLayout initComponentHostView(Context context) {
-    FrameLayout videoRoot = new FrameLayout(mContext);
+  protected FrameLayout initComponentHostView(@NonNull Context context) {
+    FrameLayout videoRoot = new FrameLayout(context);
     videoRoot.setBackgroundColor(WXResourceUtils.getColor("#ee000000"));
 
-    mVideoView = new WXVideoView(mContext);
+    mVideoView = new WXVideoView(context);
     FrameLayout.LayoutParams videoLayoutParams =
         new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT);
@@ -265,7 +266,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
     mVideoView.setLayoutParams(videoLayoutParams);
     videoRoot.addView(mVideoView);
 
-    mProgressBar = new ProgressBar(mContext);
+    mProgressBar = new ProgressBar(context);
     FrameLayout.LayoutParams pLayoutParams =
         new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -273,7 +274,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
     pLayoutParams.gravity = Gravity.CENTER;
     videoRoot.addView(mProgressBar);
 
-    final MediaController controller = new MediaController(mContext);
+    final MediaController controller = new MediaController(context);
 
     controller.setAnchorView(videoRoot);
 
@@ -288,7 +289,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         mPrepared = false;
         mError = true;
 
-        if ( mDomObj.getEvents().contains(Constants.Event.FAIL)) {
+        if ( getDomObject().getEvents().contains(Constants.Event.FAIL)) {
           WXVideo.this.notify(Constants.Event.FAIL, Constants.Value.STOP);
         }
         return true;
@@ -324,7 +325,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onCompletion");
         }
-        if ( mDomObj.getEvents().contains(Constants.Event.FINISH)) {
+        if ( getDomObject().getEvents().contains(Constants.Event.FINISH)) {
           WXVideo.this.notify(Constants.Event.FINISH, Constants.Value.STOP);
         }
       }
@@ -337,7 +338,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("Video", "onPause");
         }
-        if ( mDomObj.getEvents().contains(Constants.Event.PAUSE)) {
+        if ( getDomObject().getEvents().contains(Constants.Event.PAUSE)) {
           WXVideo.this.notify(Constants.Event.PAUSE, Constants.Value.PAUSE);
         }
       }
@@ -348,7 +349,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
           WXLogUtils.d("Video", "onStart");
         }
 
-        if ( mDomObj.getEvents().contains(Constants.Event.START)) {
+        if ( getDomObject().getEvents().contains(Constants.Event.START)) {
           WXVideo.this.notify(Constants.Event.START, Constants.Value.PLAY);
         }
       }
@@ -370,7 +371,7 @@ public class WXVideo extends WXComponent<FrameLayout> {
     attrsChanges.put(Constants.Name.PLAY_STATUS, newStatus);
     domChanges.put("attrs", attrsChanges);
 
-    WXSDKManager.getInstance().fireEvent(mInstanceId, getRef(), event, params, domChanges);
+    WXSDKManager.getInstance().fireEvent(getInstanceId(), getRef(), event, params, domChanges);
   }
 
   @Override

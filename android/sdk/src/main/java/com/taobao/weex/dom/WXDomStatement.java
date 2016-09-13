@@ -943,8 +943,8 @@ class WXDomStatement {
   /**
    * Create a command object for adding a default event listener to the corresponding {@link
    * WXDomObject} and put the command object in the queue.
-   * When the event is triggered, the eventListener will call {@link WXSDKManager#fireEvent
-   * (String, String, String)}, and the JS will handle all the operations from there.
+   * When the event is triggered, the eventListener will call {@link WXSDKManager#fireEvent(String, String, String)}
+   * , and the JS will handle all the operations from there.
    *
    * @param ref Reference of the dom.
    * @param type the type of the event, this may be a plain event defined in
