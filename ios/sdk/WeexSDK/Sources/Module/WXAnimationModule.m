@@ -70,10 +70,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             opacity = [styles[property] floatValue];
             isAnimateOpacity = YES;
         } else if ([property isEqualToString:@"width"]) {
-            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, [WXConvert CGFloat:styles[property]], newFrame.size.height);
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, [WXConvert WXPixelType:styles[property]], newFrame.size.height);
             isAnimateFrame = YES;
         } else if ([property isEqualToString:@"height"]) {
-            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, newFrame.size.width, [WXConvert CGFloat:styles[property]]);
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, newFrame.size.width, [WXConvert WXPixelType:styles[property]]);
             isAnimateFrame = YES;
         }
     }
