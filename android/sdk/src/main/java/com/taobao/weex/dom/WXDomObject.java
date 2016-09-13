@@ -346,7 +346,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
   /**
    * Parse the jsonObject to {@link WXDomObject} recursively
    * @param map the original JSONObject
-   * @return Dom Object corresponding to the JSONObject.
    */
   public void parseFromJson(JSONObject map){
     if (map == null || map.size() <= 0) {
