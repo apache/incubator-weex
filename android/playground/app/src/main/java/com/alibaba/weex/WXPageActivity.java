@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -297,6 +299,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   public void setCurrentWxPageActivity(Activity activity) {
     wxPageActivityInstance = activity;
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    Intent intent=new Intent("requestPermission");
+    intent.putExtra("REQUEST_PERMISSION_CODE",requestCode);
+    intent.putExtra("permissions",permissions);
+    intent.putExtra("grantResults",grantResults);
+    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
   }
 
   @Override

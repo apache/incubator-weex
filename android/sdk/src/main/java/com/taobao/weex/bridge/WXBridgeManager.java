@@ -209,6 +209,7 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -219,12 +220,26 @@ import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.*;
+import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.IWXDebugProxy;
+import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXPerformance;
+import com.taobao.weex.common.WXRefreshData;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
-import com.taobao.weex.utils.*;
+import com.taobao.weex.utils.WXFileUtils;
+import com.taobao.weex.utils.WXHack;
 import com.taobao.weex.utils.WXHack.HackDeclaration.HackAssertionException;
 import com.taobao.weex.utils.WXHack.HackedClass;
+import com.taobao.weex.utils.WXJsonUtils;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
@@ -510,6 +525,37 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     // get next tick
     getNextTick(instanceId, callback);
     return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddElement(String instanceId, String ref,String dom,String index, String callback){
+
+    if(mDestroyedInstanceId!=null && mDestroyedInstanceId.contains(instanceId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+      long start = System.currentTimeMillis();
+      JSONObject domObject = JSON.parseObject(dom);
+
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
+      }
+      sDomModule = getDomModule(instanceId);
+      sDomModule.addElement(ref, domObject, Integer.parseInt(index));
+
+
+    }
+
+
+
+
+    if (UNDEFINED.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
   }
 
   private void getNextTick(final String instanceId, final String callback) {
@@ -803,16 +849,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                        + ", data:" + data);
         }
         WXJSObject instanceIdObj = new WXJSObject(WXJSObject.String,
-                                                  instanceId);
+                instanceId);
         WXJSObject instanceObj = new WXJSObject(WXJSObject.String,
                                                 template);
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
-                                               options == null ? "{}"
-                                                               : WXJsonUtils.fromObjectToJSONString(options));
+                options == null ? "{}"
+                        : WXJsonUtils.fromObjectToJSONString(options));
         WXJSObject dataObj = new WXJSObject(WXJSObject.JSON,
-                                            data == null ? "{}" : data);
+                data == null ? "{}" : data);
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
-            dataObj};
+                dataObj};
         invokeExecJS(instanceId, null, METHOD_CREATE_INSTANCE, args);
       } catch (Throwable e) {
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);

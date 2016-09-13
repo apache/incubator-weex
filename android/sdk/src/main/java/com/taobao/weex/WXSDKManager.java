@@ -149,7 +149,6 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,6 +231,11 @@ public class WXSDKManager {
   @Deprecated
   public void callback(String instanceId, String funcId, Map<String, Object> data) {
     mBridgeManager.callback(instanceId, funcId, data);
+  }
+
+  @Deprecated
+  public void callback(String instanceId, String funcId, Map<String, Object> data,boolean keepAlive) {
+    mBridgeManager.callback(instanceId, funcId, data,true);
   }
 
   public void initScriptsFramework(String framework) {
