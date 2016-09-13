@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lixinke on 16/9/10.
  */
 public class GeolocationModule extends WXModule implements Destroyable {
 
@@ -32,11 +31,11 @@ public class GeolocationModule extends WXModule implements Destroyable {
   }
 
   /**
-   * 获取当前位置信息，只回调一次。
+   * Get current location information, the callback only once
    *
-   * @param successCallback 成功回调function id.
-   * @param errorCallback   错误回调function id.(例如:没有权限)
-   * @param params          JSON格式的参数(例如:准确度等).
+   * @param successCallback success callback function id.
+   * @param errorCallback   error callback function id.(example:no persimmon)
+   * @param params          JSON parameter(example:address).
    */
   @WXModuleAnno
   public void getCurrentPosition(String successCallback, String errorCallback, String params) {
@@ -50,11 +49,11 @@ public class GeolocationModule extends WXModule implements Destroyable {
   }
 
   /**
-   * 注册监听全局定位
+   * register global location listener，if location change，you will be notify.
    *
-   * @param successCallback 定位成功回调function id.
-   * @param errorCallback   错误回调(例如:没有权限等).
-   * @param params          SON格式的参数(例如:准确度等).
+   * @param successCallback location success callback function id.
+   * @param errorCallback   location error callback (example:no persimmon).
+   * @param params          JSON parameter(example:address).
    */
   @WXModuleAnno
   public void watchPosition(String successCallback, String errorCallback, String params) {
@@ -68,9 +67,9 @@ public class GeolocationModule extends WXModule implements Destroyable {
   }
 
   /**
-   * 注销监听全局定位
+   * remove global location listener.
    *
-   * @param registerID 注册时返回的唯一ID。
+   * @param registerID register id,you can get from watchPosition method。
    */
   @WXModuleAnno
   public void clearWatch(String registerID) {

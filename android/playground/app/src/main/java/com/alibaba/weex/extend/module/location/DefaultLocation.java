@@ -270,7 +270,7 @@ public class DefaultLocation implements ILocatable {
     }
 
     /**
-     * 获取位置信息
+     * get address info
      */
     private Address getAddress(double latitude, double longitude) {
       WXLogUtils.d(TAG, "into--[getAddress] latitude:" + latitude + " longitude:" + longitude);
