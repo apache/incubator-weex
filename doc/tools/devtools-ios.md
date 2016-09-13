@@ -1,6 +1,8 @@
 # Devtools for IOS
 Remote debug for your native iOS app using Chrome Developer Tools
 
+<a href="https://github.com/weexteam/article/issues/81"  class="weex-translate">cn</a>
+
 ## weex-devtool launch：
 
 0. install and run weex-devtool
