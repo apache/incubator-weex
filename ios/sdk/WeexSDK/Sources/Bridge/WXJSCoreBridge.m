@@ -44,13 +44,13 @@
         NSDictionary *data = [WXUtility getEnvironment];
         _jsContext[@"WXEnvironment"] = data;
         
-        _jsContext[@"setTimeout"] = ^(JSValue* function, JSValue* timeout) {
+        _jsContext[@"setTimeout"] = ^(JSValue *function, JSValue *timeout) {
             // this setTimeout is used by internal logic in JS framework, normal setTimeout called by users will call WXTimerModule's method;
             [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
                 [function callWithArguments:@[]];
             } afterDelay:[timeout toDouble] / 1000];
         };
-    
+        
         _jsContext[@"nativeLog"] = ^() {
             static NSDictionary *levelMap;
             static dispatch_once_t onceToken;
@@ -132,6 +132,23 @@
     };
     
     _jsContext[@"callNative"] = callNativeBlock;
+}
+
+- (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
+{
+    id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXLogDebug(@"callAddElement...%@, %@, %@, %@", instanceId, ref, element, index);
+        NSString *instanceIdString = [instanceId toString];
+        NSDictionary *componentData = [element toDictionary];
+        NSString *parentRef = [ref toString];
+        NSInteger insertIndex = [[index toNumber] integerValue];
+        
+        return callAddElement(instanceIdString, parentRef, componentData, insertIndex);
+    };
+
+    _jsContext[@"callAddElement"] = callAddElementBlock;
 }
 
 - (JSValue*)exception

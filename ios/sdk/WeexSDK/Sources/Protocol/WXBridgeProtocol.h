@@ -9,6 +9,8 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 
 typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
+typedef NSInteger (^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
+
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -36,6 +38,11 @@ typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString
 - (void)resetEnvironment;
 
 @optional
+
+/**
+ * Register callback when addElement tasks occur
+ */
+- (void)registerCallAddElement:(WXJSCallAddElement)callAddElement;
 
 /**
  * Called when garbage collection is wanted by sdk.
