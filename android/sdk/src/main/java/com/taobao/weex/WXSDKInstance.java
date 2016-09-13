@@ -225,7 +225,6 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
-import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
@@ -268,6 +267,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private float refreshMargin = 0;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
+  private boolean isDestroy=false;
 
   /**
    * Render strategy.
@@ -581,10 +581,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public Context getContext() {
     if(mContext == null){
-      mContext = WXEnvironment.sApplication;
-      if(WXEnvironment.isApkDebugable()){
-        throw new WXRuntimeException("WXSdkInstance mContext == null");
-      }
       WXLogUtils.e("WXSdkInstance mContext == null");
     }
     return mContext;
@@ -931,7 +927,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     }
   }
 
-  public void destroy() {
+  public synchronized void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
 
     if (mGodCom != null && mGodCom.getHostView() != null) {
@@ -949,6 +945,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
     mScrollView = null;
     mContext = null;
     mRenderListener = null;
+    isDestroy=true;
+  }
+
+  public boolean isDestroy(){
+    return isDestroy;
   }
 
   public String getBundleUrl() {
