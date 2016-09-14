@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -252,6 +253,9 @@ public class WXImage extends WXComponent<ImageView> {
     protected ImageView initComponentHostView(Context context) {
         WXImageView view = new WXImageView(mContext);
         view.setScaleType(ScaleType.FIT_XY);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) {
+            view.setCropToPadding(true);
+        }
         return view;
     }
 
