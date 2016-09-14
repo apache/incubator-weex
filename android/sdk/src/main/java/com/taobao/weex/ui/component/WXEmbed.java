@@ -387,6 +387,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
+    this.src=src;
     Uri uri = Uri.parse(src);
     if (TextUtils.isEmpty(uri.getScheme())) {
       String url = uri.toString();
@@ -397,7 +398,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       }
       uri = Uri.parse(url);
     }
-    this.src = uri.toString();
+    if(uri!=null){
+      this.src = uri.toString();
+    }
 
     if (mNestedInstance != null) {
       mNestedInstance.destroy();
