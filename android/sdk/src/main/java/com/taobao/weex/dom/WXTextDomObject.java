@@ -88,6 +88,9 @@ public class WXTextDomObject extends WXDomObject {
         textDomObject.previousWidth = textDomObject.layout.getWidth();
         measureOutput.height = textDomObject.layout.getHeight();
         measureOutput.width = textDomObject.previousWidth;
+      }else{
+        measureOutput.height = 0;
+        measureOutput.width = 0;
       }
     }
   };
