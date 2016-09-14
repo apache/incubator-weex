@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -230,8 +229,6 @@ import com.taobao.weex.utils.WXViewUtils;
 public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   public static final String ITEM_ID = "itemId";
-  private static final String WX_TPL = "_wx_tpl";
-
 
   private String src;
   private WXSDKInstance mNestedInstance;
@@ -424,27 +421,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
     sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            getRealSrc(src),
+                            src,
                             null, null, layoutParams.width,
                             layoutParams.height,
                             WXRenderStrategy.APPEND_ASYNC);
     return sdkInstance;
-  }
-  public String getRealSrc(String url) {
-    Uri uri = Uri.parse(url);
-    if (uri != null && TextUtils.isEmpty(uri.getScheme())) {
-      url = uri.toString();
-      if (url.startsWith("//")) {
-        url = "http:" + url;
-      } else {
-        url = "http://" + url;
-      }
-      uri = Uri.parse(url);
-    }
-    if (uri != null && uri.isHierarchical() && !TextUtils.isEmpty(uri.getQueryParameter(WX_TPL))) {
-      url = uri.getQueryParameter(WX_TPL);
-    }
-    return url;
   }
 
   @Override
