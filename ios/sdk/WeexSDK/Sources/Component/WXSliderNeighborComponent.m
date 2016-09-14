@@ -1656,17 +1656,16 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         _itemRect = view.frame;
     }
     CGAffineTransform transfrom = CGAffineTransformIdentity;
-    if (fabs(self->neighborSpace - 0) > CGFLOAT_MIN) {
-        transfrom = CGAffineTransformMakeScale(1-self->neighborSpace*2/_itemRect.size.width, 1.0);
-    }
-    
-    if (index != [self.sliderView currentItemIndex]) {
-        if (fabs(self->neighborScale - 0) > CGFLOAT_MIN) {
-            transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(self->neighborScale, self->neighborScale));
+    if (fabs(self->neighborScale - 0) <= CGFLOAT_MIN) {
+        if (self.currentIndex == index) {
+            self->neighborScale = 0.9;
+        } else {
+            self->neighborScale = 0.8;
         }
-        view.alpha = self->neighborAlpha;
     }
-    view.transform = transfrom;
+    view.transform = CGAffineTransformScale(transfrom, self->neighborScale, neighborScale);
+    
+    
     return view;
 }
 
@@ -1723,13 +1722,16 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             currentView.alpha = 1.0;
             
             if (fabs(strongSelf->neighborSpace - 0) > CGFLOAT_MIN) {
-                transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(1-strongSelf->neighborSpace*2/_itemRect.size.width, 1.0));
+                transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(0.9, 0.9));
             }
 
             currentView.transform = transfrom;
-            if (fabs(strongSelf->neighborScale - 0) > CGFLOAT_MIN) {
-                transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
+            transfrom = CGAffineTransformIdentity;
+            if (fabs(strongSelf->neighborScale - 0) <= CGFLOAT_MIN) {
+                strongSelf->neighborScale = 0.8;
             }
+            
+            transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
             
             lastView.transform = transfrom;
             nextView.transform = transfrom;
