@@ -8,7 +8,7 @@ let lazyloadTimer
 
 // fire lazyimg on images.
 function fire () {
-  lib.img.fire()
+  setTimeout(() => lib.img.fire(), 0)
 }
 
 // we don't know when all images are appended
