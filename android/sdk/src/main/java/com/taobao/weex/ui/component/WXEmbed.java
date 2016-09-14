@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -230,8 +229,6 @@ import com.taobao.weex.utils.WXViewUtils;
 public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   public static final String ITEM_ID = "itemId";
-  private static final String WX_TPL = "_wx_tpl";
-
 
   private String src;
   private WXSDKInstance mNestedInstance;
@@ -287,7 +284,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
           public void onClick(View v) {
             imageView.setOnClickListener(null);
             imageView.setEnabled(false);
-            comp.loadInstance(comp.src);
+            comp.loadInstance();
           }
         });
         FrameLayout hostView = comp.getHostView();
@@ -382,41 +379,26 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   public void renderNewURL(String url) {
     src = url;
-    loadInstance(src);
+    loadInstance();
   }
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
-    Uri uri = Uri.parse(src);
-    if (TextUtils.isEmpty(uri.getScheme())) {
-      String url = uri.toString();
-      if (url.startsWith("//")) {
-        url = "http:" + url;
-      } else {
-        url = "http://" + url;
-      }
-      uri = Uri.parse(url);
-    }
-    this.src = uri.toString();
-
+    this.src = src;
     if (mNestedInstance != null) {
       mNestedInstance.destroy();
       mNestedInstance = null;
     }
     if (TextUtils.equals(getVisibility(), Constants.Value.VISIBLE)) {
-      if (uri != null && uri.isHierarchical() && !TextUtils.isEmpty(uri.getQueryParameter(WX_TPL))) {
-        loadInstance(uri.getQueryParameter(WX_TPL));
-        return;
-      }
-      loadInstance(this.src);
+      loadInstance();
     }
   }
   public String getSrc() {
     return src;
   }
 
-  void loadInstance(String src){
-    mNestedInstance = createInstance(src);
+  void loadInstance(){
+    mNestedInstance = createInstance();
     if(mListener != null && mListener.mEventListener != null){
       if(!mListener.mEventListener.onPreCreate(this,src)){
         //cancel render
@@ -425,7 +407,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
   }
 
-  private WXSDKInstance createInstance(String src) {
+  private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
     mInstance.addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
@@ -452,7 +434,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     boolean visible = TextUtils.equals(visibility, Constants.Value.VISIBLE);
     if (!TextUtils.isEmpty(src) && visible) {
       if (mNestedInstance == null) {
-        loadInstance(src);
+        loadInstance();
       } else {
         mNestedInstance.onViewAppear();
       }
