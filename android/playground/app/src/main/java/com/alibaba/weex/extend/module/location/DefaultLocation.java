@@ -152,6 +152,7 @@ public class DefaultLocation implements ILocatable {
       for (WeexLocationListener listener : mWeexLocationListeners) {
         if (listener != null) {
           listener.destroy();
+          mLocationManager.removeUpdates(listener);
         }
       }
       mWeexLocationListeners.clear();
@@ -161,8 +162,8 @@ public class DefaultLocation implements ILocatable {
       Collection<WeexLocationListener> values = mRegisterSucCallbacks.values();
       if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
         for (WeexLocationListener listener : values) {
-          listener.
-              mLocationManager.removeUpdates(listener);
+          listener.destroy();
+          mLocationManager.removeUpdates(listener);
         }
       }
       mRegisterSucCallbacks.clear();
@@ -187,11 +188,7 @@ public class DefaultLocation implements ILocatable {
       this.enableAddress = enableAddress;
       mHandler = new Handler(this);
       mLocationManager = locationManager;
-      //      WVThreadPool.getInstance().execute(new Runnable() {
-      //        public void run() {
       mHandler.sendEmptyMessageDelayed(1, GPS_TIMEOUT);
-      //        }
-      //      });
     }
 
     @Override
