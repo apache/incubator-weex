@@ -1437,6 +1437,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     _sliderView = (WXSliderNeighborView *)self.view;
     _sliderView.delegate = self;
     _sliderView.dataSource = self;
+    _sliderView.contentView.clipsToBounds = YES;
     if (_autoPlay) {
         [self _startAutoPlayTimer];
     } else {
