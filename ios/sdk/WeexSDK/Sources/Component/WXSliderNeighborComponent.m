@@ -73,6 +73,7 @@
 @property (nonatomic, readonly) CGFloat toggle;
 @property (nonatomic, assign) NSInteger previousItemIndex;
 @property (nonatomic, readonly) CGFloat itemWidth;
+@property (nonatomic, assign) BOOL inited;
 @end
 
 @implementation WXSliderNeighborView
@@ -94,6 +95,7 @@
     _stopAtItemBoundary = YES;
     _scrollToItemBoundary = YES;
     _centerItemWhenSelected = YES;
+    _inited = NO;
     
     _contentView = [[UIView alloc] initWithFrame:self.bounds];
     
@@ -414,9 +416,12 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             _scrollOffset = [self clampedOffset:_scrollOffset];
         }
     }
-    
     //update views
-    [self didScroll];
+    if (_inited) {
+        [self didScroll];
+    }
+    
+    _inited = YES;
 }
 
 - (CGFloat)valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value
@@ -551,13 +556,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
                             //call scroll to trigger events for legacy support reasons
                             //even though technically we don't need to scroll at all
                             [self scroll2ItemViewAtIndex:self.currentItemIndex duration:0.01];
-                        }else {
+                        } else {
                             [self scroll2ItemViewAtIndex:self.currentItemIndex animated:YES];
                         }
-                    }else {
+                    } else {
                         [self depthSortViews];
                     }
-                }else {
+                } else {
                     [self pushAnimationState:YES];
                     [_delegate sliderNeighborWillBeginDecelerating:self];
                     [self popAnimationState];
@@ -694,13 +699,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (_numberOfItems == 0)
     {
         return -1;
-    }
-    else if (_wrapEnabled)
-    {
+    } else if (_wrapEnabled) {
         return index - floor((CGFloat)index / (CGFloat)_numberOfItems) * _numberOfItems;
-    }
-    else
-    {
+    } else {
         return MIN(MAX(0, index), MAX(0, _numberOfItems - 1));
     }
 }
@@ -1561,13 +1562,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 }
 
 - (void)setNeighborSpace:(NSDictionary *)attributes{
-    if (attributes[@"neighborSpace"]) {
-        self->neighborSpace = [WXConvert WXPixelType:attributes[@"neighborSpace"]];
-        self->neighborSpace = self->neighborSpace >= 0 ? self->neighborSpace :0;
-        self->neighborSpace = self->neighborSpace <= WXScreenSize().width/2 ? self->neighborSpace : WXScreenSize().width/2;
-    } else {
-        self->neighborSpace = [WXConvert WXPixelType:@"150"];
-    }
+    self->neighborSpace = [WXConvert WXPixelType:@(25)];
 }
 
 - (void)setNeighborAlpha:(NSDictionary *)attributes {
@@ -1654,14 +1649,12 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         _itemRect = view.frame;
     }
     CGAffineTransform transfrom = CGAffineTransformIdentity;
-    if (fabs(self->neighborScale - 0) <= CGFLOAT_MIN) {
-        if (self.currentIndex == index) {
-            self->neighborScale = 0.9;
-        } else {
-            self->neighborScale = 0.8;
-        }
+    if (index != [self.sliderView currentItemIndex]) {
+        transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale((1-self->neighborSpace/_itemRect.size.width), 1.0));
+        view.transform = CGAffineTransformScale(transfrom, self->neighborScale, self->neighborScale);
+    } else {
+        view.transform = CGAffineTransformScale(transfrom, 0.9, 0.9);
     }
-    view.transform = CGAffineTransformScale(transfrom, self->neighborScale, neighborScale);
     
     
     return view;
@@ -1709,6 +1702,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     UIView * currentView  = [self.sliderView itemViewAtIndex:[_sliderView currentItemIndex]];
     UIView * lastView  = [self.sliderView itemViewAtIndex:[_sliderView lastItemIndex]];
     UIView * nextView  = [self.sliderView itemViewAtIndex:[_sliderView nextItemIndex]];
+    
     __block CGAffineTransform transfrom = CGAffineTransformIdentity;
     float duration = 0;
     __weak typeof(self) weakSelf = self;
@@ -1720,18 +1714,19 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         if (strongSelf) {
             currentView.alpha = 1.0;
             
-            if (fabs(strongSelf->neighborSpace - 0) > CGFLOAT_MIN) {
+            if (fabs(strongSelf->neighborScale - 0) > CGFLOAT_MIN) {
                 transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(0.9, 0.9));
+               
             }
-
             currentView.transform = transfrom;
             transfrom = CGAffineTransformIdentity;
+            
             if (fabs(strongSelf->neighborScale - 0) <= CGFLOAT_MIN) {
                 strongSelf->neighborScale = 0.8;
             }
             
             transfrom = CGAffineTransformConcat(transfrom, CGAffineTransformMakeScale(strongSelf->neighborScale, strongSelf->neighborScale));
-            
+            transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale((1-self->neighborSpace/_itemRect.size.width), 1.0));
             lastView.transform = transfrom;
             nextView.transform = transfrom;
             lastView.alpha = strongSelf->neighborAlpha;
