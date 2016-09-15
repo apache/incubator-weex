@@ -551,16 +551,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
                             //call scroll to trigger events for legacy support reasons
                             //even though technically we don't need to scroll at all
                             [self scroll2ItemViewAtIndex:self.currentItemIndex duration:0.01];
-                        } else if ([self shouldScroll]) {
-                            NSInteger direction = (int)(_startVelocity / fabs(_startVelocity));
-                            [self scroll2ItemViewAtIndex:self.currentItemIndex + direction animated:YES];
-                        } else {
+                        }else {
                             [self scroll2ItemViewAtIndex:self.currentItemIndex animated:YES];
                         }
-                    } else {
+                    }else {
                         [self depthSortViews];
                     }
-                } else {
+                }else {
                     [self pushAnimationState:YES];
                     [_delegate sliderNeighborWillBeginDecelerating:self];
                     [self popAnimationState];
@@ -1692,6 +1689,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
+        NSLog(@"index %ld",index);
     }
 }
 
