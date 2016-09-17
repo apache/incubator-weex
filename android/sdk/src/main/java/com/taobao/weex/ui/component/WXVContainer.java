@@ -236,7 +236,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    */
   @Deprecated
   public ViewGroup getView(){
-    return mHost;
+    return getHostView();
   }
 
   @Override
@@ -385,10 +385,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
 
     mChildren.remove(child);
-    if(mInstance!=null
-            &&mInstance.getRootView()!=null
-            && child.mDomObj.isFixed()){
-      mInstance.getRootView().removeView(child.getHostView());
+    if(getInstance()!=null
+            &&getInstance().getRootView()!=null
+            && child.getDomObject().isFixed()){
+      getInstance().getRootView().removeView(child.getHostView());
     }else if(getRealView() != null) {
       getRealView().removeView(child.getHostView());
     }

@@ -205,6 +205,7 @@
 package com.alibaba.weex.commons.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.WXDomObject;
@@ -221,8 +222,8 @@ public class FrescoImageComponent extends WXImage {
   }
 
   @Override
-  protected ImageView initComponentHostView(Context context) {
-    FrescoImageView view = new FrescoImageView(mContext);
+  protected ImageView initComponentHostView(@NonNull Context context) {
+    FrescoImageView view = new FrescoImageView(context);
     view.setScaleType(ImageView.ScaleType.FIT_XY);
 
     return view;

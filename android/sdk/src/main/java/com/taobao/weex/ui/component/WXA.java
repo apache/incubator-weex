@@ -228,10 +228,10 @@ public class WXA extends WXDiv {
     addClickListener(new OnClickListener() {
       @Override
       public void onHostViewClick() {
-        if ( mDomObj.getAttrs().get("href") != null) {
+        if ( getDomObject().getAttrs().get("href") != null) {
           JSONArray array = new JSONArray();
-          array.add(mDomObj.getAttrs().get("href"));
-          WXSDKManager.getInstance().getWXBridgeManager().callModuleMethod(mInstanceId, "event", "openURL", array);
+          array.add(getDomObject().getAttrs().get("href"));
+          WXSDKManager.getInstance().getWXBridgeManager().callModuleMethod(getInstanceId(), "event", "openURL", array);
         } else {
           WXLogUtils.d("WXA", "Property href is empty.");
         }

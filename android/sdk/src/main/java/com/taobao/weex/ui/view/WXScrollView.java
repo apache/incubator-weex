@@ -524,6 +524,9 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
   }
 
   private void showStickyView() {
+    if(mWAScroller == null){
+      return;
+    }
     View curStickyView = procSticky(mWAScroller.getStickMap());
 
     if (curStickyView != null) {

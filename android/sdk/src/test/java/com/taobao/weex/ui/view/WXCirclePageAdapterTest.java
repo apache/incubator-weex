@@ -202,142 +202,82 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.ui.view;
 
+import android.app.Activity;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.bridge.WXBridgeManagerTest;
-import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomManager;
-import com.taobao.weex.dom.WXDomManagerTest;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.*;
-import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.TestActivity;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.runners.Suite;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowApplication;
-import org.robolectric.shadows.ShadowLooper;
 
-import static org.powermock.api.mockito.PowerMockito.*;
 import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
-
 
 /**
- * Created by sospartan on 7/27/16.
+ * Created by sospartan on 9/7/16.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
-@PrepareForTest({WXFileUtils.class,WXSoInstallMgrSdk.class})
-public class WXSDKInstanceTest {
-  @Rule
-  public PowerMockRule rule = new PowerMockRule();
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXCirclePageAdapterTest {
 
-  public static WXSDKInstance createInstance(){
-    WXSDKInstance instance =  new WXSDKInstance(Robolectric.setupActivity(TestActivity.class));
-    instance.registerRenderListener(new IWXRenderListener() {
-      @Override
-      public void onViewCreated(WXSDKInstance instance, View view) {
-
-      }
-
-      @Override
-      public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-
-      }
-
-      @Override
-      public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
-      }
-
-      @Override
-      public void onException(WXSDKInstance instance, String errCode, String msg) {
-
-      }
-    });
-    instance.mInstanceId = "1";
-    instance.mContext = Robolectric.setupActivity(TestActivity.class);
-
-    return instance;
-  }
-
-  public static void setupRoot(WXSDKInstance instance){
-    WXDomObject domObject = new WXDomObject();
-    WXDomObject.prepareGod(domObject);
-    WXVContainer comp = (WXVContainer) WXComponentFactory.newInstance(instance, domObject, null);
-
-    WXComponent root = WXDivTest.create(comp);
-    comp.addChild(root);
-    comp.createView(null, -1);
-
-    instance.onViewCreated(comp);
-    ShadowLooper.idleMainLooper();
-  }
-
-  WXSDKInstance mInstance;
+  WXCirclePageAdapter adapter;
+  View child;
 
   @Before
-  public void setup() throws Exception {
-    mockStatic(WXSoInstallMgrSdk.class);
-    when(WXSoInstallMgrSdk.initSo("weexv8", 1, null)).thenReturn(true);
-    WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
-    mInstance = createInstance();
-    WXBridgeManagerTest.getLooper().idle();
-
-    mockStatic(WXFileUtils.class);
-    when(WXFileUtils.loadAsset(null,null)).thenReturn("{}");
+  public void setUp() throws Exception {
+    adapter = new WXCirclePageAdapter();
   }
 
   @After
   public void tearDown() throws Exception {
-    WXBridgeManagerTest.getLooper().idle();
-    WXDomManagerTest.getLooper().idle();
-    mInstance.destroy();
+  }
+
+  @Test
+  public void testAddPageView() throws Exception {
+    Activity activity = Robolectric.setupActivity(TestActivity.class);
+    child = new View(activity);
+    adapter.addPageView(child);
+    child = new View(activity);
+    adapter.addPageView(child);
+    child = new View(activity);
+    adapter.addPageView(child);
+
+    assertEquals(adapter.getRealCount(),3);
+  }
+
+  @Test
+  public void testRemovePageView() throws Exception {
+    testAddPageView();
+    adapter.removePageView(child);
+    assertEquals(adapter.getRealCount(),2);
   }
 
 
   @Test
-  public void testRender() throws Exception {
-    assertEquals(WXFileUtils.loadAsset(null,null),"{}");
-
-    mInstance.render("{}",null,null,null);
-
+  public void testInstantiateItem() throws Exception {
+    testAddPageView();
+    ViewPager viewPager = new ViewPager(child.getContext());
+    viewPager.setAdapter(adapter);
+    Object obj = adapter.instantiateItem(viewPager,adapter.getRealCount()*10-1);
+    assertEquals(child,obj);
   }
 
   @Test
-  public void testSetSize() throws Exception {
-    setupRoot(mInstance);
-    mInstance.setSize(10,10);
-  }
+  public void testReplacePageView() throws Exception {
+    testAddPageView();
+    View relace = new View(child.getContext());
 
-  @Test
-  public void testRenderEvent() throws Exception {
-    mInstance.onRenderError("test","test");
-    mInstance.onRenderSuccess(10,10);
-  }
+    adapter.replacePageView(child,relace);
 
-  @Test
-  public void testRenderByUrl() throws Exception {
-    mInstance.renderByUrl(WXPerformance.DEFAULT,"file:///test",null,null,100,100, WXRenderStrategy.APPEND_ASYNC);
-    mInstance.renderByUrl(WXPerformance.DEFAULT,"http://taobao.com",null,null,100,100, WXRenderStrategy.APPEND_ASYNC);
+    assertEquals(adapter.getRealCount(),3);
+    
   }
 }

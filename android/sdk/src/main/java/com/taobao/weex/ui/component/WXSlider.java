@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.util.Log;
@@ -269,7 +270,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  protected FrameLayout initComponentHostView(Context context) {
+  protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
     // init view pager
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
@@ -492,11 +493,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
 
-      if (getDomObject().event == null || getDomObject().event.size() == 0) {
+      if (getDomObject().getEvents().size() == 0) {
         return;
       }
-      WXEvent event = getDomObject().event;
-      String ref = getDomObject().ref;
+      WXEvent event = getDomObject().getEvents();
+      String ref = getDomObject().getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
         params.put("index", realPosition);
 
@@ -519,6 +520,5 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         root.invalidate();
       }
     }
-
   }
 }

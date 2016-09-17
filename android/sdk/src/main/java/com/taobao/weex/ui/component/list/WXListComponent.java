@@ -301,7 +301,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     @Override
     protected MeasureOutput measure(int width, int height) {
         int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
-        int weexH = WXViewUtils.getWeexHeight(mInstanceId);
+        int weexH = WXViewUtils.getWeexHeight(getInstanceId());
         int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
         return super.measure(width, outHeight);
     }
@@ -372,10 +372,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
     @Override
-    protected BounceRecyclerView initComponentHostView(Context context) {
+    protected BounceRecyclerView initComponentHostView(@NonNull Context context) {
         bounceRecyclerView = new BounceRecyclerView(context, getOrientation());
 
-        String transforms = (String) mDomObj.getAttrs().get(TRANSFORM);
+        String transforms = (String) getDomObject().getAttrs().get(TRANSFORM);
         if (transforms != null) {
             bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
         }
@@ -659,22 +659,22 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     private boolean checkRefreshOrLoading(final WXComponent child) {
 
         if (child instanceof WXRefresh) {
-            mHost.setOnRefreshListener((WXRefresh)child);
-            mHost.postDelayed(new Runnable() {
+            getHostView().setOnRefreshListener((WXRefresh)child);
+            getHostView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setHeaderView(child);
+                    getHostView().setHeaderView(child);
                 }
             },100);
             return true;
         }
 
         if (child instanceof WXLoading) {
-            mHost.setOnLoadingListener((WXLoading)child);
-            mHost.postDelayed(new Runnable() {
+            getHostView().setOnLoadingListener((WXLoading)child);
+            getHostView().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHost.setFooterView(child);
+                    getHostView().setFooterView(child);
                 }
             },100);
             return true;
@@ -976,7 +976,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(), getDomObject().getRef(), Constants.Event.LOADMORE);
+            getInstance().fireEvent(getDomObject().getRef(), Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }
@@ -1010,13 +1010,12 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         continue;
       }
 
-      Rect listRect=new Rect();
-      boolean visible = (!outOfVisibleRange) && item.isViewVisible(listRect);
+      boolean visible = (!outOfVisibleRange) && item.isViewVisible();
 
       int result = item.setAppearStatus(visible);
-        if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
-        }
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+      }
       if (result == AppearanceHelper.RESULT_NO_CHANGE) {
         continue;
       }
