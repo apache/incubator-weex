@@ -22,12 +22,15 @@ export function Document (id, url, handler) {
   this.createDocumentElement()
 }
 
+Document.handler = null
+
 function genCallTasks (id) {
+  const handler = Document.handler || callNative
   return (tasks) => {
     if (!Array.isArray(tasks)) {
       tasks = [tasks]
     }
-    return callNative(id, tasks, '-1')
+    return handler(id, tasks, '-1')
   }
 }
 

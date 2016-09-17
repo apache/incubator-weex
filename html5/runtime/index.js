@@ -21,6 +21,8 @@ const config = {
   }
 }
 
+Document.handler = config.sendTasks
+
 const methods = init(config)
 
 export default methods

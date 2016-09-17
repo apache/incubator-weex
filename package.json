@@ -48,6 +48,7 @@
     "dev:test": "webpack --watch --config build/webpack.test.config.js",
     "build": "npm run build:native && npm run build:browser && npm run build:examples && npm run build:examples:vue && npm run build:test",
     "lint": "eslint html5",
+    "test:case": "mocha --compilers js:babel-core/register html5/test/case/test.js",
     "test:unit": "mocha --compilers js:babel-core/register html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:cover": "babel-node node_modules/isparta/bin/isparta cover --report text node_modules/mocha/bin/_mocha -- --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:e2e": "npm run build:browser && node html5/test/e2e/runner.js",
