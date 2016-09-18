@@ -456,15 +456,14 @@ public class BorderDrawable extends Drawable {
 
   public
   @NonNull
-  Path getContentPath(int viewTopPadding, int viewRightPadding, int viewBottomPadding, int
-      viewLeftPadding) {
+  Path getContentPath(int viewTopPadding,
+                      int viewRightPadding,
+                      int viewBottomPadding,
+                      int viewLeftPadding,
+                      @NonNull RectF contentBox) {
     RectF rectForBorderOutline = new RectF();
     Path contentClip = new Path();
-    rectForBorderOutline.set(getBounds());
-    rectForBorderOutline.top += viewTopPadding;
-    rectForBorderOutline.right -= viewRightPadding;
-    rectForBorderOutline.bottom -= viewBottomPadding;
-    rectForBorderOutline.left += viewLeftPadding;
+    rectForBorderOutline.set(contentBox);
     if (mBorderRadius != null) {
       prepareBorderRadius();
       float topLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS);
