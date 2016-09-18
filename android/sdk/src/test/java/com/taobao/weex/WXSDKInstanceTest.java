@@ -233,6 +233,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLooper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.powermock.api.mockito.PowerMockito.*;
 import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -339,5 +342,48 @@ public class WXSDKInstanceTest {
   public void testRenderByUrl() throws Exception {
     mInstance.renderByUrl(WXPerformance.DEFAULT,"file:///test",null,null,100,100, WXRenderStrategy.APPEND_ASYNC);
     mInstance.renderByUrl(WXPerformance.DEFAULT,"http://taobao.com",null,null,100,100, WXRenderStrategy.APPEND_ASYNC);
+  }
+
+  @Test
+  public void testGlobalEvent() throws Exception {
+    mInstance.addEventListener(null,null);
+    mInstance.addEventListener(null,"");
+    mInstance.addEventListener("",null);
+
+    mInstance.addEventListener("test","123");
+    mInstance.fireGlobalEventCallback("test",null);
+    mInstance.removeEventListener("test");
+    mInstance.removeEventListener("test","123");
+  }
+
+  @Test
+  public void testFireEvent() throws Exception {
+    mInstance.fireEvent("1","test");
+    Map<String,Object> params = new HashMap<>();
+    params.put("arg1",null);
+    params.put("arg2",123);
+    mInstance.fireEvent("1","test",params);
+
+    Map<String,Object> domChange = new HashMap<>();
+    domChange.put("attr1","123");
+    mInstance.fireEvent("1","test",params,domChange);
+  }
+
+
+  @Test
+  public void testOnActivityLifecycle() throws Exception {
+    mInstance.registerActivityStateListener(mock(IWXActivityStateListener.class));
+    mInstance.onActivityCreate();
+    mInstance.onActivityStart();
+    mInstance.onActivityResume();
+    mInstance.onActivityPause();
+    mInstance.onActivityStop();
+    mInstance.onActivityDestroy();
+  }
+
+  @Test
+  public void testOnJSException() throws Exception {
+    mInstance.onJSException(null,null,null);
+    mInstance.onJSException("100","test","some error");
   }
 }
