@@ -624,9 +624,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     if (listener == null || mActivityStateListeners==null) {
       return;
     }
-    if(mActivityStateListeners == null){
-       mActivityStateListeners = new ConcurrentLinkedQueue<>();
-    }
+    mActivityStateListeners = new ConcurrentLinkedQueue<>();
 
     if (!mActivityStateListeners.contains(listener)) {
       mActivityStateListeners.add(listener);
