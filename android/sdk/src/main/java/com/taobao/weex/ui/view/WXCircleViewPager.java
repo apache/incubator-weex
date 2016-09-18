@@ -280,6 +280,7 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
     postInitViewPager();
   }
 
+  @Override
   public boolean handleMessage(Message msg) {
     if (isAutoScroll && !isPause) {
 
@@ -331,7 +332,9 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
     mCircleHandler.removeCallbacksAndMessages(null);
   }
 
-
+  public boolean isAutoScroll() {
+    return isAutoScroll;
+  }
 
   @Override
   public void setCurrentItem(int item) {
