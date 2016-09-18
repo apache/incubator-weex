@@ -139,11 +139,12 @@
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
         
         // Temporary here , in order to improve performance, will be refactored next version.
-        WXLogDebug(@"callAddElement...%@, %@, %@, %@", instanceId, ref, element, index);
         NSString *instanceIdString = [instanceId toString];
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
+        
+         WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, insertIndex);
         
         return callAddElement(instanceIdString, parentRef, componentData, insertIndex);
     };
