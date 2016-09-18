@@ -228,6 +228,8 @@ public interface NestedContainer {
      */
     boolean onPreCreate(NestedContainer comp, String src);
 
+    String transformUrl(String origin);
+
     void onCreated(NestedContainer comp, WXSDKInstance nestedInstance);
   }
 }
