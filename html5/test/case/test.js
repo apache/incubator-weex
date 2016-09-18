@@ -60,7 +60,7 @@ Object.assign(global, {
   transformerVersion: subversion.transformer
 })
 
-describe.only('test input and output', () => {
+describe('test input and output', () => {
   let runtime
   let instance
 
@@ -665,16 +665,16 @@ describe.only('test input and output', () => {
     let actual = instance.getRealRoot()
     expect(actual).eql(expected)
 
-    expected.children[0].attr.value = 'abcdefg'
+    instance.doc.body.children[0].attr.value = 'abcdefg'
     instance.$fireEvent(instance.doc.body.children[0].ref, 'change', {}, { attrs: { value: 'abcdefg' }})
-
+    expected.children[0].attr.value = 'abcdefg'
     expected.children.push({ type: 'text', attr: { value: '1 - abcdefg' }})
     actual = instance.getRealRoot()
     expect(actual).eql(expected)
 
-    expected.children[0].attr.value = '12345'
+    instance.doc.body.children[0].attr.value = '12345'
     instance.$fireEvent(instance.doc.body.children[0].ref, 'change', {}, { attrs: { value: '12345' }})
-
+    expected.children[0].attr.value = '12345'
     expected.children.push({ type: 'text', attr: { value: '2 - 12345' }})
     actual = instance.getRealRoot()
     expect(actual).eql(expected)

@@ -1,7 +1,6 @@
 import '../shared'
 import runtime from '../runtime'
 import { subversion } from '../../package.json'
-import * as methods from '../default/api/methods'
 
 const { native, transformer } = subversion
 
@@ -19,6 +18,3 @@ for (const methodName in runtime) {
 // register framework meta info
 global.frameworkVersion = native
 global.transformerVersion = transformer
-
-// register special methods for Weex framework
-global.registerMethods(methods)
