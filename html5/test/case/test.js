@@ -83,6 +83,7 @@ describe('test input and output', () => {
   })
 
   afterEach(() => {
+    callNativeHandler = function () {}
   })
 
   it('single case', () => {
@@ -697,79 +698,78 @@ describe('test input and output', () => {
 })
 
 describe('test callNative signals', () => {
-  // const oriCallNative = defaultFramework.callNative
-  // const callNativeSpy = sinon.spy()
-  // let runtime
-  // let instance
+  const callNativeSpy = sinon.spy()
+  let runtime
+  let instance
 
-  // function genCallNativeWrapper (count) {
-  //   return (name, tasks, cbId) => {
-  //     callNativeSpy(tasks)
-  //     const length = callNativeSpy.args.length
-  //     if (length > count) {
-  //       return -1
-  //     }
-  //     return length
-  //   }
-  // }
+  function genCallNativeWrapper (count) {
+    return (name, tasks, cbId) => {
+      callNativeSpy(tasks)
+      const length = callNativeSpy.args.length
+      if (length > count) {
+        return -1
+      }
+      return length
+    }
+  }
 
-  // before(() => {
-  //   runtime = new Runtime(defaultFramework)
-  //   sinon.stub(console, 'info')
-  //   sinon.stub(console, 'warn')
-  //   sinon.stub(console, 'error')
-  // })
+  before(() => {
+    runtime = new Runtime(defaultFramework)
+    sinon.stub(console, 'info')
+    sinon.stub(console, 'warn')
+    sinon.stub(console, 'error')
+  })
 
-  // after(() => {
-  //   console.info.restore()
-  //   console.warn.restore()
-  //   console.error.restore()
-  // })
+  after(() => {
+    console.info.restore()
+    console.warn.restore()
+    console.error.restore()
+  })
 
-  // beforeEach(() => {
-  //   instance = new Instance(runtime)
-  //   callNativeSpy.reset()
-  // })
+  beforeEach(() => {
+    instance = new Instance(runtime)
+    callNativeSpy.reset()
+  })
 
-  // afterEach(() => {
-  //   defaultFramework.callNative = oriCallNative
-  // })
+  afterEach(() => {
+    callNativeHandler = function () {}
+  })
 
-  // it('signals control', function () {
-  //   this.timeout(15000)
+  it('signals control', function () {
+    this.timeout(15000)
 
-  //   const name = 'signals'
-  //   const inputCode = readInput(name)
+    const name = 'signals'
+    const inputCode = readInput(name)
 
-  //   function run (calls) {
-  //     callNativeSpy.reset()
-  //     defaultFramework.callNative = genCallNativeWrapper(calls)
-  //     instance.$create(inputCode)
-  //     instance.$destroy()
-  //     expect(callNativeSpy.args.length).eql(calls + 2)
-  //   }
+    function run (calls) {
+      callNativeSpy.reset()
+      callNativeHandler = genCallNativeWrapper(calls)
+      instance.$create(inputCode)
+      instance.$destroy()
+      expect(callNativeSpy.args.length).eql(calls + 2)
+    }
 
-  //   for (let i = 5; i < 60; i++) {
-  //     run(i)
-  //   }
-  // })
+    for (let i = 5; i < 60; i++) {
+      run(i)
+    }
+  })
 
-  // it('long signals control', function () {
-  //   this.timeout(50000)
+  it('long signals control', function () {
+    this.timeout(50000)
 
-  //   const name = 'signals-long'
-  //   const inputCode = readInput(name)
+    const name = 'signals-long'
+    const inputCode = readInput(name)
 
-  //   function run (calls) {
-  //     callNativeSpy.reset()
-  //     defaultFramework.callNative = genCallNativeWrapper(calls)
-  //     instance.$create(inputCode)
-  //     instance.$destroy()
-  //     expect(callNativeSpy.args.length).eql(calls + 2)
-  //   }
+    function run (calls) {
+      callNativeSpy.reset()
+      callNativeHandler = genCallNativeWrapper(calls)
+      instance.$create(inputCode)
+      instance.$destroy()
+      expect(callNativeSpy.args.length).eql(calls + 2)
+    }
 
-  //   run(10)
-  //   run(30)
-  //   run(90)
-  // })
+    run(10)
+    run(30)
+    run(90)
+  })
 })
