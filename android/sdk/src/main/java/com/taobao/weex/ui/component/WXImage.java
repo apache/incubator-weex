@@ -206,6 +206,7 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -250,8 +251,8 @@ public class WXImage extends WXComponent<ImageView> {
     }
 
     @Override
-    protected ImageView initComponentHostView(Context context) {
-        WXImageView view = new WXImageView(mContext);
+    protected ImageView initComponentHostView(@NonNull Context context) {
+        WXImageView view = new WXImageView(context);
         view.setScaleType(ScaleType.FIT_XY);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) {
             view.setCropToPadding(true);
@@ -339,7 +340,7 @@ public class WXImage extends WXComponent<ImageView> {
                 if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
-                    WXSDKManager.getInstance().fireEvent(getInstance().getInstanceId(),getRef(), Constants.Event.ONLOAD,params);
+                    getInstance().fireEvent(getDomObject().getRef(), Constants.Event.ONLOAD,params);
                 }
             }
         });

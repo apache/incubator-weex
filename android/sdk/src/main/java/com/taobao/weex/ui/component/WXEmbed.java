@@ -426,7 +426,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
-    mInstance.addOnInstanceVisibleListener(this);
+    getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
 
     String url=src;
@@ -488,7 +488,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootCom();
       if(comp != null)
-        WXBridgeManager.getInstance().fireEvent(mNestedInstance.getInstanceId(), comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
+        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
     }
   }
 
@@ -498,7 +498,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootCom();
       if(comp != null)
-        WXBridgeManager.getInstance().fireEvent(mNestedInstance.getInstanceId(), comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
+        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
     }
   }
 }

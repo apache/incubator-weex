@@ -132,6 +132,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -193,9 +194,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** Use {@link #getDomObject()} instead.  Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
   public volatile WXDomObject mDomObj;
-  /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
+  /** Use {@link #getInstanceId()} ()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
-  public String mInstanceId;
+  public final String mInstanceId;
 
   /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
   @Deprecated
@@ -218,6 +219,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
+  private String mCurrentRef;
 
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
@@ -229,12 +231,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.put("y", location[1]);
       params.put("width", mDomObj.getCSSLayoutWidth());
       params.put("height", mDomObj.getCSSLayoutHeight());
-      WXSDKManager.getInstance().fireEvent(mInstanceId,
-          mDomObj.getRef(),
+      getInstance().fireEvent(mCurrentRef,
           Constants.Event.CLICK,
           params);
     }
   };
+
+  public String getInstanceId() {
+    return mInstanceId;
+  }
 
   interface OnClickListener{
     void onHostViewClick();
@@ -256,6 +261,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mDomObj = dom.clone();
     mInstanceId = instance.getInstanceId();
     mLazy = isLazy;
+    mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
   }
@@ -349,6 +355,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (component == null) {
         component = this;
       }
+      mCurrentRef = component.getDomObject().getRef();
       updateProperties(component.getDomObject().getStyles());
       updateProperties(component.getDomObject().getAttrs());
       updateExtra(component.getDomObject().getExtra());
@@ -379,7 +386,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * layout view
    */
   public final void setLayout(WXDomObject domObject) {
-    if (mParent == null || domObject == null || TextUtils.isEmpty(mDomObj.getRef())) {
+    if (mParent == null || domObject == null || TextUtils.isEmpty(mCurrentRef)) {
       return;
     }
 
@@ -662,8 +669,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          WXSDKManager.getInstance().fireEvent(mInstanceId,
-              mDomObj.getRef(),
+          getInstance().fireEvent(mCurrentRef,
               hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
@@ -749,7 +755,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (mDomObj == null) {
       return null;
     }
-    return mDomObj.getRef();
+    return mCurrentRef;
   }
 
   /**
@@ -789,7 +795,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost = initComponentHostView(mContext);
   }
 
-  protected T initComponentHostView(Context context){
+  protected T initComponentHostView(@NonNull Context context){
     /**
      * compatible old initView
      * TODO: change to abstract method in next V1.0 .
@@ -1119,7 +1125,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if(getDomObject().containsEvent(Constants.Event.APPEAR) || getDomObject().containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
-      WXBridgeManager.getInstance().fireEvent(mInstanceId, getRef(), wxEventType, params,null);
+      getInstance().fireEvent(getRef(), wxEventType, params,null);
     }
   }
 
