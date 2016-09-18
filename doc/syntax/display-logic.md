@@ -114,13 +114,13 @@ e.g.
 e.g.
 
 ```html
-<div repeat="{% raw %}{{v in list}}{% endraw %}">
+<div repeat="{{v in list}}">
   <text>No. {{$index + 1}}, {{v.nickname}}</text>
 </div>
 ```
 
 ```html
-<div repeat="{% raw %}{{(k, v) in list}}{% endraw %}">
+<div repeat="{{(k, v) in list}}">
   <text>No. {{k + 1}}, {{v.nickname}}</text>
 </div>
 ```
