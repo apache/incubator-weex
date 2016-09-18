@@ -10,6 +10,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXConvert.h"
 #import "WXTransform.h"
+#import "WXUtility.h"
 
 @implementation WXAnimationModule
 
@@ -19,13 +20,17 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
-    WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
-    if (!targetComponent) {
-        callback([NSString stringWithFormat:@"No component find for ref:%@", nodeRef]);
-        return;
-    }
-    
-    [self animation:targetComponent args:args callback:callback];
+    WXPerformBlockOnComponentThread(^{
+        WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
+        if (!targetComponent) {
+            callback([NSString stringWithFormat:@"No component find for ref:%@", nodeRef]);
+            return;
+        }
+        
+        WXPerformBlockOnMainThread(^{
+            [self animation:targetComponent args:args callback:callback];
+        });
+    });
 }
 
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleCallback)callback
