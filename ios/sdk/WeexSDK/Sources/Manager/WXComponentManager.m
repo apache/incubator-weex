@@ -445,7 +445,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponent *component;
     while ((component = [enumerator nextObject])) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [component _unloadView];
+            [component _unloadViewWithReusing:NO];
         });
     }
     

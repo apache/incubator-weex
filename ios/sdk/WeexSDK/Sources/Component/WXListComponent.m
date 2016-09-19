@@ -401,7 +401,7 @@
     if (![visibleIndexPaths containsObject:indexPath]) {
         WXCellComponent *cell = [self cellForIndexPath:indexPath];
         // Must invoke synchronously otherwise it will remove the view just added.
-        [cell _unloadView];
+        [cell _unloadViewWithReusing:YES];
     }
 }
 
