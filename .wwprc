@@ -25,6 +25,7 @@
     "webview",
     "navigator",
     "storage",
-    "clipboard"
+    "clipboard",
+    "geolocation"
   ]
 }
