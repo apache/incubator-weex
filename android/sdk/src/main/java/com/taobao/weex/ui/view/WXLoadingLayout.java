@@ -202,66 +202,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.ui.view.WXLoadingLayout;
-import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
-import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
-import com.taobao.weex.utils.WXUtils;
 
 /**
- * div component
+ * Created by lixinke on 16/9/19.
  */
-public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadingListener {
+public class WXLoadingLayout extends WXBaseRefreshLayout {
 
-  public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-  }
-
-  @Override
-  protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-    return new WXLoadingLayout(context);
-  }
-
-  @Override
-  public void onLoading() {
-    if (getDomObject().getEvents().contains(Constants.Event.ONLOADING)) {
-      getInstance().fireEvent(getRef(), Constants.Event.ONLOADING);
-    }
-  }
-
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.DISPLAY:
-        String display = WXUtils.getString(param,null);
-        if (display != null)
-          setDisplay(display);
-        return true;
-    }
-    return super.setProperty(key, param);
-  }
-
-  @WXComponentProp(name = Constants.Name.DISPLAY)
-  public void setDisplay(String display) {
-    if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
-        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
-          if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
-            ((BaseBounceView) getParent().getHostView()).finishPullLoad();
-            ((BaseBounceView) getParent().getHostView()).onLoadmoreComplete();
-          }
-        }
-      }
-    }
+  public WXLoadingLayout(Context context) {
+    super(context);
   }
 }
