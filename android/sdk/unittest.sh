@@ -1,2 +1,2 @@
 #! /bin/sh
-./gradlew testDebugUnitTest jacocoTestReportDebug
+./gradlew clean testDebugUnitTest jacocoTestReportDebug
