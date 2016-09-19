@@ -695,6 +695,51 @@ describe('test input and output', () => {
 
     instance.$destroy()
   })
+
+  it('use HTML5 timer API', function (done) {
+    this.timeout(5000)
+    const name = 'timer'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    setTimeout(_ => {
+      const actual = instance.getRealRoot()
+      expect(actual).eql(expected)
+      setTimeout(_ => {
+        expected.children[0].attr.value = 'bar'
+        const actual = instance.getRealRoot()
+        expect(actual).eql(expected)
+        instance.$destroy()
+        done()
+      }, 1000)
+    }, 1000)
+  })
+
+  it('use modal API', function (done) {
+    this.timeout(5000)
+    const name = 'modal'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    // the test driver will hold the API callback about 1 sec
+    setTimeout(_ => {
+      expected.children[0].attr.value = 'bar'
+      const actual = instance.getRealRoot()
+      expect(actual).eql(expected)
+      instance.$destroy()
+      done()
+    }, 1500)
+  })
 })
 
 describe('test callNative signals', () => {
