@@ -303,7 +303,9 @@ public class WXModalUIModule extends WXModule {
       builder.setPositiveButton(okTitle_f, new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          callback.invoke(okTitle_f);
+          if(callback !=null) {
+            callback.invoke(okTitle_f);
+          }
         }
       });
       AlertDialog alertDialog = builder.create();
@@ -345,14 +347,17 @@ public class WXModalUIModule extends WXModule {
       builder.setPositiveButton(okTitle_f, new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          callback.invoke(okTitle_f);
+          if(callback != null){
+            callback.invoke(okTitle_f);
+          }
         }
       });
       builder.setNegativeButton(cancelTitle_f, new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          callback.invoke(cancelTitle_f);
-
+          if(callback != null){
+            callback.invoke(cancelTitle_f);
+          }
         }
       });
       AlertDialog alertDialog = builder.create();
@@ -398,20 +403,24 @@ public class WXModalUIModule extends WXModule {
       builder.setPositiveButton(okTitle_f, new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          Map<String, Object> result = new HashMap<String, Object>();
-          result.put(RESULT, okTitle_f);
-          result.put(DATA, editText.getText().toString());
-          callback.invoke( result);
-
+          if(callback != null){
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put(RESULT, okTitle_f);
+            result.put(DATA, editText.getText().toString());
+            callback.invoke( result);
+          }
         }
       });
       builder.setNegativeButton(cancelTitle_f, new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          Map<String, Object> result = new HashMap<String, Object>();
-          result.put(RESULT, cancelTitle_f);
-          result.put(DATA, editText.getText().toString());
-          callback.invoke( result);
+          if(callback !=null){
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put(RESULT, cancelTitle_f);
+            result.put(DATA, editText.getText().toString());
+            callback.invoke( result);
+          }
+
         }
       });
       AlertDialog alertDialog = builder.create();
