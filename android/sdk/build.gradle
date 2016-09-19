@@ -22,11 +22,15 @@ allprojects {
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.hierynomus.license'
-apply plugin: 'com.vanniktech.android.junit.jacoco'
 apply plugin: 'checkstyle'
 
-junitJacoco {
-    excludes = ['com/taobao/weex/dom/flex/**']
+ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
+
+if(!disableCov.toBoolean()){
+    apply plugin: 'com.vanniktech.android.junit.jacoco'
+    junitJacoco {
+        excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
+    }
 }
 
 task checkstyle(type: Checkstyle) {
