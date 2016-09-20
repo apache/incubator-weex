@@ -209,7 +209,6 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -529,9 +528,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public int callAddElement(String instanceId, String ref,String dom,String index, String callback){
 
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callNative::callAddElement >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref).append(", dom:").append(dom).append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
     if(mDestroyedInstanceId!=null && mDestroyedInstanceId.contains(instanceId)){
       return IWXBridge.DESTROY_INSTANCE;
     }
+
 
     if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
       long start = System.currentTimeMillis();
