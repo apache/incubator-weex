@@ -17,6 +17,7 @@
 #import "WXHandlerFactory.h"
 #import "WXDebugTool.h"
 #import "WXUtility.h"
+#import "WXAssert.h"
 #import "WXLog.h"
 #import "WXView.h"
 #import "WXThreadSafeMutableDictionary.h"
@@ -284,11 +285,15 @@ NSTimeInterval JSLibInitTime = 0;
 
 - (WXComponent *)componentForRef:(NSString *)ref
 {
+    WXAssertComponentThread();
+    
     return [_componentManager componentForRef:ref];
 }
 
 - (NSUInteger)numberOfComponents
 {
+    WXAssertComponentThread();
+    
     return [_componentManager numberOfComponents];
 }
 

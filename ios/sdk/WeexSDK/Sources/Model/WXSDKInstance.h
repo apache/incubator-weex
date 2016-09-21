@@ -177,12 +177,12 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (id)moduleForClass:(Class)moduleClass;
 
 /**
- * get Componet instance by ref
+ * get Component instance by ref, must be called on component thread by calling WXPerformBlockOnComponentThread
  */
 - (WXComponent *)componentForRef:(NSString *)ref;
 
 /**
- * Number of components created
+ * Number of components created, must be called on component thread by calling WXPerformBlockOnComponentThread
  */
 - (NSUInteger)numberOfComponents;
 

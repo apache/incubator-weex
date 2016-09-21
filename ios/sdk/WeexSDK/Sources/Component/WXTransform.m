@@ -75,6 +75,10 @@
 - (CATransform3D)getTransform:(NSString *)cssValue withView:(UIView *)view withOrigin:(NSString *)origin
 {
     if (origin && origin.length > 0 && ![origin isEqualToString:@"none"]) {
+        /**
+          * Waiting to fix the issue that transform-origin behaves in rotation 
+          * http://ronnqvi.st/translate-rotate-translate/
+         **/
         CGPoint originPoint = [self getTransformOrigin:origin withView:view];
         if (originPoint.x != 0 || originPoint.y != 0) {
             cssValue = [NSString stringWithFormat:@"translate(%f,%f) %@ translate(%f,%f)", originPoint.x, originPoint.y, cssValue, -originPoint.x, -originPoint.y];
@@ -185,7 +189,7 @@
 {
     float rotateAngle = [self getAngle:value[0]];
     
-    if (_isTransformRotate) {
+    if (_isTransformRotate || rotateAngle <= M_PI+0.0001) {
         _transform = CGAffineTransformRotate(_transform, rotateAngle);
     }
 

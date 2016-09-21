@@ -46,7 +46,6 @@ typedef NS_ENUM(NSInteger, WXSliderNeighborOption)
 - (void)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor didScrollToItemAtIndex:(NSInteger)index;
 
 - (CGFloat)sliderNeighborItemWidth:(WXSliderNeighborView * _Nonnull)sliderNeighbor;
-- (CATransform3D)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor itemTransformForOffset:(CGFloat)offset baseTransform:(CATransform3D)transform;
 - (CGFloat)sliderNeighbor:(WXSliderNeighborView * _Nonnull)sliderNeighbor valueForOption:(WXSliderNeighborOption)option withDefault:(CGFloat)value;
 
 @end

@@ -201,7 +201,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
-     WXComponent *component = [self _buildComponentForData:componentData];
+    WXComponent *component = [self _buildComponentForData:componentData];
     
     index = (index == -1 ? supercomponent->_subcomponents.count : index);
     
@@ -271,8 +271,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (WXComponent *)componentForRef:(NSString *)ref
 {
-    NSDictionary *dict = [_indexDict copy];
-    return [dict objectForKey:ref];
+    WXAssertComponentThread();
+    
+    return [_indexDict objectForKey:ref];
 }
 
 - (WXComponent *)componentForRoot
@@ -282,6 +283,8 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (NSUInteger)numberOfComponents
 {
+    WXAssertComponentThread();
+    
     return _indexDict.count;
 }
 
@@ -442,7 +445,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponent *component;
     while ((component = [enumerator nextObject])) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [component _unloadView];
+            [component _unloadViewWithReusing:NO];
         });
     }
     

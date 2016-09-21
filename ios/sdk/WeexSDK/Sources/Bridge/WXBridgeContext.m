@@ -221,11 +221,9 @@ _Pragma("clang diagnostic pop") \
     
     [self callJSMethod:@"destroyInstance" args:@[instance]];
     
-#ifdef DEBUG
     if ([self.jsBridge respondsToSelector:@selector(garbageCollect)]) {
          [self.jsBridge garbageCollect];
     }
-#endif
 }
 
 - (void)refreshInstance:(NSString *)instance

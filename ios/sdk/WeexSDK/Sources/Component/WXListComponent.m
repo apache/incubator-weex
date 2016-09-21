@@ -225,8 +225,6 @@
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    [super _insertSubcomponent:subcomponent atIndex:index];
-    
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).list = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
@@ -237,6 +235,8 @@
         WXLogError(@"list only support cell/header/refresh/loading/fixed-component as child.");
         return;
     }
+    
+    [super _insertSubcomponent:subcomponent atIndex:index];
     
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
     if (_sections.count <= indexPath.section) {
@@ -401,7 +401,7 @@
     if (![visibleIndexPaths containsObject:indexPath]) {
         WXCellComponent *cell = [self cellForIndexPath:indexPath];
         // Must invoke synchronously otherwise it will remove the view just added.
-        [cell _unloadView];
+        [cell _unloadViewWithReusing:YES];
     }
 }
 

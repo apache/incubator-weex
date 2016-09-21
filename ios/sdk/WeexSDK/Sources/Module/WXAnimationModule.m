@@ -10,6 +10,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXConvert.h"
 #import "WXTransform.h"
+#import "WXUtility.h"
 
 @implementation WXAnimationModule
 
@@ -19,13 +20,17 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
-    WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
-    if (!targetComponent) {
-        callback([NSString stringWithFormat:@"No component find for ref:%@", nodeRef]);
-        return;
-    }
-    
-    [self animation:targetComponent args:args callback:callback];
+    WXPerformBlockOnComponentThread(^{
+        WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
+        if (!targetComponent) {
+            callback([NSString stringWithFormat:@"No component find for ref:%@", nodeRef]);
+            return;
+        }
+        
+        WXPerformBlockOnMainThread(^{
+            [self animation:targetComponent args:args callback:callback];
+        });
+    });
 }
 
 - (void)animation:(WXComponent *)targetComponent args:(NSDictionary *)args callback:(WXModuleCallback)callback
@@ -55,7 +60,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             WXTransform *wxTransform = [WXTransform new];
             transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin isTransformRotate:NO];
             rotateAngle = [wxTransform getRotateAngle];
-            if (rotateAngle != 0) {
+            if (rotateAngle > M_PI+0.0001) {
                 /**
                  Rotate >= 180 degree not working on UIView block animation, have not found any more elegant solution than using CAAnimation
                  See http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation

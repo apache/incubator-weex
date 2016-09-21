@@ -12,6 +12,8 @@
 #import "WXAppMonitorProtocol.h"
 #import "WXHandlerFactory.h"
 #import "WXLog.h"
+#import "WXUtility.h"
+#import "WXComponentManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXAppConfiguration.h"
 
@@ -78,22 +80,6 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
 
 + (void)performanceFinish:(WXSDKInstance *)instance
 {
-    static NSDictionary *commitKeyDict;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // non-standard perf commit names, remove this hopefully.
-        commitKeyDict = @{
-                              @(WXPTInitalize) : SDKINITTIME,
-                              @(WXPTInitalizeSync) : SDKINITINVOKETIME,
-                              @(WXPTFrameworkExecute) : JSLIBINITTIME,
-                              @(WXPTJSDownload) : NETWORKTIME,
-                              @(WXPTJSCreateInstance) : COMMUNICATETIME,
-                              @(WXPTFirstScreenRender) : SCREENRENDERTIME,
-                              @(WXPTAllRender) : TOTALTIME,
-                              @(WXPTBundleSize) : JSTEMPLATESIZE
-                              };
-    });
-    
     NSMutableDictionary *commitDict = [NSMutableDictionary dictionaryWithCapacity:WXPTEnd+4];
     
     commitDict[BIZTYPE] = instance.bizType ?: @"";
@@ -101,8 +87,34 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     commitDict[WXSDKVERSION] = WX_SDK_VERSION;
     commitDict[JSLIBVERSION] = [WXAppConfiguration JSFrameworkVersion];
 #if DEBUG
-    commitDict[@"componentCount"] = @([instance numberOfComponents]);
+    WXPerformBlockOnComponentThread(^{
+        commitDict[@"componentCount"] = @([instance numberOfComponents]);
+        WXPerformBlockOnMainThread(^{
 #endif
+    [self commitPerformanceWithDict:commitDict instance:instance];
+#if DEBUG
+        });
+    });
+#endif
+}
+
++ (void)commitPerformanceWithDict:(NSMutableDictionary *)commitDict instance:(WXSDKInstance *)instance
+{
+    static NSDictionary *commitKeyDict;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // non-standard perf commit names, remove this hopefully.
+        commitKeyDict = @{
+                          @(WXPTInitalize) : SDKINITTIME,
+                          @(WXPTInitalizeSync) : SDKINITINVOKETIME,
+                          @(WXPTFrameworkExecute) : JSLIBINITTIME,
+                          @(WXPTJSDownload) : NETWORKTIME,
+                          @(WXPTJSCreateInstance) : COMMUNICATETIME,
+                          @(WXPTFirstScreenRender) : SCREENRENDERTIME,
+                          @(WXPTAllRender) : TOTALTIME,
+                          @(WXPTBundleSize) : JSTEMPLATESIZE
+                          };
+    });
     
     for (int tag = 0; tag < WXPTEnd; tag++) {
         NSMutableDictionary *performanceDict = tag <= WXPTFrameworkExecute ? globalPerformanceDict : instance.performanceDict;

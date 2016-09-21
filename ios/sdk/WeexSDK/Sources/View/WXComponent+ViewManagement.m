@@ -158,9 +158,13 @@
     }
 }
 
-- (void)_unloadView
+- (void)_unloadViewWithReusing:(BOOL)isReusing
 {
     WXAssertMainThread();
+    
+    if (isReusing && self->_positionType == WXPositionTypeFixed) {
+        return;
+    }
     
     [self viewWillUnload];
     
@@ -174,10 +178,12 @@
     }
     
     for (WXComponent *subcomponents in [self.subcomponents reverseObjectEnumerator]) {
-        [subcomponents _unloadView];
+        [subcomponents _unloadViewWithReusing:isReusing];
     }
     
+    [_view removeFromSuperview];
     _view = nil;
+    [_layer removeFromSuperlayer];
     _layer = nil;
     
     [self viewDidUnload];
