@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component;
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXLogUtils;
@@ -237,5 +238,14 @@ public class WXA extends WXDiv {
         }
       }
     });
+  }
+
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch(key){
+      case Constants.Name.HREF:
+        return true;
+    }
+    return super.setProperty(key, param);
   }
 }
