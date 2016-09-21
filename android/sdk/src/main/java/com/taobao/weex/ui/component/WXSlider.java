@@ -245,7 +245,10 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   /**
    * Scrollable sliderview
    */
-  /** package **/ WXCircleViewPager mViewPager;
+  /**
+   * package
+   **/
+  WXCircleViewPager mViewPager;
   /**
    * Circle indicator
    */
@@ -274,7 +277,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     FrameLayout view = new FrameLayout(context);
     // init view pager
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
-         LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     mViewPager = new WXCircleViewPager(context);
     mViewPager.setLayoutParams(pagerParams);
 
@@ -464,7 +467,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @WXComponentProp(name = Constants.Name.INDEX)
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
-      if(index >= mAdapter.getRealCount() || index < 0){
+      if (index >= mAdapter.getRealCount() || index < 0) {
         return;
       }
       index = index % mAdapter.getRealCount();
@@ -516,7 +519,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     @Override
     public void onPageScrollStateChanged(int arg0) {
       FrameLayout root = getHostView();
-      if(null != root) {
+      if (null != root) {
         root.invalidate();
       }
     }
