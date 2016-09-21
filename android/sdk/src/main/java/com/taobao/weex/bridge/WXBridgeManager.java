@@ -671,7 +671,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   /**
    * Invoke JavaScript callback. Use {@link JSCallback} instead.
-   * @see #callback(String, String, Map<String, Object>)
    */
   @Deprecated
   public void callback(final String instanceId, final String callback,
