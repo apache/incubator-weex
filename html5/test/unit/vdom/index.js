@@ -4,8 +4,6 @@ import sinonChai from 'sinon-chai'
 const { expect } = chai
 chai.use(sinonChai)
 
-global.callNative = function () {}
-
 import {
   instanceMap,
   Document,
@@ -16,6 +14,16 @@ import {
 import Listener from '../../../vdom/listener'
 
 global.callNative = function () {}
+
+const tempHandler = Document.handler
+
+before(() => {
+  Document.handler = global.callNative
+})
+
+after(() => {
+  Document.handler = tempHandler
+})
 
 describe('document constructor', () => {
   it('create & destroy document', () => {

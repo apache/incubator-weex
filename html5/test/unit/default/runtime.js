@@ -6,11 +6,15 @@ const {
 } = chai
 chai.use(sinonChai)
 
-import framework from '../../../runtime'
-import frameworks from '../../../runtime/config'
-import config from '../../../default/config'
+import { init, config } from '../../../runtime'
+import frameworks from '../../../config'
+import defaultConfig from '../../../default/config'
+config.frameworks = frameworks
+
 import Vm from '../../../default/vm'
 import { clearModules, getModule } from '../../../default/app/register'
+
+const framework = init(config)
 
 function clearRefs (json) {
   delete json.ref
@@ -35,6 +39,7 @@ describe('framework entry', () => {
         }])
       }
     }
+    config.Document.handler = global.callNative
   })
 
   afterEach(() => {
@@ -42,6 +47,7 @@ describe('framework entry', () => {
   })
 
   after(() => {
+    config.Document.handler = function () {}
     global.callNative = oriCallNative
   })
 
@@ -252,7 +258,7 @@ describe('framework entry', () => {
   describe('registerComponents', () => {
     it('with old format', () => {
       framework.registerComponents(['a', 'b', 'c'])
-      expect(config.nativeComponentMap).to.contain.keys('a', 'b', 'c')
+      expect(defaultConfig.nativeComponentMap).to.contain.keys('a', 'b', 'c')
     })
 
     it('with new format', () => {
@@ -260,8 +266,8 @@ describe('framework entry', () => {
         type: 'd',
         append: 'tree'
       }])
-      expect(config.nativeComponentMap).to.contain.keys('d')
-      expect(config.nativeComponentMap['d']).to.be.deep.equal({
+      expect(defaultConfig.nativeComponentMap).to.contain.keys('d')
+      expect(defaultConfig.nativeComponentMap['d']).to.be.deep.equal({
         type: 'd',
         append: 'tree'
       })
@@ -271,7 +277,7 @@ describe('framework entry', () => {
       framework.registerComponents({
         type: 'e'
       })
-      expect(config.nativeComponentMap).not.contain.keys('e')
+      expect(defaultConfig.nativeComponentMap).not.contain.keys('e')
     })
   })
 

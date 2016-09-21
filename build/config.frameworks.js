@@ -10,7 +10,7 @@ if (process.argv[2]) {
 var path = require('path')
 var fs = require('fs')
 
-var dirPath = path.resolve(__dirname, '..', 'html5', 'runtime')
+var dirPath = path.resolve(__dirname, '..', 'html5', 'config')
 
 function getAllFrameworkNames () {
   var files = fs.readdirSync(dirPath)
@@ -44,7 +44,7 @@ function generateContent () {
 
 function writeContent() {
   var content = generateContent()
-  var filePath = path.join(dirPath, 'config.js')
+  var filePath = path.join(dirPath, 'index.js')
   fs.writeFileSync(filePath, content)
 }
 
