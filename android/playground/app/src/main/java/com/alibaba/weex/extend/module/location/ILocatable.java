@@ -6,9 +6,6 @@ import com.taobao.weex.WXSDKInstance;
  */
 public interface ILocatable {
 
-  /**
-   * request location persimmon
-   */
   int REQUEST_CUR_PERMISSION_CODE = 0x12;
   int REQUEST_WATCH_PERMISSION_CODE = 0x13;
 
@@ -18,11 +15,8 @@ public interface ILocatable {
   String ERROR_MSG = "errorMsg";
   String COORDS = "coords";
   String ADDRESS = "address";
-  String REGISTER_ID = "registerId";
+  String WATCH_ID = "watchId";
 
-  /**
-   * error code
-   */
   interface ErrorCode {
 
     int SUCCESS = 90000;
@@ -32,9 +26,6 @@ public interface ILocatable {
     int LOCATION_TIME_OUT = 9004;
   }
 
-  /**
-   * error msg
-   */
   interface ErrorMsg {
 
     String NO_PERMISSION_ERROR = "NO PERMISSION";
@@ -66,9 +57,9 @@ public interface ILocatable {
   /**
    * remove global location listener.
    *
-   * @param registerID register id,you can get from watchPosition method。
+   * @param watchId register id,you can get from watchPosition method。
    */
-  void clearWatch(String registerID);
+  void clearWatch(String watchId);
 
   /**
    * set instance
