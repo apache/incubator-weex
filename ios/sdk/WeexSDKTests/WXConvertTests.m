@@ -44,7 +44,7 @@
     
     
     val= [WXConvert NSUInteger:@"9"];
-    XCTAssertTrue(9);
+    XCTAssertTrue(9==val);
     
     //test max
     NSString * unsignedIntMax = [NSString stringWithFormat:@"%lu", NSUIntegerMax ];
@@ -60,6 +60,25 @@
     NSString * ulval  = [NSString stringWithFormat:@"%llu", uio ];
     val = [WXConvert NSUInteger:ulval];
     XCTAssertTrue(0==val);//overflowed
+    
+}
+
+- (void) testArray{
+    NSMutableArray * array = [[NSMutableArray alloc]initWithCapacity:1];
+    [array addObject:@"x"];
+    NSUInteger val = [WXConvert NSUInteger:array];
+    XCTAssertTrue(0==val);//test array
+    
+    NSMutableArray *array1 = [[NSMutableArray alloc]initWithCapacity:1];
+    val = [WXConvert NSUInteger:array1];
+    XCTAssertTrue(0==val);//test array
+}
+
+- (void) testDict{
+    NSMutableDictionary * dict = [[NSMutableDictionary alloc]initWithCapacity:1];
+    [dict setObject:@"sdfasd" forKey:@"3"];
+    NSUInteger val = [WXConvert NSUInteger:dict];
+    XCTAssertTrue(0==val);//test array
     
 }
 
