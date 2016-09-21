@@ -354,7 +354,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     mListener = new EmbedRenderListener(this);
 
     if(instance instanceof EmbedManager) {
-      String itemId = (String) node.getAttrs().get(ITEM_ID);
+      String itemId = node.getAttrs().get(ITEM_ID).toString();
       ((EmbedManager) instance).putEmbed(itemId, this);
     }
   }

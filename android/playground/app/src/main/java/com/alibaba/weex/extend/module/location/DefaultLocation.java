@@ -33,15 +33,17 @@ import java.util.UUID;
  */
 public class DefaultLocation implements ILocatable {
 
-  private static final String TAG = "WindvaneLocation";
-  private Map<String, WeexLocationListener> mRegisterSucCallbacks = new HashMap<>();
-  private List<WeexLocationListener> mWeexLocationListeners = new ArrayList<>();
+  private static final String TAG = "DefaultLocation";
+  private static final int TIME_OUT_WHAT = 0x11;
+
+  private Map<String, WXLocationListener> mRegisterSucCallbacks = new HashMap<>();
+  private List<WXLocationListener> mWXLocationListeners = new ArrayList<>();
   private WXSDKInstance mWXSDKInstance;
   private LocationManager mLocationManager;
 
   private static final int GPS_TIMEOUT = 15000;
   private int MIN_TIME = 20000;
-  private int MIN_DISTANCE = 30;
+  private int MIN_DISTANCE = 5;
 
   public DefaultLocation(WXSDKInstance instance) {
     mWXSDKInstance = instance;
@@ -58,11 +60,11 @@ public class DefaultLocation implements ILocatable {
     if (!TextUtils.isEmpty(params)) {
       try {
         org.json.JSONObject jsObj = new org.json.JSONObject(params);
-        boolean enableHighAcuracy = jsObj.optBoolean("enableHighAcuracy");
+        boolean enableHighAccuracy = jsObj.optBoolean("enableHighAccuracy");
         boolean enableAddress = jsObj.optBoolean("address");
-        WeexLocationListener listener = findLocation(null, successCallback, errorCallback, enableHighAcuracy, enableAddress);
+        WXLocationListener listener = findLocation(null, successCallback, errorCallback, enableHighAccuracy, enableAddress);
         if (listener != null) {
-          mWeexLocationListeners.add(listener);
+          mWXLocationListeners.add(listener);
         }
         return;
       } catch (JSONException e) {
@@ -75,22 +77,22 @@ public class DefaultLocation implements ILocatable {
     WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallback, options);
   }
 
-  private WeexLocationListener findLocation(String registerID, String sucCallback, String errorCallback, boolean enableHighAcuracy, boolean enableAddress) {
-    WXLogUtils.d(TAG, "into--[findLocation] registerID:" + registerID + "\nsuccessCallback:" + sucCallback + "\nerrorCallback:" + errorCallback + "\nenableHighAcuracy:" + enableHighAcuracy + "\nenableAddress:" + enableAddress);
+  private WXLocationListener findLocation(String watchId, String sucCallback, String errorCallback, boolean enableHighAccuracy, boolean enableAddress) {
+    WXLogUtils.d(TAG, "into--[findLocation] mWatchId:" + watchId + "\nsuccessCallback:" + sucCallback + "\nerrorCallback:" + errorCallback + "\nenableHighAccuracy:" + enableHighAccuracy + "\nmEnableAddress:" + enableAddress);
 
     if (mLocationManager == null) {
       mLocationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
     }
     Criteria criteria = new Criteria();
-    if (enableHighAcuracy) {
+    if (enableHighAccuracy) {
       criteria.setAccuracy(Criteria.ACCURACY_COARSE);
     }
     //String provider = locationManager.getBestProvider(criteria, false);
     if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-      WeexLocationListener weexLocationListener = new WeexLocationListener(mLocationManager, mWXSDKInstance, registerID, sucCallback, errorCallback, enableAddress);
-      mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, weexLocationListener);
-      mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, weexLocationListener);
-      return weexLocationListener;
+      WXLocationListener WXLocationListener = new WXLocationListener(mLocationManager, mWXSDKInstance, watchId, sucCallback, errorCallback, enableAddress);
+      mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, WXLocationListener);
+      mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, WXLocationListener);
+      return WXLocationListener;
     } else {
       Map<String, Object> options = new HashMap<>();
       options.put(ERROR_CODE, ErrorCode.NO_PERMISSION_ERROR);
@@ -106,11 +108,11 @@ public class DefaultLocation implements ILocatable {
     if (!TextUtils.isEmpty(params)) {
       try {
         org.json.JSONObject jsObj = new org.json.JSONObject(params);
-        boolean enableHighAcuracy = jsObj.optBoolean("enableHighAcuracy");
+        boolean enableHighAccuracy = jsObj.optBoolean("enableHighAccuracy");
         boolean enableAddress = jsObj.optBoolean("address");
 
         String id = UUID.randomUUID().toString();
-        WeexLocationListener listener = findLocation(id, successCallback, errorCallback, enableHighAcuracy, enableAddress);
+        WXLocationListener listener = findLocation(id, successCallback, errorCallback, enableHighAccuracy, enableAddress);
         if (listener != null) {
           mRegisterSucCallbacks.put(id, listener);
         }
@@ -126,18 +128,18 @@ public class DefaultLocation implements ILocatable {
   }
 
   @Override
-  public void clearWatch(String registerID) {
-    WXLogUtils.d("into--[clearWatch] registerID:" + registerID);
+  public void clearWatch(String watchId) {
+    WXLogUtils.d("into--[clearWatch] mWatchId:" + watchId);
     if (mWXSDKInstance == null || mWXSDKInstance.isDestroy() || mLocationManager == null) {
       return;
     }
     if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-      WeexLocationListener listener = mRegisterSucCallbacks.get(registerID);
+      WXLocationListener listener = mRegisterSucCallbacks.get(watchId);
       if (listener != null) {
         listener.destroy();
         mLocationManager.removeUpdates(listener);
       }
-      mRegisterSucCallbacks.remove(registerID);
+      mRegisterSucCallbacks.remove(watchId);
     }
   }
 
@@ -148,52 +150,58 @@ public class DefaultLocation implements ILocatable {
       return;
     }
 
-    if (mWeexLocationListeners != null && mWeexLocationListeners.size() > 0) {
-      for (WeexLocationListener listener : mWeexLocationListeners) {
-        if (listener != null) {
-          listener.destroy();
-          mLocationManager.removeUpdates(listener);
+    if (mWXLocationListeners != null && mWXLocationListeners.size() > 0) {
+      if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        for (WXLocationListener listener : mWXLocationListeners) {
+          if (listener != null) {
+            listener.destroy();
+            mLocationManager.removeUpdates(listener);
+          }
         }
+        mWXLocationListeners.clear();
       }
-      mWeexLocationListeners.clear();
     }
 
     if (mRegisterSucCallbacks != null && mRegisterSucCallbacks.size() > 0) {
-      Collection<WeexLocationListener> values = mRegisterSucCallbacks.values();
+      Collection<WXLocationListener> values = mRegisterSucCallbacks.values();
       if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        for (WeexLocationListener listener : values) {
+        for (WXLocationListener listener : values) {
           listener.destroy();
           mLocationManager.removeUpdates(listener);
         }
+        mRegisterSucCallbacks.clear();
       }
-      mRegisterSucCallbacks.clear();
     }
   }
 
-  static class WeexLocationListener implements LocationListener, Handler.Callback {
+  static class WXLocationListener implements LocationListener, Handler.Callback {
 
     private WXSDKInstance mWXSDKInstance;
-    private String registerID;
-    private String sucCallback;
-    private String errorCallbak;
-    private boolean enableAddress;
+    private String mWatchId;
+    private String mSucCallback;
+    private String mErrorCallback;
+    private boolean mEnableAddress;
     private Handler mHandler;
     private LocationManager mLocationManager;
 
-    private WeexLocationListener(LocationManager locationManager, WXSDKInstance instance, String registerID, String sucCallback, String errorCallback, boolean enableAddress) {
+    private WXLocationListener(LocationManager locationManager, WXSDKInstance instance, String watchId, String sucCallback, String errorCallback, boolean enableAddress) {
       mWXSDKInstance = instance;
-      this.registerID = registerID;
-      this.sucCallback = sucCallback;
-      this.errorCallbak = errorCallback;
-      this.enableAddress = enableAddress;
+      this.mWatchId = watchId;
+      this.mSucCallback = sucCallback;
+      this.mErrorCallback = errorCallback;
+      this.mEnableAddress = enableAddress;
       mHandler = new Handler(this);
       mLocationManager = locationManager;
-      mHandler.sendEmptyMessageDelayed(1, GPS_TIMEOUT);
+//      WVThreadPool.getInstance().execute(new Runnable() {
+//        public void run() {
+          mHandler.sendEmptyMessageDelayed(TIME_OUT_WHAT, GPS_TIMEOUT);
+//        }
+//      });
     }
 
     @Override
     public void onLocationChanged(Location location) {
-      mHandler.removeMessages(1);
+      mHandler.removeMessages(TIME_OUT_WHAT);
       WXLogUtils.d(TAG, "into--[onLocationChanged] location:" + location == null ? "Location is NULL!" : location.toString());
 
       if (mWXSDKInstance == null || mWXSDKInstance.isDestroy()) {
@@ -214,7 +222,7 @@ public class DefaultLocation implements ILocatable {
         result.put(COORDS, coords);
 
         // 行政区域
-        if (enableAddress) {
+        if (mEnableAddress) {
           Address addr = getAddress(latitude, longitude);
           Map<String, Object> address = new HashMap<>();
           if (addr != null) {
@@ -237,20 +245,20 @@ public class DefaultLocation implements ILocatable {
         }
         result.put(ERROR_CODE, ErrorCode.SUCCESS);
         result.put(ERROR_MSG, ErrorMsg.SUCCESS);
-        if (!TextUtils.isEmpty(registerID)) {
-          result.put(REGISTER_ID, registerID);
+        if (!TextUtils.isEmpty(mWatchId)) {
+          result.put(WATCH_ID, mWatchId);
         }
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), sucCallback, result, TextUtils.isEmpty(registerID) ? false : true);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), mSucCallback, result, TextUtils.isEmpty(mWatchId) ? false : true);
       } else {
         Map<String, Object> options = new HashMap<>();
         options.put(ERROR_CODE, ErrorCode.LOCATION_ERROR);
         options.put(ERROR_MSG, ErrorMsg.LOCATION_ERROR);
-        if (!TextUtils.isEmpty(registerID)) {
-          options.put(REGISTER_ID, registerID);
+        if (!TextUtils.isEmpty(mWatchId)) {
+          options.put(WATCH_ID, mWatchId);
         }
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallbak, options, TextUtils.isEmpty(registerID) ? false : true);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), mErrorCallback, options, TextUtils.isEmpty(mWatchId) ? false : true);
       }
-      if (TextUtils.isEmpty(registerID)) {
+      if (TextUtils.isEmpty(mWatchId)) {
         if (mLocationManager != null && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
           destroy();
           mLocationManager.removeUpdates(this);
@@ -275,7 +283,7 @@ public class DefaultLocation implements ILocatable {
 
     @Override
     public boolean handleMessage(Message msg) {
-      if (msg.what == 1) {
+      if (msg.what == TIME_OUT_WHAT) {
         WXLogUtils.d(TAG, "into--[handleMessage] Location Time Out!");
         if (mWXSDKInstance == null || mWXSDKInstance.isDestroy() || mLocationManager == null) {
           return false;
@@ -286,10 +294,10 @@ public class DefaultLocation implements ILocatable {
         Map<String, Object> options = new HashMap<>();
         options.put(ERROR_CODE, ErrorCode.LOCATION_TIME_OUT);
         options.put(ERROR_MSG, ErrorMsg.LOCATION_TIME_OUT);
-        if (!TextUtils.isEmpty(registerID)) {
-          options.put(REGISTER_ID, registerID);
+        if (!TextUtils.isEmpty(mWatchId)) {
+          options.put(WATCH_ID, mWatchId);
         }
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), errorCallbak, options);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), mErrorCallback, options);
         return true;
       }
       return false;
@@ -317,7 +325,8 @@ public class DefaultLocation implements ILocatable {
 
     public void destroy() {
       if (mHandler != null) {
-        mHandler.removeMessages(1);
+        mHandler.removeMessages(TIME_OUT_WHAT);
+        mWXSDKInstance=null;
       }
     }
   }
