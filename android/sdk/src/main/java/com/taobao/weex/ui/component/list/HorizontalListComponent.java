@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component.list;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -212,6 +213,8 @@ import com.taobao.weex.ui.component.WXVContainer;
 /**
  * Created by sospartan on 6/2/16.
  */
+@Component(lazyload = false)
+
 public class HorizontalListComponent extends WXListComponent {
   public HorizontalListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);

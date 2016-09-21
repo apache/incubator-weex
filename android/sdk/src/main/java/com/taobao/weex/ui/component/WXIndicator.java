@@ -211,6 +211,7 @@ import android.view.View;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
@@ -227,6 +228,7 @@ import java.util.Map;
  *
  * Slider indicator
  */
+@Component(lazyload = false)
 public class WXIndicator extends WXComponent<WXCircleIndicator> {
 
   @Deprecated

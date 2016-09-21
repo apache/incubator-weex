@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXEditText;
 
@@ -212,6 +213,7 @@ import com.taobao.weex.ui.view.WXEditText;
  *
  * Input component
  */
+@Component(lazyload = false)
 public class WXInput extends AbstractEditComponent{
 
   @Deprecated
