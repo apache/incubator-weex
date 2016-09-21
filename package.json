@@ -52,7 +52,7 @@
     "test:unit": "mocha --compilers js:babel-core/register html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:cover": "babel-node node_modules/isparta/bin/isparta cover --report text node_modules/mocha/bin/_mocha -- --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:e2e": "npm run build:browser && node html5/test/e2e/runner.js",
-    "test": "npm run build:config && npm run lint && npm run test:cover && npm run test:e2e",
+    "test": "npm run build:config && npm run lint && npm run test:cover && npm run test:case && npm run test:e2e",
     "serve": "serve ./ -p 12580",
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
@@ -106,6 +106,7 @@
     "weex-components": "^0.2.0",
     "weex-loader": "^0.3.1",
     "weex-rx-framework": "^0.0.9",
+    "weex-vdom-tester": "^0.1.0",
     "weex-vue-components": "^0.1.0",
     "weex-vue-framework": "^0.1.8",
     "weex-vue-loader": "^0.1.1"
