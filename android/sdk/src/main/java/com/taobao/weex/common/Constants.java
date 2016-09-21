@@ -211,7 +211,7 @@ public class Constants {
   }
 
   public interface Name {
-
+    String HREF = "href";
     String WIDTH = "width";
     String MIN_WIDTH = "minWidth";
     String MAX_WIDTH = "maxWidth";

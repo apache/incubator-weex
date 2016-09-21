@@ -583,7 +583,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   /**
-   * SetProperty to hostview
+   * Apply styles and attributes.
    * @param key name of argument
    * @param param value of argument
    * @return true means that the property is consumed
