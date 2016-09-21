@@ -257,6 +257,10 @@ public class WXSliderTest {
     return (WXIndicator) new SimpleComponentHolder(WXIndicator.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
+  public static WXIndicator createIndicator(WXVContainer container) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXIndicator) new SimpleComponentHolder(WXIndicator.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), container, false);
+  }
+
   @Before
   public void setup() throws Exception {
     component = create();
@@ -277,7 +281,7 @@ public class WXSliderTest {
     component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
     component.addChild(ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class));
 
-    WXIndicator indicator = new WXIndicator(component.mInstance,new TestDomObject(),component,false);
+    WXIndicator indicator = new WXIndicator(component.getInstance(),new TestDomObject(),component,false);
     ComponentTest.create(indicator);
     component.addChild(indicator);
     ComponentTest.create(component);
@@ -304,8 +308,7 @@ public class WXSliderTest {
 
   @Test
   public void testIndicator() throws Exception {
-    WXIndicator indicator = createIndicator();
-    indicator.mParent = component;
+    WXIndicator indicator = createIndicator(component);
     ComponentTest.create(indicator);
     component.addChild(indicator);
     ComponentTest.setProperty(indicator,IPROPS,IVALUES);

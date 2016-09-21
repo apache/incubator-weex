@@ -508,7 +508,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         Map<String, Object> attrsChanges = new HashMap<>();
         attrsChanges.put("value", realPosition);
         domChanges.put("attrs", attrsChanges);
-        WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
+        WXSDKManager.getInstance().fireEvent(getInstanceId(), ref,
             Constants.Event.CHANGE, params, domChanges);
       }
 

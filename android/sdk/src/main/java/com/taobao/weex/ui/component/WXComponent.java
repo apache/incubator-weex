@@ -186,24 +186,13 @@ import java.util.Set;
 public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener {
 
   public static int mComponentNum = 0;
-  public T mHost;
+  /** package **/ T mHost;
 
-  /** Use {@link #getParent()} instead.  Do not access this field outside of this class which will be removed soon.**/
-  @Deprecated
-  public volatile WXVContainer mParent;
-  /** Use {@link #getDomObject()} instead.  Do not access this field outside of this class which will be removed soon.**/
-  @Deprecated
-  public volatile WXDomObject mDomObj;
-  /** Use {@link #getInstanceId()} ()} instead. Do not access this field outside of this class which will be removed soon.**/
-  @Deprecated
-  public final String mInstanceId;
+  private volatile WXVContainer mParent;
+  private volatile WXDomObject mDomObj;
+  private WXSDKInstance mInstance;
+  private Context mContext;
 
-  /** Use {@link #getInstance()} instead. Do not access this field outside of this class which will be removed soon.**/
-  @Deprecated
-  protected WXSDKInstance mInstance;
-  /** Use {@link #getContext()} instead. Do not access this field outside of this class which will be removed soon.**/
-  @Deprecated
-  protected Context mContext;
   protected int mAbsoluteY = 0;
   protected int mAbsoluteX = 0;
   protected Set<String> mGestureType;
@@ -238,7 +227,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   };
 
   public String getInstanceId() {
-    return mInstanceId;
+    return mInstance.getInstanceId();
   }
 
   interface OnClickListener{
@@ -259,7 +248,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mContext = mInstance.getContext();
     mParent = parent;
     mDomObj = dom.clone();
-    mInstanceId = instance.getInstanceId();
     mLazy = isLazy;
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
