@@ -224,6 +224,24 @@ public class Constants {
     String FLEX_DIRECTION = "flexDirection";
     String JUSTIFY_CONTENT = "justifyContent";
     String FLEX_WRAP = "flexWrap";
+
+    String MARGIN = "margin";
+    String MARGIN_TOP = "marginTop";
+    String MARGIN_LEFT = "marginLeft";
+    String MARGIN_RIGHT = "marginRight";
+    String MARGIN_BOTTOM = "marginBottom";
+    String PADDING = "padding";
+    String PADDING_TOP = "paddingTop";
+    String PADDING_LEFT = "paddingLeft";
+    String PADDING_RIGHT = "paddingRight";
+    String PADDING_BOTTOM = "paddingBottom";
+
+    String LEFT = "left";
+    String TOP = "top";
+    String RIGHT = "right";
+    String BOTTOM = "bottom";
+
+
     String BACKGROUND_COLOR = "backgroundColor";
     String OPACITY = "opacity";
     String BORDER_RADIUS = "borderRadius";
@@ -246,21 +264,9 @@ public class Constants {
     String BORDER_BOTTOM_STYLE = "borderBottomStyle";
     String BORDER_LEFT_STYLE = "borderLeftStyle";
     String BORDER_TOP_STYLE = "borderTopStyle";
-    String MARGIN = "margin";
-    String MARGIN_TOP = "marginTop";
-    String MARGIN_LEFT = "marginLeft";
-    String MARGIN_RIGHT = "marginRight";
-    String MARGIN_BOTTOM = "marginBottom";
-    String PADDING = "padding";
-    String PADDING_TOP = "paddingTop";
-    String PADDING_LEFT = "paddingLeft";
-    String PADDING_RIGHT = "paddingRight";
-    String PADDING_BOTTOM = "paddingBottom";
+
     String POSITION = "position";
-    String LEFT = "left";
-    String TOP = "top";
-    String RIGHT = "right";
-    String BOTTOM = "bottom";
+
     String TEXT_DECORATION = "textDecoration";
     String TEXT_ALIGN = "textAlign";
     String FONT_WEIGHT = "fontWeight";
