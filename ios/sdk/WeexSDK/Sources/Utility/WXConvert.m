@@ -37,7 +37,6 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 
 
-
 //unsignedLongLongValue
 + (uint64_t)uint64_t:(id)value {\
     NSString * strval = [NSString stringWithFormat:@"%@",value];
