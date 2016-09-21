@@ -945,6 +945,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mGlobalEvents.clear();
     }
 
+    mNestedInstanceInterceptor = null;
+    mUserTrackAdapter = null;
+    mWXHttpAdapter = null;
     rootView = null;
     mScrollView = null;
     mContext = null;
