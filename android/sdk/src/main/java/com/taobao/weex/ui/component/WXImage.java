@@ -278,6 +278,8 @@ public class WXImage extends WXComponent<ImageView> {
                 if (src != null)
                     setSrc(src);
                 return true;
+            case Constants.Name.IMAGE_QUALITY:
+                return true;
         }
         return super.setProperty(key, param);
     }

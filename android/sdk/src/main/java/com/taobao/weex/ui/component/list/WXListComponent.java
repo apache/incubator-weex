@@ -258,6 +258,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         IRecyclerAdapterListener<ListBaseViewHolder>,IOnLoadMoreListener,Scrollable {
 
   public static final String TRANSFORM = "transform";
+  public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "WXListComponent";
   private int mListCellCount = 0;
   private String mLoadMoreRetry = "";
@@ -452,6 +453,15 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
     return findDirectListChild(parent);
+  }
+
+  @Override
+  protected boolean setProperty(String key, Object param) {
+    switch (key){
+      case LOADMOREOFFSET:
+        return true;
+    }
+    return super.setProperty(key, param);
   }
 
   private void setAppearanceWatch(WXComponent component, int event, boolean enable) {
