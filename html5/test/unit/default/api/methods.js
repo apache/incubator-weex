@@ -5,9 +5,9 @@ const { expect } = chai
 chai.use(sinonChai)
 
 import '../../../../shared/console'
-import * as modules from '../../../../default/api/modules'
-import * as methods from '../../../../default/api/methods'
-import { initModules, requireModule, clearModules, initMethods } from '../../../../default/app/register'
+import * as modules from '../../../../frameworks/legacy/api/modules'
+import * as methods from '../../../../frameworks/legacy/api/methods'
+import { initModules, requireModule, clearModules, initMethods } from '../../../../frameworks/legacy/app/register'
 
 function Vm () {
 }

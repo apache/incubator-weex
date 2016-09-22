@@ -6,8 +6,8 @@ chai.use(sinonChai)
 
 global.callNative = function () {}
 
-import App from '../../../../default/app'
-import { Element } from '../../../../vdom'
+import App from '../../../../frameworks/legacy/app'
+import { Element } from '../../../../runtime/vdom'
 
 describe('App Instance', () => {
   const oriCallNative = global.callNative

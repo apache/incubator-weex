@@ -34,12 +34,12 @@ import {
 // env
 
 import '../../shared'
-import { Document, Element, Comment } from '../../vdom'
-import Listener from '../../vdom/listener'
+import { Document, Element, Comment } from '../../runtime/vdom'
+import Listener from '../../runtime/listener'
 
 // framework
 
-import * as defaultFramework from '../../default'
+import * as defaultFramework from '../../frameworks/legacy'
 import { subversion } from '../../../package.json'
 
 let callNativeHandler = function () {}

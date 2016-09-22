@@ -1,7 +1,7 @@
 import chai from 'chai'
 const { expect } = chai
 
-import * as util from '../../../../default/util'
+import * as util from '../../../../frameworks/legacy/util'
 
 describe('Util', () => {
   describe('isReserved', () => {

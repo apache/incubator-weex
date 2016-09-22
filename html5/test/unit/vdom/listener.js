@@ -6,8 +6,8 @@ chai.use(sinonChai)
 
 global.callNative = function () {}
 
-import { Document } from '../../../vdom'
-import Listener from '../../../vdom/listener'
+import { Document } from '../../../runtime/vdom'
+import Listener from '../../../runtime/listener'
 
 global.callNative = function () {}
 

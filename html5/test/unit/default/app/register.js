@@ -12,7 +12,7 @@ import {
   requireModule,
   requireCustomComponent,
   registerCustomComponent
-} from '../../../../default/app/register'
+} from '../../../../frameworks/legacy/app/register'
 
 function Ctx () {
   this.customComponentMap = {}

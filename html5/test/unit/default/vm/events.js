@@ -6,9 +6,9 @@ chai.use(sinonChai)
 
 global.callNative = function () {}
 
-import Vm from '../../../../default/vm'
-import { Document } from '../../../../vdom'
-import Listener from '../../../../vdom/listener'
+import Vm from '../../../../frameworks/legacy/vm'
+import { Document } from '../../../../runtime/vdom'
+import Listener from '../../../../runtime/listener'
 
 describe('bind and fire events', () => {
   let doc, customComponentMap, spy

@@ -7,12 +7,12 @@ const {
 chai.use(sinonChai)
 
 import { init, config } from '../../../runtime'
-import frameworks from '../../../config'
-import defaultConfig from '../../../default/config'
+import frameworks from '../../../frameworks'
+import defaultConfig from '../../../frameworks/legacy/config'
 config.frameworks = frameworks
 
-import Vm from '../../../default/vm'
-import { clearModules, getModule } from '../../../default/app/register'
+import Vm from '../../../frameworks/legacy/vm'
+import { clearModules, getModule } from '../../../frameworks/legacy/app/register'
 
 const framework = init(config)
 

@@ -9,9 +9,9 @@ import {
   Document,
   Element,
   Comment
-} from '../../../vdom'
+} from '../../../runtime/vdom'
 
-import Listener from '../../../vdom/listener'
+import Listener from '../../../runtime/listener'
 
 global.callNative = function () {}
 
