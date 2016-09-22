@@ -3,9 +3,9 @@
  * Weex instance constructor & definition
  */
 
-import { requireModule } from '../../../default/app/register'
+import { requireModule } from '../../../../frameworks/legacy/app/register'
 import { updateActions, callTasks } from './ctrl'
-import App from '../../../default/app/instance'
+import App from '../../../../frameworks/legacy/app/instance'
 
 /**
  * @deprecated

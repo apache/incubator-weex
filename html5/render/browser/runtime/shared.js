@@ -1,4 +1,4 @@
-import '../../shared/promise'
+import '../../../shared/promise'
 // import '../../shared/console'
 
 export {
@@ -10,4 +10,4 @@ export {
   toArray,
   isObject,
   isPlainObject
-} from '../../shared/utils'
+} from '../../../shared/utils'

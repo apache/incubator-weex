@@ -7,14 +7,14 @@
  * corresponded with the API of instance manager (framework.js)
  */
 
-import Vm from '../../../../default/vm'
-import { removeWeexPrefix } from '../../../../default/util'
+import Vm from '../../../../../frameworks/legacy/vm'
+import { removeWeexPrefix } from '../../../../../frameworks/legacy/util'
 import {
   defineFn,
   bootstrap,
   register
 } from '../bundle'
-import { updateActions } from '../../../../default/app/ctrl/misc'
+import { updateActions } from '../../../../../frameworks/legacy/app/ctrl/misc'
 
 /**
  * Init an app by run code witgh data

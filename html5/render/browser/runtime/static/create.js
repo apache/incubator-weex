@@ -1,5 +1,5 @@
 import App from '../app'
-import { instanceMap } from '../../../default/static/map'
+import { instanceMap } from '../../../../frameworks/legacy/static/map'
 import { init as initApp } from '../app/ctrl'
 
 /**

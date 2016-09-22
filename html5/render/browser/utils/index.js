@@ -17,7 +17,7 @@ export {
   isObject,
   isPlainObject,
   typof
-} from '../../default/util'
+} from '../../../frameworks/legacy/util'
 
 import { isArray, slice } from './array'
 export { isArray, slice }

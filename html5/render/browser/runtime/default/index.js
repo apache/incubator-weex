@@ -13,7 +13,7 @@
  *   - callback(funcId, data)
  */
 export { createInstance } from '../static/create'
-export { init, refreshInstance, destroyInstance } from '../../../default/static/life'
-export { registerComponents, registerModules, registerMethods } from '../../../default/static/register'
-export { receiveTasks } from '../../../default/static/bridge'
-export { getRoot } from '../../../default/static/misc'
+export { init, refreshInstance, destroyInstance } from '../../../../frameworks/legacy/static/life'
+export { registerComponents, registerModules, registerMethods } from '../../../../frameworks/legacy/static/register'
+export { receiveTasks } from '../../../../frameworks/legacy/static/bridge'
+export { getRoot } from '../../../../frameworks/legacy/static/misc'

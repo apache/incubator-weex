@@ -19,4 +19,4 @@ export {
   callback,
   updateActions,
   callTasks
-} from '../../../../default/app/ctrl/misc'
+} from '../../../../../frameworks/legacy/app/ctrl/misc'

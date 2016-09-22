@@ -1,14 +1,14 @@
-import Vm from '../../../../default/vm'
+import Vm from '../../../../../frameworks/legacy/vm'
 import {
   requireCustomComponent
-} from '../../../../default/app/register'
+} from '../../../../../frameworks/legacy/app/register'
 import {
   isPlainObject,
   isWeexComponent,
   isNpmModule,
   removeWeexPrefix,
   removeJSSurfix
-} from '../../../../default/util'
+} from '../../../../../frameworks/legacy/util'
 
 /**
  * bootstrap app from a certain custom component with config & data

@@ -4,9 +4,9 @@ import './shared'
 // import init from '../../runtime/init'
 import init from './init'
 import frameworks from './config'
-import { Document, Element, Comment } from '../../vdom'
+import { Document, Element, Comment } from '../../../runtime/vdom'
 // import { subversion } from '../../../package.json'
-import * as methods from '../../default/api/methods'
+import * as methods from '../../../frameworks/legacy/api/methods'
 import Listener from '../dom/componentManager'
 
 const config = {
