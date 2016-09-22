@@ -17,7 +17,7 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
 })
 
 module.exports = {
-  entry: './html5/browser',
+  entry: './html5/render/browser',
   output: {
     path: './dist',
     filename: 'browser.js',

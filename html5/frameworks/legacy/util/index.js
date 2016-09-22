@@ -7,7 +7,7 @@ export {
   toArray,
   isObject,
   isPlainObject
-} from '../../shared/utils'
+} from '../../../shared/utils'
 
 /**
  * Check if a string starts with $ or _

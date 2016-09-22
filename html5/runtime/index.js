@@ -5,8 +5,8 @@
  * virtual-DOM layer.
  */
 
-import { Document, Element, Comment } from '../vdom'
-import Listener from '../vdom/listener'
+import { Document, Element, Comment } from './vdom'
+import Listener from './listener'
 import init from './init'
 
 const config = {

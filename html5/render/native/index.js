@@ -1,7 +1,7 @@
-import '../shared'
-import { subversion } from '../../package.json'
-import { init, config } from '../runtime'
-import frameworks from '../config'
+import '../../shared'
+import { subversion } from '../../../package.json'
+import { init, config } from '../../runtime'
+import frameworks from '../../frameworks'
 config.frameworks = frameworks
 const { native, transformer } = subversion
 

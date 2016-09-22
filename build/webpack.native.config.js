@@ -27,7 +27,7 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
 })
 
 module.exports = {
-  entry: './html5/native',
+  entry: './html5/render/native',
   output: {
     path: './dist',
     filename: 'native.js',

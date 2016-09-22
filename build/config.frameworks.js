@@ -10,7 +10,7 @@ if (process.argv[2]) {
 var path = require('path')
 var fs = require('fs')
 
-var dirPath = path.resolve(__dirname, '..', 'html5', 'config')
+var dirPath = path.resolve(__dirname, '..', 'html5', 'frameworks')
 
 function getAllFrameworkNames () {
   var files = fs.readdirSync(dirPath)
