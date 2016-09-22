@@ -2,22 +2,22 @@ const config = {}
 
 const instanceMap = {}
 
-export function init (cfg) {
+function init (cfg) {
   config.Document = cfg.Document
   config.Element = cfg.Element
   config.Comment = cfg.Comment
   config.sendTasks = cfg.sendTasks
 }
 
-export function registerComponents (components) {}
+function registerComponents (components) {}
 
-export function registerModules (modules) {}
+function registerModules (modules) {}
 
-export function registerMethods (apis) {}
+function registerMethods (apis) {}
 
-export function prepareInstance (id, options, data) {}
+function prepareInstance (id, options, data) {}
 
-export function createInstance (id, code, options, data) {
+function createInstance (id, code, options, data) {
   const document = new config.Document(id, options.bundleUrl)
   const callbacks = {}
   let lastCallbackId = 0
@@ -57,17 +57,17 @@ export function createInstance (id, code, options, data) {
   )
 }
 
-export function refreshInstance (id, data) {}
+function refreshInstance (id, data) {}
 
-export function destroyInstance (id) {
+function destroyInstance (id) {
   delete instanceMap[id]
 }
 
-export function getRoot (id) {
+function getRoot (id) {
   return instanceMap[id].body.toJSON()
 }
 
-export function receiveTasks (id, tasks) {
+function receiveTasks (id, tasks) {
   const jsHandlers = {
     fireEvent: (id, ref, type, data, domChanges) => {
       const document = instanceMap[id]
@@ -95,3 +95,14 @@ export function receiveTasks (id, tasks) {
     return results
   }
 }
+
+exports.init = init
+exports.registerComponents = registerComponents
+exports.registerModules = registerModules
+exports.registerMethods = registerMethods
+exports.prepareInstance = prepareInstance
+exports.createInstance = createInstance
+exports.refreshInstance = refreshInstance
+exports.destroyInstance = destroyInstance
+exports.getRoot = getRoot
+exports.receiveTasks = receiveTasks
