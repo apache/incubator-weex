@@ -137,6 +137,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -146,9 +147,7 @@ import android.widget.ScrollView;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
@@ -558,13 +557,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
 
   public void updateProperties(Map<String, Object> props) {
-    if (props == null|| props.isEmpty() || mHost == null) {
+    if (props == null || mHost == null) {
       return;
     }
 
-    for (String key : props.keySet()){
-      Object param = props.get(key);
-      if (!setProperty(key, param)) {
+      for(String key : props.keySet()) {
+        Object param = props.get(key);
+        if(!setProperty(key, param)){
         Invoker invoker = mHolder.getMethod(key);
         if (invoker != null) {
           try {
@@ -651,6 +650,33 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         String visibility = WXUtils.getString(param,null);
         if (visibility != null)
           setVisibility(visibility);
+        return true;
+      case Constants.Name.WIDTH:
+      case Constants.Name.MIN_WIDTH:
+      case Constants.Name.MAX_WIDTH:
+      case Constants.Name.HEIGHT:
+      case Constants.Name.MIN_HEIGHT:
+      case Constants.Name.MAX_HEIGHT:
+      case Constants.Name.ALIGN_ITEMS:
+      case Constants.Name.ALIGN_SELF:
+      case Constants.Name.FLEX:
+      case Constants.Name.FLEX_DIRECTION:
+      case Constants.Name.JUSTIFY_CONTENT:
+      case Constants.Name.FLEX_WRAP:
+      case Constants.Name.MARGIN:
+      case Constants.Name.MARGIN_TOP:
+      case Constants.Name.MARGIN_LEFT:
+      case Constants.Name.MARGIN_RIGHT:
+      case Constants.Name.MARGIN_BOTTOM:
+      case Constants.Name.PADDING:
+      case Constants.Name.PADDING_TOP:
+      case Constants.Name.PADDING_LEFT:
+      case Constants.Name.PADDING_RIGHT:
+      case Constants.Name.PADDING_BOTTOM:
+      case Constants.Name.LEFT:
+      case Constants.Name.TOP:
+      case Constants.Name.RIGHT:
+      case Constants.Name.BOTTOM:
         return true;
       default:
         return false;

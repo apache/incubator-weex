@@ -211,6 +211,7 @@ import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXSwitchView;
@@ -218,6 +219,8 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+@Component(lazyload = false)
 
 public class WXSwitch extends WXComponent<WXSwitchView>{
 

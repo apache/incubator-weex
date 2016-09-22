@@ -211,6 +211,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -219,6 +220,8 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 /**
  * Root component for components in {@link WXListComponent}
  */
+@Component(lazyload = false)
+
 public class WXCell extends WXVContainer<WXFrameLayout> {
 
     public int lastLocationY = -1;

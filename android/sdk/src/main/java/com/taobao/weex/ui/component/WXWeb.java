@@ -207,10 +207,10 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-
 import android.view.View;
+
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.IWebView;
@@ -219,6 +219,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+@Component(lazyload = false)
 
 public class WXWeb extends WXComponent {
 
