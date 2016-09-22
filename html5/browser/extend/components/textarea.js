@@ -12,7 +12,8 @@ const DEFAULT_ROWS = 2
 const proto = {
   create () {
     const node = document.createElement('textarea')
-    node.classList.add('weex-element', 'weex-textarea')
+    node.classList.add('weex-element')
+    node.classList.add('weex-textarea')
     return node
   }
 }
