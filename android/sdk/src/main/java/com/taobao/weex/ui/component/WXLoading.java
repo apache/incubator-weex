@@ -209,6 +209,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.list.WXListComponent;
@@ -221,6 +222,7 @@ import com.taobao.weex.utils.WXUtils;
 /**
  * div component
  */
+@Component(lazyload = false)
 public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadingListener {
 
   public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {

@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -216,9 +215,9 @@ import android.widget.FrameLayout.LayoutParams;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
@@ -247,6 +246,8 @@ import java.util.Map.Entry;
  * Component for scroller. It also support features like
  * "appear", "disappear" and "sticky"
  */
+@Component(lazyload = false)
+
 public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewListener,Scrollable {
 
   public static final String DIRECTION = "direction";
