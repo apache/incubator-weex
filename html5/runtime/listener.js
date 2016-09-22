@@ -1,4 +1,4 @@
-export default function Listener (id, handler) {
+function Listener (id, handler) {
   this.id = id
   this.batched = false
   this.updates = []
@@ -98,6 +98,9 @@ Listener.prototype.addActions = function (actions) {
   }
 }
 
-export function createAction (name, args) {
+function createAction (name, args) {
   return { module: 'dom', method: name, args: args }
 }
+
+exports.default = Listener
+exports.createAction = createAction

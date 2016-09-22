@@ -2,16 +2,15 @@
  * @fileOverview
  * A simple virtual dom implementation
  */
-// import { extend } from '../shared'
-import { extend } from '../shared/utils'
-import Listener from './listener'
+const { extend } = require('../shared/utils')
+const Listener = require('./listener').default
 
 const DEFAULT_TAG_NAME = 'div'
 
-export const instanceMap = {}
+const instanceMap = {}
 let nextNodeRef = 1
 
-export function Document (id, url, handler) {
+function Document (id, url, handler) {
   id = id ? id.toString() : ''
   this.id = id
   this.URL = url
@@ -164,7 +163,7 @@ function updateElement (el, changes) {
   }
 }
 
-export function Node () {
+function Node () {
   this.nodeId = (nextNodeRef++).toString()
   this.ref = this.nodeId
   this.children = []
@@ -185,7 +184,7 @@ Node.prototype.destroy = function () {
   })
 }
 
-export function Element (type = DEFAULT_TAG_NAME, props) {
+function Element (type = DEFAULT_TAG_NAME, props) {
   props = props || {}
   this.nodeType = 1
   this.nodeId = (nextNodeRef++).toString()
@@ -539,7 +538,7 @@ Element.prototype.toString = function () {
     '</' + this.type + '>'
 }
 
-export function Comment (value) {
+function Comment (value) {
   this.nodeType = 8
   this.nodeId = (nextNodeRef++).toString()
   this.ref = this.nodeId
@@ -554,3 +553,9 @@ Comment.prototype = new Node()
 Comment.prototype.toString = function () {
   return '<!-- ' + this.value + ' -->'
 }
+
+exports.instanceMap = instanceMap
+exports.Document = Document
+exports.Node = Node
+exports.Element = Element
+exports.Comment = Comment

@@ -5,7 +5,7 @@
  * @param {Object} from
  */
 
-export function extend (target, ...src) {
+function extend (target, ...src) {
   if (typeof Object.assign === 'function') {
     Object.assign(target, ...src)
   }
@@ -30,7 +30,7 @@ export function extend (target, ...src) {
  * @param {Boolean} [enumerable]
  */
 
-export function def (obj, key, val, enumerable) {
+function def (obj, key, val, enumerable) {
   Object.defineProperty(obj, key, {
     value: val,
     enumerable: !!enumerable,
@@ -46,7 +46,7 @@ export function def (obj, key, val, enumerable) {
  * @param {*} item
  */
 
-export function remove (arr, item) {
+function remove (arr, item) {
   if (arr.length) {
     const index = arr.indexOf(item)
     if (index > -1) {
@@ -63,7 +63,7 @@ export function remove (arr, item) {
  * @return {Boolean}
  */
 const hasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwn (obj, key) {
+function hasOwn (obj, key) {
   return hasOwnProperty.call(obj, key)
 }
 
@@ -75,7 +75,7 @@ export function hasOwn (obj, key) {
  * @return {Function}
  */
 
-export function bind (fn, ctx) {
+function bind (fn, ctx) {
   return function (a) {
     const l = arguments.length
     return l
@@ -94,7 +94,7 @@ export function bind (fn, ctx) {
  * @return {Array}
  */
 
-export function toArray (list, start) {
+function toArray (list, start) {
   start = start || 0
   let i = list.length - start
   const ret = new Array(i)
@@ -113,7 +113,7 @@ export function toArray (list, start) {
  * @return {Boolean}
  */
 
-export function isObject (obj) {
+function isObject (obj) {
   return obj !== null && typeof obj === 'object'
 }
 
@@ -127,6 +127,15 @@ export function isObject (obj) {
 
 const toString = Object.prototype.toString
 const OBJECT_STRING = '[object Object]'
-export function isPlainObject (obj) {
+function isPlainObject (obj) {
   return toString.call(obj) === OBJECT_STRING
 }
+
+exports.extend = extend
+exports.def = def
+exports.remove = remove
+exports.hasOwn = hasOwn
+exports.bind = bind
+exports.toArray = toArray
+exports.isObject = isObject
+exports.isPlainObject = isPlainObject

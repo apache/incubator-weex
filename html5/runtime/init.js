@@ -99,7 +99,7 @@ function adaptInstance (methodName, nativeMethodName) {
   }
 }
 
-export default function init (config) {
+function init (config) {
   frameworks = config.frameworks || {}
 
   // Init each framework by `init` method and `config` which contains three
@@ -119,3 +119,5 @@ export default function init (config) {
 
   return methods
 }
+
+exports.default = init

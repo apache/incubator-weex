@@ -1,9 +1,9 @@
-import './setTimeout'
-import './promise'
-import './console'
-import './objectAssign'
+require('./setTimeout')
+require('./promise')
+require('./console')
+require('./objectAssign')
 
-export {
+const {
   extend,
   def,
   remove,
@@ -12,4 +12,13 @@ export {
   toArray,
   isObject,
   isPlainObject
-} from './utils'
+} = require('./utils')
+
+exports.extend = extend
+exports.def = def
+exports.remove = remove
+exports.hasOwn = hasOwn
+exports.bind = bind
+exports.toArray = toArray
+exports.isObject = isObject
+exports.isPlainObject = isPlainObject

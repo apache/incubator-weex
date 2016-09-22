@@ -1,7 +1,10 @@
 let nextNodeRef = 1
 
-export const instanceMap = {}
+const instanceMap = {}
 
-export function getNextNodeRef () {
+function getNextNodeRef () {
   return nextNodeRef++
 }
+
+exports.instanceMap = instanceMap
+exports.getNextNodeRef = getNextNodeRef
