@@ -1,1 +1,1 @@
-import * as Weex from '../default'
+import * as Weex from './legacy'

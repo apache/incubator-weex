@@ -1,1 +1,1 @@
-import * as Vanilla from '../vanilla'
+import * as Vanilla from './vanilla'
