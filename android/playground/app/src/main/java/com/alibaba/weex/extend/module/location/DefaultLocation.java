@@ -15,6 +15,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXLogUtils;
@@ -56,7 +57,9 @@ public class DefaultLocation implements ILocatable {
 
   @Override
   public void getCurrentPosition(final String successCallback, final String errorCallback, final String params) {
-    WXLogUtils.d(TAG, "into--[getCurrentPosition] successCallback:" + successCallback + " \nerrorCallback:" + errorCallback + " \nparams:" + params);
+    if(WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d(TAG, "into--[getCurrentPosition] successCallback:" + successCallback + " \nerrorCallback:" + errorCallback + " \nparams:" + params);
+    }
     if (!TextUtils.isEmpty(params)) {
       try {
         org.json.JSONObject jsObj = new org.json.JSONObject(params);
@@ -78,7 +81,7 @@ public class DefaultLocation implements ILocatable {
   }
 
   private WXLocationListener findLocation(String watchId, String sucCallback, String errorCallback, boolean enableHighAccuracy, boolean enableAddress) {
-    WXLogUtils.d(TAG, "into--[findLocation] mWatchId:" + watchId + "\nsuccessCallback:" + sucCallback + "\nerrorCallback:" + errorCallback + "\nenableHighAccuracy:" + enableHighAccuracy + "\nmEnableAddress:" + enableAddress);
+//    WXLogUtils.d(TAG, "into--[findLocation] mWatchId:" + watchId + "\nsuccessCallback:" + sucCallback + "\nerrorCallback:" + errorCallback + "\nenableHighAccuracy:" + enableHighAccuracy + "\nmEnableAddress:" + enableAddress);
 
     if (mLocationManager == null) {
       mLocationManager = (LocationManager) mWXSDKInstance.getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -202,7 +205,9 @@ public class DefaultLocation implements ILocatable {
     @Override
     public void onLocationChanged(Location location) {
       mHandler.removeMessages(TIME_OUT_WHAT);
-      WXLogUtils.d(TAG, "into--[onLocationChanged] location:" + location == null ? "Location is NULL!" : location.toString());
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "into--[onLocationChanged] location:" + location == null ? "Location is NULL!" : location.toString());
+      }
 
       if (mWXSDKInstance == null || mWXSDKInstance.isDestroy()) {
         return;
@@ -284,7 +289,9 @@ public class DefaultLocation implements ILocatable {
     @Override
     public boolean handleMessage(Message msg) {
       if (msg.what == TIME_OUT_WHAT) {
-        WXLogUtils.d(TAG, "into--[handleMessage] Location Time Out!");
+        if(WXEnvironment.isApkDebugable()) {
+          WXLogUtils.d(TAG, "into--[handleMessage] Location Time Out!");
+        }
         if (mWXSDKInstance == null || mWXSDKInstance.isDestroy() || mLocationManager == null) {
           return false;
         }
@@ -307,7 +314,9 @@ public class DefaultLocation implements ILocatable {
      * get address info
      */
     private Address getAddress(double latitude, double longitude) {
-      WXLogUtils.d(TAG, "into--[getAddress] latitude:" + latitude + " longitude:" + longitude);
+      if(WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "into--[getAddress] latitude:" + latitude + " longitude:" + longitude);
+      }
       try {
         if (mWXSDKInstance == null || mWXSDKInstance.isDestroy()) {
           return null;
