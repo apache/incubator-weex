@@ -68,7 +68,7 @@ See [SCRIPTS.md](./SCRIPTS.md) for more information.
 
 See [Weex Community](https://github.com/alibaba/weex/wiki/Weex-Community) Wiki page
 
-Weex team have developed a [DevTool](https://github.com/weexteam/weex-devtool) help you to improve `we file` debug efficiency.
+Weex team have developed a [DevTool](https://github.com/weexteam/weex-devtool) to help you to improve `we file` debug efficiency.
 
 ## FAQ
 
