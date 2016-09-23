@@ -201,3 +201,18 @@ export function throttle (func, wait) {
     return result
   }
 }
+
+export function camelToKebab (name) {
+  if (!name) { return '' }
+  return name.replace(/([A-Z])/g, function (g, g1) {
+    return `-${g1.toLowerCase()}`
+  })
+}
+
+export function kebabToCamel (name) {
+  if (!name) { return '' }
+  return name.replace(/-([a-z])/g, function (g, g1) {
+    console.log(g1)
+    return `${g1.toUpperCase()}`
+  })
+}
