@@ -910,7 +910,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
             WXLogUtils.d(performance.toString());
           }
         }
-        mUserTrackAdapter.commit(mContext, null, type, performance, null);
+        if( mUserTrackAdapter!= null) {
+          mUserTrackAdapter.commit(mContext, null, type, performance, null);
+        }
       }
     });
   }
