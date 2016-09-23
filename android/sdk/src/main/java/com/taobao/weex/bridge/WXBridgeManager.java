@@ -549,12 +549,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
       sDomModule = getDomModule(instanceId);
       sDomModule.addElement(ref, domObject, Integer.parseInt(index));
-
-
     }
-
-
-
 
     if (UNDEFINED.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;

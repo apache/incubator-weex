@@ -437,12 +437,12 @@ public class WXPerformance {
   }
   public String getPerfData(){
       return  "networkTime:" + networkTime
-              +",\nactualNetworkTime:" + actualNetworkTime
-              + "\nconnectionType:" + connectionType
-              + "\nrequestType:" + requestType
-              +"\nfirstScreenRenderTime:" + screenRenderTime
-              + "\nfirstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-              + "\ncomponentCount:" + componentCount
-              +"\ntotalTime:" + totalTime;
+              + " actualNetworkTime:" + actualNetworkTime
+              + " connectionType:" + connectionType
+              + " requestType:" + requestType
+              + " firstScreenRenderTime:" + screenRenderTime
+              + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + " componentCount:" + componentCount
+              + "  totalTime:" + totalTime;
   }
 }
