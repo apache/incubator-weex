@@ -436,13 +436,13 @@ public class WXPerformance {
     return super.toString();
   }
   public String getPerfData(){
-      return  "firstScreenRenderTime:" + screenRenderTime
-              + ",firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
-              + ",componentCount:" + componentCount
-              + ",networkTime:" + networkTime
-              + ",actualNetworkTime:" + actualNetworkTime
-              + ",connectionType:" + connectionType
-              + ",requestType:" + requestType
-              +",totalTime:" + totalTime;
+      return  "networkTime:" + networkTime
+              +",\nactualNetworkTime:" + actualNetworkTime
+              + "\nconnectionType:" + connectionType
+              + "\nrequestType:" + requestType
+              +"\nfirstScreenRenderTime:" + screenRenderTime
+              + "\nfirstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + "\ncomponentCount:" + componentCount
+              +"\ntotalTime:" + totalTime;
   }
 }

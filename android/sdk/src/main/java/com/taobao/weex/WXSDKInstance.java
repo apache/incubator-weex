@@ -758,9 +758,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     WXLogUtils.renderPerformanceLog("       TotalCssLayoutTime", mWXPerformance.cssLayoutTime);
     WXLogUtils.renderPerformanceLog("       TotalApplyUpdateTime", mWXPerformance.applyUpdateTime);
     WXLogUtils.renderPerformanceLog("       TotalUpdateDomObjTime", mWXPerformance.updateDomObjTime);
-    if(!WXEnvironment.isApkDebugable()){
-      Log.e("weex_perf",mWXPerformance.getPerfData());
-    }
+
 
     mWXPerformance.totalTime = time;
     if(mWXPerformance.screenRenderTime<0.001){
@@ -789,6 +787,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
           }
         }
       });
+    }
+    if(!WXEnvironment.isApkDebugable()){
+      Log.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
 
