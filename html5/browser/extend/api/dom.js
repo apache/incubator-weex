@@ -40,13 +40,12 @@ const dom = {
   addRule: function (key, styles) {
     key = camelToKebab(key)
     let stylesText = ''
-    for (var k in styles) {
+    for (const k in styles) {
       if (styles.hasOwnProperty(k)) {
         stylesText += camelToKebab(k) + ':' + styles[k] + ';'
       }
-    } 
+    }
     const styleText = `@${key}{${stylesText}}`
-    console.log(styleText)
     appendStyle(styleText, 'dom-added-rules')
   }
 }
