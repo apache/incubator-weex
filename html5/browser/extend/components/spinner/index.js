@@ -90,9 +90,11 @@ function computeKeyFrameRules (rgb) {
 const proto = {
   create () {
     const node = document.createElement('div')
-    node.classList.add('weex-container', 'weex-spinner-wrap')
+    node.classList.add('weex-container')
+    node.classList.add('weex-spinner-wrap')
     this.spinner = document.createElement('div')
-    this.spinner.classList.add('weex-element', 'weex-spinner')
+    this.spinner.classList.add('weex-element')
+    this.spinner.classList.add('weex-spinner')
     node.appendChild(this.spinner)
     return node
   }

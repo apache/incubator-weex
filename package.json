@@ -40,7 +40,7 @@
     "build:test": "webpack --config build/webpack.test.config.js",
     "dist:browser": "npm run build:browser && npm run build:common && bash ./bin/dist-browser.sh",
     "dist": "npm run dist:browser",
-    "dev:browser": "webpack --watch --config build/webpack.browser.config.js",
+    "dev:browser": "wwp && webpack --watch --config build/webpack.browser.config.js",
     "dev:native": "webpack --watch --config build/webpack.native.config.js",
     "dev:examples": "webpack --watch --config build/webpack.examples.config.js",
     "dev:test": "webpack --watch --config build/webpack.test.config.js",
