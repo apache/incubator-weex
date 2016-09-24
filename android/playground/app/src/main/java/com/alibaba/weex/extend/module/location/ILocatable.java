@@ -10,7 +10,7 @@ public interface ILocatable {
   int REQUEST_WATCH_PERMISSION_CODE = 0x13;
 
 
-  String REQUEST_PERMISSION_CODE = "REQUEST_PERMISSION_CODE";
+  String REQUEST_PERMISSION_CODE = "requestCode";
   String ERROR_CODE = "errorCode";
   String ERROR_MSG = "errorMsg";
   String COORDS = "coords";
