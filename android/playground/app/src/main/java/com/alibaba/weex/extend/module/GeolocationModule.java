@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Created by lixinke on 16/9/10.
  */
 public class GeolocationModule extends WXModule implements Destroyable {
 
@@ -31,45 +32,44 @@ public class GeolocationModule extends WXModule implements Destroyable {
   }
 
   /**
-   * Get current location information, the callback only once
+   * 获取当前位置信息，只回调一次。
    *
-   * @param successCallback success callback function id.
-   * @param errorCallback   error callback function id.(example:no persimmon)
-   * @param params          JSON parameter(example:address).
+   * @param successCallback 成功回调function id.
+   * @param errorCallback   错误回调function id.(例如:没有权限)
+   * @param params          JSON格式的参数(例如:准确度等).
    */
   @WXModuleAnno
   public void getCurrentPosition(String successCallback, String errorCallback, String params) {
     mILocatable.setWXSDKInstance(mWXSDKInstance);
-    if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    if (checkPermission()) {
       mILocatable.getCurrentPosition(successCallback, errorCallback, params);
     } else {
-      ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, ILocatable.REQUEST_CUR_PERMISSION_CODE);
-      LocalBroadcastManager.getInstance(mWXSDKInstance.getContext()).registerReceiver(new PerReceiver(mWXSDKInstance.getInstanceId(), mILocatable, successCallback, errorCallback, params), new IntentFilter("requestPermission"));
+      requestPermission(successCallback, errorCallback, params, ILocatable.REQUEST_CUR_PERMISSION_CODE);
     }
   }
 
+
   /**
-   * register global location listener，if location change，you will be notify.
+   * 注册监听全局定位
    *
-   * @param successCallback location success callback function id.
-   * @param errorCallback   location error callback (example:no persimmon).
-   * @param params          JSON parameter(example:address).
+   * @param successCallback 定位成功回调function id.
+   * @param errorCallback   错误回调(例如:没有权限等).
+   * @param params          SON格式的参数(例如:准确度等).
    */
   @WXModuleAnno
   public void watchPosition(String successCallback, String errorCallback, String params) {
     mILocatable.setWXSDKInstance(mWXSDKInstance);
-    if (ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    if (checkPermission()) {
       mILocatable.watchPosition(successCallback, errorCallback, params);
     } else {
-      ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, ILocatable.REQUEST_WATCH_PERMISSION_CODE);
-      LocalBroadcastManager.getInstance(mWXSDKInstance.getContext()).registerReceiver(new PerReceiver(mWXSDKInstance.getInstanceId(), mILocatable, successCallback, errorCallback, params), new IntentFilter("requestPermission"));
+      requestPermission(successCallback, errorCallback, params, ILocatable.REQUEST_WATCH_PERMISSION_CODE);
     }
   }
 
   /**
-   * remove global location listener.
+   * 注销监听全局定位
    *
-   * @param registerID register id,you can get from watchPosition method。
+   * @param registerID 注册时返回的唯一ID。
    */
   @WXModuleAnno
   public void clearWatch(String registerID) {
@@ -81,6 +81,18 @@ public class GeolocationModule extends WXModule implements Destroyable {
   @Override
   public void destroy() {
     mILocatable.destroy();
+  }
+
+  private void requestPermission(String successCallback, String errorCallback, String params, int requestCurPermissionCode) {
+    ActivityCompat.requestPermissions((Activity) mWXSDKInstance.getContext(),
+                                      new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, requestCurPermissionCode);
+    LocalBroadcastManager.getInstance(mWXSDKInstance.getContext())
+        .registerReceiver(new PerReceiver(mWXSDKInstance.getInstanceId(), mILocatable, successCallback, errorCallback, params), new IntentFilter("actionRequestPermissionsResult"));
+  }
+
+  private boolean checkPermission() {
+    return ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+           && ActivityCompat.checkSelfPermission(mWXSDKInstance.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
   }
 
   static class PerReceiver extends BroadcastReceiver {
