@@ -54,7 +54,7 @@
     NSTextContainer *textContainer = nil;
     if ([_textStorage.layoutManagers respondsToSelector:@selector(firstObject)]) {
         layoutManager = _textStorage.layoutManagers.firstObject;
-        if ([layoutManager respondsToSelector:@selector(firstObject)]) {
+        if ([layoutManager.textContainers respondsToSelector:@selector(firstObject)]) {
             textContainer = layoutManager.textContainers.firstObject;
         }
     }
