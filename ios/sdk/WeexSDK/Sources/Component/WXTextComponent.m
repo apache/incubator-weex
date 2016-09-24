@@ -50,9 +50,18 @@
     if ([self.wx_component _needsDrawBorder]) {
         [self.wx_component _drawBorderWithContext:context size:bounds.size];
     }
+    NSLayoutManager *layoutManager = nil;
+    NSTextContainer *textContainer = nil;
+    if ([_textStorage.layoutManagers respondsToSelector:@selector(firstObject)]) {
+        layoutManager = _textStorage.layoutManagers.firstObject;
+        if ([layoutManager respondsToSelector:@selector(firstObject)]) {
+            textContainer = layoutManager.textContainers.firstObject;
+        }
+    }
     
-    NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
-    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+    if (!layoutManager || !textContainer) {
+        return nil;
+    }
     
     CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
     NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
@@ -287,7 +296,7 @@ do {\
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
     }
-    
+
     return attributedString;
 }
 
