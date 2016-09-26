@@ -944,6 +944,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void setOpacity(float opacity) {
     if (opacity >= 0 && opacity <= 1 && mHost.getAlpha() != opacity) {
+      mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
       mHost.setAlpha(opacity);
     }
   }
