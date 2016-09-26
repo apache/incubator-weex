@@ -75,9 +75,9 @@ public class WXTextDomObject extends WXDomObject {
    * Object for calculating text's width and height. This class is an anonymous class of
    * implementing {@link com.taobao.weex.dom.flex.CSSNode.MeasureFunction}
    */
-  private static final CSSNode.MeasureFunction TEXT_MEASURE_FUNCTION = new CSSNode.MeasureFunction() {
+  /** package **/ static final CSSNode.MeasureFunction TEXT_MEASURE_FUNCTION = new CSSNode.MeasureFunction() {
     @Override
-    public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
+    public void measure(CSSNode node, float width, @NonNull MeasureOutput measureOutput) {
       WXTextDomObject textDomObject = (WXTextDomObject) node;
       if (CSSConstants.isUndefined(width)) {
         width = node.cssstyle.maxWidth;
@@ -132,6 +132,10 @@ public class WXTextDomObject extends WXDomObject {
     super();
     mTextPaint.setFlags(TextPaint.ANTI_ALIAS_FLAG);
     setMeasureFunction(TEXT_MEASURE_FUNCTION);
+  }
+
+  public TextPaint getTextPaint() {
+    return mTextPaint;
   }
 
   /**
@@ -360,7 +364,7 @@ public class WXTextDomObject extends WXDomObject {
    * @return if forceToDesired is false, it will be the minimum value of the width of text and
    * outerWidth in case of outerWidth is defined, in other case, it will be outer width.
    */
-  private float getTextWidth(TextPaint textPaint,float outerWidth, boolean forceToDesired) {
+  /** package **/ float getTextWidth(TextPaint textPaint,float outerWidth, boolean forceToDesired) {
     float textWidth;
     if (forceToDesired) {
       textWidth = outerWidth;
