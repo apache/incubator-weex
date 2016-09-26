@@ -7,7 +7,7 @@
 <template>
   <div class="wrapper">
     <image
-      src="http://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
+      src="https://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
       class="logo"
     ></image>
     <text class="title">Hello World</text>
