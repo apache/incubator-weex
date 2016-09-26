@@ -17,7 +17,8 @@ function Document (id, url, handler) {
 
   instanceMap[id] = this
   this.nodeMap = {}
-  Listener && (this.listener = new Listener(id, handler || genCallTasks(id)))
+  const L = Document.Listener || Listener
+  this.listener = new L(id, handler || genCallTasks(id))
   this.createDocumentElement()
 }
 

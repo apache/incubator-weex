@@ -4,7 +4,32 @@
 
 import './style/base.css'
 
-import '../runtime'
+import { subversion } from '../../../../package.json'
+import { init, config as runtimeConfig } from '../../../runtime'
+import frameworks from '../../../frameworks'
+
+runtimeConfig.frameworks = frameworks
+const { framework, transformer } = subversion
+
+// register framework meta info
+global.frameworkVersion = framework
+global.transformerVersion = transformer
+
+// init frameworks
+import Listener from '../dom/componentManager'
+runtimeConfig.Document.Listener = Listener
+const globalMethods = init(runtimeConfig)
+
+// set global methods
+for (const methodName in globalMethods) {
+  global[methodName] = (...args) => {
+    const ret = globalMethods[methodName](...args)
+    if (ret instanceof Error) {
+      console.error(ret.toString())
+    }
+    return ret
+  }
+}
 
 import config from './config'
 import { load } from './loader'
@@ -131,24 +156,9 @@ Weex.prototype = {
       this.data
     )
 
-    if (!instance) {
-      return console.error('[h5-render] createInstance error: get void for instance.')
-    }
-
     if (instance instanceof Error) {
       return console.error('[h5-render]', instance)
     }
-
-    if (instance instanceof Promise) {
-      return instance.then(function (res) {
-        this.appInstance = res
-        // Weex._instances[this.instanceId] = this.root
-      }).catch(function (err) {
-        console.error('[h5-render]', err)
-      })
-    }
-
-    this.appInstance = instance
 
     // Do not destroy instance before unload, because in most browser
     // press back button to back to this page will not refresh
