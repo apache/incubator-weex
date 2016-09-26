@@ -435,4 +435,14 @@ public class WXPerformance {
     }
     return super.toString();
   }
+  public String getPerfData(){
+      return  "networkTime:" + networkTime
+              + " actualNetworkTime:" + actualNetworkTime
+              + " connectionType:" + connectionType
+              + " requestType:" + requestType
+              + " firstScreenRenderTime:" + screenRenderTime
+              + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
+              + " componentCount:" + componentCount
+              + "  totalTime:" + totalTime;
+  }
 }

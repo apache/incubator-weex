@@ -208,6 +208,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -762,7 +763,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mWXPerformance.screenRenderTime =  time;
     }
     mWXPerformance.componentCount = WXComponent.mComponentNum;
-    WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
+    if(WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, "mComponentNum:" + WXComponent.mComponentNum);
+    }
     WXComponent.mComponentNum = 0;
     if (mRenderListener != null && mContext != null) {
       runOnUiThread(new Runnable() {
@@ -782,6 +785,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
           }
         }
       });
+    }
+    if(!WXEnvironment.isApkDebugable()){
+      Log.e("weex_perf",mWXPerformance.getPerfData());
     }
   }
 
@@ -902,7 +908,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
             WXLogUtils.d(performance.toString());
           }
         }
-        mUserTrackAdapter.commit(mContext, null, type, performance, null);
+        if( mUserTrackAdapter!= null) {
+          mUserTrackAdapter.commit(mContext, null, type, performance, null);
+        }
       }
     });
   }

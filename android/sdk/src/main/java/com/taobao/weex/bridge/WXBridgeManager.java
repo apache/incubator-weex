@@ -549,12 +549,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
       sDomModule = getDomModule(instanceId);
       sDomModule.addElement(ref, domObject, Integer.parseInt(index));
-
-
     }
-
-
-
 
     if (UNDEFINED.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
@@ -982,11 +977,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       mLodBuilder.setLength(0);
     }
 
-    if(mDestroyedInstanceId!=null && !mDestroyedInstanceId.contains(instanceId)) {
+//    if(mDestroyedInstanceId!=null && !mDestroyedInstanceId.contains(instanceId)) {
       mWXBridge.execJS(instanceId, namespace, function, args);
-    }else{
-      WXLogUtils.w("invokeExecJS: instanceId: "+instanceId+"was  destroy !! ExecJS abandon !!");
-    }
+//    }else{
+//      WXLogUtils.w("invokeExecJS: instanceId: "+instanceId+"was  destroy !! ExecJS abandon !!");
+//    }
   }
 
   private WXJSObject[] createTimerArgs(int instanceId, int funcId, boolean keepAlive) {

@@ -367,11 +367,8 @@ class WXDomStatement {
     if(instance != null) {
       instance.updateDomObjTime(System.currentTimeMillis() - start);
     }
-
-    WXLogUtils.d("Batch","animation size :" +animations.size());
     parseAnimation();
 
-    WXLogUtils.d("Batch","task size :" +mNormalTasks.size());
     int count = mNormalTasks.size();
     for (int i = 0; i < count && !mDestroy; ++i) {
       mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));

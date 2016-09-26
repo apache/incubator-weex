@@ -248,8 +248,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    Intent intent = new Intent("requestPermission");
-    intent.putExtra("REQUEST_PERMISSION_CODE", requestCode);
+    Intent intent = new Intent("actionRequestPermissionsResult");
+    intent.putExtra("requestCode", requestCode);
     intent.putExtra("permissions", permissions);
     intent.putExtra("grantResults", grantResults);
     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

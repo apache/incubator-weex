@@ -359,6 +359,18 @@ public class WXAttr extends SafePutConcurrentHashMap<String, Object> {
     return src.toString();
   }
 
+  public String optString(String key){
+    if(contains(key)){
+      Object value = get(key);
+      if (value instanceof String) {
+        return (String) value;
+      } else if (value != null) {
+        return String.valueOf(value);
+      }
+    }
+    return "";
+  }
+
   public boolean getIsRecycleImage() {
     Object obj = get(Constants.Name.RECYCLE_IMAGE);
     if (obj == null) {
