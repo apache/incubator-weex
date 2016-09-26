@@ -82,6 +82,9 @@ NSTimeInterval JSLibInitTime = 0;
     
     _scriptURL = url;
     NSMutableDictionary *newOptions = [options mutableCopy];
+    if (!newOptions) {
+        newOptions = [[NSMutableDictionary alloc] init];
+    }
     newOptions[bundleUrlOptionKey] = url.absoluteString;
     
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
