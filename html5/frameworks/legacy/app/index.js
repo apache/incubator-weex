@@ -4,7 +4,7 @@
  */
 
 import { requireModule } from './register'
-import { updateActions, callTasks } from './ctrl'
+import { updateActions, callTasks } from './ctrl/index'
 import App from './instance'
 
 /**

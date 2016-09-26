@@ -1,4 +1,4 @@
-import Vm from '../vm'
+import Vm from '../vm/index'
 import config from '../config'
 import {
   initModules,

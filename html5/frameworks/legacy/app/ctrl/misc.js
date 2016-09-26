@@ -9,7 +9,7 @@
  *
  * corresponded with the API of instance manager (framework.js)
  */
-import { extend, typof } from '../../util'
+import { extend, typof } from '../../util/index'
 import renderer from '../../config'
 
 /**

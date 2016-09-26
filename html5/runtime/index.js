@@ -5,9 +5,9 @@
  * virtual-DOM layer.
  */
 
-const { Document, Element, Comment } = require('./vdom')
-const Listener = require('./listener').default
-const init = require('./init').default
+import { Document, Element, Comment } from './vdom'
+import Listener from './listener'
+import init from './init'
 
 const config = {
   Document, Element, Comment, Listener,
@@ -18,5 +18,7 @@ const config = {
 
 Document.handler = config.sendTasks
 
-exports.init = init
-exports.config = config
+export {
+  init,
+  config
+}

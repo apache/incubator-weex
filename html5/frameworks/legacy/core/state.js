@@ -10,7 +10,7 @@ import {
 import {
   isPlainObject,
   bind
-} from '../util'
+} from '../util/index'
 
 export function initState (vm) {
   vm._watchers = []

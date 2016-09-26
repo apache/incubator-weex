@@ -2,8 +2,8 @@
  * @fileOverview
  * A simple virtual dom implementation
  */
-const { extend } = require('../shared/utils')
-const Listener = require('./listener').default
+import { extend } from '../shared/utils'
+import Listener from './listener'
 
 const DEFAULT_TAG_NAME = 'div'
 
@@ -555,8 +555,10 @@ Comment.prototype.toString = function () {
   return '<!-- ' + this.value + ' -->'
 }
 
-exports.instanceMap = instanceMap
-exports.Document = Document
-exports.Node = Node
-exports.Element = Element
-exports.Comment = Comment
+export {
+  instanceMap,
+  Document,
+  Node,
+  Element,
+  Comment
+}

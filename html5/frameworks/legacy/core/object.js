@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-var _ = require('../util')
+import * as _ from '../util/index'
 var objProto = Object.prototype
 
 /**

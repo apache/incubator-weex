@@ -2,7 +2,7 @@ import config from '../config'
 import {
   refresh,
   destroy
-} from '../app/ctrl'
+} from '../app/ctrl/index'
 import { instanceMap } from './map'
 
 /**

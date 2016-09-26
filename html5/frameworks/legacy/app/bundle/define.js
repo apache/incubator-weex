@@ -5,7 +5,7 @@ import {
   isNpmModule,
   removeWeexPrefix,
   removeJSSurfix
-} from '../../util'
+} from '../../util/index'
 import {
   registerCustomComponent,
   requireCustomComponent,

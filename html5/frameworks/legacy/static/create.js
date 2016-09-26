@@ -1,6 +1,6 @@
-import App from '../app'
+import App from '../app/index'
 import { instanceMap } from './map'
-import { init as initApp } from '../app/ctrl'
+import { init as initApp } from '../app/ctrl/index'
 
 /**
  * Create a Weex instance.

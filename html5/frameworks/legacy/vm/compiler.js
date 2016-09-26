@@ -7,7 +7,7 @@ import {
   extend,
   isObject,
   bind
-} from '../util'
+} from '../util/index'
 import {
   initData,
   initComputed

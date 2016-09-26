@@ -2,7 +2,7 @@ import { instanceMap } from './map'
 import {
   fireEvent,
   callback
-} from '../app/ctrl'
+} from '../app/ctrl/index'
 
 const jsHandlers = {
   fireEvent: (id, ...args) => {

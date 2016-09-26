@@ -131,11 +131,13 @@ function isPlainObject (obj) {
   return toString.call(obj) === OBJECT_STRING
 }
 
-exports.extend = extend
-exports.def = def
-exports.remove = remove
-exports.hasOwn = hasOwn
-exports.bind = bind
-exports.toArray = toArray
-exports.isObject = isObject
-exports.isPlainObject = isPlainObject
+export {
+  extend,
+  def,
+  remove,
+  hasOwn,
+  bind,
+  toArray,
+  isObject,
+  isPlainObject
+}

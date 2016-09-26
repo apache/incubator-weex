@@ -3,7 +3,7 @@
  * Directive Parser
  */
 
-import { bind, typof } from '../util'
+import { bind, typof } from '../util/index'
 
 import Watcher from '../core/watcher'
 import config from '../config'

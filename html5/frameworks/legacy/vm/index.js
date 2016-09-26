@@ -3,7 +3,7 @@
  * ViewModel Constructor & definition
  */
 
-import { extend } from '../util'
+import { extend } from '../util/index'
 import {
   initState
 } from '../core/state'

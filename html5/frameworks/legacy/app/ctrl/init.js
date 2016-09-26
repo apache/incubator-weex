@@ -7,13 +7,13 @@
  * corresponded with the API of instance manager (framework.js)
  */
 
-import Vm from '../../vm'
-import { removeWeexPrefix } from '../../util'
+import Vm from '../../vm/index'
+import { removeWeexPrefix } from '../../util/index'
 import {
   defineFn,
   bootstrap,
   register
-} from '../bundle'
+} from '../bundle/index'
 import { updateActions } from './misc'
 
 /**

@@ -1,5 +1,5 @@
 import semver from 'semver'
-import { isPlainObject, typof } from '../util'
+import { isPlainObject, typof } from '../util/index'
 
 /**
  * Normalize a version string.

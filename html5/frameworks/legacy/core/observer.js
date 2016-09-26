@@ -10,7 +10,7 @@ import {
   hasProto,
   hasOwn,
   isReserved
-} from '../util'
+} from '../util/index'
 
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 

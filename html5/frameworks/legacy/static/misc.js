@@ -1,7 +1,7 @@
 import { instanceMap } from './map'
 import {
   getRootElement
-} from '../app/ctrl'
+} from '../app/ctrl/index'
 
 /**
  * Get a whole element tree of an instance for debugging.
