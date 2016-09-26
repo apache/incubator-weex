@@ -270,7 +270,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
 
     editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles()));
-    editText.setText((String) getDomObject().getAttrs().get("value"));
+    editText.setText(getDomObject().getAttrs().optString(Constants.Name.VALUE));
   }
 
 
