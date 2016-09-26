@@ -168,7 +168,7 @@
     _jsContext[@"WXEnvironment"] = data;
 }
 
-typedef BOOL (*WXJSCGarbageCollect)(JSContextRef);
+typedef void (*WXJSCGarbageCollect)(JSContextRef);
 
 - (void)garbageCollect
 {
