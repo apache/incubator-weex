@@ -334,6 +334,28 @@ public class WXStorageModule extends WXSDKEngine.DestroyableModule implements IW
     }
 
     @Override
+    public void setItemPersistent(String key, String value, @Nullable final JSCallback callback) {
+        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+            StorageResultHandler.handleInvalidParam(callback);
+            return;
+        }
+
+        IWXStorageAdapter adapter = ability();
+        if (adapter == null) {
+            StorageResultHandler.handleNoHandlerError(callback);
+            return;
+        }
+        adapter.setItemPersistent(key, value, new IWXStorageAdapter.OnResultReceivedListener() {
+            @Override
+            public void onReceived(Map<String, Object> data) {
+                if(callback != null){
+                    callback.invoke(data);
+                }
+            }
+        });
+    }
+
+    @Override
     public void destroy() {
         IWXStorageAdapter adapter = ability();
         if (adapter != null) {
