@@ -962,7 +962,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     @Override
     public boolean onFailedToRecycleView(ListBaseViewHolder holder) {
-        WXLogUtils.d(TAG, "Failed to recycle " + holder);
+        if(WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(TAG, "Failed to recycle " + holder);
+        }
         return false;
     }
 

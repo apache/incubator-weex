@@ -257,7 +257,7 @@ class WXBridge implements IWXBridge {
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
         e.printStackTrace();
-        WXLogUtils.e(TAG,"callNative throw expection:"+e.getMessage());
+        WXLogUtils.e(TAG,"callNative throw exception:"+e.getMessage());
       }
     }
 

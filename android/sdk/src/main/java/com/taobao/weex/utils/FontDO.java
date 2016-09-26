@@ -205,6 +205,8 @@
 package com.taobao.weex.utils;
 
 import android.graphics.Typeface;
+
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 
 import java.net.URI;
@@ -267,7 +269,9 @@ public class FontDO {
       mState = STATE_INVALID;
     }
 
-    WXLogUtils.d("TypefaceUtil", "src:" + src + ", mUrl:" + mUrl + ", mType:" + mType);
+    if(WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("TypefaceUtil", "src:" + src + ", mUrl:" + mUrl + ", mType:" + mType);
+    }
   }
 
   public String getUrl() {

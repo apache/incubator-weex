@@ -206,9 +206,6 @@ package com.taobao.weex.utils;
 
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import com.taobao.weex.dom.WXStyle;
-
-import java.util.HashMap;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXEnvironment;
@@ -216,8 +213,10 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.dom.WXStyle;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -287,7 +286,9 @@ public class TypefaceUtil {
         try {
           Typeface typeface = Typeface.createFromAsset(WXEnvironment.getApplication().getAssets(), fontDo.getUrl());
           if (typeface != null) {
-            WXLogUtils.d(TAG, "load asset file success");
+            if(WXEnvironment.isApkDebugable()) {
+              WXLogUtils.d(TAG, "load asset file success");
+            }
             fontDo.setState(FontDO.STATE_SUCCESS);
             fontDo.setTypeface(typeface);
           } else {
@@ -325,7 +326,9 @@ public class TypefaceUtil {
     adapter.sendRequest(request, new IWXHttpAdapter.OnHttpListener() {
       @Override
       public void onHttpStart() {
-        WXLogUtils.d(TAG, "downloadFontByNetwork begin url:" + url);
+        if(WXEnvironment.isApkDebugable()) {
+          WXLogUtils.d(TAG, "downloadFontByNetwork begin url:" + url);
+        }
       }
 
       @Override
@@ -360,7 +363,9 @@ public class TypefaceUtil {
           if (result) {
             result = loadLocalFontFile(fullPath, fontFamily);
           } else {
-            WXLogUtils.d(TAG, "downloadFontByNetwork() onHttpFinish success, but save file failed.");
+            if(WXEnvironment.isApkDebugable()) {
+              WXLogUtils.d(TAG, "downloadFontByNetwork() onHttpFinish success, but save file failed.");
+            }
           }
         } else {
           result = false;
@@ -391,7 +396,9 @@ public class TypefaceUtil {
         if (fontDo != null) {
           fontDo.setState(FontDO.STATE_SUCCESS);
           fontDo.setTypeface(typeface);
-          WXLogUtils.d(TAG, "load local font file success");
+          if(WXEnvironment.isApkDebugable()) {
+            WXLogUtils.d(TAG, "load local font file success");
+          }
           return true;
         }
       } else {

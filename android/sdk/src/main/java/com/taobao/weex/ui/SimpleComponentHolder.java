@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.MethodInvoker;
@@ -298,7 +299,9 @@ public class SimpleComponentHolder implements IFComponentHolder{
   }
 
   private synchronized void generate(){
-    WXLogUtils.d(TAG,"Generate Component:"+mClz.getSimpleName());
+    if(WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d(TAG, "Generate Component:" + mClz.getSimpleName());
+    }
 
     mMethods = getMethods(mClz);
   }
