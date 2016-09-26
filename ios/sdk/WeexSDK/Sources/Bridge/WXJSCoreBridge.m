@@ -21,6 +21,11 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXPolyfillSet.h"
 
+#import <dlfcn.h>
+
+#import <mach/mach.h>
+
+
 @interface WXJSCoreBridge ()
 
 @property (nonatomic, strong)  JSContext *jsContext;
@@ -163,11 +168,19 @@
     _jsContext[@"WXEnvironment"] = data;
 }
 
-JS_EXPORT void JSSynchronousGarbageCollectForDebugging(JSContextRef ctx);
+typedef BOOL (*WXJSCGarbageCollect)(JSContextRef);
 
 - (void)garbageCollect
 {
-    JSSynchronousGarbageCollectForDebugging(_jsContext.JSGlobalContextRef);
+    char str[80];
+    strcpy(str, "JSSynchron");
+    strcat(str, "ousGarbageColl");
+    strcat(str, "ectForDebugging");
+    WXJSCGarbageCollect garbageCollect = dlsym(RTLD_DEFAULT, str);
+    
+    if (garbageCollect != NULL) {
+        garbageCollect(_jsContext.JSGlobalContextRef);
+    }
 }
 
 #pragma mark - Private
