@@ -15,6 +15,7 @@
 #import "WXModuleProtocol.h"
 #import "WXUtility.h"
 #import "WXRuleManager.h"
+#import "WXSDKInstance.h"
 
 @interface WXDomModule ()
 
@@ -37,6 +38,7 @@ WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
+WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
 
 
 - (void)performBlockOnComponentMananger:(void(^)(WXComponentManager *))block
@@ -160,6 +162,29 @@ WX_EXPORT_METHOD(@selector(addRule:rule:))
     
     [self performSelectorOnRuleManager:^{
         [[WXRuleManager sharedInstance] addRule:type rule:rule];
+    }];
+}
+
+- (void)getComponentSize:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    
+    [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
+        NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
+        if ([ref isEqualToString:@"root"]) {
+            [callbackRsp setObject:@(true)forKey:@"result"];
+            CGSize rootSize = [manager.weexInstance.rootView superview].frame.size;
+            [callbackRsp setObject:@{@"width":@(rootSize.width),@"height":@(rootSize.height)} forKey:@"size"];
+        }else {
+            WXComponent *component = [manager componentForRef:ref];
+            if (!component) {
+                [callbackRsp setObject:@(false) forKey:@"result"];
+                [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
+            } else {
+                CGSize componentSize = component.calculatedFrame.size;
+                [callbackRsp setObject:@(true)forKey:@"result"];
+                [callbackRsp setObject:@{@"width":@(componentSize.width),@"height":@(componentSize.height)} forKey:@"size"];
+            }
+        }
+        callback(callbackRsp, false);
     }];
 }
 
