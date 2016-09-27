@@ -51,4 +51,8 @@ export default {
       this.node.style.justifyContent = value
     }
   }
-};
+}
+
+/* eslint-disable */
+;
+/* eslint-enable */

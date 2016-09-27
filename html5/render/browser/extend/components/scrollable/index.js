@@ -12,4 +12,8 @@ export default {
     Weex.install(refresh)
     Weex.install(loading)
   }
-};
+}
+
+/* eslint-disable */
+;
+/* eslint-enable */

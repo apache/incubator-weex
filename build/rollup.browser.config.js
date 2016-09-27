@@ -1,9 +1,10 @@
 import { rollup } from 'rollup'
+import postcss from 'rollup-plugin-postcss'
+import json from 'rollup-plugin-json'
+import eslint from 'rollup-plugin-eslint'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import json from 'rollup-plugin-json'
 import buble from 'rollup-plugin-buble'
-import postcss from 'rollup-plugin-postcss'
 
 const banner = `var global = this
 var process = { env: {}};
@@ -17,13 +18,16 @@ export default {
   moduleName: 'weex',
   plugins: [
     postcss(),
+    json(),
+    eslint({
+      exclude: ['./package.json', '**/*.css']
+    }),
     nodeResolve({
       jsnext: true,
       main: true,
       browser: true
     }),
     commonjs(),
-    json(),
     buble()
   ]
 }

@@ -1,6 +1,6 @@
 'use strict'
 
-const Kountdown = import 'kountdown'
+import Kountdown from 'kountdown'
 
 const FORMATTER_REGEXP = /(\\)?(dd*|hh?|mm?|ss?)/gi
 
