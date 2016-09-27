@@ -221,7 +221,9 @@ import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -235,7 +237,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class WXDomManager {
 
   private WXThread mDomThread;
-  /** package **/ Handler mDomHandler;
+  /** package **/
+  Handler mDomHandler;
   private WXRenderManager mWXRenderManager;
   private ConcurrentHashMap<String, WXDomStatement> mDomRegistries;
 
@@ -575,5 +578,20 @@ public final class WXDomManager {
     String src = jsonObject.getString(Constants.Name.SRC);
     String name = jsonObject.getString(Constants.Name.FONT_FAMILY);
     return new FontDO(name, src);
+  }
+
+  public void getComponentSize(String instanceId, String ref, String callback) {
+    if (!isDomThread()) {
+      throw new WXRuntimeException("getComponentSize operation must be done in dom thread");
+    }
+    WXDomStatement statement = mDomRegistries.get(instanceId);
+    if (statement == null) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      WXSDKManager.getInstance().callback(instanceId, callback, options);
+      return;
+    }
+    statement.getComponentSize(ref, callback);
   }
 }

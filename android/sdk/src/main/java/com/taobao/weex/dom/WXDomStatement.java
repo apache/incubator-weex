@@ -1286,6 +1286,30 @@ class WXDomStatement {
     }
   }
 
+  public void getComponentSize(final String ref, final String callback) {
+    if (mDestroy) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      WXSDKManager.getInstance().callback(mInstanceId, callback, options);
+      return;
+    }
+
+    mNormalTasks.add(new IWXRenderTask() {
+
+      @Override
+      public void execute() {
+        mWXRenderManager.getComponentSize(mInstanceId, ref, callback);
+      }
+
+      @Override
+      public String toString() {
+        return "getComponentSize";
+      }
+    });
+
+  }
+
   static class AddDomInfo {
 
     public WXComponent component;

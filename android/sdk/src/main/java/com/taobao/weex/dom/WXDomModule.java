@@ -215,6 +215,8 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -583,5 +585,45 @@ public final class WXDomModule extends WXModule {
     msg.what = WXDomHandler.MsgType.WX_DOM_ADD_RULE;
     msg.obj = task;
     WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
+  }
+
+  /**
+   * By ref the width and height of the component.
+   *
+   * @param ref      the refer of component
+   * @param callback function id
+   */
+  public void getComponentSize(String ref, String callback) {
+    if (TextUtils.isEmpty(ref) || TextUtils.isEmpty(callback)) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Illegal parameter");
+      WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+      return;
+    } else if ("root".equals(ref)) {
+      if(mWXSDKInstance!=null && mWXSDKInstance.getRootView()!=null){
+        Map<String, Object> options = new HashMap<>();
+        Map<String, String> sizes = new HashMap<>();
+        sizes.put("width", String.valueOf(mWXSDKInstance.getRootView().getWidth()));
+        sizes.put("height", String.valueOf(mWXSDKInstance.getRootView().getHeight()));
+        options.put("result", true);
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+      }else{
+        Map<String, Object> options = new HashMap<>();
+        options.put("result", false);
+        options.put("errMsg", "Component does not exist");
+        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+      }
+    } else {
+      Message msg = Message.obtain();
+      WXDomTask task = new WXDomTask();
+      task.instanceId = mWXSDKInstance.getInstanceId();
+      task.args = new ArrayList<>();
+      task.args.add(ref);
+      task.args.add(callback);
+      msg.what = WXDomHandler.MsgType.WX_COMPONENT_SIZE;
+      msg.obj = task;
+      WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
+    }
   }
 }
