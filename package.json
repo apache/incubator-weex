@@ -33,7 +33,8 @@
   "scripts": {
     "postinstall": "bash ./bin/install-hooks.sh",
     "build:new": "rollup -c build/rollup.config.js",
-    "build:browser:new": "rollup -w -c build/rollup.browser.config.js",
+    "build:browser:new": "rollup -c build/rollup.browser.config.js",
+    "build:browser:common:new": "rollup -c build/rollup.browser.common.config.js",
     "build:config": "node build/config.frameworks.js",
     "build:browser": "webpack --config build/webpack.browser.config.js",
     "build:common": "webpack --config build/webpack.common.config.js",
