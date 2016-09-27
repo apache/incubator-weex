@@ -1,6 +1,6 @@
 'use strict'
 
-require('./video.css')
+import './video.css'
 
 function getProto (Weex) {
   const Atomic = Weex.Atomic

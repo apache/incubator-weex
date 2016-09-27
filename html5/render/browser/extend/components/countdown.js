@@ -1,6 +1,6 @@
 'use strict'
 
-const Kountdown = require('kountdown')
+const Kountdown = import 'kountdown'
 
 const FORMATTER_REGEXP = /(\\)?(dd*|hh?|mm?|ss?)/gi
 

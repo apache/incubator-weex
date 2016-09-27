@@ -2,8 +2,8 @@
 
 'use strict'
 
-require('./scrollable.css')
-require('./scroll')
+import './scrollable.css'
+import './scroll'
 
 // lib.scroll events:
 //  - scrollstart

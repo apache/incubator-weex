@@ -2,7 +2,7 @@
 
 'use strict'
 
-require('lazyimg')
+import 'lazyimg'
 
 let lazyloadTimer
 

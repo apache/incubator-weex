@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-require('./motion')
+import './motion'
 
 var doc = window.document
 var ua = window.navigator.userAgent

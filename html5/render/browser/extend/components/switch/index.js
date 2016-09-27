@@ -1,6 +1,6 @@
 'use strict'
 
-require('./switch.css')
+import './switch.css'
 
 const defaults = {
   color: '#64bd63',

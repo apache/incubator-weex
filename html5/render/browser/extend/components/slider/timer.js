@@ -35,32 +35,26 @@ function _getGlobalId() {
   return _globalId
 }
 
-var timer = {
-
-  setTimeout: function (cb, ms) {
-    var id = _getGlobalId()
-    var start = Date.now()
-    _idMap[id] = raf(function loop() {
-      if (!_idMap[id] && _idMap[id] !== 0) {
-        return
-      }
-      var ind = Date.now() - start
-      if (ind < ms) {
-        _idMap[id] = raf(loop)
-      } else {
-        delete _idMap[id]
-        cb()
-      }
-    })
-    return id
-  },
-
-  clearTimeout: function (id) {
-    var tid = _idMap[id]
-    tid && caf(tid)
-    delete _idMap[id]
-  }
-
+export function setTimeout (cb, ms) {
+  var id = _getGlobalId()
+  var start = Date.now()
+  _idMap[id] = raf(function loop() {
+    if (!_idMap[id] && _idMap[id] !== 0) {
+      return
+    }
+    var ind = Date.now() - start
+    if (ind < ms) {
+      _idMap[id] = raf(loop)
+    } else {
+      delete _idMap[id]
+      cb()
+    }
+  })
+  return id
 }
 
-module.exports = timer
+export function clearTimeout (id) {
+  var tid = _idMap[id]
+  tid && caf(tid)
+  delete _idMap[id]
+}

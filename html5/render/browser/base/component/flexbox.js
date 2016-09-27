@@ -51,4 +51,4 @@ export default {
       this.node.style.justifyContent = value
     }
   }
-}
+};

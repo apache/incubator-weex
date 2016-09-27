@@ -201,9 +201,9 @@ function setClassStyle (el, css, classList) {
   for (let i = 0; i < length; i++) {
     const style = css[classList[i]]
     if (style) {
-      for (const key in style) {
+      Object.keys(style).forEach((key) => {
         classStyle[key] = style[key]
-      }
+      })
     }
   }
   el.setClassStyle(classStyle)

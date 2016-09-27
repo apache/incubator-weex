@@ -3,9 +3,9 @@
 'use strict'
 
 // require('./gesture')
-require('cubicbezier')
-require('animationjs')
-require('./carrousel.css')
+import 'cubicbezier'
+import 'animationjs'
+import './carrousel.css'
 
 var doc = window.document
 var ua = window.navigator.userAgent
@@ -14,7 +14,7 @@ var IEMobile = !!ua.match(/IEMobile/i)
 var cssPrefix = Firefox ? '-moz-' : IEMobile ? '-ms-' : '-webkit-'
 var stylePrefix = Firefox ? 'Moz' : IEMobile ? 'ms' : 'webkit'
 
-var timer = require('./timer')
+import * as timer from './timer'
 var setTimeout = timer.setTimeout
 var clearTimeout = timer.clearTimeout
 

@@ -2,7 +2,7 @@
 
 'use strict'
 
-require('./spinner.css')
+import './spinner.css'
 
 let loopArray, getRgb
 

@@ -1,6 +1,6 @@
 'use strict'
 
-require('./indicator.css')
+import './indicator.css'
 
 const DEFAULT_ITEM_COLOR = '#999'
 const DEFAULT_ITEM_SELECTED_COLOR = '#0000ff'

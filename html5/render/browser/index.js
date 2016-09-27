@@ -1,6 +1,6 @@
 'use strict'
 
-import Weex from './render'
+import Weex from './render/index'
 
 /**
  * install components and APIs

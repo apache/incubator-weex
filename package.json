@@ -33,6 +33,7 @@
   "scripts": {
     "postinstall": "bash ./bin/install-hooks.sh",
     "build:new": "rollup -c build/rollup.config.js",
+    "build:browser:new": "rollup -w -c build/rollup.browser.config.js",
     "build:config": "node build/config.frameworks.js",
     "build:browser": "webpack --config build/webpack.browser.config.js",
     "build:common": "webpack --config build/webpack.common.config.js",
@@ -102,6 +103,7 @@
     "rollup-plugin-commonjs": "^5.0.4",
     "rollup-plugin-json": "^2.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-postcss": "^0.2.0",
     "rollup-watch": "^2.5.0",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",

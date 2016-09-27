@@ -12,4 +12,4 @@ export default {
     Weex.install(refresh)
     Weex.install(loading)
   }
-}
+};
