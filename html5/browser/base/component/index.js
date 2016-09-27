@@ -116,15 +116,30 @@ Component.prototype = {
   },
 
   onAppend: function () {
-    const rect = this.node.getBoundingClientRect()
-    const parent = this.getParentScroller()
-    const parentNode = parent
-      ? parent.node
-      : this.getRootContainer()
-    const ctRect = parentNode.getBoundingClientRect()
-    if (hasIntersection(rect, ctRect)) {
-      this.dispatchEvent('appear', { direction: '' })
+    const evts = this.data.event
+    if (!evts || !evts.length) { return }
+    let flag = false
+    for (let i = 0, l = evts.length; i < l; i++) {
+      if (evts[i] === 'appear') {
+        flag = true
+        break
+      }
     }
+    if (!flag) {
+      return
+    }
+    // trigger 'appear' event in the next tick.
+    setTimeout(() => {
+      const rect = this.node.getBoundingClientRect()
+      const parent = this.getParentScroller()
+      const parentNode = parent
+        ? parent.node
+        : this.getRootContainer()
+      const ctRect = parentNode.getBoundingClientRect()
+      if (hasIntersection(rect, ctRect)) {
+        this.dispatchEvent('appear', { direction: '' })
+      }
+    }, 0)
   },
 
   addAppendHandler (cb) {
