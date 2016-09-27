@@ -1104,6 +1104,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXComponent] destroy can only be called in main thread");
     }
+    if(mHost!= null && mHost.getLayerType()==View.LAYER_TYPE_HARDWARE) {
+      mHost.setLayerType(View.LAYER_TYPE_NONE, null);
+    }
     removeAllEvent();
     removeStickyStyle();
     if (mDomObj != null) {
