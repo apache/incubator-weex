@@ -205,6 +205,7 @@
 package com.taobao.weex;
 
 import android.view.View;
+import android.widget.FrameLayout;
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.common.WXPerformance;
@@ -256,10 +257,11 @@ public class WXSDKInstanceTest {
 
   public static WXSDKInstance createInstance(){
     WXSDKInstance instance =  new WXSDKInstance(Robolectric.setupActivity(TestActivity.class));
+    final FrameLayout container = new FrameLayout(instance.getContext());
     instance.registerRenderListener(new IWXRenderListener() {
       @Override
       public void onViewCreated(WXSDKInstance instance, View view) {
-
+        container.addView(view);
       }
 
       @Override
@@ -284,6 +286,7 @@ public class WXSDKInstanceTest {
   }
 
   public static void setupRoot(WXSDKInstance instance){
+
     WXDomObject domObject = new WXDomObject();
     WXDomObject.prepareGod(domObject);
     WXVContainer comp = (WXVContainer) WXComponentFactory.newInstance(instance, domObject, null);
