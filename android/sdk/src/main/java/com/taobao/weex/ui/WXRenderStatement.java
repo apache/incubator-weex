@@ -215,13 +215,13 @@ import android.widget.ScrollView;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.Scrollable;
-import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
@@ -568,5 +568,21 @@ class WXRenderStatement {
 
   void startAnimation(@NonNull String ref, @NonNull WXAnimationBean animationBean, @Nullable String callBack) {
     WXAnimationModule.startAnimation(mWXSDKInstance, mRegistry.get(ref), animationBean, callBack);
+  }
+
+  public void getComponentSize(String ref, String callback) {
+    WXComponent component = mRegistry.get(ref);
+    Map<String, Object> options = new HashMap<>();
+    if (component != null) {
+      Map<String, String> size = new HashMap<>();
+      int[] sizes = component.getComponentSize();
+      size.put("width", String.valueOf(sizes[0]));
+      size.put("height", String.valueOf(sizes[1]));
+      options.put("size", size);
+      options.put("result", true);
+    } else {
+      options.put("errMsg", "Component does not exist");
+    }
+    WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
   }
 }

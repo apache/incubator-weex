@@ -228,6 +228,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mInstance.getInstanceId();
   }
 
+  public int[] getComponentSize() {
+    int [] size={0,0};
+    if(mHost!=null){
+      size[0]=mHost.getWidth();
+      size[1]=mHost.getHeight();
+    }
+    return size;
+  }
+
   interface OnClickListener{
     void onHostViewClick();
   }

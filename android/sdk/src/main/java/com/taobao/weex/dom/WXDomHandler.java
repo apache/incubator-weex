@@ -292,6 +292,9 @@ public class WXDomHandler implements Handler.Callback {
       case MsgType.WX_DOM_ADD_RULE:
         mWXDomManager.addRule((String) task.args.get(0), (JSONObject) task.args.get(1));
         break;
+      case MsgType.WX_COMPONENT_SIZE:
+        mWXDomManager.getComponentSize(task.instanceId,(String) task.args.get(0),(String) task.args.get(1));
+        break;
       default:
         break;
     }
@@ -317,5 +320,7 @@ public class WXDomHandler implements Handler.Callback {
     public static final int WX_DOM_ADD_RULE=0xd;
 
     public static final int WX_DOM_BATCH = 0xff;
+
+    public static final int WX_COMPONENT_SIZE= 0xff1;
   }
 }
