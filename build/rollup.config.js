@@ -13,6 +13,7 @@ export default {
   entry: './html5/render/native/index.js',
   dest: './dist/native.js',
   banner,
+  sourceMap: 'inline',
   plugins: [
     json(),
     eslint({

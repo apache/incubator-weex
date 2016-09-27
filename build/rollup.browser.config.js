@@ -16,6 +16,7 @@ export default {
   banner,
   format: 'umd',
   moduleName: 'weex',
+  sourceMap: 'inline',
   plugins: [
     postcss(),
     json(),
