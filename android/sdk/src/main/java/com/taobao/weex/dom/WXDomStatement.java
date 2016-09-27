@@ -916,10 +916,12 @@ class WXDomStatement {
         return "updateStyle";
       }
     });
-    if (update.containsKey("padding") || update.containsKey("paddingTop") ||
-        update.containsKey("paddingLeft") ||
-        update.containsKey("paddingRight") ||
-        update.containsKey("paddingBottom") || update.containsKey("borderWidth")) {
+    if (update.containsKey(Constants.Name.PADDING) ||
+        update.containsKey(Constants.Name.PADDING_TOP) ||
+        update.containsKey(Constants.Name.PADDING_LEFT) ||
+        update.containsKey(Constants.Name.PADDING_RIGHT) ||
+        update.containsKey(Constants.Name.PADDING_BOTTOM) ||
+        update.containsKey(Constants.Name.BORDER_WIDTH)) {
       mNormalTasks.add(new IWXRenderTask() {
 
         @Override
