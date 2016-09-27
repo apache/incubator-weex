@@ -216,6 +216,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index;
 
 /**
+ * @abstract Tells the component that a subcomponent's view is about to be removed.
+ *
+ * @discussion The method is called on the main thread.
+ */
+- (void)willRemoveSubview:(WXComponent *)component;
+
+/**
  * @abstract Remove the component's view from its superview.
  *
  * @discussion The method is called on the main thread.

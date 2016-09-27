@@ -265,6 +265,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [_indexDict removeObjectForKey:ref];
     
     [self _addUITask:^{
+        if (component.supercomponent) {
+            [component.supercomponent willRemoveSubview:component];
+        }
         [component removeFromSuperview];
     }];
 }
