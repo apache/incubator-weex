@@ -281,7 +281,7 @@ do {\
     }
     
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-    
+
     if (_textAlign) {
         paragraphStyle.alignment = _textAlign;
     }
