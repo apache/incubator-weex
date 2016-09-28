@@ -169,16 +169,17 @@ WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
     
     [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
         NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
-        CGRect rootRect = [manager.weexInstance.rootView superview].frame;
+        UIView *rootView = manager.weexInstance.rootView;
+        CGRect rootRect = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
         if ([ref isEqualToString:@"viewport"]) {
             [callbackRsp setObject:@(true)forKey:@"result"];
             [callbackRsp setObject:@{
                                      @"width":@(rootRect.size.width),
                                      @"height":@(rootRect.size.height),
-                                     @"bottom":@(rootRect.size.height),
-                                     @"left":@(0),
-                                     @"right":@(rootRect.size.width),
-                                     @"top":@(0)
+                                     @"bottom":@(CGRectGetMaxY(rootRect) - rootRect.origin.y),
+                                     @"left":@(rootRect.origin.x),
+                                     @"right":@(CGRectGetMaxX(rootRect) - rootRect.origin.x),
+                                     @"top":@(rootRect.origin.y)
                                     } forKey:@"size"];
         }else {
             WXComponent *component = [manager componentForRef:ref];
@@ -186,13 +187,13 @@ WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
                 [callbackRsp setObject:@(false) forKey:@"result"];
                 [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
             } else {
-                CGRect componentRect = component.calculatedFrame;
+                CGRect componentRect = [component.view convertRect:component.calculatedFrame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
                 [callbackRsp setObject:@(true)forKey:@"result"];
                 [callbackRsp setObject:@{
                                          @"width":@(componentRect.size.width),
                                          @"height":@(componentRect.size.height),
                                          @"bottom":@(CGRectGetMaxY(componentRect) - rootRect.origin.y),
-                                         @"left":@(componentRect.origin.x - componentRect.origin.x),
+                                         @"left":@(componentRect.origin.x - rootRect.origin.x),
                                          @"right":@(CGRectGetMaxX(componentRect) - rootRect.origin.x),
                                          @"top":@(componentRect.origin.y - rootRect.origin.y)
                                          } forKey:@"size"];
