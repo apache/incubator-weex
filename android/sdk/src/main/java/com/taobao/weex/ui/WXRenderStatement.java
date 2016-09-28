@@ -577,17 +577,12 @@ class WXRenderStatement {
     if (component != null) {
       Map<String, String> size = new HashMap<>();
       Rect sizes = component.getComponentSize();
-
-      Rect viewpointRect=new Rect(0,0,0,0);
-      if(mWXSDKInstance.getRootView()!=null){
-        mWXSDKInstance.getRootView().getGlobalVisibleRect(viewpointRect);
-      }
       size.put("width", String.valueOf(sizes.width()));
       size.put("height", String.valueOf(sizes.height()));
-      size.put("bottom",String.valueOf(sizes.bottom-viewpointRect.top));
-      size.put("left",String.valueOf(sizes.left-viewpointRect.left));
-      size.put("right",String.valueOf(sizes.right-viewpointRect.left));
-      size.put("top",String.valueOf(sizes.top-viewpointRect.top));
+      size.put("bottom",String.valueOf(sizes.bottom));
+      size.put("left",String.valueOf(sizes.left));
+      size.put("right",String.valueOf(sizes.right));
+      size.put("top",String.valueOf(sizes.top));
       options.put("size", size);
       options.put("result", true);
     } else {
