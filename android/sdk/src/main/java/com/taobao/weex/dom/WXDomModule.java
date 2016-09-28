@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.dom;
 
+import android.graphics.Rect;
 import android.os.Message;
 import android.text.TextUtils;
 
@@ -606,12 +607,18 @@ public final class WXDomModule extends WXModule {
       options.put("errMsg", "Illegal parameter");
       WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
       return;
-    } else if ("root".equals(ref)) {
+    } else if ("viewport".equalsIgnoreCase(ref)) {
       if(mWXSDKInstance!=null && mWXSDKInstance.getRootView()!=null){
         Map<String, Object> options = new HashMap<>();
         Map<String, String> sizes = new HashMap<>();
-        sizes.put("width", String.valueOf(mWXSDKInstance.getRootView().getWidth()));
-        sizes.put("height", String.valueOf(mWXSDKInstance.getRootView().getHeight()));
+        Rect rect=new Rect();
+        mWXSDKInstance.getRootView().getGlobalVisibleRect(rect);
+        sizes.put("width", String.valueOf(rect.width()));
+        sizes.put("height", String.valueOf(rect.height()));
+        sizes.put("bottom",String.valueOf(rect.bottom));
+        sizes.put("left",String.valueOf(rect.left));
+        sizes.put("right",String.valueOf(rect.right));
+        sizes.put("top",String.valueOf(rect.top));
         options.put("size", sizes);
         options.put("result", true);
         WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);

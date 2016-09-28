@@ -130,6 +130,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.NonNull;
@@ -228,11 +229,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mInstance.getInstanceId();
   }
 
-  public int[] getComponentSize() {
-    int [] size={0,0};
+  public Rect getComponentSize() {
+     Rect size=new Rect();
     if(mHost!=null){
-      size[0]=mHost.getWidth();
-      size[1]=mHost.getHeight();
+      mHost.getGlobalVisibleRect(size);
     }
     return size;
   }
