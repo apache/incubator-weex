@@ -59,6 +59,11 @@ We will bring a better syntax design in the future.
 
 `line-height` style in text component is different from h5 and Android,  text value will be placed at bottom of line box because of iOS native api. We are trying to optimize it.
 
+## Android only support `overflow:hidden`
+The `overflow` style in android is `hidden` and cannot be changed. This is the result of Android View framework. This only happens on Android, iOS will work as expected.
+
+## Android do not support emoji
+As Android NDK only supports Modified UTF-8, emoji is not support yet. Any attemp to use emoji may cause crash in case of lower than Android 6.0, and unexpected behavior when it is higher than 6.0. Only use Modified UTF-8, **do not** use emoji.
 
 ## How to get rid of 750 adaption and calculate width/height in real pixels？
 
