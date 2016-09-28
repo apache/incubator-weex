@@ -205,6 +205,7 @@
 package com.taobao.weex.ui;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
@@ -575,9 +576,13 @@ class WXRenderStatement {
     Map<String, Object> options = new HashMap<>();
     if (component != null) {
       Map<String, String> size = new HashMap<>();
-      int[] sizes = component.getComponentSize();
-      size.put("width", String.valueOf(sizes[0]));
-      size.put("height", String.valueOf(sizes[1]));
+      Rect sizes = component.getComponentSize();
+      size.put("width", String.valueOf(sizes.width()));
+      size.put("height", String.valueOf(sizes.height()));
+      size.put("bottom",String.valueOf(sizes.bottom));
+      size.put("left",String.valueOf(sizes.left));
+      size.put("right",String.valueOf(sizes.right));
+      size.put("top",String.valueOf(sizes.top));
       options.put("size", size);
       options.put("result", true);
     } else {
