@@ -38,6 +38,7 @@ function createInstance (id, code, config, data) {
     if (!frameworks[info.framework]) {
       info.framework = 'Weex'
     }
+    info.created = Date.now()
     instanceMap[id] = info
     config = JSON.parse(JSON.stringify(config || {}))
     config.bundleVersion = info.version
@@ -76,7 +77,11 @@ function genInstance (methodName) {
     const id = args[0]
     const info = instanceMap[id]
     if (info && frameworks[info.framework]) {
-      return frameworks[info.framework][methodName](...args)
+      const result = frameworks[info.framework][methodName](...args)
+      if (methodName === 'destroyInstance') {
+        delete instanceMap[id]
+      }
+      return result
     }
     return new Error(`invalid instance id "${id}"`)
   }
