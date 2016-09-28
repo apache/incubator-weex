@@ -210,11 +210,11 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -337,8 +337,8 @@ public class WXDomObject extends CSSNode implements Cloneable {
     dest.setModifyWidth(isModifyWidth);
     dest.ref = ref;
     dest.type = type;
-    dest.style = style;//mStyles == null ? null : mStyles.clone();
-    dest.attr = attr;//mAttrs == null ? null : mAttrs.clone();
+    dest.style = style == null ? null : style.clone();//mStyles == null ? null : mStyles.clone();
+    dest.attr = attr == null ? null : attr.clone();//mAttrs == null ? null : mAttrs.clone();
     dest.event = event == null ? null : event.clone();
     dest.csslayout.copy(this.csslayout);
   }
@@ -357,14 +357,14 @@ public class WXDomObject extends CSSNode implements Cloneable {
     this.ref = (String) map.get("ref");
     Object style = map.get("style");
     if (style != null && style instanceof JSONObject) {
-      WXStyle styles = new WXStyle();
-      WXJsonUtils.putAll(styles, (JSONObject) style);
+      WXStyle styles = new WXStyle((JSONObject) style);
+      //WXJsonUtils.putAll(styles, (JSONObject) style);
       this.style = styles;
     }
     Object attr = map.get("attr");
     if (attr != null && attr instanceof JSONObject) {
-      WXAttr attrs = new WXAttr();
-      WXJsonUtils.putAll(attrs, (JSONObject) attr);
+      WXAttr attrs = new WXAttr((JSONObject) attr);
+      //WXJsonUtils.putAll(attrs, (JSONObject) attr);
       this.attr = attrs;
     }
     Object event = map.get("event");
@@ -592,41 +592,106 @@ public class WXDomObject extends CSSNode implements Cloneable {
   public void applyStyleToNode() {
     WXStyle stylesMap = getStyles();
     if (!stylesMap.isEmpty()) {
-      setAlignItems(stylesMap.getAlignItems());
-      setAlignSelf(stylesMap.getAlignSelf());
-      setFlex(stylesMap.getFlex());
-      setFlexDirection(stylesMap.getFlexDirection());
-      setJustifyContent(stylesMap.getJustifyContent());
-      setWrap(stylesMap.getCSSWrap());
-
-      setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth()));
-      setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth()));
-      setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight()));
-      setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight()));
-
-      setMargin(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginLeft()));
-      setMargin(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getMarginTop()));
-      setMargin(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginRight()));
-      setMargin(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getMarginBottom()));
-
-      setPadding(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingLeft()));
-      setPadding(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingTop()));
-      setPadding(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingRight()));
-      setPadding(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingBottom()));
-
-      setPositionType(stylesMap.getPosition());
-      setPositionLeft(WXViewUtils.getRealPxByWidth(stylesMap.getLeft()));
-      setPositionTop(WXViewUtils.getRealPxByWidth(stylesMap.getTop()));
-      setPositionRight(WXViewUtils.getRealPxByWidth(stylesMap.getRight()));
-      setPositionBottom(WXViewUtils.getRealPxByWidth(stylesMap.getBottom()));
-
-      setBorder(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getBorderTopWidth()));
-      setBorder(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderRightWidth()));
-      setBorder(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getBorderBottomWidth()));
-      setBorder(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderLeftWidth()));
-
-      setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.getHeight()));
-      setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.getWidth()));
+      for(Map.Entry<String,Object> item:stylesMap.entrySet()) {
+        switch (item.getKey()) {
+          case Constants.Name.ALIGN_ITEMS:
+            setAlignItems(stylesMap.getAlignItems());
+            break;
+          case Constants.Name.ALIGN_SELF:
+            setAlignSelf(stylesMap.getAlignSelf());
+            break;
+          case Constants.Name.FLEX:
+            setFlex(stylesMap.getFlex());
+            break;
+          case Constants.Name.FLEX_DIRECTION:
+            setFlexDirection(stylesMap.getFlexDirection());
+            break;
+          case Constants.Name.JUSTIFY_CONTENT:
+            setJustifyContent(stylesMap.getJustifyContent());
+            break;
+          case Constants.Name.FLEX_WRAP:
+            setWrap(stylesMap.getCSSWrap());
+            break;
+          case Constants.Name.MIN_WIDTH:
+            setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth()));
+            break;
+          case Constants.Name.MIN_HEIGHT:
+            setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight()));
+            break;
+          case Constants.Name.MAX_WIDTH:
+            setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth()));
+            break;
+          case Constants.Name.MAX_HEIGHT:
+            setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight()));
+            break;
+          case Constants.Name.HEIGHT:
+            setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.getHeight()));
+            break;
+          case Constants.Name.WIDTH:
+            setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.getWidth()));
+            break;
+          case Constants.Name.POSITION:
+            setPositionType(stylesMap.getPosition());
+            break;
+          case Constants.Name.LEFT:
+            setPositionLeft(WXViewUtils.getRealPxByWidth(stylesMap.getLeft()));
+            break;
+          case Constants.Name.TOP:
+            setPositionTop(WXViewUtils.getRealPxByWidth(stylesMap.getTop()));
+            break;
+          case Constants.Name.RIGHT:
+            setPositionRight(WXViewUtils.getRealPxByWidth(stylesMap.getRight()));
+            break;
+          case Constants.Name.BOTTOM:
+            setPositionBottom(WXViewUtils.getRealPxByWidth(stylesMap.getBottom()));
+            break;
+          case Constants.Name.MARGIN:
+            setMargin(Spacing.ALL, WXViewUtils.getRealPxByWidth(stylesMap.getMargin()));
+            break;
+          case Constants.Name.MARGIN_LEFT:
+            setMargin(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginLeft()));
+            break;
+          case Constants.Name.MARGIN_TOP:
+            setMargin(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getMarginTop()));
+            break;
+          case Constants.Name.MARGIN_RIGHT:
+            setMargin(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getMarginRight()));
+            break;
+          case Constants.Name.MARGIN_BOTTOM:
+            setMargin(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getMarginBottom()));
+            break;
+          case Constants.Name.BORDER_WIDTH:
+            setBorder(Spacing.ALL, WXViewUtils.getRealPxByWidth(stylesMap.getBorderWidth()));
+            break;
+          case Constants.Name.BORDER_TOP_WIDTH:
+            setBorder(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getBorderTopWidth()));
+            break;
+          case Constants.Name.BORDER_RIGHT_WIDTH:
+            setBorder(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderRightWidth()));
+            break;
+          case Constants.Name.BORDER_BOTTOM_WIDTH:
+            setBorder(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getBorderBottomWidth()));
+            break;
+          case Constants.Name.BORDER_LEFT_WIDTH:
+            setBorder(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getBorderLeftWidth()));
+            break;
+          case Constants.Name.PADDING:
+            setPadding(Spacing.ALL, WXViewUtils.getRealPxByWidth(stylesMap.getPadding()));
+            break;
+          case Constants.Name.PADDING_LEFT:
+            setPadding(Spacing.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingLeft()));
+            break;
+          case Constants.Name.PADDING_TOP:
+            setPadding(Spacing.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingTop()));
+            break;
+          case Constants.Name.PADDING_RIGHT:
+            setPadding(Spacing.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingRight()));
+            break;
+          case Constants.Name.PADDING_BOTTOM:
+            setPadding(Spacing.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getPaddingBottom()));
+            break;
+        }
+      }
     }
   }
 

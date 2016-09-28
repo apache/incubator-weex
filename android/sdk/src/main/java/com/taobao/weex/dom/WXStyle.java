@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.dom;
 
+import android.support.annotation.NonNull;
 import android.text.Layout;
 import android.text.TextUtils;
 
@@ -218,16 +219,31 @@ import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Store value of component style
  *
  */
-public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
+public class WXStyle implements Map<String, Object>,Cloneable {
 
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
+
+  private @NonNull final Map<String,Object> map;
+
+  public WXStyle(){
+    map = new HashMap<>();
+  }
+
+  public WXStyle(@NonNull Map<String,Object> map){
+    this.map=map;
+  }
+
+
   /*
    * text-decoration
    **/
@@ -447,11 +463,7 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
 
   //TODO fix : only when set backgroundColor
   public float getBorderWidth() {
-    float temp = WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
-    if (WXUtils.isUndefined(temp)) {
-      return Float.NaN;
-    }
-    return temp;
+    return WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
   }
 
   public float getBorderRightWidth() {
@@ -474,6 +486,14 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
   public String getBorderStyle() {
     Object borderStyle = get(Constants.Name.BORDER_STYLE);
     return borderStyle == null ? null : borderStyle.toString();
+  }
+
+  public float getMargin(){
+    return WXUtils.getFloat(get(Constants.Name.MARGIN));
+  }
+
+  public float getPadding(){
+    return WXUtils.getFloat(get(Constants.Name.PADDING));
   }
 
   /*
@@ -617,5 +637,83 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
   public String getOverflow() {
     Object obj = get(Constants.Name.OVERFLOW);
     return obj == null ? Constants.Value.VISIBLE : obj.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return map.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    return map.hashCode();
+  }
+
+  @Override
+  public void clear() {
+    map.clear();
+  }
+
+  @Override
+  public boolean containsKey(Object key) {
+    return map.containsKey(key);
+  }
+
+  @Override
+  public boolean containsValue(Object value) {
+    return map.containsValue(value);
+  }
+
+  @NonNull
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    return map.entrySet();
+  }
+
+  @Override
+  public Object get(Object key) {
+    return map.get(key);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
+  @NonNull
+  @Override
+  public Set<String> keySet() {
+    return map.keySet();
+  }
+
+  @Override
+  public Object put(String key, Object value) {
+    return map.put(key,value);
+  }
+
+  @Override
+  public void putAll(Map<? extends String, ?> map) {
+    this.map.putAll(map);
+  }
+
+  @Override
+  public Object remove(Object key) {
+    return map.remove(key);
+  }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
+
+  @NonNull
+  @Override
+  public Collection<Object> values() {
+    return map.values();
+  }
+
+  @Override
+  protected WXStyle clone(){
+    return new WXStyle(new HashMap<>(map));
   }
 }
