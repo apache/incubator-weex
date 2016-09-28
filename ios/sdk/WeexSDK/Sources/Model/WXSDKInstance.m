@@ -85,7 +85,9 @@ NSTimeInterval JSLibInitTime = 0;
     if (!newOptions) {
         newOptions = [[NSMutableDictionary alloc] init];
     }
-    newOptions[bundleUrlOptionKey] = url.absoluteString;
+    if (!newOptions[bundleUrlOptionKey]) {
+        newOptions[bundleUrlOptionKey] = url.absoluteString;
+    }
     
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
         self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
