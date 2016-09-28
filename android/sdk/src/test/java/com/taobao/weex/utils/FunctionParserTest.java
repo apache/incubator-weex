@@ -202,70 +202,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.utils;
 
-import android.view.ViewGroup;
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXScrollerDomObject;
-import com.taobao.weex.ui.view.WXScrollView;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 8/25/16.
+ * Created by sospartan on 27/09/2016.
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
-public class WXScrollerTest {
-
-  public static WXScroller create(){
-    WXDiv div = WXDivTest.create();
-    ComponentTest.create(div);
-    WXScroller component = new WXScroller(WXSDKInstanceTest.createInstance(),new WXScrollerDomObject(),div,false);
-    div.addChild(component);
-    return component;
-  }
-
-
-  WXScroller component;
-
-  @Before
-  public void setUp() throws Exception {
-    component = create();
-    ComponentTest.create(component);
-  }
+public class FunctionParserTest {
 
   @Test
-  public void testAddChild() throws Exception{
-    WXDiv div = WXDivTest.create(component);
-    component.addChild(div);
-    ComponentTest.create(div);
-
-  }
-
-  @Test
-  public void testScroll() throws Exception {
-    WXScroller comp = create();
-    WXDiv div = WXDivTest.create(comp);
-    ComponentTest.create(div);
-    comp.addChild(div);
-    ComponentTest.create(comp);
-    WXScrollView view = (WXScrollView) comp.getInnerView();
-    view.scrollTo(100,100);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    component.destroy();
+  public void testParse() throws Exception {
+    new SingleFunctionParser<String>("transform(50 , 20)", new SingleFunctionParser.FlatMapper<String>() {
+      @Override
+      public String map(String raw) {
+        return null;
+      }
+    }).parse("transform");
   }
 }

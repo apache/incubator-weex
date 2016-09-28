@@ -329,16 +329,20 @@ class WXDomStatement {
    * in the queue.
    */
   void batch() {
-    long start0 = System.currentTimeMillis();
 
     if (!mDirty || mDestroy) {
       return;
     }
 
     WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
+    layout(rootDom);
+  }
+
+  void layout(WXDomObject rootDom) {
     if (rootDom == null) {
       return;
     }
+    long start0 = System.currentTimeMillis();
 
     rebuildingDomTree(rootDom);
 
@@ -349,7 +353,7 @@ class WXDomStatement {
     rootDom.calculateLayout(mLayoutContext);
 
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    if(instance != null) {
+    if (instance != null) {
       instance.cssLayoutTime(System.currentTimeMillis() - start);
     }
 
@@ -358,13 +362,13 @@ class WXDomStatement {
     start = System.currentTimeMillis();
     applyUpdate(rootDom);
 
-    if(instance != null) {
+    if (instance != null) {
       instance.applyUpdateTime(System.currentTimeMillis() - start);
     }
 
     start = System.currentTimeMillis();
     updateDomObj();
-    if(instance != null) {
+    if (instance != null) {
       instance.updateDomObjTime(System.currentTimeMillis() - start);
     }
     parseAnimation();
@@ -377,10 +381,9 @@ class WXDomStatement {
     mAddDom.clear();
     animations.clear();
     mDirty = false;
-    if(instance != null) {
+    if (instance != null) {
       instance.batchTime(System.currentTimeMillis() - start0);
     }
-
   }
 
   /**
@@ -1250,7 +1253,7 @@ class WXDomStatement {
    * {@link WXDomObject} {@link com.taobao.weex.dom.flex.CSSNode#mChildren} and parsing style,
    *              false for only parsing style.
    */
-  private void transformStyle(WXDomObject dom, boolean isAdd) {
+  /** package **/ void transformStyle(WXDomObject dom, boolean isAdd) {
     if (dom == null) {
       return;
     }

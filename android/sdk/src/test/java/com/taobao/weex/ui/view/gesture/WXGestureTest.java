@@ -202,70 +202,67 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.gesture;
 
-import android.view.ViewGroup;
+import android.provider.Settings;
+import android.view.MotionEvent;
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.dom.WXScrollerDomObject;
-import com.taobao.weex.ui.view.WXScrollView;
-import org.junit.After;
+import com.taobao.weex.TestActivity;
+import com.taobao.weex.ui.component.ComponentTest;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXDiv;
+import com.taobao.weex.ui.component.WXDivTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by sospartan on 8/25/16.
+ * Created by sospartan on 27/09/2016.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
-public class WXScrollerTest {
+public class WXGestureTest {
 
-  public static WXScroller create(){
-    WXDiv div = WXDivTest.create();
-    ComponentTest.create(div);
-    WXScroller component = new WXScroller(WXSDKInstanceTest.createInstance(),new WXScrollerDomObject(),div,false);
-    div.addChild(component);
-    return component;
-  }
-
-
-  WXScroller component;
-
+  WXGesture mGesture;
+  WXComponent component;
   @Before
   public void setUp() throws Exception {
-    component = create();
+    component = WXDivTest.create();
     ComponentTest.create(component);
+
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_CANCEL.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_DOWN.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_MOVE.toString());
+    component.addEvent(WXGestureType.LowLevelGesture.ACTION_UP.toString());
+
+    TestActivity activity = Robolectric.setupActivity(TestActivity.class);
+    mGesture = new WXGesture(component, activity);
+
   }
 
   @Test
-  public void testAddChild() throws Exception{
-    WXDiv div = WXDivTest.create(component);
-    component.addChild(div);
-    ComponentTest.create(div);
+  public void testOnTouch() throws Exception {
+    MotionEvent event = MotionEvent.obtain(System.currentTimeMillis(), System.currentTimeMillis(),MotionEvent.ACTION_DOWN,0,0,0);
+    mGesture.onTouch(component.getHostView(),event);
 
-  }
+    event = MotionEvent.obtain(System.currentTimeMillis(), System.currentTimeMillis(),MotionEvent.ACTION_MOVE,0,0,0);
+    mGesture.onTouch(component.getHostView(),event);
 
-  @Test
-  public void testScroll() throws Exception {
-    WXScroller comp = create();
-    WXDiv div = WXDivTest.create(comp);
-    ComponentTest.create(div);
-    comp.addChild(div);
-    ComponentTest.create(comp);
-    WXScrollView view = (WXScrollView) comp.getInnerView();
-    view.scrollTo(100,100);
-  }
+    event = MotionEvent.obtain(System.currentTimeMillis(), System.currentTimeMillis(),MotionEvent.ACTION_UP,0,0,0);
+    mGesture.onTouch(component.getHostView(),event);
 
-  @After
-  public void tearDown() throws Exception {
-    component.destroy();
+    event = MotionEvent.obtain(System.currentTimeMillis(), System.currentTimeMillis(),MotionEvent.ACTION_POINTER_UP,0,0,0);
+    mGesture.onTouch(component.getHostView(),event);
+
+    event = MotionEvent.obtain(System.currentTimeMillis(), System.currentTimeMillis(),MotionEvent.ACTION_CANCEL,0,0,0);
+    mGesture.onTouch(component.getHostView(),event);
   }
 }
