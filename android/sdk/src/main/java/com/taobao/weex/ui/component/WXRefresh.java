@@ -228,6 +228,8 @@ import java.util.Map;
 @Component(lazyload = false)
 public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefreshListener{
 
+  public static final String HIDE = "hide";
+
   @Deprecated
   public WXRefresh(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
     this(instance,dom,parent,isLazy);
@@ -275,7 +277,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   @WXComponentProp(name = Constants.Name.DISPLAY)
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
+      if (display.equals(HIDE)) {
         if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
           if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
             ((BaseBounceView) getParent().getHostView()).finishPullRefresh();

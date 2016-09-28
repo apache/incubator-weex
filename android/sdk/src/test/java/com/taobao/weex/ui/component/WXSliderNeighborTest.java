@@ -266,6 +266,21 @@ public class WXSliderNeighborTest {
     component.setProperty(WXSliderNeighbor.NEIGHBOR_SCALE,0.9f);
   }
 
+  @Test
+  public void testZoomTransformer() throws Exception {
+    component = create();
+    TestComponent page = ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class);
+    TestComponent pageChild = ComponentTest.createComponent(new TestDomObject(),component,TestComponent.class);
+    page.addChild(pageChild);
+    component.addChild(page);
+
+    ComponentTest.create(component);
+//    ComponentTest.create(pageChild);
+//    ComponentTest.create(page);
+    WXSliderNeighbor.ZoomTransformer transformer = component.createTransformer();
+    transformer.transformPage(page.getHostView(),0.2f);
+  }
+
   @After
   public void tearDown() throws Exception {
     component.destroy();

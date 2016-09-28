@@ -213,6 +213,7 @@ import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 
 import com.taobao.weex.ui.SimpleComponentHolder;
+import org.apache.tools.ant.taskdefs.EchoXML;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -267,6 +268,20 @@ public class WXTextTest {
         mWXText = new WXText(instance, mDomObject, mParent, false);
         mWXText.bindHolder(new SimpleComponentHolder(WXText.class));
         assertNotNull(instance.getContext());
+    }
+
+    @Test
+    public void testSetProperties() throws Exception {
+        mWXText.setProperty(Constants.Name.LINES,null);
+        mWXText.setProperty(Constants.Name.FONT_SIZE,null);
+        mWXText.setProperty(Constants.Name.FONT_WEIGHT,null);
+        mWXText.setProperty(Constants.Name.FONT_STYLE,null);
+        mWXText.setProperty(Constants.Name.COLOR,null);
+        mWXText.setProperty(Constants.Name.TEXT_DECORATION,null);
+        mWXText.setProperty(Constants.Name.FONT_FAMILY,null);
+        mWXText.setProperty(Constants.Name.TEXT_ALIGN,null);
+        mWXText.setProperty(Constants.Name.TEXT_OVERFLOW,null);
+        mWXText.setProperty(Constants.Name.LINE_HEIGHT,null);
     }
 
     @Test

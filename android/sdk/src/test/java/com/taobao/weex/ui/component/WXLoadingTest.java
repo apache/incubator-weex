@@ -204,253 +204,56 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.content.Context;
-import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXCircleIndicator;
-import com.taobao.weex.ui.view.WXCirclePageAdapter;
-import com.taobao.weex.ui.view.WXCircleViewPager;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.TestDomObject;
+import com.taobao.weex.ui.SimpleComponentHolder;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
- * Known Issus: In auto play mode, neighbor view not scaled or aplhaed rarely.
- *
- * Created by xingjiu on 16/8/18.
+ * Created by sospartan on 28/09/2016.
  */
-public class WXSliderNeighbor extends WXSlider {
-    public static final String NEIGHBOR_SCALE = "neighborScale"; // the init scale of neighor page
-    public static final String NEIGHBOR_ALPHA = "neighborAlpha"; // the init alpha of neighor page
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
+public class WXLoadingTest {
 
-    private static final int DEFAULT_NEIGHBOR_SPACE = 25;
-    private static final float DEFAULT_NEIGHBOR_SCALE = 0.8F;
-    private static final float DEFAULT_NEIGHBOR_ALPHA = 0.6F;
-
-    private float mNerghborScale = DEFAULT_NEIGHBOR_SCALE;
-    private float mNerghborAlpha = DEFAULT_NEIGHBOR_ALPHA;
-
-    private static final float WX_DEFAULT_MAIN_NEIGHBOR_SCALE = 0.9f;
-
-    public WXSliderNeighbor(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-        super(instance, node, parent, lazy);
-    }
-
-    public static class Creator implements ComponentCreator {
-        public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-            return new WXSliderNeighbor(instance, node, parent, lazy);
-        }
-    }
-
-    @Override
-    public void bindData(WXComponent component) {
-        super.bindData(component);
-        mViewPager.setCurrentItem(0);
-        if(mAdapter.getRealCount() > 3){
-            mViewPager.setOffscreenPageLimit(2);
-        }else if(mAdapter.getRealCount() == 3){
-            mViewPager.setOffscreenPageLimit(1);
-        }
-
-    }
-
-    @Override
-    protected FrameLayout initComponentHostView(Context context) {
-        FrameLayout view = new FrameLayout(context);
-
-        // init view pager
-        FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-        pagerParams.gravity = Gravity.CENTER;
-        mViewPager = new WXCircleViewPager(getContext());
-        mViewPager.setLayoutParams(pagerParams);
-
-        // init adapter
-        mAdapter = new WXCirclePageAdapter();
-        mViewPager.setAdapter(mAdapter);
-
-        // add to parent
-        view.addView(mViewPager);
-        mViewPager.addOnPageChangeListener(mPageChangeListener);
-
-        // set animation
-        mViewPager.setPageTransformer(true, createTransformer());
-        mViewPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        view.setClipChildren(false);
-        registerActivityStateListener();
-
-        return view;
-    }
-
-  ZoomTransformer createTransformer() {
-    return new ZoomTransformer();
+  public static WXLoading create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    return (WXLoading) new SimpleComponentHolder(WXLoading.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
   }
 
-    @Override
-    protected void addSubView(View view, int index) {
-        updateScaleAndAlpha(view, mNerghborAlpha, mNerghborScale); // we need to set neighbor view status when added.
-        if (view == null || mAdapter == null) {
-            return;
-        }
+  WXLoading component;
 
-        if (view instanceof WXCircleIndicator) {
-            return;
-        }
+  @Before
+  public void setUp() throws Exception {
+    component = create();
+    ComponentTest.create(component);
+  }
 
-        FrameLayout wrapper = new FrameLayout(getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.CENTER;
-        view.setLayoutParams(params);
-        wrapper.addView(view);
+  @After
+  public void tearDown() throws Exception {
+    component.destroy();
+  }
 
-        mAdapter.addPageView(wrapper);
-        mAdapter.notifyDataSetChanged();
-        if (mIndicator != null) {
-            mIndicator.getHostView().forceLayout();
-            mIndicator.getHostView().requestLayout();
-        }
+  @Test
+  public void testOnLoading() throws Exception {
+    component.onLoading();
+  }
 
-    }
 
-    private void updateScaleAndAlpha(View view, float alpha, float scale) {
-        if(null == view) {
-            return;
-        }
-        if(alpha >= 0) {
-            view.setAlpha(alpha);
-        }
-        if(scale >= 0) {
-            view.setScaleX(scale);
-            view.setScaleY(scale);
-        }
-    }
-
-    private void updateAdpaterScaleAndAplha(float alpha, float scale) {
-        List<View> pageViews = mAdapter.getViews();
-        int cusPos = mViewPager.getCurrentItem();
-        if(null != pageViews && pageViews.size() > 0) {
-            for(View v : pageViews) {
-                View realView = ((ViewGroup)v).getChildAt(0);
-
-                if(mAdapter.getItemPosition(v) != cusPos) {
-                    updateScaleAndAlpha(realView, alpha, scale);
-                }else{
-                    updateScaleAndAlpha(realView,1.0F,WX_DEFAULT_MAIN_NEIGHBOR_SCALE);
-                }
-            }
-        }
-    }
-
-    @WXComponentProp(name = NEIGHBOR_SCALE)
-    public void setNeighborScale(String input) {
-        float neighborScale = DEFAULT_NEIGHBOR_SCALE;
-        if (!TextUtils.isEmpty(input)) {
-            try {
-                neighborScale = Float.parseFloat(input);
-            } catch (NumberFormatException e) {
-            }
-        }
-
-        // addSubView is called before setProperty, so we need to modify the neighbor view in mAdapter.
-        if(this.mNerghborScale != neighborScale) {
-            this.mNerghborScale = neighborScale;
-            updateAdpaterScaleAndAplha(-1, neighborScale);
-        }
-    }
-
-    @WXComponentProp(name = NEIGHBOR_ALPHA)
-    public void setNeighborAlpha(String input) {
-        float neighborAlpha = DEFAULT_NEIGHBOR_ALPHA;
-        if (!TextUtils.isEmpty(input)) {
-            try {
-                neighborAlpha = Float.parseFloat(input);
-            } catch (NumberFormatException e) {
-            }
-        }
-
-        // The same work as setNeighborScale()
-        if(this.mNerghborAlpha != neighborAlpha) {
-            this.mNerghborAlpha = neighborAlpha;
-            updateAdpaterScaleAndAplha(neighborAlpha, -1);
-        }
-    }
-
-    @Override
-    protected boolean setProperty(String key, Object param) {
-        String input = "";
-        switch (key) {
-            case NEIGHBOR_SCALE:
-                input = WXUtils.getString(param, null);
-                if (input != null) {
-                    setNeighborScale(input);
-                }
-                return true;
-            case NEIGHBOR_ALPHA:
-                input = WXUtils.getString(param, null);
-                if (input != null) {
-                    setNeighborAlpha(input);
-                }
-                return true;
-        }
-        return super.setProperty(key, param);
-    }
-
-    // Here is the trick.
-    class ZoomTransformer implements ViewPager.PageTransformer {
-        @Override
-        public void transformPage(View page, float position) {
-            View realView = ((ViewGroup)page).getChildAt(0);
-            if(realView == null){
-                return;
-            }
-            float alpha, scale;
-
-            if(position <= (-mAdapter.getRealCount() + 1)) {
-                position = position + mAdapter.getRealCount();
-            }
-            if(position >= mAdapter.getRealCount() - 1) {
-                position = position - mAdapter.getRealCount();
-            }
-
-            if (position >= -1 && position <= 1) {
-                float factor = Math.abs(Math.abs(position) - 1);
-                scale = mNerghborScale + factor * (WX_DEFAULT_MAIN_NEIGHBOR_SCALE-mNerghborScale);
-                alpha = (1-mNerghborAlpha) * factor + mNerghborAlpha;
-                int delta = page.getMeasuredWidth()-realView.getMeasuredWidth();
-                float translation = ((page.getMeasuredWidth()-realView.getMeasuredWidth()*WX_DEFAULT_MAIN_NEIGHBOR_SCALE)- WXViewUtils.getRealPxByWidth(DEFAULT_NEIGHBOR_SPACE)*2)/2;
-                if(mViewPager.getCurrentItem() != mAdapter.getItemPosition(page)){
-                    if(position > 0){
-                        realView.setPivotX(0);
-                        realView.setTranslationX(-delta);
-                        page.setTranslationX(-translation);
-                    }else{
-                        realView.setPivotX(realView.getMeasuredWidth());
-                        realView.setTranslationX(delta);
-                        page.setTranslationX(translation);
-                    }
-                }else{
-                    realView.setPivotX(realView.getMeasuredWidth()/2);
-                    page.setTranslationX(0);
-                    realView.setTranslationX(0);
-                }
-
-                realView.setPivotY(realView.getMeasuredHeight()/2);
-
-                realView.setAlpha(alpha);
-                realView.setScaleX(scale);
-                realView.setScaleY(scale);
-            }
-        }
-    }
-
+  @Test
+  public void testSetProperty() throws Exception {
+    component.setProperty(Constants.Name.DISPLAY,WXLoading.HIDE);
+  }
 }

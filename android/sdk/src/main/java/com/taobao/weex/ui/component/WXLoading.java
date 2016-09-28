@@ -225,6 +225,8 @@ import com.taobao.weex.utils.WXUtils;
 @Component(lazyload = false)
 public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadingListener {
 
+  public static final String HIDE = "hide";
+
   public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
   }
@@ -256,7 +258,7 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   @WXComponentProp(name = Constants.Name.DISPLAY)
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
+      if (display.equals(HIDE)) {
         if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
           if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
             ((BaseBounceView) getParent().getHostView()).finishPullLoad();

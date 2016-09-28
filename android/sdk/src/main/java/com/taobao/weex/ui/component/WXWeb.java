@@ -223,6 +223,9 @@ import java.util.Map;
 
 public class WXWeb extends WXComponent {
 
+    public static final String GO_BACK = "goBack";
+    public static final String GO_FORWARD = "goForward";
+    public static final String RELOAD = "reload";
     protected IWebView mWebView;
     private String mUrl;
 
@@ -322,11 +325,11 @@ public class WXWeb extends WXComponent {
 
     public void setAction(String action) {
         if (!TextUtils.isEmpty(action)) {
-            if (action.equals("goBack")) {
+            if (action.equals(GO_BACK)) {
                 goBack();
-            } else if (action.equals("goForward")) {
+            } else if (action.equals(GO_FORWARD)) {
                 goForward();
-            } else if (action.equals("reload")) {
+            } else if (action.equals(RELOAD)) {
                 reload();
             }
         }
