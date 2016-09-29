@@ -84,8 +84,15 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     
     commitDict[BIZTYPE] = instance.bizType ?: @"";
     commitDict[PAGENAME] = instance.pageName ?: @"";
+    
     commitDict[WXSDKVERSION] = WX_SDK_VERSION;
     commitDict[JSLIBVERSION] = [WXAppConfiguration JSFrameworkVersion];
+    if (instance.userInfo[@"weex_bundlejs_connectionType"]) {
+        commitDict[@"connectionType"] = instance.userInfo[@"weex_bundlejs_connectionType"];
+    }
+    if (instance.userInfo[@"weex_bundlejs_requestType"]) {
+        commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
+    }
 #if DEBUG
     WXPerformBlockOnComponentThread(^{
         commitDict[@"componentCount"] = @([instance numberOfComponents]);
