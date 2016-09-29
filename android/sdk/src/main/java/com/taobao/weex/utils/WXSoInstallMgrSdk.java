@@ -213,8 +213,6 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
 
-import dalvik.system.PathClassLoader;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -226,6 +224,8 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import dalvik.system.PathClassLoader;
 
 
 /**
@@ -250,8 +250,8 @@ public class WXSoInstallMgrSdk {
   private final static String ARMEABI = "armeabi"; //default
   private final static String X86 = "x86";
   private final static String MIPS = "mips";
-  private final static int ARMEABI_Size = 3563340;
-  private final static int X86_Size = 4308128;
+  private final static int ARMEABI_Size = 3579724;
+  private final static int X86_Size = 4328576;
 
   static Context mContext = null;
 

@@ -284,7 +284,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
-  
+
   // args
   public static final String MODULE = "module";
   public static final String METHOD = "method";
@@ -427,9 +427,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       return;
     }
 
-    Message m = Message.obtain(mJSHandler, WXThread.secure(r));
-    m.obj = token;
-    m.sendToTarget();
+    if (isJSThread() && r != null) {
+      r.run();
+    } else {
+      Message m = Message.obtain(mJSHandler, WXThread.secure(r));
+      m.obj = token;
+      m.sendToTarget();
+    }
   }
 
   void setTimeout(String callbackId, String time) {
@@ -1163,6 +1167,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         invokeRegisterComponents(components);
       }
     }, null);
+  }
+
+  private boolean isJSThread() {
+    return mJSThread != null && mJSThread.getId() == Thread.currentThread().getId();
   }
 
   private void invokeRegisterModules(Map<String, Object> modules) {
