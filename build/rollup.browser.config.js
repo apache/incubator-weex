@@ -6,8 +6,12 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import buble from 'rollup-plugin-buble'
 
-const banner = `var global = this
-var process = { env: {}};
+const pkg = require('../package.json')
+const version = pkg.subversion.browser
+const date = new Date().toISOString().split('T')[0].replace(/\-/g, '')
+const banner = `\
+(this.nativeLog || function(s) {console.log(s)})('START WEEX HTML5: ${version} Build ${date}');
+var global = this, process = { env: {}};
 `
 
 export default {
