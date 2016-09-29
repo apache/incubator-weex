@@ -318,10 +318,13 @@ public class WXImageView extends ImageView implements WXGestureObservable {
     setImageDrawable(drawable);
   }
 
-  @Override
-  public void setImageDrawable(Drawable drawable) {
+  public void setImageDrawable(Drawable drawable,boolean isGif) {
     if (drawable != null) {
-      super.setImageDrawable(new ImageClipDrawable(drawable));
+      if(isGif){
+        super.setImageDrawable(drawable);
+      }else{
+        super.setImageDrawable(new ImageClipDrawable(drawable));
+      }
     } else {
       super.setImageDrawable(null);
     }
@@ -343,6 +346,11 @@ public class WXImageView extends ImageView implements WXGestureObservable {
       matrix.setScale(scale, scale);
       setImageMatrix(matrix);
     }
+  }
+
+  @Override
+  public void setImageDrawable(Drawable drawable) {
+    setImageDrawable(drawable,false);
   }
 
   @Override
