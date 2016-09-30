@@ -271,6 +271,11 @@ class WXBridge implements IWXBridge {
     }
     return errorCode;
   }
+  public int callAddElement(String instanceId, String ref,byte[] dom,String index, String callback) {
+
+
+    return callAddElement(instanceId,ref, new String(dom),index,callback);
+  }
 
   public int callAddElement(String instanceId, String ref,String dom,String index, String callback) {
 
