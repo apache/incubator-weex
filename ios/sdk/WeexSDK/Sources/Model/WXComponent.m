@@ -210,25 +210,30 @@
         [self viewDidLoad];
         
         if (_lazyCreateView) {
-            if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
-                NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;
-                
-                NSInteger index = [subcomponents indexOfObject:self];
-                if (index != NSNotFound) {
-                    [((WXComponent *)self.supercomponent).view insertSubview:_view atIndex:index];
-                }
-            }
-            
-            NSArray *subcomponents = self.subcomponents;
-            for (int i = 0; i < subcomponents.count; i++) {
-                WXComponent *subcomponent = subcomponents[i];
-                [self insertSubview:subcomponent atIndex:i];
-            }
+            [self _buildViewHierachyLazily];
         }
         
         [self _handleFirstScreenTime];
         
         return _view;
+    }
+}
+
+- (void)_buildViewHierachyLazily
+{
+    if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
+        NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;
+        
+        NSInteger index = [subcomponents indexOfObject:self];
+        if (index != NSNotFound) {
+            [(WXComponent *)self.supercomponent insertSubview:self atIndex:index];
+        }
+    }
+    
+    NSArray *subcomponents = self.subcomponents;
+    for (int i = 0; i < subcomponents.count; i++) {
+        WXComponent *subcomponent = subcomponents[i];
+        [self insertSubview:subcomponent atIndex:i];
     }
 }
 
