@@ -477,16 +477,19 @@
 - (void)scrollToTarget:(WXScrollToTarget *)target scrollRect:(CGRect)rect
 {
     WXComponent *component = target.target;
+    if (![component isViewLoaded]) {
+        return;
+    }
     
     CGFloat ctop;
-    if (component.supercomponent) {
+    if (component.supercomponent && [component.supercomponent isViewLoaded]) {
         ctop = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].y;
     } else {
         ctop = 0.0;
     }
     CGFloat cbottom = ctop + CGRectGetHeight(component.calculatedFrame);
     CGFloat cleft;
-    if (component.supercomponent) {
+    if (component.supercomponent && [component.supercomponent isViewLoaded]) {
         cleft = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].x;
     } else {
         cleft = 0.0;
