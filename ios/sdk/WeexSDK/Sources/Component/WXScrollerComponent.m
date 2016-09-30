@@ -128,10 +128,10 @@
 {
     if ([self isViewLoaded]) {
         [self setContentSize:_contentSize];
+        [self adjustSticky];
+        [self handleAppear];
     }
     
-    [self adjustSticky];
-    [self handleAppear];
     [_loadingComponent resizeFrame];
 }
 
@@ -203,6 +203,9 @@
 
 - (void)adjustSticky
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
     CGFloat scrollOffsetY = ((UIScrollView *)self.view).contentOffset.y;
     for(WXComponent *component in self.stickyArray) {
         if (CGPointEqualToPoint(component->_absolutePosition, CGPointZero)) {
@@ -455,6 +458,9 @@
 
 - (void)handleAppear
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
     UIScrollView *scrollView = (UIScrollView *)self.view;
     CGFloat vx = scrollView.contentInset.left + scrollView.contentOffset.x;
     CGFloat vy = scrollView.contentInset.top + scrollView.contentOffset.y;
