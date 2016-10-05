@@ -28,6 +28,7 @@ function genCallTasks (id) {
   // @todo: The `callAddElement` API should be re-design immediately
   // because its public and global and without config opportunity.
   const handler = Document.handler || callNative
+  const hasAddElementHandler = typeof callAddElement === 'function'
   return (tasks) => {
     if (!Array.isArray(tasks)) {
       tasks = [tasks]
@@ -35,7 +36,7 @@ function genCallTasks (id) {
     for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i]
       let returnValue
-      if (task.module === 'dom' && task.method === 'addElement') {
+      if (hasAddElementHandler && task.module === 'dom' && task.method === 'addElement') {
         const [ref, json, index] = task.args
         returnValue = callAddElement(id, ref, json, index, '-1')
       }
