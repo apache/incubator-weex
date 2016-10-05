@@ -4,10 +4,8 @@
  */
 
 import { bind, typof } from '../util/index'
-
 import Watcher from '../core/watcher'
 import config from '../config'
-import { parsePath } from '../util'
 
 const { nativeComponentMap } = config
 
@@ -341,7 +339,7 @@ function bindKey (vm, el, name, key, calc) {
  */
 export function watch (vm, calc, callback) {
   if (vm._static) {
-    return ((typeof calc === 'function') ? calc : parsePath(calc)).call(vm, vm)
+    return calc.call(vm, vm)
   }
   const watcher = new Watcher(vm, calc, function (value, oldValue) {
     /* istanbul ignore if */
