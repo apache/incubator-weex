@@ -1,6 +1,6 @@
 /*eslint no-eval: "off"*/
 
-// fs
+// prepare fs
 
 import fs from 'fs'
 import path from 'path'
@@ -15,7 +15,7 @@ function readOutput (name) {
   return fs.readFileSync(readpath, 'utf8')
 }
 
-// test suite
+// prepare test suite
 
 import chai from 'chai'
 import sinon from 'sinon'
@@ -24,23 +24,25 @@ import sinonChai from 'sinon-chai'
 const expect = chai.expect
 chai.use(sinonChai)
 
-// test driver
+// load test driver
 
 import {
   Runtime,
   Instance
 } from 'weex-vdom-tester'
 
-// env
+// load env
 
 import '../../shared'
 import { Document, Element, Comment } from '../../runtime/vdom'
 import Listener from '../../runtime/listener'
 
-// framework
+// load framework
 
 import * as defaultFramework from '../../frameworks/legacy'
 import { subversion } from '../../../package.json'
+
+// mock config & global APIs
 
 let callNativeHandler = function () {}
 
@@ -51,7 +53,10 @@ const config = {
   }
 }
 
+Document.Listener = Listener
 Document.handler = config.sendTasks
+
+// init framework
 
 defaultFramework.init(config)
 
@@ -59,6 +64,13 @@ Object.assign(global, {
   frameworkVersion: subversion.native,
   transformerVersion: subversion.transformer
 })
+
+// init special API called `callAddElement()`
+// which is supported temporarily in native render
+
+global.callAddElement = function (id, ref, json, index) {
+  return callNativeHandler(id, [{ module: 'dom', method: 'addElement', args: [ref, json, index] }])
+}
 
 describe('test input and output', () => {
   let runtime
@@ -88,6 +100,58 @@ describe('test input and output', () => {
 
   it('single case', () => {
     const name = 'foo'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
+  it('static1 case', () => {
+    const name = 'static1'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
+  it('static2 case', () => {
+    const name = 'static2'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
+  it('static3 case', () => {
+    const name = 'static3'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
+  it('static4 case', () => {
+    const name = 'static4'
     const inputCode = readInput(name)
     const outputCode = readOutput(name)
 
@@ -289,6 +353,53 @@ describe('test input and output', () => {
     const expected = eval('(' + outputCode + ')')
     const actual = instance.getRealRoot()
     expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
+  it('append-root-event case', () => {
+    const name = 'append-root-event'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$fireEvent(instance.doc.body.children[0].ref, 'click', {})
+    const actual2 = instance.getRealRoot()
+    expect(actual2.children[0].attr.value).eql(2)
+
+    instance.$destroy()
+  })
+
+  it('clear-module case', () => {
+    const instance2 = new Instance(runtime)
+
+    const nameA = 'clear-moduleA'
+    const nameB = 'clear-moduleB'
+    const inputCodeA = readInput(nameA)
+    const outputCodeA = readOutput(nameA)
+    const inputCodeB = readInput(nameB)
+    const outputCodeB = readOutput(nameB)
+
+    instance.$create(inputCodeA)
+    instance2.$create(inputCodeB)
+
+    const expectedB = eval('(' + outputCodeB + ')')
+    const actualB = instance2.getRealRoot()
+    expect(actualB).eql(expectedB)
+
+    instance2.$destroy()
+
+    console.log(instance.getRealRoot())
+    instance.$fireEvent(instance.doc.body.children[0].ref, 'click', {})
+
+    const expectedA = eval('(' + outputCodeA + ')')
+    const actualA = instance.getRealRoot()
+
+    expect(actualA).eql(expectedA)
 
     instance.$destroy()
   })
@@ -800,7 +911,7 @@ describe('test callNative signals', () => {
   })
 
   it('long signals control', function () {
-    this.timeout(50000)
+    this.timeout(500000)
 
     const name = 'signals-long'
     const inputCode = readInput(name)

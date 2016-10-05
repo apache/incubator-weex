@@ -85,6 +85,10 @@ function compile (vm, target, dest, meta) {
     return
   }
 
+  if (target.attr && target.attr.hasOwnProperty('static')) {
+    vm._static = true
+  }
+
   if (targetIsFragment(target)) {
     compileFragment(vm, target, dest, meta)
     return
@@ -303,6 +307,9 @@ function compileCustomComponent (vm, component, target, dest, type, meta) {
   const Ctor = vm.constructor
   const subVm = new Ctor(type, component, vm, dest, undefined, {
     'hook:init': function () {
+      if (vm._static) {
+        this._static = vm._static
+      }
       setId(vm, null, target.id, this)
       // bind template earlier because of lifecycle issues
       this._externalBinding = {
@@ -319,7 +326,7 @@ function compileCustomComponent (vm, component, target, dest, type, meta) {
       }
     }
   })
-  bindSubVmAfterInitialized(vm, subVm, target)
+  bindSubVmAfterInitialized(vm, subVm, target, dest)
 }
 
 /**
@@ -453,7 +460,7 @@ function bindRepeat (vm, target, fragBlock, info) {
   const list = watchBlock(vm, fragBlock, getter, 'repeat',
     (data) => {
       console.debug('[JS Framework] the "repeat" item has changed', data)
-      if (!fragBlock) {
+      if (!fragBlock || !data) {
         return
       }
 
@@ -604,5 +611,8 @@ function mergeContext (context, mergedData) {
   initData(newContext)
   initComputed(newContext)
   newContext._realParent = context
+  if (context._static) {
+    newContext._static = context._static
+  }
   return newContext
 }

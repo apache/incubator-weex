@@ -5,6 +5,7 @@ const { expect } = chai
 chai.use(sinonChai)
 
 global.callNative = function () {}
+global.callAddElement = function () {}
 
 import * as bundle from '../../../../frameworks/legacy/app/bundle'
 import * as register from '../../../../frameworks/legacy/app/register'
@@ -35,7 +36,6 @@ describe('parsing a bundle file', () => {
     console.warn.restore()
     console.error.restore()
     console.debug.restore()
-    bundle.clearCommonModules()
   })
 
   describe('use define/bootstrap', () => {
@@ -53,6 +53,7 @@ describe('parsing a bundle file', () => {
       app = {
         id, doc,
         customComponentMap: {},
+        commonModules: {},
         callbacks: {},
         callTasks: (tasks, callback) => {
           callTasksSpy(tasks)

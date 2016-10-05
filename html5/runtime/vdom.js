@@ -25,12 +25,27 @@ function Document (id, url, handler) {
 Document.handler = null
 
 function genCallTasks (id) {
+  // @todo: The `callAddElement` API should be re-design immediately
+  // because its public and global and without config opportunity.
   const handler = Document.handler || callNative
   return (tasks) => {
     if (!Array.isArray(tasks)) {
       tasks = [tasks]
     }
-    return handler(id, tasks, '-1')
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i]
+      let returnValue
+      if (task.module === 'dom' && task.method === 'addElement') {
+        const [ref, json, index] = task.args
+        returnValue = callAddElement(id, ref, json, index, '-1')
+      }
+      else {
+        returnValue = handler(id, [task], '-1')
+      }
+      if (returnValue === -1) {
+        return returnValue
+      }
+    }
   }
 }
 
@@ -89,6 +104,7 @@ function appendBody (doc, node, before) {
       node.docId = doc.id
       node.ownerDocument = doc
       node.parentNode = documentElement
+      linkParent(node, documentElement)
     }
     else {
       node.children.forEach(child => {

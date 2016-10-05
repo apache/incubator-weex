@@ -5,6 +5,7 @@ const { expect } = chai
 chai.use(sinonChai)
 
 global.callNative = function () {}
+global.callAddElement = function () {}
 
 import Vm from '../../../../frameworks/legacy/vm'
 import { Document } from '../../../../runtime/vdom'
