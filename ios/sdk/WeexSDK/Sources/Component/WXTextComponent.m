@@ -12,6 +12,7 @@
 #import "WXLayer.h"
 #import "WXUtility.h"
 #import "WXConvert.h"
+#import <pthread/pthread.h>
 
 @interface WXText : UIView
 
@@ -117,6 +118,16 @@
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
+    
+   
+    pthread_mutex_t _textStorageMutex;
+    pthread_mutexattr_t _textStorageMutexAttr;
+}
+
+static BOOL _isUsingTextStorageLock = YES;
++ (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
+{
+    _isUsingTextStorageLock = isUsingTextStorageLock;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -128,11 +139,25 @@
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
+        if (_isUsingTextStorageLock) {
+            pthread_mutexattr_init(&_textStorageMutexAttr);
+            pthread_mutexattr_settype(&_textStorageMutexAttr, PTHREAD_MUTEX_RECURSIVE);
+            pthread_mutex_init(&_textStorageMutex, &_textStorageMutexAttr);
+        }
+        
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
     }
     
     return self;
+}
+
+- (void)dealloc
+{
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_destroy(&_textStorageMutex);
+        pthread_mutexattr_destroy(&_textStorageMutexAttr);
+    }
 }
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
@@ -185,7 +210,13 @@ do {\
 
 - (void)setNeedsRepaint
 {
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_lock(&_textStorageMutex);
+    }
     _textStorage = nil;
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_unlock(&_textStorageMutex);
+    }
 }
 
 #pragma mark - Subclass
@@ -197,7 +228,13 @@ do {\
 
 - (void)viewDidLoad
 {
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_lock(&_textStorageMutex);
+    }
     ((WXText *)self.view).textStorage = _textStorage;
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_unlock(&_textStorageMutex);
+    }
     [self setNeedsDisplay];
 }
 
@@ -213,7 +250,17 @@ do {\
         if (isCancelled()) {
             return nil;
         }
-        return [textView drawTextWithBounds:bounds padding:_padding];
+        if (_isUsingTextStorageLock) {
+            pthread_mutex_lock(&_textStorageMutex);
+        }
+        
+        UIImage *image = [textView drawTextWithBounds:bounds padding:_padding];
+        
+        if (_isUsingTextStorageLock) {
+            pthread_mutex_unlock(&_textStorageMutex);
+        }
+        
+        return image;
     };
 }
 
@@ -329,7 +376,14 @@ do {\
     [layoutManager ensureLayoutForTextContainer:textContainer];
     
     _textStorageWidth = width;
+    
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_lock(&_textStorageMutex);
+    }
     _textStorage = textStorage;
+    if (_isUsingTextStorageLock) {
+        pthread_mutex_unlock(&_textStorageMutex);
+    }
     
     return textStorage;
 }
@@ -341,7 +395,13 @@ do {\
     
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
+            if (_isUsingTextStorageLock) {
+                pthread_mutex_lock(&_textStorageMutex);
+            }
             ((WXText *)self.view).textStorage = textStorage;
+            if (_isUsingTextStorageLock) {
+                pthread_mutex_unlock(&_textStorageMutex);
+            }
             [self setNeedsDisplay];
         }
     }];
