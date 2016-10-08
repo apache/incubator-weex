@@ -733,8 +733,8 @@ class WXDomStatement {
       }
       return;
     }
-    if(domObject.parent.equals(parentObject)){
-      return ;
+    if (domObject.parent.equals(parentObject) && parentObject.index(domObject) == index) {
+      return;
     }
     domObject.parent.remove(domObject);
     parentObject.add(domObject, index);

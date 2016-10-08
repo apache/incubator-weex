@@ -195,6 +195,10 @@ public class WXLogUtils {
     e(WEEX_TAG,msg);
   }
 
+  public static void d(String tag, byte[] msg) {
+    d(tag,new String(msg));
+  }
+
   public static void d(String tag, String msg) {
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
       msg = getLineNumber() + msg;
