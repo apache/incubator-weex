@@ -9,6 +9,7 @@
 #import "WXTextInputComponent.h"
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXSDKInstance.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -67,6 +68,8 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
+@property (nonatomic, assign) CGSize keyboardSize;
+@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -152,7 +155,6 @@
         }
         [self setPlaceholderAttributedString];
         [self setTextFont];
-        
         UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
         if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
             [self setPadding:padding];
@@ -161,6 +163,8 @@
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             [self setBorder:border];
         }
+        
+        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -190,9 +194,28 @@
     _inputView.inputAccessoryView = toolbar;
 }
 
+- (void)viewWillLoad {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
 - (void)viewWillUnload
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:_inputView];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardDidShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
 }
 
 #pragma mark - Add Event
@@ -394,6 +417,31 @@
     }
 }
 
+- (void)setViewMovedUp:(BOOL)movedUp
+{
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:0.1]; //slide up the view
+    UIView *rootView = self.weexInstance.rootView;
+    CGRect rect = _rootViewOriginFrame;
+    if (movedUp) {
+        CGFloat offset = _keyboardSize.height - CGRectGetMaxY(rect) + CGRectGetMaxY(_inputView.frame);
+        if (offset > 0) {
+            rect = (CGRect){
+                .origin.x = 0.f,
+                .origin.y = -offset,
+                .size = rootView.frame.size
+            };
+        }
+    }else {
+        // revert back to the origin state
+        rect = _rootViewOriginFrame;
+    }
+    self.weexInstance.rootView.frame = rect;
+    
+    [UIView commitAnimations];
+}
+
+
 #pragma mark
 
 - (void)setPlaceholderAttributedString
@@ -461,6 +509,35 @@
 {
     _border = border;
     [_inputView setBorder:border];
+}
+
+#pragma mark keyboard
+- (void)keyboardWasShown:(NSNotification*)notification
+{
+    // Animate the current view out of the way
+    _keyboardSize = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    UIView * rootView = self.weexInstance.rootView;
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    if (CGRectIsNull(_rootViewOriginFrame)) {
+        _rootViewOriginFrame = rootView.frame;
+    }
+    CGRect keyboardRect = (CGRect){
+        .origin.x = 0,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 44,
+        .size = _keyboardSize
+    };
+    CGRect inputFrame = _inputView.frame;
+    if (keyboardRect.origin.y - inputFrame.size.height - 44 <= inputFrame.origin.y) {
+        [self setViewMovedUp:YES];
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification*)notification
+{
+    UIView * rootView = self.weexInstance.rootView;
+    if (rootView.frame.origin.y < 0) {
+        [self setViewMovedUp:NO];
+    }
 }
 
 - (void)closeKeyboard
