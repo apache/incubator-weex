@@ -250,6 +250,10 @@ public class WXSDKManager {
     mBridgeManager.registerModules(modules);
   }
 
+  /**
+   * Do not direct invoke this method in Components, use {@link WXSDKInstance#fireEvent(String, String, Map, Map)} instead.
+   */
+  @Deprecated
   public void fireEvent(final String instanceId, String ref, String type) {
     fireEvent(instanceId, ref, type, new HashMap<String, Object>());
   }
