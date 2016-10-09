@@ -9,8 +9,10 @@ import android.text.method.Touch;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.alibaba.weex.R;
 import com.alibaba.weex.WXPageActivity;
@@ -78,7 +80,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
 //        addAllTargetView("AG_");
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
     }
 
     /**
@@ -101,6 +103,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
             String caseViewName = ((WXTextView) caseView).getText().toString();
             String testComponet = (String)getTestMap().get("testComponet");
+            Log.e(TAG, "caseViewName==" + caseViewName + "==testComponet==" + testComponet);
 
             if (caseViewName.equals(testComponet)) {
 
@@ -113,6 +116,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     while(scrollCount <maxStep){
 
                         TouchUtils.dragQuarterScreenUp(this, this.getActivity());
+                        sleep(1000);
                         scrollCount ++;
 
                     }
@@ -272,8 +276,22 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     Log.e(TAG,"viewY==" + viewY);
                     Log.e(TAG,"viewX==" + viewX);
 
-                    TouchUtils.clickView(this, view);
-                    sleep(2000);
+                    final View clickView = view;
+                    mInstrumentation.runOnMainSync(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e(TAG, "find veiw text=" + ((WXTextView)clickView).getText().toString());
+                            clickView.requestFocus();
+                            clickView.performClick();
+                            Log.e(TAG, "child clcik!");
+                        }
+                    });
+//                    if (view instanceof EditText){
+//                        view.performClick();
+//                    }else {
+//                        TouchUtils.clickView(this, view);
+//                    }
+                    sleep(1000);
                     Log.e(TAG,"clickView==" );
 
 
@@ -359,6 +377,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         int count =0 ;
         while (count < max){
             TouchUtils.dragQuarterScreenUp(this, this.getActivity());
+            sleep(500);
             mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
             mCaseListIndexView = ViewUtil.findViewWithText(mViewGroup, target);
             mCaseListIndexView.addAll(mCaseListIndexView);
