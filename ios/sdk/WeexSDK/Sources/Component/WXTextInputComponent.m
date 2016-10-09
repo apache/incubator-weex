@@ -419,26 +419,25 @@
 
 - (void)setViewMovedUp:(BOOL)movedUp
 {
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.1]; //slide up the view
     UIView *rootView = self.weexInstance.rootView;
     CGRect rect = _rootViewOriginFrame;
+    CGRect rootViewFrame = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+    CGRect inputFrame = [_inputView convertRect:_inputView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
     if (movedUp) {
-        CGFloat offset = _keyboardSize.height - CGRectGetMaxY(rect) + CGRectGetMaxY(_inputView.frame);
+        CGFloat offset = _keyboardSize.height - CGRectGetMaxY(rect) + CGRectGetMaxY(inputFrame);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
                 .origin.y = -offset,
-                .size = rootView.frame.size
+                .size = rootViewFrame.size
             };
         }
     }else {
         // revert back to the origin state
         rect = _rootViewOriginFrame;
+        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
-    
-    [UIView commitAnimations];
 }
 
 
@@ -514,26 +513,33 @@
 #pragma mark keyboard
 - (void)keyboardWasShown:(NSNotification*)notification
 {
-    // Animate the current view out of the way
+    if(![_inputView isFirstResponder]) {
+        return;
+    }
+    
     _keyboardSize = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
+        _rootViewOriginFrame = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
     }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
-        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 44,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height,
         .size = _keyboardSize
     };
-    CGRect inputFrame = _inputView.frame;
-    if (keyboardRect.origin.y - inputFrame.size.height - 44 <= inputFrame.origin.y) {
+    CGRect inputFrame = [_inputView convertRect:_inputView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace]
+    ;
+    if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
     }
 }
 
 - (void)keyboardWillHide:(NSNotification*)notification
 {
+    if (![_inputView isFirstResponder]) {
+        return;
+    }
     UIView * rootView = self.weexInstance.rootView;
     if (rootView.frame.origin.y < 0) {
         [self setViewMovedUp:NO];
