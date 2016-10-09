@@ -366,7 +366,7 @@ public class WXStreamModule extends WXModule {
                       headers != null ? getHeader(headers, "Content-Type") : ""
               );
               try {
-                resp.put("data", parseJson(respData, options.getType()));
+                resp.put("data", parseData(respData, options.getType()));
               } catch (JSONException exception) {
                 WXLogUtils.e("", exception);
                 resp.put("ok", false);
@@ -382,7 +382,7 @@ public class WXStreamModule extends WXModule {
     }, progressCallback);
   }
 
-  Object parseJson(String data,Options.Type type) throws JSONException{
+  Object parseData(String data, Options.Type type) throws JSONException{
     if( type == Options.Type.json){
       return JSONObject.parse(data);
     }else if( type == Options.Type.jsonp){
