@@ -533,7 +533,7 @@
     }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
-        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
         .size = _keyboardSize
     };
     CGRect inputFrame = [_inputView convertRect:_inputView.frame toView:rootView]
