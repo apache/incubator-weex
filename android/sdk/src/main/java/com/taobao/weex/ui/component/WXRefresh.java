@@ -253,7 +253,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
 
   @Override
   public void onPullingDown(float dy, int headerHeight, float maxHeight) {
-    if (getDomObject().event != null && getDomObject().event.contains(Constants.Event.ONPULLING_DOWN)) {
+    if (getDomObject().getEvents() != null && getDomObject().getEvents().contains(Constants.Event.ONPULLING_DOWN)) {
       Map<String, Object> data = new HashMap<>();
       data.put("dy", dy);
       data.put("headerHeight", headerHeight);

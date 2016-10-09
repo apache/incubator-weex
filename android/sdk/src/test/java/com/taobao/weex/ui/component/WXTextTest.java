@@ -208,6 +208,7 @@ import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -251,10 +252,10 @@ public class WXTextTest {
         Mockito.when(mParentDomObj.getPadding()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.getBorder()).thenReturn(new Spacing());
         Mockito.when(mParentDomObj.clone()).thenReturn(mParentDomObj);
-        mParentDomObj.ref = "_root";
+        TestDomObject.setRef(mParentDomObj,WXDomObject.ROOT);
 
         mDomObject = Mockito.spy(new WXTextDomObject());
-        mDomObject.ref = "1";
+        TestDomObject.setRef(mDomObject,"1");
         mDomObject.addEvent(Constants.Event.CLICK);
         Mockito.when(mDomObject.clone()).thenReturn(mDomObject);
         Mockito.when(mDomObject.getPadding()).thenReturn(new Spacing());

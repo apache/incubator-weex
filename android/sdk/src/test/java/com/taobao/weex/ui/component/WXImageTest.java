@@ -228,8 +228,8 @@ public class WXImageTest {
 
   @Test
   public void testSetSrc() throws Exception {
-    mWXImage.getDomObject().attr = PowerMockito.mock(WXAttr.class);
-    PowerMockito.when(mWXImage.getDomObject().attr.getImageSharpen()).thenReturn(WXImageSharpen.SHARPEN);
+    TestDomObject.setAttribute(mWXImage.getDomObject(),PowerMockito.mock(WXAttr.class));
+    PowerMockito.when(mWXImage.getDomObject().getAttrs().getImageSharpen()).thenReturn(WXImageSharpen.SHARPEN);
     mWXImage.setSrc("");
 
   }
