@@ -388,7 +388,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if(getInstance()!=null
             &&getInstance().getRootView()!=null
             && child.getDomObject().isFixed()){
-      getInstance().getRootView().removeView(child.getHostView());
+      getInstance().removeFixedView(child.getHostView());
     }else if(getRealView() != null) {
       getRealView().removeView(child.getHostView());
     }

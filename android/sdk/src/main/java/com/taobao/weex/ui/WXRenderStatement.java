@@ -204,13 +204,9 @@
  */
 package com.taobao.weex.ui;
 
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -246,7 +242,6 @@ class WXRenderStatement {
   /**
    * The container for weex root view.
    */
-  private WXVContainer mGodComponent;
 
   public WXRenderStatement(WXSDKInstance instance) {
     mWXSDKInstance = instance;
@@ -258,9 +253,6 @@ class WXRenderStatement {
    */
   public void destroy() {
     mWXSDKInstance = null;
-    if (mGodComponent != null) {
-      mGodComponent.destroy();
-    }
     mRegistry.clear();
   }
 
@@ -274,7 +266,7 @@ class WXRenderStatement {
    */
   void createBody(WXComponent component) {
     long start = System.currentTimeMillis();
-    component.createView(mGodComponent, -1);
+    component.createView(null, -1);
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
@@ -292,9 +284,9 @@ class WXRenderStatement {
         mWXSDKInstance.setRootScrollView((ScrollView) scroller.getInnerView());
       }
     }
-    mWXSDKInstance.setRootView(mGodComponent.getRealView());
+    mWXSDKInstance.onRootCreated(component);
     if (mWXSDKInstance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
-      mWXSDKInstance.onViewCreated(mGodComponent);
+      mWXSDKInstance.onCreateFinish();
     }
   }
 
@@ -302,26 +294,10 @@ class WXRenderStatement {
     if (mWXSDKInstance == null) {
       return null;
     }
-    WXDomObject domObject = new WXDomObject();
-    WXDomObject.prepareGod(domObject);
-    mGodComponent = (WXVContainer) WXComponentFactory.newInstance(mWXSDKInstance, domObject, null);
-    mGodComponent.createView(null, -1);
-    if (mGodComponent == null) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("rootView failed!");
-      }
-      //TODO error callback
-      return null;
-    }
-    FrameLayout frameLayout = (FrameLayout) mGodComponent.getHostView();
-    ViewGroup.LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-    frameLayout.setLayoutParams(layoutParams);
-    frameLayout.setBackgroundColor(Color.TRANSPARENT);
 
-    WXComponent component = generateComponentTree(dom, mGodComponent);
-    mGodComponent.addChild(component);
-    mRegistry.put(component.getRef(), component);
-    return component;
+    WXComponent rootComp = generateComponentTree(dom, null);
+    mRegistry.put(rootComp.getRef(), rootComp);
+    return rootComp;
   }
 
   /**
@@ -522,7 +498,7 @@ class WXRenderStatement {
    */
   void createFinish(int width, int height) {
     if (mWXSDKInstance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
-      mWXSDKInstance.onViewCreated(mGodComponent);
+      mWXSDKInstance.onCreateFinish();
     }
     mWXSDKInstance.onRenderSuccess(width, height);
   }
@@ -545,11 +521,11 @@ class WXRenderStatement {
 
 
   private WXComponent generateComponentTree(WXDomObject dom, WXVContainer parent) {
-    if (dom == null || parent == null) {
+    if (dom == null ) {
       return null;
     }
     WXComponent component = WXComponentFactory.newInstance(mWXSDKInstance, dom,
-                                                           parent, parent.isLazy());
+                                                           parent, parent != null && parent.isLazy());
 
     mRegistry.put(dom.getRef(), component);
     if (component instanceof WXVContainer) {

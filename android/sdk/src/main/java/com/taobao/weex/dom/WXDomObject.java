@@ -234,7 +234,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
-  public static final String GOD = "god";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
   private AtomicBoolean sDestroy = new AtomicBoolean();
@@ -312,11 +311,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public static void prepareRoot(WXDomObject obj) {
     obj.mRef = WXDomObject.ROOT;
-  }
-
-  public static void prepareGod(WXDomObject obj) {
-    obj.mRef = GOD;
-    obj.mType = WXBasicComponentType.DIV;
   }
 
   protected final void copyFields(WXDomObject dest) {

@@ -33,6 +33,7 @@ import com.alibaba.weex.https.WXHttpManager;
 import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -55,7 +56,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   public static Activity wxPageActivityInstance;
   private ViewGroup mContainer;
   private ProgressBar mProgressBar;
-  private View mWAView;
   private WXSDKInstance mInstance;
   private Handler mWXHandler;
   private BroadcastReceiver mReceiver;
@@ -121,8 +121,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance = null;
     }
     if (mInstance == null) {
+      RenderContainer renderContainer = new RenderContainer(this);
+      mContainer.addView(renderContainer);
+
       mInstance = new WXSDKInstance(this);
-      // mInstance.setImgLoaderAdapter(new ImageAdapter(this));
+      mInstance.setRenderContainer(renderContainer);
       mInstance.registerRenderListener(this);
       mInstance.setNestedInstanceInterceptor(this);
     }
@@ -135,8 +138,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         mConfigMap.put("bundleUrl", mUri.toString());
         String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
         mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
-            mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this),
-            ScreenUtil.getDisplayHeight(WXPageActivity.this),
+            mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
       }
     });
@@ -172,8 +174,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance.destroy();
     }
 
+    RenderContainer renderContainer = new RenderContainer(this);
+    mContainer.addView(renderContainer);
+
     mInstance = new WXSDKInstance(this);
+    mInstance.setRenderContainer(renderContainer);
     mInstance.registerRenderListener(this);
+    mInstance.setNestedInstanceInterceptor(this);
 
     WXHttpTask httpTask = new WXHttpTask();
     httpTask.url = url;
@@ -281,14 +288,6 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
     WXLogUtils.e("into--[onViewCreated]");
-    if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
-      mContainer.removeView(mWAView);
-    }
-
-    mWAView = view;
-    mContainer.addView(view);
-    mContainer.requestLayout();
-    Log.d("WARenderListener", "renderSuccess");
   }
 
   @Override

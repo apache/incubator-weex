@@ -463,7 +463,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.height = realHeight;
       params.setMargins(realLeft, realTop, realRight, realBottom);
       mHost.setLayoutParams(params);
-      mInstance.getRootView().addView(mHost);
+      mInstance.addFixedView(mHost);
 
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + realLeft + " " + realTop + " " + realWidth + " " + realHeight);
@@ -571,6 +571,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       for(String key : props.keySet()) {
         Object param = props.get(key);
         if(!setProperty(key, param)){
+          if(mHolder == null){
+            return;
+          }
         Invoker invoker = mHolder.getMethod(key);
         if (invoker != null) {
           try {
