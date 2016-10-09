@@ -196,32 +196,28 @@
 }
 
 - (void)viewWillLoad {
-     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWasShown:)
-                                                     name:UIKeyboardDidShowNotification
-                                                   object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWillHide:)
-                                                     name:UIKeyboardWillHideNotification
-                                                   object:nil];
-     }
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
 }
 
 - (void)viewWillUnload
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:_inputView];
     
-    if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                        name:UIKeyboardDidShowNotification
-                                                      object:nil];
-        
-        [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                        name:UIKeyboardWillHideNotification
-                                                      object:nil];
-    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardDidShowNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardWillHideNotification
+                                                  object:nil];
 }
 
 #pragma mark - Add Event
@@ -428,8 +424,8 @@
 {
     UIView *rootView = self.weexInstance.rootView;
     CGRect rect = _rootViewOriginFrame;
-    CGRect rootViewFrame = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
-    CGRect inputFrame = [_inputView convertRect:_inputView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+    CGRect rootViewFrame = rootView.frame;
+    CGRect inputFrame = [_inputView convertRect:_inputView.frame toView:rootView];
     if (movedUp) {
         CGFloat offset = _keyboardSize.height - CGRectGetMaxY(rect) + CGRectGetMaxY(inputFrame);
         if (offset > 0) {
@@ -540,7 +536,7 @@
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height,
         .size = _keyboardSize
     };
-    CGRect inputFrame = [_inputView convertRect:_inputView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace]
+    CGRect inputFrame = [_inputView convertRect:_inputView.frame toView:rootView]
     ;
     if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
