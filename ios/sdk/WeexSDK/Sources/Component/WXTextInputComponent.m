@@ -369,7 +369,6 @@
     };
 }
 
-
 #pragma mark -
 #pragma mark UITextFieldDelegate
 
@@ -410,7 +409,8 @@
     }
 }
 
-- (void)textFiledEditChanged:(NSNotification *)notifi{
+- (void)textFiledEditChanged:(NSNotification *)notifi
+{
     if (_inputEvent) {
         UITextField *textField = (UITextField *)notifi.object;
         // bind each other , the key must be attrs
@@ -517,12 +517,17 @@
     if(![_inputView isFirstResponder]) {
         return;
     }
+    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
     
-    _keyboardSize = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
+    if(begin.size.height <= 44 ){
+        return;
+    }
+    _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+        _rootViewOriginFrame = rootView.frame;
     }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
