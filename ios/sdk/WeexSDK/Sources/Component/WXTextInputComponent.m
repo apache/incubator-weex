@@ -413,7 +413,8 @@
 - (void)textFiledEditChanged:(NSNotification *)notifi{
     if (_inputEvent) {
         UITextField *textField = (UITextField *)notifi.object;
-        [self fireEvent:@"input" params:@{@"value":textField.text}];
+        // bind each other , the key must be attrs
+        [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
     }
 }
 
