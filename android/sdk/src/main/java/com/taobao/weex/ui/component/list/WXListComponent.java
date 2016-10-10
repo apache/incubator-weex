@@ -602,7 +602,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
                 int top = location[1] - parentLocation[1];
 
-                boolean showSticky = ((WXCell) stickyComponent).lastLocationY > 0 && top <= 0 && dy > 0;
+                boolean showSticky = ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy > 0;
                 boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy < 0;
                 if (showSticky) {
                     bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
@@ -666,9 +666,21 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     if(view != null) {
       view.getAdapter().notifyItemInserted(adapterPosition);
     }
+    relocateAppearanceHelper();
   }
 
-    /**
+  private void relocateAppearanceHelper() {
+    Iterator<Map.Entry<String, AppearanceHelper>> iterator = mAppearComponents.entrySet().iterator();
+    while(iterator.hasNext()){
+      Map.Entry<String, AppearanceHelper> item = iterator.next();
+      AppearanceHelper value = item.getValue();
+      WXComponent dChild = findDirectListChild(value.getAwareChild());
+      int index = mChildren.indexOf(dChild);
+      value.setCellPosition(index);
+    }
+  }
+
+  /**
      * Setting refresh view and loading view
      * @param child the refresh_view or loading_view
      */
