@@ -205,9 +205,11 @@
 package com.taobao.weex;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -222,6 +224,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -778,6 +781,22 @@ public class WXSDKInstance implements IWXActivityStateListener {
       }
     }
     return false;
+  }
+
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    Intent intent=new Intent(WXModule.ACTION_REQUEST_PERMISSIONS_RESULT);
+    intent.putExtra(WXModule.REQUEST_CODE,requestCode);
+    intent.putExtra(WXModule.PERMISSIONS,permissions);
+    intent.putExtra(WXModule.GRANT_RESULTS,grantResults);
+    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+  }
+
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    Intent intent=data==null?new Intent():new Intent(data);
+    intent.setAction(WXModule.ACTION_ACTIVITY_RESULT);
+    intent.putExtra(WXModule.REQUEST_CODE,requestCode);
+    intent.putExtra(WXModule.RESULT_CODE,resultCode);
+    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
   }
 
   public void onCreateFinish() {
