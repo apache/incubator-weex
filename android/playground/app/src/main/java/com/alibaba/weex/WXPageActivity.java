@@ -231,9 +231,14 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if (mInstance != null) {
       mInstance.onActivityDestroy();
     }
+    mContainer = null;
     // TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
     unregisterBroadcastReceiver();
+
+    if(wxPageActivityInstance == this){
+      wxPageActivityInstance = null;
+    }
   }
 
   @Override
@@ -373,6 +378,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     if (mReceiver != null) {
       unregisterReceiver(mReceiver);
     }
+    mReceiver = null;
   }
 
   private static class NavigatorAdapter implements IActivityNavBarSetter {
