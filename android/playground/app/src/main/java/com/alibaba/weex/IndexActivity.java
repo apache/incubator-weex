@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -48,6 +49,7 @@ public class IndexActivity extends AbstractWeexActivity {
     setContainer((ViewGroup) findViewById(R.id.index_container));
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+    getWindow().setFormat(PixelFormat.TRANSLUCENT);
 
     mProgressBar = (ProgressBar) findViewById(R.id.index_progressBar);
     mTipView = (TextView) findViewById(R.id.index_tip);
