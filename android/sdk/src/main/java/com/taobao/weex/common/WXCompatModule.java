@@ -217,11 +217,11 @@ import com.taobao.weex.WXEnvironment;
  * Created by lixinke on 16/10/10.
  */
 
-public abstract class AppCompatModule extends WXModule implements Destroyable {
+public abstract class WXCompatModule extends WXModule implements Destroyable {
 
   private ModuleReceive mModuleReceive;
 
-  public AppCompatModule() {
+  public WXCompatModule() {
     mModuleReceive = new ModuleReceive(this);
     LocalBroadcastManager.getInstance(WXEnvironment.getApplication())
         .registerReceiver(mModuleReceive, new IntentFilter(WXModule.ACTION_ACTIVITY_RESULT));
@@ -243,10 +243,10 @@ public abstract class AppCompatModule extends WXModule implements Destroyable {
 
   static class ModuleReceive extends BroadcastReceiver {
 
-    private AppCompatModule mAppCompatModule;
+    private WXCompatModule mWXCompatModule;
 
-    ModuleReceive(AppCompatModule module) {
-      mAppCompatModule = module;
+    ModuleReceive(WXCompatModule module) {
+      mWXCompatModule = module;
     }
 
     @Override
@@ -256,13 +256,13 @@ public abstract class AppCompatModule extends WXModule implements Destroyable {
         case WXModule.ACTION_ACTIVITY_RESULT:
           int requestCode = intent.getIntExtra(WXModule.REQUEST_CODE, -1);
           int resultCode = intent.getIntExtra(WXModule.RESULT_CODE, Activity.RESULT_OK);
-          mAppCompatModule.onActivityResult(requestCode, resultCode, intent);
+          mWXCompatModule.onActivityResult(requestCode, resultCode, intent);
           break;
         case WXModule.ACTION_REQUEST_PERMISSIONS_RESULT:
           requestCode = intent.getIntExtra(WXModule.REQUEST_CODE, -1);
           String[] permissions = intent.getStringArrayExtra(WXModule.PERMISSIONS);
           int[] grantResults = intent.getIntArrayExtra(WXModule.GRANT_RESULTS);
-          mAppCompatModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
+          mWXCompatModule.onRequestPermissionsResult(requestCode, permissions, grantResults);
           break;
       }
     }
