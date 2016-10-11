@@ -268,7 +268,7 @@ public class WXDomStatementTest {
     root.add(new WXSwitchDomObject(),0);
     root.add(new TextAreaEditTextDomObject(),0);
     stmt.layout(root);
-    root.traverseTree(new WXDomStatement.ApplyStyleConsumer());
+    root.traverseTree(WXDomStatement.ApplyStyleConsumer.getInstance());
   }
 
   @Test
