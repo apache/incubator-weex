@@ -152,7 +152,6 @@ import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -437,43 +436,43 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     realWidth = measureOutput.width;
     realHeight = measureOutput.height;
 
-    if (mHost instanceof WXCircleIndicator) {
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(realWidth, realHeight);
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
-      return;
-    }
-
     //fixed style
-    if (mDomObj.isFixed() && mInstance.getRootView() != null) {
-      if (mHost.getParent() instanceof ViewGroup) {
-        ViewGroup viewGroup = (ViewGroup) mHost.getParent();
-        viewGroup.removeView(mHost);
-      }
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-      params.width = realWidth;
-      params.height = realHeight;
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
-      mInstance.addFixedView(mHost);
-
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + realLeft + " " + realTop + " " + realWidth + " " + realHeight);
-        WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + mDomObj.getStyles().getLeft() + " " + (int) mDomObj.getStyles().getTop());
-      }
-      return;
-    }
-
-    ViewGroup.LayoutParams lp = mParent.getChildLayoutParams(mHost,realWidth, realHeight, realLeft,realRight,realTop,realBottom);
-    if(lp != null) {
-      mHost.setLayoutParams(lp);
+    if (mDomObj.isFixed()) {
+      setFixedHostLayoutParams(mHost,realWidth,realHeight,realLeft,realRight,realTop,realBottom);
+    }else {
+      setHostLayoutParams(mHost, realWidth, realHeight, realLeft, realRight, realTop, realBottom);
     }
 
     mPreRealWidth = realWidth;
     mPreRealHeight = realHeight;
     mPreRealLeft = realLeft;
     mPreRealTop = realTop;
+  }
+
+  protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
+    ViewGroup.LayoutParams lp = mParent.getChildLayoutParams(host,width, height, left,right,top,bottom);
+    if(lp != null) {
+      mHost.setLayoutParams(lp);
+    }
+  }
+
+  private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
+    if (host.getParent() instanceof ViewGroup) {
+      ViewGroup viewGroup = (ViewGroup) host.getParent();
+      viewGroup.removeView(host);
+    }
+    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+    params.width = width;
+    params.height = height;
+    params.setMargins(left, top, right, bottom);
+    host.setLayoutParams(params);
+    mInstance.addFixedView(host);
+
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
+      WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + mDomObj.getStyles().getLeft() + " " + (int) mDomObj.getStyles().getTop());
+    }
   }
 
   public void setPadding(Spacing padding, Spacing border) {
