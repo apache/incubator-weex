@@ -212,11 +212,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDivTest;
-import com.taobao.weex.ui.component.WXScrollerTest;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.component.list.WXListComponentTest;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -272,7 +268,7 @@ public class WXDomStatementTest {
     root.add(new WXSwitchDomObject(),0);
     root.add(new TextAreaEditTextDomObject(),0);
     stmt.layout(root);
-    stmt.transformStyle(root,false);
+    root.traverseTree(new WXDomStatement.ApplyStyleConsumer());
   }
 
   @Test

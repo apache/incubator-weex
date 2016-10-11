@@ -205,6 +205,7 @@
 package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -219,6 +220,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -231,7 +233,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@link android.view.View} and {@link WXDomObject}.
  */
 public class WXDomObject extends CSSNode implements Cloneable {
-
+  public static final String CHILDREN = "children";
+  public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();
   public static final String ROOT = "_root";
   public static final String TRANSFORM = "transform";
@@ -260,6 +263,23 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   private boolean isModifyHeight;
   private boolean isModifyWidth;
+
+  /** package **/ void traverseTree(Consumer...consumers){
+    if (consumers == null) {
+      return;
+    }
+
+    for (Consumer consumer:consumers){
+      consumer.accept(this);
+    }
+
+    int count = childCount();
+    WXDomObject child;
+    for (int i = 0; i < count; ++i) {
+      child = getChild(i);
+      child.traverseTree(consumers);
+    }
+  }
 
   public boolean isModifyHeight() {
     return isModifyHeight;
@@ -309,8 +329,28 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
   }
 
-  public static void prepareRoot(WXDomObject obj) {
-    obj.mRef = WXDomObject.ROOT;
+  public static void prepareRoot(WXDomObject domObj,float defaultHeight,float defaultWidth) {
+    domObj.mRef = WXDomObject.ROOT;
+
+    WXStyle domStyles = domObj.getStyles();
+    Map<String, Object> style = new HashMap<>(5);
+    if (!domStyles.containsKey(Constants.Name.FLEX_DIRECTION)) {
+      style.put(Constants.Name.FLEX_DIRECTION, "column");
+    }
+    if (!domStyles.containsKey(Constants.Name.BACKGROUND_COLOR)) {
+      style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
+    }
+    //If there is height or width in JS, then that value will override value here.
+    if ( !domStyles.containsKey(Constants.Name.WIDTH)) {
+      style.put(Constants.Name.WIDTH, defaultWidth);
+      domObj.setModifyWidth(true);
+    }
+    if ( !domStyles.containsKey(Constants.Name.HEIGHT)) {
+      style.put(Constants.Name.HEIGHT, defaultHeight);
+      domObj.setModifyHeight(true);
+    }
+
+    domObj.updateStyle(style);
   }
 
   protected final void copyFields(WXDomObject dest) {
@@ -571,7 +611,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
     super.dirty();
   }
 
-  public void applyStyleToNode() {
+  /** package **/ void applyStyleToNode() {
     WXStyle stylesMap = getStyles();
     if (!stylesMap.isEmpty()) {
       for(Map.Entry<String,Object> item:stylesMap.entrySet()) {
@@ -757,5 +797,38 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   public String dumpDomTree() {
     return mRef + ": " + toString();
+  }
+
+  /**
+   * Parse the jsonObject to {@link WXDomObject} recursively
+   * @param json the original JSONObject
+   * @return Dom Object corresponding to the JSONObject.
+   */
+  public static @Nullable WXDomObject parse(JSONObject json){
+      if (json == null || json.size() <= 0) {
+        return null;
+      }
+
+      String type = (String) json.get(TYPE);
+      WXDomObject domObject = WXDomObjectFactory.newInstance(type);
+      if(domObject == null){
+        return null;
+      }
+      domObject.parseFromJson(json);
+
+      Object children = json.get(CHILDREN);
+      if (children != null && children instanceof JSONArray) {
+        JSONArray childrenArray = (JSONArray) children;
+        int count = childrenArray.size();
+        for (int i = 0; i < count; ++i) {
+          domObject.add(parse(childrenArray.getJSONObject(i)),-1);
+        }
+      }
+
+      return domObject;
+  }
+
+  interface Consumer{
+    void accept(WXDomObject dom);
   }
 }
