@@ -384,22 +384,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
     mDomObj = domObject;
 
-    if (this instanceof WXRefresh && mParent instanceof WXScroller &&
-            hasScrollParent(mParent)) {
-      mInstance.setRefreshMargin(mDomObj.getCSSLayoutHeight());
-    }
-    if ((this instanceof WXBaseRefresh && mParent instanceof WXScroller)) {
-      return;
-    }
-
-    if (mParent instanceof WXScroller && hasScrollParent(mParent)) {
-      if (!(this instanceof WXBaseRefresh)) {
-          CSSLayout newLayout = new CSSLayout();
-          newLayout.copy(mDomObj.csslayout);
-          newLayout.position[CSSLayout.POSITION_TOP] = mDomObj.getCSSLayoutTop() - mInstance.getRefreshMargin();
-          mDomObj.csslayout.copy(newLayout);
-      }
-    }
+    handleRefreshShit();
 
     Spacing parentPadding = mParent.getDomObject().getPadding();
     Spacing parentBorder = mParent.getDomObject().getBorder();
@@ -447,6 +432,22 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mPreRealHeight = realHeight;
     mPreRealLeft = realLeft;
     mPreRealTop = realTop;
+  }
+
+  private void handleRefreshShit() {
+    if (this instanceof WXRefresh && mParent instanceof WXScroller &&
+        hasScrollParent(mParent)) {
+      mInstance.setRefreshMargin(mDomObj.getCSSLayoutHeight());
+    }
+
+    if (mParent instanceof WXScroller && hasScrollParent(mParent)) {
+      if (!(this instanceof WXBaseRefresh)) {
+        CSSLayout newLayout = new CSSLayout();
+        newLayout.copy(mDomObj.csslayout);
+        newLayout.position[CSSLayout.POSITION_TOP] = mDomObj.getCSSLayoutTop() - mInstance.getRefreshMargin();
+        mDomObj.csslayout.copy(newLayout);
+      }
+    }
   }
 
   protected void setHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
