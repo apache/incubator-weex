@@ -135,14 +135,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
@@ -155,15 +151,12 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
-import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
-import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
-import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -472,36 +465,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    if (mParent.getRealView() instanceof ViewPager ) {
-//      ViewPager.LayoutParams params = new ViewPager.LayoutParams();
-//      params.width = realWidth;
-//      params.height = realHeight;
-//      mHost.setLayoutParams(params);
-    } else if (mParent.getRealView() instanceof BounceRecyclerView && this instanceof WXCell) {
-      RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) mHost.getLayoutParams();
-      if (params == null)
-        params = new RecyclerView.LayoutParams(realWidth,realHeight);
-      params.width = realWidth;
-      params.height = realHeight;
-      params.setMargins(realLeft, 0, realRight, 0);
-      mHost.setLayoutParams(params);
-    } else if(mParent.getRealView() instanceof BaseBounceView && this instanceof WXBaseRefresh) {
-      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(realWidth,realHeight);
-      realTop = (int) (parentPadding.get(Spacing.TOP) - parentBorder.get(Spacing.TOP));
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
-    } else if (mParent.getRealView() instanceof FrameLayout) {
-      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(realWidth, realHeight);
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
-    } else if (mParent.getRealView() instanceof LinearLayout) {
-      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(realWidth, realHeight);
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
-    } else if (mParent.getRealView() instanceof ScrollView) {
-      ScrollView.LayoutParams params = new ScrollView.LayoutParams(realWidth, realHeight);
-      params.setMargins(realLeft, realTop, realRight, realBottom);
-      mHost.setLayoutParams(params);
+    ViewGroup.LayoutParams lp = mParent.getChildLayoutParams(mHost,realWidth, realHeight, realLeft,realRight,realTop,realBottom);
+    if(lp != null) {
+      mHost.setLayoutParams(lp);
     }
 
     mPreRealWidth = realWidth;

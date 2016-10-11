@@ -206,6 +206,7 @@ package com.taobao.weex.ui.component;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
@@ -252,6 +253,25 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       }
     }
   }
+
+  /**
+   * Get or generate new layout parameter for child view
+   *
+   */
+  public ViewGroup.LayoutParams getChildLayoutParams(View childView, int width, int height, int left, int right, int top, int bottom){
+    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    if(lp == null) {
+      lp = new ViewGroup.LayoutParams(width,height);
+    }else{
+      lp.width = width;
+      lp.height = height;
+      if(lp instanceof ViewGroup.MarginLayoutParams){
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
+      }
+    }
+    return lp;
+  }
+
 
   @Override
   public void lazy(boolean lazy) {

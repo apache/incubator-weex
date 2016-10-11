@@ -328,6 +328,19 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             mRefToViewType.clear();
     }
 
+  @Override
+  public ViewGroup.LayoutParams getChildLayoutParams(View hostView, int width, int height, int left, int right, int top, int bottom) {
+    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) hostView.getLayoutParams();
+    if(params == null) {
+      params = new RecyclerView.LayoutParams(width, height);
+    }else {
+      params.width = width;
+      params.height = height;
+      params.setMargins(left, 0, right, 0);
+    }
+    return params;
+  }
+
   /**
    * These transform functions are supported:
    - `scale(x,y)`: scale item, x and y should be a positive float number.
