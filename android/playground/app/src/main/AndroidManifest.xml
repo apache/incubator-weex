@@ -89,7 +89,7 @@
                 android:label="@string/history_title"
                 android:stateNotNeeded="true"/>
         <activity
-                android:name=".DynamicActivity"
+                android:name=".WXDebugActivity"
                 android:label="@string/title_activity_dynamic"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

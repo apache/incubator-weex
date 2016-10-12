@@ -17,7 +17,7 @@ import com.taobao.weex.common.WXResponse;
 import java.util.List;
 import java.util.Map;
 
-public class DynamicActivity extends AppCompatActivity implements IWXHttpAdapter.OnHttpListener {
+public class WXDebugActivity extends AppCompatActivity implements IWXHttpAdapter.OnHttpListener {
 
   private TextView mTipView;
   private TextView mResultView;
@@ -81,7 +81,7 @@ public class DynamicActivity extends AppCompatActivity implements IWXHttpAdapter
     if ("200".equals(response.statusCode)) {
       String framework = new String(response.originalData);
       if (framework != null) {
-        WXSDKEngine.reload(DynamicActivity.this, framework, false);
+        WXSDKEngine.reload(WXDebugActivity.this, framework, false);
         finish();
         return;
       }
