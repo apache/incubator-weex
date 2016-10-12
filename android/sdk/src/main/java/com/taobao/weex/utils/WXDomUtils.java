@@ -203,91 +203,65 @@
  *    limitations under the License.
  */
 
-package com.taobao.weex.ui.view.border;
+package com.taobao.weex.utils;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
-
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.Spacing;
 
-class BorderUtil {
+public class WXDomUtils {
 
-  static <T> T fetchFromSparseArray(@Nullable SparseArray<T> array, int position, T fallback) {
-    return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
+  /**
+   * Get the content width of the dom.
+   * @return the width of the dom that excludes left-padding, left-border-width,
+   * right-border-width and right-padding.
+   */
+  public static float getContentWidth(WXDomObject domObject) {
+    float rawWidth = domObject.getLayoutWidth();
+    float leftPadding, rightPadding, leftBorder, rightBorder;
+    Spacing padding = domObject.getPadding();
+    Spacing border = domObject.getBorder();
 
-  static int fetchFromSparseArray(@Nullable SparseIntArray array, int position, int fallback) {
-    return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
-
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value) {
-    updateSparseArray(array, position, value, false);
-  }
-
-  static void updateSparseArray(@NonNull SparseIntArray array, int position, int value) {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
-      }
+    if (!CSSConstants.isUndefined((leftPadding = padding.get(Spacing.LEFT)))) {
+      rawWidth -= leftPadding;
+    }
+    if (!CSSConstants.isUndefined((rightPadding = padding.get(Spacing.RIGHT)))) {
+      rawWidth -= rightPadding;
     }
 
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value,
-                             boolean borderRadius) {
-    if (borderRadius) {
-      if (position == BorderDrawable.BORDER_RADIUS_ALL) {
-        array.put(BorderDrawable.BORDER_RADIUS_ALL, value);
-        array.put(BorderDrawable.BORDER_TOP_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, value);
-      } else {
-        array.put(position, value);
-      }
-    } else {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
-      }
+    if (!CSSConstants.isUndefined(leftBorder = border.get(Spacing.LEFT))) {
+      rawWidth -= leftBorder;
     }
+    if (!CSSConstants.isUndefined(rightBorder = border.get(Spacing.RIGHT))) {
+      rawWidth -= rightBorder;
+    }
+    return rawWidth;
   }
 
-  static boolean areEdgesSame(float... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      float init = numbers[0];
-      for (float number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
+  /**
+   * Get the content height of the dom.
+   * @return the height of the dom that excludes top-padding, top-border-width, bottom-padding
+   * and bottom-border-width.
+   */
+  public static float getContentHeight(WXDomObject domObject) {
+    float rawHeight = domObject.getLayoutHeight();
+    float topPadding, bottomPadding, topBorder, bottomBorder;
+    Spacing padding = domObject.getPadding();
+    Spacing border = domObject.getBorder();
 
-  static boolean areEdgesSame(int... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      int init = numbers[0];
-      for (int number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
+    if (!CSSConstants.isUndefined((topPadding = padding.get(Spacing.TOP)))) {
+      rawHeight -= topPadding;
     }
-    return false;
+    if (!CSSConstants.isUndefined((bottomPadding = padding.get(Spacing.BOTTOM)))) {
+      rawHeight -= bottomPadding;
+    }
+
+    if (!CSSConstants.isUndefined(topBorder = border.get(Spacing.TOP))) {
+      rawHeight -= topBorder;
+    }
+    if (!CSSConstants.isUndefined(bottomBorder = border.get(Spacing.BOTTOM))) {
+      rawHeight -= bottomBorder;
+    }
+    return rawHeight;
   }
 }
