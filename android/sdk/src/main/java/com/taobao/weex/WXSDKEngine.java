@@ -560,10 +560,10 @@ public class WXSDKEngine {
       }
     }
   }
-  public static void reload(final Context context, boolean remoteDebug) {
+  public static void reload(final Context context,String framework, boolean remoteDebug) {
     WXEnvironment.sRemoteDebugMode = remoteDebug;
     WXBridgeManager.getInstance().restart();
-    WXBridgeManager.getInstance().initScriptsFramework(null);
+    WXBridgeManager.getInstance().initScriptsFramework(framework);
     WXModuleManager.reload();
     WXComponentRegistry.reload();
     WXSDKManager.getInstance().postOnUiThread(new Runnable() {
@@ -572,6 +572,9 @@ public class WXSDKEngine {
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(JS_FRAMEWORK_RELOAD));
       }
     }, 1000);
+  }
+  public static void reload(final Context context, boolean remoteDebug) {
+   reload(context,null,remoteDebug);
   }
 
   public static void reload() {

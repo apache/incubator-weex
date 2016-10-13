@@ -11,6 +11,8 @@ import com.taobao.weex.common.WXModuleAnno;
 public class WXEventModule extends WXModule {
 
   private static final String WEEX_CATEGORY = "com.taobao.android.intent.category.WEEX";
+  private static final String WEEX_ACTION = "com.taobao.android.intent.action.WEEX";
+
 
   @WXModuleAnno(moduleMethod = true,runOnUIThread = true)
   public void openURL(String url) {
@@ -27,7 +29,7 @@ public class WXEventModule extends WXModule {
     }
 
     Uri uri = Uri.parse(builder.toString());
-    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+    Intent intent = new Intent(WEEX_ACTION, uri);
     intent.addCategory(WEEX_CATEGORY);
     mWXSDKInstance.getContext().startActivity(intent);
   }

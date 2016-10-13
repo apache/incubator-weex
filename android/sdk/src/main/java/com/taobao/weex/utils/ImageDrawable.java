@@ -203,91 +203,109 @@
  *    limitations under the License.
  */
 
-package com.taobao.weex.ui.view.border;
+package com.taobao.weex.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Matrix;
+import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
+import android.widget.ImageView;
 
-import com.taobao.weex.dom.flex.Spacing;
+public class ImageDrawable extends PaintDrawable {
 
-class BorderUtil {
+  public static Drawable createImageDrawable(@Nullable Drawable original,
+                                             @NonNull ImageView.ScaleType scaleType,
+                                             int vWidth,
+                                             int vHeight,
+                                             boolean gif) {
+    Bitmap bm;
+    if (!gif && vWidth > 0 && vHeight > 0) {
+      if (original instanceof BitmapDrawable &&
+          (bm = ((BitmapDrawable) original).getBitmap()) != null) {
+        ImageDrawable imageDrawable;
+        imageDrawable = new ImageDrawable();
+        imageDrawable.setIntrinsicWidth(vWidth);
+        imageDrawable.setIntrinsicHeight(vHeight);
+        imageDrawable.bitmapWidth = bm.getWidth();
+        imageDrawable.bitmapHeight = bm.getHeight();
 
-  static <T> T fetchFromSparseArray(@Nullable SparseArray<T> array, int position, T fallback) {
-    return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
-
-  static int fetchFromSparseArray(@Nullable SparseIntArray array, int position, int fallback) {
-    return array == null ? fallback :
-           array.get(position, array.get(Spacing.ALL));
-  }
-
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value) {
-    updateSparseArray(array, position, value, false);
-  }
-
-  static void updateSparseArray(@NonNull SparseIntArray array, int position, int value) {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
+        BitmapShader bitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
+                                           imageDrawable.bitmapWidth,
+                                           imageDrawable.bitmapHeight);
+        bitmapShader.setLocalMatrix(matrix);
+        imageDrawable.getPaint().setShader(bitmapShader);
+        return imageDrawable;
+      } else if (original instanceof ImageDrawable) {
+        ImageDrawable imageDrawable = (ImageDrawable) original;
+        imageDrawable.setIntrinsicWidth(vWidth);
+        imageDrawable.setIntrinsicHeight(vHeight);
+        if (imageDrawable.getPaint() != null &&
+            imageDrawable.getPaint().getShader() instanceof BitmapShader) {
+          BitmapShader bitmapShader = (BitmapShader) imageDrawable.getPaint().getShader();
+          Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
+                                             imageDrawable.bitmapWidth,
+                                             imageDrawable.bitmapHeight);
+          bitmapShader.setLocalMatrix(matrix);
+          return imageDrawable;
+        }
       }
+
     }
+    return original;
+  }
 
-  static <T> void updateSparseArray(@NonNull SparseArray<T> array, int position, T value,
-                             boolean borderRadius) {
-    if (borderRadius) {
-      if (position == BorderDrawable.BORDER_RADIUS_ALL) {
-        array.put(BorderDrawable.BORDER_RADIUS_ALL, value);
-        array.put(BorderDrawable.BORDER_TOP_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, value);
-        array.put(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, value);
-      } else {
-        array.put(position, value);
-      }
+  @NonNull
+  private static Matrix createShaderMatrix(@NonNull ImageView.ScaleType scaleType, int vWidth,
+                                           int vHeight, int bmWidth, int bmHeight) {
+    float scale, translateX = 0, translateY = 0;
+
+    if (bmWidth * vHeight > bmHeight * vWidth) {
+      scale = vHeight / (float) bmHeight;
+      translateX = (vWidth - bmWidth * scale) * 0.5f;
     } else {
-      if (position == Spacing.ALL) {
-        array.put(Spacing.ALL, value);
-        array.put(Spacing.TOP, value);
-        array.put(Spacing.LEFT, value);
-        array.put(Spacing.RIGHT, value);
-        array.put(Spacing.BOTTOM, value);
-      } else {
-        array.put(position, value);
-      }
+      scale = vWidth / (float) bmWidth;
+      translateY = (vHeight - bmHeight * scale) * 0.5f;
     }
+
+    Matrix mMatrix = new Matrix();
+    if (scaleType == ImageView.ScaleType.FIT_XY) {
+      mMatrix.setScale(vWidth / (float) bmWidth, vHeight / (float) bmHeight);
+    } else if (scaleType == ImageView.ScaleType.FIT_CENTER) {
+      RectF src = new RectF(0, 0, bmWidth, bmHeight);
+      RectF dist = new RectF(0, 0, vWidth, vHeight);
+      mMatrix.setRectToRect(src, dist, Matrix.ScaleToFit.CENTER);
+    } else if (scaleType == ImageView.ScaleType.CENTER_CROP) {
+      mMatrix.setScale(scale, scale);
+      mMatrix.postTranslate(translateX + 0.5f, translateY + 0.5f);
+    }
+    return mMatrix;
   }
 
-  static boolean areEdgesSame(float... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      float init = numbers[0];
-      for (float number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
+  private float[] radii;
+  private int bitmapHeight;
+  private int bitmapWidth;
+
+  private ImageDrawable() {
+
   }
 
-  static boolean areEdgesSame(int... numbers) {
-    if (numbers != null && numbers.length > 0) {
-      int init = numbers[0];
-      for (int number : numbers) {
-        if (number != init) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
+  @Override
+  public void setCornerRadii(float[] radii) {
+    this.radii = radii;
+    super.setCornerRadii(radii);
   }
+
+  public
+  @Nullable
+  float[] getCornerRadii() {
+    return this.radii;
+  }
+
 }

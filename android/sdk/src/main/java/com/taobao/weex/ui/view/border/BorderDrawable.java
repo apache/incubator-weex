@@ -218,6 +218,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 import com.taobao.weex.dom.flex.FloatUtil;
 import com.taobao.weex.dom.flex.Spacing;
@@ -248,8 +249,8 @@ public class BorderDrawable extends Drawable {
   public static final int BORDER_RADIUS_ALL = 8;
   static final int DEFAULT_BORDER_COLOR = Color.BLACK;
   static final float DEFAULT_BORDER_WIDTH = 0;
-  static final float DEFAULT_BORDER_RADIUS = 0;
-  static final BorderStyle DEFAULT_BORDER_STYLE = BorderStyle.SOLID;
+  private static final float DEFAULT_BORDER_RADIUS = 0;
+  private static final BorderStyle DEFAULT_BORDER_STYLE = BorderStyle.SOLID;
   private static final String TAG = "Border";
   private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -264,10 +265,10 @@ public class BorderDrawable extends Drawable {
   SparseArray<Float> mOverlappingBorderRadius;
   private
   @Nullable
-  SparseArray<Integer> mBorderColor;
+  SparseIntArray mBorderColor;
   private
   @Nullable
-  SparseArray<Integer> mBorderStyle;
+  SparseIntArray mBorderStyle;
 
   private
   @Nullable
@@ -280,7 +281,7 @@ public class BorderDrawable extends Drawable {
   }
 
   @Override
-  public void draw(Canvas canvas) {
+  public void draw(@NonNull Canvas canvas) {
     canvas.save();
     updateBorderOutline();
     if (mPathForBorderOutline != null) {
@@ -326,6 +327,7 @@ public class BorderDrawable extends Drawable {
 
   }
 
+  @SuppressWarnings("WrongConstant")
   @Override
   public int getOpacity() {
     return WXViewUtils.getOpacityFromColor(WXViewUtils.multiplyColorAlpha(mColor, mAlpha));
@@ -367,19 +369,41 @@ public class BorderDrawable extends Drawable {
       mBorderRadius.put(Spacing.ALL, DEFAULT_BORDER_RADIUS);
     }
     if (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, position), radius)) {
-      BorderUtil.updateSparseArray(mBorderRadius, position, radius, false);
+      BorderUtil.updateSparseArray(mBorderRadius, position, radius, true);
       mNeedUpdatePath = true;
       invalidateSelf();
     }
   }
 
-  float getBorderRadius(@Nullable SparseArray<Float> borderRadius, int position) {
-    return BorderUtil.fetchFromSparseArray(borderRadius, position, DEFAULT_BORDER_RADIUS);
+  /**
+   * This method is only used for Unit test, do not call this method, use
+   * {@link #getBorderRadius(SparseArray, int)} instead.
+   * @param position the index of the edge
+   * @return the radius considering border-overlapping of the corner.
+   */
+  @Deprecated
+  float getBorderRadius(int position) {
+    return getBorderRadius(mOverlappingBorderRadius, position);
+  }
+
+
+  public
+  @NonNull
+  float[] getBorderRadius(RectF borderBox) {
+    prepareBorderRadius(borderBox);
+    float topLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS);
+    float topRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS);
+    float bottomRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS);
+    float bottomLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_BOTTOM_LEFT_RADIUS);
+    return new float[]{topLeftRadius,topLeftRadius,
+        topRightRadius,topRightRadius,
+        bottomRightRadius, bottomRightRadius,
+        bottomLeftRadius,bottomLeftRadius};
   }
 
   public void setBorderColor(int position, int color) {
     if (mBorderColor == null) {
-      mBorderColor = new SparseArray<>(5);
+      mBorderColor = new SparseIntArray(5);
       mBorderColor.put(Spacing.ALL, DEFAULT_BORDER_COLOR);
     }
     if (getBorderColor(position) != color) {
@@ -394,7 +418,7 @@ public class BorderDrawable extends Drawable {
 
   public void setBorderStyle(int position, @NonNull String style) {
     if (mBorderStyle == null) {
-      mBorderStyle = new SparseArray<>(5);
+      mBorderStyle = new SparseIntArray(5);
       mBorderStyle.put(Spacing.ALL, DEFAULT_BORDER_STYLE.ordinal());
     }
     try {
@@ -412,17 +436,6 @@ public class BorderDrawable extends Drawable {
     return BorderUtil.fetchFromSparseArray(mBorderStyle, position, BorderStyle.SOLID.ordinal());
   }
 
-  /**
-   * This method is only used for Unit test, do not call this method, use
-   * {@link #getBorderRadius(SparseArray, int)} instead.
-   * @param position the index of the edge
-   * @return the radius considering border-overlapping of the corner.
-   */
-  @Deprecated
-  float getBorderRadius(int position) {
-    return getBorderRadius(mOverlappingBorderRadius, position);
-  }
-
   public int getColor() {
     return mColor;
   }
@@ -432,17 +445,8 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
-  public
-  @NonNull
-  Path getContentPath(int viewTopPadding,
-                      int viewRightPadding,
-                      int viewBottomPadding,
-                      int viewLeftPadding,
-                      @NonNull RectF contentBox) {
-    Path contentClip = new Path();
-    prepareBorderPath(viewTopPadding, viewRightPadding, viewBottomPadding, viewLeftPadding,
-                      new RectF(contentBox), contentClip);
-    return contentClip;
+  private float getBorderRadius(@Nullable SparseArray<Float> borderRadius, int position) {
+    return BorderUtil.fetchFromSparseArray(borderRadius, position, DEFAULT_BORDER_RADIUS);
   }
 
   private void updateBorderOutline() {
@@ -463,7 +467,7 @@ public class BorderDrawable extends Drawable {
                                  @NonNull RectF rectF,
                                  @NonNull Path path) {
     if (mBorderRadius != null) {
-      prepareBorderRadius();
+      prepareBorderRadius(rectF);
       float topLeftRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_LEFT_RADIUS);
       float topRightRadius = getBorderRadius(mOverlappingBorderRadius, BORDER_TOP_RIGHT_RADIUS);
       float bottomRightRadius = getBorderRadius(mOverlappingBorderRadius,
@@ -491,9 +495,9 @@ public class BorderDrawable extends Drawable {
   /**
    * Process overlapping curve according to https://www.w3.org/TR/css3-background/#corner-overlap .
    */
-  private void prepareBorderRadius() {
+  private void prepareBorderRadius(@NonNull RectF borderBox) {
     if (mBorderRadius != null) {
-      float factor = getScaleFactor();
+      float factor = getScaleFactor(borderBox);
       if (mOverlappingBorderRadius == null) {
         mOverlappingBorderRadius = new SparseArray<>(5);
         mOverlappingBorderRadius.put(Spacing.ALL, 0f);
@@ -524,8 +528,7 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  private float getScaleFactor() {
-    Rect borderBox = getBounds();
+  private float getScaleFactor(@NonNull RectF borderBox) {
     final float topRadius = getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS)
                             + getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS);
     final float rightRadius = getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS)
