@@ -774,16 +774,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /**
    * create view
    *
-   * @param parent
-   * @param index
    */
-  public final void createView(WXVContainer parent, int index) {
+  public final void createView() {
     if(!isLazy()) {
-      createViewImpl(parent, index);
+      createViewImpl();
     }
   }
 
-  protected void createViewImpl(WXVContainer parent, int index) {
+  protected void createViewImpl() {
     if (mContext != null) {
       mHost = initComponentHostView(mContext);
       if (mHost == null) {
@@ -791,9 +789,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         initView();
       }
       onHostViewInitialized(mHost);
-      if (parent != null) {
-        parent.addSubView(mHost, index);
-      }
     }else{
       WXLogUtils.e("createViewImpl","Context is null");
     }

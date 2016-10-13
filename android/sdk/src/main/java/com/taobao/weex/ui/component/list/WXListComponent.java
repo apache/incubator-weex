@@ -731,10 +731,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      */
     @Override
     protected void addSubView(View child, int index) {
-      BounceRecyclerView view =  getHostView();
-      if(view == null){
-        return;
-      }
+
     }
 
     /**
@@ -855,7 +852,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                             return new ListBaseViewHolder(component, viewType);
                         } else {
                             component.lazy(false);
-                            component.createView(this, -1);
+                            component.createView();
                             component.applyLayoutAndEvent(component);
                             return new ListBaseViewHolder(component, viewType);
                         }

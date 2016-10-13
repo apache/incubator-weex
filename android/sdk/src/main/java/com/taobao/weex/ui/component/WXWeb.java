@@ -236,10 +236,10 @@ public class WXWeb extends WXComponent {
 
     public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
         super(instance, dom, parent, isLazy);
-        createView();
+        createWebView();
     }
 
-    protected void  createView(){
+    protected void  createWebView(){
         mWebView = new WXWebView(getContext());
     }
 

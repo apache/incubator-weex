@@ -287,7 +287,7 @@ public class WXSDKInstanceTest {
 
     WXComponent root = WXDivTest.create(comp);
     comp.addChild(root);
-    comp.createView(null, -1);
+    comp.createView();
 
     instance.onCreateFinish();
     ShadowLooper.idleMainLooper();

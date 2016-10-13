@@ -219,8 +219,15 @@ import java.util.Map;
 public class ComponentTest {
   public static void create(WXComponent comp){
     TestDomObject domObject = new TestDomObject();
-    WXVContainer parent = comp.getParent() == null?WXDivTest.create():comp.getParent();
-    comp.createView(parent,1);
+    WXVContainer parent;
+    if((parent = comp.getParent())!=null){
+      comp.createView();
+    }else{
+      parent = WXDivTest.create();
+      parent.addChild(comp);
+      parent.createChildViewAt(-1);
+    }
+
     comp.setLayout(domObject);
 
     domObject = new TestDomObject();

@@ -266,7 +266,7 @@ class WXRenderStatement {
    */
   void createBody(WXComponent component) {
     long start = System.currentTimeMillis();
-    component.createView(null, -1);
+    component.createView();
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
@@ -358,10 +358,11 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
-    component.createView(parent, index);
+    parent.addChild(component, index);
+    parent.createChildViewAt(index);
+
     component.applyLayoutAndEvent(component);
     component.bindData(component);
-    parent.addChild(component, index);
   }
 
   /**

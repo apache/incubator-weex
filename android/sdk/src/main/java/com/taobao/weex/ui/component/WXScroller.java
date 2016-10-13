@@ -297,11 +297,11 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
 
   @Override
-  public void createViewImpl(WXVContainer parent, int index) {
-    super.createViewImpl(parent, index);
+  public void createViewImpl() {
+    super.createViewImpl();
     for (int i = 0; i < mRefreshs.size(); i++) {
       WXComponent component = mRefreshs.get(i);
-      component.createViewImpl(null, -1);
+      component.createViewImpl();
       checkRefreshOrLoading(component);
     }
   }
