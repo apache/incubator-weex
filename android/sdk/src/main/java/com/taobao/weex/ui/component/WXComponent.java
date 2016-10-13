@@ -187,9 +187,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private WXSDKInstance mInstance;
   private Context mContext;
 
-  protected int mAbsoluteY = 0;
-  protected int mAbsoluteX = 0;
-  protected Set<String> mGestureType;
+  private int mAbsoluteY = 0;
+  private int mAbsoluteX = 0;
+  private Set<String> mGestureType;
 
   private BorderDrawable mBackgroundDrawable;
   private boolean mLazy;
@@ -402,8 +402,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    mAbsoluteY = (int) (nullParent?0:mParent.mAbsoluteY + mDomObj.getLayoutY());
-    mAbsoluteX = (int) (nullParent?0:mParent.mAbsoluteX + mDomObj.getLayoutX());
+    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutY());
+    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mDomObj.getLayoutX());
 
     //calculate first screen time
     if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {

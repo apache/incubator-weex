@@ -224,6 +224,7 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
+import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -310,14 +311,19 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     return lp;
   }
 
-  //TODO Slider don't support any gesture for now.
+
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
     if (getRealView() != null) {
       getRealView().setOnTouchListener(null);
     }
-    mGestureType.clear();
+  }
+
+  @Override
+  public boolean containsGesture(WXGestureType WXGestureType) {
+    //TODO Slider don't support any gesture for now.
+    return false;
   }
 
   @Override

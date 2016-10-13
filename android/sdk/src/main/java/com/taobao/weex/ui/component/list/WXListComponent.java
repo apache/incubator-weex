@@ -310,7 +310,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     protected MeasureOutput measure(int width, int height) {
         int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
         int weexH = WXViewUtils.getWeexHeight(getInstanceId());
-        int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - mAbsoluteY : height;
+        int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - getAbsoluteY() : height;
         return super.measure(width, outHeight);
     }
 
