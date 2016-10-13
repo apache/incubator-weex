@@ -230,35 +230,32 @@ public class ImageDrawable extends PaintDrawable {
           (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
         imageDrawable = new ImageDrawable();
-        imageDrawable.setIntrinsicWidth(vWidth);
-        imageDrawable.setIntrinsicHeight(vHeight);
         imageDrawable.bitmapWidth = bm.getWidth();
         imageDrawable.bitmapHeight = bm.getHeight();
-
         BitmapShader bitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
-                                           imageDrawable.bitmapWidth,
-                                           imageDrawable.bitmapHeight);
-        bitmapShader.setLocalMatrix(matrix);
+        updateShaderAndSize(scaleType, vWidth, vHeight, imageDrawable, bitmapShader);
         imageDrawable.getPaint().setShader(bitmapShader);
         return imageDrawable;
       } else if (original instanceof ImageDrawable) {
         ImageDrawable imageDrawable = (ImageDrawable) original;
-        imageDrawable.setIntrinsicWidth(vWidth);
-        imageDrawable.setIntrinsicHeight(vHeight);
         if (imageDrawable.getPaint() != null &&
             imageDrawable.getPaint().getShader() instanceof BitmapShader) {
           BitmapShader bitmapShader = (BitmapShader) imageDrawable.getPaint().getShader();
-          Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
-                                             imageDrawable.bitmapWidth,
-                                             imageDrawable.bitmapHeight);
-          bitmapShader.setLocalMatrix(matrix);
+          updateShaderAndSize(scaleType, vWidth, vHeight, imageDrawable, bitmapShader);
           return imageDrawable;
         }
       }
-
     }
     return original;
+  }
+
+  private static void updateShaderAndSize(@NonNull ImageView.ScaleType scaleType, int vWidth, int vHeight, ImageDrawable imageDrawable, BitmapShader bitmapShader) {
+    imageDrawable.setIntrinsicWidth(vWidth);
+    imageDrawable.setIntrinsicHeight(vHeight);
+    Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
+                                       imageDrawable.bitmapWidth,
+                                       imageDrawable.bitmapHeight);
+    bitmapShader.setLocalMatrix(matrix);
   }
 
   @NonNull
