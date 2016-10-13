@@ -281,6 +281,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   private static final int MAX_VIEWTYPE_ALLOW_CACHE = 9;
   private static boolean mAllowCacheViewHolder = true;
   private static boolean mDownForBidCacheViewHolder = false;
+  private int mChildrenLayoutOffset = 0;//Use for offset children layout
 
   /**
    * Map for storing component that is sticky.
@@ -653,6 +654,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       addChild(child, -1);
   }
 
+  @Override
+  protected int getChildrenLayoutTopOffset() {
+    return mChildrenLayoutOffset;
+  }
+
   /**
   * @param child the inserted child
   * @param index the index of the child to be inserted.
@@ -660,23 +666,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   */
   @Override
   public void addChild(WXComponent child, int index) {
+    mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
+    if (checkRefreshOrLoading(child)) {
+        return;
+    }
 
-      if (child == null || index < -1) {
-          return;
-      }
-      if (checkRefreshOrLoading(child)) {
-          return;
-      }
+    super.addChild(child,index);
 
-      int count = mChildren.size();
-      index = index >= count ? -1 : index;
-      if (index == -1) {
-          mChildren.add(child);
-      } else {
-          mChildren.add(index, child);
-      }
-      bindViewType(child);
-
+    bindViewType(child);
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
     BounceRecyclerView view =  getHostView();
     if(view != null) {

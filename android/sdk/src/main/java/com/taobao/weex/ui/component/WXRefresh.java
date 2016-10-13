@@ -252,6 +252,12 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   }
 
   @Override
+  public int getLayoutTopOffsetForSibling() {
+    //offset siblings
+    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getCSSLayoutHeight()) : 0;
+  }
+
+  @Override
   public void onPullingDown(float dy, int headerHeight, float maxHeight) {
     if (getDomObject().getEvents() != null && getDomObject().getEvents().contains(Constants.Event.ONPULLING_DOWN)) {
       Map<String, Object> data = new HashMap<>();

@@ -209,7 +209,10 @@ import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Component;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.CSSNode;
+import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.utils.WXViewUtils;
 
 /**
  * div component
@@ -237,7 +240,7 @@ public class WXBaseRefresh extends WXVContainer<WXFrameLayout> {
 
   @Override
   protected void setHostLayoutParams(WXFrameLayout host, int width, int height, int left, int right, int top, int bottom) {
-    if (getParent() instanceof WXScroller) {
+    if (getParent() instanceof Scrollable) {
       //do nothing
       return;
     }else{

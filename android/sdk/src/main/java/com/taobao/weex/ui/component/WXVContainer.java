@@ -232,6 +232,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
   /**
+   * Offset top for children layout.
+   * @return
+   */
+  protected int getChildrenLayoutTopOffset(){
+    return 0;
+  }
+
+  /**
    * use {@link #getHostView()} instead
    * @return
    */
@@ -249,8 +257,10 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       super.applyLayoutAndEvent(component);
       int count = childCount();
       for (int i = 0; i < count; i++) {
-        getChild(i).applyLayoutAndEvent(((WXVContainer)component).getChild(i));
+        WXComponent child = getChild(i);
+        child.applyLayoutAndEvent(((WXVContainer)component).getChild(i));
       }
+
     }
   }
 

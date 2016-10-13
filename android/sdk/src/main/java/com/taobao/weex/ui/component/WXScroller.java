@@ -253,6 +253,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
   private List<WXComponent> mRefreshs=new ArrayList<>();
+  private int mChildrenLayoutOffset = 0;//Use for offset children layout
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -340,15 +341,17 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     }
   }
 
+  @Override
+  protected int getChildrenLayoutTopOffset() {
+    return mChildrenLayoutOffset;
+  }
+
   /**
    * Intercept refresh view and loading view
    */
   @Override
   public void addChild(WXComponent child, int index) {
-    if (child == null || index < -1) {
-      return;
-    }
-
+    mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
     if (child instanceof WXBaseRefresh) {
       if (!checkRefreshOrLoading(child)) {
         mRefreshs.add(child);
@@ -356,16 +359,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       return;
     }
 
-    if (mChildren == null) {
-      mChildren = new ArrayList<>();
-    }
-    int count = mChildren.size();
-    index = index >= count ? -1 : index;
-    if (index == -1) {
-      mChildren.add(child);
-    } else {
-      mChildren.add(index, child);
-    }
+    super.addChild(child,index);
   }
 
   /**

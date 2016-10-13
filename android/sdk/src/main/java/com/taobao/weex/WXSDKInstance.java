@@ -269,7 +269,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private WXComponent mRootComp;
   private boolean mRendered;
   private WXRefreshData mLastRefreshData;
-  private float refreshMargin = 0;
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
   private boolean isDestroy=false;
@@ -1084,14 +1083,6 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mWXScrollListeners=new ArrayList<>();
     }
     mWXScrollListeners.add(wxScrollListener);
-  }
-
-  public float getRefreshMargin() {
-    return refreshMargin;
-  }
-
-  public void setRefreshMargin(float refreshMargin) {
-    this.refreshMargin = refreshMargin;
   }
 
   private void updateRootComponentStyle(JSONObject style) {
