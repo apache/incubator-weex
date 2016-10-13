@@ -481,15 +481,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mHost.setPadding(left, top, right, bottom);
   }
 
-//  private void updateProperties() {
-//    if (mDomObj.attr != null && mDomObj.attr.size() > 0) {
-//      updateProperties(mDomObj.attr);
-//    }
-//    if (mDomObj.style != null && mDomObj.style.size() > 0) {
-//      updateProperties(mDomObj.style);
-//    }
-//  }
-
   private void addEvents() {
     int count = mDomObj.getEvents().size();
     for (int i = 0; i < count; ++i) {
