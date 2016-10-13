@@ -288,7 +288,7 @@ public class WXTextDomObject extends WXDomObject {
     Layout layout;
     if (!FloatUtil.floatsEqual(previousWidth, textWidth) || previousLayout == null) {
       layout = new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-                                Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
+                                Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
     } else {
       layout = previousLayout;
     }
@@ -302,7 +302,7 @@ public class WXTextDomObject extends WXDomObject {
                                         mTextPaint, layout.getWidth(), textOverflow);
         spanned = createSpanned(text);
         return new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
-                                Layout.Alignment.ALIGN_NORMAL, 1, 0, true);
+                                Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
       }
     }
     return layout;
