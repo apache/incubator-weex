@@ -331,7 +331,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
   @Override
   public ViewGroup.LayoutParams getChildLayoutParams(View hostView, int width, int height, int left, int right, int top, int bottom) {
-    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) hostView.getLayoutParams();
+    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) hostView.getLayoutParams();
     if(params == null) {
       params = new RecyclerView.LayoutParams(width, height);
     }else {
