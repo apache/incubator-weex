@@ -91,9 +91,7 @@ describe('test input and output', function () {
     it('promise case', () => checkOutput(app, 'promise'))
   })
 
-  // computed
   // append-root-event
-  // clear-module
   // repeat-track-by
   // if-refresh
   // if-repeat-refresh
@@ -107,4 +105,95 @@ describe('test input and output', function () {
   // use HTML5 timer API
   // use modal API
   // test callNative signals
+
+  describe('complex cases', function() {
+    let app
+
+    beforeEach(() => {
+      app = createApp(runtime)
+      callNativeHandler = (...args) => app._target.callNative(...args)
+    })
+
+    afterEach(() => {
+      callNativeHandler = function () {}
+    })
+
+    function readInput (name) {
+      return getCode('assets/' + name + '.input')
+    }
+
+    function readOutput (name) {
+      return getCode('assets/' + name + '.output')
+    }
+
+    it('computed case', () => {
+      const name = 'computed'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$refresh({ x: 10 })
+      expected.children[0].attr.value = 12
+      expected.children[1].attr.value = 12
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$refresh({ m: 10 })
+      expected.children[0].attr.value = 20
+      expected.children[1].attr.value = 20
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+  })
+
+
+  describe('multi page cases', function() {
+    let app
+
+    beforeEach(() => {
+      app = createApp(runtime)
+      callNativeHandler = (...args) => app._target.callNative(...args)
+    })
+
+    afterEach(() => {
+      callNativeHandler = function () {}
+    })
+
+    function readInput (name) {
+      return getCode('assets/' + name + '.input')
+    }
+
+    function readOutput (name) {
+      return getCode('assets/' + name + '.output')
+    }
+
+    it('clear-module case', () => {
+      const app2 = createApp(runtime)
+
+      const nameA = 'clear-moduleA'
+      const nameB = 'clear-moduleB'
+      const inputCodeA = readInput(nameA)
+      const outputCodeA = readOutput(nameA)
+      const inputCodeB = readInput(nameB)
+      const outputCodeB = readOutput(nameB)
+      const expectedA = eval('(' + outputCodeA + ')')
+      const expectedB = eval('(' + outputCodeB + ')')
+
+      app.$create(inputCodeA)
+      app2.$create(inputCodeB)
+
+      const actualB = app2.getRealRoot()
+      expect(app2.getRealRoot()).eql(expectedB)
+
+      app2.$destroy()
+      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
+      expect(app.getRealRoot()).eql(expectedA)
+
+      app.$destroy()
+    })
+
+  })
 })
