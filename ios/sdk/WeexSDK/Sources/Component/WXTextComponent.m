@@ -61,6 +61,10 @@
     }
     
     if (!layoutManager || !textContainer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Tip" message:@"text 为nil" delegate:nil cancelButtonTitle:@"cancel" otherButtonTitles:nil];
+            [alert show];
+        });
         return nil;
     }
     
