@@ -250,11 +250,11 @@ public class ImageDrawable extends PaintDrawable {
   }
 
   private static void updateShaderAndSize(@NonNull ImageView.ScaleType scaleType, int vWidth, int vHeight, ImageDrawable imageDrawable, BitmapShader bitmapShader) {
-    imageDrawable.setIntrinsicWidth(vWidth);
-    imageDrawable.setIntrinsicHeight(vHeight);
     Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
                                        imageDrawable.bitmapWidth,
                                        imageDrawable.bitmapHeight);
+    resizeIntrinsicSize(imageDrawable, scaleType, matrix,
+                        new RectF(0, 0, imageDrawable.bitmapWidth, imageDrawable.bitmapHeight));
     bitmapShader.setLocalMatrix(matrix);
   }
 
@@ -283,6 +283,25 @@ public class ImageDrawable extends PaintDrawable {
       mMatrix.postTranslate(translateX + 0.5f, translateY + 0.5f);
     }
     return mMatrix;
+  }
+
+  private static void resizeIntrinsicSize(@NonNull ImageDrawable imageDrawable,
+                                          @NonNull ImageView.ScaleType scaleType,
+                                          @NonNull Matrix matrix,
+                                          @NonNull RectF bitmapRect){
+    int width,height;
+    if(scaleType == ImageView.ScaleType.FIT_CENTER){
+      RectF dst=new RectF();
+      matrix.mapRect(dst,bitmapRect);
+      width= (int) dst.width();
+      height= (int) dst.height();
+    }
+    else {
+      width = (int) bitmapRect.width();
+      height = (int) bitmapRect.height();
+    }
+    imageDrawable.setIntrinsicWidth(width);
+    imageDrawable.setIntrinsicHeight(height);
   }
 
   private float[] radii;
