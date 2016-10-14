@@ -617,6 +617,19 @@ describe('test input and output', () => {
     instance.$destroy()
   })
 
+  it('dynamic property case', () => {
+    const name = 'dynamic-property'
+    const inputCode = readInput(name)
+    const outputCode = readOutput(name)
+
+    instance.$create(inputCode)
+    const expected = eval('(' + outputCode + ')')
+    const actual = instance.getRealRoot()
+    expect(actual).eql(expected)
+
+    instance.$destroy()
+  })
+
   it('click case', () => {
     const name = 'click'
     const inputCode = readInput(name)
