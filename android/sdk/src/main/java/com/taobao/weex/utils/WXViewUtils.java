@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -218,6 +219,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.view.border.BorderDrawable;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Utility class for views
@@ -238,6 +241,28 @@ public class WXViewUtils {
    */
   public static final int OPAQUE = -1;
   private static final boolean mUseWebPx = false;
+  private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+
+  @SuppressLint("NewApi")
+  public static int generateViewId() {
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      for (;;) {
+        final int result = sNextGeneratedId.get();
+        // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+        int newValue = result + 1;
+        if (newValue > 0x00FFFFFF)
+          newValue = 1; // Roll over to 1, not 0.
+        if (sNextGeneratedId.compareAndSet(result, newValue)) {
+          return result;
+        }
+      }
+    } else {
+      return View.generateViewId();
+    }
+
+  }
+
 
   public static int getWeexHeight(String instanceId) {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
