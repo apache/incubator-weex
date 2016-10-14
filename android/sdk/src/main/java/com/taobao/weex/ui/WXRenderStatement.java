@@ -221,7 +221,6 @@ import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.Scrollable;
-import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
@@ -381,6 +380,7 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
+    component.lazy(parent.isLazy());
     component.createView(parent, index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
