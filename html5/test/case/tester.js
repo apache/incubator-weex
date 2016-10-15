@@ -356,11 +356,10 @@ describe('test input and output', function () {
     let app
 
     const callNativeSpy = sinon.spy()
-
     function genCallNativeWrapper (count) {
       return (name, tasks, cbId) => {
         callNativeSpy(tasks)
-        const length = callNativeSpy.args.length
+        const length = callNativeSpy.callCount
         if (length > count) {
           return -1
         }
@@ -436,7 +435,7 @@ describe('test input and output', function () {
         callNativeHandler = genCallNativeWrapper(calls)
         app.$create(inputCode)
         app.$destroy()
-        expect(callNativeSpy.args.length).eql(calls + 2)
+        expect(callNativeSpy.callCount).eql(calls + 2)
       }
 
       for (let i = 5; i < 60; i++) {
@@ -455,7 +454,7 @@ describe('test input and output', function () {
         callNativeHandler = genCallNativeWrapper(calls)
         app.$create(inputCode)
         app.$destroy()
-        expect(callNativeSpy.args.length).eql(calls + 2)
+        expect(callNativeSpy.callCount).eql(calls + 2)
       }
 
       run(10)
