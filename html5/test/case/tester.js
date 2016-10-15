@@ -36,8 +36,8 @@ describe('test input and output', function () {
     })
 
     function checkOutput (app, name) {
-      const source = getCode('assets/' + name + '.input')
-      const output = getCode('assets/' + name + '.output')
+      const source = getCode('basic/' + name + '.source.js')
+      const output = getCode('basic/' + name + '.output.js')
       const result = eval('(' + output + ')')
 
       app.$create(source)
@@ -104,20 +104,15 @@ describe('test input and output', function () {
       callNativeHandler = function () {}
     })
 
-    function readInput (name) {
-      return getCode('assets/' + name + '.input')
-    }
-
-    function readOutput (name) {
-      return getCode('assets/' + name + '.output')
-    }
+    const readSource = name => getCode('complex/' + name + '.source.js')
+    const readOutput = name => getCode('complex/' + name + '.output.js')
 
     it('computed case', () => {
       const name = 'computed'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -136,10 +131,10 @@ describe('test input and output', function () {
 
     it('append-root-event case', () => {
       const name = 'append-root-event'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       const actual = app.getRealRoot()
       expect(actual).eql(expected)
@@ -153,10 +148,10 @@ describe('test input and output', function () {
 
     it('repeat with array track-by case', () => {
       const name = 'repeat-track-by'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       app.$refresh({
         titlelist: [
           { text: 'Hello World2' },
@@ -171,10 +166,10 @@ describe('test input and output', function () {
 
     it('if-refresh case', () => {
       const name = 'if-refresh'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       app.$refresh({ showTitle: false })
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
@@ -184,10 +179,10 @@ describe('test input and output', function () {
 
     it('if-repeat-refresh case', () => {
       const name = 'if-repeat-refresh'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       app.$refresh({
         titlelist: [
           { showTitle: false, title: 'Hello World1' },
@@ -203,10 +198,10 @@ describe('test input and output', function () {
 
     it('click case', () => {
       const name = 'click'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -217,10 +212,10 @@ describe('test input and output', function () {
 
     it('inline click case', () => {
       const name = 'inline-click'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -234,10 +229,10 @@ describe('test input and output', function () {
 
     it('refresh twice', () => {
       const name = 'refresh2'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       expect(app.getRealRoot()).eql({ type: 'container' })
 
       app.$refresh({ ext: { showbar1: false }})
@@ -250,28 +245,28 @@ describe('test input and output', function () {
 
     it('a less wrong transformer version', () => {
       const name = 'transformer2'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
 
-      const result = app.$create(inputCode)
+      const result = app.$create(sourceCode)
       expect(result).to.be.an.instanceof(Error)
       app.$destroy()
     })
 
     it('a bigger wrong transformer version', () => {
       const name = 'transformer3'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
 
-      const result = app.$create(inputCode)
+      const result = app.$create(sourceCode)
       expect(result).to.be.an.instanceof(Error)
       app.$destroy()
     })
 
     it('input binding', () => {
       const name = 'input-binding'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -303,28 +298,23 @@ describe('test input and output', function () {
       callNativeHandler = function () {}
     })
 
-    function readInput (name) {
-      return getCode('assets/' + name + '.input')
-    }
-
-    function readOutput (name) {
-      return getCode('assets/' + name + '.output')
-    }
+    const readSource = name => getCode('multi/' + name + '.source.js')
+    const readOutput = name => getCode('multi/' + name + '.output.js')
 
     it('clear-module case', () => {
       const app2 = createApp(runtime)
 
       const nameA = 'clear-moduleA'
       const nameB = 'clear-moduleB'
-      const inputCodeA = readInput(nameA)
+      const sourceCodeA = readSource(nameA)
       const outputCodeA = readOutput(nameA)
-      const inputCodeB = readInput(nameB)
+      const sourceCodeB = readSource(nameB)
       const outputCodeB = readOutput(nameB)
       const expectedA = eval('(' + outputCodeA + ')')
       const expectedB = eval('(' + outputCodeB + ')')
 
-      app.$create(inputCodeA)
-      app2.$create(inputCodeB)
+      app.$create(sourceCodeA)
+      app2.$create(sourceCodeB)
 
       expect(app2.getRealRoot()).eql(expectedB)
 
@@ -360,21 +350,16 @@ describe('test input and output', function () {
       callNativeHandler = function () {}
     })
 
-    function readInput (name) {
-      return getCode('assets/' + name + '.input')
-    }
-
-    function readOutput (name) {
-      return getCode('assets/' + name + '.output')
-    }
+    const readSource = name => getCode('signals/' + name + '.source.js')
+    const readOutput = name => getCode('signals/' + name + '.output.js')
 
     it('use HTML5 timer API', function (done) {
       this.timeout(5000)
       const name = 'timer'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -392,10 +377,10 @@ describe('test input and output', function () {
     it('use modal API', function (done) {
       this.timeout(5000)
       const name = 'modal'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(inputCode)
+      app.$create(sourceCode)
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -412,12 +397,12 @@ describe('test input and output', function () {
       this.timeout(15000)
 
       const name = 'signals'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
 
       function run (calls) {
         callNativeSpy.reset()
         callNativeHandler = genCallNativeWrapper(calls)
-        app.$create(inputCode)
+        app.$create(sourceCode)
         app.$destroy()
         expect(callNativeSpy.callCount).eql(calls + 2)
       }
@@ -431,12 +416,12 @@ describe('test input and output', function () {
       this.timeout(500000)
 
       const name = 'signals-long'
-      const inputCode = readInput(name)
+      const sourceCode = readSource(name)
 
       function run (calls) {
         callNativeSpy.reset()
         callNativeHandler = genCallNativeWrapper(calls)
-        app.$create(inputCode)
+        app.$create(sourceCode)
         app.$destroy()
         expect(callNativeSpy.callCount).eql(calls + 2)
       }
