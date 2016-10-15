@@ -77,6 +77,7 @@ describe('test input and output', function () {
     it('repeat with array non-obj case', () => checkOutput(app, 'repeat-array-non-obj'))
     it('repeat watch case', () => checkOutput(app, 'repeat-watch'))
 
+    it('reset style case', () => checkOutput(app, 'reset-style'))
     it('dynamic type case', () => checkOutput(app, 'dynamic-type'))
     it('dynamic property case', () => checkOutput(app, 'dynamic-property'))
 
@@ -227,23 +228,6 @@ describe('test input and output', function () {
 
       expected.children[0].attr.value = 'Hello World2'
       expect(app.getRealRoot()).eql(expected)
-
-      app.$destroy()
-    })
-
-    it.skip('reset class style case', () => {
-      const name = 'reset-style'
-      const inputCode = readInput(name)
-      const outputCode = readOutput(name)
-
-      app.$create(inputCode)
-      const expected = eval('(' + outputCode + ')')
-
-      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
-
-      setTimeout(function () {
-        expect(app.getRealRoot()).eql(expected)
-      }, 0)
 
       app.$destroy()
     })

@@ -5,11 +5,9 @@ define('@weex-component/reset-style', function (require, exports, module) {
 	  data: function () {return {
 	    className: 'highlight'
 	  }},
-	  methods: {
-	    ready: function() {
-	      this.className = 'normal';
-	    }
-	  }
+    ready: function() {
+      this.className = 'normal'
+    }
   }
 
 
