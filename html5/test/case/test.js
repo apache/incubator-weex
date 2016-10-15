@@ -404,36 +404,23 @@ describe('test input and output', () => {
     instance.$destroy()
   })
 
-  it('clear-dep-target case', () => {
+  it.skip('clear-dep-target case', () => {
     const nameError = 'clear-dep-target-error'
     const nameFine = 'clear-dep-target-fine'
-    const inputCodeError = readInput(nameError)
-    const inputCodeFine = readInput(nameFine)
+    const sourceCodeError = readInput(nameError)
+    const sourceCodeFine = readInput(nameFine)
     const outputCodeFine = readOutput(nameFine)
 
-    const docError = new Document(nameError)
-    allDocs[nameError] = docError
-
     // should throw
-    expect(() => {
-      framework.createInstance(nameError, inputCodeError)
-    }).to.throw(TypeError)
+    expect(() => { instance.$create(sourceCodeError) }).to.throw(TypeError)
+    instance.$destroy()
 
-    framework.destroyInstance(nameError)
-
-    const docFine = new Document(nameFine)
-    allDocs[nameFine] = docFine
-
-    // no throw
-    framework.createInstance(nameFine, inputCodeFine)
-
+    // not throw
+    instance.$create(sourceCodeFine)
     const expected = eval('(' + outputCodeFine + ')')
-    const actual = docFine.toJSON()
-    expect(actual).eql(expected)
+    expect(instance.getRealRoot()).eql(expected)
 
-    framework.destroyInstance(nameFine)
-    delete allDocs[nameError]
-    delete allDocs[nameFine]
+    instance.$destroy()
   })
 
   it('if case', () => {
