@@ -324,6 +324,25 @@ describe('test input and output', function () {
 
       app.$destroy()
     })
+
+    it.skip('clear-dep-target case', () => {
+      const nameError = 'clear-dep-target-error'
+      const nameFine = 'clear-dep-target-fine'
+      const sourceCodeError = readSource(nameError)
+      const sourceCodeFine = readSource(nameFine)
+      const outputCodeFine = readOutput(nameFine)
+
+      // should throw
+      expect(() => { app.$create(sourceCodeError) }).to.throw(TypeError)
+      app.$destroy()
+
+      // not throw
+      app.$create(sourceCodeFine)
+      const expected = eval('(' + outputCodeFine + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
   })
 
   describe('timer & callNative signals', function () {
