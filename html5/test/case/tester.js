@@ -91,22 +91,7 @@ describe('test input and output', function () {
     it('promise case', () => checkOutput(app, 'promise'))
   })
 
-  // append-root-event
-  // repeat-track-by
-  // if-refresh
-  // if-repeat-refresh
-  // reset class style case
-  // click
-  // inline-click
-  // refresh twice
-  // a less wrong transformer version
-  // a big wrong transformer version
-  // input binding
-  // use HTML5 timer API
-  // use modal API
-  // test callNative signals
-
-  describe('complex cases', function() {
+  describe('complex cases', function () {
     let app
 
     beforeEach(() => {
@@ -147,10 +132,182 @@ describe('test input and output', function () {
 
       app.$destroy()
     })
+
+    it('append-root-event case', () => {
+      const name = 'append-root-event'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      const actual = app.getRealRoot()
+      expect(actual).eql(expected)
+
+      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
+      const actual2 = app.getRealRoot()
+      expect(actual2.children[0].attr.value).eql(2)
+
+      app.$destroy()
+    })
+
+    it('repeat with array track-by case', () => {
+      const name = 'repeat-track-by'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      app.$refresh({
+        titlelist: [
+          { text: 'Hello World2' },
+          { text: 'Hello World1' }
+        ]
+      })
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+
+    it('if-refresh case', () => {
+      const name = 'if-refresh'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      app.$refresh({ showTitle: false })
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+
+    it('if-repeat-refresh case', () => {
+      const name = 'if-repeat-refresh'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      app.$refresh({
+        titlelist: [
+          { showTitle: false, title: 'Hello World1' },
+          { showTitle: true, title: 'Hello World2' },
+          { showTitle: true, title: 'Hello World3' }
+        ]
+      })
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+
+    it('click case', () => {
+      const name = 'click'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
+
+      app.$destroy()
+    })
+
+    it('inline click case', () => {
+      const name = 'inline-click'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
+
+      expected.children[0].attr.value = 'Hello World2'
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+
+    it.skip('reset class style case', () => {
+      const name = 'reset-style'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+
+      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
+
+      setTimeout(function () {
+        expect(app.getRealRoot()).eql(expected)
+      }, 0)
+
+      app.$destroy()
+    })
+
+    it('refresh twice', () => {
+      const name = 'refresh2'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      expect(app.getRealRoot()).eql({ type: 'container' })
+
+      app.$refresh({ ext: { showbar1: false }})
+      app.$refresh({ ext: { showbar1: true }})
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
+
+    it('a less wrong transformer version', () => {
+      const name = 'transformer2'
+      const inputCode = readInput(name)
+
+      const result = app.$create(inputCode)
+      expect(result).to.be.an.instanceof(Error)
+      app.$destroy()
+    })
+
+    it('a bigger wrong transformer version', () => {
+      const name = 'transformer3'
+      const inputCode = readInput(name)
+
+      const result = app.$create(inputCode)
+      expect(result).to.be.an.instanceof(Error)
+      app.$destroy()
+    })
+
+    it('input binding', () => {
+      const name = 'input-binding'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      app.doc.body.children[0].attr.value = 'abcdefg'
+      app.$fireEvent(app.doc.body.children[0].ref, 'change', {}, { attrs: { value: 'abcdefg' }})
+      expected.children[0].attr.value = 'abcdefg'
+      expected.children.push({ type: 'text', attr: { value: '1 - abcdefg' }})
+      expect(app.getRealRoot()).eql(expected)
+
+      app.doc.body.children[0].attr.value = '12345'
+      app.$fireEvent(app.doc.body.children[0].ref, 'change', {}, { attrs: { value: '12345' }})
+      expected.children[0].attr.value = '12345'
+      expected.children.push({ type: 'text', attr: { value: '2 - 12345' }})
+      expect(app.getRealRoot()).eql(expected)
+
+      app.$destroy()
+    })
   })
 
-
-  describe('multi page cases', function() {
+  describe('multi page cases', function () {
     let app
 
     beforeEach(() => {
@@ -185,7 +342,6 @@ describe('test input and output', function () {
       app.$create(inputCodeA)
       app2.$create(inputCodeB)
 
-      const actualB = app2.getRealRoot()
       expect(app2.getRealRoot()).eql(expectedB)
 
       app2.$destroy()
@@ -194,6 +350,5 @@ describe('test input and output', function () {
 
       app.$destroy()
     })
-
   })
 })
