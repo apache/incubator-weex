@@ -81,7 +81,7 @@ describe('test input and output', function () {
     it('dynamic type case', () => checkOutput(app, 'dynamic-type'))
     it('dynamic property case', () => checkOutput(app, 'dynamic-property'))
 
-    it('bind subvm', () => checkOutput(app, 'subVm'))
+    it('bind subvm', () => checkOutput(app, 'subvm'))
     it('components options', () => checkOutput(app, 'components'))
     it('change data when created', () => checkOutput(app, 'created'))
     it('change data when ready', () => checkOutput(app, 'ready'))
