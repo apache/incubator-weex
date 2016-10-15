@@ -351,4 +351,116 @@ describe('test input and output', function () {
       app.$destroy()
     })
   })
+
+  describe('timer & callNative signals', function () {
+    let app
+
+    const callNativeSpy = sinon.spy()
+
+    function genCallNativeWrapper (count) {
+      return (name, tasks, cbId) => {
+        callNativeSpy(tasks)
+        const length = callNativeSpy.args.length
+        if (length > count) {
+          return -1
+        }
+        return length
+      }
+    }
+    beforeEach(() => {
+      app = createApp(runtime)
+      callNativeHandler = (...args) => app._target.callNative(...args)
+    })
+
+    afterEach(() => {
+      callNativeSpy.reset()
+      callNativeHandler = function () {}
+    })
+
+    function readInput (name) {
+      return getCode('assets/' + name + '.input')
+    }
+
+    function readOutput (name) {
+      return getCode('assets/' + name + '.output')
+    }
+
+    it('use HTML5 timer API', function (done) {
+      this.timeout(5000)
+      const name = 'timer'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      setTimeout(_ => {
+        expect(app.getRealRoot()).eql(expected)
+        setTimeout(_ => {
+          expected.children[0].attr.value = 'bar'
+          expect(app.getRealRoot()).eql(expected)
+          app.$destroy()
+          done()
+        }, 1000)
+      }, 1000)
+    })
+
+    it('use modal API', function (done) {
+      this.timeout(5000)
+      const name = 'modal'
+      const inputCode = readInput(name)
+      const outputCode = readOutput(name)
+
+      app.$create(inputCode)
+      const expected = eval('(' + outputCode + ')')
+      expect(app.getRealRoot()).eql(expected)
+
+      // the test driver will hold the API callback about 1 sec
+      setTimeout(_ => {
+        expected.children[0].attr.value = 'bar'
+        expect(app.getRealRoot()).eql(expected)
+        app.$destroy()
+        done()
+      }, 1500)
+    })
+
+    it('signals control', function () {
+      this.timeout(15000)
+
+      const name = 'signals'
+      const inputCode = readInput(name)
+
+      function run (calls) {
+        callNativeSpy.reset()
+        callNativeHandler = genCallNativeWrapper(calls)
+        app.$create(inputCode)
+        app.$destroy()
+        expect(callNativeSpy.args.length).eql(calls + 2)
+      }
+
+      for (let i = 5; i < 60; i++) {
+        run(i)
+      }
+    })
+
+    it('long signals control', function () {
+      this.timeout(500000)
+
+      const name = 'signals-long'
+      const inputCode = readInput(name)
+
+      function run (calls) {
+        callNativeSpy.reset()
+        callNativeHandler = genCallNativeWrapper(calls)
+        app.$create(inputCode)
+        app.$destroy()
+        expect(callNativeSpy.args.length).eql(calls + 2)
+      }
+
+      run(10)
+      run(30)
+      run(90)
+    })
+  })
 })
