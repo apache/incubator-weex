@@ -32,6 +32,7 @@ describe('test input and output', function () {
     })
 
     afterEach(() => {
+      app = null
       callNativeHandler = function () {}
     })
 
@@ -101,6 +102,7 @@ describe('test input and output', function () {
     })
 
     afterEach(() => {
+      app = null
       callNativeHandler = function () {}
     })
 
@@ -303,6 +305,8 @@ describe('test input and output', function () {
     })
 
     afterEach(() => {
+      appA = null
+      appB = null
       callNativeHandler = function () {}
     })
 
@@ -368,6 +372,7 @@ describe('test input and output', function () {
     })
 
     afterEach(() => {
+      app = null
       callNativeSpy.reset()
       callNativeHandler = function () {}
     })
