@@ -37,7 +37,7 @@ export function bootstrap (app, name, config, data) {
   config = isPlainObject(config) ? config : {}
   // 2.1 transformer version check
   console.log(`transformerVersion: ${config.transformerVersion}, `
-    + `available transformerVersion: ${global.transformerVersion}`)
+    + `available transformerVersion: ${global.transformVersion}`)
 
   // 3. create a new Vm with custom component name and data
   app.vm = new Vm(cleanName, null, { _app: app }, null, data)
