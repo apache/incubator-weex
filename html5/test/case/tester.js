@@ -287,11 +287,19 @@ describe('test input and output', function () {
   })
 
   describe('multi page cases', function () {
-    let app
+    let appA
+    let appB
 
     beforeEach(() => {
-      app = createApp(runtime)
-      callNativeHandler = (...args) => app._target.callNative(...args)
+      appA = createApp(runtime)
+      appB = createApp(runtime)
+
+      callNativeHandler = (id, ...args) => {
+        switch (true) {
+          case (appA.id === id) : { appA._target.callNative(id, ...args) } break
+          case (appB.id === id) : { appB._target.callNative(id, ...args) } break
+        }
+      }
     })
 
     afterEach(() => {
@@ -302,46 +310,41 @@ describe('test input and output', function () {
     const readOutput = name => getCode('multi/' + name + '.output.js')
 
     it('clear-module case', () => {
-      const app2 = createApp(runtime)
-
       const nameA = 'clear-moduleA'
       const nameB = 'clear-moduleB'
       const sourceCodeA = readSource(nameA)
-      const outputCodeA = readOutput(nameA)
       const sourceCodeB = readSource(nameB)
-      const outputCodeB = readOutput(nameB)
-      const expectedA = eval('(' + outputCodeA + ')')
-      const expectedB = eval('(' + outputCodeB + ')')
+      const expectedA = eval('(' + readOutput(nameA) + ')')
+      const expectedB = eval('(' + readOutput(nameB) + ')')
 
-      app.$create(sourceCodeA)
-      app2.$create(sourceCodeB)
+      appA.$create(sourceCodeA)
+      appB.$create(sourceCodeB)
 
-      expect(app2.getRealRoot()).eql(expectedB)
+      expect(appB.getRealRoot()).eql(expectedB)
 
-      app2.$destroy()
-      app.$fireEvent(app.doc.body.children[0].ref, 'click', {})
-      expect(app.getRealRoot()).eql(expectedA)
+      appB.$destroy()
+      appA.$fireEvent(appA.doc.body.children[0].ref, 'click', {})
+      expect(appA.getRealRoot()).eql(expectedA)
 
-      app.$destroy()
+      appA.$destroy()
     })
 
-    it.skip('clear-dep-target case', () => {
+    it('clear-dep-target case', () => {
       const nameError = 'clear-dep-target-error'
       const nameFine = 'clear-dep-target-fine'
       const sourceCodeError = readSource(nameError)
       const sourceCodeFine = readSource(nameFine)
-      const outputCodeFine = readOutput(nameFine)
+      const expectedFine = eval('(' + readOutput(nameFine) + ')')
 
       // should throw
-      expect(() => { app.$create(sourceCodeError) }).to.throw(TypeError)
-      app.$destroy()
+      expect(() => { appA.$create(sourceCodeError) }).to.throw(TypeError)
+      appA.$destroy()
 
       // not throw
-      app.$create(sourceCodeFine)
-      const expected = eval('(' + outputCodeFine + ')')
-      expect(app.getRealRoot()).eql(expected)
+      appB.$create(sourceCodeFine)
+      expect(appB.getRealRoot()).eql(expectedFine)
 
-      app.$destroy()
+      appB.$destroy()
     })
   })
 
