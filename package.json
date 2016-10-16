@@ -47,7 +47,7 @@
     "dev:examples:vue": "webpack --watch --config build/webpack.examples.vue.config.js",
     "dev:test": "webpack --watch --config build/webpack.test.config.js",
     "lint": "eslint html5",
-    "test:case": "mocha --require reify html5/test/case/test.js",
+    "test:case": "mocha --require reify html5/test/case/tester.js",
     "test:unit": "mocha --require reify html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test": "npm run lint && npm run test:unit && npm run test:case",
     "test:cover": "isparta cover --report text node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
