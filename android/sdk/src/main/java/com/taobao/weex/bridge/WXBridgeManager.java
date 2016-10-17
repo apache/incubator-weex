@@ -767,6 +767,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       return;
     }
     errCode.appendErrMsg(" url:"+instance.getBundleUrl());
+    errCode.setArgs(instance.getBundleUrl());
     instance.commitUTStab(IWXUserTrackAdapter.JS_BRIDGE, errCode);
   }
 
@@ -1241,6 +1242,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
     errorMsg.append(" exception function:"+function);
     errorMsg.append(" exception:"+exception);
+    WXErrorCode.WX_ERR_JS_EXECUTE.resetErrorMsg("JS execute error!");
     WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(errorMsg.toString());
     commitJSBridgeAlarmMonitor(instanceId,WXErrorCode.WX_ERR_JS_EXECUTE);
   }

@@ -321,6 +321,7 @@ public enum WXErrorCode {
 
   private String errorCode;
   private String errorMsg;
+  private String args;
 
   WXErrorCode(String errorCode, String errorMsg) {
     this.errorCode = errorCode;
@@ -341,6 +342,18 @@ public enum WXErrorCode {
 
   public String getErrorMsg() {
     return this.errorMsg;
+  }
+
+  public void resetErrorMsg(String defaultMsg){
+    errorMsg=defaultMsg;
+  }
+
+  public String getArgs() {
+    return args;
+  }
+
+  public void setArgs(String args) {
+    this.args = args;
   }
 
 }
