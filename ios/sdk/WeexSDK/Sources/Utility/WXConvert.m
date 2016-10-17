@@ -608,7 +608,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         return [CAMediaTimingFunction functionWithControlPoints:x1 :y1 :x2 :y2];
     }
     
-    return nil;
+    return [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
 }
 
 #pragma mark Visibility

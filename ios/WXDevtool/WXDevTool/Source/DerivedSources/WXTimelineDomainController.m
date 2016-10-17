@@ -1,5 +1,5 @@
 //
-//  PDTimelineDomainController.m
+//  WXTimelineDomainController.m
 /**
  * Created by Weex.
  * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
@@ -9,7 +9,7 @@
  */
 #import "WXTimelineDomainController.h"
 
-@interface WXTimelineDomainController () <PDTimelineCommandDelegate>
+@interface WXTimelineDomainController () <WXTimelineCommandDelegate>
 
 @end
 
@@ -28,30 +28,30 @@
 }
 
 +(Class)domainClass {
-    return [PDTimelineDomain class];
+    return [WXTimelineDomain class];
 }
 
-#pragma mark - PDTimelineCommandDelegate
+#pragma mark - WXTimelineCommandDelegate
 // Starts capturing instrumentation events.
 // Param maxCallStackDepth: Samples JavaScript stack traces up to <code>maxCallStackDepth</code>, defaults to 5.
-- (void)domain:(PDTimelineDomain *)domain startWithMaxCallStackDepth:(NSNumber *)maxCallStackDepth callback:(void (^)(id error))callback {
+- (void)domain:(WXTimelineDomain *)domain startWithMaxCallStackDepth:(NSNumber *)maxCallStackDepth callback:(void (^)(id error))callback {
     
 }
 
 // Stops capturing instrumentation events.
-- (void)domain:(PDTimelineDomain *)domain stopWithCallback:(void (^)(id error))callback {
+- (void)domain:(WXTimelineDomain *)domain stopWithCallback:(void (^)(id error))callback {
     
 }
 
 // Starts calculating various DOM statistics and sending them as part of timeline events.
 // Param enabled: True to start collecting DOM counters.
-- (void)domain:(PDTimelineDomain *)domain setIncludeMemoryDetailsWithEnabled:(NSNumber *)enabled callback:(void (^)(id error))callback {
+- (void)domain:(WXTimelineDomain *)domain setIncludeMemoryDetailsWithEnabled:(NSNumber *)enabled callback:(void (^)(id error))callback {
     
 }
 
 // Tells whether timeline agent supports frame instrumentation.
 // Callback Param result: True if timeline supports frame instrumentation.
-- (void)domain:(PDTimelineDomain *)domain supportsFrameInstrumentationWithCallback:(void (^)(NSNumber *result, id error))callback {
+- (void)domain:(WXTimelineDomain *)domain supportsFrameInstrumentationWithCallback:(void (^)(NSNumber *result, id error))callback {
     
 }
 
