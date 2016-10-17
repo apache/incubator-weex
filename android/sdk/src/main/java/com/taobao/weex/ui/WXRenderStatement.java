@@ -358,9 +358,9 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
+    component.lazy(parent.isLazy());
     parent.addChild(component, index);
     parent.createChildViewAt(index);
-
     component.applyLayoutAndEvent(component);
     component.bindData(component);
   }
