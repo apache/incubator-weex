@@ -17,7 +17,8 @@ href attributes defines the URL of the hyperlink.
 **common styles**: check out the [common styles](../references/common-attrs.md)
 
 ### Events
-**common events**: check out the [common events](../references/common-event.md)
+**common events**: check out the [common events](../references/common-event.md)  
+tip: we can't guarantee the order of execution between onclick function and href
 
 ### Examples
     <a href="http://g.tbcdn.cn/ali-wireless-h5/res/0.0.16/hello.js">
