@@ -234,11 +234,11 @@ public class WXImageView extends ImageView implements WXGestureObservable {
   }
 
   public void setImageDrawable(Drawable drawable, boolean isGif) {
-    this.gif=isGif;
+    this.gif = isGif;
     ViewGroup.LayoutParams layoutParams;
     if ((layoutParams = getLayoutParams()) != null) {
       Drawable wrapDrawable = ImageDrawable.createImageDrawable(drawable,
-                                                                getScaleType(),
+                                                                getScaleType(), borderRadius,
                                                                 layoutParams.width - getPaddingLeft() - getPaddingRight(),
                                                                 layoutParams.height - getPaddingTop() - getPaddingBottom(),
                                                                 isGif);
@@ -248,7 +248,7 @@ public class WXImageView extends ImageView implements WXGestureObservable {
           imageDrawable.setCornerRadii(borderRadius);
         }
       }
-      WXImageView.super.setImageDrawable(wrapDrawable);
+      super.setImageDrawable(wrapDrawable);
     }
   }
 
@@ -278,7 +278,7 @@ public class WXImageView extends ImageView implements WXGestureObservable {
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
-    if(changed) {
+    if (changed) {
       setImageDrawable(getDrawable(), gif);
     }
   }

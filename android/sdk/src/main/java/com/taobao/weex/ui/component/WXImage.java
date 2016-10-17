@@ -223,6 +223,7 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
+import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -375,7 +376,7 @@ public class WXImage extends WXComponent<ImageView> {
       BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
       float[] borderRadius;
       if (borderDrawable != null) {
-        RectF borderBox = new RectF(0, 0, imageDom.getLayoutWidth(), imageDom.getLayoutHeight());
+        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
         borderRadius = borderDrawable.getBorderRadius(borderBox);
       } else {
         borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
