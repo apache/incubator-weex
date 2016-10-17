@@ -49,7 +49,7 @@ eg:
 
 ## For Parent-Child Communication
 
-Parent component can using `this.$([String id])` get context of child component. you can access child component information using the context object.
+Parent component can use `this.$vm([String id])` get vm instance of child component. you can access child component information using the vm instance.
 
 ```html
 <we-element name="foo">
@@ -85,7 +85,7 @@ Parent component can using `this.$([String id])` get context of child component.
   module.exports = {
     methods: {
       test: function (e) {
-        var foo = this.$('fooEl')
+        var foo = this.$vm('fooEl')
         foo.setTitle('...')
         foo.imageUrl = '...'
       }
