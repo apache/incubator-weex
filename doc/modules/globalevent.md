@@ -13,13 +13,12 @@ You can register events via `addEventListener`, which can be removed by `removin
 ## How to make your Module support global events
 API development is complete, when the event needs to be sent, the need through the following methods:
 ```
-WXSDKInstance instance=(get WXSDKInstance instance);
 /**
   * 
   * @param eventName eventName
   * @param params event params
   */
-instance.fireGlobalEventCallback(String eventName, Map<String,Object> params);
+instance.fireGlobalEventCallback(eventName,params);
 ```
 
 ## API
@@ -30,7 +29,8 @@ register global event.
 
 #### Arguments
 
-* `eventName`*(string)*: The name of the event you need to listen to.`callback`*(function)*: the callback function after executing this action.  
+* `eventName`*(string)*: The name of the event you want to listen to.  
+* `callback`*(function)*: the callback function after executing this action.  
 
 #### Example
 
