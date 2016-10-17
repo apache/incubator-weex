@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <CommonCrypto/CommonCrypto.h>
 #import "WXDefine.h"
 #import "WXType.h"
 #import "WXLog.h"
