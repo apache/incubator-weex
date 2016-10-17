@@ -7,6 +7,9 @@
  */
 
 #import "WXDebugDomainController.h"
+#import "WXDevToolType.h"
+#import <WeexSDK/WXLog.h>
+#import <WeexSDK/WXSDKEngine.h>
 
 @implementation WXDebugDomainController
 @dynamic domain;
@@ -24,13 +27,41 @@
     return [WXDebugDomain class];
 }
 
-#pragma mark - PDCommandDelegate
-- (void)domain:(PDDynamicDebuggerDomain *)domain enableWithCallback:(void (^)(id error))callback {
++ (NSDictionary *)getLogLevelMap {
+    NSDictionary *logLevelEnumToString =
+    @{
+      @"all":@(WXLogLevelDebug),
+      @"error":@(WXLogLevelError),
+      @"warn":@(WXLogLevelWarning),
+      @"info":@(WXLogLevelInfo),
+      @"log":@(WXLogLevelLog),
+      @"debug":@(WXLogLevelDebug),
+      @"off":@(WXLogLevelOff)
+      };
+    return logLevelEnumToString;
+}
+
+#pragma mark - WXCommandDelegate
+- (void)domain:(WXDynamicDebuggerDomain *)domain enableWithCallback:(void (^)(id error))callback {
+    [WXDevToolType setDebug:YES];
+    [WXSDKEngine restart];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
     callback(nil);
 }
 
-- (void)domain:(PDDynamicDebuggerDomain *)domain disableWithCallback:(void (^)(id error))callback {
-    
+- (void)domain:(WXDynamicDebuggerDomain *)domain disableWithCallback:(void (^)(id error))callback {
+    [WXDevToolType setDebug:NO];
+    [WXSDKEngine restart];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"RefreshInstance" object:nil];
+    callback(nil);
 }
+
+- (void)domain:(WXDebugDomain *)domain sendLogLevel:(NSString *)level WithCallback:(void (^)(id error))callback {
+    NSDictionary *logLevelMap = [WXDebugDomainController getLogLevelMap];
+    WXLogLevel wxLogLevel = [[logLevelMap objectForKey:level] integerValue];
+    [WXLog setLogLevel:wxLogLevel];
+    callback(nil);
+}
+
 
 @end
