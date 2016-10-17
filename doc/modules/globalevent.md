@@ -20,6 +20,18 @@ API development is complete, when the event needs to be sent, the need through t
   */
 instance.fireGlobalEventCallback(eventName,params);
 ```
+### Example
+
+#### Android
+```java
+Map<String,Object> params=new HashMap<>();
+params.put("key","value");
+mWXSDKInstance.fireGlobalEventCallback("geolocation",params);
+```
+#### iOS
+```Objective-C
+[weexInstance fireGlobalEvent:@"geolocation" params:@{@"key":@"value"}];
+```
 
 ## API
 
