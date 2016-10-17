@@ -217,15 +217,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
+import java.util.Arrays;
+
 public class ImageDrawable extends PaintDrawable {
 
   public static Drawable createImageDrawable(@Nullable Drawable original,
                                              @NonNull ImageView.ScaleType scaleType,
+                                             @Nullable float[] borderRadius,
                                              int vWidth,
                                              int vHeight,
                                              boolean gif) {
     Bitmap bm;
-    if (!gif && vWidth > 0 && vHeight > 0) {
+    if (!gif && vWidth > 0 && vHeight > 0 && !
+        Arrays.equals(borderRadius, new float[]{0, 0, 0, 0, 0, 0, 0, 0})) {
       if (original instanceof BitmapDrawable &&
           (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;

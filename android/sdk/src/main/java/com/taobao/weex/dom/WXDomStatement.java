@@ -207,7 +207,6 @@ package com.taobao.weex.dom;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Pair;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
@@ -230,10 +229,9 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -260,7 +258,7 @@ class WXDomStatement {
   private String mInstanceId;
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
-  private Set <Pair<String, Map<String, Object>>> animations;
+  private Map <String, Map<String, Object>> animations;
   private CSSLayoutContext mLayoutContext;
   private volatile boolean mDirty;
   private boolean mDestroy;
@@ -281,7 +279,7 @@ class WXDomStatement {
     mLayoutContext = new CSSLayoutContext();
     mRegistry = new ConcurrentHashMap<>();
     mNormalTasks = new ArrayList<>();
-    animations = new HashSet<>();
+    animations = new LinkedHashMap<>();
     mWXRenderManager = renderManager;
     mAddDOMConsumer = new AddDOMConsumer(mRegistry);
   }
@@ -449,14 +447,14 @@ class WXDomStatement {
   }
 
   private void parseAnimation() {
-    for(final Pair<String, Map<String, Object>> pair:animations) {
-      if (!TextUtils.isEmpty(pair.first)) {
-        final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
+    for(final Map.Entry<String, Map<String, Object>> entry:animations.entrySet()) {
+      if (!TextUtils.isEmpty(entry.getKey())) {
+        final WXAnimationBean animationBean = createAnimationBean(entry.getKey(), entry.getValue());
         if (animationBean != null) {
           mNormalTasks.add(new IWXRenderTask() {
             @Override
             public void execute() {
-              mWXRenderManager.startAnimation(mInstanceId, pair.first, animationBean, null);
+              mWXRenderManager.startAnimation(mInstanceId, entry.getKey(), animationBean, null);
             }
 
             @Override
@@ -609,7 +607,7 @@ class WXDomStatement {
 
     IWXRenderTask task = isRoot ? new CreateBodyTask(component) : new AddDOMTask(component, parentRef, index);
     mNormalTasks.add(task);
-    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(), domObject.getStyles()));
+    animations.put(domObject.getRef(), domObject.getStyles());
     mDirty = true;
 
     instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -830,7 +828,7 @@ class WXDomStatement {
     Map<String, Object> animationMap= WXDataStructureUtil.newHashMapWithExpectedSize(2);
     animationMap.put(WXDomObject.TRANSFORM, style.remove(WXDomObject.TRANSFORM));
     animationMap.put(WXDomObject.TRANSFORM_ORIGIN, style.remove(WXDomObject.TRANSFORM_ORIGIN));
-    animations.add(new Pair<>(ref, animationMap));
+    animations.put(ref, animationMap);
 
     if(!style.isEmpty()){
       domObject.updateStyle(style);
