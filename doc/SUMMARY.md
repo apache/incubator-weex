@@ -67,6 +67,7 @@
         * [storage](/modules/storage.md)
         * [timer](/modules/timer.md)
         * [clipboard](/modules/clipboard.md)
+        * [globalEvent](/modules/globalevent.md)
     * Low-level Specs
         * [JS Bundle Format](/specs/js-bundle-format.md)
         * [JS Framework APIs](/specs/js-framework-apis.md)
