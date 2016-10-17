@@ -60,7 +60,7 @@
   },
   "subversion": {
     "browser": "0.4.0",
-    "framework": "0.15.2",
+    "framework": "0.16.17",
     "transformer": ">=0.1.5 <0.4"
   },
   "dependencies": {
@@ -100,8 +100,7 @@
     "style-loader": "^0.13.1",
     "uglify-js": "^2.6.4",
     "webpack": "^1.13.1",
-    "weex-loader": "^0.2.0",
-    "wwp": "^0.2.0",
-    "weex-loader": "^0.3.1"
+    "weex-loader": "^0.3.1",
+    "wwp": "^0.2.0"
   }
 }
