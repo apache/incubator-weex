@@ -37,4 +37,3 @@ for (const methodName in runtime) {
  * register methods
  */
 global.registerMethods(methods)
-
