@@ -96,6 +96,9 @@ describe('the api of app', () => {
       expect(json.type).eql('div')
       expect(json.children.length).eql(1)
     })
+    it('from empty object', () => {
+      expect(ctrl.getRootElement({})).to.deep.equal({})
+    })
   })
 
   describe('fireEvent', () => {
@@ -147,6 +150,31 @@ describe('the api of app', () => {
     })
   })
 
+  describe('updateActions', () => {
+    let originalCallNative
+
+    before(() => {
+      originalCallNative = global.callNative
+      global.callNative = function () {}
+    })
+
+    after(() => {
+      global.callNative = originalCallNative
+    })
+
+    it('update actions in listener', () => {
+      app.doc.listener.updates = [
+        {
+          method () {},
+          args: [undefined, null, /\.x/i, new Date(), 2, '3', true, ['']]
+        }
+      ]
+      ctrl.updateActions(app)
+
+      expect(app.doc.listener.updates).to.deep.equal([])
+    })
+  })
+
   describe('refreshData', () => {
     it('a simple data', () => {
       const data = { b: 'c' }
@@ -175,6 +203,32 @@ describe('the api of app', () => {
       expect(app.doc).to.be.null
       expect(app.customComponentMap).to.be.null
       expect(app.callbacks).to.be.null
+    })
+    it('the incomplete data', () => {
+      const appx = createApp()
+      delete appx.vm
+      ctrl.destroy(appx)
+      expect(appx.id).to.be.empty
+      expect(appx.blocks).to.be.null
+      expect(appx.vm).to.be.null
+      expect(appx.doc).to.be.null
+      expect(appx.customComponentMap).to.be.null
+      expect(appx.callbacks).to.be.null
+    })
+    it('clear vms', () => {
+      const appy = createApp()
+      appy.vm = {
+        $emit () {},
+        _watchers: [{ teardown () {} }],
+        _childrenVms: [{ $emit () {} }]
+      }
+      ctrl.destroy(appy)
+      expect(appy.id).to.be.empty
+      expect(appy.blocks).to.be.null
+      expect(appy.vm).to.be.null
+      expect(appy.doc).to.be.null
+      expect(appy.customComponentMap).to.be.null
+      expect(appy.callbacks).to.be.null
     })
   })
 })
