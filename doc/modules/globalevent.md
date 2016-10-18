@@ -20,6 +20,13 @@ API development is complete, when the event needs to be sent, the need through t
   */
 instance.fireGlobalEventCallback(eventName,params);
 ```
+How to dispatch a global event in a weex-html5 component or module ? Just dispatch the event on the document element:
+```javascript
+var evt = new Event('some-type')
+evt.data = { foo: 'bar' }
+document.dispatchEvent(evt)
+```
+
 ### Example
 
 #### Android
