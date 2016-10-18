@@ -764,6 +764,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         WXLogUtils.d(TAG, "removeChild child at " + index);
       }
       super.remove(child, destroy);
+      if (child instanceof WXLoading) {
+        getHostView().removeFooterView(child);
+      } else if (child instanceof WXRefresh) {
+        getHostView().removeHeaderView(child);
+      }
     }
 
     @Override
