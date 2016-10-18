@@ -989,6 +989,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
           performance = new WXPerformance();
           performance.errCode = errorCode.getErrorCode();
           performance.errMsg = errorCode.getErrorMsg();
+          performance.args = errorCode.getArgs();
           if (WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(performance.toString());
           }

@@ -204,8 +204,6 @@
  */
 package com.taobao.weex.common;
 
-import android.text.TextUtils;
-
 public enum WXErrorCode {
     /*
      * environment
@@ -321,6 +319,8 @@ public enum WXErrorCode {
 
   private String errorCode;
   private String errorMsg;
+  private String appendMsg="";
+  private String args;
 
   WXErrorCode(String errorCode, String errorMsg) {
     this.errorCode = errorCode;
@@ -328,11 +328,7 @@ public enum WXErrorCode {
   }
 
   public void appendErrMsg(String err) {
-    if (!TextUtils.isEmpty(err)) {
-      StringBuilder builder = new StringBuilder(errorMsg);
-      builder.append(err);
-      errorMsg = builder.toString();
-    }
+   appendMsg=err;
   }
 
   public String getErrorCode() {
@@ -340,7 +336,17 @@ public enum WXErrorCode {
   }
 
   public String getErrorMsg() {
-    return this.errorMsg;
+    StringBuilder builder=new StringBuilder(errorMsg);
+    builder.append(appendMsg);
+    return builder.toString();
+  }
+
+  public String getArgs() {
+    return args;
+  }
+
+  public void setArgs(String args) {
+    this.args = args;
   }
 
 }

@@ -766,7 +766,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instance == null) {
       return;
     }
-    errCode.appendErrMsg(" url:"+instance.getBundleUrl());
+    errCode.setArgs(instance.getBundleUrl());
     instance.commitUTStab(IWXUserTrackAdapter.JS_BRIDGE, errCode);
   }
 
@@ -1230,18 +1230,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                    + ", exception function:" + function + ", exception:"
                    + exception);
     }
-    StringBuilder errorMsg=new StringBuilder();
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
       // TODO add errCode
       instance.onJSException(null, function, exception);
-      errorMsg.append("bundleUrl:"+instance.getBundleUrl());
-    }else{
-      errorMsg.append(" bundleUrl:instance is null!");
     }
-    errorMsg.append(" exception function:"+function);
-    errorMsg.append(" exception:"+exception);
-    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg(errorMsg.toString());
+    WXErrorCode.WX_ERR_JS_EXECUTE.appendErrMsg("\nfunction:"+function+"\nexception:"+exception);
     commitJSBridgeAlarmMonitor(instanceId,WXErrorCode.WX_ERR_JS_EXECUTE);
   }
 

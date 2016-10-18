@@ -346,6 +346,8 @@ public class WXPerformance {
    */
   public String errMsg;
 
+  public String args="";
+
   public String connectionType;
   public String requestType;
 
