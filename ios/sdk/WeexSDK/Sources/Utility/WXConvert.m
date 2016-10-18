@@ -351,6 +351,14 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         }
         
         if ([rgba hasPrefix:@"#"]) {
+            // #fff
+            if ([rgba length] == 4) {
+              unichar f =   [rgba characterAtIndex:1];
+              unichar s =   [rgba characterAtIndex:2];
+              unichar t =   [rgba characterAtIndex:3];
+              rgba = [NSString stringWithFormat:@"#%C%C%C%C%C%C", f, f, s, s, t, t];
+            }
+            
             // 3. #rrggbb
             uint32_t colorValue = 0;
             sscanf(rgba.UTF8String, "#%x", &colorValue);
