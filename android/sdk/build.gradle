@@ -139,6 +139,7 @@ dependencies {
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
     testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
     testCompile "org.robolectric:shadows-httpclient:3.0"
     testCompile 'org.json:json:20160212'
 }
