@@ -5,21 +5,24 @@ export default function Listener (id, handler) {
   if (typeof handler === 'function') {
     this.handler = handler
   }
+  else {
+    console.error('[JS Runtime] invalid parameter, handler must be a function')
+  }
 }
 
 Listener.prototype.createFinish = function (callback) {
   const handler = this.handler
-  return handler([createAction('createFinish', [])], callback)
+  return handler([createAction('createFinish')], callback)
 }
 
 Listener.prototype.updateFinish = function (callback) {
   const handler = this.handler
-  return handler([createAction('updateFinish', [])], callback)
+  return handler([createAction('updateFinish')], callback)
 }
 
 Listener.prototype.refreshFinish = function (callback) {
   const handler = this.handler
-  return handler([createAction('refreshFinish', [])], callback)
+  return handler([createAction('refreshFinish')], callback)
 }
 
 Listener.prototype.createBody = function (element) {
@@ -98,6 +101,6 @@ Listener.prototype.addActions = function (actions) {
   }
 }
 
-export function createAction (name, args) {
+export function createAction (name, args = []) {
   return { module: 'dom', method: name, args: args }
 }
