@@ -3,9 +3,9 @@
 
 ### Summary
 
-The weex builtin component ``textarea`` is used to create interactive controls to accept data from users.It can be a multi-line [input](./input.md)
+The weex builtin component ``textarea`` is used to create interactive controls to accept data from users. It can be a multi-line [input](./input.md)
 
-**Notes:** `<textarea>` support all event which `<input>` had
+**Notes:** `<textarea>` support all event which `<input>` had.
 
 ### Child Components
 
@@ -65,11 +65,9 @@ Other attributes please check out the [common attributes](../references/common-a
 ```
 <div>
   <textarea
-    type="url"
     autofocus="true"
     placeholder="..."
-    value="http://alibaba.github.io/weex/"
-    style="placeholder-color: #666666;">
+    value="I am a multiple input">
   </textarea>
 </div>
 ```
