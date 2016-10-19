@@ -276,6 +276,10 @@ describe('framework entry', () => {
   })
 
   describe('callJS', () => {
+    it('fireEvent with no params', () => {
+      framework.callJS()
+    })
+
     it('fireEvent with a exist instanceId', () => {
       framework.callJS(instanceId, [{
         method: 'fireEvent',
@@ -338,6 +342,10 @@ describe('framework entry', () => {
   })
 
   describe('destroyInstance', () => {
+    it('with no params', () => {
+      framework.destroyInstance()
+    })
+
     it('with a exist instanceId', () => {
       const result = framework.destroyInstance(instanceId)
       expect(result[instanceId]).to.be.undefined
@@ -401,5 +409,11 @@ describe('framework entry', () => {
       expect(Vm.prototype.a).a.function
       delete Vm.prototype.a
     })
+  })
+})
+
+describe('config', () => {
+  it('config is an object', () => {
+    init({})
   })
 })
