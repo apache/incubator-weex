@@ -83,6 +83,7 @@
     "babel-istanbul": "^0.11.0",
     "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.16.0",
+    "babel-runtime": "^6.11.6",
     "chai": "^3.5.0",
     "chromedriver": "^2.21.2",
     "cross-spawn": "^4.0.0",
