@@ -4,6 +4,7 @@
  */
 import { extend } from '../shared/utils'
 import Listener from './listener'
+import { createHandler } from './handler'
 
 const DEFAULT_TAG_NAME = 'div'
 
@@ -18,37 +19,11 @@ function Document (id, url, handler) {
   instanceMap[id] = this
   this.nodeMap = {}
   const L = Document.Listener || Listener
-  this.listener = new L(id, handler || genCallTasks(id))
+  this.listener = new L(id, handler || createHandler(id, Document.handler))
   this.createDocumentElement()
 }
 
 Document.handler = null
-
-function genCallTasks (id) {
-  // @todo: The `callAddElement` API should be re-design immediately
-  // because its public and global and without config opportunity.
-  const handler = Document.handler || callNative
-  const hasAddElementHandler = typeof callAddElement === 'function'
-  return (tasks) => {
-    if (!Array.isArray(tasks)) {
-      tasks = [tasks]
-    }
-    for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i]
-      let returnValue
-      if (hasAddElementHandler && task.module === 'dom' && task.method === 'addElement') {
-        const [ref, json, index] = task.args
-        returnValue = callAddElement(id, ref, json, index, '-1')
-      }
-      else {
-        returnValue = handler(id, [task], '-1')
-      }
-      if (returnValue === -1) {
-        return returnValue
-      }
-    }
-  }
-}
 
 Document.prototype.destroy = function () {
   delete this.listener
