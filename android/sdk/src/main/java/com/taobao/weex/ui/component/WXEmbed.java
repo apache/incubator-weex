@@ -217,7 +217,7 @@ import com.taobao.weappplus_sdk.R;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;

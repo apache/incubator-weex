@@ -207,12 +207,9 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.utils.WXViewUtils;
 
 /**
  * div component

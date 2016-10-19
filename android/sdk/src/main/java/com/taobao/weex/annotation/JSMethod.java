@@ -202,18 +202,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by sospartan on 6/12/16.
+ * Created by sospartan on 19/10/2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Component {
-  boolean lazyload() default true;
+@Inherited
+@Target(ElementType.METHOD)
+public @interface JSMethod {
+  boolean uiThread() default true;
+
+  String alias() default NOT_SET;
+
+  String NOT_SET = "_";
 }

@@ -217,8 +217,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import java.util.Arrays;
-
 public class ImageDrawable extends PaintDrawable {
 
   public static Drawable createImageDrawable(@Nullable Drawable original,
@@ -228,8 +226,7 @@ public class ImageDrawable extends PaintDrawable {
                                              int vHeight,
                                              boolean gif) {
     Bitmap bm;
-    if (!gif && vWidth > 0 && vHeight > 0 && !
-        Arrays.equals(borderRadius, new float[]{0, 0, 0, 0, 0, 0, 0, 0})) {
+    if (!gif && vWidth > 0 && vHeight > 0) {
       if (original instanceof BitmapDrawable &&
           (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
@@ -254,11 +251,20 @@ public class ImageDrawable extends PaintDrawable {
   }
 
   private static void updateShaderAndSize(@NonNull ImageView.ScaleType scaleType, int vWidth, int vHeight, ImageDrawable imageDrawable, BitmapShader bitmapShader) {
-    imageDrawable.setIntrinsicWidth(vWidth);
-    imageDrawable.setIntrinsicHeight(vHeight);
     Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
                                        imageDrawable.bitmapWidth,
                                        imageDrawable.bitmapHeight);
+    int intrinsicWidth = vWidth, intrinsicHeight = vHeight;
+    if (scaleType == ImageView.ScaleType.FIT_CENTER) {
+      RectF bitmapRect = new RectF(0, 0, imageDrawable.bitmapWidth, imageDrawable.bitmapHeight), contentRect = new RectF();
+      matrix.mapRect(contentRect, bitmapRect);
+      intrinsicWidth = (int) contentRect.width();
+      intrinsicHeight = (int) contentRect.height();
+      matrix = createShaderMatrix(scaleType, intrinsicWidth, intrinsicHeight, imageDrawable
+          .bitmapWidth, imageDrawable.bitmapHeight);
+    }
+    imageDrawable.setIntrinsicWidth(intrinsicWidth);
+    imageDrawable.setIntrinsicHeight(intrinsicHeight);
     bitmapShader.setLocalMatrix(matrix);
   }
 

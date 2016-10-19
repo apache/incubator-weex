@@ -120,8 +120,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.utils.WXLogUtils;
 
 public class WXNavigatorModule extends WXModule {
@@ -133,7 +133,7 @@ public class WXNavigatorModule extends WXModule {
     private final static String WEEX = "com.taobao.android.intent.category.WEEX";
     private final static String URL = "url";
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void push(String param, JSCallback callback) {
 
         if (!TextUtils.isEmpty(param)) {
@@ -169,7 +169,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void pop(String param, JSCallback callback) {
 
         if (WXSDKEngine.getActivityNavBarSetter() != null) {
@@ -185,7 +185,7 @@ public class WXNavigatorModule extends WXModule {
         }
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void setNavBarRightItem(String param, JSCallback callback) {
         if (!TextUtils.isEmpty(param)) {
             if (WXSDKEngine.getActivityNavBarSetter() != null) {
@@ -199,7 +199,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void clearNavBarRightItem(String param, JSCallback callback) {
         if (WXSDKEngine.getActivityNavBarSetter() != null) {
             if (WXSDKEngine.getActivityNavBarSetter().clearNavBarRightItem(param)) {
@@ -211,7 +211,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void setNavBarLeftItem(String param, JSCallback callback) {
         if (!TextUtils.isEmpty(param)) {
             if (WXSDKEngine.getActivityNavBarSetter() != null) {
@@ -226,7 +226,7 @@ public class WXNavigatorModule extends WXModule {
 
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void clearNavBarLeftItem(String param, JSCallback callback) {
         if (WXSDKEngine.getActivityNavBarSetter() != null) {
             if (WXSDKEngine.getActivityNavBarSetter().clearNavBarLeftItem(param)) {
@@ -238,7 +238,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void setNavBarMoreItem(String param, JSCallback callback) {
         if (!TextUtils.isEmpty(param)) {
             if (WXSDKEngine.getActivityNavBarSetter() != null) {
@@ -252,7 +252,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void clearNavBarMoreItem(String param, JSCallback callback) {
         if (WXSDKEngine.getActivityNavBarSetter() != null) {
             if (WXSDKEngine.getActivityNavBarSetter().clearNavBarMoreItem(param)) {
@@ -264,7 +264,7 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod(uiThread = true)
     public void setNavBarTitle(String param, JSCallback callback) {
         if (!TextUtils.isEmpty(param)) {
             if (WXSDKEngine.getActivityNavBarSetter() != null) {

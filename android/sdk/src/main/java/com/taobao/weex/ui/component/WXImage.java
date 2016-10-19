@@ -214,7 +214,7 @@ import android.widget.ImageView.ScaleType;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;

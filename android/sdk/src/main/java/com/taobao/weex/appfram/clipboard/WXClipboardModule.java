@@ -213,8 +213,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.FileInputStream;
@@ -236,7 +236,7 @@ public class WXClipboardModule extends WXModule implements IWXClipboard {
     private static final String RESULT_FAILED = "failed";
 
     @Override
-    @WXModuleAnno
+    @JSMethod
     public void setString(String text) {
         if(null == text) {
             return;
@@ -249,7 +249,7 @@ public class WXClipboardModule extends WXModule implements IWXClipboard {
     }
 
     @Override
-    @WXModuleAnno
+    @JSMethod
     public void getString(@Nullable JSCallback callback) {
         Context context = mWXSDKInstance.getContext();
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
