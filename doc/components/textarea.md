@@ -1,4 +1,4 @@
-# &lt;input&gt;
+# &lt;textarea&gt;
 <span class="weex-version">0.8</span>
 
 ### Summary
@@ -22,8 +22,6 @@ This component supports no child components.
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles
-
-- `placeholder-color`: the color of placeholder. Default value is ``#999999``.
 
 **text styles**: checkout [text styles](../references/text-style.md)
 
