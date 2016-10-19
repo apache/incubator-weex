@@ -206,10 +206,8 @@ package com.taobao.weex.ui.component;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 

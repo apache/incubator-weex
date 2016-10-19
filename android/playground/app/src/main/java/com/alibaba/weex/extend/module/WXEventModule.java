@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
 
 
 public class WXEventModule extends WXModule {
@@ -14,7 +14,7 @@ public class WXEventModule extends WXModule {
   private static final String WEEX_ACTION = "com.taobao.android.intent.action.WEEX";
 
 
-  @WXModuleAnno(moduleMethod = true,runOnUIThread = true)
+  @JSMethod(uiThread = true)
   public void openURL(String url) {
     if (TextUtils.isEmpty(url)) {
       return;

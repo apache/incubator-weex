@@ -205,6 +205,7 @@
 package com.taobao.weex.common;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.MethodInvoker;
 import com.taobao.weex.bridge.ModuleFactory;
@@ -240,10 +241,19 @@ public class TypeModuleFactory<T extends WXModule> implements ModuleFactory<T> {
       for (Method method : mClazz.getMethods()) {
         // iterates all the annotations available in the method
         for (Annotation anno : method.getDeclaredAnnotations()) {
-          if (anno != null && anno instanceof WXModuleAnno) {
-            methods.add(method.getName());
-            methodMap.put(method.getName(), new MethodInvoker(method));
-            break;
+          if (anno != null) {
+            if(anno instanceof JSMethod) {
+              JSMethod methodAnnotation = (JSMethod) anno;
+              String name = JSMethod.NOT_SET.equals(methodAnnotation.alias())?method.getName():methodAnnotation.alias();
+              methods.add(name);
+              methodMap.put(name, new MethodInvoker(method,methodAnnotation.uiThread()));
+              break;
+            }else if(anno instanceof WXModuleAnno) {
+              WXModuleAnno methodAnnotation = (WXModuleAnno)anno;
+              methods.add(method.getName());
+              methodMap.put(method.getName(), new MethodInvoker(method,methodAnnotation.runOnUIThread()));
+              break;
+            }
           }
         }
       }

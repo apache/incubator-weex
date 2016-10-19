@@ -354,7 +354,7 @@ public class WXModuleManager {
           params[i] = WXReflectionUtils.parseArgument(paramClazz,value);
         }
       }
-      if (invoker.isRunInUIThread()) {
+      if (invoker.isRunOnUIThread()) {
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
           @Override
           public void run() {

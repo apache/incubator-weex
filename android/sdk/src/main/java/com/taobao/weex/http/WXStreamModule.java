@@ -211,8 +211,8 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.utils.WXLogUtils;
@@ -247,7 +247,7 @@ public class WXStreamModule extends WXModule {
    * @param callback formate：handler(err, response)
    */
   @Deprecated
-  @WXModuleAnno
+  @JSMethod(uiThread = false)
   public void sendHttp(String params, final String callback) {
 
     JSONObject paramsObj = JSON.parseObject(params);
@@ -305,7 +305,7 @@ public class WXStreamModule extends WXModule {
    *  statusText：状态消息，用于定位具体错误原因
    *  headers: object 响应头
    */
-  @WXModuleAnno
+  @JSMethod(uiThread = false)
   public void fetch(String optionsStr, final JSCallback callback, JSCallback progressCallback){
 
     JSONObject optionsObj = null;
