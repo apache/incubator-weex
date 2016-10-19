@@ -13,7 +13,7 @@ const {
   setTimeoutNative
 } = global
 
-/* istanbul ignore if */
+/* istanbul ignore next */
 if (typeof setTimeout === 'undefined' &&
   typeof setTimeoutNative === 'function') {
   const timeoutMap = {}
