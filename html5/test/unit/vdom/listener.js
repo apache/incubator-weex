@@ -18,12 +18,12 @@ describe('dom listener basic', () => {
     const doc = new Document(null, null, null)
     doc.destroy()
   })
-  
+
   it('works with no handler', () => {
     Document.handler = null
-    global.callNative = function () {return -1;}
-    global.callAddElement = function () {return -1;}
-    
+    global.callNative = function () { return -1 }
+    global.callAddElement = function () { return -1 }
+
     const doc = new Document('foo1', null, null)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
@@ -33,14 +33,14 @@ describe('dom listener basic', () => {
   })
 
   it('works with an handler', () => {
-    const doc = new Document('foo2', null, function() {})
+    const doc = new Document('foo2', null, function () {})
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     doc.destroy()
   })
 
   it('works with an handler', () => {
-    const doc = new Document('foo2', null, function() {})
+    const doc = new Document('foo2', null, function () {})
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     doc.destroy()
@@ -117,7 +117,7 @@ describe('dom listener details', () => {
       attr: { a: 1 }, style: { b: 2 }
     })
     const el = doc.createComment('asd')
-    
+
     doc.documentElement.appendChild(el)
     doc.documentElement.insertBefore(body, el)
 
@@ -171,7 +171,7 @@ describe('dom listener details', () => {
   it('removeChild', (done) => {
     const el = doc.createElement('el')
     const el1 = doc.createElement('el1')
-    
+
     el.removeChild(el1)
     el.removeChild(el1, true)
 
@@ -369,7 +369,6 @@ describe('dom listener details', () => {
 })
 
 describe('listener', () => {
-
   let spy, listener
 
   beforeEach(() => {
@@ -379,12 +378,12 @@ describe('listener', () => {
 
   it('removeElement many', () => {
     listener.removeElement(['1', '2', '3', '4'])
-    
+
     expect(spy.args[0][0]).eql([
       { module: 'dom', method: 'removeElement', args: ['1'] },
       { module: 'dom', method: 'removeElement', args: ['2'] },
       { module: 'dom', method: 'removeElement', args: ['3'] },
-      { module: 'dom', method: 'removeElement', args: ['4'] },
+      { module: 'dom', method: 'removeElement', args: ['4'] }
     ])
 
     listener = null
