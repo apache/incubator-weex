@@ -20,16 +20,17 @@
     "web"
   ],
   "apis": [
+    "animation",
+    "clipboard",
     "dom",
     "event",
-    "pageInfo",
-    "stream",
+    "geolocation",
+    "globalEvent",
     "modal",
-    "animation",
-    "webview",
     "navigator",
+    "pageInfo",
     "storage",
-    "clipboard",
-    "geolocation"
+    "stream",
+    "webview"
   ]
 }
