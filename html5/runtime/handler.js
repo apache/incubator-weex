@@ -1,6 +1,13 @@
 
 const handlerMap = {
-  addElement: 'callAddElement'
+  createBody: 'callCreateBody',
+  addElement: 'callAddElement',
+  removeElement: 'callRemoveElement',
+  moveElement: 'callMoveElement',
+  updateAttrs: 'callUpdateAttrs',
+  updateStyle: 'callUpdateStyle',
+  addEvent: 'callAddEvent',
+  removeEvent: 'callRemoveEvent'
 }
 
 /**
@@ -11,6 +18,10 @@ const handlerMap = {
  */
 export function createHandler (id, handler) {
   const defaultHandler = handler || callNative
+
+  if (typeof defaultHandler !== 'function') {
+    console.error('[JS Runtime] no default handler')
+  }
 
   return function taskHandler (tasks) {
     if (!Array.isArray(tasks)) {
@@ -48,13 +59,7 @@ function dispatchTask (id, task, defaultHandler) {
   const { module, method, args } = task
 
   if (hasAvailableHandler(module, method)) {
-    switch (method) {
-      case 'addElement':
-        return callAddElement(id, args[0], args[1], args[2], '-1')
-
-      default:
-        console.error(`[JS Runtime] "${method}" has no corresponding handler`)
-    }
+    return global[handlerMap[method]](id, ...args, '-1')
   }
 
   return defaultHandler(id, [task], '-1')
