@@ -16,7 +16,7 @@ const dom = {
     const offset = (Number(options.offset) || 0) * this.scale
     const elem = this.getComponentManager().getComponent(ref)
     if (!elem) {
-      return console.error(`[h5-render] component of ref ${ref} doesn\'t exist.`)
+      return console.error(`[h5-render] component of ref ${ref} doesn't exist.`)
     }
     const parentScroller = elem.getParentScroller()
     if (parentScroller) {
