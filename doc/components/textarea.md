@@ -3,7 +3,7 @@
 
 ### Summary
 
-The weex builtin component ``textarea`` is used to create interactive controls to accept data from users. It can be a multi-line [input](./input.md)
+The weex builtin component ``textarea`` is used to create interactive controls to accept data from users. It can be a multi-line [input](./input.md).
 
 **Notes:** `<textarea>` support all event which `<input>` had.
 
@@ -17,7 +17,7 @@ This component supports no child components.
 - `placeholder`: &lt;string&gt; a hint to the user of which can be entered to the control. The placeholder text must have no carriage returns or line-feeds.
 - `disabled`: &lt;boolean&gt; a boolean attribute indicates that the form control is not available for interaction. In particular, the click event will not be dispatched on disabled controls.
 - `autofocus`: &lt;boolean&gt; a boolean attribute lets you specify that a form control should have input focus when the page loads.
-- `rows:`&lt;number&gt; a number which can specify the height of textarea, Default is `2`
+- `rows:`&lt;number&gt; a number which can specify the height of textarea, default is `2`.
 
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
@@ -34,9 +34,9 @@ Other attributes please check out the [common attributes](../references/common-a
 
 **common styles**: check out [common styles for components](../references/common-style.md)
 
-- support flexbox related styles
-- support box model related styles
-- support ``position`` related styles
+- support flexbox related styles.
+- support box model related styles.
+- support ``position`` related styles.
 - support ``opacity``, ``background-color`` etc.
 
 ### Events
@@ -48,7 +48,7 @@ Other attributes please check out the [common attributes](../references/common-a
 
 **common events**: check out the [common events](../references/common-event.md)
 
-- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md).
 
 **Notes:** `<textarea>` does not support the common-event `click`. Please listen to the `input` or `change` event instead.
 
