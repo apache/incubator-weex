@@ -35,7 +35,7 @@ const dom = {
   /**
    * getComponentRect
    * @param {string} ref
-   * @param {string} callbackId
+   * @param {function} callbackId
    */
   getComponentRect: function (ref, callbackId) {
     const info = { result: false }
@@ -91,7 +91,7 @@ const meta = {
     args: ['string', 'object']
   }, {
     name: 'getComponentRect',
-    args: ['string', 'string']
+    args: ['string', 'function']
   }, {
     name: 'addRule',
     args: ['string', 'object']
