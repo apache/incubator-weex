@@ -13,7 +13,7 @@ const levelMap = {}
 
 generateLevelMap()
 
-/* istanbul ignore if */
+/* istanbul ignore next */
 if (
   typeof console === 'undefined' || // Android
   (global.WXEnvironment && global.WXEnvironment.platform === 'iOS') // iOS
@@ -88,6 +88,7 @@ function checkLevel (type) {
  * @param  {array} args
  * @return {array}
  */
+/* istanbul ignore next */
 function format (args) {
   return args.map((v) => {
     const type = Object.prototype.toString.call(v)
