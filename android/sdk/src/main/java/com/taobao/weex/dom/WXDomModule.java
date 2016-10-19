@@ -248,7 +248,7 @@ public final class WXDomModule extends WXModule {
   static final String UPDATE_FINISH = "updateFinish";
   static final String SCROLL_TO_ELEMENT = "scrollToElement";
   static final String ADD_RULE = "addRule";
-  static final String GET_COMPONENT_SIZE = "getComponentSize";
+  static final String GET_COMPONENT_RECT = "getComponentRect";
 
   public static final String WXDOM = "dom";
 
@@ -258,7 +258,7 @@ public final class WXDomModule extends WXModule {
    */
   public static final String[] METHODS = {CREATE_BODY, UPDATE_ATTRS, UPDATE_STYLE,
       REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
-      REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_SIZE};
+      REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_RECT};
 
   public void callDomMethod(JSONObject task) {
     if (task == null) {
@@ -342,11 +342,11 @@ public final class WXDomModule extends WXModule {
             return;
           }
           addRule((String) args.get(0), (JSONObject) args.get(1));
-        case GET_COMPONENT_SIZE:
+        case GET_COMPONENT_RECT:
           if(args == null){
             return;
           }
-          getComponentSize((String) args.get(0),(String) args.get(1));
+          getComponentRect((String) args.get(0),(String) args.get(1));
       }
 
     } catch (IndexOutOfBoundsException e) {
@@ -600,7 +600,7 @@ public final class WXDomModule extends WXModule {
    * @param ref      the refer of component
    * @param callback function id
    */
-  public void getComponentSize(String ref, String callback) {
+  public void getComponentRect(String ref, String callback) {
     if (TextUtils.isEmpty(ref) || TextUtils.isEmpty(callback)) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
