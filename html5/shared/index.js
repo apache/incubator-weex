@@ -5,7 +5,7 @@ import './objectAssign'
 import './objectSetPrototypeOf'
 import './arrayFrom'
 
-export {
+import {
   extend,
   def,
   remove,
@@ -15,3 +15,14 @@ export {
   isObject,
   isPlainObject
 } from './utils'
+
+export {
+  extend,
+  def,
+  remove,
+  hasOwn,
+  bind,
+  toArray,
+  isObject,
+  isPlainObject
+}

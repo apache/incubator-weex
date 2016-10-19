@@ -12,16 +12,24 @@ import {
   Document,
   Element,
   Comment
-} from '../../../vdom'
-
-import Listener from '../../../vdom/listener'
+} from '../../../runtime/vdom'
 
 global.callNative = function () {}
 global.callAddElement = function () {}
 
+const tempHandler = Document.handler
+
+before(() => {
+  Document.handler = global.callNative
+})
+
+after(() => {
+  Document.handler = tempHandler
+})
+
 describe('document constructor', () => {
   it('create & destroy document', () => {
-    const doc = new Document('foo', 'http://path/to/url', null, Listener)
+    const doc = new Document('foo', 'http://path/to/url')
     expect(doc).is.an.object
     expect(doc.id).eql('foo')
     expect(doc.URL).eql('http://path/to/url')
@@ -37,7 +45,7 @@ describe('document methods', () => {
   let doc
 
   beforeEach(() => {
-    doc = new Document('foo', null, null, Listener)
+    doc = new Document('foo', null, function () {})
   })
 
   afterEach(() => {
@@ -102,7 +110,7 @@ describe('Element in document methods', () => {
   let doc, el, el2, el3
 
   beforeEach(() => {
-    doc = new Document('foo', null, null, Listener)
+    doc = new Document('foo', null, function () {})
     el = new Element('bar', {
       attr: { a: 11, b: 12 },
       style: { c: 13, d: 14 },
@@ -348,7 +356,7 @@ describe('Node', () => {
 
   beforeEach(() => {
     spy = sinon.spy()
-    doc = new Document('foo', '', spy, Listener)
+    doc = new Document('foo', '', spy)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     el = new Element('bar')
@@ -427,7 +435,7 @@ describe('complicated situations', () => {
 
   beforeEach(() => {
     spy = sinon.spy()
-    doc = new Document('foo', '', spy, Listener)
+    doc = new Document('foo', '', spy)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     el = new Element('bar', null, doc)

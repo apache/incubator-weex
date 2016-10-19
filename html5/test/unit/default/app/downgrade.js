@@ -1,7 +1,7 @@
 import chai from 'chai'
 const { expect } = chai
 
-import * as Downgrade from '../../../../default/app/downgrade'
+import * as Downgrade from '../../../../frameworks/legacy/app/downgrade'
 
 describe('downgrade', () => {
   describe('normalizeVersion', () => {

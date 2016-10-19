@@ -7,10 +7,10 @@ chai.use(sinonChai)
 global.callNative = function () {}
 global.callAddElement = function () {}
 
-import * as ctrl from '../../../../default/app/ctrl'
-import Differ from '../../../../default/app/differ'
-import { Document } from '../../../../vdom'
-import Listener from '../../../../vdom/listener'
+import * as ctrl from '../../../../frameworks/legacy/app/ctrl'
+import Differ from '../../../../frameworks/legacy/app/differ'
+import { Document } from '../../../../runtime/vdom'
+import Listener from '../../../../runtime/listener'
 
 describe('the api of app', () => {
   let app

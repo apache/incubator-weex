@@ -7,15 +7,15 @@ chai.use(sinonChai)
 global.callNative = function () {}
 global.callAddElement = function () {}
 
-import { Document } from '../../../vdom'
-import Listener from '../../../vdom/listener'
+import { Document } from '../../../runtime/vdom'
+import Listener from '../../../runtime/listener'
 
 global.callNative = function () {}
 global.callAddElement = function () {}
 
 describe('dom listener basic', () => {
   it('works with no handler', () => {
-    const doc = new Document('foo', null, null, Listener)
+    const doc = new Document('foo', null, function () {})
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
     doc.destroy()

@@ -5,9 +5,9 @@ const { expect } = chai
 chai.use(sinonChai)
 
 import '../../../../shared/console'
-import * as modules from '../../../../default/api/modules'
-import * as methods from '../../../../default/api/methods'
-import { initModules, requireModule, clearModules, initMethods } from '../../../../default/app/register'
+import * as modules from '../../../../frameworks/legacy/api/modules'
+import * as methods from '../../../../frameworks/legacy/api/methods'
+import { initModules, requireModule, clearModules, initMethods } from '../../../../frameworks/legacy/app/register'
 
 function Vm () {
 }
@@ -108,16 +108,10 @@ describe('built-in methods', () => {
   })
 
   it('$getConfig', () => {
-    global.WXEnvironment = {
-      a: 'b'
-    }
     const config = vm.$getConfig()
     expect(config).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl',
-      env: {
-        a: 'b'
-      }
+      bundleUrl: 'path_to_bundleUrl'
     })
 
     const configSpy = sinon.spy()
@@ -126,10 +120,7 @@ describe('built-in methods', () => {
     expect(configSpy.args.length).eql(1)
     expect(configSpy.args[0][0]).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl',
-      env: {
-        a: 'b'
-      }
+      bundleUrl: 'path_to_bundleUrl'
     })
   })
 
