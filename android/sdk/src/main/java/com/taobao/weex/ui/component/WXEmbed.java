@@ -408,7 +408,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance.destroy();
       mNestedInstance = null;
     }
-    if (TextUtils.equals(getVisibility(), Constants.Value.VISIBLE)) {
+    if (mIsVisible) {
       loadInstance();
     }
   }
