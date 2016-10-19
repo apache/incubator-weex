@@ -206,7 +206,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.TypedValue;
 import android.widget.CompoundButton;
 
 import com.taobao.weex.WXSDKInstance;
@@ -222,11 +221,11 @@ import java.util.Map;
 
 @Component(lazyload = false)
 
-public class WXSwitch extends WXComponent<WXSwitchView>{
+public class WXSwitch extends WXComponent<WXSwitchView> {
 
   @Deprecated
   public WXSwitch(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+    this(instance, dom, parent, isLazy);
   }
 
   public WXSwitch(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
@@ -235,9 +234,7 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
 
   @Override
   protected WXSwitchView initComponentHostView(@NonNull Context context) {
-    WXSwitchView view = new WXSwitchView(context);
-    view.setTextSize(TypedValue.COMPLEX_UNIT_PX,22);
-    return view;
+    return new WXSwitchView(context);
   }
 
 
@@ -253,9 +250,9 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
 
           Map<String, Object> domChanges = new HashMap<>();
           Map<String, Object> attrsChanges = new HashMap<>();
-          attrsChanges.put("checked",Boolean.toString(isChecked));
-          domChanges.put("attrs",attrsChanges);
-          WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), Constants.Event.CHANGE, params,domChanges);
+          attrsChanges.put("checked", Boolean.toString(isChecked));
+          domChanges.put("attrs", attrsChanges);
+          WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), Constants.Event.CHANGE, params, domChanges);
         }
       });
     }
@@ -273,9 +270,10 @@ public class WXSwitch extends WXComponent<WXSwitchView>{
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.CHECKED:
-        Boolean result = WXUtils.getBoolean(param,null);
-        if (result != null)
+        Boolean result = WXUtils.getBoolean(param, null);
+        if (result != null) {
           setChecked(result);
+        }
         return true;
     }
     return super.setProperty(key, param);

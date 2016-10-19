@@ -211,6 +211,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -240,6 +241,8 @@ public class WXDomObject extends CSSNode implements Cloneable {
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
   private AtomicBoolean sDestroy = new AtomicBoolean();
+
+  private WXSDKInstance mWXSDKInstance;
 
   /** package **/ String mRef = ROOT;
 
@@ -321,6 +324,10 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
 
     return mEvents;
+  }
+
+  public @Nullable WXSDKInstance getWXSDKInstance() {
+    return mWXSDKInstance;
   }
 
   public void clearEvents(){
@@ -804,7 +811,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
    * @param json the original JSONObject
    * @return Dom Object corresponding to the JSONObject.
    */
-  public static @Nullable WXDomObject parse(JSONObject json){
+  public static @Nullable WXDomObject parse(JSONObject json, WXSDKInstance wxsdkInstance){
       if (json == null || json.size() <= 0) {
         return null;
       }
@@ -815,13 +822,14 @@ public class WXDomObject extends CSSNode implements Cloneable {
         return null;
       }
       domObject.parseFromJson(json);
+      domObject.mWXSDKInstance=wxsdkInstance;
 
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {
         JSONArray childrenArray = (JSONArray) children;
         int count = childrenArray.size();
         for (int i = 0; i < count; ++i) {
-          domObject.add(parse(childrenArray.getJSONObject(i)),-1);
+          domObject.add(parse(childrenArray.getJSONObject(i),wxsdkInstance),-1);
         }
       }
 
