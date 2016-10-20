@@ -5,10 +5,10 @@
 import { extend } from '../shared/utils'
 import Listener from './listener'
 import { createHandler } from './handler'
+import { addDoc, getDoc, removeDoc, getListener } from './vdom/maps'
 
 const DEFAULT_TAG_NAME = 'div'
 
-const instanceMap = {}
 let nextNodeRef = 1
 
 function Document (id, url, handler) {
@@ -16,7 +16,7 @@ function Document (id, url, handler) {
   this.id = id
   this.URL = url
 
-  instanceMap[id] = this
+  addDoc(id, this)
   this.nodeMap = {}
   const L = Document.Listener || Listener
   this.listener = new L(id, handler || createHandler(id, Document.handler))
@@ -28,7 +28,7 @@ Document.handler = null
 Document.prototype.destroy = function () {
   delete this.listener
   delete this.nodeMap
-  delete instanceMap[this.id]
+  removeDoc(this.id)
 }
 
 Document.prototype.open = function () {
@@ -167,7 +167,7 @@ function Node () {
 }
 
 Node.prototype.destroy = function () {
-  const doc = instanceMap[this.docId]
+  const doc = getDoc(this.docId)
   if (doc) {
     delete this.docId
     delete doc.nodeMap[this.nodeId]
@@ -205,8 +205,8 @@ Element.prototype.appendChild = function (node) {
     }
     if (node.nodeType === 1) {
       insertIndex(node, this.pureChildren, this.pureChildren.length)
-      if (this.docId) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener) {
         return listener.addElement(node, this.ref, -1)
       }
     }
@@ -215,8 +215,8 @@ Element.prototype.appendChild = function (node) {
     moveIndex(node, this.children, this.children.length, true)
     if (node.nodeType === 1) {
       const index = moveIndex(node, this.pureChildren, this.pureChildren.length)
-      if (this.docId && index >= 0) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener && index >= 0) {
         return listener.moveElement(node.ref, this.ref, index)
       }
     }
@@ -245,8 +245,8 @@ Element.prototype.insertBefore = function (node, before) {
           ? this.pureChildren.indexOf(pureBefore)
           : this.pureChildren.length
       )
-      if (this.docId) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener) {
         return listener.addElement(node, this.ref, index)
       }
     }
@@ -262,8 +262,8 @@ Element.prototype.insertBefore = function (node, before) {
           ? this.pureChildren.indexOf(pureBefore)
           : this.pureChildren.length
       )
-      if (this.docId && index >= 0) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener && index >= 0) {
         return listener.moveElement(node.ref, this.ref, index)
       }
     }
@@ -289,8 +289,8 @@ Element.prototype.insertAfter = function (node, after) {
         this.pureChildren,
         this.pureChildren.indexOf(previousElement(after)) + 1
       )
-      if (this.docId) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener) {
         return listener.addElement(node, this.ref, index)
       }
     }
@@ -303,8 +303,8 @@ Element.prototype.insertAfter = function (node, after) {
         this.pureChildren,
         this.pureChildren.indexOf(previousElement(after)) + 1
       )
-      if (this.docId && index >= 0) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener && index >= 0) {
         return listener.moveElement(node.ref, this.ref, index)
       }
     }
@@ -316,8 +316,8 @@ Element.prototype.removeChild = function (node, preserved) {
     removeIndex(node, this.children, true)
     if (node.nodeType === 1) {
       removeIndex(node, this.pureChildren)
-      if (this.docId) {
-        const listener = instanceMap[this.docId].listener
+      const listener = getListener(this.docId)
+      if (listener) {
         listener.removeElement(node.ref)
       }
     }
@@ -328,8 +328,8 @@ Element.prototype.removeChild = function (node, preserved) {
 }
 
 Element.prototype.clear = function () {
-  if (this.docId) {
-    const listener = instanceMap[this.docId].listener
+  const listener = getListener(this.docId)
+  if (listener) {
     this.pureChildren.forEach(node => {
       listener.removeElement(node.ref)
     })
@@ -373,7 +373,7 @@ function linkParent (node, parent) {
 }
 
 function registerNode (docId, node) {
-  const doc = instanceMap[docId]
+  const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
 
@@ -443,8 +443,8 @@ Element.prototype.setAttr = function (key, value, silent) {
     return
   }
   this.attr[key] = value
-  if (!silent && this.docId) {
-    const listener = instanceMap[this.docId].listener
+  const listener = getListener(this.docId)
+  if (!silent && listener) {
     listener.setAttr(this.ref, key, value)
   }
 }
@@ -454,8 +454,8 @@ Element.prototype.setStyle = function (key, value, silent) {
     return
   }
   this.style[key] = value
-  if (!silent && this.docId) {
-    const listener = instanceMap[this.docId].listener
+  const listener = getListener(this.docId)
+  if (!silent && listener) {
     listener.setStyle(this.ref, key, value)
   }
 }
@@ -469,8 +469,8 @@ Element.prototype.resetClassStyle = function () {
 Element.prototype.setClassStyle = function (classStyle) {
   this.resetClassStyle()
   extend(this.classStyle, classStyle)
-  if (this.docId) {
-    const listener = instanceMap[this.docId].listener
+  const listener = getListener(this.docId)
+  if (listener) {
     listener.setStyles(this.ref, this.toStyle())
   }
 }
@@ -478,8 +478,8 @@ Element.prototype.setClassStyle = function (classStyle) {
 Element.prototype.addEvent = function (type, handler) {
   if (!this.event[type]) {
     this.event[type] = handler
-    if (this.docId) {
-      const listener = instanceMap[this.docId].listener
+    const listener = getListener(this.docId)
+    if (listener) {
       listener.addEvent(this.ref, type)
     }
   }
@@ -488,8 +488,8 @@ Element.prototype.addEvent = function (type, handler) {
 Element.prototype.removeEvent = function (type) {
   if (this.event[type]) {
     delete this.event[type]
-    if (this.docId) {
-      const listener = instanceMap[this.docId].listener
+    const listener = getListener(this.docId)
+    if (listener) {
       listener.removeEvent(this.ref, type)
     }
   }
@@ -548,7 +548,6 @@ Comment.prototype.toString = function () {
 }
 
 export {
-  instanceMap,
   Document,
   Node,
   Element,
