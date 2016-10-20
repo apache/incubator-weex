@@ -5,11 +5,18 @@
 import { extend } from '../shared/utils'
 import Listener from './listener'
 import { createHandler } from './handler'
-import { addDoc, getDoc, removeDoc, getListener } from './vdom/maps'
+import {
+  addDoc,
+  getDoc,
+  removeDoc,
+  getListener,
+  uniqueId,
+  appendBody,
+  setBody,
+  linkParent
+} from './vdom/operation'
 
 const DEFAULT_TAG_NAME = 'div'
-
-let nextNodeRef = 1
 
 function Document (id, url, handler) {
   id = id ? id.toString() : ''
@@ -60,56 +67,6 @@ Document.prototype.createDocumentElement = function () {
   return this.documentElement
 }
 
-function appendBody (doc, node, before) {
-  const { documentElement } = doc
-
-  if (documentElement.pureChildren.length > 0 || node.parentNode) {
-    return
-  }
-  const children = documentElement.children
-  const beforeIndex = children.indexOf(before)
-  if (beforeIndex < 0) {
-    children.push(node)
-  }
-  else {
-    children.splice(beforeIndex, 0, node)
-  }
-
-  if (node.nodeType === 1) {
-    if (node.role === 'body') {
-      node.docId = doc.id
-      node.ownerDocument = doc
-      node.parentNode = documentElement
-      linkParent(node, documentElement)
-    }
-    else {
-      node.children.forEach(child => {
-        child.parentNode = node
-      })
-      setBody(doc, node)
-      node.docId = doc.id
-      node.ownerDocument = doc
-      linkParent(node, documentElement)
-      delete doc.nodeMap[node.nodeId]
-    }
-    documentElement.pureChildren.push(node)
-    doc.listener.createBody(node)
-  }
-  else {
-    node.parentNode = documentElement
-    doc.nodeMap[node.ref] = node
-  }
-}
-
-function setBody (doc, el) {
-  el.role = 'body'
-  el.depth = 1
-  delete doc.nodeMap[el.nodeId]
-  el.ref = '_root'
-  doc.nodeMap._root = el
-  doc.body = el
-}
-
 Document.prototype.createBody = function (type, props) {
   if (!this.body) {
     const el = new Element(type, props)
@@ -157,7 +114,7 @@ function updateElement (el, changes) {
 }
 
 function Node () {
-  this.nodeId = (nextNodeRef++).toString()
+  this.nodeId = uniqueId()
   this.ref = this.nodeId
   this.children = []
   this.pureChildren = []
@@ -180,7 +137,7 @@ Node.prototype.destroy = function () {
 function Element (type = DEFAULT_TAG_NAME, props) {
   props = props || {}
   this.nodeType = 1
-  this.nodeId = (nextNodeRef++).toString()
+  this.nodeId = uniqueId()
   this.ref = this.nodeId
   this.type = type
   this.attr = props.attr || {}
@@ -359,19 +316,6 @@ function previousElement (node) {
   }
 }
 
-function linkParent (node, parent) {
-  node.parentNode = parent
-  if (parent.docId) {
-    node.docId = parent.docId
-    node.ownerDocument = parent.ownerDocument
-    node.ownerDocument.nodeMap[node.nodeId] = node
-    node.depth = parent.depth + 1
-  }
-  node.children.forEach(child => {
-    linkParent(child, node)
-  })
-}
-
 function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
@@ -533,7 +477,7 @@ Element.prototype.toString = function () {
 
 function Comment (value) {
   this.nodeType = 8
-  this.nodeId = (nextNodeRef++).toString()
+  this.nodeId = uniqueId()
   this.ref = this.nodeId
   this.type = 'comment'
   this.value = value
