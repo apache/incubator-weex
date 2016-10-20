@@ -392,6 +392,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         if (maxlength != null)
           setMaxLength(maxlength);
         return true;
+      case Constants.Name.MAXLENGTH:
+        Integer maxLength = WXUtils.getInteger(param, null);
+        if (maxLength != null)
+          setMaxLength(maxLength);
+        return true;
     }
     return super.setProperty(key, param);
   }
