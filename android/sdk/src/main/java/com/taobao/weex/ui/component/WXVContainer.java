@@ -267,7 +267,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    * Get or generate new layout parameter for child view
    *
    */
-  public ViewGroup.LayoutParams getChildLayoutParams(View childView, int width, int height, int left, int right, int top, int bottom){
+  public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom){
     ViewGroup.LayoutParams lp = childView.getLayoutParams();
     if(lp == null) {
       lp = new ViewGroup.LayoutParams(width,height);
@@ -330,9 +330,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     super.createViewImpl();
     int count = childCount();
     for (int i = 0; i < count; ++i) {
-      WXComponent child = getChild(i);
-      child.createViewImpl();
-      addSubView(child.getHostView(),i);
+      createChildViewAt(i);
     }
     if(getHostView()!=null){
        getHostView().setClipToPadding(false);
