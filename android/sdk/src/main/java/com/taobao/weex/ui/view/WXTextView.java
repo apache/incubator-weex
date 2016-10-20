@@ -210,6 +210,7 @@ import android.text.Layout;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
@@ -261,5 +262,8 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
 
   public void setTextLayout(Layout layout) {
     this.textLayout = layout;
+    if(WXEnvironment.isApkDebugable() && layout!=null){
+      setContentDescription(layout.getText());
+    }
   }
 }
