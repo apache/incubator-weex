@@ -70,7 +70,7 @@ Element.prototype.insertBefore = function (node, before) {
   if (node.parentNode && node.parentNode !== this) {
     return
   }
-  if (node === before || node.nextSibling === before) {
+  if (node === before || (node.nextSibling && node.nextSibling === before)) {
     return
   }
   if (!node.parentNode) {
@@ -117,7 +117,7 @@ Element.prototype.insertAfter = function (node, after) {
   if (node.parentNode && node.parentNode !== this) {
     return
   }
-  if (node === after || node.previousSibling === after) {
+  if (node === after || (node.previousSibling && node.previousSibling === after)) {
     return
   }
   if (!node.parentNode) {
