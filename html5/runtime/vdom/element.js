@@ -1,6 +1,16 @@
 import Node from './node'
 import { extend } from '../../shared/utils'
-import { getDoc, getListener, uniqueId, linkParent } from './operation'
+import {
+  getDoc,
+  getListener,
+  uniqueId,
+  linkParent,
+  nextElement,
+  previousElement,
+  insertIndex,
+  moveIndex,
+  removeIndex
+} from './operation'
 
 const DEFAULT_TAG_NAME = 'div'
 
@@ -11,8 +21,8 @@ export default function Element (type = DEFAULT_TAG_NAME, props) {
   this.ref = this.nodeId
   this.type = type
   this.attr = props.attr || {}
-  this.classStyle = props.classStyle || {}
   this.style = props.style || {}
+  this.classStyle = props.classStyle || {}
   this.event = {}
   this.children = []
   this.pureChildren = []
@@ -20,6 +30,11 @@ export default function Element (type = DEFAULT_TAG_NAME, props) {
 
 Element.prototype = new Node()
 Element.prototype.constructor = Element
+
+function registerNode (docId, node) {
+  const doc = getDoc(docId)
+  doc.nodeMap[node.nodeId] = node
+}
 
 Element.prototype.appendChild = function (node) {
   if (node.parentNode && node.parentNode !== this) {
@@ -167,90 +182,6 @@ Element.prototype.clear = function () {
   })
   this.children.length = 0
   this.pureChildren.length = 0
-}
-
-function nextElement (node) {
-  while (node) {
-    if (node.nodeType === 1) {
-      return node
-    }
-    node = node.nextSibling
-  }
-}
-
-function previousElement (node) {
-  while (node) {
-    if (node.nodeType === 1) {
-      return node
-    }
-    node = node.previousSibling
-  }
-}
-
-function registerNode (docId, node) {
-  const doc = getDoc(docId)
-  doc.nodeMap[node.nodeId] = node
-}
-
-function insertIndex (target, list, newIndex, changeSibling) {
-  if (newIndex < 0) {
-    newIndex = 0
-  }
-  const before = list[newIndex - 1]
-  const after = list[newIndex]
-  list.splice(newIndex, 0, target)
-  if (changeSibling) {
-    before && (before.nextSibling = target)
-    target.previousSibling = before
-    target.nextSibling = after
-    after && (after.previousSibling = target)
-  }
-  return newIndex
-}
-
-function moveIndex (target, list, newIndex, changeSibling) {
-  const index = list.indexOf(target)
-  if (index < 0) {
-    return -1
-  }
-  if (changeSibling) {
-    const before = list[index - 1]
-    const after = list[index + 1]
-    before && (before.nextSibling = after)
-    after && (after.previousSibling = before)
-  }
-  list.splice(index, 1)
-  let newIndexAfter = newIndex
-  if (index <= newIndex) {
-    newIndexAfter = newIndex - 1
-  }
-  const beforeNew = list[newIndexAfter - 1]
-  const afterNew = list[newIndexAfter]
-  list.splice(newIndexAfter, 0, target)
-  if (changeSibling) {
-    beforeNew && (beforeNew.nextSibling = target)
-    target.previousSibling = beforeNew
-    target.nextSibling = afterNew
-    afterNew && (afterNew.previousSibling = target)
-  }
-  if (index === newIndexAfter) {
-    return -1
-  }
-  return newIndex
-}
-
-function removeIndex (target, list, changeSibling) {
-  const index = list.indexOf(target)
-  if (index < 0) {
-    return
-  }
-  if (changeSibling) {
-    const before = list[index - 1]
-    const after = list[index + 1]
-    before && (before.nextSibling = after)
-    after && (after.previousSibling = before)
-  }
-  list.splice(index, 1)
 }
 
 Element.prototype.setAttr = function (key, value, silent) {
