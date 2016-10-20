@@ -452,11 +452,13 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @WXComponentProp(name = Constants.Name.VALUE)
   public void setValue(String value){
-    if(getHostView() == null){
+    WXEditText view;
+    if((view = getHostView()) == null){
       return;
     }
 
-    getHostView().setText(value);
+    view.setText(value);
+    view.setSelection(value == null?0:value.length());
   }
 
   @WXComponentProp(name = Constants.Name.COLOR)
@@ -517,6 +519,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
    * @param maxLength
    */
   @WXComponentProp(name = Constants.Name.MAXLENGTH)
+  @Deprecated
   public void setMaxlength(int maxLength) {
     setMaxLength(maxLength);
   }
