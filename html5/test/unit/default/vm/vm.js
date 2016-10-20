@@ -14,6 +14,7 @@ import Differ from '../../../../frameworks/legacy/app/differ'
 
 describe('generate virtual dom for a single vm', () => {
   const spy = sinon.spy()
+  const spy1 = sinon.spy()
   let doc
   let customComponentMap
   let differ
@@ -30,7 +31,79 @@ describe('generate virtual dom for a single vm', () => {
 
   afterEach(() => {
     spy.reset()
+    spy1.reset()
     doc.destroy()
+  })
+
+  it('$watch', () => {
+    let data = {
+      a: {
+        b: 1
+      }
+    }
+    customComponentMap.foo = {
+      template: {
+        type: 'container'
+      },
+      data: data
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(doc.body).is.an.object
+
+    vm.$watch(function () {
+      return this.a.b 
+    }, (value) => {
+      expect(value).eql(2)
+    })
+
+    data.a.b = 2
+  })
+
+  it('no param parentVm', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container'
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, null)
+
+    expect(vm._app).is.an.object
+    expect(doc.body).is.an.object
+
+  })
+
+  it('no param options', () => {
+
+    const app = {}
+    const vm = new Vm('foo', null, { _app: app})
+
+    expect(vm._app).is.an.object
+    expect(doc.body).is.an.object
+  })
+
+  it('old method.ready', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container'
+      },
+      methods: {
+        ready: spy1
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(doc.body).is.an.object
+    expect(doc.body.type).eql('container')
+    expect(spy1).callCount(1)
   })
 
   it('generate an single element', () => {
