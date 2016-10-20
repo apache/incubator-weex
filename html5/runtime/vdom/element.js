@@ -1,140 +1,10 @@
-/**
- * @fileOverview
- * A simple virtual dom implementation
- */
-import { extend } from '../shared/utils'
-import Listener from './listener'
-import { createHandler } from './handler'
-import {
-  addDoc,
-  getDoc,
-  removeDoc,
-  getListener,
-  uniqueId,
-  appendBody,
-  setBody,
-  linkParent
-} from './vdom/operation'
+import Node from './node'
+import { extend } from '../../shared/utils'
+import { getDoc, getListener, uniqueId, linkParent } from './operation'
 
 const DEFAULT_TAG_NAME = 'div'
 
-function Document (id, url, handler) {
-  id = id ? id.toString() : ''
-  this.id = id
-  this.URL = url
-
-  addDoc(id, this)
-  this.nodeMap = {}
-  const L = Document.Listener || Listener
-  this.listener = new L(id, handler || createHandler(id, Document.handler))
-  this.createDocumentElement()
-}
-
-Document.handler = null
-
-Document.prototype.destroy = function () {
-  delete this.listener
-  delete this.nodeMap
-  removeDoc(this.id)
-}
-
-Document.prototype.open = function () {
-  this.listener.batched = false
-}
-
-Document.prototype.close = function () {
-  this.listener.batched = true
-}
-
-Document.prototype.createDocumentElement = function () {
-  if (!this.documentElement) {
-    const el = new Element('document')
-    el.docId = this.id
-    el.ownerDocument = this
-    el.role = 'documentElement'
-    el.depth = 0
-    el.ref = '_documentElement'
-    this.nodeMap._documentElement = el
-    this.documentElement = el
-    el.appendChild = (node) => {
-      appendBody(this, node)
-    }
-    el.insertBefore = (node, before) => {
-      appendBody(this, node, before)
-    }
-  }
-
-  return this.documentElement
-}
-
-Document.prototype.createBody = function (type, props) {
-  if (!this.body) {
-    const el = new Element(type, props)
-    setBody(this, el)
-  }
-
-  return this.body
-}
-
-Document.prototype.createElement = function (tagName, props) {
-  return new Element(tagName, props)
-}
-
-Document.prototype.createComment = function (text) {
-  return new Comment(text)
-}
-
-Document.prototype.fireEvent = function (el, type, e, domChanges) {
-  if (!el) {
-    return
-  }
-  e = e || {}
-  e.type = type
-  e.target = el
-  e.timestamp = Date.now()
-  if (domChanges) {
-    updateElement(el, domChanges)
-  }
-  return el.fireEvent(type, e)
-}
-
-Document.prototype.getRef = function (ref) {
-  return this.nodeMap[ref]
-}
-
-function updateElement (el, changes) {
-  const attrs = changes.attrs || {}
-  for (const name in attrs) {
-    el.setAttr(name, attrs[name], true)
-  }
-  const style = changes.style || {}
-  for (const name in style) {
-    el.setStyle(name, style[name], true)
-  }
-}
-
-function Node () {
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.children = []
-  this.pureChildren = []
-  this.parentNode = null
-  this.nextSibling = null
-  this.previousSibling = null
-}
-
-Node.prototype.destroy = function () {
-  const doc = getDoc(this.docId)
-  if (doc) {
-    delete this.docId
-    delete doc.nodeMap[this.nodeId]
-  }
-  this.children.forEach(child => {
-    child.destroy()
-  })
-}
-
-function Element (type = DEFAULT_TAG_NAME, props) {
+export default function Element (type = DEFAULT_TAG_NAME, props) {
   props = props || {}
   this.nodeType = 1
   this.nodeId = uniqueId()
@@ -149,6 +19,7 @@ function Element (type = DEFAULT_TAG_NAME, props) {
 }
 
 Element.prototype = new Node()
+Element.prototype.constructor = Element
 
 Element.prototype.appendChild = function (node) {
   if (node.parentNode && node.parentNode !== this) {
@@ -473,27 +344,4 @@ Element.prototype.toString = function () {
     ' style=' + JSON.stringify(this.toStyle()) + '>' +
     this.pureChildren.map((child) => child.toString()).join('') +
     '</' + this.type + '>'
-}
-
-function Comment (value) {
-  this.nodeType = 8
-  this.nodeId = uniqueId()
-  this.ref = this.nodeId
-  this.type = 'comment'
-  this.value = value
-  this.children = []
-  this.pureChildren = []
-}
-
-Comment.prototype = new Node()
-
-Comment.prototype.toString = function () {
-  return '<!-- ' + this.value + ' -->'
-}
-
-export {
-  Document,
-  Node,
-  Element,
-  Comment
 }
