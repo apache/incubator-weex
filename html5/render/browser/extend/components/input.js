@@ -2,7 +2,7 @@
 
 let appendStyle
 
-const availableTypes = ['text', 'password', 'tel', 'email', 'url']
+const availableTypes = ['text', 'password', 'tel', 'email', 'url', 'date', 'time']
 const DEFAULT_TYPE = 'text'
 
 function setPlaceholderColor (input, placeholderColor) {
