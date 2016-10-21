@@ -36,7 +36,7 @@
 
 <style>
   .input {
-    font-size: 80px;
+    font-size: 60px;
     height: 80px;
     width: 400px;
   }
