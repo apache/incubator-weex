@@ -76,11 +76,6 @@ function hasOwn (obj, key) {
  */
 
 function bind (fn, ctx) {
-  if (typeof fn !== 'function') {
-    console.error('[JS Framework] the first parameter of `bind`'
-      + ` must be a function, not ${typeof fn}`)
-    return function bindFailed () {}
-  }
   return function (a) {
     const l = arguments.length
     return l

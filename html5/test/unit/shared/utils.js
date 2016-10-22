@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import sinon from 'sinon'
 import utils from '../../../shared/utils'
 
 describe('test util functions', () => {
@@ -76,18 +75,6 @@ describe('test util functions', () => {
     expect(askWho.call(ctx)).to.be.equal('fixed')
     expect(askWho.apply(ctx)).to.be.equal('fixed')
     expect(who.apply(ctx)).to.be.equal('changed')
-  })
-
-  it('invalid bind', () => {
-    sinon.stub(console, 'error')
-    const resA = utils.bind()
-    const resB = utils.bind(null, {})
-    expect(resA).to.be.a('function')
-    expect(resB).to.be.a('function')
-    expect(resA()).to.be.undefined
-    expect(resB()).to.be.undefined
-    expect(console.error.callCount).to.be.equal(2)
-    console.error.restore()
   })
 
   it('toArray', () => {
