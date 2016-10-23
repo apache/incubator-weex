@@ -249,18 +249,16 @@ extend(Element.prototype, {
     }
   },
 
-  resetClassStyle () {
-    for (const key in this.classStyle) {
-      this.classStyle[key] = ''
-    }
-  },
-
   /**
    * Set style properties from class.
    * @param {object} classStyle
    */
   setClassStyle (classStyle) {
-    this.resetClassStyle()
+    // reset previous class style to empty string
+    for (const key in this.classStyle) {
+      this.classStyle[key] = ''
+    }
+
     extend(this.classStyle, classStyle)
     const listener = getListener(this.docId)
     if (listener) {
