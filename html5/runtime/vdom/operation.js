@@ -2,20 +2,38 @@ export { extend } from '../../shared/utils'
 
 const docMap = {}
 
+/**
+ * Add a document object into docMap.
+ * @param {string} id
+ * @param {object} document
+ */
 export function addDoc (id, doc) {
   if (id) {
     docMap[id] = doc
   }
 }
 
+/**
+ * Get the document object by id.
+ * @param {string} id
+ */
 export function getDoc (id) {
   return docMap[id]
 }
 
+/**
+ * Remove the document from docMap by id.
+ * @param {string} id
+ */
 export function removeDoc (id) {
   delete docMap[id]
 }
 
+/**
+ * Get listener by document id.
+ * @param {string} id
+ * @return {object} listener
+ */
 export function getListener (id) {
   const doc = docMap[id]
   if (doc && doc.listener) {
@@ -24,11 +42,20 @@ export function getListener (id) {
   return null
 }
 
+/**
+ * Get a unique id.
+ */
 let nextNodeRef = 1
 export function uniqueId () {
   return (nextNodeRef++).toString()
 }
 
+/**
+ * Append body node to documentElement.
+ * @param {object} document
+ * @param {object} node
+ * @param {object} before
+ */
 export function appendBody (doc, node, before) {
   const { documentElement } = doc
 
@@ -70,6 +97,11 @@ export function appendBody (doc, node, before) {
   }
 }
 
+/**
+ * Set up body node.
+ * @param {object} document
+ * @param {object} element
+ */
 export function setBody (doc, el) {
   el.role = 'body'
   el.depth = 1
@@ -79,6 +111,11 @@ export function setBody (doc, el) {
   doc.body = el
 }
 
+/**
+ * Establish the connection between parent and child node.
+ * @param {object} child node
+ * @param {object} parent node
+ */
 export function linkParent (node, parent) {
   node.parentNode = parent
   if (parent.docId) {
@@ -92,6 +129,10 @@ export function linkParent (node, parent) {
   })
 }
 
+/**
+ * Get the next sibling element.
+ * @param {object} node
+ */
 export function nextElement (node) {
   while (node) {
     if (node.nodeType === 1) {
@@ -101,6 +142,10 @@ export function nextElement (node) {
   }
 }
 
+/**
+ * Get the previous sibling element.
+ * @param {object} node
+ */
 export function previousElement (node) {
   while (node) {
     if (node.nodeType === 1) {
@@ -110,6 +155,14 @@ export function previousElement (node) {
   }
 }
 
+/**
+ * Insert a node into list at the specified index.
+ * @param {object} target node
+ * @param {array} list
+ * @param {number} newIndex
+ * @param {boolean} changeSibling
+ * @return {number} newIndex
+ */
 export function insertIndex (target, list, newIndex, changeSibling) {
   if (newIndex < 0) {
     newIndex = 0
@@ -126,6 +179,14 @@ export function insertIndex (target, list, newIndex, changeSibling) {
   return newIndex
 }
 
+/**
+ * Move the node to a new index in list.
+ * @param {object} target node
+ * @param {array} list
+ * @param {number} newIndex
+ * @param {boolean} changeSibling
+ * @return {number} newIndex
+ */
 export function moveIndex (target, list, newIndex, changeSibling) {
   const index = list.indexOf(target)
   if (index < 0) {
@@ -157,6 +218,12 @@ export function moveIndex (target, list, newIndex, changeSibling) {
   return newIndex
 }
 
+/**
+ * Remove the node from list.
+ * @param {object} target node
+ * @param {array} list
+ * @param {boolean} changeSibling
+ */
 export function removeIndex (target, list, changeSibling) {
   const index = list.indexOf(target)
   if (index < 0) {

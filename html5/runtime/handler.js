@@ -1,3 +1,7 @@
+/**
+ * @fileOverview
+ * Task handler for communication between javascript and native.
+ */
 
 const handlerMap = {
   createBody: 'callCreateBody',
@@ -11,7 +15,7 @@ const handlerMap = {
 }
 
 /**
- * Create task handler
+ * Create a task handler.
  * @param {string} id
  * @param {function} handler
  * @return {function} taskHandler
@@ -37,7 +41,7 @@ export function createHandler (id, handler) {
 }
 
 /**
- * Check if there is a corresponding available handler in the environment
+ * Check if there is a corresponding available handler in the environment.
  * @param {string} module
  * @param {string} method
  * @return {boolean}
@@ -49,7 +53,7 @@ function hasAvailableHandler (module, method) {
 }
 
 /**
- * Dispatch the task to the specified handler
+ * Dispatch the task to the specified handler.
  * @param {string} id
  * @param {object} task
  * @param {function} defaultHandler

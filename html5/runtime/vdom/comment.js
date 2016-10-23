@@ -1,3 +1,8 @@
+/**
+ * @fileOverview
+ * Virtual-DOM Comment.
+ */
+
 import Node from './node'
 import { uniqueId } from './operation'
 
@@ -14,6 +19,10 @@ export default function Comment (value) {
 Comment.prototype = new Node()
 Comment.prototype.constructor = Comment
 
+/**
+ * Convert to HTML comment string.
+ * @return {stirng} html
+ */
 Comment.prototype.toString = function () {
   return '<!-- ' + this.value + ' -->'
 }

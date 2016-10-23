@@ -1,3 +1,8 @@
+/**
+ * @fileOverview
+ * Virtual-DOM Element.
+ */
+
 import Node from './node'
 import {
   extend,
@@ -37,6 +42,11 @@ function registerNode (docId, node) {
 }
 
 extend(Element.prototype, {
+  /**
+   * Append a child node.
+   * @param {object} node
+   * @return {undefined | number} the signal sent by native
+   */
   appendChild (node) {
     if (node.parentNode && node.parentNode !== this) {
       return
@@ -67,6 +77,12 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Insert a node before specified node.
+   * @param {object} node
+   * @param {object} before
+   * @return {undefined | number} the signal sent by native
+   */
   insertBefore (node, before) {
     if (node.parentNode && node.parentNode !== this) {
       return
@@ -114,6 +130,12 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Insert a node after specified node.
+   * @param {object} node
+   * @param {object} after
+   * @return {undefined | number} the signal sent by native
+   */
   insertAfter (node, after) {
     if (node.parentNode && node.parentNode !== this) {
       return
@@ -155,6 +177,11 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Remove a child node, and decide whether it should be destroyed.
+   * @param {object} node
+   * @param {boolean} preserved
+   */
   removeChild (node, preserved) {
     if (node.parentNode) {
       removeIndex(node, this.children, true)
@@ -171,6 +198,9 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Clear all child nodes.
+   */
   clear () {
     const listener = getListener(this.docId)
     if (listener) {
@@ -185,6 +215,12 @@ extend(Element.prototype, {
     this.pureChildren.length = 0
   },
 
+  /**
+   * Set an attribute, and decide whether the task should be send to native.
+   * @param {string} key
+   * @param {string | number} value
+   * @param {boolean} silent
+   */
   setAttr (key, value, silent) {
     if (this.attr[key] === value && silent !== false) {
       return
@@ -196,6 +232,12 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Set a style property, and decide whether the task should be send to native.
+   * @param {string} key
+   * @param {string | number} value
+   * @param {boolean} silent
+   */
   setStyle (key, value, silent) {
     if (this.style[key] === value && silent !== false) {
       return
@@ -213,6 +255,10 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Set style properties from class.
+   * @param {object} classStyle
+   */
   setClassStyle (classStyle) {
     this.resetClassStyle()
     extend(this.classStyle, classStyle)
@@ -222,6 +268,11 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Add an event handler.
+   * @param {string} event type
+   * @param {function} event handler
+   */
   addEvent (type, handler) {
     if (!this.event[type]) {
       this.event[type] = handler
@@ -232,6 +283,10 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Remove an event handler.
+   * @param {string} event type
+   */
   removeEvent (type) {
     if (this.event[type]) {
       delete this.event[type]
@@ -242,6 +297,12 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Fire an event manually.
+   * @param {string} event type
+   * @param {function} event handler
+   * @return {} anything returned by handler function
+   */
   fireEvent (type, e) {
     const handler = this.event[type]
     if (handler) {
@@ -249,10 +310,18 @@ extend(Element.prototype, {
     }
   },
 
+  /**
+   * Get all styles of current element.
+   * @return {object} style
+   */
   toStyle () {
     return extend({}, this.classStyle, this.style)
   },
 
+  /**
+   * Convert current element to JSON like object.
+   * @return {object} element
+   */
   toJSON () {
     const result = {
       ref: this.ref.toString(),
@@ -270,6 +339,10 @@ extend(Element.prototype, {
     return result
   },
 
+  /**
+   * Convert to HTML element tag string.
+   * @return {stirng} html
+   */
   toString () {
     return '<' + this.type +
     ' attr=' + JSON.stringify(this.attr) +

@@ -1,3 +1,8 @@
+/**
+ * @fileOverview
+ * Virtual-DOM Document.
+ */
+
 import Comment from './comment'
 import Element from './element'
 import Listener from '../listener'
@@ -16,8 +21,14 @@ export default function Document (id, url, handler) {
   this.createDocumentElement()
 }
 
+// default task handler
 Document.handler = null
 
+/**
+ * Update all changes for an element.
+ * @param {object} element
+ * @param {object} changes
+ */
 function updateElement (el, changes) {
   const attrs = changes.attrs || {}
   for (const name in attrs) {
@@ -30,18 +41,33 @@ function updateElement (el, changes) {
 }
 
 extend(Document.prototype, {
+  /**
+   * Get the node from nodeMap.
+   * @param {string} reference id
+   * @return {object} node
+   */
   getRef (ref) {
     return this.nodeMap[ref]
   },
 
+  /**
+   * Turn on batched updates.
+   */
   open () {
     this.listener.batched = false
   },
 
+  /**
+   * Turn off batched updates.
+   */
   close () {
     this.listener.batched = true
   },
 
+  /**
+   * Create the document element.
+   * @return {object} documentElement
+   */
   createDocumentElement () {
     if (!this.documentElement) {
       const el = new Element('document')
@@ -63,6 +89,12 @@ extend(Document.prototype, {
     return this.documentElement
   },
 
+  /**
+   * Create the body element.
+   * @param {string} type
+   * @param {objct} props
+   * @return {object} body element
+   */
   createBody (type, props) {
     if (!this.body) {
       const el = new Element(type, props)
@@ -72,14 +104,33 @@ extend(Document.prototype, {
     return this.body
   },
 
+  /**
+   * Create an element.
+   * @param {string} tagName
+   * @param {objct} props
+   * @return {object} element
+   */
   createElement (tagName, props) {
     return new Element(tagName, props)
   },
 
+  /**
+   * Create an comment.
+   * @param {string} text
+   * @return {object} comment
+   */
   createComment (text) {
     return new Comment(text)
   },
 
+  /**
+   * Fire an event on specified element manually.
+   * @param {object} element
+   * @param {string} event type
+   * @param {object} event object
+   * @param {object} dom changes
+   * @return {} anything returned by handler function
+   */
   fireEvent (el, type, e, domChanges) {
     if (!el) {
       return
@@ -94,6 +145,9 @@ extend(Document.prototype, {
     return el.fireEvent(type, e)
   },
 
+  /**
+   * Destroy current document, and remove itself form docMap.
+   */
   destroy () {
     delete this.listener
     delete this.nodeMap

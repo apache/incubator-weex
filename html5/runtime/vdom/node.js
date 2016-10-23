@@ -1,3 +1,8 @@
+/**
+ * @fileOverview
+ * Virtual-DOM Node. It's the supper class of Element and Comment.
+ */
+
 import { getDoc, uniqueId } from './operation'
 
 export default function Node () {
@@ -10,6 +15,9 @@ export default function Node () {
   this.previousSibling = null
 }
 
+/**
+ * Destroy current node, and remove itself form nodeMap.
+ */
 Node.prototype.destroy = function () {
   const doc = getDoc(this.docId)
   if (doc) {
