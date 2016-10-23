@@ -57,6 +57,9 @@ export function init (app, code, data) {
     functionBody = code.toString()
   }
 
+  // wrap IFFE and use strict mode
+  functionBody = `(function(){'use strict'; ${functionBody} })()`
+
   // run code and get result
   const { WXEnvironment } = global
   if (WXEnvironment && WXEnvironment.platform !== 'Web') {
