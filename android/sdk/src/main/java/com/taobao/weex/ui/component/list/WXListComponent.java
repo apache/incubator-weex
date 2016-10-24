@@ -217,6 +217,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -227,6 +228,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
+import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
@@ -281,7 +283,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   private static final int MAX_VIEWTYPE_ALLOW_CACHE = 9;
   private static boolean mAllowCacheViewHolder = true;
   private static boolean mDownForBidCacheViewHolder = false;
-  private int mChildrenLayoutOffset = 0;//Use for offset children layout
 
   /**
    * Map for storing component that is sticky.
@@ -330,9 +331,11 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
 
   @Override
-  public ViewGroup.LayoutParams getChildLayoutParams(View hostView, int width, int height, int left, int right, int top, int bottom) {
+  public ViewGroup.LayoutParams getChildLayoutParams(WXComponent child,View hostView, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) hostView.getLayoutParams();
-    if(params == null) {
+    if(child instanceof WXBaseRefresh && params == null) {
+      params = new LinearLayout.LayoutParams(width,height);
+    }else if(params == null) {
       params = new RecyclerView.LayoutParams(width, height);
     }else {
       params.width = width;
@@ -656,7 +659,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
   @Override
   protected int getChildrenLayoutTopOffset() {
-    return mChildrenLayoutOffset;
+    return 0;
   }
 
   /**
@@ -666,20 +669,42 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   */
   @Override
   public void addChild(WXComponent child, int index) {
-    mChildrenLayoutOffset += child.getLayoutTopOffsetForSibling();
-    if (checkRefreshOrLoading(child)) {
-        return;
-    }
-
     super.addChild(child,index);
 
     bindViewType(child);
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
-    BounceRecyclerView view =  getHostView();
-    if(view != null) {
+    BounceRecyclerView view = getHostView();
+    if (view != null) {
       view.getAdapter().notifyItemInserted(adapterPosition);
     }
     relocateAppearanceHelper();
+  }
+
+  @Override
+  public void createChildViewAt(int index) {
+    final WXComponent child = getChild(index);
+    if(child instanceof WXBaseRefresh){
+      child.createView();
+      if (child instanceof WXRefresh) {
+        getHostView().setOnRefreshListener((WXRefresh)child);
+        getHostView().postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            getHostView().setHeaderView(child);
+          }
+        },100);
+      }else if (child instanceof WXLoading) {
+        getHostView().setOnLoadingListener((WXLoading)child);
+        getHostView().postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            getHostView().setFooterView(child);
+          }
+        },100);
+      }
+    }else {
+      super.createChildViewAt(index);
+    }
   }
 
   private void relocateAppearanceHelper() {
@@ -693,36 +718,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     }
   }
 
-  /**
-     * Setting refresh view and loading view
-     * @param child the refresh_view or loading_view
-     */
-    private boolean checkRefreshOrLoading(final WXComponent child) {
-
-        if (child instanceof WXRefresh) {
-            getHostView().setOnRefreshListener((WXRefresh)child);
-            getHostView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getHostView().setHeaderView(child);
-                }
-            },100);
-            return true;
-        }
-
-        if (child instanceof WXLoading) {
-            getHostView().setOnLoadingListener((WXLoading)child);
-            getHostView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getHostView().setFooterView(child);
-                }
-            },100);
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,
@@ -861,7 +856,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                             component.applyLayoutAndEvent(component);
                             return new ListBaseViewHolder(component, viewType);
                         }
-                    } else {
+                    } else if (component instanceof WXBaseRefresh){
+                      return createVHForRefreshComponent(viewType);
+                    }else {
                         WXLogUtils.e(TAG, "List cannot include element except cell、header、fixed、refresh and loading");
                         return createVHForFakeComponent(viewType);
                     }
@@ -981,10 +978,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      */
     @Override
     public int getItemCount() {
-        if (mChildren != null) {
-            return mChildren.size();
-        }
-        return 0;
+        return getChildCount();
     }
 
     @Override
@@ -1094,4 +1088,13 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
         return new ListBaseViewHolder(view, viewType);
     }
+
+
+  private ListBaseViewHolder createVHForRefreshComponent(int viewType) {
+    FrameLayout view = new FrameLayout(getContext());
+    view.setBackgroundColor(Color.WHITE);
+    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
+    view.setVisibility(View.GONE);
+    return new ListBaseViewHolder(view, viewType);
+  }
 }

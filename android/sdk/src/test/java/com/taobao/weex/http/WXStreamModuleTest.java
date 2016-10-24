@@ -222,6 +222,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -236,6 +237,7 @@ import static junit.framework.Assert.*;
  */
 @RunWith(RobolectricTestRunner.class)
 @PrepareForTest({WXStreamModule.class, IWXHttpAdapter.class})
+@Config(manifest= Config.NONE)
 public class WXStreamModuleTest {
 
   @Before

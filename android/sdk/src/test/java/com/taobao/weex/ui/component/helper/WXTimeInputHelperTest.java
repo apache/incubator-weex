@@ -202,85 +202,52 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view;
+package com.taobao.weex.ui.component.helper;
 
-import android.content.Context;
-import android.os.Build;
-import android.view.MotionEvent;
-import android.view.ViewParent;
-import android.widget.EditText;
+import com.taobao.weappplus_sdk.BuildConfig;
 
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.view.gesture.WXGesture;
-import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+
+import java.lang.reflect.Method;
 
 /**
- * Wrapper class for editText
+ * Created by moxun on 16/10/24.
  */
-public class WXEditText extends EditText implements WXGestureObservable {
 
-  private WXGesture wxGesture;
-  private int mLines = 1;
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*", "org.json.*"})
+@PrepareForTest()
+public class WXTimeInputHelperTest {
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
 
-  public WXEditText(Context context) {
-    super(context);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-      setBackground(null);
-    } else {
-      setBackgroundDrawable(null);
-    }
-  }
-
-  @Override
-  public void registerGestureListener(WXGesture wxGesture) {
-    this.wxGesture = wxGesture;
-  }
-
-  @Override
-  public void setLines(int lines) {
-    super.setLines(lines);
-    mLines = lines;
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    boolean result = super.onTouchEvent(event);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, event);
+    @Test
+    public void testParseDate() throws Exception{
+        Method parseDate = WXTimeInputHelper.class.getDeclaredMethod("parseDate", String.class);
+        parseDate.setAccessible(true);
+        parseDate.invoke(null, "");
+        parseDate.invoke(null, "test");
+        parseDate.invoke(null, "2016-12-11");
+        parseDate.invoke(null, "2016-1-1");
+        parseDate.invoke(null, "9999-99-99");
     }
 
-    ViewParent parent = getParent();
-    if(parent != null){
-      switch (event.getAction() & MotionEvent.ACTION_MASK){
-        case MotionEvent.ACTION_DOWN:
-          if(mLines < getLineCount()) {
-            //scrollable
-            parent.requestDisallowInterceptTouchEvent(true);
-          }
-          break;
-        case MotionEvent.ACTION_UP:
-        case MotionEvent.ACTION_CANCEL:
-          parent.requestDisallowInterceptTouchEvent(false);
-          break;
-      }
+    @Test
+    public void testParseTime() throws Exception{
+        Method parseTime = WXTimeInputHelper.class.getDeclaredMethod("parseTime", String.class);
+        parseTime.setAccessible(true);
+        parseTime.invoke(null, "");
+        parseTime.invoke(null, "test");
+        parseTime.invoke(null, "11:11");
+        parseTime.invoke(null, "1:1");
+        parseTime.invoke(null, "25:61");
     }
-    return result;
-  }
-
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged(w, h, oldw, oldh);
-    int contentH = getLayout().getHeight();
-    //TODO: known issue,set movement to null will make cursor disappear.
-    if(h < contentH){
-      setMovementMethod(null);
-    }else{
-      setMovementMethod(getDefaultMovementMethod());
-    }
-  }
-  
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
 }

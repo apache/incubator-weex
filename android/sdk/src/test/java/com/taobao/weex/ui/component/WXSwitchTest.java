@@ -209,10 +209,13 @@ import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
+import com.taobao.weex.ui.view.WXSwitchView;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -238,7 +241,7 @@ public class WXSwitchTest {
   @Before
   public void setUp() throws Exception {
     component = create();
-    ComponentTest.create(component);
+    ComponentTest.create(component, Mockito.mock(WXSwitchView.class));
   }
 
   @After

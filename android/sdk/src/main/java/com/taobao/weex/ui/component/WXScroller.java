@@ -356,7 +356,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (!checkRefreshOrLoading(child)) {
         mRefreshs.add(child);
       }
-      return;
     }
 
     super.addChild(child,index);

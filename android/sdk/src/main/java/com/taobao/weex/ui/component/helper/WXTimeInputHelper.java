@@ -202,85 +202,101 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view;
+package com.taobao.weex.ui.component.helper;
 
-import android.content.Context;
-import android.os.Build;
-import android.view.MotionEvent;
-import android.view.ViewParent;
-import android.widget.EditText;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.view.gesture.WXGesture;
-import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
- * Wrapper class for editText
+ * Created by moxun on 16/10/12.
  */
-public class WXEditText extends EditText implements WXGestureObservable {
 
-  private WXGesture wxGesture;
-  private int mLines = 1;
+public class WXTimeInputHelper {
 
-  public WXEditText(Context context) {
-    super(context);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-      setBackground(null);
-    } else {
-      setBackgroundDrawable(null);
+    private static SimpleDateFormat timeFormatter;
+    private static SimpleDateFormat dateFormatter;
+
+    public static void pickDate(String max, String min, final TextView target) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseDate(target.getText().toString()));
+        final DatePickerDialog dialog = new DatePickerDialog(
+                target.getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int realMonth = monthOfYear + 1;
+                        String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
+                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
+                        target.setText(result);
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        final DatePicker datePicker = dialog.getDatePicker();
+        if (min != null) {
+            datePicker.setMinDate(parseDate(min).getTime());
+        }
+        if (max != null) {
+            datePicker.setMaxDate(parseDate(max).getTime());
+        }
+        dialog.show();
     }
-  }
 
-  @Override
-  public void registerGestureListener(WXGesture wxGesture) {
-    this.wxGesture = wxGesture;
-  }
-
-  @Override
-  public void setLines(int lines) {
-    super.setLines(lines);
-    mLines = lines;
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    boolean result = super.onTouchEvent(event);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, event);
+    public static void pickTime(final TextView target) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseTime(target.getText().toString()));
+        TimePickerDialog dialog = new TimePickerDialog(
+                target.getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
+                        String m = minute < 10 ? "0" + minute : String.valueOf(minute);
+                        target.setText(h + ":" + m);
+                    }
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                false
+        );
+        dialog.show();
     }
 
-    ViewParent parent = getParent();
-    if(parent != null){
-      switch (event.getAction() & MotionEvent.ACTION_MASK){
-        case MotionEvent.ACTION_DOWN:
-          if(mLines < getLineCount()) {
-            //scrollable
-            parent.requestDisallowInterceptTouchEvent(true);
-          }
-          break;
-        case MotionEvent.ACTION_UP:
-        case MotionEvent.ACTION_CANCEL:
-          parent.requestDisallowInterceptTouchEvent(false);
-          break;
-      }
-    }
-    return result;
-  }
+    private static Date parseDate(String s) {
+        if (dateFormatter == null) {
+            dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        }
 
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged(w, h, oldw, oldh);
-    int contentH = getLayout().getHeight();
-    //TODO: known issue,set movement to null will make cursor disappear.
-    if(h < contentH){
-      setMovementMethod(null);
-    }else{
-      setMovementMethod(getDefaultMovementMethod());
+        try {
+            return dateFormatter.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
     }
-  }
-  
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
+
+    private static Date parseTime(String s) {
+        if (timeFormatter == null) {
+            timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        }
+
+        try {
+            return timeFormatter.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
+    }
 }

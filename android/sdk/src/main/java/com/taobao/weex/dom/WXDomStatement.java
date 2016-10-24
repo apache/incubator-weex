@@ -568,7 +568,7 @@ class WXDomStatement {
 
     //only non-root has parent.
     WXDomObject parent;
-    WXDomObject domObject = WXDomObject.parse(dom);
+    WXDomObject domObject = WXDomObject.parse(dom,instance);
 
     if (domObject == null || mRegistry.containsKey(domObject.getRef())) {
       if (WXEnvironment.isApkDebugable()) {

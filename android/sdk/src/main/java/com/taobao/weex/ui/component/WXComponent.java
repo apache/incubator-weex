@@ -443,7 +443,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.setMargins(left, top, right, bottom);
       lp = params;
     }else{
-      lp = mParent.getChildLayoutParams(host,width, height, left,right,top,bottom);
+      lp = mParent.getChildLayoutParams(this,host,width, height, left,right,top,bottom);
     }
     if(lp != null) {
       mHost.setLayoutParams(lp);

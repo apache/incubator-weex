@@ -318,6 +318,8 @@ public class Constants {
     String INTERVAL = "interval";
     String PLAY_STATUS = "playStatus";
     String FONT_FACE = "fontFace";
+    String MAX = "max";
+    String MIN = "min";
   }
 
   public interface Value {

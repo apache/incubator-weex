@@ -297,7 +297,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  public LayoutParams getChildLayoutParams(View childView, int width, int height, int left, int right, int top, int bottom) {
+  public LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.LayoutParams lp = childView.getLayoutParams();
     if(lp == null) {
       lp = new FrameLayout.LayoutParams(width, height);

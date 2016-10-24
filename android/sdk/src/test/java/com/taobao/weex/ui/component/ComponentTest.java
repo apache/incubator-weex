@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.view.View;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
@@ -218,10 +220,18 @@ import java.util.Map;
  */
 public class ComponentTest {
   public static void create(WXComponent comp){
+    create(comp,null);
+  }
+  public static void create(WXComponent comp,View view){
     TestDomObject domObject = new TestDomObject();
     WXVContainer parent;
+
     if((parent = comp.getParent())!=null){
-      comp.createView();
+      if(view != null) {
+        comp.mHost = view;
+      }else{
+        comp.createView();
+      }
     }else{
       parent = WXDivTest.create();
       parent.addChild(comp);

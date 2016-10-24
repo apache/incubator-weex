@@ -244,7 +244,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by sospartan on 7/27/16.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
+@Config(constants = BuildConfig.class, sdk = 19,manifest = Config.NONE)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
 @PrepareForTest({WXFileUtils.class,WXSoInstallMgrSdk.class})
 public class WXSDKInstanceTest {
