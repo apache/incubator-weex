@@ -52,6 +52,7 @@
 @interface WXTextInputComponent()
 
 @property (nonatomic, strong) WXTextInputView *inputView;
+@property (nonatomic, strong) WXDatePickerManager *datePickerManager;
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;
 @property (nonatomic, strong) NSString *placeholder;
@@ -61,6 +62,8 @@
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) WXTextWeight fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
+@property (nonatomic, copy) NSString *inputType;
+
 //event
 @property (nonatomic) BOOL inputEvent;
 @property (nonatomic) BOOL focusEvent;
@@ -95,6 +98,8 @@
         _clickEvent = NO;
         
         _inputView = [[WXTextInputView alloc] init];
+        _datePickerManager = [[WXDatePickerManager alloc] init];
+        _datePickerManager.delegate = self;
         if (attributes[@"type"]) {
             NSString *type = [WXConvert NSString:attributes[@"type"]];
             if (type) {
@@ -108,12 +113,15 @@
         if (attributes[@"disabled"]) {
             [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
         }
-        
         if (attributes[@"value"]) {
             NSString* value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
                 _inputView.text = value;
             }
+        }
+        if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+        {
+            [_datePickerManager configDatePicker:attributes];
         }
         if (attributes[@"placeholder"]) {
             NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
@@ -280,7 +288,6 @@
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
-    
     if (attributes[@"placeholder"]) {
         NSString* placeholder = [WXConvert NSString:attributes[@"placeholder"]];
         if (placeholder) {
@@ -288,12 +295,15 @@
             _placeholder = placeholder;
         }
     }
-    
     if (attributes[@"value"]) {
         NSString* value = [WXConvert NSString:attributes[@"value"]];
         if (value) {
             _inputView.text = value;
         }
+    }
+    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+    {
+        [_datePickerManager updateDatePicker:attributes];
     }
     
     [self setPlaceholderAttributedString];
@@ -372,6 +382,30 @@
 }
 
 #pragma mark -
+#pragma mark WXDatePickerManagerDelegate
+-(void)fetchDatePickerValue:(NSString *)value
+{
+    _inputView.text = value;
+    if (_changeEvent) {
+        if (![[_inputView text] isEqualToString:_changeEventString]) {
+            [self fireEvent:@"change" params:@{@"value":[_inputView text]} domChanges:@{@"attrs":@{@"value":[_inputView text]}}];
+        }
+    }
+}
+
+#pragma mark UITextFieldDelegate
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    if([self isDateType])
+    {
+        [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+        _changeEventString = [textField text];
+        [_datePickerManager show];
+        return NO;
+    }
+    return  YES;
+}
+
 #pragma mark UITextFieldDelegate
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
@@ -446,6 +480,13 @@
 
 #pragma mark
 
+-(BOOL)isDateType
+{
+    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+        return YES;
+    return NO;
+}
+
 - (void)setPlaceholderAttributedString
 {
     if (_placeholderColor) {
@@ -464,9 +505,21 @@
 - (void)setAutofocus:(BOOL)b
 {
     if (b) {
-        [_inputView becomeFirstResponder];
+        if([self isDateType])
+        {
+            [_datePickerManager show];
+        }else
+        {
+            [_inputView becomeFirstResponder];
+        }
     } else {
-        [_inputView resignFirstResponder];
+        if([self isDateType])
+        {
+            [_datePickerManager hide];
+        }else
+        {
+            [_inputView resignFirstResponder];
+        }
     }
 }
 
@@ -474,6 +527,7 @@
 {
     [_inputView setKeyboardType:UIKeyboardTypeDefault];
     [_inputView setSecureTextEntry:NO];
+    _inputType = type;
     
     if ([type isEqualToString:@"text"]) {
         [_inputView setKeyboardType:UIKeyboardTypeDefault];
@@ -489,15 +543,6 @@
     }
     else if ([type isEqualToString:@"url"]) {
         [_inputView setKeyboardType:UIKeyboardTypeURL];
-    }
-    else if ([type isEqualToString:@"date"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
-    else if ([type isEqualToString:@"time"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
-    else if ([type isEqualToString:@"datetime"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
     }
 }
 
