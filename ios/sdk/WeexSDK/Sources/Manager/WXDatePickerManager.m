@@ -20,15 +20,10 @@
 @property(nonatomic,copy)NSString *type;
 @property(nonatomic)BOOL isAnimating;
 
-
-
 @end
 
 @implementation WXDatePickerManager
 @synthesize datePicker;
-
-
-
 
 - (instancetype)init
 {

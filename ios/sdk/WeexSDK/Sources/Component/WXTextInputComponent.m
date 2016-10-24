@@ -113,17 +113,16 @@
         if (attributes[@"disabled"]) {
             [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
         }
-        
-        if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
-        {
-            [_datePickerManager configDatePicker:attributes];
-        }else if (attributes[@"value"]) {
+        if (attributes[@"value"]) {
             NSString* value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
                 _inputView.text = value;
             }
         }
-        
+        if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+        {
+            [_datePickerManager configDatePicker:attributes];
+        }
         if (attributes[@"placeholder"]) {
             NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
             if (placeHolder) {
@@ -289,7 +288,6 @@
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
-    
     if (attributes[@"placeholder"]) {
         NSString* placeholder = [WXConvert NSString:attributes[@"placeholder"]];
         if (placeholder) {
@@ -297,15 +295,15 @@
             _placeholder = placeholder;
         }
     }
-    
-    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
-    {
-        [_datePickerManager updateDatePicker:attributes];
-    }else if (attributes[@"value"]) {
+    if (attributes[@"value"]) {
         NSString* value = [WXConvert NSString:attributes[@"value"]];
         if (value) {
             _inputView.text = value;
         }
+    }
+    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+    {
+        [_datePickerManager updateDatePicker:attributes];
     }
     
     [self setPlaceholderAttributedString];
