@@ -202,305 +202,101 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.component.helper;
 
-import android.annotation.SuppressLint;
-import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
-import com.taobao.weappplus_sdk.R;
-import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXRenderErrorCode;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
-@Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
-  public static final String ITEM_ID = "itemId";
+/**
+ * Created by moxun on 16/10/12.
+ */
 
-  private String src;
-  private WXSDKInstance mNestedInstance;
-  private final static int ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270);
-  private final static int ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260);
+public class WXTimeInputHelper {
 
-  private boolean mIsVisible = true;
-  private EmbedRenderListener mListener;
+    private static SimpleDateFormat timeFormatter;
+    private static SimpleDateFormat dateFormatter;
 
-  public interface EmbedManager {
-    WXEmbed getEmbed(String itemId);
-    void putEmbed(String itemId,WXEmbed comp);
-  }
+    public static void pickDate(String max, String min, final TextView target) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseDate(target.getText().toString()));
+        final DatePickerDialog dialog = new DatePickerDialog(
+                target.getContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int realMonth = monthOfYear + 1;
+                        String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
+                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
+                        target.setText(result);
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
 
-  public static class FailToH5Listener extends ClickToReloadListener {
-    @SuppressLint("SetJavaScriptEnabled")
-    @Override
-    public void onException(NestedContainer comp, String errCode, String msg) {
-      //downgrade embed
-      if( errCode != null && comp instanceof WXEmbed && errCode.startsWith("1|")) {
-        ViewGroup container = comp.getViewContainer();
-        WebView webView = new WebView(container.getContext());
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        webView.setLayoutParams(params);
-        webView.getSettings().setJavaScriptEnabled(true);
-
-        container.removeAllViews();
-        container.addView(webView);
-        webView.loadUrl(((WXEmbed)comp).src);
-      }else{
-        super.onException(comp,errCode,msg);
-      }
-    }
-  }
-
-  /**
-   * Default event listener.
-   */
-  public static class ClickToReloadListener implements OnNestedInstanceEventListener {
-    @Override
-    public void onException(NestedContainer container, String errCode, String msg) {
-      if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
-        final WXEmbed comp = ((WXEmbed)container);
-        final ImageView imageView = new ImageView(comp.getContext());
-        imageView.setImageResource(R.drawable.error);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ERROR_IMG_WIDTH, ERROR_IMG_HEIGHT);
-        layoutParams.gravity = Gravity.CENTER;
-        imageView.setLayoutParams(layoutParams);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setAdjustViewBounds(true);
-        imageView.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            imageView.setOnClickListener(null);
-            imageView.setEnabled(false);
-            comp.loadInstance();
-          }
-        });
-        FrameLayout hostView = comp.getHostView();
-        hostView.removeAllViews();
-        hostView.addView(imageView);
-        WXLogUtils.e("WXEmbed", "NetWork failure :" + errCode + ",\n error message :" + msg);
-      }
+        final DatePicker datePicker = dialog.getDatePicker();
+        if (min != null) {
+            datePicker.setMinDate(parseDate(min).getTime());
+        }
+        if (max != null) {
+            datePicker.setMaxDate(parseDate(max).getTime());
+        }
+        dialog.show();
     }
 
-    @Override
-    public boolean onPreCreate(NestedContainer comp, String src) {
-      return true;
+    public static void pickTime(final TextView target) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseTime(target.getText().toString()));
+        TimePickerDialog dialog = new TimePickerDialog(
+                target.getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
+                        String m = minute < 10 ? "0" + minute : String.valueOf(minute);
+                        target.setText(h + ":" + m);
+                    }
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                false
+        );
+        dialog.show();
     }
 
-    @Override
-    public String transformUrl(String origin) {
-      return origin;
+    private static Date parseDate(String s) {
+        if (dateFormatter == null) {
+            dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        }
+
+        try {
+            return dateFormatter.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
     }
 
-    @Override
-    public void onCreated(NestedContainer comp, WXSDKInstance nestedInstance) {
+    private static Date parseTime(String s) {
+        if (timeFormatter == null) {
+            timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        }
 
+        try {
+            return timeFormatter.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
     }
-  }
-
-  static class EmbedRenderListener implements IWXRenderListener {
-    WXEmbed mComponent;
-    OnNestedInstanceEventListener mEventListener;
-
-    EmbedRenderListener(WXEmbed comp) {
-      mComponent = comp;
-      mEventListener = new ClickToReloadListener();
-    }
-
-    @Override
-    public void onViewCreated(WXSDKInstance instance, View view) {
-      FrameLayout hostView = mComponent.getHostView();
-      hostView.removeAllViews();
-      hostView.addView(view);
-    }
-
-    @Override
-    public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-
-    }
-
-    @Override
-    public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
-    }
-
-    @Override
-    public void onException(WXSDKInstance instance, String errCode, String msg) {
-      if (mEventListener != null) {
-        mEventListener.onException(mComponent, errCode, msg);
-      }
-    }
-  }
-
-  @Deprecated
-  public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
-  }
-
-  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-    mListener = new EmbedRenderListener(this);
-
-    if(instance instanceof EmbedManager) {
-      Object itemId = node.getAttrs().get(ITEM_ID);
-      if (itemId != null) {
-        ((EmbedManager) instance).putEmbed(itemId.toString(), this);
-      }
-    }
-  }
-
-  @Override
-  public void setOnNestEventListener(OnNestedInstanceEventListener listener){
-    mListener.mEventListener = listener;
-  }
-
-  @Override
-  public ViewGroup getViewContainer() {
-    return getHostView();
-  }
-
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.SRC:
-        String src = WXUtils.getString(param,null);
-        if (src != null)
-          setSrc(src);
-        return true;
-    }
-    return super.setProperty(key, param);
-  }
-
-  @Override
-  public void renderNewURL(String url) {
-    src = url;
-    loadInstance();
-  }
-
-
-  public String getOriginUrl() {
-    return originUrl;
-  }
-
-  public void setOriginUrl(String originUrl) {
-    this.originUrl = originUrl;
-  }
-
-  private String originUrl;
-
-  @WXComponentProp(name = Constants.Name.SRC)
-  public void setSrc(String src) {
-    originUrl=src;
-    this.src = src;
-    if (mNestedInstance != null) {
-      mNestedInstance.destroy();
-      mNestedInstance = null;
-    }
-    if (mIsVisible) {
-      loadInstance();
-    }
-  }
-  public String getSrc() {
-    return src;
-  }
-
-  void loadInstance(){
-    mNestedInstance = createInstance();
-    if(mListener != null && mListener.mEventListener != null){
-      if(!mListener.mEventListener.onPreCreate(this,src)){
-        //cancel render
-        mListener.mEventListener.onCreated(this, mNestedInstance);
-      }
-    }
-  }
-
-  private WXSDKInstance createInstance() {
-    WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
-    getInstance().addOnInstanceVisibleListener(this);
-    sdkInstance.registerRenderListener(mListener);
-
-    String url=src;
-    if(mListener != null && mListener.mEventListener != null){
-      url=mListener.mEventListener.transformUrl(src);
-      if(!mListener.mEventListener.onPreCreate(this,src)){
-        //cancel render
-        return null;
-      }
-    }
-
-    if(TextUtils.isEmpty(url)){
-      mListener.mEventListener.onException(this,WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,"degradeToH5");
-      return sdkInstance;
-    }
-
-    ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
-    sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            url,
-                            null, null, layoutParams.width,
-                            layoutParams.height,
-                            WXRenderStrategy.APPEND_ASYNC);
-    return sdkInstance;
-  }
-
-  @Override
-  public void setVisibility(String visibility) {
-    super.setVisibility(visibility);
-    boolean visible = TextUtils.equals(visibility, Constants.Value.VISIBLE);
-    if (!TextUtils.isEmpty(src) && visible) {
-      if (mNestedInstance == null) {
-        loadInstance();
-      } else {
-        mNestedInstance.onViewAppear();
-      }
-    }
-
-    if (!visible) {
-      if (mNestedInstance != null) {
-        mNestedInstance.onViewDisappear();
-      }
-    }
-    mIsVisible = visible;
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    if (mNestedInstance != null) {
-      mNestedInstance.destroy();
-      mNestedInstance = null;
-    }
-    src = null;
-  }
-
-  @Override
-  public void onAppear() {
-    //appear event from root instance will not trigger visibility change
-    if(mIsVisible && mNestedInstance != null){
-      WXComponent comp = mNestedInstance.getRootComponent();
-      if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
-    }
-  }
-
-  @Override
-  public void onDisappear() {
-    //appear event from root instance will not trigger visibility change
-    if(mIsVisible && mNestedInstance != null){
-      WXComponent comp = mNestedInstance.getRootComponent();
-      if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
-    }
-  }
 }
