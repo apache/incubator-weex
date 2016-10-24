@@ -71,7 +71,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         launchActivityWithIntent("com.alibaba.weex", WXPageActivity.class, intent);
         waTestPageActivity = getActivity();
         Log.e(TAG, "activity1=" + waTestPageActivity.toString());
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
         setViewGroup(mViewGroup);
