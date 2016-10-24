@@ -36,11 +36,12 @@ describe('generate virtual dom for a single vm', () => {
   })
 
   it('$watch', () => {
-    let data = {
+    const data = {
       a: {
         b: 1
       }
     }
+
     customComponentMap.foo = {
       template: {
         type: 'container'
@@ -55,7 +56,7 @@ describe('generate virtual dom for a single vm', () => {
     expect(doc.body).is.an.object
 
     vm.$watch(function () {
-      return this.a.b 
+      return this.a.b
     }, (value) => {
       expect(value).eql(2)
     })
@@ -70,18 +71,15 @@ describe('generate virtual dom for a single vm', () => {
       }
     }
 
-    const app = { doc, customComponentMap, differ }
     const vm = new Vm('foo', customComponentMap.foo, null)
 
     expect(vm._app).is.an.object
     expect(doc.body).is.an.object
-
   })
 
   it('no param options', () => {
-
     const app = {}
-    const vm = new Vm('foo', null, { _app: app})
+    const vm = new Vm('foo', null, { _app: app })
 
     expect(vm._app).is.an.object
     expect(doc.body).is.an.object
