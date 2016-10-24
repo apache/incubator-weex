@@ -544,9 +544,6 @@
     else if ([type isEqualToString:@"url"]) {
         [_inputView setKeyboardType:UIKeyboardTypeURL];
     }
-    else if ([type isEqualToString:@"datetime"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
 }
 
 - (void)setPadding:(UIEdgeInsets)padding
