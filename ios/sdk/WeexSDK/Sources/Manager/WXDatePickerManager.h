@@ -21,6 +21,8 @@
 -(void)show;
 -(void)hide;
 -(void)configDatePicker:(NSDictionary *)attributes;
+-(void)updateDatePicker:(NSDictionary *)attributes;
+
 
 
 @end

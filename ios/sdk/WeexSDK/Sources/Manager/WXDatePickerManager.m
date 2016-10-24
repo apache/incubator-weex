@@ -123,6 +123,57 @@
     }
 }
 
+
+-(void)updateDatePicker:(NSDictionary *)attributes
+{
+    if(attributes[@"type"])
+    {
+        _type = attributes[@"type"];
+        if( [attributes[@"type"] isEqualToString:@"date"])
+        {
+            if(attributes[@"value"])
+            {
+                NSDate *date = [self inputDateStringToDate:attributes[@"value"]];
+                if(date)
+                {
+                    self.datePicker.date =date;
+                }
+            }
+            if(attributes[@"max"])
+            {
+                NSDate *date = [self inputDateStringToDate:attributes[@"max"]];
+                if(date)
+                {
+                    self.datePicker.maximumDate =date;
+                }
+            }
+            if(attributes[@"min"])
+            {
+                NSDate *date = [self inputDateStringToDate:attributes[@"min"]];
+                if(date)
+                {
+                    self.datePicker.minimumDate =date;
+                }
+            }
+            
+            self.datePicker.datePickerMode = UIDatePickerModeDate;
+        }else if([attributes[@"type"] isEqualToString:@"time"])
+        {
+            if(attributes[@"value"])
+            {
+                NSDate *date = [self inputTimeStringToDate:attributes[@"value"]];
+                if(date)
+                {
+                    self.datePicker.date = date;
+                }
+                self.datePicker.datePickerMode = UIDatePickerModeTime;
+            }
+        }
+        
+        
+    }
+}
+
 -(UIView *)createBackgroudView
 {
     UIView *view = [UIView new];
