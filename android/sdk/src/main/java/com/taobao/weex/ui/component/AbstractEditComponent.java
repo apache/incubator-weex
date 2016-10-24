@@ -271,6 +271,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     });
   }
 
+  protected int getVerticalGravity(){
+    return Gravity.CENTER_VERTICAL;
+  }
+
   /**
    * Process view after created.
    *
@@ -282,7 +286,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if (textAlign <= 0) {
       textAlign = Gravity.LEFT;
     }
-    editText.setGravity(textAlign | Gravity.CENTER_VERTICAL);
+    editText.setGravity(textAlign | getVerticalGravity());
     int colorInt = WXResourceUtils.getColor("#999999");
     if (colorInt != Integer.MIN_VALUE) {
       editText.setHintTextColor(colorInt);
