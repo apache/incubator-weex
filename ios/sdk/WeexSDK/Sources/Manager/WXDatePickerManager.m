@@ -46,8 +46,6 @@
             datePicker = [[UIDatePicker alloc]init];
         }
         
-        
-        
         datePicker.datePickerMode=UIDatePickerModeDate;
         CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
         datePicker.backgroundColor = [UIColor whiteColor];
@@ -113,11 +111,8 @@
                 self.datePicker.datePickerMode = UIDatePickerModeTime;
             }
         }
-        
-        
     }
 }
-
 
 -(void)updateDatePicker:(NSDictionary *)attributes
 {
@@ -164,7 +159,6 @@
                 self.datePicker.datePickerMode = UIDatePickerModeTime;
             }
         }
-        
         
     }
 }
@@ -220,12 +214,12 @@
     }];
 }
 
--(IBAction)cancel:(id)sender
+-(void)cancel:(id)sender
 {
     [self hide];
 }
 
--(IBAction)done:(id)sender
+-(void)done:(id)sender
 {
     [self hide];
     if (self.delegate && [self.delegate respondsToSelector:@selector(fetchDatePickerValue:)]) {
@@ -257,7 +251,6 @@
     NSDate *date=[formatter dateFromString:dateString];
     return date;
 }
-
 
 -(NSString *)dateToString:(NSDate *)date
 {
