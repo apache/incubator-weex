@@ -38,7 +38,7 @@ WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
-WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
+WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 
 - (void)performBlockOnComponentMananger:(void(^)(WXComponentManager *))block
@@ -165,7 +165,7 @@ WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
     }];
 }
 
-- (void)getComponentSize:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+- (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     
     [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
         NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
@@ -181,25 +181,29 @@ WX_EXPORT_METHOD(@selector(getComponentSize:callback:))
                                      @"right":@(CGRectGetMaxX(rootRect) - rootRect.origin.x),
                                      @"top":@(rootRect.origin.y)
                                     } forKey:@"size"];
+            callback(callbackRsp, false);
         }else {
             WXComponent *component = [manager componentForRef:ref];
-            if (!component) {
-                [callbackRsp setObject:@(false) forKey:@"result"];
-                [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
-            } else {
-                CGRect componentRect = [component.view convertRect:component.calculatedFrame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
-                [callbackRsp setObject:@(true)forKey:@"result"];
-                [callbackRsp setObject:@{
-                                         @"width":@(componentRect.size.width),
-                                         @"height":@(componentRect.size.height),
-                                         @"bottom":@(CGRectGetMaxY(componentRect) - rootRect.origin.y),
-                                         @"left":@(componentRect.origin.x - rootRect.origin.x),
-                                         @"right":@(CGRectGetMaxX(componentRect) - rootRect.origin.x),
-                                         @"top":@(componentRect.origin.y - rootRect.origin.y)
-                                         } forKey:@"size"];
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!component) {
+                    [callbackRsp setObject:@(false) forKey:@"result"];
+                    [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
+                } else {
+                    CGRect componentRect = [component.view convertRect:component.calculatedFrame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+                    [callbackRsp setObject:@(true)forKey:@"result"];
+                    [callbackRsp setObject:@{
+                                             @"width":@(componentRect.size.width),
+                                             @"height":@(componentRect.size.height),
+                                             @"bottom":@(CGRectGetMaxY(componentRect) - rootRect.origin.y),
+                                             @"left":@(componentRect.origin.x - rootRect.origin.x),
+                                             @"right":@(CGRectGetMaxX(componentRect) - rootRect.origin.x),
+                                             @"top":@(componentRect.origin.y - rootRect.origin.y)
+                                             } forKey:@"size"];
+                }
+                callback(callbackRsp, false);
+            });
+           
         }
-        callback(callbackRsp, false);
     }];
 }
 
