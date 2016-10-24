@@ -106,6 +106,35 @@ describe('generate virtual dom for a single vm', () => {
     expect(spy1).callCount(1)
   })
 
+  it('generate an static element ', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        attr: {
+          a: 1,
+          b: 2,
+          static: ''
+        },
+        style: {
+          c: 3,
+          d: 4
+        }
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(vm._static).eql(true)
+    expect(doc.body).is.an.object
+    expect(doc.body.type).eql('container')
+    expect(doc.body.attr).eql({ a: 1, b: 2, static: '' })
+    expect(doc.body.style).eql({ c: 3, d: 4 })
+    expect(doc.body.children).is.an.array
+    expect(doc.body.children.length).eql(0)
+  })
+
   it('generate an single element', () => {
     customComponentMap.foo = {
       template: {
@@ -457,6 +486,107 @@ describe('generate virtual dom for a single vm', () => {
     expect(el.children[6].attr).eql({ src: 6 })
   })
 
+  it('generate an static element tree with shown and repeat', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        attr: {
+          static: ''
+        },
+        children: [
+          { type: 'prev' },
+          {
+            shown: function () { return this.x % 2 === 0 },
+            repeat: function () { return this.list },
+            type: 'image', attr: { src: function () { return this.x } }
+          },
+          { type: 'next' }
+        ]
+      },
+      data: {
+        x: '<some image url>',
+        list: [
+          { uid: 1, x: 1 }, { uid: 2, x: 2 }, { uid: 3 }
+        ]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(vm._static).equal(true)
+    expect(vm.x).eql('<some image url>')
+    expect(vm.list).eql([
+      { uid: 1, x: 1, $index: 0 },
+      { uid: 2, x: 2, $index: 1 },
+      { uid: 3, $index: 2 }])
+
+    const el = doc.body
+    expect(el.type).eql('container')
+    expect(el.children).is.an.array
+    expect(el.children.length).eql(11)
+
+    const prev = el.children[0]
+    const next = el.children[10]
+    expect(prev.type).eql('prev')
+    expect(el.children[1].type).eql('comment')
+    expect(el.children[1].value).eql('start')
+    expect(el.children[9].type).eql('comment')
+    expect(el.children[9].value).eql('end')
+
+    expect(el.children[2].type).eql('comment')
+    expect(el.children[2].value).eql('start')
+    expect(el.children[3].type).eql('comment')
+    expect(el.children[3].value).eql('end')
+
+    expect(el.children[4].type).eql('comment')
+    expect(el.children[4].value).eql('start')
+    expect(el.children[5].type).eql('image')
+    expect(el.children[5].attr).eql({ src: 2 })
+    expect(el.children[6].type).eql('comment')
+    expect(el.children[6].value).eql('end')
+
+    expect(el.children[7].type).eql('comment')
+    expect(el.children[7].value).eql('start')
+    expect(el.children[8].type).eql('comment')
+    expect(el.children[8].value).eql('end')
+    expect(next.type).eql('next')
+
+    vm.list[0].x = 4
+    differ.flush()
+
+    expect(el.children.length).eql(11)
+    expect(el.children[5].type).eql('image')
+    expect(el.children[5].attr).eql({ src: 2 })
+  })
+
+  it('generate an element tree which root element with shown and repeat', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        shown: function () { return this.x % 2 === 0 },
+        repeat: function () { return this.list }
+      },
+      data: {
+        x: 2,
+        list: [
+          { uid: 1, x: 1 }, { uid: 2, x: 2 }, { uid: 3 }
+        ]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(vm.x).eql(2)
+    expect(vm.list).eql([
+      { uid: 1, x: 1 },
+      { uid: 2, x: 2 },
+      { uid: 3 }])
+  })
+
   it('generate an element tree with shown and repeat', () => {
     customComponentMap.foo = {
       template: {
@@ -784,6 +914,40 @@ describe('generate virtual dom for sub vm', () => {
     expect(vm._ids['bar2-1'].el).to.be.not.undefined
     expect(vm._ids['bar2-2'].vm).to.be.not.undefined
     expect(vm._ids['bar2-2'].el).to.be.not.undefined
+  })
+
+  it('generate sub element with static', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        attr: {
+          static: ''
+        },
+        children: [{ type: 'bar', component: true }]
+      }
+    }
+    customComponentMap.bar = {
+      replace: true,
+      template: {
+        type: 'container',
+        children: [{ type: 'aaa' }]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(vm._static).eql(true)
+    const el = doc.body
+    expect(el.type).eql('container')
+    expect(el.children).is.an.array
+    expect(el.children.length).eql(1)
+
+    const aaa = el.children[0]
+    expect(aaa.type).eql('aaa')
+    expect(vm._childrenVms.length).to.be.equal(1)
+    expect(vm._childrenVms[0]._static).eql(true)
   })
 
   it('generate replaced sub element', () => {
