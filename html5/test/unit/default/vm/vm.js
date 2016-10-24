@@ -559,15 +559,113 @@ describe('generate virtual dom for a single vm', () => {
     expect(el.children[5].attr).eql({ src: 2 })
   })
 
-  it('generate an element tree which root element with shown and repeat', () => {
+  it('generate an element tree which root element with shown', () => {
     customComponentMap.foo = {
       template: {
         type: 'container',
-        shown: function () { return this.x % 2 === 0 },
+        shown: function () { return this.x % 2 === 0 }
+      },
+      data: {
+        x: 2
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(vm.x).eql(2)
+  })
+
+  it('append tree', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        attr: {
+          append: 'tree'
+        },
+        children: [
+          { type: 'a' },
+          { repeat: {}}
+        ]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+  })
+
+  it('repeat is not a function', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        children: [
+          { type: 'a' },
+          { repeat: {}}
+        ]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+  })
+
+  it('repeat oldStyle with item which not a object', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        children: [
+          { type: 'a' },
+          { repeat: function () { return [1, 2, 3] } }
+        ]
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+  })
+
+  it('classList length is zero', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        classList: []
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+  })
+
+  it('classList is a function', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
+        classList: function () { return [] }
+      }
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+  })
+
+  it('generate an element tree which root element with repeat', () => {
+    customComponentMap.foo = {
+      template: {
+        type: 'container',
         repeat: function () { return this.list }
       },
       data: {
-        x: 2,
         list: [
           { uid: 1, x: 1 }, { uid: 2, x: 2 }, { uid: 3 }
         ]
@@ -578,11 +676,11 @@ describe('generate virtual dom for a single vm', () => {
     const vm = new Vm('foo', customComponentMap.foo, { _app: app })
 
     expect(vm._app).equal(app)
-    expect(vm.x).eql(2)
     expect(vm.list).eql([
       { uid: 1, x: 1 },
       { uid: 2, x: 2 },
-      { uid: 3 }])
+      { uid: 3 }
+    ])
   })
 
   it('generate an element tree with shown and repeat', () => {
