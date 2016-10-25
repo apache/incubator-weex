@@ -286,26 +286,6 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     return mRef;
   }
 
-  @Override
-  public float getLayoutLeft() {
-    return getCSSLayoutLeft();
-  }
-
-  @Override
-  public float getLayoutRight() {
-    return getCSSLayoutRight();
-  }
-
-  @Override
-  public float getLayoutTop() {
-    return getCSSLayoutTop();
-  }
-
-  @Override
-  public float getLayoutBottom() {
-    return getCSSLayoutBottom();
-  }
-
   public String getType(){
     return mType;
   }

@@ -215,10 +215,8 @@ public interface ImmutableDomObject {
   Spacing getMargin();
   float getLayoutWidth();
   float getLayoutHeight();
-  float getLayoutLeft();
-  float getLayoutRight();
-  float getLayoutTop();
-  float getLayoutBottom();
+  float getLayoutX();
+  float getLayoutY();
   boolean isFixed();
   WXStyle getStyles();
   WXEvent getEvents();

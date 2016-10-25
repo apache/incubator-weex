@@ -393,9 +393,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     Spacing margin = mDomObj.getMargin();
     int realWidth = (int) mDomObj.getLayoutWidth();
     int realHeight = (int) mDomObj.getLayoutHeight();
-    int realLeft = (int) (mDomObj.getLayoutLeft() - parentPadding.get(Spacing.LEFT) -
+    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) -
                           parentBorder.get(Spacing.LEFT));
-    int realTop = (int) (mDomObj.getLayoutTop() - parentPadding.get(Spacing.TOP) -
+    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) -
                          parentBorder.get(Spacing.TOP)) + siblingOffset;
     int realRight = (int) margin.get(Spacing.RIGHT);
     int realBottom = (int) margin.get(Spacing.BOTTOM);
@@ -404,8 +404,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutTop());
-    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mDomObj.getLayoutLeft());
+    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutY());
+    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mDomObj.getLayoutX());
 
     //calculate first screen time
     if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
