@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <SRWebSocket.h>
 
-@interface WXDemoViewController : UIViewController<SRWebSocketDelegate>
+@interface WXDemoViewController : UIViewController<SRWebSocketDelegate,UIViewControllerPreviewingDelegate>
 
 @property (nonatomic, strong) NSString *script;
 @property (nonatomic, strong) NSURL *url;

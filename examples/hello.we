@@ -1,5 +1,96 @@
 <template>
-  <div>
-    <text style="font-size:100px;">Hello World.</text>
-  </div>
+  <scroller>
+    <wxc-panel title="color" type="primary">
+      <text id="fsize" class="txt">default is black</text>
+      <text class="txt" style="color:#286090">#286090</text>
+      <text class="txt" style="color:#0f0">#0f0</text>
+      <text class="txt" style="color:red">keyword</text>
+      <text class="txt" style="color:rgb(238, 162, 54)">rgb(238, 162, 54)</text>
+      <text class="txt" style="color:rgba(238, 162, 54, 0.5)">rgba(238, 162, 54, 0.5)</text>
+    </wxc-panel>
+
+    <wxc-panel  title="font-size" type="primary">
+      <!--<div style="flex-direction: row">-->
+        <text class="txt" style="font-size: 32px;">32</text>
+        <text class="txt" style="font-size: 64px;">64</text>
+        <text class="txt" style="font-size: 100px;">100</text>
+      <!--</div>-->
+    </wxc-panel>
+
+    <wxc-panel title="font-style" type="primary">
+      <text class="txt" style="font-style: normal">normal</text>
+      <text class="txt" style="font-style: italic">italic</text>
+    </wxc-panel>
+
+    <wxc-panel id="fheight" title="font-weight" type="primary">
+      <text class="txt" style="font-weight: normal">normal</text>
+      <text class="txt" style="font-weight: bold">bold</text>
+    </wxc-panel>
+
+    <wxc-panel title="text-decoration" type="primary">
+      <text class="txt" style="text-decoration: none">none</text>
+      <text class="txt" style="text-decoration: underline">underline</text>
+      <text class="txt" style="text-decoration: line-through">line-through</text>
+    </wxc-panel>
+
+    <wxc-panel title="text-align" type="primary">
+      <text class="txt" style="text-align: left">left</text>
+      <text class="txt" style="text-align: center">center</text>
+      <text class="txt" style="text-align: right">right</text>
+    </wxc-panel>
+
+    <wxc-panel title="text-overflow" type="primary">
+      <text class="txt" style="lines:1">no text-overflow, no text-overflow</text>
+      <text class="txt" style="text-overflow:clip;width: 450px;lines:1">text-overflow: clip, text-overflow: clip</text>
+      <text class="txt" style="text-overflow:ellipsis;width: 450px;lines:1">text-overflow: ellipsis, text-overflow: ellipsis</text>
+    </wxc-panel>
+    <wxc-panel id="lineh" title="line-height" type="primary">
+      <text class="txt">no lineheight setting</text>
+      <text class="txt" style="line-height: 50">lineheight 50</text>
+      <text class="txt" style="line-height: 80"> lineheight 80</text>
+    </wxc-panel>
+  </scroller>
 </template>
+
+<style>
+  .txt {
+    margin-bottom: 12px;
+    font-size: 40px;
+  }
+</style>
+
+<script>
+  require('weex-components');
+  var dom = require('@weex-module/dom')
+  module.exports = {
+    ready: function() {
+      console.log('dom module:', dom)
+      var fsize = this.$el('fsize')
+      console.log('fsize:', fsize)
+
+      var rect = dom.getComponentRect(fsize, function (info) {
+        console.log('run callback', info)
+      })
+      dom.getComponentRect(this.$el('fheight'), function (info) {
+        console.log('font-height', info)
+      })
+      dom.getComponentRect(this.$el('lineh'), function (info) {
+        console.log('line-height', info)
+      })
+      dom.getComponentRect('viewport', function (info) {
+        console.log('viewport', info)
+      })
+      dom.getComponentRect('invalid', function (info) {
+        console.log('invalid', info)
+      })
+
+      setTimeout(function() {
+        dom.getComponentRect(fsize, function (info) {
+          console.log('run    callback', info)
+        })
+      }, 2000)
+
+      console.log('getComponentRect:', rect)
+    }
+  }
+</script>
