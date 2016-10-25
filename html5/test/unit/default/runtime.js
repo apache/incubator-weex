@@ -6,9 +6,11 @@ const {
 } = chai
 chai.use(sinonChai)
 
-import { init, config } from '../../../runtime'
+import runtime from '../../../runtime'
 import frameworks from '../../../frameworks'
 import defaultConfig from '../../../frameworks/legacy/config'
+
+const { init, config } = runtime
 config.frameworks = frameworks
 
 import Vm from '../../../frameworks/legacy/vm'
@@ -31,6 +33,7 @@ describe('framework entry', () => {
   const instanceId = Date.now() + ''
 
   before(() => {
+    runtime.setNativeConsole()
     global.callNative = (id, tasks, callbackId) => {
       callNativeSpy(id, tasks, callbackId)
       /* istanbul ignore if */

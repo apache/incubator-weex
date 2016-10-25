@@ -1,6 +1,7 @@
 import './setTimeout'
-import './promise'
-import './console'
+import './arrayFrom'
 import './objectAssign'
 import './objectSetPrototypeOf'
-import './arrayFrom'
+import './promise'
+
+export * from './console'
