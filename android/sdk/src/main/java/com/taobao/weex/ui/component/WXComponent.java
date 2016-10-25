@@ -147,6 +147,7 @@ import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -183,7 +184,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
-  private volatile WXDomObject mDomObj;
+  private volatile ImmutableDomObject mDomObj;
   private WXSDKInstance mInstance;
   private Context mContext;
 
@@ -203,6 +204,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private List<OnClickListener> mHostClickListeners;
   private List<OnFocusChangeListener> mFocusChangeListeners;
   private String mCurrentRef;
+  private Set<String> mAppendEvents = new HashSet<>();
 
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
@@ -212,8 +214,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost.getLocationOnScreen(location);
       params.put("x", location[0]);
       params.put("y", location[1]);
-      params.put("width", mDomObj.getCSSLayoutWidth());
-      params.put("height", mDomObj.getCSSLayoutHeight());
+      params.put("width", mDomObj.getLayoutWidth());
+      params.put("height", mDomObj.getLayoutHeight());
       getInstance().fireEvent(mCurrentRef,
           Constants.Event.CLICK,
           params);
@@ -375,7 +377,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /**
    * layout view
    */
-  public final void setLayout(WXDomObject domObject) {
+  public final void setLayout(ImmutableDomObject domObject) {
     if ( domObject == null || TextUtils.isEmpty(mCurrentRef)) {
       return;
     }
@@ -391,9 +393,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     Spacing margin = mDomObj.getMargin();
     int realWidth = (int) mDomObj.getLayoutWidth();
     int realHeight = (int) mDomObj.getLayoutHeight();
-    int realLeft = (int) (mDomObj.getLayoutX() - parentPadding.get(Spacing.LEFT) -
+    int realLeft = (int) (mDomObj.getLayoutLeft() - parentPadding.get(Spacing.LEFT) -
                           parentBorder.get(Spacing.LEFT));
-    int realTop = (int) (mDomObj.getLayoutY() - parentPadding.get(Spacing.TOP) -
+    int realTop = (int) (mDomObj.getLayoutTop() - parentPadding.get(Spacing.TOP) -
                          parentBorder.get(Spacing.TOP)) + siblingOffset;
     int realRight = (int) margin.get(Spacing.RIGHT);
     int realBottom = (int) margin.get(Spacing.BOTTOM);
@@ -402,8 +404,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutY());
-    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mDomObj.getLayoutX());
+    mAbsoluteY = (int) (nullParent?0:mParent.getAbsoluteY() + mDomObj.getLayoutTop());
+    mAbsoluteX = (int) (nullParent?0:mParent.getAbsoluteX() + mDomObj.getLayoutLeft());
 
     //calculate first screen time
     if (!mInstance.mEnd &&!(mHost instanceof ViewGroup) && mAbsoluteY+realHeight > mInstance.getWeexHeight()+1) {
@@ -492,7 +494,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   }
 
-  public WXDomObject getDomObject() {
+  public ImmutableDomObject getDomObject() {
     return mDomObj;
   }
 
@@ -674,7 +676,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (TextUtils.isEmpty(type)) {
       return;
     }
-    mDomObj.addEvent(type);
+    mAppendEvents.add(type);
     if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
       addClickListener(mClickEventListener);
     } else if ((type.equals( Constants.Event.FOCUS) || type.equals( Constants.Event.BLUR)) ) {
@@ -845,14 +847,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (dom == null) {
       return;
     }
-    mDomObj = dom;
+    mDomObj = dom.clone();
   }
 
   public final void removeEvent(String type) {
     if (TextUtils.isEmpty(type)) {
       return;
     }
-    mDomObj.removeEvent(type);
+    mAppendEvents.remove(type);//only clean append events, not dom's events.
     mGestureType.remove(type);
     removeEventFromView(type);
   }
@@ -878,7 +880,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     for (String event : mDomObj.getEvents()) {
       removeEventFromView(event);
     }
-    mDomObj.clearEvents();
+    mAppendEvents.clear();//only clean append events, not dom's events.
     mGestureType.clear();
     wxGesture = null;
     if (getRealView() != null &&
@@ -1097,7 +1099,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     removeAllEvent();
     removeStickyStyle();
     if (mDomObj != null) {
-      mDomObj.destroy();
+      mDomObj = null;
     }
   }
 
@@ -1136,8 +1138,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
+  protected boolean containsEvent(String event){
+    return mDomObj.getEvents().contains(event) || mAppendEvents.contains(event);
+  }
+
   public void notifyAppearStateChange(String wxEventType,String direction){
-    if(getDomObject().containsEvent(Constants.Event.APPEAR) || getDomObject().containsEvent(Constants.Event.DISAPPEAR)) {
+    if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
       getInstance().fireEvent(getRef(), wxEventType, params,null);

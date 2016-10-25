@@ -339,7 +339,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   @Override
   public void destroy() {
-    super.destroy();
     if (mChildren != null) {
       int count = mChildren.size();
       for (int i = 0; i < count; ++i) {
@@ -347,6 +346,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       }
       mChildren.clear();
     }
+    super.destroy();
   }
 
   @Override

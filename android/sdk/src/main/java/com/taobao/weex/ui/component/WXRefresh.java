@@ -254,7 +254,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   @Override
   public int getLayoutTopOffsetForSibling() {
     //offset siblings
-    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getCSSLayoutHeight()) : 0;
+    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getLayoutHeight()) : 0;
   }
 
   @Override

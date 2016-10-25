@@ -211,6 +211,8 @@ public class Constants {
   }
 
   public interface Name {
+    String DEFAULT_WIDTH = "defaultWidth";
+    String DEFAULT_HEIGHT = "defaultHeight";
     String HREF = "href";
     String WIDTH = "width";
     String MIN_WIDTH = "minWidth";
