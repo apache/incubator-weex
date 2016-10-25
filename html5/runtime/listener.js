@@ -3,7 +3,7 @@
  * Listen virtual-dom operations and create corresponding actions.
  */
 
-import { extend } from './vdom/operation'
+import '../shared/objectAssign'
 
 export default function Listener (id, handler) {
   this.id = id
@@ -27,7 +27,7 @@ export function createAction (name, args = []) {
   return { module: 'dom', method: name, args: args }
 }
 
-extend(Listener.prototype, {
+Object.assign(Listener.prototype, {
   /**
    * Send the "createFinish" signal.
    * @param {function} callback

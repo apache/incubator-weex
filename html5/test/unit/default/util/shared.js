@@ -1,5 +1,6 @@
 import { expect } from 'chai'
-import utils from '../../../shared/utils'
+
+import * as utils from '../../../../frameworks/legacy/util/shared'
 
 describe('test util functions', () => {
   it('extend', () => {

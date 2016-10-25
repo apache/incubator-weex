@@ -3,9 +3,9 @@
  * Virtual-DOM Element.
  */
 
+import '../../shared/objectAssign'
 import Node from './node'
 import {
-  extend,
   getDoc,
   getListener,
   uniqueId,
@@ -41,7 +41,7 @@ function registerNode (docId, node) {
   doc.nodeMap[node.nodeId] = node
 }
 
-extend(Element.prototype, {
+Object.assign(Element.prototype, {
   /**
    * Append a child node.
    * @param {object} node
@@ -259,7 +259,7 @@ extend(Element.prototype, {
       this.classStyle[key] = ''
     }
 
-    extend(this.classStyle, classStyle)
+    Object.assign(this.classStyle, classStyle)
     const listener = getListener(this.docId)
     if (listener) {
       listener.setStyles(this.ref, this.toStyle())
@@ -313,7 +313,7 @@ extend(Element.prototype, {
    * @return {object} style
    */
   toStyle () {
-    return extend({}, this.classStyle, this.style)
+    return Object.assign({}, this.classStyle, this.style)
   },
 
   /**

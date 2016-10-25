@@ -5,6 +5,7 @@
  * virtual-DOM layer.
  */
 
+import '../shared'
 import { Document, Element, Comment } from './vdom'
 import Listener from './listener'
 import init from './init'

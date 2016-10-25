@@ -3,11 +3,12 @@
  * Virtual-DOM Document.
  */
 
+import '../../shared/objectAssign'
 import Comment from './comment'
 import Element from './element'
 import Listener from '../listener'
 import { createHandler } from '../handler'
-import { extend, addDoc, removeDoc, appendBody, setBody } from './operation'
+import { addDoc, removeDoc, appendBody, setBody } from './operation'
 
 export default function Document (id, url, handler) {
   id = id ? id.toString() : ''
@@ -40,7 +41,7 @@ function updateElement (el, changes) {
   }
 }
 
-extend(Document.prototype, {
+Object.assign(Document.prototype, {
   /**
    * Get the node from nodeMap.
    * @param {string} reference id

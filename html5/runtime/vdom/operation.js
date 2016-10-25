@@ -1,4 +1,3 @@
-export { extend } from '../../shared/utils'
 
 const docMap = {}
 
