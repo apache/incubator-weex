@@ -233,6 +233,7 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
@@ -1119,12 +1120,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
         JSONObject style = new JSONObject();
         WXComponent rootComponent = mRootComp;
-        if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyHeight()) {
-          style.put(Constants.Name.HEIGHT, realHeight);
+
+        if(rootComponent == null){
+          return;
         }
-        if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyWidth()) {
-          style.put(Constants.Name.WIDTH, realWidth);
-        }
+        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
+        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
         updateRootComponentStyle(style);
       }
     }

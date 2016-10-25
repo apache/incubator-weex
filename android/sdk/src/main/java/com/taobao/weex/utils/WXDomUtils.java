@@ -205,6 +205,7 @@
 
 package com.taobao.weex.utils;
 
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.Spacing;
@@ -216,7 +217,7 @@ public class WXDomUtils {
    * @return the width of the dom that excludes left-padding, left-border-width,
    * right-border-width and right-padding.
    */
-  public static float getContentWidth(WXDomObject domObject) {
+  public static float getContentWidth(ImmutableDomObject domObject) {
     float rawWidth = domObject.getLayoutWidth();
     float leftPadding, rightPadding, leftBorder, rightBorder;
     Spacing padding = domObject.getPadding();
@@ -243,7 +244,7 @@ public class WXDomUtils {
    * @return the height of the dom that excludes top-padding, top-border-width, bottom-padding
    * and bottom-border-width.
    */
-  public static float getContentHeight(WXDomObject domObject) {
+  public static float getContentHeight(ImmutableDomObject domObject) {
     float rawHeight = domObject.getLayoutHeight();
     float topPadding, bottomPadding, topBorder, bottomBorder;
     Spacing padding = domObject.getPadding();

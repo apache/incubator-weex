@@ -347,7 +347,7 @@ class WXRenderStatement {
     if(comp == null || !(comp instanceof WXVContainer)){
       return null;
     }
-    return generateComponentTree(dom, (WXVContainer) mRegistry.get(parentRef));
+    return generateComponentTree(dom, (WXVContainer) comp);
   }
 
   /**
