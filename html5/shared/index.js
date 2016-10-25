@@ -1,28 +1,7 @@
-import './setTimeout'
-import './promise'
-import './console'
+import './arrayFrom'
 import './objectAssign'
 import './objectSetPrototypeOf'
-import './arrayFrom'
+import './promise'
 
-import {
-  extend,
-  def,
-  remove,
-  hasOwn,
-  bind,
-  toArray,
-  isObject,
-  isPlainObject
-} from './utils'
-
-export {
-  extend,
-  def,
-  remove,
-  hasOwn,
-  bind,
-  toArray,
-  isObject,
-  isPlainObject
-}
+export * from './console'
+export * from './setTimeout'

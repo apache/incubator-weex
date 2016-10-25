@@ -5,6 +5,7 @@
  * virtual-DOM layer.
  */
 
+import * as shared from '../shared'
 import { Document, Element, Comment } from './vdom'
 import Listener from './listener'
 import init from './init'
@@ -18,7 +19,11 @@ const config = {
 
 Document.handler = config.sendTasks
 
-export {
+export default {
+  setNativeConsole: shared.setNativeConsole,
+  resetNativeConsole: shared.resetNativeConsole,
+  setNativeTimer: shared.setNativeTimer,
+  resetNativeTimer: shared.resetNativeTimer,
   init,
   config
 }
