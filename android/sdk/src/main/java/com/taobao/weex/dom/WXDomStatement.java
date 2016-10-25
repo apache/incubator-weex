@@ -422,27 +422,16 @@ class WXDomStatement {
             @Override
             public void execute() {
               mWXRenderManager.setLayout(mInstanceId, copy.getRef(), copy);
+              if(copy.getExtra() != null) {
+                mWXRenderManager.setExtra(mInstanceId, copy.getRef(), copy.getExtra());
+              }
             }
 
             @Override
             public String toString() {
-              return "setLayout";
+              return "setLayout & setExtra";
             }
           });
-          if (dom.getExtra() != null) {
-            mNormalTasks.add(new IWXRenderTask() {
-
-              @Override
-              public void execute() {
-                mWXRenderManager.setExtra(mInstanceId, copy.getRef(), copy.getExtra());
-              }
-
-              @Override
-              public String toString() {
-                return "setExtra";
-              }
-            });
-          }
         }
       }
     }
