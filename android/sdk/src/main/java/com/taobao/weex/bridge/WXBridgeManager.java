@@ -756,7 +756,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     } catch (Throwable e) {
       String err = "[WXBridgeManager] invokeRefreshInstance " + e.getCause();
       WXErrorCode.WX_ERR_INVOKE_NATIVE.appendErrMsg(err);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE);
       WXLogUtils.e(err);
     }
   }
