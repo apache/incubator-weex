@@ -7,6 +7,7 @@ config.frameworks = frameworks
 const { native, transformer } = subversion
 
 runtime.setNativeConsole()
+runtime.setNativeTimer()
 
 // register framework meta info
 global.frameworkVersion = native

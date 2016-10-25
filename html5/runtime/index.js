@@ -22,6 +22,8 @@ Document.handler = config.sendTasks
 export default {
   setNativeConsole: shared.setNativeConsole,
   resetNativeConsole: shared.resetNativeConsole,
+  setNativeTimer: shared.setNativeTimer,
+  resetNativeTimer: shared.resetNativeTimer,
   init,
   config
 }

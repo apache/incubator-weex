@@ -8,26 +8,34 @@
  * `html5/default/app/ctrl.js`).
  */
 
-const {
-  setTimeout,
-  setTimeoutNative
-} = global
+const originalSetTimeout = global.setTimeout
+const setTimeoutNative = global.setTimeoutNative
 
-/* istanbul ignore next */
-if (typeof setTimeout === 'undefined' &&
+/**
+ * Set up native timer
+ */
+export function setNativeTimer () {
+  /* istanbul ignore next */
+  if (typeof setTimeout === 'undefined' &&
   typeof setTimeoutNative === 'function') {
-  const timeoutMap = {}
-  let timeoutId = 0
+    const timeoutMap = {}
+    let timeoutId = 0
 
-  global.setTimeout = (cb, time) => {
-    timeoutMap[++timeoutId] = cb
-    setTimeoutNative(timeoutId.toString(), time)
-  }
+    global.setTimeout = (cb, time) => {
+      timeoutMap[++timeoutId] = cb
+      setTimeoutNative(timeoutId.toString(), time)
+    }
 
-  global.setTimeoutCallback = (id) => {
-    if (typeof timeoutMap[id] === 'function') {
-      timeoutMap[id]()
-      delete timeoutMap[id]
+    global.setTimeoutCallback = (id) => {
+      if (typeof timeoutMap[id] === 'function') {
+        timeoutMap[id]()
+        delete timeoutMap[id]
+      }
     }
   }
+}
+
+export function resetNativeTimer () {
+  global.setTimeout = originalSetTimeout
+  global.setTimeoutCallback = null
 }
