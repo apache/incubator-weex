@@ -1230,13 +1230,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                    + ", exception function:" + function + ", exception:"
                    + exception);
     }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    if (instance != null) {
+    WXSDKInstance instance;
+    if (instanceId != null && (instance = WXSDKManager.getInstance().getSDKInstance(instanceId)) != null) {
       // TODO add errCode
       instance.onJSException(null, function, exception);
+
+      String err="function:"+function+"#exception:"+exception;
+      commitJSBridgeAlarmMonitor(instanceId,WXErrorCode.WX_ERR_JS_EXECUTE,err);
     }
-    String err="function:"+function+"#exception:"+exception;
-    commitJSBridgeAlarmMonitor(instanceId,WXErrorCode.WX_ERR_JS_EXECUTE,err);
   }
 
   public static class TimerInfo {
