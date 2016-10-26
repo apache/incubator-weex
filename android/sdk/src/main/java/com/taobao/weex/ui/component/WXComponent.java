@@ -887,6 +887,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         getRealView() instanceof WXGestureObservable) {
       ((WXGestureObservable) getRealView()).registerGestureListener(null);
     }
+    if(mHost != null) {
+      mHost.setOnFocusChangeListener(null);
+      mHost.setOnClickListener(null);
+    }
   }
 
   public final void removeStickyStyle() {

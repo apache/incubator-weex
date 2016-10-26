@@ -284,7 +284,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     String alignStr = (String) getDomObject().getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
-      textAlign = Gravity.LEFT;
+      textAlign = Gravity.START;
     }
     editText.setGravity(textAlign | getVerticalGravity());
     int colorInt = WXResourceUtils.getColor("#999999");
@@ -522,7 +522,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   public void setTextAlign(String textAlign) {
     int align = getTextAlign(textAlign);
     if (align > 0) {
-      getHostView().setGravity(align | Gravity.CENTER_VERTICAL);
+      getHostView().setGravity(align | getVerticalGravity());
     }
   }
 
@@ -624,16 +624,16 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   private int getTextAlign(String textAlign) {
-    int align = Gravity.LEFT;
+    int align = Gravity.START;
     if (TextUtils.isEmpty(textAlign)) {
       return align;
     }
     if (textAlign.equals(Constants.Value.LEFT)) {
-      align = Gravity.LEFT;
+      align = Gravity.START;
     } else if (textAlign.equals(Constants.Value.CENTER)) {
       align = Gravity.CENTER;
     } else if (textAlign.equals(Constants.Value.RIGHT)) {
-      align = Gravity.RIGHT;
+      align = Gravity.END;
     }
     return align;
   }
