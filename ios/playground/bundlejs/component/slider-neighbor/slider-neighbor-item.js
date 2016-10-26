@@ -45,10 +45,11 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(231)
-	var __weex_script__ = __webpack_require__(232)
+	var __weex_template__ = __webpack_require__(153)
+	var __weex_style__ = __webpack_require__(154)
+	var __weex_script__ = __webpack_require__(155)
 
-	__weex_define__('@weex-component/df4a1d587e74e64ad99011cd2bcf06b7', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/d723bedd436352d63e4fa599317a8037', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -57,54 +58,70 @@
 
 	    __weex_module__.exports.template = __weex_template__
 
+	    __weex_module__.exports.style = __weex_style__
+
 	})
 
-	__weex_bootstrap__('@weex-component/df4a1d587e74e64ad99011cd2bcf06b7',undefined,undefined)
+	__weex_bootstrap__('@weex-component/d723bedd436352d63e4fa599317a8037',undefined,undefined)
 
 /***/ },
 
-/***/ 231:
+/***/ 153:
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "image",
-	  "style": {
-	    "width": function () {return this.width},
-	    "height": function () {return this.height}
+	  "type": "div",
+	  "classList": [
+	    "slider-item-container"
+	  ],
+	  "children": [
+	    {
+	      "type": "image",
+	      "classList": [
+	        "slider-item-image"
+	      ],
+	      "attr": {
+	        "src": function () {return this.image}
+	      }
+	    }
+	  ]
+	}
+
+/***/ },
+
+/***/ 154:
+/***/ function(module, exports) {
+
+	module.exports = {
+	  "slider-item-container": {
+	    "width": 542,
+	    "height": 360,
+	    "justifyContent": "center",
+	    "flexDirection": "row",
+	    "padding": 10
 	  },
-	  "attr": {
-	    "src": function () {return this.src},
-	    "imageQuality": function () {return this.quality}
-	  },
-	  "events": {
-	    "click": "_clickHandler"
+	  "slider-item-image": {
+	    "width": 542,
+	    "height": 360
 	  }
 	}
 
 /***/ },
 
-/***/ 232:
+/***/ 155:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
 	module.exports = {
 	  data: function () {return {
-	    quality: 'normal',
-	    width: 0,
-	    height: 0,
-	    src: '',
-	    href: '',
-	    spmc: 0,
-	    spmd: 0
+	    image: '',
+	    link: '',
+	    href: ''
 	  }},
 	  methods: {
-	    ready: function ready() {},
-	    _clickHandler: function _clickHandler() {
-	      this.$call('modal', 'toast', {
-	        message: 'click',
-	        duration: 1
-	      });
+	    ready: function ready() {
+	      this.href = this.link;
 	    }
 	  }
 	};}

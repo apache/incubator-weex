@@ -44,10 +44,10 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(216)
-	var __weex_script__ = __webpack_require__(217)
+	var __weex_template__ = __webpack_require__(214)
+	var __weex_script__ = __webpack_require__(215)
 
-	__weex_define__('@weex-component/2c445dcf67fa0895d197edb5ffa2f439', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -58,7 +58,7 @@
 
 	})
 
-	__weex_bootstrap__('@weex-component/2c445dcf67fa0895d197edb5ffa2f439',undefined,undefined)
+	__weex_bootstrap__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf',undefined,undefined)
 
 /***/ },
 /* 1 */,
@@ -2167,9 +2167,7 @@
 /* 211 */,
 /* 212 */,
 /* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */
+/* 214 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2178,20 +2176,20 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "stream.fetch",
+	        "title": "storage API",
 	        "type": "primary"
 	      },
 	      "children": [
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "method = GET"
+	            "title": "setItem"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.getResult}
+	                "value": function () {return this.setItemResult}
 	              }
 	            }
 	          ]
@@ -2199,13 +2197,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "method = GET / type = jsonp"
+	            "title": "getItem"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.getJsonpResult}
+	                "value": function () {return this.getItemResult}
 	              }
 	            }
 	          ]
@@ -2213,13 +2211,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "method = POST"
+	            "title": "length"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.postResult}
+	                "value": function () {return this.lengthResult}
 	              }
 	            }
 	          ]
@@ -2227,13 +2225,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "method = PUT"
+	            "title": "getAllKeys"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.putResult}
+	                "value": function () {return this.getAllKeysResult}
 	              }
 	            }
 	          ]
@@ -2241,41 +2239,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "method = DELETE"
+	            "title": "removeItem"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.deleteResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = HEAD"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.headResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = PATCH"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.patchResult}
+	                "value": function () {return this.removeItemResult}
 	              }
 	            }
 	          ]
@@ -2286,7 +2256,7 @@
 	}
 
 /***/ },
-/* 217 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -2298,139 +2268,49 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	__webpack_require__(4);
-
 	module.exports = {
 	  data: function () {return {
-	    getJsonpResult: 'loading...',
-	    getResult: 'loading...',
-	    postResult: 'loading...',
-	    putResult: 'loading...',
-	    deleteResult: 'loading...',
-	    headResult: 'loading...',
-	    patchResult: 'loading...'
+	    setItemResult: 'loading',
+	    getItemResult: 'loading',
+	    removeItemResult: 'loading',
+	    lengthResult: 'loading',
+	    getAllKeysResult: 'loading'
 	  }},
 	  ready: function ready() {
-	    var stream = __weex_require__('@weex-module/stream');
+	    var storage = __weex_require__('@weex-module/storage');
 	    var me = this;
-	    var GET_URL_JSONP = 'http://jsfiddle.net/echo/jsonp/?callback=anything&result=content_in_response';
-	    var GET_URL = 'http://httpbin.org/get';
-	    var POST_URL = 'http://httpbin.org/post';
-	    var PUT_URL = 'http://httpbin.org/put';
-	    var DELETE_URL = 'http://httpbin.org/delete';
-	    var HEAD_URL = 'http://httpbin.org/status/418';
-	    var PATCH_URL = 'http://httpbin.org/patch';
 
-	    stream.fetch({
-	      method: 'GET',
-	      url: GET_URL_JSONP,
-	      type: 'jsonp'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.getJsonpResult = "request failed";
-	      } else {
-	        console.log('get:' + ret);
-	        me.getJsonpResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get jsonp in progress:' + response.length);
-	      me.getJsonpResult = "bytes received:" + response.length;
+	    storage.setItem('foo', 'foo-value', function (e) {
+	      console.log('set [foo<->foo-value]:' + (0, _stringify2.default)(e));
+	      me.setItemResult = 'foo:' + (0, _stringify2.default)(e) + '\n';
+	    });
+	    storage.setItem('bar', 'bar-value', function (e) {
+	      console.log('set [bar<->bar-value]:' + (0, _stringify2.default)(e));
+	      me.setItemResult = me.setItemResult + 'bar:' + (0, _stringify2.default)(e);
 	    });
 
-	    stream.fetch({
-	      method: 'GET',
-	      url: GET_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.getResult = "request failed";
-	      } else {
-	        console.log('get:' + ret);
-	        me.getResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.getResult = "bytes received:" + response.length;
+	    storage.getItem('foo', function (e) {
+	      console.log('get foo result:' + (0, _stringify2.default)(e));
+	      me.getItemResult = 'get foo,value is ' + e.data + '\n';
+	    });
+	    storage.getItem('bar', function (e) {
+	      console.log('get bar result:' + (0, _stringify2.default)(e));
+	      me.getItemResult += 'get bar,value is ' + e.data;
 	    });
 
-	    stream.fetch({
-	      method: 'POST',
-	      url: POST_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.postResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.postResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.postResult = "bytes received:" + response.length;
+	    storage.length(function (e) {
+	      console.log('length:' + (0, _stringify2.default)(e));
+	      me.lengthResult = 'current length is ' + e.data;
 	    });
 
-	    stream.fetch({
-	      method: 'PUT',
-	      url: PUT_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.putResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.putResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.putResult = "bytes received:" + response.length;
+	    storage.getAllKeys(function (e) {
+	      console.log('getAllKeys:' + (0, _stringify2.default)(e));
+	      me.getAllKeysResult = (0, _stringify2.default)(e.data);
 	    });
 
-	    stream.fetch({
-	      method: 'DELETE',
-	      url: DELETE_URL,
-	      type: 'json'
-	    }, function (ret) {
-
-	      if (!ret.ok) {
-	        me.deleteResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.deleteResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.deleteResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'HEAD',
-	      url: HEAD_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (ret.statusText !== 'I\'m a teapot') {
-	        me.headResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.headResult = ret.statusText;
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.headResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'PATCH',
-	      url: PATCH_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.patchResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.patchResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.patchResult = "bytes received:" + response.length;
+	    storage.removeItem('foo', function (e) {
+	      console.log('remove foo:' + (0, _stringify2.default)(e));
+	      me.removeItemResult = 'remove item foo ' + e.result;
 	    });
 	  }
 	};}
