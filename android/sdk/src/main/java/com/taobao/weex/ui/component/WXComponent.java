@@ -792,7 +792,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
       if(mHost != null){
         mHost.setId(WXViewUtils.generateViewId());
-        mHost.setTag(mDomObj.getType());
       }
       onHostViewInitialized(mHost);
     }else{
@@ -886,6 +885,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (getRealView() != null &&
         getRealView() instanceof WXGestureObservable) {
       ((WXGestureObservable) getRealView()).registerGestureListener(null);
+    }
+    if(mHost != null) {
+      mHost.setOnFocusChangeListener(null);
+      mHost.setOnClickListener(null);
     }
   }
 
