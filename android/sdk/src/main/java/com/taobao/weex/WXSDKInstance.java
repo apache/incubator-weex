@@ -461,6 +461,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
       mRenderContainer = new RenderContainer(getContext());
+      mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
       mRenderContainer.setSDKInstance(this);
     }
