@@ -240,6 +240,7 @@ public class WXComponentRegistry {
           }
 
           registerInfo.put("type",type);
+          registerInfo.put("methods","['test','test2']");
           registerNativeComponent(type, holder);
           registerJSComponent(registerInfo);
           sComponentInfos.add(registerInfo);
