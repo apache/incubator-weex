@@ -12,6 +12,7 @@ import defaultConfig from '../../../frameworks/legacy/config'
 
 const { init, config } = runtime
 config.frameworks = frameworks
+runtime.setNativeConsole()
 
 import Vm from '../../../frameworks/legacy/vm'
 import { clearModules, getModule } from '../../../frameworks/legacy/app/register'
@@ -33,7 +34,6 @@ describe('framework entry', () => {
   const instanceId = Date.now() + ''
 
   before(() => {
-    runtime.setNativeConsole()
     global.callNative = (id, tasks, callbackId) => {
       callNativeSpy(id, tasks, callbackId)
       /* istanbul ignore if */
