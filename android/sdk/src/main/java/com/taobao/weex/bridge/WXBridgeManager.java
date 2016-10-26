@@ -765,11 +765,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
     WXPerformance performance = null;
     if (errCode != WXErrorCode.WX_SUCCESS) {
+      performance = new WXPerformance();
       performance.errCode = errCode.getErrorCode();
       performance.appendErrMsg(errCode.getErrorMsg());
       performance.appendErrMsg("#");
       performance.appendErrMsg(errMsg);
       performance.args = instance.getBundleUrl();
+      WXLogUtils.e("wx_monitor",performance.toString());
     }
     adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, null);
   }
@@ -786,7 +788,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       performance.appendErrMsg(errorCode.getErrorMsg());
       performance.appendErrMsg("#");
       performance.appendErrMsg(errMsg);
-      WXLogUtils.e(performance.toString());
+      WXLogUtils.e("wx_monitor",performance.toString());
     }
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
@@ -1043,7 +1045,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
       } catch (Throwable e) {
         WXLogUtils.e("[WXBridgeManager] invokeInitFramework ", e);
-        String err="[WXBridgeManager] invokeInitFramework exception!";
+        String err="[WXBridgeManager] invokeInitFramework exception!#"+e.toString();
         commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK, WXErrorCode.WX_ERR_JS_FRAMEWORK, err);
       }
     }

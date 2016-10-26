@@ -441,6 +441,7 @@ public class WXPerformance {
              + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
              + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
              + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
+             + ",arg:" + args
              + ",errMsg:" + getErrMsg();
     }
     return super.toString();
