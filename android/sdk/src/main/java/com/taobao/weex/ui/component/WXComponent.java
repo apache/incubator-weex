@@ -792,7 +792,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
       if(mHost != null){
         mHost.setId(WXViewUtils.generateViewId());
-        mHost.setTag(mDomObj.getType());
       }
       onHostViewInitialized(mHost);
     }else{
