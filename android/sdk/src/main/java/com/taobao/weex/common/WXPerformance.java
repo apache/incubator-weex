@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.common;
 
+import android.text.TextUtils;
+
 import com.taobao.weex.WXEnvironment;
 
 import java.util.HashMap;
@@ -344,12 +346,18 @@ public class WXPerformance {
   /**
    * Error message
    */
+  @Deprecated
   public String errMsg;
+  private StringBuilder mErrMsgBuilder;
 
   public String args="";
 
   public String connectionType;
   public String requestType;
+
+  public WXPerformance(){
+    mErrMsgBuilder=new StringBuilder(TextUtils.isEmpty(errMsg)?"":errMsg);
+  }
 
   public Map<String,Double> getMeasureMap(){
     Map<String,Double> quotas = new HashMap<>();
@@ -433,7 +441,7 @@ public class WXPerformance {
              + ",SDKInitTime:"+ WXEnvironment.sSDKInitTime
              + ",totalTime:" + totalTime + ",JSLibVersion:" + JSLibVersion + ",WXSDKVersion:" + WXSDKVersion
              + ",errCode:" + errCode + ",renderFailedDetail:" + renderFailedDetail
-             + ",errMsg:" + errMsg;
+             + ",errMsg:" + getErrMsg();
     }
     return super.toString();
   }
@@ -446,5 +454,13 @@ public class WXPerformance {
               + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
               + " componentCount:" + componentCount
               + "  totalTime:" + totalTime;
+  }
+
+  public String getErrMsg() {
+    return mErrMsgBuilder.toString();
+  }
+
+  public void appendErrMsg(CharSequence msg) {
+    mErrMsgBuilder.append(msg);
   }
 }
