@@ -143,13 +143,19 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.JSCallbackCreator;
+import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.dom.flex.Spacing;
@@ -237,6 +243,38 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public String getInstanceId() {
     return mInstanceId;
+  }
+
+  public void invoke(String method, JSONArray args) {
+    final Invoker invoker = mHolder.getMethodInvoker(method);
+    if (invoker != null) {
+      try {
+        final Object[] params = WXReflectionUtils.prepareArguments(
+            invoker.getParameterTypes(),
+            args,
+            new JSCallbackCreator() {
+              @Override
+              public JSCallback create(String callbackId) {
+                return new SimpleJSCallback(mInstanceId,callbackId);
+              }
+            });
+        if(invoker.isRunInUIThread()){
+          WXSDKManager.getInstance().postOnUiThread(WXThread.secure(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                invoker.invoke(WXComponent.this, params);
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            }
+          }),0);
+        }
+
+      } catch (Exception e) {
+        WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
+      }
+    }
   }
 
   interface OnClickListener{
@@ -563,7 +601,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       for(String key : props.keySet()) {
         Object param = props.get(key);
         if(!setProperty(key, param)){
-        Invoker invoker = mHolder.getMethod(key);
+        Invoker invoker = mHolder.getPropertyInvoker(key);
         if (invoker != null) {
           try {
             Type[] paramClazzs = invoker.getParameterTypes();

@@ -229,6 +229,7 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXFileUtils;
@@ -244,9 +245,12 @@ import com.taobao.weex.utils.batch.Interceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.UnknownFormatConversionException;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -286,6 +290,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String KEY_ARGS = "args";
 
   // args
+  public static final String COMPONENT = "component";
+  public static final String REF = "ref";
   public static final String MODULE = "module";
   public static final String METHOD = "method";
   public static final String ARGS = "args";
@@ -296,7 +302,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   static WXBridgeManager mBridgeManager;
 
-  private WXDomModule sDomModule;
+  private WXDomModule sDomModule;//TODO: move to {@link WXModuleManager}
 
   /**
    * next tick tasks, can set priority
@@ -321,7 +327,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mInit;
   }
 
-  private List<List<Map<String, String>>> mRegisterComponentFailList = new ArrayList<>(8);
+  private List<Map<String, Object>> mRegisterComponentFailList = new ArrayList<>(8);
   private List<Map<String, Object>> mRegisterModuleFailList = new ArrayList<>(8);
 
   private List<String> mDestroyedInstanceId = new ArrayList<>();
@@ -504,13 +510,22 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         for (int i = 0; i < size; ++i) {
           task = (JSONObject) array.get(i);
           if (task != null && WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-            if (TextUtils.equals(WXDomModule.WXDOM, (String) task.get(MODULE))) {
-              sDomModule = getDomModule(instanceId);
-              sDomModule.callDomMethod(task);
-              sDomModule.mWXSDKInstance = null;
-            } else {
-              WXModuleManager.callModuleMethod(instanceId, (String) task.get(MODULE),
-                      (String) task.get(METHOD), (JSONArray) task.get(ARGS));
+            Object target = task.get(MODULE);
+            if(target != null){
+              if(WXDomModule.WXDOM.equals(target)){
+                WXDomModule dom = getDomModule(instanceId);
+                dom.callDomMethod(task);
+                dom.mWXSDKInstance = null;
+              }else {
+                WXModuleManager.callModuleMethod(instanceId, (String) target,
+                    (String) task.get(METHOD), (JSONArray) task.get(ARGS));
+              }
+            }else if(task.get(COMPONENT) != null){
+              //call component
+              WXDomModule dom = getDomModule(instanceId);
+              dom.invokeMethod((String) task.get(REF),(String) task.get(METHOD),(JSONArray) task.get(ARGS));
+            }else{
+              throw new IllegalArgumentException("unknown callNative");
             }
           }
         }
@@ -1117,18 +1132,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     int moduleCount = mRegisterModuleFailList.size();
     if (moduleCount > 0) {
       for (int i = 0; i < moduleCount; ++i) {
-        registerModules(mRegisterModuleFailList.get(i));
+        invokeRegisterModules(mRegisterModuleFailList.get(i));
       }
-      mRegisterModuleFailList.clear();
-      WXLogUtils.e("[WXBridgeManager] execRegisterFailTask register module fail");
     }
-    int componentCount = mRegisterComponentFailList.size();
-    if (componentCount > 0) {
-      for (int i = 0; i < componentCount; ++i) {
-        registerComponents(mRegisterComponentFailList.get(i));
-      }
-      mRegisterComponentFailList.clear();
-      WXLogUtils.e("[WXBridgeManager] execRegisterFailTask register component fail");
+    if (mRegisterComponentFailList.size() > 0) {
+      invokeRegisterComponents(mRegisterComponentFailList);
     }
   }
 
@@ -1154,7 +1162,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   /**
    * Registered component
    */
-  public void registerComponents(final List<Map<String, String>> components) {
+  public void registerComponents(final List<Map<String, Object>> components) {
     if ( mJSHandler == null || components == null
         || components.size() == 0) {
       return;
@@ -1190,12 +1198,15 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  private void invokeRegisterComponents(List<Map<String, String>> components) {
-    if (components == null || !isJSFrameworkInit()) {
-      if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+  private void invokeRegisterComponents(List<Map<String, Object>> components) {
+    if (!isJSFrameworkInit()) {
+      WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+      for (Map<String,Object> comp:components){
+        mRegisterComponentFailList.add(comp);
       }
-      mRegisterComponentFailList.add(components);
+      return;
+    }
+    if(components == null){
       return;
     }
 

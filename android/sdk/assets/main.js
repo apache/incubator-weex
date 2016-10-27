@@ -1,5 +1,6 @@
 (this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK: 0.17.0-alpha2 Build 20161026');
 var global = this, process = { env: {}};
+var setTimeout = global.setTimeout;
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :

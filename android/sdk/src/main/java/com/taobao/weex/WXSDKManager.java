@@ -242,7 +242,7 @@ public class WXSDKManager {
     mBridgeManager.initScriptsFramework(framework);
   }
 
-  public void registerComponents(List<Map<String, String>> components) {
+  public void registerComponents(List<Map<String, Object>> components) {
     mBridgeManager.registerComponents(components);
   }
 

@@ -393,11 +393,11 @@ public class WXSDKEngine {
 
   static boolean registerComponent(IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
     boolean result =  true;
-    Map<String, String> componentInfo = new HashMap<>();
-    if (appendTree) {
-      componentInfo.put("append", "tree");
-    }
     for(String name:names) {
+      Map<String, Object> componentInfo = new HashMap<>();
+      if (appendTree) {
+        componentInfo.put("append", "tree");
+      }
       result  = result && WXComponentRegistry.registerComponent(name, holder, componentInfo);
     }
     return result;
@@ -466,14 +466,14 @@ public class WXSDKEngine {
   }
 
   public static boolean registerComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    return WXComponentRegistry.registerComponent(type, new SimpleComponentHolder(clazz),new HashMap<String, String>());
+    return WXComponentRegistry.registerComponent(type, new SimpleComponentHolder(clazz),new HashMap<String, Object>());
   }
 
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
+  public static boolean registerComponent(Map<String, Object> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
     if(componentInfo == null){
       return false;
     }
-    String type = componentInfo.get("type");
+    String type = (String)componentInfo.get("type");
     if(TextUtils.isEmpty(type)){
       return false;
     }
