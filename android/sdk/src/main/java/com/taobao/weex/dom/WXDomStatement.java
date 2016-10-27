@@ -209,6 +209,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -532,6 +533,18 @@ class WXDomStatement {
         updateDomObj(container.getChild(i));
       }
     }
+  }
+
+  void invokeMethod(String ref, String method, JSONArray args){
+    if(mDestroy){
+      return;
+    }
+    WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId, ref);
+    if(comp == null){
+      WXLogUtils.e("DomStatement","target component not found.");
+      return;
+    }
+    comp.invoke(method,args);
   }
 
   /**

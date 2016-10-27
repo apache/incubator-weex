@@ -231,8 +231,18 @@ public class ComponentHolderTest {
       }
 
       @Override
-      public Invoker getMethod(String name) {
+      public Invoker getPropertyInvoker(String name) {
         return null;
+      }
+
+      @Override
+      public Invoker getMethodInvoker(String name) {
+        return null;
+      }
+
+      @Override
+      public String[] getMethods() {
+        return new String[0];
       }
 
       @Override
