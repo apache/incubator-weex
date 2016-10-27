@@ -233,7 +233,6 @@ import com.taobao.weex.common.WXResponse;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
-import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXComponent;
@@ -1189,6 +1188,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
       return;
     }
     mGlobalEvents.remove(eventName);
+  }
+
+  public WXPerformance getWXPerformance(){
+    return mWXPerformance;
   }
 
     /**

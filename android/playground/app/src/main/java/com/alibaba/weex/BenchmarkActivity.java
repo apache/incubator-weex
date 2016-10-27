@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,185 +202,149 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.telephony.TelephonyManager;
+package com.alibaba.weex;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.utils.LogLevel;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-import com.taobao.weex.utils.WXUtils;
+import android.os.Bundle;
+import android.support.test.espresso.idling.CountingIdlingResource;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import com.alibaba.weex.commons.adapter.ImageAdapter;
+import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.WXRenderStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class WXEnvironment {
+public class BenchmarkActivity extends AppCompatActivity implements IWXRenderListener {
 
-  public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
-  public static final String SYS_MODEL = android.os.Build.MODEL;
-  public static final String ENVIRONMENT = "environment";
-  /*********************
-   * Global config
-   ***************************/
+  public final static String ROOT = "root";
+  private final static String TAG = "WEEX";
+  private final static String URL =
+      "http://h5.waptest.taobao.com/app/weextc031/build/TC_Monitor_List_WithAppendTree.js";
+  private WXSDKInstance mInstance;
+  private LinearLayout root;
+  public static CountingIdlingResource countingIdlingResource;
 
-  public static String JS_LIB_SDK_VERSION = BuildConfig.buildJavascriptFrameworkVersion;
-
-  public static String WXSDK_VERSION = BuildConfig.buildVersion;
-  public static Application sApplication;
-  public static final String DEV_Id = getDevId();
-  public static int sDefaultWidth = 750;
-  public volatile static boolean JsFrameworkInit = false;
-
-  public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
-
-  public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
-  /**
-   * Debug model
-   */
-  public static boolean sDebugMode = false;
-  public static String sDebugWsUrl = "";
-  public static boolean sRemoteDebugMode = false;
-  public static String sRemoteDebugProxyUrl = "";
-  public static long sJSLibInitTime = 0;
-
-  public static long sSDKInitStart = 0;// init start timestamp
-  public static long sSDKInitInvokeTime = 0;//time cost to invoke init method
-  public static long sSDKInitExecuteTime = 0;//time cost to execute init job
-  /** from init to sdk-ready **/
-  public static long sSDKInitTime =0;
-
-  public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
-  public static boolean isPerf = false;
-
-  public static boolean sShow3DLayer=true;
-
-  private static Map<String, String> options = new HashMap<>();
-
-  /**
-   * dynamic
-   */
-  public static boolean sDynamicMode = false;
-  public static String sDynamicUrl = "";
-
-  /**
-   * Fetch system information.
-   * @return map contains system information.
-   */
-  public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
-    return configs;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    root = new LinearLayout(this);
+    root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                    ViewGroup.LayoutParams.MATCH_PARENT));
+    root.setOrientation(LinearLayout.VERTICAL);
+    root.setContentDescription(ROOT);
+    setContentView(root);
+    WXEnvironment.isPerf = true;
+    WXSDKEngine.addCustomOptions("appName", "WXSample");
+    WXSDKEngine.addCustomOptions("appGroup", "WXApp");
+    WXSDKEngine.initialize(getApplication(),
+                           new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build());
   }
 
-  /**
-   * Get the version of the current app.
-   */
-  private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
-    try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
-    }
-    return versionName;
-  }
-
-  public static void addCustomOptions(String key, String value) {
-    options.put(key, value);
-  }
-
-  public static boolean isSupport() {
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
-    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86()&&excludeX86;
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport()&&!isX86AndExcluded;
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
-    }
-    return isCPUSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
-  }
-
-  public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
-    }
-
-    if (isPerf) {
-      return false;
-    }
-
-    if (!isApkDebug) {
-      return false;
-    }
-    try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  public static boolean isPerf() {
-    return isPerf;
-  }
-
-  private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-  }
-
-  public static Application getApplication() {
-    return sApplication;
-  }
-
-  public void initMetrics() {
-    if (sApplication == null) {
-      return;
+  @Override
+  public void onStart() {
+    super.onStart();
+    if (mInstance != null) {
+      mInstance.onActivityStart();
     }
   }
 
-  public static String getDiskCacheDir(Context context) {
-    if (context == null) {
-      return null;
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (mInstance != null) {
+      mInstance.onActivityResume();
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
-    }
-    return cachePath;
   }
 
+  @Override
+  public void onPause() {
+    super.onPause();
+    if (mInstance != null) {
+      mInstance.onActivityPause();
+    }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    if (mInstance != null) {
+      mInstance.onActivityStop();
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if (mInstance != null) {
+      mInstance.onActivityDestroy();
+    }
+  }
+
+  @Override
+  public void onViewCreated(WXSDKInstance instance, View view) {
+    if (root != null) {
+      root.removeAllViews();
+      root.addView(view);
+    }
+  }
+
+  @Override
+  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+    if (countingIdlingResource != null) {
+      countingIdlingResource.decrement();
+    }
+  }
+
+  @Override
+  public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
+
+  }
+
+  @Override
+  public void onException(WXSDKInstance instance, String errCode, String msg) {
+
+  }
+
+  public WXSDKInstance getWXInstance() {
+    return mInstance;
+  }
+
+  public void loadWeexPage() {
+    loadWeexPage(URL);
+  }
+
+  public void loadWeexPage(final String url) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (mInstance != null) {
+          mInstance.destroy();
+        }
+        mInstance = new WXSDKInstance(BenchmarkActivity.this);
+        Map<String, Object> options = new HashMap<>();
+        options.put(WXSDKInstance.BUNDLE_URL, url);
+        mInstance.registerRenderListener(BenchmarkActivity.this);
+        if (countingIdlingResource != null) {
+          countingIdlingResource.increment();
+        }
+        mInstance.renderByUrl(
+            TAG,
+            url,
+            options,
+            null,
+            root.getWidth(),
+            root.getHeight(),
+            WXRenderStrategy.APPEND_ASYNC);
+      }
+    });
+  }
 }

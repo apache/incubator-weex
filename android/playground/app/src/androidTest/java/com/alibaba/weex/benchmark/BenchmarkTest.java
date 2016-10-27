@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,185 +202,218 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.telephony.TelephonyManager;
+package com.alibaba.weex.benchmark;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.utils.LogLevel;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.filters.SdkSuppress;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.Direction;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
+import android.support.test.uiautomator.Until;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.alibaba.weex.BenchmarkActivity;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-import com.taobao.weex.utils.WXUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.hamcrest.Matchers;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class WXEnvironment {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-  public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
-  public static final String SYS_MODEL = android.os.Build.MODEL;
-  public static final String ENVIRONMENT = "environment";
-  /*********************
-   * Global config
-   ***************************/
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-  public static String JS_LIB_SDK_VERSION = BuildConfig.buildJavascriptFrameworkVersion;
+@RunWith(AndroidJUnit4.class)
+public class BenchmarkTest {
 
-  public static String WXSDK_VERSION = BuildConfig.buildVersion;
-  public static Application sApplication;
-  public static final String DEV_Id = getDevId();
-  public static int sDefaultWidth = 750;
-  public volatile static boolean JsFrameworkInit = false;
+  private static final String TAG = "benchmark";
+  private static final int TIMES = 20;
+  private static final int FLING_SPEED = 10000;
+  private static final int SCROLL_SPEED = 5000;
+  private static final int FRAMES = 120;
+  private static final long WAIT_TIMEOUT = 10000;
+  private static final float FPS = 30;
+  private static final float FIRST_SCREEN_RENDER_TIME = 600F;
+  private static List<Long> firstScreenRenderTime = new LinkedList<>();
+  private static List<Long> flingFrameSeconds = new LinkedList<>();
+  private static List<Long> scrollFrameSeconds = new LinkedList<>();
+  private static final String DUMP_START = "Flags,IntendedVsync,Vsync,OldestInputEvent,NewestInputEvent,"
+                                           + "HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,"
+                                           + "SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,\n";
+  private static final String DUMP_END = "---PROFILEDATA---";
+  private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
 
-  public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
+  @Rule
+  public BenchmarkActivityTestRule mActivityRule = new BenchmarkActivityTestRule(
+      BenchmarkActivity.class);
+  @Rule
+  public RepeatRule repeatRule = new RepeatRule();
+  private UiDevice mUiDevice;
 
-  public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
-  /**
-   * Debug model
-   */
-  public static boolean sDebugMode = false;
-  public static String sDebugWsUrl = "";
-  public static boolean sRemoteDebugMode = false;
-  public static String sRemoteDebugProxyUrl = "";
-  public static long sJSLibInitTime = 0;
-
-  public static long sSDKInitStart = 0;// init start timestamp
-  public static long sSDKInitInvokeTime = 0;//time cost to invoke init method
-  public static long sSDKInitExecuteTime = 0;//time cost to execute init job
-  /** from init to sdk-ready **/
-  public static long sSDKInitTime =0;
-
-  public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
-  public static boolean isPerf = false;
-
-  public static boolean sShow3DLayer=true;
-
-  private static Map<String, String> options = new HashMap<>();
-
-  /**
-   * dynamic
-   */
-  public static boolean sDynamicMode = false;
-  public static String sDynamicUrl = "";
-
-  /**
-   * Fetch system information.
-   * @return map contains system information.
-   */
-  public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
-    return configs;
+  @Before
+  public void init() {
+    mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   }
 
-  /**
-   * Get the version of the current app.
-   */
-  private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
+  @Test
+  public void testFirstScreenPerformance() {
+    List<Long> localTotalTime = new ArrayList<>(TIMES);
+    for (int i = 0; i < TIMES; i++) {
+      long currentTime = calcTime();
+      localTotalTime.add(currentTime);
+      Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity not kill) " + currentTime + "ms");
+    }
+    BoxPlot boxPlot = new BoxPlot(localTotalTime);
+    Log.i(TAG, "Average firstScreenRenderTime (activity not kill) " + boxPlot.draw());
+    assertThat(boxPlot.getAverage(), Matchers.lessThan(FIRST_SCREEN_RENDER_TIME));
+  }
+
+  @Repeat(TIMES)
+  @Test
+  public void testFirstFirstScreenPerformance() {
+    long currentTime = calcTime();
+    firstScreenRenderTime.add(currentTime);
+    Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity killed) " + currentTime + " ms");
+  }
+
+  @Repeat(TIMES)
+  @Test
+  @SdkSuppress(minSdkVersion = 23)
+  public void testFlingFPS() {
+    UiObject2 uiObject2 = loadPageForFPS();
+    if (uiObject2 != null) {
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      processGfxInfo(flingFrameSeconds);
+    }
+  }
+
+  @Repeat(TIMES)
+  @Test
+  @SdkSuppress(minSdkVersion = 23)
+  public void testScrollFPS() {
+    UiObject2 uiObject2 = loadPageForFPS();
+    if (uiObject2 != null) {
+      uiObject2.scroll(Direction.DOWN, 6, SCROLL_SPEED);
+      processGfxInfo(scrollFrameSeconds);
+    }
+  }
+
+  @AfterClass
+  public static void count() {
+    BoxPlot boxPlot = new BoxPlot(firstScreenRenderTime);
+    Log.i(TAG, "Average firstScreenRenderTime (activity killed) " + boxPlot.draw());
+    assertThat(boxPlot.getAverage(), Matchers.lessThan(FIRST_SCREEN_RENDER_TIME));
+    BoxPlot flingPlot = new BoxPlot(flingFrameSeconds);
+    Log.i(TAG, "Average Fling FPS : " + flingPlot.draw());
+    assertThat(1000 / flingPlot.getMedian(), Matchers.greaterThan(FPS));
+    BoxPlot scrollPlot = new BoxPlot(scrollFrameSeconds);
+    Log.i(TAG, "Average Scroll FPS : " + scrollPlot.draw());
+    assertThat(1000 / scrollPlot.getMedian(), Matchers.greaterThan(FPS));
+  }
+
+  private UiObject2 loadPageForFPS() {
+    BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
+    benchmarkActivity.loadWeexPage();
+    onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform(RecyclerViewActions.scrollToPosition(0));
+    return mUiDevice.wait(Until.findObject(By.desc(BenchmarkActivity.ROOT)), WAIT_TIMEOUT);
+  }
+
+  private void processGfxInfo(List<Long> container) {
     try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
+      String line;
+      String[] columns;
+      long timeStart, timeEnd, duration;
+      String result = mUiDevice.executeShellCommand(DUMP_COMMAND);
+      //histogramGfxInfo(result);
+      result = result.substring(result.indexOf(DUMP_START), result.lastIndexOf(DUMP_END));
+      result = result.substring(DUMP_START.length());
+      BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
+      List<Long> list = createList(bufferedReader);
+      //Collections.sort(list);
+      //Log.d(TAG, list.toString());
+      container.addAll(list);
+      BoxPlot boxPlot = new BoxPlot(list);
+      boxPlot.draw();
+      Log.d(TAG, "FPS : " + boxPlot.getMedian() + " ms");
+    } catch (IOException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
     }
-    return versionName;
   }
 
-  public static void addCustomOptions(String key, String value) {
-    options.put(key, value);
+  private List<Long> createList(BufferedReader bufferedReader) throws IOException {
+    String line;
+    String[] columns;
+    long timeStart, timeEnd, duration;
+    List<Long> list = new ArrayList<>(FRAMES);
+    while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+      columns = line.split(",");
+      if (Long.parseLong(columns[0]) == 0) {
+        timeStart = Long.parseLong(columns[1]);
+        timeEnd = Long.parseLong(columns[columns.length - 1]);
+        duration = timeEnd - timeStart;
+        if (duration > 0) {
+          list.add(TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS));
+        }
+      }
+    }
+    return list;
   }
 
-  public static boolean isSupport() {
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
-    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86()&&excludeX86;
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport()&&!isX86AndExcluded;
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
-    }
-    return isCPUSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
+  private long calcTime() {
+    BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
+    benchmarkActivity.loadWeexPage();
+    onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform
+        (RecyclerViewActions.scrollToPosition(0));
+    return benchmarkActivity.getWXInstance().getWXPerformance().screenRenderTime;
   }
 
-  public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
-    }
-
-    if (isPerf) {
-      return false;
-    }
-
-    if (!isApkDebug) {
-      return false;
-    }
+/*  private void histogramGfxInfo(String result) {
     try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  public static boolean isPerf() {
-    return isPerf;
-  }
-
-  private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-  }
-
-  public static Application getApplication() {
-    return sApplication;
-  }
-
-  public void initMetrics() {
-    if (sApplication == null) {
-      return;
+      String start = "HISTOGRAM: ";
+      result = result.substring(result.indexOf(start));
+      result = result.substring(start.length());
+      BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
+      result = bufferedReader.readLine();
+      List<Long> list = transformToLong(result.split("\\s"));
+      Log.d(TAG, list.toString());
+    } catch (IOException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
     }
   }
 
-  public static String getDiskCacheDir(Context context) {
-    if (context == null) {
-      return null;
+  private List<Long> transformToLong(String[] string) {
+    List<Long> array = new LinkedList<>();
+    int count;
+    long value;
+    for (String item : string) {
+      value = Long.parseLong(item.substring(0, item.indexOf("ms")));
+      if (value > 0) {
+        count = parseInt(item.substring(item.indexOf('=') + 1));
+        for (int i = 0; i < count; i++) {
+          array.add(value);
+        }
+      }
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
-    }
-    return cachePath;
-  }
-
+    return array;
+  }*/
 }

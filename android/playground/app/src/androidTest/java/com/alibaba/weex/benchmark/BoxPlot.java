@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,185 +202,69 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.telephony.TelephonyManager;
+package com.alibaba.weex.benchmark;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.common.WXConfig;
-import com.taobao.weex.utils.LogLevel;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-import com.taobao.weex.utils.WXUtils;
+import java.util.Collections;
+import java.util.List;
 
-import java.util.HashMap;
-import java.util.Map;
+public class BoxPlot {
 
-public class WXEnvironment {
+  private static final String LINE = "–";
 
-  public static final String OS = "android";
-  public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
-  public static final String SYS_MODEL = android.os.Build.MODEL;
-  public static final String ENVIRONMENT = "environment";
-  /*********************
-   * Global config
-   ***************************/
+  private List<Long> array;
 
-  public static String JS_LIB_SDK_VERSION = BuildConfig.buildJavascriptFrameworkVersion;
+  private float average, max, min, median, q1, q3;
 
-  public static String WXSDK_VERSION = BuildConfig.buildVersion;
-  public static Application sApplication;
-  public static final String DEV_Id = getDevId();
-  public static int sDefaultWidth = 750;
-  public volatile static boolean JsFrameworkInit = false;
-
-  public static final String SETTING_EXCLUDE_X86SUPPORT = "env_exclude_x86";
-
-  public static boolean SETTING_FORCE_VERTICAL_SCREEN = false;
-  /**
-   * Debug model
-   */
-  public static boolean sDebugMode = false;
-  public static String sDebugWsUrl = "";
-  public static boolean sRemoteDebugMode = false;
-  public static String sRemoteDebugProxyUrl = "";
-  public static long sJSLibInitTime = 0;
-
-  public static long sSDKInitStart = 0;// init start timestamp
-  public static long sSDKInitInvokeTime = 0;//time cost to invoke init method
-  public static long sSDKInitExecuteTime = 0;//time cost to execute init job
-  /** from init to sdk-ready **/
-  public static long sSDKInitTime =0;
-
-  public static LogLevel sLogLevel = LogLevel.DEBUG;
-  private static boolean isApkDebug = true;
-  public static boolean isPerf = false;
-
-  public static boolean sShow3DLayer=true;
-
-  private static Map<String, String> options = new HashMap<>();
-
-  /**
-   * dynamic
-   */
-  public static boolean sDynamicMode = false;
-  public static String sDynamicUrl = "";
-
-  /**
-   * Fetch system information.
-   * @return map contains system information.
-   */
-  public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
-    return configs;
+  public BoxPlot(List<Long> array) {
+    this.array = array;
   }
 
-  /**
-   * Get the version of the current app.
-   */
-  private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
-    try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
-    }
-    return versionName;
-  }
-
-  public static void addCustomOptions(String key, String value) {
-    options.put(key, value);
-  }
-
-  public static boolean isSupport() {
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
-    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86()&&excludeX86;
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport()&&!isX86AndExcluded;
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + " WXSDKEngine.isInitialized():" + WXSDKEngine.isInitialized()
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
-    }
-    return isCPUSupport && WXSDKEngine.isInitialized() && !WXUtils.isTabletDevice();
-  }
-
-  public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
-    }
-
-    if (isPerf) {
-      return false;
-    }
-
-    if (!isApkDebug) {
-      return false;
-    }
-    try {
-      ApplicationInfo info = sApplication.getApplicationInfo();
-      isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      return isApkDebug;
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  public static boolean isPerf() {
-    return isPerf;
-  }
-
-  private static String getDevId() {
-    return sApplication == null ? "" : ((TelephonyManager) sApplication
-        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-  }
-
-  public static Application getApplication() {
-    return sApplication;
-  }
-
-  public void initMetrics() {
-    if (sApplication == null) {
-      return;
+  public void clear() {
+    if (array != null) {
+      array.clear();
     }
   }
 
-  public static String getDiskCacheDir(Context context) {
-    if (context == null) {
-      return null;
-    }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
-    }
-    return cachePath;
+  public float getAverage(){
+    return average;
   }
 
+  public float getMedian(){
+    return median;
+  }
+
+  public String draw() {
+    StringBuilder stringBuilder = new StringBuilder();
+    if(array!=null) {
+      calcValues();
+      stringBuilder.append("Average: ");
+      stringBuilder.append(average);
+      stringBuilder.append(", min: ");
+      stringBuilder.append(min);
+      stringBuilder.append(", q1: ");
+      stringBuilder.append(q1);
+      stringBuilder.append(", median: ");
+      stringBuilder.append(median);
+      stringBuilder.append(", q3: ");
+      stringBuilder.append(q3);
+      stringBuilder.append(", max: ");
+      stringBuilder.append(max);
+    }
+    return stringBuilder.toString();
+  }
+
+  private void calcValues() {
+    long sum = 0;
+    Collections.sort(array);
+    max = Collections.max(array);
+    min = Collections.min(array);
+    median = array.get(array.size() / 2);
+    q1 = array.get(array.size() / 4);
+    q3 = array.get(array.size() / 4 * 3);
+    for (Long value : array) {
+      sum += value;
+    }
+    average = sum / (float)array.size();
+  }
 }
