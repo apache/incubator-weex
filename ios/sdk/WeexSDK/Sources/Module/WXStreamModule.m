@@ -149,7 +149,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
                             if ([type isEqualToString:@"jsonp"]) {
                                 NSUInteger start = [responseData rangeOfString:@"("].location + 1 ;
                                 NSUInteger end = [responseData rangeOfString:@")" options:NSBackwardsSearch].location;
-                                if (end > start) {
+                                if (end < [responseData length] && end > start) {
                                     responseData = [responseData substringWithRange:NSMakeRange(start, end-start)];
                                 }
                             }
