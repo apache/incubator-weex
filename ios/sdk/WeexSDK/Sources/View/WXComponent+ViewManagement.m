@@ -48,6 +48,11 @@
     }
 }
 
+- (void)willRemoveSubview:(WXComponent *)component
+{
+    WXAssertMainThread();
+}
+
 - (void)removeFromSuperview
 {
     WXAssertMainThread();
@@ -125,9 +130,11 @@
         if (positionType == WXPositionTypeFixed) {
             [self.weexInstance.componentManager addFixedComponent:self];
             _isNeedJoinLayoutSystem = NO;
+            [self.supercomponent _recomputeCSSNodeChildren];
         } else if (_positionType == WXPositionTypeFixed) {
             [self.weexInstance.componentManager removeFixedComponent:self];
             _isNeedJoinLayoutSystem = YES;
+            [self.supercomponent _recomputeCSSNodeChildren];
         }
         
         _positionType = positionType;
@@ -156,9 +163,13 @@
     }
 }
 
-- (void)_unloadView
+- (void)_unloadViewWithReusing:(BOOL)isReusing
 {
     WXAssertMainThread();
+    
+    if (isReusing && self->_positionType == WXPositionTypeFixed) {
+        return;
+    }
     
     [self viewWillUnload];
     
@@ -172,10 +183,12 @@
     }
     
     for (WXComponent *subcomponents in [self.subcomponents reverseObjectEnumerator]) {
-        [subcomponents _unloadView];
+        [subcomponents _unloadViewWithReusing:isReusing];
     }
     
+    [_view removeFromSuperview];
     _view = nil;
+    [_layer removeFromSuperlayer];
     _layer = nil;
     
     [self viewDidUnload];

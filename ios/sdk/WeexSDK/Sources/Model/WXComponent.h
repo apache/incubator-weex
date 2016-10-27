@@ -6,7 +6,9 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "Layout.h"
+#import <Foundation/Foundation.h>
+#import "WXLayoutDefine.h"
+
 @class WXSDKInstance;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,22 +41,27 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  @abstract The component's identifier string.
  */
-@property (nonatomic, readonly, copy) NSString *ref;
+@property (nonatomic, readonly, strong) NSString *ref;
+
+/**
+ *  @abstract The component's type string.
+ */
+@property (nonatomic, readonly, copy) NSString *type;
 
 /**
  *  @abstract The component's styles.
  */
-@property (nonatomic, readonly, copy) NSDictionary *styles;
+@property (nonatomic, readonly, strong) NSDictionary *styles;
 
 /**
  *  @abstract The component's attributes.
  */
-@property (nonatomic, readonly, copy) NSDictionary *attributes;
+@property (nonatomic, readonly, strong) NSDictionary *attributes;
 
 /**
  *  @abstract The component's events.
  */
-@property (nonatomic, readonly, copy) NSArray *events;
+@property (nonatomic, readonly, strong) NSArray *events;
 
 /**
  *  @abstract The reference to
@@ -64,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract The component's subcomponents.
  */
-@property (nonatomic, readonly, copy, nullable) NSArray<WXComponent *> *subcomponents;
+@property (nonatomic, readonly, strong, nullable) NSArray<WXComponent *> *subcomponents;
 
 /**
  * @abstract The component's supercomponent.
@@ -83,11 +90,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly, assign) CGRect calculatedFrame;
 
 /**
- * @abstract Return the calculated absolute position.
- *
- * @warning Subclasses must not override this.
+ * @abstract Tell if component's view frame will keep synchronized with calculatedFrame. 
+ * Default Value is YES.
  */
-@property(nonatomic, assign) CGPoint absolutePosition;
+@property(nonatomic, assign) BOOL isViewFrameSyncWithCalculated;
+
+///**
+// * @abstract Return the calculated absolute position.
+// *
+// * @warning Subclasses must not override this.
+// */
+//@property(nonatomic, assign) CGPoint absolutePosition;
 
 /**
  * @abstract Return the css node used to layout.
@@ -203,6 +216,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index;
 
 /**
+ * @abstract Tells the component that a subcomponent's view is about to be removed.
+ *
+ * @discussion The method is called on the main thread.
+ */
+- (void)willRemoveSubview:(WXComponent *)component;
+
+/**
  * @abstract Remove the component's view from its superview.
  *
  * @discussion The method is called on the main thread.
@@ -228,6 +248,16 @@ NS_ASSUME_NONNULL_BEGIN
  * @param params The parameters to fire with
  **/
 - (void)fireEvent:(NSString *)eventName params:(nullable NSDictionary *)params;
+
+/**
+ * @abstract Fire an event to the component and tell Javascript which value has been changed. 
+ * Used for two-way data binding.
+ *
+ * @param eventName The name of the event to fire
+ * @param params The parameters to fire with
+ * @param domChanges The values has been changed, used for two-way data binding.
+ **/
+- (void)fireEvent:(NSString *)eventName params:(nullable NSDictionary *)params domChanges:(nullable NSDictionary *)domChanges;
 
 ///--------------------------------------
 /// @name Updating
@@ -263,7 +293,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param eventName The removed event's name
  * @discussion It can be overrided to handle specific event removing. The method is called on the main thread.
  **/
-- (void)removeEvent:(NSString *)evetName;
+- (void)removeEvent:(NSString *)eventName;
 
 ///--------------------------------------
 /// @name Display
@@ -298,6 +328,8 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
 @interface UIView (WXComponent)
 
 @property (nonatomic, weak) WXComponent *wx_component;
+
+@property (nonatomic, weak) NSString *wx_ref;
 
 @end
 

@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/0e1e16da3df6f124806760e661cfb765", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/5e6c4a62a4f2ddfd7c2d1010facc95ec", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(15);
@@ -65,7 +65,6 @@
 	        {name: 'component/scroller-demo', title: 'Scroller'},
 	        {name: 'component/list/list-basic', title: 'List (Basic)'},
 	        {name: 'component/list/list-demo', title: 'List (Advanced)'},
-	        {name: 'component/list/list-demo-horizon', title: 'List (Horizontal)'},
 	        {name: 'component/slider/index', title: 'Slider'},
 	        {name: 'component/a-demo', title: 'A'},
 	        {name: 'component/video-demo', title: 'Video'},
@@ -79,11 +78,15 @@
 	        {name: 'module/instance-api', title: 'Instance API'},
 	        {name: 'module/modal', title: 'Modal'},
 	        {name: 'module/stream-demo', title: 'Stream'},
+	        {name: 'module/storage-demo',title:'Storage'},
+	        {name: 'module/clipboard', title: 'Clipboard'},
+
 	        // showcase
 	        {name: 'showcase/new-fashion/index', title: 'Activity'},
 	        {name: 'showcase/calculator', title: 'Calculator'},
 	        {name: 'showcase/minesweeper', title: 'Minesweeper'},
-	        {name: 'showcase/ui', title: 'UI Gallery'}
+	        {name: 'showcase/ui', title: 'UI Gallery'},
+	        {name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown'}
 	      ]
 	    }}
 	  }
@@ -97,7 +100,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/0e1e16da3df6f124806760e661cfb765", {
+	;__weex_bootstrap__("@weex-component/5e6c4a62a4f2ddfd7c2d1010facc95ec", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -847,7 +850,7 @@
 	      },
 	      "shown": function () {return !this.rightItemSrc},
 	      "events": {
-	        "click": "onclickrigthitem"
+	        "click": "onclickrightitem"
 	      }
 	    },
 	    {

@@ -32,6 +32,11 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  **/
 - (void)startComponentTasks;
 
+/**
+ * @abstract tell the component mananger that instance root view's frame has been changed
+ **/
+- (void)rootViewFrameDidChange:(CGRect)frame;
+
 ///--------------------------------------
 /// @name Component Tree Building
 ///--------------------------------------
@@ -57,9 +62,19 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 - (void)moveComponent:(NSString *)ref toSuper:(NSString *)superRef atIndex:(NSInteger)index;
 
 /**
- * @abstract return component for specific ref
+ * @abstract return component for specific ref, must be called on component thread by calling WXPerformBlockOnComponentThread
  */
 - (WXComponent *)componentForRef:(NSString *)ref;
+
+/**
+ * @abstract return root component
+ */
+- (WXComponent *)componentForRoot;
+
+/**
+ * @abstract number of components created, must be called on component thread by calling WXPerformBlockOnComponentThread
+ */
+- (NSUInteger)numberOfComponents;
 
 
 ///--------------------------------------
@@ -134,6 +149,8 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  *  @param component
  */
 - (void)removeFixedComponent:(WXComponent *)fixComponent;
+
+- (void)_addUITask:(void (^)())block;
 
 
 @end

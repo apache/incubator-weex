@@ -10,6 +10,8 @@
 #import "WXComponent_internal.h"
 #import "WXTransform.h"
 #import "WXAssert.h"
+#import "WXComponent_internal.h"
+#import "WXSDKInstance_private.h"
 
 @implementation WXComponent (Layout)
 
@@ -55,14 +57,18 @@
     }
     _cssNode->context = (__bridge void *)self;
     
-    
-    
     [self _recomputeCSSNodeChildren];
     [self _fillCSSNode:styles];
     
-    // TODO: JS Default flex:1 on root, not here
-    if ([self.ref isEqualToString:WX_SDK_ROOT_REF] && isUndefined(_cssNode->style.dimensions[CSS_HEIGHT])) {
-        _cssNode->style.flex = 1.0;
+    // To be in conformity with Android/Web, hopefully remove this in the future.
+    if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
+        if (isUndefined(_cssNode->style.dimensions[CSS_HEIGHT]) && self.weexInstance.frame.size.height) {
+            _cssNode->style.dimensions[CSS_HEIGHT] = self.weexInstance.frame.size.height;
+        }
+        
+        if (isUndefined(_cssNode->style.dimensions[CSS_WIDTH]) && self.weexInstance.frame.size.width) {
+            _cssNode->style.dimensions[CSS_WIDTH] = self.weexInstance.frame.size.width;
+        }
     }
 }
 
@@ -78,8 +84,9 @@
 
 - (NSUInteger)_childrenCountForLayout
 {
-    NSUInteger count = self.subcomponents.count;
-    for (WXComponent *component in self.subcomponents) {
+    NSArray *subcomponents = _subcomponents;
+    NSUInteger count = subcomponents.count;
+    for (WXComponent *component in subcomponents) {
         if (!component->_isNeedJoinLayoutSystem) {
             count--;
         }
@@ -87,9 +94,21 @@
     return (int)(count);
 }
 
-- (void)_frameDidCalculated
+- (void)_frameDidCalculated:(BOOL)isChanged
 {
     WXAssertComponentThread();
+    
+    if ([self isViewLoaded] && isChanged && [self isViewFrameSyncWithCalculated]) {
+        
+        [self.weexInstance.componentManager _addUITask:^{
+            self.view.frame = _calculatedFrame;
+            if (_transform) {
+                _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            }
+            
+            [_layer setNeedsDisplay];
+        }];
+    }
 }
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition
@@ -108,43 +127,50 @@
                                  WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
                                  WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
     
+    BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
+        isFrameChanged = YES;
         _calculatedFrame = newFrame;
         [self _recomputeBorderRadius];
         [dirtyComponents addObject:self];
     }
     
-    CGPoint newAboslutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
-                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
-    
-    if(!CGPointEqualToPoint(_absolutePosition, newAboslutePosition)){
-        _absolutePosition = newAboslutePosition;
-    }
+    CGPoint newAbsolutePosition = [self computeNewAbsolutePosition:superAbsolutePosition];
     
     _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
     _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
     _cssNode->layout.position[CSS_LEFT] = 0;
     _cssNode->layout.position[CSS_TOP] = 0;
     
-    [self _frameDidCalculated];
+    [self _frameDidCalculated:isFrameChanged];
     
-    for (WXComponent *subcomponent in self.subcomponents) {
-        [subcomponent _calculateFrameWithSuperAbsolutePosition:newAboslutePosition gatherDirtyComponents:dirtyComponents];
+    for (WXComponent *subcomponent in _subcomponents) {
+        [subcomponent _calculateFrameWithSuperAbsolutePosition:newAbsolutePosition gatherDirtyComponents:dirtyComponents];
     }
+}
+
+- (CGPoint)computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
+{
+    // Not need absolutePosition any more
+ //   [self _computeNewAbsolutePosition:superAbsolutePosition];
+    return superAbsolutePosition;
+}
+
+- (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
+{
+    CGPoint newAbsolutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
+                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
+    
+    if(!CGPointEqualToPoint(_absolutePosition, newAbsolutePosition)){
+        _absolutePosition = newAbsolutePosition;
+    }
+    
+    return newAbsolutePosition;
 }
 
 - (void)_layoutDidFinish
 {
     WXAssertMainThread();
-    
-    if ([self isViewLoaded] && !CGRectEqualToRect(_calculatedFrame, self.view.frame)) {
-        self.view.frame = _calculatedFrame;
-        // transform does not belong to layout, move it to other place hopefully
-        if (_transform) {
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:self.view withOrigin:_transformOrigin];
-        }
-        [_layer setNeedsDisplay];
-    }
     
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
@@ -219,9 +245,10 @@ do {\
 
 - (void)_fillAbsolutePositions
 {
-    CGPoint absolutePosition = self.absolutePosition;
-    for (WXComponent *subcomponent in self.subcomponents) {
-        subcomponent.absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
+    CGPoint absolutePosition = _absolutePosition;
+    NSArray *subcomponents = self.subcomponents;
+    for (WXComponent *subcomponent in subcomponents) {
+        subcomponent->_absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
         [subcomponent _fillAbsolutePositions];
     }
 }
@@ -238,19 +265,21 @@ static void cssNodePrint(void *context)
 static css_node_t * cssNodeGetChild(void *context, int i)
 {
     WXComponent *component = (__bridge WXComponent *)context;
-    
-    for (int j = 0; j <= i && j < component.subcomponents.count; j++) {
-        WXComponent *child = component.subcomponents[j];
+    NSArray *subcomponents = component->_subcomponents;
+    for (int j = 0; j <= i && j < subcomponents.count; j++) {
+        WXComponent *child = subcomponents[j];
         if (!child->_isNeedJoinLayoutSystem) {
             i++;
         }
     }
     
-    if(i >= 0 && i < component.subcomponents.count){
-        WXComponent *child = component.subcomponents[i];
+    if(i >= 0 && i < subcomponents.count){
+        WXComponent *child = subcomponents[i];
         return child->_cssNode;
     }
     
+    
+    WXAssert(NO, @"Can not find component:%@'s css node child at index: %ld, totalCount:%ld", component, i, subcomponents.count);
     return NULL;
 }
 

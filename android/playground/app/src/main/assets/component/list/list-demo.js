@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/1518171e61dbbc39d28ab3409c7cfdff", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/b14be55e383e036df641734903dcecc6", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __weex_module__.exports = {
@@ -356,24 +356,6 @@
 	      ],
 	    }},
 	    methods: {
-	      onrefresh: function(e) {
-	        var self = this;
-	        self.refresh_display = 'show';
-	        this.$call('modal', 'toast', {
-	          'message': "onrefresh",
-	          'duration': 2
-	        });
-	        self.refresh_display = 'hide';
-	      },
-	      onloading: function(e) {
-	        var self = this;
-	        self.loading_display = 'show';
-	        this.$call('modal', 'toast', {
-	          'message': "onloading",
-	          'duration': 2
-	        });
-	        self.loading_display = 'hide';
-	      },
 	      oncellclick: function(e) {
 	        this.$call('modal', 'toast', {
 	          'message': 'row ' + e.target.attr.rownumber + ' clicked',
@@ -389,6 +371,12 @@
 	          this.backgroundColor = 'red';
 	          this.composite = false;
 	        }
+	      },
+	      onloading: function (e) {
+	        this.loading_display = true
+	        setTimeout(function () {
+	          this.loading_display = 'hide'
+	        }.bind(this), 1000)
 	      }
 	    }
 
@@ -404,42 +392,6 @@
 	    "loadmoreoffset": "2000"
 	  },
 	  "children": [
-	    {
-	      "type": "refresh",
-	      "classList": [
-	        "refresh-view"
-	      ],
-	      "attr": {
-	        "display": function () {return this.refresh_display}
-	      },
-	      "events": {
-	        "refresh": "onrefresh"
-	      },
-	      "children": [
-	        {
-	          "type": "loading-indicator",
-	          "style": {
-	            "height": 60,
-	            "width": 60,
-	            "color": "rgb(238,162,54)"
-	          }
-	        },
-	        {
-	          "type": "text",
-	          "classList": [
-	            "refresh-arrow"
-	          ],
-	          "style": {
-	            "textAlign": "center",
-	            "color": "rgb(238,162,54)"
-	          },
-	          "shown": function () {return (this.refresh_display==='hide')},
-	          "attr": {
-	            "value": "Pull To Refresh"
-	          }
-	        }
-	      ]
-	    },
 	    {
 	      "type": "cell",
 	      "append": "tree",
@@ -1242,7 +1194,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/1518171e61dbbc39d28ab3409c7cfdff", {
+	;__weex_bootstrap__("@weex-component/b14be55e383e036df641734903dcecc6", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 

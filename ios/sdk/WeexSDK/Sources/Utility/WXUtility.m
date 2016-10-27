@@ -10,11 +10,15 @@
 #import "WXLog.h"
 #import "WXSDKEngine.h"
 #import "WXAppConfiguration.h"
+#import "WXThreadSafeMutableDictionary.h"
+#import "WXRuleManager.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <sys/utsname.h>
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
+#import <CommonCrypto/CommonCrypto.h>
+#import <coreText/CoreText.h>
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
@@ -122,7 +126,7 @@ CGPoint WXPixelPointResize(CGPoint value)
                               value.y * WXScreenResizeRadio());
     return new;
 }
-
+static BOOL WXNotStat;
 @implementation WXUtility
 
 + (NSDictionary *)getEnvironment
@@ -208,6 +212,20 @@ CGPoint WXPixelPointResize(CGPoint value)
     }
     
     return obj;
+}
+
++ (id)JSONObject:(NSData*)data error:(NSError **)error
+{
+    if (!data) return nil;
+    id jsonObj = nil;
+    @try {
+        jsonObj = [NSJSONSerialization JSONObjectWithData:data
+                                                  options:NSJSONReadingAllowFragments | NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                    error:error];
+    } @catch (NSException *exception) {
+        *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{NSLocalizedDescriptionKey: [exception description]}];
+    }
+    return jsonObj;
 }
 
 + (NSString *)JSONString:(id)object
@@ -296,26 +314,83 @@ CGPoint WXPixelPointResize(CGPoint value)
 + (UIFont *)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
 {
     CGFloat fontSize = (isnan(size) || size == 0) ?  WX_TEXT_FONT_SIZE : size;
-    UIFont *font;
+    UIFont *font = nil;
     
-    if (fontFamily) {
-        font = [UIFont fontWithName:fontFamily size:fontSize];
-        if (!font) {
-            WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
+    WXThreadSafeMutableDictionary *fontFace = [[WXRuleManager sharedInstance] getRule:@"fontFace"];
+    WXThreadSafeMutableDictionary *fontFamilyDic = fontFace[fontFamily];
+    if (fontFamilyDic[@"localSrc"]){
+        NSString *fpath = [((NSURL*)fontFamilyDic[@"localSrc"]) path];
+        CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename([fpath UTF8String]);
+        CGFontRef customfont = CGFontCreateWithDataProvider(fontDataProvider);
+        
+        CGDataProviderRelease(fontDataProvider);
+        NSString *fontName = (__bridge NSString *)CGFontCopyFullName(customfont);
+        CFErrorRef error;
+        CTFontManagerRegisterGraphicsFont(customfont, &error);
+        if (error){
+            CTFontManagerUnregisterGraphicsFont(customfont, &error);
+            CTFontManagerRegisterGraphicsFont(customfont, &error);
+        }
+        CGFontRelease(customfont);
+        font = [UIFont fontWithName:fontName size:fontSize];
+    }
+    if (!font) {
+        if (fontFamily) {
+            font = [UIFont fontWithName:fontFamily size:fontSize];
+            if (!font) {
+                WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
+                font = [UIFont systemFontOfSize:fontSize];
+            }
+        } else {
             font = [UIFont systemFontOfSize:fontSize];
         }
-    } else {
-        font = [UIFont systemFontOfSize:fontSize];
     }
     
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
     traits = (textWeight == WXTextWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
-    fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
-    font = [UIFont fontWithDescriptor:fontD size:0];
+    if (traits != 0) {
+        fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
+        UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
+        if (tempFont) {
+            font = tempFont;
+        }
+    }
     
     return font;
+}
+
++ (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock
+{
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSURL * downloadPath = nil;
+        if (!error && location) {
+            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url path]]];
+            
+            downloadPath = [NSURL fileURLWithPath:file];
+            NSFileManager *mgr = [NSFileManager defaultManager];
+            NSError * error ;
+            if (![mgr fileExistsAtPath:[file stringByDeletingLastPathComponent]]) {
+                // create font cache directory and its parent if not exist
+                [mgr createDirectoryAtPath:[file stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
+            }
+            BOOL result = [mgr moveItemAtURL:location toURL:downloadPath error:&error];
+            if (!result) {
+                downloadPath = nil;
+            }
+        }
+        completionBlock(downloadPath, error);
+    }];
+    
+    [task resume];
+}
+
++ (BOOL)isFileExist:(NSString *)filePath
+{
+    
+    return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 
 + (NSString *)documentDirectory
@@ -368,30 +443,12 @@ CGPoint WXPixelPointResize(CGPoint value)
     return machine;
 }
 
-+ (NSString *)registeredDeviceName {
++ (NSString *)registeredDeviceName
+{
     NSString *machine = [[UIDevice currentDevice] model];
     NSString *systemVer = [[UIDevice currentDevice] systemVersion] ? : @"";
     NSString *model = [NSString stringWithFormat:@"%@:%@",machine,systemVer];
     return model;
-}
-
-+ (void)addStatTrack:(NSString *)appName
-{
-    if (!appName) {
-        return;
-    }
-    
-    // App name for non-commercial use
-    NSString *urlString = [NSString stringWithFormat:@"http://gm.mmstat.com/weex.1003?appname=%@", appName];
-    NSURL *URL = [NSURL URLWithString:urlString];
-    NSURLRequest *request = [NSURLRequest requestWithURL:URL];
-    
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:
-                                  ^(NSData *data, NSURLResponse *response, NSError *error) {
-                                  }];
-    [task resume];
 }
 
 CGFloat WXScreenResizeRadio(void)
@@ -479,6 +536,58 @@ CGFloat WXScreenResizeRadio(void)
 + (void)delete:(NSString *)service {
     NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
     SecItemDelete((CFDictionaryRef)keychainQuery);
+}
+
++ (void)setNotStat:(BOOL)notStat {
+    WXNotStat = YES;
+}
+
++ (BOOL)notStat {
+    return WXNotStat;
+}
+
++ (NSURL *)urlByDeletingParameters:(NSURL *)url
+{
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:YES];
+    components.query = nil;     // remove the query
+    components.fragment = nil;
+    return [components URL];
+}
+
++ (NSString *)stringWithContentsOfFile:(NSString *)filePath
+{
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSString *contents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+        if (contents) {
+            return contents;
+        }
+    }
+    return nil;
+}
+
++ (NSString *)md5:(NSString *)string
+{
+    const char *str = string.UTF8String;
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(str, (CC_LONG)strlen(str), result);
+    
+    return [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+            result[0], result[1], result[2], result[3],
+            result[4], result[5], result[6], result[7],
+            result[8], result[9], result[10], result[11],
+            result[12], result[13], result[14], result[15]
+            ];
+}
+
++ (NSString *)uuidString
+{
+    CFUUIDRef uuidRef = CFUUIDCreate(NULL);
+    CFStringRef uuidStringRef= CFUUIDCreateString(NULL, uuidRef);
+    NSString *uuid = [NSString stringWithString:(__bridge NSString *)uuidStringRef];
+    CFRelease(uuidRef);
+    CFRelease(uuidStringRef);
+    
+    return [uuid lowercaseString];
 }
 
 @end

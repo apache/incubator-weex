@@ -9,6 +9,7 @@
 #import "WXIndicatorComponent.h"
 #import "WXSliderComponent.h"
 #import "WXConvert.h"
+#import "WXSliderNeighborComponent.h"
 
 @implementation WXIndicatorView
 
@@ -157,7 +158,7 @@
     _indicatorView.pointSize = _itemSize;
     
     WXComponent *parent = self.supercomponent;
-    if([parent isKindOfClass:[WXSliderComponent class]]) {
+    if([parent isKindOfClass:[WXSliderComponent class]] || [parent isKindOfClass:[WXSliderNeighborComponent class]]) {
         WXSliderComponent *parentSlider = (WXSliderComponent *)parent;
         [parentSlider setIndicatorView:_indicatorView];
     }
@@ -169,25 +170,28 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     BOOL styleChange = NO;
+    
     if (styles[@"itemColor"]) {
         styleChange = YES;
         _itemColor = [WXConvert UIColor:styles[@"itemColor"]];
         [_indicatorView setPointColor:_itemColor];
     }
-    else if (styles[@"itemSelectedColor"]) {
+    
+    if (styles[@"itemSelectedColor"]) {
         styleChange = YES;
         _itemSelectedColor = [WXConvert UIColor:styles[@"itemSelectedColor"]];
         [_indicatorView setLightColor:_itemSelectedColor];
     }
-    else if (styles[@"itemSize"]) {
+    
+    if (styles[@"itemSize"]) {
         styleChange = YES;
         _itemSize = [WXConvert WXPixelType:styles[@"itemSize"]];
         [_indicatorView setPointSize:_itemSize];
     }
+    
     if (styleChange) {
         [self setNeedsDisplay];
     }
 }
 
 @end
-

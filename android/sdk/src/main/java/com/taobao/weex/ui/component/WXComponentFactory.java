@@ -210,7 +210,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentHolder;
+import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -228,13 +228,12 @@ public class WXComponentFactory {
       return null;
     }
 
-    ComponentHolder holder = WXComponentRegistry.getComponent(node.type);
+    IFComponentHolder holder = WXComponentRegistry.getComponent(node.type);
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
-        StringBuilder tag = new StringBuilder();
-        tag.append("WXComponentFactory error type:[");
-        tag.append(node.type).append("]").append(" class not found");
-        WXLogUtils.e(tag.toString());
+        String tag = "WXComponentFactory error type:[" +
+                node.type + "]" + " class not found";
+        WXLogUtils.e(tag);
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
       holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
@@ -246,12 +245,7 @@ public class WXComponentFactory {
     try {
       return holder.createInstance(instance, node, parent, lazy);
     } catch (Exception e) {
-      if (WXEnvironment.isApkDebugable()) {
-        StringBuilder builder = new StringBuilder("WXComponentFactory Exception type:[");
-        builder.append(node.type).append("] ");
-        builder.append(WXLogUtils.getStackTrace(e));
-        WXLogUtils.e(builder.toString());
-      }
+      WXLogUtils.e("WXComponentFactory Exception type:[" + node.type + "] ", e);
     }
 
     return null;

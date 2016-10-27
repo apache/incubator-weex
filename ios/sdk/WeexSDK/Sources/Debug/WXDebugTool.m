@@ -36,9 +36,7 @@ static NSString* WXDebugrepJSFramework;
 
 + (BOOL)isDebug
 {
-#ifdef DEBUG
-    return YES;
-#endif
+    return WXIsDebug;
 }
 
 + (void)setDevToolDebug:(BOOL)isDevToolDebug {
@@ -70,7 +68,7 @@ static NSString* WXDebugrepJSFramework;
     void(^scriptLoadFinish)(NSString*, NSString*) = ^(NSString* key, NSString* script){
         if ([key isEqualToString:@"jsframework"]) {
             WXDebugrepJSFramework = script;
-            [[WXSDKManager bridgeMgr] unload];
+            [WXSDKManager unload];
             [WXSDKEngine initSDKEnviroment:script];
         }else {
             WXDebugrepBundleJS = script;

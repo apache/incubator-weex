@@ -1,6 +1,7 @@
 # Created by IDE
 .idea/
 *.iml
+.DS_Store
 
 # Created by Builder
 examples/build
@@ -20,6 +21,9 @@ node_modules
 pids
 *.pid
 *.seed
+
+# build framework options by script
+html5/runtime/config.js
 
 # e2e test
 html5/test/e2e/reports

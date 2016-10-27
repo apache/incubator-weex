@@ -206,12 +206,11 @@ package com.taobao.weex.ui;
 
 import android.text.TextUtils;
 
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXLogUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -221,58 +220,45 @@ import java.util.Map;
  */
 public class WXComponentRegistry {
 
-  private static Map<String, ComponentHolder> sTypeComponentMap = new HashMap<>();
-  private static Map<String, String> sClassTypeMap = new HashMap<>();
+  private static Map<String, IFComponentHolder> sTypeComponentMap = new HashMap<>();
+  private static ArrayList<Map<String, String>> sComponentInfos=new ArrayList<>();
 
-  public static boolean registerComponent(String type, Class<? extends WXComponent> clazz, boolean appendTree) throws WXException {
-    if (clazz == null || TextUtils.isEmpty(type)) {
+  public static boolean registerComponent(final String type, final IFComponentHolder holder, Map<String, String> componentInfo) throws WXException {
+    if (holder == null || TextUtils.isEmpty(type)) {
       return false;
     }
-
-    Map<String, String> componentInfo = new HashMap<>();
-    componentInfo.put("type", type);
-    if (appendTree) {
-      componentInfo.put("append", "tree");
+    if (componentInfo == null){
+      componentInfo = new HashMap<>();
     }
-    registerInternal(type,clazz,componentInfo);
-    return true;
-  }
 
-  private static void registerInternal(final String type,final Class<? extends WXComponent> clazz, final Map<String, String> componentInfo){
-    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+    componentInfo.put("type",type);
+    final Map<String, String> registerInfo = componentInfo;
+    //execute task in js thread to make sure register order is same as the order invoke register method.
+    WXBridgeManager.getInstance().getJSHandler()
+    .post(new Runnable() {
       @Override
       public void run() {
         try {
-          registerNativeComponent(type, clazz);
-          registerJSComponent(componentInfo);
+          registerNativeComponent(type, holder);
+          registerJSComponent(registerInfo);
+          sComponentInfos.add(registerInfo);
         } catch (WXException e) {
-          e.printStackTrace();
+          WXLogUtils.e("", e);
         }
 
       }
     });
+    return true;
   }
 
-  private static boolean registerNativeComponent(String type, Class<? extends WXComponent> clazz) throws WXException {
-    if (type == null) {
-      if (WXEnvironment.isApkDebugable()) {
-        throw new WXException("Component name required." );
-      } else {
-        WXLogUtils.e("Component name required." + type);
-        return false;
-      }
+  private static boolean registerNativeComponent(String type, IFComponentHolder holder) throws WXException {
+    try {
+      holder.loadIfNonLazy();
+      sTypeComponentMap.put(type, holder);
+    }catch (ArrayStoreException e){
+      e.printStackTrace();
+      //ignore: ArrayStoreException: java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
     }
-    //same component class for different name
-    ComponentHolder holder;
-    if(sClassTypeMap.get(clazz.getName()) == null){
-      holder = new ComponentHolder(clazz);
-      sClassTypeMap.put(clazz.getName(),type);
-    }else{
-      //use the same holder
-      holder = sTypeComponentMap.get(sClassTypeMap.get(clazz.getName()));
-    }
-
-    sTypeComponentMap.put(type, holder);
     return true;
   }
 
@@ -283,22 +269,23 @@ public class WXComponentRegistry {
     return true;
   }
 
-  public static boolean registerComponent(Map<String, String> componentInfo, Class<? extends WXComponent> clazz) throws WXException {
-    if (componentInfo == null || clazz == null) {
-      return false;
-    }
-
-    String type = componentInfo.get("type");
-    if(type == null){
-      return false;
-    }else{
-      registerInternal(type,clazz,componentInfo);
-      return true;
-    }
+  public static IFComponentHolder getComponent(String type) {
+    return sTypeComponentMap.get(type);
   }
 
-  public static ComponentHolder getComponent(String type) {
-    return sTypeComponentMap.get(type);
+  public static void reload(){
+    WXBridgeManager.getInstance().getJSHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          for(Map<String,String> com:sComponentInfos){
+            registerJSComponent(com);
+          }
+        } catch (WXException e) {
+          WXLogUtils.e("", e);
+        }
+      }
+    });
   }
 
 }

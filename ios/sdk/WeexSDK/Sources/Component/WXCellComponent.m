@@ -22,7 +22,7 @@
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     
     if (self) {
-        _async = YES;
+        _async = attributes[@"async"] ? [WXConvert BOOL:attributes[@"async"]] : YES;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -35,9 +35,13 @@
     
 }
 
-- (void)layoutDidFinish
+- (void)_frameDidCalculated:(BOOL)isChanged
 {
-    [self.list cellDidLayout:self];
+    [super _frameDidCalculated:isChanged];
+    
+    if (isChanged) {
+        [self.list cellDidLayout:self];
+    }
 }
 
 - (WXDisplayCompeletionBlock)displayCompeletionBlock
@@ -51,18 +55,27 @@
     };
 }
 
-- (void)moveToSuperview:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
+- (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
-    if (newSupercomponent == self.list) {
+    if (self.list == newSupercomponent) {
         [self.list cell:self didMoveToIndex:index];
+        [super _removeFromSupercomponent];
+        [newSupercomponent _insertSubcomponent:self atIndex:index];
     } else {
-        [super moveToSuperview:newSupercomponent atIndex:index];
+        [super _moveToSupercomponent:newSupercomponent atIndex:index];
     }
+}
+
+- (void)_removeFromSupercomponent
+{
+    [super _removeFromSupercomponent];
+    
+    [self.list cellDidRemove:self];
 }
 
 - (void)removeFromSuperview
 {
-    [self.list cellDidRemove:self];
+    // do nothing
 }
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
@@ -73,7 +86,9 @@
     
     if ([self needsLayout]) {
         layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
-//        print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+        if ([WXLog logLevel] >= WXLogLevelDebug) {
+            print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+        }
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];

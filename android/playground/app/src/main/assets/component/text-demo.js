@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	;__weex_define__("@weex-component/d38cc0c23cf5a41b3da8d60e141cbdd6", [], function(__weex_require__, __weex_exports__, __weex_module__){
+	;__weex_define__("@weex-component/621c9dd25370a65530622e88f51a4c08", [], function(__weex_require__, __weex_exports__, __weex_module__){
 
 	;
 	  __webpack_require__(1);
@@ -380,6 +380,48 @@
 	          }
 	        }
 	      ]
+	    },
+	    {
+	      "type": "wxc-panel",
+	      "attr": {
+	        "title": "line-height",
+	        "type": "primary"
+	      },
+	      "children": [
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "attr": {
+	            "value": "no lineheight setting"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "lineHeight": 50
+	          },
+	          "attr": {
+	            "value": "lineheight 50"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "lineHeight": 80
+	          },
+	          "attr": {
+	            "value": "lineheight 80"
+	          }
+	        }
+	      ]
 	    }
 	  ]
 	})
@@ -391,7 +433,7 @@
 	  }
 	})
 	})
-	;__weex_bootstrap__("@weex-component/d38cc0c23cf5a41b3da8d60e141cbdd6", {
+	;__weex_bootstrap__("@weex-component/621c9dd25370a65530622e88f51a4c08", {
 	  "transformerVersion": "0.3.1"
 	},undefined)
 
@@ -1141,7 +1183,7 @@
 	      },
 	      "shown": function () {return !this.rightItemSrc},
 	      "events": {
-	        "click": "onclickrigthitem"
+	        "click": "onclickrightitem"
 	      }
 	    },
 	    {

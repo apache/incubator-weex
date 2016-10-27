@@ -2,22 +2,22 @@
  * @fileOverview
  * A simple virtual dom implementation
  */
-
-import Listener from './listener'
+// import { extend } from '../shared'
+import { extend } from '../shared/utils'
 
 const DEFAULT_TAG_NAME = 'div'
 
 export const instanceMap = {}
 let nextNodeRef = 1
 
-export function Document (id, url, handler) {
+export function Document (id, url, handler, Listener) {
   id = id ? id.toString() : ''
   this.id = id
   this.URL = url
 
   instanceMap[id] = this
   this.nodeMap = {}
-  this.listener = new Listener(id, handler || genCallTasks(id))
+  Listener && (this.listener = new Listener(id, handler || genCallTasks(id)))
   this.createDocumentElement()
 }
 
@@ -26,7 +26,7 @@ function genCallTasks (id) {
     if (!Array.isArray(tasks)) {
       tasks = [tasks]
     }
-    callNative(id, tasks, '-1')
+    return callNative(id, tasks, '-1')
   }
 }
 
@@ -211,7 +211,7 @@ Element.prototype.appendChild = function (node) {
       insertIndex(node, this.pureChildren, this.pureChildren.length)
       if (this.docId) {
         const listener = instanceMap[this.docId].listener
-        listener.addElement(node, this.ref, -1)
+        return listener.addElement(node, this.ref, -1)
       }
     }
   }
@@ -221,7 +221,7 @@ Element.prototype.appendChild = function (node) {
       const index = moveIndex(node, this.pureChildren, this.pureChildren.length)
       if (this.docId && index >= 0) {
         const listener = instanceMap[this.docId].listener
-        listener.moveElement(node.ref, this.ref, index)
+        return listener.moveElement(node.ref, this.ref, index)
       }
     }
   }
@@ -251,7 +251,7 @@ Element.prototype.insertBefore = function (node, before) {
       )
       if (this.docId) {
         const listener = instanceMap[this.docId].listener
-        listener.addElement(node, this.ref, index)
+        return listener.addElement(node, this.ref, index)
       }
     }
   }
@@ -268,7 +268,7 @@ Element.prototype.insertBefore = function (node, before) {
       )
       if (this.docId && index >= 0) {
         const listener = instanceMap[this.docId].listener
-        listener.moveElement(node.ref, this.ref, index)
+        return listener.moveElement(node.ref, this.ref, index)
       }
     }
   }
@@ -295,7 +295,7 @@ Element.prototype.insertAfter = function (node, after) {
       )
       if (this.docId) {
         const listener = instanceMap[this.docId].listener
-        listener.addElement(node, this.ref, index)
+        return listener.addElement(node, this.ref, index)
       }
     }
   }
@@ -309,7 +309,7 @@ Element.prototype.insertAfter = function (node, after) {
       )
       if (this.docId && index >= 0) {
         const listener = instanceMap[this.docId].listener
-        listener.moveElement(node.ref, this.ref, index)
+        return listener.moveElement(node.ref, this.ref, index)
       }
     }
   }
@@ -500,7 +500,7 @@ Element.prototype.fireEvent = function (type, e) {
 }
 
 Element.prototype.toStyle = function () {
-  return Object.assign({}, this.classStyle, this.style)
+  return extend({}, this.classStyle, this.style)
 }
 
 Element.prototype.toJSON = function () {

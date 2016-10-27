@@ -13,6 +13,9 @@
 #import "WXSDKInstance_private.h"
 #import "WXLog.h"
 #import "WXModuleProtocol.h"
+#import "WXUtility.h"
+#import "WXRuleManager.h"
+#import "WXSDKInstance.h"
 
 @interface WXDomModule ()
 
@@ -27,13 +30,16 @@ WX_EXPORT_METHOD(@selector(addElement:element:atIndex:))
 WX_EXPORT_METHOD(@selector(removeElement:))
 WX_EXPORT_METHOD(@selector(moveElement:parentRef:index:))
 WX_EXPORT_METHOD(@selector(addEvent:event:))
-WX_EXPORT_METHOD(@selector(removeElement:))
+WX_EXPORT_METHOD(@selector(removeEvent:event:))
 WX_EXPORT_METHOD(@selector(createFinish))
 WX_EXPORT_METHOD(@selector(updateFinish))
 WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
+WX_EXPORT_METHOD(@selector(addRule:rule:))
+WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+
 
 - (void)performBlockOnComponentMananger:(void(^)(WXComponentManager *))block
 {
@@ -49,6 +55,14 @@ WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
         }
         [mananger startComponentTasks];
         block(mananger);
+    });
+}
+- (void)performSelectorOnRuleManager:(void(^)(void))block{
+    if (!block) {
+        return;
+    }
+    WXPerformBlockOnComponentThread(^{
+        block();
     });
 }
 
@@ -138,6 +152,58 @@ WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 {
     [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
         [manager updateAttributes:attrs forComponent:elemRef];
+    }];
+}
+
+- (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
+    if ([WXUtility isBlankString:type] || ![rule count]) {
+        return;
+    }
+    
+    [self performSelectorOnRuleManager:^{
+        [[WXRuleManager sharedInstance] addRule:type rule:rule];
+    }];
+}
+
+- (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    
+    [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
+        NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
+        UIView *rootView = manager.weexInstance.rootView;
+        CGRect rootRect = [rootView convertRect:rootView.frame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+        if ([ref isEqualToString:@"viewport"]) {
+            [callbackRsp setObject:@(true)forKey:@"result"];
+            [callbackRsp setObject:@{
+                                     @"width":@(rootRect.size.width),
+                                     @"height":@(rootRect.size.height),
+                                     @"bottom":@(CGRectGetMaxY(rootRect) - rootRect.origin.y),
+                                     @"left":@(rootRect.origin.x),
+                                     @"right":@(CGRectGetMaxX(rootRect) - rootRect.origin.x),
+                                     @"top":@(rootRect.origin.y)
+                                    } forKey:@"size"];
+            callback(callbackRsp, false);
+        }else {
+            WXComponent *component = [manager componentForRef:ref];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!component) {
+                    [callbackRsp setObject:@(false) forKey:@"result"];
+                    [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
+                } else {
+                    CGRect componentRect = [component.view convertRect:component.calculatedFrame toCoordinateSpace:[UIScreen mainScreen].coordinateSpace];
+                    [callbackRsp setObject:@(true)forKey:@"result"];
+                    [callbackRsp setObject:@{
+                                             @"width":@(componentRect.size.width),
+                                             @"height":@(componentRect.size.height),
+                                             @"bottom":@(CGRectGetMaxY(componentRect) - rootRect.origin.y),
+                                             @"left":@(componentRect.origin.x - rootRect.origin.x),
+                                             @"right":@(CGRectGetMaxX(componentRect) - rootRect.origin.x),
+                                             @"top":@(componentRect.origin.y - rootRect.origin.y)
+                                             } forKey:@"size"];
+                }
+                callback(callbackRsp, false);
+            });
+           
+        }
     }];
 }
 

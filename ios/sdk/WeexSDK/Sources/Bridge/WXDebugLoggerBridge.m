@@ -74,7 +74,8 @@
 {
     if (!_isConnect) return;
     
-    for (NSString *msg in _msgAry) {
+    NSArray *templateContainers = [NSArray arrayWithArray:_msgAry];
+    for (NSString *msg in templateContainers) {
         [_webSocket send:msg];
     }
     [_msgAry removeAllObjects];
@@ -97,7 +98,7 @@
             return;
         }
         //call native
-        WXLogVerbose(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
+        WXLogDebug(@"Calling native... instancdId:%@, methods:%@, callbackId:%@", instanceId, [WXUtility JSONString:methods], callbackId);
         _nativeCallBlock(instanceId, methods, callbackId);
     } else if ([method isEqualToString:@"setLogLevel"]) {
         NSString *levelString = [args firstObject];
@@ -112,11 +113,11 @@
     [self callJSMethod:@"evalFramework" args:@[frameworkScript]];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args
+- (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     if (![method isEqualToString:@"__logger"]) {
         // prevent recursion
-        WXLogVerbose(@"Calling JS... method:%@, args:%@", method, [WXUtility JSONString:args]);
+        WXLogDebug(@"Calling JS... method:%@, args:%@", method, [WXUtility JSONString:args]);
     }
     
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -125,6 +126,8 @@
     
     [_msgAry addObject:[WXUtility JSONString:dict]];
     [self _executionMsgAry];
+    
+    return nil;
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
@@ -140,6 +143,11 @@
 - (void)resetEnvironment
 {
     [self _initEnvironment];
+}
+
+- (void)garbageCollect
+{
+    
 }
 
 - (void)executeBridgeThead:(dispatch_block_t)block

@@ -34,6 +34,13 @@
     return self;
 }
 
+- (void)dealloc
+{
+    if (_tap.delegate) {
+        _tap.delegate = nil;
+    }
+}
+
 - (void)viewDidLoad
 {
     [self.view addGestureRecognizer:_tap];
@@ -48,7 +55,7 @@
                                                             withContainer:)]) {
             __weak typeof(self) weexSelf = self;
             [navigationHandler pushViewControllerWithParam:@{@"url":_href} completion:^(NSString *code, NSDictionary *responseData) {
-                WXLogVerbose(@"Push success -> %@", weexSelf.href);
+                WXLogDebug(@"Push success -> %@", weexSelf.href);
             } withContainer:self.weexInstance.viewController];
         } else {
             WXLogError(@"Event handler of class %@ does not respond to pushViewControllerWithParam", NSStringFromClass([navigationHandler class]));
@@ -58,9 +65,21 @@
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
-    if (attributes[@""]) {
+    if (attributes[@"href"]) {
         _href = attributes[@"href"];
     }
+}
+
+#pragma mark
+#pragma gesture delegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end

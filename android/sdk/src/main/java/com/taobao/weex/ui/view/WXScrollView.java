@@ -278,7 +278,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     try {
       WXReflectionUtils.setValue(this, "mMinimumVelocity", 5);
     } catch (Exception e) {
-      WXLogUtils.e("[WXScrollView] WXScrollView: " + WXLogUtils.getStackTrace(e));
+      WXLogUtils.e("[WXScrollView] WXScrollView: ", e);
     }
   }
 
@@ -383,6 +383,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       MotionEvent down = MotionEvent.obtain(ev);
       down.setAction(MotionEvent.ACTION_DOWN);
       mHasNotDoneActionDown = false;
+      down.recycle();
     }
 
     if (ev.getAction() == MotionEvent.ACTION_DOWN) {
@@ -548,14 +549,17 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       stickyData = entry.getValue();
 
       getLocationOnScreen(stickyScrollerP);
-      stickyData.getView().getLocationOnScreen(stickyViewP);
-      int parentH = stickyData.getParent().getRealView().getHeight();
-      int stickyViewH = stickyData.getView().getHeight();
+      stickyData.getHostView().getLocationOnScreen(stickyViewP);
+      int parentH = 0;
+      if(stickyData.getParent()!=null && stickyData.getParent().getRealView()!=null){
+        parentH=stickyData.getParent().getRealView().getHeight();
+      }
+      int stickyViewH = stickyData.getHostView().getHeight();
       int stickyShowPos = stickyScrollerP[1];
       int stickyStartHidePos = -parentH + stickyScrollerP[1] + stickyViewH;
       if (stickyViewP[1] <= stickyShowPos && stickyViewP[1] >= (stickyStartHidePos - stickyViewH)) {
         mStickyOffset = stickyViewP[1] - stickyStartHidePos;
-        return stickyData.getView();
+        return stickyData.getHostView();
       }
     }
     return null;

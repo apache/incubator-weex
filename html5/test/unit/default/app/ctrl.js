@@ -9,6 +9,7 @@ global.callNative = function () {}
 import * as ctrl from '../../../../default/app/ctrl'
 import Differ from '../../../../default/app/differ'
 import { Document } from '../../../../vdom'
+import Listener from '../../../../vdom/listener'
 
 describe('the api of app', () => {
   let app
@@ -21,8 +22,9 @@ describe('the api of app', () => {
     const app = {
       id: id,
       customComponentMap: {},
-      define: sinon.spy(),
-      bootstrap: sinon.stub(),
+      registerComponent: function () {},
+      // define: sinon.spy(),
+      // bootstrap: sinon.stub(),
       callbacks: {
         1: spy2
       },
@@ -30,9 +32,9 @@ describe('the api of app', () => {
       differ: new Differ(id)
     }
 
-    app.doc = new Document(id, '', spy1)
+    app.doc = new Document(id, '', spy1, Listener)
     app.doc.createBody('div')
-    app.bootstrap.returns()
+    // app.bootstrap.returns()
 
     Object.assign(app, ctrl)
 
@@ -43,6 +45,7 @@ describe('the api of app', () => {
     spy1 = sinon.spy()
     spy2 = sinon.spy()
     app = createApp()
+    !console.debug && (console.debug = function () {})
   })
 
   afterEach(() => {
@@ -52,31 +55,33 @@ describe('the api of app', () => {
 
   describe('init', () => {
     before(() => {
-      global.needTransformerVersion = '0.1.3'
+      global.transformerVersion = '0.1.3'
     })
 
     after(() => {
-      global.needTransformerVersion = undefined
+      global.transformerVersion = undefined
     })
 
     it('a simple bundle', () => {
+      app.requireModule = () => {}
       app.init(`
-        define('main', {
-          "type": "container",
-          "children": [{
-            "type": "text",
-            "attr": {
-              "value": "Hello World"
-            }
-          }]
+        define('main', function (r, e, m) {
+          e.template = {
+            "type": "container",
+            "children": [{
+              "type": "text",
+              "attr": {
+                "value": "Hello World"
+              }
+            }]
+          }
         })
 
         bootstrap('main')
       `)
 
-      expect(app.doc.listener.batched).to.be.true
-      expect(app.define.calledOnce).to.be.true
-      expect(app.bootstrap.calledOnce).to.be.true
+      // expect(app.define.calledOnce).to.be.true
+      // expect(app.bootstrap.calledOnce).to.be.true
 
       const task = spy1.firstCall.args[0][0]
       expect(task.module).to.be.equal('dom')

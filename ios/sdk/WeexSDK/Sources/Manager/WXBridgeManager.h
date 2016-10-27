@@ -7,9 +7,16 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXBridgeMethod.h"
+
+@class WXBridgeMethod;
+@class WXSDKInstance;
 
 @interface WXBridgeManager : NSObject
+
+/**
+ *  return instance at the top of the stack.
+ **/
+@property (nonatomic, weak, readonly) WXSDKInstance *topInstance;
 
 /**
  *  Create Instance Method
@@ -24,6 +31,11 @@
                   data:(id)data;
 
 /**
+ * @abstract return currentInstanceId
+ **/
+- (NSArray *)getInstanceIdStack;
+
+/**
  *  Destroy Instance Method
  *  @param instance  :   instance id
  **/
@@ -34,9 +46,11 @@
  *  @param instance  :   instance id
  *  @param data      :   external data
  **/
-- (void)refreshInstance:(NSString *)instance
-                   data:(id)data;
+- (void)refreshInstance:(NSString *)instance data:(id)data;
 
+/**
+ *  Unload
+ **/
 - (void)unload;
 
 /**
@@ -71,14 +85,17 @@
  **/
 - (void)registerComponents:(NSArray* )components;
 
+- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params DEPRECATED_MSG_ATTRIBUTE("Use fireEvent:ref:type:params:domChanges: method instead.");
+
 /**
  *  FireEvent
  *  @param instanceId:   instance id
  *  @param ref       :   node reference
  *  @param type      :   event type
  *  @param params    :   parameters
+ *  @param domChanges:   dom value changes, used for two-way data binding
  **/
-- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params;
+- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges;
 
 /**
  *  callBack
@@ -88,7 +105,13 @@
  *  @param params     params
  *  @param iflast     indicate that whether this func will be reused
  */
-- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(NSString *)params keepAlive:(BOOL)keepAlive;
+- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive;
+
+/**
+ *  Connect To WebSocket for devtool debug
+ *  @param url       :   url to connect
+ **/
+- (void)connectToDevToolWithUrl:(NSURL *)url;
 
 /**
  *  CallBack
@@ -96,13 +119,7 @@
  *  @param funcId    :   callback id
  *  @param params    :   parameters
  **/
-- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(NSString *)params;
-
-/**
- *  Connect To WebSocket for devtool debug
- *  @param url       :   url to connect
- **/
-- (void)connectToDevToolWithUrl:(NSURL *)url;
+- (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params;
 
 /**
  *  Connect To WebSocket for collecting log
