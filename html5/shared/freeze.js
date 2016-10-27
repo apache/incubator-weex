@@ -1,6 +1,7 @@
 /**
  * Freeze the prototype of javascript build-in objects.
  */
+/* istanbul ignore next */
 export function freezePrototype () {
   Object.freeze(Object)
   Object.freeze(Array)

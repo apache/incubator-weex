@@ -19,6 +19,7 @@ const config = {
 
 Document.handler = config.sendTasks
 
+/* istanbul ignore next */
 function freezePrototype () {
   shared.freezePrototype()
 

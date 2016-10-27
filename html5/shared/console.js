@@ -65,6 +65,7 @@ export function setNativeConsole () {
 /**
  * Reset hacked console to original.
  */
+/* istanbul ignore next */
 export function resetNativeConsole () {
   levelMap = {}
   global.console = originalConsole
