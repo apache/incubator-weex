@@ -254,7 +254,6 @@
 
 -(NSString *)dateToString:(NSDate *)date
 {
-    NSDate *currentDate = [NSDate date];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSString *str = [dateFormatter stringFromDate:date];
@@ -263,7 +262,6 @@
 
 -(NSString *)timeToString:(NSDate *)date
 {
-    NSDate *currentDate = [NSDate date];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"HH:mm"];
     NSString *str = [dateFormatter stringFromDate:date];
