@@ -210,6 +210,7 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
@@ -262,6 +263,10 @@ public final class WXDomModule extends WXModule {
       REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
       REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_RECT,
       INVOKE_METHOD};
+
+  public WXDomModule(WXSDKInstance instance){
+    mWXSDKInstance = instance;
+  }
 
   public void callDomMethod(JSONObject task) {
     if (task == null) {

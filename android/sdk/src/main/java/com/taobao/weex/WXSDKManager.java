@@ -215,7 +215,7 @@ public class WXSDKManager {
   }
 
   public WXSDKInstance getSDKInstance(String instanceId) {
-    return mWXRenderManager.getWXSDKInstance(instanceId);
+    return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
   }
 
   public void postOnUiThread(Runnable runnable, long delayMillis) {

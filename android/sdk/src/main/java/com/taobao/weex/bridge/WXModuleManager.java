@@ -207,6 +207,7 @@ package com.taobao.weex.bridge;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
@@ -231,6 +232,7 @@ public class WXModuleManager {
    */
   private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
+  private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
   /**
    * module object dictionary
@@ -327,11 +329,11 @@ public class WXModuleManager {
           invoker.getParameterTypes(),
           args,
           new JSCallbackCreator() {
-        @Override
-        public JSCallback create(String callbackId) {
-          return new SimpleJSCallback(instanceId,callbackId);
-        }
-      });
+            @Override
+            public JSCallback create(String callbackId) {
+              return new SimpleJSCallback(instanceId, callbackId);
+            }
+          });
       if (invoker.isRunOnUIThread()) {
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {
           @Override
@@ -387,6 +389,7 @@ public class WXModuleManager {
   }
 
   public static void destroyInstanceModules(String instanceId) {
+    sDomModuleMap.remove(instanceId);
     HashMap<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
     if (moduleMap == null || moduleMap.size() < 1) {
       return;
@@ -401,6 +404,20 @@ public class WXModuleManager {
       }
 
     }
+  }
+
+  public static void createDomModule(WXSDKInstance instance){
+    if(instance != null) {
+      sDomModuleMap.put(instance.getInstanceId(), new WXDomModule(instance));
+    }
+  }
+
+  public static void destoryDomModule(String instanceID){
+    sDomModuleMap.remove(instanceID);
+  }
+
+  public static WXDomModule getDomModule(String instanceId){
+    return sDomModuleMap.get(instanceId);
   }
 
   public static void reload(){
