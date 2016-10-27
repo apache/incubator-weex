@@ -21,7 +21,7 @@ extern NSString *const bundleUrlOptionKey;
 /**
  * The rootView which the weex bundle is rendered at.
  **/
-@property (nonatomic, strong) UIView *rootView;
+@property (nonatomic, strong, readonly) UIView *rootView;
 
 /**
  * The scriptURL of weex bundle.
