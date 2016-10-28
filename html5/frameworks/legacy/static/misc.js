@@ -15,6 +15,7 @@ export function getRoot (id) {
     result = getRootElement(instance)
   }
   else {
+    /* istanbul ignore next */
     result = new Error(`invalid instance id "${id}"`)
   }
   return result
