@@ -11,6 +11,9 @@
 
 @class WXSDKInstance;
 
+typedef void (^WXCallback)(id result);
+typedef void (^WXKeepAliveCallback)(id result, BOOL keepAlive);
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WXComponent : NSObject

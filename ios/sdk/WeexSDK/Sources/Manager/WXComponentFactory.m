@@ -10,11 +10,18 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 
+#import <objc/runtime.h>
+
 @interface WXComponentConfig : NSObject
 
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *clazz;
 @property (nonatomic, strong) NSDictionary *properties;
+
+/**
+ *  The methods map
+ **/
+@property (nonatomic, strong) NSMutableDictionary   *methods;
 
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz pros:(NSDictionary *)pros;
 
@@ -28,10 +35,56 @@
         _name = name;
         _clazz = clazz;
         _properties = pros;
+        _methods = [NSMutableDictionary new];
     }
     
     return self;
 }
+
+- (void)registerComponentMethods
+{
+    Class currentClass = NSClassFromString(_clazz);
+    
+    if (!currentClass) {
+        WXLogWarning(@"The module class [%@] doesn't exit！", _clazz);
+        return;
+    }
+    
+    while (currentClass != [NSObject class]) {
+        unsigned int methodCount = 0;
+        Method *methodList = class_copyMethodList(object_getClass(currentClass), &methodCount);
+        for (unsigned int i = 0; i < methodCount; i++) {
+            NSString *selStr = [NSString stringWithCString:sel_getName(method_getName(methodList[i])) encoding:NSUTF8StringEncoding];
+            
+            if (![selStr hasPrefix:@"wx_export_method_"]) continue;
+            
+            NSString *name = nil, *method = nil;
+            SEL selector = NSSelectorFromString(selStr);
+            if ([currentClass respondsToSelector:selector]) {
+                method = ((NSString* (*)(id, SEL))[currentClass methodForSelector:selector])(currentClass, selector);
+            }
+            
+            if (method.length <= 0) {
+                WXLogWarning(@"The module class [%@] doesn't has any method！", _clazz);
+                continue;
+            }
+            
+            NSRange range = [method rangeOfString:@":"];
+            if (range.location != NSNotFound) {
+                name = [method substringToIndex:range.location];
+            } else {
+                name = method;
+            }
+            
+            [_methods setObject:method forKey:name];
+        }
+        
+        free(methodList);
+        currentClass = class_getSuperclass(currentClass);
+        
+    }
+}
+
 
 @end
 
@@ -87,7 +140,55 @@
     return [[self sharedInstance] getComponentConfigs];
 }
 
++ (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method
+{
+    return [[self sharedInstance] _methodWithComponnetName:name withMethod:method];
+}
+
++ (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name
+{
+    return [[self sharedInstance] _componentMethodMapsWithName:name];
+}
+
 #pragma mark Private
+
+- (NSMutableDictionary *)_componentMethodMapsWithName:(NSString *)name
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSMutableArray *methods = [NSMutableArray array];
+    
+    [_configLock lock];
+    [dict setValue:methods forKey:@"methods"];
+    
+    WXComponentConfig *config = _componentConfigs[name];
+    void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        [methods addObject:mKey];
+    };
+    [config.methods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [_configLock unlock];
+    
+    return dict;
+}
+
+- (SEL)_methodWithComponnetName:(NSString *)name withMethod:(NSString *)method
+{
+    WXAssert(name && method, @"Fail to find selector with module name and method, please check if the parameters are correct ！");
+    
+    NSString *selStr = nil; SEL selector = nil;
+    WXComponentConfig *config = nil;
+    
+    [_configLock lock];
+    config = [_componentConfigs objectForKey:name];
+    if (config.methods) {
+        selStr = [config.methods objectForKey:method];
+    }
+    if (selStr) {
+        selector = NSSelectorFromString(selStr);
+    }
+    [_configLock unlock];
+    
+    return selector;
+}
 
 - (NSDictionary *)getComponentConfigs {
     NSMutableDictionary *componentDic = [[NSMutableDictionary alloc] init];
@@ -141,9 +242,10 @@
     
     config = [[WXComponentConfig alloc] initWithName:name class:NSStringFromClass(clazz) pros:pros];
     [_componentConfigs setValue:config forKey:name];
+    [config registerComponentMethods];
+    
     [_configLock unlock];
 }
-
 
 - (void)registerComponents:(NSArray *)components
 {

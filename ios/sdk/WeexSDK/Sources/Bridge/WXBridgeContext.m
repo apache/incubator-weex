@@ -153,7 +153,13 @@ _Pragma("clang diagnostic pop") \
     for (NSDictionary *task in tasks) {
         WXBridgeMethod *method = [[WXBridgeMethod alloc] initWihData:task];
         method.instance = instance;
-        [[WXSDKManager moduleMgr] dispatchMethod:method];
+        if(method.targets) {
+            WXSDKInstance *weexInstance = [WXSDKManager instanceForID:instance];
+            [[weexInstance componentManager] dispatchComponentMethod:method];
+        }
+        if (method.module) {
+            [[WXSDKManager moduleMgr] dispatchMethod:method];
+        }
     }
     
     NSMutableArray *sendQueue = [self.sendQueue valueForKey:instance];
