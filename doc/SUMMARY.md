@@ -49,6 +49,7 @@
         * [text](/components/text.md)
         * [image](/components/image.md)
         * [input](/components/input.md)
+        * [textarea](/components/textarea.md)
         * [switch](/components/switch.md)
         * [slider](/components/slider.md)
             * [indicator](/components/indicator.md)
