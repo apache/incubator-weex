@@ -420,3 +420,30 @@ describe('config', () => {
     init({})
   })
 })
+
+describe.skip('freeze the prototypes of vdom', function () {
+  const { Document, Element, Comment, Listener } = config
+
+  before(() => {
+    runtime.freezePrototype()
+  })
+
+  it('Document.prototype', () => {
+    expect(Document.prototype).to.be.frozen
+  })
+
+  it('Element & Element.prototype', () => {
+    expect(Element).to.be.frozen
+    expect(Element.prototype).to.be.frozen
+  })
+
+  it('Comment & Comment.prototype', () => {
+    expect(Comment).to.be.frozen
+    expect(Comment.prototype).to.be.frozen
+  })
+
+  it('Listener & Listener.prototype', () => {
+    expect(Listener).to.be.frozen
+    expect(Listener.prototype).to.be.frozen
+  })
+})

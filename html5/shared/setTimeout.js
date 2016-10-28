@@ -14,8 +14,8 @@ const setTimeoutNative = global.setTimeoutNative
 /**
  * Set up native timer
  */
+/* istanbul ignore next */
 export function setNativeTimer () {
-  /* istanbul ignore next */
   if (typeof setTimeout === 'undefined' &&
   typeof setTimeoutNative === 'function') {
     const timeoutMap = {}
@@ -35,6 +35,7 @@ export function setNativeTimer () {
   }
 }
 
+/* istanbul ignore next */
 export function resetNativeTimer () {
   global.setTimeout = originalSetTimeout
   global.setTimeoutCallback = null
