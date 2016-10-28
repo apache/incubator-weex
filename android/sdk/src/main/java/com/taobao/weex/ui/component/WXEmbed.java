@@ -490,7 +490,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootComponent();
       if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
+        comp.fireEvent(Constants.Event.VIEWAPPEAR);
     }
   }
 
@@ -500,7 +500,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootComponent();
       if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
+        comp.fireEvent(Constants.Event.VIEWDISAPPEAR);
     }
   }
 }

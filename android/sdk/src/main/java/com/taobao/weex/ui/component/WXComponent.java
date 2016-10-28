@@ -222,7 +222,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.put("y", location[1]);
       params.put("width", mDomObj.getLayoutWidth());
       params.put("height", mDomObj.getLayoutHeight());
-      getInstance().fireEvent(mCurrentRef,
+      fireEvent(
           Constants.Event.CLICK,
           params);
     }
@@ -307,6 +307,29 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public Context getContext(){
     return mContext;
+  }
+
+  protected final WXComponent findComponent(String ref){
+    if(mInstance != null && ref != null){
+      WXSDKManager.getInstance()
+          .getWXRenderManager()
+          .getWXComponent(mInstance.getInstanceId(), ref);
+    }
+    return null;
+  }
+
+  protected final void fireEvent(String type){
+    fireEvent(type,null);
+  }
+
+  protected final void fireEvent(String type, Map<String, Object> params){
+    fireEvent(type,params,null);
+  }
+
+  protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
+    if(mInstance != null && mDomObj != null) {
+      mInstance.fireEvent(mCurrentRef, type, params,domChanges);
+    }
   }
 
   /**
@@ -722,8 +745,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          getInstance().fireEvent(mCurrentRef,
-              hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
+          fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
     } else if (getRealView() != null &&
@@ -1187,7 +1209,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
-      getInstance().fireEvent(getRef(), wxEventType, params,null);
+      fireEvent(wxEventType, params);
     }
   }
 

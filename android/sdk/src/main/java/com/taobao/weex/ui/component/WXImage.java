@@ -350,7 +350,7 @@ public class WXImage extends WXComponent<ImageView> {
         if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
           Map<String, Object> params = new HashMap<>();
           params.put("success", result);
-          getInstance().fireEvent(getDomObject().getRef(), Constants.Event.ONLOAD, params);
+          fireEvent(Constants.Event.ONLOAD, params);
         }
       }
     });
