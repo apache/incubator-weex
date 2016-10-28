@@ -114,6 +114,14 @@ describe('the api of app', () => {
       const result = ctrl.fireEvent(app, '_rootTest', 'click')
       expect(result).to.be.an.instanceof(Error)
     })
+
+    it('click on both root & _rootTest', () => {
+      ctrl.fireEvent(app, ['_root', '_rootTest'], 'click')
+      const task = spy1.lastCall.args[0][0]
+      expect(task.module).to.be.equal('dom')
+      expect(task.method).to.be.equal('updateFinish')
+      expect(task.args.length).to.be.equal(0)
+    })
   })
 
   describe('callback', () => {
@@ -185,6 +193,15 @@ describe('the api of app', () => {
       expect(task.module).to.be.equal('dom')
       expect(task.method).to.be.equal('refreshFinish')
       expect(task.args.length).to.be.equal(0)
+    })
+
+    it('call refresh with refreshData function', () => {
+      app.vm.refreshData = function () {
+        app.vm.data = 'hello'
+      }
+      const data = { b: 'c' }
+      ctrl.refresh(app, data)
+      expect(app.vm.data).to.equal('hello')
     })
 
     it('error', () => {

@@ -64,6 +64,23 @@ describe('generate virtual dom for a single vm', () => {
     data.a.b = 2
   })
 
+  it('vm.data is not a object', () => {
+    const data = 'hello'
+
+    customComponentMap.foo = {
+      template: {
+        type: 'container'
+      },
+      data: data
+    }
+
+    const app = { doc, customComponentMap, differ }
+    const vm = new Vm('foo', customComponentMap.foo, { _app: app })
+
+    expect(vm._app).equal(app)
+    expect(doc.body).is.an.object
+  })
+
   it('no param parentVm', () => {
     customComponentMap.foo = {
       template: {
@@ -482,6 +499,20 @@ describe('generate virtual dom for a single vm', () => {
     expect(el.children[4].attr).eql({ src: 4 })
     expect(el.children[5].attr).eql({ src: 'other string value' })
     expect(el.children[6].attr).eql({ src: 6 })
+
+    vm.list.$set(0, { uid: 321, x: 32 })
+    vm.list.$set(10, { uid: 8889, x: 8888 })
+    differ.flush()
+
+    expect(el.children.length).eql(10)
+    expect(el.children[2].attr).eql({ src: 32 })
+    expect(el.children[7].attr).eql({ src: 8888 })
+
+    vm.list.unshift({ uid: 12345, x: 123456 })
+    differ.flush()
+
+    expect(el.children.length).eql(11)
+    expect(el.children[2].attr).eql({ src: 123456 })
   })
 
   it('generate an static element tree with shown and repeat', () => {
