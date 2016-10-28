@@ -1,3 +1,3 @@
 #! /bin/sh
-./gradlew clean testDebugUnitTest jacocoTestReportDebug
+./gradlew clean testDebugUnitTest jacocoTestReportDebug -PtargetSDK=19
 osascript -e 'display notification "Test Done!" with title "Weex Unit Test"'
