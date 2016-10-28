@@ -245,7 +245,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mInstanceId;
   }
 
-  public void invoke(String method, JSONArray args) {
+  public final void invoke(String method, JSONArray args) {
     final Invoker invoker = mHolder.getMethodInvoker(method);
     if (invoker != null) {
       try {
