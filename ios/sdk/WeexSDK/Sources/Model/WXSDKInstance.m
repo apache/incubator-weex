@@ -20,6 +20,7 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXView.h"
+#import "WXRootView.h"
 #import "WXThreadSafeMutableDictionary.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
@@ -29,8 +30,8 @@ NSTimeInterval JSLibInitTime = 0;
 @implementation WXSDKInstance
 {
     id<WXNetworkProtocol> _networkHandler;
-    
     WXComponentManager *_componentManager;
+    WXRootView *_rootView;
 }
 
 - (void) dealloc
@@ -67,6 +68,11 @@ NSTimeInterval JSLibInitTime = 0;
 }
 
 #pragma mark Public Mehtods
+
+- (UIView *)rootView
+{
+    return _rootView;
+}
 
 - (void)renderWithURL:(NSURL *)url
 {
@@ -199,9 +205,10 @@ NSTimeInterval JSLibInitTime = 0;
     
     //TODO WXRootView
     WXPerformBlockOnMainThread(^{
-        _rootView = [[WXView alloc] initWithFrame:self.frame];
+        _rootView = [[WXRootView alloc] initWithFrame:self.frame];
+        _rootView.instance = self;
         if(self.onCreate) {
-            self.onCreate(self.rootView);
+            self.onCreate(_rootView);
         }
     });
 
@@ -215,8 +222,8 @@ NSTimeInterval JSLibInitTime = 0;
     if (!CGRectEqualToRect(frame, _frame)) {
         _frame = frame;
         WXPerformBlockOnMainThread(^{
-            if (self.rootView) {
-                self.rootView.frame = frame;
+            if (_rootView) {
+                _rootView.frame = frame;
                 WXPerformBlockOnComponentThread(^{
                     [self.componentManager rootViewFrameDidChange:frame];
                 });

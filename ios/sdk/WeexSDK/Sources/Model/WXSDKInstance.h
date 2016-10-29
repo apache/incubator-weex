@@ -19,7 +19,8 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, weak) UIViewController *viewController;
 
 /**
- * The Native root container used to bear the view rendered by weex file.
+ * The Native root container used to bear the view rendered by weex file. 
+ * The root view is controlled by WXSDKInstance, so you can only get it, but not change it.
  **/
 @property (nonatomic, strong, readonly) UIView *rootView;
 
@@ -79,6 +80,13 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *  @param view The rootView.
  **/
 @property (nonatomic, copy) void (^onCreate)(UIView *);
+
+/**
+ *  The callback triggered when the root container's frame has changed.
+ *
+ *  @param view The rootView.
+ **/
+@property (nonatomic, copy) void (^onLayout)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes rendering.
@@ -198,7 +206,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
-@property (nonatomic, copy) void (^updateFinish)(UIView *) DEPRECATED_MSG_ATTRIBUTE();
+@property (nonatomic, copy) void (^updateFinish)(UIView *);
 
 - (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
 
