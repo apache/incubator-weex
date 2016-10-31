@@ -246,7 +246,7 @@ public class ComponentHolderTest {
       }
 
       @Override
-      public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         mComponent.bindHolder(this);
         return mComponent;
       }

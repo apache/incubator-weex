@@ -255,8 +255,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private List<WXComponent> mRefreshs=new ArrayList<>();
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXScroller(instance,node,parent,lazy);
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXScroller(instance,node,parent);
     }
   }
   /**
@@ -277,12 +277,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @Deprecated
   public WXScroller(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+    this(instance,dom,parent);
   }
 
   public WXScroller(WXSDKInstance instance, WXDomObject node,
-                    WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+                    WXVContainer parent) {
+    super(instance, node, parent);
     stickyHelper = new WXStickyHelper(this);
   }
 

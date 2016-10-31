@@ -380,7 +380,6 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
-    component.lazy(parent.isLazy());
     component.createView(parent, index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
@@ -548,7 +547,7 @@ class WXRenderStatement {
       return null;
     }
     WXComponent component = WXComponentFactory.newInstance(mWXSDKInstance, dom,
-                                                           parent, parent.isLazy());
+                                                           parent);
 
     mRegistry.put(dom.getRef(), component);
     if (component instanceof WXVContainer) {

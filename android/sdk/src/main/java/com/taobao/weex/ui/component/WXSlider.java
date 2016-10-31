@@ -239,8 +239,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   Map<String, Object> params = new HashMap<>();
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXSlider(instance, node, parent, lazy);
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXSlider(instance, node, parent);
     }
   }
 
@@ -264,11 +264,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Deprecated
   public WXSlider(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+    this(instance, dom, parent);
   }
 
-  public WXSlider(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXSlider(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
   }
 
   @Override

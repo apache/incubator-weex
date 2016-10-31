@@ -251,31 +251,39 @@ public class SimpleComponentHolder implements IFComponentHolder{
       Class<? extends WXComponent> c = mCompClz;
       Constructor<? extends WXComponent> constructor;
       try {
-        constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
+        constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class);
       } catch (NoSuchMethodException e) {
         WXLogUtils.d("ClazzComponentCreator","Use deprecated component constructor");
         try {
-          //compatible deprecated constructor
-          constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
+          //compatible deprecated constructor with 4 args
+          constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
         } catch (NoSuchMethodException e1) {
-          throw new WXRuntimeException("Can't find constructor of component.");
+          try {
+            //compatible deprecated constructor with 5 args
+            constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
+          } catch (NoSuchMethodException e2) {
+            throw new WXRuntimeException("Can't find constructor of component.");
+          }
         }
       }
       mConstructor = constructor;
     }
 
     @Override
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
       if(mConstructor == null){
         loadConstructor();
       }
       int parameters = mConstructor.getParameterTypes().length;
       WXComponent component;
-      if(parameters == 4){
-        component =  mConstructor.newInstance(instance,node,parent,lazy);
+
+      if(parameters == 3){
+        component =  mConstructor.newInstance(instance,node,parent);
+      }else if(parameters == 4){
+        component =  mConstructor.newInstance(instance,node,parent,false);
       }else{
         //compatible deprecated constructor
-        component =  mConstructor.newInstance(instance,node,parent,instance.getInstanceId(),lazy);
+        component =  mConstructor.newInstance(instance,node,parent,instance.getInstanceId(),parent.isLazy());
       }
       return component;
     }
@@ -358,8 +366,8 @@ public class SimpleComponentHolder implements IFComponentHolder{
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCreator.createInstance(instance,node,parent,lazy);
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    WXComponent component = mCreator.createInstance(instance,node,parent);
 
     component.bindHolder(this);
     return component;

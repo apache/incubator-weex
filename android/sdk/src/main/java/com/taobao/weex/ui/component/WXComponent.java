@@ -213,7 +213,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected Set<String> mGestureType;
 
   private BorderDrawable mBackgroundDrawable;
-  private boolean mLazy;
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
@@ -290,13 +289,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     this(instance,dom,parent,isLazy);
   }
 
+  @Deprecated
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
+    this(instance,dom,parent);
+  }
+
+  public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;
     mDomObj = dom.clone();
     mInstanceId = instance.getInstanceId();
-    mLazy = isLazy;
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
@@ -320,13 +323,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @return true for lazy
    */
   public boolean isLazy() {
-    return mLazy;
+    return mParent != null && mParent.isLazy();
   }
-
-  public void lazy(boolean lazy) {
-    mLazy = lazy;
-  }
-
 
   public void applyLayoutAndEvent(WXComponent component) {
     if(!isLazy()) {

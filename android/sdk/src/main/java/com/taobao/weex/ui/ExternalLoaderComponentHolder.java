@@ -250,12 +250,12 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
     if(mClass == null){
       mClass = mClzGetter.getExternalComponentClass(mType);
     }
     ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
-    WXComponent component = creator.createInstance(instance,node,parent,lazy);
+    WXComponent component = creator.createInstance(instance,node,parent);
 
     component.bindHolder(this);
     return component;
