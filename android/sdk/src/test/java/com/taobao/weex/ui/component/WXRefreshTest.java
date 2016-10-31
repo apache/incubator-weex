@@ -228,7 +228,7 @@ import java.lang.reflect.InvocationTargetException;
 public class WXRefreshTest {
 
   public static WXRefresh create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXRefresh) new SimpleComponentHolder(WXRefresh.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXRefresh) new SimpleComponentHolder(WXRefresh.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   WXRefresh component;

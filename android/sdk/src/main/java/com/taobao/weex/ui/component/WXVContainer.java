@@ -226,8 +226,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     this(instance,dom,parent,isLazy);
   }
 
+  @Deprecated
   public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+    super(instance, node, parent);
+  }
+
+  public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
   }
 
   /**
@@ -281,15 +286,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     return lp;
   }
 
-
-  @Override
-  public void lazy(boolean lazy) {
-    super.lazy(lazy);
-    int count = childCount();
-    for (int i = 0; i < count; i++) {
-      getChild(i).lazy(lazy);
-    }
-  }
 
   @Override
   public void bindData(WXComponent component) {

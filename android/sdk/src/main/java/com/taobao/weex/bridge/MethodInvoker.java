@@ -240,6 +240,7 @@ public class MethodInvoker implements Invoker {
     return mParam;
   }
 
+  @Override
   public boolean isRunOnUIThread() {
     return mRunOnUIThread;
   }

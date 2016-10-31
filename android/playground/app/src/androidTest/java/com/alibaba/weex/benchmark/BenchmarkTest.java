@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,200 +202,218 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
 
-import android.util.Pair;
+package com.alibaba.weex.benchmark;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.MethodInvoker;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentProp;
-import com.taobao.weex.ui.component.WXVContainer;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.filters.SdkSuppress;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.Direction;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
+import android.support.test.uiautomator.Until;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.alibaba.weex.BenchmarkActivity;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.hamcrest.Matchers;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/**
- * Created by sospartan on 6/12/16.
- */
-public class SimpleComponentHolder implements IFComponentHolder{
-  public static final String TAG = "SimpleComponentHolder";
-  private final Class<? extends WXComponent> mClz;
-  private Map<String, Invoker> mPropertyInvokers;
-  private Map<String, Invoker> mMethodInvokers;
-  private ComponentCreator mCreator;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-  static class ClazzComponentCreator implements ComponentCreator{
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-    private Constructor<? extends WXComponent> mConstructor;
-    private final Class<? extends WXComponent> mCompClz;
+@RunWith(AndroidJUnit4.class)
+public class BenchmarkTest {
 
-    ClazzComponentCreator(Class<? extends WXComponent> c){
-      mCompClz = c;
-    }
+  private static final String TAG = "benchmark";
+  private static final int TIMES = 20;
+  private static final int FLING_SPEED = 10000;
+  private static final int SCROLL_SPEED = 5000;
+  private static final int FRAMES = 120;
+  private static final long WAIT_TIMEOUT = 10000;
+  private static final float FPS = 30;
+  private static final float FIRST_SCREEN_RENDER_TIME = 600F;
+  private static List<Long> firstScreenRenderTime = new LinkedList<>();
+  private static List<Long> flingFrameSeconds = new LinkedList<>();
+  private static List<Long> scrollFrameSeconds = new LinkedList<>();
+  private static final String DUMP_START = "Flags,IntendedVsync,Vsync,OldestInputEvent,NewestInputEvent,"
+                                           + "HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,"
+                                           + "SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,\n";
+  private static final String DUMP_END = "---PROFILEDATA---";
+  private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
 
-    private void loadConstructor(){
-      Class<? extends WXComponent> c = mCompClz;
-      Constructor<? extends WXComponent> constructor;
-      try {
-        constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class);
-      } catch (NoSuchMethodException e) {
-        WXLogUtils.d("ClazzComponentCreator","Use deprecated component constructor");
-        try {
-          //compatible deprecated constructor with 4 args
-          constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
-        } catch (NoSuchMethodException e1) {
-          try {
-            //compatible deprecated constructor with 5 args
-            constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
-          } catch (NoSuchMethodException e2) {
-            throw new WXRuntimeException("Can't find constructor of component.");
-          }
-        }
-      }
-      mConstructor = constructor;
-    }
+  @Rule
+  public BenchmarkActivityTestRule mActivityRule = new BenchmarkActivityTestRule(
+      BenchmarkActivity.class);
+  @Rule
+  public RepeatRule repeatRule = new RepeatRule();
+  private UiDevice mUiDevice;
 
-    @Override
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      if(mConstructor == null){
-        loadConstructor();
-      }
-      int parameters = mConstructor.getParameterTypes().length;
-      WXComponent component;
-
-      if(parameters == 3){
-        component =  mConstructor.newInstance(instance,node,parent);
-      }else if(parameters == 4){
-        component =  mConstructor.newInstance(instance,node,parent,false);
-      }else{
-        //compatible deprecated constructor
-        component =  mConstructor.newInstance(instance,node,parent,instance.getInstanceId(),parent.isLazy());
-      }
-      return component;
-    }
+  @Before
+  public void init() {
+    mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
   }
 
-  public SimpleComponentHolder(Class<? extends WXComponent> clz) {
-    this(clz,new ClazzComponentCreator(clz));
+  @Test
+  public void testFirstScreenPerformance() {
+    List<Long> localTotalTime = new ArrayList<>(TIMES);
+    for (int i = 0; i < TIMES; i++) {
+      long currentTime = calcTime();
+      localTotalTime.add(currentTime);
+      Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity not kill) " + currentTime + "ms");
+    }
+    BoxPlot boxPlot = new BoxPlot(localTotalTime);
+    Log.i(TAG, "Average firstScreenRenderTime (activity not kill) " + boxPlot.draw());
+    assertThat(boxPlot.getAverage(), Matchers.lessThan(FIRST_SCREEN_RENDER_TIME));
   }
 
-  public SimpleComponentHolder(Class<? extends WXComponent> clz,ComponentCreator customCreator) {
-    this.mClz = clz;
-    this.mCreator = customCreator;
+  @Repeat(TIMES)
+  @Test
+  public void testFirstFirstScreenPerformance() {
+    long currentTime = calcTime();
+    firstScreenRenderTime.add(currentTime);
+    Log.d(TAG, "FIRST_SCREEN_RENDER_TIME (activity killed) " + currentTime + " ms");
   }
 
-  @Override
-  public void loadIfNonLazy() {
-    Annotation[] annotations = mClz.getDeclaredAnnotations();
-    for (Annotation annotation :
-      annotations) {
-      if (annotation instanceof Component){
-        if(!((Component) annotation).lazyload() && mMethodInvokers == null){
-          generate();
-        }
-        return;
-      }
+  @Repeat(TIMES)
+  @Test
+  @SdkSuppress(minSdkVersion = 23)
+  public void testFlingFPS() {
+    UiObject2 uiObject2 = loadPageForFPS();
+    if (uiObject2 != null) {
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      uiObject2.fling(Direction.DOWN, FLING_SPEED);
+      processGfxInfo(flingFrameSeconds);
     }
   }
 
-  private synchronized void generate(){
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "Generate Component:" + mClz.getSimpleName());
+  @Repeat(TIMES)
+  @Test
+  @SdkSuppress(minSdkVersion = 23)
+  public void testScrollFPS() {
+    UiObject2 uiObject2 = loadPageForFPS();
+    if (uiObject2 != null) {
+      uiObject2.scroll(Direction.DOWN, 6, SCROLL_SPEED);
+      processGfxInfo(scrollFrameSeconds);
     }
-
-    Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = getMethods(mClz);
-    mPropertyInvokers = methodPair.first;
-    mMethodInvokers = methodPair.second;
   }
 
-  static Pair<Map<String,Invoker>,Map<String,Invoker>> getMethods(Class clz){
-    Map<String, Invoker> methods = new HashMap<>();
-    Map<String, Invoker> mInvokers = new HashMap<>();
+  @AfterClass
+  public static void count() {
+    BoxPlot boxPlot = new BoxPlot(firstScreenRenderTime);
+    Log.i(TAG, "Average firstScreenRenderTime (activity killed) " + boxPlot.draw());
+    assertThat(boxPlot.getAverage(), Matchers.lessThan(FIRST_SCREEN_RENDER_TIME));
+    BoxPlot flingPlot = new BoxPlot(flingFrameSeconds);
+    Log.i(TAG, "Average Fling FPS : " + flingPlot.draw());
+    assertThat(1000 / flingPlot.getMedian(), Matchers.greaterThan(FPS));
+    BoxPlot scrollPlot = new BoxPlot(scrollFrameSeconds);
+    Log.i(TAG, "Average Scroll FPS : " + scrollPlot.draw());
+    assertThat(1000 / scrollPlot.getMedian(), Matchers.greaterThan(FPS));
+  }
 
-    Annotation[] annotations;
-    Annotation anno;
+  private UiObject2 loadPageForFPS() {
+    BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
+    benchmarkActivity.loadWeexPage();
+    onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform(RecyclerViewActions.scrollToPosition(0));
+    return mUiDevice.wait(Until.findObject(By.desc(BenchmarkActivity.ROOT)), WAIT_TIMEOUT);
+  }
+
+  private void processGfxInfo(List<Long> container) {
     try {
-      for (Method method : clz.getMethods()) {
-        try {
-          annotations = method.getDeclaredAnnotations();
-          for (int i = 0, annotationsCount = annotations.length;
-               i < annotationsCount; ++i) {
-            anno = annotations[i];
-            if(anno == null){
-              continue;
-            }
-            if (anno instanceof WXComponentProp) {
-              String name = ((WXComponentProp) anno).name();
-              methods.put(name, new MethodInvoker(method,true));
-              break;
-            }else if(anno instanceof JSMethod){
-              JSMethod methodAnno = (JSMethod)anno;
-              String name = methodAnno.alias();
-              if(JSMethod.NOT_SET.equals(name)){
-                name = method.getName();
-              }
-              mInvokers.put(name, new MethodInvoker(method,methodAnno.uiThread()));
-              break;
-            }
-          }
-        } catch (ArrayIndexOutOfBoundsException | IncompatibleClassChangeError e) {
-          //ignore: getDeclaredAnnotations may throw this
+      String line;
+      String[] columns;
+      long timeStart, timeEnd, duration;
+      String result = mUiDevice.executeShellCommand(DUMP_COMMAND);
+      //histogramGfxInfo(result);
+      result = result.substring(result.indexOf(DUMP_START), result.lastIndexOf(DUMP_END));
+      result = result.substring(DUMP_START.length());
+      BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
+      List<Long> list = createList(bufferedReader);
+      //Collections.sort(list);
+      //Log.d(TAG, list.toString());
+      container.addAll(list);
+      BoxPlot boxPlot = new BoxPlot(list);
+      boxPlot.draw();
+      Log.d(TAG, "FPS : " + boxPlot.getMedian() + " ms");
+    } catch (IOException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+    }
+  }
+
+  private List<Long> createList(BufferedReader bufferedReader) throws IOException {
+    String line;
+    String[] columns;
+    long timeStart, timeEnd, duration;
+    List<Long> list = new ArrayList<>(FRAMES);
+    while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+      columns = line.split(",");
+      if (Long.parseLong(columns[0]) == 0) {
+        timeStart = Long.parseLong(columns[1]);
+        timeEnd = Long.parseLong(columns[columns.length - 1]);
+        duration = timeEnd - timeStart;
+        if (duration > 0) {
+          list.add(TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS));
         }
       }
-    }catch (IndexOutOfBoundsException e){
-      e.printStackTrace();
-      //ignore: getMethods may throw this
     }
-    return new Pair<>(methods,mInvokers);
+    return list;
   }
 
-
-
-  @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCreator.createInstance(instance,node,parent);
-
-    component.bindHolder(this);
-    return component;
+  private long calcTime() {
+    BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
+    benchmarkActivity.loadWeexPage();
+    onView(withClassName(Matchers.is(WXRecyclerView.class.getName()))).perform
+        (RecyclerViewActions.scrollToPosition(0));
+    return benchmarkActivity.getWXInstance().getWXPerformance().screenRenderTime;
   }
 
-  @Override
-  public synchronized Invoker getPropertyInvoker(String name){
-      if (mPropertyInvokers == null) {
-        generate();
+/*  private void histogramGfxInfo(String result) {
+    try {
+      String start = "HISTOGRAM: ";
+      result = result.substring(result.indexOf(start));
+      result = result.substring(start.length());
+      BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
+      result = bufferedReader.readLine();
+      List<Long> list = transformToLong(result.split("\\s"));
+      Log.d(TAG, list.toString());
+    } catch (IOException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+    }
+  }
+
+  private List<Long> transformToLong(String[] string) {
+    List<Long> array = new LinkedList<>();
+    int count;
+    long value;
+    for (String item : string) {
+      value = Long.parseLong(item.substring(0, item.indexOf("ms")));
+      if (value > 0) {
+        count = parseInt(item.substring(item.indexOf('=') + 1));
+        for (int i = 0; i < count; i++) {
+          array.add(value);
+        }
       }
-
-    return mPropertyInvokers.get(name);
-  }
-
-  @Override
-  public Invoker getMethodInvoker(String name) {
-    if(mMethodInvokers == null){
-      generate();
     }
-    return mMethodInvokers.get(name);
-  }
-
-  @Override
-  public String[] getMethods() {
-    if(mMethodInvokers == null){
-      generate();
-    }
-    Set<String> keys = mMethodInvokers.keySet();
-    return keys.toArray(new String[keys.size()]);
-  }
-
+    return array;
+  }*/
 }

@@ -240,21 +240,20 @@ import java.util.Map;
 public class WXImage extends WXComponent<ImageView> {
 
   public static class Ceator implements ComponentCreator {
-
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXImage(instance, node, parent, lazy);
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        return new WXImage(instance,node,parent);
     }
   }
 
 
   @Deprecated
   public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+      this(instance,dom,parent);
   }
 
   public WXImage(WXSDKInstance instance, WXDomObject node,
-                 WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+                  WXVContainer parent) {
+      super(instance, node, parent);
   }
 
   @Override
@@ -350,7 +349,7 @@ public class WXImage extends WXComponent<ImageView> {
         if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
           Map<String, Object> params = new HashMap<>();
           params.put("success", result);
-          getInstance().fireEvent(getDomObject().getRef(), Constants.Event.ONLOAD, params);
+          fireEvent(Constants.Event.ONLOAD, params);
         }
       }
     });

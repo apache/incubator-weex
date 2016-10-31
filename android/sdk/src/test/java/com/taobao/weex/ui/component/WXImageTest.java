@@ -162,7 +162,7 @@ public class WXImageTest {
     mDomObject = new TestDomObject();
     PowerMockito.when(Mockito.spy(mDomObject).clone()).thenReturn(mDomObject);
     mWXDiv = PowerMockito.mock(WXDiv.class);
-    mWXImage = new WXImage(mInstance, mDomObject, mWXDiv, true);
+    mWXImage = new WXImage(mInstance, mDomObject, mWXDiv);
 
   }
 

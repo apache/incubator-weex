@@ -111,6 +111,8 @@
                       android:path="/dynamic/replace/bundle"/>
             </intent-filter>
         </activity>
+        <activity android:name="com.alibaba.weex.BenchmarkActivity"
+                  android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

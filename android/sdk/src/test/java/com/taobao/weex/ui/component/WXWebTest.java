@@ -232,7 +232,7 @@ import static org.junit.Assert.*;
 public class WXWebTest {
 
   public static WXWeb create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXWeb) new SimpleComponentHolder(WXWeb.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXWeb) new SimpleComponentHolder(WXWeb.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   WXWeb component;

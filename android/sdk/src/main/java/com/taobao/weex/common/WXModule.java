@@ -205,6 +205,8 @@
 package com.taobao.weex.common;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.ui.component.WXComponent;
 
 /**
  * All modules must extend this class
@@ -220,4 +222,14 @@ public abstract class WXModule implements IWXObject {
 
 
   public WXSDKInstance mWXSDKInstance;
+
+
+  protected final WXComponent findComponent(String ref){
+    if(mWXSDKInstance != null && ref != null){
+      WXSDKManager.getInstance()
+          .getWXRenderManager()
+          .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
+    }
+    return null;
+  }
 }

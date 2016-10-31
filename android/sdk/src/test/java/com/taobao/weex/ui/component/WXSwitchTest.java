@@ -233,7 +233,7 @@ import static org.junit.Assert.*;
 public class WXSwitchTest {
 
   public static WXSwitch create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXSwitch) new SimpleComponentHolder(WXSwitch.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXSwitch) new SimpleComponentHolder(WXSwitch.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   WXSwitch component;

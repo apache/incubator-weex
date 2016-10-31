@@ -257,7 +257,7 @@ public class WXWeb extends WXComponent {
                 if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
-                    getInstance().fireEvent(getRef(), Constants.Event.RECEIVEDTITLE, params);
+                    fireEvent(Constants.Event.RECEIVEDTITLE, params);
                 }
             }
 
@@ -266,7 +266,7 @@ public class WXWeb extends WXComponent {
                 if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
-                    getInstance().fireEvent(getRef(), Constants.Event.PAGESTART, params);
+                    fireEvent(Constants.Event.PAGESTART, params);
                 }
             }
 
@@ -277,7 +277,7 @@ public class WXWeb extends WXComponent {
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
                     params.put("canGoForward", canGoForward);
-                    getInstance().fireEvent(getRef(), Constants.Event.PAGEFINISH, params);
+                    fireEvent(Constants.Event.PAGEFINISH, params);
                 }
             }
         });
@@ -340,7 +340,7 @@ public class WXWeb extends WXComponent {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);
-            getInstance().fireEvent(getRef(), Constants.Event.ERROR, params);
+            fireEvent(Constants.Event.ERROR, params);
         }
     }
 

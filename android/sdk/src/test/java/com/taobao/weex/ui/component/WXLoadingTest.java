@@ -230,7 +230,7 @@ import static org.junit.Assert.*;
 public class WXLoadingTest {
 
   public static WXLoading create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXLoading) new SimpleComponentHolder(WXLoading.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXLoading) new SimpleComponentHolder(WXLoading.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   WXLoading component;

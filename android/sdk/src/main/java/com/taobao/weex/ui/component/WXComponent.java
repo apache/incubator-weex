@@ -140,14 +140,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.JSCallbackCreator;
+import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -193,7 +199,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private Set<String> mGestureType;
 
   private BorderDrawable mBackgroundDrawable;
-  private boolean mLazy;
   private int mPreRealWidth = 0;
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
@@ -216,7 +221,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       params.put("y", location[1]);
       params.put("width", mDomObj.getLayoutWidth());
       params.put("height", mDomObj.getLayoutHeight());
-      getInstance().fireEvent(mCurrentRef,
+      fireEvent(
           Constants.Event.CLICK,
           params);
     }
@@ -234,6 +239,38 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return size;
   }
 
+  public final void invoke(String method, JSONArray args) {
+    final Invoker invoker = mHolder.getMethodInvoker(method);
+    if (invoker != null) {
+      try {
+        final Object[] params = WXReflectionUtils.prepareArguments(
+            invoker.getParameterTypes(),
+            args,
+            new JSCallbackCreator() {
+              @Override
+              public JSCallback create(String callbackId) {
+                return new SimpleJSCallback(mInstance.getInstanceId(),callbackId);
+              }
+            });
+        if(invoker.isRunOnUIThread()){
+          WXSDKManager.getInstance().postOnUiThread(WXThread.secure(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                invoker.invoke(WXComponent.this, params);
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            }
+          }),0);
+        }
+
+      } catch (Exception e) {
+        WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
+      }
+    }
+  }
+
   interface OnClickListener{
     void onHostViewClick();
   }
@@ -247,12 +284,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     this(instance,dom,parent,isLazy);
   }
 
+  @Deprecated
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
+    this(instance,dom,parent);
+  }
+
+  public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;
     mDomObj = dom.clone();
-    mLazy = isLazy;
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
@@ -271,18 +312,36 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mContext;
   }
 
+  protected final WXComponent findComponent(String ref){
+    if(mInstance != null && ref != null){
+      WXSDKManager.getInstance()
+          .getWXRenderManager()
+          .getWXComponent(mInstance.getInstanceId(), ref);
+    }
+    return null;
+  }
+
+  protected final void fireEvent(String type){
+    fireEvent(type,null);
+  }
+
+  protected final void fireEvent(String type, Map<String, Object> params){
+    fireEvent(type,params,null);
+  }
+
+  protected final void fireEvent(String type, Map<String, Object> params,Map<String, Object> domChanges){
+    if(mInstance != null && mDomObj != null) {
+      mInstance.fireEvent(mCurrentRef, type, params,domChanges);
+    }
+  }
+
   /**
    * The view is created as needed
    * @return true for lazy
    */
   public boolean isLazy() {
-    return mLazy;
+    return mParent != null && mParent.isLazy();
   }
-
-  public void lazy(boolean lazy) {
-    mLazy = lazy;
-  }
-
 
   public void applyLayoutAndEvent(WXComponent component) {
     if(!isLazy()) {
@@ -526,20 +585,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           if(mHolder == null){
             return;
           }
-        Invoker invoker = mHolder.getMethod(key);
-        if (invoker != null) {
-          try {
-            Type[] paramClazzs = invoker.getParameterTypes();
-            if (paramClazzs.length != 1) {
-              WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
-              return;
+          Invoker invoker = mHolder.getPropertyInvoker(key);
+          if (invoker != null) {
+            try {
+              Type[] paramClazzs = invoker.getParameterTypes();
+              if (paramClazzs.length != 1) {
+                WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
+                return;
+              }
+              param = WXReflectionUtils.parseArgument(paramClazzs[0],props.get(key));
+              invoker.invoke(this, param);
+            } catch (Exception e) {
+              WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
             }
-            param = WXReflectionUtils.parseArgument(paramClazzs[0],props.get(key));
-            invoker.invoke(this, param);
-          } catch (Exception e) {
-            WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
           }
-        }
       }
     }
   }
@@ -684,8 +743,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          getInstance().fireEvent(mCurrentRef,
-              hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
+          fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
     } else if (getRealView() != null &&
@@ -1149,7 +1207,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if(containsEvent(Constants.Event.APPEAR) || containsEvent(Constants.Event.DISAPPEAR)) {
       Map<String, Object> params = new HashMap<>();
       params.put("direction", direction);
-      getInstance().fireEvent(getRef(), wxEventType, params,null);
+      fireEvent(wxEventType, params);
     }
   }
 

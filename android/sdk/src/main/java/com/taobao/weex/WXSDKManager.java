@@ -215,7 +215,7 @@ public class WXSDKManager {
   }
 
   public WXSDKInstance getSDKInstance(String instanceId) {
-    return mWXRenderManager.getWXSDKInstance(instanceId);
+    return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
   }
 
   public void postOnUiThread(Runnable runnable, long delayMillis) {
@@ -242,7 +242,7 @@ public class WXSDKManager {
     mBridgeManager.initScriptsFramework(framework);
   }
 
-  public void registerComponents(List<Map<String, String>> components) {
+  public void registerComponents(List<Map<String, Object>> components) {
     mBridgeManager.registerComponents(components);
   }
 

@@ -604,5 +604,6 @@ public class BorderDrawable extends Drawable {
     mPaint.setShader(shader);
     mPaint.setColor(color);
     mPaint.setStrokeWidth(borderWidth);
+    mPaint.setStrokeCap(Paint.Cap.ROUND);
   }
 }

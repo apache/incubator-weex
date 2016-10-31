@@ -239,7 +239,7 @@ public class WXListComponentTest {
   }
 
   public static WXListComponent create(WXVContainer parent, WXDomObject dom) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXListComponent) new SimpleComponentHolder(WXListComponent.class).createInstance(WXSDKInstanceTest.createInstance(), dom, parent, false);
+    return (WXListComponent) new SimpleComponentHolder(WXListComponent.class).createInstance(WXSDKInstanceTest.createInstance(), dom, parent);
   }
 
   @Before

@@ -242,13 +242,13 @@ public class WXSliderNeighbor extends WXSlider {
 
     private static final float WX_DEFAULT_MAIN_NEIGHBOR_SCALE = 0.9f;
 
-    public WXSliderNeighbor(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-        super(instance, node, parent, lazy);
+    public WXSliderNeighbor(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+        super(instance, node, parent);
     }
 
     public static class Creator implements ComponentCreator {
-        public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-            return new WXSliderNeighbor(instance, node, parent, lazy);
+        public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            return new WXSliderNeighbor(instance, node, parent);
         }
     }
 
