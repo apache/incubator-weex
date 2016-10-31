@@ -271,11 +271,11 @@ public class EditComponentTest {
   AbstractEditComponent component;
 
   public static WXInput create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXInput) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXInput) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   public static Textarea createTextarea() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (Textarea) new SimpleComponentHolder(Textarea.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (Textarea) new SimpleComponentHolder(Textarea.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
 

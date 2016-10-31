@@ -346,11 +346,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   @Deprecated
   public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+    this(instance,dom,parent);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
     mListener = new EmbedRenderListener(this);
 
     if(instance instanceof EmbedManager) {
