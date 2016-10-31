@@ -270,13 +270,8 @@ public class WXDivTest {
         WXDomObject testDom = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom.clone()).thenReturn(testDom);
-<<<<<<< HEAD
         TestDomObject.setRef(testDom,"2");
-        WXText child1 = new WXText(instance, testDom, mWXDiv, false);
-=======
-        testDom.ref = "2";
         WXText child1 = new WXText(instance, testDom, mWXDiv);
->>>>>>> v0.9.3-stable
         child1.initView();
 
         mWXDiv.addChild(child1, 0);
@@ -286,13 +281,8 @@ public class WXDivTest {
         WXDomObject testDom2 = Mockito.spy(new WXDomObject());
         Mockito.when(testDom2.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom2.clone()).thenReturn(testDom2);
-<<<<<<< HEAD
         TestDomObject.setRef(testDom2,"3");
-        child2 = new WXText(instance, testDom2, mWXDiv, false);
-=======
-        testDom2.ref = "3";
         child2 = new WXText(instance, testDom2, mWXDiv);
->>>>>>> v0.9.3-stable
         child2.initView();
 
         mWXDiv.addChild(child2, -1);
@@ -303,13 +293,8 @@ public class WXDivTest {
         WXDomObject testDom3 = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom3.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom3.clone()).thenReturn(testDom3);
-<<<<<<< HEAD
         TestDomObject.setRef(testDom3,"4");
-        WXText child3 = new WXText(instance, testDom3, mWXDiv, false);
-=======
-        testDom3.ref = "4";
         WXText child3 = new WXText(instance, testDom3, mWXDiv);
->>>>>>> v0.9.3-stable
         child3.initView();
 
         mWXDiv.addChild(child3, 1);

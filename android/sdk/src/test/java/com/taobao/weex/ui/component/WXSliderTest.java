@@ -258,7 +258,7 @@ public class WXSliderTest {
   }
 
   public static WXIndicator createIndicator(WXVContainer container) throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXIndicator) new SimpleComponentHolder(WXIndicator.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), container, false);
+    return (WXIndicator) new SimpleComponentHolder(WXIndicator.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), container);
   }
 
   @Before

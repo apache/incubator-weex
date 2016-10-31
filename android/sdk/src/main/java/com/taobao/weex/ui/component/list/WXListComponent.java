@@ -852,7 +852,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                             return new ListBaseViewHolder(component, viewType);
                         } else {
                             ((WXCell)component).lazy(false);
-                            component.createView(this, -1);
+                            component.createView();
                             component.applyLayoutAndEvent(component);
                             return new ListBaseViewHolder(component, viewType);
                         }

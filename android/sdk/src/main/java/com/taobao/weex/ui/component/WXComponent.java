@@ -294,7 +294,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mContext = mInstance.getContext();
     mParent = parent;
     mDomObj = dom.clone();
-    mInstanceId = instance.getInstanceId();
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
