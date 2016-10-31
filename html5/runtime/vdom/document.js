@@ -79,12 +79,24 @@ Object.assign(Document.prototype, {
       el.ref = '_documentElement'
       this.nodeMap._documentElement = el
       this.documentElement = el
-      el.appendChild = (node) => {
-        appendBody(this, node)
-      }
-      el.insertBefore = (node, before) => {
-        appendBody(this, node, before)
-      }
+
+      Object.defineProperty(el, 'appendChild', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: (node) => {
+          appendBody(this, node)
+        }
+      })
+
+      Object.defineProperty(el, 'insertBefore', {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: (node, before) => {
+          appendBody(this, node, before)
+        }
+      })
     }
 
     return this.documentElement
