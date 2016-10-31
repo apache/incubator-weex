@@ -230,6 +230,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
@@ -256,7 +257,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener {
+public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
 
   //Performance
   public boolean mEnd = false;
@@ -647,6 +648,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public WXRenderStrategy getRenderStrategy() {
     return mRenderStrategy;
+  }
+
+  @Override
+  public Context getUIContext() {
+    return mContext;
   }
 
   public String getInstanceId() {

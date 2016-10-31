@@ -223,7 +223,7 @@ public class WXSwitchDomObject extends WXDomObject {
     public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
       try {
         if (!measured) {
-          WXSwitchView wxSwitchView = new WXSwitchView(((WXDomObject) node).getWXSDKInstance().getContext());
+          WXSwitchView wxSwitchView = new WXSwitchView(((WXDomObject) node).getDomContext().getUIContext());
           int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
           int widthSpec = View.MeasureSpec.makeMeasureSpec((int) width, View.MeasureSpec.AT_MOST);
           wxSwitchView.measure(widthSpec, heightSpec);
