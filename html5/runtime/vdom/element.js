@@ -33,7 +33,7 @@ export default function Element (type = DEFAULT_TAG_NAME, props) {
   this.pureChildren = []
 }
 
-Element.prototype = new Node()
+Element.prototype = Object.create(Node.prototype)
 Element.prototype.constructor = Element
 
 function registerNode (docId, node) {
