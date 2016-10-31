@@ -139,6 +139,7 @@
 		74B80E6C1C3FB32C00239FB9 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = 74B80E6B1C3FB32C00239FB9 /* main.js */; };
 		74B8BEFE1DC47B72004A6027 /* WXRootView.h in Headers */ = {isa = PBXBuildFile; fileRef = 74B8BEFC1DC47B72004A6027 /* WXRootView.h */; };
 		74B8BEFF1DC47B72004A6027 /* WXRootView.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BEFD1DC47B72004A6027 /* WXRootView.m */; };
+		74B8BF011DC49AFE004A6027 /* WXRootViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */; };
 		74C896401D2AC2210043B82A /* WeexSDKTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 74C8963F1D2AC2210043B82A /* WeexSDKTests.m */; };
 		74C896421D2AC2210043B82A /* WeexSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77D160FD1C02DBE70010B15B /* WeexSDK.framework */; };
 		74CC7A1C1C2BC5F800829368 /* WXCellComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CC7A1A1C2BC5F800829368 /* WXCellComponent.h */; };
@@ -373,6 +374,7 @@
 		74B80E6B1C3FB32C00239FB9 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = main.js; sourceTree = "<group>"; };
 		74B8BEFC1DC47B72004A6027 /* WXRootView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXRootView.h; sourceTree = "<group>"; };
 		74B8BEFD1DC47B72004A6027 /* WXRootView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRootView.m; sourceTree = "<group>"; };
+		74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRootViewTests.m; sourceTree = "<group>"; };
 		74C27A011CEC441D004E488E /* WeexSDK-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WeexSDK-Prefix.pch"; sourceTree = "<group>"; };
 		74C8963D1D2AC2210043B82A /* WeexSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeexSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		74C8963F1D2AC2210043B82A /* WeexSDKTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeexSDKTests.m; sourceTree = "<group>"; };
@@ -613,10 +615,10 @@
 				5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */,
 				597334B21D4DE1A600988789 /* WXBridgeMethodTests.m */,
 				597334B01D4D9E7F00988789 /* WXSDKManagerTests.m */,
-				598805AC1D52D8C800EDED2C /* WXStorageTests.m */,
 				596FDD671D3F9EFF0082CD5B /* TestSupportUtils.h */,
 				596FDD681D3F9EFF0082CD5B /* TestSupportUtils.m */,
 				1C1A2BEC1D91172800539AA1 /* WXConvertTests.m */,
+				74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */,
 			);
 			path = WeexSDKTests;
 			sourceTree = "<group>";
@@ -901,6 +903,7 @@
 		DC9F46841D61AC9100A88239 /* module */ = {
 			isa = PBXGroup;
 			children = (
+				598805AC1D52D8C800EDED2C /* WXStorageTests.m */,
 				596FDD651D3F52700082CD5B /* WXAnimationModuleTests.m */,
 				591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */,
 				DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */,
@@ -1188,6 +1191,7 @@
 				596FDD661D3F52700082CD5B /* WXAnimationModuleTests.m in Sources */,
 				591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */,
 				597334B31D4DE1A600988789 /* WXBridgeMethodTests.m in Sources */,
+				74B8BF011DC49AFE004A6027 /* WXRootViewTests.m in Sources */,
 				597334B11D4D9E7F00988789 /* WXSDKManagerTests.m in Sources */,
 				74C896401D2AC2210043B82A /* WeexSDKTests.m in Sources */,
 				598805AD1D52D8C800EDED2C /* WXStorageTests.m in Sources */,

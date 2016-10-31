@@ -158,8 +158,6 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     
     _rootComponent = [self _buildComponentForData:data];
-    self.weexInstance.rootView.wx_component = _rootComponent;
-    
     [self _initRootCSSNode];
     
     __weak typeof(self) weakSelf = self;
