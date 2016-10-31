@@ -296,7 +296,6 @@ class WXRenderStatement {
     }
 
     WXComponent rootComp = generateComponentTree(dom, null);
-    mRegistry.put(rootComp.getRef(), rootComp);
     return rootComp;
   }
 
