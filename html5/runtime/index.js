@@ -23,13 +23,13 @@ Document.handler = config.sendTasks
 function freezePrototype () {
   shared.freezePrototype()
 
-  // Object.freeze(Element)
-  // Object.freeze(Comment)
-  // Object.freeze(Listener)
-  // Object.freeze(Document.prototype)
-  // Object.freeze(Element.prototype)
+  Object.freeze(Element)
+  Object.freeze(Comment)
+  Object.freeze(Listener)
+  Object.freeze(Document.prototype)
+  Object.freeze(Element.prototype)
   Object.freeze(Comment.prototype)
-  // Object.freeze(Listener.prototype)
+  Object.freeze(Listener.prototype)
 }
 
 export default {
