@@ -219,6 +219,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
@@ -930,6 +931,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
         // Ensure that the viewgroup's status to be normal
         WXReflectionUtils.setValue(rootView, "mChildrenCount", 0);
 
+      }
+      if(rootView instanceof Destroyable){
+        ((Destroyable)rootView).destroy();
       }
     } catch (Exception e) {
       WXLogUtils.e("WXSDKInstance destroyView Exception: ", e);
