@@ -14,15 +14,16 @@ import { resetTarget } from '../core/dep'
 export function createInstance (id, code, options, data) {
   resetTarget()
   let instance = instanceMap[id]
+  /* istanbul ignore else */
   options = options || {}
   let result
+  /* istanbul ignore else */
   if (!instance) {
     instance = new App(id, options)
     instanceMap[id] = instance
     result = initApp(instance, code, data)
   }
   else {
-    /* istanbul ignore next */
     result = new Error(`invalid instance id "${id}"`)
   }
   return result

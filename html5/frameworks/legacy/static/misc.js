@@ -11,11 +11,11 @@ import {
 export function getRoot (id) {
   const instance = instanceMap[id]
   let result
+  /* istanbul ignore else */
   if (instance) {
     result = getRootElement(instance)
   }
   else {
-    /* istanbul ignore next */
     result = new Error(`invalid instance id "${id}"`)
   }
   return result
