@@ -226,7 +226,7 @@ public abstract class WXModule implements IWXObject {
 
   protected final WXComponent findComponent(String ref){
     if(mWXSDKInstance != null && ref != null){
-      WXSDKManager.getInstance()
+      return WXSDKManager.getInstance()
           .getWXRenderManager()
           .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
     }

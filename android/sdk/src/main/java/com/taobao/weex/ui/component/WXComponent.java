@@ -319,7 +319,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   protected final WXComponent findComponent(String ref){
     if(mInstance != null && ref != null){
-      WXSDKManager.getInstance()
+      return WXSDKManager.getInstance()
           .getWXRenderManager()
           .getWXComponent(mInstance.getInstanceId(), ref);
     }
