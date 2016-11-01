@@ -19,6 +19,7 @@
 #import "WXScrollerProtocol.h"
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
+#import "WXRuntimeConfig.h"
 
 static NSThread *WXComponentThread;
 
@@ -410,59 +411,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         
         [self _executeComponentMethod:componentInstance withMethod:method];
     });
-   }
+}
 
-- (void)_executeComponentMethod:(WXComponent *)component withMethod:(WXBridgeMethod*)method
+- (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
 {
-    if (!component) {
-        NSString *errorMessage = [NSString stringWithFormat:@"component：%@ doesn't exist！",method.targets[@"component"]];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        
-        return;
-    }
-    SEL selector = [WXComponentFactory methodWithComponentName:method.targets[@"component"] withMethod:method.method];
-    NSArray *arguments = method.arguments;
-    NSMethodSignature *signature = [component methodSignatureForSelector:selector];
-    if (!signature) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Module:%@, method：%@ doesn't exist", method.module, method.method];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return;
-    }
-
-    if (signature.numberOfArguments - 2 != method.arguments.count) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Module:%@, the parameters in calling method [%@] and registered method [%@] are not consistent！", method.module, method.method, NSStringFromSelector(selector)];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return;
-    }
-    
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-    invocation.target = component;
-    invocation.selector = selector;
-    NSString *instanceId = method.instance;
-    void **freeList = NULL;
-    
-    NSMutableArray *blockArray = [NSMutableArray array];
-    WX_ALLOC_FLIST(freeList, arguments.count);
-    for (int i = 0; i < arguments.count; i ++ ) {
-        id obj = arguments[i];
-        const char *parameterType = [signature getArgumentTypeAtIndex:i + 2];
-        static const char *blockType = @encode(typeof(^{}));
-        id argument;
-        if (!strcmp(parameterType, blockType)) {
-            // callback
-            argument = [^void(NSString *result, BOOL keepAlive) {
-                [[WXSDKManager bridgeMgr]callBack:instanceId funcId:(NSString *)obj params:result keepAlive:keepAlive];
-            } copy];
-            
-            // retain block
-            [blockArray addObject:argument];
-            [invocation setArgument:&argument atIndex:i + 2];
-        } else {
-            argument = obj;
-            WX_ARGUMENTS_SET(invocation, signature, i, argument, freeList);
-        }
-    }
-    [invocation retainArguments];
+    NSInvocation * invocation = [[WXRuntimeConfig sharedInstance] invocationWithTargetMethod:target method:method];
     WXPerformBlockOnMainThread(^{
         [invocation invoke];
     });
