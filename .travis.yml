@@ -1,7 +1,0 @@
-language: objective-c
-xcode_workspace: ios/playground/WeexDemo.xcworkspace # path to your workspace
-xcode_scheme: WeexDemo
-podfile: ios/playground/Podfile
-
-osx_image: xcode7.3
-xcode_sdk: iphonesimulator9.3 , iphonesimulator8.1
