@@ -199,7 +199,7 @@ NSTimeInterval JSLibInitTime = 0;
     
     //TODO WXRootView
     WXPerformBlockOnMainThread(^{
-        self.rootView = [[WXView alloc] initWithFrame:self.frame];
+        _rootView = [[WXView alloc] initWithFrame:self.frame];
         if(self.onCreate) {
             self.onCreate(self.rootView);
         }
