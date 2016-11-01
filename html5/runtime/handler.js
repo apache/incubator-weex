@@ -23,11 +23,13 @@ const handlerMap = {
 export function createHandler (id, handler) {
   const defaultHandler = handler || callNative
 
+  /* istanbul ignore if */
   if (typeof defaultHandler !== 'function') {
     console.error('[JS Runtime] no default handler')
   }
 
   return function taskHandler (tasks) {
+    /* istanbul ignore if */
     if (!Array.isArray(tasks)) {
       tasks = [tasks]
     }

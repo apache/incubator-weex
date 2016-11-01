@@ -27,11 +27,11 @@ export function init (cfg) {
 export function refreshInstance (id, data) {
   const instance = instanceMap[id]
   let result
+  /* istanbul ignore else */
   if (instance) {
     result = refresh(instance, data)
   }
   else {
-    /* istanbul ignore next */
     result = new Error(`invalid instance id "${id}"`)
   }
   return result
@@ -44,8 +44,8 @@ export function refreshInstance (id, data) {
 export function destroyInstance (id) {
   resetTarget()
   const instance = instanceMap[id]
+  /* istanbul ignore else */
   if (!instance) {
-    /* istanbul ignore next */
     return new Error(`invalid instance id "${id}"`)
   }
   destroy(instance)
