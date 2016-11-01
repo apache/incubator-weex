@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "WXModuleProtocol.h"
 
-@interface WXPickerModule : NSObject <WXModuleProtocol>
+@interface WXPickerModule : NSObject <WXModuleProtocol,UIPickerViewDelegate>
 
 @end
