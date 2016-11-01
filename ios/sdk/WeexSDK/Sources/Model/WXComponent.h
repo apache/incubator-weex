@@ -11,8 +11,8 @@
 
 @class WXSDKInstance;
 
-typedef void (^WXCallback)(id result);
-typedef void (^WXKeepAliveCallback)(id result, BOOL keepAlive);
+typedef void (^WXCallback)(_Nonnull id result);
+typedef void (^WXKeepAliveCallback)(_Nonnull id result, BOOL keepAlive);
 
 NS_ASSUME_NONNULL_BEGIN
 
