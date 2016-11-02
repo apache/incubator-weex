@@ -380,11 +380,11 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
+    parent.addChild(component, index);
     component.lazy(parent.isLazy());
     component.createView(parent, index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
-    parent.addChild(component, index);
   }
 
   /**
