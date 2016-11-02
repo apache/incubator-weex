@@ -234,7 +234,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     @Override
     public void run() {
       //don't override ViewPager#setCurrentItem(int item, bool smoothScroll)
-      arrowScroll(FOCUS_FORWARD);
+      setCurrentItem(WXCircleViewPager.super.getCurrentItem()+1, true);
     }
   };
 
