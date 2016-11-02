@@ -70,8 +70,8 @@ function _xhr (config, callback, progressCallback) {
   xhr.open(config.method, config.url, true)
 
   // cors cookie support
-  if (config.withCrendentials === true) {
-    xhr.withCrendentials = true
+  if (config.withCredentials === true) {
+    xhr.withCredentials = true
   }
 
   const headers = config.headers || {}
