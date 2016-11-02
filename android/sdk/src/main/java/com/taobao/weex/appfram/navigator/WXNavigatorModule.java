@@ -118,18 +118,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class WXNavigatorModule extends WXModule {
 
@@ -285,12 +283,12 @@ public class WXNavigatorModule extends WXModule {
         callback.invoke(MSG_FAILED);
     }
 
-    @WXModuleAnno
+    @JSMethod
     public void setNavBarHidden(String param, final String callback) {
         String message = MSG_FAILED;
         try {
-            JSONObject jsObj = new JSONObject(param);
-            int visibility = jsObj.getInt(Constants.Name.NAV_BAR_VISIBILITY);
+            JSONObject jsObj = JSON.parseObject(param);
+            int visibility = jsObj.getInteger(Constants.Name.NAV_BAR_VISIBILITY);
             boolean success = changeVisibilityOfActionBar(mWXSDKInstance.getContext(), visibility);
             if (success) {
                 message = MSG_SUCCESS;
