@@ -235,6 +235,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     super(instance, node, parent);
   }
 
+  @Override
+  protected void onHostViewInitialized(T host) {
+    super.onHostViewInitialized(host);
+    host.setFocusable(true);
+    host.setFocusableInTouchMode(true);
+    host.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+  }
+
   /**
    * Offset top for children layout.
    * @return

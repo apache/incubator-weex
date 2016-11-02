@@ -335,7 +335,7 @@ public class WXSliderNeighbor extends WXSlider {
         }
     }
 
-    private void updateAdpaterScaleAndAplha(float alpha, float scale) {
+    private void updateAdpaterScaleAndAlpha(float alpha, float scale) {
         List<View> pageViews = mAdapter.getViews();
         int cusPos = mViewPager.getCurrentItem();
         if(null != pageViews && pageViews.size() > 0) {
@@ -364,7 +364,7 @@ public class WXSliderNeighbor extends WXSlider {
         // addSubView is called before setProperty, so we need to modify the neighbor view in mAdapter.
         if(this.mNerghborScale != neighborScale) {
             this.mNerghborScale = neighborScale;
-            updateAdpaterScaleAndAplha(-1, neighborScale);
+            updateAdpaterScaleAndAlpha(-1, neighborScale);
         }
     }
 
@@ -381,7 +381,7 @@ public class WXSliderNeighbor extends WXSlider {
         // The same work as setNeighborScale()
         if(this.mNerghborAlpha != neighborAlpha) {
             this.mNerghborAlpha = neighborAlpha;
-            updateAdpaterScaleAndAplha(neighborAlpha, -1);
+            updateAdpaterScaleAndAlpha(neighborAlpha, -1);
         }
     }
 

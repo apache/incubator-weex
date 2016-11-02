@@ -206,10 +206,6 @@ package com.taobao.weex.ui.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Handler.Callback;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -217,7 +213,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXLogUtils;
@@ -227,26 +222,60 @@ import java.lang.reflect.Field;
 /**
  */
 @SuppressLint("HandlerLeak")
-public class WXCircleViewPager extends ViewPager implements Callback, WXGestureObservable {
+public class WXCircleViewPager extends ViewPager implements WXGestureObservable {
 
   private WXGesture wxGesture;
-  private Handler mCircleHandler;
   private boolean isAutoScroll;
-  private boolean isPause;
   private long intervalTime = 3 * 1000;
   private WXSmoothScroller mScroller;
+  private boolean needLoop = true;
+
+  private Runnable scrollAction = new Runnable() {
+    @Override
+    public void run() {
+      //don't override ViewPager#setCurrentItem(int item, bool smoothScroll)
+      arrowScroll(FOCUS_FORWARD);
+    }
+  };
 
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context) {
     super(context);
-    initView();
-    setOverScrollMode(View.OVER_SCROLL_NEVER);
-    postInitViewPager();
-
+    init();
   }
 
-  private void initView() {
-    mCircleHandler = new Handler(Looper.getMainLooper(), WXThread.secure(this));
+  private void init() {
+    setOverScrollMode(View.OVER_SCROLL_NEVER);
+
+    addOnPageChangeListener(new OnPageChangeListener() {
+      @Override
+      public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+      }
+
+      @Override
+      public void onPageSelected(int position) {
+        if (isAutoScroll()) {
+          removeCallbacks(scrollAction);
+          postDelayed(scrollAction, intervalTime);
+        }
+      }
+
+      @Override
+      public void onPageScrollStateChanged(int state) {
+        WXCirclePageAdapter adapter = getCirclePageAdapter();
+        int currentItemInternal = WXCircleViewPager.super.getCurrentItem();
+        if (needLoop && state == ViewPager.SCROLL_STATE_IDLE && adapter.getCount() > 1) {
+          if (currentItemInternal == adapter.getCount() - 1) {
+            WXCircleViewPager.super.setCurrentItem(1, false);
+          } else if (currentItemInternal == 0) {
+            WXCircleViewPager.super.setCurrentItem(adapter.getCount() - 2, false);
+          }
+        }
+      }
+    });
+
+    postInitViewPager();
   }
 
   /**
@@ -275,35 +304,12 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context, AttributeSet attrs) {
     super(context, attrs);
-    initView();
-    setOverScrollMode(View.OVER_SCROLL_NEVER);
-    postInitViewPager();
-  }
-
-  @Override
-  public boolean handleMessage(Message msg) {
-    if (isAutoScroll && !isPause) {
-
-      setCurrentItem(getCurrentItem() + 1,true);
-      mCircleHandler.removeCallbacksAndMessages(null);
-      mCircleHandler.sendEmptyMessageDelayed(0, intervalTime);
-    }
-    return true;
+    init();
   }
 
   @Override
   public int getCurrentItem() {
-    if (getAdapter().getCount() == 0) {
-      return super.getCurrentItem();
-    }
-    int position = super.getCurrentItem();
-    if (getAdapter() instanceof WXCirclePageAdapter) {
-      WXCirclePageAdapter infAdapter = (WXCirclePageAdapter) getAdapter();
-      // Return the actual item position in the data backing InfinitePagerAdapter
-      return (position % infAdapter.getRealCount());
-    } else {
-      return super.getCurrentItem();
-    }
+    return getRealCurrentItem();
   }
 
   @Override
@@ -320,8 +326,8 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
    */
   public void startAutoScroll() {
     isAutoScroll = true;
-    //		mViewPager.setCurrentItem(0);
-    mCircleHandler.sendEmptyMessageDelayed(0, intervalTime);
+    removeCallbacks(scrollAction);
+    postDelayed(scrollAction, intervalTime);
   }
 
   /**
@@ -329,7 +335,7 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
    */
   public void stopAutoScroll() {
     isAutoScroll = false;
-    mCircleHandler.removeCallbacksAndMessages(null);
+    removeCallbacks(scrollAction);
   }
 
   public boolean isAutoScroll() {
@@ -338,39 +344,7 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
 
   @Override
   public void setCurrentItem(int item) {
-    setCurrentItem(item,false);
-  }
-
-  /**
-   * set real item
-   *
-   */
-  @Override
-  public void setCurrentItem(int item, boolean smoothScroll) {
-    if (getAdapter().getCount() == 0) {
-      super.setCurrentItem(item, smoothScroll);
-      return;
-    }
-    item = getOffsetAmount() + (item % getAdapter().getCount());
-    super.setCurrentItem(item, smoothScroll);
-  }
-
-
-  private int getOffsetAmount() {
-    if (getAdapter().getCount() == 0) {
-      return 0;
-    }
-    if (getAdapter() instanceof WXCirclePageAdapter) {
-      WXCirclePageAdapter infAdapter = (WXCirclePageAdapter) getAdapter();
-      // allow for 100 back cycles from the beginning
-      // should be enough to create an illusion of infinity
-      // warning: scrolling to very high values (1,000,000+) results in
-      // strange drawing behaviour
-      int realCount = infAdapter.getRealCount();
-      return realCount> 2 ? 0 : realCount * 50;
-    } else {
-      return 0;
-    }
+    setRealCurrentItem(item);
   }
 
   /**
@@ -405,37 +379,46 @@ public class WXCircleViewPager extends ViewPager implements Callback, WXGestureO
     this.intervalTime = intervalTime;
   }
 
+  public void setCircle(boolean circle) {
+    needLoop = circle;
+  }
+
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    // TODO Auto-generated method stub
-    if (ev.getAction() == MotionEvent.ACTION_DOWN) {// Stop auto scroll
-      isPause = true;
-      if (mCircleHandler != null) {
-        mCircleHandler.removeCallbacksAndMessages(null);
-      }
-    } else if (ev.getAction() == MotionEvent.ACTION_CANCEL) {// Restart auto scroll
-      isPause = false;
-      if (mCircleHandler != null) {
-        mCircleHandler.sendEmptyMessageDelayed(0, intervalTime);
-      }
-    } else if (ev.getAction() == MotionEvent.ACTION_UP) {
-      isPause = false;
-      if (mCircleHandler != null) {
-        mCircleHandler.sendEmptyMessageDelayed(0, intervalTime);
-      }
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+      case MotionEvent.ACTION_MOVE:
+        removeCallbacks(scrollAction);
+        break;
+      case MotionEvent.ACTION_UP:
+      case MotionEvent.ACTION_CANCEL:
+        if (isAutoScroll()) {
+          postDelayed(scrollAction, intervalTime);
+        }
+        break;
     }
-
     return super.dispatchTouchEvent(ev);
   }
 
   public void destory() {
-    if (mCircleHandler != null) {
-      mCircleHandler.removeCallbacksAndMessages(null);
-    }
+
   }
 
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  private int getRealCurrentItem() {
+    int i = getCurrentItem();
+    return ((WXCirclePageAdapter) getAdapter()).getRealPosition(i);
+  }
+
+  private void setRealCurrentItem(int item) {
+    super.setCurrentItem(((WXCirclePageAdapter) getAdapter()).getFirst() + item);
+  }
+
+  public int getRealCount() {
+    return ((WXCirclePageAdapter) getAdapter()).getRealCount();
   }
 }

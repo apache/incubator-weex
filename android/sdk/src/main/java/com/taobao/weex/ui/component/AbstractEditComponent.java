@@ -261,9 +261,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       public void onHostViewClick() {
         switch (mType) {
           case Constants.Value.DATE:
+            hideSoftKeyboard();
             WXTimeInputHelper.pickDate(mMax, mMin, getHostView());
             break;
           case Constants.Value.TIME:
+            hideSoftKeyboard();
             WXTimeInputHelper.pickTime(getHostView());
             break;
         }

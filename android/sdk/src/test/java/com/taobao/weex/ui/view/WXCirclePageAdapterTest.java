@@ -266,7 +266,7 @@ public class WXCirclePageAdapterTest {
     testAddPageView();
     ViewPager viewPager = new ViewPager(child.getContext());
     viewPager.setAdapter(adapter);
-    Object obj = adapter.instantiateItem(viewPager,adapter.getRealCount()*10-1);
+    Object obj = adapter.instantiateItem(viewPager,adapter.getRealCount());
     assertEquals(child,obj);
   }
 

@@ -357,6 +357,7 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
+
     parent.addChild(component, index);
     parent.createChildViewAt(index);
     component.applyLayoutAndEvent(component);

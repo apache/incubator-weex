@@ -341,7 +341,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       return;
     }
     mAdapter.addPageView(view);
-    mAdapter.notifyDataSetChanged();
+    mViewPager.setCurrentItem(0);
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
@@ -453,7 +453,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       return;
     }
 
-    mViewPager.setCurrentItem(i);
+    setIndex(i);
   }
 
   @WXComponentProp(name = Constants.Name.AUTO_PLAY)
@@ -493,12 +493,14 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       if (index >= mAdapter.getRealCount() || index < 0) {
         return;
       }
-      index = index % mAdapter.getRealCount();
+      index = index + mAdapter.getFirst();
       mViewPager.setCurrentItem(index);
     }
   }
 
   protected class SliderPageChangeListener implements OnPageChangeListener {
+
+    private int lastPos = -1;
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -507,14 +509,17 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     @Override
     public void onPageSelected(int pos) {
+      if (mAdapter.getRealPosition(pos) == lastPos) {
+        return;
+      }
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("onPageSelected >>>>" + pos);
+        WXLogUtils.d("onPageSelected >>>>" + mAdapter.getRealPosition(pos));
       }
       if (mAdapter == null || mAdapter.getRealCount() == 0) {
         return;
       }
 
-      int realPosition = pos % mAdapter.getRealCount();
+      int realPosition = mAdapter.getRealPosition(pos);
       if (mChildren == null || realPosition >= mChildren.size()) {
         return;
       }
@@ -537,6 +542,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
       mViewPager.requestLayout();
       getHostView().invalidate();
+      lastPos = mAdapter.getRealPosition(pos);
     }
 
     @Override
