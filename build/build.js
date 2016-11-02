@@ -12,6 +12,11 @@ const uglify = require('rollup-plugin-uglify')
 const commonjs = require('rollup-plugin-commonjs')
 const buble = require('rollup-plugin-buble')
 
+const frameworkVersion = pkg.subversion.framework
+const browserVersion = pkg.subversion.browser
+const commonBanner = `(this.getJSFMVersion = function(){return "${frameworkVersion}"});`
+  + `var global = this, process = { env: {} };var setTimeout = global.setTimeout;\n`
+
 // create dist folder
 if (!fs.existsSync('dist')) {
   fs.mkdirSync('dist')
@@ -22,6 +27,7 @@ if (process.argv[2]) {
   switch (process.argv[2]) {
     case 'native': buildNative(); break;
     case 'runtime': buildRuntime(); break;
+    case 'browser': buildBrowser(); break;
     default: console.log('\n  invalid package name.\n')
   }
 }
@@ -65,7 +71,11 @@ function build (name, options, plugins) {
       sourceMap: 'inline',
       plugins: [
         ...plugins,
-        replace({ 'process.env.NODE_ENV': JSON.stringify('development') })
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('development'),
+          'process.env.VUE_ENV': JSON.stringify('weex'),
+          'process.env.NODE_DEBUG': false
+        })
       ]
     }))
   }
@@ -77,7 +87,11 @@ function build (name, options, plugins) {
       dest: `./dist/${name}.min.js`,
       plugins: [
         ...plugins,
-        replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
+        replace({
+          'process.env.NODE_ENV': JSON.stringify('production'),
+          'process.env.VUE_ENV': JSON.stringify('weex'),
+          'process.env.NODE_DEBUG': false
+        }),
         uglify()
       ]
     }))
@@ -85,11 +99,9 @@ function build (name, options, plugins) {
 }
 
 function buildNative () {
-  const version = pkg.subversion.framework
-  const banner = `\
-  (this.nativeLog || function(s) {console.log(s)})('START JS FRAMEWORK: ${version} Build ${now()}');
-  var global = this, process = { env: {}};
-  `
+  const banner = `(this.nativeLog || function(s) {console.log(s)})`
+    + `('START JS FRAMEWORK: ${frameworkVersion} Build ${now()}');\n`
+    + commonBanner
 
   build('native', {
     entry: './html5/render/native/index.js',
@@ -111,10 +123,14 @@ function buildNative () {
 }
 
 function buildRuntime () {
+  const banner = `('WEEX JS RUNTIME: ${frameworkVersion}, Build ${now()}');`
+    + `var global = this, process = { env: {} };var setTimeout = global.setTimeout;\n`
+
   build('runtime', {
     moduleName: 'weexRuntime',
     entry: './html5/runtime/index.js',
     format: 'umd',
+    banner,
     plugins: [
       eslint(),
       nodeResolve({
@@ -127,10 +143,38 @@ function buildRuntime () {
   })
 }
 
+function buildBrowser () {
+  const banner = `(this.nativeLog || function(s) {console.log(s)})`
+    + `('START WEEX HTML5: ${browserVersion} Build ${now()}');\n`
+    + commonBanner
+
+  build('browser', {
+    moduleName: 'weex',
+    entry: './html5/render/browser/index.js',
+    banner,
+    format: 'umd',
+    plugins: [
+      postcss(),
+      json(),
+      eslint({
+        exclude: ['./package.json', '**/*.css']
+      }),
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
+      commonjs(),
+      buble()
+    ]
+  })
+}
+
 function getSize (file) {
   return (fs.statSync(file).size / 1024).toFixed(2) + 'KB'
 }
 
 function now () {
-  return new Date().toISOString().replace('T', ' ').substring(0, 16)
+  const time = Date.now() - (new Date()).getTimezoneOffset() * 60000
+  return (new Date(time)).toISOString().replace('T', ' ').substring(0, 16)
 }
