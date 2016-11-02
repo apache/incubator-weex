@@ -382,7 +382,6 @@ class WXRenderStatement {
     }
     
     parent.addChild(component, index);
-    component.lazy(parent.isLazy());
     component.createView(parent, index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
