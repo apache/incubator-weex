@@ -84,7 +84,7 @@ static WXRuleManager *_sharedInstance = nil;
             
             __weak typeof(self) weakSelf = self;
             [WXUtility getIconfont:fontURL completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
-                if (!error && !url) {
+                if (!error && url) {
                     // load success
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
