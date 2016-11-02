@@ -100,6 +100,7 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
 {
     [self hide];
     self.callback([NSNumber numberWithInteger:self.index]);
+    self.callback=nil;
 }
 
 #pragma mark -
