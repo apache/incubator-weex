@@ -57,6 +57,7 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
 
 -(void)show
 {
+    [[[UIApplication sharedApplication] keyWindow] endEditing:YES];  //收起键盘
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.backgroudView];
     if(self.isAnimating)
