@@ -73,6 +73,7 @@
         _type = attributes[@"type"];
         if( [attributes[@"type"] isEqualToString:@"date"])
         {
+            self.datePicker.datePickerMode = UIDatePickerModeDate;
             if(attributes[@"value"])
             {
                 NSDate *date = [self inputDateStringToDate:attributes[@"value"]];
@@ -97,10 +98,9 @@
                     self.datePicker.minimumDate =date;
                 }
             }
-            
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
         }else if([attributes[@"type"] isEqualToString:@"time"])
         {
+            self.datePicker.datePickerMode = UIDatePickerModeTime;
             if(attributes[@"value"])
             {
                 NSDate *date = [self inputTimeStringToDate:attributes[@"value"]];
@@ -108,7 +108,6 @@
                 {
                     self.datePicker.date = date;
                 }
-                self.datePicker.datePickerMode = UIDatePickerModeTime;
             }
         }
     }
