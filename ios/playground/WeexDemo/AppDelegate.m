@@ -40,8 +40,6 @@
     // Override point for customization after application launch.
     [self startSplashScreen];
     
-    [self checkUpdate];
-    
     return YES;
 }
 
