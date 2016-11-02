@@ -14,6 +14,5 @@ export function freezePrototype () {
 
   Object.freeze(Error.prototype)
   Object.freeze(Date.prototype)
-  Object.freeze(Math.prototype)
   Object.freeze(RegExp.prototype)
 }
