@@ -182,7 +182,7 @@ const stream = {
    *   - headers {obj}
    *   - url {string}
    *   - mode {string} 'cors' | 'no-cors' | 'same-origin' | 'navigate'
-   *   - withCrendentials {boolean}
+   *   - withCredentials {boolean}
    *   - body
    *   - type {string} 'json' | 'jsonp' | 'text'
    * @param  {string} callbackId
