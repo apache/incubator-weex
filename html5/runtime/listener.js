@@ -10,7 +10,12 @@ export default function Listener (id, handler) {
   this.batched = false
   this.updates = []
   if (typeof handler === 'function') {
-    this.handler = handler
+    Object.defineProperty(this, 'handler', {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: handler
+    })
   }
   else {
     console.error('[JS Runtime] invalid parameter, handler must be a function')
