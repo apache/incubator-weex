@@ -154,8 +154,6 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  * Renders weex view with source string of bundle and some others.
  *
- * @param url The source string of bundle rendered to a weex view.
- *
  * @param options The params passed by user, sometimes you should pass the value of "bundleUrl".
  *
  * @param data The data the bundle needs when rendered.

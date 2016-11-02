@@ -146,6 +146,7 @@
 		74CC7A1D1C2BC5F800829368 /* WXCellComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CC7A1B1C2BC5F800829368 /* WXCellComponent.m */; };
 		74CC7A201C2BF9DC00829368 /* WXListComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CC7A1E1C2BF9DC00829368 /* WXListComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74CC7A211C2BF9DC00829368 /* WXListComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CC7A1F1C2BF9DC00829368 /* WXListComponent.m */; };
+		74F7BFF51DC782EC004D0871 /* testRootView.js in Resources */ = {isa = PBXBuildFile; fileRef = 74F7BFF41DC782EC004D0871 /* testRootView.js */; };
 		74FD6E041C7C0E9600DBEB6D /* WXScrollerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 74FD6E031C7C0E9600DBEB6D /* WXScrollerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		775BEE4E1C16F993008D1629 /* WXDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE4D1C16F993008D1629 /* WXDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		775BEE6E1C1BD8F4008D1629 /* WXImgLoaderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE6C1C1BD8F4008D1629 /* WXImgLoaderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -383,6 +384,7 @@
 		74CC7A1B1C2BC5F800829368 /* WXCellComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCellComponent.m; sourceTree = "<group>"; };
 		74CC7A1E1C2BF9DC00829368 /* WXListComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXListComponent.h; sourceTree = "<group>"; };
 		74CC7A1F1C2BF9DC00829368 /* WXListComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXListComponent.m; sourceTree = "<group>"; };
+		74F7BFF41DC782EC004D0871 /* testRootView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = testRootView.js; sourceTree = "<group>"; };
 		74FD6E031C7C0E9600DBEB6D /* WXScrollerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXScrollerProtocol.h; sourceTree = "<group>"; };
 		775BEE4D1C16F993008D1629 /* WXDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDefine.h; sourceTree = "<group>"; };
 		775BEE6C1C1BD8F4008D1629 /* WXImgLoaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXImgLoaderProtocol.h; sourceTree = "<group>"; };
@@ -606,6 +608,7 @@
 		74C8963E1D2AC2210043B82A /* WeexSDKTests */ = {
 			isa = PBXGroup;
 			children = (
+				74F7BFF31DC782DF004D0871 /* Resources */,
 				DC9F46841D61AC9100A88239 /* module */,
 				74C8963F1D2AC2210043B82A /* WeexSDKTests.m */,
 				74C896411D2AC2210043B82A /* Info.plist */,
@@ -621,6 +624,14 @@
 				74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */,
 			);
 			path = WeexSDKTests;
+			sourceTree = "<group>";
+		};
+		74F7BFF31DC782DF004D0871 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				74F7BFF41DC782EC004D0871 /* testRootView.js */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		77D160F31C02DBE70010B15B = {
@@ -1122,6 +1133,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74F7BFF51DC782EC004D0871 /* testRootView.js in Resources */,
 				DC9F46871D61BA8C00A88239 /* wx_load_error@3x.png in Resources */,
 				DC9F46881D61BA8C00A88239 /* main.js in Resources */,
 			);

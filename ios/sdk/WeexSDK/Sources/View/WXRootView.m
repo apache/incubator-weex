@@ -13,9 +13,14 @@
 
 - (void)setFrame:(CGRect)frame
 {
+    BOOL shouldNotifyLayout;
+    if (_instance.onLayout && !CGRectEqualToRect(self.frame, frame)) {
+        shouldNotifyLayout = YES;
+    }
+    
     [super setFrame:frame];
     
-    if (!CGRectEqualToRect(self.frame, frame) && _instance.onLayout) {
+    if (shouldNotifyLayout) {
         _instance.onLayout(self);
     }
 }
