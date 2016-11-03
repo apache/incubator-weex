@@ -738,11 +738,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      * @param child the child to be removed
      */
     @Override
-    public void remove(WXComponent child) {
-        remove(child, true);
-    }
-
-    @Override
     public void remove(WXComponent child, boolean destroy) {
       int index = mChildren.indexOf(child);
       if (destroy) {

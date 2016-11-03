@@ -425,10 +425,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
   }
 
-  public void remove(WXComponent child) {
-    remove(child,true);
-  }
-
   public void remove(WXComponent child, boolean destroy){
     if (child == null || mChildren == null || mChildren.size() == 0) {
       return;

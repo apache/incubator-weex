@@ -306,7 +306,7 @@ public class WXDivTest {
     @Test
     public void testRemove(){
         testAddChild();
-        mWXDiv.remove(child2);
+        mWXDiv.remove(child2,true);
 
         assertEquals(2, mWXDiv.childCount());
     }

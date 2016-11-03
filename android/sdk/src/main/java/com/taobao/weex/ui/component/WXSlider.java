@@ -349,11 +349,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  public void remove(WXComponent child) {
-    remove(child, true);
-  }
-
-  @Override
   public void remove(WXComponent child, boolean destroy) {
     if (child == null || child.getHostView() == null || mAdapter == null) {
       return;
