@@ -9,11 +9,11 @@
 #import "WXComponentFactory.h"
 #import "WXAssert.h"
 #import "WXLog.h"
-#import "WXRuntimeConfig.h"
+#import "WXInvocationConfig.h"
 
 #import <objc/runtime.h>
 
-@interface WXComponentConfig : WXRuntimeConfig
+@interface WXComponentConfig : WXInvocationConfig
 @property (nonatomic, strong) NSDictionary *properties;
 
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz pros:(NSDictionary *)pros;

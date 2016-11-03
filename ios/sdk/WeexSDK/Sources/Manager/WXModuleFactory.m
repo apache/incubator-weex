@@ -9,13 +9,14 @@
 #import "WXModuleFactory.h"
 #import "WXAssert.h"
 #import "WXLog.h"
-#import <WXRuntimeConfig.h>
+#import "WXInvocationConfig.h"
+
 #import <objc/runtime.h>
 #import <objc/message.h>
 
 /************************************************************************************************/
 
-@interface WXModuleConfig : WXRuntimeConfig
+@interface WXModuleConfig : WXInvocationConfig
 
 @end
 

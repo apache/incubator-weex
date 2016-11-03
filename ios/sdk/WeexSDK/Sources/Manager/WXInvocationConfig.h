@@ -10,7 +10,7 @@
 
 #import "WXBridgeMethod.h"
 
-@interface WXRuntimeConfig : NSObject
+@interface WXInvocationConfig : NSObject
 
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *clazz;

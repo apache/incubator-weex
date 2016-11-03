@@ -14,7 +14,7 @@
 #import "WXMonitor.h"
 #import "WXSDKManager.h"
 #import "WXThreadSafeMutableDictionary.h"
-#import "WXRuntimeConfig.h"
+#import "WXInvocationConfig.h"
 
 #import <objc/message.h>
 
@@ -58,7 +58,7 @@
 
 - (void)_executeModuleMethod:(id)module withMethod:(WXBridgeMethod *)method
 {
-    NSInvocation *invocation = [[WXRuntimeConfig sharedInstance] invocationWithTargetMethod:module method:method];
+    NSInvocation *invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:module method:method];
     [invocation invoke];
 }
 

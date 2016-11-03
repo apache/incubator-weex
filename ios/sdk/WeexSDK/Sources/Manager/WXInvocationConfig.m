@@ -6,7 +6,7 @@
 //  Copyright © 2016 taobao. All rights reserved.
 //
 
-#import "WXRuntimeConfig.h"
+#import "WXInvocationConfig.h"
 #import "WXLog.h"
 #import "WXSDKInstance.h"
 #import "WXSDKManager.h"
@@ -20,10 +20,10 @@
 
 #import <objc/runtime.h>
 
-@interface WXRuntimeConfig()
+@interface WXInvocationConfig()
 @end
 
-@implementation WXRuntimeConfig
+@implementation WXInvocationConfig
 
 + (instancetype)sharedInstance
 {

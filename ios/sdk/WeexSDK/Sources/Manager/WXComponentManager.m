@@ -19,7 +19,7 @@
 #import "WXScrollerProtocol.h"
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
-#import "WXRuntimeConfig.h"
+#import "WXInvocationConfig.h"
 
 static NSThread *WXComponentThread;
 
@@ -415,7 +415,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
 {
-    NSInvocation * invocation = [[WXRuntimeConfig sharedInstance] invocationWithTargetMethod:target method:method];
+    NSInvocation * invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:target method:method];
     WXPerformBlockOnMainThread(^{
         [invocation invoke];
     });
