@@ -399,7 +399,6 @@ class WXRenderStatement {
     clearRegistryForComponent(component);
     parent.remove(component);
     mRegistry.remove(ref);
-    component.destroy();
     return component;
   }
 
