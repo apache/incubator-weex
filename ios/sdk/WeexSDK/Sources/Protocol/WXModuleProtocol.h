@@ -25,15 +25,6 @@
 typedef void (^WXModuleCallback)(id result);
 typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 
-/**
- *  @abstract export public method
- */
-
-#define WX_EXPORT_METHOD(method) \
-+ (NSString *)WX_CONCAT_WRAPPER(wx_export_method_, __LINE__) { \
-    return NSStringFromSelector(method); \
-}
-
 #define WX_EXPORT_MODULE(module) 
 
 @optional
