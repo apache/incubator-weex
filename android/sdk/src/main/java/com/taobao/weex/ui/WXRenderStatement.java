@@ -316,6 +316,7 @@ class WXRenderStatement {
     frameLayout.setLayoutParams(layoutParams);
     frameLayout.setBackgroundColor(Color.TRANSPARENT);
 
+    mGodComponent.getRealView().addOnLayoutChangeListener(getWXSDKInstance());
     WXComponent component = generateComponentTree(dom, mGodComponent);
     mGodComponent.addChild(component);
     mRegistry.put(component.getRef(), component);

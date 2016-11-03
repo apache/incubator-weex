@@ -253,7 +253,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener {
+public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutChangeListener {
 
   //Performance
   public boolean mEnd = false;
@@ -841,6 +841,23 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
 
+  @Override
+  public final void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int
+      oldTop, int oldRight, int oldBottom) {
+    if (left != oldLeft || top != oldTop || right != oldRight || bottom != oldBottom) {
+      onLayoutChange(v);
+    }
+  }
+
+  /**
+   * Subclass should override this method to get notifications of layout change of GodView.
+   * @param godView the godView. If you call {@link #getGodCom()}, then call
+   * {@link WXVContainer#getRealView()}, you will get the same result.
+   */
+  public void onLayoutChange(View godView) {
+
+  }
+
   private boolean mCreateInstance =true;
   public void firstScreenCreateInstanceTime(long time) {
     if(mCreateInstance) {
@@ -944,6 +961,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
 
     if (mGodCom != null && mGodCom.getHostView() != null) {
+      mGodCom.getRealView().removeOnLayoutChangeListener(this);
       mGodCom.destroy();
       destroyView(mGodCom.getHostView());
       mGodCom = null;
