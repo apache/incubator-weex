@@ -40,7 +40,8 @@
     [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
     [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
-	[self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
+    [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
+    [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
