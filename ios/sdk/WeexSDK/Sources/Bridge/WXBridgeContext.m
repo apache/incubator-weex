@@ -25,6 +25,7 @@
 #import "WXSDKInstance_private.h"
 #import "WXThreadSafeMutableArray.h"
 #import "WXAppConfiguration.h"
+#import "WXInvocationConfig.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -152,8 +153,8 @@ _Pragma("clang diagnostic pop") \
     
     for (NSDictionary *task in tasks) {
         WXBridgeMethod *method = [[WXBridgeMethod alloc] initWihData:task];
-        method.instance = instance;
-        [[WXSDKManager moduleMgr] dispatchMethod:method];
+         method.instance = instance;
+        [[WXInvocationConfig sharedInstance] dispatchMethod:method];
     }
     
     NSMutableArray *sendQueue = [self.sendQueue valueForKey:instance];
