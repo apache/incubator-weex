@@ -296,7 +296,6 @@ class WXRenderStatement {
     }
 
     WXComponent rootComp = generateComponentTree(dom, null);
-    mRegistry.put(rootComp.getRef(), rootComp);
     return rootComp;
   }
 
@@ -358,6 +357,7 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
+
     parent.addChild(component, index);
     parent.createChildViewAt(index);
     component.applyLayoutAndEvent(component);
@@ -374,9 +374,8 @@ class WXRenderStatement {
     }
     WXVContainer parent = component.getParent();
     clearRegistryForComponent(component);
-    parent.remove(component);
+    parent.remove(component,true);
     mRegistry.remove(ref);
-    component.destroy();
     return component;
   }
 

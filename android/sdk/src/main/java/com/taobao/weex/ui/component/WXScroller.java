@@ -394,8 +394,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   @Override
-  public void remove(WXComponent child) {
-    super.remove(child);
+  public void remove(WXComponent child,boolean destory) {
+    super.remove(child,destory);
     if(child instanceof WXLoading){
       ((BaseBounceView)getHostView()).removeFooterView(child);
     }else if(child instanceof WXRefresh){

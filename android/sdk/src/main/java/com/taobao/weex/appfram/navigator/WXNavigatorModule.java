@@ -111,18 +111,23 @@
 package com.taobao.weex.appfram.navigator;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
+
 
 public class WXNavigatorModule extends WXModule {
 
@@ -276,5 +281,55 @@ public class WXNavigatorModule extends WXModule {
         }
 
         callback.invoke(MSG_FAILED);
+    }
+
+    @JSMethod
+    public void setNavBarHidden(String param, final String callback) {
+        String message = MSG_FAILED;
+        try {
+            JSONObject jsObj = JSON.parseObject(param);
+            int visibility = jsObj.getInteger(Constants.Name.NAV_BAR_VISIBILITY);
+            boolean success = changeVisibilityOfActionBar(mWXSDKInstance.getContext(), visibility);
+            if (success) {
+                message = MSG_SUCCESS;
+            }
+        } catch (JSONException e) {
+            WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+        }
+        WXBridgeManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, message);
+    }
+
+    private boolean changeVisibilityOfActionBar(Context context, int visibility) {
+        boolean result = false;
+        if (mWXSDKInstance.getContext() instanceof AppCompatActivity) {
+            android.support.v7.app.ActionBar actionbar = ((AppCompatActivity) mWXSDKInstance.getContext()).getSupportActionBar();
+            if (actionbar != null) {
+                switch (visibility) {
+                    case Constants.Value.NAV_BAR_HIDDEN:
+                        actionbar.hide();
+                        result = true;
+                        break;
+                    case Constants.Value.NAV_BAR_SHOWN:
+                        actionbar.show();
+                        result = true;
+                        break;
+                }
+            }
+        } else if (mWXSDKInstance.getContext() instanceof Activity) {
+            android.app.ActionBar actionbar = ((Activity) mWXSDKInstance.getContext()).getActionBar();
+            if (actionbar != null) {
+                switch (visibility) {
+                    case Constants.Value.NAV_BAR_HIDDEN:
+                        actionbar.hide();
+                        result = true;
+                        break;
+                    case Constants.Value.NAV_BAR_SHOWN:
+                        actionbar.show();
+                        result = true;
+                        break;
+                }
+            }
+        }
+        return result;
     }
 }

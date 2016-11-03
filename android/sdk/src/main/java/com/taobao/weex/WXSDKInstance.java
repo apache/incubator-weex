@@ -222,6 +222,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -230,6 +231,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
@@ -256,7 +258,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener {
+public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener {
 
   //Performance
   public boolean mEnd = false;
@@ -300,6 +302,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   public void setRenderContainer(RenderContainer a){
     if(a != null) {
       a.setSDKInstance(this);
+      a.addOnLayoutChangeListener(this);
     }
     mRenderContainer = a;
   }
@@ -463,6 +466,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
       mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
       mRenderContainer.setSDKInstance(this);
+      mRenderContainer.addOnLayoutChangeListener(this);
     }
   }
 
@@ -647,6 +651,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public WXRenderStrategy getRenderStrategy() {
     return mRenderStrategy;
+  }
+
+  @Override
+  public Context getUIContext() {
+    return mContext;
   }
 
   public String getInstanceId() {
@@ -924,6 +933,22 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
 
+  @Override
+  public final void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int
+      oldTop, int oldRight, int oldBottom) {
+    if (left != oldLeft || top != oldTop || right != oldRight || bottom != oldBottom) {
+      onLayoutChange(v);
+    }
+  }
+
+  /**
+   * Subclass should override this method to get notifications of layout change of GodView.
+   * @param godView the godView.
+   */
+  public void onLayoutChange(View godView) {
+
+  }
+
   private boolean mCreateInstance =true;
   public void firstScreenCreateInstanceTime(long time) {
     if(mCreateInstance) {
@@ -1014,6 +1039,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
         // Ensure that the viewgroup's status to be normal
         WXReflectionUtils.setValue(rootView, "mChildrenCount", 0);
 
+      }
+      if(rootView instanceof Destroyable){
+        ((Destroyable)rootView).destroy();
       }
     } catch (Exception e) {
       WXLogUtils.e("WXSDKInstance destroyView Exception: ", e);

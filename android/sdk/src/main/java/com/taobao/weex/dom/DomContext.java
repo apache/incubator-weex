@@ -202,34 +202,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.dom;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
+import android.content.Context;
 
 /**
- * All modules must extend this class
+ * Created by sospartan on 31/10/2016.
  */
-public abstract class WXModule implements IWXObject {
 
-  public static final String ACTION_ACTIVITY_RESULT = "actionActivityResult";
-  public static final String ACTION_REQUEST_PERMISSIONS_RESULT = "actionRequestPermissionsResult";
-  public static final String REQUEST_CODE = "requestCode";
-  public static final String RESULT_CODE = "resultCode";
-  public static final String PERMISSIONS = "permissions";
-  public static final String GRANT_RESULTS = "grantResults";
-
-
-  public WXSDKInstance mWXSDKInstance;
-
-
-  protected final WXComponent findComponent(String ref){
-    if(mWXSDKInstance != null && ref != null){
-      return WXSDKManager.getInstance()
-          .getWXRenderManager()
-          .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
-    }
-    return null;
-  }
+public interface DomContext {
+  Context getUIContext();
+  String getInstanceId();
 }

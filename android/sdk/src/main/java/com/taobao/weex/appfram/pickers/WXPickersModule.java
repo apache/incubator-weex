@@ -202,34 +202,53 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.appfram.pickers;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.ui.component.WXComponent;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
+
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXModuleAnno;
+
+import java.util.List;
 
 /**
- * All modules must extend this class
+ * Created by moxun on 16/10/27.
  */
-public abstract class WXModule implements IWXObject {
 
-  public static final String ACTION_ACTIVITY_RESULT = "actionActivityResult";
-  public static final String ACTION_REQUEST_PERMISSIONS_RESULT = "actionRequestPermissionsResult";
-  public static final String REQUEST_CODE = "requestCode";
-  public static final String RESULT_CODE = "resultCode";
-  public static final String PERMISSIONS = "permissions";
-  public static final String GRANT_RESULTS = "grantResults";
+public class WXPickersModule extends WXModule {
 
+    private int selected;
 
-  public WXSDKInstance mWXSDKInstance;
-
-
-  protected final WXComponent findComponent(String ref){
-    if(mWXSDKInstance != null && ref != null){
-      return WXSDKManager.getInstance()
-          .getWXRenderManager()
-          .getWXComponent(mWXSDKInstance.getInstanceId(), ref);
+    @WXModuleAnno
+    public void pick(List<String> items, int checked, JSCallback callback) {
+        performSinglePick(items, checked, callback);
     }
-    return null;
-  }
+
+    private void performSinglePick(List<String> items, int checked, final JSCallback callback) {
+        selected = checked;
+        new AlertDialog.Builder(mWXSDKInstance.getContext())
+                .setSingleChoiceItems(items.toArray(new String[items.size()]), checked, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selected = which;
+                    }
+                })
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //which == -1
+                        callback.invoke(selected);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //which == -2
+                        callback.invoke(-1);
+                    }
+                })
+                .show();
+    }
 }
