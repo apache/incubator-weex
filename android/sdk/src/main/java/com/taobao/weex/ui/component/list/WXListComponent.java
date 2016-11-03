@@ -851,7 +851,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                         if (component.getRealView() != null) {
                             return new ListBaseViewHolder(component, viewType);
                         } else {
-                            component.lazy(false);
+                            ((WXCell)component).lazy(false);
                             component.createView();
                             component.applyLayoutAndEvent(component);
                             return new ListBaseViewHolder(component, viewType);
@@ -1015,7 +1015,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
-            getInstance().fireEvent(getDomObject().getRef(), Constants.Event.LOADMORE);
+            fireEvent(Constants.Event.LOADMORE);
             mListCellCount = mChildren.size();
             mLoadMoreRetry = loadMoreRetry;
           }

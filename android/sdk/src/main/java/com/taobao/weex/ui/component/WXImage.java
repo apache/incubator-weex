@@ -218,6 +218,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
@@ -239,21 +240,20 @@ import java.util.Map;
 public class WXImage extends WXComponent<ImageView> {
 
   public static class Ceator implements ComponentCreator {
-
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXImage(instance, node, parent, lazy);
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        return new WXImage(instance,node,parent);
     }
   }
 
 
   @Deprecated
   public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+      this(instance,dom,parent);
   }
 
   public WXImage(WXSDKInstance instance, WXDomObject node,
-                 WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+                  WXVContainer parent) {
+      super(instance, node, parent);
   }
 
   @Override
@@ -346,10 +346,10 @@ public class WXImage extends WXComponent<ImageView> {
         if (!result && imageView != null) {
           imageView.setImageDrawable(null);
         }
-        if (getDomObject() != null && getDomObject().containsEvent(Constants.Event.ONLOAD)) {
+        if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
           Map<String, Object> params = new HashMap<>();
           params.put("success", result);
-          getInstance().fireEvent(getDomObject().getRef(), Constants.Event.ONLOAD, params);
+          fireEvent(Constants.Event.ONLOAD, params);
         }
       }
     });
@@ -369,7 +369,7 @@ public class WXImage extends WXComponent<ImageView> {
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
     WXImageView imageView;
-    WXDomObject imageDom;
+    ImmutableDomObject imageDom;
     if ((imageDom = getDomObject()) != null &&
         getHostView() instanceof WXImageView) {
       imageView = (WXImageView) getHostView();

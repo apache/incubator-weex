@@ -235,7 +235,7 @@ public class WXEmbedTest {
     WXEnvironment.sApplication = RuntimeEnvironment.application;
     WXDiv div = WXDivTest.create();
     ComponentTest.create(div);
-    component = new WXEmbed(div.getInstance(),new TestDomObject(),div,false);
+    component = new WXEmbed(div.getInstance(),new TestDomObject(),div);
     ComponentTest.create(component);
     component.getDomObject().getStyles().put(Constants.Name.VISIBILITY, Constants.Value.VISIBLE);
   }

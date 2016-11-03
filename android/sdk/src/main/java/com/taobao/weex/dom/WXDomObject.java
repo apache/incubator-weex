@@ -233,7 +233,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Actually, {@link com.taobao.weex.ui.component.WXComponent} hold references to
  * {@link android.view.View} and {@link WXDomObject}.
  */
-public class WXDomObject extends CSSNode implements Cloneable {
+public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject {
   public static final String CHILDREN = "children";
   public static final String TYPE = "type";
   public static final String TAG = WXDomObject.class.getSimpleName();
@@ -242,7 +242,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
   private AtomicBoolean sDestroy = new AtomicBoolean();
 
-  private WXSDKInstance mWXSDKInstance;
+  private DomContext mDomContext;
 
   /** package **/ String mRef = ROOT;
 
@@ -264,9 +264,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   private boolean mYoung = false;
 
-  private boolean isModifyHeight;
-  private boolean isModifyWidth;
-
   /** package **/ void traverseTree(Consumer...consumers){
     if (consumers == null) {
       return;
@@ -284,17 +281,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
   }
 
-  public boolean isModifyHeight() {
-    return isModifyHeight;
-  }
-
-  public void setModifyHeight(boolean isModifyHeight) {
-    this.isModifyHeight = isModifyHeight;
-  }
-
-  public boolean isModifyWidth() {
-    return isModifyWidth;
-  }
 
   public String getRef(){
     return mRef;
@@ -326,8 +312,8 @@ public class WXDomObject extends CSSNode implements Cloneable {
     return mEvents;
   }
 
-  public @Nullable WXSDKInstance getWXSDKInstance() {
-    return mWXSDKInstance;
+  public @NonNull DomContext getDomContext() {
+    return mDomContext;
   }
 
   public void clearEvents(){
@@ -347,23 +333,15 @@ public class WXDomObject extends CSSNode implements Cloneable {
     if (!domStyles.containsKey(Constants.Name.BACKGROUND_COLOR)) {
       style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
     }
-    //If there is height or width in JS, then that value will override value here.
-    if ( !domStyles.containsKey(Constants.Name.WIDTH)) {
-      style.put(Constants.Name.WIDTH, defaultWidth);
-      domObj.setModifyWidth(true);
-    }
-    if ( !domStyles.containsKey(Constants.Name.HEIGHT)) {
-      style.put(Constants.Name.HEIGHT, defaultHeight);
-      domObj.setModifyHeight(true);
-    }
+
+    style.put(Constants.Name.DEFAULT_WIDTH, defaultWidth);
+    style.put(Constants.Name.DEFAULT_HEIGHT, defaultHeight);
 
     domObj.updateStyle(style);
   }
 
   protected final void copyFields(WXDomObject dest) {
     dest.cssstyle.copy(this.cssstyle);
-    dest.setModifyHeight(isModifyHeight);
-    dest.setModifyWidth(isModifyWidth);
     dest.mRef = mRef;
     dest.mType = mType;
     dest.mStyles = mStyles == null ? null : mStyles.clone();//mStyles == null ? null : mStyles.clone();
@@ -409,10 +387,6 @@ public class WXDomObject extends CSSNode implements Cloneable {
 
   }
 
-
-  public void setModifyWidth(boolean isModifyWidth) {
-    this.isModifyWidth = isModifyWidth;
-  }
 
   /**
    * Do pre-staff before layout. Subclass may provide different implementation.
@@ -653,11 +627,13 @@ public class WXDomObject extends CSSNode implements Cloneable {
           case Constants.Name.MAX_HEIGHT:
             setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight()));
             break;
+          case Constants.Name.DEFAULT_HEIGHT:
           case Constants.Name.HEIGHT:
-            setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.getHeight()));
+            setStyleHeight(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.HEIGHT)?stylesMap.getHeight():stylesMap.getDefaultHeight()));
             break;
           case Constants.Name.WIDTH:
-            setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.getWidth()));
+          case Constants.Name.DEFAULT_WIDTH:
+            setStyleWidth(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.WIDTH)?stylesMap.getWidth():stylesMap.getDefaultWidth()));
             break;
           case Constants.Name.POSITION:
             setPositionType(stylesMap.getPosition());
@@ -751,7 +727,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
     }
     WXDomObject dom = null;
     try {
-      dom = new WXDomObject();
+      dom = WXDomObjectFactory.newInstance(mType);
       copyFields(dom);
     } catch (Exception e) {
       if (WXEnvironment.isApkDebugable()) {
@@ -780,6 +756,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
       }
       mDomChildren.clear();
     }
+    mDomContext = null;
   }
 
   /** package **/
@@ -822,7 +799,7 @@ public class WXDomObject extends CSSNode implements Cloneable {
         return null;
       }
       domObject.parseFromJson(json);
-      domObject.mWXSDKInstance=wxsdkInstance;
+      domObject.mDomContext = wxsdkInstance;
 
       Object children = json.get(CHILDREN);
       if (children != null && children instanceof JSONArray) {

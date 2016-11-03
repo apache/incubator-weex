@@ -249,7 +249,7 @@ public enum WXErrorCode {
   /**
    * Failure for executing JavaScript function.
    */
-  WX_ERR_JS_EXECUTE("-2013", "JS execute error!"),
+  WX_ERR_JS_EXECUTE("-2013", "JavaScript execute error!"),
 
   /*
    * domModule

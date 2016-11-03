@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.ui;
 
+import android.util.Pair;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.dom.WXDomObject;
@@ -212,13 +214,15 @@ import com.taobao.weex.ui.component.WXVContainer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sospartan on 8/26/16.
  */
 public class ExternalLoaderComponentHolder implements IFComponentHolder {
   public static final String TAG = "SimpleComponentHolder";
-  private Map<String, Invoker> mMethods;
+  private Map<String, Invoker> mPropertyInvokers;
+  private Map<String, Invoker> mMethodInvokers;
   private final IExternalComponentGetter mClzGetter;
   private final String mType;
   private Class mClass;
@@ -237,29 +241,49 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
     Class clz = mClzGetter.getExternalComponentClass(mType);
     mClass = clz;
 
-    mMethods = SimpleComponentHolder.getMethods(clz);
+
+    Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = SimpleComponentHolder.getMethods(clz);
+    mPropertyInvokers = methodPair.first;
+    mMethodInvokers = methodPair.second;
   }
 
 
 
   @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
     if(mClass == null){
       mClass = mClzGetter.getExternalComponentClass(mType);
     }
     ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
-    WXComponent component = creator.createInstance(instance,node,parent,lazy);
+    WXComponent component = creator.createInstance(instance,node,parent);
 
     component.bindHolder(this);
     return component;
   }
 
   @Override
-  public synchronized Invoker getMethod(String name){
-    if (mMethods == null) {
+  public synchronized Invoker getPropertyInvoker(String name){
+    if (mPropertyInvokers == null) {
       generate();
     }
 
-    return mMethods.get(name);
+    return mPropertyInvokers.get(name);
+  }
+
+  @Override
+  public Invoker getMethodInvoker(String name) {
+    if(mMethodInvokers == null){
+      generate();
+    }
+    return mMethodInvokers.get(name);
+  }
+
+  @Override
+  public String[] getMethods() {
+    if(mMethodInvokers == null){
+      generate();
+    }
+    Set<String> keys = mMethodInvokers.keySet();
+    return keys.toArray(new String[keys.size()]);
   }
 }

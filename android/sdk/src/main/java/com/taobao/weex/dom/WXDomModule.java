@@ -210,6 +210,7 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
@@ -218,6 +219,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 
 /**
@@ -253,12 +255,18 @@ public final class WXDomModule extends WXModule {
   public static final String WXDOM = "dom";
 
 
+  public static final String INVOKE_METHOD = "invokeMethod";
   /**
    * Methods expose to js. Every method which will be called in js should add to this array.
    */
   public static final String[] METHODS = {CREATE_BODY, UPDATE_ATTRS, UPDATE_STYLE,
       REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
-      REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_RECT};
+      REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_RECT,
+      INVOKE_METHOD};
+
+  public WXDomModule(WXSDKInstance instance){
+    mWXSDKInstance = instance;
+  }
 
   public void callDomMethod(JSONObject task) {
     if (task == null) {
@@ -347,6 +355,13 @@ public final class WXDomModule extends WXModule {
             return;
           }
           getComponentRect((String) args.get(0),(String) args.get(1));
+          break;
+        case INVOKE_METHOD:
+          if(args == null){
+            return;
+          }
+          invokeMethod((String) args.get(0),(String) args.get(1),(JSONArray) args.get(2));
+          break;
       }
 
     } catch (IndexOutOfBoundsException e) {
@@ -356,6 +371,31 @@ public final class WXDomModule extends WXModule {
     } catch (ClassCastException cce) {
       WXLogUtils.e("Dom module call arguments format error!!");
     }
+  }
+
+  /**
+   * invoke dom method
+   * @param ref
+   * @param method
+   * @param args
+   */
+  public void invokeMethod(String ref, String method, JSONArray args){
+    if(ref == null || method == null){
+      return;
+    }
+
+    Message msg = Message.obtain();
+    WXDomTask task = new WXDomTask();
+    task.instanceId = mWXSDKInstance.getInstanceId();
+    List<Object> msgArgs = new ArrayList<>();
+    msgArgs.add(ref);
+    msgArgs.add(method);
+    msgArgs.add(args);
+
+    task.args = msgArgs;
+    msg.what = WXDomHandler.MsgType.WX_DOM_INVOKE;
+    msg.obj = task;
+    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
   }
 
   /**

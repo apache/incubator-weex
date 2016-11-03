@@ -209,6 +209,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -524,7 +525,7 @@ class WXDomStatement {
       return;
     }
     domObject.old();
-    component.updateDom(domObject.clone());
+    component.updateDom(domObject);
     if (component instanceof WXVContainer) {
       WXVContainer container = (WXVContainer) component;
       int count = container.childCount();
@@ -532,6 +533,18 @@ class WXDomStatement {
         updateDomObj(container.getChild(i));
       }
     }
+  }
+
+  void invokeMethod(String ref, String method, JSONArray args){
+    if(mDestroy){
+      return;
+    }
+    WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId, ref);
+    if(comp == null){
+      WXLogUtils.e("DomStatement","target component not found.");
+      return;
+    }
+    comp.invoke(method,args);
   }
 
   /**
@@ -900,6 +913,10 @@ class WXDomStatement {
       return;
     }
     domObject.addEvent(type);
+    //sync dom change to component
+    AddDomInfo info = mAddDom.get(ref);
+    WXComponent component = info.component;
+    component.updateDom(domObject);
     mNormalTasks.add(new IWXRenderTask() {
 
       @Override
@@ -940,6 +957,10 @@ class WXDomStatement {
       return;
     }
     domObject.removeEvent(type);
+    //sync dom change to component
+    AddDomInfo info = mAddDom.get(ref);
+    WXComponent component = info.component;
+    component.updateDom(domObject);
     mNormalTasks.add(new IWXRenderTask() {
 
       @Override

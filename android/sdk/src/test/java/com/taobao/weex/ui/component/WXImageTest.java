@@ -162,7 +162,7 @@ public class WXImageTest {
     mDomObject = new TestDomObject();
     PowerMockito.when(Mockito.spy(mDomObject).clone()).thenReturn(mDomObject);
     mWXDiv = PowerMockito.mock(WXDiv.class);
-    mWXImage = new WXImage(mInstance, mDomObject, mWXDiv, true);
+    mWXImage = new WXImage(mInstance, mDomObject, mWXDiv);
 
   }
 
@@ -228,7 +228,7 @@ public class WXImageTest {
 
   @Test
   public void testSetSrc() throws Exception {
-    TestDomObject.setAttribute(mWXImage.getDomObject(),PowerMockito.mock(WXAttr.class));
+    TestDomObject.setAttribute((WXDomObject)mWXImage.getDomObject(),PowerMockito.mock(WXAttr.class));
     PowerMockito.when(mWXImage.getDomObject().getAttrs().getImageSharpen()).thenReturn(WXImageSharpen.SHARPEN);
     mWXImage.setSrc("");
 

@@ -247,14 +247,14 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   @Override
   public void onRefresh() {
     if (getDomObject().getEvents().contains(Constants.Event.ONREFRESH)) {
-      getInstance().fireEvent(getRef(), Constants.Event.ONREFRESH);
+      fireEvent(Constants.Event.ONREFRESH);
     }
   }
 
   @Override
   public int getLayoutTopOffsetForSibling() {
     //offset siblings
-    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getCSSLayoutHeight()) : 0;
+    return getParent() instanceof Scrollable ? -Math.round(getDomObject().getLayoutHeight()) : 0;
   }
 
   @Override
@@ -264,7 +264,7 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
       data.put("dy", dy);
       data.put("headerHeight", headerHeight);
       data.put("maxHeight", maxHeight);
-      getInstance().fireEvent(getRef(), Constants.Event.ONPULLING_DOWN, data);
+      fireEvent(Constants.Event.ONPULLING_DOWN, data);
     }
   }
 

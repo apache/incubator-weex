@@ -205,12 +205,16 @@
 package com.taobao.weex.common;
 
 public class Constants {
-  public interface Orientation{
+
+  public interface Orientation {
+
     int HORIZONTAL = 0;
     int VERTICAL = 1;
   }
 
   public interface Name {
+    String DEFAULT_WIDTH = "defaultWidth";
+    String DEFAULT_HEIGHT = "defaultHeight";
     String HREF = "href";
     String WIDTH = "width";
     String MIN_WIDTH = "minWidth";
@@ -277,13 +281,13 @@ public class Constants {
     String FONT_FAMILY = "fontFamily";
     String TEXT_OVERFLOW = "textOverflow";
     String ELLIPSIS = "ellipsis";
-    String LINE_HEIGHT ="lineHeight";
+    String LINE_HEIGHT = "lineHeight";
     String DISABLED = "disabled";
     String VALUE = "value";
     String IMAGE_QUALITY = "imageQuality";
     String QUALITY = "quality";
     String SRC = "src";
-    String PLACE_HOLDER ="placeHolder";
+    String PLACE_HOLDER = "placeHolder";
     String RESIZE_MODE = "resizeMode";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
@@ -300,7 +304,7 @@ public class Constants {
     String AUTOFOCUS = "autofocus";
     String SINGLELINE = "singleline";
     String MAX_LENGTH = "maxLength";
-    String MAXLENGTH ="maxlength";
+    String MAXLENGTH = "maxlength";
     String ROWS = "rows";
     String CHECKED = "checked";
     String VISIBILITY = "visibility";
@@ -320,10 +324,13 @@ public class Constants {
     String FONT_FACE = "fontFace";
     String MAX = "max";
     String MIN = "min";
+    String NAV_BAR_VISIBILITY = "hidden";
   }
 
   public interface Value {
 
+    int NAV_BAR_SHOWN = 0;
+    int NAV_BAR_HIDDEN = 1;
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
@@ -376,7 +383,8 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
   }
 
-  public interface Scheme{
+  public interface Scheme {
+
     String FILE = "file";
     String HTTPS = "https";
     String HTTP = "http";

@@ -226,8 +226,21 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     this(instance,dom,parent,isLazy);
   }
 
+  @Deprecated
   public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+    super(instance, node, parent);
+  }
+
+  public WXVContainer(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
+  }
+
+  @Override
+  protected void onHostViewInitialized(T host) {
+    super.onHostViewInitialized(host);
+    host.setFocusable(true);
+    host.setFocusableInTouchMode(true);
+    host.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
   }
 
   /**
@@ -283,15 +296,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
 
   @Override
-  public void lazy(boolean lazy) {
-    super.lazy(lazy);
-    int count = childCount();
-    for (int i = 0; i < count; i++) {
-      getChild(i).lazy(lazy);
-    }
-  }
-
-  @Override
   public void bindData(WXComponent component) {
     if(!isLazy()) {
       if (component == null) {
@@ -339,7 +343,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   @Override
   public void destroy() {
-    super.destroy();
     if (mChildren != null) {
       int count = mChildren.size();
       for (int i = 0; i < count; ++i) {
@@ -347,6 +350,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       }
       mChildren.clear();
     }
+    super.destroy();
   }
 
   @Override

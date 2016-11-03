@@ -346,11 +346,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   @Deprecated
   public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
+    this(instance,dom,parent);
   }
 
-  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
     mListener = new EmbedRenderListener(this);
 
     if(instance instanceof EmbedManager) {
@@ -490,7 +490,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootComponent();
       if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
+        comp.fireEvent(Constants.Event.VIEWAPPEAR);
     }
   }
 
@@ -500,7 +500,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     if(mIsVisible && mNestedInstance != null){
       WXComponent comp = mNestedInstance.getRootComponent();
       if(comp != null)
-        mNestedInstance.fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR,null, null);
+        comp.fireEvent(Constants.Event.VIEWDISAPPEAR);
     }
   }
 }

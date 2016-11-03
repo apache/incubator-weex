@@ -233,6 +233,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
 
+
   private @NonNull final Map<String,Object> map;
 
   public WXStyle(){
@@ -418,6 +419,10 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return WXUtils.getFloat(get(Constants.Name.WIDTH));
   }
 
+  public float getDefaultWidth() {
+    return WXUtils.getFloat(get(Constants.Name.DEFAULT_WIDTH));
+  }
+
   public float getMinWidth() {
     return WXUtils.getFloat(get(Constants.Name.MIN_WIDTH));
   }
@@ -428,6 +433,10 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public float getHeight() {
     return WXUtils.getFloat(get(Constants.Name.HEIGHT));
+  }
+
+  public float getDefaultHeight() {
+    return WXUtils.getFloat(get(Constants.Name.DEFAULT_HEIGHT));
   }
 
   public float getMinHeight() {

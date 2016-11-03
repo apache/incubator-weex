@@ -229,7 +229,7 @@ import static org.junit.Assert.*;
 public class WXSliderNeighborTest {
 
   public static WXSliderNeighbor create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXSliderNeighbor) new SimpleComponentHolder(WXSliderNeighbor.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create(), false);
+    return (WXSliderNeighbor) new SimpleComponentHolder(WXSliderNeighbor.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
   }
 
   WXSliderNeighbor component;

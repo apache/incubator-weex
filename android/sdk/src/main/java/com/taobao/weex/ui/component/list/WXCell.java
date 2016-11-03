@@ -228,6 +228,8 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
+    private boolean mLazy = true;
+
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -238,6 +240,14 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         super(instance, dom, parent,true );
     }
 
+    @Override
+    public boolean isLazy() {
+        return mLazy;
+    }
+
+    public void lazy(boolean lazy) {
+        mLazy = lazy;
+    }
 
     /**
      * If Cell is Sticky, need wraped FrameLayout
@@ -272,8 +282,8 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         getHostView().removeView(mHeadView);
         mRealView = (ViewGroup) mHeadView;
         mTempStickyView = new FrameLayout(getContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().csslayout.dimensions[CSSLayout.DIMENSION_WIDTH],
-                (int) getDomObject().csslayout.dimensions[CSSLayout.DIMENSION_HEIGHT]);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().getLayoutWidth(),
+                (int) getDomObject().getLayoutHeight());
         getHostView().addView(mTempStickyView, lp);
         mHeadView.setTranslationX(headerViewOffsetX);
         mHeadView.setTranslationY(headerViewOffsetY);

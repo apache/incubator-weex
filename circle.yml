@@ -7,7 +7,7 @@ test:
   override:
     #- npm run test
     - cd android/playground && ./gradlew assembleDebug
-    - cd android/sdk && ./gradlew clean testDebugUnitTest -PdisableCov=true
+    - cd android/sdk && ./gradlew clean testDebugUnitTest -PdisableCov=true -PtargetSDK=19
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS # playground artifacts
     - cp -r android/sdk/build/ $CIRCLE_ARTIFACTS/build

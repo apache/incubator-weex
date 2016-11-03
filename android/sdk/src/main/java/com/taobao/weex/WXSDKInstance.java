@@ -222,6 +222,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -230,6 +231,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
@@ -256,7 +258,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener {
+public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
 
   //Performance
   public boolean mEnd = false;
@@ -460,6 +462,7 @@ public class WXSDKInstance implements IWXActivityStateListener {
   private void ensureRenderArchor(){
     if(mRenderContainer == null){
       mRenderContainer = new RenderContainer(getContext());
+      mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
       mRenderContainer.setSDKInstance(this);
     }
@@ -646,6 +649,11 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
   public WXRenderStrategy getRenderStrategy() {
     return mRenderStrategy;
+  }
+
+  @Override
+  public Context getUIContext() {
+    return mContext;
   }
 
   public String getInstanceId() {
@@ -1014,6 +1022,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
         WXReflectionUtils.setValue(rootView, "mChildrenCount", 0);
 
       }
+      if(rootView instanceof Destroyable){
+        ((Destroyable)rootView).destroy();
+      }
     } catch (Exception e) {
       WXLogUtils.e("WXSDKInstance destroyView Exception: ", e);
     }
@@ -1119,12 +1130,12 @@ public class WXSDKInstance implements IWXActivityStateListener {
 
         JSONObject style = new JSONObject();
         WXComponent rootComponent = mRootComp;
-        if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyHeight()) {
-          style.put(Constants.Name.HEIGHT, realHeight);
+
+        if(rootComponent == null){
+          return;
         }
-        if (rootComponent != null && rootComponent.getDomObject() != null && rootComponent.getDomObject().isModifyWidth()) {
-          style.put(Constants.Name.WIDTH, realWidth);
-        }
+        style.put(Constants.Name.DEFAULT_WIDTH, realWidth);
+        style.put(Constants.Name.DEFAULT_HEIGHT, realHeight);
         updateRootComponentStyle(style);
       }
     }
@@ -1187,6 +1198,10 @@ public class WXSDKInstance implements IWXActivityStateListener {
       return;
     }
     mGlobalEvents.remove(eventName);
+  }
+
+  public WXPerformance getWXPerformance(){
+    return mWXPerformance;
   }
 
     /**

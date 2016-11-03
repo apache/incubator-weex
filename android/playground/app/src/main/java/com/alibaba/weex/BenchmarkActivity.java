@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,200 +202,149 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
 
-import android.util.Pair;
+package com.alibaba.weex;
 
+import android.os.Bundle;
+import android.support.test.espresso.idling.CountingIdlingResource;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import com.alibaba.weex.commons.adapter.ImageAdapter;
+import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.MethodInvoker;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXComponentProp;
-import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.common.WXRenderStrategy;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * Created by sospartan on 6/12/16.
- */
-public class SimpleComponentHolder implements IFComponentHolder{
-  public static final String TAG = "SimpleComponentHolder";
-  private final Class<? extends WXComponent> mClz;
-  private Map<String, Invoker> mPropertyInvokers;
-  private Map<String, Invoker> mMethodInvokers;
-  private ComponentCreator mCreator;
+public class BenchmarkActivity extends AppCompatActivity implements IWXRenderListener {
 
-  static class ClazzComponentCreator implements ComponentCreator{
+  public final static String ROOT = "root";
+  private final static String TAG = "WEEX";
+  private final static String URL =
+      "http://h5.waptest.taobao.com/app/weextc031/build/TC_Monitor_List_WithAppendTree.js";
+  private WXSDKInstance mInstance;
+  private LinearLayout root;
+  public static CountingIdlingResource countingIdlingResource;
 
-    private Constructor<? extends WXComponent> mConstructor;
-    private final Class<? extends WXComponent> mCompClz;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    root = new LinearLayout(this);
+    root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                    ViewGroup.LayoutParams.MATCH_PARENT));
+    root.setOrientation(LinearLayout.VERTICAL);
+    root.setContentDescription(ROOT);
+    setContentView(root);
+    WXEnvironment.isPerf = true;
+    WXSDKEngine.addCustomOptions("appName", "WXSample");
+    WXSDKEngine.addCustomOptions("appGroup", "WXApp");
+    WXSDKEngine.initialize(getApplication(),
+                           new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build());
+  }
 
-    ClazzComponentCreator(Class<? extends WXComponent> c){
-      mCompClz = c;
+  @Override
+  public void onStart() {
+    super.onStart();
+    if (mInstance != null) {
+      mInstance.onActivityStart();
     }
+  }
 
-    private void loadConstructor(){
-      Class<? extends WXComponent> c = mCompClz;
-      Constructor<? extends WXComponent> constructor;
-      try {
-        constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class);
-      } catch (NoSuchMethodException e) {
-        WXLogUtils.d("ClazzComponentCreator","Use deprecated component constructor");
-        try {
-          //compatible deprecated constructor with 4 args
-          constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class, boolean.class);
-        } catch (NoSuchMethodException e1) {
-          try {
-            //compatible deprecated constructor with 5 args
-            constructor = c.getConstructor(WXSDKInstance.class, WXDomObject.class, WXVContainer.class,String.class, boolean.class);
-          } catch (NoSuchMethodException e2) {
-            throw new WXRuntimeException("Can't find constructor of component.");
-          }
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (mInstance != null) {
+      mInstance.onActivityResume();
+    }
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    if (mInstance != null) {
+      mInstance.onActivityPause();
+    }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    if (mInstance != null) {
+      mInstance.onActivityStop();
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    if (mInstance != null) {
+      mInstance.onActivityDestroy();
+    }
+  }
+
+  @Override
+  public void onViewCreated(WXSDKInstance instance, View view) {
+    if (root != null) {
+      root.removeAllViews();
+      root.addView(view);
+    }
+  }
+
+  @Override
+  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+    if (countingIdlingResource != null) {
+      countingIdlingResource.decrement();
+    }
+  }
+
+  @Override
+  public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
+
+  }
+
+  @Override
+  public void onException(WXSDKInstance instance, String errCode, String msg) {
+
+  }
+
+  public WXSDKInstance getWXInstance() {
+    return mInstance;
+  }
+
+  public void loadWeexPage() {
+    loadWeexPage(URL);
+  }
+
+  public void loadWeexPage(final String url) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (mInstance != null) {
+          mInstance.destroy();
         }
-      }
-      mConstructor = constructor;
-    }
-
-    @Override
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      if(mConstructor == null){
-        loadConstructor();
-      }
-      int parameters = mConstructor.getParameterTypes().length;
-      WXComponent component;
-
-      if(parameters == 3){
-        component =  mConstructor.newInstance(instance,node,parent);
-      }else if(parameters == 4){
-        component =  mConstructor.newInstance(instance,node,parent,false);
-      }else{
-        //compatible deprecated constructor
-        component =  mConstructor.newInstance(instance,node,parent,instance.getInstanceId(),parent.isLazy());
-      }
-      return component;
-    }
-  }
-
-  public SimpleComponentHolder(Class<? extends WXComponent> clz) {
-    this(clz,new ClazzComponentCreator(clz));
-  }
-
-  public SimpleComponentHolder(Class<? extends WXComponent> clz,ComponentCreator customCreator) {
-    this.mClz = clz;
-    this.mCreator = customCreator;
-  }
-
-  @Override
-  public void loadIfNonLazy() {
-    Annotation[] annotations = mClz.getDeclaredAnnotations();
-    for (Annotation annotation :
-      annotations) {
-      if (annotation instanceof Component){
-        if(!((Component) annotation).lazyload() && mMethodInvokers == null){
-          generate();
+        mInstance = new WXSDKInstance(BenchmarkActivity.this);
+        Map<String, Object> options = new HashMap<>();
+        options.put(WXSDKInstance.BUNDLE_URL, url);
+        mInstance.registerRenderListener(BenchmarkActivity.this);
+        if (countingIdlingResource != null) {
+          countingIdlingResource.increment();
         }
-        return;
+        mInstance.renderByUrl(
+            TAG,
+            url,
+            options,
+            null,
+            root.getWidth(),
+            root.getHeight(),
+            WXRenderStrategy.APPEND_ASYNC);
       }
-    }
+    });
   }
-
-  private synchronized void generate(){
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "Generate Component:" + mClz.getSimpleName());
-    }
-
-    Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = getMethods(mClz);
-    mPropertyInvokers = methodPair.first;
-    mMethodInvokers = methodPair.second;
-  }
-
-  static Pair<Map<String,Invoker>,Map<String,Invoker>> getMethods(Class clz){
-    Map<String, Invoker> methods = new HashMap<>();
-    Map<String, Invoker> mInvokers = new HashMap<>();
-
-    Annotation[] annotations;
-    Annotation anno;
-    try {
-      for (Method method : clz.getMethods()) {
-        try {
-          annotations = method.getDeclaredAnnotations();
-          for (int i = 0, annotationsCount = annotations.length;
-               i < annotationsCount; ++i) {
-            anno = annotations[i];
-            if(anno == null){
-              continue;
-            }
-            if (anno instanceof WXComponentProp) {
-              String name = ((WXComponentProp) anno).name();
-              methods.put(name, new MethodInvoker(method,true));
-              break;
-            }else if(anno instanceof JSMethod){
-              JSMethod methodAnno = (JSMethod)anno;
-              String name = methodAnno.alias();
-              if(JSMethod.NOT_SET.equals(name)){
-                name = method.getName();
-              }
-              mInvokers.put(name, new MethodInvoker(method,methodAnno.uiThread()));
-              break;
-            }
-          }
-        } catch (ArrayIndexOutOfBoundsException | IncompatibleClassChangeError e) {
-          //ignore: getDeclaredAnnotations may throw this
-        }
-      }
-    }catch (IndexOutOfBoundsException e){
-      e.printStackTrace();
-      //ignore: getMethods may throw this
-    }
-    return new Pair<>(methods,mInvokers);
-  }
-
-
-
-  @Override
-  public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    WXComponent component = mCreator.createInstance(instance,node,parent);
-
-    component.bindHolder(this);
-    return component;
-  }
-
-  @Override
-  public synchronized Invoker getPropertyInvoker(String name){
-      if (mPropertyInvokers == null) {
-        generate();
-      }
-
-    return mPropertyInvokers.get(name);
-  }
-
-  @Override
-  public Invoker getMethodInvoker(String name) {
-    if(mMethodInvokers == null){
-      generate();
-    }
-    return mMethodInvokers.get(name);
-  }
-
-  @Override
-  public String[] getMethods() {
-    if(mMethodInvokers == null){
-      generate();
-    }
-    Set<String> keys = mMethodInvokers.keySet();
-    return keys.toArray(new String[keys.size()]);
-  }
-
 }

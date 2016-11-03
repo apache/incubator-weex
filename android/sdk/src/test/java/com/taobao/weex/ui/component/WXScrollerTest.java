@@ -231,7 +231,7 @@ public class WXScrollerTest {
   public static WXScroller create(){
     WXDiv div = WXDivTest.create();
     ComponentTest.create(div);
-    WXScroller component = new WXScroller(WXSDKInstanceTest.createInstance(),new WXScrollerDomObject(),div,false);
+    WXScroller component = new WXScroller(WXSDKInstanceTest.createInstance(),new WXScrollerDomObject(),div);
     div.addChild(component);
     return component;
   }
