@@ -233,7 +233,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
     this(true);
   }
 
-  private WXCirclePageAdapter(boolean needLoop) {
+  public WXCirclePageAdapter(boolean needLoop) {
     super();
     this.needLoop = needLoop;
   }
@@ -338,7 +338,11 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   public int getRealPosition(int shadowPosition) {
-    return getItemPosition(shadow.get(shadowPosition));
+    if (shadowPosition < 0 || shadowPosition >= shadow.size()) {
+      return -1;
+    } else {
+      return getItemPosition(shadow.get(shadowPosition));
+    }
   }
 
   public int getFirst() {

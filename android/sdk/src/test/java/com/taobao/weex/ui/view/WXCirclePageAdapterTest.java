@@ -280,4 +280,14 @@ public class WXCirclePageAdapterTest {
     assertEquals(adapter.getRealCount(),3);
     
   }
+
+  @Test
+  public void testGetRealPosition() throws Exception {
+    testAddPageView();
+    assertEquals(adapter.getRealPosition(0), adapter.getRealCount() - 1);
+    assertEquals(adapter.getRealPosition(1), 0);
+    assertEquals(adapter.getRealPosition(adapter.getRealCount() + 1), 0);
+    assertEquals(adapter.getRealPosition(100), -1);
+    assertEquals(adapter.getRealPosition(-1), -1);
+  }
 }
