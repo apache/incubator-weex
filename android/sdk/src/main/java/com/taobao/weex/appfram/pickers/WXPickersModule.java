@@ -202,92 +202,53 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view;
+package com.taobao.weex.appfram.pickers;
 
-import android.app.Activity;
-import android.support.v4.view.ViewPager;
-import android.view.View;
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.TestActivity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.annotation.Config;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 
-import static org.junit.Assert.*;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.common.WXModule;
+import com.taobao.weex.common.WXModuleAnno;
+
+import java.util.List;
 
 /**
- * Created by sospartan on 9/7/16.
+ * Created by moxun on 16/10/27.
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
-public class WXCirclePageAdapterTest {
 
-  WXCirclePageAdapter adapter;
-  View child;
+public class WXPickersModule extends WXModule {
 
-  @Before
-  public void setUp() throws Exception {
-    adapter = new WXCirclePageAdapter();
-  }
+    private int selected;
 
-  @After
-  public void tearDown() throws Exception {
-  }
+    @WXModuleAnno
+    public void pick(List<String> items, int checked, JSCallback callback) {
+        performSinglePick(items, checked, callback);
+    }
 
-  @Test
-  public void testAddPageView() throws Exception {
-    Activity activity = Robolectric.setupActivity(TestActivity.class);
-    child = new View(activity);
-    adapter.addPageView(child);
-    child = new View(activity);
-    adapter.addPageView(child);
-    child = new View(activity);
-    adapter.addPageView(child);
-
-    assertEquals(adapter.getRealCount(),3);
-  }
-
-  @Test
-  public void testRemovePageView() throws Exception {
-    testAddPageView();
-    adapter.removePageView(child);
-    assertEquals(adapter.getRealCount(),2);
-  }
-
-
-  @Test
-  public void testInstantiateItem() throws Exception {
-    testAddPageView();
-    ViewPager viewPager = new ViewPager(child.getContext());
-    viewPager.setAdapter(adapter);
-    Object obj = adapter.instantiateItem(viewPager,adapter.getRealCount());
-    assertEquals(child,obj);
-  }
-
-  @Test
-  public void testReplacePageView() throws Exception {
-    testAddPageView();
-    View relace = new View(child.getContext());
-
-    adapter.replacePageView(child,relace);
-
-    assertEquals(adapter.getRealCount(),3);
-    
-  }
-
-  @Test
-  public void testGetRealPosition() throws Exception {
-    testAddPageView();
-    assertEquals(adapter.getRealPosition(0), adapter.getRealCount() - 1);
-    assertEquals(adapter.getRealPosition(1), 0);
-    assertEquals(adapter.getRealPosition(adapter.getRealCount() + 1), 0);
-    assertEquals(adapter.getRealPosition(100), -1);
-    assertEquals(adapter.getRealPosition(-1), -1);
-  }
+    private void performSinglePick(List<String> items, int checked, final JSCallback callback) {
+        selected = checked;
+        new AlertDialog.Builder(mWXSDKInstance.getContext())
+                .setSingleChoiceItems(items.toArray(new String[items.size()]), checked, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selected = which;
+                    }
+                })
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //which == -1
+                        callback.invoke(selected);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //which == -2
+                        callback.invoke(-1);
+                    }
+                })
+                .show();
+    }
 }

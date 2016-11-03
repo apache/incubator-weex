@@ -258,7 +258,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Each instance of WXSDKInstance represents an running weex instance.
  * It can be a pure weex view, or mixed with native view
  */
-public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
+public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.OnLayoutChangeListener {
 
   //Performance
   public boolean mEnd = false;
@@ -302,6 +302,7 @@ public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
   public void setRenderContainer(RenderContainer a){
     if(a != null) {
       a.setSDKInstance(this);
+      a.addOnLayoutChangeListener(this);
     }
     mRenderContainer = a;
   }
@@ -465,6 +466,7 @@ public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
       mRenderContainer.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       mRenderContainer.setBackgroundColor(Color.TRANSPARENT);
       mRenderContainer.setSDKInstance(this);
+      mRenderContainer.addOnLayoutChangeListener(this);
     }
   }
 
@@ -930,6 +932,22 @@ public class WXSDKInstance implements IWXActivityStateListener ,DomContext{
     }
   }
 
+
+  @Override
+  public final void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int
+      oldTop, int oldRight, int oldBottom) {
+    if (left != oldLeft || top != oldTop || right != oldRight || bottom != oldBottom) {
+      onLayoutChange(v);
+    }
+  }
+
+  /**
+   * Subclass should override this method to get notifications of layout change of GodView.
+   * @param godView the godView.
+   */
+  public void onLayoutChange(View godView) {
+
+  }
 
   private boolean mCreateInstance =true;
   public void firstScreenCreateInstanceTime(long time) {
