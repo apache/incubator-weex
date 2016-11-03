@@ -12,7 +12,6 @@
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
-
 /**
  * The following variables and methods are used in Weex INTERNAL logic.
  * @warning These variables and methods must never be called or overridden.

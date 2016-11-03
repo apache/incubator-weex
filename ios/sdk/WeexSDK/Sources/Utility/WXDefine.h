@@ -71,6 +71,15 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_FONT_DOWNLOAD_DIR [[WXUtility cacheDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"wxdownload"]]
 
 /**
+ *  @abstract export public method
+ */
+
+#define WX_EXPORT_METHOD(method) \
++ (NSString *)WX_CONCAT_WRAPPER(wx_export_method_, __LINE__) { \
+return NSStringFromSelector(method); \
+}
+
+/**
  *  @abstract Compared with system version of current device 
  *  
  *  @return YES if greater than or equal to the system verison, otherwise, NO.
