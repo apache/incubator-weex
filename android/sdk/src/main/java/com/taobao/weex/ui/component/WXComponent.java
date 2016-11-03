@@ -268,12 +268,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
               }
             }
           }),0);
+        }else{
+          invoker.invoke(this,params);
         }
 
       } catch (Exception e) {
         WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
       }
+    }else{
+      onInvokeUnknownMethod(method,args);
     }
+  }
+
+  /**
+   * Will be invoked when request method not found.
+   * Subclass should override this method, If you return hard-code method list in {@link IFComponentHolder#getMethods()}
+   * @param method
+   * @param args
+   */
+  protected void onInvokeUnknownMethod(String method, JSONArray args){
+
   }
 
   interface OnClickListener{
