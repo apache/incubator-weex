@@ -229,7 +229,6 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXFileUtils;
@@ -245,12 +244,9 @@ import com.taobao.weex.utils.batch.Interceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IllegalFormatException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.UnknownFormatConversionException;
 
 /**
  * Manager class for communication between JavaScript and Android.
@@ -788,7 +784,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       performance.args = instance.getBundleUrl();
       WXLogUtils.e("wx_monitor",performance.toString());
     }
-    adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, null);
+    adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, instance.getUserTrackParams());
   }
 
   public void commitJSFrameworkAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {
