@@ -338,7 +338,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   public int getRealPosition(int shadowPosition) {
-    return getItemPosition(shadow.get(shadowPosition));
+    return getItemPosition(shadowPosition>=shadow.size()-1 ? -1 : shadow.get(shadowPosition));
   }
 
   public int getFirst() {
