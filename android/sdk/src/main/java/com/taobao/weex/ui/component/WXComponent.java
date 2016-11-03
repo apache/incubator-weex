@@ -258,7 +258,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
               }
             });
         if(invoker.isRunInUIThread()){
-          WXSDKManager.getInstance().postOnUiThread(WXThread.secure(new Runnable() {
+          WXSDKManager.getInstance().postOnUiThread(new Runnable() {
             @Override
             public void run() {
               try {
@@ -267,7 +267,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
                 throw new RuntimeException(e);
               }
             }
-          }),0);
+          },0);
         }else{
           invoker.invoke(this,params);
         }
