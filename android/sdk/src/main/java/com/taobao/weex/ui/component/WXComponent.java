@@ -317,6 +317,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
+    onCreate();
+  }
+
+  protected void onCreate(){
+
   }
 
   public void bindHolder(IFComponentHolder holder){
@@ -556,6 +561,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mPreRealHeight = realHeight;
     mPreRealLeft = realLeft;
     mPreRealTop = realTop;
+
+    onFinishLayout();
+  }
+
+  /**
+   * After component's layout result is apply to view. May be invoke multiple times since
+   * DOM can be changed in js runtime.
+   */
+  protected void onFinishLayout(){
+
   }
 
   public void setPadding(Spacing padding, Spacing border) {
@@ -870,6 +885,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost = initComponentHostView(mContext);
   }
 
+
+  /**
+   * Create corresponding view for this component.
+   * @param context
+   * @return
+   */
   protected T initComponentHostView(@NonNull Context context){
     /**
      * compatible old initView
