@@ -2,6 +2,11 @@
  * @fileOverview The api for invoking with "$" prefix
  */
 import { extend, typof } from '../util'
+import config from '../config'
+
+const {
+  nativeComponentMap
+} = config
 
 /**
  * ==========================================================
@@ -24,6 +29,25 @@ export function $ (id) {
   }
 }
 
+function addComponentMethods (app, el) {
+  if (el && el.type) {
+    const component = nativeComponentMap[el.type]
+    if (component && component.methods) {
+      component.methods.forEach((method) => {
+        el[method] = (...args) => {
+          app.callTasks({
+            component: component.type,
+            ref: el.ref,
+            method: method,
+            args: args
+          })
+        }
+      })
+    }
+  }
+  return el
+}
+
 /**
  * find the element by id
  * Note: there is only one id in whole component
@@ -33,7 +57,7 @@ export function $ (id) {
 export function $el (id) {
   const info = this._ids[id]
   if (info) {
-    return info.el
+    return addComponentMethods(info.vm._app || {}, info.el)
   }
 }
 
