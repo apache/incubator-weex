@@ -21,6 +21,7 @@ import com.alibaba.weex.constants.Constants;
 import com.taobao.weex.devtools.inspector.elements.ObjectDescriptor;
 import com.taobao.weex.ui.view.WXTextView;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +72,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         launchActivityWithIntent("com.alibaba.weex", WXPageActivity.class, intent);
         waTestPageActivity = getActivity();
         Log.e(TAG, "activity1=" + waTestPageActivity.toString());
-        Thread.sleep(2000);
+        Thread.sleep(3000);
 
         mViewGroup = (ViewGroup) waTestPageActivity.findViewById(R.id.container);
         setViewGroup(mViewGroup);
@@ -80,7 +81,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
 //        addAllTargetView("AG_");
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
     }
 
     /**
@@ -110,15 +111,21 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 final WXTextView inputView = (WXTextView) caseView;
 
                 // handle if the view is INVISIBLE then scrollToBottom
-                int maxStep = 16;
+                int maxStep = 10;
                 int scrollCount = 0;
                 if(inputView.getVisibility() == View.INVISIBLE){
                     while(scrollCount <maxStep){
-
                         TouchUtils.dragQuarterScreenUp(this, this.getActivity());
                         sleep(1000);
                         scrollCount ++;
-
+                    }
+                }
+                int topCount = 10;
+                if(inputView.getVisibility() == View.INVISIBLE){
+                    while(topCount>0){
+                        TouchUtils.dragQuarterScreenDown(this, this.getActivity());
+                        sleep(1000);
+                        topCount--;
                     }
                 }
 
@@ -163,7 +170,19 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                         sleep(1000);
                         findCount ++ ;
 
-                    }else{
+                    }else {
+                            while(topCount>0){
+                                if(inputListView.size() == 0){
+                                    TouchUtils.dragQuarterScreenDown(this, this.getActivity());
+                                    sleep(1000);
+                                    myGroup = (ViewGroup) (activity2.findViewById(R.id.container));
+                                    inputListView = ViewUtil.findViewWithText(myGroup,
+                                            childCaseName);
+                                    sleep(1000);
+                                }
+                                topCount --;
+                            }
+                        assertNotSame("Assert Case Found!!",0 ,inputListView.size());
                         break;
                     }
                 }
@@ -215,6 +234,14 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                 break;
             }
         }
+
+    }
+
+
+    public void afterTest(ArrayList viewList){
+        Log.e(TAG,"===do test after===");
+        sleep(2000);
+
     }
 
     public void testStep(Object testStepkey,  Object testStepValue) {
@@ -263,7 +290,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
         ViewGroup myGroup = (ViewGroup) (activity2.findViewById(R.id.container));
         ArrayList<View> inputListView11 = new ArrayList<View>();
-        sleep(1000);
+        sleep(2000);
 
         inputListView11 = ViewUtil.getAllChildViews(myGroup);
 
