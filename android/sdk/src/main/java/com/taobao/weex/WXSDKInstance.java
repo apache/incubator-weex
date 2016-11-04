@@ -750,6 +750,8 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
   public void onRenderSuccess(final int width, final int height) {
+    firstScreenRenderFinished();
+
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
     WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
@@ -858,6 +860,9 @@ public class WXSDKInstance implements IWXActivityStateListener {
   }
 
   public void firstScreenRenderFinished() {
+    if(mEnd == true)
+       return;
+
     mEnd = true;
     mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
