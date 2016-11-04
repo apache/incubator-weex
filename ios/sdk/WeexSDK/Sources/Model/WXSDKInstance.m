@@ -102,7 +102,7 @@ NSTimeInterval JSLibInitTime = 0;
             NSString *path = [url path];
             NSData *scriptData = [[NSFileManager defaultManager] contentsAtPath:path];
             NSString *script = [[NSString alloc] initWithData:scriptData encoding:NSUTF8StringEncoding];
-            if (!script) {
+            if (!script || script.length <= 0) {
                 NSString *errorDesc = [NSString stringWithFormat:@"File read error at url: %@", url];
                 WXLogError(@"%@", errorDesc);
                 if (weakSelf.onFailed) {
