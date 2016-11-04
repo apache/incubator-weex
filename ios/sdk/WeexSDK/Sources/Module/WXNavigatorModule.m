@@ -78,7 +78,7 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
     NSMutableDictionary* cbkDat = [NSMutableDictionary new];
     [cbkDat setObject:@false forKey:MSG_SUCCESS];
     
-    if ([[NSArray arrayWithObjects:@"0",@"1",@1,@2, nil] containsObject:param[@"hidden"]]) {
+    if ([[NSArray arrayWithObjects:@"0",@"1",@1,@0, nil] containsObject:param[@"hidden"]]) {
         
         id<WXNavigationProtocol> navigator = [self navigator];
         [navigator setNavigationBarHidden:[param[@"hidden"] boolValue] animated:[param[@"animated"] boolValue] withContainer:self.weexInstance.viewController];
