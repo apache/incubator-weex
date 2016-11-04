@@ -225,6 +225,7 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -381,7 +382,7 @@ class WXRenderStatement {
       return;
     }
     parent.addChild(component, index);
-    component.lazy(parent.isLazy());
+    component.syncLazy();
     component.createView(parent, index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);

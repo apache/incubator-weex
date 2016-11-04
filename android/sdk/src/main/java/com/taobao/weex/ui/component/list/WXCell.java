@@ -257,6 +257,11 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     }
 
     @Override
+    public void syncLazy() {
+        //Do nothing,cell not sync lazy from parent.
+    }
+
+    @Override
     public ViewGroup getRealView() {
         return mRealView;
     }

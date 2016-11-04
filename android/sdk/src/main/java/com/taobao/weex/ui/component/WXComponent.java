@@ -285,6 +285,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mLazy;
   }
 
+  public void syncLazy(){
+    if(mParent != null){
+      lazy(mParent.isLazy());
+    }
+  }
+
   public void lazy(boolean lazy) {
     mLazy = lazy;
   }
