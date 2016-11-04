@@ -674,7 +674,7 @@ class WXDomStatement {
    * @param parentRef Reference of the new parent DOM node
    * @param index the index of the dom to be inserted in the new parent.
    */
-  void moveDom(final String ref, final String parentRef, final int index) {
+  void moveDom(final String ref, final String parentRef, int index) {
     if (mDestroy) {
       return;
     }
@@ -688,17 +688,23 @@ class WXDomStatement {
       }
       return;
     }
-    if (domObject.parent.equals(parentObject) && parentObject.index(domObject) == index) {
-      return;
+    if (domObject.parent.equals(parentObject)) {
+      if(parentObject.index(domObject) == index) {
+        return;
+      } else if(domObject.parent.index(domObject)<index){
+        index = index -1;
+      }
     }
+
+    final int newIndex = index;
     domObject.parent.remove(domObject);
-    parentObject.add(domObject, index);
+    parentObject.add(domObject, newIndex);
 
     mNormalTasks.add(new IWXRenderTask() {
 
       @Override
       public void execute() {
-        mWXRenderManager.moveComponent(mInstanceId, ref, parentRef, index);
+        mWXRenderManager.moveComponent(mInstanceId, ref, parentRef, newIndex);
       }
 
       @Override

@@ -785,7 +785,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       performance.args = instance.getBundleUrl();
       WXLogUtils.e("wx_monitor",performance.toString());
     }
-    adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, null);
+    adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, instance.getUserTrackParams());
   }
 
   public void commitJSFrameworkAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {

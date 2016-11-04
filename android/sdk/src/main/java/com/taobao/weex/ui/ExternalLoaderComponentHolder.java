@@ -237,14 +237,19 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   public void loadIfNonLazy() {
   }
 
-  private synchronized void generate(){
+  private synchronized boolean generate(){
     Class clz = mClzGetter.getExternalComponentClass(mType);
+    if(clz == null){
+      //external loader may return null,skip
+      return false;
+    }
     mClass = clz;
 
 
     Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = SimpleComponentHolder.getMethods(clz);
     mPropertyInvokers = methodPair.first;
     mMethodInvokers = methodPair.second;
+    return true;
   }
 
 
@@ -263,8 +268,8 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
 
   @Override
   public synchronized Invoker getPropertyInvoker(String name){
-    if (mPropertyInvokers == null) {
-      generate();
+    if (mPropertyInvokers == null && !generate()) {
+      return null;
     }
 
     return mPropertyInvokers.get(name);
@@ -272,16 +277,17 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
 
   @Override
   public Invoker getMethodInvoker(String name) {
-    if(mMethodInvokers == null){
-      generate();
+    if(mMethodInvokers == null && !generate()){
+      return null;
     }
     return mMethodInvokers.get(name);
   }
 
   @Override
   public String[] getMethods() {
-    if(mMethodInvokers == null){
-      generate();
+    if(mMethodInvokers == null && !generate()){
+      //generate failed
+      return new String[0];
     }
     Set<String> keys = mMethodInvokers.keySet();
     return keys.toArray(new String[keys.size()]);

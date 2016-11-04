@@ -341,7 +341,7 @@ public class WXModuleManager {
             try {
               invoker.invoke(wxModule, params);
             } catch (Exception e) {
-              WXLogUtils.e("callModuleMethod >>> invoke module:", e);
+              throw new RuntimeException(e);
             }
           }
         }, 0);
