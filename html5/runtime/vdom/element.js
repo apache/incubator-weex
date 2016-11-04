@@ -51,6 +51,7 @@ Object.assign(Element.prototype, {
     if (node.parentNode && node.parentNode !== this) {
       return
     }
+    /* istanbul ignore else */
     if (!node.parentNode) {
       linkParent(node, this)
       insertIndex(node, this.children, this.children.length, true)
@@ -146,6 +147,7 @@ Object.assign(Element.prototype, {
     if (!node.parentNode) {
       linkParent(node, this)
       insertIndex(node, this.children, this.children.indexOf(after) + 1, true)
+      /* istanbul ignore else */
       if (this.docId) {
         registerNode(this.docId, node)
       }
@@ -156,6 +158,7 @@ Object.assign(Element.prototype, {
           this.pureChildren.indexOf(previousElement(after)) + 1
         )
         const listener = getListener(this.docId)
+        /* istanbul ignore else */
         if (listener) {
           return listener.addElement(node, this.ref, index)
         }
@@ -203,6 +206,7 @@ Object.assign(Element.prototype, {
    */
   clear () {
     const listener = getListener(this.docId)
+    /* istanbul ignore else */
     if (listener) {
       this.pureChildren.forEach(node => {
         listener.removeElement(node.ref)
