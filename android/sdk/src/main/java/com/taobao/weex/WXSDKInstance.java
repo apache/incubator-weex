@@ -247,10 +247,12 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -274,6 +276,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private NestedInstanceInterceptor mNestedInstanceInterceptor;
   private String mBundleUrl = "";
   private boolean isDestroy=false;
+  private Map<String,Serializable> mUserTrackParams;
 
   /**
    * Render strategy.
@@ -842,6 +845,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void onRenderSuccess(final int width, final int height) {
+    firstScreenRenderFinished();
+
     long time = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("onRenderSuccess", time);
     WXLogUtils.renderPerformanceLog("   invokeCreateInstance",mWXPerformance.communicateTime);
@@ -874,7 +879,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
             if (mUserTrackAdapter != null) {
-              mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, null);
+              mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
               commitUTStab(IWXUserTrackAdapter.JS_BRIDGE,WXErrorCode.WX_SUCCESS);
             }
           }
@@ -966,6 +971,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void firstScreenRenderFinished() {
+    if(mEnd == true)
+       return;
+
     mEnd = true;
     mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
@@ -1021,7 +1029,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           }
         }
         if( mUserTrackAdapter!= null) {
-          mUserTrackAdapter.commit(mContext, null, type, performance, null);
+          mUserTrackAdapter.commit(mContext, null, type, performance, getUserTrackParams());
         }
       }
     });
@@ -1222,9 +1230,32 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mWXPerformance;
   }
 
-    /**
-     * load bundle js listener
-     */
+  public Map<String, Serializable> getUserTrackParams() {
+    return mUserTrackParams;
+  }
+
+  public void addUserTrackParameter(String key,Serializable value){
+    if(this.mUserTrackParams == null){
+      this.mUserTrackParams = new ConcurrentHashMap<>();
+    }
+    mUserTrackParams.put(key,value);
+  }
+
+  public void clearUserTrackParameters(){
+    if(this.mUserTrackParams != null){
+      this.mUserTrackParams.clear();
+    }
+  }
+
+  public void removeUserTrackParameter(String key){
+    if(this.mUserTrackParams != null){
+      this.mUserTrackParams.remove(key);
+    }
+  }
+
+  /**
+   * load bundle js listener
+   */
   class WXHttpListener implements IWXHttpAdapter.OnHttpListener {
 
     private String pageName;

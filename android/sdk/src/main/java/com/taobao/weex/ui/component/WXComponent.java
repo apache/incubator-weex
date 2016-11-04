@@ -263,12 +263,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
               }
             }
           }),0);
+        }else{
+          invoker.invoke(this,params);
         }
 
       } catch (Exception e) {
         WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
       }
+    }else{
+      onInvokeUnknownMethod(method,args);
     }
+  }
+
+  /**
+   * Will be invoked when request method not found.
+   * Subclass should override this method, If you return hard-code method list in {@link IFComponentHolder#getMethods()}
+   * @param method
+   * @param args
+   */
+  protected void onInvokeUnknownMethod(String method, JSONArray args){
+
   }
 
   interface OnClickListener{
@@ -297,6 +311,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
+    onCreate();
+  }
+
+  protected void onCreate(){
+
   }
 
   public void bindHolder(IFComponentHolder holder){
@@ -495,6 +514,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mPreRealHeight = realHeight;
     mPreRealLeft = realLeft;
     mPreRealTop = realTop;
+
+    onFinishLayout();
   }
 
 
@@ -533,6 +554,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
       WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout Left:" + mDomObj.getStyles().getLeft() + " " + (int) mDomObj.getStyles().getTop());
     }
+  }
+
+  /**
+   * After component's layout result is apply to view. May be invoke multiple times since
+   * DOM can be changed in js runtime.
+   */
+  protected void onFinishLayout(){
+
   }
 
   public void setPadding(Spacing padding, Spacing border) {
@@ -871,6 +900,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mHost = initComponentHostView(mContext);
   }
 
+
+  /**
+   * Create corresponding view for this component.
+   * @param context
+   * @return
+   */
   protected T initComponentHostView(@NonNull Context context){
     /**
      * compatible old initView
