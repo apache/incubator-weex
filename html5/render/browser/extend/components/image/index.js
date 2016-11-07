@@ -11,6 +11,7 @@ const DEFAULT_RESIZE_MODE = 'stretch'
 /**
  * resize: 'cover' | 'contain' | 'stretch', default is 'stretch'
  * src: url
+ * placeholder / place-holder: url
  */
 const proto = {
   create () {
@@ -37,6 +38,11 @@ const attr = {
 
   placeholder: function (val) {
     this.node.dataset.placeholder = val
+  },
+
+  // alias for placeholder (place-holder)
+  placeHolder: function (val) {
+    return this.attr.placeholder.call(this, val)
   },
 
   resize: function (val) {
