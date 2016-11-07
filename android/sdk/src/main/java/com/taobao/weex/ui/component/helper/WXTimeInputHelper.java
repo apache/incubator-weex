@@ -206,10 +206,11 @@ package com.taobao.weex.ui.component.helper;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.taobao.weex.ui.component.AbstractEditComponent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -226,12 +227,10 @@ public class WXTimeInputHelper {
     private static SimpleDateFormat timeFormatter;
     private static SimpleDateFormat dateFormatter;
 
-    public static void pickDate(String max, String min, final TextView target) {
+    public static void pickDate(String max, String min, final AbstractEditComponent component) {
+        final TextView target = component.getHostView();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(parseDate(target.getText().toString()));
-        target.setFocusable(true);
-        target.setFocusableInTouchMode(true);
-        target.requestFocus();
         final DatePickerDialog dialog = new DatePickerDialog(
                 target.getContext(),
                 new DatePickerDialog.OnDateSetListener() {
@@ -241,7 +240,7 @@ public class WXTimeInputHelper {
                         String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
                         String result = year + "-" + realMonthString + "-" + dayOfMonth;
                         target.setText(result);
-                        target.clearFocus();
+                        component.performOnChange(result);
                     }
                 },
                 calendar.get(Calendar.YEAR),
@@ -256,21 +255,13 @@ public class WXTimeInputHelper {
         if (max != null) {
             datePicker.setMaxDate(parseDate(max).getTime());
         }
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                target.clearFocus();
-            }
-        });
         dialog.show();
     }
 
-    public static void pickTime(final TextView target) {
+    public static void pickTime(final AbstractEditComponent component) {
+        final TextView target = component.getHostView();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(parseTime(target.getText().toString()));
-        target.setFocusable(true);
-        target.setFocusableInTouchMode(true);
-        target.requestFocus();
         TimePickerDialog dialog = new TimePickerDialog(
                 target.getContext(),
                 new TimePickerDialog.OnTimeSetListener() {
@@ -278,20 +269,15 @@ public class WXTimeInputHelper {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
                         String m = minute < 10 ? "0" + minute : String.valueOf(minute);
-                        target.setText(h + ":" + m);
-                        target.clearFocus();
+                        String result = h + ":" + m;
+                        target.setText(result);
+                        component.performOnChange(result);
                     }
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 false
         );
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                target.clearFocus();
-            }
-        });
         dialog.show();
     }
 
