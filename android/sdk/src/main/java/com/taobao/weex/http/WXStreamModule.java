@@ -427,7 +427,7 @@ public class WXStreamModule extends WXModule {
 
   private void extractHeaders(JSONObject headers, Options.Builder builder){
     //set user-agent
-    String UA = WXHttpUtil.assembleUserAgent(mWXSDKInstance.getContext(),WXEnvironment.getConfig());
+    String UA = WXHttpUtil.assembleUserAgent(WXEnvironment.getApplication(),WXEnvironment.getConfig());
     if(headers != null){
       for (String key : headers.keySet()) {
         if (key.equals(KEY_USER_AGENT)) {
