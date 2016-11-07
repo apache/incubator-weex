@@ -210,6 +210,9 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.view.WXEditText;
+
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -305,6 +308,15 @@ public class EditComponentTest {
   public void testSetProperty() throws Exception {
 
     ComponentTest.setProperty(component,PROPS,TEST_VALUES);
+  }
+
+  @Test
+  public void testFocus() throws Exception {
+    component.getParent().mHost = component.getParent().initComponentHostView(component.getContext());
+    component.getParent().interceptFocus();
+    component.getHostView().clearFocus();
+    component.focus();
+    Assert.assertEquals(component.getHostView().hasFocus(), true);
   }
 
 

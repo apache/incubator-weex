@@ -235,12 +235,29 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     super(instance, node, parent);
   }
 
-  @Override
-  protected void onHostViewInitialized(T host) {
-    super.onHostViewInitialized(host);
-    host.setFocusable(true);
-    host.setFocusableInTouchMode(true);
-    host.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+  /**
+   * Container will get focus before any of its descendants.
+   */
+  public void interceptFocus() {
+    T host = getHostView();
+    if (host != null) {
+      host.setFocusable(true);
+      host.setFocusableInTouchMode(true);
+      host.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+      host.requestFocus();
+    }
+  }
+
+  /**
+   * Container will can not receive focus
+   */
+  public void ignoreFocus() {
+    T host = getHostView();
+    if (host != null) {
+      host.setFocusable(false);
+      host.setFocusableInTouchMode(false);
+      host.clearFocus();
+    }
   }
 
   /**

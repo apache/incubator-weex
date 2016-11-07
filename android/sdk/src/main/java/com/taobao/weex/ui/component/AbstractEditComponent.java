@@ -214,12 +214,15 @@ import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
@@ -242,6 +245,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private String mType = "text";
   private String mMax = null;
   private String mMin = null;
+  private String mLastValue = "";
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -262,11 +266,17 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         switch (mType) {
           case Constants.Value.DATE:
             hideSoftKeyboard();
-            WXTimeInputHelper.pickDate(mMax, mMin, getHostView());
+            if (getParent() != null) {
+              getParent().interceptFocus();
+            }
+            WXTimeInputHelper.pickDate(mMax, mMin, AbstractEditComponent.this);
             break;
           case Constants.Value.TIME:
             hideSoftKeyboard();
-            WXTimeInputHelper.pickTime(getHostView());
+            if (getParent() != null) {
+              getParent().interceptFocus();
+            }
+            WXTimeInputHelper.pickTime(AbstractEditComponent.this);
             break;
         }
       }
@@ -300,7 +310,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
 
   @Override
-  public void addEvent(String type) {
+  public void addEvent(final String type) {
     super.addEvent(type);
     if (getHostView() == null || TextUtils.isEmpty(type)) {
       return;
@@ -309,17 +319,40 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
     if (type.equals(Constants.Event.CHANGE)) {
       addFocusChangeListener(new OnFocusChangeListener() {
-        CharSequence mLastValue = text.getText();
         @Override
         public void onFocusChange(boolean hasFocus) {
-          CharSequence newValue = text.getText();
-          newValue = newValue == null ? "" : newValue;
-          if (!hasFocus && !newValue.equals(mLastValue)) {
-            mLastValue = newValue;
-
-            String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
-            fireEvent(event, newValue.toString());
+          if (hasFocus) {
+            mLastValue = text.getText().toString();
+          } else {
+            CharSequence newValue = text.getText();
+            newValue = newValue == null ? "" : newValue;
+            if (!newValue.toString().equals(mLastValue)) {
+              String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+              fireEvent(event, newValue.toString());
+              mLastValue = text.getText().toString();
+            }
           }
+        }
+      });
+
+      getHostView().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+          if (actionId == EditorInfo.IME_ACTION_DONE) {
+            CharSequence newValue = text.getText();
+            newValue = newValue == null ? "" : newValue;
+            if (!newValue.toString().equals(mLastValue)) {
+              String eventName = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+              fireEvent(eventName, newValue.toString());
+              mLastValue = text.getText().toString();
+            }
+            if (getParent() != null) {
+              getParent().interceptFocus();
+            }
+            hideSoftKeyboard();
+            return true;
+          }
+          return false;
         }
       });
     } else if (type.equals(Constants.Event.INPUT)) {
@@ -362,6 +395,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
       WXSDKManager.getInstance().fireEvent(getInstanceId(), getDomObject().getRef(), event, params, domChanges);
     }
+  }
+
+  public void performOnChange(String value) {
+    String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+    fireEvent(event, value);
   }
 
   @Override
@@ -476,19 +514,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       inputView.setFocusable(true);
       inputView.requestFocus();
       inputView.setFocusableInTouchMode(true);
-      inputView.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          showSoftKeyboard();
-        }
-      }, 16);
+      showSoftKeyboard();
     } else {
-      inputView.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          hideSoftKeyboard();
-        }
-      }, 16);
+      hideSoftKeyboard();
     }
   }
 
@@ -615,13 +643,25 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private boolean showSoftKeyboard() {
     if (getHostView() == null) {
       return false;
+    } else {
+      getHostView().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
+        }
+      }, 16);
     }
-    return mInputMethodManager.showSoftInput(getHostView(), InputMethodManager.SHOW_IMPLICIT);
+    return true;
   }
 
   private void hideSoftKeyboard() {
     if (getHostView() != null) {
-      mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
+      getHostView().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
+        }
+      }, 16);
     }
   }
 
@@ -640,4 +680,29 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     return align;
   }
 
+  @JSMethod
+  public void blur() {
+    WXEditText host = getHostView();
+    if (host != null && host.hasFocus()) {
+      if (getParent() != null) {
+        getParent().interceptFocus();
+      }
+      host.clearFocus();
+      hideSoftKeyboard();
+    }
+  }
+
+  @JSMethod
+  public void focus() {
+    WXEditText host = getHostView();
+    if (host != null && !host.hasFocus()) {
+      if (getParent() != null) {
+        getParent().ignoreFocus();
+      }
+      host.requestFocus();
+      host.setFocusable(true);
+      host.setFocusableInTouchMode(true);
+      showSoftKeyboard();
+    }
+  }
 }
