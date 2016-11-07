@@ -35,6 +35,10 @@ const attr = {
     this.enableLazyload(val)
   },
 
+  placeholder: function (val) {
+    this.node.dataset.placeholder = val
+  },
+
   resize: function (val) {
     if (RESIZE_MODES.indexOf(val) === -1) {
       val = 'stretch'
