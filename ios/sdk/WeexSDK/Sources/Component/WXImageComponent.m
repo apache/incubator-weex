@@ -57,9 +57,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         } else {
             WXLogWarning(@"image src is nil");
         }
-        if (attributes[@"placeholder"]) {
-            _placeholdSrc = [[WXConvert NSString:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        }
+        [self configPlaceHolder];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
@@ -67,6 +65,16 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
     
     return self;
+}
+
+- (void)configPlaceHolder {
+    if (attributes[@"placeHolder"]) {
+        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }else if (attributes[@"placeholder"]) {
+        _placeholdSrc = [[WXConvert NSString:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }else {
+        
+    }
 }
 
 - (UIView *)loadView
@@ -105,9 +113,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    if (attributes[@"placeholder"]) {
-        _placeholdSrc = [[WXConvert NSString:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    }
+    [self configPlaceHolder];
     
     if (attributes[@"resize"]) {
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
