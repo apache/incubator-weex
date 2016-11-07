@@ -767,9 +767,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (errCode != WXErrorCode.WX_SUCCESS) {
       performance = new WXPerformance();
       performance.errCode = errCode.getErrorCode();
-      performance.appendErrMsg(errCode.getErrorMsg());
-      performance.appendErrMsg("#");
-      performance.appendErrMsg(errMsg);
+      performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errCode.getErrorMsg():errMsg);
       performance.args = instance.getBundleUrl();
       WXLogUtils.e("wx_monitor",performance.toString());
     }
@@ -785,9 +783,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (errorCode != WXErrorCode.WX_SUCCESS) {
       performance = new WXPerformance();
       performance.errCode = errorCode.getErrorCode();
-      performance.appendErrMsg(errorCode.getErrorMsg());
-      performance.appendErrMsg("#");
-      performance.appendErrMsg(errMsg);
+      performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errorCode.getErrorMsg():errMsg);
       WXLogUtils.e("wx_monitor",performance.toString());
     }
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
