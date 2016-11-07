@@ -393,7 +393,7 @@ public class WXSDKEngine {
   }
 
 
-  static boolean registerComponent(IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
+  public static boolean registerComponent(IFComponentHolder holder, boolean appendTree, String ... names) throws WXException {
     boolean result =  true;
     for(String name:names) {
       Map<String, Object> componentInfo = new HashMap<>();
