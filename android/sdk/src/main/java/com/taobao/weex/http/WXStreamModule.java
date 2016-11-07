@@ -224,6 +224,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
+
 public class WXStreamModule extends WXModule {
 
   public static final String STATUS_TEXT = "statusText";
@@ -424,13 +426,18 @@ public class WXStreamModule extends WXModule {
 
 
   private void extractHeaders(JSONObject headers, Options.Builder builder){
+    //set user-agent
+    String UA = WXHttpUtil.assembleUserAgent(mWXSDKInstance.getContext(),WXEnvironment.getConfig());
     if(headers != null){
-      Iterator<String> it = headers.keySet().iterator();
-      while(it.hasNext()){
-        String key = it.next();
-        builder.putHeader(key,headers.getString(key));
+      for (String key : headers.keySet()) {
+        if (key.equals(KEY_USER_AGENT)) {
+          UA = headers.getString(key);
+          continue;
+        }
+        builder.putHeader(key, headers.getString(key));
       }
     }
+    builder.putHeader(KEY_USER_AGENT,UA);
   }
 
 
