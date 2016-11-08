@@ -1,7 +1,13 @@
 import Node from './node'
+import Element from './element'
 import Comment from './comment'
 import Document from './document'
-import { Element } from './element-types'
+
+export {
+  elementTypes,
+  registerElement,
+  clearElementTypes
+} from './element-types'
 
 export {
   Document,

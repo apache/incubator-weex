@@ -16,10 +16,18 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
+import {
+  elementTypes,
+  setElement
+} from './element-types'
 
 const DEFAULT_TAG_NAME = 'div'
 
-export default function BasicElement (type = DEFAULT_TAG_NAME, props) {
+export default function Element (type = DEFAULT_TAG_NAME, props, isExtended) {
+  const XElement = elementTypes[type]
+  if (XElement && !isExtended) {
+    return new XElement(props)
+  }
   props = props || {}
   this.nodeType = 1
   this.nodeId = uniqueId()
@@ -33,15 +41,17 @@ export default function BasicElement (type = DEFAULT_TAG_NAME, props) {
   this.pureChildren = []
 }
 
-BasicElement.prototype = Object.create(Node.prototype)
-BasicElement.prototype.constructor = BasicElement
+Element.prototype = Object.create(Node.prototype)
+Element.prototype.constructor = Element
 
 function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
 
-Object.assign(BasicElement.prototype, {
+setElement(Element)
+
+Object.assign(Element.prototype, {
   /**
    * Append a child node.
    * @param {object} node

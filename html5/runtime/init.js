@@ -1,3 +1,5 @@
+import { registerElement } from './vdom/element-types'
+
 let frameworks
 
 const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
@@ -59,12 +61,25 @@ const methods = {
  */
 function genInit (methodName) {
   methods[methodName] = function (...args) {
+    if (methodName === 'registerComponents') {
+      checkComponentMethods(args[0])
+    }
     for (const name in frameworks) {
       const framework = frameworks[name]
       if (framework && framework[methodName]) {
         framework[methodName](...args)
       }
     }
+  }
+}
+
+function checkComponentMethods (components) {
+  if (Array.isArray(components)) {
+    components.forEach((name) => {
+      if (name && name.type && name.methods) {
+        registerElement(name.type, name.methods)
+      }
+    })
   }
 }
 

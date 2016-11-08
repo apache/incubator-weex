@@ -1,5 +1,10 @@
-import BasicElement from './element'
 import { getListener } from './operation'
+
+let Element
+
+export function setElement (El) {
+  Element = El
+}
 
 /**
  * A map which stores all type of elements.
@@ -8,54 +13,37 @@ import { getListener } from './operation'
 export const elementTypes = {}
 
 /**
- * Outer encapsulation for Element.
- * @param {string} type
- * @param {object} props
- */
-export function Element (type, props) {
-  const XElement = elementTypes[type]
-  if (XElement) {
-    return new XElement(props)
-  }
-  return new BasicElement(type, props)
-}
-
-/**
  * Register an extended element type with component methods.
  * @param  {string} type    component type
  * @param  {array}  methods a list of method names
- * @return {XElement}
  */
 export function registerElement (type, methods) {
   // Skip when no special component methods.
   if (!methods || !methods.length) {
-    elementTypes[type] = BasicElement
-    return BasicElement
+    return
   }
 
   // Init constructor.
   const XElement = function (props) {
-    BasicElement.call(this, type, props)
+    Element.call(this, type, props, true)
   }
 
   // Init prototype.
-  XElement.prototype = Object.create(BasicElement.prototype)
-  XElement.prototype.constructor = BasicElement
+  XElement.prototype = Object.create(Element.prototype)
+  XElement.prototype.constructor = Element
 
   // Add methods to prototype.
-  for (const methodName in methods) {
+  methods.forEach(methodName => {
     XElement.prototype[methodName] = function (...args) {
       const listener = getListener(this.docId)
       if (listener) {
         listener.callComponentMethod(this.ref, type, methodName, args)
       }
     }
-  }
+  })
 
   // Add to element type map.
   elementTypes[type] = XElement
-
-  return XElement
 }
 
 /**
@@ -66,3 +54,4 @@ export function clearElementTypes () {
     delete elementTypes[type]
   }
 }
+
