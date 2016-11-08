@@ -78,7 +78,7 @@ describe('component methods management', () => {
     doc.body.appendChild(n)
     expect(spy.args.length).eql(5)
 
-    x.foo(1,2,3)
+    x.foo(1, 2, 3)
     expect(spy.args.length).eql(6)
     expect(spy.args[5]).eql([[{ component: 'x', method: 'foo', args: [x.ref, 1, 2, 3] }]])
   })
