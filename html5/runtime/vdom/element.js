@@ -19,7 +19,7 @@ import {
 
 const DEFAULT_TAG_NAME = 'div'
 
-export default function Element (type = DEFAULT_TAG_NAME, props) {
+export default function BasicElement (type = DEFAULT_TAG_NAME, props) {
   props = props || {}
   this.nodeType = 1
   this.nodeId = uniqueId()
@@ -33,15 +33,15 @@ export default function Element (type = DEFAULT_TAG_NAME, props) {
   this.pureChildren = []
 }
 
-Element.prototype = Object.create(Node.prototype)
-Element.prototype.constructor = Element
+BasicElement.prototype = Object.create(Node.prototype)
+BasicElement.prototype.constructor = BasicElement
 
 function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
 
-Object.assign(Element.prototype, {
+Object.assign(BasicElement.prototype, {
   /**
    * Append a child node.
    * @param {object} node
