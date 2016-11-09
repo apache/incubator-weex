@@ -42,7 +42,6 @@ task checkstyle(type: Checkstyle) {
     exclude '**/test/**'
     exclude '**/com/taobao/weex/dom/flex/**'
     classpath = files()
-    
 }
 
 checkstyle {
