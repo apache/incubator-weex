@@ -27,9 +27,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,7 +44,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
     private ViewGroup mViewGroup;
     private ArrayList<View> mCaseListIndexView;
     private WXPageActivity activity2;
-    private HashMap testMap = new HashMap();
+    private TreeMap testMap = new TreeMap();
     private int stepCountFlag = 0;
     private int allRoundFound = 5;
     int maxStep = 10;
@@ -204,9 +204,9 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                     sleep(1000);
                 }
 
-                HashMap testStepMap = new HashMap();
+                TreeMap testStepMap = new TreeMap();
 
-                testStepMap = (HashMap)testMap.clone();
+                testStepMap = (TreeMap)testMap.clone();
                 testStepMap.remove("testComponet");
                 testStepMap.remove("testChildCaseInit");
 
@@ -215,7 +215,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
                 while (iter.hasNext()) {
                     stepCountFlag ++;
-                    HashMap.Entry entry = (HashMap.Entry) iter.next();
+                    TreeMap.Entry entry = (TreeMap.Entry) iter.next();
                     Object testStepkey = entry.getKey();
                     Log.e(TAG,"testStepMap testStepkey==" + testStepkey.toString());
 
@@ -262,12 +262,12 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
     public void testStep(Object testStepkey,  Object testStepValue) {
 
-        HashMap testSteps = (HashMap) testStepValue;
+        TreeMap testSteps = (TreeMap) testStepValue;
         Iterator iter = testSteps.entrySet().iterator();
         Log.e(TAG,"testSteps keyset==" + testSteps.keySet().toString());
 
         while (iter.hasNext()) {
-            HashMap.Entry entry = (HashMap.Entry) iter.next();
+            TreeMap.Entry entry = (TreeMap.Entry) iter.next();
             Object testStepAction = entry.getKey();
             Log.e(TAG,"testSteps testStepAction==" + testStepAction.toString());
 
@@ -286,7 +286,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         if(action.equals("click")){
             doClickAction(action, actionValue);
         }
-        sleep(1000);
+//        sleep(1000);
 
         if(action.equals("screenshot")){
             doScreenShotAction(actionValue);
@@ -295,7 +295,6 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
     }
     private void doScreenShotAction (String name){
-        sleep(1000);
         screenShot(name);
         sleep(1000);
     }
@@ -387,11 +386,11 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
         }
     }
 
-    public void setTestMap(HashMap testStepMap) {
+    public void setTestMap(TreeMap testStepMap) {
         this.testMap = testStepMap;
     }
 
-    public HashMap getTestMap(){
+    public TreeMap getTestMap(){
         return testMap;
     }
 
