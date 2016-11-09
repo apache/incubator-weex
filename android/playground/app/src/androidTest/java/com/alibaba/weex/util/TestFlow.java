@@ -46,6 +46,10 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
     private WXPageActivity activity2;
     private HashMap testMap = new HashMap();
     private int stepCountFlag = 0;
+    private int allRoundFound = 5;
+    int maxStep = 10;
+    int topCount = 10;
+    private boolean childCaseFound = false;
 
 
     public TestFlow(Class<WXPageActivity> activityClass) {
@@ -109,23 +113,14 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
             if (caseViewName.equals(testComponet)) {
 
                 final WXTextView inputView = (WXTextView) caseView;
-
-                // handle if the view is INVISIBLE then scrollToBottom
-                int maxStep = 10;
-                int scrollCount = 0;
-                if(inputView.getVisibility() == View.INVISIBLE){
-                    while(scrollCount <maxStep){
-                        TouchUtils.dragQuarterScreenUp(this, this.getActivity());
-                        sleep(1000);
-                        scrollCount ++;
-                    }
-                }
-                int topCount = 10;
-                if(inputView.getVisibility() == View.INVISIBLE){
-                    while(topCount>0){
-                        TouchUtils.dragQuarterScreenDown(this, this.getActivity());
-                        sleep(1000);
-                        topCount--;
+                if(inputView.getVisibility()== View.VISIBLE){
+                    Log.e(TAG, "Child Case Found!!");
+                    childCaseFound = true;
+                }else{
+                    Log.e(TAG, "上下滑动一圈都没有找到!!");
+                    while(allRoundFound >0 && inputView.getVisibility()== View.INVISIBLE){
+                        findChildCase(inputView);
+                        allRoundFound --;
                     }
                 }
 
@@ -182,7 +177,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
                                 }
                                 topCount --;
                             }
-                        assertNotSame("Assert Case Found!!",0 ,inputListView.size());
+                        assertNotSame("Child Case Not Found!!",0 ,inputListView.size());
                         break;
                     }
                 }
@@ -237,6 +232,27 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
 
     }
 
+    private void findChildCase(final WXTextView inputView ){
+        // handle if the view is INVISIBLE then scrollToBottom
+//        int maxStep = 10;
+        int scrollCount = 0;
+        if(inputView.getVisibility() == View.INVISIBLE){
+            while(scrollCount <maxStep){
+                TouchUtils.dragQuarterScreenUp(this, this.getActivity());
+                sleep(1000);
+                scrollCount ++;
+            }
+        }
+//        int topCount = 10;
+        if(inputView.getVisibility() == View.INVISIBLE){
+            while(topCount>0 && (inputView.getVisibility() == View.INVISIBLE)){
+                TouchUtils.dragQuarterScreenDown(this, this.getActivity());
+                sleep(1000);
+                topCount--;
+            }
+        }
+
+    }
 
     public void afterTest(ArrayList viewList){
         Log.e(TAG,"===do test after===");

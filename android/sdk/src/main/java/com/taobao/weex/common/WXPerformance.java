@@ -204,8 +204,6 @@
  */
 package com.taobao.weex.common;
 
-import android.text.TextUtils;
-
 import com.taobao.weex.WXEnvironment;
 
 import java.util.HashMap;
@@ -356,7 +354,7 @@ public class WXPerformance {
   public String requestType;
 
   public WXPerformance(){
-    mErrMsgBuilder=new StringBuilder(TextUtils.isEmpty(errMsg)?"":errMsg);
+    mErrMsgBuilder=new StringBuilder();
   }
 
   public Map<String,Double> getMeasureMap(){

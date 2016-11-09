@@ -299,7 +299,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static long LOW_MEM_VALUE = 80;
 
-  static WXBridgeManager mBridgeManager;
+  static volatile WXBridgeManager mBridgeManager;
 
 
   /**
@@ -335,10 +335,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private Interceptor mInterceptor;
 
   private WXBridgeManager() {
-    launchInspector(WXEnvironment.sRemoteDebugMode);
-    if (mWXBridge == null) {
-      mWXBridge = new WXBridge();
-    }
+    initWXBridge(WXEnvironment.sRemoteDebugMode);
     mJSThread = new WXThread("WeexJSBridgeThread", this);
     mJSHandler = mJSThread.getHandler();
   }
@@ -354,28 +351,38 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mBridgeManager;
   }
 
-  private void launchInspector(boolean remoteDebug) {
+  private void initWXBridge(boolean remoteDebug) {
     if (WXEnvironment.isApkDebugable()) {
-      try {
-        if (mWxDebugProxy != null) {
-          mWxDebugProxy.stop();
-        }
-        HackedClass<Object> debugProxyClass = WXHack.into("com.taobao.weex.devtools.debug.DebugServerProxy");
-        mWxDebugProxy = (IWXDebugProxy) debugProxyClass.constructor(Context.class, WXBridgeManager.class)
-                .getInstance(WXEnvironment.getApplication(), WXBridgeManager.this);
-        if (mWxDebugProxy != null) {
-          mWxDebugProxy.start();
-          if (remoteDebug) {
-            mWXBridge = mWxDebugProxy.getWXBridge();
-          } else {
-            if (mWXBridge != null && !(mWXBridge instanceof WXBridge)) {
-              mWXBridge = null;
-            }
-          }
-        }
-      } catch (HackAssertionException e) {
-        WXLogUtils.e("launchInspector HackAssertionException ", e);
+      if (remoteDebug) {
+        WXEnvironment.sDebugServerConnectable = true;
       }
+
+      if (mWxDebugProxy != null) {
+        mWxDebugProxy.stop(false);
+      }
+      if (WXEnvironment.sDebugServerConnectable) {
+        try {
+          HackedClass<Object> debugProxyClass = WXHack.into("com.taobao.weex.devtools.debug.DebugServerProxy");
+          mWxDebugProxy = (IWXDebugProxy) debugProxyClass.constructor(Context.class, WXBridgeManager.class)
+              .getInstance(WXEnvironment.getApplication(), WXBridgeManager.this);
+          if (mWxDebugProxy != null) {
+            mWxDebugProxy.start();
+          }
+        } catch (HackAssertionException e) {
+          WXLogUtils.e("initWXBridge HackAssertionException ", e);
+        }
+      }
+    }
+    if (remoteDebug && mWxDebugProxy != null) {
+      mWXBridge = mWxDebugProxy.getWXBridge();
+    } else {
+      mWXBridge = new WXBridge();
+    }
+  }
+
+  public void stopRemoteDebug() {
+    if (mWxDebugProxy != null) {
+      mWxDebugProxy.stop(true);
     }
   }
 
@@ -388,10 +395,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
   public void restart() {
     mInit = false;
-    launchInspector(WXEnvironment.sRemoteDebugMode);
-    if (mWXBridge == null) {
-      mWXBridge = new WXBridge();
-    }
+    initWXBridge(WXEnvironment.sRemoteDebugMode);
   }
 
   /**
@@ -779,9 +783,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (errCode != WXErrorCode.WX_SUCCESS) {
       performance = new WXPerformance();
       performance.errCode = errCode.getErrorCode();
-      performance.appendErrMsg(errCode.getErrorMsg());
-      performance.appendErrMsg("#");
-      performance.appendErrMsg(errMsg);
+      performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errCode.getErrorMsg():errMsg);
       performance.args = instance.getBundleUrl();
       WXLogUtils.e("wx_monitor",performance.toString());
     }
@@ -797,9 +799,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (errorCode != WXErrorCode.WX_SUCCESS) {
       performance = new WXPerformance();
       performance.errCode = errorCode.getErrorCode();
-      performance.appendErrMsg(errorCode.getErrorMsg());
-      performance.appendErrMsg("#");
-      performance.appendErrMsg(errMsg);
+      performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errorCode.getErrorMsg():errMsg);
       WXLogUtils.e("wx_monitor",performance.toString());
     }
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
