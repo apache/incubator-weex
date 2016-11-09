@@ -35,6 +35,7 @@
     * [Bootstrap](/references/bootstrap.md)
     * [Component Definition](/references/component-defs.md)
     * [Instance APIs](/references/api.md)
+    * [Gesture](/references/gesture.md)
     * [Built-in Components](/components/main.md)
         * [Common Attributes](/references/common-attrs.md)
         * [Common Style](/references/common-style.md)
