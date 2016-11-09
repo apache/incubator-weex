@@ -207,6 +207,7 @@ package com.taobao.weex.appfram.pickers;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXModuleAnno;
@@ -221,7 +222,7 @@ public class WXPickersModule extends WXModule {
 
     private int selected;
 
-    @WXModuleAnno
+    @JSMethod
     public void pick(List<String> items, int checked, JSCallback callback) {
         performSinglePick(items, checked, callback);
     }
