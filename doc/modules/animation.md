@@ -28,6 +28,10 @@ A series of animation api.
   * `delay`*(number)*: Specify the amount of milliseconds to wait between a change being requested to a property that is to be transitioned and the start of the transition effect. By default, the value is 0ms.
 * **callback** Callback which is called after the completion of transition.
 
+#### Note
+
+Animations listed in transform is much faster than other animaions, as they are GPU accelerated. Developers should make their own choice according to their situation.
+
 #### Example
 
 ```html
