@@ -215,7 +215,6 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXReflectionUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -303,7 +302,7 @@ public class WXModuleManager {
 
   static boolean registerJSModule(String moduleName, ModuleFactory factory) {
     Map<String, Object> modules = new HashMap<>();
-    modules.put(moduleName, factory.getMethodNames());
+    modules.put(moduleName, factory.getMethods());
     WXSDKManager.getInstance().registerModules(modules);
     return true;
   }
@@ -321,12 +320,7 @@ public class WXModuleManager {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     wxModule.mWXSDKInstance = instance;
 
-    Map<String, Invoker> methodsMap = factory.getMethodMap();
-    if (methodsMap == null) {
-      WXLogUtils.e("[WXModuleManager] callModuleMethod methodsMap is null.");
-      return false;
-    }
-    final Invoker invoker = methodsMap.get(methodStr);
+    final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
       instance
           .getNativeInvokeHelper()

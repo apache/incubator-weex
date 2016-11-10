@@ -202,19 +202,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
-
-import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.JavascriptInvokable;
+package com.taobao.weex.bridge;
 
 /**
- * Created by sospartan on 6/23/16.
+ * Created by sospartan on 11/11/2016.
  */
-public interface IFComponentHolder extends ComponentCreator,JavascriptInvokable {
 
-    /** Prepare component if not a lazy load componnet.**/
-    void loadIfNonLazy();
-
-    Invoker getPropertyInvoker(String name);
-
+public interface JavascriptInvokable {
+  String[] getMethods();
+  Invoker getMethodInvoker(String name);
 }
