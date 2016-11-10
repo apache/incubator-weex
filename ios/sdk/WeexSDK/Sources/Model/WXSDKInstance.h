@@ -86,7 +86,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *
  *  @param view The rootView.
  **/
-@property (nonatomic, copy) void (^onLayout)(UIView *);
+@property (nonatomic, copy) void (^onLayoutChange)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes rendering.

@@ -81,7 +81,7 @@
     WXSDKInstance *instance3 = [[WXSDKInstance alloc] init];
     [instance3 renderView:jsScript options:nil data:templateRootFrameData];
     XCTestExpectation *expectation3 = [self expectationWithDescription:@"instance 3"];
-    XCTestExpectation *expectation31 = [self expectationWithDescription:@"instance 3 onLayout"];
+    XCTestExpectation *expectation31 = [self expectationWithDescription:@"instance 3 onLayoutChange"];
     instance3.renderFinish = ^(UIView *view){
         XCTAssert(CGRectEqualToRect(view.frame,
                                     CGRectMake(0,0,
@@ -95,12 +95,12 @@
                                                WXPixelResize(templateRootFrame.size.height))));
         [expectation3 fulfill];
         
-        // 31.if weex template root frame changed, root container will change the width and height computed by layout, thus trigger instance's onLayout;
+        // 31.if weex template root frame changed, root container will change the width and height computed by layout, thus trigger instance's onLayoutChange;
         NSMutableDictionary *changedFrameData = [templateRootFrameData mutableCopy];
         [changedFrameData setObject:@(400) forKey:@"height"];
         
         [instance3 refreshInstance:changedFrameData];
-        instance3.onLayout = ^(UIView *view) {
+        instance3.onLayoutChange = ^(UIView *view) {
             XCTAssert(CGRectEqualToRect(view.frame,
                                         CGRectMake(0,0,
                                                    WXPixelResize(templateRootFrame.size.width),
