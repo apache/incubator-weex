@@ -176,14 +176,12 @@
     _textView = (WXTextAreaView*)self.view;
     [self setEnabled];
     [self setAutofocus];
-    [self setPlaceholderAttributedString];
     if (_placeholderString) {
         _placeHolderLabel = [[UILabel alloc] init];
         _placeHolderLabel.numberOfLines = 0;
-        [self setPlaceholderAttributedString];
         [_textView addSubview:_placeHolderLabel];
     }
-   
+    [self setPlaceholderAttributedString];
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];
@@ -414,9 +412,10 @@
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
     }
     _placeHolderLabel.backgroundColor = [UIColor clearColor];
-    CGSize expectedLabelSize = [_placeholderString sizeWithFont:_placeHolderLabel.font constrainedToSize:CGSizeMake(296, FLT_MAX) lineBreakMode:_placeHolderLabel.lineBreakMode];
+    CGSize expectedLabelSize = [_placeholderString boundingRectWithSize:CGSizeMake(_textView.frame.size.width/2, _textView.frame.size.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:nil context:nil].size;
+    _placeHolderLabel.clipsToBounds = NO;
     CGRect newFrame = _placeHolderLabel.frame;
-    newFrame.size.height = expectedLabelSize.height;
+    newFrame.size.height = ceil(expectedLabelSize.height);
     newFrame.size.width = _textView.frame.size.width;
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
