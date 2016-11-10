@@ -146,14 +146,10 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.Invoker;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.bridge.JSCallbackCreator;
-import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -243,24 +239,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     final Invoker invoker = mHolder.getMethodInvoker(method);
     if (invoker != null) {
       try {
-        final Object[] params = WXReflectionUtils.prepareArguments(
-            invoker.getParameterTypes(),
-            args,
-            SimpleJSCallbackCreator.getCreatorForOnetimeUsage(getInstanceId()));
-        if(invoker.isRunOnUIThread()){
-          WXSDKManager.getInstance().postOnUiThread(WXThread.secure(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                invoker.invoke(WXComponent.this, params);
-              } catch (Exception e) {
-                throw new RuntimeException(e);
-              }
-            }
-          }),0);
-        }else{
-          invoker.invoke(this,params);
-        }
+        getInstance()
+            .getNativeInvokeHelper()
+            .invoke(this,invoker,args);
 
       } catch (Exception e) {
         WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
@@ -608,26 +589,27 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-      for(String key : props.keySet()) {
-        Object param = props.get(key);
-        if(!setProperty(key, param)){
-          if(mHolder == null){
-            return;
-          }
-          Invoker invoker = mHolder.getPropertyInvoker(key);
-          if (invoker != null) {
-            try {
-              Type[] paramClazzs = invoker.getParameterTypes();
-              if (paramClazzs.length != 1) {
-                WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
-                return;
-              }
-              param = WXReflectionUtils.parseArgument(paramClazzs[0],props.get(key));
-              invoker.invoke(this, param);
-            } catch (Exception e) {
-              WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
+    for(Map.Entry<String, Object> entry : props.entrySet()) {
+      String key = entry.getKey();
+      Object param = entry.getValue();
+      if (!setProperty(key, param)) {
+        if (mHolder == null) {
+          return;
+        }
+        Invoker invoker = mHolder.getPropertyInvoker(key);
+        if (invoker != null) {
+          try {
+            Type[] paramClazzs = invoker.getParameterTypes();
+            if (paramClazzs.length != 1) {
+              WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
+              return;
             }
+            param = WXReflectionUtils.parseArgument(paramClazzs[0], param);
+            invoker.invoke(this, param);
+          } catch (Exception e) {
+            WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
           }
+        }
       }
     }
   }
@@ -1267,29 +1249,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return false;
     } else {
       return hasScrollParent(component.getParent());
-    }
-  }
-
-  static class SimpleJSCallbackCreator implements JSCallbackCreator {
-    static SimpleJSCallbackCreator sInstance;
-
-    String mInstanceId;
-
-    private SimpleJSCallbackCreator(){
-
-    }
-
-    static JSCallbackCreator getCreatorForOnetimeUsage(String instanceId){
-      if( sInstance ==null ){
-        sInstance = new SimpleJSCallbackCreator();
-      }
-      sInstance.mInstanceId = instanceId;
-      return sInstance;
-    }
-
-    @Override
-    public JSCallback create(String callbackId) {
-      return new SimpleJSCallback(mInstanceId,callbackId);
     }
   }
 }

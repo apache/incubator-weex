@@ -215,9 +215,10 @@ import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXReflectionUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -301,7 +302,7 @@ public class WXModuleManager {
 
   static boolean registerJSModule(String moduleName, ModuleFactory factory) {
     Map<String, Object> modules = new HashMap<>();
-    modules.put(moduleName, factory.getMethodNames());
+    modules.put(moduleName, factory.getMethods());
     WXSDKManager.getInstance().registerModules(modules);
     return true;
   }
@@ -316,38 +317,14 @@ public class WXModuleManager {
     if (wxModule == null) {
       return false;
     }
-    wxModule.mWXSDKInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    wxModule.mWXSDKInstance = instance;
 
-    Map<String, Invoker> methodsMap = factory.getMethodMap();
-    if (methodsMap == null) {
-      WXLogUtils.e("[WXModuleManager] callModuleMethod methodsMap is null.");
-      return false;
-    }
-    final Invoker invoker = methodsMap.get(methodStr);
+    final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
-      final Object[] params = WXReflectionUtils.prepareArguments(
-          invoker.getParameterTypes(),
-          args,
-          new JSCallbackCreator() {
-            @Override
-            public JSCallback create(String callbackId) {
-              return new SimpleJSCallback(instanceId, callbackId);
-            }
-          });
-      if (invoker.isRunOnUIThread()) {
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              invoker.invoke(wxModule, params);
-            } catch (Exception e) {
-              throw new RuntimeException(e);
-            }
-          }
-        }, 0);
-      } else {
-        invoker.invoke(wxModule, params);
-      }
+      instance
+          .getNativeInvokeHelper()
+          .invoke(wxModule,invoker,args);
     } catch (Exception e) {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return false;
@@ -421,10 +398,9 @@ public class WXModuleManager {
   }
 
   public static void reload(){
-    if(sModuleFactoryMap!=null){
-      Set<String> keys=sModuleFactoryMap.keySet();
-      for(String key:keys){
-        registerJSModule(key,sModuleFactoryMap.get(key));
+    if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
+      for (Map.Entry<String, ModuleFactory> entry : sModuleFactoryMap.entrySet()) {
+        registerJSModule(entry.getKey(), entry.getValue());
       }
     }
   }

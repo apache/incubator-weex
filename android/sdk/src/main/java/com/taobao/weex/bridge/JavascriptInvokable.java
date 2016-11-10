@@ -205,9 +205,10 @@
 package com.taobao.weex.bridge;
 
 /**
- * Created by sospartan on 27/10/2016.
+ * Created by sospartan on 11/11/2016.
  */
 
-public interface JSCallbackCreator {
-  JSCallback create(String callbackId);
+public interface JavascriptInvokable {
+  String[] getMethods();
+  Invoker getMethodInvoker(String name);
 }
