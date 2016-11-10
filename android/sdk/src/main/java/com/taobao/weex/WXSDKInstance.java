@@ -220,6 +220,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
@@ -279,6 +280,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private String mBundleUrl = "";
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
+  private NativeInvokeHelper mNativeInvokeHelper;
 
   /**
    * Render strategy.
@@ -360,6 +362,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void init(Context context) {
     mContext = context;
+    mNativeInvokeHelper = new NativeInvokeHelper(mInstanceId);
 
     mWXPerformance = new WXPerformance();
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
@@ -368,7 +371,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
   }
 
-
+  public NativeInvokeHelper getNativeInvokeHelper() {
+    return mNativeInvokeHelper;
+  }
 
   public void setBizType(String bizType) {
     if (!TextUtils.isEmpty(bizType)) {

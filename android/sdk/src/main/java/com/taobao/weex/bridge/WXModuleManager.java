@@ -316,7 +316,8 @@ public class WXModuleManager {
     if (wxModule == null) {
       return false;
     }
-    wxModule.mWXSDKInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    wxModule.mWXSDKInstance = instance;
 
     Map<String, Invoker> methodsMap = factory.getMethodMap();
     if (methodsMap == null) {
@@ -325,29 +326,9 @@ public class WXModuleManager {
     }
     final Invoker invoker = methodsMap.get(methodStr);
     try {
-      final Object[] params = WXReflectionUtils.prepareArguments(
-          invoker.getParameterTypes(),
-          args,
-          new JSCallbackCreator() {
-            @Override
-            public JSCallback create(String callbackId) {
-              return new SimpleJSCallback(instanceId, callbackId);
-            }
-          });
-      if (invoker.isRunOnUIThread()) {
-        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              invoker.invoke(wxModule, params);
-            } catch (Exception e) {
-              throw new RuntimeException(e);
-            }
-          }
-        }, 0);
-      } else {
-        invoker.invoke(wxModule, params);
-      }
+      instance
+          .getNativeInvokeHelper()
+          .invoke(wxModule,invoker,args);
     } catch (Exception e) {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return false;

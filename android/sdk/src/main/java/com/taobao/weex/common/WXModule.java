@@ -232,4 +232,6 @@ public abstract class WXModule implements IWXObject {
     }
     return null;
   }
+
+
 }
