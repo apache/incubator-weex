@@ -207,6 +207,7 @@ package com.taobao.weex.dom;
 import android.graphics.Rect;
 import android.os.Message;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -648,11 +649,12 @@ public final class WXDomModule extends WXModule {
       WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
       return;
     } else if ("viewport".equalsIgnoreCase(ref)) {
-      if(mWXSDKInstance!=null && mWXSDKInstance.getRootView()!=null){
+      if(mWXSDKInstance!=null && mWXSDKInstance.getContainerView()!=null
+         && mWXSDKInstance.getContainerView().getParent()!=null){
         Map<String, Object> options = new HashMap<>();
         Map<String, String> sizes = new HashMap<>();
         Rect rect=new Rect();
-        mWXSDKInstance.getRootView().getGlobalVisibleRect(rect);
+        ((View)mWXSDKInstance.getContainerView().getParent()).getGlobalVisibleRect(rect);
         sizes.put("width", String.valueOf(rect.width()));
         sizes.put("height", String.valueOf(rect.height()));
         sizes.put("bottom",String.valueOf(rect.bottom));

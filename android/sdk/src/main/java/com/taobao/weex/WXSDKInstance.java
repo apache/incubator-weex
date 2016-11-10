@@ -1097,6 +1097,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mRootComp.getRealView();
   }
 
+  public View getContainerView(){
+    return mRenderContainer;
+  }
+
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
     mRenderContainer.addView(root.getHostView());
