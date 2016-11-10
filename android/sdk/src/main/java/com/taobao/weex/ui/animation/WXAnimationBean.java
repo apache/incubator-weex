@@ -207,6 +207,7 @@ package com.taobao.weex.ui.animation;
 import android.animation.PropertyValuesHolder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.Property;
@@ -459,8 +460,7 @@ public class WXAnimationBean {
     }
 
     private static @NonNull Map<Property<View, Float>, Float> createDefaultTransform(){
-      Map<Property<View, Float>, Float> defaultMap=
-          WXDataStructureUtil.newHashMapWithExpectedSize(5);
+      Map<Property<View, Float>, Float> defaultMap= new ArrayMap<>(5);
       defaultMap.put(View.TRANSLATION_X, 0f);
       defaultMap.put(View.TRANSLATION_Y, 0f);
       defaultMap.put(View.SCALE_X, 1f);

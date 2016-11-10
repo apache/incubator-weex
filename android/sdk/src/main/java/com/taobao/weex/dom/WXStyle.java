@@ -205,6 +205,7 @@
 package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
 
@@ -220,7 +221,6 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -233,17 +233,16 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
 
-
-  private @NonNull final Map<String,Object> map;
+  private @NonNull final ArrayMap<String,Object> map;
 
   public WXStyle(){
-    map = new HashMap<>();
+    map = new ArrayMap<>();
   }
 
-  public WXStyle(@NonNull Map<String,Object> map){
-    this.map=map;
+  public WXStyle(@NonNull Map<String,Object> standardMap){
+    this();
+    map.putAll(standardMap);
   }
-
 
   /*
    * text-decoration
@@ -723,6 +722,8 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   protected WXStyle clone(){
-    return new WXStyle(new HashMap<>(map));
+    WXStyle wxStyle=new WXStyle();
+    wxStyle.putAll(map);
+    return wxStyle;
   }
 }
