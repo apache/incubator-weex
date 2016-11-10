@@ -244,8 +244,8 @@ public class DefaultWXStorageTest {
     storage = new DefaultWXStorage(RuntimeEnvironment.application);
 
     mockStatic(WXSQLiteOpenHelper.class);
-
-    PowerMockito.when(WXSQLiteOpenHelper.getInstance(RuntimeEnvironment.application)).thenReturn(supplier);
+    WXSQLiteOpenHelper helper = new WXSQLiteOpenHelper(RuntimeEnvironment.application);
+    PowerMockito.when(helper).thenReturn(supplier);
   }
 
 
