@@ -722,8 +722,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   protected WXStyle clone(){
-    WXStyle wxStyle=new WXStyle();
-    wxStyle.putAll(map);
-    return wxStyle;
+    return new WXStyle(map);
   }
 }

@@ -482,8 +482,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   protected WXAttr clone(){
-    WXAttr wxAttr=new WXAttr();
-    wxAttr.putAll(map);
-    return wxAttr;
+    return new WXAttr(map);
   }
 }
