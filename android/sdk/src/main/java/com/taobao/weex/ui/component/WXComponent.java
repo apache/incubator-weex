@@ -246,12 +246,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         final Object[] params = WXReflectionUtils.prepareArguments(
             invoker.getParameterTypes(),
             args,
-            new JSCallbackCreator() {
-              @Override
-              public JSCallback create(String callbackId) {
-                return new SimpleJSCallback(mInstance.getInstanceId(),callbackId);
-              }
-            });
+            SimpleJSCallbackCreator.getCreatorForOnetimeUsage(getInstanceId()));
         if(invoker.isRunOnUIThread()){
           WXSDKManager.getInstance().postOnUiThread(WXThread.secure(new Runnable() {
             @Override
@@ -1265,4 +1260,36 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     public int height;
   }
 
+  public boolean hasScrollParent(WXComponent component) {
+    if (component.getParent() == null) {
+      return true;
+    } else if (component.getParent() instanceof WXScroller) {
+      return false;
+    } else {
+      return hasScrollParent(component.getParent());
+    }
+  }
+
+  static class SimpleJSCallbackCreator implements JSCallbackCreator {
+    static SimpleJSCallbackCreator sInstance;
+
+    String mInstanceId;
+
+    private SimpleJSCallbackCreator(){
+
+    }
+
+    static JSCallbackCreator getCreatorForOnetimeUsage(String instanceId){
+      if( sInstance ==null ){
+        sInstance = new SimpleJSCallbackCreator();
+      }
+      sInstance.mInstanceId = instanceId;
+      return sInstance;
+    }
+
+    @Override
+    public JSCallback create(String callbackId) {
+      return new SimpleJSCallback(mInstanceId,callbackId);
+    }
+  }
 }

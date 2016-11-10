@@ -206,6 +206,7 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -225,7 +226,6 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -835,7 +835,7 @@ class WXDomStatement {
       return;
     }
 
-    Map<String, Object> animationMap= WXDataStructureUtil.newHashMapWithExpectedSize(2);
+    Map<String, Object> animationMap= new ArrayMap<>(2);
     animationMap.put(WXDomObject.TRANSFORM, style.remove(WXDomObject.TRANSFORM));
     animationMap.put(WXDomObject.TRANSFORM_ORIGIN, style.remove(WXDomObject.TRANSFORM_ORIGIN));
     animations.add(new Pair<>(ref, animationMap));

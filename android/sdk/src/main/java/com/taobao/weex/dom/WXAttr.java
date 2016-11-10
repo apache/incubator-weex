@@ -205,13 +205,13 @@
 package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -222,15 +222,17 @@ import java.util.Set;
 public class WXAttr implements Map<String, Object>,Cloneable {
 
   private static final long serialVersionUID = -2619357510079360946L;
-  private @NonNull final Map<String, Object> map;
+  private @NonNull final ArrayMap<String, Object> map;
 
   public WXAttr(){
-    map=new HashMap<>();
+    map=new ArrayMap<>();
   }
 
-  public WXAttr(@NonNull Map<String, Object> map) {
-    this.map=map;
+  public WXAttr(@NonNull Map<String,Object> standardMap) {
+    this();
+    map.putAll(standardMap);
   }
+
   public static String getPrefix(Map<String, Object> attr) {
     if (attr == null) {
       return null;
@@ -480,6 +482,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   @Override
   protected WXAttr clone(){
-    return new WXAttr(new HashMap<>(map));
+    return new WXAttr(map);
   }
 }
