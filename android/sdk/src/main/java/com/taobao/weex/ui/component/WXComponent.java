@@ -589,26 +589,27 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-      for(String key : props.keySet()) {
-        Object param = props.get(key);
-        if(!setProperty(key, param)){
-          if(mHolder == null){
-            return;
-          }
-          Invoker invoker = mHolder.getPropertyInvoker(key);
-          if (invoker != null) {
-            try {
-              Type[] paramClazzs = invoker.getParameterTypes();
-              if (paramClazzs.length != 1) {
-                WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
-                return;
-              }
-              param = WXReflectionUtils.parseArgument(paramClazzs[0],props.get(key));
-              invoker.invoke(this, param);
-            } catch (Exception e) {
-              WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
+    for(Map.Entry<String, Object> entry : props.entrySet()) {
+      String key = entry.getKey();
+      Object param = entry.getValue();
+      if (!setProperty(key, param)) {
+        if (mHolder == null) {
+          return;
+        }
+        Invoker invoker = mHolder.getPropertyInvoker(key);
+        if (invoker != null) {
+          try {
+            Type[] paramClazzs = invoker.getParameterTypes();
+            if (paramClazzs.length != 1) {
+              WXLogUtils.e("[WXComponent] setX method only one parameter：" + invoker);
+              return;
             }
+            param = WXReflectionUtils.parseArgument(paramClazzs[0], param);
+            invoker.invoke(this, param);
+          } catch (Exception e) {
+            WXLogUtils.e("[WXComponent] updateProperties :" + "class:" + getClass() + "method:" + invoker.toString() + " function " + WXLogUtils.getStackTrace(e));
           }
+        }
       }
     }
   }

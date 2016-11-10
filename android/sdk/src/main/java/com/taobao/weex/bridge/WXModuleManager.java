@@ -217,7 +217,9 @@ import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -402,10 +404,9 @@ public class WXModuleManager {
   }
 
   public static void reload(){
-    if(sModuleFactoryMap!=null){
-      Set<String> keys=sModuleFactoryMap.keySet();
-      for(String key:keys){
-        registerJSModule(key,sModuleFactoryMap.get(key));
+    if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
+      for (Map.Entry<String, ModuleFactory> entry : sModuleFactoryMap.entrySet()) {
+        registerJSModule(entry.getKey(), entry.getValue());
       }
     }
   }
