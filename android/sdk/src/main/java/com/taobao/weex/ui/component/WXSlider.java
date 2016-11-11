@@ -338,6 +338,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     mAdapter.removePageView(child.getHostView());
     mAdapter.notifyDataSetChanged();
+    super.remove(child,destroy);
   }
 
   @Override
