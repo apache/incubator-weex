@@ -515,10 +515,14 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       @Override
       public void onGlobalLayout() {
         procAppear(0,0,0,0);
+        View view;
+        if( (view = getHostView()) == null){
+          return;
+        }
         if(Build.VERSION.SDK_INT >=  Build.VERSION_CODES.JELLY_BEAN) {
-          getHostView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+          view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         }else{
-          getHostView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+          view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
         }
       }
     });
