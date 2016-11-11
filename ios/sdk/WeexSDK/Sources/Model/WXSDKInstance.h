@@ -22,7 +22,7 @@ extern NSString *const bundleUrlOptionKey;
  * The Native root container used to bear the view rendered by weex file. 
  * The root view is controlled by WXSDKInstance, so you can only get it, but not change it.
  **/
-@property (nonatomic, strong, readonly) UIView *rootView;
+@property (nonatomic, strong) UIView *rootView;
 
 /**
  * The scriptURL of weex bundle.
