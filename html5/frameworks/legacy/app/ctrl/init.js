@@ -63,7 +63,7 @@ export function init (app, code, data) {
   }
 
   // wrap IFFE and use strict mode
-  functionBody = `(function(){'use strict'; ${functionBody} })()`
+  functionBody = `(function(global){"use strict"; ${functionBody} })(Object.create(this))`
 
   // run code and get result
   const { WXEnvironment } = global
