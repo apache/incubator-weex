@@ -531,6 +531,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       view.postDelayed(new Runnable() {
         @Override
         public void run() {
+          if(cellComp.getHostView() == null){
+            return;
+          }
           if(getOrientation() == Constants.Orientation.VERTICAL){
             int scrollY = cellComp.getHostView().getTop()+offset;
             view.smoothScrollBy(0,scrollY );
