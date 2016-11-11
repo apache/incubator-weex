@@ -444,7 +444,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
     int i;
     try {
-      i = Integer.valueOf(value);
+      i = Integer.parseInt(value);
     } catch (NumberFormatException e) {
       WXLogUtils.e("", e);
       return;

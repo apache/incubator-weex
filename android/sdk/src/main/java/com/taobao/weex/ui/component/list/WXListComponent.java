@@ -430,7 +430,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                 for (OnWXScrollListener listener : listeners) {
                   if (listener != null) {
                     View topView = recyclerView.getChildAt(0);
-                    if (topView != null && listener != null) {
+                    if (topView != null) {
                       int y = topView.getTop();
                       listener.onScrollStateChanged(recyclerView, 0, y, newState);
                     }
@@ -805,9 +805,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
             return;
         }
 
-        if (component != null&& holder.getComponent() != null
-                && holder.getComponent() instanceof WXCell) {
-
+        if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
                 holder.getComponent().bindData(component);
 //              holder.getComponent().refreshData(component);
         }

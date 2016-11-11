@@ -283,11 +283,12 @@ public class WXClipboardModule extends WXModule implements IWXClipboard {
         // Condition 2. a URI value
         Uri uri = item.getUri();
         if (uri != null) {
+            InputStreamReader reader = null;
             FileInputStream stream = null;
             try {
                 AssetFileDescriptor assetFileDescriptor = context.getContentResolver().openTypedAssetFileDescriptor(uri, "text/*", null);
                 stream = assetFileDescriptor.createInputStream();
-                InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+                reader = new InputStreamReader(stream, "UTF-8");
 
                 StringBuilder builder = new StringBuilder(128);
                 char[] buffer = new char[8192];
@@ -302,6 +303,13 @@ public class WXClipboardModule extends WXModule implements IWXClipboard {
             } catch (IOException e) {
                 WXLogUtils.w("ClippedData Failure loading text.", e);
             } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        // ignore
+                    }
+                }
                 if (stream != null) {
                     try {
                         stream.close();
