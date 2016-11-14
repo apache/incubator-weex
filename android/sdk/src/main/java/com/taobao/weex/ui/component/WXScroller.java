@@ -204,12 +204,15 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
@@ -506,6 +509,23 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       });
       host = scrollerView;
     }
+
+    host.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+      @Override
+      public void onGlobalLayout() {
+        procAppear(0,0,0,0);
+        View view;
+        if( (view = getHostView()) == null){
+          return;
+        }
+        if(Build.VERSION.SDK_INT >=  Build.VERSION_CODES.JELLY_BEAN) {
+          view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }else{
+          view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        }
+      }
+    });
     return host;
   }
 
@@ -575,7 +595,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
     item.setWatchEvent(event,isWatch);
 
-    procAppear(1,1,0,0);//check current components appearance status.
+    procAppear(0,0,0,0);//check current components appearance status.
   }
 
   /**
