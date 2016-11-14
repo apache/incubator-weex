@@ -97,7 +97,6 @@ export function init (app, code, data) {
     const fn = new Function(
       'define',
       'require',
-      'document',
       'bootstrap',
       'register',
       'render',
@@ -116,7 +115,6 @@ export function init (app, code, data) {
     fn(
       bundleDefine,
       bundleRequire,
-      bundleDocument,
       bundleBootstrap,
       bundleRegister,
       bundleRender,
@@ -134,7 +132,6 @@ export function init (app, code, data) {
     const fn = new Function(
       'define',
       'require',
-      'document',
       'bootstrap',
       'register',
       'render',
@@ -149,7 +146,6 @@ export function init (app, code, data) {
     fn(
       bundleDefine,
       bundleRequire,
-      bundleDocument,
       bundleBootstrap,
       bundleRegister,
       bundleRender,
