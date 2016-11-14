@@ -95,7 +95,7 @@ The origin data properties which not belongs to the array will also be bound:
 </script>
 ```
 
-### A extension of repeat syntax
+### An extension of repeat syntax
 
 #### use default `$index` for the index of array.
 <span class="weex-version">0.5</span>
