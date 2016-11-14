@@ -1,7 +1,9 @@
 /**
  * @fileOverview The api for invoking with "$" prefix
  */
-import { nativeComponentMap } from '../config'
+import config from '../config'
+
+const { nativeComponentMap } = config
 
 /**
  * ==========================================================
