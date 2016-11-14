@@ -27,7 +27,7 @@ $weex your_best_weex.we  -o . --watch
 ```
 $weex we/file/storage/path  -o outputpath
 ```
-every `we file` in `we/file/storage/path` we be transform to JS Bundle  , saved in `outputpath` path
+every `we file` in `we/file/storage/path` will be transformed to JS Bundle  , saved in `outputpath` path
 
 please access [npmjs.com](https://www.npmjs.com/package/weex-toolkit) for more information about weex-toolkit.
 

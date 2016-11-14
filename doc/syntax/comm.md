@@ -148,7 +148,7 @@ eg:
   <div>
     <text onclick="test">click to update foo</text>
     <foo></foo>
-    <foo></foo>
+    <bar></bar>
   </div>
 </template>
 
