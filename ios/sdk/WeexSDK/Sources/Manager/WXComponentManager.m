@@ -161,8 +161,6 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     
     _rootComponent = [self _buildComponentForData:data];
-    self.weexInstance.rootView.wx_component = _rootComponent;
-    
     [self _initRootCSSNode];
     
     __weak typeof(self) weakSelf = self;
@@ -437,7 +435,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
-            [instance creatFinish];
             instance.renderFinish(rootView);
         }
     }];
