@@ -132,7 +132,7 @@ import com.taobao.weex.utils.WXLogUtils;
 public class WXNavigatorModule extends WXModule {
 
     public static final String MSG_SUCCESS = "WX_SUCCESS";
-    public static final String MSG_FAILED = "MSG_FAILED";
+    public static final String MSG_FAILED = "WX_FAILED";
     private final static String INSTANCE_ID = "instanceId";
     private final static String TAG = "Navigator";
     private final static String WEEX = "com.taobao.android.intent.category.WEEX";

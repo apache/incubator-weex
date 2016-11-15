@@ -47,7 +47,7 @@ public class TestFlow extends ActivityInstrumentationTestCase2<WXPageActivity>{
     private TreeMap testMap = new TreeMap();
     private int stepCountFlag = 0;
     private int allRoundFound = 5;
-    int maxStep = 10;
+    int maxStep = 16;
     int topCount = 10;
     private boolean childCaseFound = false;
 
