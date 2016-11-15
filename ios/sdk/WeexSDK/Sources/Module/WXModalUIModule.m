@@ -321,7 +321,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         case WXModalTypePrompt: {
             NSString *clickTitle = [alertView buttonTitleAtIndex:buttonIndex];
             NSString *text= [[alertView textFieldAtIndex:0] text] ?: @"";
-            result = [WXUtility JSONString:@{ @"result": clickTitle, @"data": text }];
+            result = @{ @"result": clickTitle, @"data": text };
         }
         default:
             break;

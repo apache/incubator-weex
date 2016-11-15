@@ -9,6 +9,7 @@
 #import "WXDatePickerManager.h"
 #import <UIKit/UIDatePicker.h>
 #import <UIKit/UIKit.h>
+#import "WXConvert.h"
 
 #define WXPickerHeight 266
 
@@ -68,47 +69,51 @@
 
 -(void)configDatePicker:(NSDictionary *)attributes
 {
-    if(attributes[@"type"])
+    NSString *type = [WXConvert NSString:attributes[@"type"]];
+    if(type)
     {
-        _type = attributes[@"type"];
-        if( [attributes[@"type"] isEqualToString:@"date"])
+        _type = type;
+        if( [type isEqualToString:@"date"])
         {
-            if(attributes[@"value"])
+            self.datePicker.datePickerMode = UIDatePickerModeDate;
+            NSString *value = [WXConvert NSString:attributes[@"value"]];
+            if(value)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"value"]];
+                NSDate *date = [self inputDateStringToDate:value];
                 if(date)
                 {
                     self.datePicker.date =date;
                 }
             }
-            if(attributes[@"max"])
+            NSString *max = [WXConvert NSString:attributes[@"max"]];
+            if(max)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"max"]];
+                NSDate *date = [self inputDateStringToDate:max];
                 if(date)
                 {
                     self.datePicker.maximumDate =date;
                 }
             }
-            if(attributes[@"min"])
+            NSString *min = [WXConvert NSString:attributes[@"min"]];
+            if(min)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"min"]];
+                NSDate *date = [self inputDateStringToDate:min];
                 if(date)
                 {
                     self.datePicker.minimumDate =date;
                 }
             }
-            
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
-        }else if([attributes[@"type"] isEqualToString:@"time"])
+        }else if([type isEqualToString:@"time"])
         {
-            if(attributes[@"value"])
+            self.datePicker.datePickerMode = UIDatePickerModeTime;
+            NSString *value = [WXConvert NSString:attributes[@"value"]];
+            if(value)
             {
-                NSDate *date = [self inputTimeStringToDate:attributes[@"value"]];
+                NSDate *date = [self inputTimeStringToDate:value];
                 if(date)
                 {
                     self.datePicker.date = date;
                 }
-                self.datePicker.datePickerMode = UIDatePickerModeTime;
             }
         }
     }
@@ -116,50 +121,56 @@
 
 -(void)updateDatePicker:(NSDictionary *)attributes
 {
-    if(attributes[@"type"])
+    NSString *type = [WXConvert NSString:attributes[@"type"]];
+    if(type)
     {
-        _type = attributes[@"type"];
-        if( [attributes[@"type"] isEqualToString:@"date"])
+        _type = type;
+    }
+    if(_type)
+    {
+        if( [_type isEqualToString:@"date"])
         {
-            if(attributes[@"value"])
+            self.datePicker.datePickerMode = UIDatePickerModeDate;
+            NSString *value = [WXConvert NSString:attributes[@"value"]];
+            if(value)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"value"]];
+                NSDate *date = [self inputDateStringToDate:value];
                 if(date)
                 {
                     self.datePicker.date =date;
                 }
             }
-            if(attributes[@"max"])
+            NSString *max = [WXConvert NSString:attributes[@"max"]];
+            if(max)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"max"]];
+                NSDate *date = [self inputDateStringToDate:max];
                 if(date)
                 {
                     self.datePicker.maximumDate =date;
                 }
             }
-            if(attributes[@"min"])
+            NSString *min = [WXConvert NSString:attributes[@"min"]];
+            if(min)
             {
-                NSDate *date = [self inputDateStringToDate:attributes[@"min"]];
+                NSDate *date = [self inputDateStringToDate:min];
                 if(date)
                 {
                     self.datePicker.minimumDate =date;
                 }
             }
-            
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
-        }else if([attributes[@"type"] isEqualToString:@"time"])
+        }else if([_type isEqualToString:@"time"])
         {
-            if(attributes[@"value"])
+            self.datePicker.datePickerMode = UIDatePickerModeTime;
+            NSString *value = [WXConvert NSString:attributes[@"value"]];
+            if(value)
             {
-                NSDate *date = [self inputTimeStringToDate:attributes[@"value"]];
+                NSDate *date = [self inputTimeStringToDate:value];
                 if(date)
                 {
                     self.datePicker.date = date;
                 }
-                self.datePicker.datePickerMode = UIDatePickerModeTime;
             }
         }
-        
     }
 }
 

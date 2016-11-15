@@ -17,6 +17,9 @@
 #import "WXUtility.h"
 #import "WXMonitor.h"
 #import "WXScrollerProtocol.h"
+#import "WXSDKManager.h"
+#import "WXSDKError.h"
+#import "WXInvocationConfig.h"
 
 static NSThread *WXComponentThread;
 
@@ -158,8 +161,6 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     
     _rootComponent = [self _buildComponentForData:data];
-    self.weexInstance.rootView.wx_component = _rootComponent;
-    
     [self _initRootCSSNode];
     
     __weak typeof(self) weakSelf = self;
@@ -391,6 +392,33 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     }];
 }
 
+- (void)dispatchComponentMethod:(WXBridgeMethod *)method
+{
+    if (!method) {
+        return;
+    }
+    Class componentClazz = [WXComponentFactory classWithComponentName:method.targets[@"component"]];
+    if (!componentClazz) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist！", method.module];
+        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
+        return;
+    }
+    WXPerformBlockOnComponentThread(^{
+        WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
+        WXComponent *componentInstance = [weexInstance componentForRef:method.targets[@"ref"]];
+        
+        [self _executeComponentMethod:componentInstance withMethod:method];
+    });
+}
+
+- (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
+{
+    NSInvocation * invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:target method:method];
+    WXPerformBlockOnMainThread(^{
+        [invocation invoke];
+    });
+}
+
 #pragma mark Life Cycle
 
 - (void)createFinish
@@ -407,7 +435,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
-            [instance creatFinish];
             instance.renderFinish(rootView);
         }
     }];
