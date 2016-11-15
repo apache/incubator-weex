@@ -10,17 +10,23 @@ const channels = {}
 
 /**
  * Mock MessageEvent type
- * @param {whatever} message
+ * @param {string} type
+ * @param {object} dict { data, origin, source, ports }
  *
  * This type has been simplified.
  * https://html.spec.whatwg.org/multipage/comms.html#messageevent
  * https://dom.spec.whatwg.org/#interface-event
  */
-function MessageEvent (message) {
-  this.data = message
-  this.origin = ''
+export function MessageEvent (type, dict = {}) {
+  this.type = type || 'message'
+
+  this.data = dict.data || null
+  this.origin = dict.origin || ''
+  this.source = dict.source || null
+  this.ports = dict.ports || []
+
+  // inherit properties
   this.target = null
-  this.type = 'message'
   this.timeStamp = Date.now()
 }
 
@@ -29,7 +35,7 @@ function MessageEvent (message) {
  * channel name can be sent and received.
  * @param {string} name
  */
-export default function BroadcastChannel (name) {
+export function BroadcastChannel (name) {
   // the name property is readonly
   Object.defineProperty(this, 'name', {
     configurable: false,
@@ -38,7 +44,7 @@ export default function BroadcastChannel (name) {
     value: String(name)
   })
 
-  this.closed = false
+  this._closed = false
   this.onmessage = null
 
   if (!channels[this.name]) {
@@ -49,13 +55,11 @@ export default function BroadcastChannel (name) {
 
 /**
  * Sends the given message to other BroadcastChannel objects set up for this channel.
- * @param {object} message
+ * @param {any} message
  */
 BroadcastChannel.prototype.postMessage = function (message) {
-  if (this.closed) {
-    // should throw an DOMException
-    // throw new DOMException('InvalidStateError: This BroadcastChannel is closed.')
-    throw new Error('This BroadcastChannel is closed.')
+  if (this._closed) {
+    throw new Error(`BroadcastChannel "${this.name}" is closed.`)
   }
 
   const subscribers = channels[this.name]
@@ -63,10 +67,10 @@ BroadcastChannel.prototype.postMessage = function (message) {
     for (let i = 0; i < subscribers.length; ++i) {
       const member = subscribers[i]
 
-      if (member.closed || member === this) continue
+      if (member._closed || member === this) continue
 
       if (typeof member.onmessage === 'function') {
-        member.onmessage(new MessageEvent(message))
+        member.onmessage(new MessageEvent('message', { data: message }))
       }
     }
   }
@@ -76,7 +80,7 @@ BroadcastChannel.prototype.postMessage = function (message) {
  * Closes the BroadcastChannel object, opening it up to garbage collection.
  */
 BroadcastChannel.prototype.close = function () {
-  this.closed = true
+  this._closed = true
 
   // remove itself from channels.
   if (channels[this.name]) {

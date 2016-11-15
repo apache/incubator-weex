@@ -1,7 +1,8 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 
-import BroadcastChannel from '../../../shared/BroadcastChannel'
+// import '../../../shared'
+import { MessageEvent, BroadcastChannel } from '../../../shared/BroadcastChannel'
 
 describe('BroadcastChannel', () => {
   it('is a function', () => {
@@ -137,7 +138,39 @@ describe('BroadcastChannel', () => {
       expect(Steven.onmessage.callCount).to.be.equal(0)
     })
 
-    it('MessageEvent', () => {
+    it('MessageEvent dafault parameters', () => {
+      const event = new MessageEvent()
+
+      expect(event).is.an('object')
+      expect(event.data).to.be.null
+      expect(event.type).to.be.equal('message')
+      expect(event.origin).to.be.equal('')
+      expect(event.target).to.be.null
+      expect(event.source).to.be.null
+      expect(event.timeStamp).to.be.a('number')
+      expect(event.ports).to.be.an('array')
+    })
+
+    it('MessageEvent constructor', () => {
+      const source = { type: 'empty' }
+      const event = new MessageEvent('custom', {
+        source,
+        data: 'Nothing',
+        origin: 'http://127.0.0.1',
+        ports: ['8080']
+      })
+
+      expect(event).is.an('object')
+      expect(event.data).to.be.equal('Nothing')
+      expect(event.type).to.be.equal('custom')
+      expect(event.origin).to.be.equal('http://127.0.0.1')
+      expect(event.target).to.be.null
+      expect(event.source).to.deep.equal(source)
+      expect(event.timeStamp).to.be.a('number')
+      expect(event.ports).to.deep.equal(['8080'])
+    })
+
+    it('use MessageEvent', () => {
       Steven.postMessage('Be Together.')
 
       const event = Stack.onmessage.firstCall.args[0]
