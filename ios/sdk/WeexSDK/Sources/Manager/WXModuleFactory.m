@@ -141,7 +141,7 @@ static WXModuleFactory *_sharedInstance = nil;
     NSMutableDictionary *moduleDic = [[NSMutableDictionary alloc] init];
     void (^moduleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         WXModuleConfig *moduleConfig = (WXModuleConfig *)mObj;
-        if (moduleConfig.clazz) {
+        if (moduleConfig.clazz && moduleConfig.name) {
             [moduleDic setObject:moduleConfig.clazz forKey:moduleConfig.name];
         }
     };
