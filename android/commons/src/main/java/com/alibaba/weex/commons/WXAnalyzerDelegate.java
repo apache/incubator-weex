@@ -204,205 +204,176 @@
  */
 package com.alibaba.weex.commons;
 
-import android.graphics.Rect;
-import android.os.Bundle;
-import android.support.annotation.CallSuper;
+import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import com.alibaba.weex.commons.util.ScreenUtil;
-import com.alibaba.weex.commons.util.AssertUtil;
-import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXRenderStrategy;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.taobao.weex.WXSDKInstance;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
- * Created by sospartan on 5/30/16.
+ * Description:
+ * <p>
+ * Created by rowandjj(chuyi)<br/>
+ * Date: 2016/10/27<br/>
+ * Time: 下午7:01<br/>
  */
-public abstract class AbstractWeexActivity extends AppCompatActivity implements IWXRenderListener {
-  private static final String TAG = "AbstractWeexActivity";
 
-  private ViewGroup mContainer;
-  private WXSDKInstance mInstance;
+public final class WXAnalyzerDelegate {
+    private Object mWXAnalyzer;
 
-  protected WXAnalyzerDelegate mWxAnalyzerDelegate;
+    private static boolean ENABLE = false;
 
-  @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    createWeexInstance();
-    mInstance.onActivityCreate();
-    mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
-    mWxAnalyzerDelegate.onCreate();
-  }
-
-  protected final void setContainer(ViewGroup container){
-    mContainer = container;
-  }
-
-  protected final ViewGroup getContainer(){
-    return mContainer;
-  }
-
-  protected void destoryWeexInstance(){
-    if(mInstance != null){
-      mInstance.registerRenderListener(null);
-      mInstance.destroy();
-      mInstance = null;
+    @SuppressWarnings("unchecked")
+    public WXAnalyzerDelegate(@Nullable Context context) {
+        if(!ENABLE){
+            return;
+        }
+        if(context == null){
+            return;
+        }
+        try {
+            Class clazz = Class.forName("com.taobao.weex.analyzer.WeexDevOptions");
+            Constructor constructor = clazz.getDeclaredConstructor(Context.class);
+            mWXAnalyzer = constructor.newInstance(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 
-  protected void createWeexInstance(){
-    destoryWeexInstance();
-
-    Rect outRect = new Rect();
-    getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
-
-    mInstance = new WXSDKInstance(this);
-    mInstance.registerRenderListener(this);
-  }
-
-  protected void renderPage(String template,String source){
-    renderPage(template,source,null);
-  }
-
-  protected void renderPage(String template,String source,String jsonInitData){
-    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
-    Map<String, Object> options = new HashMap<>();
-    options.put(WXSDKInstance.BUNDLE_URL, source);
-    mInstance.render(
-      getPageName(),
-      template,
-      options,
-      jsonInitData,
-      ScreenUtil.getDisplayWidth(this),
-      ScreenUtil.getDisplayHeight(this),
-      WXRenderStrategy.APPEND_ASYNC);
-  }
-
-  protected void renderPageByURL(String url){
-    renderPageByURL(url,null);
-  }
-
-  protected void renderPageByURL(String url,String jsonInitData){
-    AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
-    Map<String, Object> options = new HashMap<>();
-    options.put(WXSDKInstance.BUNDLE_URL, url);
-    mInstance.renderByUrl(
-      getPageName(),
-      url,
-      options,
-      jsonInitData,
-      ScreenUtil.getDisplayWidth(this),
-      ScreenUtil.getDisplayHeight(this),
-      WXRenderStrategy.APPEND_ASYNC);
-  }
-
-  protected String getPageName(){
-    return TAG;
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    if(mInstance!=null){
-      mInstance.onActivityStart();
+    public void onCreate() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onCreate");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onStart();
-    }
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    if(mInstance!=null){
-      mInstance.onActivityResume();
-    }
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onResume();
-    }
-  }
-
-  @Override
-  public void onPause() {
-    super.onPause();
-    if(mInstance!=null){
-      mInstance.onActivityPause();
-    }
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onPause();
-    }
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    if(mInstance!=null){
-      mInstance.onActivityStop();
-    }
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onStop();
-    }
-  }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    if(mInstance!=null){
-      mInstance.onActivityDestroy();
-    }
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onDestroy();
-    }
-  }
-
-  @Override
-  public void onViewCreated(WXSDKInstance wxsdkInstance, View view) {
-    View wrappedView = null;
-    if(mWxAnalyzerDelegate != null){
-      wrappedView = mWxAnalyzerDelegate.onWeexViewCreated(wxsdkInstance,view);
-    }
-    if(wrappedView != null){
-      view = wrappedView;
-    }
-    if (mContainer != null) {
-      mContainer.removeAllViews();
-      mContainer.addView(view);
-    }
-  }
 
 
-
-  @Override
-  public void onRefreshSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
-
-  }
-
-  @Override
-  @CallSuper
-  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-    if(mWxAnalyzerDelegate  != null){
-      mWxAnalyzerDelegate.onWeexRenderSuccess(instance);
+    public void onStart() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStart");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 
-  @Override
-  @CallSuper
-  public void onException(WXSDKInstance instance, String errCode, String msg) {
-    if(mWxAnalyzerDelegate != null){
-      mWxAnalyzerDelegate.onException(instance,errCode,msg);
+    public void onResume() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onResume");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-  }
 
-  @Override
-  @CallSuper
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
-    return (mWxAnalyzerDelegate != null && mWxAnalyzerDelegate.onKeyUp(keyCode,event)) || super.onKeyUp(keyCode, event);
-  }
+
+    public void onPause() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onPause");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onStop() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStop");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onDestroy() {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onDestroy");
+            method.invoke(mWXAnalyzer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void onWeexRenderSuccess(@Nullable WXSDKInstance instance) {
+        if (mWXAnalyzer == null || instance == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onWeexRenderSuccess", WXSDKInstance.class);
+            method.invoke(mWXAnalyzer, instance);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (mWXAnalyzer == null) {
+            return false;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onKeyUp", int.class, KeyEvent.class);
+            return (boolean) method.invoke(mWXAnalyzer, keyCode, event);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void onException(WXSDKInstance instance, String errCode, String msg) {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(errCode) && TextUtils.isEmpty(msg)) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onException", WXSDKInstance.class, String.class, String.class);
+            method.invoke(mWXAnalyzer, instance, errCode, msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public View onWeexViewCreated(WXSDKInstance instance, View view) {
+        if (mWXAnalyzer == null || instance == null || view == null) {
+            return null;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onWeexViewCreated", WXSDKInstance.class, View.class);
+            View retView = (View) method.invoke(mWXAnalyzer, instance, view);
+            return retView;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return view;
+        }
+    }
+
 }
