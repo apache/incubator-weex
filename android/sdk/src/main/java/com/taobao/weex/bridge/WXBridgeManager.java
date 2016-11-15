@@ -435,13 +435,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       return;
     }
 
-    if (isJSThread() && r != null) {
-      r.run();
-    } else {
-      Message m = Message.obtain(mJSHandler, WXThread.secure(r));
-      m.obj = token;
-      m.sendToTarget();
-    }
+    Message m = Message.obtain(mJSHandler, WXThread.secure(r));
+    m.obj = token;
+    m.sendToTarget();
   }
 
   void setTimeout(String callbackId, String time) {
@@ -1132,16 +1128,19 @@ public class WXBridgeManager implements Callback,BactchExecutor {
    */
 
   public void registerModules(final Map<String, Object> modules) {
-    if ( mJSHandler == null || modules == null
-        || modules.size() == 0) {
-      return;
-    }
-    post(new Runnable() {
-      @Override
-      public void run() {
+    if (modules != null && modules.size() != 0) {
+      if(isJSThread()){
         invokeRegisterModules(modules);
       }
-    }, null);
+      else{
+        post(new Runnable() {
+          @Override
+          public void run() {
+            invokeRegisterModules(modules);
+          }
+        }, null);
+      }
+    }
   }
 
   /**
