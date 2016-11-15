@@ -31,9 +31,9 @@
     return self;
 }
 
-- (bool)isValid
+- (BOOL)isValid
 {
-    if (_name == nil || _clazz == nil || _properties == nil) {
+    if (self.name == nil || self.clazz == nil || _properties == nil) {
         return NO;
     }
     return YES;
