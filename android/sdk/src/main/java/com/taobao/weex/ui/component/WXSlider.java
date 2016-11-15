@@ -237,6 +237,7 @@ import java.util.Map;
 
 public class WXSlider extends WXVContainer<FrameLayout> {
 
+  public static final String INDEX = "index";
   Map<String, Object> params = new HashMap<>();
 
   public static class Creator implements ComponentCreator {
@@ -356,6 +357,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     mAdapter.removePageView(child.getHostView());
     mAdapter.notifyDataSetChanged();
+    super.remove(child,destroy);
   }
 
   @Override
@@ -442,7 +444,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
     int i;
     try {
-      i = Integer.valueOf(value);
+      i = Integer.parseInt(value);
     } catch (NumberFormatException e) {
       WXLogUtils.e("", e);
       return;
@@ -525,11 +527,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       WXEvent event = getDomObject().getEvents();
       String ref = getDomObject().getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
-        params.put("index", realPosition);
+        params.put(INDEX, realPosition);
 
         Map<String, Object> domChanges = new HashMap<>();
         Map<String, Object> attrsChanges = new HashMap<>();
-        attrsChanges.put("value", realPosition);
+        attrsChanges.put(INDEX, realPosition);
         domChanges.put("attrs", attrsChanges);
         WXSDKManager.getInstance().fireEvent(getInstanceId(), ref,
             Constants.Event.CHANGE, params, domChanges);

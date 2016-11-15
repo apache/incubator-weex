@@ -159,7 +159,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WXSDKManager {
 
-  private static WXSDKManager sManager;
+  private static volatile WXSDKManager sManager;
   private static AtomicInteger sInstanceId = new AtomicInteger(0);
   private final WXDomManager mWXDomManager;
   private WXBridgeManager mBridgeManager;
