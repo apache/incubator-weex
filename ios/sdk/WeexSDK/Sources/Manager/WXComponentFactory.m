@@ -33,6 +33,14 @@
     return self;
 }
 
+- (bool)isValid
+{
+    if (_name == nil || _clazz == nil || _properties == nil) {
+        return NO;
+    }
+    return YES;
+}
+
 @end
 
 @implementation WXComponentFactory
@@ -93,13 +101,13 @@
     NSMutableDictionary *componentDic = [[NSMutableDictionary alloc] init];
     void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         WXComponentConfig *componentConfig = (WXComponentConfig *)mObj;
-        NSMutableDictionary *configDic = [[NSMutableDictionary alloc] init];
-        [configDic setObject:componentConfig.name forKey:@"name"];
-        [configDic setObject:componentConfig.clazz forKey:@"clazz"];
-        if (componentConfig.properties) {
+        if ([componentConfig isValid]) {
+            NSMutableDictionary *configDic = [[NSMutableDictionary alloc] init];
+            [configDic setObject:componentConfig.name forKey:@"name"];
+            [configDic setObject:componentConfig.clazz forKey:@"clazz"];
             [configDic setObject:componentConfig.properties forKey:@"pros"];
+            [componentDic setObject:configDic forKey:componentConfig.name];
         }
-        [componentDic setObject:configDic forKey:componentConfig.name];
     };
     [_componentConfigs enumerateKeysAndObjectsUsingBlock:componentBlock];
     return componentDic;
