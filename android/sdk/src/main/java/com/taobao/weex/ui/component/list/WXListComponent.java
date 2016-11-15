@@ -562,7 +562,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         }
       },50);
 
-      onPostScrollToPosition(pos);
+//      onPostScrollToPosition(pos);
     }
 
   }
