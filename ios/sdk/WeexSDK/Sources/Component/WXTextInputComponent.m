@@ -10,6 +10,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXDefine.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -86,6 +87,9 @@
 @synthesize border = _border;
 @synthesize padding = _padding;
 @synthesize textStorage = _textStorage;
+
+WX_EXPORT_METHOD(@selector(focus))
+WX_EXPORT_METHOD(@selector(blur))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -226,6 +230,22 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardWillHideNotification
                                                   object:nil];
+}
+
+-(void)focus
+{
+    if(self.view)
+    {
+        [self.view becomeFirstResponder];
+    }
+}
+
+-(void)blur
+{
+    if(self.view)
+    {
+        [self.view resignFirstResponder];
+    }
 }
 
 #pragma mark - Add Event

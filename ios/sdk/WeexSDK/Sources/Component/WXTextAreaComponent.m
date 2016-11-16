@@ -130,7 +130,7 @@
         }
         
         if (styles[@"color"]) {
-           _color = [WXConvert UIColor:styles[@"color"]];
+            _color = [WXConvert UIColor:styles[@"color"]];
         }
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -174,25 +174,14 @@
 - (void)viewDidLoad
 {
     _textView = (WXTextAreaView*)self.view;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewEditChanged:)
-                                                 name:UITextViewTextDidChangeNotification
-                                               object:_textView];
     [self setEnabled];
     [self setAutofocus];
-    [self setPlaceholderAttributedString];
     if (_placeholderString) {
         _placeHolderLabel = [[UILabel alloc] init];
-        [self setPlaceholderAttributedString];
-        [_placeHolderLabel setFrame:(CGRect){
-            .origin.x = CGRectGetMinX(_textView.bounds),
-            .origin.y = CGRectGetMinY(_textView.bounds)+5,
-            .size.width = _textView.frame.size.width,
-            .size.height = [_placeholderString sizeWithAttributes:nil].height
-        }];
-        
+        _placeHolderLabel.numberOfLines = 0;
         [_textView addSubview:_placeHolderLabel];
     }
-   
+    [self setPlaceholderAttributedString];
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];
@@ -219,7 +208,7 @@
     [_textView setClipsToBounds:YES];
 }
 
-#pragma mark - Add Event
+#pragma mark - add-remove Event
 - (void)addEvent:(NSString *)eventName
 {
     if ([eventName isEqualToString:@"input"]) {
@@ -238,8 +227,6 @@
         _clickEvent = YES;
     }
 }
-
-#pragma Remove Event
 
 -(void)removeEvent:(NSString *)eventName
 {
@@ -261,7 +248,6 @@
 }
 
 #pragma mark - upate attributes
-
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"autofocus"]) {
@@ -272,7 +258,6 @@
     }
     if (attributes[@"placeholder"]) {
         _placeholderString = attributes[@"placeholder"];
-
     }
     if (attributes[@"value"]) {
         NSString * value = [WXConvert NSString:attributes[@"value"]];
@@ -305,7 +290,6 @@
 }
 
 #pragma mark - upate styles
-
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
@@ -387,7 +371,6 @@
 #pragma mark textview Delegate
 - (void)textViewDidBeginEditing:(UITextView *)textView
 {
-    _placeHolderLabel.text = @"";
     _changeEventString = [textView text];
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
@@ -396,6 +379,14 @@
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+}
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    _placeHolderLabel.text = @"";
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":textView.text}];
+    }
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
@@ -413,14 +404,7 @@
     }
 }
 
-- (void)textViewEditChanged:(NSNotification*)notifi
-{
-    if (_inputEvent) {
-        UITextView *textView = (UITextView *)notifi.object;
-        [self fireEvent:@"input" params:@{@"value":textView.text}];
-    }
-}
-
+#pragma mark - set properties
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
@@ -428,6 +412,12 @@
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
     }
     _placeHolderLabel.backgroundColor = [UIColor clearColor];
+    CGSize expectedLabelSize = [_placeholderString boundingRectWithSize:CGSizeMake(_textView.frame.size.width/2, _textView.frame.size.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:nil context:nil].size;
+    _placeHolderLabel.clipsToBounds = NO;
+    CGRect newFrame = _placeHolderLabel.frame;
+    newFrame.size.height = ceil(expectedLabelSize.height);
+    newFrame.size.width = _textView.frame.size.width;
+    _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }
 
