@@ -203,211 +203,134 @@
  *    limitations under the License.
  */
 
-package com.alibaba.weex;
+package com.alibaba.weex.benchmark;
 
-import android.os.Bundle;
-import android.support.test.espresso.idling.CountingIdlingResource;
-import android.support.v7.app.AppCompatActivity;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.alibaba.weex.commons.adapter.ImageAdapter;
-import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.InitConfig;
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.utils.WXFileUtils;
+import com.alibaba.weex.BenchmarkActivity;
+import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.utils.WXLogUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class BenchmarkActivity extends AppCompatActivity implements IWXRenderListener {
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-  public final static String ROOT = "root";
-  private final static String TAG = "WEEX";
-  private final static String URL =
-      "http://h5.waptest.taobao.com/app/weextc031/build/TC_Monitor_List_WithAppendTree.js";
-  public static CountingIdlingResource countingIdlingResource;
-  private WXSDKInstance mInstance;
-  private LinearLayout root;
-  private long startTime;
-  private long endTime;
-  private long duration;
-  private boolean perfStart;
-  private boolean perfEnd;
-  private boolean isWeex;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    root = new LinearLayout(this);
-    root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                    ViewGroup.LayoutParams.MATCH_PARENT));
-    root.setOrientation(LinearLayout.VERTICAL);
-    root.setContentDescription(ROOT);
-    setContentView(root);
-    root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-      @Override
-      public void onGlobalLayout() {
-        endTime = System.currentTimeMillis();
-        Log.v(TAG, "End: " + endTime);
-        if (perfStart && (perfEnd||!isWeex)) {
-          perfStart = false;
-          perfEnd = false;
-          duration = (endTime - startTime);
-          Log.v(TAG, "OnGlobalLayoutListener: " + getDuration());
+@RunWith(AndroidJUnit4.class)
+public class WeexNativeCompareTest {
+  private static final String TAG = "benchmark";
+  private static final int TIMES = 40;
+  private static final int FRAMES = 120;
+  private static final float FIRST_SCREEN_RENDER_TIME = 600F;
+  private static final String DUMP_START = "Flags,IntendedVsync,Vsync,OldestInputEvent,NewestInputEvent,"
+                                           + "HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,"
+                                           + "SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,\n";
+  private static final String DUMP_END = "---PROFILEDATA---";
+  private static final String DUMP_COMMAND = "dumpsys gfxinfo com.alibaba.weex framestats reset";
+
+  @Rule
+  public BenchmarkActivityTestRule mActivityRule = new BenchmarkActivityTestRule(
+      BenchmarkActivity.class);
+  @Rule
+  public RepeatRule repeatRule = new RepeatRule();
+  private UiDevice mUiDevice;
+
+  @Before
+  public void init() {
+    mUiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+  }
+
+  @Test
+  public void testWeexPerformance() {
+    List<Long> localTotalTime = new ArrayList<>(TIMES);
+    for (int i = 0; i < TIMES; i++) {
+      long currentTime = calcTime(true);
+      localTotalTime.add(currentTime);
+      Log.d(TAG, "Weex render time: " + currentTime + "ms");
+    }
+    BoxPlot boxPlot = new BoxPlot(localTotalTime);
+    Log.i(TAG, "Average Weex render time: " + boxPlot.draw());
+  }
+
+  @Test
+  public void testNativePerformance(){
+    List<Long> localTotalTime = new ArrayList<>(TIMES);
+    for (int i = 0; i < TIMES; i++) {
+      long currentTime = calcTime(false);
+      localTotalTime.add(currentTime);
+      Log.d(TAG, "Native render time: " + currentTime + "ms");
+    }
+    BoxPlot boxPlot = new BoxPlot(localTotalTime);
+    Log.i(TAG, "Average native render time: " + boxPlot.draw());
+  }
+
+  private long calcTime(boolean weex) {
+    BenchmarkActivity benchmarkActivity = mActivityRule.getActivity();
+    benchmarkActivity.loadWeexPage(weex);
+    if(weex) {
+      onView(withClassName(Matchers.is(WXFrameLayout.class.getName()))).perform
+          (ViewActions.swipeDown());
+    }
+    else{
+      onView(withClassName(Matchers.is(TextView.class.getName()))).perform
+          (ViewActions.swipeDown());
+    }
+    return benchmarkActivity.getDuration();
+        //.getWXInstance().getWXPerformance().screenRenderTime;
+  }
+
+  private void processGfxInfo(List<Long> container) {
+    try {
+      String line;
+      String[] columns;
+      long timeStart, timeEnd, duration;
+      String result = mUiDevice.executeShellCommand(DUMP_COMMAND);
+      result = result.substring(result.indexOf(DUMP_START), result.lastIndexOf(DUMP_END));
+      result = result.substring(DUMP_START.length());
+      BufferedReader bufferedReader = new BufferedReader(new StringReader(result));
+      List<Long> list = createList(bufferedReader);
+      container.addAll(list);
+      BoxPlot boxPlot = new BoxPlot(list);
+      boxPlot.draw();
+      Log.d(TAG, "FPS : " + boxPlot.getMedian() + " ms");
+    } catch (IOException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+    }
+  }
+
+  private List<Long> createList(BufferedReader bufferedReader) throws IOException {
+    String line;
+    String[] columns;
+    long timeStart, timeEnd, duration;
+    List<Long> list = new ArrayList<>(FRAMES);
+    while (!TextUtils.isEmpty(line = bufferedReader.readLine())) {
+      columns = line.split(",");
+      if (Long.parseLong(columns[0]) == 0) {
+        timeStart = Long.parseLong(columns[1]);
+        timeEnd = Long.parseLong(columns[columns.length - 1]);
+        duration = timeEnd - timeStart;
+        if (duration > 0) {
+          list.add(TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS));
         }
       }
-    });
-    WXEnvironment.isPerf = true;
-    WXSDKEngine.addCustomOptions("appName", "WXSample");
-    WXSDKEngine.addCustomOptions("appGroup", "WXApp");
-    WXSDKEngine.initialize(getApplication(),
-                           new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build());
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    if (mInstance != null) {
-      mInstance.onActivityStart();
     }
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    if (mInstance != null) {
-      mInstance.onActivityResume();
-    }
-  }
-
-  @Override
-  public void onPause() {
-    super.onPause();
-    if (mInstance != null) {
-      mInstance.onActivityPause();
-    }
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    if (mInstance != null) {
-      mInstance.onActivityStop();
-    }
-  }
-
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    if (mInstance != null) {
-      mInstance.onActivityDestroy();
-    }
-  }
-
-  @Override
-  public void onViewCreated(WXSDKInstance instance, View view) {
-    if (root != null) {
-      root.removeAllViews();
-      root.addView(view);
-    }
-  }
-
-  @Override
-  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-    if (countingIdlingResource != null) {
-      countingIdlingResource.decrement();
-    }
-    perfEnd = true;
-  }
-
-  @Override
-  public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
-  }
-
-  @Override
-  public void onException(WXSDKInstance instance, String errCode, String msg) {
-
-  }
-
-  public WXSDKInstance getWXInstance() {
-    return mInstance;
-  }
-
-  public void loadWeexPage(final boolean weex) {
-    isWeex=weex;
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (weex) {
-          if (mInstance != null) {
-            mInstance.destroy();
-          }
-          mInstance = new WXSDKInstance(BenchmarkActivity.this);
-          Map<String, Object> options = new HashMap<>();
-          options.put(WXSDKInstance.BUNDLE_URL, "file://assets/hello_weex.js");
-          mInstance.registerRenderListener(BenchmarkActivity.this);
-          if (countingIdlingResource != null) {
-            countingIdlingResource.increment();
-          }
-          perfStart = true;
-          Log.v(TAG, "Start: " + startTime);
-          startTime = System.currentTimeMillis();
-          mInstance.render(TAG,
-                           WXFileUtils.loadAsset("hello.js", BenchmarkActivity.this),
-                           options,
-                           null,
-                           root.getWidth(),
-                           root.getHeight(),
-                           WXRenderStrategy.APPEND_ASYNC);
-        } else {
-          root.removeAllViews();
-          perfStart = true;
-          startTime = System.currentTimeMillis();
-          View.inflate(BenchmarkActivity.this, R.layout.hello_weex, root);
-        }
-      }
-    });
-  }
-
-  public void loadWeexPage() {
-    loadWeexPage(URL);
-  }
-
-  public void loadWeexPage(final String url) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        if (mInstance != null) {
-          mInstance.destroy();
-        }
-        mInstance = new WXSDKInstance(BenchmarkActivity.this);
-        Map<String, Object> options = new HashMap<>();
-        options.put(WXSDKInstance.BUNDLE_URL, url);
-        mInstance.registerRenderListener(BenchmarkActivity.this);
-        if (countingIdlingResource != null) {
-          countingIdlingResource.increment();
-        }
-        mInstance.renderByUrl(
-            TAG,
-            url,
-            options,
-            null,
-            root.getWidth(),
-            root.getHeight(),
-            WXRenderStrategy.APPEND_ASYNC);
-      }
-    });
-  }
-
-  public long getDuration() {
-    return duration;
+    return list;
   }
 }
