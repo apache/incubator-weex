@@ -232,6 +232,11 @@ WX_EXPORT_METHOD(@selector(blur))
                                                   object:nil];
 }
 
+- (void)dealloc {
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 -(void)focus
 {
     if(self.view)
