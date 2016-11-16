@@ -13,6 +13,9 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 
+#import "WXDivComponent.h"
+#import "WXImageComponent.h"
+
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 @implementation WXComponent (ViewManagement)
@@ -90,9 +93,22 @@
 
 #pragma mark Private
 
+- (UIColor *) _fetchBackgroundColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(self && ([self isKindOfClass:[WXDivComponent class]]|| [self isKindOfClass:[WXImageComponent class]]))
+    {
+        if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]])
+        {
+            color = [UIColor clearColor];
+        }
+    }
+    return color;
+}
+
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
-    _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
@@ -104,7 +120,7 @@
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
+        _backgroundColor = [self _fetchBackgroundColor:styles[@"backgroundColor"]];
         _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }

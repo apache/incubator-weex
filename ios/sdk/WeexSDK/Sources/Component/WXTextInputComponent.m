@@ -142,7 +142,7 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if (styles[@"color"]) {
-            [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+            [_inputView setTextColor:[self covertColor:styles[@"color"]]];
         }
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -334,7 +334,7 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+        [_inputView setTextColor:[self covertColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -399,6 +399,20 @@ WX_EXPORT_METHOD(@selector(blur))
             WXCeilPixelValue(computedSize.height)
         };
     };
+}
+
+-(UIColor *)covertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value)
+    {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str])
+        {
+            color = [UIColor blackColor];
+        }
+    }
+    return color;
 }
 
 #pragma mark -
