@@ -207,7 +207,8 @@ WX_EXPORT_METHOD(@selector(blur))
     _inputView.inputAccessoryView = toolbar;
 }
 
-- (void)viewWillLoad {
+- (void)viewWillLoad
+{
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWasShown:)
                                                  name:UIKeyboardDidShowNotification
@@ -219,17 +220,9 @@ WX_EXPORT_METHOD(@selector(blur))
                                                object:nil];
 }
 
-- (void)viewWillUnload
+- (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:_inputView];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardDidShowNotification
-                                                  object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillHideNotification
-                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(void)focus
