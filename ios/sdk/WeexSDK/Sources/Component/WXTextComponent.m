@@ -50,6 +50,10 @@
     
     if ([self.wx_component _needsDrawBorder]) {
         [self.wx_component _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self.wx_component _resetNativeBorderRadius];
+        });
     }
     NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
     NSTextContainer *textContainer = layoutManager.textContainers.firstObject;

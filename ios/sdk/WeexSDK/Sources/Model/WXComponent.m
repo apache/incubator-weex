@@ -22,6 +22,7 @@
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXThreadSafeMutableArray.h"
 #import "WXTransform.h"
+#import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
@@ -183,7 +184,7 @@
         if (![self _needsDrawBorder]) {
             _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
-            _layer.cornerRadius = _borderTopLeftRadius;
+            [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
         }
@@ -235,6 +236,12 @@
         WXComponent *subcomponent = subcomponents[i];
         [self insertSubview:subcomponent atIndex:i];
     }
+}
+
+- (void)_resetNativeBorderRadius
+{
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopRightRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    _layer.cornerRadius = borderRect.radii.topLeft;
 }
 
 - (void)_handleFirstScreenTime
