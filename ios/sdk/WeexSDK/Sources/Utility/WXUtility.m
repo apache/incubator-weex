@@ -320,19 +320,23 @@ static BOOL WXNotStat;
     WXThreadSafeMutableDictionary *fontFamilyDic = fontFace[fontFamily];
     if (fontFamilyDic[@"localSrc"]){
         NSString *fpath = [((NSURL*)fontFamilyDic[@"localSrc"]) path];
-        CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename([fpath UTF8String]);
-        CGFontRef customfont = CGFontCreateWithDataProvider(fontDataProvider);
-        
-        CGDataProviderRelease(fontDataProvider);
-        NSString *fontName = (__bridge NSString *)CGFontCopyFullName(customfont);
-        CFErrorRef error;
-        CTFontManagerRegisterGraphicsFont(customfont, &error);
-        if (error){
-            CTFontManagerUnregisterGraphicsFont(customfont, &error);
+        if ([self isFileExist:fpath]) {
+            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename([fpath UTF8String]);
+            CGFontRef customfont = CGFontCreateWithDataProvider(fontDataProvider);
+            
+            CGDataProviderRelease(fontDataProvider);
+            NSString *fontName = (__bridge NSString *)CGFontCopyFullName(customfont);
+            CFErrorRef error;
             CTFontManagerRegisterGraphicsFont(customfont, &error);
+            if (error){
+                CTFontManagerUnregisterGraphicsFont(customfont, &error);
+                CTFontManagerRegisterGraphicsFont(customfont, &error);
+            }
+            CGFontRelease(customfont);
+            font = [UIFont fontWithName:fontName size:fontSize];
+        }else {
+            [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
-        CGFontRelease(customfont);
-        font = [UIFont fontWithName:fontName size:fontSize];
     }
     if (!font) {
         if (fontFamily) {

@@ -12,6 +12,8 @@
 #define PAGENAME            @"pageName"
 #define WXSDKVERSION        @"WXSDKVersion"
 #define JSLIBVERSION        @"JSLibVersion"
+#define WXREQUESTTYPE       @"requestType"
+#define WXCONNECTIONTYPE    @"connectionType"
 
 #define SDKINITTIME         @"SDKInitTime"
 #define SDKINITINVOKETIME   @"SDKInitInvokeTime"

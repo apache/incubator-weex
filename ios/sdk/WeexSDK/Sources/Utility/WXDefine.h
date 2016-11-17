@@ -9,7 +9,7 @@
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.8.0"
+#define WX_SDK_VERSION @"0.9.1"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
@@ -69,6 +69,15 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_BRIDGE_THREAD_NAME @"com.taobao.weex.bridge"
 
 #define WX_FONT_DOWNLOAD_DIR [[WXUtility cacheDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"wxdownload"]]
+
+/**
+ *  @abstract export public method
+ */
+
+#define WX_EXPORT_METHOD(method) \
++ (NSString *)WX_CONCAT_WRAPPER(wx_export_method_, __LINE__) { \
+return NSStringFromSelector(method); \
+}
 
 /**
  *  @abstract Compared with system version of current device 

@@ -6,9 +6,11 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import <UIKit/UIKit.h>
 
-@interface WXClipboardModule : NSObject <WXModuleProtocol>
+@class WXSDKInstance;
+@interface WXRootView : UIView
+
+@property (nonatomic, weak) WXSDKInstance *instance;
 
 @end
