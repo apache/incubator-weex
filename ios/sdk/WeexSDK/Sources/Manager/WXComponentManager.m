@@ -161,6 +161,7 @@ static NSThread *WXComponentThread;
     WXAssertParam(data);
     
     _rootComponent = [self _buildComponentForData:data];
+
     [self _initRootCSSNode];
     
     __weak typeof(self) weakSelf = self;
