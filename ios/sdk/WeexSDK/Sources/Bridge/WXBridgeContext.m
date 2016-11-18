@@ -141,7 +141,7 @@ _Pragma("clang diagnostic pop") \
 
 #pragma mark JS Bridge Management
 
-- (NSInteger)invokeNative:(NSString *)instance tasks:(NSArray *)tasks callback:(NSString *)callback
+- (NSInteger)invokeNative:(NSString *)instance tasks:(NSArray *)tasks callback:(NSString __unused*)callback
 {
     WXAssertBridgeThread();
     
@@ -159,18 +159,6 @@ _Pragma("clang diagnostic pop") \
         WXBridgeMethod *method = [[WXBridgeMethod alloc] initWihData:task];
         method.instance = instance;
         [[WXInvocationConfig sharedInstance] dispatchMethod:method];
-    }
-    
-    NSMutableArray *sendQueue = [self.sendQueue valueForKey:instance];
-    if (!sendQueue) {
-        WXLogError(@"No send queue for instance:%@", instance);
-        return -1;
-    }
-    
-    if (![callback isEqualToString:@"undefined"] && ![callback isEqualToString:@"-1"] && callback) {
-        WXBridgeMethod *method = [self _methodWithCallback:callback];
-        method.instance = instance;
-        [sendQueue addObject:method];
     }
     
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
