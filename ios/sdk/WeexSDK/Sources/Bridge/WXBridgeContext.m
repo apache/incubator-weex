@@ -89,6 +89,11 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
         WXPerformBlockOnComponentThread(^{
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
@@ -99,7 +104,6 @@ _Pragma("clang diagnostic pop") \
         });
         
         return 0;
-
     }];
     
     return _jsBridge;
@@ -154,7 +158,10 @@ _Pragma("clang diagnostic pop") \
     for (NSDictionary *task in tasks) {
         WXBridgeMethod *method = [[WXBridgeMethod alloc] initWihData:task];
          method.instance = instance;
-        [[WXInvocationConfig sharedInstance] dispatchMethod:method];
+        id returnValue = [[WXInvocationConfig sharedInstance] dispatchMethod:method];
+        if (returnValue) {
+            return returnValue;
+        }
     }
     
     NSMutableArray *sendQueue = [self.sendQueue valueForKey:instance];
