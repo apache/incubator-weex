@@ -81,7 +81,7 @@
     WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
     id<WXModuleProtocol> moduleInstance = [weexInstance moduleForClass:module];
     
-    // dispatch to user specified queue or thread
+    // dispatch to user specified queue or thread, default is main thread
     __weak typeof(self) weakSelf = self;
     dispatch_block_t dipatchMethodBlock = ^ (){
         [weakSelf _executeModuleMethod:moduleInstance withMethod:method];
@@ -100,9 +100,7 @@
     WXAssert(targetQueue || targetThread, @"No queue or thread found for module:%@", moduleInstance);
     
     if (targetQueue) {
-        dispatch_async(targetQueue, ^{
-            dipatchMethodBlock();
-        });
+        dispatch_async(targetQueue, dipatchMethodBlock);
     } else {
         WXPerformBlockOnThread(^{
             dipatchMethodBlock();
