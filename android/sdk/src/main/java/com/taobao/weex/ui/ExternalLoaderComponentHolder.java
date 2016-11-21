@@ -238,11 +238,15 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   }
 
   private synchronized boolean generate(){
-    if(mClass==null){
+    Class clz = mClzGetter.getExternalComponentClass(mType);
+    if(clz == null){
+      //external loader may return null,skip
       return false;
     }
+    mClass = clz;
 
-    Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = SimpleComponentHolder.getMethods(mClass);
+
+    Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = SimpleComponentHolder.getMethods(clz);
     mPropertyInvokers = methodPair.first;
     mMethodInvokers = methodPair.second;
     return true;
@@ -253,7 +257,7 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   @Override
   public synchronized WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
     if(mClass == null){
-      mClass = mClzGetter.getExternalComponentClass(mType,instance);
+      mClass = mClzGetter.getExternalComponentClass(mType);
     }
     ComponentCreator creator = new SimpleComponentHolder.ClazzComponentCreator(mClass);
     WXComponent component = creator.createInstance(instance,node,parent);
