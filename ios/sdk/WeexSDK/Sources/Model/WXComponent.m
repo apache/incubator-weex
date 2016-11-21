@@ -91,6 +91,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _resetViewStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -382,9 +383,12 @@
     WXAssertMainThread();
     
     [self _updateViewStyles:styles];
+    [self _resetViewStyles:styles];
     [self _handleBorders:styles isUpdating:YES];
-    
+
     [self updateStyles:styles];
+    [self fetchResetStyles:styles];
+
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -402,6 +406,29 @@
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+#pragma mark Reset
+-(BOOL)isShouldReset:(NSString *)string
+{
+    if(!string || [@"" isEqualToString:string]){
+        return YES;
+    }
+    return NO;
+}
+
+-(void)fetchResetStyles:(NSDictionary *)styles
+{
+    NSMutableArray *resetStyleAry = [@[] mutableCopy];
+    if([self isShouldReset:styles[@"backgroundColor"]]){
+        [resetStyleAry addObject:@"backgroundColor"];
+    }
+    [self resetStyles:resetStyleAry];
+}
+
+- (void)resetStyles:(NSArray *)elements
 {
     WXAssertMainThread();
 }

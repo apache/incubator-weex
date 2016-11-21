@@ -275,6 +275,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateStyles:(NSDictionary *)styles;
 
 /**
+ * @abstract Called when component's style are reset
+ *
+ * @param elements The reset style's elements
+ * @discussion It can be overrided to handle specific style reseting. The method is called on the main thread.
+ **/
+- (void)resetStyles:(NSArray *)elements;
+
+/**
  * @abstract Called when component's attributes are updated
  *
  * @param attributes The updated attributes dictionary

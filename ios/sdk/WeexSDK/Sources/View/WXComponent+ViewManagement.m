@@ -96,10 +96,8 @@
 - (UIColor *) _fetchBackgroundColor:(id)value
 {
     UIColor *color = [WXConvert UIColor:value];
-    if(self)
-    {
-        if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]])
-        {
+    if(self) {
+        if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]]) {
             color = [UIColor clearColor];
         }
     }
@@ -108,7 +106,7 @@
 
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
-    _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
@@ -120,7 +118,7 @@
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
     if (styles[@"backgroundColor"]) {
-        _backgroundColor = [self _fetchBackgroundColor:styles[@"backgroundColor"]];
+        _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
         _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
@@ -177,6 +175,11 @@
             [_layer setNeedsDisplay];
         }
     }
+}
+
+-(void)_resetViewStyles:(NSDictionary *)styles
+{
+    _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
 }
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing

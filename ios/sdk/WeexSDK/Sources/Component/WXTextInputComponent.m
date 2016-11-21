@@ -404,11 +404,9 @@ WX_EXPORT_METHOD(@selector(blur))
 -(UIColor *)covertColor:(id)value
 {
     UIColor *color = [WXConvert UIColor:value];
-    if(value)
-    {
+    if(value) {
         NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str])
-        {
+        if(str && [@"" isEqualToString:str]) {
             color = [UIColor blackColor];
         }
     }

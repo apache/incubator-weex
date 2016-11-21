@@ -166,14 +166,11 @@ do {\
 {
     do{
         id value = styles[@"color"];
-        if(value)
-        {
+        if(value) {
             NSString *str = [WXConvert NSString:value];
-            if(str && [@"" isEqualToString:str])
-            {
+            if(str && [@"" isEqualToString:str]) {
                 _color = [UIColor blackColor];
-            }else
-            {
+            }else {
                 WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
             }
             [self setNeedsRepaint];
