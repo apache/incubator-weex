@@ -96,7 +96,7 @@
 - (UIColor *) _fetchBackgroundColor:(id)value
 {
     UIColor *color = [WXConvert UIColor:value];
-    if(self && ([self isKindOfClass:[WXDivComponent class]]|| [self isKindOfClass:[WXImageComponent class]]))
+    if(self)
     {
         if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]])
         {
