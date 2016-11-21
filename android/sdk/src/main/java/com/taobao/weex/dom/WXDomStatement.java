@@ -1209,6 +1209,7 @@ class WXDomStatement {
           return "startAnimationByCall";
         }
       });
+      mDirty=true;
     }
   }
 
