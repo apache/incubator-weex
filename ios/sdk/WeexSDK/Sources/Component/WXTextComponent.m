@@ -170,12 +170,12 @@ do {\
             NSString *str = [WXConvert NSString:value];
             if(str && [@"" isEqualToString:str]) {
                 _color = [UIColor blackColor];
+                [self setNeedsRepaint];
+                if (needLayout) {
+                    [self setNeedsLayout];
+                }
             }else {
-                WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
-            }
-            [self setNeedsRepaint];
-            if (needLayout) {
-                [self setNeedsLayout];
+                WX_STYLE_FILL_TEXT(color, color, UIColor, needLayout)
             }
         }
     }while(0);
