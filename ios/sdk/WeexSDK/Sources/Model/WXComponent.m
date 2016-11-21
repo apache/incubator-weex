@@ -421,11 +421,11 @@
 
 -(void)fetchResetStyles:(NSDictionary *)styles
 {
-    NSMutableArray *resetStyleAry = [@[] mutableCopy];
+    NSMutableArray *elements = [@[] mutableCopy];
     if([self isShouldReset:styles[@"backgroundColor"]]){
-        [resetStyleAry addObject:@"backgroundColor"];
+        [elements addObject:@"backgroundColor"];
     }
-    [self resetStyles:resetStyleAry];
+    [self resetStyles:elements];
 }
 
 - (void)resetStyles:(NSArray *)elements
