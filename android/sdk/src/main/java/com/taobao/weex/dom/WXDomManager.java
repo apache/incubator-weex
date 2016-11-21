@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.dom;
 
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -213,7 +214,9 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -542,9 +545,9 @@ public final class WXDomManager {
     statement.startAnimation(ref,animation,callBack);
   }
 
-  public void addRule(final String type,final JSONObject jsonObject) {
+  public void addRule(String instanceId,final String type,final JSONObject jsonObject) {
     if (Constants.Name.FONT_FACE.equals(type)) {
-      FontDO fontDO = parseFontDO(jsonObject);
+      FontDO fontDO = parseFontDO(jsonObject, mWXRenderManager.getWXSDKInstance(instanceId));
       if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
         FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
         if (cacheFontDO == null || !TextUtils.equals(cacheFontDO.getUrl(), fontDO.getUrl())) {
@@ -557,12 +560,14 @@ public final class WXDomManager {
     }
   }
 
-  private FontDO parseFontDO(JSONObject jsonObject) {
+  private FontDO parseFontDO(JSONObject jsonObject,WXSDKInstance instance) {
     if(jsonObject == null) {
       return null;
     }
     String src = jsonObject.getString(Constants.Name.SRC);
     String name = jsonObject.getString(Constants.Name.FONT_FAMILY);
+
+    src = instance.rewriteUri(Uri.parse(src), URIAdapter.FONT).toString();
     return new FontDO(name, src);
   }
 }

@@ -249,7 +249,6 @@ public class FontDO {
       try {
         URI uri = URI.create(mUrl);
         String scheme = uri.getScheme();
-        //TODO: use bundle url to process relative path. see #497
         if (Constants.Scheme.HTTP.equals(scheme) ||
                 Constants.Scheme.HTTPS.equals(scheme)) {
           mType = TYPE_NETWORK;
