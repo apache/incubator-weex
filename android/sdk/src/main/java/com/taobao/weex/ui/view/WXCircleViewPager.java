@@ -330,6 +330,10 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     postDelayed(scrollAction, intervalTime);
   }
 
+  public void pauseAutoScroll(){
+    removeCallbacks(scrollAction);
+  }
+
   /**
    * Stop auto scroll.
    */
