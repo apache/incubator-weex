@@ -422,8 +422,26 @@
 -(void)fetchResetStyles:(NSDictionary *)styles
 {
     NSMutableArray *elements = [@[] mutableCopy];
-    if([self isShouldReset:styles[@"backgroundColor"]]){
+    if([self isShouldReset:styles[@"backgroundColor"]]) {
         [elements addObject:@"backgroundColor"];
+    }
+    if([self isShouldReset:styles[@"opacity"]]) {
+        [elements addObject:@"opacity"];
+    }
+    if([self isShouldReset:styles[@"overflow"]]) {
+        [elements addObject:@"overflow"];
+    }
+    if([self isShouldReset:styles[@"visibility"]]) {
+        [elements addObject:@"visibility"];
+    }
+    if([self isShouldReset:styles[@"position"]]) {
+        [elements addObject:@"position"];
+    }
+    if([self isShouldReset:styles[@"transform"]]) {
+        [elements addObject:@"transform"];
+    }
+    if([self isShouldReset:styles[@"transformOrigin"]]) {
+        [elements addObject:@"transformOrigin"];
     }
     [self resetStyles:elements];
 }
