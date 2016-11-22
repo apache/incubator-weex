@@ -242,7 +242,7 @@ public class WXSDKManager {
 
   @Deprecated
   public void callback(String instanceId, String funcId, Map<String, Object> data,boolean keepAlive) {
-    mBridgeManager.callback(instanceId, funcId, data,true);
+    mBridgeManager.callback(instanceId, funcId, data,keepAlive);
   }
 
   public void initScriptsFramework(String framework) {
