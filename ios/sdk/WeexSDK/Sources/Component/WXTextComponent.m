@@ -118,7 +118,7 @@
     pthread_mutexattr_t _textStorageMutexAttr;
 }
 
-static BOOL _isUsingTextStorageLock = YES;
+static BOOL _isUsingTextStorageLock = NO;
 + (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
 {
     _isUsingTextStorageLock = isUsingTextStorageLock;
