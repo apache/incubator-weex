@@ -217,6 +217,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
@@ -514,7 +515,7 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     IWXHttpAdapter adapter=WXSDKManager.getInstance().getIWXHttpAdapter();
 
     WXRequest wxRequest = new WXRequest();
-    wxRequest.url = url;
+    wxRequest.url = rewriteUri(Uri.parse(url),URIAdapter.BUNDLE).toString();
     if (wxRequest.paramMap == null) {
       wxRequest.paramMap = new HashMap<String, String>();
     }
@@ -604,6 +605,14 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
 
   public IWXImgLoaderAdapter getImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
+  }
+
+  public URIAdapter getURIAdapter(){
+    return WXSDKManager.getInstance().getURIAdapter();
+  }
+
+  public Uri rewriteUri(Uri uri,String type){
+    return getURIAdapter().rewrite(this,type,uri);
   }
 
   @Deprecated
