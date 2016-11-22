@@ -16,10 +16,18 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
+import {
+  elementTypes,
+  setElement
+} from './element-types'
 
 const DEFAULT_TAG_NAME = 'div'
 
-export default function Element (type = DEFAULT_TAG_NAME, props) {
+export default function Element (type = DEFAULT_TAG_NAME, props, isExtended) {
+  const XElement = elementTypes[type]
+  if (XElement && !isExtended) {
+    return new XElement(props)
+  }
   props = props || {}
   this.nodeType = 1
   this.nodeId = uniqueId()
@@ -40,6 +48,8 @@ function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
+
+setElement(Element)
 
 Object.assign(Element.prototype, {
   /**

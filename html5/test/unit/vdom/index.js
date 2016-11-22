@@ -10,7 +10,10 @@ global.callAddElement = function () {}
 import {
   Document,
   Element,
-  Comment
+  Comment,
+  elementTypes,
+  registerElement,
+  clearElementTypes
 } from '../../../runtime/vdom'
 
 global.callNative = function () {}
@@ -35,6 +38,49 @@ describe('document constructor', () => {
     expect(doc.documentElement).is.an.object
     expect(doc.documentElement.role).equal('documentElement')
     doc.destroy()
+  })
+})
+
+describe('component methods management', () => {
+  before(() => {
+    registerElement('x', ['foo', 'bar'])
+    registerElement('y', [])
+    registerElement('z')
+  })
+
+  after(() => {
+    clearElementTypes()
+  })
+
+  it('has registered element types', () => {
+    expect(Object.keys(elementTypes)).eql(['x'])
+  })
+
+  it('will call component method', () => {
+    const spy = sinon.spy()
+    const doc = new Document('test', '', spy)
+    const x = new Element('x')
+    const y = new Element('y')
+    const z = new Element('z')
+    const n = new Element('n')
+    expect(x.foo).is.function
+    expect(x.bar).is.function
+    expect(x.baz).is.undefined
+    expect(y.foo).is.undefined
+    expect(z.foo).is.undefined
+    expect(n.foo).is.undefined
+
+    doc.createBody('r')
+    doc.documentElement.appendChild(doc.body)
+    doc.body.appendChild(x)
+    doc.body.appendChild(y)
+    doc.body.appendChild(z)
+    doc.body.appendChild(n)
+    expect(spy.args.length).eql(5)
+
+    x.foo(1, 2, 3)
+    expect(spy.args.length).eql(6)
+    expect(spy.args[5]).eql([[{ component: 'x', method: 'foo', args: [x.ref, 1, 2, 3] }]])
   })
 })
 
@@ -435,12 +481,12 @@ describe('complicated situations', () => {
     doc = new Document('foo', '', spy)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
-    el = new Element('bar', null, doc)
-    el2 = new Element('baz', null, doc)
-    el3 = new Element('qux', null, doc)
-    c = new Comment('aaa', doc)
-    c2 = new Comment('bbb', doc)
-    c3 = new Comment('ccc', doc)
+    el = new Element('bar')
+    el2 = new Element('baz')
+    el3 = new Element('qux')
+    c = new Comment('aaa')
+    c2 = new Comment('bbb')
+    c3 = new Comment('ccc')
   })
 
   afterEach(() => {
