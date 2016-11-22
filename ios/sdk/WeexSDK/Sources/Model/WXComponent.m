@@ -141,7 +141,7 @@
 {
     NSArray *events;
     pthread_mutex_lock(&_propertyMutex);
-    events = _events;
+    events = [_events copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return events;
