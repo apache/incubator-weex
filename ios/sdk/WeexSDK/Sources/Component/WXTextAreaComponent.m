@@ -13,7 +13,6 @@
 #import "WXView.h"
 #import "WXSDKInstance.h"
 
-
 @interface WXTextAreaView : UITextView
 @property (nonatomic, assign) UIEdgeInsets border;
 @property (nonatomic, assign) UIEdgeInsets padding;
@@ -534,6 +533,5 @@
     }
     self.weexInstance.rootView.frame = rect;
 }
-
 
 @end
