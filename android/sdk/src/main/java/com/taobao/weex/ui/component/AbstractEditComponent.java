@@ -700,4 +700,15 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       showSoftKeyboard();
     }
   }
+
+  @Override
+  protected Object convertEmptyProperty(String propName) {
+    switch (propName) {
+      case Constants.Name.FONT_SIZE:
+        return WXText.sDEFAULT_SIZE;
+      case Constants.Name.COLOR:
+        return "black";
+    }
+    return super.convertEmptyProperty(propName);
+  }
 }

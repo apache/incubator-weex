@@ -132,6 +132,7 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -155,7 +156,6 @@ import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.dom.flex.Spacing;
@@ -622,6 +622,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
       for(String key : props.keySet()) {
         Object param = props.get(key);
+        String value = WXUtils.getString(param, null);
+        if (TextUtils.isEmpty(value)) {
+          param = convertEmptyProperty(key);
+        }
         if(!setProperty(key, param)){
         Invoker invoker = mHolder.getPropertyInvoker(key);
         if (invoker != null) {
@@ -1269,5 +1273,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     public JSCallback create(String callbackId) {
       return new SimpleJSCallback(mInstanceId,callbackId);
     }
+  }
+
+  /**
+   * Called when property has empty value
+   * @param propName
+     */
+  @CheckResult
+  protected Object convertEmptyProperty(String propName) {
+    if (Constants.Name.BACKGROUND_COLOR.equals(propName)) {
+      return "transparent";
+    }
+    return null;
   }
 }
