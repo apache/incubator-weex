@@ -1181,7 +1181,6 @@ class WXDomStatement {
       }
     });
 
-    mDirty = true;
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
       instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
