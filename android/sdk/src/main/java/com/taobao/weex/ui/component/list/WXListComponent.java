@@ -223,6 +223,7 @@ import android.widget.ImageView;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -1024,6 +1025,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
         if (offScreenY < Integer.parseInt(offset)) {
           String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
+          if (loadMoreRetry == null) {
+             loadMoreRetry = mLoadMoreRetry;
+          }
 
           if (mListCellCount != mChildren.size()
               || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
@@ -1099,5 +1103,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         view.setBackgroundColor(Color.WHITE);
         view.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
         return new ListBaseViewHolder(view, viewType);
+    }
+
+    @JSMethod
+    public void resetLoadmore() {
+        mLoadMoreRetry = "";
     }
 }

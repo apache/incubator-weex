@@ -218,6 +218,7 @@ import android.widget.FrameLayout.LayoutParams;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -256,6 +257,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   public static final String DIRECTION = "direction";
   protected int mOrientation = Constants.Orientation.VERTICAL;
   private List<WXComponent> mRefreshs=new ArrayList<>();
+  private String mLoadMoreRetry = "";
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -727,10 +729,14 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
         }
-
-        if (mContentHeight != contentH) {
+        String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
+        if (loadMoreRetry == null) {
+          loadMoreRetry = mLoadMoreRetry;
+        }
+        if (mContentHeight != contentH || !mLoadMoreRetry.equals(loadMoreRetry)) {
           getInstance().fireEvent(getDomObject().getRef(), Constants.Event.LOADMORE);
           mContentHeight = contentH;
+          mLoadMoreRetry = loadMoreRetry;
         }
       }
     } catch (Exception e) {
@@ -739,4 +745,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   }
 
+  @JSMethod
+  public void resetLoadmore() {
+    mLoadMoreRetry = "";
+  }
 }
