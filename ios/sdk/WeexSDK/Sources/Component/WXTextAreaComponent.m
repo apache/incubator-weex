@@ -11,6 +11,7 @@
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
 #import "WXView.h"
+#import "WXSDKInstance.h"
 
 @interface WXTextAreaView : UITextView
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -77,6 +78,8 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
+@property (nonatomic, assign) CGSize keyboardSize;
+@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -161,6 +164,24 @@
     }
     
     return self;
+}
+
+- (void)viewWillLoad
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillUnload
@@ -443,9 +464,74 @@
     _textView.editable = !(_disabled);
     _textView.selectable = !(_disabled);
 }
+
+#pragma mark keyboard
+- (void)keyboardWasShown:(NSNotification*)notification
+{
+    if(![_textView isFirstResponder]) {
+        return;
+    }
+    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
+    
+    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
+    if(begin.size.height <= 44 ){
+        return;
+    }
+    _keyboardSize = end.size;
+    UIView * rootView = self.weexInstance.rootView;
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    if (CGRectIsNull(_rootViewOriginFrame)) {
+        _rootViewOriginFrame = rootView.frame;
+    }
+    CGRect keyboardRect = (CGRect){
+        .origin.x = 0,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
+        .size = _keyboardSize
+    };
+    CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
+    if (keyboardRect.origin.y - textAreaFrame.size.height <= textAreaFrame.origin.y) {
+        [self setViewMovedUp:YES];
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification*)notification
+{
+    if (![_textView isFirstResponder]) {
+        return;
+    }
+    UIView * rootView = self.weexInstance.rootView;
+    if (rootView.frame.origin.y < 0) {
+        [self setViewMovedUp:NO];
+    }
+}
+
 - (void)closeKeyboard
 {
     [_textView resignFirstResponder];
+}
+
+#pragma mark method
+- (void)setViewMovedUp:(BOOL)movedUp
+{
+    UIView *rootView = self.weexInstance.rootView;
+    CGRect rect = _rootViewOriginFrame;
+    CGRect rootViewFrame = rootView.frame;
+    CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
+    if (movedUp) {
+        CGFloat offset =textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
+        if (offset > 0) {
+            rect = (CGRect){
+                .origin.x = 0.f,
+                .origin.y = -offset,
+                .size = rootViewFrame.size
+            };
+        }
+    }else {
+        // revert back to the origin state
+        rect = _rootViewOriginFrame;
+        _rootViewOriginFrame = CGRectNull;
+    }
+    self.weexInstance.rootView.frame = rect;
 }
 
 @end

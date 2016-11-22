@@ -21,7 +21,18 @@ WX_EXPORT_METHOD(@selector(getString:))
 
 - (void)getString:(WXModuleCallback)callback{
     UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
-    callback((clipboard.string ? : @""));
+    NSDictionary *result = [@{} mutableCopy];
+    if(clipboard.string)
+    {
+        [result setValue:clipboard.string forKey:@"data"];
+        [result setValue:@"success" forKey:@"result"];
+    }else
+    {
+        [result setValue:@"" forKey:@"data"];
+        [result setValue:@"fail" forKey:@"result"];
+    }
+    callback(result);
+
 }
 
 @end
