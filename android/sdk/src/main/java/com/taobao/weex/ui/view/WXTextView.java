@@ -262,7 +262,7 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   public void setTextLayout(Layout layout) {
     this.textLayout = layout;
     if(layout!=null){
-      setContentDescription(getText());
+      setContentDescription(layout.getText());
     }
   }
 }

@@ -133,6 +133,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -589,9 +590,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
 
-    for(Map.Entry<String, Object> entry : props.entrySet()) {
+    for (Map.Entry<String, Object> entry : props.entrySet()) {
       String key = entry.getKey();
       Object param = entry.getValue();
+      String value = WXUtils.getString(param, null);
+      if (TextUtils.isEmpty(value)) {
+        param = convertEmptyProperty(key);
+      }
       if (!setProperty(key, param)) {
         if (mHolder == null) {
           return;
@@ -1250,5 +1255,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     } else {
       return hasScrollParent(component.getParent());
     }
+  }
+
+  /**
+   * Called when property has empty value
+   * @param propName
+     */
+  @CheckResult
+  protected Object convertEmptyProperty(String propName) {
+    if (Constants.Name.BACKGROUND_COLOR.equals(propName)) {
+      return "transparent";
+    }
+    return null;
   }
 }

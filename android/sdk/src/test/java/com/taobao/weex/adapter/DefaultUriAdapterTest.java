@@ -202,202 +202,107 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.adapter;
 
-import android.content.Context;
-import android.graphics.RectF;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 
+import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXImageSharpen;
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.ComponentCreator;
-import com.taobao.weex.ui.view.WXImageView;
-import com.taobao.weex.ui.view.border.BorderDrawable;
-import com.taobao.weex.utils.ImageDrawable;
-import com.taobao.weex.utils.WXDomUtils;
-import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.WXSDKManagerTest;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXRequest;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.internal.util.MockUtil;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+import static org.junit.Assert.assertEquals;
+
 
 /**
- * Image component
+ * Created by sospartan on 21/11/2016.
  */
-@Component(lazyload = false)
-public class WXImage extends WXComponent<ImageView> {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 19)
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
+public class DefaultUriAdapterTest {
+  URIAdapter adapter;
+  WXSDKInstance instance;
 
-  public static class Ceator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        return new WXImage(instance,node,parent);
-    }
-  }
-
-
-  @Deprecated
-  public WXImage(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-      this(instance,dom,parent);
-  }
-
-  public WXImage(WXSDKInstance instance, WXDomObject node,
-                  WXVContainer parent) {
-      super(instance, node, parent);
-  }
-
-  @Override
-  protected ImageView initComponentHostView(@NonNull Context context) {
-    WXImageView view = new WXImageView(context);
-    view.setScaleType(ScaleType.FIT_XY);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-      view.setCropToPadding(true);
-    }
-    return view;
-  }
-
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.RESIZE_MODE:
-        String resize_mode = WXUtils.getString(param, null);
-        if (resize_mode != null) {
-          setResizeMode(resize_mode);
+  @Before
+  public void setup() {
+    WXEnvironment.sApplication = RuntimeEnvironment.application;
+    WXSDKManager wxsdkManager = WXSDKManager.getInstance();
+    if (!new MockUtil().isSpy(wxsdkManager)) {
+      WXSDKManager spy = Mockito.spy(wxsdkManager);
+      WXSDKManagerTest.setInstance(spy);
+      Mockito.when(spy.getIWXHttpAdapter()).thenReturn(new IWXHttpAdapter() {
+        @Override
+        public void sendRequest(WXRequest request, OnHttpListener listener) {
+          //do nothing.
         }
-        return true;
-      case Constants.Name.RESIZE:
-        String resize = WXUtils.getString(param, null);
-        if (resize != null) {
-          setResize(resize);
-        }
-        return true;
-      case Constants.Name.SRC:
-        String src = WXUtils.getString(param, null);
-        if (src != null) {
-          setSrc(src);
-        }
-        return true;
-      case Constants.Name.IMAGE_QUALITY:
-        return true;
-    }
-    return super.setProperty(key, param);
-  }
-
-  @Override
-  public void refreshData(WXComponent component) {
-    super.refreshData(component);
-    if (component instanceof WXImage) {
-      setSrc(component.getDomObject().getAttrs().getImageSrc());
-    }
-  }
-
-  @WXComponentProp(name = Constants.Name.RESIZE_MODE)
-  public void setResizeMode(String resizeMode) {
-    (getHostView()).setScaleType(getResizeMode(resizeMode));
-  }
-
-  private ScaleType getResizeMode(String resizeMode) {
-    ScaleType scaleType = ScaleType.FIT_XY;
-    if (TextUtils.isEmpty(resizeMode)) {
-      return scaleType;
+      });
     }
 
-    switch (resizeMode) {
-      case "cover":
-        scaleType = ScaleType.CENTER_CROP;
-        break;
-      case "contain":
-        scaleType = ScaleType.FIT_CENTER;
-        break;
-      case "stretch":
-        scaleType = ScaleType.FIT_XY;
-        break;
-    }
-    return scaleType;
+    adapter = new DefaultUriAdapter();
+    instance = WXSDKInstanceTest.createInstance();
   }
 
-  @WXComponentProp(name = Constants.Name.RESIZE)
-  public void setResize(String resize) {
-    (getHostView()).setScaleType(getResizeMode(resize));
+  @Test
+  public void testRewrite() throws Exception {
+
+    final String host = "http://127.0.0.1";
+    final String base = host + "/test/123/";
+    final String bundleWithSlash = base + "?arg=value";
+    final String bundle = base + "bundle.js?arg=value";
+
+
+    instance.renderByUrl("", bundle, null, null, 0, 0, WXRenderStrategy.APPEND_ONCE);
+    testRelative(host, base);
+    instance.renderByUrl("", bundleWithSlash, null, null, 0, 0, WXRenderStrategy.APPEND_ONCE);
+    testRelative(host, base);
   }
 
-  @WXComponentProp(name = Constants.Name.SRC)
-  public void setSrc(String src) {
+  private void testRelative(String host, String baseWithSlash) {
+    Uri uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("./456"));
+    assertEquals(Uri.parse(baseWithSlash + "./456"), uri);
 
-    WXImageStrategy imageStrategy = new WXImageStrategy();
-    imageStrategy.isClipping = true;
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("../456"));
+    assertEquals(Uri.parse(baseWithSlash + "../456"), uri);
 
-    WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
-    imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
-    imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
-      @Override
-      public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-        if (!result && imageView != null) {
-          imageView.setImageDrawable(null);
-        }
-        if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
-          Map<String, Object> params = new HashMap<>();
-          params.put("success", result);
-          fireEvent(Constants.Event.ONLOAD, params);
-        }
-      }
-    });
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("./456?k=v"));
+    assertEquals(Uri.parse(baseWithSlash + "./456?k=v"), uri);
 
-    WXSDKInstance instance = getInstance();
-    if (getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)) {
-      String attr = (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
-      if(TextUtils.isEmpty(attr)){
-        Uri rewrited = instance.rewriteUri(Uri.parse(attr),URIAdapter.IMAGE);
-        imageStrategy.placeHolder = rewrited.toString();
-      }
-    }
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("./456?k=v&k2=v2"));
+    assertEquals(Uri.parse(baseWithSlash + "./456?k=v&k2=v2"), uri);
 
-    IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
-    if (imgLoaderAdapter != null) {
-      Uri rewrited = instance.rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
-      imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-                                getDomObject().getAttrs().getImageQuality(), imageStrategy);
-    }
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("./456?k=v#flagment"));
+    assertEquals(Uri.parse(baseWithSlash + "./456?k=v#flagment"), uri);
+
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("//test.com/test/test2"));
+    assertEquals(Uri.parse("http://test.com/test/test2"), uri);
+
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("/test2"));
+    assertEquals(Uri.parse(host + "/test2"), uri);
   }
 
-  @Override
-  public void updateProperties(Map<String, Object> props) {
-    super.updateProperties(props);
-    WXImageView imageView;
-    ImmutableDomObject imageDom;
-    if ((imageDom = getDomObject()) != null &&
-        getHostView() instanceof WXImageView) {
-      imageView = (WXImageView) getHostView();
-      BorderDrawable borderDrawable = WXViewUtils.getBorderDrawable(getHostView());
-      float[] borderRadius;
-      if (borderDrawable != null) {
-        RectF borderBox = new RectF(0, 0, WXDomUtils.getContentWidth(imageDom), WXDomUtils.getContentHeight(imageDom));
-        borderRadius = borderDrawable.getBorderRadius(borderBox);
-      } else {
-        borderRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
-      }
-      imageView.setBorderRadius(borderRadius);
+  @Test
+  public void testLocal() throws Exception {
+    Uri uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("local:///test/test2"));
+    assertEquals(Uri.parse("file:///" + DefaultUriAdapter.ANDROID_ASSET + "/test/test2"), uri);
 
-      if (imageView.getDrawable() instanceof ImageDrawable) {
-        ImageDrawable imageDrawable = (ImageDrawable) imageView.getDrawable();
-        float[] previousRadius = imageDrawable.getCornerRadii();
-        if (!Arrays.equals(previousRadius, borderRadius)) {
-          imageDrawable.setCornerRadii(borderRadius);
-        }
-      }
-    }
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("local:///test/test2?k=v#segment"));
+    assertEquals(Uri.parse("file:///" + DefaultUriAdapter.ANDROID_ASSET + "/test/test2?k=v#segment"), uri);
   }
+
 }

@@ -226,11 +226,7 @@ public class WXSDKEngine {
         long start = System.currentTimeMillis();
         WXSDKManager sm = WXSDKManager.getInstance();
         if(config != null ) {
-          sm.setIWXHttpAdapter(config.getHttpAdapter());
-          sm.setIWXImgLoaderAdapter(config.getImgAdapter());
-          sm.setIWXUserTrackAdapter(config.getUtAdapter());
-          sm.setIWXDebugAdapter(config.getDebugAdapter());
-          sm.setIWXStorageAdapter(config.getStorageAdapter());
+          sm.setInitConfig(config);
           if(config.getDebugAdapter()!=null){
             config.getDebugAdapter().initDebug(application);
           }
@@ -490,33 +486,12 @@ public class WXSDKEngine {
     return WXSDKManager.getInstance().getIWXUserTrackAdapter();
   }
 
-  @Deprecated
-  public static void setIWXUserTrackAdapter(IWXUserTrackAdapter IWXUserTrackAdapter) {
-    WXSDKManager.getInstance().setIWXUserTrackAdapter(IWXUserTrackAdapter);
-  }
-
   public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
   }
 
-  @Deprecated
-  public static void setIWXImgLoaderAdapter(IWXImgLoaderAdapter IWXImgLoaderAdapter) {
-    if(IWXImgLoaderAdapter==null){
-      if(WXEnvironment.isApkDebugable()){
-        throw new IllegalStateException("ImageLoaderAdapter can not be set to null");
-      }
-      return;
-    }
-    WXSDKManager.getInstance().setIWXImgLoaderAdapter(IWXImgLoaderAdapter);
-  }
-
   public static IWXHttpAdapter getIWXHttpAdapter() {
     return WXSDKManager.getInstance().getIWXHttpAdapter();
-  }
-
-  @Deprecated
-  public static void setIWXHttpAdapter(IWXHttpAdapter IWXHttpAdapter) {
-    WXSDKManager.getInstance().setIWXHttpAdapter(IWXHttpAdapter);
   }
 
   public static IWXStorageAdapter getIWXStorageAdapter() {

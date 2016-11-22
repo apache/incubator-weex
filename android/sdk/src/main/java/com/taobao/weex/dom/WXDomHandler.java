@@ -293,7 +293,7 @@ public class WXDomHandler implements Handler.Callback {
         mWXDomManager.scrollToDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
         break;
       case MsgType.WX_DOM_ADD_RULE:
-        mWXDomManager.addRule((String) task.args.get(0), (JSONObject) task.args.get(1));
+        mWXDomManager.addRule(task.instanceId,(String) task.args.get(0), (JSONObject) task.args.get(1));
         break;
       case MsgType.WX_COMPONENT_SIZE:
         mWXDomManager.getComponentSize(task.instanceId,(String) task.args.get(0),(String) task.args.get(1));
