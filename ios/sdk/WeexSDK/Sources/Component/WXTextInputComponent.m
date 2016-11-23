@@ -11,7 +11,6 @@
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
 #import "WXDefine.h"
-#import "WXComponent_internal.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -142,7 +141,7 @@ WX_EXPORT_METHOD(@selector(blur))
             _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
-        if(styles[@"color"]) {
+        if (styles[@"color"]) {
             [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
         }
         
