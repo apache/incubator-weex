@@ -169,6 +169,7 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
+import com.taobao.weex.utils.WXDataStructureUtil;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
@@ -227,16 +228,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
     public void onHostViewClick() {
-      Map<String, Object> params = new HashMap<>();
+      Map<String, Object> param= WXDataStructureUtil.newHashMapWithExpectedSize(1);
+      Map<String, Object> position = WXDataStructureUtil.newHashMapWithExpectedSize(4);
       int[] location = new int[2];
       mHost.getLocationOnScreen(location);
-      params.put("x", location[0]);
-      params.put("y", location[1]);
-      params.put("width", mDomObj.getCSSLayoutWidth());
-      params.put("height", mDomObj.getCSSLayoutHeight());
+      position.put("x", WXViewUtils.getWebPxByWidth(location[0]));
+      position.put("y", WXViewUtils.getWebPxByWidth(location[1]));
+      position.put("width", WXViewUtils.getWebPxByWidth(mDomObj.getCSSLayoutWidth()));
+      position.put("height", WXViewUtils.getWebPxByWidth(mDomObj.getCSSLayoutHeight()));
+      param.put(Constants.Name.POSITION, position);
       getInstance().fireEvent(mCurrentRef,
           Constants.Event.CLICK,
-          params);
+          param);
     }
   };
 
