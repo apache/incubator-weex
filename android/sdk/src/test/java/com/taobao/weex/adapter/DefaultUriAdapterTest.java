@@ -296,13 +296,4 @@ public class DefaultUriAdapterTest {
     assertEquals(Uri.parse(host + "/test2"), uri);
   }
 
-  @Test
-  public void testLocal() throws Exception {
-    Uri uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("local:///test/test2"));
-    assertEquals(Uri.parse("file:///" + DefaultUriAdapter.ANDROID_ASSET + "/test/test2"), uri);
-
-    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("local:///test/test2?k=v#segment"));
-    assertEquals(Uri.parse("file:///" + DefaultUriAdapter.ANDROID_ASSET + "/test/test2?k=v#segment"), uri);
-  }
-
 }

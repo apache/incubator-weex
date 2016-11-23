@@ -205,9 +205,12 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -223,10 +226,12 @@ import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -326,10 +331,42 @@ public class WXImage extends WXComponent<ImageView> {
         (getHostView()).setScaleType(getResizeMode(resize));
     }
 
+  /**
+   * Process local scheme, load drawable.
+   * @param rewrited
+   */
+  private void setLocalSrc(Uri rewrited){
+        Resources resources = getContext().getResources();
+        List<String> segments = rewrited.getPathSegments();
+        if(segments.size() != 1){
+            WXLogUtils.e("Local src format is invalid.");
+            return;
+        }
+        ImageView imageView;
+        int id = resources.getIdentifier(segments.get(0),"drawable",getContext().getPackageName());
+        if(id != 0 && (imageView = getHostView()) != null){
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(resources,id,null));
+        }
+    }
+
     @WXComponentProp(name = Constants.Name.SRC)
     public void setSrc(String src) {
+        if(src == null){
+            return ;
+        }
 
+        WXSDKInstance instance = getInstance();
+        Uri rewrited = instance.rewriteUri(Uri.parse(src),URIAdapter.IMAGE);
 
+        if(Constants.Scheme.LOCAL.equals(rewrited.getScheme())){
+            setLocalSrc(rewrited);
+        }else{
+            setRemoteSrc(rewrited);
+        }
+    }
+
+    private void setRemoteSrc(Uri rewrited){
+        WXSDKInstance instance = getInstance();
         WXImageStrategy imageStrategy = new WXImageStrategy();
         imageStrategy.isClipping = true;
 
@@ -350,7 +387,7 @@ public class WXImage extends WXComponent<ImageView> {
             }
         });
 
-        WXSDKInstance instance = getInstance();
+
         if( getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
             String placeHolder= (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
             imageStrategy.placeHolder = instance.rewriteUri(Uri.parse(placeHolder),URIAdapter.IMAGE).toString();
@@ -358,9 +395,9 @@ public class WXImage extends WXComponent<ImageView> {
 
         IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
         if (imgLoaderAdapter != null) {
-            Uri rewrited = instance.rewriteUri(Uri.parse(src),URIAdapter.IMAGE);
+
             imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-                    getDomObject().getAttrs().getImageQuality(), imageStrategy);
+                getDomObject().getAttrs().getImageQuality(), imageStrategy);
         }
     }
 }

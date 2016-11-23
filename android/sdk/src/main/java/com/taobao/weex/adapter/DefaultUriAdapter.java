@@ -208,6 +208,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.common.Constants;
 
 import java.util.List;
 
@@ -218,9 +219,6 @@ import java.util.List;
  */
 public class DefaultUriAdapter implements URIAdapter {
 
-  private static final String SCHEME_LOCAL = "local";
-  public static final String SCHEME_FILE = "file";
-  public static final String ANDROID_ASSET = "android_asset";
 
   @NonNull
   @Override
@@ -230,27 +228,11 @@ public class DefaultUriAdapter implements URIAdapter {
 
     if (uri.isRelative()) {
       resultBuilder = buildRelativeURI(resultBuilder, base, uri);
-    } else {
-      String scheme = uri.getScheme();
-      if (SCHEME_LOCAL.equals(scheme)) {
-        resultBuilder = buildLocal(resultBuilder, uri);
-      }
+      return resultBuilder.build();
     }
+    return uri;
 
-    return resultBuilder.build();
-  }
 
-  private Uri.Builder buildLocal(Uri.Builder resultBuilder, Uri uri) {
-    List<String> segments = uri.getPathSegments();
-    resultBuilder
-        .path(null)
-        .appendEncodedPath(ANDROID_ASSET)
-        .scheme(SCHEME_FILE);
-    for (String seg :
-        segments) {
-      resultBuilder.appendEncodedPath(seg);
-    }
-    return resultBuilder;
   }
 
   private Uri.Builder buildRelativeURI(Uri.Builder resultBuilder, Uri base, Uri uri) {
@@ -258,7 +240,7 @@ public class DefaultUriAdapter implements URIAdapter {
       return resultBuilder.scheme(base.getScheme());
     } else {
       resultBuilder
-          .authority(base.getAuthority())
+          .encodedAuthority(base.getEncodedAuthority())
           .scheme(base.getScheme())
           .path(null);
 
