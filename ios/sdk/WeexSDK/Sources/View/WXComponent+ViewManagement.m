@@ -13,9 +13,6 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 
-#import "WXDivComponent.h"
-#import "WXImageComponent.h"
-
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 @implementation WXComponent (ViewManagement)

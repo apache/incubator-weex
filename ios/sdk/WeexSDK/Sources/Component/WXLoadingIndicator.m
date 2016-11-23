@@ -8,7 +8,6 @@
 
 #import "WXLoadingIndicator.h"
 #import "WXConvert.h"
-#import "WXComponent_internal.h"
 
 @interface WXLoadingIndicator()
 

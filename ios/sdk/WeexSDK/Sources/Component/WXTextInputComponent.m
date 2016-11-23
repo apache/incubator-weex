@@ -142,8 +142,7 @@ WX_EXPORT_METHOD(@selector(blur))
             _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
-        if(styles[@"color"])
-        {
+        if(styles[@"color"]) {
             [_inputView setTextColor:[self convertColor:styles[@"color"]]];
         }
         
@@ -351,8 +350,7 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)updateStyles:(NSDictionary *)styles
 {
-    if(styles[@"color"])
-    {
+    if(styles[@"color"]) {
        [_inputView setTextColor:[self convertColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {

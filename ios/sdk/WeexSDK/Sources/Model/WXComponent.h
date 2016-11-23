@@ -280,7 +280,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param elements The reset style's elements
  * @discussion It can be overrided to handle specific style reseting. The method is called on the main thread.
  **/
-- (void)resetStyles:(NSArray *)elements;
+- (void)resetViewStyles:(NSArray *)elements;
 
 /**
  * @abstract Called when component's attributes are updated

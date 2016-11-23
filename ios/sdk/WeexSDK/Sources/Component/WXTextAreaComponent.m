@@ -127,6 +127,9 @@
                 _textValue = value;
             }
         }
+        if (styles[@"color"]) {
+            _color = [WXConvert UIColor:styles[@"color"]];
+        }
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
         }
