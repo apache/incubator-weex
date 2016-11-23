@@ -707,6 +707,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      */
     private boolean checkRefreshOrLoading(final WXComponent child) {
 
+        if(getHostView() == null){
+            WXLogUtils.e(TAG, "checkRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
+            return true;
+        }
         if (child instanceof WXRefresh) {
             getHostView().setOnRefreshListener((WXRefresh)child);
             getHostView().postDelayed(new Runnable() {
