@@ -570,8 +570,7 @@ public final class WXDomManager {
     String src = jsonObject.getString(Constants.Name.SRC);
     String name = jsonObject.getString(Constants.Name.FONT_FAMILY);
 
-    src = instance.rewriteUri(Uri.parse(src), URIAdapter.FONT).toString();
-    return new FontDO(name, src);
+    return new FontDO(name, src,instance);
   }
 
   public void getComponentSize(String instanceId, String ref, String callback) {
