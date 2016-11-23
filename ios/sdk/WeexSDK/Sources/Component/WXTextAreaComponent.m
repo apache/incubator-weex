@@ -124,7 +124,6 @@
         }else {
             _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
         }
-        
         if (attributes[@"value"]) {
             NSString * value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
@@ -134,7 +133,6 @@
                 }
             }
         }
-        
         if (styles[@"color"]) {
             _color = [WXConvert UIColor:styles[@"color"]];
         }
@@ -233,6 +231,21 @@
     [_textView setClipsToBounds:YES];
 }
 
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
+}
+
 #pragma mark - add-remove Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -321,13 +334,12 @@
 }
 
 #pragma mark - upate styles
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles
+- (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
         _color = [WXConvert UIColor:styles[@"color"]];
         [_textView setTextColor:_color];
     }
-    
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
     }
@@ -550,6 +562,15 @@
         _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
+}
+
+#pragma mark -reset color
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if ([elements containsObject:@"color"]) {
+        _color = [UIColor blackColor];
+        [_textView setTextColor:[UIColor blackColor]];
+    }
 }
 
 @end
