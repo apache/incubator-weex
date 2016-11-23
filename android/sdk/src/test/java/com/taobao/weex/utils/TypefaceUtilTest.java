@@ -227,9 +227,9 @@ public class TypefaceUtilTest {
 
   @Test
   public void testPutFontDO() throws Exception {
-    FontDO font = new FontDO("test","url('test')", WXSDKInstanceTest.createInstance());
+    FontDO font = new FontDO("test","url('local:///test')", WXSDKInstanceTest.createInstance());
     TypefaceUtil.putFontDO(font);
-    assertEquals(TypefaceUtil.getFontDO("test").getUrl(),"test");
+    assertEquals(TypefaceUtil.getFontDO("test").getUrl(),"local:///test");
 
   }
 
