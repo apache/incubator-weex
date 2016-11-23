@@ -75,7 +75,7 @@
 {
     if (_textStorage != textStorage) {
         _textStorage = textStorage;
-        [self setNeedsDisplay];
+        [self.wx_component setNeedsDisplay];
     }
 }
 
@@ -168,21 +168,19 @@ do {\
 
 -(void )fillColor:(NSDictionary *)styles needLayout:(BOOL )needLayout
 {
-    do{
-        id value = styles[@"color"];
-        if(value) {
-            NSString *str = [WXConvert NSString:value];
-            if(str && [@"" isEqualToString:str]) {
-                _color = [UIColor blackColor];
-                [self setNeedsRepaint];
-                if (needLayout) {
-                    [self setNeedsLayout];
-                }
-            }else {
-                WX_STYLE_FILL_TEXT(color, color, UIColor, needLayout)
+    id value = styles[@"color"];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            _color = [UIColor blackColor];
+            [self setNeedsRepaint];
+            if (needLayout) {
+                [self setNeedsLayout];
             }
+        }else {
+            WX_STYLE_FILL_TEXT(color, color, UIColor, needLayout)
         }
-    }while(0);
+    }
 }
 
 - (void)fillCSSStyles:(NSDictionary *)styles

@@ -106,7 +106,7 @@
                 _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
             }
             
-            [_layer setNeedsDisplay];
+            [self setNeedsDisplay];
         }];
     }
 }
