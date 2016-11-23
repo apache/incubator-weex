@@ -126,6 +126,9 @@
             NSString * value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
                 _textValue = value;
+                if([value length] > 0) {
+                    _placeHolderLabel.text = @"";
+                }
             }
         }
         
@@ -189,8 +192,9 @@
     
     _textView.inputAccessoryView = toolbar;
     
-    if (_textValue) {
+    if (_textValue && [_textValue length]>0) {
         _textView.text = _textValue;
+        _placeHolderLabel.text = @"";
     }else {
         _textView.text = @"";
     }
@@ -263,6 +267,9 @@
         NSString * value = [WXConvert NSString:attributes[@"value"]];
         if (value) {
             _textValue = value;
+            if([value length] > 0) {
+                _placeHolderLabel.text = @"";
+            }
         }
     }
 }
@@ -285,6 +292,9 @@
         if (value) {
             _textValue = value;
             _textView.text = _textValue;
+            if([value length] > 0) {
+                _placeHolderLabel.text = @"";
+            }
         }
     }
 }
@@ -383,11 +393,13 @@
 
 - (void)textViewDidChange:(UITextView *)textView
 {
-    _placeHolderLabel.text = @"";
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":textView.text}];
-        }
+    if(textView.text && [textView.text length] > 0){
+        _placeHolderLabel.text = @"";
+    }else{
+        [self setPlaceholderAttributedString];
+    }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":textView.text}];
     }
 }
 
@@ -398,7 +410,7 @@
     }
     if (_changeEvent) {
         if (![[textView text] isEqualToString:_changeEventString]) {
-            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
+            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[_textView text]}}];
         }
     }
     if (_blurEvent) {
@@ -410,15 +422,21 @@
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
     if (_placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
+        [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, _placeholderString.length)];
     }
     _placeHolderLabel.backgroundColor = [UIColor clearColor];
-    CGSize expectedLabelSize = [_placeholderString boundingRectWithSize:CGSizeMake(_textView.frame.size.width/2, _textView.frame.size.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:nil context:nil].size;
+    CGRect expectedLabelSize = [attributedString boundingRectWithSize:(CGSize){self.view.frame.size.width, CGFLOAT_MAX}
+                                               options:NSStringDrawingUsesLineFragmentOrigin
+                                               context:nil];
+    
     _placeHolderLabel.clipsToBounds = NO;
     CGRect newFrame = _placeHolderLabel.frame;
-    newFrame.size.height = ceil(expectedLabelSize.height);
+    newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
+    newFrame.origin.y = 6;
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }
