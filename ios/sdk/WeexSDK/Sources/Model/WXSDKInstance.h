@@ -26,7 +26,7 @@ extern NSString *const bundleUrlOptionKey;
 
 /**
  * User can keep the root view frame through the isIntact
- * If you want keep the rootview frame, set isIntact True,or set False.
+ * If you want keep the rootview frame, set isIntact YES,or set NO.
  **/
 @property (nonatomic, assign) BOOL isIntact;
 
