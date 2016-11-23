@@ -349,7 +349,7 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)updateStyles:(NSDictionary *)styles
 {
-    if(styles[@"color"]) {
+    if (styles[@"color"]) {
        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
