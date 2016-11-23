@@ -548,7 +548,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_layoutAndSyncUI
 {
     [self _layout];
-    
     if(_uiTaskQueue.count > 0){
         [self _syncUITasks];
         _noTaskTickCount = 0;
@@ -633,7 +632,10 @@ static css_node_t * rootNodeGetChild(void *context, int i)
                               WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_WIDTH]),
                               WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_HEIGHT]));
     WXPerformBlockOnMainThread(^{
-        self.weexInstance.rootView.frame = frame;
+        if(!self.weexInstance.isIntact) {
+            self.weexInstance.rootView.frame = frame;
+        }
+        
     });
     
     resetNodeLayout(_rootCSSNode);

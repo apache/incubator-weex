@@ -509,6 +509,7 @@
     CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
     if (keyboardRect.origin.y - textAreaFrame.size.height <= textAreaFrame.origin.y) {
         [self setViewMovedUp:YES];
+        self.weexInstance.isIntact = YES;
     }
 }
 
@@ -520,6 +521,7 @@
     UIView * rootView = self.weexInstance.rootView;
     if (rootView.frame.origin.y < 0) {
         [self setViewMovedUp:NO];
+        self.weexInstance.isIntact = NO;
     }
 }
 

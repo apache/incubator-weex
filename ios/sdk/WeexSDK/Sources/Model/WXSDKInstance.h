@@ -25,6 +25,12 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) UIView *rootView;
 
 /**
+ * User can keep the root view frame through the isIntact
+ * If you want keep the rootview frame, set isIntact True,or set False.
+ **/
+@property (nonatomic, assign) BOOL isIntact;
+
+/**
  * The scriptURL of weex bundle.
  **/
 @property (nonatomic, strong) NSURL *scriptURL;
