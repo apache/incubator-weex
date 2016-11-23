@@ -460,8 +460,7 @@
 #pragma mark -reset color
 -(void)resetViewStyles:(NSArray *)elements
 {
-    if([elements containsObject:@"color"])
-    {
+    if ([elements containsObject:@"color"]) {
         _color = [UIColor blackColor];
         [_textView setTextColor:[UIColor blackColor]];
     }
