@@ -90,6 +90,17 @@
 
 #pragma mark Private
 
+- (UIColor *) _fetchBackgroundColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(self) {
+        if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]]) {
+            color = [UIColor clearColor];
+        }
+    }
+    return color;
+}
+
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
     _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
@@ -108,7 +119,6 @@
         _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
-    
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
         _layer.opacity = _opacity;
@@ -161,6 +171,11 @@
             [_layer setNeedsDisplay];
         }
     }
+}
+
+-(void)_resetViewStyles:(NSDictionary *)styles
+{
+    _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
 }
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing

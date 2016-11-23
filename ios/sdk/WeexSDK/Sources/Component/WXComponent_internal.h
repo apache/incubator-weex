@@ -150,6 +150,8 @@
 
 - (void)_updateViewStyles:(NSDictionary *)styles;
 
+- (void)_resetViewStyles:(NSDictionary *)styles;
+
 - (void)_initEvents:(NSArray *)events;
 
 - (void)_removeAllEvents;
