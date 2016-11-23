@@ -50,6 +50,10 @@
     
     if ([self.wx_component _needsDrawBorder]) {
         [self.wx_component _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self.wx_component _resetNativeBorderRadius];
+        });
     }
     NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
     NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
@@ -114,7 +118,7 @@
     pthread_mutexattr_t _textStorageMutexAttr;
 }
 
-static BOOL _isUsingTextStorageLock = YES;
+static BOOL _isUsingTextStorageLock = NO;
 + (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
 {
     _isUsingTextStorageLock = isUsingTextStorageLock;

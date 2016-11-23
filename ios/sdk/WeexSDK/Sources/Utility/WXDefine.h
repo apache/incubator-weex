@@ -79,6 +79,18 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 return NSStringFromSelector(method); \
 }
 
+/** extern "C" makes a function-name in C++ have 'C' linkage (compiler does not mangle the name) 
+ * so that client C code can link to (i.e use) your function using a 'C' compatible header file that contains just the declaration of your function.
+ *  http://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c
+ */
+#ifdef __cplusplus
+# define WX_EXTERN_C_BEGIN extern "C" {
+# define WX_EXTERN_C_END   }
+#else
+# define WX_EXTERN_C_BEGIN
+# define WX_EXTERN_C_END
+#endif
+
 /**
  *  @abstract Compared with system version of current device 
  *  

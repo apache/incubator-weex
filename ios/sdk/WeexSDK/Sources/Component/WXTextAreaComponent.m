@@ -11,6 +11,7 @@
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
 #import "WXView.h"
+#import "WXSDKInstance.h"
 
 @interface WXTextAreaView : UITextView
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -77,6 +78,8 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
+@property (nonatomic, assign) CGSize keyboardSize;
+@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -126,6 +129,9 @@
             NSString * value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
                 _textValue = value;
+                if([value length] > 0) {
+                    _placeHolderLabel.text = @"";
+                }
             }
         }
         
@@ -163,6 +169,24 @@
     return self;
 }
 
+- (void)viewWillLoad
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)viewWillUnload
 {
     _textView = nil;
@@ -189,8 +213,9 @@
     
     _textView.inputAccessoryView = toolbar;
     
-    if (_textValue) {
+    if (_textValue && [_textValue length]>0) {
         _textView.text = _textValue;
+        _placeHolderLabel.text = @"";
     }else {
         _textView.text = @"";
     }
@@ -263,6 +288,9 @@
         NSString * value = [WXConvert NSString:attributes[@"value"]];
         if (value) {
             _textValue = value;
+            if([value length] > 0) {
+                _placeHolderLabel.text = @"";
+            }
         }
     }
 }
@@ -285,6 +313,9 @@
         if (value) {
             _textValue = value;
             _textView.text = _textValue;
+            if([value length] > 0) {
+                _placeHolderLabel.text = @"";
+            }
         }
     }
 }
@@ -383,11 +414,13 @@
 
 - (void)textViewDidChange:(UITextView *)textView
 {
-    _placeHolderLabel.text = @"";
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":textView.text}];
-        }
+    if(textView.text && [textView.text length] > 0){
+        _placeHolderLabel.text = @"";
+    }else{
+        [self setPlaceholderAttributedString];
+    }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":textView.text}];
     }
 }
 
@@ -398,7 +431,7 @@
     }
     if (_changeEvent) {
         if (![[textView text] isEqualToString:_changeEventString]) {
-            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
+            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[_textView text]}}];
         }
     }
     if (_blurEvent) {
@@ -410,15 +443,21 @@
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
     if (_placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
+        [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, _placeholderString.length)];
     }
     _placeHolderLabel.backgroundColor = [UIColor clearColor];
-    CGSize expectedLabelSize = [_placeholderString boundingRectWithSize:CGSizeMake(_textView.frame.size.width/2, _textView.frame.size.height) options:NSStringDrawingUsesLineFragmentOrigin attributes:nil context:nil].size;
+    CGRect expectedLabelSize = [attributedString boundingRectWithSize:(CGSize){self.view.frame.size.width, CGFLOAT_MAX}
+                                               options:NSStringDrawingUsesLineFragmentOrigin
+                                               context:nil];
+    
     _placeHolderLabel.clipsToBounds = NO;
     CGRect newFrame = _placeHolderLabel.frame;
-    newFrame.size.height = ceil(expectedLabelSize.height);
+    newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
+    newFrame.origin.y = 6;
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }
@@ -443,9 +482,74 @@
     _textView.editable = !(_disabled);
     _textView.selectable = !(_disabled);
 }
+
+#pragma mark keyboard
+- (void)keyboardWasShown:(NSNotification*)notification
+{
+    if(![_textView isFirstResponder]) {
+        return;
+    }
+    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
+    
+    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
+    if(begin.size.height <= 44 ){
+        return;
+    }
+    _keyboardSize = end.size;
+    UIView * rootView = self.weexInstance.rootView;
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    if (CGRectIsNull(_rootViewOriginFrame)) {
+        _rootViewOriginFrame = rootView.frame;
+    }
+    CGRect keyboardRect = (CGRect){
+        .origin.x = 0,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
+        .size = _keyboardSize
+    };
+    CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
+    if (keyboardRect.origin.y - textAreaFrame.size.height <= textAreaFrame.origin.y) {
+        [self setViewMovedUp:YES];
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification*)notification
+{
+    if (![_textView isFirstResponder]) {
+        return;
+    }
+    UIView * rootView = self.weexInstance.rootView;
+    if (rootView.frame.origin.y < 0) {
+        [self setViewMovedUp:NO];
+    }
+}
+
 - (void)closeKeyboard
 {
     [_textView resignFirstResponder];
+}
+
+#pragma mark method
+- (void)setViewMovedUp:(BOOL)movedUp
+{
+    UIView *rootView = self.weexInstance.rootView;
+    CGRect rect = _rootViewOriginFrame;
+    CGRect rootViewFrame = rootView.frame;
+    CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
+    if (movedUp) {
+        CGFloat offset =textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
+        if (offset > 0) {
+            rect = (CGRect){
+                .origin.x = 0.f,
+                .origin.y = -offset,
+                .size = rootViewFrame.size
+            };
+        }
+    }else {
+        // revert back to the origin state
+        rect = _rootViewOriginFrame;
+        _rootViewOriginFrame = CGRectNull;
+    }
+    self.weexInstance.rootView.frame = rect;
 }
 
 @end

@@ -144,8 +144,6 @@
 
 - (void)_recomputeCSSNodeChildren;
 
-- (void)_recomputeBorderRadius;
-
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating;
 
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles;
@@ -161,5 +159,7 @@
 - (void)_updateNavBarAttributes:(NSDictionary *)attributes;
 
 - (void)_handleFirstScreenTime;
+
+- (void)_resetNativeBorderRadius;
 
 @end
