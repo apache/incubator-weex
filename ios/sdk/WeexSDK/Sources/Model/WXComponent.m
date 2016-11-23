@@ -92,6 +92,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _resetViewStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -389,9 +390,11 @@
     WXAssertMainThread();
     
     [self _updateViewStyles:styles];
+    [self _resetViewStyles:styles];
     [self _handleBorders:styles isUpdating:YES];
-    
+
     [self updateStyles:styles];
+    [self fetchResetViewStyles:styles];
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -409,6 +412,34 @@
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+#pragma mark Reset
+-(BOOL)isShouldReset:(id )value
+{
+    if([value isKindOfClass:[NSString class]]) {
+        if(!value || [@"" isEqualToString:value]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+-(void)fetchResetViewStyles:(NSDictionary *)styles
+{
+    NSMutableArray *elements = [@[] mutableCopy];
+    for (NSString *key in styles) {
+        id value = [styles objectForKey:key];
+        if([self isShouldReset:value]){
+            [elements addObject:key];
+        }
+    }
+    [self resetViewStyles:elements];
+}
+
+- (void)resetViewStyles:(NSArray *)elements
 {
     WXAssertMainThread();
 }
