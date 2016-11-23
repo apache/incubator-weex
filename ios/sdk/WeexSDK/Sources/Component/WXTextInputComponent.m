@@ -143,7 +143,7 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if(styles[@"color"]) {
-            [_inputView setTextColor:[self convertColor:styles[@"color"]]];
+            [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
         }
         
         if (styles[@"fontSize"]) {
@@ -351,7 +351,7 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)updateStyles:(NSDictionary *)styles
 {
     if(styles[@"color"]) {
-       [_inputView setTextColor:[self convertColor:styles[@"color"]]];
+       [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -650,5 +650,14 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)closeKeyboard
 {
     [_inputView resignFirstResponder];
+}
+
+#pragma mark -reset color
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if([elements containsObject:@"color"])
+    {
+        [_inputView setTextColor:[UIColor blackColor]];
+    }
 }
 @end

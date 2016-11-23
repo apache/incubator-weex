@@ -139,9 +139,6 @@
         if (styles[@"fontStyle"]) {
             _fontStyle = [WXConvert WXTextStyle:styles[@"fontStyle"]];
         }
-        if (styles[@"color"]) {
-            _color = [self convertColor:styles[@"color"]];
-        }
         if (styles[@"fontFamily"]) {
             _fontFamily = styles[@"fontFamily"];
         }
@@ -308,7 +305,7 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        _color = [self convertColor:styles[@"color"]];
+        _color = [WXConvert UIColor:styles[@"color"]];
         [_textView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {
@@ -458,6 +455,16 @@
 - (void)closeKeyboard
 {
     [_textView resignFirstResponder];
+}
+
+#pragma mark -reset color
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if([elements containsObject:@"color"])
+    {
+        _color = [UIColor blackColor];
+        [_textView setTextColor:[UIColor blackColor]];
+    }
 }
 
 @end
