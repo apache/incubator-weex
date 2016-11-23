@@ -36,6 +36,8 @@
             supercomponent = supercomponent.supercomponent;
         }
         [supercomponent setNeedsDisplay];
+    } else if (!_layer || _layer.frame.size.width ==0 || _layer.frame.size.height == 0) {
+        return;
     } else {
         [_layer setNeedsDisplay];
     }
