@@ -92,7 +92,6 @@
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
         [self _resetViewStyles:_styles];
-        [self fetchResetStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -388,8 +387,7 @@
     [self _handleBorders:styles isUpdating:YES];
 
     [self updateStyles:styles];
-    [self fetchResetStyles:styles];
-
+    [self fetchResetViewStyles:styles];
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -412,47 +410,31 @@
 }
 
 #pragma mark Reset
--(BOOL)isShouldReset:(NSString *)string
+-(BOOL)isShouldReset:(id )value
 {
-    if(!string || [@"" isEqualToString:string]){
-        return YES;
+    if([value isKindOfClass:[NSString class]]) {
+        if(!value || [@"" isEqualToString:value]) {
+            return YES;
+        }
     }
     return NO;
 }
 
--(void)fetchResetStyles:(NSDictionary *)styles
+-(void)fetchResetViewStyles:(NSDictionary *)styles
 {
     NSMutableArray *elements = [@[] mutableCopy];
-    if([self isShouldReset:styles[@"backgroundColor"]]) {
-        [elements addObject:@"backgroundColor"];
-    }
-    if([self isShouldReset:styles[@"color"]]) {
-        [elements addObject:@"color"];
-    }
-    if([self isShouldReset:styles[@"opacity"]]) {
-        [elements addObject:@"opacity"];
-    }
-    if([self isShouldReset:styles[@"overflow"]]) {
-        [elements addObject:@"overflow"];
-    }
-    if([self isShouldReset:styles[@"visibility"]]) {
-        [elements addObject:@"visibility"];
-    }
-    if([self isShouldReset:styles[@"position"]]) {
-        [elements addObject:@"position"];
-    }
-    if([self isShouldReset:styles[@"transform"]]) {
-        [elements addObject:@"transform"];
-    }
-    if([self isShouldReset:styles[@"transformOrigin"]]) {
-        [elements addObject:@"transformOrigin"];
+    for (NSString *key in styles) {
+        id value = [styles objectForKey:key];
+        if([self isShouldReset:value]){
+            [elements addObject:key];
+        }
     }
     [self resetViewStyles:elements];
 }
 
 - (void)resetViewStyles:(NSArray *)elements
 {
-//    WXAssertMainThread();
+    WXAssertMainThread();
 }
 
 #pragma mark Layout

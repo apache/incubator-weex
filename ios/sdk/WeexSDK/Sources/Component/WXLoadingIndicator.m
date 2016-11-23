@@ -22,8 +22,8 @@
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         _indicator = [[UIActivityIndicatorView alloc] init];
-        if (_color) {
-            [self setColor:_color];
+        if (styles[@"color"]) {
+            [self setColor:[WXConvert UIColor:styles[@"color"]]];
         }
     }
     
@@ -33,7 +33,7 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [self setColor:_color];
+        [self setColor:[WXConvert UIColor:styles[@"color"]]];
     }
 }
 

@@ -68,6 +68,7 @@
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) WXTextWeight fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
+@property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -135,6 +136,9 @@
         if (styles[@"fontStyle"]) {
             _fontStyle = [WXConvert WXTextStyle:styles[@"fontStyle"]];
         }
+        if (styles[@"color"]) {
+            _color = [self convertColor:styles[@"color"]];
+        }
         if (styles[@"fontFamily"]) {
             _fontFamily = styles[@"fontFamily"];
         }
@@ -199,6 +203,21 @@
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+}
+
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
 }
 
 #pragma mark - add-remove Event
@@ -286,6 +305,7 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
+        _color = [self convertColor:styles[@"color"]];
         [_textView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {

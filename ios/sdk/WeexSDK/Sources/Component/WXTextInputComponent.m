@@ -144,7 +144,7 @@ WX_EXPORT_METHOD(@selector(blur))
         
         if(styles[@"color"])
         {
-            [_inputView setTextColor:_color];
+            [_inputView setTextColor:[self convertColor:styles[@"color"]]];
         }
         
         if (styles[@"fontSize"]) {
@@ -251,6 +251,21 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
+}
+
 #pragma mark - Add Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -338,7 +353,7 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     if(styles[@"color"])
     {
-        [_inputView setTextColor:_color];
+       [_inputView setTextColor:[self convertColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
