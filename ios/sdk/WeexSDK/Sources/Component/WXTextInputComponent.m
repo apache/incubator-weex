@@ -144,6 +144,7 @@ WX_EXPORT_METHOD(@selector(blur))
         if (styles[@"color"]) {
             [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
         }
+        
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
         }
@@ -241,6 +242,21 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
+}
+
 #pragma mark - Add Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -327,7 +343,7 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+       [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -392,6 +408,18 @@ WX_EXPORT_METHOD(@selector(blur))
             WXCeilPixelValue(computedSize.height)
         };
     };
+}
+
+-(UIColor *)covertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }
+    return color;
 }
 
 #pragma mark -
@@ -616,4 +644,11 @@ WX_EXPORT_METHOD(@selector(blur))
     [_inputView resignFirstResponder];
 }
 
+#pragma mark -reset color
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if ([elements containsObject:@"color"]) {
+        [_inputView setTextColor:[UIColor blackColor]];
+    }
+}
 @end
