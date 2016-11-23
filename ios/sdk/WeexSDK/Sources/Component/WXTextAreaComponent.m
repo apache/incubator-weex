@@ -68,7 +68,6 @@
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) WXTextWeight fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
-@property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -121,16 +120,11 @@
         }else {
             _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
         }
-        
         if (attributes[@"value"]) {
             NSString * value = [WXConvert NSString:attributes[@"value"]];
             if (value) {
                 _textValue = value;
             }
-        }
-        
-        if (styles[@"color"]) {
-            _color = [self covertColor:styles[@"color"]];
         }
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -162,19 +156,6 @@
     
     return self;
 }
-
--(UIColor *)covertColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }
-    return color;
-}
-
 - (void)viewWillUnload
 {
     _textView = nil;
@@ -302,13 +283,11 @@
 }
 
 #pragma mark - upate styles
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles
+- (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        _color = [self covertColor:styles[@"color"]];
         [_textView setTextColor:_color];
     }
-    
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
     }

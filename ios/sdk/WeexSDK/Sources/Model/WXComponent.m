@@ -92,6 +92,7 @@
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
         [self _resetViewStyles:_styles];
+        [self fetchResetStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -425,6 +426,9 @@
     if([self isShouldReset:styles[@"backgroundColor"]]) {
         [elements addObject:@"backgroundColor"];
     }
+    if([self isShouldReset:styles[@"color"]]) {
+        [elements addObject:@"color"];
+    }
     if([self isShouldReset:styles[@"opacity"]]) {
         [elements addObject:@"opacity"];
     }
@@ -443,10 +447,10 @@
     if([self isShouldReset:styles[@"transformOrigin"]]) {
         [elements addObject:@"transformOrigin"];
     }
-    [self resetStyles:elements];
+    [self resetViewStyles:elements];
 }
 
-- (void)resetStyles:(NSArray *)elements
+- (void)resetViewStyles:(NSArray *)elements
 {
     WXAssertMainThread();
 }

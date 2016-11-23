@@ -11,6 +11,7 @@
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
 #import "WXDefine.h"
+#import "WXComponent_internal.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -141,9 +142,11 @@ WX_EXPORT_METHOD(@selector(blur))
             _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
-        if (styles[@"color"]) {
-            [_inputView setTextColor:[self covertColor:styles[@"color"]]];
+        if(styles[@"color"])
+        {
+            [_inputView setTextColor:_color];
         }
+        
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
         }
@@ -333,8 +336,9 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)updateStyles:(NSDictionary *)styles
 {
-    if (styles[@"color"]) {
-        [_inputView setTextColor:[self covertColor:styles[@"color"]]];
+    if(styles[@"color"])
+    {
+        [_inputView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -634,5 +638,4 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     [_inputView resignFirstResponder];
 }
-
 @end

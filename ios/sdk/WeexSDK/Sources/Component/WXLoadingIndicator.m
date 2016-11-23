@@ -8,6 +8,7 @@
 
 #import "WXLoadingIndicator.h"
 #import "WXConvert.h"
+#import "WXComponent_internal.h"
 
 @interface WXLoadingIndicator()
 
@@ -21,8 +22,8 @@
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         _indicator = [[UIActivityIndicatorView alloc] init];
-        if (styles[@"color"]) {
-            [self setColor:[WXConvert UIColor:styles[@"color"]]];
+        if (_color) {
+            [self setColor:_color];
         }
     }
     
@@ -32,7 +33,7 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [self setColor:[WXConvert UIColor:styles[@"color"]]];
+        [self setColor:_color];
     }
 }
 
@@ -72,6 +73,14 @@
 - (void)setFrame:(CGRect)frame
 {
     [_indicator setFrame:frame];
+}
+
+#pragma mark resetColor
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if ([elements containsObject:@"color"]) {
+        _color = [UIColor redColor];
+    }
 }
 
 @end
