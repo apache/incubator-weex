@@ -238,6 +238,12 @@
     
     [super _insertSubcomponent:subcomponent atIndex:index];
     
+    if (![subcomponent isKindOfClass:[WXHeaderComponent class]]
+        && ![subcomponent isKindOfClass:[WXCellComponent class]]) {
+        // Don't insert section if subcomponent is not header or cell
+        return;
+    }
+    
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
     if (_sections.count <= indexPath.section) {
         WXSection *section = [WXSection new];

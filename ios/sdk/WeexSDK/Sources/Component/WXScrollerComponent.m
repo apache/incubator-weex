@@ -482,15 +482,15 @@
     }
     
     CGFloat ctop;
-    if (component.supercomponent && [component.supercomponent isViewLoaded]) {
-        ctop = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].y;
+    if (component && component->_view && component->_view.superview) {
+        ctop = [component->_view.superview convertPoint:component->_view.frame.origin toView:_view].y;
     } else {
         ctop = 0.0;
     }
     CGFloat cbottom = ctop + CGRectGetHeight(component.calculatedFrame);
     CGFloat cleft;
-    if (component.supercomponent && [component.supercomponent isViewLoaded]) {
-        cleft = [component.supercomponent->_view convertPoint:component->_view.frame.origin toView:_view].x;
+    if (component && component->_view && component->_view.superview) {
+        cleft = [component->_view.superview convertPoint:component->_view.frame.origin toView:_view].x;
     } else {
         cleft = 0.0;
     }

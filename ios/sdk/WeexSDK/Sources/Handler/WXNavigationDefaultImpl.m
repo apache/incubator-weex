@@ -99,6 +99,10 @@
 - (void)setNavigationBarHidden:(BOOL)hidden animated:(BOOL)animated
                  withContainer:(UIViewController *)container
 {
+    if (![container isKindOfClass:[WXBaseViewController class]]) {
+        return;
+    }
+    
     container.navigationController.navigationBarHidden = hidden;
 }
 

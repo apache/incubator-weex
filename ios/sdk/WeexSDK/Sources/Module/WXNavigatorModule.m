@@ -75,19 +75,13 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
 
 - (void)setNavBarHidden:(NSDictionary*)param callback:(WXModuleCallback)callback
 {
-    NSMutableDictionary* cbkDat = [NSMutableDictionary new];
-    [cbkDat setObject:@false forKey:MSG_SUCCESS];
-    
-    if ([[NSArray arrayWithObjects:@"0",@"1",@1,@2, nil] containsObject:param[@"hidden"]]) {
-        
+    NSString *result = MSG_FAILED;
+    if ([[NSArray arrayWithObjects:@"0",@"1",@0,@1, nil] containsObject:param[@"hidden"]]) {
         id<WXNavigationProtocol> navigator = [self navigator];
         [navigator setNavigationBarHidden:[param[@"hidden"] boolValue] animated:[param[@"animated"] boolValue] withContainer:self.weexInstance.viewController];
-        [cbkDat setObject:@true forKey:MSG_SUCCESS];
-    }else {
-        [cbkDat setObject:@"param illegal" forKey:MSG_PARAM_ERR];
+        result = MSG_SUCCESS;
     }
-    
-    callback(cbkDat);
+    callback(result);
 }
 
 #pragma mark Navigation Setup

@@ -10,6 +10,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXDefine.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -86,6 +87,9 @@
 @synthesize border = _border;
 @synthesize padding = _padding;
 @synthesize textStorage = _textStorage;
+
+WX_EXPORT_METHOD(@selector(focus))
+WX_EXPORT_METHOD(@selector(blur))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -203,7 +207,8 @@
     _inputView.inputAccessoryView = toolbar;
 }
 
-- (void)viewWillLoad {
+- (void)viewWillLoad
+{
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWasShown:)
                                                  name:UIKeyboardDidShowNotification
@@ -215,17 +220,25 @@
                                                object:nil];
 }
 
-- (void)viewWillUnload
+- (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:_inputView];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardDidShowNotification
-                                                  object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIKeyboardWillHideNotification
-                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void)focus
+{
+    if(self.view)
+    {
+        [self.view becomeFirstResponder];
+    }
+}
+
+-(void)blur
+{
+    if(self.view)
+    {
+        [self.view resignFirstResponder];
+    }
 }
 
 #pragma mark - Add Event
@@ -459,9 +472,9 @@
     UIView *rootView = self.weexInstance.rootView;
     CGRect rect = _rootViewOriginFrame;
     CGRect rootViewFrame = rootView.frame;
-    CGRect inputFrame = [_inputView convertRect:_inputView.frame toView:rootView];
+    CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset = _keyboardSize.height - CGRectGetMaxY(rect) + CGRectGetMaxY(inputFrame);
+        CGFloat offset =inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -581,8 +594,7 @@
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
         .size = _keyboardSize
     };
-    CGRect inputFrame = [_inputView convertRect:_inputView.frame toView:rootView]
-    ;
+    CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
     }

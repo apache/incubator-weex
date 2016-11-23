@@ -11,7 +11,16 @@
 
 @class WXSDKInstance;
 
+/**
+ * @abstract the component callback , result can be string or dictionary.
+ * @discussion callback data to js, the id of callback function will be removed to save memory.
+ */
 typedef void (^WXCallback)(_Nonnull id result);
+
+/**
+ * @abstract the component callback , result can be string or dictionary.
+ * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed unitl instance destroyed, so you can call it repetitious.
+ */
 typedef void (^WXKeepAliveCallback)(_Nonnull id result, BOOL keepAlive);
 
 NS_ASSUME_NONNULL_BEGIN
