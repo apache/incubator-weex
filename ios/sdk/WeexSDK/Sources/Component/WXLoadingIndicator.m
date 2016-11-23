@@ -79,7 +79,7 @@
 -(void)resetViewStyles:(NSArray *)elements
 {
     if ([elements containsObject:@"color"]) {
-        _color = [UIColor redColor];
+        _color = [UIColor whiteColor];
     }
 }
 

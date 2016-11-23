@@ -452,7 +452,7 @@
 
 - (void)resetViewStyles:(NSArray *)elements
 {
-    WXAssertMainThread();
+//    WXAssertMainThread();
 }
 
 #pragma mark Layout
