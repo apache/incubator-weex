@@ -75,12 +75,4 @@
     [_indicator setFrame:frame];
 }
 
-#pragma mark resetColor
--(void)resetViewStyles:(NSArray *)elements
-{
-    if ([elements containsObject:@"color"]) {
-        _color = [UIColor whiteColor];
-    }
-}
-
 @end
