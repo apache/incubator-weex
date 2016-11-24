@@ -509,13 +509,19 @@ class WXDomStatement {
       style.put(Constants.Name.BACKGROUND_COLOR, "#ffffff");
     }
     //If there is height or width in JS, then that value will override value here.
-    if ( !domObject.getStyles().containsKey(Constants.Name.WIDTH)) {
-      style.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
-      domObject.setModifyWidth(true);
+    if (!domObject.getStyles().containsKey(Constants.Name.WIDTH)) {
+      int weexWidth = WXViewUtils.getWeexWidth(mInstanceId, false);
+      if (weexWidth != WXViewUtils.DIMENSION_UNSET) {
+        style.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(weexWidth));
+        domObject.setModifyWidth(true);
+      }
     }
-    if ( !domObject.getStyles().containsKey(Constants.Name.HEIGHT)) {
-      style.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)));
-      domObject.setModifyHeight(true);
+    if (!domObject.getStyles().containsKey(Constants.Name.HEIGHT)) {
+      int weexHeight = WXViewUtils.getWeexHeight(mInstanceId, false);
+      if (weexHeight != WXViewUtils.DIMENSION_UNSET) {
+        style.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(weexHeight));
+        domObject.setModifyHeight(true);
+      }
     }
     WXDomObject.prepareRoot(domObject);
     domObject.updateStyle(style);

@@ -284,11 +284,11 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
   /**
    * Width of weex's root container.
    */
-  private int mGodViewWidth = -1;
+  private int mGodViewWidth = WXViewUtils.DIMENSION_UNSET;
   /**
    * Height of weex's root container.
    */
-  private int mGodViewHeight = -1;
+  private int mGodViewHeight = WXViewUtils.DIMENSION_UNSET;
   /**
    * Render start time
    */
