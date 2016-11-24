@@ -216,6 +216,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -655,12 +656,12 @@ public final class WXDomModule extends WXModule {
         Map<String, String> sizes = new HashMap<>();
         Rect rect=new Rect();
         ((View)mWXSDKInstance.getContainerView().getParent()).getGlobalVisibleRect(rect);
-        sizes.put("width", String.valueOf(rect.width()));
-        sizes.put("height", String.valueOf(rect.height()));
-        sizes.put("bottom",String.valueOf(rect.bottom));
-        sizes.put("left",String.valueOf(rect.left));
-        sizes.put("right",String.valueOf(rect.right));
-        sizes.put("top",String.valueOf(rect.top));
+        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width())));
+        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height())));
+        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom)));
+        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left)));
+        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right)));
+        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top)));
         options.put("size", sizes);
         options.put("result", true);
         WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);

@@ -551,12 +551,12 @@ class WXRenderStatement {
     if (component != null) {
       Map<String, String> size = new HashMap<>();
       Rect sizes = component.getComponentSize();
-      size.put("width", String.valueOf(sizes.width()));
-      size.put("height", String.valueOf(sizes.height()));
-      size.put("bottom",String.valueOf(sizes.bottom));
-      size.put("left",String.valueOf(sizes.left));
-      size.put("right",String.valueOf(sizes.right));
-      size.put("top",String.valueOf(sizes.top));
+      size.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.width())));
+      size.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.height())));
+      size.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.bottom)));
+      size.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.left)));
+      size.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.right)));
+      size.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.top)));
       options.put("size", size);
       options.put("result", true);
     } else {
