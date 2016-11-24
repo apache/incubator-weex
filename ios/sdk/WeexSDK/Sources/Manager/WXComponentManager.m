@@ -635,7 +635,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         if(!self.weexInstance.isRootViewFrozen) {
             self.weexInstance.rootView.frame = frame;
         }
-        
     });
     
     resetNodeLayout(_rootCSSNode);
