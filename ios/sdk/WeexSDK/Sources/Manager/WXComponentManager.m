@@ -632,7 +632,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
                               WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_WIDTH]),
                               WXRoundPixelValue(_rootCSSNode->layout.dimensions[CSS_HEIGHT]));
     WXPerformBlockOnMainThread(^{
-        if(!self.weexInstance.isIntact) {
+        if(!self.weexInstance.isRootViewFrozen) {
             self.weexInstance.rootView.frame = frame;
         }
         

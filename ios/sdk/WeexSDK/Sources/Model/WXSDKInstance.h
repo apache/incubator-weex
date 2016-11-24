@@ -25,10 +25,10 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) UIView *rootView;
 
 /**
- * User can keep the root view frame through the isIntact
- * If you want keep the rootview frame, set isIntact YES,or set NO.
+ * Component can freeze the rootview frame through the variable isRootViewFrozen
+ * If Component want to freeze the rootview frame, set isRootViewFrozen YES, weex will not change the rootview frame when layout,or set NO.
  **/
-@property (nonatomic, assign) BOOL isIntact;
+@property (nonatomic, assign) BOOL isRootViewFrozen;
 
 /**
  * The scriptURL of weex bundle.
