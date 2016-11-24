@@ -70,7 +70,6 @@
 @property (nonatomic) BOOL focusEvent;
 @property (nonatomic) BOOL blurEvent;
 @property (nonatomic) BOOL changeEvent;
-@property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
 @property (nonatomic, assign) CGRect rootViewOriginFrame;
@@ -99,7 +98,6 @@ WX_EXPORT_METHOD(@selector(blur))
         _focusEvent = NO;
         _blurEvent = NO;
         _changeEvent = NO;
-        _clickEvent = NO;
         
         _inputView = [[WXTextInputView alloc] init];
         _datePickerManager = [[WXDatePickerManager alloc] init];
@@ -144,6 +142,7 @@ WX_EXPORT_METHOD(@selector(blur))
         if (styles[@"color"]) {
             [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
         }
+        
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
         }
@@ -241,6 +240,21 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
+}
+
 #pragma mark - Add Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -255,9 +269,6 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = YES;
-    }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = YES;
     }
 }
 
@@ -276,9 +287,6 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = NO;
-    }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = NO;
     }
 }
 
@@ -327,7 +335,7 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+       [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -394,6 +402,18 @@ WX_EXPORT_METHOD(@selector(blur))
     };
 }
 
+-(UIColor *)covertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }
+    return color;
+}
+
 #pragma mark -
 #pragma mark WXDatePickerManagerDelegate
 -(void)fetchDatePickerValue:(NSString *)value
@@ -426,9 +446,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _changeEventString = [textField text];
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
-    }
-    if (_clickEvent) {
-        [self fireEvent:@"click" params:nil];
     }
 }
 
@@ -597,6 +614,7 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
+        self.weexInstance.isRootViewFrozen = YES;
     }
 }
 
@@ -608,6 +626,7 @@ WX_EXPORT_METHOD(@selector(blur))
     UIView * rootView = self.weexInstance.rootView;
     if (rootView.frame.origin.y < 0) {
         [self setViewMovedUp:NO];
+        self.weexInstance.isRootViewFrozen = NO;
     }
 }
 
@@ -616,4 +635,11 @@ WX_EXPORT_METHOD(@selector(blur))
     [_inputView resignFirstResponder];
 }
 
+#pragma mark -reset color
+-(void)resetViewStyles:(NSArray *)elements
+{
+    if ([elements containsObject:@"color"]) {
+        [_inputView setTextColor:[UIColor blackColor]];
+    }
+}
 @end

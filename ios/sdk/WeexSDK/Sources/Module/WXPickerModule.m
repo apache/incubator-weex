@@ -7,10 +7,12 @@
  */
 
 #import "WXPickerModule.h"
+#import "WXConvert.h"
 #import <UIKit/UIPickerView.h>
 #import <UIKit/UIKit.h>
 
 #define WXPickerHeight 266
+#define WXPickerToolBarHeight 44
 
 @interface WXPickerModule()
 
@@ -30,14 +32,28 @@
 @implementation WXPickerModule
 @synthesize weexInstance;
 
-WX_EXPORT_METHOD(@selector(pick:index:callback:))
+WX_EXPORT_METHOD(@selector(pick:callback:))
 
 #pragma mark -
 #pragma mark Single Picker
--(void)pick:(NSArray *)items index:(NSInteger)index callback:(WXModuleCallback)callback
+-(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
-    [self createPicker:items index:index];
-    self.callback = callback;
+    NSArray *items = @[];
+    NSInteger index = 0 ;
+    if(options[@"items"]) {
+        items = options[@"items"];
+    }
+    if(options[@"index"]) {
+        index = [WXConvert NSInteger:options[@"index"]];
+    }
+    if(items && [items count]>0) {
+        [self createPicker:items index:index];
+        self.callback = callback;
+    }else {
+        callback(@{ @"result": @"error" });
+        self.callback = nil;
+    }
+    
 }
 
 -(void)createPicker:(NSArray *)items index:(NSInteger)index
@@ -45,11 +61,9 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
     [self configPickerView];
     self.items = [items copy];
     self.index = index;
-    if(items && index < [items count])
-    {
+    if(items && index < [items count]) {
         [self.picker selectRow:index inComponent:0 animated:NO];
-    }else if(items && [items count]>0)
-    {
+    }else if(items && [items count]>0) {
         [self.picker selectRow:0 inComponent:0 animated:NO];
     }
     [self show];
@@ -60,8 +74,7 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
     [[[UIApplication sharedApplication] keyWindow] endEditing:YES];  //收起键盘
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.backgroudView];
-    if(self.isAnimating)
-    {
+    if(self.isAnimating) {
         return;
     }
     self.isAnimating = YES;
@@ -76,8 +89,7 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
 
 -(void)hide
 {
-    if(self.isAnimating)
-    {
+    if(self.isAnimating) {
         return;
     }
     self.isAnimating = YES;
@@ -94,33 +106,30 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
 -(void)cancel:(id)sender
 {
     [self hide];
+    self.callback(@{ @"result": @"cancel"});
+    self.callback=nil;
 }
 
 -(void)done:(id)sender
 {
     [self hide];
-    self.callback([NSNumber numberWithInteger:self.index]);
+    self.callback(@{ @"result": @"success",@"data":[NSNumber numberWithInteger:self.index]});
     self.callback=nil;
 }
 
 #pragma mark -
 #pragma mark Pikcer View
 
--(void *)configPickerView
+-(void)configPickerView
 {
-    if(!self.backgroudView)
-    {
+    if(!self.backgroudView) {
         self.backgroudView = [self createBackgroudView];
         UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
         [self.backgroudView addGestureRecognizer:tapGesture];
-        
     }
-    
-    if(!self.pickerView)
-    {
+    if(!self.pickerView) {
         self.pickerView = [self createPickerView];
-        CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
-        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
+        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
         [toolBar setBackgroundColor:[UIColor whiteColor]];
         UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
         noSpace.width=10;
@@ -130,12 +139,10 @@ WX_EXPORT_METHOD(@selector(pick:index:callback:))
         [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
         [self.pickerView addSubview:toolBar];
     }
-    
-    if(!self.picker)
-    {
+    if(!self.picker) {
         self.picker = [[UIPickerView alloc]init];
         self.picker.delegate = self;
-        CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
+        CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
         self.picker.backgroundColor = [UIColor whiteColor];
         self.picker.frame = pickerFrame;
         [self.pickerView addSubview:self.picker];
