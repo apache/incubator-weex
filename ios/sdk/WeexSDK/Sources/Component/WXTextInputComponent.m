@@ -625,6 +625,7 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
+        self.weexInstance.isRootViewFrozen = YES;
     }
 }
 
@@ -636,6 +637,7 @@ WX_EXPORT_METHOD(@selector(blur))
     UIView * rootView = self.weexInstance.rootView;
     if (rootView.frame.origin.y < 0) {
         [self setViewMovedUp:NO];
+        self.weexInstance.isRootViewFrozen = NO;
     }
 }
 
