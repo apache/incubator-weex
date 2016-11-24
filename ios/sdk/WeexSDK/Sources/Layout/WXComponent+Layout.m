@@ -106,7 +106,7 @@
                 _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
             }
             
-            [_layer setNeedsDisplay];
+            [self setNeedsDisplay];
         }];
     }
 }
@@ -182,8 +182,13 @@
 do {\
     id value = styles[@#key];\
     if (value) {\
-        _cssNode->style.cssProp = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
-        [self setNeedsLayout];\
+        typeof(_cssNode->style.cssProp) convertedValue = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
+        if([@"WXPixelType" isEqualToString:@#type] && isnan(convertedValue)) {\
+            WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
+        } else { \
+            _cssNode->style.cssProp = convertedValue;\
+            [self setNeedsLayout];\
+        } \
     }\
 } while(0);
 
