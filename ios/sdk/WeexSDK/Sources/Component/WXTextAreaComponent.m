@@ -162,6 +162,7 @@
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             _border = border;
         }
+        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
