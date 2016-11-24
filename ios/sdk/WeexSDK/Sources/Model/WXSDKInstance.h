@@ -25,6 +25,12 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) UIView *rootView;
 
 /**
+ * Component can freeze the rootview frame through the variable isRootViewFrozen
+ * If Component want to freeze the rootview frame, set isRootViewFrozen YES, weex will not change the rootview frame when layout,or set NO.
+ **/
+@property (nonatomic, assign) BOOL isRootViewFrozen;
+
+/**
  * The scriptURL of weex bundle.
  **/
 @property (nonatomic, strong) NSURL *scriptURL;
