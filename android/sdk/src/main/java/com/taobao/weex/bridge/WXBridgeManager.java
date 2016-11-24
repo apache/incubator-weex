@@ -872,7 +872,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                 data == null ? "{}" : data);
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj};
-        invokeExecJS(instanceId, null, METHOD_CREATE_INSTANCE, args);
+        invokeExecJS(instanceId, null, METHOD_CREATE_INSTANCE, args, false);
       } catch (Throwable e) {
         WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
         if (instance != null) {
@@ -978,20 +978,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return false;
   }
 
-  private void invokeExecJS(String instanceId, String namespace, String function, WXJSObject[] args){
-    if (WXEnvironment.isApkDebugable()) {
+  private void invokeExecJS(String instanceId, String namespace, String function, WXJSObject[] args) {
+    invokeExecJS(instanceId, namespace, function, args, true);
+  }
+
+  private void invokeExecJS(String instanceId, String namespace, String function,
+                            WXJSObject[] args,boolean log){
+    if (log && WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
               .append("function:").append(function)
               .append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
-
-//    if(mDestroyedInstanceId!=null && !mDestroyedInstanceId.contains(instanceId)) {
-      mWXBridge.execJS(instanceId, namespace, function, args);
-//    }else{
-//      WXLogUtils.w("invokeExecJS: instanceId: "+instanceId+"was  destroy !! ExecJS abandon !!");
-//    }
+    mWXBridge.execJS(instanceId, namespace, function, args);
   }
 
   private WXJSObject[] createTimerArgs(int instanceId, int funcId, boolean keepAlive) {
