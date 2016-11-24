@@ -983,11 +983,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void invokeExecJS(String instanceId, String namespace, String function,
-                            WXJSObject[] args,boolean log){
-    if (log && WXEnvironment.isApkDebugable()) {
+                            WXJSObject[] args,boolean logTaskDetail){
+    if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
-              .append("function:").append(function)
-              .append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
+              .append("function:").append(function);
+      if(logTaskDetail)
+        mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
