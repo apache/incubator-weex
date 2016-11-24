@@ -47,6 +47,7 @@
         * [scroller](/components/scroller.md)
         * [list](/components/list.md)
             * [cell](/components/cell.md)
+            * [refresh & loading](/components/refresh-loading.md)
         * [text](/components/text.md)
         * [image](/components/image.md)
         * [input](/components/input.md)
