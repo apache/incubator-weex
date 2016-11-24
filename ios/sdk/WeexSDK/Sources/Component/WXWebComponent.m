@@ -9,6 +9,9 @@
 #import "WXWebComponent.h"
 #import "WXComponent_internal.h"
 #import "WXUtility.h"
+#import "WXHandlerFactory.h"
+#import "WXURLRewriteProtocol.h"
+
 #import <JavaScriptCore/JavaScriptCore.h>
 
 @interface WXWebView : UIWebView
@@ -103,9 +106,17 @@ WX_EXPORT_METHOD(@selector(goForward))
 
 - (void)setUrl:(NSString *)url
 {
-    if (![url isEqualToString:_url]) {
-        _url = url;
-        
+    NSString* newUrl = nil;
+    id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
+    if ([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
+        newUrl = [urlRewriter rewriteURL:url withResourceType:WXResourceTypeLink withInstance:self.weexInstance].absoluteString;
+    }
+    if (!newUrl) {
+        return;
+    }
+    
+    if (![newUrl isEqualToString:_url]) {
+        _url = newUrl;
         if (_url) {
             [self loadURL:_url];
         }
