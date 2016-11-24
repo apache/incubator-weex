@@ -198,6 +198,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params;
 
+/**
+ * complete url based with bundle url
+ */
+- (NSURL *)completeURL:(NSString *)url;
 
 /**
  * application performance statistics
