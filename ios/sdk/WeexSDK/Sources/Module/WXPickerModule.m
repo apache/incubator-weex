@@ -12,6 +12,7 @@
 #import <UIKit/UIKit.h>
 
 #define WXPickerHeight 266
+#define WXPickerToolBarHeight 44
 
 @interface WXPickerModule()
 
@@ -128,7 +129,7 @@ WX_EXPORT_METHOD(@selector(pick:callback:))
     }
     if(!self.pickerView) {
         self.pickerView = [self createPickerView];
-        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
+        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
         [toolBar setBackgroundColor:[UIColor whiteColor]];
         UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
         noSpace.width=10;
@@ -141,7 +142,7 @@ WX_EXPORT_METHOD(@selector(pick:callback:))
     if(!self.picker) {
         self.picker = [[UIPickerView alloc]init];
         self.picker.delegate = self;
-        CGRect pickerFrame = CGRectMake(0, 44, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-44);
+        CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
         self.picker.backgroundColor = [UIColor whiteColor];
         self.picker.frame = pickerFrame;
         [self.pickerView addSubview:self.picker];
