@@ -106,11 +106,8 @@ WX_EXPORT_METHOD(@selector(goForward))
 
 - (void)setUrl:(NSString *)url
 {
-    NSString* newUrl = nil;
-    id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-    if ([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
-        newUrl = [urlRewriter rewriteURL:url withResourceType:WXResourceTypeLink withInstance:self.weexInstance].absoluteString;
-    }
+    NSMutableString* newUrl = url;
+    WX_REWRITE_URL(newUrl, WXResourceTypeLink, self.weexInstance, &newUrl)
     if (!newUrl) {
         return;
     }

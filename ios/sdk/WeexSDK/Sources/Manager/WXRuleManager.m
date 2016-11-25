@@ -61,11 +61,9 @@ static WXRuleManager *_sharedInstance = nil;
                 return;
             }
             
-            NSString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
-            id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-            if ([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
-                fontSrc = [urlRewriter rewriteURL:fontSrc withResourceType:WXResourceTypeLink withInstance:self.instance].absoluteString;
-            }
+            NSMutableString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
+            WX_REWRITE_URL(fontSrc, WXResourceTypeLink, self.instance, &fontSrc)
+            
             if (!fontSrc) {
                 return;
             }

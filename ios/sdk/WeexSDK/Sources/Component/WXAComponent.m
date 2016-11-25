@@ -50,11 +50,8 @@
 - (void)openURL
 {
     if (_href && [_href length] > 0) {
-        NSString *newHref = _href;
-        id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-        if([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
-             newHref = [urlRewriter rewriteURL:_href withResourceType:WXResourceTypeLink withInstance:self.weexInstance].absoluteString;
-        }
+        NSMutableString *newHref = _href;
+        WX_REWRITE_URL(_href, WXResourceTypeLink, self.weexInstance, &newHref)
         if (!newHref) {
             return;
         }

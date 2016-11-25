@@ -66,11 +66,8 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         // default HTTP method is GET
         method = @"GET";
     }
-    NSString *urlStr = [options objectForKey:@"url"];
-    id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-    if ([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
-        urlStr = [urlRewriter rewriteURL:urlStr withResourceType:WXResourceTypeLink withInstance:self.weexInstance].absoluteString;
-    }
+    NSMutableString *urlStr = [options objectForKey:@"url"];
+    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &urlStr)
     
     if (!options || [WXUtility isBlankString:urlStr]) {
         [callbackRsp setObject:@(-1) forKey:@"status"];

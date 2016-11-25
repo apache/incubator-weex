@@ -139,14 +139,13 @@
 
 - (void)setURL:(NSURL *)URL
 {
-    NSURL *newURL = nil;
-    id<WXURLRewriteProtocol> urlRewriter = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-    if ([urlRewriter respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {
-        newURL = [urlRewriter rewriteURL:URL.absoluteString withResourceType:WXResourceTypeVideo withInstance:self.weexSDKInstance];
-    }
-    if (!newURL) {
+    NSMutableString *urlStr = nil;
+    WX_REWRITE_URL(URL.absoluteString, WXResourceTypeLink, self.weexSDKInstance, &urlStr)
+    
+    if (!urlStr) {
         return;
     }
+    NSURL *newURL = [NSURL URLWithString:urlStr];
     if ([self greater8SysVer]){
         
         AVPlayerViewController *AVVC = (AVPlayerViewController*)_playerViewController;
