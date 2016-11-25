@@ -347,7 +347,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
 
   public int getFirst() {
     if (needLoop) {
-      return getRealCount();
+      return getRealCount() + 1;
     } else {
       return 0;
     }
