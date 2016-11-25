@@ -102,15 +102,14 @@
     
     [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
     NSMutableDictionary *dict = [WXComponentFactory componentMethodMapsWithName:name];
+    dict[@"type"] = name;
     if (properties) {
         NSMutableDictionary *props = [properties mutableCopy];
-        props[@"type"] = name;
         if ([dict[@"methods"] count]) {
             [props addEntriesFromDictionary:dict];
         }
         [[WXSDKManager bridgeMgr] registerComponents:@[props]];
     } else {
-        dict[@"type"] = name;
         [[WXSDKManager bridgeMgr] registerComponents:@[dict]];
     }
 }
