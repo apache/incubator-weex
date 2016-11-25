@@ -204,11 +204,13 @@
  */
 package com.taobao.weex.http;
 
+import android.net.Uri;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
+import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.annotation.JSMethod;
@@ -453,7 +455,7 @@ public class WXStreamModule extends WXModule {
   private void sendRequest(Options options,ResponseCallback callback,JSCallback progressCallback){
     WXRequest wxRequest = new WXRequest();
     wxRequest.method = options.getMethod();
-    wxRequest.url = options.getUrl();
+    wxRequest.url = mWXSDKInstance.rewriteUri(Uri.parse(options.getUrl()), URIAdapter.REQUEST).toString();
     wxRequest.body = options.getBody();
     wxRequest.timeoutMs = options.getTimeout();
 

@@ -240,6 +240,7 @@ public class WXViewUtils {
    * System chooses an opaque format (no alpha bits required)
    */
   public static final int OPAQUE = -1;
+  public static final int DIMENSION_UNSET = -1;
   private static final boolean mUseWebPx = false;
   private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
@@ -264,14 +265,16 @@ public class WXViewUtils {
   }
 
 
-  public static int getWeexHeight(String instanceId) {
+  public static int getWeexHeight(String instanceId){
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
       int weexHeight = instance.getWeexHeight();
       if (weexHeight >= 0 || weexHeight == -2) {
         return weexHeight;
       }
-      return getScreenHeight(WXEnvironment.sApplication);
+      else {
+        return getScreenHeight(WXEnvironment.sApplication);
+      }
     }
     return -3;
   }
@@ -300,14 +303,16 @@ public class WXViewUtils {
 
   }
 
-  public static int getWeexWidth(String instanceId) {
+  public static int getWeexWidth(String instanceId){
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
       int weexWidth = instance.getWeexWidth();
       if (weexWidth >= 0 || weexWidth == -2) {
         return weexWidth;
       }
-      return getScreenWidth(WXEnvironment.sApplication);
+      else {
+        return getScreenWidth(WXEnvironment.sApplication);
+      }
     }
     return -3;
   }

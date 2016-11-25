@@ -216,6 +216,11 @@ import com.taobao.weex.WXSDKInstance;
 public interface URIAdapter {
 
   /**
+   * Stream request url.
+   */
+  String REQUEST = "request";
+
+  /**
    * URI for image src.
    */
   String IMAGE = "image";

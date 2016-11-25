@@ -869,7 +869,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                 data == null ? "{}" : data);
         WXJSObject[] args = {instanceIdObj, instanceObj, optionsObj,
                 dataObj};
-        invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args);
+        invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args,false);
       } catch (Throwable e) {
         instance.onRenderError(WXRenderErrorCode.WX_CREATE_INSTANCE_ERROR,
                                  "createInstance failed!");
@@ -967,20 +967,21 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return false;
   }
 
-  private void invokeExecJS(String instanceId, String namespace, String function, WXJSObject[] args){
+  private void invokeExecJS(String instanceId, String namespace, String function, WXJSObject[] args) {
+    invokeExecJS(instanceId, namespace, function, args, true);
+  }
+
+  private void invokeExecJS(String instanceId, String namespace, String function,
+                            WXJSObject[] args,boolean logTaskDetail){
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
-              .append("function:").append(function)
-              .append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
+              .append("function:").append(function);
+      if(logTaskDetail)
+        mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
       WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
-
-//    if(mDestroyedInstanceId!=null && !mDestroyedInstanceId.contains(instanceId)) {
-      mWXBridge.execJS(instanceId, namespace, function, args);
-//    }else{
-//      WXLogUtils.w("invokeExecJS: instanceId: "+instanceId+"was  destroy !! ExecJS abandon !!");
-//    }
+    mWXBridge.execJS(instanceId, namespace, function, args);
   }
 
   private WXJSObject[] createTimerArgs(int instanceId, int funcId, boolean keepAlive) {
