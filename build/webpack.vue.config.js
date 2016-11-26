@@ -7,6 +7,7 @@ var bannerPlugin = new webpack.BannerPlugin('//banner\n', {
 })
 
 var devtool = '#inline-source-map'
+var filename = 'vue-renderer.js'
 
 var plugins = [
   bannerPlugin,
@@ -20,6 +21,7 @@ var plugins = [
 
 if (process.env.NODE_ENV === 'production') {
   devtool = null
+  filename = 'vue-renderer.min.js'
   plugins.push(new webpack.optimize.UglifyJsPlugin({
     compress: {
       warnings: false
@@ -31,7 +33,7 @@ module.exports = {
   entry: path.resolve('./html5/render/vue/index.js'),
   output: {
     path: path.resolve('./dist'),
-    filename: 'vue-renderer.js'
+    filename: filename
   },
   module: {
     loaders: [
