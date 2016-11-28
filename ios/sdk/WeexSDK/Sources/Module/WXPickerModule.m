@@ -41,6 +41,19 @@ WX_EXPORT_METHOD(@selector(pick:callback:))
 WX_EXPORT_METHOD(@selector(pickDate:callback:))
 WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
+#pragma mark - private method
+-(void)resetPickerView
+{
+    if(self.picker)
+    {
+        [self.picker removeFromSuperview];
+    }
+    if(self.pickerView)
+    {
+        [self.pickerView removeFromSuperview];
+    }
+}
+
 #pragma mark -
 #pragma mark Single Picker
 -(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
@@ -124,7 +137,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 }
 
 #pragma mark -
-#pragma mark Pikcer View
+#pragma mark Picker View
 
 -(void)configPickerView
 {
@@ -151,9 +164,10 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
         self.picker.backgroundColor = [UIColor whiteColor];
         self.picker.frame = pickerFrame;
-        [self.pickerView addSubview:self.picker];
-        [self.backgroudView addSubview:self.pickerView];
     }
+    [self resetPickerView];
+    [self.pickerView addSubview:self.picker];
+    [self.backgroudView addSubview:self.pickerView];
 }
 
 -(UIView *)createPickerView
@@ -283,6 +297,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
     self.datePicker.backgroundColor = [UIColor whiteColor];
     self.datePicker.frame = pickerFrame;
+    [self resetPickerView];
     [self.pickerView addSubview:self.datePicker];
     [self.backgroudView addSubview:self.pickerView];
 }
