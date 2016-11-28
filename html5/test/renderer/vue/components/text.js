@@ -2,18 +2,17 @@ import { expect } from 'chai'
 import { multiDescribe } from '../utils'
 import text from '../../../../render/vue/components/text.vue'
 
-multiDescribe('text component', (Vue, helper) => {
+multiDescribe('<text> component', (Vue, helper) => {
   before(() => {
-    Vue.config.isReservedTag = function () { return false }
-    Vue.component('text', Vue.extend(text))
+    helper.register('text', text)
   })
 
   after(() => {
-    Vue.component('text', null)
+    helper.reset()
   })
 
   it('create simple text component', () => {
-    const vm = helper.createVm(`<text>abc</text>`)
+    const vm = helper.compile(`<text>abc</text>`)
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('DIV')
@@ -30,7 +29,7 @@ multiDescribe('text component', (Vue, helper) => {
   })
 
   it('empty text component', () => {
-    const vm = helper.createVm(`<text></text>`)
+    const vm = helper.compile(`<text></text>`)
 
     expect(vm.$el.tagName).to.be.equal('DIV')
     expect(vm.$el.className).to.be.equal('weex-container')

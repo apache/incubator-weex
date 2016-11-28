@@ -2,18 +2,17 @@ import { expect } from 'chai'
 import { multiDescribe } from '../utils'
 import a from '../../../../render/vue/components/a.vue'
 
-multiDescribe('a component', (Vue, helper) => {
+multiDescribe('<a> component', (Vue, helper) => {
   before(() => {
-    Vue.config.isReservedTag = function () { return false }
-    Vue.component('a', Vue.extend(a))
+    helper.register('a', a)
   })
 
   after(() => {
-    Vue.component('a', null)
+    helper.reset()
   })
 
   it('create simple a component', () => {
-    const vm = helper.createVm(`<a href="http://dotwe.org">abc</a>`)
+    const vm = helper.compile(`<a href="http://dotwe.org">abc</a>`)
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('DIV')

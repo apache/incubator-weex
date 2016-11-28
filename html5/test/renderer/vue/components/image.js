@@ -2,18 +2,17 @@ import { expect } from 'chai'
 import { multiDescribe } from '../utils'
 import image from '../../../../render/vue/components/image.vue'
 
-multiDescribe('image component', (Vue, helper) => {
+multiDescribe('<image> component', (Vue, helper) => {
   before(() => {
-    Vue.config.isReservedTag = function () { return false }
-    Vue.component('image', Vue.extend(image))
+    helper.register('image', image)
   })
 
   after(() => {
-    Vue.component('image', null)
+    helper.reset()
   })
 
   it('create simple image component', () => {
-    const vm = helper.createVm(`<image>abc</image>`)
+    const vm = helper.compile(`<image>abc</image>`)
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('DIV')
@@ -26,7 +25,7 @@ multiDescribe('image component', (Vue, helper) => {
   })
 
   it('image component with src', () => {
-    const vm = helper.createVm(`<image src="http://dotwe.org">`)
+    const vm = helper.compile(`<image src="http://dotwe.org">`)
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('DIV')
