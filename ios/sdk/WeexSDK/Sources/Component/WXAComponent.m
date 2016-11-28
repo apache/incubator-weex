@@ -50,7 +50,7 @@
 - (void)openURL
 {
     if (_href && [_href length] > 0) {
-        NSMutableString *newHref = _href;
+        NSMutableString *newHref = [_href mutableCopy];
         WX_REWRITE_URL(_href, WXResourceTypeLink, self.weexInstance, &newHref)
         if (!newHref) {
             return;
