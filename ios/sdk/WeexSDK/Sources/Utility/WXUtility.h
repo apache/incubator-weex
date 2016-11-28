@@ -334,4 +334,28 @@ CGPoint WXPixelPointResize(CGPoint value);
  */
 + (NSString *_Nullable)uuidString;
 
+/**
+ *  @abstract convert date string to date.
+ *
+ */
++ (NSDate *_Nullable)dateStringToDate:(NSString *_Nullable)dateString;
+
+/**
+ *  @abstract convert time string to date.
+ *
+ */
++ (NSDate *_Nullable)timeStringToDate:(NSString *_Nullable)timeString;
+
+/**
+ *  @abstract convert date to date string.
+ *
+ */
++ (NSString *_Nullable)dateToString:(NSDate *_Nullable)date;
+
+/**
+ *  @abstract convert date to time string.
+ *
+ */
++ (NSString *_Nullable)timeToString:(NSDate *_Nullable)date;
+
 @end
