@@ -61,13 +61,15 @@ static WXRuleManager *_sharedInstance = nil;
                 return;
             }
             
-            NSMutableString *fontSrc = [[rule[@"src"] substringWithRange:NSMakeRange(start, end-start)] mutableCopy];
-            WX_REWRITE_URL(fontSrc, WXResourceTypeLink, self.instance, &fontSrc)
+            NSString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
+            NSMutableString *newFontSrc = [fontSrc mutableCopy];
+            WX_REWRITE_URL(fontSrc, WXResourceTypeLink, self.instance, &newFontSrc)
             
-            if (!fontSrc) {
+            if (!newFontSrc) {
                 return;
             }
             
+            fontSrc = newFontSrc;
             NSMutableDictionary * fontFamily = [self.fontStorage objectForKey:rule[@"fontFamily"]];
             if (fontFamily && [fontFamily[@"src"] isEqualToString:fontSrc]) {
                 // if the new src is same as src in dictionary , ignore it, or update it
