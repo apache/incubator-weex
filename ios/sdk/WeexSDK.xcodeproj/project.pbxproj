@@ -1407,7 +1407,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
-					"$(PROJECT_DIR)/WeexTests/Dependency",
+					"$(PROJECT_DIR)/WeexSDKTests/Dependency",
 				);
 				INFOPLIST_FILE = WeexSDKTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -1430,7 +1430,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
-					"$(PROJECT_DIR)/WeexTests/Dependency",
+					"$(PROJECT_DIR)/WeexSDKTests/Dependency",
 				);
 				INFOPLIST_FILE = WeexSDKTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
