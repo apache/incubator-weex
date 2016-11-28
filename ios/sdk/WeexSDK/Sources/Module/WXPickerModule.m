@@ -44,12 +44,10 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 #pragma mark - private method
 -(void)resetPickerView
 {
-    if(self.picker)
-    {
+    if (self.picker) {
         [self.picker removeFromSuperview];
     }
-    if(self.pickerView)
-    {
+    if (self.pickerView) {
         [self.pickerView removeFromSuperview];
     }
 }
