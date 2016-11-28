@@ -334,6 +334,19 @@ NSTimeInterval JSLibInitTime = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
+- (NSURL *)completeURL:(NSString *)url
+{
+    if (!_scriptURL) {
+        return [NSURL URLWithString:url];
+    }
+    
+    if (!url) {
+        return nil;
+    }
+    
+    return [NSURL URLWithString:url relativeToURL:_scriptURL];
+}
+
 #pragma mark Private Methods
 
 - (void)addObservers

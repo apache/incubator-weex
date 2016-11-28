@@ -70,7 +70,6 @@
 @property (nonatomic) BOOL focusEvent;
 @property (nonatomic) BOOL blurEvent;
 @property (nonatomic) BOOL changeEvent;
-@property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
 @property (nonatomic, assign) CGRect rootViewOriginFrame;
@@ -99,7 +98,6 @@ WX_EXPORT_METHOD(@selector(blur))
         _focusEvent = NO;
         _blurEvent = NO;
         _changeEvent = NO;
-        _clickEvent = NO;
         
         _inputView = [[WXTextInputView alloc] init];
         _datePickerManager = [[WXDatePickerManager alloc] init];
@@ -272,9 +270,6 @@ WX_EXPORT_METHOD(@selector(blur))
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = YES;
     }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = YES;
-    }
 }
 
 #pragma Remove Event
@@ -292,9 +287,6 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = NO;
-    }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = NO;
     }
 }
 
@@ -454,9 +446,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _changeEventString = [textField text];
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
-    }
-    if (_clickEvent) {
-        [self fireEvent:@"click" params:nil];
     }
 }
 
@@ -625,6 +614,7 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
         [self setViewMovedUp:YES];
+        self.weexInstance.isRootViewFrozen = YES;
     }
 }
 
@@ -636,6 +626,7 @@ WX_EXPORT_METHOD(@selector(blur))
     UIView * rootView = self.weexInstance.rootView;
     if (rootView.frame.origin.y < 0) {
         [self setViewMovedUp:NO];
+        self.weexInstance.isRootViewFrozen = NO;
     }
 }
 

@@ -34,7 +34,7 @@ do{\
  *  @abstract macro for asserting if the handler conforms to the protocol
  */
 #define WXAssertProtocol(handler, protocol) WXAssert([handler conformsToProtocol:protocol], \
-@"handler does not conform to protocol")
+@"handler:%@ does not conform to protocol:%@", handler, protocol)
 
 /**
  *  @abstract macro for asserting that the object is kind of special class.
