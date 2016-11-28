@@ -623,4 +623,36 @@ CGFloat WXScreenResizeRadio(void)
     return [uuid lowercaseString];
 }
 
++ (NSDate *)dateStringToDate:(NSString *)dateString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate *date=[formatter dateFromString:dateString];
+    return date;
+}
+
++ (NSDate *)timeStringToDate:(NSString *)timeString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
+    [formatter setDateFormat:@"HH:mm"];
+    NSDate *date=[formatter dateFromString:timeString];
+    return date;
+}
+
++ (NSString *)dateToString:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSString *str = [dateFormatter stringFromDate:date];
+    return str;
+}
+
++ (NSString *)timeToString:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm"];
+    NSString *str = [dateFormatter stringFromDate:date];
+    return str;
+}
+
 @end
