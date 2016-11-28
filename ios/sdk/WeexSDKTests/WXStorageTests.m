@@ -46,7 +46,7 @@
     [self.storage setItem:@"initKey1" value:@"initValue1" callback:^(id result) {}];
     [self.storage setItem:@"initKey2" value:@"initValue2" callback:^(id result) {}];
     [self.storage setItem:@"initKey3" value:@"initValue3" callback:^(id result) {}];
-    [self.storage setItemPersistent:@"initKey4" value:@"" callback:^(id result) {}];
+    [self.storage setItemPersistent:@"initKey4" value:@"1234" callback:^(id result) {}];
     
     self.storageQueue = [self.storage targetExecuteQueue];
 }
@@ -346,8 +346,6 @@
     
     __weak typeof(self) welf = self;
     dispatch_group_notify(storageGroup, dispatch_get_main_queue(), ^{
-        [NSThread sleepForTimeInterval:20];
-        
         [expectation fulfill];
         
         NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:welf.filePath];
