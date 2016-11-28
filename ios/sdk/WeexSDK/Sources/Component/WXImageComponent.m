@@ -204,7 +204,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-        NSMutableString *newURL = _placeholdSrc;
+        NSMutableString *newURL = [_placeholdSrc mutableCopy];
         WX_REWRITE_URL(_placeholdSrc, WXResourceTypeLink, self.weexInstance, &newURL)
         
         __weak typeof(self) weakSelf = self;
@@ -238,7 +238,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp)};
-        NSMutableString * newURL = imageSrc;
+        NSMutableString * newURL = [imageSrc mutableCopy];
         WX_REWRITE_URL(imageSrc, WXResourceTypeLink, self.weexInstance, &newURL)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{

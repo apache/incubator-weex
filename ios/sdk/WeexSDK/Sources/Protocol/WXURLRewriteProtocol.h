@@ -24,7 +24,7 @@ do {\
     (*newUrl) = nil;\
     id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];\
     if ([rewriteHandler respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {\
-        (*newUrl) = [rewriteHandler rewriteURL:url withResourceType:WXResourceTypeLink withInstance:instance].absoluteString;\
+        (*newUrl) = [[rewriteHandler rewriteURL:url withResourceType:WXResourceTypeLink withInstance:instance].absoluteString mutableCopy];\
     }\
 } while(0);
 
