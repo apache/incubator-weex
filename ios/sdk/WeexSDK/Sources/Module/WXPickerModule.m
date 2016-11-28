@@ -19,8 +19,8 @@
 
 //view
 @property(nonatomic,strong)UIPickerView *picker;
-@property(nonatomic,strong)UIView *backgroudView; //手势触摸，隐藏picker
-@property(nonatomic,strong)UIView *pickerView;    //picker页面
+@property(nonatomic,strong)UIView *backgroudView;
+@property(nonatomic,strong)UIView *pickerView;
     
 //data
 @property(nonatomic,copy)NSArray *items;
@@ -78,7 +78,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)show
 {
-    [[[UIApplication sharedApplication] keyWindow] endEditing:YES];  //收起键盘
+    [[[UIApplication sharedApplication] keyWindow] endEditing:YES];  //hide keyboard
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.backgroudView];
     if (self.isAnimating) {
@@ -244,8 +244,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         NSString *min = [WXConvert NSString:options[@"min"]];
         if (min) {
             NSDate *date = [self inputDateStringToDate:min];
-            if(date)
-            {
+            if (date) {
                 self.datePicker.minimumDate =date;
             }
         }
