@@ -8,6 +8,7 @@
 
 #import "WXPickerModule.h"
 #import "WXConvert.h"
+#import "WXUtility.h"
 #import <UIKit/UIPickerView.h>
 #import <UIKit/UIDatePicker.h>
 #import <UIKit/UIKit.h>
@@ -240,21 +241,21 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.datePicker.datePickerMode = UIDatePickerModeDate;
         NSString *value = [WXConvert NSString:options[@"value"]];
         if (value) {
-            NSDate *date = [self inputDateStringToDate:value];
+            NSDate *date = [WXUtility dateStringToDate:value];
             if (date) {
                 self.datePicker.date =date;
             }
         }
         NSString *max = [WXConvert NSString:options[@"max"]];
         if (max) {
-            NSDate *date = [self inputDateStringToDate:max];
+            NSDate *date = [WXUtility dateStringToDate:max];
             if (date) {
                 self.datePicker.maximumDate =date;
             }
         }
         NSString *min = [WXConvert NSString:options[@"min"]];
         if (min) {
-            NSDate *date = [self inputDateStringToDate:min];
+            NSDate *date = [WXUtility dateStringToDate:min];
             if (date) {
                 self.datePicker.minimumDate =date;
             }
@@ -263,7 +264,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         self.datePicker.datePickerMode = UIDatePickerModeTime;
         NSString *value = [WXConvert NSString:options[@"value"]];
         if (value) {
-            NSDate *date = [self inputTimeStringToDate:value];
+            NSDate *date = [WXUtility timeStringToDate:value];
             if (date) {
                 self.datePicker.date = date;
             }
@@ -346,45 +347,13 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     [self hide];
     NSString *value = @"";
     if (UIDatePickerModeTime == self.datePicker.datePickerMode) {
-        value = [self timeToString:self.datePicker.date];
+        value = [WXUtility timeToString:self.datePicker.date];
     } else if(UIDatePickerModeDate == self.datePicker.datePickerMode)
     {
-        value = [self dateToString:self.datePicker.date];
+        value = [WXUtility dateToString:self.datePicker.date];
     }
     self.callback(@{ @"result": @"success",@"data":value});
     self.callback=nil;
-}
-    
--(NSDate *)inputDateStringToDate:(NSString *)dateString
-{
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
-    [formatter setDateFormat:@"yyyy-MM-dd"];
-    NSDate *date=[formatter dateFromString:dateString];
-    return date;
-}
-    
--(NSDate *)inputTimeStringToDate:(NSString *)dateString
-{
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
-    [formatter setDateFormat:@"HH:mm"];
-    NSDate *date=[formatter dateFromString:dateString];
-    return date;
-}
-    
--(NSString *)dateToString:(NSDate *)date
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSString *str = [dateFormatter stringFromDate:date];
-    return str;
-}
-    
--(NSString *)timeToString:(NSDate *)date
-{
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"HH:mm"];
-    NSString *str = [dateFormatter stringFromDate:date];
-    return str;
 }
 
 @end
