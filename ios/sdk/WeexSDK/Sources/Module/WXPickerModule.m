@@ -37,7 +37,6 @@
 @implementation WXPickerModule
 @synthesize weexInstance;
 
-
 WX_EXPORT_METHOD(@selector(pick:callback:))
 WX_EXPORT_METHOD(@selector(pickDate:callback:))
 WX_EXPORT_METHOD(@selector(pickTime:callback:))
@@ -261,8 +260,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     [self configDatePickerView];
     [self showDatePicker];
 }
- 
-       
+
 -(void)configDatePickerView
 {
     if (!self.backgroudView) {
@@ -288,6 +286,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     [self.pickerView addSubview:self.datePicker];
     [self.backgroudView addSubview:self.pickerView];
 }
+
 -(void)showDatePicker
 {
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
