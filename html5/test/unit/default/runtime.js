@@ -386,16 +386,13 @@ describe('framework entry', () => {
     })
 
     it('with methods', () => {
-      const components = 
-      [{
+      const components = [{
         type: 'x',
         methods: ['foo', 'bar']
-      },
-      {
+      }, {
         type: 'y',
         methods: []
-      },
-      {
+      }, {
         type: 'z',
         methods: null
       }]
