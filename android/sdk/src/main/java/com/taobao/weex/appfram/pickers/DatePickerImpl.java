@@ -202,53 +202,128 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component.helper;
+package com.taobao.weex.appfram.pickers;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.TextView;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
-import com.taobao.weex.appfram.pickers.DatePickerImpl;
-import com.taobao.weex.ui.component.AbstractEditComponent;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
- * Created by moxun on 16/10/12.
+ * Created by moxun on 16/11/23.
  */
 
-public class WXTimeInputHelper {
-    public static void pickDate(String max, String min, final AbstractEditComponent component) {
-        final TextView target = component.getHostView();
+public class DatePickerImpl {
 
-        DatePickerImpl.pickDate(
-                target.getContext(),
-                target.getText().toString(),
-                max,
-                min,
-                new DatePickerImpl.OnPickListener() {
+    private static SimpleDateFormat timeFormatter;
+    private static SimpleDateFormat dateFormatter;
+
+    public static void pickDate(@NonNull Context context, String value, String max, String min, @NonNull final OnPickListener listener) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseDate(value));
+        final DatePickerDialog dialog = new DatePickerDialog(
+                context,
+                new DatePickerDialog.OnDateSetListener() {
                     @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            target.setText(result);
-                            component.performOnChange(result);
-                        }
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int realMonth = monthOfYear + 1;
+                        String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
+                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
+                        listener.onPick(true, result);
                     }
-                });
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        final DatePicker datePicker = dialog.getDatePicker();
+        if (min != null) {
+            datePicker.setMinDate(parseDate(min).getTime());
+        }
+        if (max != null) {
+            datePicker.setMaxDate(parseDate(max).getTime());
+        }
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                listener.onPick(false, null);
+            }
+        });
+
+        dialog.show();
     }
 
-    public static void pickTime(final AbstractEditComponent component) {
-        final TextView target = component.getHostView();
-
-        DatePickerImpl.pickTime(
-                target.getContext(),
-                target.getText().toString(),
-                new DatePickerImpl.OnPickListener() {
+    public static void pickTime(@NonNull Context context, String value, @NonNull final OnPickListener listener) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseTime(value));
+        TimePickerDialog dialog = new TimePickerDialog(
+                context,
+                new TimePickerDialog.OnTimeSetListener() {
                     @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            target.setText(result);
-                            component.performOnChange(result);
-                        }
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
+                        String m = minute < 10 ? "0" + minute : String.valueOf(minute);
+                        String result = h + ":" + m;
+                        listener.onPick(true, result);
                     }
-                }
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                false
         );
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                listener.onPick(false, null);
+            }
+        });
+
+        dialog.show();
+    }
+
+    public interface OnPickListener {
+        void onPick(boolean set, @Nullable String result);
+    }
+
+    private static Date parseDate(String s) {
+        if (dateFormatter == null) {
+            dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        }
+
+        try {
+            return dateFormatter.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
+    }
+
+    private static Date parseTime(String s) {
+        if (timeFormatter == null) {
+            timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        }
+
+        try {
+            return timeFormatter.parse(s);
+        } catch (ParseException e) {
+            //don't worry
+            WXLogUtils.w("[DatePickerImpl] " + e.toString());
+        }
+        return new Date();
     }
 }
