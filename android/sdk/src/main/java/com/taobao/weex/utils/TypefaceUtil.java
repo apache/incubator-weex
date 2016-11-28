@@ -301,7 +301,7 @@ public class TypefaceUtil {
         final String url = fontDo.getUrl();
         final String fontFamily = fontDo.getFontFamilyName();
         final String fileName = url.replace('/', '_');
-        final String fullPath = getFontCacheDir() + fileName;
+        final String fullPath = getFontCacheDir() + File.separator + fileName;
         if (!loadLocalFontFile(fullPath, fontFamily)) {
           downloadFontByNetwork(url, fullPath, fontFamily);
         }
