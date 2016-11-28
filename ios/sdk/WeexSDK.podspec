@@ -38,5 +38,6 @@ Pod::Spec.new do |s|
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit'
 
   s.dependency 'SocketRocket'
+  s.libraries = "stdc++"
 
 end

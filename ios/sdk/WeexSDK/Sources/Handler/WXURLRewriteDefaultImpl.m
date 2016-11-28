@@ -10,6 +10,7 @@
 #import "WXLog.h"
 #import "WXSDKInstance.h"
 
+
 NSString *const WXURLLocalScheme = @"local";
 
 @implementation WXURLRewriteDefaultImpl
@@ -23,7 +24,6 @@ NSString *const WXURLLocalScheme = @"local";
         return completeURL;
     } else if ([self isLocalURL:completeURL]) {
         NSString *resourceName = [[completeURL host] stringByAppendingString:[completeURL path]];
-//        NSString *extension = [completeURL pathExtension];
         NSURL *resourceURL = [[NSBundle mainBundle] URLForResource:resourceName withExtension:@""];
         if (!resourceURL) {
             WXLogError(@"Invalid local resource URL:%@, no resouce found.", url);

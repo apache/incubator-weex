@@ -161,7 +161,9 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     }
     
     [self performSelectorOnRuleManager:^{
+        [WXRuleManager sharedInstance].instance = weexInstance;
         [[WXRuleManager sharedInstance] addRule:type rule:rule];
+        
     }];
 }
 
