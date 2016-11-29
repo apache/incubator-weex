@@ -138,8 +138,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(NSString *)convertItem:(id)value
 {
-    if ([value isKindOfClass:[NSNumber class]])
-    {
+    if ([value isKindOfClass:[NSNumber class]]) {
         return [NSString stringWithFormat:@"%ld",[value longValue]];
     }
     return value;
