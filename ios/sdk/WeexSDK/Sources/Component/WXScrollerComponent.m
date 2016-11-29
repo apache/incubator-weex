@@ -54,6 +54,13 @@
     css_node_t *_scrollerCSSNode;
 }
 
+WX_EXPORT_METHOD(@selector(resetLoadmore))
+
+- (void)resetLoadmore
+{
+    _previousLoadMoreContentHeight=0;
+}
+
 - (css_node_t *)scrollerCSSNode
 {
     return _scrollerCSSNode;

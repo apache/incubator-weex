@@ -19,11 +19,15 @@ typedef enum : NSUInteger {
     WXResourceTypeOthers
 } WXResourceType;
 
-#define WX_REWRITE_URL(url, resourceType, instance)\
+#define WX_REWRITE_URL(url, resourceType, instance, newUrl)\
 do {\
+    (*newUrl) = nil;\
     id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];\
-    return [rewriteHandler rewriteURL:url withResourceType:resourceType withInstance:instance]; \
+    if ([rewriteHandler respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {\
+        (*newUrl) = [[rewriteHandler rewriteURL:url withResourceType:WXResourceTypeLink withInstance:instance].absoluteString mutableCopy];\
+    }\
 } while(0);
+
 
 @protocol WXURLRewriteProtocol <NSObject>
 

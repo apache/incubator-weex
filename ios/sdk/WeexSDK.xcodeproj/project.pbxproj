@@ -150,10 +150,12 @@
 		74CC7A1D1C2BC5F800829368 /* WXCellComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CC7A1B1C2BC5F800829368 /* WXCellComponent.m */; };
 		74CC7A201C2BF9DC00829368 /* WXListComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 74CC7A1E1C2BF9DC00829368 /* WXListComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74CC7A211C2BF9DC00829368 /* WXListComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 74CC7A1F1C2BF9DC00829368 /* WXListComponent.m */; };
-		74EF31AA1DE58AE600667A07 /* WXURLRewriteProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 74EF31A91DE58AE600667A07 /* WXURLRewriteProtocol.h */; };
+		74EF31AA1DE58AE600667A07 /* WXURLRewriteProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 74EF31A91DE58AE600667A07 /* WXURLRewriteProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74EF31AD1DE58BE200667A07 /* WXURLRewriteDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 74EF31AB1DE58BE200667A07 /* WXURLRewriteDefaultImpl.h */; };
 		74EF31AE1DE58BE200667A07 /* WXURLRewriteDefaultImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 74EF31AC1DE58BE200667A07 /* WXURLRewriteDefaultImpl.m */; };
 		74EF31C01DE5ED6F00667A07 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 74EF31BE1DE5ED5900667A07 /* libstdc++.tbd */; };
+		74EF31C31DE6935600667A07 /* WXURLRewriteTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 74EF31C21DE6935600667A07 /* WXURLRewriteTests.m */; };
+		74EF31C51DE6AADD00667A07 /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 74EF31C41DE6AADD00667A07 /* libOCMock.a */; };
 		74F7BFF51DC782EC004D0871 /* testRootView.js in Resources */ = {isa = PBXBuildFile; fileRef = 74F7BFF41DC782EC004D0871 /* testRootView.js */; };
 		74FD6E041C7C0E9600DBEB6D /* WXScrollerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 74FD6E031C7C0E9600DBEB6D /* WXScrollerProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		775BEE4E1C16F993008D1629 /* WXDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 775BEE4D1C16F993008D1629 /* WXDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -404,6 +406,8 @@
 		74EF31AB1DE58BE200667A07 /* WXURLRewriteDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXURLRewriteDefaultImpl.h; sourceTree = "<group>"; };
 		74EF31AC1DE58BE200667A07 /* WXURLRewriteDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXURLRewriteDefaultImpl.m; sourceTree = "<group>"; };
 		74EF31BE1DE5ED5900667A07 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
+		74EF31C21DE6935600667A07 /* WXURLRewriteTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXURLRewriteTests.m; sourceTree = "<group>"; };
+		74EF31C41DE6AADD00667A07 /* libOCMock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOCMock.a; path = WeexSDKTests/dependency/libOCMock.a; sourceTree = "<group>"; };
 		74F7BFF41DC782EC004D0871 /* testRootView.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = testRootView.js; sourceTree = "<group>"; };
 		74FD6E031C7C0E9600DBEB6D /* WXScrollerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXScrollerProtocol.h; sourceTree = "<group>"; };
 		775BEE4D1C16F993008D1629 /* WXDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDefine.h; sourceTree = "<group>"; };
@@ -490,6 +494,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74EF31C51DE6AADD00667A07 /* libOCMock.a in Frameworks */,
 				74EF31C01DE5ED6F00667A07 /* libstdc++.tbd in Frameworks */,
 				DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */,
 				740938FB1D3D0E1700DBB801 /* AVKit.framework in Frameworks */,
@@ -639,13 +644,13 @@
 		74C8963E1D2AC2210043B82A /* WeexSDKTests */ = {
 			isa = PBXGroup;
 			children = (
+				74EF31C11DE6932900667A07 /* handler */,
 				74F7BFF31DC782DF004D0871 /* Resources */,
 				DC9F46841D61AC9100A88239 /* module */,
 				74C8963F1D2AC2210043B82A /* WeexSDKTests.m */,
 				74C896411D2AC2210043B82A /* Info.plist */,
 				740938EA1D3D026600DBB801 /* WXComponentTests.m */,
 				5996BD6F1D49EC0600C0FEA6 /* WXInstanceWrapTests.m */,
-				5996BD711D4A219300C0FEA6 /* WXNetworkTests.m */,
 				5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */,
 				597334B21D4DE1A600988789 /* WXBridgeMethodTests.m */,
 				597334B01D4D9E7F00988789 /* WXSDKManagerTests.m */,
@@ -655,6 +660,15 @@
 				74B8BF001DC49AFE004A6027 /* WXRootViewTests.m */,
 			);
 			path = WeexSDKTests;
+			sourceTree = "<group>";
+		};
+		74EF31C11DE6932900667A07 /* handler */ = {
+			isa = PBXGroup;
+			children = (
+				5996BD711D4A219300C0FEA6 /* WXNetworkTests.m */,
+				74EF31C21DE6935600667A07 /* WXURLRewriteTests.m */,
+			);
+			name = handler;
 			sourceTree = "<group>";
 		};
 		74F7BFF31DC782DF004D0871 /* Resources */ = {
@@ -935,6 +949,7 @@
 		A5818E244F9E235722E3B938 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				74EF31C41DE6AADD00667A07 /* libOCMock.a */,
 				74EF31BE1DE5ED5900667A07 /* libstdc++.tbd */,
 				DC9867431D826D1E000AF388 /* GLKit.framework */,
 				740938FA1D3D0E1700DBB801 /* AVKit.framework */,
@@ -1242,6 +1257,7 @@
 				596FDD691D3F9EFF0082CD5B /* TestSupportUtils.m in Sources */,
 				DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */,
 				1C1A2BED1D91172800539AA1 /* WXConvertTests.m in Sources */,
+				74EF31C31DE6935600667A07 /* WXURLRewriteTests.m in Sources */,
 				740938EC1D3D075700DBB801 /* SRWebSocket.m in Sources */,
 				740938F31D3D0D9300DBB801 /* WXComponentTests.m in Sources */,
 				596FDD661D3F52700082CD5B /* WXAnimationModuleTests.m in Sources */,
@@ -1391,10 +1407,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
+					"$(PROJECT_DIR)/WeexSDKTests/Dependency",
 				);
 				INFOPLIST_FILE = WeexSDKTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/WeexSDKTests/dependency",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.weex.WeexSDKTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1409,10 +1430,15 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
+					"$(PROJECT_DIR)/WeexSDKTests/Dependency",
 				);
 				INFOPLIST_FILE = WeexSDKTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/WeexSDKTests/dependency",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.weex.WeexSDKTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
