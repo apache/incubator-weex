@@ -358,7 +358,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssertComponentExist(component);
     
     NSDictionary *normalStyles = [self fetchStyles:styles];
-    normalStyles = @{};
     NSDictionary *resetStyles = [self fetchResetStyles:styles];
     [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
     [self _addUITask:^{
