@@ -210,6 +210,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
@@ -250,10 +251,10 @@ public class DatePickerImpl {
         );
 
         final DatePicker datePicker = dialog.getDatePicker();
-        if (min != null) {
+        if (!TextUtils.isEmpty(min)) {
             datePicker.setMinDate(parseDate(min).getTime());
         }
-        if (max != null) {
+        if (!TextUtils.isEmpty(max)) {
             datePicker.setMaxDate(parseDate(max).getTime());
         }
 
@@ -308,7 +309,8 @@ public class DatePickerImpl {
         try {
             return dateFormatter.parse(s);
         } catch (ParseException e) {
-            e.printStackTrace();
+            //don't worry
+            WXLogUtils.w("[DatePickerImpl] " + e.toString());
         }
         return new Date();
     }

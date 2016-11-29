@@ -230,10 +230,6 @@ public class WXPickersModule extends WXModule {
     private static final String RESULT = "result";
     private static final String DATA = "data";
 
-    private static final String TYPE_DATE = "date";
-    private static final String TYPE_TIME = "time";
-
-    private static final String KEY_TYPE = "type";
     private static final String KEY_VALUE = "value";
     private static final String KEY_INDEX = "index";
     private static final String KEY_TITLE = "title";
@@ -253,20 +249,12 @@ public class WXPickersModule extends WXModule {
 
     @WXModuleAnno
     public void pickDate(Map<String, Object> options, JSCallback callback) {
-        String type = getOption(options, KEY_TYPE, "undefined");
-        switch (type) {
-            case TYPE_DATE:
-                performPickDate(options, callback);
-                break;
-            case TYPE_TIME:
-                performPickTime(options, callback);
-                break;
-            default:
-                Map<String, Object> ret = new HashMap<>(2);
-                ret.put(RESULT, ERROR);
-                ret.put(DATA, "unknow type: " + type);
-                callback.invoke(ret);
-        }
+        performPickDate(options, callback);
+    }
+
+    @WXModuleAnno
+    public void pickTime(Map<String, Object> options, JSCallback callback) {
+        performPickTime(options, callback);
     }
 
     private <T> T getOption(Map<String, Object> options, String key, T defValue) {
