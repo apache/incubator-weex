@@ -20,7 +20,7 @@
 
 //picker
 @property(nonatomic,strong)UIPickerView *picker;
-@property(nonatomic,strong)UIView *backgroudView;
+@property(nonatomic,strong)UIView *backgroundView;
 @property(nonatomic,strong)UIView *pickerView;
 
 //data
@@ -80,15 +80,15 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 {
     [[[UIApplication sharedApplication] keyWindow] endEditing:YES];  //hide keyboard
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:self.backgroudView];
+    [window addSubview:self.backgroundView];
     if (self.isAnimating) {
         return;
     }
     self.isAnimating = YES;
-    self.backgroudView.hidden = NO;
+    self.backgroundView.hidden = NO;
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - WXPickerHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroudView.alpha = 1;
+        self.backgroundView.alpha = 1;
     } completion:^(BOOL finished) {
         self.isAnimating = NO;
     }];
@@ -102,11 +102,11 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.isAnimating = YES;
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroudView.alpha = 0;
+        self.backgroundView.alpha = 0;
     } completion:^(BOOL finished) {
-        self.backgroudView.hidden = YES;
+        self.backgroundView.hidden = YES;
         self.isAnimating = NO;
-        [self.backgroudView removeFromSuperview];
+        [self.backgroundView removeFromSuperview];
     }];
 }
 
@@ -129,9 +129,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)configPickerView
 {
-    self.backgroudView = [self createBackgroudView];
+    self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-    [self.backgroudView addGestureRecognizer:tapGesture];
+    [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
     [toolBar setBackgroundColor:[UIColor whiteColor]];
@@ -148,7 +148,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.picker.backgroundColor = [UIColor whiteColor];
     self.picker.frame = pickerFrame;
     [self.pickerView addSubview:self.picker];
-    [self.backgroudView addSubview:self.pickerView];
+    [self.backgroundView addSubview:self.pickerView];
 }
 
 -(UIView *)createPickerView
@@ -159,7 +159,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     return view;
 }
 
--(UIView *)createBackgroudView
+-(UIView *)createbackgroundView
 {
     UIView *view = [UIView new];
     view.frame = [UIScreen mainScreen].bounds;
@@ -216,9 +216,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 - (void)createDatePicker:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
     self.callback = callback;
-    if (!self.datePicker) {
-        self.datePicker = [[UIDatePicker alloc]init];
-    }
+    self.datePicker = [[UIDatePicker alloc]init];
     if (UIDatePickerModeDate == self.datePickerMode) {
         self.datePicker.datePickerMode = UIDatePickerModeDate;
         NSString *value = [WXConvert NSString:options[@"value"]];
@@ -258,9 +256,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)configDatePickerView
 {
-    self.backgroudView = [self createBackgroudView];
+    self.backgroundView = [self createbackgroundView];
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-    [self.backgroudView addGestureRecognizer:tapGesture];
+    [self.backgroundView addGestureRecognizer:tapGesture];
     self.pickerView = [self createPickerView];
     UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
     [toolBar setBackgroundColor:[UIColor whiteColor]];
@@ -275,22 +273,22 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.datePicker.frame = pickerFrame;
     self.datePicker.backgroundColor = [UIColor whiteColor];
     [self.pickerView addSubview:self.datePicker];
-    [self.backgroudView addSubview:self.pickerView];
+    [self.backgroundView addSubview:self.pickerView];
 }
 
 -(void)showDatePicker
 {
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:self.backgroudView];
+    [window addSubview:self.backgroundView];
     if (self.isAnimating)
     {
         return;
     }
     self.isAnimating = YES;
-    self.backgroudView.hidden = NO;
+    self.backgroundView.hidden = NO;
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - WXPickerHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroudView.alpha = 1;
+        self.backgroundView.alpha = 1;
     } completion:^(BOOL finished) {
         self.isAnimating = NO;
     }];
@@ -304,11 +302,11 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.isAnimating = YES;
     [UIView animateWithDuration:0.35f animations:^{
         self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroudView.alpha = 0;
+        self.backgroundView.alpha = 0;
     } completion:^(BOOL finished) {
-        self.backgroudView.hidden = YES;
+        self.backgroundView.hidden = YES;
         self.isAnimating = NO;
-        [self.backgroudView removeFromSuperview];
+        [self.backgroundView removeFromSuperview];
     }];
 }
     
