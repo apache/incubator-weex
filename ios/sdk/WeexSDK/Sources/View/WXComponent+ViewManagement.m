@@ -173,9 +173,11 @@
     }
 }
 
--(void)_resetViewStyles:(NSDictionary *)styles
+-(void)_resetStyles:(NSDictionary *)styles
 {
-    _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    if (styles[@"backgroundColor"]) {
+        _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    }
 }
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing
