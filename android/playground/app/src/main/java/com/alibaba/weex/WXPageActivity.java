@@ -331,7 +331,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       view = wrappedView;
     }
 
-    mContainer.addView(view);
+    if(view.getParent() == null) {
+      mContainer.addView(view);
+    }
     mContainer.requestLayout();
     Log.d("WARenderListener", "renderSuccess");
   }
