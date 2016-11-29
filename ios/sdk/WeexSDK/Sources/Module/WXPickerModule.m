@@ -54,7 +54,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     if (options[@"index"]) {
         index = [WXConvert NSInteger:options[@"index"]];
     }
-    if (items && [items count]>0) {
+    if (items && [items count]>0 && [self isRightItems:items]) {
         [self createPicker:items index:index];
         self.callback = callback;
     } else {
@@ -124,6 +124,27 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.callback=nil;
 }
 
+-(BOOL)isRightItems:(NSArray *)array
+{
+    for (id value in array) {
+        if([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
+            continue;
+        }else {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+-(NSString *)convertItem:(id)value
+{
+    if ([value isKindOfClass:[NSNumber class]])
+    {
+        return [NSString stringWithFormat:@"%ld",[value longValue]];
+    }
+    return value;
+}
+
 #pragma mark -
 #pragma mark Picker View
 
@@ -181,14 +202,14 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-    return self.items[row];
+    return [self convertItem:self.items[row]];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
     self.index = row;
 }
-    
+
 #pragma mark -
 #pragma Date & Time Picker
 -(void)pickDate:(NSDictionary *)options callback:(WXModuleCallback)callback
