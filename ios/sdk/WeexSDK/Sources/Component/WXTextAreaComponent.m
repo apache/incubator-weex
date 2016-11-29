@@ -432,8 +432,10 @@
     }else{
         [self setPlaceholderAttributedString];
     }
-    if (_inputEvent) {
-        [self fireEvent:@"input" params:@{@"value":textView.text}];
+    if (textView.markedTextRange == nil) {
+        if (_inputEvent) {
+            [self fireEvent:@"input" params:@{@"value":textView.text}];
+        }
     }
 }
 
