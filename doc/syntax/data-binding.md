@@ -1,6 +1,5 @@
 # Data-Binding
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/5"  class="weex-translate">cn</a>
 
 In Weex, we use the *mustache* syntax `{{...}}` to bind data in `<template>` which are defined in `<script>`. Once data and template is bound, the data changes will influence the corresponding template content immediately and automatically.
 

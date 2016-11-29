@@ -1,7 +1,6 @@
 # Tutorial
 
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/4"  class="weex-translate">cn</a>
 
 We will make a simple but realistic list, in which the technologies Weex uses will be shown. This form of list also works for a lot of e-commercial apps and mobile sites.
 

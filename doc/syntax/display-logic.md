@@ -1,6 +1,5 @@
 # Display Logic Control
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/12"  class="weex-translate">cn</a>
 
 There are two attributes for display logic control: `if` and `repeat`. We can create Weex page structure and effects more flexible with them.
 

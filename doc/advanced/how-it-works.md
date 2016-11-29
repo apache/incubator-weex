@@ -1,6 +1,5 @@
 # How it works
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/32"  class="weex-translate">cn</a>
 
 ## Overview
 

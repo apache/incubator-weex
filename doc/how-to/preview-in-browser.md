@@ -1,5 +1,4 @@
 # How to preview weex code in browser ?
-<a href="https://github.com/weexteam/article/issues/43"  class="weex-translate">cn</a>
 
 
 ## weex-toolkit

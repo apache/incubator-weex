@@ -1,6 +1,5 @@
 # &lt;web&gt;
 <span class="weex-version">0.5</span>
-<a href="https://github.com/weexteam/article/issues/80"  class="weex-translate">cn</a>
 
 ### Summary
 

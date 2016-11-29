@@ -1,6 +1,5 @@
 # &lt;textarea&gt;
 <span class="weex-version">0.8</span>
-<a href="https://github.com/weexteam/article/issues/95"  class="weex-translate">cn</a>
 
 
 ### Summary

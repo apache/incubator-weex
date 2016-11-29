@@ -1,6 +1,5 @@
 # storage
 <span class="weex-version">0.7</span>
-<a href="https://github.com/weexteam/article/issues/78"  class="weex-translate">cn</a>
 
 ## Summary
 
