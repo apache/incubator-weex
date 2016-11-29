@@ -175,8 +175,7 @@
 
 -(void)_resetStyles:(NSDictionary *)styles
 {
-    if(styles[@"backgroundColor"])
-    {
+    if (styles[@"backgroundColor"]) {
         _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
     }
 }
