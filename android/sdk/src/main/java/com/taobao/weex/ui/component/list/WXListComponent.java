@@ -623,8 +623,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
                 int top = location[1] - parentLocation[1];
 
-                boolean showSticky = ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy > 0;
-                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy < 0;
+                boolean showSticky = ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 ;
+                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 ;
                 if (showSticky) {
                     bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
                 } else if (removeSticky) {
