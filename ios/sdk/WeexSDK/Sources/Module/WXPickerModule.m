@@ -251,7 +251,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         }
     }
     [self configDatePickerView];
-    [self showDatePicker];
+    [self show];
 }
 
 -(void)configDatePickerView
@@ -274,40 +274,6 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.datePicker.backgroundColor = [UIColor whiteColor];
     [self.pickerView addSubview:self.datePicker];
     [self.backgroundView addSubview:self.pickerView];
-}
-
--(void)showDatePicker
-{
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    [window addSubview:self.backgroundView];
-    if (self.isAnimating)
-    {
-        return;
-    }
-    self.isAnimating = YES;
-    self.backgroundView.hidden = NO;
-    [UIView animateWithDuration:0.35f animations:^{
-        self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height - WXPickerHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroundView.alpha = 1;
-    } completion:^(BOOL finished) {
-        self.isAnimating = NO;
-    }];
-}
-    
--(void)hideDatePicker
-{
-    if (self.isAnimating) {
-        return;
-    }
-    self.isAnimating = YES;
-    [UIView animateWithDuration:0.35f animations:^{
-        self.pickerView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, [UIScreen mainScreen].bounds.size.width, WXPickerHeight);
-        self.backgroundView.alpha = 0;
-    } completion:^(BOOL finished) {
-        self.backgroundView.hidden = YES;
-        self.isAnimating = NO;
-        [self.backgroundView removeFromSuperview];
-    }];
 }
     
 -(void)cancelDatePicker:(id)sender
