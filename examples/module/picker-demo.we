@@ -39,8 +39,8 @@
                 var self = this;
                 picker.pickDate({
                     'value':'2016-11-28',
-                    'max':'2015-11-28',
-                    'min':'2017-11-28'
+                    'max':'2017-11-28',
+                    'min':'2015-11-28'
                 },function (ret) {
                     var result = ret.result;
                     if(result == 'success')
