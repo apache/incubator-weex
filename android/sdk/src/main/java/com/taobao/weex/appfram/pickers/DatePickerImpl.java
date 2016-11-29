@@ -252,10 +252,20 @@ public class DatePickerImpl {
 
         final DatePicker datePicker = dialog.getDatePicker();
         if (!TextUtils.isEmpty(min)) {
-            datePicker.setMinDate(parseDate(min).getTime());
+            long minDate = parseDate(min).getTime();
+            if (datePicker.getMaxDate() >= minDate) {
+                datePicker.setMinDate(parseDate(min).getTime());
+            } else {
+                new IllegalArgumentException("Argument 'min' must not be greater than 'max'").printStackTrace();
+            }
         }
         if (!TextUtils.isEmpty(max)) {
-            datePicker.setMaxDate(parseDate(max).getTime());
+            long maxDate = parseDate(max).getTime();
+            if (datePicker.getMinDate() <= maxDate) {
+                datePicker.setMaxDate(parseDate(max).getTime());
+            } else {
+                new IllegalArgumentException("Argument 'max' must not be smaller than 'min'").printStackTrace();
+            }
         }
 
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
