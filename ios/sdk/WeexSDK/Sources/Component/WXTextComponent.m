@@ -424,16 +424,16 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles
 {
-    [super _updateStylesOnComponentThread:styles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSDictionary *)resetStyles];
     
     [self fillCSSStyles:styles];
     
     [self syncTextStorageForView];
 }
 
-- (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
+- (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes resetStyles:(NSDictionary *)resetStyles
 {
     [super _updateAttributesOnComponentThread:attributes];
     
