@@ -1,9 +1,11 @@
-import { validateText } from '../utils/validator'
+import { extend } from '../utils/shared'
+import { validateText, validateStyles } from '../utils/validator'
 
 /**
  * Get text styles
  */
-function getTextStyle (props = {}) {
+function getTextStyle (context = {}) {
+  const { data, props } = context
   const style = {
     whiteSpace: 'pre-wrap',
     wordWrap: 'break-word',
@@ -23,7 +25,7 @@ function getTextStyle (props = {}) {
     style.webkitLineClamp = ''
   }
 
-  return style
+  return extend(style, data.staticStyle)
 }
 
 export default {
@@ -33,20 +35,27 @@ export default {
     value: [String]
   },
   render (createElement, context) {
-    if (process.env.NODE_ENV === 'development') {
+    /* istanbul ignore next */
+    if (process.env.NODE_ENV !== 'production') {
       validateText(context)
+      validateStyles('text', context.data && context.data.staticStyle)
     }
-    const { props } = context
+
+    let className = 'weex-container'
+    if (context.data.staticClass) {
+      className += ' ' + context.data.staticClass
+    }
+
     return createElement(
       'div',
       {
-        staticClass: 'weex-container',
+        staticClass: className,
         staticStyle: { fontSize: '32px' }
       },
       [createElement(
         'span',
-        { staticStyle: getTextStyle(props) },
-        context.children || [props.value]
+        { staticStyle: getTextStyle(context) },
+        context.children || [context.props.value]
       )]
     )
   }

@@ -34,7 +34,6 @@ multiDescribe('<text> component', (Vue, helper) => {
 
   it('default styles', () => {
     const vm = helper.compile(`<text></text>`)
-
     const div = vm.$el
     const span = vm.$el.children[0]
 
@@ -67,6 +66,51 @@ multiDescribe('<text> component', (Vue, helper) => {
       expect(span.style.textOverflow).to.be.equal('ellipsis')
       expect(span.style.webkitLineClamp).to.be.equal('5')
     }
+  })
+
+  it('inline styles', () => {
+    const vm = helper.compile(`<text style="color:blue">abc</text>`)
+    const div = vm.$el
+    const span = vm.$el.children[0]
+
+    if (semver.gt(Vue.version, '2.0.8')) {
+      expect(div.style.color).to.be.equal('')
+      expect(span.style.color).to.be.equal('blue')
+      expect(span.style.whiteSpace).to.be.equal('pre-wrap')
+      expect(span.style.wordWrap).to.be.equal('break-word')
+      expect(span.style.display).to.be.equal('-webkit-box')
+      expect(span.style.webkitBoxOrient).to.be.equal('vertical')
+      expect(span.style.overflow).to.be.equal('visible')
+      expect(span.style.textOverflow).to.be.equal('')
+      expect(span.style.webkitLineClamp).to.be.equal('')
+    }
+  })
+
+  it('override default styles', () => {
+    const vm = helper.compile(`
+      <text
+        style="white-space:nowrap; color:blue; overflow: hidden;"
+        >abc</text>
+    `)
+    const span = vm.$el.children[0]
+
+    if (semver.gt(Vue.version, '2.0.8')) {
+      expect(span.style.color).to.be.equal('blue')
+      expect(span.style.whiteSpace).to.be.equal('nowrap')
+      expect(span.style.wordWrap).to.be.equal('break-word')
+      expect(span.style.display).to.be.equal('-webkit-box')
+      expect(span.style.webkitBoxOrient).to.be.equal('vertical')
+      expect(span.style.overflow).to.be.equal('hidden')
+      expect(span.style.textOverflow).to.be.equal('')
+      expect(span.style.webkitLineClamp).to.be.equal('')
+    }
+  })
+
+  // Not sure about this feature.
+  it('class property', () => {
+    const vm = helper.compile(`<text class="title"></text>`)
+    expect(vm.$el.className).to.be.equal('weex-container title')
+    expect(vm.$el.children[0].className).to.be.equal('')
   })
 
   it('value property', () => {
