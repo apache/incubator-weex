@@ -241,7 +241,7 @@ public class WXPickersModule extends WXModule {
 
     @WXModuleAnno
     public void pick(Map<String, Object> options, JSCallback callback) {
-        List<String> items = getOption(options, KEY_ITEMS, new ArrayList<String>());
+        List<String> items = safeConvert(getOption(options, KEY_ITEMS, new ArrayList<String>()));
         int index = getOption(options, KEY_INDEX, 0);
         String title = getOption(options, KEY_TITLE, null);
         performSinglePick(items, index, title, callback);
@@ -255,6 +255,14 @@ public class WXPickersModule extends WXModule {
     @WXModuleAnno
     public void pickTime(Map<String, Object> options, JSCallback callback) {
         performPickTime(options, callback);
+    }
+
+    private List<String> safeConvert(List src) {
+        List<String> result = new ArrayList<>(src.size());
+        for (Object obj : src) {
+            result.add(String.valueOf(obj));
+        }
+        return result;
     }
 
     private <T> T getOption(Map<String, Object> options, String key, T defValue) {
