@@ -18,11 +18,11 @@
 
 @interface WXPickerModule()
 
-//view
+//picker
 @property(nonatomic,strong)UIPickerView *picker;
 @property(nonatomic,strong)UIView *backgroudView;
 @property(nonatomic,strong)UIView *pickerView;
-    
+
 //data
 @property(nonatomic,copy)NSArray *items;
 @property(nonatomic)BOOL isAnimating;
@@ -41,17 +41,6 @@
 WX_EXPORT_METHOD(@selector(pick:callback:))
 WX_EXPORT_METHOD(@selector(pickDate:callback:))
 WX_EXPORT_METHOD(@selector(pickTime:callback:))
-
-#pragma mark - private method
--(void)resetPickerView
-{
-    if (self.picker) {
-        [self.picker removeFromSuperview];
-    }
-    if (self.pickerView) {
-        [self.pickerView removeFromSuperview];
-    }
-}
 
 #pragma mark -
 #pragma mark Single Picker
@@ -140,31 +129,24 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)configPickerView
 {
-    if (!self.backgroudView) {
-        self.backgroudView = [self createBackgroudView];
-        UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-        [self.backgroudView addGestureRecognizer:tapGesture];
-    }
-    if (!self.pickerView) {
-        self.pickerView = [self createPickerView];
-        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
-        [toolBar setBackgroundColor:[UIColor whiteColor]];
-        UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        noSpace.width=10;
-        UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
-        UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
-        [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
-        [self.pickerView addSubview:toolBar];
-    }
-    if (!self.picker) {
-        self.picker = [[UIPickerView alloc]init];
-        self.picker.delegate = self;
-        CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
-        self.picker.backgroundColor = [UIColor whiteColor];
-        self.picker.frame = pickerFrame;
-    }
-    [self resetPickerView];
+    self.backgroudView = [self createBackgroudView];
+    UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    [self.backgroudView addGestureRecognizer:tapGesture];
+    self.pickerView = [self createPickerView];
+    UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
+    [toolBar setBackgroundColor:[UIColor whiteColor]];
+    UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    noSpace.width=10;
+    UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
+    [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
+    [self.pickerView addSubview:toolBar];
+    self.picker = [[UIPickerView alloc]init];
+    self.picker.delegate = self;
+    CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
+    self.picker.backgroundColor = [UIColor whiteColor];
+    self.picker.frame = pickerFrame;
     [self.pickerView addSubview:self.picker];
     [self.backgroudView addSubview:self.pickerView];
 }
@@ -276,27 +258,22 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 -(void)configDatePickerView
 {
-    if (!self.backgroudView) {
-        self.backgroudView = [self createBackgroudView];
-        UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
-        [self.backgroudView addGestureRecognizer:tapGesture];
-    }
-    if (!self.pickerView) {
-        self.pickerView = [self createPickerView];
-        UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
-        [toolBar setBackgroundColor:[UIColor whiteColor]];
-        UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-        noSpace.width=10;
-        UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneDatePicker:)];
-        UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-        UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelDatePicker:)];
-        [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
-        [self.pickerView addSubview:toolBar];
-    }
+    self.backgroudView = [self createBackgroudView];
+    UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(hide)];
+    [self.backgroudView addGestureRecognizer:tapGesture];
+    self.pickerView = [self createPickerView];
+    UIToolbar *toolBar=[[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, WXPickerToolBarHeight)];
+    [toolBar setBackgroundColor:[UIColor whiteColor]];
+    UIBarButtonItem* noSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    noSpace.width=10;
+    UIBarButtonItem* doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneDatePicker:)];
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem* cancelBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelDatePicker:)];
+    [toolBar setItems:[NSArray arrayWithObjects:noSpace,cancelBtn,flexSpace,doneBtn,noSpace, nil]];
+    [self.pickerView addSubview:toolBar];
     CGRect pickerFrame = CGRectMake(0, WXPickerToolBarHeight, [UIScreen mainScreen].bounds.size.width, WXPickerHeight-WXPickerToolBarHeight);
-    self.datePicker.backgroundColor = [UIColor whiteColor];
     self.datePicker.frame = pickerFrame;
-    [self resetPickerView];
+    self.datePicker.backgroundColor = [UIColor whiteColor];
     [self.pickerView addSubview:self.datePicker];
     [self.backgroudView addSubview:self.pickerView];
 }
