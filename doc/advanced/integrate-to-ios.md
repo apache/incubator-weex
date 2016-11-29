@@ -26,7 +26,7 @@ end
 ```
 You can get your `YourTarget` below
 
-![img](http://img4.tbcdn.cn/L1/461/1/4d9f4d6a8441b44e4816c7778627824fb72c58de)
+![img](//img4.tbcdn.cn/L1/461/1/4d9f4d6a8441b44e4816c7778627824fb72c58de)
 
 Run pod install in current directory, for a while, .xcworkspace will be created.  At this point, the dependencies have been established.
 
