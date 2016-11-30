@@ -228,6 +228,9 @@ import java.util.Locale;
 
 public class DatePickerImpl {
 
+    private static final int DEFAULT_START_YEAR = 1900;
+    private static final int DEFAULT_END_YEAR = 2100;
+
     private static SimpleDateFormat timeFormatter;
     private static SimpleDateFormat dateFormatter;
 
@@ -251,12 +254,20 @@ public class DatePickerImpl {
         );
 
         final DatePicker datePicker = dialog.getDatePicker();
+
+        final Calendar defaultMinDate = Calendar.getInstance(Locale.getDefault());
+        final Calendar defaultMaxDate = Calendar.getInstance(Locale.getDefault());
+
+        defaultMinDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
+        defaultMaxDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
+
         if (!TextUtils.isEmpty(min)) {
             long minDate = parseDate(min).getTime();
             if (datePicker.getMaxDate() >= minDate) {
                 datePicker.setMinDate(parseDate(min).getTime());
             } else {
-                new IllegalArgumentException("Argument 'min' must not be greater than 'max'").printStackTrace();
+                datePicker.setMinDate(defaultMinDate.getTimeInMillis());
+                datePicker.setMaxDate(defaultMaxDate.getTimeInMillis());
             }
         }
         if (!TextUtils.isEmpty(max)) {
@@ -264,7 +275,8 @@ public class DatePickerImpl {
             if (datePicker.getMinDate() <= maxDate) {
                 datePicker.setMaxDate(parseDate(max).getTime());
             } else {
-                new IllegalArgumentException("Argument 'max' must not be smaller than 'min'").printStackTrace();
+                datePicker.setMinDate(defaultMinDate.getTimeInMillis());
+                datePicker.setMaxDate(defaultMaxDate.getTimeInMillis());
             }
         }
 
