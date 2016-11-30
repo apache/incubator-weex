@@ -212,6 +212,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -220,6 +221,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -616,6 +618,18 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                     return;
                 }
 
+
+              RecyclerView.LayoutManager layoutManager;
+              boolean beforeFirstVisibleItem = false;
+              if((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager){
+                int fVisible = ((LinearLayoutManager)layoutManager).findFirstCompletelyVisibleItemPosition();
+                int pos = mChildren.indexOf(stickyComponent);
+
+                if( pos <= fVisible){
+                  beforeFirstVisibleItem = true;
+                }
+              }
+
                 int[] location = new int[2];
                 stickyComponent.getHostView().getLocationOnScreen(location);
                 int[] parentLocation = new int[2];
@@ -623,8 +637,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
                 int top = location[1] - parentLocation[1];
 
-                boolean showSticky = ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 ;
-                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 ;
+                boolean showSticky = beforeFirstVisibleItem && ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy >= 0;
+                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy <= 0;
                 if (showSticky) {
                     bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
                 } else if (removeSticky) {
