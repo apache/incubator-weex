@@ -432,8 +432,10 @@
     }else{
         [self setPlaceholderAttributedString];
     }
-    if (_inputEvent) {
-        [self fireEvent:@"input" params:@{@"value":textView.text}];
+    if (textView.markedTextRange == nil) {
+        if (_inputEvent) {
+            [self fireEvent:@"input" params:@{@"value":textView.text}];
+        }
     }
 }
 
@@ -568,7 +570,7 @@
 }
 
 #pragma mark -reset color
--(void)resetViewStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)elements
 {
     if ([elements containsObject:@"color"]) {
         _color = [UIColor blackColor];
