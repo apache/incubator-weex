@@ -362,6 +362,7 @@
     [_styles addEntriesFromDictionary:styles];
     pthread_mutex_unlock(&_propertyMutex);
     [self _updateCSSNodeStyles:styles];
+    [self configResetCSSNodeStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
@@ -417,14 +418,29 @@
 }
 
 #pragma mark Reset
-
--(void *)configResetStyles:(NSDictionary *)styles
+-(NSArray *)fetchResetElements:(NSDictionary *)styles
 {
     NSMutableArray *elements = [@[] mutableCopy];
     for (NSString *key in styles) {
         [elements addObject:key];
     }
+    return elements;
+}
+
+-(void )configResetStyles:(NSDictionary *)styles
+{
+    NSArray *elements = [[self fetchResetElements:styles] mutableCopy];
     [self resetStyles:elements];
+}
+
+-(void )configResetCSSNodeStyles:(NSDictionary *)styles
+{
+    NSArray *elements = [[self fetchResetElements:styles] mutableCopy];
+    [self _resetCSSNodeStyles:elements];
+}
+
+- (void)_resetCSSNodeStyles:(NSArray *)elements
+{
 }
 
 - (void)resetStyles:(NSArray *)elements

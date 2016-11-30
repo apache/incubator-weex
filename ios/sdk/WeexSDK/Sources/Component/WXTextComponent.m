@@ -166,26 +166,9 @@ do {\
     }\
 } while(0);
 
--(void )fillColor:(NSDictionary *)styles needLayout:(BOOL )needLayout
-{
-    id value = styles[@"color"];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            _color = [UIColor blackColor];
-            [self setNeedsRepaint];
-            if (needLayout) {
-                [self setNeedsLayout];
-            }
-        }else {
-            WX_STYLE_FILL_TEXT(color, color, UIColor, needLayout)
-        }
-    }
-}
-
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    [self fillColor:styles needLayout:NO];
+    WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT(fontSize, fontSize, WXPixelType, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -448,6 +431,14 @@ do {\
     return super.description;
 }
 #endif
+
+- (void)_resetCSSNodeStyles:(NSArray *)elements
+{
+    if ([elements containsObject:@"color"]) {
+        _color = [UIColor blackColor];
+        [self setNeedsRepaint];
+    }
+}
 
 @end
 

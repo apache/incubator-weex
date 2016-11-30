@@ -163,5 +163,12 @@
 - (void)_handleFirstScreenTime;
 
 - (void)_resetNativeBorderRadius;
+/**
+ * @abstract Called when component's style are reset
+ *
+ * @param elements The reset CSS Nodestyle's elements
+ * @discussion It can be overrided to handle specific style reseting.
+ **/
+- (void)_resetCSSNodeStyles:(NSArray *)elements;
 
 @end
