@@ -416,7 +416,7 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes resetStyles:(NSDictionary *)resetStyles
+- (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
 {
     [super _updateAttributesOnComponentThread:attributes];
     
