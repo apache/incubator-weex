@@ -436,10 +436,10 @@
 -(void )configResetCSSNodeStyles:(NSDictionary *)styles
 {
     NSArray *elements = [[self fetchResetElements:styles] mutableCopy];
-    [self resetCSSNodeStyles:elements];
+    [self _resetCSSNodeStyles:elements];
 }
 
-- (void)resetCSSNodeStyles:(NSArray *)elements
+- (void)_resetCSSNodeStyles:(NSArray *)elements
 {
 }
 

@@ -292,14 +292,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetStyles:(NSArray *)elements;
 
 /**
- * @abstract Called when component's style are reset
- *
- * @param elements The reset CSS Nodestyle's elements
- * @discussion It can be overrided to handle specific style reseting.
- **/
-- (void)resetCSSNodeStyles:(NSArray *)elements;
-
-/**
  * @abstract Called when component's attributes are updated
  *
  * @param attributes The updated attributes dictionary

@@ -432,7 +432,7 @@ do {\
 }
 #endif
 
-- (void)resetCSSNodeStyles:(NSArray *)elements
+- (void)_resetCSSNodeStyles:(NSArray *)elements
 {
     if ([elements containsObject:@"color"]) {
         _color = [UIColor blackColor];
