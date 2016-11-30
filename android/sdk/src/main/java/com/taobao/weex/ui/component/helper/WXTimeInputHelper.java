@@ -204,106 +204,51 @@
  */
 package com.taobao.weex.ui.component.helper;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.widget.DatePicker;
+import android.support.annotation.Nullable;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
+import com.taobao.weex.appfram.pickers.DatePickerImpl;
 import com.taobao.weex.ui.component.AbstractEditComponent;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by moxun on 16/10/12.
  */
 
 public class WXTimeInputHelper {
-
-    private static SimpleDateFormat timeFormatter;
-    private static SimpleDateFormat dateFormatter;
-
     public static void pickDate(String max, String min, final AbstractEditComponent component) {
         final TextView target = component.getHostView();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(parseDate(target.getText().toString()));
-        final DatePickerDialog dialog = new DatePickerDialog(
-                target.getContext(),
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        int realMonth = monthOfYear + 1;
-                        String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
-                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
-                        target.setText(result);
-                        component.performOnChange(result);
-                    }
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-        );
 
-        final DatePicker datePicker = dialog.getDatePicker();
-        if (min != null) {
-            datePicker.setMinDate(parseDate(min).getTime());
-        }
-        if (max != null) {
-            datePicker.setMaxDate(parseDate(max).getTime());
-        }
-        dialog.show();
+        DatePickerImpl.pickDate(
+                target.getContext(),
+                target.getText().toString(),
+                max,
+                min,
+                new DatePickerImpl.OnPickListener() {
+                    @Override
+                    public void onPick(boolean set, @Nullable String result) {
+                        if (set) {
+                            target.setText(result);
+                            component.performOnChange(result);
+                        }
+                    }
+                });
     }
 
     public static void pickTime(final AbstractEditComponent component) {
         final TextView target = component.getHostView();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(parseTime(target.getText().toString()));
-        TimePickerDialog dialog = new TimePickerDialog(
+
+        DatePickerImpl.pickTime(
                 target.getContext(),
-                new TimePickerDialog.OnTimeSetListener() {
+                target.getText().toString(),
+                new DatePickerImpl.OnPickListener() {
                     @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
-                        String m = minute < 10 ? "0" + minute : String.valueOf(minute);
-                        String result = h + ":" + m;
-                        target.setText(result);
-                        component.performOnChange(result);
+                    public void onPick(boolean set, @Nullable String result) {
+                        if (set) {
+                            target.setText(result);
+                            component.performOnChange(result);
+                        }
                     }
-                },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                false
+                }
         );
-        dialog.show();
-    }
-
-    private static Date parseDate(String s) {
-        if (dateFormatter == null) {
-            dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        }
-
-        try {
-            return dateFormatter.parse(s);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return new Date();
-    }
-
-    private static Date parseTime(String s) {
-        if (timeFormatter == null) {
-            timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        }
-
-        try {
-            return timeFormatter.parse(s);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return new Date();
     }
 }

@@ -212,6 +212,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -581,36 +582,8 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         }
       },50);
 
-//      onPostScrollToPosition(pos);
     }
 
-  }
-
-  /**
-   * Call after onPostScrollToPosition
-   * @param pos
-   */
-  private void onPostScrollToPosition(int pos){
-    if (pos < 0)
-      return;
-    checkLastSticky(pos);
-  }
-
-  /**
-   * Check last Sticky after scrollTo
-   * @param position scroll to position
-   */
-  public void checkLastSticky(final int position) {
-      bounceRecyclerView.clearSticky();
-      for (int i = 0; i <= position; i++) {
-          WXComponent component = getChild(i);
-          if (component.isSticky() && component instanceof WXCell) {
-              if (component.getHostView() == null) {
-                  return;
-              }
-              bounceRecyclerView.notifyStickyShow((WXCell) component);
-          }
-      }
   }
 
     @Override
@@ -626,30 +599,42 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         Map.Entry<String, WXComponent> entry;
         WXComponent stickyComponent;
         while (iterator.hasNext()) {
-            entry = iterator.next();
-            stickyComponent = entry.getValue();
+          entry = iterator.next();
+          stickyComponent = entry.getValue();
 
-            if (stickyComponent != null && stickyComponent.getDomObject() != null
-                    && stickyComponent instanceof WXCell) {
-                if (stickyComponent.getHostView() == null) {
-                    return;
-                }
+          if (stickyComponent != null && stickyComponent.getDomObject() != null
+              && stickyComponent instanceof WXCell) {
+            if (stickyComponent.getHostView() == null) {
+              return;
+            }
 
-                int[] location = new int[2];
-                stickyComponent.getHostView().getLocationOnScreen(location);
-                int[] parentLocation = new int[2];
-                stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
 
-                int top = location[1] - parentLocation[1];
+            RecyclerView.LayoutManager layoutManager;
+            boolean beforeFirstVisibleItem = false;
+            if ((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager) {
+              int fVisible = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+              int pos = mChildren.indexOf(stickyComponent);
 
-                boolean showSticky = ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy > 0;
-                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy < 0;
-                if (showSticky) {
-                    bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
-                } else if (removeSticky) {
-                    bounceRecyclerView.notifyStickyRemove((WXCell) stickyComponent);
-                }
-                ((WXCell) stickyComponent).lastLocationY = top;
+              if (pos <= fVisible) {
+                beforeFirstVisibleItem = true;
+              }
+            }
+
+            int[] location = new int[2];
+            stickyComponent.getHostView().getLocationOnScreen(location);
+            int[] parentLocation = new int[2];
+            stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
+
+            int top = location[1] - parentLocation[1];
+
+            boolean showSticky = beforeFirstVisibleItem && ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy >= 0;
+            boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy <= 0;
+            if (showSticky) {
+              bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
+            } else if (removeSticky) {
+              bounceRecyclerView.notifyStickyRemove((WXCell) stickyComponent);
+            }
+            ((WXCell) stickyComponent).lastLocationY = top;
             }
         }
     }
@@ -737,7 +722,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       value.setCellPosition(index);
     }
   }
-
 
     /**
      * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,

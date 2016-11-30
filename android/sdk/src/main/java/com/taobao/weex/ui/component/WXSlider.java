@@ -490,7 +490,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       if (index >= mAdapter.getRealCount() || index < 0) {
         return;
       }
-      index = index + mAdapter.getFirst();
       mViewPager.setCurrentItem(index);
     }
   }

@@ -202,167 +202,152 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.view.refresh.wrapper;
+package com.taobao.weex.appfram.pickers;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
-import android.support.v7.widget.OrientationHelper;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.view.listview.WXRecyclerView;
-import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
+import com.taobao.weex.utils.WXLogUtils;
 
-import java.util.Stack;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
-public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
+/**
+ * Created by moxun on 16/11/23.
+ */
 
-  private RecyclerViewBaseAdapter adapter = null;
-  private Stack<View> headerViewStack = new Stack<>();
-  private Stack<WXCell> headComponentStack = new Stack<>();
+public class DatePickerImpl {
 
-  @Override
-  public boolean postDelayed(Runnable action, long delayMillis) {
-    return super.postDelayed(WXThread.secure(action), delayMillis);
-  }
+    private static final int DEFAULT_START_YEAR = 1900;
+    private static final int DEFAULT_END_YEAR = 2100;
 
-  public BounceRecyclerView(Context context, int orientation) {
-    super(context, orientation);
-  }
+    private static SimpleDateFormat timeFormatter;
+    private static SimpleDateFormat dateFormatter;
 
-  public BounceRecyclerView(Context context, AttributeSet attrs) {
-    super(context, attrs, OrientationHelper.VERTICAL);
-  }
+    public static void pickDate(@NonNull Context context, String value, String max, String min, @NonNull final OnPickListener listener) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseDate(value));
+        final DatePickerDialog dialog = new DatePickerDialog(
+                context,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        int realMonth = monthOfYear + 1;
+                        String realMonthString = realMonth < 10 ? "0" + realMonth : String.valueOf(realMonth);
+                        String result = year + "-" + realMonthString + "-" + dayOfMonth;
+                        listener.onPick(true, result);
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
 
-  public void setAdapter(RecyclerViewBaseAdapter adapter) {
-    this.adapter = adapter;
-    if (getInnerView() != null) {
-      getInnerView().setAdapter(adapter);
-    }
-  }
+        final DatePicker datePicker = dialog.getDatePicker();
 
-  public RecyclerViewBaseAdapter getAdapter() {
-    return adapter;
-  }
+        final Calendar defaultMinDate = Calendar.getInstance(Locale.getDefault());
+        final Calendar defaultMaxDate = Calendar.getInstance(Locale.getDefault());
 
-  @Override
-  public WXRecyclerView setInnerView(Context context) {
-    WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
-    wxRecyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
-    return wxRecyclerView;
-  }
+        defaultMinDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
+        defaultMaxDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
 
-  @Override
-  public void onRefreshingComplete() {
-    if (adapter != null) {
-      adapter.notifyDataSetChanged();
-    }
-  }
-
-  @Override
-  public void onLoadmoreComplete() {
-    if (adapter != null) {
-      adapter.notifyDataSetChanged();
-    }
-  }
-
-  /**
-   * @param component
-   */
-  public void notifyStickyShow(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty()) {
-      WXCell oldCom = headComponentStack.pop();
-      if (!oldCom.getRef().equals(component.getRef())) {
-        headComponentStack.push(oldCom);
-        headComponentStack.push(component);
-        showSticky();
-      } else {
-        headComponentStack.push(oldCom);
-        return;
-      }
-    } else {
-      headComponentStack.push(component);
-      showSticky();
-    }
-  }
-
-  /**
-   * @param component
-   */
-  public void notifyStickyRemove(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty() && !headerViewStack.isEmpty()) {
-      removeSticky(component);
-    }
-  }
-
-  /**
-   * Pop stickyView to stack
-   */
-  private void showSticky() {
-    WXCell headComponent = headComponentStack.pop();
-    headComponentStack.push(headComponent);
-    final View headerView = headComponent.getRealView();
-    if (headerView == null)
-      return;
-    headerViewStack.push(headerView);
-    headComponent.removeSticky();
-    final ViewGroup parent = (ViewGroup) getParent();
-    if(parent != null){
-      parent.post(WXThread.secure(new Runnable() {
-        @Override
-        public void run() {
-          ViewGroup existedParent;
-          if((existedParent = (ViewGroup)headerView.getParent())!= null){
-            existedParent.removeView(headerView);
-          }
-          parent.addView(headerView);
+        if (!TextUtils.isEmpty(min)) {
+            long minDate = parseDate(min).getTime();
+            if (datePicker.getMaxDate() >= minDate) {
+                datePicker.setMinDate(parseDate(min).getTime());
+            } else {
+                datePicker.setMinDate(defaultMinDate.getTimeInMillis());
+                datePicker.setMaxDate(defaultMaxDate.getTimeInMillis());
+            }
         }
-      }));
-    }
-  }
-
-  /**
-   * remove top stickyView
-   * @param component
-   */
-  private void removeSticky(WXComponent component) {
-    final WXCell headComponent = headComponentStack.pop();
-    if (!component.getRef().equals(headComponent.getRef())) {
-      headComponentStack.push(headComponent);
-      return;
-    }
-    final View headerView = headerViewStack.pop();
-    final ViewGroup parent = (ViewGroup) getParent();
-    if(parent != null){
-      parent.post(WXThread.secure(new Runnable() {
-        @Override
-        public void run() {
-          parent.removeView(headerView);
-          headComponent.recoverySticky();
+        if (!TextUtils.isEmpty(max)) {
+            long maxDate = parseDate(max).getTime();
+            if (datePicker.getMinDate() <= maxDate) {
+                datePicker.setMaxDate(parseDate(max).getTime());
+            } else {
+                datePicker.setMinDate(defaultMinDate.getTimeInMillis());
+                datePicker.setMaxDate(defaultMaxDate.getTimeInMillis());
+            }
         }
-      }));
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                listener.onPick(false, null);
+            }
+        });
+
+        dialog.show();
     }
 
-  }
+    public static void pickTime(@NonNull Context context, String value, @NonNull final OnPickListener listener) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(parseTime(value));
+        TimePickerDialog dialog = new TimePickerDialog(
+                context,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String h = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
+                        String m = minute < 10 ? "0" + minute : String.valueOf(minute);
+                        String result = h + ":" + m;
+                        listener.onPick(true, result);
+                    }
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                false
+        );
 
-  /**
-   * Clear All Sticky of stack
-   */
-  public void clearSticky() {
-    int size = headComponentStack.size();
-    while (size > 0 && headerViewStack.size() == size) {
-      WXCell headComponent = headComponentStack.pop();
-      View headerView = headerViewStack.pop();
-      ((ViewGroup) getParent()).removeView(headerView);
-      headComponent.recoverySticky();
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                listener.onPick(false, null);
+            }
+        });
+
+        dialog.show();
     }
-  }
+
+    public interface OnPickListener {
+        void onPick(boolean set, @Nullable String result);
+    }
+
+    private static Date parseDate(String s) {
+        if (dateFormatter == null) {
+            dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        }
+
+        try {
+            return dateFormatter.parse(s);
+        } catch (ParseException e) {
+            //don't worry
+            WXLogUtils.w("[DatePickerImpl] " + e.toString());
+        }
+        return new Date();
+    }
+
+    private static Date parseTime(String s) {
+        if (timeFormatter == null) {
+            timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        }
+
+        try {
+            return timeFormatter.parse(s);
+        } catch (ParseException e) {
+            //don't worry
+            WXLogUtils.w("[DatePickerImpl] " + e.toString());
+        }
+        return new Date();
+    }
 }

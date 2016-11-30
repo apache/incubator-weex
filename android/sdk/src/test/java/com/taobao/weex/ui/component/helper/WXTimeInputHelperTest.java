@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component.helper;
 
 import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.appfram.pickers.DatePickerImpl;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -231,7 +232,7 @@ public class WXTimeInputHelperTest {
 
     @Test
     public void testParseDate() throws Exception{
-        Method parseDate = WXTimeInputHelper.class.getDeclaredMethod("parseDate", String.class);
+        Method parseDate = DatePickerImpl.class.getDeclaredMethod("parseDate", String.class);
         parseDate.setAccessible(true);
         parseDate.invoke(null, "");
         parseDate.invoke(null, "test");
@@ -242,7 +243,7 @@ public class WXTimeInputHelperTest {
 
     @Test
     public void testParseTime() throws Exception{
-        Method parseTime = WXTimeInputHelper.class.getDeclaredMethod("parseTime", String.class);
+        Method parseTime = DatePickerImpl.class.getDeclaredMethod("parseTime", String.class);
         parseTime.setAccessible(true);
         parseTime.invoke(null, "");
         parseTime.invoke(null, "test");
