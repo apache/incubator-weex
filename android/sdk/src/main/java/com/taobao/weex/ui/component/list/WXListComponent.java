@@ -687,7 +687,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
   @Override
   public void createChildViewAt(int index) {
-    final WXComponent child = getChild(index);
+    int indexToCreate = index;
+    if(indexToCreate < 0){
+      indexToCreate = childCount()-1;
+      if(indexToCreate < 0 ){
+        return;
+      }
+    }
+    final WXComponent child = getChild(indexToCreate);
     if(child instanceof WXBaseRefresh){
       child.createView();
       if (child instanceof WXRefresh) {
@@ -708,7 +715,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
         },100);
       }
     }else {
-      super.createChildViewAt(index);
+      super.createChildViewAt(indexToCreate);
     }
   }
 
