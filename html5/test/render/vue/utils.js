@@ -1,13 +1,13 @@
 import { expect } from 'chai'
-import * as shared from '../../../render/vue/utils/shared'
+import * as utils from '../../../render/vue/utils'
 
-describe('shared', function () {
+describe('utils', function () {
   it('cached', () => {
-    expect(shared.cached).to.be.a('function')
+    expect(utils.cached).to.be.a('function')
   })
 
   it('camelize', () => {
-    const { camelize } = shared
+    const { camelize } = utils
     expect(camelize).to.be.a('function')
     expect(camelize('')).to.be.equal('')
     expect(camelize('dispaly')).to.be.equal('dispaly')
@@ -17,7 +17,7 @@ describe('shared', function () {
   })
 
   it('capitalize', () => {
-    const { capitalize } = shared
+    const { capitalize } = utils
     expect(capitalize).to.be.a('function')
     expect(capitalize('')).to.be.equal('')
     expect(capitalize('string')).to.be.equal('String')
@@ -27,7 +27,7 @@ describe('shared', function () {
   })
 
   it('hyphenate', () => {
-    const { hyphenate } = shared
+    const { hyphenate } = utils
     expect(hyphenate).to.be.a('function')
     expect(hyphenate('')).to.be.equal('')
     expect(hyphenate('dispaly')).to.be.equal('dispaly')
@@ -37,7 +37,7 @@ describe('shared', function () {
   })
 
   it('extend', () => {
-    const { extend } = shared
+    const { extend } = utils
     expect(extend).to.be.a('function')
 
     const abc = { name: 'abc' }

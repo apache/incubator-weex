@@ -14,7 +14,7 @@ module.exports = function (config) {
     frameworks: ['mocha'],
     browsers: ['PhantomJS'],
     files: [
-      '../html5/test/renderer/index.js'
+      '../html5/test/render/index.js'
     ],
 
     singleRun: true,

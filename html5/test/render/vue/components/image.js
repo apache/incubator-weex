@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { multiDescribe } from '../utils'
+import { multiDescribe } from '../helper'
 import image from '../../../../render/vue/components/image.vue'
 
 multiDescribe('<image> component', (Vue, helper) => {

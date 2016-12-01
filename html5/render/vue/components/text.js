@@ -1,5 +1,5 @@
-import { extend } from '../utils/shared'
-import { validateText, validateStyles } from '../utils/validator'
+import { extend } from '../utils'
+import { validateStyles } from '../validator'
 
 /**
  * Get text styles
@@ -37,7 +37,6 @@ export default {
   render (createElement, context) {
     /* istanbul ignore next */
     if (process.env.NODE_ENV !== 'production') {
-      validateText(context)
       validateStyles('text', context.data && context.data.staticStyle)
     }
 
