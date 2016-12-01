@@ -1013,6 +1013,10 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     return mBundleUrl;
   }
 
+  public void setBundleUrl(String url){
+    mBundleUrl = url;
+  }
+
   public ViewGroup getRootView() {
     return rootView;
   }
