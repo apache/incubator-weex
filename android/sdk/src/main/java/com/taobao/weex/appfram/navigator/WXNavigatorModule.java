@@ -307,8 +307,10 @@ public class WXNavigatorModule extends WXModule {
         try {
             JSONObject jsObj = new JSONObject(param);
             int visibility = jsObj.getInt(Constants.Name.NAV_BAR_VISIBILITY);
+            int oldStatus = mWXSDKInstance.getNavBarStatus();
             boolean success = changeVisibilityOfActionBar(mWXSDKInstance.getContext(), visibility);
             if (success) {
+                mWXSDKInstance.onNavBarStatusChange(oldStatus, visibility);
                 message = MSG_SUCCESS;
             }
         } catch (JSONException e) {
