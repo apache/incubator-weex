@@ -1,10 +1,16 @@
 import { expect } from 'chai'
-import * as validator from '../../../../render/vue/validator/index'
+import * as validator from '../../../../render/vue/validator'
 
 describe('validator', function () {
-  it('validateStyles', () => {
-    const { validateStyles } = validator
+  const { validateStyles, validateProps, configure } = validator
+  const warn = function () {}
 
+  before(() => {
+    configure({ silent: false })
+    configure({ silent: true, onfail: warn })
+  })
+
+  it('validateStyles', () => {
     const styles = {
       position: 'absolute',
       color: '#dddddd'
@@ -16,11 +22,15 @@ describe('validator', function () {
   })
 
   it('validateStyles (invalid)', () => {
-    const { validateStyles } = validator
-
     expect(validateStyles).to.be.a('function')
     expect(validateStyles('unknown', { color: 'blue' })).to.be.true
     expect(validateStyles('text', { unknown: 'nothing' })).to.be.false
     expect(validateStyles('text', { color: '#ABCC' })).to.be.false
+    expect(validateStyles('text', { color: '#ABCC' })).to.be.false
+  })
+
+  it('validateProps', () => {
+    expect(validateProps).to.be.a('function')
+    expect(validateProps('unknown', { whatever: 'nothing' })).to.be.true
   })
 })

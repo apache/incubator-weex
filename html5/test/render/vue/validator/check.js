@@ -1,8 +1,8 @@
 import { expect } from 'chai'
-import * as supported from '../../../../render/vue/validator/supported'
+import * as check from '../../../../render/vue/validator/check'
 
-describe('supported', () => {
-  const { flatten, checkSupported, isSupportedStyle, isSupportedProp } = supported
+describe('check', () => {
+  const { flatten, checkSupported, isSupportedStyle, isSupportedProp } = check
   it('flatten', () => {
     expect(flatten([])).to.deep.equal([])
     expect(flatten(['a', 'b'])).to.deep.equal(['a', 'b'])

@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 import * as style from '../../../../render/vue/validator/style'
 
-describe('supported', () => {
-  describe('isCSSColor', () => {
-    const { isCSSColor } = style
+describe('check style value', () => {
+  const { isCSSColor } = style
 
+  describe('isCSSColor', () => {
     it('isCSSColor (hash)', () => {
       expect(isCSSColor('#ABCDEF')).to.be.true
       expect(isCSSColor('#AB00EF')).to.be.true
@@ -64,16 +64,6 @@ describe('supported', () => {
       expect(isCSSColor('rgba (256, 0, 24,, 0)')).to.be.false
       expect(isCSSColor('rgba (256, 0, 24, 0.2, 0)')).to.be.false
     })
-  })
-
-  it('color', () => {
-    expect(style.color('#ABCDEF')).to.be.true
-    expect(style.color('#CIHDEG')).to.be.false
-  })
-
-  it('background-color', () => {
-    expect(style.backgroundColor('#ABCDEF')).to.be.true
-    expect(style.backgroundColor('#CIHDEE')).to.be.false
   })
 
   it('position', () => {

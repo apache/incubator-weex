@@ -1,14 +1,34 @@
-const supportedProps = {
+const supportedProperties = {
+  '@common': [
+    'id', 'ref', 'style', 'class', 'append'
+  ]
 }
 
 const supportedStyles = {
   '@box-model': [
-    'width', 'height',
+    'width', 'height', 'position',
     'padding-top', 'padding-bottom', 'padding-left', 'padding-right',
     'margin-top', 'margin-bottom', 'margin-left', 'margin-right'
   ],
+  '@border': [
+    'border-style', 'border-width', 'border-color', 'border-radius',
+    'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+    'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius'
+  ],
+  '@flexbox': [
+    'display', 'flex', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap'
+  ],
+  '@font': [
+    'font-size', 'font-weight', 'font-style', 'font-family'
+  ],
+  '@colors': [
+    'color', 'background-color', 'opacity'
+  ],
   text: [
-    '@box-model', 'position', 'background-color', 'color', 'opacity'
+    '@box-model', '@border', '@flexbox', '@font', '@colors',
+    'text-align', 'text-decoration', 'text-overflow'
   ]
 }
 
@@ -49,5 +69,5 @@ export function isSupportedStyle (type, style) {
  * @param {String} property
  */
 export function isSupportedProp (type, prop) {
-  return checkSupported(type, prop, supportedProps)
+  return checkSupported(type, prop, supportedProperties)
 }
