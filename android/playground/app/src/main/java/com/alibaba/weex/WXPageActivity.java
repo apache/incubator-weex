@@ -177,19 +177,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance = null;
     }
     if (mInstance == null) {
-      mInstance = new WXSDKInstance(this){
-        @Override
-        public void onNavBarStatusChange(int oldVisibility, int visibility) {
-          if (oldVisibility != visibility) {
-            int actionBarHeight = getActionBarHeight();
-            if (oldVisibility == com.taobao.weex.common.Constants.Value.NAV_BAR_SHOWN && visibility == com.taobao.weex.common.Constants.Value.NAV_BAR_HIDDEN) {
-              setSize(getWeexWidth(), getWeexHeight() + actionBarHeight);
-            } else if (oldVisibility == com.taobao.weex.common.Constants.Value.NAV_BAR_HIDDEN && visibility == com.taobao.weex.common.Constants.Value.NAV_BAR_SHOWN) {
-              setSize(getWeexWidth(), getWeexHeight() - actionBarHeight);
-            }
-          }
-        }
-      };
+      mInstance = new WXSDKInstance(this);
       //        mInstance.setImgLoaderAdapter(new ImageAdapter(this));
       mInstance.registerRenderListener(this);
       mInstance.setNestedInstanceInterceptor(this);
@@ -241,19 +229,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance.destroy();
     }
 
-    mInstance = new WXSDKInstance(this) {
-      @Override
-      public void onNavBarStatusChange(int oldVisibility, int visibility) {
-        if (oldVisibility != visibility) {
-          int actionBarHeight = getActionBarHeight();
-          if (oldVisibility == com.taobao.weex.common.Constants.Value.NAV_BAR_SHOWN && visibility == com.taobao.weex.common.Constants.Value.NAV_BAR_HIDDEN) {
-            setSize(getWeexWidth(), getWeexHeight() + actionBarHeight);
-          } else if (oldVisibility == com.taobao.weex.common.Constants.Value.NAV_BAR_HIDDEN && visibility == com.taobao.weex.common.Constants.Value.NAV_BAR_SHOWN) {
-            setSize(getWeexWidth(), getWeexHeight() - actionBarHeight);
-          }
-        }
-      }
-    };
+    mInstance = new WXSDKInstance(this);
     mInstance.registerRenderListener(this);
     mInstance.setBundleUrl(url);
 

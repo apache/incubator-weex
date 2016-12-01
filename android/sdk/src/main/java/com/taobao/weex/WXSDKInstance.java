@@ -204,11 +204,9 @@
  */
 package com.taobao.weex;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -746,7 +744,6 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
             if(WXEnvironment.isApkDebugable() && WXSDKManager.getInstance().getIWXDebugAdapter()!=null){
               wxView=WXSDKManager.getInstance().getIWXDebugAdapter().wrapContainer(WXSDKInstance.this,wxView);
             }
-            setSize(mGodViewWidth, mGodViewHeight);
             mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
           }
         }
@@ -875,34 +872,6 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
    */
   public void onLayoutChange(View godView) {
 
-  }
-
-  public void onNavBarStatusChange(int oldVisibility, int visibility) {
-
-  }
-
-  public int getNavBarStatus() {
-    int status = Constants.Value.NAV_BAR_UNKNOWN;
-    if (getContext() instanceof AppCompatActivity) {
-      android.support.v7.app.ActionBar actionbar = ((AppCompatActivity) getContext()).getSupportActionBar();
-      if (actionbar != null) {
-        if (actionbar.isShowing()) {
-          status = Constants.Value.NAV_BAR_SHOWN;
-        } else {
-          status = Constants.Value.NAV_BAR_HIDDEN;
-        }
-      }
-    } else if (getContext() instanceof Activity) {
-      android.app.ActionBar actionbar = ((Activity) getContext()).getActionBar();
-      if (actionbar != null) {
-        if (actionbar.isShowing()) {
-          status = Constants.Value.NAV_BAR_SHOWN;
-        } else {
-          status = Constants.Value.NAV_BAR_HIDDEN;
-        }
-      }
-    }
-    return status;
   }
 
   private boolean mCreateInstance =true;
@@ -1099,8 +1068,8 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     float realWidth = WXViewUtils.getWebPxByWidth(width);
     float realHeight = WXViewUtils.getWebPxByWidth(height);
 
-    View godView;
-    if (mGodCom != null && (godView = mGodCom.getHostView()) != null) {
+    View godView = mGodCom.getHostView();
+    if (godView != null) {
       ViewGroup.LayoutParams layoutParams = godView.getLayoutParams();
       if (layoutParams != null) {
         layoutParams.width = width;

@@ -330,7 +330,6 @@ public class Constants {
 
     int NAV_BAR_SHOWN = 0;
     int NAV_BAR_HIDDEN = 1;
-    int NAV_BAR_UNKNOWN = - 128;
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
