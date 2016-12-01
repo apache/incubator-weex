@@ -302,28 +302,6 @@
 {
     if (attributes[@"autofocus"]) {
         _autofocus = [attributes[@"autofocus"] boolValue];
-    }
-    if (attributes[@"disabled"]) {
-        _disabled = [attributes[@"disabled"] boolValue];
-    }
-    if (attributes[@"placeholder"]) {
-        _placeholderString = attributes[@"placeholder"];
-    }
-    if (attributes[@"value"]) {
-        NSString * value = [WXConvert NSString:attributes[@"value"]];
-        if (value) {
-            _textValue = value;
-            [self correctCursor];
-            if([value length] > 0) {
-                _placeHolderLabel.text = @"";
-            }
-        }
-    }
-}
-- (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
-{
-    if (attributes[@"autofocus"]) {
-        _autofocus = [attributes[@"autofocus"] boolValue];
         [self setAutofocus];
     }
     if (attributes[@"disabled"]) {
@@ -345,7 +323,6 @@
             }
         }
     }
-    
 }
 
 #pragma mark - upate styles
