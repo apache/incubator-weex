@@ -408,7 +408,7 @@ static BOOL WXNotStat;
         NSURL * downloadPath = nil;
         NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse*)response;
         if (200 == httpResponse.statusCode && !error && location) {
-            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url path]]];
+            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url absoluteString]]];
             downloadPath = [NSURL fileURLWithPath:file];
             NSFileManager *mgr = [NSFileManager defaultManager];
             NSError * error ;
