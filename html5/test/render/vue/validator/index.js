@@ -30,7 +30,14 @@ describe('validator', function () {
   })
 
   it('validateProps', () => {
+    const props = {
+      isString: 'absolute',
+      style: 'color: #dddddd'
+    }
+
     expect(validateProps).to.be.a('function')
     expect(validateProps('unknown', { whatever: 'nothing' })).to.be.true
+    expect(validateProps('unknown', props)).to.be.true
+    expect(validateProps('unknown', { isString: false })).to.be.false
   })
 })

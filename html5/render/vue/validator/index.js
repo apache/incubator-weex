@@ -1,7 +1,7 @@
 import * as styleValidator from './style'
 import * as propValidator from './prop'
 import { hyphenate, camelize } from '../utils'
-import { isSupportedStyle, isSupportedProp } from './check'
+import { isSupportedStyle } from './check'
 
 let onfail = function nope () {}
 let showConsole = true
@@ -55,16 +55,10 @@ export function validateStyles (type, styles = {}) {
 export function validateProps (type, props = {}) {
   let isValid = true
   for (const key in props) {
-    if (!isSupportedProp(type, hyphenate(key))) {
+    const validator = propValidator[camelize(key)]
+    if (validator && !validator(props[key])) {
       isValid = false
-      warn(`[Property Validator] <${type}> is not support to use the "${key}" property.`)
-    }
-    else {
-      const validator = propValidator[camelize(key)]
-      if (validator && !validator(props[key])) {
-        isValid = false
-        warn(`[Property Validator] The property "${key}" is not support the "${props[key]}" value.`)
-      }
+      warn(`[Property Validator] The property "${key}" is not support the "${props[key]}" value.`)
     }
   }
   return isValid

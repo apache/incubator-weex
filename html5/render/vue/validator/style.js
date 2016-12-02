@@ -10,7 +10,7 @@ export function isCSSColor (value) {
 }
 
 export function isCSSLength (value) {
-  return /^[+-]?[0-9]+.?([0-9]+)?(px|%)$/.test(String(value))
+  return /^[+-]?[0-9]+.?([0-9]+)?(px|%)?$/.test(String(value))
 }
 
 export function position (value) {
@@ -39,15 +39,15 @@ export function alignItems (value) {
 }
 
 export function flex (value) {
-  return String(value).match(/^\d{1,3}$/)
+  return /^\d{1,3}$/.test(String(value))
 }
 
 export function fontStyle (value) {
-  return ['normal', 'italic'].indexOf(value) !== -1
+  return ['normal', 'italic', 'oblique'].indexOf(value) !== -1
 }
 
 export function fontWeight (value) {
-  return ['normal', 'bold'].indexOf(value) !== -1
+  return ['normal', 'bold', 'light', 'bolder', 'lighter'].indexOf(value) !== -1
 }
 
 export function textDecoration (value) {
@@ -66,25 +66,37 @@ export function textOverflow (value) {
   return ['clip', 'ellipsis'].indexOf(value) !== -1
 }
 
+/**
+ * Common style validator.
+ * @param {any} value
+ * @param {String} key
+ */
 export function common (value, key) {
-  if (/^[\w\-]?color$/.test(key)) {
+  if (/^[\w\-]*color$/.test(String(key))) {
     return isCSSColor(value)
   }
 
-  if (/^[\w\-]?(width|height|radius)$/.test(key)) {
+  if (/^(width|height)$/.test(String(key))) {
+    return isCSSLength(value)
+  }
+
+  // checkout border-radius
+  if (/^border-((top|right|bottom|left)-){0,2}(width|radius)$/.test(String(key))) {
     return isCSSLength(value)
   }
 
   // check border-style
-  if (/border-((top|right|bottom|left)-)?style/.test(key)) {
+  if (/border-((top|right|bottom|left)-)?style/.test(String(key))) {
     return ['solid', 'dashed', 'dotted'].indexOf(value) !== -1
   }
 
-  if (/^((margin|padding)-)?(top|right|bottom|left)/.test(key)) {
+  if (/^((margin|padding)-)?(top|right|bottom|left)/.test(String(key))) {
     return isCSSLength(value)
   }
 
-  switch (key) {
+  switch (String(key)) {
     case 'font-size': return isCSSLength(value)
   }
+
+  return true
 }
