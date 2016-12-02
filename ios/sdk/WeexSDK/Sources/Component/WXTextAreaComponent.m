@@ -81,6 +81,9 @@
 @property (nonatomic, assign) CGSize keyboardSize;
 @property (nonatomic, assign) CGRect rootViewOriginFrame;
 
+//private
+@property(nonatomic) NSRange selectedRange; //save selectedrange. because re layout change textview selectedRange
+
 @end
 
 @implementation WXTextAreaComponent {
@@ -172,7 +175,7 @@
 {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWasShown:)
-                                                 name:UIKeyboardDidShowNotification
+                                                 name:UIKeyboardWillShowNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -247,6 +250,14 @@
     return color;
 }
 
+-(void)correctCursor
+{
+    if(self.selectedRange.location != 0 && self.textView.selectedRange.location != self.selectedRange.location)
+    {
+        self.textView.selectedRange = self.selectedRange;
+    }
+}
+
 #pragma mark - add-remove Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -291,27 +302,6 @@
 {
     if (attributes[@"autofocus"]) {
         _autofocus = [attributes[@"autofocus"] boolValue];
-    }
-    if (attributes[@"disabled"]) {
-        _disabled = [attributes[@"disabled"] boolValue];
-    }
-    if (attributes[@"placeholder"]) {
-        _placeholderString = attributes[@"placeholder"];
-    }
-    if (attributes[@"value"]) {
-        NSString * value = [WXConvert NSString:attributes[@"value"]];
-        if (value) {
-            _textValue = value;
-            if([value length] > 0) {
-                _placeHolderLabel.text = @"";
-            }
-        }
-    }
-}
-- (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
-{
-    if (attributes[@"autofocus"]) {
-        _autofocus = [attributes[@"autofocus"] boolValue];
         [self setAutofocus];
     }
     if (attributes[@"disabled"]) {
@@ -327,6 +317,7 @@
         if (value) {
             _textValue = value;
             _textView.text = _textValue;
+            [self correctCursor];
             if([value length] > 0) {
                 _placeHolderLabel.text = @"";
             }
@@ -377,7 +368,6 @@
         _border = border;
         [_textView setBorder:_border];
     }
-    
 }
 
 #pragma mark measure frame
@@ -432,6 +422,7 @@
     }else{
         [self setPlaceholderAttributedString];
     }
+    self.selectedRange = textView.selectedRange;
     if (textView.markedTextRange == nil) {
         if (_inputEvent) {
             [self fireEvent:@"input" params:@{@"value":textView.text}];
@@ -441,6 +432,7 @@
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
+    self.selectedRange = NSMakeRange(0, 0);
     if (![textView.text length]) {
         [self setPlaceholderAttributedString];
     }
