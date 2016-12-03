@@ -322,7 +322,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
 
   private void ensureShadow() {
     shadow.clear();
-    if (needLoop) {
+    if (needLoop && views.size() > 2) {
       shadow.add(0, views.get(views.size() - 1));
       for (View view : views) {
         shadow.add(view);
@@ -346,7 +346,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   public int getFirst() {
-    if (needLoop) {
+    if (needLoop && views.size() > 2) {
       return getRealCount() + 1;
     } else {
       return 0;
