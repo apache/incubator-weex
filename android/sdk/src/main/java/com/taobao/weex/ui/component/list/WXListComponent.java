@@ -683,7 +683,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       if (child == null || index < -1) {
           return;
       }
-      checkRefreshOrLoading(child);
+      setRefreshOrLoading(child);
       int count = mChildren.size();
       index = index >= count ? -1 : index;
       if (index == -1) {
@@ -716,10 +716,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      * Setting refresh view and loading view
      * @param child the refresh_view or loading_view
      */
-    private boolean checkRefreshOrLoading(final WXComponent child) {
+    private boolean setRefreshOrLoading(final WXComponent child) {
 
         if(getHostView() == null){
-            WXLogUtils.e(TAG, "checkRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
+            WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
             return true;
         }
         if (child instanceof WXRefresh) {
