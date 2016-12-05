@@ -206,7 +206,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -216,7 +215,6 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Component;
@@ -387,10 +385,14 @@ public class WXImage extends WXComponent<ImageView> {
             }
         });
 
-
-        if( getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
-            String placeHolder= (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
-            imageStrategy.placeHolder = instance.rewriteUri(Uri.parse(placeHolder),URIAdapter.IMAGE).toString();
+        String placeholder=null;
+        if(getDomObject().getAttrs().containsKey(Constants.Name.PLACEHOLDER)){
+            placeholder= (String) getDomObject().getAttrs().get(Constants.Name.PLACEHOLDER);
+        }else if(getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)){
+            placeholder=(String)getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
+        }
+        if(placeholder!=null){
+            imageStrategy.placeHolder = instance.rewriteUri(Uri.parse(placeholder),URIAdapter.IMAGE).toString();
         }
 
         IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
