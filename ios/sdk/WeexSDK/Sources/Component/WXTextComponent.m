@@ -432,21 +432,13 @@ do {\
 }
 #endif
 
--(void)resetTextCSSNode:(NSArray *)elements
-{
-    if ([elements containsObject:@"height"]) {
-        _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
-    }
-    [self setNeedsLayout];
-}
-
 - (void)_resetCSSNodeStyles:(NSArray *)elements
 {
+    [super _resetCSSNodeStyles:elements];
     if ([elements containsObject:@"color"]) {
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }
-    [self resetTextCSSNode:elements];
 }
 
 @end

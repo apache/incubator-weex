@@ -439,8 +439,17 @@
     [self _resetCSSNodeStyles:elements];
 }
 
+-(void)configDefaultCSSNode:(NSArray *)elements
+{
+    if ([elements containsObject:@"height"]) {
+        _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
+    }
+    [self setNeedsLayout];
+}
+
 - (void)_resetCSSNodeStyles:(NSArray *)elements
 {
+    [self configDefaultCSSNode:elements];
 }
 
 - (void)resetStyles:(NSArray *)elements
