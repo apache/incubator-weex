@@ -1013,6 +1013,10 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     return mBundleUrl;
   }
 
+  public void setBundleUrl(String url){
+    mBundleUrl = url;
+  }
+
   public ViewGroup getRootView() {
     return rootView;
   }
@@ -1064,8 +1068,8 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     float realWidth = WXViewUtils.getWebPxByWidth(width);
     float realHeight = WXViewUtils.getWebPxByWidth(height);
 
-    View godView = mGodCom.getHostView();
-    if (godView != null) {
+    View godView;
+    if (mGodCom != null && (godView = mGodCom.getHostView()) != null) {
       ViewGroup.LayoutParams layoutParams = godView.getLayoutParams();
       if (layoutParams != null) {
         layoutParams.width = width;
