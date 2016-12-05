@@ -294,21 +294,18 @@ do {\
     WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
     
     // margin
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(margin, margin, CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], CSS_UNDEFINED)
     
     // border
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(borderWidth, border, CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], CSS_UNDEFINED)
     
     // padding
-    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(padding, padding, CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], CSS_UNDEFINED)
