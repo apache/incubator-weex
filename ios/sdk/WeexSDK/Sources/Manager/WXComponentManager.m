@@ -324,7 +324,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     return NO;
 }
 
--(void)styles:(NSDictionary *)styles normalStyles:(NSMutableDictionary *)normalStyles resetStyles:(NSMutableArray *)resetStyles
+-(void)filterStyles:(NSDictionary *)styles normalStyles:(NSMutableDictionary *)normalStyles resetStyles:(NSMutableArray *)resetStyles
 {
     for (NSString *key in styles) {
         id value = [styles objectForKey:key];
@@ -346,7 +346,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     NSMutableDictionary *normalStyles = [NSMutableDictionary new];
     NSMutableArray *resetStyles = [NSMutableArray new];
-    [self styles:styles normalStyles:normalStyles resetStyles:resetStyles];
+    [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
     [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
