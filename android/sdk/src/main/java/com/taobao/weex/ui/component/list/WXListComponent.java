@@ -622,7 +622,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
               RecyclerView.LayoutManager layoutManager;
               boolean beforeFirstVisibleItem = false;
               if((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager){
-                int fVisible = ((LinearLayoutManager)layoutManager).findFirstCompletelyVisibleItemPosition();
+                int fVisible = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
                 int pos = mChildren.indexOf(stickyComponent);
 
                 if( pos <= fVisible){
