@@ -432,17 +432,22 @@ do {\
 }
 #endif
 
+-(void)resetTextCSSNodes:(NSArray *)elements
+{
+    if([elements containsObject:@"height"])
+    {
+        _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
+    }
+    [self setNeedsLayout];
+}
+
 - (void)_resetCSSNodeStyles:(NSArray *)elements
 {
     if ([elements containsObject:@"color"]) {
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }
-    if ([elements containsObject:@"height"]) {
-        NSMutableDictionary *styles = [@{} mutableCopy];
-        [styles setValue:[NSString stringWithFormat:@"%f",_fontSize/WXScreenResizeRadio()] forKeyPath:@"height"];
-        [self _updateCSSNodeStyles:styles];
-    }
+    [self resetTextCSSNodes:elements];
 }
 
 @end
