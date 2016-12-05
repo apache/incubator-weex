@@ -434,8 +434,7 @@ do {\
 
 -(void)resetTextCSSNodes:(NSArray *)elements
 {
-    if([elements containsObject:@"height"])
-    {
+    if ([elements containsObject:@"height"]) {
         _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
     }
     [self setNeedsLayout];
