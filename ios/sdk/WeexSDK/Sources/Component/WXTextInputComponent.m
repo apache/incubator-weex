@@ -636,9 +636,9 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark -reset color
-- (void)resetStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)styles
 {
-    if ([elements containsObject:@"color"]) {
+    if ([styles containsObject:@"color"]) {
         [_inputView setTextColor:[UIColor blackColor]];
     }
 }

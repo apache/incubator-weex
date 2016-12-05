@@ -92,7 +92,6 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
-        [self _resetStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -356,13 +355,13 @@
 
 #pragma mark Updating
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     pthread_mutex_lock(&_propertyMutex);
     [_styles addEntriesFromDictionary:styles];
     pthread_mutex_unlock(&_propertyMutex);
     [self _updateCSSNodeStyles:styles];
-    [self configResetCSSNodeStyles:resetStyles];
+    [self _resetCSSNodeStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
@@ -386,7 +385,7 @@
     pthread_mutex_unlock(&_propertyMutex);
 }
 
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles
+- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
     
@@ -395,7 +394,7 @@
     [self _handleBorders:styles isUpdating:YES];
     
     [self updateStyles:styles];
-    [self configResetStyles:resetStyles];
+    [self resetStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -418,41 +417,7 @@
 }
 
 #pragma mark Reset
--(NSArray *)fetchResetElements:(NSDictionary *)styles
-{
-    NSMutableArray *elements = [@[] mutableCopy];
-    for (NSString *key in styles) {
-        [elements addObject:key];
-    }
-    return elements;
-}
-
--(void )configResetStyles:(NSDictionary *)styles
-{
-    NSArray *elements = [[self fetchResetElements:styles] mutableCopy];
-    [self resetStyles:elements];
-}
-
--(void )configResetCSSNodeStyles:(NSDictionary *)styles
-{
-    NSArray *elements = [[self fetchResetElements:styles] mutableCopy];
-    [self _resetCSSNodeStyles:elements];
-}
-
--(void)configDefaultCSSNode:(NSArray *)elements
-{
-    if ([elements containsObject:@"height"]) {
-        _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
-        [self setNeedsLayout];
-    }
-}
-
-- (void)_resetCSSNodeStyles:(NSArray *)elements
-{
-    [self configDefaultCSSNode:elements];
-}
-
-- (void)resetStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)styles
 {
     WXAssertMainThread();
 }
