@@ -265,7 +265,6 @@ do {\
 - (void)_resetCSSNode:(NSArray *)styles;
 {
     // flex
-    
     WX_STYLE_RESET_CSS_NODE(alignContent, align_items, CSS_ALIGN_STRETCH)
     WX_STYLE_RESET_CSS_NODE(alignContent, align_content, CSS_ALIGN_FLEX_START)
 
