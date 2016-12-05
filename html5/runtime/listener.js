@@ -176,6 +176,23 @@ Object.assign(Listener.prototype, {
   },
 
   /**
+   * Call a component method with args.
+   * @param  {string} ref
+   * @param  {string} type
+   * @param  {string} method
+   * @param  {array}  args
+   * @return {undefined | number} the signal sent by native
+   */
+  callComponentMethod (ref, type, method, args) {
+    return this.addActions({
+      component: type,
+      method,
+      ref: ref,
+      args: [...args]
+    })
+  },
+
+  /**
    * Default handler.
    * @param {object | array} actions
    * @param {function} callback
