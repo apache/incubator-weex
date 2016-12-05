@@ -446,7 +446,7 @@ do {\
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }
-    [self resetTextCSSNodes:elements];
+    [self resetTextCSSNode:elements];
 }
 
 @end
