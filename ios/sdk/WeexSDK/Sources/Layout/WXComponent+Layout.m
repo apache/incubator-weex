@@ -252,8 +252,6 @@ do {\
     WX_STYLE_FILL_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], WXPixelType)
 }
 
-
-
 #define WX_STYLE_RESET_CSS_NODE(key, cssProp, defaultValue)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
@@ -262,41 +260,59 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(key, cssProp, defaultValue)\
+do {\
+    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_TOP], defaultValue)\
+    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_LEFT], defaultValue)\
+    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_RIGHT], defaultValue)\
+    WX_STYLE_RESET_CSS_NODE(key, cssProp[CSS_BOTTOM], defaultValue)\
+} while(0);
+
 - (void)_resetCSSNode:(NSArray *)styles;
 {
     // flex
-    WX_STYLE_RESET_CSS_NODE(alignContent, align_items, CSS_ALIGN_STRETCH)
-    WX_STYLE_RESET_CSS_NODE(alignContent, align_content, CSS_ALIGN_FLEX_START)
-
+    WX_STYLE_RESET_CSS_NODE(flex, flex, 0.0)
     WX_STYLE_RESET_CSS_NODE(flexDirection, flex_direction, CSS_FLEX_DIRECTION_COLUMN)
-
-    // dimension
-    WX_STYLE_RESET_CSS_NODE(width, dimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(height, dimensions[CSS_HEIGHT], CSS_UNDEFINED)
-    
-    WX_STYLE_RESET_CSS_NODE(minWidth, minDimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(minHeight, minDimensions[CSS_HEIGHT], CSS_UNDEFINED)
-    
-    WX_STYLE_RESET_CSS_NODE(maxWidth, maxDimensions[CSS_WIDTH], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
-    
-    // position
+    WX_STYLE_RESET_CSS_NODE(alignItems, align_items, CSS_ALIGN_STRETCH)
+    WX_STYLE_RESET_CSS_NODE(alignSelf, align_self, CSS_ALIGN_AUTO)
+    WX_STYLE_RESET_CSS_NODE(flexWrap, flex_wrap, CSS_NOWRAP)
+    WX_STYLE_RESET_CSS_NODE(justifyContent, justify_content, CSS_JUSTIFY_FLEX_START)
+//
+//    // position
+    WX_STYLE_RESET_CSS_NODE(position, position_type, CSS_POSITION_RELATIVE)
     WX_STYLE_RESET_CSS_NODE(top, position[CSS_TOP], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(left, position[CSS_LEFT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(right, position[CSS_RIGHT], CSS_UNDEFINED)
     WX_STYLE_RESET_CSS_NODE(bottom, position[CSS_BOTTOM], CSS_UNDEFINED)
     
+    // dimension
+    WX_STYLE_RESET_CSS_NODE(width, dimensions[CSS_WIDTH], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(height, dimensions[CSS_HEIGHT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(minWidth, minDimensions[CSS_WIDTH], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(minHeight, minDimensions[CSS_HEIGHT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(maxWidth, maxDimensions[CSS_WIDTH], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
+    
     // margin
-    WX_STYLE_RESET_CSS_NODE(marginStart, margin[CSS_START], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(marginEnd, margin[CSS_END], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(margin, margin, CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], CSS_UNDEFINED)
     
     // border
-    WX_STYLE_RESET_CSS_NODE(paddingStart, border[CSS_START], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(paddingEnd, border[CSS_END], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(borderWidth, border, CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], CSS_UNDEFINED)
     
     // padding
-    WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_START], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_END], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(padding, padding, CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], CSS_UNDEFINED)
 }
 
 - (void)_fillAbsolutePositions
