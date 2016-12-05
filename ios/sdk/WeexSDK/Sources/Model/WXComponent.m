@@ -443,8 +443,8 @@
 {
     if ([elements containsObject:@"height"]) {
         _cssNode->style.dimensions[CSS_HEIGHT] = NAN;
+        [self setNeedsLayout];
     }
-    [self setNeedsLayout];
 }
 
 - (void)_resetCSSNodeStyles:(NSArray *)elements
