@@ -439,6 +439,11 @@ do {\
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = 0;
+        [self setNeedsRepaint];
+        [self setNeedsLayout];
+    }
 }
 
 @end

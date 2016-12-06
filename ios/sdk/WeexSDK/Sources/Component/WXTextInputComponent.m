@@ -641,5 +641,9 @@ WX_EXPORT_METHOD(@selector(blur))
     if ([styles containsObject:@"color"]) {
         [_inputView setTextColor:[UIColor blackColor]];
     }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = 0;
+        [self setTextFont];
+    }
 }
 @end

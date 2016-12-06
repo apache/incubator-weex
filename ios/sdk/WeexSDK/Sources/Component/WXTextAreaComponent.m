@@ -568,6 +568,10 @@
         _color = [UIColor blackColor];
         [_textView setTextColor:[UIColor blackColor]];
     }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = 0;
+        [self setTextFont];
+    }
 }
 
 @end
