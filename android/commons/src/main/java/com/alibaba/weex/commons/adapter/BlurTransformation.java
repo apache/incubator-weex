@@ -202,208 +202,37 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.alibaba.weex.commons.adapter;
 
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXImageSharpen;
-import com.taobao.weex.utils.WXLogUtils;
+import android.graphics.Bitmap;
 
-import java.util.Map;
+import com.squareup.picasso.Transformation;
 
-/**
- * store value of component attribute
- *
- */
-public class WXAttr extends SafePutConcurrentHashMap<String, Object> {
+public class BlurTransformation implements Transformation {
 
-  private static final long serialVersionUID = -2619357510079360946L;
+  private int mRadius;
 
-  public static String getPrefix(Map<String, Object> attr) {
-    if (attr == null) {
-      return null;
-    }
-    Object src = attr.get(Constants.Name.PREFIX);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
+  public BlurTransformation(int radius) {
+    mRadius = radius;
   }
 
-  public static String getSuffix(Map<String, Object> attr) {
-    if (attr == null) {
-      return null;
+  @Override public Bitmap transform(Bitmap source) {
+    if(mRadius <= 0) {
+      return source;
     }
-    Object src = attr.get(Constants.Name.SUFFIX);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
-  }
-
-  /**
-   * Compatible with value、content
-   *
-   * @return
-   */
-  public static String getValue(Map<String, Object> attr) {
-    if (attr == null) {
-      return null;
-    }
-    Object src = attr.get(Constants.Name.VALUE);
-    if (src == null) {
-      src = attr.get("content");
-      if (src == null) {
-        return null;
-      }
-    }
-    return src.toString();
-  }
-
-  public WXImageQuality getImageQuality() {
-
-    Object obj = get(Constants.Name.QUALITY);
-    if (obj == null) {
-      obj = get(Constants.Name.IMAGE_QUALITY);
-    }
-    if (obj == null) {
-      return WXImageQuality.LOW;
-    }
-    WXImageQuality waImageQuality = WXImageQuality.LOW;
-    String imageQuality = obj.toString();
-    if (imageQuality.equals(Constants.Value.ORIGINAL)) {
-      waImageQuality = WXImageQuality.ORIGINAL;
-    } else if (imageQuality.equals(Constants.Value.LOW)) {
-      waImageQuality = WXImageQuality.LOW;
-    } else if (imageQuality.equals(Constants.Value.NORMAL)) {
-      waImageQuality = WXImageQuality.NORMAL;
-    } else if (imageQuality.equals(Constants.Value.HIGH)) {
-      waImageQuality = WXImageQuality.HIGH;
-    }
-
-    return waImageQuality;
-  }
-
-  public WXImageSharpen getImageSharpen() {
-    Object obj = get(Constants.Name.SHARPEN);
-    if (obj == null) {
-      obj = get(Constants.Name.IMAGE_SHARPEN);
-    }
-    if (obj == null) {
-      return WXImageSharpen.UNSHARPEN;
-    }
-    String imageSharpen = obj.toString();
-    WXImageSharpen waImageSharpen = WXImageSharpen.UNSHARPEN;
-    if (imageSharpen.equals("sharpen")) {
-      waImageSharpen = WXImageSharpen.SHARPEN;
-    }
-
-    return waImageSharpen;
-  }
-
-  public int getImageBlurRadius(){
-    Object blurRadius = get(Constants.Name.BLUR);
-    if(blurRadius == null) {
-      return 0;
-    }
-
-    int radius;
+    Bitmap bitmap;
     try {
-      radius = Integer.parseInt(String.valueOf(blurRadius));
-    }catch (Exception e) {
-      radius = 0;
+      bitmap = BlurTool.blur(source, mRadius);
+    }catch (Exception e){
+      bitmap = source;
     }
-    return radius;
+    if(bitmap != source) {
+      source.recycle();
+    }
+    return bitmap;
   }
 
-  public String getImageSrc() {
-    Object src = get(Constants.Name.SRC);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
-  }
-
-  public boolean showIndicators() {
-    Object obj = get(Constants.Name.SHOW_INDICATORS);
-    if (obj == null) {
-      return true;
-    }
-
-    try {
-      return Boolean.parseBoolean(String.valueOf(obj));
-    } catch (Exception e) {
-      WXLogUtils.e("[WXAttr] showIndicators:", e);
-    }
-    return true;
-  }
-
-  public boolean autoPlay() {
-    Object obj = get(Constants.Name.AUTO_PLAY);
-    if (obj == null) {
-      return false;
-    }
-
-    try {
-      return Boolean.parseBoolean(String.valueOf(obj));
-    } catch (Exception e) {
-      WXLogUtils.e("[WXAttr] autoPlay:", e);
-    }
-    return false;
-  }
-
-  public String getScope() {
-    Object src = get(Constants.Name.SCOPE);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
-  }
-  public String getLoadMoreRetry() {
-    Object src = get(Constants.Name.LOADMORERETRY);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
-  }
-
-  public String getLoadMoreOffset() {
-    Object src = get(Constants.Name.LOADMOREOFFSET);
-    if (src == null) {
-      return null;
-    }
-    return src.toString();
-  }
-
-  public String optString(String key){
-    if(contains(key)){
-      Object value = get(key);
-      if (value instanceof String) {
-        return (String) value;
-      } else if (value != null) {
-        return String.valueOf(value);
-      }
-    }
-    return "";
-  }
-
-  public boolean getIsRecycleImage() {
-    Object obj = get(Constants.Name.RECYCLE_IMAGE);
-    if (obj == null) {
-      return true;
-    }
-
-    try {
-      return Boolean.parseBoolean(String.valueOf(obj));
-    } catch (Exception e) {
-      WXLogUtils.e("[WXAttr] recycleImage:", e);
-    }
-    return false;
-  }
-  public String getScrollDirection() {
-    Object scrollDirection = get("scrollDirection");
-    if (scrollDirection == null) {
-      return "vertical";
-    }
-    return scrollDirection.toString();
+  @Override public String key() {
+    return "BlurTransformation(radius=" + mRadius + ")";
   }
 }
