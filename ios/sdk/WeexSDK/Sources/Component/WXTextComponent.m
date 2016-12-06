@@ -439,6 +439,11 @@ do {\
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = WX_TEXT_FONT_SIZE;
+        [self setNeedsRepaint];
+        [self setNeedsLayout];
+    }
 }
 
 @end
