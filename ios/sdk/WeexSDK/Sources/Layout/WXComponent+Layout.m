@@ -294,22 +294,25 @@ do {\
     WX_STYLE_RESET_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], CSS_UNDEFINED)
     
     // margin
-    WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(margin, margin, 0.0)
+    WX_STYLE_RESET_CSS_NODE(marginTop, margin[CSS_TOP], 0.0)
+    WX_STYLE_RESET_CSS_NODE(marginLeft, margin[CSS_LEFT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(marginRight, margin[CSS_RIGHT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(marginBottom, margin[CSS_BOTTOM], 0.0)
     
     // border
-    WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(borderWidth, border, 0.0)
+    WX_STYLE_RESET_CSS_NODE(borderTopWidth, border[CSS_TOP], 0.0)
+    WX_STYLE_RESET_CSS_NODE(borderLeftWidth, border[CSS_LEFT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(borderRightWidth, border[CSS_RIGHT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], 0.0)
     
     // padding
-    WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], CSS_UNDEFINED)
-    WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], CSS_UNDEFINED)
+    WX_STYLE_RESET_CSS_NODE_ALL_DIRECTION(padding, padding, 0.0)
+    WX_STYLE_RESET_CSS_NODE(paddingTop, padding[CSS_TOP], 0.0)
+    WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], 0.0)
+    WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
 }
 
 - (void)_fillAbsolutePositions
