@@ -210,7 +210,7 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWasShown:)
-                                                 name:UIKeyboardDidShowNotification
+                                                 name:UIKeyboardWillShowNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -636,9 +636,9 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark -reset color
-- (void)resetStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)styles
 {
-    if ([elements containsObject:@"color"]) {
+    if ([styles containsObject:@"color"]) {
         [_inputView setTextColor:[UIColor blackColor]];
     }
 }

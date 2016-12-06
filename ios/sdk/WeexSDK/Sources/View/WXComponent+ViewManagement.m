@@ -90,17 +90,6 @@
 
 #pragma mark Private
 
-- (UIColor *) _fetchBackgroundColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(self) {
-        if([value isKindOfClass:[NSString class]] && [@"" isEqualToString:[WXConvert NSString:value]]) {
-            color = [UIColor clearColor];
-        }
-    }
-    return color;
-}
-
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
     _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
@@ -173,10 +162,10 @@
     }
 }
 
--(void)_resetStyles:(NSDictionary *)styles
+-(void)_resetStyles:(NSArray *)styles
 {
-    if (styles[@"backgroundColor"]) {
-        _backgroundColor = styles[@"backgroundColor"] ? [self _fetchBackgroundColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    if (styles && [styles containsObject:@"backgroundColor"]) {
+        _backgroundColor = [UIColor clearColor];
     }
 }
 
