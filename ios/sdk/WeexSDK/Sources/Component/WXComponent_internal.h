@@ -110,9 +110,9 @@
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles;
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles;
+- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes;
 
 - (void)_addEventOnComponentThread:(NSString *)eventName;
@@ -142,6 +142,8 @@
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 
+- (void)_resetCSSNodeStyles:(NSArray *)styles;
+
 - (void)_recomputeCSSNodeChildren;
 
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating;
@@ -150,7 +152,7 @@
 
 - (void)_updateViewStyles:(NSDictionary *)styles;
 
-- (void)_resetStyles:(NSDictionary *)styles;
+- (void)_resetStyles:(NSArray *)styles;
 
 - (void)_initEvents:(NSArray *)events;
 
@@ -163,12 +165,5 @@
 - (void)_handleFirstScreenTime;
 
 - (void)_resetNativeBorderRadius;
-/**
- * @abstract Called when component's style are reset
- *
- * @param elements The reset CSS Nodestyle's elements
- * @discussion It can be overrided to handle specific style reseting.
- **/
-- (void)_resetCSSNodeStyles:(NSArray *)elements;
 
 @end

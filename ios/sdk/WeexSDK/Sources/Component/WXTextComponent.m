@@ -407,9 +407,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSDictionary *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
-    [super _updateStylesOnComponentThread:styles resetStyles:(NSDictionary *)resetStyles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
     
     [self fillCSSStyles:styles];
     
@@ -431,10 +431,11 @@ do {\
     return super.description;
 }
 #endif
-
-- (void)_resetCSSNodeStyles:(NSArray *)elements
+ 
+- (void)_resetCSSNodeStyles:(NSArray *)styles
 {
-    if ([elements containsObject:@"color"]) {
+    [super _resetCSSNodeStyles:styles];
+    if ([styles containsObject:@"color"]) {
         _color = [UIColor blackColor];
         [self setNeedsRepaint];
     }

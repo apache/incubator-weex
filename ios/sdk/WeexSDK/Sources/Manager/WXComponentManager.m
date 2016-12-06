@@ -324,30 +324,17 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     return NO;
 }
 
--(NSDictionary *)fetchResetStyles:(NSDictionary *)styles
+-(void)filterStyles:(NSDictionary *)styles normalStyles:(NSMutableDictionary *)normalStyles resetStyles:(NSMutableArray *)resetStyles
 {
-    NSMutableDictionary *resetStyles = [@{} mutableCopy];
     for (NSString *key in styles) {
         id value = [styles objectForKey:key];
         if([self isShouldReset:value]) {
-            [resetStyles setValue:styles[key] forKey:key];
+            [resetStyles addObject:key];
+        }else{
+            [normalStyles setObject:styles[key] forKey:key];
         }
     }
-    return resetStyles;
 }
-
--(NSDictionary *)fetchStyles:(NSDictionary *)styles
-{
-    NSMutableDictionary *normalStyles = [@{} mutableCopy];
-    for (NSString *key in styles) {
-        id value = [styles objectForKey:key];
-        if(![self isShouldReset:value]) {
-            [normalStyles setValue:styles[key] forKey:key];
-        }
-    }
-    return normalStyles;
-}
-
 
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
@@ -357,8 +344,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponent *component = [_indexDict objectForKey:ref];
     WXAssertComponentExist(component);
     
-    NSDictionary *normalStyles = [[self fetchStyles:styles] mutableCopy];
-    NSDictionary *resetStyles = [[self fetchResetStyles:styles] mutableCopy];
+    NSMutableDictionary *normalStyles = [NSMutableDictionary new];
+    NSMutableArray *resetStyles = [NSMutableArray new];
+    [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
     [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
