@@ -440,7 +440,7 @@ do {\
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {
-        _fontSize = 0;
+        _fontSize = WX_TEXT_FONT_SIZE;
         [self setNeedsRepaint];
         [self setNeedsLayout];
     }
