@@ -205,6 +205,7 @@
 package com.taobao.weex;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
@@ -219,6 +220,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -729,6 +731,13 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
       }
     }
     return false;
+  }
+
+  /**
+   * Bridge the  onActivityResult callback of Activity to Instance;
+   * */
+  public void onActivityResult(int requestCode, int resultCode, Intent data){
+    WXModuleManager.onActivityResult(getInstanceId(),requestCode,resultCode,data);
   }
 
   public void onViewCreated(final WXComponent component) {

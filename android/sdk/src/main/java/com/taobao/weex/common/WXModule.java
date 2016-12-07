@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.common;
 
+import android.content.Intent;
+
 import com.taobao.weex.WXSDKInstance;
 
 /**
@@ -220,4 +222,8 @@ public abstract class WXModule implements IWXObject {
 
 
   public WXSDKInstance mWXSDKInstance;
-}
+
+  public void onActivityResult(int requestCode, int resultCode, Intent data){};
+
+
+  }
