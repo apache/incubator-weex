@@ -325,16 +325,19 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   private void ensureShadow() {
-    shadow.clear();
+    List<View> temp = new ArrayList<>();
     if (needLoop && views.size() > 2) {
-      shadow.add(0, views.get(views.size() - 1));
+      temp.add(0, views.get(views.size() - 1));
       for (View view : views) {
-        shadow.add(view);
+        temp.add(view);
       }
-      shadow.add(views.get(0));
+      temp.add(views.get(0));
     } else {
-      shadow.addAll(views);
+      temp.addAll(views);
     }
+    shadow.clear();
+    notifyDataSetChanged();
+    shadow.addAll(temp);
     notifyDataSetChanged();
   }
 
