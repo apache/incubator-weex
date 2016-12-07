@@ -221,7 +221,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -233,6 +232,7 @@ import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
+import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
@@ -623,7 +623,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
               RecyclerView.LayoutManager layoutManager;
               boolean beforeFirstVisibleItem = false;
               if((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager){
-                int fVisible = ((LinearLayoutManager)layoutManager).findFirstCompletelyVisibleItemPosition();
+                int fVisible = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
                 int pos = mChildren.indexOf(stickyComponent);
 
                 if( pos <= fVisible){
@@ -684,10 +684,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       if (child == null || index < -1) {
           return;
       }
-      if (checkRefreshOrLoading(child)) {
-          return;
-      }
-
+      setRefreshOrLoading(child);
       int count = mChildren.size();
       index = index >= count ? -1 : index;
       if (index == -1) {
@@ -720,10 +717,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
      * Setting refresh view and loading view
      * @param child the refresh_view or loading_view
      */
-    private boolean checkRefreshOrLoading(final WXComponent child) {
+    private boolean setRefreshOrLoading(final WXComponent child) {
 
         if(getHostView() == null){
-            WXLogUtils.e(TAG, "checkRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
+            WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
             return true;
         }
         if (child instanceof WXRefresh) {
@@ -886,7 +883,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
                             component.applyLayoutAndEvent(component);
                             return new ListBaseViewHolder(component, viewType);
                         }
-                    } else {
+                    } else if (component instanceof WXBaseRefresh){
+                      return createVHForRefreshComponent(viewType);
+                    }else {
                         WXLogUtils.e(TAG, "List cannot include element except cell、header、fixed、refresh and loading");
                         return createVHForFakeComponent(viewType);
                     }
@@ -1127,4 +1126,12 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     public void resetLoadmore() {
         mLoadMoreRetry = "";
     }
+
+  private ListBaseViewHolder createVHForRefreshComponent(int viewType) {
+    FrameLayout view = new FrameLayout(getContext());
+    view.setBackgroundColor(Color.WHITE);
+    view.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
+    view.setVisibility(View.GONE);
+    return new ListBaseViewHolder(view, viewType);
+  }
 }
