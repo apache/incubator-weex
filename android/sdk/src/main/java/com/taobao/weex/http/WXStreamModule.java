@@ -364,9 +364,15 @@ public class WXStreamModule extends WXModule {
               resp.put("data", null);
             } else {
               String respData = readAsString(response.originalData,
-                headers!=null?getHeader(headers,"Content-Type"):""
+                      headers != null ? getHeader(headers, "Content-Type") : ""
               );
-              resp.put("data",parseJson(respData,options.getType()));
+              try {
+                resp.put("data", parseJson(respData, options.getType()));
+              } catch (JSONException exception) {
+                WXLogUtils.e("", exception);
+                resp.put("ok", false);
+                resp.put("data","{'err':'Data parse failed!'}");
+              }
             }
             resp.put(STATUS_TEXT, Status.getStatusText(response.statusCode));
           }
@@ -377,7 +383,7 @@ public class WXStreamModule extends WXModule {
     }, progressCallback);
   }
 
-  Object parseJson(String data,Options.Type type){
+  Object parseJson(String data,Options.Type type) throws JSONException{
     if( type == Options.Type.json){
       return JSONObject.parse(data);
     }else if( type == Options.Type.jsonp){

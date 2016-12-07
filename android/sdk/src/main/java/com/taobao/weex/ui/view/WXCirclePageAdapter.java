@@ -309,10 +309,14 @@ public class WXCirclePageAdapter extends PagerAdapter {
 
   @Override
   public int getItemPosition(Object object) {
+    return POSITION_NONE;
+  }
+
+  public int getItemIndex(Object object) {
     if (object instanceof View) {
       return views.indexOf(object);
     } else {
-      return POSITION_UNCHANGED;
+      return -1;
     }
   }
 
@@ -322,11 +326,8 @@ public class WXCirclePageAdapter extends PagerAdapter {
 
   private void ensureShadow() {
     shadow.clear();
-    if (needLoop) {
+    if (needLoop && views.size() > 2) {
       shadow.add(0, views.get(views.size() - 1));
-      for (View view : views) {
-        shadow.add(view);
-      }
       for (View view : views) {
         shadow.add(view);
       }
@@ -341,13 +342,13 @@ public class WXCirclePageAdapter extends PagerAdapter {
     if (shadowPosition < 0 || shadowPosition >= shadow.size()) {
       return -1;
     } else {
-      return getItemPosition(shadow.get(shadowPosition));
+      return getItemIndex(shadow.get(shadowPosition));
     }
   }
 
   public int getFirst() {
-    if (needLoop) {
-      return getRealCount() + 1;
+    if (needLoop && views.size() > 2) {
+      return 1;
     } else {
       return 0;
     }
