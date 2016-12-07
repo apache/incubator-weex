@@ -133,7 +133,7 @@
         NSString *callbackId = [callback toString];
         
         WXLogDebug(@"Calling native... instance:%@, tasks:%@, callback:%@", instanceId, tasksArray, callbackId);
-        return [JSValue valueWithInt32:callNative(instanceId, tasksArray, callbackId) inContext:[JSContext currentContext]];
+        return [JSValue valueWithInt32:(int32_t)callNative(instanceId, tasksArray, callbackId) inContext:[JSContext currentContext]];
     };
     
     _jsContext[@"callNative"] = callNativeBlock;
@@ -151,7 +151,7 @@
         
          WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
         
-        return [JSValue valueWithInt32:callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
+        return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
     };
 
     _jsContext[@"callAddElement"] = callAddElementBlock;
