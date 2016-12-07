@@ -472,6 +472,17 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
       mViewPager.setCurrentItem(index);
+      if (mIndicator != null && mIndicator.getHostView() != null
+              && mIndicator.getHostView().getRealCurrentItem() != index) {
+        //OnPageChangeListener not triggered
+        WXLogUtils.d("setIndex >>>> correction indicator to " + index);
+        mIndicator.getHostView().setRealCurrentItem(index);
+        mIndicator.getHostView().invalidate();
+
+        if (mPageChangeListener != null && mAdapter != null) {
+          mPageChangeListener.onPageSelected(mAdapter.getFirst() + index);
+        }
+      }
     }
   }
 
@@ -490,7 +501,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         return;
       }
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("onPageSelected >>>>" + mAdapter.getRealPosition(pos));
+        WXLogUtils.d("onPageSelected >>>>" + mAdapter.getRealPosition(pos) + " lastPos: " + lastPos);
       }
       if (mAdapter == null || mAdapter.getRealCount() == 0) {
         return;
