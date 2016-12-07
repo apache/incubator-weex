@@ -599,57 +599,57 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
     @Override
     public void onBeforeScroll(int dx, int dy) {
-        if (mStickyMap == null) {
+      if (mStickyMap == null) {
+        return;
+      }
+      HashMap<String, WXComponent> stickyMap = mStickyMap.get(getRef());
+      if (stickyMap == null) {
+        return;
+      }
+      Iterator<Map.Entry<String, WXComponent>> iterator = stickyMap.entrySet().iterator();
+      Map.Entry<String, WXComponent> entry;
+      WXComponent stickyComponent;
+      while (iterator.hasNext()) {
+        entry = iterator.next();
+        stickyComponent = entry.getValue();
+
+        if (stickyComponent != null && stickyComponent.getDomObject() != null
+            && stickyComponent instanceof WXCell) {
+
+          WXCell cell = (WXCell) stickyComponent;
+          if (cell.getHostView() == null) {
             return;
-        }
-        HashMap<String, WXComponent> stickyMap = mStickyMap.get(getRef());
-        if (stickyMap == null) {
-            return;
-        }
-        Iterator<Map.Entry<String, WXComponent>> iterator = stickyMap.entrySet().iterator();
-        Map.Entry<String, WXComponent> entry;
-        WXComponent stickyComponent;
-        while (iterator.hasNext()) {
-            entry = iterator.next();
-            stickyComponent = entry.getValue();
-
-            if (stickyComponent != null && stickyComponent.getDomObject() != null
-                    && stickyComponent instanceof WXCell) {
-
-                WXCell cell = (WXCell) stickyComponent;
-                if (cell.getHostView() == null) {
-                    return;
-                }
+          }
 
 
-              RecyclerView.LayoutManager layoutManager;
-              boolean beforeFirstVisibleItem = false;
-              if((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager){
-                int fVisible = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
-                int pos = mChildren.indexOf(cell);
+          RecyclerView.LayoutManager layoutManager;
+          boolean beforeFirstVisibleItem = false;
+          if ((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager) {
+            int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            int pos = mChildren.indexOf(cell);
 
-                if( pos <= fVisible){
-                  beforeFirstVisibleItem = true;
-                }
-              }
-
-                int[] location = new int[2];
-                stickyComponent.getHostView().getLocationOnScreen(location);
-                int[] parentLocation = new int[2];
-                stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
-
-                int top = location[1] - parentLocation[1];
-
-                boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
-                boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
-                if (showSticky) {
-                    bounceRecyclerView.notifyStickyShow(cell);
-                } else if (removeSticky) {
-                    bounceRecyclerView.notifyStickyRemove(cell);
-                }
-                cell.setLocationFromStart(top);
+            if (pos <= fVisible) {
+              beforeFirstVisibleItem = true;
             }
+          }
+
+          int[] location = new int[2];
+          stickyComponent.getHostView().getLocationOnScreen(location);
+          int[] parentLocation = new int[2];
+          stickyComponent.getParentScroller().getView().getLocationOnScreen(parentLocation);
+
+          int top = location[1] - parentLocation[1];
+
+          boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
+          boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
+          if (showSticky) {
+            bounceRecyclerView.notifyStickyShow(cell);
+          } else if (removeSticky) {
+            bounceRecyclerView.notifyStickyRemove(cell);
+          }
+          cell.setLocationFromStart(top);
         }
+      }
     }
 
   @Override
