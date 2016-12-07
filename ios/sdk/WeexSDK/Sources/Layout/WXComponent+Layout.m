@@ -105,13 +105,24 @@
     
     if ([self isViewLoaded] && isChanged && [self isViewFrameSyncWithCalculated]) {
         
+        __weak typeof(self) weakSelf = self;
         [self.weexInstance.componentManager _addUITask:^{
-            self.view.frame = _calculatedFrame;
-            if (_transform) {
-                _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf->_transform && !CATransform3DEqualToTransform(strongSelf.layer.transform, CATransform3DIdentity)) {
+                // From the UIView's frame documentation:
+                // https://developer.apple.com/reference/uikit/uiview#//apple_ref/occ/instp/UIView/frame
+                // Warning : If the transform property is not the identity transform, the value of this property is undefined and therefore should be ignored.
+                // So layer's transform must be reset to CATransform3DIdentity before setFrame, otherwise frame will be incorrect
+                strongSelf.layer.transform = CATransform3DIdentity;
             }
             
-            [self setNeedsDisplay];
+            strongSelf.view.frame = strongSelf.calculatedFrame;
+            
+            if (strongSelf->_transform) {
+                strongSelf.layer.transform = [[WXTransform new] getTransform:strongSelf->_transform withView:strongSelf.view withOrigin:strongSelf->_transformOrigin];
+            }
+            
+            [strongSelf setNeedsDisplay];
         }];
     }
 }
