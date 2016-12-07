@@ -234,7 +234,10 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     @Override
     public void run() {
       //don't override ViewPager#setCurrentItem(int item, bool smoothScroll)
+      WXLogUtils.d("[CircleViewPager] trigger auto play action");
       setCurrentItem(WXCircleViewPager.super.getCurrentItem()+1, true);
+      removeCallbacks(this);
+      postDelayed(this, intervalTime);
     }
   };
 
@@ -255,10 +258,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
 
       @Override
       public void onPageSelected(int position) {
-        if (isAutoScroll()) {
-          removeCallbacks(scrollAction);
-          postDelayed(scrollAction, intervalTime);
-        }
+
       }
 
       @Override
