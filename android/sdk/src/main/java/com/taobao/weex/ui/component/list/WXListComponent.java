@@ -615,7 +615,9 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
             if (stickyComponent != null && stickyComponent.getDomObject() != null
                     && stickyComponent instanceof WXCell) {
-                if (stickyComponent.getHostView() == null) {
+
+                WXCell cell = (WXCell) stickyComponent;
+                if (cell.getHostView() == null) {
                     return;
                 }
 
@@ -624,7 +626,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
               boolean beforeFirstVisibleItem = false;
               if((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager){
                 int fVisible = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
-                int pos = mChildren.indexOf(stickyComponent);
+                int pos = mChildren.indexOf(cell);
 
                 if( pos <= fVisible){
                   beforeFirstVisibleItem = true;
@@ -638,14 +640,14 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
                 int top = location[1] - parentLocation[1];
 
-                boolean showSticky = beforeFirstVisibleItem && ((WXCell) stickyComponent).lastLocationY >= 0 && top <= 0 && dy >= 0;
-                boolean removeSticky = ((WXCell) stickyComponent).lastLocationY <= 0 && top > 0 && dy <= 0;
+                boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
+                boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
                 if (showSticky) {
-                    bounceRecyclerView.notifyStickyShow((WXCell) stickyComponent);
+                    bounceRecyclerView.notifyStickyShow(cell);
                 } else if (removeSticky) {
-                    bounceRecyclerView.notifyStickyRemove((WXCell) stickyComponent);
+                    bounceRecyclerView.notifyStickyRemove(cell);
                 }
-                ((WXCell) stickyComponent).lastLocationY = top;
+                cell.setLocationFromStart(top);
             }
         }
     }
