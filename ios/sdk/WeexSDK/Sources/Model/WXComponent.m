@@ -22,6 +22,7 @@
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXThreadSafeMutableArray.h"
 #import "WXTransform.h"
+#import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
@@ -140,7 +141,7 @@
 {
     NSArray *events;
     pthread_mutex_lock(&_propertyMutex);
-    events = _events;
+    events = [_events copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return events;
@@ -183,7 +184,7 @@
         if (![self _needsDrawBorder]) {
             _layer.borderColor = _borderTopColor.CGColor;
             _layer.borderWidth = _borderTopWidth;
-            _layer.cornerRadius = _borderTopLeftRadius;
+            [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
         }
@@ -235,6 +236,12 @@
         WXComponent *subcomponent = subcomponents[i];
         [self insertSubview:subcomponent atIndex:i];
     }
+}
+
+- (void)_resetNativeBorderRadius
+{
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopRightRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    _layer.cornerRadius = borderRect.radii.topLeft;
 }
 
 - (void)_handleFirstScreenTime
@@ -348,12 +355,13 @@
 
 #pragma mark Updating
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     pthread_mutex_lock(&_propertyMutex);
     [_styles addEntriesFromDictionary:styles];
     pthread_mutex_unlock(&_propertyMutex);
     [self _updateCSSNodeStyles:styles];
+    [self _resetCSSNodeStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
@@ -377,14 +385,16 @@
     pthread_mutex_unlock(&_propertyMutex);
 }
 
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles
+- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
     
     [self _updateViewStyles:styles];
+    [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     
     [self updateStyles:styles];
+    [self resetStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -402,6 +412,12 @@
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+#pragma mark Reset
+- (void)resetStyles:(NSArray *)styles
 {
     WXAssertMainThread();
 }

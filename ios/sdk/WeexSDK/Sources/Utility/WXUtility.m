@@ -25,6 +25,8 @@
 
 void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
 {
+    if (!block) return;
+    
     if ([NSThread isMainThread]) {
         block();
     } else {
@@ -36,6 +38,8 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
 
 void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
 {
+    if (!block) return;
+    
     if ([NSThread isMainThread]) {
         block();
     } else {
@@ -43,6 +47,11 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
             block();
         });
     }
+}
+
+void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+{
+    [WXUtility performBlock:block onThread:thread];
 }
 
 void WXSwizzleInstanceMethod(Class class, SEL original, SEL replaced)
@@ -128,6 +137,26 @@ CGPoint WXPixelPointResize(CGPoint value)
 }
 static BOOL WXNotStat;
 @implementation WXUtility
+
++ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
+{
+    if (!thread || !block) return;
+    
+    if ([NSThread currentThread] == thread) {
+        block();
+    } else {
+        [self performSelector:@selector(_performBlock:)
+                     onThread:thread
+                   withObject:[block copy]
+                waitUntilDone:NO];
+    }
+}
+
++ (void)_performBlock:(void (^)())block
+{
+    block();
+}
+
 
 + (NSDictionary *)getEnvironment
 {
@@ -321,19 +350,15 @@ static BOOL WXNotStat;
     if (fontFamilyDic[@"localSrc"]){
         NSString *fpath = [((NSURL*)fontFamilyDic[@"localSrc"]) path];
         if ([self isFileExist:fpath]) {
-            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithFilename([fpath UTF8String]);
-            CGFontRef customfont = CGFontCreateWithDataProvider(fontDataProvider);
-            
+            // if the font file is not the correct font file. it will crash by singal 9
+            CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
+            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
+            CFRelease(fontURL);
+            CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
             CGDataProviderRelease(fontDataProvider);
-            NSString *fontName = (__bridge NSString *)CGFontCopyFullName(customfont);
-            CFErrorRef error;
-            CTFontManagerRegisterGraphicsFont(customfont, &error);
-            if (error){
-                CTFontManagerUnregisterGraphicsFont(customfont, &error);
-                CTFontManagerRegisterGraphicsFont(customfont, &error);
-            }
-            CGFontRelease(customfont);
-            font = [UIFont fontWithName:fontName size:fontSize];
+            CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
+            CFRelease(graphicFont);
+            font = (__bridge UIFont*)smallFont;
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -367,12 +392,23 @@ static BOOL WXNotStat;
 
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock
 {
+    if ([url isFileURL]) {
+        // local file url
+        NSError * error = nil;
+        if (![WXUtility isFileExist:url.absoluteString]) {
+            error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
+        }
+        completionBlock(url, error);
+        return;
+    }
+    
+    // remote font url
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSURL * downloadPath = nil;
-        if (!error && location) {
-            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url path]]];
-            
+        NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse*)response;
+        if (200 == httpResponse.statusCode && !error && location) {
+            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url absoluteString]]];
             downloadPath = [NSURL fileURLWithPath:file];
             NSFileManager *mgr = [NSFileManager defaultManager];
             NSError * error ;
@@ -383,6 +419,10 @@ static BOOL WXNotStat;
             BOOL result = [mgr moveItemAtURL:location toURL:downloadPath error:&error];
             if (!result) {
                 downloadPath = nil;
+            }
+        } else {
+            if (200 != httpResponse.statusCode) {
+                error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"ErrorMsg": [NSString stringWithFormat:@"can not load the font url %@ ", url.absoluteString]}];
             }
         }
         completionBlock(downloadPath, error);
@@ -592,6 +632,38 @@ CGFloat WXScreenResizeRadio(void)
     CFRelease(uuidStringRef);
     
     return [uuid lowercaseString];
+}
+
++ (NSDate *)dateStringToDate:(NSString *)dateString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
+    [formatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate *date=[formatter dateFromString:dateString];
+    return date;
+}
+
++ (NSDate *)timeStringToDate:(NSString *)timeString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init] ;
+    [formatter setDateFormat:@"HH:mm"];
+    NSDate *date=[formatter dateFromString:timeString];
+    return date;
+}
+
++ (NSString *)dateToString:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSString *str = [dateFormatter stringFromDate:date];
+    return str;
+}
+
++ (NSString *)timeToString:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm"];
+    NSString *str = [dateFormatter stringFromDate:date];
+    return str;
 }
 
 @end

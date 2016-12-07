@@ -50,6 +50,10 @@
     
     if ([self.wx_component _needsDrawBorder]) {
         [self.wx_component _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self.wx_component _resetNativeBorderRadius];
+        });
     }
     NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
     NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
@@ -71,7 +75,7 @@
 {
     if (_textStorage != textStorage) {
         _textStorage = textStorage;
-        [self setNeedsDisplay];
+        [self.wx_component setNeedsDisplay];
     }
 }
 
@@ -114,7 +118,7 @@
     pthread_mutexattr_t _textStorageMutexAttr;
 }
 
-static BOOL _isUsingTextStorageLock = YES;
+static BOOL _isUsingTextStorageLock = NO;
 + (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
 {
     _isUsingTextStorageLock = isUsingTextStorageLock;
@@ -403,9 +407,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
-    [super _updateStylesOnComponentThread:styles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
     
     [self fillCSSStyles:styles];
     
@@ -427,6 +431,20 @@ do {\
     return super.description;
 }
 #endif
+ 
+- (void)_resetCSSNodeStyles:(NSArray *)styles
+{
+    [super _resetCSSNodeStyles:styles];
+    if ([styles containsObject:@"color"]) {
+        _color = [UIColor blackColor];
+        [self setNeedsRepaint];
+    }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = WX_TEXT_FONT_SIZE;
+        [self setNeedsRepaint];
+        [self setNeedsLayout];
+    }
+}
 
 @end
 
