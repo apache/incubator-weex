@@ -206,6 +206,7 @@ package com.taobao.weex.ui.module;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.text.TextUtils;
@@ -215,9 +216,9 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.common.WXModule;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.net.URLDecoder;
@@ -230,7 +231,7 @@ import java.util.Map;
  * for example(weex JS):
  * this.$call('modal','toast',{'message':'test toast','duration': 2.0});
  */
-public class WXModalUIModule extends WXModule {
+public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
 
   public static final String OK = "OK";
   public static final String CANCEL = "Cancel";
@@ -242,7 +243,7 @@ public class WXModalUIModule extends WXModule {
   public static final String CANCEL_TITLE = "cancelTitle";
   public static final String DEFAULT = "default";
   private Toast toast;
-
+  private Dialog activeDialog;
 
   @JSMethod(uiThread = true)
   public void toast(String param) {
@@ -314,6 +315,7 @@ public class WXModalUIModule extends WXModule {
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
       alertDialog.show();
+      tracking(alertDialog);
     } else {
       WXLogUtils.e("[WXModalUIModule] when call alert mWXSDKInstance.getContext() must instanceof Activity");
     }
@@ -366,6 +368,7 @@ public class WXModalUIModule extends WXModule {
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
       alertDialog.show();
+      tracking(alertDialog);
     } else {
       WXLogUtils.e("[WXModalUIModule] when call confirm mWXSDKInstance.getContext() must instanceof Activity");
     }
@@ -428,9 +431,27 @@ public class WXModalUIModule extends WXModule {
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
       alertDialog.show();
+      tracking(alertDialog);
     } else {
       WXLogUtils.e("when call prompt mWXSDKInstance.getContext() must instanceof Activity");
     }
   }
 
+  private void tracking(Dialog dialog) {
+    activeDialog = dialog;
+    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+      @Override
+      public void onDismiss(DialogInterface dialog) {
+        activeDialog = null;
+      }
+    });
+  }
+
+  @Override
+  public void destroy() {
+    if (activeDialog != null && activeDialog.isShowing()) {
+      WXLogUtils.w("Dismiss the active dialog");
+      activeDialog.dismiss();
+    }
+  }
 }

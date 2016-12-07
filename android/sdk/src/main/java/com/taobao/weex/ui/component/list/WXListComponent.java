@@ -608,11 +608,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
               return;
             }
 
-
             RecyclerView.LayoutManager layoutManager;
             boolean beforeFirstVisibleItem = false;
             if ((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager) {
-              int fVisible = ((LinearLayoutManager) layoutManager).findFirstCompletelyVisibleItemPosition();
+              int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
               int pos = mChildren.indexOf(stickyComponent);
 
               if (pos <= fVisible) {
@@ -676,7 +675,19 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   public void addChild(WXComponent child, int index) {
     super.addChild(child,index);
 
+    if (child == null || index < -1) {
+        return;
+    }
+    setRefreshOrLoading(child);
+    int count = mChildren.size();
+    index = index >= count ? -1 : index;
+    if (index == -1) {
+        mChildren.add(child);
+    } else {
+        mChildren.add(index, child);
+    }
     bindViewType(child);
+
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
     BounceRecyclerView view = getHostView();
     if (view != null) {
@@ -729,6 +740,41 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
       value.setCellPosition(index);
     }
   }
+
+  /**
+     * Setting refresh view and loading view
+     * @param child the refresh_view or loading_view
+     */
+    private boolean setRefreshOrLoading(final WXComponent child) {
+
+        if(getHostView() == null){
+            WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
+            return true;
+        }
+        if (child instanceof WXRefresh) {
+            getHostView().setOnRefreshListener((WXRefresh)child);
+            getHostView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getHostView().setHeaderView(child);
+                }
+            },100);
+            return true;
+        }
+
+        if (child instanceof WXLoading) {
+            getHostView().setOnLoadingListener((WXLoading)child);
+            getHostView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getHostView().setFooterView(child);
+                }
+            },100);
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * RecyclerView manage its children in a way that different from {@link WXVContainer}. Therefore,

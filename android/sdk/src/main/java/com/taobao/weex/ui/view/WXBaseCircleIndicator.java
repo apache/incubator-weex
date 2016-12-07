@@ -323,7 +323,7 @@ public class WXBaseCircleIndicator extends FrameLayout implements OnPageChangeLi
 
   @Override
   public void onPageSelected(int position) {
-    realCurrentItem = position % getCount();
+    realCurrentItem = mCircleViewPager.getRealCurrentItem();
     invalidate();
     if (mListener != null) {
       mListener.onPageSelected(position);

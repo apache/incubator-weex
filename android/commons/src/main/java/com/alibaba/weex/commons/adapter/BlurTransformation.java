@@ -204,78 +204,35 @@
  */
 package com.alibaba.weex.commons.adapter;
 
-import android.net.Uri;
-import android.text.TextUtils;
-import android.widget.ImageView;
+import android.graphics.Bitmap;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.common.WXImageStrategy;
-import com.taobao.weex.dom.WXImageQuality;
+import com.squareup.picasso.Transformation;
 
-public class ImageAdapter implements IWXImgLoaderAdapter {
+public class BlurTransformation implements Transformation {
 
-  public ImageAdapter() {
+  private int mRadius;
+
+  public BlurTransformation(int radius) {
+    mRadius = radius;
   }
 
-  @Override
-  public void setImage(final String url, final ImageView view,
-                       WXImageQuality quality, final WXImageStrategy strategy) {
+  @Override public Bitmap transform(Bitmap source) {
+    if(mRadius <= 0) {
+      return source;
+    }
+    Bitmap bitmap;
+    try {
+      bitmap = BlurTool.blur(source, mRadius);
+    }catch (Exception e){
+      bitmap = source;
+    }
+    if(bitmap != source) {
+      source.recycle();
+    }
+    return bitmap;
+  }
 
-    WXSDKManager.getInstance().postOnUiThread(new Runnable() {
-
-      @Override
-      public void run() {
-        if(view==null||view.getLayoutParams()==null){
-          return;
-        }
-        if (TextUtils.isEmpty(url)) {
-          view.setImageBitmap(null);
-          return;
-        }
-        String temp = url;
-        if (url.startsWith("//")) {
-          temp = "http:" + url;
-        }
-        if (view.getLayoutParams().width <= 0 || view.getLayoutParams().height <= 0) {
-          return;
-        }
-
-
-        if(!TextUtils.isEmpty(strategy.placeHolder)){
-          Picasso.Builder builder=new Picasso.Builder(WXEnvironment.getApplication());
-          Picasso picasso=builder.build();
-          picasso.load(Uri.parse(strategy.placeHolder)).into(view);
-
-          view.setTag(strategy.placeHolder.hashCode(),picasso);
-        }
-
-        Picasso.with(WXEnvironment.getApplication())
-            .load(temp)
-            .transform(new BlurTransformation(strategy.blurRadius))
-            .into(view, new Callback() {
-              @Override
-              public void onSuccess() {
-                if(strategy.getImageListener()!=null){
-                  strategy.getImageListener().onImageFinish(url,view,true,null);
-                }
-
-                if(!TextUtils.isEmpty(strategy.placeHolder)){
-                  ((Picasso) view.getTag(strategy.placeHolder.hashCode())).cancelRequest(view);
-                }
-              }
-
-              @Override
-              public void onError() {
-                if(strategy.getImageListener()!=null){
-                  strategy.getImageListener().onImageFinish(url,view,false,null);
-                }
-              }
-            });
-      }
-    },0);
+  @Override public String key() {
+    return "BlurTransformation(radius=" + mRadius + ")";
   }
 }

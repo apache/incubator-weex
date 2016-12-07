@@ -1111,8 +1111,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mRootComp.getRealView();
   }
 
-  public View getContainerView(){
+  public View getContainerView() {
     return mRenderContainer;
+  }
+
+  public void setBundleUrl(String url){
+    mBundleUrl = url;
   }
 
   public void onRootCreated(WXComponent root) {

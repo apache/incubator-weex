@@ -272,30 +272,30 @@ public class WXImage extends WXComponent<ImageView> {
     return view;
   }
 
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.RESIZE_MODE:
-        String resize_mode = WXUtils.getString(param, null);
-        if (resize_mode != null) {
-          setResizeMode(resize_mode);
-        }
-        return true;
-      case Constants.Name.RESIZE:
-        String resize = WXUtils.getString(param, null);
-        if (resize != null) {
-          setResize(resize);
-        }
-        return true;
-      case Constants.Name.SRC:
-        String src = WXUtils.getString(param, null);
-        if (src != null) {
-          setSrc(src);
-        }
-        return true;
-      case Constants.Name.IMAGE_QUALITY:
-        return true;
-    }
+    @Override
+    protected boolean setProperty(String key, Object param) {
+      switch (key) {
+        case Constants.Name.RESIZE_MODE:
+          String resize_mode = WXUtils.getString(param, null);
+          if (resize_mode != null)
+            setResizeMode(resize_mode);
+          return true;
+        case Constants.Name.RESIZE:
+          String resize = WXUtils.getString(param, null);
+          if (resize != null)
+            setResize(resize);
+          return true;
+        case Constants.Name.SRC:
+          String src = WXUtils.getString(param, null);
+          if (src != null)
+            setSrc(src);
+          return true;
+        case Constants.Name.IMAGE_QUALITY:
+          return true;
+        case Constants.Name.BLUR:
+          return true;
+
+      }
     return super.setProperty(key, param);
   }
 
@@ -373,39 +373,43 @@ public class WXImage extends WXComponent<ImageView> {
 
   private void setRemoteSrc(Uri rewrited) {
 
-    WXImageStrategy imageStrategy = new WXImageStrategy();
-    imageStrategy.isClipping = true;
+      WXImageStrategy imageStrategy = new WXImageStrategy();
+      imageStrategy.isClipping = true;
 
-    WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
-    imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
+      WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
+      imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
-    imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
-      @Override
-      public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-        if (!result && imageView != null) {
-          imageView.setImageDrawable(null);
+      int radius = getDomObject().getAttrs().getImageBlurRadius();
+      radius = Math.max(0, radius);
+      imageStrategy.blurRadius = Math.min(10, radius);
+
+      imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
+        @Override
+        public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
+          if (!result && imageView != null) {
+            imageView.setImageDrawable(null);
+          }
+          if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("success", result);
+            fireEvent(Constants.Event.ONLOAD, params);
+          }
         }
-        if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
-          Map<String, Object> params = new HashMap<>();
-          params.put("success", result);
-          fireEvent(Constants.Event.ONLOAD, params);
+      });
+
+      WXSDKInstance instance = getInstance();
+      if (getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)) {
+        String attr = (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
+        if (TextUtils.isEmpty(attr)) {
+          imageStrategy.placeHolder = instance.rewriteUri(Uri.parse(attr), URIAdapter.IMAGE).toString();
         }
       }
-    });
 
-    WXSDKInstance instance = getInstance();
-    if (getDomObject().getAttrs().containsKey(Constants.Name.PLACE_HOLDER)) {
-      String attr = (String) getDomObject().getAttrs().get(Constants.Name.PLACE_HOLDER);
-      if(TextUtils.isEmpty(attr)){
-        imageStrategy.placeHolder = instance.rewriteUri(Uri.parse(attr),URIAdapter.IMAGE).toString();
+      IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
+      if (imgLoaderAdapter != null) {
+        imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
+            getDomObject().getAttrs().getImageQuality(), imageStrategy);
       }
-    }
-
-    IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
-    if (imgLoaderAdapter != null) {
-      imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
-                                getDomObject().getAttrs().getImageQuality(), imageStrategy);
-    }
   }
 
   @Override

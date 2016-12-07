@@ -285,6 +285,7 @@ public class Constants {
     String DISABLED = "disabled";
     String VALUE = "value";
     String IMAGE_QUALITY = "imageQuality";
+    String BLUR = "blur";
     String QUALITY = "quality";
     String SRC = "src";
     String PLACE_HOLDER = "placeHolder";
