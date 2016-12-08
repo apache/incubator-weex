@@ -202,88 +202,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.ui.view.WXRefreshLayout;
-import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
-import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
-import com.taobao.weex.utils.WXUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * div component
+ * Created by lixinke on 16/9/19.
  */
-@Component(lazyload = false)
+public class WXRefreshLayout extends WXBaseRefreshLayout {
 
-public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefreshListener{
-
-  @Deprecated
-  public WXRefresh(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
-  }
-
-  public WXRefresh(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-  }
-
-  @Override
-  protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-    return new WXRefreshLayout(context);
-  }
-
-  @Override
-  public void onRefresh() {
-    if (getDomObject().getEvents().contains(Constants.Event.ONREFRESH)) {
-      getInstance().fireEvent(getRef(), Constants.Event.ONREFRESH);
-    }
-  }
-
-  @Override
-  public void onPullingDown(float dy, int headerHeight, float maxHeight) {
-    if (getDomObject().event != null && getDomObject().event.contains(Constants.Event.ONPULLING_DOWN)) {
-      Map<String, Object> data = new HashMap<>();
-      data.put("dy", dy);
-      data.put("headerHeight", headerHeight);
-      data.put("maxHeight", maxHeight);
-      getInstance().fireEvent(getRef(), Constants.Event.ONPULLING_DOWN, data);
-    }
-  }
-
-  @Override
-  protected boolean setProperty(String key, Object param) {
-    switch (key) {
-      case Constants.Name.DISPLAY:
-        String display = WXUtils.getString(param,null);
-        if (display != null)
-          setDisplay(display);
-        return true;
-    }
-    return super.setProperty(key,param);
-  }
-
-  @WXComponentProp(name = Constants.Name.DISPLAY)
-  public void setDisplay(String display) {
-    if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
-        if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
-          if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
-            ((BaseBounceView) getParent().getHostView()).finishPullRefresh();
-            ((BaseBounceView) getParent().getHostView()).onRefreshingComplete();
-          }
-        }
-      }
-    }
+  public WXRefreshLayout(Context context) {
+    super(context);
   }
 }

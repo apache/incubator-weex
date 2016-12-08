@@ -205,6 +205,7 @@
 package com.taobao.weex.ui;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
@@ -215,6 +216,7 @@ import android.widget.ScrollView;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -568,5 +570,25 @@ class WXRenderStatement {
 
   void startAnimation(@NonNull String ref, @NonNull WXAnimationBean animationBean, @Nullable String callBack) {
     WXAnimationModule.startAnimation(mWXSDKInstance, mRegistry.get(ref), animationBean, callBack);
+  }
+
+  public void getComponentSize(String ref, String callback) {
+    WXComponent component = mRegistry.get(ref);
+    Map<String, Object> options = new HashMap<>();
+    if (component != null) {
+      Map<String, String> size = new HashMap<>();
+      Rect sizes = component.getComponentSize();
+      size.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.width())));
+      size.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.height())));
+      size.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.bottom)));
+      size.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.left)));
+      size.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.right)));
+      size.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.top)));
+      options.put("size", size);
+      options.put("result", true);
+    } else {
+      options.put("errMsg", "Component does not exist");
+    }
+    WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
   }
 }
