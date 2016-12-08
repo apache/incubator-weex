@@ -226,16 +226,14 @@ WX_EXPORT_METHOD(@selector(blur))
 
 -(void)focus
 {
-    if(self.inputView)
-    {
+    if(self.inputView) {
         [self.inputView becomeFirstResponder];
     }
 }
 
 -(void)blur
 {
-    if(self.inputView)
-    {
+    if(self.inputView) {
         [self.inputView resignFirstResponder];
     }
 }
