@@ -110,9 +110,9 @@
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles;
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles;
+- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes;
 
 - (void)_addEventOnComponentThread:(NSString *)eventName;
@@ -142,6 +142,8 @@
 
 - (void)_updateCSSNodeStyles:(NSDictionary *)styles;
 
+- (void)_resetCSSNodeStyles:(NSArray *)styles;
+
 - (void)_recomputeCSSNodeChildren;
 
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating;
@@ -150,7 +152,7 @@
 
 - (void)_updateViewStyles:(NSDictionary *)styles;
 
-- (void)_resetViewStyles:(NSDictionary *)styles;
+- (void)_resetStyles:(NSArray *)styles;
 
 - (void)_initEvents:(NSArray *)events;
 

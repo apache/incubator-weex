@@ -58,9 +58,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         } else {
             WXLogWarning(@"image src is nil");
         }
-        if (attributes[@"placeHolder"]) {
-            _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        }
+        [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
@@ -68,6 +66,12 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
     
     return self;
+}
+
+- (void)configPlaceHolder:(NSDictionary*)attributes {
+    if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
+        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
 }
 
 - (UIView *)loadView
@@ -106,9 +110,8 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    if (attributes[@"placeHolder"]) {
-        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    }
+    
+    [self configPlaceHolder:attributes];
     
     if (attributes[@"resize"]) {
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
@@ -204,11 +207,11 @@ static dispatch_queue_t WXImageUpdateQueue;
     
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
-        id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-        NSURL *newURL = [rewriteHandler rewriteURL:placeholderSrc withResourceType:WXResourceTypeImage withInstance:self.weexInstance];
+        NSMutableString *newURL = [_placeholdSrc mutableCopy];
+        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeLink, self.weexInstance, &newURL)
         
         __weak typeof(self) weakSelf = self;
-        self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL.absoluteString imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
+        self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 __strong typeof(self) strongSelf = weakSelf;
                 UIImage *viewImage = ((UIImageView *)strongSelf.view).image;
@@ -233,16 +236,16 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
+    
     NSString *imageSrc = self.imageSrc;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp)};
-        id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];
-        NSURL *newURL = [rewriteHandler rewriteURL:imageSrc withResourceType:WXResourceTypeImage withInstance:self.weexInstance];
-        
+        NSMutableString * newURL = [imageSrc mutableCopy];
+        WX_REWRITE_URL(imageSrc, WXResourceTypeLink, self.weexInstance, &newURL)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL.absoluteString imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
+            weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(self) strongSelf = weakSelf;
                     

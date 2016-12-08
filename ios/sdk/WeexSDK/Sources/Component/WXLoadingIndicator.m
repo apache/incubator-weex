@@ -75,9 +75,9 @@
 }
 
 #pragma mark -reset color
--(void)resetViewStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)styles
 {
-    if ([elements containsObject:@"color"]) {
+    if ([styles containsObject:@"color"]) {
         [self setColor:[UIColor blackColor]];
     }
 }

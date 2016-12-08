@@ -516,6 +516,11 @@
     return rowNumber;
 }
 
+- (void)resetLoadmore{
+    [super resetLoadmore];
+    _previousLoadMoreRowNumber=0;
+}
+
 #pragma mark Private
 
 - (WXCellComponent *)cellForIndexPath:(NSIndexPath *)indexPath

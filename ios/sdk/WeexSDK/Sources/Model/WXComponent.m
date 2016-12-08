@@ -92,7 +92,6 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
-        [self _resetViewStyles:_styles];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -356,12 +355,13 @@
 
 #pragma mark Updating
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     pthread_mutex_lock(&_propertyMutex);
     [_styles addEntriesFromDictionary:styles];
     pthread_mutex_unlock(&_propertyMutex);
     [self _updateCSSNodeStyles:styles];
+    [self _resetCSSNodeStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes
@@ -385,16 +385,16 @@
     pthread_mutex_unlock(&_propertyMutex);
 }
 
-- (void)_updateStylesOnMainThread:(NSDictionary *)styles
+- (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
     
     [self _updateViewStyles:styles];
-    [self _resetViewStyles:styles];
+    [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
-
+    
     [self updateStyles:styles];
-    [self fetchResetViewStyles:styles];
+    [self resetStyles:resetStyles];
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -417,29 +417,7 @@
 }
 
 #pragma mark Reset
--(BOOL)isShouldReset:(id )value
-{
-    if([value isKindOfClass:[NSString class]]) {
-        if(!value || [@"" isEqualToString:value]) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
--(void)fetchResetViewStyles:(NSDictionary *)styles
-{
-    NSMutableArray *elements = [@[] mutableCopy];
-    for (NSString *key in styles) {
-        id value = [styles objectForKey:key];
-        if([self isShouldReset:value]){
-            [elements addObject:key];
-        }
-    }
-    [self resetViewStyles:elements];
-}
-
-- (void)resetViewStyles:(NSArray *)elements
+- (void)resetStyles:(NSArray *)styles
 {
     WXAssertMainThread();
 }

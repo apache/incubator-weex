@@ -11,6 +11,7 @@
 #import "WXUtility.h"
 #import "WXHandlerFactory.h"
 #import "WXNetworkProtocol.h"
+#import "WXURLRewriteProtocol.h"
 
 @implementation WXStreamModule
 
@@ -66,6 +67,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         method = @"GET";
     }
     NSString *urlStr = [options objectForKey:@"url"];
+    NSMutableString *newUrlStr = [urlStr mutableCopy];
+    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &newUrlStr)
+    
     if (!options || [WXUtility isBlankString:urlStr]) {
         [callbackRsp setObject:@(-1) forKey:@"status"];
         [callbackRsp setObject:@false forKey:@"ok"];
@@ -73,6 +77,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         
         return;
     }
+    urlStr = newUrlStr;
     NSDictionary *headers = [options objectForKey:@"headers"];
     NSString *body = [options objectForKey:@"body"];
     NSString *type = [options objectForKey:@"type"];
