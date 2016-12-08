@@ -22,13 +22,25 @@
 #import "WXView.h"
 #import "WXRootView.h"
 #import "WXThreadSafeMutableDictionary.h"
+#import "WXResourceRequest.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
 
+typedef enum : NSUInteger {
+    WXLoadTypeNormal,
+    WXLoadTypeBack,
+    WXLoadTypeForward,
+    WXLoadTypeReload,
+    WXLoadTypeReplace
+} WXLoadType;
+
 @implementation WXSDKInstance
 {
+    NSDictionary *_options;
+    id _data;
+    
     id<WXNetworkProtocol> _networkHandler;
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
@@ -74,6 +86,22 @@ NSTimeInterval JSLibInitTime = 0;
     return _rootView;
 }
 
+
+- (void)setFrame:(CGRect)frame
+{
+    if (!CGRectEqualToRect(frame, _frame)) {
+        _frame = frame;
+        WXPerformBlockOnMainThread(^{
+            if (_rootView) {
+                _rootView.frame = frame;
+                WXPerformBlockOnComponentThread(^{
+                    [self.componentManager rootViewFrameDidChange:frame];
+                });
+            }
+        });
+    }
+}
+
 - (void)renderWithURL:(NSURL *)url
 {
     [self renderWithURL:url options:nil data:nil];
@@ -86,99 +114,16 @@ NSTimeInterval JSLibInitTime = 0;
         return;
     }
     
-    _scriptURL = url;
-    NSMutableDictionary *newOptions = [options mutableCopy];
-    if (!newOptions) {
-        newOptions = [[NSMutableDictionary alloc] init];
-    }
-    if (!newOptions[bundleUrlOptionKey]) {
-        newOptions[bundleUrlOptionKey] = url.absoluteString;
-    }
-    if ([newOptions[bundleUrlOptionKey] isKindOfClass:[NSURL class]]) {
-        newOptions[bundleUrlOptionKey] = ((NSURL*)newOptions[bundleUrlOptionKey]).absoluteString;
-    }
-    
-    if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
-    }
-    
-    __weak typeof(self) weakSelf = self;
-    if ([url isFileURL]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSString *path = [url path];
-            NSData *scriptData = [[NSFileManager defaultManager] contentsAtPath:path];
-            NSString *script = [[NSString alloc] initWithData:scriptData encoding:NSUTF8StringEncoding];
-            if (!script || script.length <= 0) {
-                NSString *errorDesc = [NSString stringWithFormat:@"File read error at url: %@", url];
-                WXLogError(@"%@", errorDesc);
-                if (weakSelf.onFailed) {
-                    weakSelf.onFailed([NSError errorWithDomain:WX_ERROR_DOMAIN code:0 userInfo:@{NSLocalizedDescriptionKey: errorDesc}]);
-                }
-                return;
-            }
-            [weakSelf renderView:script options:newOptions data:data];
-        });
-    } else {
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
-        [request setValue:@"weex" forHTTPHeaderField:@"f-refer"];
-        
-        id<WXNetworkProtocol> networkHandler = [self networkHandler];
-        
-        __block NSURLResponse *urlResponse;
-        [networkHandler sendRequest:request
-                   withSendingData:^(int64_t bytesSent, int64_t totalBytes) {}
-                      withResponse:^(NSURLResponse *response) {
-                          urlResponse = response;
-                      }
-                   withReceiveData:^(NSData *data) {}
-                   withCompeletion:^(NSData *totalData, NSError *error) {
-            //TODO 304
-            if (!error && [urlResponse isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)urlResponse).statusCode != 200) {
-                error = [NSError errorWithDomain:WX_ERROR_DOMAIN
-                                            code:((NSHTTPURLResponse *)urlResponse).statusCode
-                                        userInfo:@{@"message":@"status code error."}];
-            }
-            
-            if (error) {
-                NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ occurs an error:%@", request.URL, error.localizedDescription];
-                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
-                
-                if (weakSelf.onFailed) {
-                    weakSelf.onFailed(error);
-                }
-                return;
-            }
-                       
-            if (!totalData) {
-                NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ but no data return", request.URL];
-                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
-                
-                if (weakSelf.onFailed) {
-                    weakSelf.onFailed(error);
-                }
-                return;
-            }
-                       
-            NSString *script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
-            if (!script) {
-                WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", weakSelf.pageName)
-                return;
-            }
-            
-            WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, weakSelf.pageName);
-            WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, weakSelf);
-
-            [weakSelf renderView:script options:newOptions data:data];
-        }];
-    }
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:url referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
+    [self renderWithRequest:request options:options data:data];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
 {
     WXLogDebug(@"Render view: %@, data:%@", self, [WXUtility JSONString:data]);
+    
+    _options = options;
+    _data = data;
     
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -217,19 +162,117 @@ NSTimeInterval JSLibInitTime = 0;
     WX_MONITOR_PERF_SET(WXPTBundleSize, [source lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
-- (void)setFrame:(CGRect)frame
+
+- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
-    if (!CGRectEqualToRect(frame, _frame)) {
-        _frame = frame;
-        WXPerformBlockOnMainThread(^{
-            if (_rootView) {
-                _rootView.frame = frame;
-                WXPerformBlockOnComponentThread(^{
-                    [self.componentManager rootViewFrameDidChange:frame];
-                });
-            }
-        });
+    NSURL *url = request.URL;
+    _scriptURL = url;
+    NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
+    
+    if (!newOptions[bundleUrlOptionKey]) {
+        newOptions[bundleUrlOptionKey] = url.absoluteString;
     }
+    // compatible with some wrong type, remove this hopefully in the future.
+    if ([newOptions[bundleUrlOptionKey] isKindOfClass:[NSURL class]]) {
+        WXLogWarning(@"Error type in options with key:bundleUrl, should be of type NSString, not NSURL!");
+        newOptions[bundleUrlOptionKey] = ((NSURL*)newOptions[bundleUrlOptionKey]).absoluteString;
+    }
+    
+    if (!self.pageName || [self.pageName isEqualToString:@""]) {
+        self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
+    }
+    
+    [self loadRequest:request loadType:WXLoadTypeNormal options:newOptions data:data];
+}
+
+- (void)loadRequest:(WXResourceRequest *)request loadType:(WXLoadType)loadType options:(NSDictionary *)options data:(id)data;
+{
+    request.userAgent = [WXUtility userAgent];
+    __weak typeof(self) weakSelf = self;
+    if ([url isFileURL]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSString *path = [url path];
+            NSData *scriptData = [[NSFileManager defaultManager] contentsAtPath:path];
+            NSString *script = [[NSString alloc] initWithData:scriptData encoding:NSUTF8StringEncoding];
+            if (!script || script.length <= 0) {
+                NSString *errorDesc = [NSString stringWithFormat:@"File read error at url: %@", url];
+                WXLogError(@"%@", errorDesc);
+                if (weakSelf.onFailed) {
+                    weakSelf.onFailed([NSError errorWithDomain:WX_ERROR_DOMAIN code:0 userInfo:@{NSLocalizedDescriptionKey: errorDesc}]);
+                }
+                return;
+            }
+            [weakSelf renderView:script options:newOptions data:data];
+        });
+    } else {
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
+        [request setValue:@"weex" forHTTPHeaderField:@"f-refer"];
+        
+        id<WXNetworkProtocol> networkHandler = [self networkHandler];
+        
+        __block NSURLResponse *urlResponse;
+        [networkHandler sendRequest:request
+                    withSendingData:^(int64_t bytesSent, int64_t totalBytes) {}
+                       withResponse:^(NSURLResponse *response) {
+                           urlResponse = response;
+                       }
+                    withReceiveData:^(NSData *data) {}
+                    withCompeletion:^(NSData *totalData, NSError *error) {
+                        //TODO 304
+                        if (!error && [urlResponse isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)urlResponse).statusCode != 200) {
+                            error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+                                                        code:((NSHTTPURLResponse *)urlResponse).statusCode
+                                                    userInfo:@{@"message":@"status code error."}];
+                        }
+                        
+                        if (error) {
+                            NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ occurs an error:%@", request.URL, error.localizedDescription];
+                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+                            
+                            if (weakSelf.onFailed) {
+                                weakSelf.onFailed(error);
+                            }
+                            return;
+                        }
+                        
+                        if (!totalData) {
+                            NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ but no data return", request.URL];
+                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+                            
+                            if (weakSelf.onFailed) {
+                                weakSelf.onFailed(error);
+                            }
+                            return;
+                        }
+                        
+                        NSString *script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
+                        if (!script) {
+                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", weakSelf.pageName)
+                            return;
+                        }
+                        
+                        WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, weakSelf.pageName);
+                        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, weakSelf);
+                        
+                        [weakSelf renderView:script options:newOptions data:data];
+                    }];
+    }
+}
+
+- (void)reload:(BOOL)forcedReload
+{
+    // TODO: [self cancel]
+    if (!_scriptURL) {
+        WXLogError(@"No script URL found while reloading!");
+        return;
+    }
+    
+    NSURLRequestCachePolicy cachePolicy = forcedReload ? NSURLRequestReloadIgnoringCacheData : NSURLRequestUseProtocolCachePolicy;
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:_scriptURL referrer:_scriptURL.absoluteString cachePolicy:cachePolicy];
+    [self renderWithRequest:request options:_options data:_data];
 }
 
 - (void)reloadData:(id)data
