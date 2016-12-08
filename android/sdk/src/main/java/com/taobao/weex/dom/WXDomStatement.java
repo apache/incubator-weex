@@ -554,7 +554,7 @@ class WXDomStatement {
           return "createBody";
         }
       });
-      animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+      addAnimationForDomTree(domObject);
       mDirty = true;
 
       if (instance != null) {
@@ -690,7 +690,7 @@ class WXDomStatement {
         return "AddDom";
       }
     });
-    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+    addAnimationForDomTree(domObject);
     mDirty = true;
 
     if (instance != null) {
@@ -1216,6 +1216,13 @@ class WXDomStatement {
         }
       });
       mDirty=true;
+    }
+  }
+
+  private void addAnimationForDomTree(WXDomObject domObject){
+    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+    for(int i=0;i<domObject.childCount();i++){
+      addAnimationForDomTree(domObject.getChild(i));
     }
   }
 
