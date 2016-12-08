@@ -1107,6 +1107,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
     wxParams.setDeviceWidth(TextUtils.isEmpty(config.get("deviceWidth")) ? String.valueOf(WXViewUtils.getScreenWidth(WXEnvironment.sApplication)) : config.get("deviceWidth"));
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
+    wxParams.setOptions(WXEnvironment.getCustomOptions());
     return wxParams;
   }
 
