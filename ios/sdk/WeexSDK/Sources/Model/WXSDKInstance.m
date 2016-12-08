@@ -23,6 +23,8 @@
 #import "WXRootView.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXResourceRequest.h"
+#import "WXResourceResponse.h"
+#import "WXResourceLoader.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -39,14 +41,14 @@ typedef enum : NSUInteger {
 @implementation WXSDKInstance
 {
     NSDictionary *_options;
-    id _data;
+    id _jsData;
     
-    id<WXNetworkProtocol> _networkHandler;
+    WXResourceLoader *_mainBundleLoader;
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [self removeObservers];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -114,17 +116,22 @@ typedef enum : NSUInteger {
         return;
     }
     
-    WXResourceRequest *request = [WXResourceRequest requestWithURL:url referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
-    [self renderWithRequest:request options:options data:data];
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
+    [self _renderWithRequest:request options:options data:data];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
 {
-    WXLogDebug(@"Render view: %@, data:%@", self, [WXUtility JSONString:data]);
+    WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
     
     _options = options;
-    _data = data;
+    _jsData = data;
     
+    [self _renderWithMainBundleString:source];
+}
+
+- (void)_renderWithMainBundleString:(NSString *)mainBundleString
+{
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
@@ -139,13 +146,13 @@ typedef enum : NSUInteger {
     WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, self);
     WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, self);
     
-    NSMutableDictionary *dictionary = [options mutableCopy];
+    NSMutableDictionary *dictionary = [_options mutableCopy];
     if ([WXLog logLevel] >= WXLogLevelLog) {
         dictionary[@"debug"] = @(YES);
     }
     
     if ([WXDebugTool getReplacedBundleJS]) {
-        source = [WXDebugTool getReplacedBundleJS];
+        mainBundleString = [WXDebugTool getReplacedBundleJS];
     }
     
     //TODO WXRootView
@@ -156,17 +163,19 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
-
-    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:source options:dictionary data:data];
-
-    WX_MONITOR_PERF_SET(WXPTBundleSize, [source lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
+    
+    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    
+    WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
 
-- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
+- (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
     NSURL *url = request.URL;
     _scriptURL = url;
+    _options = options;
+    _jsData = data;
     NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
     
     if (!newOptions[bundleUrlOptionKey]) {
@@ -182,102 +191,69 @@ typedef enum : NSUInteger {
         self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
     }
     
-    [self loadRequest:request loadType:WXLoadTypeNormal options:newOptions data:data];
-}
-
-- (void)loadRequest:(WXResourceRequest *)request loadType:(WXLoadType)loadType options:(NSDictionary *)options data:(id)data;
-{
     request.userAgent = [WXUtility userAgent];
+    
+    WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
     __weak typeof(self) weakSelf = self;
-    if ([url isFileURL]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSString *path = [url path];
-            NSData *scriptData = [[NSFileManager defaultManager] contentsAtPath:path];
-            NSString *script = [[NSString alloc] initWithData:scriptData encoding:NSUTF8StringEncoding];
-            if (!script || script.length <= 0) {
-                NSString *errorDesc = [NSString stringWithFormat:@"File read error at url: %@", url];
-                WXLogError(@"%@", errorDesc);
-                if (weakSelf.onFailed) {
-                    weakSelf.onFailed([NSError errorWithDomain:WX_ERROR_DOMAIN code:0 userInfo:@{NSLocalizedDescriptionKey: errorDesc}]);
-                }
-                return;
+    _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
+    _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        
+        if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
+            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+                                        code:((NSHTTPURLResponse *)response).statusCode
+                                    userInfo:@{@"message":@"status code error."}];
+            if (strongSelf.onFailed) {
+                strongSelf.onFailed(error);
             }
-            [weakSelf renderView:script options:newOptions data:data];
-        });
-    } else {
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, self);
+            return ;
+        }
+
+        if (!data) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ With no data return", request.URL];
+            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, strongSelf.pageName);
+
+            if (strongSelf.onFailed) {
+                strongSelf.onFailed(error);
+            }
+            return;
+        }
         
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
-        [request setValue:@"weex" forHTTPHeaderField:@"f-refer"];
+        NSString *jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if (!jsBundleString) {
+            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)
+            return;
+        }
+
+        WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
+
+        [strongSelf _renderWithMainBundleString:jsBundleString];
+    };
+    
+    _mainBundleLoader.onFailed = ^(NSError *loadError) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@", request.URL, loadError.localizedDescription];
+        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
-        id<WXNetworkProtocol> networkHandler = [self networkHandler];
-        
-        __block NSURLResponse *urlResponse;
-        [networkHandler sendRequest:request
-                    withSendingData:^(int64_t bytesSent, int64_t totalBytes) {}
-                       withResponse:^(NSURLResponse *response) {
-                           urlResponse = response;
-                       }
-                    withReceiveData:^(NSData *data) {}
-                    withCompeletion:^(NSData *totalData, NSError *error) {
-                        //TODO 304
-                        if (!error && [urlResponse isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)urlResponse).statusCode != 200) {
-                            error = [NSError errorWithDomain:WX_ERROR_DOMAIN
-                                                        code:((NSHTTPURLResponse *)urlResponse).statusCode
-                                                    userInfo:@{@"message":@"status code error."}];
-                        }
-                        
-                        if (error) {
-                            NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ occurs an error:%@", request.URL, error.localizedDescription];
-                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
-                            
-                            if (weakSelf.onFailed) {
-                                weakSelf.onFailed(error);
-                            }
-                            return;
-                        }
-                        
-                        if (!totalData) {
-                            NSString *errorMessage = [NSString stringWithFormat:@"Connection to %@ but no data return", request.URL];
-                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
-                            
-                            if (weakSelf.onFailed) {
-                                weakSelf.onFailed(error);
-                            }
-                            return;
-                        }
-                        
-                        NSString *script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
-                        if (!script) {
-                            WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", weakSelf.pageName)
-                            return;
-                        }
-                        
-                        WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, weakSelf.pageName);
-                        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, weakSelf);
-                        
-                        [weakSelf renderView:script options:newOptions data:data];
-                    }];
-    }
+        if (weakSelf.onFailed) {
+            weakSelf.onFailed(loadError);
+        }
+    };
+    
+    [_mainBundleLoader start];
 }
 
 - (void)reload:(BOOL)forcedReload
 {
-    // TODO: [self cancel]
+    // TODO: [self unload]
     if (!_scriptURL) {
         WXLogError(@"No script URL found while reloading!");
         return;
     }
     
     NSURLRequestCachePolicy cachePolicy = forcedReload ? NSURLRequestReloadIgnoringCacheData : NSURLRequestUseProtocolCachePolicy;
-    WXResourceRequest *request = [WXResourceRequest requestWithURL:_scriptURL referrer:_scriptURL.absoluteString cachePolicy:cachePolicy];
-    [self renderWithRequest:request options:_options data:_data];
-}
-
-- (void)reloadData:(id)data
-{
-    [self refreshInstance:data];
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:_scriptURL resourceType:WXResourceTypeMainBundle referrer:_scriptURL.absoluteString cachePolicy:cachePolicy];
+    [self _renderWithRequest:request options:_options data:_jsData];
 }
 
 - (void)refreshInstance:(id)data
@@ -355,16 +331,6 @@ typedef enum : NSUInteger {
     return [_componentManager numberOfComponents];
 }
 
-- (void)finishPerformance
-{
-    //deperacated
-}
-
-- (void)creatFinish
-{
-    
-}
-
 - (void)fireGlobalEvent:(NSString *)eventName params:(NSDictionary *)params
 {
     if (!params){
@@ -411,15 +377,6 @@ typedef enum : NSUInteger {
     return _componentManager;
 }
 
-- (id<WXNetworkProtocol>)networkHandler
-{
-    if (!_networkHandler) {
-        _networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
-    }
-    
-    return _networkHandler;
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if ([keyPath isEqualToString:@"state"]) {
@@ -430,6 +387,27 @@ typedef enum : NSUInteger {
             [self destroyInstance];
         }
     }
+}
+
+@end
+
+@implementation WXSDKInstance (Deprecated)
+
+# pragma mark - Deprecated
+
+- (void)reloadData:(id)data
+{
+    [self refreshInstance:data];
+}
+
+- (void)finishPerformance
+{
+    //deperacated
+}
+
+- (void)creatFinish
+{
+    
 }
 
 @end

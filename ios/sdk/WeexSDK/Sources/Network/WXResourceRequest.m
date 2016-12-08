@@ -13,14 +13,20 @@ NSString * const kHTTPHeaderNameReferrer = @"Referer"; // The misspelling refere
 
 @implementation WXResourceRequest
 
-+ (instancetype)requestWithURL:(NSURL *)url referrer:(NSString *)referrer cachePolicy:(NSURLRequestCachePolicy)cachePolicy
++ (instancetype)requestWithURL:(NSURL *)url
+                  resourceType:(WXResourceType)type
+                      referrer:(NSString *)referrer
+                   cachePolicy:(NSURLRequestCachePolicy)cachePolicy
 {
-    return [[self alloc] initWithURL:url referrer:referrer cachePolicy:cachePolicy];
+    return [[self alloc] initWithURL:url resourceType:type referrer:referrer cachePolicy:cachePolicy];
 }
 
-- (instancetype)initWithURL:(NSURL *)url referrer:(NSString *)referrer cachePolicy:(NSURLRequestCachePolicy)cachePolicy
+- (instancetype)initWithURL:(NSURL *)url
+               resourceType:(WXResourceType)type
+                   referrer:(NSString *)referrer cachePolicy:(NSURLRequestCachePolicy)cachePolicy
 {
     if (self = [super initWithURL:url]) {
+        self.type = type;
         self.cachePolicy = cachePolicy;
         [self setValue:referrer forHTTPHeaderField:kHTTPHeaderNameReferrer];
     }
@@ -30,22 +36,22 @@ NSString * const kHTTPHeaderNameReferrer = @"Referer"; // The misspelling refere
 
 - (NSString *)referrer
 {
-    return [self valueForKey:kHTTPHeaderNameReferrer];
+    return [self valueForHTTPHeaderField:kHTTPHeaderNameReferrer];
 }
 
 - (void)setReferrer:(NSString *)referrer
 {
-    [self setValue:referrer forKey:kHTTPHeaderNameReferrer];
+    [self setValue:referrer forHTTPHeaderField:kHTTPHeaderNameReferrer];
 }
 
 - (NSString *)userAgent
 {
-    return [self valueForKey:kHTTPHeaderNameUserAgent];
+    return [self valueForHTTPHeaderField:kHTTPHeaderNameUserAgent];
 }
 
 - (void)setUserAgent:(NSString *)userAgent
 {
-    [self setValue:userAgent forKey:kHTTPHeaderNameUserAgent];
+    [self setValue:userAgent forHTTPHeaderField:kHTTPHeaderNameUserAgent];
 }
 
 @end

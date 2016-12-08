@@ -12,9 +12,10 @@
 #import "WXComponentFactory.h"
 
 #import "WXAppConfiguration.h"
-#import "WXNetworkDefaultImpl.h"
+#import "WXResourceRequestHandlerDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
+
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXMonitor.h"
@@ -119,7 +120,7 @@
 // register some default handlers when the engine initializes.
 + (void)_registerDefaultHandlers
 {
-    [self registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
+    [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
 }

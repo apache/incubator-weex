@@ -63,7 +63,7 @@ static WXRuleManager *_sharedInstance = nil;
             
             NSString *fontSrc = [rule[@"src"] substringWithRange:NSMakeRange(start, end-start)];
             NSMutableString *newFontSrc = [fontSrc mutableCopy];
-            WX_REWRITE_URL(fontSrc, WXResourceTypeLink, self.instance, &newFontSrc)
+            WX_REWRITE_URL(fontSrc, WXResourceTypeFont, self.instance, &newFontSrc)
             
             if (!newFontSrc) {
                 return;

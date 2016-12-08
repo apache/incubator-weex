@@ -90,8 +90,11 @@ static NSString* WXDebugrepJSFramework;
         // HTTP/HTTPS URL
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
-        
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         id<WXNetworkProtocol> networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
+#pragma GCC diagnostic pop
         
         __block NSURLResponse *urlResponse;
         [networkHandler sendRequest:request

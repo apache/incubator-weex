@@ -38,7 +38,12 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     }
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    
     id<WXNetworkProtocol> networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
+    
+#pragma GCC diagnostic pop
     
     [networkHandler sendRequest:request
                 withSendingData:^(int64_t bytesSent, int64_t totalBytes) {
@@ -101,7 +106,11 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     
     progressCallback(callbackRsp, TRUE);
     
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     id<WXNetworkProtocol> networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
+#pragma GCC diagnostic pop
+    
     __block NSString *respEncode = nil;
     __weak typeof(self) weakSelf = self;
     [networkHandler sendRequest:request

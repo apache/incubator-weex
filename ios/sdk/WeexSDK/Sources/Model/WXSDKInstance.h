@@ -158,16 +158,16 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  **/
 - (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data;
 
-/**
- * Renders weex view with resource request.
- *
- * @param request The resource request specifying the URL to render with.
- *
- * @param options The params passed by user.
- *
- * @param data The data the bundle needs when rendered.  Defalut is nil.
- **/
-- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
+///**
+// * Renders weex view with resource request.
+// *
+// * @param request The resource request specifying the URL to render with.
+// *
+// * @param options The params passed by user.
+// *
+// * @param data The data the bundle needs when rendered.  Defalut is nil.
+// **/
+//- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 
 /**
  * Renders weex view with source string of bundle and some others.
@@ -232,12 +232,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
 
 
+/** 
+ * Deprecated 
+ */
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);
 
-- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
+@end
 
+@interface WXSDKInstance (Deprecated)
+
+- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
 - (void)reloadData:(id)data  DEPRECATED_MSG_ATTRIBUTE("Use refreshInstance: method instead.");
 - (void)creatFinish DEPRECATED_MSG_ATTRIBUTE();
 

@@ -140,7 +140,7 @@
 - (void)setURL:(NSURL *)URL
 {
     NSMutableString *urlStr = nil;
-    WX_REWRITE_URL(URL.absoluteString, WXResourceTypeLink, self.weexSDKInstance, &urlStr)
+    WX_REWRITE_URL(URL.absoluteString, WXResourceTypeVideo, self.weexSDKInstance, &urlStr)
     
     if (!urlStr) {
         return;

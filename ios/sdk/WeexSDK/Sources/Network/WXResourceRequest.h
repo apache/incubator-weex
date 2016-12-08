@@ -8,12 +8,26 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum : NSUInteger {
+    WXResourceTypeMainBundle,
+    WXResourceTypeImage,
+    WXResourceTypeFont,
+    WXResourceTypeVideo,
+    WXResourceTypeLink,
+    WXResourceTypeOthers
+} WXResourceType;
+
+
 @interface WXResourceRequest : NSMutableURLRequest
+
+@property (nonatomic, strong) id taskIdentifier;
+@property (nonatomic, assign) WXResourceType type;
 
 @property (nonatomic, strong) NSString *referrer;
 @property (nonatomic, strong) NSString *userAgent;
 
 + (instancetype)requestWithURL:(NSURL *)url
+                  resourceType:(WXResourceType)type
                       referrer:(NSString *)referrer
                    cachePolicy:(NSURLRequestCachePolicy)cachePolicy;
 
