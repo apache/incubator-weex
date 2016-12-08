@@ -46,6 +46,8 @@ describe('test input and output', function () {
       app.$destroy()
     }
 
+    it('global Weex object', () => checkOutput(app, 'global-weex-object'))
+
     it('single case', () => checkOutput(app, 'foo'))
     it('foo2 case', () => checkOutput(app, 'foo2'))
     it('foo3 case', () => checkOutput(app, 'foo3'))

@@ -49,6 +49,17 @@ export function init (app, code, data) {
   /* istanbul ignore next */
   const bundleRequireModule = name => app.requireModule(removeWeexPrefix(name))
 
+  const Weex = {
+    config: app.options,
+    define: bundleDefine,
+    bootstrap: bundleBootstrap,
+    require: bundleDocument,
+    document: bundleRequireModule,
+    Vm: bundleVm
+  }
+
+  Object.freeze(Weex)
+
   // prepare code
   let functionBody
   /* istanbul ignore if */
@@ -105,6 +116,7 @@ export function init (app, code, data) {
       '__weex_document__', // alias for bootstrap
       '__weex_require__',
       '__weex_viewmodel__',
+      'Weex',
       'setTimeout',
       'setInterval',
       'clearTimeout',
@@ -123,6 +135,7 @@ export function init (app, code, data) {
       bundleDocument,
       bundleRequireModule,
       bundleVm,
+      Weex,
       timerAPIs.setTimeout,
       timerAPIs.setInterval,
       timerAPIs.clearTimeout,
@@ -140,6 +153,7 @@ export function init (app, code, data) {
       '__weex_document__', // alias for bootstrap
       '__weex_require__',
       '__weex_viewmodel__',
+      'Weex',
       functionBody
     )
 
@@ -153,7 +167,8 @@ export function init (app, code, data) {
       bundleBootstrap,
       bundleDocument,
       bundleRequireModule,
-      bundleVm)
+      bundleVm,
+      Weex)
   }
 
   return result
