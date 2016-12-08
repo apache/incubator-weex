@@ -14,6 +14,7 @@
 #import "WXType.h"
 #import "WXConvert.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXImageUtils.h"
 
 @interface WXImageView : UIImageView
 
@@ -34,6 +35,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 @property (nonatomic, strong) NSString *imageSrc;
 @property (nonatomic, strong) NSString *placeholdSrc;
+@property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
 @property (nonatomic, assign) WXImageSharp imageSharp;
@@ -60,6 +62,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         }
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
+        [self configFilter:styles];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
@@ -74,8 +77,34 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
 }
 
+- (void)configFilter:(NSDictionary *)styles {
+    if (styles[@"filter"]) {
+        NSString *filter = styles[@"filter"];
+        
+        NSString *pattern = @"blur\\((\\d+)(px)?\\)";
+        NSError *error = nil;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                               options:NSRegularExpressionCaseInsensitive
+                                                                                 error:&error];
+        NSArray *matches = [regex matchesInString:filter options:0 range:NSMakeRange(0, filter.length)];
+        if (matches && matches.count > 0) {
+            NSTextCheckingResult *match = matches[matches.count - 1];
+            NSRange matchRange = [match rangeAtIndex:1];
+            NSString *matchString = [filter substringWithRange:matchRange];
+            NSLog(@"----blur: %@",matchString);
+            if (matchString && matchString.length > 0) {
+                _blurRadius = [matchString doubleValue];
+                
+                
+            }
+        }
+    }
+}
+
 - (UIView *)loadView
 {
+    WXImageView *view = [[WXImageView alloc] init];
+    
     return [[WXImageView alloc] init];
 }
 
@@ -102,6 +131,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         [self updateImage];
     }
+    [self configFilter:styles];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -246,27 +276,46 @@ static dispatch_queue_t WXImageUpdateQueue;
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
+                
+                if (_blurRadius > 0 && image) {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        UIImage *newImage = [WXImageUtils toGaussianBluredImage:image blurRadius:_blurRadius];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            __strong typeof(self) strongSelf = weakSelf;
+                            [strongSelf imageDownloaded:newImage imageSrc:imageSrc error:error downloadFailedBlock:downloadFailedBlock];
+                        });
+                    });
+                    return;
+                }
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(self) strongSelf = weakSelf;
-                    
-                    if (weakSelf.imageLoadEvent) {
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @"false" : @"true"}];
-                    }
-                    if (error) {
-                        downloadFailedBlock(imageSrc, error);
-                        return ;
-                    }
-                    
-                    if (![imageSrc isEqualToString:strongSelf.imageSrc]) {
-                        return ;
-                    }
-                    
-                    if ([strongSelf isViewLoaded]) {
-                        ((UIImageView *)strongSelf.view).image = image;
-                    }
+                    [strongSelf imageDownloaded:image imageSrc:imageSrc error:error downloadFailedBlock:downloadFailedBlock];
                 });
             }];
         });
+    }
+}
+
+- (void)imageDownloaded:(UIImage *)image
+               imageSrc:(NSString *)imageSrc
+                  error:(NSError *)error
+    downloadFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock {
+    
+    if (self.imageLoadEvent) {
+        [self fireEvent:@"load" params:@{ @"success": error? @"false" : @"true"}];
+    }
+    if (error) {
+        downloadFailedBlock(imageSrc, error);
+        return ;
+    }
+    
+    if (![imageSrc isEqualToString:self.imageSrc]) {
+        return ;
+    }
+    
+    if ([self isViewLoaded]) {
+        ((UIImageView *)self.view).image = image;
     }
 }
 
