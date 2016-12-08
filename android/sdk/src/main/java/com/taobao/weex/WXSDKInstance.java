@@ -808,7 +808,10 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
             }
             if (mUserTrackAdapter != null) {
               mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
-              commitUTStab(IWXUserTrackAdapter.JS_BRIDGE,WXErrorCode.WX_SUCCESS);
+              WXPerformance performance=new WXPerformance();
+              performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
+              performance.args=getBundleUrl();
+              mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
             }
           }
         }
@@ -947,12 +950,11 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        WXPerformance performance = null;
+        WXPerformance performance = new WXPerformance();
+        performance.errCode = errorCode.getErrorCode();
+        performance.args = errorCode.getArgs();
         if (errorCode != WXErrorCode.WX_SUCCESS) {
-          performance = new WXPerformance();
-          performance.errCode = errorCode.getErrorCode();
           performance.errMsg = errorCode.getErrorMsg();
-          performance.args = errorCode.getArgs();
           if (WXEnvironment.isApkDebugable()) {
             WXLogUtils.d(performance.toString());
           }
