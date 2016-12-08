@@ -310,6 +310,10 @@ public class WXEnvironment {
     return versionName;
   }
 
+  public static Map<String, String> getCustomOptions() {
+    return options;
+  }
+
   public static void addCustomOptions(String key, String value) {
     options.put(key, value);
   }
