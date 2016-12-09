@@ -1336,7 +1336,7 @@ class WXDomStatement {
         return "getComponentSize";
       }
     });
-
+    mDirty=true;
   }
 
   static class AddDomInfo {
