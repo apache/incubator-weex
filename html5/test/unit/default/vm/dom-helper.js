@@ -2,6 +2,7 @@ import chai from 'chai'
 const { expect } = chai
 
 global.callNative = function () {}
+global.callAddElement = function () {}
 
 import {
   createElement,
@@ -10,9 +11,9 @@ import {
   attachTarget,
   moveTarget,
   removeTarget
-} from '../../../../default/vm/dom-helper'
-import { Document } from '../../../../vdom'
-import Listener from '../../../../vdom/listener'
+} from '../../../../frameworks/legacy/vm/dom-helper'
+import { Document } from '../../../../runtime/vdom'
+import Listener from '../../../../runtime/listener'
 
 describe('help create body', () => {
   let vm

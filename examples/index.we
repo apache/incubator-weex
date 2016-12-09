@@ -11,6 +11,7 @@
         // FORMAT:
         // `name` key is the example filename without '.we'
         // Support sub directory, e.g. 'new-fashion/index'
+        {name: 'vue/index', title: 'Vue Examples'},
 
         // common
         {name: 'hello', title: 'Hello World'},
@@ -26,6 +27,7 @@
         {name: 'component/list/list-basic', title: 'List (Basic)'},
         {name: 'component/list/list-demo', title: 'List (Advanced)'},
         {name: 'component/slider/index', title: 'Slider'},
+        {name: 'component/slider-neighbor/silder-neighbor', title: 'Slider-Neighbor'},
         {name: 'component/a-demo', title: 'A'},
         {name: 'component/video-demo', title: 'Video'},
         {name: 'component/countdown-demo', title: 'Countdown'},
@@ -40,7 +42,7 @@
         {name: 'module/modal', title: 'Modal'},
         {name: 'module/stream-demo', title: 'Stream'},
         {name: 'module/storage-demo',title:'Storage'},
-        // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
+        {name: 'module/clipboard', title: 'Clipboard'},
 
         // showcase
         {name: 'showcase/new-fashion/index', title: 'Activity'},

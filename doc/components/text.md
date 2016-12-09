@@ -58,5 +58,3 @@ Other attributes please check out the [common attributes](../references/common-a
   <text value="{{...}}"></text>
 </div>
 ```
-
-
