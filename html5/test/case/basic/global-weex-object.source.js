@@ -1,8 +1,8 @@
-Weex.define('@weex-component/foo', function (require, exports, module) {
+weex.define('@weex-component/foo', function (require, exports, module) {
   module.exports = {
     data: function () {
       return {
-        x: Weex.config.env.appName
+        x: weex.config.env.appName
       }
     },
     template: {
@@ -16,4 +16,4 @@ Weex.define('@weex-component/foo', function (require, exports, module) {
   }
 })
 
-Weex.bootstrap('@weex-component/foo')
+weex.bootstrap('@weex-component/foo')
