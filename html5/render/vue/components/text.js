@@ -46,7 +46,7 @@ export default {
     }
 
     return createElement(
-      'div',
+      'p',
       {
         staticClass: className,
         staticStyle: { fontSize: '32px' }

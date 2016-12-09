@@ -15,7 +15,7 @@ multiDescribe('<text> component', (Vue, helper) => {
   it('create simple text component', () => {
     const vm = helper.compile(`<text>abc</text>`)
 
-    expect(vm.$el.tagName).to.be.equal('DIV')
+    expect(vm.$el.tagName).to.be.equal('P')
 
     const span = vm.$el.children[0]
     expect(span.tagName).to.be.equal('SPAN')
@@ -25,7 +25,7 @@ multiDescribe('<text> component', (Vue, helper) => {
   it('empty text component', () => {
     const vm = helper.compile(`<text></text>`)
 
-    expect(vm.$el.tagName).to.be.equal('DIV')
+    expect(vm.$el.tagName).to.be.equal('P')
 
     const span = vm.$el.children[0]
     expect(span.tagName).to.be.equal('SPAN')
