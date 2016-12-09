@@ -11,6 +11,8 @@ function getProto (Weex) {
       node.classList.add('weex-element')
       node.controls = true
       node.autoplay = this.autoPlay
+      node.setAttribute('playsinline', '')
+      node.setAttribute('webkit-playsinline', '')
       node.setAttribute('play-status', this.playStatus)
       this.node = node
       if (this.autoPlay && this.playStatus === 'play') {
