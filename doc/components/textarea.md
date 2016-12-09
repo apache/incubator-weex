@@ -1,31 +1,28 @@
-# &lt;input&gt;
-<span class="weex-version">0.4</span>
+# &lt;textarea&gt;
+<span class="weex-version">0.8</span>
 
 
 ### Summary
 
-The weex builtin component ``input`` is used to create interactive controls to accept data from users. How a ``input`` component works varies considerably depending on the value of its ``type`` attribute, such as ``text``, ``password``, ``url``, ``email``, ``tel`` etc.
+The weex builtin component ``textarea`` is used to create interactive controls to accept data from users. It can be a multi-line [input](./input.md).
 
-**Notes:** `<input>` does not support the common-event `click`. Please listen to the `input` or `change` event instead.
+**Notes:** `<textarea>` support all event which `<input>` had.
 
 ### Child Components
 
 This component supports no child components.
 
-### Attributes
+### attributes
 
-- `type`: &lt;string&gt; the type of controls to display. The default value is ``text``, if this attribute is not specified. Possible values are ``text``, ``password``, ``tel``, ``email``, ``url`` etc, each of which has the same meaning with w3c standard.
 - `value`: &lt;string&gt; the value of the control.
 - `placeholder`: &lt;string&gt; a hint to the user of which can be entered to the control. The placeholder text must have no carriage returns or line-feeds.
 - `disabled`: &lt;boolean&gt; a boolean attribute indicates that the form control is not available for interaction. In particular, the click event will not be dispatched on disabled controls.
 - `autofocus`: &lt;boolean&gt; a boolean attribute lets you specify that a form control should have input focus when the page loads.
-- `maxlength`<sup class="wx-v">0.7</sup> :&lt;length&gt; a number value to specify maxlength of input
+- `rows:`&lt;number&gt; a number which can specify the height of textarea, default is `2`.
 
 Other attributes please check out the [common attributes](../references/common-attrs.md).
 
 ### Styles
-
-- `placeholder-color`: the color of placeholder. Default value is ``#999999``.
 
 **text styles**: checkout [text styles](../references/text-style.md)
 
@@ -38,9 +35,9 @@ Other attributes please check out the [common attributes](../references/common-a
 
 **common styles**: check out [common styles for components](../references/common-style.md)
 
-- support flexbox related styles
-- support box model related styles
-- support ``position`` related styles
+- support flexbox related styles.
+- support box model related styles.
+- support ``position`` related styles.
 - support ``opacity``, ``background-color`` etc.
 
 ### Events
@@ -52,9 +49,9 @@ Other attributes please check out the [common attributes](../references/common-a
 
 **common events**: check out the [common events](../references/common-event.md)
 
-- support `appear` / `disappear` event. Check out [common events](../references/common-event.md)
+- support `appear` / `disappear` event. Check out [common events](../references/common-event.md).
 
-**Notes:** `<input>` does not support the common-event `click`. Please listen to the `input` or `change` event instead.
+**Notes:** `<textarea>` does not support the common-event `click`. Please listen to the `input` or `change` event instead.
 
 ### Parameters of events' object
 
@@ -68,12 +65,10 @@ Other attributes please check out the [common attributes](../references/common-a
 
 ```
 <div>
-  <input
-    type="url"
+  <textarea
     autofocus="true"
     placeholder="..."
-    value="http://alibaba.github.io/weex/"
-    style="placeholder-color: #666666;">
-  </input>
+    value="I am a multiple input">
+  </textarea>
 </div>
 ```
