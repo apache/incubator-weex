@@ -14,7 +14,7 @@ export default {
   methods: {
     handleScroll (event) {
       if (this.reachBottom()) {
-        this.$emit('loadmore', event)
+        this.$emit('loadmore')
       }
     }
   },
@@ -22,23 +22,23 @@ export default {
   render (createElement) {
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
-      validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+      validateStyles('list', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    return createElement('main', {
+    return createElement('div', {
       ref: 'wrapper',
-      attrs: { 'weex-type': 'scroller' },
-      staticClass: 'weex-scroller weex-scroller-wrapper',
+      attrs: { 'weex-type': 'list' },
+      staticClass: 'weex-list weex-list-wrapper',
       on: {
         scroll: debounce(bind(this.handleScroll, this), 100)
       }
     }, [
-      createElement('mark', { ref: 'topMark', staticClass: 'weex-scroller-top-mark' }),
-      createElement('div', {
+      createElement('mark', { ref: 'topMark', staticClass: 'weex-list-top-mark' }),
+      createElement('ul', {
         ref: 'inner',
-        staticClass: 'weex-scroller-inner'
+        staticClass: 'weex-list-inner'
       }, this.$slots.default),
-      createElement('mark', { ref: 'bottomMark', staticClass: 'weex-scroller-bottom-mark' })
+      createElement('mark', { ref: 'bottomMark', staticClass: 'weex-list-bottom-mark' })
     ])
   }
 }

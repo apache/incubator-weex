@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
-import list from '../../../../render/vue/components/list.vue'
+import list from '../../../../render/vue/components/list'
 
 multiDescribe('<list> component', (Vue, helper) => {
   before(() => {
@@ -16,6 +16,6 @@ multiDescribe('<list> component', (Vue, helper) => {
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('DIV')
-    expect(vm.$el.className).to.be.equal('weex-container scrollable-wrap list-wrap')
+    expect(vm.$el.className).to.be.equal('weex-list weex-list-wrapper')
   })
 })
