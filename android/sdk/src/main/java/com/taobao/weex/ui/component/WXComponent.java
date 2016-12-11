@@ -128,6 +128,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -1134,44 +1135,55 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  @Deprecated
   public void registerActivityStateListener() {
-    if (mInstance != null) {
-      mInstance.registerActivityStateListener(this);
-    }
+
   }
 
-  @Override
+
+  /********************************
+   *  begin hook Activity life cycle callback
+   ********************************************************/
   public void onActivityCreate() {
 
   }
 
-  @Override
   public void onActivityStart() {
 
   }
 
-  @Override
   public void onActivityPause() {
 
   }
 
-  @Override
   public void onActivityResume() {
+
   }
 
-  @Override
   public void onActivityStop() {
+
   }
 
-  @Override
   public void onActivityDestroy() {
 
   }
 
-  @Override
   public boolean onActivityBack() {
     return false;
   }
+
+  public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+  }
+
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+  }
+
+  /********************************
+   *  end hook Activity life cycle callback
+   ********************************************************/
+
 
   public void destroy() {
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {

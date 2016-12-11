@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -262,7 +263,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   /**
    * Offset top for children layout.
-   * @return
    */
   protected int getChildrenLayoutTopOffset(){
     return 0;
@@ -270,7 +270,6 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
 
   /**
    * use {@link #getHostView()} instead
-   * @return
    */
   @Deprecated
   public ViewGroup getView(){
@@ -473,4 +472,106 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       component.notifyAppearStateChange(wxEventType,direction);
     }
   }
+
+  /********************************
+   *  begin hook Activity life cycle callback
+   ********************************************************/
+  @Override
+  public void onActivityCreate() {
+    super.onActivityCreate();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityCreate();
+    }
+  }
+
+  @Override
+  public void onActivityStart() {
+    super.onActivityStart();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityStart();
+    }
+
+  }
+
+  @Override
+  public void onActivityPause() {
+    super.onActivityPause();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityPause();
+    }
+  }
+
+  @Override
+  public void onActivityResume() {
+    super.onActivityResume();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityResume();
+    }
+  }
+
+  @Override
+  public void onActivityStop() {
+    super.onActivityStop();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityStop();
+    }
+  }
+
+  @Override
+  public void onActivityDestroy() {
+    super.onActivityDestroy();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityDestroy();
+    }
+
+  }
+
+  @Override
+  public boolean onActivityBack() {
+    super.onActivityBack();
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityBack();
+    }
+    return false;
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data){
+    super.onActivityResult(requestCode,resultCode,data);
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onActivityResult(requestCode,resultCode,data);
+    }
+
+  }
+
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+    super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onRequestPermissionsResult(requestCode,permissions,grantResults);
+    }
+  }
+
+  /********************************
+   *  end hook Activity life cycle callback
+   ********************************************************/
 }

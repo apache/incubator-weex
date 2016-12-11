@@ -209,7 +209,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -220,14 +219,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
-import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -255,7 +254,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -295,7 +293,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * Refresh start time
    */
   private long mRefreshStartTime;
-  private ConcurrentLinkedQueue<IWXActivityStateListener> mActivityStateListeners = new ConcurrentLinkedQueue<>();
   private WXPerformance mWXPerformance;
   private ScrollView mScrollView;
   private WXScrollViewListener mWXScrollViewListener;
@@ -705,6 +702,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return WXSDKManager.getInstance().getIWXHttpAdapter();
   }
 
+  @Deprecated
   public void reloadImages() {
     if (mScrollView == null) {
       return;
@@ -718,43 +716,144 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mRenderListener = listener;
   }
 
+  @Deprecated
   public void registerActivityStateListener(IWXActivityStateListener listener) {
-    if (listener == null || mActivityStateListeners==null) {
-      return;
-    }
-    mActivityStateListeners = new ConcurrentLinkedQueue<>();
 
-    if (!mActivityStateListeners.contains(listener)) {
-      mActivityStateListeners.add(listener);
-    }
   }
 
   /********************************
    * end register listener
    ********************************************************/
 
-  // WAActivityStateListener//////////////////////////////////////////////////////////////////////////////////
+
+  /********************************
+   *  begin hook Activity life cycle callback
+   ********************************************************/
+
   @Override
   public void onActivityCreate() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityCreate();
+
+    // module listen Activity onActivityCreate
+    WXModuleManager.onActivityCreate(getInstanceId());
+
+    if(mRootComp != null) {
+      mRootComp.onActivityCreate();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely,onActivityCreate can not be call!");
     }
+
   }
 
   @Override
   public void onActivityStart() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityStart();
+
+    // module listen Activity onActivityCreate
+    WXModuleManager.onActivityStart(getInstanceId());
+    if(mRootComp != null) {
+      mRootComp.onActivityStart();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely,onActivityStart can not be call!");
     }
+
   }
 
   @Override
   public void onActivityPause() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityPause();
+
+    // module listen Activity onActivityPause
+    WXModuleManager.onActivityPause(getInstanceId());
+    if(mRootComp != null) {
+      mRootComp.onActivityPause();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
+
     onViewDisappear();
   }
+
+
+  @Override
+  public void onActivityResume() {
+
+    // notify onActivityResume callback to module
+    WXModuleManager.onActivityResume(getInstanceId());
+
+    if(mRootComp != null) {
+      mRootComp.onActivityResume();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
+    }
+
+    onViewAppear();
+  }
+
+  @Override
+  public void onActivityStop() {
+
+    // notify onActivityResume callback to module
+    WXModuleManager.onActivityStop(getInstanceId());
+
+    if(mRootComp != null) {
+      mRootComp.onActivityStop();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onActivityStop can not be call!");
+    }
+
+
+  }
+
+  @Override
+  public void onActivityDestroy() {
+    WXModuleManager.onActivityDestroy(getInstanceId());
+
+    if(mRootComp != null) {
+      mRootComp.onActivityDestroy();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onActivityDestroy can not be call!");
+    }
+
+    destroy();
+  }
+
+  @Override
+  public boolean onActivityBack() {
+
+    WXModuleManager.onActivityBack(getInstanceId());
+
+    if(mRootComp != null) {
+      return mRootComp.onActivityBack();
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onActivityBack can not be call!");
+    }
+
+    return false;
+  }
+
+  public void onActivityResult(int requestCode, int resultCode, Intent data){
+    WXModuleManager.onActivityResult(getInstanceId(),requestCode,requestCode,data);
+
+    if(mRootComp != null) {
+      mRootComp.onActivityResult(requestCode,requestCode,data);
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onActivityResult can not be call!");
+    }
+  }
+
+
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+    WXModuleManager.onRequestPermissionsResult(getInstanceId(),requestCode,permissions,grantResults);
+
+    if(mRootComp != null) {
+       mRootComp.onRequestPermissionsResult(requestCode,permissions,grantResults);
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely, onRequestPermissionsResult can not be call!");
+    }
+  }
+
+  /********************************
+   *  end hook Activity life cycle callback
+   ********************************************************/
 
   public void onViewDisappear(){
     WXComponent comp = getRootComponent();
@@ -777,55 +876,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
-  @Override
-  public void onActivityResume() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityResume();
-    }
-    onViewAppear();
-  }
-
-  @Override
-  public void onActivityStop() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityStop();
-    }
-  }
-
-  @Override
-  public void onActivityDestroy() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityDestroy();
-    }
-    destroy();
-  }
-
-  @Override
-  public boolean onActivityBack() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      boolean isIntercept = listener.onActivityBack();
-      if (isIntercept) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    Intent intent=new Intent(WXModule.ACTION_REQUEST_PERMISSIONS_RESULT);
-    intent.putExtra(WXModule.REQUEST_CODE,requestCode);
-    intent.putExtra(WXModule.PERMISSIONS,permissions);
-    intent.putExtra(WXModule.GRANT_RESULTS,grantResults);
-    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-  }
-
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    Intent intent=data==null?new Intent():new Intent(data);
-    intent.setAction(WXModule.ACTION_ACTIVITY_RESULT);
-    intent.putExtra(WXModule.REQUEST_CODE,requestCode);
-    intent.putExtra(WXModule.RESULT_CODE,resultCode);
-    LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-  }
 
   public void onCreateFinish() {
     if (mContext != null) {
@@ -1080,11 +1130,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       destroyView(mRenderContainer);
       mRenderContainer = null;
       mRootComp = null;
-    }
-
-    if (mActivityStateListeners != null) {
-      mActivityStateListeners.clear();
-      mActivityStateListeners = null;
     }
 
     if(mGlobalEvents!=null){
