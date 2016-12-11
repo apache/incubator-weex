@@ -1,6 +1,6 @@
 import a from './a.vue'
 import text from './text'
-import image from './image.vue'
+import image from './image'
 import web from './web.vue'
 import _switch from './switch.vue'
 

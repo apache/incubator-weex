@@ -17,6 +17,7 @@ function install (Vue) {
   }
 }
 
+/* eslint-disable no-undef */
 if (typeof Vue === 'undefined') {
   console.error('[Vue Renderer] `Vue` is not defined!')
 }
@@ -30,5 +31,6 @@ else {
 
   Vue.use({ install })
 }
+/* eslint-enable no-undef */
 
 export default { install }

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
-import image from '../../../../render/vue/components/image.vue'
+import image from '../../../../render/vue/components/image'
 
 multiDescribe('<image> component', (Vue, helper) => {
   before(() => {
@@ -11,29 +11,39 @@ multiDescribe('<image> component', (Vue, helper) => {
     helper.reset()
   })
 
-  it('create simple image component', () => {
+  it('simple <image> component', () => {
     const vm = helper.compile(`<image>abc</image>`)
 
     // console.log(vm.$el)
-    expect(vm.$el.tagName).to.be.equal('DIV')
-    expect(vm.$el.className).to.be.equal('weex-container')
-    expect(vm.$el.innerHTML).to.be.equal('<img class="weex-img weex-element">')
-
-    const image = vm.$el.children[0]
-    expect(image.tagName).to.be.equal('IMG')
-    expect(image.className).to.be.equal('weex-img weex-element')
+    expect(vm.$el.tagName).to.be.equal('FIGURE')
+    expect(vm.$el.className).to.be.equal('weex-image')
+    expect(vm.$el.innerHTML).to.be.equal('')
   })
 
-  it('image component with src', () => {
-    const vm = helper.compile(`<image src="http://dotwe.org">`)
+  it('<image> with src', () => {
+    const src = 'https://vuejs.org/images/logo.png'
+    const vm = helper.compile(`<image src="${src}">`)
 
-    // console.log(vm.$el)
-    expect(vm.$el.tagName).to.be.equal('DIV')
-    expect(vm.$el.className).to.be.equal('weex-container')
+    expect(vm.$el.style.backgroundImage).match(new RegExp(`url\s*\\("?${src}"?\\)`), 'i')
+  })
 
-    const image = vm.$el.children[0]
-    expect(image.tagName).to.be.equal('IMG')
-    expect(image.getAttribute('src')).to.be.equal('http://dotwe.org')
-    expect(image.className).to.be.equal('weex-img weex-element')
+  it('<image> resize="cover"', () => {
+    const vm = helper.compile(`<image resize="cover">`)
+    expect(vm.$el.style.backgroundSize).to.be.equal('cover')
+  })
+
+  it('<image> resize="contain"', () => {
+    const vm = helper.compile(`<image resize="contain">`)
+    expect(vm.$el.style.backgroundSize).to.be.equal('contain')
+  })
+
+  it('<image> resize="stretch"', () => {
+    const vm = helper.compile(`<image resize="stretch">`)
+    expect(vm.$el.style.backgroundSize).to.be.equal('100%')
+  })
+
+  it('<image> unknown resize', () => {
+    const vm = helper.compile(`<image resize="unknown">`)
+    expect(vm.$el.style.backgroundSize).to.be.equal('')
   })
 })

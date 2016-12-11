@@ -1,5 +1,5 @@
 <template>
-  <span :class="wrapperClass" @click="toggle">
+  <span weex-type="switch" :class="wrapperClass" @click="toggle">
     <small class="weex-switch-inner"></small>
   </sapn>
 </template>
