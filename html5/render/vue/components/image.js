@@ -1,3 +1,5 @@
+import { validateStyles } from '../validator'
+
 export default {
   props: {
     src: String,
@@ -10,6 +12,11 @@ export default {
   },
 
   render (createElement) {
+    /* istanbul ignore next */
+    if (process.env.NODE_ENV === 'development') {
+      validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
+    }
+
     /* istanbul ignore next */
     if (!this.src && process.env.NODE_ENV === 'development') {
       console.warn(`[Vue Renderer] The <image> component must have the "src" attribute.`)

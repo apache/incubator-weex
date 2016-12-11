@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
-import _switch from '../../../../render/vue/components/switch.vue'
+import _switch from '../../../../render/vue/components/switch'
 
 multiDescribe('<switch> component', (Vue, helper) => {
   before(() => {
@@ -46,6 +46,25 @@ multiDescribe('<switch> component', (Vue, helper) => {
     expect(vmA.$el.className).to.match(/weex\-switch\-checked/)
     expect(vmB.$el.className).to.match(/weex\-switch\-checked/)
     expect(vmC.$el.className).to.match(/weex\-switch\-checked/)
+  })
+
+  it('toggle <switch>', () => {
+    const vm = new Vue(_switch)
+
+    expect(vm.isChecked).to.not.be.true
+    vm.toggle()
+    expect(vm.isChecked).to.be.true
+    vm.toggle()
+    expect(vm.isChecked).to.not.be.true
+  })
+
+  it('toggle & disabled <switch>', () => {
+    const vm = new Vue(_switch)
+    vm.isDisabled = true
+
+    expect(vm.isChecked).to.not.be.true
+    vm.toggle()
+    expect(vm.isChecked).to.not.be.true
   })
 
   it('unchecked <switch>', () => {

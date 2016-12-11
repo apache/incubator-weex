@@ -1,61 +1,35 @@
-import { extend } from '../utils'
 import { validateStyles } from '../validator'
 
 /**
  * Get text styles
  */
-function getTextStyle (context = {}) {
-  const { data, props } = context
-  const style = {
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
-    display: '-webkit-box',
-    webkitBoxOrient: 'vertical'
-  }
-
+function getTextStyle (props = {}) {
   const lines = parseInt(props.lines) || 0
   if (lines > 0) {
-    style.overflow = 'hidden'
-    style.textOverflow = 'ellipsis'
-    style.webkitLineClamp = lines
+    return {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      webkitLineClamp: lines
+    }
   }
-  else {
-    style.overflow = 'visible'
-    style.textOverflow = ''
-    style.webkitLineClamp = ''
-  }
-
-  return extend(style, data.staticStyle)
 }
 
 export default {
-  functional: true,
   props: {
     lines: [Number, String],
     value: [String]
   },
-  render (createElement, context) {
+
+  render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV !== 'production') {
-      validateStyles('text', context.data && context.data.staticStyle)
+    if (process.env.NODE_ENV === 'development') {
+      validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    let className = 'weex-container'
-    if (context.data.staticClass) {
-      className += ' ' + context.data.staticClass
-    }
-
-    return createElement(
-      'p',
-      {
-        staticClass: className,
-        staticStyle: { fontSize: '32px' }
-      },
-      [createElement(
-        'span',
-        { staticStyle: getTextStyle(context) },
-        context.children || [context.props.value]
-      )]
-    )
+    return createElement('p', {
+      attrs: { 'weex-type': 'text' },
+      staticClass: 'weex-text',
+      staticStyle: getTextStyle(this)
+    }, this.$slots.default || [this.value])
   }
 }

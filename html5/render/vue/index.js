@@ -1,8 +1,8 @@
 // import Vue from 'vue'
-import components from './components'
+import * as components from './components'
 import semver from 'semver'
 
-function install (Vue) {
+export function install (Vue) {
   const htmlRegex = /^html:/i
   Vue.config.isReservedTag = tag => htmlRegex.test(tag)
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
@@ -13,7 +13,8 @@ function install (Vue) {
 
   /* istanbul ignore next */
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[Vue Renderer] Registered components: ${Object.keys(components)}.`)
+    console.log(`[Vue Renderer] Registered components: `
+      + `[${Object.keys(components).join(', ')}].`)
   }
 }
 
@@ -31,6 +32,3 @@ else {
 
   Vue.use({ install })
 }
-/* eslint-enable no-undef */
-
-export default { install }

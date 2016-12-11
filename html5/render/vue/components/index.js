@@ -1,13 +1,14 @@
-import a from './a.vue'
-import text from './text'
-import image from './image'
-import web from './web.vue'
-import _switch from './switch.vue'
+import _switch from './switch'
+export { _switch as switch }
 
-export default {
-  a,
+import image from './image'
+import scroller from './scroller'
+import text from './text'
+import web from './web'
+
+export {
+  image,
+  scroller,
   text,
-  web,
-  'switch': _switch,
-  image
+  web
 }

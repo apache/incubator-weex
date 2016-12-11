@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
-import web from '../../../../render/vue/components/web.vue'
+import web from '../../../../render/vue/components/web'
 
 multiDescribe('<web> component', (Vue, helper) => {
   before(() => {
