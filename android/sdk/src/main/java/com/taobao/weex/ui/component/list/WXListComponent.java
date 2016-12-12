@@ -690,11 +690,6 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     setRefreshOrLoading(child);
     int count = mChildren.size();
     index = index >= count ? -1 : index;
-    if (index == -1) {
-        mChildren.add(child);
-    } else {
-        mChildren.add(index, child);
-    }
     bindViewType(child);
 
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
