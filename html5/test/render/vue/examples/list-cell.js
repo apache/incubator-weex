@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
 import list from '../../../../render/vue/components/list'
-import cell from '../../../../render/vue/components/cell'
+import cell from '../../../../render/vue/components/list/cell'
 import text from '../../../../render/vue/components/text'
 
 multiDescribe('list & cell example', (Vue, helper) => {
@@ -31,7 +31,7 @@ multiDescribe('list & cell example', (Vue, helper) => {
     })
 
     // console.log(vm.$el)
-    expect(vm.$el.tagName).to.be.equal('DIV')
+    expect(vm.$el.tagName).to.be.equal('MAIN')
     expect(vm.$el.className).to.be.equal('weex-list weex-list-wrapper')
 
     expect(vm.$el.children.length).to.be.equal(3)

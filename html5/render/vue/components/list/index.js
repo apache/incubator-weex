@@ -1,6 +1,6 @@
-import { validateStyles } from '../validator'
-import { debounce, bind } from '../utils'
-import rectMixin from '../mixins/rect'
+import { validateStyles } from '../../validator'
+import { debounce, bind } from '../../utils'
+import rectMixin from '../../mixins/rect'
 
 export default {
   mixins: [rectMixin],
@@ -25,7 +25,7 @@ export default {
       validateStyles('list', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    return createElement('div', {
+    return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'list' },
       staticClass: 'weex-list weex-list-wrapper',
@@ -34,7 +34,7 @@ export default {
       }
     }, [
       createElement('mark', { ref: 'topMark', staticClass: 'weex-list-top-mark' }),
-      createElement('ul', {
+      createElement('div', {
         ref: 'inner',
         staticClass: 'weex-list-inner'
       }, this.$slots.default),
