@@ -55,6 +55,14 @@
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
 
 /**
+ * @abstract Returns a given handler instance for specific protocol
+ *
+ * @param protocol The protocol to confirm
+ *
+ */
++ (id)handlerForProtocol:(Protocol *)protocol;
+
+/**
  * @abstract Initializes the global sdk enviroment
  *
  * @discussion Injects main.js in app bundle as default JSFramework script.
