@@ -15,6 +15,7 @@ import {
   register
 } from '../bundle/index'
 import { updateActions } from './misc'
+import { BroadcastChannel } from '../../../../shared/BroadcastChannel'
 
 /**
  * Init an app by run code witgh data
@@ -44,6 +45,14 @@ export function init (app, code, data) {
   }
   const bundleDocument = app.doc
   const bundleRequireModule = name => app.requireModule(removeWeexPrefix(name))
+
+  const appBroadcastChannel = name => {
+    const channel = new BroadcastChannel(name)
+    if (app.channels) {
+      app.channels[name] = channel
+    }
+    return channel
+  }
 
   // prepare code
   let functionBody
@@ -100,6 +109,7 @@ export function init (app, code, data) {
       '__weex_document__', // alias for bootstrap
       '__weex_require__',
       '__weex_viewmodel__',
+      'BroadcastChannel',
       'setTimeout',
       'setInterval',
       'clearTimeout',
@@ -119,6 +129,7 @@ export function init (app, code, data) {
       bundleDocument,
       bundleRequireModule,
       bundleVm,
+      appBroadcastChannel,
       timerAPIs.setTimeout,
       timerAPIs.setInterval,
       timerAPIs.clearTimeout,
@@ -137,6 +148,7 @@ export function init (app, code, data) {
       '__weex_document__', // alias for bootstrap
       '__weex_require__',
       '__weex_viewmodel__',
+      'BroadcastChannel',
       functionBody
     )
 
@@ -151,7 +163,8 @@ export function init (app, code, data) {
       bundleBootstrap,
       bundleDocument,
       bundleRequireModule,
-      bundleVm)
+      bundleVm,
+      BroadcastChannel)
   }
 
   return result
