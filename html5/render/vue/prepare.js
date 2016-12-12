@@ -1,4 +1,8 @@
-// import Vue from 'vue'
+import '../../shared/arrayFrom'
+import '../../shared/objectAssign'
+import '../../shared/objectSetPrototypeOf'
+
+// TODO: Promise polyfill
 
 const DEFAULT_VIEWPORT_WIDTH = 750
 
