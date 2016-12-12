@@ -201,6 +201,18 @@
     return [WXSDKManager bridgeMgr].topInstance;
 }
 
+
+static NSDictionary *_customEnvironment;
++ (void)setCustomEnvironment:(NSDictionary *)environment
+{
+    _customEnvironment = environment;
+}
+
++ (NSDictionary *)customEnvironment
+{
+    return _customEnvironment;
+}
+
 # pragma mark Debug
 
 + (void)unload
