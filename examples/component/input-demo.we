@@ -10,7 +10,7 @@
                         type="text"
                         placeholder="Input Text"
                         class="input"
-                        autofocus="true"
+                        autofocus="{{autofocus}}"
                         value=""
                         onchange="onchange"
                         oninput="oninput"
@@ -110,9 +110,16 @@
     module.exports = {
         data: {
             txtInput: '',
-            txtChange: ''
+            txtChange: '',
+            autofocus: false,
         },
         methods: {
+            ready : function () {
+                var self = this;
+                setTimeout(function () {
+                    self.autofocus = true;
+                },1000);
+            },
             onchange: function (event) {
                 this.txtChange = event.value;
                 console.log('onchange', event.value);
