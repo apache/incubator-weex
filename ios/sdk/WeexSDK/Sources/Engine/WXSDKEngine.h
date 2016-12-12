@@ -100,6 +100,14 @@
 + (WXSDKInstance *)topInstance;
 
 /**
+ * @abstract Add custom envionment variables 
+ * @discuss These variables can be obtained by $getConfig().env
+ *
+ **/
++ (void)setCustomEnvironment:(NSDictionary *)environment;
++ (NSDictionary *)customEnvironment;
+
+/**
  * @abstract Connects to websocket for collecting log
  *
  * @param URL The URL of websocket to connect
