@@ -25,11 +25,9 @@ export default {
     let cssText = `background-image:url("${this.src}");`
 
     // compatibility: http://caniuse.com/#search=background-size
-    if (this.resize) {
-      cssText += (this.resize === 'stretch')
-      ? `background-size: 100% 100%;`
-      : `background-size: ${this.resize};`
-    }
+    cssText += (this.resize && this.resize !== 'stretch')
+      ? `background-size: ${this.resize};`
+      : `background-size: 100% 100%;`
 
     return createElement('figure', {
       attrs: { 'weex-type': 'image' },

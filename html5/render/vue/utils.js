@@ -77,11 +77,12 @@ export function debounce (func, wait) {
 
 export function throttle (func, wait) {
   let last = 0
-  return function () {
+  return function (...args) {
+    const context = this
     const time = new Date().getTime()
     if (time - last > wait) {
-      func.apply(null)
+      func.apply(context, args)
+      last = time
     }
-    last = time
   }
 }
