@@ -170,7 +170,7 @@
 
 - (void)_resortItemViews
 {
-    if (self.itemViews.count <= 2) return;
+    if (self.itemViews.count <= 1) return;
     
     NSInteger center = [self _centerItemIndex];
     NSInteger index = 0;
@@ -217,7 +217,7 @@
 
 - (NSInteger)_centerItemIndex
 {
-    if (self.itemViews.count > 2) {
+    if (self.itemViews.count > 1) {
         return self.itemViews.count % 2 ? self.itemViews.count / 2 : self.itemViews.count / 2 - 1;
     }
     return 0;
@@ -225,7 +225,7 @@
 
 - (void)_scroll2Center
 {
-    if (self.itemViews.count > 2) {
+    if (self.itemViews.count > 1) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
         [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
     }
