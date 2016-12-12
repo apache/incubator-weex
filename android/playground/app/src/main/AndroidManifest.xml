@@ -57,10 +57,12 @@
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="com.taobao.android.intent.category.WEEX"/>
+                <action android:name="android.intent.action.VIEW"/>
 
                 <data android:scheme="http"/>
                 <data android:scheme="https"/>
                 <data android:scheme="file"/>
+                <data android:scheme="wxpage" />
             </intent-filter>
         </activity>
         <activity

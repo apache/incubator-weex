@@ -53,6 +53,7 @@ import java.util.HashMap;
 public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
 
   private static final String TAG = "WXPageActivity";
+  public static final String WXPAGE = "wxpage";
   public static Activity wxPageActivityInstance;
   private ViewGroup mContainer;
   private ProgressBar mProgressBar;
@@ -104,7 +105,11 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     Log.e("TestScript_Guide mUri==", mUri.toString());
     initUIAndData();
 
-    if (TextUtils.equals("http", mUri.getScheme()) || TextUtils.equals("https", mUri.getScheme())) {
+    if(WXPAGE.equals(mUri.getScheme())) {
+      mUri = mUri.buildUpon().scheme("http").build();
+      loadWXfromService(mUri.toString());
+      startHotRefresh();
+    }else if (TextUtils.equals("http", mUri.getScheme()) || TextUtils.equals("https", mUri.getScheme())) {
       // if url has key "_wx_tpl" then get weex bundle js
       String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
       String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
