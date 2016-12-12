@@ -7,8 +7,8 @@
  */
 
 #import <Foundation/Foundation.h>
-@class WXResourceRequest;
-@class WXResourceResponse;
+#import "WXResourceRequest.h"
+#import "WXResourceResponse.h"
 
 
 @interface WXResourceLoader : NSObject

@@ -47,7 +47,6 @@
 		597334B31D4DE1A600988789 /* WXBridgeMethodTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 597334B21D4DE1A600988789 /* WXBridgeMethodTests.m */; };
 		598805AD1D52D8C800EDED2C /* WXStorageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 598805AC1D52D8C800EDED2C /* WXStorageTests.m */; };
 		5996BD701D49EC0600C0FEA6 /* WXInstanceWrapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD6F1D49EC0600C0FEA6 /* WXInstanceWrapTests.m */; };
-		5996BD721D4A219300C0FEA6 /* WXNetworkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD711D4A219300C0FEA6 /* WXNetworkTests.m */; };
 		5996BD751D4D8A0E00C0FEA6 /* WXSDKEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */; };
 		59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */; };
@@ -307,7 +306,6 @@
 		597334B21D4DE1A600988789 /* WXBridgeMethodTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeMethodTests.m; sourceTree = "<group>"; };
 		598805AC1D52D8C800EDED2C /* WXStorageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStorageTests.m; sourceTree = "<group>"; };
 		5996BD6F1D49EC0600C0FEA6 /* WXInstanceWrapTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceWrapTests.m; sourceTree = "<group>"; };
-		5996BD711D4A219300C0FEA6 /* WXNetworkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXNetworkTests.m; sourceTree = "<group>"; };
 		5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSDKEngineTests.m; sourceTree = "<group>"; };
 		59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppMonitorProtocol.h; sourceTree = "<group>"; };
 		59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXBridgeContext.h; sourceTree = "<group>"; };
@@ -704,7 +702,6 @@
 		74EF31C11DE6932900667A07 /* handler */ = {
 			isa = PBXGroup;
 			children = (
-				5996BD711D4A219300C0FEA6 /* WXNetworkTests.m */,
 				74EF31C21DE6935600667A07 /* WXURLRewriteTests.m */,
 			);
 			name = handler;
@@ -1315,7 +1312,6 @@
 				597334B11D4D9E7F00988789 /* WXSDKManagerTests.m in Sources */,
 				74C896401D2AC2210043B82A /* WeexSDKTests.m in Sources */,
 				598805AD1D52D8C800EDED2C /* WXStorageTests.m in Sources */,
-				5996BD721D4A219300C0FEA6 /* WXNetworkTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1454,6 +1450,7 @@
 		74C896461D2AC2210043B82A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1477,6 +1474,7 @@
 		74C896471D2AC2210043B82A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1598,6 +1596,7 @@
 		77D161121C02DBE70010B15B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1641,6 +1640,7 @@
 		77D161131C02DBE70010B15B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
