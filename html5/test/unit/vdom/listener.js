@@ -389,7 +389,7 @@ describe('listener', () => {
     listener = null
   })
 
-  it('', () => {
+  it('no-handler', () => {
     listener = new Listener('1')
     listener.handler(
       { module: 'dom', method: 'removeElement', args: ['1'] },

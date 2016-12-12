@@ -16,10 +16,18 @@ import {
   moveIndex,
   removeIndex
 } from './operation'
+import {
+  elementTypes,
+  setElement
+} from './element-types'
 
 const DEFAULT_TAG_NAME = 'div'
 
-export default function Element (type = DEFAULT_TAG_NAME, props) {
+export default function Element (type = DEFAULT_TAG_NAME, props, isExtended) {
+  const XElement = elementTypes[type]
+  if (XElement && !isExtended) {
+    return new XElement(props)
+  }
   props = props || {}
   this.nodeType = 1
   this.nodeId = uniqueId()
@@ -33,13 +41,15 @@ export default function Element (type = DEFAULT_TAG_NAME, props) {
   this.pureChildren = []
 }
 
-Element.prototype = new Node()
+Element.prototype = Object.create(Node.prototype)
 Element.prototype.constructor = Element
 
 function registerNode (docId, node) {
   const doc = getDoc(docId)
   doc.nodeMap[node.nodeId] = node
 }
+
+setElement(Element)
 
 Object.assign(Element.prototype, {
   /**
@@ -51,6 +61,7 @@ Object.assign(Element.prototype, {
     if (node.parentNode && node.parentNode !== this) {
       return
     }
+    /* istanbul ignore else */
     if (!node.parentNode) {
       linkParent(node, this)
       insertIndex(node, this.children, this.children.length, true)
@@ -115,6 +126,7 @@ Object.assign(Element.prototype, {
       moveIndex(node, this.children, this.children.indexOf(before), true)
       if (node.nodeType === 1) {
         const pureBefore = nextElement(before)
+        /* istanbul ignore next */
         const index = moveIndex(
           node,
           this.pureChildren,
@@ -146,6 +158,7 @@ Object.assign(Element.prototype, {
     if (!node.parentNode) {
       linkParent(node, this)
       insertIndex(node, this.children, this.children.indexOf(after) + 1, true)
+      /* istanbul ignore else */
       if (this.docId) {
         registerNode(this.docId, node)
       }
@@ -156,6 +169,7 @@ Object.assign(Element.prototype, {
           this.pureChildren.indexOf(previousElement(after)) + 1
         )
         const listener = getListener(this.docId)
+        /* istanbul ignore else */
         if (listener) {
           return listener.addElement(node, this.ref, index)
         }
@@ -203,6 +217,7 @@ Object.assign(Element.prototype, {
    */
   clear () {
     const listener = getListener(this.docId)
+    /* istanbul ignore else */
     if (listener) {
       this.pureChildren.forEach(node => {
         listener.removeElement(node.ref)

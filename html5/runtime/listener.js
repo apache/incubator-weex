@@ -10,7 +10,12 @@ export default function Listener (id, handler) {
   this.batched = false
   this.updates = []
   if (typeof handler === 'function') {
-    this.handler = handler
+    Object.defineProperty(this, 'handler', {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: handler
+    })
   }
   else {
     console.error('[JS Runtime] invalid parameter, handler must be a function')
@@ -168,6 +173,23 @@ Object.assign(Listener.prototype, {
    */
   removeEvent (ref, type) {
     return this.addActions(createAction('removeEvent', [ref, type]))
+  },
+
+  /**
+   * Call a component method with args.
+   * @param  {string} ref
+   * @param  {string} type
+   * @param  {string} method
+   * @param  {array}  args
+   * @return {undefined | number} the signal sent by native
+   */
+  callComponentMethod (ref, type, method, args) {
+    return this.addActions({
+      component: type,
+      method,
+      ref: ref,
+      args: [...args]
+    })
   },
 
   /**

@@ -3,12 +3,6 @@
  */
 
 /**
- * ==========================================================
- * common
- * ==========================================================
- */
-
-/**
  * @deprecated use $vm instead
  * find the vm by id
  * Note: there is only one id in whole component

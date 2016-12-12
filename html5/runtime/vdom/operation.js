@@ -163,6 +163,7 @@ export function previousElement (node) {
  * @return {number} newIndex
  */
 export function insertIndex (target, list, newIndex, changeSibling) {
+  /* istanbul ignore next */
   if (newIndex < 0) {
     newIndex = 0
   }
@@ -188,6 +189,7 @@ export function insertIndex (target, list, newIndex, changeSibling) {
  */
 export function moveIndex (target, list, newIndex, changeSibling) {
   const index = list.indexOf(target)
+  /* istanbul ignore next */
   if (index < 0) {
     return -1
   }
@@ -225,6 +227,7 @@ export function moveIndex (target, list, newIndex, changeSibling) {
  */
 export function removeIndex (target, list, changeSibling) {
   const index = list.indexOf(target)
+  /* istanbul ignore next */
   if (index < 0) {
     return
   }

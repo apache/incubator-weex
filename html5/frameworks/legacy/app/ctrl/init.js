@@ -36,14 +36,18 @@ export function init (app, code, data) {
     console.debug(`[JS Framework] After intialized an instance(${app.id})`)
   }
   const bundleVm = Vm
+  /* istanbul ignore next */
   const bundleRegister = (...args) => register(app, ...args)
+  /* istanbul ignore next */
   const bundleRender = (name, _data) => {
     result = bootstrap(app, name, {}, _data)
   }
+  /* istanbul ignore next */
   const bundleRequire = name => _data => {
     result = bootstrap(app, name, {}, _data)
   }
   const bundleDocument = app.doc
+  /* istanbul ignore next */
   const bundleRequireModule = name => app.requireModule(removeWeexPrefix(name))
 
   const appBroadcastChannel = name => {
@@ -54,6 +58,17 @@ export function init (app, code, data) {
     return channel
   }
 
+  const weexGlobalObject = {
+    config: app.options,
+    define: bundleDefine,
+    bootstrap: bundleBootstrap,
+    require: bundleDocument,
+    document: bundleRequireModule,
+    Vm: bundleVm
+  }
+
+  Object.freeze(weexGlobalObject)
+
   // prepare code
   let functionBody
   /* istanbul ignore if */
@@ -62,15 +77,17 @@ export function init (app, code, data) {
     // not very strict
     functionBody = code.toString().substr(12)
   }
+  /* istanbul ignore next */
   else if (code) {
     functionBody = code.toString()
   }
 
   // wrap IFFE and use strict mode
-  functionBody = `(function(){'use strict'; ${functionBody} })()`
+  functionBody = `(function(global){"use strict"; ${functionBody} })(Object.create(this))`
 
   // run code and get result
   const { WXEnvironment } = global
+  /* istanbul ignore if */
   if (WXEnvironment && WXEnvironment.platform !== 'Web') {
     // timer APIs polyfill in native
     const timer = app.requireModule('timer')
@@ -100,7 +117,6 @@ export function init (app, code, data) {
     const fn = new Function(
       'define',
       'require',
-      'document',
       'bootstrap',
       'register',
       'render',
@@ -110,6 +126,7 @@ export function init (app, code, data) {
       '__weex_require__',
       '__weex_viewmodel__',
       'BroadcastChannel',
+      'weex',
       'setTimeout',
       'setInterval',
       'clearTimeout',
@@ -120,7 +137,6 @@ export function init (app, code, data) {
     fn(
       bundleDefine,
       bundleRequire,
-      bundleDocument,
       bundleBootstrap,
       bundleRegister,
       bundleRender,
@@ -130,6 +146,7 @@ export function init (app, code, data) {
       bundleRequireModule,
       bundleVm,
       appBroadcastChannel,
+      weexGlobalObject,
       timerAPIs.setTimeout,
       timerAPIs.setInterval,
       timerAPIs.clearTimeout,
@@ -139,7 +156,6 @@ export function init (app, code, data) {
     const fn = new Function(
       'define',
       'require',
-      'document',
       'bootstrap',
       'register',
       'render',
@@ -149,13 +165,13 @@ export function init (app, code, data) {
       '__weex_require__',
       '__weex_viewmodel__',
       'BroadcastChannel',
+      'weex',
       functionBody
     )
 
     fn(
       bundleDefine,
       bundleRequire,
-      bundleDocument,
       bundleBootstrap,
       bundleRegister,
       bundleRender,
@@ -164,7 +180,8 @@ export function init (app, code, data) {
       bundleDocument,
       bundleRequireModule,
       bundleVm,
-      BroadcastChannel)
+      BroadcastChannel,
+      weexGlobalObject)
   }
 
   return result

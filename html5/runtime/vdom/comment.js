@@ -16,7 +16,7 @@ export default function Comment (value) {
   this.pureChildren = []
 }
 
-Comment.prototype = new Node()
+Comment.prototype = Object.create(Node.prototype)
 Comment.prototype.constructor = Comment
 
 /**
