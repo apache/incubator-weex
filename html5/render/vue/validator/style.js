@@ -72,7 +72,7 @@ export function textOverflow (value) {
  * @param {String} key
  */
 export function common (value, key) {
-  if (/^[\w\-]*color$/.test(String(key))) {
+  if (/^[\w-]*color$/.test(String(key))) {
     return isCSSColor(value)
   }
 

@@ -28,6 +28,7 @@ if (process.argv[2]) {
     case 'native': buildNative(); break;
     case 'runtime': buildRuntime(); break;
     case 'browser': buildBrowser(); break;
+    case 'vue': buildVue(); break;
     default: console.log('\n  invalid package name.\n')
   }
 }
@@ -163,6 +164,23 @@ function buildBrowser () {
         jsnext: true,
         main: true,
         browser: true
+      }),
+      commonjs(),
+      buble()
+    ]
+  })
+}
+
+function buildVue () {
+  build('vue-renderer', {
+    moduleName: 'weexVueRenderer',
+    entry: './html5/render/vue/index.js',
+    format: 'umd',
+    plugins: [
+      eslint(),
+      nodeResolve({
+        jsnext: true,
+        main: true
       }),
       commonjs(),
       buble()
