@@ -254,7 +254,7 @@ public enum WXErrorCode {
   /*
    * domModule
    **/
-  WX_SUCCESS(null, null),
+  WX_SUCCESS("0", "successful"),
   /**
    * Failure for createBody
    */

@@ -204,7 +204,6 @@
  */
 package com.taobao.weex.dom;
 
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -216,7 +215,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -573,6 +571,12 @@ public final class WXDomManager {
     return new FontDO(name, src,instance);
   }
 
+  /**
+   * Gets the coordinate information of the control
+   * @param instanceId wxsdkinstance id
+   * @param ref ref
+   * @param callback callback
+   */
   public void getComponentSize(String instanceId, String ref, String callback) {
     if (!isDomThread()) {
       throw new WXRuntimeException("getComponentSize operation must be done in dom thread");

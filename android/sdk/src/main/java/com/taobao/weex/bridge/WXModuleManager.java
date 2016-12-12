@@ -500,8 +500,6 @@ public class WXModuleManager {
     }
   }
 
-  /**Hook Activity life cycle callback end ***/
-
   public static void destroyInstanceModules(String instanceId) {
     sDomModuleMap.remove(instanceId);
     HashMap<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);

@@ -292,9 +292,8 @@ public class WXImage extends WXComponent<ImageView> {
           return true;
         case Constants.Name.IMAGE_QUALITY:
           return true;
-        case Constants.Name.BLUR:
+        case Constants.Name.FILTER:
           return true;
-
       }
     return super.setProperty(key, param);
   }
@@ -379,7 +378,7 @@ public class WXImage extends WXComponent<ImageView> {
       WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
       imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
-      int radius = getDomObject().getAttrs().getImageBlurRadius();
+      int radius = getDomObject().getStyles().getBlur();
       radius = Math.max(0, radius);
       imageStrategy.blurRadius = Math.min(10, radius);
 
