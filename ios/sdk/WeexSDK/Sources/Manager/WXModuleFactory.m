@@ -123,6 +123,8 @@ static WXModuleFactory *_sharedInstance = nil;
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     NSMutableArray *methods = [NSMutableArray array];
+    [methods addObject:@"addEventListener"];
+    [methods addObject:@"removeEventListener"];
     
     [_moduleLock lock];
     [dict setValue:methods forKey:name];

@@ -32,9 +32,10 @@ NSTimeInterval JSLibInitTime = 0;
     id<WXNetworkProtocol> _networkHandler;
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
+    WXThreadSafeMutableDictionary *_moduleEventObservers;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [self removeObservers];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -61,6 +62,7 @@ NSTimeInterval JSLibInitTime = 0;
         _moduleInstances = [NSMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
+        _moduleEventObservers = [WXThreadSafeMutableDictionary new];
        
         [self addObservers];
     }
@@ -334,6 +336,16 @@ NSTimeInterval JSLibInitTime = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
+- (void)fireModuleEvent:(id)module eventName:(NSString *)eventName params:(NSDictionary*)params
+{
+    NSDictionary * userInfo = @{
+                                @"moduleId":[module description]?:@"",
+                                @"param":params?:@{}
+                                };
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
+}
+
 - (NSURL *)completeURL:(NSString *)url
 {
     if (!_scriptURL) {
@@ -347,7 +359,36 @@ NSTimeInterval JSLibInitTime = 0;
     return [NSURL URLWithString:url relativeToURL:_scriptURL];
 }
 
+- (BOOL)checkModuleEventRegistered:(NSString*)event module:(id)module
+{
+    return [_moduleEventObservers[module] objectForKey:event] ? TRUE:FALSE;
+}
+
 #pragma mark Private Methods
+
+- (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId module:(id)module
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moduleEventNotif:) name:event object:nil];
+    [_moduleEventObservers setObject:@{event:callbackId} forKey:module];
+}
+
+- (void)removeModuleEventObserver:(NSString*)event module:(id)module
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:event object:nil];
+    [_moduleEventObservers[module] removeObjectForKey:event];
+    if ([_moduleEventObservers[module] count] == 0) {
+        [_moduleEventObservers removeObjectForKey:module];
+    }
+}
+
+- (void)moduleEventNotif:(NSNotification *)notification
+{
+    NSDictionary * moduleEventObserversCpy = [_moduleEventObservers copy];
+    NSDictionary * userInfo = notification.userInfo;
+    for (WXModuleKeepAliveCallback callback in [moduleEventObserversCpy[userInfo[@"moduleId"]] objectForKey:notification.name]) {
+        callback(userInfo[@"param"], true);
+    }
+}
 
 - (void)addObservers
 {

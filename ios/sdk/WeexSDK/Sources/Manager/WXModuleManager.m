@@ -16,6 +16,7 @@
 #import "WXSDKManager.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXInvocationConfig.h"
+#import "WXSDKInstance_private.h"
 
 #import <objc/message.h>
 
@@ -80,6 +81,19 @@
     
     WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
     id<WXModuleProtocol> moduleInstance = [weexInstance moduleForClass:module];
+    if ([method.method isEqualToString:@"addEventListener"]) {
+        if([method.arguments[0] isKindOfClass:[NSString class]] && method.arguments[1]) {
+            [weexInstance addModuleEventObservers:method.arguments[0] callback:method.arguments[1] module:moduleInstance];
+        }
+        return;
+    }
+    
+    if ([method.method isEqualToString:@"removeEventListener"]) {
+        if ([method.arguments[0] isKindOfClass:[NSString class]]) {
+            [weexInstance removeModuleEventObserver:method.arguments[0] module:moduleInstance];
+        }
+        return;
+    }
     
     // dispatch to user specified queue or thread, default is main thread
     __weak typeof(self) weakSelf = self;
