@@ -470,7 +470,8 @@ class WXDomStatement {
 
   private class CreateBodyTask implements IWXRenderTask {
     final WXComponent mComponent;
-    CreateBodyTask(WXComponent component){
+
+    CreateBodyTask(WXComponent component) {
       mComponent = component;
     }
 
@@ -483,6 +484,7 @@ class WXDomStatement {
       }
       try {
         mWXRenderManager.createBody(mInstanceId, mComponent);
+        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
       } catch (Exception e) {
         WXLogUtils.e("create body failed.", e);
       }
@@ -611,7 +613,7 @@ class WXDomStatement {
 
     IWXRenderTask task = isRoot ? new CreateBodyTask(component) : new AddDOMTask(component, parentRef, index);
     mNormalTasks.add(task);
-    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(), domObject.getStyles()));
+    addAnimationForDomTree(domObject);
     mDirty = true;
 
     instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
@@ -1129,6 +1131,13 @@ class WXDomStatement {
         }
       });
       mDirty=true;
+    }
+  }
+
+  private void addAnimationForDomTree(WXDomObject domObject){
+    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+    for(int i=0;i<domObject.childCount();i++){
+      addAnimationForDomTree(domObject.getChild(i));
     }
   }
 

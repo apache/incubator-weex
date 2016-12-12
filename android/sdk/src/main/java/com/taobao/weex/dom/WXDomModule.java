@@ -650,12 +650,12 @@ public final class WXDomModule extends WXModule {
       WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
       return;
     } else if ("viewport".equalsIgnoreCase(ref)) {
-      if(mWXSDKInstance!=null && mWXSDKInstance.getContainerView()!=null
-         && mWXSDKInstance.getContainerView().getParent()!=null){
+      if(mWXSDKInstance!=null && mWXSDKInstance.getRootView()!=null
+         && mWXSDKInstance.getRootView().getParent()!=null){
         Map<String, Object> options = new HashMap<>();
         Map<String, String> sizes = new HashMap<>();
         Rect rect=new Rect();
-        ((View)mWXSDKInstance.getContainerView().getParent()).getGlobalVisibleRect(rect);
+        ((View)mWXSDKInstance.getRootView().getParent()).getGlobalVisibleRect(rect);
         sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width())));
         sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height())));
         sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom)));

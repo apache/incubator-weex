@@ -315,21 +315,6 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return waImageSharpen;
   }
 
-  public int getImageBlurRadius(){
-    Object blurRadius = get(Constants.Name.BLUR);
-    if(blurRadius == null) {
-      return 0;
-    }
-
-    int radius;
-    try {
-      radius = Integer.parseInt(String.valueOf(blurRadius));
-    }catch (Exception e) {
-      radius = 0;
-    }
-    return radius;
-  }
-
   public String getImageSrc() {
     Object src = get(Constants.Name.SRC);
     if (src == null) {

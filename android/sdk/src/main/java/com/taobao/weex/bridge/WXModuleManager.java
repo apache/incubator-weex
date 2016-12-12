@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -363,6 +364,140 @@ public class WXModuleManager {
     }
 
     return wxModule;
+  }
+
+  /**Hook Activity life cycle callback begin***/
+
+
+  public static void onActivityCreate(String instanceId){
+
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityCreate();
+        } else {
+          WXLogUtils.w("onActivityCreate can not find the " + key + " module");
+        }
+      }
+    }
+
+  }
+
+  public static void onActivityStart(String instanceId){
+
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityStart();
+        } else {
+          WXLogUtils.w("onActivityStart can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static void onActivityPause(String instanceId){
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityPause();
+        } else {
+          WXLogUtils.w("onActivityPause can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static void onActivityResume(String instanceId){
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityResume();
+        } else {
+          WXLogUtils.w("onActivityResume can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static void onActivityStop(String instanceId){
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityStop();
+        } else {
+          WXLogUtils.w("onActivityStop can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static void onActivityDestroy(String instanceId){
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityDestroy();
+        } else {
+          WXLogUtils.w("onActivityDestroy can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static boolean onActivityBack(String instanceId){
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          return module.onActivityBack();
+        } else {
+          WXLogUtils.w("onActivityCreate can not find the " + key + " module");
+        }
+      }
+    }
+    return false;
+  }
+
+  public static void onActivityResult(String instanceId,int requestCode, int resultCode, Intent data){
+
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityResult(requestCode, resultCode, data);
+        } else {
+          WXLogUtils.w("onActivityResult can not find the " + key + " module");
+        }
+      }
+    }
+  }
+
+  public static void onRequestPermissionsResult(String instanceId ,int requestCode, String[] permissions, int[] grantResults) {
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
+          WXLogUtils.w("onActivityResult can not find the " + key + " module");
+        }
+      }
+    }
   }
 
   public static void destroyInstanceModules(String instanceId) {
