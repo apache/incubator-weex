@@ -315,6 +315,15 @@ public class WXPerformance {
   public long actualNetworkTime;
   public long packageSpendTime;
   public long syncTaskTime;
+  /**
+   * view hierarchy
+   */
+  public int maxDeepViewLayer;
+  /**
+   * 1:true
+   * 0:false
+   */
+  public int useScroller=0;
 
   /**
    * component Count
@@ -353,6 +362,7 @@ public class WXPerformance {
   public String connectionType;
   public String requestType;
 
+
   public WXPerformance(){
     mErrMsgBuilder=new StringBuilder();
   }
@@ -377,6 +387,8 @@ public class WXPerformance {
     quotas.put("syncTaskTime",(double)syncTaskTime);
     quotas.put("packageSpendTime",(double)packageSpendTime);
     quotas.put("SDKInitTime",(double)WXEnvironment.sSDKInitTime);
+    quotas.put("maxDeepViewLayer", (double) maxDeepViewLayer);
+    quotas.put("useScroller", (double) useScroller);
     return quotas;
   }
 
@@ -415,7 +427,9 @@ public class WXPerformance {
         "syncTaskTime",
         "pureNetworkTime",
         "actualNetworkTime",
-        "firstScreenJSFExecuteTime"};
+        "firstScreenJSFExecuteTime",
+        "maxDeepViewLayer",
+        "useScroller"};
   }
 
   @Override
