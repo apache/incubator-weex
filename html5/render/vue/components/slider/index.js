@@ -1,10 +1,11 @@
 import { validateStyles } from '../../validator'
 import { throttle, bind } from '../../utils'
 import indicator from './indicator'
+import eventMixin from '../../mixins/event'
 import slideMixin from './slideMixin'
 
 export default {
-  mixins: [slideMixin],
+  mixins: [eventMixin, slideMixin],
   components: { indicator },
   props: {
     'auto-play': {

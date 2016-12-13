@@ -19,7 +19,9 @@ export default {
       }
       if (newIndex !== this.currentIndex) {
         this.currentIndex = newIndex
-        this.$emit('change', { index: this.currentIndex })
+        this.$emit('change', this.createEvent('change', {
+          index: this.currentIndex
+        }))
       }
     },
 

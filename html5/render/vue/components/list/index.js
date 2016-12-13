@@ -1,9 +1,10 @@
 import { validateStyles } from '../../validator'
 import { debounce, bind } from '../../utils'
 import rectMixin from '../../mixins/rect'
+import eventMixin from '../../mixins/event'
 
 export default {
-  mixins: [rectMixin],
+  mixins: [rectMixin, eventMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],
@@ -14,7 +15,7 @@ export default {
   methods: {
     handleScroll (event) {
       if (this.reachBottom()) {
-        this.$emit('loadmore')
+        this.$emit('loadmore', this.createCustomEvent('loadmore'))
       }
     }
   },
