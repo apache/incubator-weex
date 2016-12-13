@@ -314,6 +314,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
 
 
+  private int mMaxDeepLayer;
+
   public interface OnInstanceVisibleListener{
     void onAppear();
     void onDisappear();
@@ -945,6 +947,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
             if (mUserTrackAdapter != null) {
+              mWXPerformance.maxDeepViewLayer=mMaxDeepLayer;
+              if(getScrollView()!=null){
+                mWXPerformance.useScroller=1;
+              }
               mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
               WXPerformance performance=new WXPerformance();
               performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
@@ -1322,6 +1328,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if(this.mUserTrackParams != null){
       this.mUserTrackParams.remove(key);
     }
+  }
+
+  public int getMaxDeepLayer() {
+    return mMaxDeepLayer;
+  }
+
+  public void setMaxDeepLayer(int maxDeepLayer) {
+    mMaxDeepLayer = maxDeepLayer;
   }
 
   /**
