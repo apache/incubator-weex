@@ -94,7 +94,7 @@
 		7423899B1C3174EB00D748CA /* WXWeakObjectWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 742389991C3174EB00D748CA /* WXWeakObjectWrapper.h */; };
 		7423899C1C3174EB00D748CA /* WXWeakObjectWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7423899A1C3174EB00D748CA /* WXWeakObjectWrapper.m */; };
 		7423899F1C32733800D748CA /* WXType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7423899D1C32733800D748CA /* WXType.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		742AD72E1DF98C45007DC46C /* WXResourceRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7251DF98C45007DC46C /* WXResourceRequest.h */; };
+		742AD72E1DF98C45007DC46C /* WXResourceRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7251DF98C45007DC46C /* WXResourceRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 742AD7261DF98C45007DC46C /* WXResourceRequest.m */; };
 		742AD7301DF98C45007DC46C /* WXResourceRequestHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7271DF98C45007DC46C /* WXResourceRequestHandler.h */; };
 		742AD7311DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7281DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.h */; };
