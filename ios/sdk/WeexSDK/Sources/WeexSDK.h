@@ -18,6 +18,7 @@
 #import "WXSDKError.h"
 #import "WXSDKEngine.h"
 #import "WXRootViewController.h"
+#import "WXResourceRequest.h"
 #import "WXNetworkProtocol.h"
 #import "WXNavigationProtocol.h"
 #import "WXMonitor.h"

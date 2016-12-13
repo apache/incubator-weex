@@ -231,13 +231,14 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)onClick:(__unused UITapGestureRecognizer *)recognizer
 {
     NSMutableDictionary *position = [[NSMutableDictionary alloc] initWithCapacity:4];
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         CGRect frame = [self.view.superview convertRect:self.calculatedFrame toView:self.view.window];
-        position[@"x"] = @(frame.origin.x/WXScreenResizeRadio());
-        position[@"y"] = @(frame.origin.y/WXScreenResizeRadio());
-        position[@"width"] = @(frame.size.width/WXScreenResizeRadio());
-        position[@"height"] = @(frame.size.height/WXScreenResizeRadio());
+        position[@"x"] = @(frame.origin.x/scaleFactor);
+        position[@"y"] = @(frame.origin.y/scaleFactor);
+        position[@"width"] = @(frame.size.width/scaleFactor);
+        position[@"height"] = @(frame.size.height/scaleFactor);
     }
 
     [self fireEvent:@"click" params:@{@"position":position}];
@@ -539,10 +540,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (NSDictionary *)touchResultWithScreenLocation:(CGPoint)screenLocation pageLocation:(CGPoint)pageLocation identifier:(NSNumber *)identifier
 {
     NSMutableDictionary *resultTouch = [[NSMutableDictionary alloc] initWithCapacity:5];
-    resultTouch[@"screenX"] = @(screenLocation.x/WXScreenResizeRadio());
-    resultTouch[@"screenY"] = @(screenLocation.y/WXScreenResizeRadio());
-    resultTouch[@"pageX"] = @(pageLocation.x/WXScreenResizeRadio());
-    resultTouch[@"pageY"] = @(pageLocation.y/WXScreenResizeRadio());
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+    resultTouch[@"screenX"] = @(screenLocation.x/scaleFactor);
+    resultTouch[@"screenY"] = @(screenLocation.y/scaleFactor);
+    resultTouch[@"pageX"] = @(pageLocation.x/scaleFactor);
+    resultTouch[@"pageY"] = @(pageLocation.y/scaleFactor);
     resultTouch[@"identifier"] = identifier;
     
     return resultTouch;

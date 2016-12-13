@@ -299,10 +299,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
     CGPoint contentOffset = scrollView.contentOffset;
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     
     if (_scrollDirection == WXScrollDirectionHorizontal) {
         CGFloat contentOffetX = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].x;
-        contentOffetX += offset * WXScreenResizeRadio();
+        contentOffetX += offset * scaleFactor;
         
         if (contentOffetX > scrollView.contentSize.width - scrollView.frame.size.width) {
             contentOffset.x = scrollView.contentSize.width - scrollView.frame.size.width;
@@ -311,7 +312,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
     } else {
         CGFloat contentOffetY = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].y;
-        contentOffetY += offset * WXScreenResizeRadio();
+        contentOffetY += offset * scaleFactor;
         
         if (contentOffetY > scrollView.contentSize.height - scrollView.frame.size.height) {
             contentOffset.y = scrollView.contentSize.height - scrollView.frame.size.height;

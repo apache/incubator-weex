@@ -141,6 +141,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *userInfo;
 
 /**
+ *  scale factor from css unit to device pixel.
+ */
+@property (nonatomic, assign, readonly) CGFloat pixelScaleFactor;
+
+/**
  * Renders weex view with bundle url.
  *
  * @param url The url of bundle rendered to a weex view.

@@ -34,7 +34,7 @@
 
 #define WX_SDK_ROOT_REF     @"_root"
 
-#define WX_TEXT_FONT_SIZE   (32.0 * WXScreenResizeRadio())
+#define WX_TEXT_FONT_SIZE   (32.0 * self.weexInstance.pixelScaleFactor)
 
 #define WX_UPDATE_CONFIG(prefix, name, configs) \
 NSString *selStr = [NSString stringWithFormat:@"%@_%@", prefix, name];\

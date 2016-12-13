@@ -343,6 +343,15 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
+- (CGFloat)pixelScaleFactor
+{
+    if (self.viewportWidth > 0) {
+        return [WXUtility portraitScreenSize].width / self.viewportWidth;
+    } else {
+        return [WXUtility defaultPixelScaleFactor];
+    }
+}
+
 - (NSURL *)completeURL:(NSString *)url
 {
     if (!_scriptURL) {
