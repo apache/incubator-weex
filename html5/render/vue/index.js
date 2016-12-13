@@ -1,7 +1,8 @@
 // import Vue from 'vue'
 import semver from 'semver'
+import './env'
 import * as components from './components'
-import { updateMeta } from './prepare'
+import { setViewport } from './viewport'
 
 export function install (Vue) {
   const htmlRegex = /^html:/i
@@ -31,7 +32,7 @@ else {
       `greater than 2.1.5, current is ${Vue.version}.`)
   }
 
-  updateMeta()
+  setViewport()
 
   Vue.use({ install })
 }
