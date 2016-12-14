@@ -19,7 +19,7 @@
 
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
-- (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId module:(id)module;
-- (void)removeModuleEventObserver:(NSString*)event module:(id)module;
+- (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
+- (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName;
 
 @end

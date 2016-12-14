@@ -197,7 +197,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  * check whether the module eventName is registered
  */
-- (BOOL)checkModuleEventRegistered:(NSString*)event module:(id)module;
+- (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName;
 
 /**
  * fire module event;

@@ -82,15 +82,15 @@
     WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
     id<WXModuleProtocol> moduleInstance = [weexInstance moduleForClass:module];
     if ([method.method isEqualToString:@"addEventListener"]) {
-        if([method.arguments[0] isKindOfClass:[NSString class]] && method.arguments[1]) {
-            [weexInstance addModuleEventObservers:method.arguments[0] callback:method.arguments[1] module:moduleInstance];
+        if([method.arguments[0] isKindOfClass:[NSString class]] && method.arguments[1] && method.arguments[2]) {
+            [weexInstance addModuleEventObservers:method.arguments[0] callback:method.arguments[1] option:method.arguments[2] moduleClassName:NSStringFromClass(module)];
         }
         return;
     }
     
     if ([method.method isEqualToString:@"removeEventListener"]) {
         if ([method.arguments[0] isKindOfClass:[NSString class]]) {
-            [weexInstance removeModuleEventObserver:method.arguments[0] module:moduleInstance];
+            [weexInstance removeModuleEventObserver:method.arguments[0] moduleClassName:NSStringFromClass(module)];
         }
         return;
     }
