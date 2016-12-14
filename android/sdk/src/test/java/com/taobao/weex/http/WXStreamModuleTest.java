@@ -366,6 +366,8 @@ public class WXStreamModuleTest {
       }
     });
     streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS),302);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS).getClass(),Integer.class);
     assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.getStatusText("302"));
   }
 
