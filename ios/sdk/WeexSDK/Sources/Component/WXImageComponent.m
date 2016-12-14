@@ -103,8 +103,6 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (UIView *)loadView
 {
-    WXImageView *view = [[WXImageView alloc] init];
-    
     return [[WXImageView alloc] init];
 }
 
