@@ -370,15 +370,15 @@ ComponentManager.prototype = {
   },
 
   createFinish (callback) {
-    // TODO
+    window.dispatchEvent(new Event('weex:createfinish'))
   },
 
   updateFinish (callback) {
-    // TODO
+    window.dispatchEvent(new Event('weex:updatefinish'))
   },
 
   refreshFinish (callback) {
-    // TODO
+    window.dispatchEvent(new Event('weex:refreshfinish'))
   }
 
 }
