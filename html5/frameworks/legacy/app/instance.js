@@ -18,6 +18,7 @@ export default function App (id, options) {
   this.customComponentMap = {}
   this.commonModules = {}
   this.callbacks = {}
+  this.channels = {}
   this.doc = new renderer.Document(
     id,
     this.options.bundleUrl,
