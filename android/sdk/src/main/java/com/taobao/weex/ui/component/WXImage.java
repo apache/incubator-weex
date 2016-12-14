@@ -388,9 +388,18 @@ public class WXImage extends WXComponent<ImageView> {
           if (!result && imageView != null) {
             imageView.setImageDrawable(null);
           }
+
+          Map<String, String> size = new HashMap<>(2);
+
+          if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
+            size.put("naturalWidth", String.valueOf(((ImageDrawable) imageView.getDrawable()).getBitmapWidth()));
+            size.put("naturalHeight", String.valueOf(((ImageDrawable) imageView.getDrawable()).getBitmapHeight()));
+          }
+
           if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
             Map<String, Object> params = new HashMap<>();
             params.put("success", result);
+            params.put("size", size);
             fireEvent(Constants.Event.ONLOAD, params);
           }
         }
