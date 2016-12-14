@@ -10,7 +10,7 @@
                         type="text"
                         placeholder="Input Text"
                         class="input"
-                        autofocus="true"
+                        autofocus="{{autofocus}}"
                         value=""
                         onchange="onchange"
                         oninput="oninput"
@@ -80,6 +80,11 @@
             </wxc-panel>
 
             <wxc-panel title="function focus() & blur()" type="primary">
+                <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
+                    <wxc-button value="Focus" type="primary" onclick="{{focus}}"></wxc-button>
+                    <wxc-button value="Blur" type="primary" onclick="{{blur}}"></wxc-button>
+                </div>
+
                 <input
                         type="text"
                         placeholder="Input1"
@@ -87,17 +92,6 @@
                         value=""
                         id="input1"
                 />
-
-                <input
-                        type="text"
-                        class="input"
-                        placeholder="Input2"
-                        value=""
-                />
-                <div style="flex-direction: row;margin-top: 16px;justify-content: space-between">
-                    <wxc-button value="Focus" type="primary" onclick="{{focus}}"></wxc-button>
-                    <wxc-button value="Blur" type="primary" onclick="{{blur}}"></wxc-button>
-                </div>
             </wxc-panel>
         </scroller>
     </div>
@@ -116,9 +110,16 @@
     module.exports = {
         data: {
             txtInput: '',
-            txtChange: ''
+            txtChange: '',
+            autofocus: false,
         },
         methods: {
+            ready : function () {
+                var self = this;
+                setTimeout(function () {
+                    self.autofocus = true;
+                },1000);
+            },
             onchange: function (event) {
                 this.txtChange = event.value;
                 console.log('onchange', event.value);
