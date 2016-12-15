@@ -1178,6 +1178,15 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     mGlobalEvents.remove(eventName);
   }
 
+  /**
+   * module event
+   * @return
+   */
+  public void fireModuleEvent(String callback,Map<String,Object> params,boolean isOnce){
+    WXSDKManager.getInstance().callback(getInstanceId(),callback,params,isOnce);
+  }
+
+
   public Map<String, Serializable> getUserTrackParams() {
     return mUserTrackParams;
   }
