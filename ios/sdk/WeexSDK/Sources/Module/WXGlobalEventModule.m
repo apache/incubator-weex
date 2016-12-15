@@ -55,11 +55,12 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 - (void)fireGlobalEvent:(NSNotification *)notification
 {
     NSDictionary * userInfo = notification.userInfo;
-    WXSDKInstance * userWeexInstance = [WXSDKManager instanceForID:userInfo[@"weexInstance"]];
-    NSDictionary * param = userInfo[@"param"];
-    if (!userWeexInstance|| userWeexInstance == weexInstance) {
+    NSString * userWeexInstanceId = userInfo[@"weexInstance"];
+    WXSDKInstance * userWeexInstance = [WXSDKManager instanceForID:userWeexInstanceId];
+     // In case that userInstanceId exists but instance has been dealloced
+    if (!userWeexInstanceId || userWeexInstance == weexInstance) {
         for (WXModuleKeepAliveCallback callback in _eventCallback[notification.name]) {
-            callback(param, true);
+            callback(userInfo[@"param"], true);
         }
     }
 }
