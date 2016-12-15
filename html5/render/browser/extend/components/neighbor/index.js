@@ -2,6 +2,8 @@
 
 'use strict'
 
+import './neighbor.css'
+
 const DEFAULT_INTERVAL = 3000
 const DEFAULT_NEIGHBOR_SPACE = 20
 const DEFAULT_NEIGHBOR_ALPHA = 0.6
@@ -99,7 +101,7 @@ function loadImg (slider) {
   const imgs2 = slider.node.querySelectorAll('[i-lazy-src]') || []
   function load (node) {
     const src = node.getAttribute('img-src') || node.getAttribute('i-lazy-src')
-    lib.img.loadProcessedSrc(node, src)
+    lib.img.applySrc(node, src, node.dataset.placeholder)
   }
   for (let i = 0; i < imgs1.length; i++) {
     load(imgs1[i])
@@ -228,6 +230,16 @@ function resetSideSlidePos (slider, side) {
   node.style.transform = transformStr
 }
 
+function resetOutsideSlides (slider, indexArr) {
+  indexArr = indexArr || []
+  const l = slider.slides.length
+  for (let i = 0; i < l; i++) {
+    if (indexArr.indexOf(i) <= -1) {
+      slider.slides[i].node.style.opacity = 0
+    }
+  }
+}
+
 const proto = {
   create () {
     const node = document.createElement('div')
@@ -253,10 +265,14 @@ const proto = {
         const data = children[i]
         data.scale = scale
         data.instanceId = this.data.instanceId
-
         // 'indicator' maybe the last child of this component.
         if (data.type !== 'indicator') {
           child = componentManager.createElement(data)
+          child.node.classList.add('weex-neighbor-item')
+          const width = (data.style || {}).width || this.data.style.width
+          const height = (data.style || {}).height || this.data.style.height
+          child.node.style.marginTop = -(height / 2 * scale) + 'px'
+          child.node.style.marginLeft = -(width / 2 * scale) + 'px'
           this.slides.push(child)
           fragment.appendChild(child.node)
           child.parentRef = this.data.ref
@@ -270,12 +286,15 @@ const proto = {
           }))
         }
       }
+      resetOutsideSlides(this, [])
       this.node.appendChild(fragment)
+      doRender(this)
     }
   },
 
   appendChild (data) {
     const children = this.data.children
+    const scale = this.data.scale
     const componentManager = this.getComponentManager()
     let child
 
@@ -289,7 +308,13 @@ const proto = {
     }
     else {
       child = componentManager.createElement(data)
+      child.node.classList.add('weex-neighbor-item')
+      const width = (data.style || {}).width || this.data.style.width
+      const height = (data.style || {}).height || this.data.style.height
+      child.node.style.marginTop = -(height / 2 * scale) + 'px'
+      child.node.style.marginLeft = -(width / 2 * scale) + 'px'
       this.slides.push(child)
+      resetOutsideSlides(this, [])
       this.node.appendChild(child.node)
     }
 
@@ -307,6 +332,7 @@ const proto = {
 
   insertBefore (child, before) {
     const children = this.data.children
+    const scale = this.data.scale
     let i = 0
     let slidesIdx = 0
     let isAppend = false
@@ -328,9 +354,16 @@ const proto = {
       }
     }
 
+    child.node.classList.add('weex-neighbor-item')
+    const data = child.data
+    const width = (data.style || {}).width || this.data.style.width
+    const height = (data.style || {}).height || this.data.style.height
+    child.node.style.marginTop = -(height / 2 * scale) + 'px'
+    child.node.style.marginLeft = -(width / 2 * scale) + 'px'
     if (isAppend) {
       this.node.appendChild(child.node)
       this.slides.push(child)
+      resetOutsideSlides(this, [])
       children.push(child.data)
     }
     else {
@@ -359,6 +392,7 @@ const proto = {
       if (i < l) {
         children.splice(i, 1)
         this.slides.splice(slidesIdx, 1)
+        resetOutsideSlides(this, [])
       }
     }
 
@@ -398,15 +432,17 @@ const proto = {
     }
     const origIdx = index
     index = loopIndex(origIdx, total)
+    const leftIndex = loopIndex(index - 1, total)
+    const rightIndex = loopIndex(index + 1, total)
 
     this.mainSlide = this.slides[index]
     this.leftSlide = this.slides[loopIndex(index - 1, total)]
     this.rightSlide = this.slides[loopIndex(index + 1, total)]
 
-    const mianTransformStr = `translate(0px, 0px) scale(${MAIN_SLIDE_SCALE})`
+    const mainTransformStr = `translate(0px, 0px) scale(${MAIN_SLIDE_SCALE})`
     setTimeout(() => animateTransform(this.mainSlide.node, {
-      webkitTransition: mianTransformStr,
-      transform: mianTransformStr,
+      webkitTransform: mainTransformStr,
+      transform: mainTransformStr,
       opacity: MAIN_SLIDE_OPACITY,
       zIndex: 99
     }), 100)
@@ -439,6 +475,8 @@ const proto = {
       opacity: this.neighborAlpha,
       zIndex: 1
     }), 100)
+
+    resetOutsideSlides(this, [index, leftIndex, rightIndex])
 
     this.currentIndex = index
     updateIndicators(this)

@@ -17,7 +17,8 @@
     "a",
     "embed",
     "spinner",
-    "web"
+    "web",
+    "neighbor"
   ],
   "apis": [
     "animation",
