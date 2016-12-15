@@ -13,6 +13,27 @@
       <text>oninput: {{txtInput}}</text>
       <text>onchange: {{txtChange}}</text>
     </wxc-panel>
+
+    <wxc-panel title="focus & blur" type="primary">
+      <input
+              type="text"
+              placeholder="Input1"
+              class="input"
+              value=""
+              id="input1"
+      />
+
+      <input
+              type="text"
+              class="input"
+              placeholder="Input2"
+              value=""
+      />
+      <div style="flex-direction: row;margin-top: 16px;justify-content: space-between">
+        <wxc-button value="Focus" type="primary" onclick="{{focus}}"></wxc-button>
+        <wxc-button value="Blur" type="primary" onclick="{{blur}}"></wxc-button>
+      </div>
+    </wxc-panel>
   </scroller>
 </template>
 
@@ -39,6 +60,12 @@
       oninput: function(event) {
         this.txtInput = event.value;
         console.log('oninput', event.value);
+      },
+      focus: function () {
+        this.$el('input1').focus();
+      },
+      blur: function () {
+        this.$el('input1').blur();
       }
     }
   };

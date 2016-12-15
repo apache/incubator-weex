@@ -45,11 +45,11 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(338)
-	var __weex_style__ = __webpack_require__(339)
-	var __weex_script__ = __webpack_require__(340)
+	var __weex_template__ = __webpack_require__(153)
+	var __weex_style__ = __webpack_require__(154)
+	var __weex_script__ = __webpack_require__(155)
 
-	__weex_define__('@weex-component/14c303543be596aa2a969ac47565db7c', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/d723bedd436352d63e4fa599317a8037', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -62,42 +62,26 @@
 
 	})
 
-	__weex_bootstrap__('@weex-component/14c303543be596aa2a969ac47565db7c',undefined,undefined)
+	__weex_bootstrap__('@weex-component/d723bedd436352d63e4fa599317a8037',undefined,undefined)
 
 /***/ },
 
-/***/ 338:
+/***/ 153:
 /***/ function(module, exports) {
 
 	module.exports = {
 	  "type": "div",
-	  "events": {
-	    "click": "update"
-	  },
+	  "classList": [
+	    "slider-item-container"
+	  ],
 	  "children": [
 	    {
-	      "type": "text",
+	      "type": "image",
 	      "classList": [
-	        "a"
+	        "slider-item-image"
 	      ],
 	      "attr": {
-	        "value": "Hello"
-	      }
-	    },
-	    {
-	      "type": "text",
-	      "classList": [
-	        "b"
-	      ],
-	      "attr": {
-	        "value": "Hello"
-	      }
-	    },
-	    {
-	      "type": "text",
-	      "classList": function () {return ['a', this.x]},
-	      "attr": {
-	        "value": "Hello"
+	        "src": function () {return this.image}
 	      }
 	    }
 	  ]
@@ -105,32 +89,39 @@
 
 /***/ },
 
-/***/ 339:
+/***/ 154:
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "a": {
-	    "fontSize": 48
+	  "slider-item-container": {
+	    "width": 542,
+	    "height": 360,
+	    "justifyContent": "center",
+	    "flexDirection": "row",
+	    "padding": 10
 	  },
-	  "b": {
-	    "color": "#ff0000"
+	  "slider-item-image": {
+	    "width": 542,
+	    "height": 360
 	  }
 	}
 
 /***/ },
 
-/***/ 340:
+/***/ 155:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
 	module.exports = {
 	  data: function () {return {
-	    x: ''
+	    image: '',
+	    link: '',
+	    href: ''
 	  }},
 	  methods: {
-	    update: function update(e) {
-	      this.x = 'b';
+	    ready: function ready() {
+	      this.href = this.link;
 	    }
 	  }
 	};}
