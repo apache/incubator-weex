@@ -328,7 +328,7 @@ NSTimeInterval JSLibInitTime = 0;
         params = [NSDictionary dictionary];
     }
     NSDictionary * userInfo = @{
-            @"weexInstance":self,
+            @"weexInstance":self.instanceId,
             @"param":params
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];

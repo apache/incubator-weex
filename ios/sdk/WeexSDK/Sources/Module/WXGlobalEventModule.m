@@ -10,6 +10,7 @@
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXThreadSafeMutableArray.h"
 #import "WXLog.h"
+#import "WXSDKManager.h"
 
 @interface WXGlobalEventModule()
 @property WXThreadSafeMutableDictionary *eventCallback;
@@ -54,7 +55,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 - (void)fireGlobalEvent:(NSNotification *)notification
 {
     NSDictionary * userInfo = notification.userInfo;
-    WXSDKInstance * userWeexInstance = userInfo[@"weexInstance"];
+    WXSDKInstance * userWeexInstance = [WXSDKManager instanceForID:userInfo[@"weexInstance"]];
     NSDictionary * param = userInfo[@"param"];
     if (!userWeexInstance|| userWeexInstance == weexInstance) {
         for (WXModuleKeepAliveCallback callback in _eventCallback[notification.name]) {
