@@ -629,12 +629,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @Override
   public void scrollTo(WXComponent component,int offset) {
-    int offsetIntF = (int) WXViewUtils.getRealPxByWidth(offset);
-
     int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
     int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
 
-    scrollBy(viewXInScroller - getScrollX()+offsetIntF,viewYInScroller - getScrollY() + offsetIntF);
+    scrollBy(viewXInScroller - getScrollX() + offset,viewYInScroller - getScrollY() + offset);
   }
 
   /**
