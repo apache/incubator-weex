@@ -39,6 +39,8 @@
     [self registerModule:@"timer" withClass:NSClassFromString(@"WXTimerModule")];
     [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
     [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
+    [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
+	[self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -79,6 +81,8 @@
     [self registerComponent:@"loading-indicator" withClass:NSClassFromString(@"WXLoadingIndicator")];
     [self registerComponent:@"refresh" withClass:NSClassFromString(@"WXRefreshComponent")];
     [self registerComponent:@"textarea" withClass:NSClassFromString(@"WXTextAreaComponent")];
+	[self registerComponent:@"canvas" withClass:NSClassFromString(@"WXCanvasComponent")];
+    [self registerComponent:@"slider-neighbor" withClass:NSClassFromString(@"WXSliderNeighborComponent")];
 }
 
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz
@@ -127,8 +131,9 @@
 {
     WX_MONITOR_PERF_START(WXPTInitalize)
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
-    
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
+  
+    NSBundle *bundle = [NSBundle bundleForClass:self];
+    NSString *filePath = [bundle pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnviroment:script];
     

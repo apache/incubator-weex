@@ -1,6 +1,5 @@
 # Display Logic Control
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/12"  class="weex-translate">cn</a>
 
 There are two attributes for display logic control: `if` and `repeat`. We can create Weex page structure and effects more flexible with them.
 
@@ -95,7 +94,7 @@ The origin data properties which not belongs to the array will also be bound:
 </script>
 ```
 
-### A extension of repeat syntax
+### An extension of repeat syntax
 
 #### use default `$index` for the index of array.
 <span class="weex-version">0.5</span>
@@ -114,13 +113,13 @@ e.g.
 e.g.
 
 ```html
-<div repeat="{% raw %}{{v in list}}{% endraw %}">
+<div repeat="{{v in list}}">
   <text>No. {{$index + 1}}, {{v.nickname}}</text>
 </div>
 ```
 
 ```html
-<div repeat="{% raw %}{{(k, v) in list}}{% endraw %}">
+<div repeat="{{(k, v) in list}}">
   <text>No. {{k + 1}}, {{v.nickname}}</text>
 </div>
 ```

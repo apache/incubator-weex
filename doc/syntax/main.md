@@ -1,6 +1,5 @@
 # Syntax
 <span class="weex-version">0.4</span>
-<a href="https://github.com/weexteam/article/issues/8"  class="weex-translate">cn</a>
 
 
 *The syntax of Weex is deeply inspired from [Vue.js](http://vuejs.org/), an elegant JavaScript framework with component system and reactive data binding.*
@@ -88,7 +87,7 @@ The syntax is JavaScript (ES5) and it describes data and behavior of a Weex page
   <container>
     <text>The time is {{datetime}}</text>
     <text>{{title}}</text>
-    <text>{% raw %}{{getTitle()}}{% endraw %}</text>
+    <text>{{getTitle()}}</text>
   </container>
 </template>
 

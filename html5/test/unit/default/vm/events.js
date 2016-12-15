@@ -5,10 +5,11 @@ const { expect } = chai
 chai.use(sinonChai)
 
 global.callNative = function () {}
+global.callAddElement = function () {}
 
-import Vm from '../../../../default/vm'
-import { Document } from '../../../../vdom'
-import Listener from '../../../../vdom/listener'
+import Vm from '../../../../frameworks/legacy/vm'
+import { Document } from '../../../../runtime/vdom'
+import Listener from '../../../../runtime/listener'
 
 describe('bind and fire events', () => {
   let doc, customComponentMap, spy
@@ -59,7 +60,6 @@ describe('bind and fire events', () => {
 
     checkReady(vm, function () {
       doc.close()
-
       expect(doc.body.event.click).a('function')
 
       const el = doc.body
@@ -106,6 +106,7 @@ describe('bind and fire events', () => {
 
       const spyA = sinon.spy()
       const spyB = sinon.spy()
+
       vm.$on('customTypeA', spyA)
       subVm.$on('customTypeA', spyB)
 

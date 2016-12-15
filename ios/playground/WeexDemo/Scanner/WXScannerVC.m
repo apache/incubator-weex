@@ -11,7 +11,7 @@
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXDemoViewController.h"
 #import "WXDebugTool.h"
-#import "WXDevTool.h"
+#import <TBWXDevTool/WXDevTool.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <WeexSDK/WXSDKEngine.h>
 
@@ -102,12 +102,16 @@
     controller.url = url;
     controller.source = @"scan";
     
-    if ([url.port integerValue] == 8081) {
-        NSURL *socketURL = [NSURL URLWithString:[NSString stringWithFormat:@"ws://%@:8082", url.host]];
-        controller.hotReloadSocket = [[SRWebSocket alloc] initWithURL:socketURL protocols:@[@"echo-protocol"]];
-        controller.hotReloadSocket.delegate = controller;
-        [controller.hotReloadSocket open];
-    }
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    NSArray *queryItems = [components queryItems];
+    NSMutableDictionary *queryDict = [NSMutableDictionary new];
+    for (NSURLQueryItem *item in queryItems)
+        [queryDict setObject:item.value forKey:item.name];
+    NSString *wsport = queryDict[@"wsport"] ?: @"8082";
+    NSURL *socketURL = [NSURL URLWithString:[NSString stringWithFormat:@"ws://%@:%@", url.host, wsport]];
+    controller.hotReloadSocket = [[SRWebSocket alloc] initWithURL:socketURL protocols:@[@"echo-protocol"]];
+    controller.hotReloadSocket.delegate = controller;
+    [controller.hotReloadSocket open];
     
     [[self navigationController] pushViewController:controller animated:YES];
 }

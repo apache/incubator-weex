@@ -11,10 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
 import com.alibaba.weex.https.HotRefreshManager;
@@ -36,6 +40,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -46,7 +51,12 @@ import java.net.URL;
 import java.util.HashMap;
 
 
-public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, android.os.Handler.Callback {
+public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
+
+  @Override
+  public void onCreateNestInstance(WXSDKInstance instance, NestedContainer container) {
+    Log.d(TAG,"Nested Instance created.");
+  }
 
   private class NavigatorAdapter implements IActivityNavBarSetter {
 
@@ -114,6 +124,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   private JSONArray mData;
   private int count = 0;
 
+  private WXAnalyzerDelegate mWxAnalyzerDelegate;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -160,6 +172,17 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     mInstance.onActivityCreate();
     registerBroadcastReceiver();
+
+    mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
+    mWxAnalyzerDelegate.onCreate();
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStart();
+    }
   }
 
   private void loadWXfromLocal(boolean reload) {
@@ -171,6 +194,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance = new WXSDKInstance(this);
       //        mInstance.setImgLoaderAdapter(new ImageAdapter(this));
       mInstance.registerRenderListener(this);
+      mInstance.setNestedInstanceInterceptor(this);
     }
     mContainer.post(new Runnable() {
       @Override
@@ -274,6 +298,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     //        TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
     unregisterBroadcastReceiver();
+
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onDestroy();
+    }
+  }
+
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    return (mWxAnalyzerDelegate != null && mWxAnalyzerDelegate.onKeyUp(keyCode,event)) || super.onKeyUp(keyCode, event);
   }
 
   @Override
@@ -281,6 +315,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onResume();
     if (mInstance != null) {
       mInstance.onActivityResume();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onResume();
     }
   }
 
@@ -290,6 +327,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   public void setCurrentWxPageActivity(Activity activity) {
     wxPageActivityInstance = activity;
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    Intent intent = new Intent("actionRequestPermissionsResult");
+    intent.putExtra("requestCode", requestCode);
+    intent.putExtra("permissions", permissions);
+    intent.putExtra("grantResults", grantResults);
+    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
   }
 
   @Override
@@ -316,6 +363,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
     WXLogUtils.e("into--[onViewCreated]");
+    View wrappedView = null;
+    if(mWxAnalyzerDelegate != null){
+      wrappedView = mWxAnalyzerDelegate.onWeexViewCreated(instance,view);
+    }
+    if(wrappedView != null){
+      view = wrappedView;
+    }
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }
@@ -328,6 +382,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+    if(mWxAnalyzerDelegate  != null){
+      mWxAnalyzerDelegate.onWeexRenderSuccess(instance);
+    }
     mProgressBar.setVisibility(View.INVISIBLE);
   }
 
@@ -339,6 +396,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onException(WXSDKInstance instance, String errCode,
                           String msg) {
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onException(instance,errCode,msg);
+    }
     mProgressBar.setVisibility(View.GONE);
     if (!TextUtils.isEmpty(errCode) && errCode.contains("|")) {
       String[] errCodeList = errCode.split("\\|");
@@ -395,6 +455,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onPause();
     if (mInstance != null) {
       mInstance.onActivityPause();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onPause();
+    }
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    if (mInstance != null) {
+      mInstance.onActivityStop();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStop();
     }
   }
 

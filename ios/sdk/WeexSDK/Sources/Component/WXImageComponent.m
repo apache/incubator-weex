@@ -53,13 +53,11 @@ static dispatch_queue_t WXImageUpdateQueue;
             WXImageUpdateQueue = dispatch_queue_create("com.taobao.weex.ImageUpdateQueue", DISPATCH_QUEUE_SERIAL);
         }
         if (attributes[@"src"]) {
-            _imageSrc = [WXConvert NSString:attributes[@"src"]];
+            _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         } else {
             WXLogWarning(@"image src is nil");
         }
-        if (attributes[@"placeHolder"]) {
-            _placeholdSrc = [WXConvert NSString:attributes[@"placeHolder"]];
-        }
+        [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
@@ -67,6 +65,12 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
     
     return self;
+}
+
+- (void)configPlaceHolder:(NSDictionary*)attributes {
+    if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
+        _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?attributes[@"placeHolder"]:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
 }
 
 - (UIView *)loadView
@@ -102,12 +106,10 @@ static dispatch_queue_t WXImageUpdateQueue;
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"src"]) {
-        _imageSrc = [WXConvert NSString:attributes[@"src"]];
+        _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    if (attributes[@"placeHolder"]) {
-        _placeholdSrc = [WXConvert NSString:attributes[@"placeHolder"]];
-    }
+    [self configPlaceHolder:attributes];
     
     if (attributes[@"resize"]) {
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
@@ -182,10 +184,6 @@ static dispatch_queue_t WXImageUpdateQueue;
     dispatch_async(WXImageUpdateQueue, ^{
         [self cancelImage];
         
-        if (CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-            return;
-        }
-        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error){
             WXLogError(@"Error downloading image:%@, detail:%@", url, [error localizedDescription]);
         };
@@ -217,6 +215,7 @@ static dispatch_queue_t WXImageUpdateQueue;
             }];
         }
         if (weakSelf.imageSrc) {
+            WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
             NSDictionary *userInfo = @{@"imageQuality":@(weakSelf.imageQuality), @"imageSharp":@(weakSelf.imageSharp)};
             
             dispatch_async(dispatch_get_main_queue(), ^{
