@@ -44,8 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(173)
-	var __weex_script__ = __webpack_require__(174)
+	var __weex_template__ = __webpack_require__(171)
+	var __weex_script__ = __webpack_require__(172)
 
 	__weex_define__('@weex-component/e76831b20ac1521dc607984f55a74c02', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -2064,14 +2064,14 @@
 
 	var _symbol2 = _interopRequireDefault(_symbol);
 
-	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj; };
+	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
 	  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	} : function (obj) {
-	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	};
 
 /***/ },
@@ -2913,9 +2913,7 @@
 /* 168 */,
 /* 169 */,
 /* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */
+/* 171 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2934,7 +2932,7 @@
 	}
 
 /***/ },
-/* 174 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -2956,7 +2954,7 @@
 	      icon: '',
 	      image: 'http://gtms01.alicdn.com/tps/i1/TB1qw.hMpXXXXagXXXX9t7RGVXX-46-46.png',
 	      selectedImage: 'http://gtms04.alicdn.com/tps/i4/TB16jjPMpXXXXazXVXX9t7RGVXX-46-46.png',
-	      src: 'tabbar-item.js?itemId=tab1',
+	      src: 'component/tabbar/tabbar-item.js?itemId=tab1',
 	      visibility: 'visible'
 	    }, {
 	      index: 1,
@@ -2965,7 +2963,7 @@
 	      icon: '',
 	      image: 'http://gtms03.alicdn.com/tps/i3/TB1LEn9MpXXXXaUXpXX9t7RGVXX-46-46.png',
 	      selectedImage: 'http://gtms02.alicdn.com/tps/i2/TB1qysbMpXXXXcnXXXX9t7RGVXX-46-46.png',
-	      src: 'tabbar-item.js?itemId=tab2',
+	      src: 'component/tabbar/tabbar-item.js?itemId=tab2',
 	      visibility: 'hidden'
 	    }, {
 	      index: 2,
@@ -2974,7 +2972,7 @@
 	      icon: '',
 	      image: 'http://gtms01.alicdn.com/tps/i1/TB1B0v5MpXXXXcvXpXX9t7RGVXX-46-46.png',
 	      selectedImage: 'http://gtms04.alicdn.com/tps/i4/TB1NxY5MpXXXXcrXpXX9t7RGVXX-46-46.png',
-	      src: 'tabbar-item.js?itemId=tab3',
+	      src: 'component/tabbar/tabbar-item.js?itemId=tab3',
 	      visibility: 'hidden'
 	    }]
 	  }},
