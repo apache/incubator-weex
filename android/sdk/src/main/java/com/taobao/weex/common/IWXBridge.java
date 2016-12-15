@@ -241,5 +241,5 @@ public interface IWXBridge extends IWXObject {
 
   Object callNativeModule(String instanceId, String module, String method,  byte [] arguments,  byte [] options);
 
-  Object callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
+  void callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
 }

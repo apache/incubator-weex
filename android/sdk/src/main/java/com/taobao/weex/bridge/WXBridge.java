@@ -284,6 +284,9 @@ class WXBridge implements IWXBridge {
     return callAddElement(instanceId,ref, new String(dom),index,callback);
   }
 
+  /**
+   * JSF render Node by callAddElement
+   */
   public int callAddElement(String instanceId, String ref,String dom,String index, String callback) {
 
     long start = System.currentTimeMillis();
@@ -299,7 +302,7 @@ class WXBridge implements IWXBridge {
       //catch everything during call native.
       if(WXEnvironment.isApkDebugable()){
         e.printStackTrace();
-        WXLogUtils.e(TAG,"callNative throw expection:"+e.getMessage());
+        WXLogUtils.e(TAG,"callNative throw error:"+e.getMessage());
       }
     }
 
@@ -325,6 +328,16 @@ class WXBridge implements IWXBridge {
     WXBridgeManager.getInstance().reportJSException(instanceId, func, exception);
   }
 
+  /**
+   * Bridge module Js Method
+   * support Sync or Async through setting  Annotation as {@link com.taobao.weex.annotation.JSMethod }
+   * @param instanceId  Instance ID
+   * @param module  the name of module
+   * @param method  the name of method
+   * @param arguments  the arguments of the method
+   * @param options  option arguments for extending
+   * @return  the result
+   */
   @Override
   public String callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
 
@@ -333,9 +346,18 @@ class WXBridge implements IWXBridge {
     return object != null ? WXJsonUtils.fromObjectToJSONString(object):"";
   }
 
+  /**
+   * Bridge component Js Method
+   * @param instanceId  Instance ID
+   * @param componentRef  the ref of component
+   * @param method  the name of method
+   * @param arguments  the arguments of the method
+   * @param options  option arguments for extending
+   */
   @Override
-  public String callNativeComponent(String instanceId, String componentRef, String method, byte [] arguments, byte [] options) {
-    return null;
+  public void callNativeComponent(String instanceId, String componentRef, String method, byte [] arguments, byte [] options) {
+    JSONArray argArray = JSON.parseArray(new String(arguments));
+     WXBridgeManager.getInstance().callNativeComponent(instanceId,componentRef,method,argArray,options);
   }
 
   public void setTimeoutNative(String callbackId, String time) {
