@@ -342,7 +342,7 @@ public class WXSliderNeighbor extends WXSlider {
             for(View v : pageViews) {
                 View realView = ((ViewGroup)v).getChildAt(0);
 
-                if(mAdapter.getItemPosition(v) != cusPos) {
+                if(mAdapter.getItemIndex(v) != cusPos) {
                     updateScaleAndAlpha(realView, alpha, scale);
                 }else{
                     updateScaleAndAlpha(realView,1.0F,WX_DEFAULT_MAIN_NEIGHBOR_SCALE);
@@ -428,7 +428,7 @@ public class WXSliderNeighbor extends WXSlider {
                 alpha = (1-mNerghborAlpha) * factor + mNerghborAlpha;
                 int delta = page.getMeasuredWidth()-realView.getMeasuredWidth();
                 float translation = ((page.getMeasuredWidth()-realView.getMeasuredWidth()*WX_DEFAULT_MAIN_NEIGHBOR_SCALE)- WXViewUtils.getRealPxByWidth(DEFAULT_NEIGHBOR_SPACE)*2)/2;
-                if(mViewPager.getCurrentItem() != mAdapter.getItemPosition(page)){
+                if(mViewPager.getCurrentItem() != mAdapter.getItemIndex(page)){
                     if(position > 0){
                         realView.setPivotX(0);
                         realView.setTranslationX(-delta);

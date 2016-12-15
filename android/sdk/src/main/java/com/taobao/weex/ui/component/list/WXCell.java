@@ -224,7 +224,7 @@ import com.taobao.weex.ui.view.WXFrameLayout;
 
 public class WXCell extends WXVContainer<WXFrameLayout> {
 
-    public int lastLocationY = -1;
+    private int mLastLocationY = 0;
     private ViewGroup mRealView;
     private View mTempStickyView;
     private View mHeadView;
@@ -264,6 +264,14 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
             mRealView = view;
             return view;
         }
+    }
+
+    public int getLocationFromStart(){
+        return mLastLocationY;
+    }
+
+    public void setLocationFromStart(int l){
+        mLastLocationY = l;
     }
 
     @Override
