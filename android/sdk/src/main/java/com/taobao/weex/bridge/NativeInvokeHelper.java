@@ -222,7 +222,7 @@ public final class NativeInvokeHelper {
       mInstanceId = instanceId;
   }
 
-  public void invoke(final Object target,final Invoker invoker,JSONArray args) throws Exception {
+  public Object invoke(final Object target,final Invoker invoker,JSONArray args) throws Exception {
     final Object[] params = prepareArguments(
         invoker.getParameterTypes(),
         args);
@@ -232,14 +232,16 @@ public final class NativeInvokeHelper {
         public void run() {
           try {
             invoker.invoke(target, params);
+
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
         }
       }, 0);
     } else {
-      invoker.invoke(target, params);
+      return invoker.invoke(target, params);
     }
+    return null;
   }
 
   private Object[] prepareArguments(Type[] paramClazzs, JSONArray args) throws Exception {
