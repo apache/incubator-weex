@@ -339,7 +339,9 @@ NSTimeInterval JSLibInitTime = 0;
     if (!_scriptURL) {
         return [NSURL URLWithString:url];
     }
-    
+    if ([url hasPrefix:@"//"] && [_scriptURL isFileURL]) {
+        return [NSURL URLWithString:url];
+    }
     if (!url) {
         return nil;
     }
