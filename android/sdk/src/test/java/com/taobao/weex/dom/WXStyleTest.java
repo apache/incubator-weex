@@ -204,6 +204,8 @@
  */
 package com.taobao.weex.dom;
 
+import android.graphics.Typeface;
+
 import com.taobao.weex.common.Constants;
 
 import org.junit.After;
@@ -211,6 +213,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
 
 
 /**
@@ -252,6 +256,60 @@ public class WXStyleTest {
         assertEquals(0,style.getBlur());
         style.put(Constants.Name.FILTER,"7");
         assertEquals(0,style.getBlur());
+    }
+
+    @Test
+    public void testFontWeight(){
+        WXStyle none = new WXStyle();
+        assertThat(WXStyle.getFontWeight(none), is(Typeface.NORMAL));
+
+        WXStyle normal = new WXStyle();
+        normal.put(Constants.Name.FONT_WEIGHT, Constants.Value.NORMAL);
+        assertThat(WXStyle.getFontWeight(normal), is(Typeface.NORMAL));
+
+        WXStyle bold = new WXStyle();
+        bold.put(Constants.Name.FONT_WEIGHT, Constants.Value.BOLD);
+        assertThat(WXStyle.getFontWeight(bold), is(Typeface.BOLD));
+
+        WXStyle illegal = new WXStyle();
+        illegal.put(Constants.Name.FONT_WEIGHT, "f");
+        assertThat(WXStyle.getFontWeight(illegal), is(Typeface.NORMAL));
+
+        WXStyle number100 = new WXStyle();
+        number100.put(Constants.Name.FONT_WEIGHT, "100");
+        assertThat(WXStyle.getFontWeight(number100), is(Typeface.NORMAL));
+
+        WXStyle number200 = new WXStyle();
+        number200.put(Constants.Name.FONT_WEIGHT, "200");
+        assertThat(WXStyle.getFontWeight(number200), is(Typeface.NORMAL));
+
+        WXStyle number300 = new WXStyle();
+        number300.put(Constants.Name.FONT_WEIGHT, "300");
+        assertThat(WXStyle.getFontWeight(number300), is(Typeface.NORMAL));
+
+        WXStyle number400 = new WXStyle();
+        number400.put(Constants.Name.FONT_WEIGHT, "400");
+        assertThat(WXStyle.getFontWeight(number400), is(Typeface.NORMAL));
+
+        WXStyle number500 = new WXStyle();
+        number500.put(Constants.Name.FONT_WEIGHT, "500");
+        assertThat(WXStyle.getFontWeight(number500), is(Typeface.NORMAL));
+
+        WXStyle number600 = new WXStyle();
+        number600.put(Constants.Name.FONT_WEIGHT, "600");
+        assertThat(WXStyle.getFontWeight(number600), is(Typeface.BOLD));
+
+        WXStyle number700 = new WXStyle();
+        number700.put(Constants.Name.FONT_WEIGHT, "700");
+        assertThat(WXStyle.getFontWeight(number700), is(Typeface.BOLD));
+
+        WXStyle number800 = new WXStyle();
+        number800.put(Constants.Name.FONT_WEIGHT, "800");
+        assertThat(WXStyle.getFontWeight(number800), is(Typeface.BOLD));
+
+        WXStyle number900 = new WXStyle();
+        number900.put(Constants.Name.FONT_WEIGHT, "900");
+        assertThat(WXStyle.getFontWeight(number900), is(Typeface.BOLD));
     }
 
     @After

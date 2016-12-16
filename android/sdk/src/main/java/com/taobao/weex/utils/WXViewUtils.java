@@ -206,6 +206,9 @@ package com.taobao.weex.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
@@ -522,5 +525,22 @@ public class WXViewUtils {
       }
     }
     return null;
+  }
+
+  public static void clipCanvasWithinBorderBox(View targetView, Canvas canvas) {
+    Drawable drawable;
+    /* According to https://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
+      API 18 or higher supports clipPath to canvas based on hardware acceleration.
+     */
+    if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ||
+         !canvas.isHardwareAccelerated()) &&
+        ((drawable = targetView.getBackground()) instanceof BorderDrawable)) {
+      BorderDrawable borderDrawable = (BorderDrawable) drawable;
+      if(borderDrawable.isRounded()) {
+        Path path = borderDrawable.getContentPath(
+            new RectF(0, 0, targetView.getWidth(), targetView.getHeight()));
+        canvas.clipPath(path);
+      }
+    }
   }
 }
