@@ -138,12 +138,14 @@ public class IndexActivity extends AbstractWeexActivity {
 
   @Override
   public void onRenderSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
+    super.onRenderSuccess(wxsdkInstance,i,i1);
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.GONE);
   }
 
   @Override
   public void onException(WXSDKInstance wxsdkInstance, String s, String s1) {
+    super.onException(wxsdkInstance,s,s1);
     mProgressBar.setVisibility(View.GONE);
     mTipView.setVisibility(View.VISIBLE);
     if (TextUtils.equals(s, WXRenderErrorCode.WX_NETWORK_ERROR)) {
