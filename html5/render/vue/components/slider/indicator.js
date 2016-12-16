@@ -1,4 +1,5 @@
 export default {
+  name: 'indicator',
   props: {
     count: [Number, String],
     active: [Number, String]

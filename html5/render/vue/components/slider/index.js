@@ -6,7 +6,7 @@ import slideMixin from './slideMixin'
 
 export default {
   mixins: [eventMixin, slideMixin],
-  components: { indicator },
+  // components: { indicator },
   props: {
     'auto-play': {
       type: [String, Boolean],
@@ -41,10 +41,37 @@ export default {
       if (inner) {
         inner.style.width = this.wrapperWidth * this.frameCount + 'px'
       }
+    },
+
+    formatChildren (createElement) {
+      const children = this.$slots.default || []
+      return children.filter(vnode => {
+        // console.log(vnode)
+        if (!vnode.tag) return false
+        if (vnode.componentOptions && vnode.componentOptions.tag === 'indicator') {
+          // console.log(vnode)
+          // console.trace()
+          this._indicator = createElement(indicator, {
+            staticClass: vnode.data.staticClass,
+            staticStyle: vnode.data.staticStyle,
+            attrs: {
+              count: this.frameCount,
+              active: this.currentIndex
+            }
+          })
+          return false
+        }
+        return true
+      }).map(vnode => {
+        return createElement('li', {
+          staticClass: 'weex-slider-cell'
+        }, [vnode])
+      })
     }
   },
 
   created () {
+    this._indicator = null
     this.$nextTick(() => {
       this.updateLayout()
     })
@@ -76,10 +103,7 @@ export default {
       validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    const children = this.$slots.default || []
-    const innerElements = children.map(vnode => createElement('li', {
-      staticClass: 'weex-slider-cell'
-    }, [vnode]))
+    const innerElements = this.formatChildren(createElement)
     this.frameCount = innerElements.length
 
     return createElement(
@@ -99,12 +123,7 @@ export default {
           ref: 'inner',
           staticClass: 'weex-slider-inner'
         }, innerElements),
-        createElement(indicator, {
-          attrs: {
-            count: this.frameCount,
-            active: this.currentIndex
-          }
-        })
+        this._indicator
       ]
     )
   }

@@ -6,7 +6,7 @@ import list from './list'
 import cell from './list/cell'
 import scroller from './scroller'
 import slider from './slider'
-import indicator from './slider/indicator'
+import indicator from './warning'
 import text from './text'
 import web from './web'
 
