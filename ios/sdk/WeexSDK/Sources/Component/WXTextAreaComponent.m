@@ -429,7 +429,7 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (textView.markedTextRange == nil) {
         if (_inputEvent) {
-            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
+            [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
         }
     }
 }
