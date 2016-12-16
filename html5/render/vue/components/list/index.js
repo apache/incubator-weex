@@ -1,10 +1,13 @@
 import { validateStyles } from '../../validator'
-import { debounce, bind } from '../../utils'
+import { debounce, throttle, bind } from '../../utils'
+import refresh from './refresh'
+import loading from './loading'
 import rectMixin from '../../mixins/rect'
 import eventMixin from '../../mixins/event'
+import listMixin from './listMixin'
 
 export default {
-  mixins: [rectMixin, eventMixin],
+  mixins: [rectMixin, eventMixin, listMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],
@@ -17,6 +20,45 @@ export default {
       if (this.reachBottom()) {
         this.$emit('loadmore', this.createCustomEvent('loadmore'))
       }
+    },
+    createLoading () {
+      //
+    },
+    createRefresh () {
+      //
+    },
+    createChildren (createElement) {
+      const slots = this.$slots.default || []
+      const cells = slots.filter(vnode => {
+        // console.log(vnode.tag)
+        if (!vnode.tag || !vnode.componentOptions) return false
+        const tagName = vnode.componentOptions.tag
+        if (tagName === 'loading') {
+          this._loading = createElement(loading, {
+            on: {
+              loading: () => this.$emit('loading', this.createCustomEvent('loading'))
+            }
+          })
+          return false
+        }
+        if (tagName === 'refresh') {
+          this._refresh = createElement(refresh, {
+            on: {
+              refresh: () => this.$emit('refresh', this.createCustomEvent('refresh'))
+            }
+          })
+          return false
+        }
+        return true
+      })
+      return [
+        this._refresh,
+        createElement('div', {
+          ref: 'inner',
+          staticClass: 'weex-list-inner'
+        }, cells),
+        this._loading
+      ]
     }
   },
 
@@ -31,15 +73,11 @@ export default {
       attrs: { 'weex-type': 'list' },
       staticClass: 'weex-list weex-list-wrapper',
       on: {
-        scroll: debounce(bind(this.handleScroll, this), 100)
+        scroll: debounce(bind(this.handleScroll, this), 100),
+        touchstart: this.handleTouchStart,
+        touchmove: throttle(bind(this.handleTouchMove, this), 25),
+        touchend: this.handleTouchEnd
       }
-    }, [
-      createElement('mark', { ref: 'topMark', staticClass: 'weex-list-top-mark' }),
-      createElement('div', {
-        ref: 'inner',
-        staticClass: 'weex-list-inner'
-      }, this.$slots.default),
-      createElement('mark', { ref: 'bottomMark', staticClass: 'weex-list-bottom-mark' })
-    ])
+    }, this.createChildren(createElement))
   }
 }

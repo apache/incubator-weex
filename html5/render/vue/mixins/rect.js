@@ -1,5 +1,9 @@
 export default {
   methods: {
+    reachTop () {
+      const wrapper = this.$refs.wrapper
+      return (!!wrapper) && (wrapper.scrollTop <= 0)
+    },
     reachBottom () {
       const wrapper = this.$refs.wrapper
       const inner = this.$refs.inner

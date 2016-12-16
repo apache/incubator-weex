@@ -7,6 +7,8 @@ import cell from './list/cell'
 import scroller from './scroller'
 import slider from './slider'
 import indicator from './warning'
+import refresh from './warning'
+import loading from './warning'
 import text from './text'
 import web from './web'
 
@@ -17,6 +19,8 @@ export {
   scroller,
   slider,
   indicator,
+  refresh,
+  loading,
   text,
   web
 }

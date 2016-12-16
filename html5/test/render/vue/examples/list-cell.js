@@ -33,7 +33,5 @@ multiDescribe('list & cell example', (Vue, helper) => {
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('MAIN')
     expect(vm.$el.className).to.be.equal('weex-list weex-list-wrapper')
-
-    expect(vm.$el.children.length).to.be.equal(3)
   })
 })
