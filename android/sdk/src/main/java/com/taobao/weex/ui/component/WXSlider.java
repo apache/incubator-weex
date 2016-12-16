@@ -297,16 +297,25 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     return view;
   }
 
+  /**
+   * Slider is not a regular container,top/left/right/bottom not apply to view,expect indicator.
+   */
   @Override
   public LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom) {
     ViewGroup.LayoutParams lp = childView.getLayoutParams();
-    if(lp == null) {
+    if (lp == null) {
       lp = new FrameLayout.LayoutParams(width, height);
-    }else{
+    } else {
       lp.width = width;
       lp.height = height;
-      if(lp instanceof ViewGroup.MarginLayoutParams){
-        ((ViewGroup.MarginLayoutParams) lp).setMargins(left,top,right,bottom);
+    }
+
+    if (lp instanceof ViewGroup.MarginLayoutParams) {
+      //expect indicator .
+      if (child instanceof WXIndicator) {
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
+      } else {
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(0, 0, 0, 0);
       }
     }
     return lp;
