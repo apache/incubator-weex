@@ -1,13 +1,13 @@
 import { validateStyles } from '../../validator'
-import { debounce, throttle, bind } from '../../utils'
+import { debounce, throttle, bind, createMixin } from '../../utils'
 import refresh from './refresh'
 import loading from './loading'
-import rectMixin from '../../mixins/rect'
-import eventMixin from '../../mixins/event'
+import * as rectMethods from '../../methods/rect'
+import * as eventMethods from '../../methods/event'
 import listMixin from './listMixin'
 
 export default {
-  mixins: [rectMixin, eventMixin, listMixin],
+  mixins: [createMixin(rectMethods, eventMethods), listMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],
@@ -18,7 +18,6 @@ export default {
   methods: {
     updateLayout () {
       this.computeWrapperSize()
-      const inner = this.$refs.inner
       if (this._cells && this._cells.length) {
         this._cells.forEach(vnode => {
           vnode._visible = this.isCellVisible(vnode.elm)
@@ -48,8 +47,8 @@ export default {
       if (this.reachBottom()) {
         this.$emit('loadmore', this.createCustomEvent('loadmore'))
       }
-
     },
+
     createChildren (createElement) {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {

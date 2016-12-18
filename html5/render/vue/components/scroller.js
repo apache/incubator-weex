@@ -1,9 +1,9 @@
 import { validateStyles } from '../validator'
-import { debounce, bind } from '../utils'
-import rectMixin from '../mixins/rect'
+import { debounce, bind, createMixin } from '../utils'
+import * as rectMethods from '../methods/rect'
 
 export default {
-  mixins: [rectMixin],
+  mixins: [createMixin(rectMethods)],
   props: {
     scrollDirection: {
       type: [String],
