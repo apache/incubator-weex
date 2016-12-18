@@ -178,6 +178,7 @@ function buildVue () {
     format: 'umd',
     plugins: [
       eslint(),
+      postcss(),
       nodeResolve({
         jsnext: true,
         main: true

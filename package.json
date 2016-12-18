@@ -43,7 +43,7 @@
     "dist": "npm run dist:browser",
     "dev:native": "rollup -w -c build/rollup.config.js",
     "dev:browser": "rollup -w -c build/rollup.browser.config.js",
-    "dev:vue": "NODE_ENV=development webpack --watch --config build/webpack.vue.config.js",
+    "dev:vue": "NODE_ENV=development rollup -w -c build/rollup.vue.config.js",
     "dev:examples": "webpack --watch --config build/webpack.examples.config.js",
     "dev:test": "webpack --watch --config build/webpack.test.config.js",
     "lint": "eslint html5",
