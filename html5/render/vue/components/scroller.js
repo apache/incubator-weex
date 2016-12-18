@@ -5,9 +5,26 @@ import rectMixin from '../mixins/rect'
 export default {
   mixins: [rectMixin],
   props: {
+    scrollDirection: {
+      type: [String],
+      default: 'vertical',
+      validator (value) {
+        return ['horizontal', 'vertical'].indexOf(value) !== -1
+      }
+    },
     loadmoreoffset: {
       type: [String, Number],
       default: 0
+    }
+  },
+
+  computed: {
+    wrapperClass () {
+      const classArray = ['weex-scroller', 'weex-scroller-wrapper']
+      if (this.scrollDirection === 'horizontal') {
+        classArray.push('weex-scroller-horizontal')
+      }
+      return classArray.join(' ')
     }
   },
 
@@ -28,7 +45,7 @@ export default {
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
-      staticClass: 'weex-scroller weex-scroller-wrapper',
+      staticClass: this.wrapperClass,
       on: {
         scroll: debounce(bind(this.handleScroll, this), 100)
       }

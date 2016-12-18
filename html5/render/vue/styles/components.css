@@ -88,6 +88,19 @@ figure, img, .weex-image, .weex-img {
 .weex-scroller-wrapper {
   overflow: scroll;
 }
+.weex-scroller-wrapper.weex-scroller-horizontal {
+  overflow: hidden;
+}
+
+.weex-scroller-horizontal .weex-scroller-inner {
+  width: auto;
+  display: block;
+  height: 100%;
+}
+.weex-scroller-horizontal .weex-scroller-inner > * {
+  display: block;
+  float: left;
+}
 
 .weex-scroller-top-mark {
   width: 100%;
