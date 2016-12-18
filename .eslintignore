@@ -2,3 +2,4 @@
 html5/test/case/*/*.source.js
 html5/test/case/*/*.output.js
 html5/test/render/vue/vender/*
+*.css
