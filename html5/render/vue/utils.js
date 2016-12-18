@@ -92,10 +92,8 @@ export function createMixin (...mixins) {
   mixins.forEach(methods => {
     for (const key in methods) {
       mixinMethods[key] = function (...args) {
-        return methods[key](this, ...args)
-        // methods[key].apply(this, [this, ...args])
+        return methods[key].apply(this, [this, ...args])
       }
-      // mixinMethods[key].name = key
     }
   })
   return {

@@ -29,7 +29,33 @@ export default {
   },
 
   methods: {
+    updateLayout () {
+      this.computeWrapperSize()
+      if (this._cells && this._cells.length) {
+        this._cells.forEach(vnode => {
+          vnode._visible = this.isCellVisible(vnode.elm)
+        })
+      }
+    },
+    isCellVisible (elem) {
+      if (!this.wrapperHeight) {
+        this.computeWrapperSize()
+      }
+      const wrapper = this.$refs.wrapper
+      return wrapper.scrollTop <= elem.offsetTop
+        && elem.offsetTop < wrapper.scrollTop + this.wrapperHeight
+    },
     handleScroll (event) {
+      this._cells.forEach((vnode, index) => {
+        const visible = this.isCellVisible(vnode.elm)
+        if (visible !== vnode._visible) {
+          const type = visible ? 'appear' : 'disappear'
+          vnode._visible = visible
+
+          // TODO: dispatch CustomEvent
+          vnode.elm.dispatchEvent(new Event(type), {})
+        }
+      })
       if (this.reachBottom()) {
         this.$emit('loadmore', event)
       }
@@ -41,6 +67,11 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
     }
+
+    this._cells = this.$slots.default || []
+    this.$nextTick(() => {
+      this.updateLayout()
+    })
 
     return createElement('main', {
       ref: 'wrapper',
@@ -54,7 +85,7 @@ export default {
       createElement('div', {
         ref: 'inner',
         staticClass: 'weex-scroller-inner'
-      }, this.$slots.default),
+      }, this._cells),
       createElement('mark', { ref: 'bottomMark', staticClass: 'weex-scroller-bottom-mark' })
     ])
   }
