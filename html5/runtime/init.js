@@ -1,4 +1,6 @@
 import { registerElement } from './vdom/element-types'
+import { services } from './service'
+import runtimeConfig from './config'
 
 let frameworks
 
@@ -36,17 +38,31 @@ const instanceMap = {}
 function createInstance (id, code, config, data) {
   let info = instanceMap[id]
   if (!info) {
+    // Init instance info.
     info = checkVersion(code) || {}
     if (!frameworks[info.framework]) {
       info.framework = 'Weex'
     }
     info.created = Date.now()
     instanceMap[id] = info
+
+    // Init instance config.
     config = JSON.parse(JSON.stringify(config || {}))
     config.bundleVersion = info.version
     config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
-    return frameworks[info.framework].createInstance(id, code, config, data)
+
+    // Init JavaScript services for this instance.
+    const serviceObjects = Object.create(null)
+    services.forEach(service => {
+      const create = service.options.create
+      if (create) {
+        const result = create(id, { info, runtime: runtimeConfig }, config)
+        Object.assign(serviceObjects, result)
+      }
+    })
+
+    return frameworks[info.framework].createInstance(id, code, config, data, serviceObjects)
   }
   return new Error(`invalid instance id "${id}"`)
 }
@@ -93,9 +109,26 @@ function genInstance (methodName) {
     const info = instanceMap[id]
     if (info && frameworks[info.framework]) {
       const result = frameworks[info.framework][methodName](...args)
-      if (methodName === 'destroyInstance') {
+
+      // Lifecycle methods
+      if (methodName === 'refreshInstance') {
+        services.forEach(service => {
+          const refresh = service.options.refresh
+          if (refresh) {
+            refresh(id, { info, runtime: runtimeConfig })
+          }
+        })
+      }
+      else if (methodName === 'destroyInstance') {
+        services.forEach(service => {
+          const destroy = service.options.destroy
+          if (destroy) {
+            destroy(id, { info, runtime: runtimeConfig })
+          }
+        })
         delete instanceMap[id]
       }
+
       return result
     }
     return new Error(`invalid instance id "${id}"`)

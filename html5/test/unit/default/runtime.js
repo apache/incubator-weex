@@ -172,7 +172,8 @@ describe('framework entry', () => {
         instanceId + '~',
         code,
         { bundleVersion: '0.3.1', env: {}},
-        undefined
+        undefined,
+        {}
       ])
 
       // also support spaces in JSON string
@@ -195,7 +196,8 @@ describe('framework entry', () => {
         instanceId + '~~~',
         code,
         { bundleVersion: undefined, env: {}},
-        undefined
+        undefined,
+        {}
       ])
 
       // test framework yyy
@@ -216,7 +218,8 @@ describe('framework entry', () => {
         instanceId + '~~~~',
         code,
         { bundleVersion: undefined, env: {}},
-        undefined
+        undefined,
+        {}
       ])
 
       // test framework Weex (wrong format at the middle)
@@ -229,7 +232,8 @@ describe('framework entry', () => {
         instanceId + '~~~~~',
         code,
         { bundleVersion: undefined, env: {}},
-        undefined
+        undefined,
+        {}
       ])
 
       // test framework Weex (without any JSON string in comment)
@@ -242,7 +246,8 @@ describe('framework entry', () => {
         instanceId + '~~~~~~',
         code,
         { bundleVersion: undefined, env: {}},
-        undefined
+        undefined,
+        {}
       ])
 
       // revert frameworks
