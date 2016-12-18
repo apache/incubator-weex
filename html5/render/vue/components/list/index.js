@@ -16,20 +16,43 @@ export default {
   },
 
   methods: {
+    updateLayout () {
+      this.computeWrapperSize()
+      const inner = this.$refs.inner
+      if (this._cells && this._cells.length) {
+        this._cells.forEach(vnode => {
+          vnode._visible = this.isCellVisible(vnode.elm)
+        })
+      }
+    },
+    isCellVisible (elem) {
+      if (!this.wrapperHeight) {
+        this.computeWrapperSize()
+      }
+      const wrapper = this.$refs.wrapper
+      return wrapper.scrollTop <= elem.offsetTop
+        && elem.offsetTop < wrapper.scrollTop + this.wrapperHeight
+    },
+
     handleScroll (event) {
+      this._cells.forEach((vnode, index) => {
+        const visible = this.isCellVisible(vnode.elm)
+        if (visible !== vnode._visible) {
+          const type = visible ? 'appear' : 'disappear'
+          vnode._visible = visible
+
+          // TODO: dispatch CustomEvent
+          vnode.elm.dispatchEvent(new Event(type), {})
+        }
+      })
       if (this.reachBottom()) {
         this.$emit('loadmore', this.createCustomEvent('loadmore'))
       }
-    },
-    createLoading () {
-      //
-    },
-    createRefresh () {
-      //
+
     },
     createChildren (createElement) {
       const slots = this.$slots.default || []
-      const cells = slots.filter(vnode => {
+      this._cells = slots.filter(vnode => {
         // console.log(vnode.tag)
         if (!vnode.tag || !vnode.componentOptions) return false
         const tagName = vnode.componentOptions.tag
@@ -56,7 +79,7 @@ export default {
         createElement('div', {
           ref: 'inner',
           staticClass: 'weex-list-inner'
-        }, cells),
+        }, this._cells),
         this._loading
       ]
     }
@@ -68,12 +91,16 @@ export default {
       validateStyles('list', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
+    this.$nextTick(() => {
+      this.updateLayout()
+    })
+
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'list' },
       staticClass: 'weex-list weex-list-wrapper',
       on: {
-        scroll: debounce(bind(this.handleScroll, this), 100),
+        scroll: debounce(bind(this.handleScroll, this), 30),
         touchstart: this.handleTouchStart,
         touchmove: throttle(bind(this.handleTouchMove, this), 25),
         touchend: this.handleTouchEnd
