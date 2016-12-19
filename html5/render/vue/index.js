@@ -1,8 +1,7 @@
 // import Vue from 'vue'
 import semver from 'semver'
-import './env'
 import * as components from './components'
-import { setViewport } from './viewport'
+import { setViewport } from './env'
 
 export function install (Vue) {
   const htmlRegex = /^html:/i

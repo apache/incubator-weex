@@ -35,6 +35,13 @@ export const hyphenate = cached(str => {
     .toLowerCase()
 })
 
+export function camelToKebab (name) {
+  if (!name) { return '' }
+  return name.replace(/([A-Z])/g, function (g, g1) {
+    return `-${g1.toLowerCase()}`
+  })
+}
+
 /**
  * Mix properties into target object.
  */
@@ -99,4 +106,19 @@ export function createMixin (...mixins) {
   return {
     methods: mixinMethods
   }
+}
+
+export function appendStyle (css, styleId, replace) {
+  let style = document.getElementById(styleId)
+  if (style && replace) {
+    style.parentNode.removeChild(style)
+    style = null
+  }
+  if (!style) {
+    style = document.createElement('style')
+    style.type = 'text/css'
+    styleId && (style.id = styleId)
+    document.getElementsByTagName('head')[0].appendChild(style)
+  }
+  style.appendChild(document.createTextNode(css))
 }

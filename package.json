@@ -38,7 +38,7 @@
     "build:vue": "node build/build.js vue",
     "build:examples": "webpack --config build/webpack.examples.config.js",
     "build:test": "webpack --config build/webpack.test.config.js",
-    "build": "npm run build:native && npm run build:browser && npm run build:vue && npm run build:examples && npm run build:test",
+    "build": "npm run build:native && npm run build:browser && npm run build:examples && npm run build:test",
     "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
     "dist": "npm run dist:browser",
     "dev:native": "rollup -w -c build/rollup.config.js",
