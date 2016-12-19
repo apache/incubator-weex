@@ -378,9 +378,6 @@ public class WXImage extends WXComponent<ImageView> {
         imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
             @Override
             public void onImageFinish(String url,ImageView imageView, boolean result, Map extra) {
-                if(!result && imageView!=null){
-                    imageView.setImageDrawable(null);
-                }
                 if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
                     Map<String,Object> params=new HashMap<String, Object>();
                     params.put("success",result);
