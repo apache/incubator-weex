@@ -206,6 +206,7 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
 import android.view.View;
@@ -239,6 +240,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   public static final String INDEX = "index";
   Map<String, Object> params = new HashMap<>();
+  private float offsetXAccuracy = 0.1f;
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -327,6 +329,12 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     super.addEvent(type);
     if (getRealView() != null) {
       getRealView().setOnTouchListener(null);
+    }
+    if (Constants.Event.SCROLL.equals(type)) {
+      if (mViewPager == null) {
+        return;
+      }
+      mViewPager.addOnPageChangeListener(new SliderOnScrollListener(this));
     }
   }
 
@@ -441,6 +449,12 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           setIndex(index);
         }
         return true;
+      case Constants.Name.OFFSET_X_ACCURACY:
+        Float accuracy = WXUtils.getFloat(param, 0.1f);
+        if (accuracy != 0) {
+          setOffsetXAccuracy(accuracy);
+        }
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -514,6 +528,11 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
   }
 
+  @WXComponentProp(name = Constants.Name.OFFSET_X_ACCURACY)
+  public void setOffsetXAccuracy(float accuracy) {
+    this.offsetXAccuracy = accuracy;
+  }
+
   protected class SliderPageChangeListener implements OnPageChangeListener {
 
     private int lastPos = -1;
@@ -566,6 +585,54 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       FrameLayout root = getHostView();
       if (null != root) {
         root.invalidate();
+      }
+    }
+  }
+
+  protected static class SliderOnScrollListener implements OnPageChangeListener {
+    private float lastPositionOffset = 99f;
+    private int selectedPosition;
+    private WXSlider target;
+
+    public SliderOnScrollListener(WXSlider target) {
+      this.target = target;
+      this.selectedPosition = target.mViewPager.superGetCurrentItem();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+      if (lastPositionOffset == 99f) {
+        lastPositionOffset = positionOffset;
+        return;
+      }
+
+      float offset = positionOffset - lastPositionOffset;
+
+      if (Math.abs(offset) >= target.offsetXAccuracy) {
+        if (position == selectedPosition) {
+          //slide to left. positionOffset[0 -> 1]
+          Map<String,Object> event = new HashMap<>(1);
+          event.put(Constants.Name.OFFSET_X_RATIO, -positionOffset);
+          target.fireEvent(Constants.Event.SCROLL, event);
+        } else if (position < selectedPosition) {
+          //slide to right. positionOffset[1 -> 0]
+          Map<String,Object> event = new HashMap<>(1);
+          event.put(Constants.Name.OFFSET_X_RATIO, (1f - positionOffset));
+          target.fireEvent(Constants.Event.SCROLL, event);
+        }
+        lastPositionOffset = positionOffset;
+      }
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+      selectedPosition = position;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+      if (state == ViewPager.SCROLL_STATE_IDLE) {
+        lastPositionOffset = 99f;
       }
     }
   }
