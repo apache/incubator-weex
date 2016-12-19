@@ -44,9 +44,9 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(184)
-	var __weex_style__ = __webpack_require__(185)
-	var __weex_script__ = __webpack_require__(186)
+	var __weex_template__ = __webpack_require__(182)
+	var __weex_style__ = __webpack_require__(183)
+	var __weex_script__ = __webpack_require__(184)
 
 	__weex_define__('@weex-component/1a81fb780319a63605d941949f4ff5d7', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -2124,9 +2124,7 @@
 /* 179 */,
 /* 180 */,
 /* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */
+/* 182 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2214,7 +2212,7 @@
 	}
 
 /***/ },
-/* 185 */
+/* 183 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2246,7 +2244,7 @@
 	}
 
 /***/ },
-/* 186 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -2256,19 +2254,16 @@
 	module.exports = {
 	    methods: {
 	        goback: function goback() {
-	            var $webview = __weex_require__('@weex-module/webview');
 	            var webElement = this.$el('webview');
-	            $webview.goBack(webElement.ref);
+	            webElement.goBack();
 	        },
 	        goforward: function goforward() {
-	            var $webview = __weex_require__('@weex-module/webview');
 	            var webElement = this.$el('webview');
-	            $webview.goForward(webElement.ref);
+	            webElement.goForward();
 	        },
 	        refresh: function refresh() {
-	            var $webview = __weex_require__('@weex-module/webview');
 	            var webElement = this.$el('webview');
-	            $webview.reload(webElement.ref);
+	            webElement.reload();
 	        },
 	        startload: function startload(e) {},
 	        finishload: function finishload(e) {},

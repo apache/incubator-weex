@@ -2040,42 +2040,249 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "scroller",
+	  "type": "div",
 	  "children": [
 	    {
-	      "type": "wxc-panel",
-	      "attr": {
-	        "title": "input",
-	        "type": "primary"
-	      },
+	      "type": "div",
 	      "children": [
 	        {
-	          "type": "input",
-	          "attr": {
-	            "type": "text",
-	            "placeholder": "Text Input",
-	            "autofocus": "true",
-	            "value": ""
-	          },
-	          "classList": [
-	            "input"
-	          ],
-	          "events": {
-	            "change": "onchange",
-	            "input": "oninput"
-	          }
-	        },
-	        {
 	          "type": "text",
+	          "style": {
+	            "fontSize": 40
+	          },
 	          "attr": {
 	            "value": function () {return 'oninput: ' + (this.txtInput)}
 	          }
 	        },
 	        {
 	          "type": "text",
+	          "style": {
+	            "fontSize": 40
+	          },
 	          "attr": {
 	            "value": function () {return 'onchange: ' + (this.txtChange)}
 	          }
+	        }
+	      ]
+	    },
+	    {
+	      "type": "scroller",
+	      "children": [
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = text",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "text",
+	                "placeholder": "Input Text",
+	                "autofocus": function () {return this.autofocus},
+	                "value": ""
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = password",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "password",
+	                "placeholder": "Input Password"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = url",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "url",
+	                "placeholder": "Input URL"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = email",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "email",
+	                "placeholder": "Input Email"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = tel",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "tel",
+	                "placeholder": "Input Tel"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = time",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "time",
+	                "placeholder": "Input Time"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "input type = date",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "date",
+	                "placeholder": "Input Date",
+	                "max": "2017-12-12",
+	                "min": "2015-01-01"
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "events": {
+	                "change": "onchange",
+	                "input": "oninput"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "function focus() & blur()",
+	            "type": "primary"
+	          },
+	          "children": [
+	            {
+	              "type": "div",
+	              "style": {
+	                "flexDirection": "row",
+	                "marginBottom": 16,
+	                "justifyContent": "space-between"
+	              },
+	              "children": [
+	                {
+	                  "type": "wxc-button",
+	                  "attr": {
+	                    "value": "Focus",
+	                    "type": "primary"
+	                  },
+	                  "events": {
+	                    "click": "focus"
+	                  }
+	                },
+	                {
+	                  "type": "wxc-button",
+	                  "attr": {
+	                    "value": "Blur",
+	                    "type": "primary"
+	                  },
+	                  "events": {
+	                    "click": "blur"
+	                  }
+	                }
+	              ]
+	            },
+	            {
+	              "type": "input",
+	              "attr": {
+	                "type": "text",
+	                "placeholder": "Input1",
+	                "value": ""
+	              },
+	              "classList": [
+	                "input"
+	              ],
+	              "id": "input1"
+	            }
+	          ]
 	        }
 	      ]
 	    }
@@ -2090,7 +2297,7 @@
 	  "input": {
 	    "fontSize": 60,
 	    "height": 80,
-	    "width": 400
+	    "width": 750
 	  }
 	}
 
@@ -2102,20 +2309,33 @@
 
 	__webpack_require__(4);
 	module.exports = {
-	  data: function () {return {
-	    txtInput: '',
-	    txtChange: ''
-	  }},
-	  methods: {
-	    onchange: function onchange(event) {
-	      this.txtChange = event.value;
-	      console.log('onchange', event.value);
-	    },
-	    oninput: function oninput(event) {
-	      this.txtInput = event.value;
-	      console.log('oninput', event.value);
+	    data: function () {return {
+	        txtInput: '',
+	        txtChange: '',
+	        autofocus: false
+	    }},
+	    methods: {
+	        ready: function ready() {
+	            var self = this;
+	            setTimeout(function () {
+	                self.autofocus = true;
+	            }, 1000);
+	        },
+	        onchange: function onchange(event) {
+	            this.txtChange = event.value;
+	            console.log('onchange', event.value);
+	        },
+	        oninput: function oninput(event) {
+	            this.txtInput = event.value;
+	            console.log('oninput', event.value);
+	        },
+	        focus: function focus() {
+	            this.$el('input1').focus();
+	        },
+	        blur: function blur() {
+	            this.$el('input1').blur();
+	        }
 	    }
-	  }
 	};}
 	/* generated by weex-loader */
 
