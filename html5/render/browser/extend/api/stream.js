@@ -10,11 +10,6 @@ import 'httpurl'
 let jsonpCnt = 0
 const ERROR_STATE = -1
 
-const TYPE_JSON = 'application/json;charset=UTF-8'
-const TYPE_FORM = 'application/x-www-form-urlencoded'
-
-const REG_FORM = /^(?:[^&=]+=[^&=]+)(?:&[^&=]+=[^&=]+)*$/
-
 function _jsonp (config, callback, progressCallback) {
   const cbName = 'jsonp_' + (++jsonpCnt)
   let url
@@ -219,6 +214,23 @@ const stream = {
     // validate options.url
     if (!config.url) {
       return console.error('[h5-render] options.url should be set for \'fetch\' API.')
+    }
+
+    // valide body content for method 'GET'.
+    if (config.method.toUpperCase() === 'GET') {
+      const body = config.body
+      if (body) {
+        try {
+          const url = lib.httpurl(config.url)
+          Object.keys(body).forEach(key => {
+            url.params[key] = body[key]
+          })
+          config.url = url.toString().replace(/^http:/, '')
+        }
+        catch (e) {
+          console.warn('[h5-render] invalid url:', config.url)
+        }
+      }
     }
 
     // validate options.mode
