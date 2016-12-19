@@ -6,6 +6,7 @@
 let utils
 
 import 'httpurl'
+import qs from 'query-string'
 
 let jsonpCnt = 0
 const ERROR_STATE = -1
@@ -216,21 +217,20 @@ const stream = {
       return console.error('[h5-render] options.url should be set for \'fetch\' API.')
     }
 
-    // valide body content for method 'GET'.
+    // validate body content for method 'GET'.
     if (config.method.toUpperCase() === 'GET') {
-      const body = config.body
-      if (body) {
-        try {
-          const url = lib.httpurl(config.url)
-          Object.keys(body).forEach(key => {
-            url.params[key] = body[key]
-          })
-          config.url = url.toString().replace(/^http:/, '')
-        }
-        catch (e) {
-          console.warn('[h5-render] invalid url:', config.url)
-        }
+      let body = config.body
+      if (utils.isPlainObject(body)) {
+        body = qs.stringify(body)
       }
+      let url = config.url
+      let hashIdx = url.indexOf('#')
+      hashIdx <= -1 && (hashIdx = url.length)
+      let hash = url.substr(hashIdx)
+      hash && (hash = '#' + hash)
+      url = url.substring(0, hashIdx)
+      url += (config.url.indexOf('?') <= -1 ? '?' : '&') + body + hash
+      config.url = url
     }
 
     // validate options.mode
