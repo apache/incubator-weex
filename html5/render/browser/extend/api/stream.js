@@ -251,24 +251,6 @@ const stream = {
       return console.error('[h5-render] options.headers should be a plain object')
     }
 
-    // validate options.body
-    const body = config.body
-    if (!config.headers['Content-Type'] && body) {
-      if (utils.isPlainObject(body)) {
-        // is a json data
-        try {
-          config.body = JSON.stringify(body)
-          config.headers['Content-Type'] = TYPE_JSON
-        }
-        catch (e) {}
-      }
-      else if (utils.getType(body) === 'string' && body.match(REG_FORM)) {
-        // is form-data
-        config.body = encodeURI(body)
-        config.headers['Content-Type'] = TYPE_FORM
-      }
-    }
-
     // validate options.timeout
     config.timeout = parseInt(config.timeout, 10) || 2500
 
