@@ -21,6 +21,7 @@ export function register (name, options) {
     console.warn(`Service "${name}" has been registered already!`)
   }
   else {
+    options = Object.assign({}, options)
     services.push({ name, options })
   }
 }
