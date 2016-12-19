@@ -293,7 +293,7 @@
 @property (nonatomic, assign) BOOL  autoPlay;
 @property (nonatomic, assign) NSUInteger interval;
 @property (nonatomic, assign) NSInteger index;
-@property (nonatomic, assign) CGFloat lastoffsetXRatio;
+@property (nonatomic, assign) CGFloat lastOffsetXRatio;
 @property (nonatomic, assign) CGFloat offsetXAccuracy;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
@@ -315,7 +315,7 @@
         _sliderScrollEvent = NO;
         _interval = 3000;
         _childrenView = [NSMutableArray new];
-        _lastoffsetXRatio = 0;
+        _lastOffsetXRatio = 0;
         
         if (attributes[@"autoPlay"]) {
             _autoPlay = [attributes[@"autoPlay"] boolValue];
@@ -540,8 +540,8 @@
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
         CGFloat offsetXRatio = (XDeviation / width);
-        if (ABS(offsetXRatio - _lastoffsetXRatio) >= _offsetXAccuracy) {
-            _lastoffsetXRatio = offsetXRatio;
+        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+            _lastOffsetXRatio = offsetXRatio;
             [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
     }
