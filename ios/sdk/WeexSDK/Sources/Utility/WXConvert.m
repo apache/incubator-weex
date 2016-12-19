@@ -483,11 +483,30 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     if([value isKindOfClass:[NSString class]]){
         NSString *string = (NSString *)value;
         if ([string isEqualToString:@"normal"])
-            return WXTextWeightNormal;
+            return WXFontWeightRegular;
         else if ([string isEqualToString:@"bold"])
-            return WXTextWeightBold;
+            return WXFontWeightBold;
+        else if ([string isEqualToString:@"100"])
+            return WXFontWeightUltraLight;
+        else if ([string isEqualToString:@"200"])
+            return WXFontWeightThin;
+        else if ([string isEqualToString:@"300"])
+            return WXFontWeightLight;
+        else if ([string isEqualToString:@"400"])
+            return WXFontWeightRegular;
+        else if ([string isEqualToString:@"500"])
+            return WXFontWeightMedium;
+        else if ([string isEqualToString:@"600"])
+            return WXFontWeightSemibold;
+        else if ([string isEqualToString:@"700"])
+            return WXFontWeightBold;
+        else if ([string isEqualToString:@"800"])
+            return WXFontWeightHeavy;
+        else if ([string isEqualToString:@"900"])
+            return WXFontWeightBlack;
+
     }
-    return WXTextWeightNormal;
+    return WXFontWeightRegular;
 }
 
 + (WXTextDecoration)WXTextDecoration:(id)value

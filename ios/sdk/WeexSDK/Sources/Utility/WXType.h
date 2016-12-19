@@ -21,8 +21,16 @@ typedef NS_ENUM(NSUInteger, WXTextStyle) {
 };
 
 typedef NS_ENUM(NSUInteger, WXTextWeight) {
-    WXTextWeightNormal = 0,
-    WXTextWeightBold,
+    WXFontWeightRegular = 0,
+    WXFontWeightUltraLight,
+    WXFontWeightThin,
+    WXFontWeightLight,
+    WXFontWeightMedium,
+    WXFontWeightSemibold,
+    WXFontWeightBold,
+    WXFontWeightHeavy,
+    WXFontWeightBlack
+
 };
 
 typedef NS_ENUM(NSInteger, WXTextDecoration) {
