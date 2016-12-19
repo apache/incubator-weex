@@ -774,12 +774,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (instance == null || adapter == null || errCode == null) {
       return;
     }
-    WXPerformance performance = null;
+    WXPerformance performance = new WXPerformance();
+    performance.args=instance.getBundleUrl();
+    performance.errCode=errCode.getErrorCode();
     if (errCode != WXErrorCode.WX_SUCCESS) {
-      performance = new WXPerformance();
-      performance.errCode = errCode.getErrorCode();
       performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errCode.getErrorMsg():errMsg);
-      performance.args = instance.getBundleUrl();
       WXLogUtils.e("wx_monitor",performance.toString());
     }
     adapter.commit(WXEnvironment.getApplication(), null, IWXUserTrackAdapter.JS_BRIDGE, performance, instance.getUserTrackParams());
@@ -790,10 +789,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (userTrackAdapter == null || TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
-    WXPerformance performance = null;
+    WXPerformance performance = new WXPerformance();
+    performance.errCode = errorCode.getErrorCode();
     if (errorCode != WXErrorCode.WX_SUCCESS) {
-      performance = new WXPerformance();
-      performance.errCode = errorCode.getErrorCode();
       performance.appendErrMsg(TextUtils.isEmpty(errMsg)?errorCode.getErrorMsg():errMsg);
       WXLogUtils.e("wx_monitor",performance.toString());
     }

@@ -130,6 +130,7 @@ package com.taobao.weex.ui.component;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.CheckResult;
@@ -184,6 +185,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.taobao.weex.utils.WXViewUtils.getWebPxByWidth;
+
 /**
  * abstract component
  *
@@ -232,10 +235,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       Map<String, Object> position = WXDataStructureUtil.newHashMapWithExpectedSize(4);
       int[] location = new int[2];
       mHost.getLocationOnScreen(location);
-      position.put("x", WXViewUtils.getWebPxByWidth(location[0]));
-      position.put("y", WXViewUtils.getWebPxByWidth(location[1]));
-      position.put("width", WXViewUtils.getWebPxByWidth(mDomObj.getCSSLayoutWidth()));
-      position.put("height", WXViewUtils.getWebPxByWidth(mDomObj.getCSSLayoutHeight()));
+      position.put("x", getWebPxByWidth(location[0]));
+      position.put("y", getWebPxByWidth(location[1]));
+      position.put("width", getWebPxByWidth(mDomObj.getCSSLayoutWidth()));
+      position.put("height", getWebPxByWidth(mDomObj.getCSSLayoutHeight()));
       param.put(Constants.Name.POSITION, position);
       getInstance().fireEvent(mCurrentRef,
           Constants.Event.CLICK,
@@ -286,6 +289,20 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   protected void onInvokeUnknownMethod(String method, JSONArray args){
 
+  }
+
+  public Rect getComponentSize() {
+    Rect size=new Rect();
+    if(mHost!=null){
+      int[] location = new int[2];
+      mHost.getLocationOnScreen(location);
+      int  left= location[0];
+      int  top= location[1];
+      int  width= (int) mDomObj.getCSSLayoutWidth();
+      int  height= (int) mDomObj.getCSSLayoutHeight();
+      size.set(left,top,left+width,top+height);
+    }
+    return size;
   }
 
   interface OnClickListener{

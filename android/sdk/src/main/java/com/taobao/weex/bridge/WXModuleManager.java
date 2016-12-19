@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.bridge;
 
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
@@ -384,6 +385,19 @@ public class WXModuleManager {
     }
 
     return wxModule;
+  }
+
+  public static void onActivityResult(String instanceId,int requestCode, int resultCode, Intent data){
+
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    for( String key : modules.keySet()){
+      WXModule module =  modules.get(key);
+       if( module != null) {
+         module.onActivityResult(requestCode, resultCode, data);
+       }else{
+         WXLogUtils.w("onActivityResult can not find the "+ key +" module");
+       }
+    }
   }
 
   public static void destroyInstanceModules(String instanceId) {

@@ -45,12 +45,12 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(163)
-	var __weex_template__ = __webpack_require__(167)
-	var __weex_style__ = __webpack_require__(168)
-	var __weex_script__ = __webpack_require__(169)
+	__webpack_require__(152)
+	var __weex_template__ = __webpack_require__(156)
+	var __weex_style__ = __webpack_require__(157)
+	var __weex_script__ = __webpack_require__(158)
 
-	__weex_define__('@weex-component/ea51bd2d36d6d5354af97da097043629', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/01b832918f8c3165cebb597eb613f790', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -63,18 +63,18 @@
 
 	})
 
-	__weex_bootstrap__('@weex-component/ea51bd2d36d6d5354af97da097043629',undefined,undefined)
+	__weex_bootstrap__('@weex-component/01b832918f8c3165cebb597eb613f790',undefined,undefined)
 
 /***/ },
 
-/***/ 163:
+/***/ 152:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(164)
-	var __weex_style__ = __webpack_require__(165)
-	var __weex_script__ = __webpack_require__(166)
+	var __weex_template__ = __webpack_require__(153)
+	var __weex_style__ = __webpack_require__(154)
+	var __weex_script__ = __webpack_require__(155)
 
-	__weex_define__('@weex-component/slider-item', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/slider-neighbor-item', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -90,34 +90,49 @@
 
 /***/ },
 
-/***/ 164:
+/***/ 153:
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "image",
+	  "type": "div",
 	  "classList": [
-	    "slider-item"
+	    "slider-item-container"
 	  ],
-	  "attr": {
-	    "src": function () {return this.image}
-	  }
+	  "children": [
+	    {
+	      "type": "image",
+	      "classList": [
+	        "slider-item-image"
+	      ],
+	      "attr": {
+	        "src": function () {return this.image}
+	      }
+	    }
+	  ]
 	}
 
 /***/ },
 
-/***/ 165:
+/***/ 154:
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "slider-item": {
-	    "width": 348,
-	    "height": 400
+	  "slider-item-container": {
+	    "width": 542,
+	    "height": 360,
+	    "justifyContent": "center",
+	    "flexDirection": "row",
+	    "padding": 10
+	  },
+	  "slider-item-image": {
+	    "width": 542,
+	    "height": 360
 	  }
 	}
 
 /***/ },
 
-/***/ 166:
+/***/ 155:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -139,7 +154,7 @@
 
 /***/ },
 
-/***/ 167:
+/***/ 156:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -149,7 +164,7 @@
 	  ],
 	  "children": [
 	    {
-	      "type": "slider-item",
+	      "type": "slider-neighbor-item",
 	      "repeat": function () {return this.sliderItems}
 	    }
 	  ]
@@ -157,21 +172,19 @@
 
 /***/ },
 
-/***/ 168:
+/***/ 157:
 /***/ function(module, exports) {
 
 	module.exports = {
 	  "slider-page": {
-	    "flexDirection": "row",
-	    "justifyContent": "space-between",
-	    "width": 714,
+	    "width": 720,
 	    "height": 420
 	  }
 	}
 
 /***/ },
 
-/***/ 169:
+/***/ 158:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";

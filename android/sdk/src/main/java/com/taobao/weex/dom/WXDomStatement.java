@@ -554,7 +554,7 @@ class WXDomStatement {
           return "createBody";
         }
       });
-      animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+      addAnimationForDomTree(domObject);
       mDirty = true;
 
       if (instance != null) {
@@ -690,7 +690,7 @@ class WXDomStatement {
         return "AddDom";
       }
     });
-    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+    addAnimationForDomTree(domObject);
     mDirty = true;
 
     if (instance != null) {
@@ -1219,6 +1219,13 @@ class WXDomStatement {
     }
   }
 
+  private void addAnimationForDomTree(WXDomObject domObject){
+    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
+    for(int i=0;i<domObject.childCount();i++){
+      addAnimationForDomTree(domObject.getChild(i));
+    }
+  }
+
   private WXAnimationBean createAnimationBean(String ref, String animation){
     try {
       WXAnimationBean animationBean =
@@ -1306,6 +1313,30 @@ class WXDomStatement {
       child = dom.getChild(i);
       transformStyle(child, isAdd);
     }
+  }
+
+  public void getComponentSize(final String ref, final String callback) {
+    if (mDestroy) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      WXSDKManager.getInstance().callback(mInstanceId, callback, options);
+      return;
+    }
+
+    mNormalTasks.add(new IWXRenderTask() {
+
+      @Override
+      public void execute() {
+        mWXRenderManager.getComponentSize(mInstanceId, ref, callback);
+      }
+
+      @Override
+      public String toString() {
+        return "getComponentSize";
+      }
+    });
+    mDirty=true;
   }
 
   static class AddDomInfo {

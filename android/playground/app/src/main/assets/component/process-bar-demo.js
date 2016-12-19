@@ -44,10 +44,11 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(216)
-	var __weex_script__ = __webpack_require__(217)
+	var __weex_template__ = __webpack_require__(145)
+	var __weex_style__ = __webpack_require__(146)
+	var __weex_script__ = __webpack_require__(147)
 
-	__weex_define__('@weex-component/2c445dcf67fa0895d197edb5ffa2f439', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/0a82ae39306363e81eeac009d30abc0a', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -56,9 +57,11 @@
 
 	    __weex_module__.exports.template = __weex_template__
 
+	    __weex_module__.exports.style = __weex_style__
+
 	})
 
-	__weex_bootstrap__('@weex-component/2c445dcf67fa0895d197edb5ffa2f439',undefined,undefined)
+	__weex_bootstrap__('@weex-component/0a82ae39306363e81eeac009d30abc0a',undefined,undefined)
 
 /***/ },
 /* 1 */,
@@ -2084,92 +2087,7 @@
 /* 142 */,
 /* 143 */,
 /* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(192), __esModule: true };
-
-/***/ },
-/* 192 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var core  = __webpack_require__(34)
-	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-/***/ },
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */
+/* 145 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2178,104 +2096,25 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "stream.fetch",
+	        "title": "Basic",
 	        "type": "primary"
 	      },
 	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = GET"
+	          "type": "div",
+	          "style": {
+	            "width": function () {return this.fullW},
+	            "borderColor": "#333333",
+	            "borderWidth": 1,
+	            "borderStyle": "solid"
 	          },
 	          "children": [
 	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.getResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = GET / type = jsonp"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.getJsonpResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = POST"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.postResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = PUT"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.putResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = DELETE"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.deleteResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = HEAD"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.headResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "method = PATCH"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.patchResult}
+	              "type": "div",
+	              "style": {
+	                "width": function () {return this.w},
+	                "height": 60,
+	                "backgroundColor": "#333333"
 	              }
 	            }
 	          ]
@@ -2286,152 +2125,30 @@
 	}
 
 /***/ },
-/* 217 */
+/* 146 */
+/***/ function(module, exports) {
+
+	module.exports = {}
+
+/***/ },
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
-	var _stringify = __webpack_require__(191);
-
-	var _stringify2 = _interopRequireDefault(_stringify);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	__webpack_require__(4);
-
+	var INC = 20;
 	module.exports = {
 	  data: function () {return {
-	    getJsonpResult: 'loading...',
-	    getResult: 'loading...',
-	    postResult: 'loading...',
-	    putResult: 'loading...',
-	    deleteResult: 'loading...',
-	    headResult: 'loading...',
-	    patchResult: 'loading...'
+	    fullW: 600,
+	    w: 40
 	  }},
 	  ready: function ready() {
-	    var stream = __weex_require__('@weex-module/stream');
 	    var me = this;
-	    var GET_URL_JSONP = 'http://jsfiddle.net/echo/jsonp/?callback=anything&result=content_in_response';
-	    var GET_URL = 'http://httpbin.org/get';
-	    var POST_URL = 'http://httpbin.org/post';
-	    var PUT_URL = 'http://httpbin.org/put';
-	    var DELETE_URL = 'http://httpbin.org/delete';
-	    var HEAD_URL = 'http://httpbin.org/status/418';
-	    var PATCH_URL = 'http://httpbin.org/patch';
-
-	    stream.fetch({
-	      method: 'GET',
-	      url: GET_URL_JSONP,
-	      type: 'jsonp'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.getJsonpResult = "request failed";
-	      } else {
-	        console.log('get:' + ret);
-	        me.getJsonpResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get jsonp in progress:' + response.length);
-	      me.getJsonpResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'GET',
-	      url: GET_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.getResult = "request failed";
-	      } else {
-	        console.log('get:' + ret);
-	        me.getResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.getResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'POST',
-	      url: POST_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.postResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.postResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.postResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'PUT',
-	      url: PUT_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.putResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.putResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.putResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'DELETE',
-	      url: DELETE_URL,
-	      type: 'json'
-	    }, function (ret) {
-
-	      if (!ret.ok) {
-	        me.deleteResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.deleteResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.deleteResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'HEAD',
-	      url: HEAD_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (ret.statusText !== 'I\'m a teapot') {
-	        me.headResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.headResult = ret.statusText;
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.headResult = "bytes received:" + response.length;
-	    });
-
-	    stream.fetch({
-	      method: 'PATCH',
-	      url: PATCH_URL,
-	      type: 'json'
-	    }, function (ret) {
-	      if (!ret.ok) {
-	        me.patchResult = "request failed";
-	      } else {
-	        console.log('get:' + (0, _stringify2.default)(ret));
-	        me.patchResult = (0, _stringify2.default)(ret.data);
-	      }
-	    }, function (response) {
-	      console.log('get in progress:' + response.length);
-	      me.patchResult = "bytes received:" + response.length;
-	    });
+	    setInterval(function () {
+	      if (me.w >= me.fullW) me.w = 0;
+	      me.w = me.w + INC >= me.fullW ? me.fullW : me.w + INC;
+	    }, 33);
 	  }
 	};}
 	/* generated by weex-loader */
