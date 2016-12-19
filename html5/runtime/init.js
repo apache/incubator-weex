@@ -1,6 +1,7 @@
 import { registerElement } from './vdom/element-types'
 import { services } from './service'
 import runtimeConfig from './config'
+import CallbackManager from './callback-manager'
 
 let frameworks
 
@@ -37,14 +38,13 @@ const instanceMap = {}
  */
 function createInstance (id, code, config, data) {
   let info = instanceMap[id]
+
   if (!info) {
     // Init instance info.
     info = checkVersion(code) || {}
     if (!frameworks[info.framework]) {
       info.framework = 'Weex'
     }
-    info.created = Date.now()
-    instanceMap[id] = info
 
     // Init instance config.
     config = JSON.parse(JSON.stringify(config || {}))
@@ -52,17 +52,31 @@ function createInstance (id, code, config, data) {
     config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
 
+    // Init callback manager
+    const callbacks = new CallbackManager(id)
+
+    const env = {
+      info,
+      config,
+      callbacks
+    }
+    env.framework = info.framework
+    env.created = Date.now()
+    env.services = {}
+    instanceMap[id] = env
+
     // Init JavaScript services for this instance.
     const serviceObjects = Object.create(null)
     services.forEach(service => {
       const create = service.options.create
       if (create) {
-        const result = create(id, { info, runtime: runtimeConfig }, config)
+        const result = create(id, env, runtimeConfig)
         Object.assign(serviceObjects, result)
       }
     })
+    env.services = serviceObjects
 
-    return frameworks[info.framework].createInstance(id, code, config, data, serviceObjects)
+    return frameworks[info.framework].createInstance(id, code, config, data, env)
   }
   return new Error(`invalid instance id "${id}"`)
 }
