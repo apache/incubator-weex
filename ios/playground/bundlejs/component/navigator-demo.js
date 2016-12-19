@@ -2117,6 +2117,9 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	__webpack_require__(4);
+	var navigator = __weex_require__('@weex-module/navigator');
+	var modal = __weex_require__('@weex-module/modal');
+
 	module.exports = {
 	  data: function () {return {
 	    navBarHeight: 88,
@@ -2136,7 +2139,7 @@
 
 	    this.$on('naviBar.rightItem.click', function (e) {
 	      duration = 2;
-	      this.$call('modal', 'toast', {
+	      modal.toast({
 	        'message': 'naviBar.rightItem.click',
 	        'duration': duration
 	      });
@@ -2144,7 +2147,7 @@
 
 	    this.$on('naviBar.leftItem.click', function (e) {
 	      duration = 2;
-	      this.$call('modal', 'toast', {
+	      modal.toast({
 	        'message': 'naviBar.leftItem.click',
 	        'duration': duration
 	      });
@@ -2169,10 +2172,10 @@
 	      }
 	      nativeBase = 'http://' + host + '/' + this.dir + '/build/';
 	    }
-	    var h5Base = './index.html?page=./' + this.dir + '/build/';
+	    var h5Base = bundleUrl;
 
 	    var base = nativeBase;
-	    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) === 'object') {
+	    if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) == 'object') {
 	      base = h5Base;
 	    }
 	    this.baseURL = base;
@@ -2180,11 +2183,14 @@
 	  methods: {
 	    push: function push() {
 	      var vm = this;
+	      if ((typeof window === 'undefined' ? 'undefined' : (0, _typeof3.default)(window)) !== 'object') {
+	        this.baseURL = this.baseURL + 'navigator-demo.js?test=1';
+	      }
 	      var params = {
-	        'url': this.baseURL + 'component/navigator-demo.js?test=1',
+	        'url': this.baseURL,
 	        'animated': 'true'
 	      };
-	      vm.$call('navigator', 'push', params, function () {});
+	      navigator.push(params, function () {});
 	    },
 
 	    pop: function pop() {
@@ -2192,7 +2198,7 @@
 	      var params = {
 	        'animated': 'true'
 	      };
-	      vm.$call('navigator', 'pop', params, function () {});
+	      navigator.pop(params, function () {});
 	    }
 	  }
 	};}
@@ -2215,14 +2221,14 @@
 
 	var _symbol2 = _interopRequireDefault(_symbol);
 
-	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj; };
+	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
 	  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	} : function (obj) {
-	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	};
 
 /***/ },

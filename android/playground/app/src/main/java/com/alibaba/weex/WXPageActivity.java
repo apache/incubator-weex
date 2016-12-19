@@ -17,6 +17,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
 import com.alibaba.weex.https.HotRefreshManager;
@@ -122,6 +124,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   private JSONArray mData;
   private int count = 0;
 
+  private WXAnalyzerDelegate mWxAnalyzerDelegate;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -168,6 +172,17 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     }
     mInstance.onActivityCreate();
     registerBroadcastReceiver();
+
+    mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
+    mWxAnalyzerDelegate.onCreate();
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStart();
+    }
   }
 
   private void loadWXfromLocal(boolean reload) {
@@ -283,6 +298,16 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     //        TopScrollHelper.getInstance(getApplicationContext()).onDestory();
     mWXHandler.obtainMessage(Constants.HOT_REFRESH_DISCONNECT).sendToTarget();
     unregisterBroadcastReceiver();
+
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onDestroy();
+    }
+  }
+
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    return (mWxAnalyzerDelegate != null && mWxAnalyzerDelegate.onKeyUp(keyCode,event)) || super.onKeyUp(keyCode, event);
   }
 
   @Override
@@ -290,6 +315,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onResume();
     if (mInstance != null) {
       mInstance.onActivityResume();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onResume();
     }
   }
 
@@ -335,6 +363,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
     WXLogUtils.e("into--[onViewCreated]");
+    View wrappedView = null;
+    if(mWxAnalyzerDelegate != null){
+      wrappedView = mWxAnalyzerDelegate.onWeexViewCreated(instance,view);
+    }
+    if(wrappedView != null){
+      view = wrappedView;
+    }
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }
@@ -347,6 +382,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+    if(mWxAnalyzerDelegate  != null){
+      mWxAnalyzerDelegate.onWeexRenderSuccess(instance);
+    }
     mProgressBar.setVisibility(View.INVISIBLE);
   }
 
@@ -358,6 +396,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   @Override
   public void onException(WXSDKInstance instance, String errCode,
                           String msg) {
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onException(instance,errCode,msg);
+    }
     mProgressBar.setVisibility(View.GONE);
     if (!TextUtils.isEmpty(errCode) && errCode.contains("|")) {
       String[] errCodeList = errCode.split("\\|");
@@ -414,6 +455,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onPause();
     if (mInstance != null) {
       mInstance.onActivityPause();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onPause();
+    }
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    if (mInstance != null) {
+      mInstance.onActivityStop();
+    }
+    if(mWxAnalyzerDelegate != null){
+      mWxAnalyzerDelegate.onStop();
     }
   }
 

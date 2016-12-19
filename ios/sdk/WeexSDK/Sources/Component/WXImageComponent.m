@@ -110,7 +110,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    
+
     [self configPlaceHolder:attributes];
     
     if (attributes[@"resize"]) {
