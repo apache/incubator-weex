@@ -309,8 +309,8 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public String callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
-        return null;
+    public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
+
     }
 
     @Override
