@@ -2098,7 +2098,9 @@
 	  "classList": [
 	    "list"
 	  ],
-	  "append": "node",
+	  "attr": {
+	    "append＝\"tree\"": ""
+	  },
 	  "children": [
 	    {
 	      "type": "refresh",
@@ -2114,10 +2116,9 @@
 	      "children": [
 	        {
 	          "type": "loading-indicator",
-	          "style": {
-	            "height": 60,
-	            "width": 60
-	          }
+	          "classList": [
+	            "indicator"
+	          ]
 	        },
 	        {
 	          "type": "text",
@@ -2193,10 +2194,9 @@
 	      "children": [
 	        {
 	          "type": "loading-indicator",
-	          "style": {
-	            "height": 60,
-	            "width": 60
-	          }
+	          "classList": [
+	            "indicator"
+	          ]
 	        }
 	      ]
 	    }
@@ -2222,15 +2222,18 @@
 	    "color": "#45b5f0"
 	  },
 	  "loading-view": {
-	    "height": 80,
 	    "width": 750,
-	    "justifyContent": "center",
+	    "height": 100,
+	    "display": "flex",
+	    "MsFlexAlign": "center",
+	    "WebkitAlignItems": "center",
+	    "WebkitBoxAlign": "center",
 	    "alignItems": "center"
 	  },
 	  "indicator": {
-	    "height": 40,
-	    "width": 40,
-	    "color": "#45b5f0"
+	    "height": 60,
+	    "width": 60,
+	    "color": "#889967"
 	  },
 	  "header": {
 	    "backgroundColor": "#45b5f0",
@@ -2263,16 +2266,25 @@
 	    onrefresh: function onrefresh(e) {
 	      var self = this;
 	      self.refresh_display = 'show';
-	      setTimeout(function () {
+	      self.$call('modal', 'toast', {
+	        'message': 'onrefresh'
+	      });
+	      this.$call('timer', 'setTimeout', function () {
 	        self.refresh_display = 'hide';
-	      }, 1000);
+	      }, 3000);
 	    },
 	    onloading: function onloading(e) {
 	      var self = this;
 	      self.loading_display = 'show';
-	      setTimeout(function () {
+	      self.$call('modal', 'toast', {
+	        'message': 'onloading'
+	      });
+	      this.$call('timer', 'setTimeout', function () {
+	        if (self.sections.length <= 6) {
+	          self.sections.push(self.moreSections[self.sections.length - 2]);
+	        }
 	        self.loading_display = 'hide';
-	      }, 1000);
+	      }, 3000);
 	    }
 	  },
 	  data: function () {return {

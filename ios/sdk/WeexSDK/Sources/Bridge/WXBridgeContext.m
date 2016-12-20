@@ -24,6 +24,8 @@
 #import "WXModuleManager.h"
 #import "WXSDKInstance_private.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXAppConfiguration.h"
+#import "WXInvocationConfig.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -66,7 +68,7 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"PDDebugger") : [WXJSCoreBridge class];
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
     
     if (_jsBridge && [_jsBridge isKindOfClass:bridgeClass]) {
         return _jsBridge;
@@ -77,10 +79,31 @@ _Pragma("clang diagnostic pop") \
         _frameworkLoadFinished = NO;
     }
     
-    _jsBridge = _debugJS ? [NSClassFromString(@"PDDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
      __weak typeof(self) weakSelf = self;
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
+    }];
+    [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
+
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
+        });
+        
+        return 0;
     }];
     
     return _jsBridge;
@@ -118,7 +141,7 @@ _Pragma("clang diagnostic pop") \
 
 #pragma mark JS Bridge Management
 
-- (NSInteger)invokeNative:(NSString *)instance tasks:(NSArray *)tasks callback:(NSString *)callback
+- (NSInteger)invokeNative:(NSString *)instance tasks:(NSArray *)tasks callback:(NSString __unused*)callback
 {
     WXAssertBridgeThread();
     
@@ -135,19 +158,7 @@ _Pragma("clang diagnostic pop") \
     for (NSDictionary *task in tasks) {
         WXBridgeMethod *method = [[WXBridgeMethod alloc] initWihData:task];
         method.instance = instance;
-        [[WXSDKManager moduleMgr] dispatchMethod:method];
-    }
-    
-    NSMutableArray *sendQueue = [self.sendQueue valueForKey:instance];
-    if (!sendQueue) {
-        WXLogError(@"No send queue for instance:%@", instance);
-        return -1;
-    }
-    
-    if (![callback isEqualToString:@"undefined"] && ![callback isEqualToString:@"-1"] && callback) {
-        WXBridgeMethod *method = [self _methodWithCallback:callback];
-        method.instance = instance;
-        [sendQueue addObject:method];
+        [[WXInvocationConfig sharedInstance] dispatchMethod:method];
     }
     
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
@@ -202,6 +213,10 @@ _Pragma("clang diagnostic pop") \
     }
     
     [self callJSMethod:@"destroyInstance" args:@[instance]];
+    
+    if ([self.jsBridge respondsToSelector:@selector(garbageCollect)]) {
+         [self.jsBridge garbageCollect];
+    }
 }
 
 - (void)refreshInstance:(NSString *)instance
@@ -239,6 +254,11 @@ _Pragma("clang diagnostic pop") \
         WX_MONITOR_SUCCESS(WXMTJSFramework);
         //the JSFramework has been load successfully.
         self.frameworkLoadFinished = YES;
+        
+        JSValue *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
+        if (frameworkVersion && [frameworkVersion isString]) {
+            [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
+        }
         
         //execute methods which has been stored in methodQueue temporarily.
         for (NSDictionary *method in _methodQueue) {
@@ -307,7 +327,7 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToDevToolWithUrl:(NSURL *)url
 {
-    id webSocketBridge = [NSClassFromString(@"PDDebugger") alloc];
+    id webSocketBridge = [NSClassFromString(@"WXDebugger") alloc];
     if(!webSocketBridge || ![webSocketBridge respondsToSelector:NSSelectorFromString(@"connectToURL:")]) {
         return;
     } else {

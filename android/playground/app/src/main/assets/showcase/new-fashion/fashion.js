@@ -45,11 +45,11 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(233)
-	__webpack_require__(236)
-	var __weex_template__ = __webpack_require__(246)
-	var __weex_style__ = __webpack_require__(247)
-	var __weex_script__ = __webpack_require__(248)
+	__webpack_require__(237)
+	__webpack_require__(240)
+	var __weex_template__ = __webpack_require__(250)
+	var __weex_style__ = __webpack_require__(251)
+	var __weex_script__ = __webpack_require__(252)
 
 	__weex_define__('@weex-component/3a0fc3e27dd7bb14f409fca1ac4baac7', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -68,7 +68,7 @@
 
 /***/ },
 
-/***/ 231:
+/***/ 235:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -88,7 +88,7 @@
 
 /***/ },
 
-/***/ 232:
+/***/ 236:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -118,11 +118,11 @@
 
 /***/ },
 
-/***/ 233:
+/***/ 237:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(231)
-	var __weex_script__ = __webpack_require__(232)
+	var __weex_template__ = __webpack_require__(235)
+	var __weex_script__ = __webpack_require__(236)
 
 	__weex_define__('@weex-component/banner', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -138,7 +138,7 @@
 
 /***/ },
 
-/***/ 234:
+/***/ 238:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -204,7 +204,7 @@
 
 /***/ },
 
-/***/ 235:
+/***/ 239:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -236,12 +236,12 @@
 
 /***/ },
 
-/***/ 236:
+/***/ 240:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(233)
-	var __weex_template__ = __webpack_require__(234)
-	var __weex_script__ = __webpack_require__(235)
+	__webpack_require__(237)
+	var __weex_template__ = __webpack_require__(238)
+	var __weex_script__ = __webpack_require__(239)
 
 	__weex_define__('@weex-component/banners', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -257,7 +257,7 @@
 
 /***/ },
 
-/***/ 246:
+/***/ 250:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -312,7 +312,7 @@
 
 /***/ },
 
-/***/ 247:
+/***/ 251:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -324,7 +324,7 @@
 
 /***/ },
 
-/***/ 248:
+/***/ 252:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";

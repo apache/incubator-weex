@@ -22,7 +22,7 @@
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     
     if (self) {
-        _async = YES;
+        _async = attributes[@"async"] ? [WXConvert BOOL:attributes[@"async"]] : YES;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -37,6 +37,8 @@
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
+    [super _frameDidCalculated:isChanged];
+    
     if (isChanged) {
         [self.list cellDidLayout:self];
     }
@@ -51,6 +53,13 @@
         
         [self.list cellDidRendered:self];
     };
+}
+
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    if (attributes[@"async"]) {
+        _async = [WXConvert BOOL:attributes[@"async"]];
+    }
 }
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index

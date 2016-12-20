@@ -1,4 +1,7 @@
-# Weex
+# Weex    
+Android[![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_sdk/images/download.svg)](https://bintray.com/alibabaweex/maven/weex_sdk/_latestVersion)
+iOS[![Pod version](https://badge.fury.io/co/WeexSDK.svg)](https://cocoapods.org/pods/WeexSDK) 
+HTML5[![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs.com/package/weex-html5)
 
 > A framework for building Mobile cross-platform UI.
 
@@ -64,9 +67,11 @@ On Android Platform , Weex code is executed in [weex_v8core](https://github.com/
 See [SCRIPTS.md](./SCRIPTS.md) for more information.
 
 
-## IDE Plugin & Syntax Highlight
+## IDE Plugin & Syntax Highlight & DevTool
 
-See [Weex Community](https://github.com/alibaba/weex/wiki/Weex-Community) Wiki page 
+See [Weex Community](https://github.com/alibaba/weex/wiki/Weex-Community) Wiki page
+
+Weex team have developed a [DevTool](https://github.com/weexteam/weex-devtool) to help you to improve `we file` debug efficiency.
 
 ## FAQ
 

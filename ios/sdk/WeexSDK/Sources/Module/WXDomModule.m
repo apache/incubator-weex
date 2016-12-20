@@ -13,6 +13,9 @@
 #import "WXSDKInstance_private.h"
 #import "WXLog.h"
 #import "WXModuleProtocol.h"
+#import "WXUtility.h"
+#import "WXRuleManager.h"
+#import "WXSDKInstance.h"
 
 @interface WXDomModule ()
 
@@ -34,6 +37,9 @@ WX_EXPORT_METHOD(@selector(refreshFinish))
 WX_EXPORT_METHOD(@selector(scrollToElement:options:))
 WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
+WX_EXPORT_METHOD(@selector(addRule:rule:))
+WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
+
 
 - (void)performBlockOnComponentMananger:(void(^)(WXComponentManager *))block
 {
@@ -49,6 +55,14 @@ WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
         }
         [mananger startComponentTasks];
         block(mananger);
+    });
+}
+- (void)performSelectorOnRuleManager:(void(^)(void))block{
+    if (!block) {
+        return;
+    }
+    WXPerformBlockOnComponentThread(^{
+        block();
     });
 }
 
@@ -138,6 +152,61 @@ WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 {
     [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
         [manager updateAttributes:attrs forComponent:elemRef];
+    }];
+}
+
+- (void)addRule:(NSString*)type rule:(NSDictionary *)rule {
+    if ([WXUtility isBlankString:type] || ![rule count]) {
+        return;
+    }
+    
+    [self performSelectorOnRuleManager:^{
+        [WXRuleManager sharedInstance].instance = weexInstance;
+        [[WXRuleManager sharedInstance] addRule:type rule:rule];
+        
+    }];
+}
+
+- (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
+    
+    [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
+        NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
+        UIView *rootView = manager.weexInstance.rootView;
+        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView.superview.superview];
+        CGFloat resize = WXScreenResizeRadio();
+        if ([ref isEqualToString:@"viewport"]) {
+            [callbackRsp setObject:@(true) forKey:@"result"];
+            [callbackRsp setObject:@{
+                                     @"width":@(rootRect.size.width/resize),
+                                     @"height":@(rootRect.size.height/resize),
+                                     @"bottom":@(CGRectGetMaxY(rootRect)/WXScreenResizeRadio()),
+                                     @"left":@(rootRect.origin.x/resize),
+                                     @"right":@(CGRectGetMaxX(rootRect)/resize),
+                                     @"top":@(rootRect.origin.y/resize)
+                                     } forKey:@"size"];
+            callback(callbackRsp, false);
+        }else {
+            WXComponent *component = [manager componentForRef:ref];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!component) {
+                    [callbackRsp setObject:@(false) forKey:@"result"];
+                    [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
+                } else {
+                    CGRect componentRect = [component.view.superview convertRect:component.calculatedFrame toView:rootView.superview.superview];
+                    [callbackRsp setObject:@(true)forKey:@"result"];
+                    [callbackRsp setObject:@{
+                                             @"width":@(componentRect.size.width /resize),
+                                             @"height":@(componentRect.size.height / resize),
+                                             @"bottom":@(CGRectGetMaxY(componentRect) / resize),
+                                             @"left":@(componentRect.origin.x / resize),
+                                             @"right":@(CGRectGetMaxX(componentRect) / resize),
+                                             @"top":@(componentRect.origin.y / resize)
+                                             } forKey:@"size"];
+                }
+                callback(callbackRsp, false);
+            });
+           
+        }
     }];
 }
 

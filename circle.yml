@@ -5,7 +5,7 @@ machine:
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
 test:
   override:
-    #- npm run test
+    - npm run test
     - cd android/playground && ./gradlew assembleDebug
     - cd android/sdk && ./gradlew clean testDebugUnitTest -PdisableCov=true
   post:

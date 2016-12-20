@@ -9,6 +9,8 @@
 #import "WXTextInputComponent.h"
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXSDKInstance.h"
+#import "WXDefine.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -51,22 +53,26 @@
 @interface WXTextInputComponent()
 
 @property (nonatomic, strong) WXTextInputView *inputView;
+@property (nonatomic, strong) WXDatePickerManager *datePickerManager;
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;
 @property (nonatomic, strong) NSString *placeholder;
-@property (nonatomic) NSUInteger maxLength;
+@property (nonatomic) NSNumber *maxLength;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) WXTextWeight fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
+@property (nonatomic, copy) NSString *inputType;
+
 //event
 @property (nonatomic) BOOL inputEvent;
 @property (nonatomic) BOOL focusEvent;
 @property (nonatomic) BOOL blurEvent;
 @property (nonatomic) BOOL changeEvent;
-@property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
+@property (nonatomic, assign) CGSize keyboardSize;
+@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -81,6 +87,9 @@
 @synthesize padding = _padding;
 @synthesize textStorage = _textStorage;
 
+WX_EXPORT_METHOD(@selector(focus))
+WX_EXPORT_METHOD(@selector(blur))
+
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
@@ -89,11 +98,15 @@
         _focusEvent = NO;
         _blurEvent = NO;
         _changeEvent = NO;
-        _clickEvent = NO;
         
         _inputView = [[WXTextInputView alloc] init];
+        _datePickerManager = [[WXDatePickerManager alloc] init];
+        _datePickerManager.delegate = self;
         if (attributes[@"type"]) {
-            [self setType: attributes[@"type"]];
+            NSString *type = [WXConvert NSString:attributes[@"type"]];
+            if (type) {
+                [self setType: type];
+            }
         }
         
         if (attributes[@"autofocus"]) {
@@ -102,24 +115,34 @@
         if (attributes[@"disabled"]) {
             [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
         }
+        if (attributes[@"value"]) {
+            NSString* value = [WXConvert NSString:attributes[@"value"]];
+            if (value) {
+                _inputView.text = value;
+            }
+        }
+        if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+        {
+            [_datePickerManager configDatePicker:attributes];
+        }
         if (attributes[@"placeholder"]) {
-            _placeholder = attributes[@"placeholder"];
-            _inputView.placeholder = _placeholder;
-        } else {
+            NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
+            if (placeHolder) {
+                _placeholder = placeHolder;
+            }
+        }
+        if (!_placeholder) {
             _placeholder = @"";
         }
-        if (attributes[@"value"]) {
-            _inputView.text = attributes[@"value"];
-        }
+        
         if (attributes[@"maxlength"]) {
-            _maxLength = [attributes[@"maxlength"] integerValue];
-        } else {
-            _maxLength = 0;
+            _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
         if (styles[@"color"]) {
             [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
         }
+        
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
         }
@@ -143,7 +166,6 @@
         }
         [self setPlaceholderAttributedString];
         [self setTextFont];
-        
         UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
         if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
             [self setPadding:padding];
@@ -152,6 +174,8 @@
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             [self setBorder:border];
         }
+        
+        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -172,6 +196,7 @@
     _padding = UIEdgeInsetsZero;
     _border = UIEdgeInsetsZero;
     _inputView.delegate = self;
+    _inputView.userInteractionEnabled = YES;
     
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -181,9 +206,51 @@
     _inputView.inputAccessoryView = toolbar;
 }
 
-- (void)viewWillUnload
+- (void)viewWillLoad
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:_inputView];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void)focus
+{
+    if(self.inputView) {
+        [self.inputView becomeFirstResponder];
+    }
+}
+
+-(void)blur
+{
+    if(self.inputView) {
+        [self.inputView resignFirstResponder];
+    }
+}
+
+#pragma mark - private method
+-(UIColor *)convertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }else {
+        color = [UIColor blackColor];
+    }
+    return color;
 }
 
 #pragma mark - Add Event
@@ -200,9 +267,6 @@
     }
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = YES;
-    }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = YES;
     }
 }
 
@@ -222,9 +286,6 @@
     if ([eventName isEqualToString:@"change"]) {
         _changeEvent = NO;
     }
-    if ([eventName isEqualToString:@"click"]) {
-        _clickEvent = NO;
-    }
 }
 
 #pragma mark - upate attributes
@@ -232,7 +293,10 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"type"]) {
-        [self setType: attributes[@"type"]];
+        NSString *type = [WXConvert NSString:attributes[@"type"]];
+        if (type) {
+            [self setType: type];
+        }
     }
     if (attributes[@"autofocus"]) {
         [self setAutofocus:[attributes[@"autofocus"] boolValue]];
@@ -241,15 +305,24 @@
         [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
     }
     if (attributes[@"maxlength"]) {
-        _maxLength = [attributes[@"maxlength"] integerValue];
+        _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
-    
     if (attributes[@"placeholder"]) {
-        _placeholder = attributes[@"placeholder"];
-        _inputView.placeholder = _placeholder;
+        NSString* placeholder = [WXConvert NSString:attributes[@"placeholder"]];
+        if (placeholder) {
+            _inputView.placeholder = _placeholder;
+            _placeholder = placeholder;
+        }
     }
     if (attributes[@"value"]) {
-        _inputView.text = attributes[@"value"];
+        NSString* value = [WXConvert NSString:attributes[@"value"]];
+        if (value) {
+            _inputView.text = value;
+        }
+    }
+    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+    {
+        [_datePickerManager updateDatePicker:attributes];
     }
     
     [self setPlaceholderAttributedString];
@@ -260,7 +333,7 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+       [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
@@ -272,7 +345,7 @@
         _fontStyle = [WXConvert WXTextStyle:styles[@"fontStyle"]];
     }
     if (styles[@"fontFamily"]) {
-        _fontFamily = styles[@"fontFamily"];
+        _fontFamily = [WXConvert NSString:styles[@"fontFamily"]];
     }
     if (styles[@"textAlign"]) {
         [_inputView setTextAlignment:[WXConvert NSTextAlignment:styles[@"textAlign"]]] ;
@@ -327,8 +400,43 @@
     };
 }
 
+-(UIColor *)covertColor:(id)value
+{
+    UIColor *color = [WXConvert UIColor:value];
+    if(value) {
+        NSString *str = [WXConvert NSString:value];
+        if(str && [@"" isEqualToString:str]) {
+            color = [UIColor blackColor];
+        }
+    }
+    return color;
+}
 
 #pragma mark -
+#pragma mark WXDatePickerManagerDelegate
+-(void)fetchDatePickerValue:(NSString *)value
+{
+    _inputView.text = value;
+    if (_changeEvent) {
+        if (![[_inputView text] isEqualToString:_changeEventString]) {
+            [self fireEvent:@"change" params:@{@"value":[_inputView text]} domChanges:@{@"attrs":@{@"value":[_inputView text]}}];
+        }
+    }
+}
+
+#pragma mark UITextFieldDelegate
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    if([self isDateType])
+    {
+        [[[UIApplication sharedApplication] keyWindow] endEditing:YES];
+        _changeEventString = [textField text];
+        [_datePickerManager show];
+        return NO;
+    }
+    return  YES;
+}
+
 #pragma mark UITextFieldDelegate
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
@@ -336,9 +444,6 @@
     _changeEventString = [textField text];
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
-    }
-    if (_clickEvent) {
-        [self fireEvent:@"click" params:nil];
     }
 }
 
@@ -351,7 +456,7 @@
         
         NSUInteger newLength = oldLength - rangeLength + replacementLength;
         
-        return newLength <= _maxLength ;
+        return newLength <= [_maxLength integerValue] ;
     }
     return YES;
 }
@@ -368,14 +473,47 @@
     }
 }
 
-- (void)textFiledEditChanged:(NSNotification *)notifi{
+- (void)textFiledEditChanged:(NSNotification *)notifi
+{
     if (_inputEvent) {
         UITextField *textField = (UITextField *)notifi.object;
-        [self fireEvent:@"input" params:@{@"value":textField.text}];
+        // bind each other , the key must be attrs
+        [self fireEvent:@"input" params:@{@"value":[textField text]} domChanges:@{@"attrs":@{@"value":[textField text]}}];
     }
 }
 
+- (void)setViewMovedUp:(BOOL)movedUp
+{
+    UIView *rootView = self.weexInstance.rootView;
+    CGRect rect = _rootViewOriginFrame;
+    CGRect rootViewFrame = rootView.frame;
+    CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
+    if (movedUp) {
+        CGFloat offset =inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
+        if (offset > 0) {
+            rect = (CGRect){
+                .origin.x = 0.f,
+                .origin.y = -offset,
+                .size = rootViewFrame.size
+            };
+        }
+    }else {
+        // revert back to the origin state
+        rect = _rootViewOriginFrame;
+        _rootViewOriginFrame = CGRectNull;
+    }
+    self.weexInstance.rootView.frame = rect;
+}
+
+
 #pragma mark
+
+-(BOOL)isDateType
+{
+    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
+        return YES;
+    return NO;
+}
 
 - (void)setPlaceholderAttributedString
 {
@@ -395,9 +533,21 @@
 - (void)setAutofocus:(BOOL)b
 {
     if (b) {
-        [_inputView becomeFirstResponder];
+        if([self isDateType])
+        {
+            [_datePickerManager show];
+        }else
+        {
+            [_inputView becomeFirstResponder];
+        }
     } else {
-        [_inputView resignFirstResponder];
+        if([self isDateType])
+        {
+            [_datePickerManager hide];
+        }else
+        {
+            [_inputView resignFirstResponder];
+        }
     }
 }
 
@@ -405,6 +555,7 @@
 {
     [_inputView setKeyboardType:UIKeyboardTypeDefault];
     [_inputView setSecureTextEntry:NO];
+    _inputType = type;
     
     if ([type isEqualToString:@"text"]) {
         [_inputView setKeyboardType:UIKeyboardTypeDefault];
@@ -421,15 +572,6 @@
     else if ([type isEqualToString:@"url"]) {
         [_inputView setKeyboardType:UIKeyboardTypeURL];
     }
-    else if ([type isEqualToString:@"date"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
-    else if ([type isEqualToString:@"time"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
-    else if ([type isEqualToString:@"datetime"]) {
-        [_inputView setKeyboardType:UIKeyboardTypeNumberPad];
-    }
 }
 
 - (void)setPadding:(UIEdgeInsets)padding
@@ -444,9 +586,62 @@
     [_inputView setBorder:border];
 }
 
+#pragma mark keyboard
+- (void)keyboardWasShown:(NSNotification*)notification
+{
+    if(![_inputView isFirstResponder]) {
+        return;
+    }
+    CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
+    
+    CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
+    if(begin.size.height <= 44 ){
+        return;
+    }
+    _keyboardSize = end.size;
+    UIView * rootView = self.weexInstance.rootView;
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    if (CGRectIsNull(_rootViewOriginFrame)) {
+        _rootViewOriginFrame = rootView.frame;
+    }
+    CGRect keyboardRect = (CGRect){
+        .origin.x = 0,
+        .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
+        .size = _keyboardSize
+    };
+    CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
+    if (keyboardRect.origin.y - inputFrame.size.height <= inputFrame.origin.y) {
+        [self setViewMovedUp:YES];
+        self.weexInstance.isRootViewFrozen = YES;
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification*)notification
+{
+    if (![_inputView isFirstResponder]) {
+        return;
+    }
+    UIView * rootView = self.weexInstance.rootView;
+    if (rootView.frame.origin.y < 0) {
+        [self setViewMovedUp:NO];
+        self.weexInstance.isRootViewFrozen = NO;
+    }
+}
+
 - (void)closeKeyboard
 {
     [_inputView resignFirstResponder];
 }
 
+#pragma mark -reset color
+- (void)resetStyles:(NSArray *)styles
+{
+    if ([styles containsObject:@"color"]) {
+        [_inputView setTextColor:[UIColor blackColor]];
+    }
+    if ([styles containsObject:@"fontSize"]) {
+        _fontSize = WX_TEXT_FONT_SIZE;
+        [self setTextFont];
+    }
+}
 @end
