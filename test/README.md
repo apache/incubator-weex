@@ -7,9 +7,12 @@
 ## Run 
 
 ### Test Build-in Cases
-execute '`bash run.sh [platform]`' to perform weex sdk tests, `platform` could be `all`(default),`android`,`ios`,`h5`.
+0. Go root folder of weex Project
+0. execute `npm install` to install all dependencies
+0. execute `./test/serve.sh` to build and serve test bundles.
+0. execute `./test/run.sh [platform]` to perform weex sdk tests, `platform` could be `all`(default),`android`,`ios`,`h5`.
 
-### Test Separate Project
+### Test Separate Project **todo##
 execute '`bash run.sh [platform] [path]`' will run test against `[path]` folder as long as it has same structure as SDK's 'test' folder.
 
 ## Develop
