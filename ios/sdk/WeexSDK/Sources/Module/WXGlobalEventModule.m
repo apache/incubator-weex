@@ -46,7 +46,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 {
     if (_eventCallback[event]) {
         [_eventCallback removeObjectForKey:event];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:event object:weexInstance];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:event object:nil];
     } else {
         WXLogWarning(@"eventName \"%@\" doesn't exist", event);
     }
