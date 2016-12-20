@@ -1,8 +1,9 @@
-import { validateStyles } from '../validator'
-import { debounce, bind, createMixin } from '../utils'
-import * as rectMethods from '../methods/rect'
+import Scrollable from './scrollable'
+import { validateStyles } from '../../validator'
+import { debounce, bind, createMixin } from '../../utils'
+import * as rectMethods from '../../methods/rect'
 
-export default {
+export default Scrollable.extend({
   mixins: [createMixin(rectMethods)],
   props: {
     scrollDirection: {
@@ -89,4 +90,4 @@ export default {
       createElement('mark', { ref: 'bottomMark', staticClass: 'weex-scroller-bottom-mark' })
     ])
   }
-}
+})

@@ -1,12 +1,13 @@
-import { validateStyles } from '../../validator'
-import { debounce, throttle, bind, createMixin } from '../../utils'
+import Scrollable from '../scrollable'
+import { validateStyles } from '../../../validator'
+import { debounce, throttle, bind, createMixin } from '../../../utils'
 import refresh from './refresh'
 import loading from './loading'
-import * as rectMethods from '../../methods/rect'
-import * as eventMethods from '../../methods/event'
+import * as rectMethods from '../../../methods/rect'
+import * as eventMethods from '../../../methods/event'
 import listMixin from './listMixin'
 
-export default {
+export default Scrollable.extend({
   mixins: [createMixin(rectMethods, eventMethods), listMixin],
   props: {
     loadmoreoffset: {
@@ -115,4 +116,4 @@ export default {
       }
     }, this.createChildren(createElement))
   }
-}
+})

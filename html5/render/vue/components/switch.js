@@ -1,6 +1,7 @@
+import Base from './base'
 import { validateStyles } from '../validator'
 
-export default {
+export default Base.extend({
   props: {
     checked: {
       type: [Boolean, String],
@@ -47,4 +48,4 @@ export default {
       on: { click: this.toggle }
     }, [createElement('small', { staticClass: 'weex-switch-inner' })])
   }
-}
+})

@@ -1,4 +1,4 @@
-import { validateStyles } from '../../validator'
+import { validateStyles } from '../../../validator'
 
 export default {
   render (createElement) {

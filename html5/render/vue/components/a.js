@@ -1,6 +1,7 @@
+import Base from './base'
 import { validateStyles } from '../validator'
 
-export default {
+export default Base.extend({
   props: {
     href: String
   },
@@ -19,3 +20,4 @@ export default {
     }, this.$slots.default)
   }
 }
+)

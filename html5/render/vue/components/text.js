@@ -1,3 +1,4 @@
+import Base from './base'
 import { validateStyles } from '../validator'
 
 /**
@@ -14,7 +15,7 @@ function getTextStyle (props = {}) {
   }
 }
 
-export default {
+export default Base.extend({
   props: {
     lines: [Number, String],
     value: [String]
@@ -32,4 +33,4 @@ export default {
       staticStyle: getTextStyle(this)
     }, this.$slots.default || [this.value])
   }
-}
+})

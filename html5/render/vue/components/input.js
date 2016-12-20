@@ -1,6 +1,7 @@
+import Base from './base'
 import { validateStyles } from '../validator'
 
-export default {
+export default Base.extend({
   props: {
     type: {
       type: String,
@@ -46,4 +47,4 @@ export default {
       staticClass: 'weex-input'
     })
   }
-}
+})

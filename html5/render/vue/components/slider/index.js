@@ -1,10 +1,11 @@
+import Base from '../base'
 import { validateStyles } from '../../validator'
 import { throttle, bind, createMixin } from '../../utils'
 import indicator from './indicator'
 import * as eventMethods from '../../methods/event'
 import slideMixin from './slideMixin'
 
-export default {
+export default Base.extend({
   mixins: [createMixin(eventMethods), slideMixin],
   // components: { indicator },
   props: {
@@ -127,4 +128,4 @@ export default {
       ]
     )
   }
-}
+})

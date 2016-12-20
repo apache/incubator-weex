@@ -1,6 +1,7 @@
+import Base from './base'
 import { validateStyles } from '../validator'
 
-export default {
+export default Base.extend({
   props: {
     value: String,
     placeholder: String,
@@ -35,4 +36,4 @@ export default {
       staticClass: 'weex-textarea'
     })
   }
-}
+})
