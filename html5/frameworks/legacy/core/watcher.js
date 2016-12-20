@@ -3,14 +3,12 @@
 import Dep, { pushTarget, popTarget } from './dep'
 // import { pushWatcher } from './batcher'
 import {
-  warn,
   remove,
   extend,
   isObject,
-  parsePath,
   createNewSet
   // _Set as Set
-} from '../util'
+} from '../util/index'
 
 let uid = 0
 
@@ -54,17 +52,6 @@ export default function Watcher (vm, expOrFn, cb, options) {
   // parse expression for getter
   if (isFn) {
     this.getter = expOrFn
-  } else {
-    this.getter = parsePath(expOrFn)
-    if (!this.getter) {
-      this.getter = function () {}
-      process.env.NODE_ENV !== 'production' && warn(
-        'Failed watching path: ' + expOrFn +
-        'Watcher only accepts simple dot-delimited paths. ' +
-        'For full control, use a function instead.',
-        vm
-      )
-    }
   }
   this.value = this.lazy
     ? undefined
@@ -236,6 +223,7 @@ Watcher.prototype.teardown = function () {
  */
 
 const seenObjects = createNewSet() // new Set()
+/* istanbul ignore next */
 function traverse (val, seen) {
   let i, keys, isA, isO
   if (!seen) {
