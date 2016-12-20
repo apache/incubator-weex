@@ -25,9 +25,13 @@
           text-size-adjust: none;
 }
 
-html {
+html, body {
   -ms-overflow-style: scrollbar;
   -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
 a,

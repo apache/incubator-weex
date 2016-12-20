@@ -41,22 +41,18 @@ export default {
     },
 
     handleTouchStart (event) {
-      // TODO: only the list is at top & bottom will trigger the touch event
       event.preventDefault()
       event.stopPropagation()
-      // console.log('touch start', event)
-      // console.log('reachTop:', this.reachTop())
-      // console.log('reachBottom:', this.reachBottom())
-      const touch = event.changedTouches[0]
-      // console.log('touch start', event.target, event.target.pageY)
-      // console.log('touches', touch)
-      this._touchParams = {
-        reachTop: this.reachTop(),
-        reachBottom: this.reachBottom(),
-        startTouchEvent: touch,
-        startX: touch.pageX,
-        startY: touch.pageY,
-        timeStamp: event.timeStamp
+      if (this._loading || this._refresh) {
+        const touch = event.changedTouches[0]
+        this._touchParams = {
+          reachTop: this.reachTop(),
+          reachBottom: this.reachBottom(),
+          startTouchEvent: touch,
+          startX: touch.pageX,
+          startY: touch.pageY,
+          timeStamp: event.timeStamp
+        }
       }
     },
 
@@ -67,7 +63,7 @@ export default {
       if (this._touchParams) {
         const inner = this.$refs.inner
         const { startY, reachTop, reachBottom } = this._touchParams
-        if (inner && (reachTop || reachBottom)) {
+        if (inner && (reachTop && this._refresh || reachBottom && this._loading)) {
           const touch = event.changedTouches[0]
           const offsetY = touch.pageY - startY
           // console.log('offsetY', offsetY, 'startY', startY, 'pageY', touch.pageY)
@@ -87,7 +83,7 @@ export default {
         const inner = this.$refs.inner
         const { offsetY, reachTop, reachBottom } = this._touchParams
         // console.log('offsetY:', offsetY)
-        if (inner && (reachTop || reachBottom)) {
+        if (inner && (reachTop && this._refresh || reachBottom && this._loading)) {
           // this.moveTo(0)
           if (offsetY > 120) {
             this.showRefresh()

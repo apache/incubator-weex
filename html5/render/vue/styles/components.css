@@ -31,11 +31,12 @@ figure, img, .weex-image, .weex-img {
   background-repeat: no-repeat;
 }
 
-.weex-list,
 .weex-list-wrapper {
   position: relative;
-  background-color: #888888;
   overflow: scroll;
+}
+.weex-list-wrapper.with-loading, .weex-list-wrapper.with-refresh {
+  background-color: #888888;
 }
 
 .weex-list-inner {
@@ -93,8 +94,8 @@ figure, img, .weex-image, .weex-img {
 }
 
 .weex-scroller-horizontal .weex-scroller-inner {
-  width: auto;
   display: block;
+  width: auto;
   height: 100%;
 }
 .weex-scroller-horizontal .weex-scroller-inner > * {

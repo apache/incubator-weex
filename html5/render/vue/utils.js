@@ -122,3 +122,17 @@ export function appendStyle (css, styleId, replace) {
   }
   style.appendChild(document.createTextNode(css))
 }
+
+/**
+ * Strict object type check. Only returns true
+ * for plain JavaScript objects.
+ *
+ * @param {*} obj
+ * @return {Boolean}
+ */
+
+const toString = Object.prototype.toString
+const OBJECT_STRING = '[object Object]'
+export function isPlainObject (obj) {
+  return toString.call(obj) === OBJECT_STRING
+}

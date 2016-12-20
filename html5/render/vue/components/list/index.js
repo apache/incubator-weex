@@ -15,6 +15,15 @@ export default {
     }
   },
 
+  computed: {
+    wrapperClass () {
+      const classArray = ['weex-list', 'weex-list-wrapper']
+      this._refresh && classArray.push('with-refresh')
+      this._loading && classArray.push('with-loading')
+      return classArray.join(' ')
+    }
+  },
+
   methods: {
     updateLayout () {
       this.computeWrapperSize()
@@ -97,7 +106,7 @@ export default {
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'list' },
-      staticClass: 'weex-list weex-list-wrapper',
+      staticClass: this.wrapperClass,
       on: {
         scroll: debounce(bind(this.handleScroll, this), 30),
         touchstart: this.handleTouchStart,
