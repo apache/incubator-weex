@@ -1,7 +1,10 @@
 import _switch from './switch'
 export { _switch as switch }
 
+import a from './a'
+import div from './div'
 import image from './image'
+import input from './input'
 import list from './list'
 import cell from './list/cell'
 import scroller from './scroller'
@@ -10,10 +13,17 @@ import indicator from './warning'
 import refresh from './warning'
 import loading from './warning'
 import text from './text'
+import textarea from './textarea'
+import video from './video'
 import web from './web'
 
 export {
+  a,
+  div,
+  div as container,
   image,
+  image as img,
+  input,
   list,
   cell,
   scroller,
@@ -22,5 +32,7 @@ export {
   refresh,
   loading,
   text,
+  textarea,
+  video,
   web
 }

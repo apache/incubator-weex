@@ -84,7 +84,7 @@ export default {
       })
       return [
         this._refresh,
-        createElement('div', {
+        createElement('html:div', {
           ref: 'inner',
           staticClass: 'weex-list-inner'
         }, this._cells),

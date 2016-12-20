@@ -82,7 +82,7 @@ export default {
       }
     }, [
       createElement('mark', { ref: 'topMark', staticClass: 'weex-scroller-top-mark' }),
-      createElement('div', {
+      createElement('html:div', {
         ref: 'inner',
         staticClass: 'weex-scroller-inner'
       }, this._cells),
