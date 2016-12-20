@@ -315,4 +315,12 @@ public class ImageDrawable extends PaintDrawable {
     return this.radii;
   }
 
+  public int getBitmapHeight() {
+    return bitmapHeight;
+  }
+
+  public int getBitmapWidth() {
+    return bitmapWidth;
+  }
+
 }

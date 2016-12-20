@@ -385,12 +385,27 @@ public class WXImage extends WXComponent<ImageView> {
       imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
         @Override
         public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-          if (!result && imageView != null) {
-            imageView.setImageDrawable(null);
+          imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
+              @Override
+              public void onImageFinish(String url,ImageView imageView, boolean result, Map extra) {
+                  if(getDomObject()!=null && getDomObject().containsEvent(Constants.Event.ONLOAD)){
+                      Map<String,Object> params=new HashMap<String, Object>();
+                      params.put("success",result);
+                      getInstance().fireEvent(getDomObject().getRef(), Constants.Event.ONLOAD,params);
+                  }
+              }
+          });
+
+          Map<String, Object> size = new HashMap<>(2);
+          if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
+            size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
+            size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
           }
+
           if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
             Map<String, Object> params = new HashMap<>();
             params.put("success", result);
+            params.put("size", size);
             fireEvent(Constants.Event.ONLOAD, params);
           }
         }

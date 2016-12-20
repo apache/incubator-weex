@@ -7,7 +7,7 @@
 import frameUpdater from './frameUpdater'
 export { frameUpdater }
 
-import '../../../shared/objectAssign'
+import '../../shared/objectAssign'
 
 export {
   extend,
@@ -19,7 +19,7 @@ export {
   isObject,
   isPlainObject,
   typof
-} from '../../../frameworks/legacy/util'
+} from '../../default/util'
 
 import { isArray, slice } from './array'
 export { isArray, slice }

@@ -256,4 +256,43 @@ public abstract class WXModule implements IWXObject {
 
     /** end **/
 
+  private Map<String, String> mEvents = new HashMap<>();
+  private Map<String, Boolean> mKeepAlives = new HashMap<>();
+
+
+
+  @WXModuleAnno
+  public void addEventListener(String eventName, String callback, Map<String, Object> options) {
+    if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(callback)) {
+      return;
+    }
+    boolean isOnce = true;
+    if (options != null && options.size() > 0 && options.containsKey("once")) {
+      Object temp = options.get("once");
+      if ("false".equals(temp)) {
+        isOnce = false;
+      }
+    }
+    mKeepAlives.put(callback, isOnce);
+    mEvents.put(eventName, callback);
+  }
+
+  @WXModuleAnno
+  public void removeEventListener(String eventName) {
+    if (mEvents.containsKey(eventName)) {
+      String callback = mEvents.remove(eventName);
+      mKeepAlives.remove(callback);
+    }
+  }
+
+  /**
+   * Check whether the EventName has been registered
+   */
+  public String getEventCallback(String eventName) {
+    return mEvents.get(eventName);
+  }
+
+  public boolean isOnce(String callback){
+    return mKeepAlives.get(callback);
+  }
 }
