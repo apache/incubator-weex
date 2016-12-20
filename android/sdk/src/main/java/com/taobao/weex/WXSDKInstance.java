@@ -206,6 +206,7 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
@@ -282,6 +283,7 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
   private boolean isCommit=false;
+  private WXGlobalEventReceiver mGlobalEventReceiver=null;
 
   /**
    * Render strategy.
@@ -667,6 +669,9 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
     for (IWXActivityStateListener listener : mActivityStateListeners) {
       listener.onActivityCreate();
     }
+
+    mGlobalEventReceiver=new WXGlobalEventReceiver(this);
+    getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
 
   @Override
@@ -1005,6 +1010,11 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
   public synchronized void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
     WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
+
+    if(mGlobalEventReceiver!=null){
+      getContext().unregisterReceiver(mGlobalEventReceiver);
+      mGlobalEventReceiver=null;
+    }
 
     if (mGodCom != null && mGodCom.getHostView() != null) {
       mGodCom.getRealView().removeOnLayoutChangeListener(this);
