@@ -3,7 +3,10 @@ import { validateStyles } from '../validator'
 
 export default Base.extend({
   props: {
-    src: String,
+    src: {
+      type: String,
+      required: true
+    },
     resize: {
       validator (value) {
         /* istanbul ignore next */
@@ -18,11 +21,6 @@ export default Base.extend({
       validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    /* istanbul ignore next */
-    if (!this.src && process.env.NODE_ENV === 'development') {
-      console.warn(`[Vue Renderer] The <image> component must have the "src" attribute.`)
-    }
-
     let cssText = `background-image:url("${this.src}");`
 
     // compatibility: http://caniuse.com/#search=background-size
@@ -32,6 +30,7 @@ export default Base.extend({
 
     return createElement('figure', {
       attrs: { 'weex-type': 'image' },
+      on: this.createEventMap(['load']),
       staticClass: 'weex-image',
       style: cssText
     })

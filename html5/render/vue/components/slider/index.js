@@ -1,6 +1,6 @@
 import Base from '../base'
 import { validateStyles } from '../../validator'
-import { throttle, bind, createMixin } from '../../utils'
+import { throttle, bind, extend, createMixin } from '../../utils'
 import indicator from './indicator'
 import * as eventMethods from '../../methods/event'
 import slideMixin from './slideMixin'
@@ -113,11 +113,11 @@ export default Base.extend({
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
         staticClass: 'weex-slider weex-slider-wrapper',
-        on: {
+        on: extend(this.createEventMap(), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd
-        }
+        })
       },
       [
         createElement('ul', {

@@ -45,7 +45,12 @@ export default Base.extend({
     return createElement('span', {
       attrs: { 'weex-type': 'switch' },
       staticClass: this.wrapperClass,
-      on: { click: this.toggle }
+      on: {
+        click: event => {
+          this.$emit('click', event)
+          this.toggle()
+        }
+      }
     }, [createElement('small', { staticClass: 'weex-switch-inner' })])
   }
 })

@@ -33,14 +33,15 @@ export default Base.extend({
       validateStyles('video', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    // TODO: support playStatus and autoplay
+    // TODO: support playStatus
     return createElement('html:video', {
       attrs: {
         'weex-type': 'video',
-        // autoplay: this.autoplay,
+        autoplay: (this.autoplay !== 'false' && this.autoplay !== false),
         controls: this.controls,
         src: this.src
       },
+      on: this.createEventMap(['start', 'pause', 'finish', 'fail']),
       staticClass: 'weex-video'
     })
   }

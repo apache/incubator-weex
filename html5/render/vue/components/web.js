@@ -16,6 +16,7 @@ export default Base.extend({
         'weex-type': 'web',
         src: this.src
       },
+      on: this.createEventMap(['pagestart', 'pagepause', 'error']),
       staticClass: 'weex-web'
     })
   }

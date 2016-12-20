@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { multiDescribe } from '../helper'
-import list from '../../../../render/vue/components/list'
-import cell from '../../../../render/vue/components/list/cell'
+import list from '../../../../render/vue/components/scrollable/list'
+import cell from '../../../../render/vue/components/scrollable/list/cell'
 import text from '../../../../render/vue/components/text'
 
 multiDescribe('list & cell example', (Vue, helper) => {

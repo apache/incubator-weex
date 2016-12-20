@@ -35,15 +35,17 @@ export default Base.extend({
       validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    // TODO: support disabled / autofocus
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
         type: this.type,
         value: this.value,
+        disabled: (this.disabled !== 'false' && this.disabled !== false),
+        autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
+      on: this.createEventMap(['input', 'change', 'focus', 'blur']),
       staticClass: 'weex-input'
     })
   }

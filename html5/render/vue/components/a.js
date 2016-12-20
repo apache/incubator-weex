@@ -16,6 +16,7 @@ export default Base.extend({
         'weex-type': 'a',
         href: this.href
       },
+      on: this.createEventMap(),
       staticClass: 'weex-a'
     }, this.$slots.default)
   }

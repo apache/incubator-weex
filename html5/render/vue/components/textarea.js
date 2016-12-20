@@ -25,14 +25,16 @@ export default Base.extend({
       validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    // TODO: support disabled / autofocus / rows
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',
         value: this.value,
+        disabled: (this.disabled !== 'false' && this.disabled !== false),
+        autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
         rows: this.rows
       },
+      on: this.createEventMap(['input', 'change', 'focus', 'blur']),
       staticClass: 'weex-textarea'
     })
   }

@@ -29,6 +29,7 @@ export default Base.extend({
 
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
+      on: this.createEventMap(),
       staticClass: 'weex-text',
       staticStyle: getTextStyle(this)
     }, this.$slots.default || [this.value])

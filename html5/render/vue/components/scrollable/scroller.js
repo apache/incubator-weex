@@ -1,10 +1,8 @@
 import Scrollable from './scrollable'
 import { validateStyles } from '../../validator'
-import { debounce, bind, createMixin } from '../../utils'
-import * as rectMethods from '../../methods/rect'
+import { debounce, bind, extend } from '../../utils'
 
 export default Scrollable.extend({
-  mixins: [createMixin(rectMethods)],
   props: {
     scrollDirection: {
       type: [String],
@@ -30,22 +28,6 @@ export default Scrollable.extend({
   },
 
   methods: {
-    updateLayout () {
-      this.computeWrapperSize()
-      if (this._cells && this._cells.length) {
-        this._cells.forEach(vnode => {
-          vnode._visible = this.isCellVisible(vnode.elm)
-        })
-      }
-    },
-    isCellVisible (elem) {
-      if (!this.wrapperHeight) {
-        this.computeWrapperSize()
-      }
-      const wrapper = this.$refs.wrapper
-      return wrapper.scrollTop <= elem.offsetTop
-        && elem.offsetTop < wrapper.scrollTop + this.wrapperHeight
-    },
     handleScroll (event) {
       this._cells.forEach((vnode, index) => {
         const visible = this.isCellVisible(vnode.elm)
@@ -78,9 +60,9 @@ export default Scrollable.extend({
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      on: {
+      on: extend(this.createEventMap(), {
         scroll: debounce(bind(this.handleScroll, this), 100)
-      }
+      })
     }, [
       createElement('mark', { ref: 'topMark', staticClass: 'weex-scroller-top-mark' }),
       createElement('html:div', {

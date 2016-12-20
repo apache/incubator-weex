@@ -1,14 +1,13 @@
 import Scrollable from '../scrollable'
 import { validateStyles } from '../../../validator'
-import { debounce, throttle, bind, createMixin } from '../../../utils'
+import { debounce, throttle, bind, extend, createMixin } from '../../../utils'
 import refresh from './refresh'
 import loading from './loading'
-import * as rectMethods from '../../../methods/rect'
 import * as eventMethods from '../../../methods/event'
 import listMixin from './listMixin'
 
 export default Scrollable.extend({
-  mixins: [createMixin(rectMethods, eventMethods), listMixin],
+  mixins: [createMixin(eventMethods), listMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],
@@ -26,23 +25,6 @@ export default Scrollable.extend({
   },
 
   methods: {
-    updateLayout () {
-      this.computeWrapperSize()
-      if (this._cells && this._cells.length) {
-        this._cells.forEach(vnode => {
-          vnode._visible = this.isCellVisible(vnode.elm)
-        })
-      }
-    },
-    isCellVisible (elem) {
-      if (!this.wrapperHeight) {
-        this.computeWrapperSize()
-      }
-      const wrapper = this.$refs.wrapper
-      return wrapper.scrollTop <= elem.offsetTop
-        && elem.offsetTop < wrapper.scrollTop + this.wrapperHeight
-    },
-
     handleScroll (event) {
       this._cells.forEach((vnode, index) => {
         const visible = this.isCellVisible(vnode.elm)
@@ -108,12 +90,12 @@ export default Scrollable.extend({
       ref: 'wrapper',
       attrs: { 'weex-type': 'list' },
       staticClass: this.wrapperClass,
-      on: {
+      on: extend(this.createEventMap(), {
         scroll: debounce(bind(this.handleScroll, this), 30),
         touchstart: this.handleTouchStart,
         touchmove: throttle(bind(this.handleTouchMove, this), 25),
         touchend: this.handleTouchEnd
-      }
+      })
     }, this.createChildren(createElement))
   }
 })
