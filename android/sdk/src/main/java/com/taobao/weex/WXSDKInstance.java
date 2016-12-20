@@ -765,9 +765,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   @Override
   public void onActivityPause() {
-    for (IWXActivityStateListener listener : mActivityStateListeners) {
-      listener.onActivityPause();
-    }
     onViewDisappear();
     if(!isCommit){
       Set<String> componentTypes= WXComponentFactory.getComponentTypesByInstanceId(getInstanceId());
@@ -780,8 +777,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       }
       isCommit=true;
     }
-  }
-
     // module listen Activity onActivityPause
     WXModuleManager.onActivityPause(getInstanceId());
     if(mRootComp != null) {
@@ -789,8 +784,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
-
-    onViewDisappear();
   }
 
 

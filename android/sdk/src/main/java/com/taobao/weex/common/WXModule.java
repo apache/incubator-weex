@@ -205,10 +205,14 @@
 package com.taobao.weex.common;
 
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * All modules must extend this class
