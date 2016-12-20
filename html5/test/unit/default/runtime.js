@@ -6,18 +6,11 @@ const {
 } = chai
 chai.use(sinonChai)
 
-import runtime from '../../../runtime'
-import frameworks from '../../../frameworks'
-import defaultConfig from '../../../frameworks/legacy/config'
-
-const { init, config } = runtime
-config.frameworks = frameworks
-runtime.setNativeConsole()
-
-import Vm from '../../../frameworks/legacy/vm'
-import { clearModules, getModule } from '../../../frameworks/legacy/app/register'
-
-const framework = init(config)
+import framework from '../../../runtime'
+import frameworks from '../../../runtime/config'
+import config from '../../../default/config'
+import Vm from '../../../default/vm'
+import { clearModules, getModule } from '../../../default/app/register'
 
 function clearRefs (json) {
   delete json.ref
@@ -44,7 +37,7 @@ describe('framework entry', () => {
         }])
       }
     }
-    config.Document.handler = global.callNative
+
     global.callAddElement = (name, id, ref, json, index, callbackId) => {
       callAddElementSpy(name, ref, json, index, callbackId)
       /* istanbul ignore if */
@@ -63,7 +56,6 @@ describe('framework entry', () => {
   })
 
   after(() => {
-    config.Document.handler = function () {}
     global.callNative = oriCallNative
     global.callAddElement = oriCallAddElement
   })
@@ -171,7 +163,7 @@ describe('framework entry', () => {
       expect(frameworks.xxx.createInstance.firstCall.args).eql([
         instanceId + '~',
         code,
-        { bundleVersion: '0.3.1', env: {}},
+        { bundleVersion: '0.3.1' },
         undefined
       ])
 
@@ -194,7 +186,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.firstCall.args).eql([
         instanceId + '~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { bundleVersion: undefined },
         undefined
       ])
 
@@ -215,7 +207,7 @@ describe('framework entry', () => {
       expect(frameworks.yyy.createInstance.firstCall.args).eql([
         instanceId + '~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { bundleVersion: undefined },
         undefined
       ])
 
@@ -228,7 +220,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.secondCall.args).eql([
         instanceId + '~~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { bundleVersion: undefined },
         undefined
       ])
 
@@ -241,7 +233,7 @@ describe('framework entry', () => {
       expect(frameworks.Weex.createInstance.thirdCall.args).eql([
         instanceId + '~~~~~~',
         code,
-        { bundleVersion: undefined, env: {}},
+        { bundleVersion: undefined },
         undefined
       ])
 
@@ -279,10 +271,6 @@ describe('framework entry', () => {
   })
 
   describe('callJS', () => {
-    it('fireEvent with no params', () => {
-      framework.callJS()
-    })
-
     it('fireEvent with a exist instanceId', () => {
       framework.callJS(instanceId, [{
         method: 'fireEvent',
@@ -345,10 +333,6 @@ describe('framework entry', () => {
   })
 
   describe('destroyInstance', () => {
-    it('with no params', () => {
-      framework.destroyInstance()
-    })
-
     it('with a exist instanceId', () => {
       const result = framework.destroyInstance(instanceId)
       expect(result[instanceId]).to.be.undefined
@@ -363,7 +347,7 @@ describe('framework entry', () => {
   describe('registerComponents', () => {
     it('with old format', () => {
       framework.registerComponents(['a', 'b', 'c'])
-      expect(defaultConfig.nativeComponentMap).to.contain.keys('a', 'b', 'c')
+      expect(config.nativeComponentMap).to.contain.keys('a', 'b', 'c')
     })
 
     it('with new format', () => {
@@ -371,8 +355,8 @@ describe('framework entry', () => {
         type: 'd',
         append: 'tree'
       }])
-      expect(defaultConfig.nativeComponentMap).to.contain.keys('d')
-      expect(defaultConfig.nativeComponentMap['d']).to.be.deep.equal({
+      expect(config.nativeComponentMap).to.contain.keys('d')
+      expect(config.nativeComponentMap['d']).to.be.deep.equal({
         type: 'd',
         append: 'tree'
       })
@@ -382,7 +366,7 @@ describe('framework entry', () => {
       framework.registerComponents({
         type: 'e'
       })
-      expect(defaultConfig.nativeComponentMap).not.contain.keys('e')
+      expect(config.nativeComponentMap).not.contain.keys('e')
     })
   })
 
@@ -412,38 +396,5 @@ describe('framework entry', () => {
       expect(Vm.prototype.a).a.function
       delete Vm.prototype.a
     })
-  })
-})
-
-describe('config', () => {
-  it('config is an object', () => {
-    init({})
-  })
-})
-
-describe.skip('freeze the prototypes of vdom', function () {
-  const { Document, Element, Comment, Listener } = config
-
-  before(() => {
-    runtime.freezePrototype()
-  })
-
-  it('Document.prototype', () => {
-    expect(Document.prototype).to.be.frozen
-  })
-
-  it('Element & Element.prototype', () => {
-    expect(Element).to.be.frozen
-    expect(Element.prototype).to.be.frozen
-  })
-
-  it('Comment & Comment.prototype', () => {
-    expect(Comment).to.be.frozen
-    expect(Comment.prototype).to.be.frozen
-  })
-
-  it('Listener & Listener.prototype', () => {
-    expect(Listener).to.be.frozen
-    expect(Listener.prototype).to.be.frozen
   })
 })

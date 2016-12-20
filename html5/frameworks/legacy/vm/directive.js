@@ -3,9 +3,11 @@
  * Directive Parser
  */
 
-import { bind, typof } from '../util/index'
+import { bind, typof } from '../util'
+
 import Watcher from '../core/watcher'
 import config from '../config'
+import { parsePath } from '../util'
 
 const { nativeComponentMap } = config
 
@@ -220,9 +222,9 @@ function setClassStyle (el, css, classList) {
   for (let i = 0; i < length; i++) {
     const style = css[classList[i]]
     if (style) {
-      Object.keys(style).forEach((key) => {
+      for (const key in style) {
         classStyle[key] = style[key]
-      })
+      }
     }
   }
   el.setClassStyle(classStyle)
@@ -282,10 +284,11 @@ function bindEvents (vm, el, events) {
       handler = vm[handler]
       /* istanbul ignore if */
       if (!handler) {
-        console.warn(`[JS Framework] The event handler "${handler}" is not defined.`)
+        console.debug(`[JS Framework] The method "${handler}" is not defined.`)
       }
     }
-    setEvent(vm, el, key, handler)
+    const realVm = vm._realParent ? vm._realParent : vm
+    setEvent(realVm, el, key, handler)
   }
 }
 
@@ -339,7 +342,7 @@ function bindKey (vm, el, name, key, calc) {
  */
 export function watch (vm, calc, callback) {
   if (vm._static) {
-    return calc.call(vm, vm)
+    return ((typeof calc === 'function') ? calc : parsePath(calc)).call(vm, vm)
   }
   const watcher = new Watcher(vm, calc, function (value, oldValue) {
     /* istanbul ignore if */

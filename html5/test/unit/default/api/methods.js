@@ -5,10 +5,9 @@ const { expect } = chai
 chai.use(sinonChai)
 
 import '../../../../shared/console'
-import * as modules from '../../../../frameworks/legacy/api/modules'
-import * as methods from '../../../../frameworks/legacy/api/methods'
-import Differ from '../../../../frameworks/legacy/app/differ'
-import { initModules, requireModule, clearModules, initMethods } from '../../../../frameworks/legacy/app/register'
+import * as modules from '../../../../default/api/modules'
+import * as methods from '../../../../default/api/methods'
+import { initModules, requireModule, clearModules, initMethods } from '../../../../default/app/register'
 
 function Vm () {
 }
@@ -32,7 +31,6 @@ describe('built-in methods', () => {
           debug: true,
           bundleUrl: 'path_to_bundleUrl'
         },
-        differ: new Differ(),
         requireModule: (name) => {
           requireSpy(name)
 
@@ -80,30 +78,19 @@ describe('built-in methods', () => {
 
   it('$', () => {
     expect(vm.$('a')).to.deep.equal(vm._ids.a.vm)
-    expect(vm.$('invalid')).to.be.undefined
-    expect(console.warn.callCount).to.be.equal(2)
+    expect(console.warn.callCount).to.be.equal(1)
   })
 
   it('$el', () => {
     expect(vm.$el('a')).to.deep.equal(vm._ids.a.el)
-    expect(vm.$el('invalid')).to.be.undefined
   })
 
   it('$vm', () => {
     expect(vm.$vm('a')).to.deep.equal(vm._ids.a.vm)
-    expect(vm.$vm('invalid')).to.be.undefined
-  })
-
-  it('$renderThen', () => {
-    const fnSpy = sinon.spy()
-    vm.$renderThen(fnSpy)
-    vm._app.differ.flush()
-    expect(fnSpy.callCount).to.be.equal(1)
   })
 
   it('$scrollTo', () => {
     vm.$scrollTo('a', 100)
-    expect(vm.$scrollTo('invalid', 100)).to.be.undefined
     expect(requireSpy.firstCall.args[0]).to.be.equal('dom')
     expect(moduleSpy.firstCall.args.length).to.be.equal(2)
   })
@@ -111,7 +98,6 @@ describe('built-in methods', () => {
   it('$transition', () => {
     const callback = sinon.spy()
     vm.$transition('a', { styles: { color: '#FF0000' }}, callback)
-    expect(vm.$transition('invalid', {})).to.be.undefined
     expect(requireSpy.firstCall.args[0]).eql('animation')
     expect(moduleSpy.firstCall.args.length).eql(3)
     expect(moduleSpy.firstCall.args[0]).eql('_root')
@@ -122,10 +108,16 @@ describe('built-in methods', () => {
   })
 
   it('$getConfig', () => {
+    global.WXEnvironment = {
+      a: 'b'
+    }
     const config = vm.$getConfig()
     expect(config).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl'
+      bundleUrl: 'path_to_bundleUrl',
+      env: {
+        a: 'b'
+      }
     })
 
     const configSpy = sinon.spy()
@@ -134,7 +126,10 @@ describe('built-in methods', () => {
     expect(configSpy.args.length).eql(1)
     expect(configSpy.args[0][0]).eql({
       debug: true,
-      bundleUrl: 'path_to_bundleUrl'
+      bundleUrl: 'path_to_bundleUrl',
+      env: {
+        a: 'b'
+      }
     })
   })
 
@@ -163,8 +158,6 @@ describe('built-in methods', () => {
 
   it('$call', () => {
     vm.$call('event', 'openURL', 'url')
-    expect(vm.$call('invalid', 'module')).to.be.undefined
-    expect(vm.$call('event', 'invalid')).to.be.undefined
     expect(requireSpy.firstCall.args[0]).eql('event')
     expect(moduleSpy.firstCall.args.length).eql(1)
     expect(moduleSpy.firstCall.args[0]).eql('url')

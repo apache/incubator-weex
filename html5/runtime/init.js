@@ -1,6 +1,6 @@
 let frameworks
 
-const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
+const versionRegExp = /^\s*\/\/ *(\{[^\}]*\}) *\r?\n/
 
 /**
  * Detect a JS Bundle code and make sure which framework it's based to. Each JS
@@ -38,11 +38,9 @@ function createInstance (id, code, config, data) {
     if (!frameworks[info.framework]) {
       info.framework = 'Weex'
     }
-    info.created = Date.now()
     instanceMap[id] = info
-    config = JSON.parse(JSON.stringify(config || {}))
+    config = config || {}
     config.bundleVersion = info.version
-    config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
     return frameworks[info.framework].createInstance(id, code, config, data)
   }
@@ -77,11 +75,7 @@ function genInstance (methodName) {
     const id = args[0]
     const info = instanceMap[id]
     if (info && frameworks[info.framework]) {
-      const result = frameworks[info.framework][methodName](...args)
-      if (methodName === 'destroyInstance') {
-        delete instanceMap[id]
-      }
-      return result
+      return frameworks[info.framework][methodName](...args)
     }
     return new Error(`invalid instance id "${id}"`)
   }
