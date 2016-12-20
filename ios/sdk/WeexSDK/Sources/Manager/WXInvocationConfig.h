@@ -22,6 +22,5 @@
 + (instancetype)sharedInstance;
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz;
 - (void)registerMethods;
-- (void)dispatchMethod:(WXBridgeMethod*)method;
-- (NSInvocation*)invocationWithTargetMethod:(id)target method:(WXBridgeMethod*)method;
+
 @end

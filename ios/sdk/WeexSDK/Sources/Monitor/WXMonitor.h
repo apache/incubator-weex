@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "WXDefine.h"
+#import "WXSDKError.h"
 
 @class WXSDKInstance;
 

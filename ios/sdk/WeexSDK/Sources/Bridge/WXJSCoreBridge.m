@@ -143,7 +143,6 @@
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
         
-        // Temporary here , in order to improve performance, will be refactored next version.
         NSString *instanceIdString = [instanceId toString];
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
@@ -155,6 +154,26 @@
     };
 
     _jsContext[@"callAddElement"] = callAddElementBlock;
+}
+
+- (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock
+{
+    _jsContext[@"callNativeModule"] = ^JSValue *(JSValue *instanceId, JSValue *moduleName, JSValue *methodName, JSValue *args, JSValue *options) {
+        NSString *instanceIdString = [instanceId toString];
+        NSString *moduleNameString = [moduleName toString];
+        NSString *methodNameString = [methodName toString];
+        NSArray *argsArray = [args toArray];
+        NSDictionary *optionsDic = [options toDictionary];
+        
+        WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, moduleNameString, methodNameString, argsArray);
+        
+        return callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
+    };
+}
+
+- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callComponentModuleBlock
+{
+    
 }
 
 - (JSValue*)exception

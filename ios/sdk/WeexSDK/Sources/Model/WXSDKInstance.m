@@ -81,6 +81,11 @@ typedef enum : NSUInteger {
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %@; url= %@>", NSStringFromClass([self class]), self, _instanceId, _rootView, _scriptURL];
+}
+
 #pragma mark Public Mehtods
 
 - (UIView *)rootView
