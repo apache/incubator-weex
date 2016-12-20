@@ -1425,6 +1425,22 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return _sliderView;
 }
 
+- (void)dealloc
+{
+    _sliderView.delegate = nil;
+    _sliderView.dataSource = nil;
+    if (_autoPlay) {
+        [self _stopAutoPlayTimer];
+    }
+    _sliderView = nil;
+    [self.items removeAllObjects];
+}
+
+- (void)viewDidUnload
+{
+    [self.items removeAllObjects];
+}
+
 - (void)viewDidLoad
 {
     _sliderView = (WXSliderNeighborView *)self.view;
