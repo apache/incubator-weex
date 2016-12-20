@@ -1,5 +1,5 @@
 import semver from 'semver'
-import Vm from '../../vm'
+import Vm from '../../vm/index'
 import * as downgrade from '../downgrade'
 import {
   requireCustomComponent
@@ -10,7 +10,7 @@ import {
   isNpmModule,
   removeWeexPrefix,
   removeJSSurfix
-} from '../../util'
+} from '../../util/index'
 
 /**
  * bootstrap app from a certain custom component with config & data
