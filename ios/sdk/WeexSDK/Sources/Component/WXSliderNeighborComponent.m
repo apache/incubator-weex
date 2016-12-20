@@ -74,6 +74,7 @@
 @property (nonatomic, assign) NSInteger previousItemIndex;
 @property (nonatomic, readonly) CGFloat itemWidth;
 @property (nonatomic, assign) BOOL inited;
+@property (nonatomic, assign) BOOL panInvertical;
 @end
 
 @implementation WXSliderNeighborView
@@ -474,6 +475,18 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return [self viewOrSuperview:view.superview ofClass:class];
 }
 
+-(id)viewInChain:(UIView *)view ofClass:(Class)class{
+    if ([view isKindOfClass:class]) {
+        return view;
+    }
+    
+    if (view.superview) {
+        return [self viewOrSuperview:view.superview ofClass:class];
+    }
+    return nil;
+
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch
 {
     if (_scrollEnabled) {
@@ -514,6 +527,23 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return YES;
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
+            UIScrollView* scrollview = (UIScrollView *)otherGestureRecognizer.view;
+            if (scrollview.scrollEnabled) {
+                UIPanGestureRecognizer* panRcgn= (UIPanGestureRecognizer *)gestureRecognizer;
+                if (fabs([panRcgn translationInView:panRcgn.view].y) > fabs([panRcgn translationInView:panRcgn.view].x)*16) {
+//                    self.scrollEnabled = NO;
+//                    self.panInvertical = YES;
+                    return YES;
+                }
+            }
+        }
+    }
+    return NO;
+}
+
 
 - (void)didPan:(UIPanGestureRecognizer *)panGesture
 {
@@ -522,18 +552,30 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         {
             case UIGestureRecognizerStateBegan:
             {
+                if (self.panInvertical) {
+                    break;
+                }
                 _dragging = YES;
                 _scrolling = NO;
                 _decelerating = NO;
                 _previousTranslation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
-                
+                if (self.panInvertical) {
+                    break;
+                }
                 [_delegate sliderNeighborWillBeginDragging:self];
                 break;
             }
             case UIGestureRecognizerStateEnded:
+//            {
+//                self.panInvertical = NO;
+//                break;
+//            }
             case UIGestureRecognizerStateCancelled:
             case UIGestureRecognizerStateFailed:
             {
+                if (self.panInvertical) {
+                    break;
+                }
                 _dragging = NO;
                 _didDrag = YES;
                 if ([self shouldDecelerate]) {
@@ -566,6 +608,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             }
             case UIGestureRecognizerStateChanged:
             {
+                if (self.panInvertical) {
+                    break;
+                }
                 CGFloat translation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
                 CGFloat velocity = _vertical? [panGesture velocityInView:self].y: [panGesture velocityInView:self].x;
                 
@@ -584,6 +629,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             case UIGestureRecognizerStatePossible:
             {
                 //do nothing
+                self.panInvertical = NO;
                 break;
             }
         }
