@@ -474,18 +474,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return [self viewOrSuperview:view.superview ofClass:class];
 }
 
--(id)viewInChain:(UIView *)view ofClass:(Class)class{
-    if ([view isKindOfClass:class]) {
-        return view;
-    }
-    
-    if (view.superview) {
-        return [self viewOrSuperview:view.superview ofClass:class];
-    }
-    return nil;
-
-}
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gesture shouldReceiveTouch:(UITouch *)touch
 {
     if (_scrollEnabled) {
@@ -527,14 +515,14 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+   //if the view which the otherGestureRecognizer works on is a scrollview and also it is scrollEnabled vertically ,at this time,we should not block the guesture from being recognized by the otherGestureRecognize
     if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
         if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
             UIScrollView* scrollview = (UIScrollView *)otherGestureRecognizer.view;
             if (scrollview.scrollEnabled) {
                 UIPanGestureRecognizer* panRcgn= (UIPanGestureRecognizer *)gestureRecognizer;
+                //check offset for confirming vertival movement
                 if (fabs([panRcgn translationInView:panRcgn.view].y) > fabs([panRcgn translationInView:panRcgn.view].x)*16) {
-//                    self.scrollEnabled = NO;
-//                    self.panInvertical = YES;
                     return YES;
                 }
             }
