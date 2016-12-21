@@ -206,6 +206,7 @@ package com.taobao.weex.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -339,12 +340,13 @@ public class WXViewUtils {
     return 0;
   }
 
-  public static int getScreenWidth(Context cxt) {
-    if(cxt!=null){
-      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
+  public static int getScreenWidth(Context ctx) {
+    if(ctx!=null){
+      Resources res = ctx.getResources();
+      int width = res.getDisplayMetrics().widthPixels;
 
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = WXEnvironment.sApplication.getResources()
+        int height = res
                 .getDisplayMetrics()
                 .heightPixels;
         width = height > width ?width:height;
