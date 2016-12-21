@@ -478,7 +478,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return WXTextStyleNormal;
 }
 
-+ (CGFloat )WXTextWeight:(id)value
++ (CGFloat)WXTextWeight:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         NSString *string = (NSString *)value;
