@@ -551,7 +551,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         {
             case UIGestureRecognizerStateBegan:
             {
-       
                 _dragging = YES;
                 _scrolling = NO;
                 _decelerating = NO;
@@ -561,14 +560,10 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
                 break;
             }
             case UIGestureRecognizerStateEnded:
-//            {
-//                self.panInvertical = NO;
-//                break;
-//            }
+
             case UIGestureRecognizerStateCancelled:
             case UIGestureRecognizerStateFailed:
             {
-          
                 _dragging = NO;
                 _didDrag = YES;
                 if ([self shouldDecelerate]) {

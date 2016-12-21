@@ -215,9 +215,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     CGFloat scrollOffsetY = ((UIScrollView *)self.view).contentOffset.y;
     for(WXComponent *component in self.stickyArray) {
-//        if (CGPointEqualToPoint(component->_absolutePosition, CGPointZero)) {
-//            component->_absolutePosition = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view];
-//        }
+        if (CGPointEqualToPoint(component->_absolutePosition, CGPointZero)) {
+            component->_absolutePosition = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view];
+        }
         CGPoint relativePosition = component->_absolutePosition;
         if (isnan(relativePosition.y)) {
             continue;
