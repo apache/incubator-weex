@@ -117,6 +117,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -488,6 +489,10 @@ public class WXSDKEngine {
 
   public static IWXImgLoaderAdapter getIWXImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
+  }
+
+  public static IDrawableLoader getDrawableLoader() {
+    return WXSDKManager.getInstance().getDrawableLoader();
   }
 
   public static IWXHttpAdapter getIWXHttpAdapter() {

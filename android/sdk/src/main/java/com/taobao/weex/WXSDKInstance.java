@@ -217,6 +217,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -696,6 +697,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public IWXImgLoaderAdapter getImgLoaderAdapter() {
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
+  }
+
+  public IDrawableLoader getDrawableLoader() {
+    return WXSDKManager.getInstance().getDrawableLoader();
   }
 
   public URIAdapter getURIAdapter(){
