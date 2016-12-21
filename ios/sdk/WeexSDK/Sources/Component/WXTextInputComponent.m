@@ -61,7 +61,7 @@
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
-@property (nonatomic) WXTextWeight fontWeight;
+@property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, copy) NSString *inputType;
 

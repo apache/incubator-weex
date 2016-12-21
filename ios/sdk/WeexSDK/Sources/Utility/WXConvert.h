@@ -44,7 +44,15 @@ typedef BOOL WXClipType;
 + (WXPositionType)WXPositionType:(id)value;
 
 + (WXTextStyle)WXTextStyle:(id)value;
-+ (WXTextWeight)WXTextWeight:(id)value;
+/**
+ * @abstract UIFontWeightRegular ,UIFontWeightBold,etc are not support by the system which is less than 8.2. weex sdk set the float value.
+ *
+ * @param value, support normal,blod,100,200,300,400,500,600,700,800,900
+ *
+ * @return A float value.
+ *
+ */
++ (CGFloat)WXTextWeight:(id)value;
 + (WXTextDecoration)WXTextDecoration:(id)value;
 + (NSTextAlignment)NSTextAlignment:(id)value;
 

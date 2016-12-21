@@ -293,8 +293,8 @@
 @property (nonatomic, assign) BOOL  autoPlay;
 @property (nonatomic, assign) NSUInteger interval;
 @property (nonatomic, assign) NSInteger index;
-@property (nonatomic, assign) CGFloat lastXDeviationPercent;
-@property (nonatomic, assign) CGFloat scrollAccuracy;
+@property (nonatomic, assign) CGFloat lastOffsetXRatio;
+@property (nonatomic, assign) CGFloat offsetXAccuracy;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
 @property (nonatomic, strong) NSMutableArray *childrenView;
@@ -315,7 +315,7 @@
         _sliderScrollEvent = NO;
         _interval = 3000;
         _childrenView = [NSMutableArray new];
-        _lastXDeviationPercent = 0;
+        _lastOffsetXRatio = 0;
         
         if (attributes[@"autoPlay"]) {
             _autoPlay = [attributes[@"autoPlay"] boolValue];
@@ -329,8 +329,8 @@
             _index = [attributes[@"index"] integerValue];
         }
         
-        if (attributes[@"xDeviationAccuracy"]) {
-            _scrollAccuracy = [WXConvert CGFloat:attributes[@"xDeviationAccuracy"]];
+        if (attributes[@"offsetXAccuracy"]) {
+            _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
         
         self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
@@ -458,8 +458,8 @@
         [_sliderView scroll2ItemView:self.currentIndex animated:YES];
     }
     
-    if (attributes[@"xDeviationAccuracy"]) {
-        _scrollAccuracy = [WXConvert CGFloat:attributes[@"xDeviationAccuracy"]];
+    if (attributes[@"offsetXAccuracy"]) {
+        _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
     }
 }
 
@@ -539,10 +539,10 @@
     if (_sliderScrollEvent) {
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
-        CGFloat XDeviationPercent = (XDeviation / width);
-        if (ABS(XDeviationPercent - _lastXDeviationPercent) >= _scrollAccuracy) {
-            _lastXDeviationPercent = XDeviationPercent;
-            [self fireEvent:@"scroll" params:@{@"XDeviationPercent":[NSNumber numberWithFloat:XDeviationPercent]} domChanges:nil];
+        CGFloat offsetXRatio = (XDeviation / width);
+        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+            _lastOffsetXRatio = offsetXRatio;
+            [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
     }
 }
