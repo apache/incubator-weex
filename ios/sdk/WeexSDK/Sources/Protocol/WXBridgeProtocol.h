@@ -8,10 +8,10 @@
 
 #import <JavaScriptCore/JavaScriptCore.h>
 
-typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
-typedef NSInteger (^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
-typedef id (^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
-typedef id (^WXJSCallNativeComponent)(NSString *instancdId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
+typedef NSInteger(^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
+typedef NSInteger(^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
+typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
+typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -58,7 +58,7 @@ typedef id (^WXJSCallNativeComponent)(NSString *instancdId, NSString *componentR
 /**
  * Register callback for global js function `callNativeComponent`
  */
-- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callComponentModuleBlock;
+- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock;
 
 
 @end

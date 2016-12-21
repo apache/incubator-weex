@@ -13,6 +13,10 @@
 
 + (JSValue *)wx_valueWithReturnValueFromInvocation:(NSInvocation *)invocation inContext:(JSContext *)context
 {
+    if (!invocation || !context) {
+        return nil;
+    }
+    
     char returnType[255];
     strcpy(returnType, [invocation.methodSignature methodReturnType]);
     

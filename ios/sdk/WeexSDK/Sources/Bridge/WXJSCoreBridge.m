@@ -20,6 +20,7 @@
 #import <sys/utsname.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXPolyfillSet.h"
+#import "JSValue+Weex.h"
 
 #import <dlfcn.h>
 
@@ -167,13 +168,24 @@
         
         WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, moduleNameString, methodNameString, argsArray);
         
-        return callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
+        NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
+        return [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
     };
 }
 
-- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callComponentModuleBlock
+- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock
 {
-    
+    _jsContext[@"callNativeComponent"] = ^void(JSValue *instanceId, JSValue *componentName, JSValue *methodName, JSValue *args, JSValue *options) {
+        NSString *instanceIdString = [instanceId toString];
+        NSString *componentNameString = [componentName toString];
+        NSString *methodNameString = [methodName toString];
+        NSArray *argsArray = [args toArray];
+        NSDictionary *optionsDic = [options toDictionary];
+        
+        WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, componentNameString, methodNameString, argsArray);
+        
+        callNativeComponentBlock(instanceIdString, componentNameString, methodNameString, argsArray, optionsDic);
+    };
 }
 
 - (JSValue*)exception

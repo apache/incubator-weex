@@ -39,7 +39,8 @@
 {
     
     if (self = [super init]) {
-        _methods = [NSMutableDictionary new];
+        _asyncMethods = [NSMutableDictionary new];
+        _syncMethods = [NSMutableDictionary new];
     }
     
     return self;
@@ -47,8 +48,7 @@
 
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz
 {
-    if (self = [super init]) {
-        _methods = [NSMutableDictionary new];
+    if (self = [self init]) {
         _name = name;
         _clazz = clazz;
     }
@@ -69,8 +69,14 @@
         Method *methodList = class_copyMethodList(object_getClass(currentClass), &methodCount);
         for (unsigned int i = 0; i < methodCount; i++) {
             NSString *selStr = [NSString stringWithCString:sel_getName(method_getName(methodList[i])) encoding:NSUTF8StringEncoding];
-            
-            if (![selStr hasPrefix:@"wx_export_method_"]) continue;
+            BOOL isSyncMethod;
+            if ([selStr hasPrefix:@"wx_export_method_sync_"]) {
+                isSyncMethod = YES;
+            } else if ([selStr hasPrefix:@"wx_export_method_"]) {
+                isSyncMethod = NO;
+            } else {
+                continue;
+            }
             
             NSString *name = nil, *method = nil;
             SEL selector = NSSelectorFromString(selStr);
@@ -90,7 +96,8 @@
                 name = method;
             }
             
-            [_methods setObject:method forKey:name];
+            NSMutableDictionary *methods = isSyncMethod ? _syncMethods : _asyncMethods;
+            [methods setObject:method forKey:name];
         }
         
         free(methodList);

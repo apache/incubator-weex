@@ -11,11 +11,10 @@
 
 @interface WXComponentMethod : WXBridgeMethod
 
-- (instancetype)initWithComponentName:(NSString *)componentName
-                         componentRef:(NSString *)ref
-                           methodName:(NSString *)methodName
-                            arguments:(NSArray *)arguments
-                             instance:(WXSDKInstance *)instance;
+- (instancetype)initWithComponentRef:(NSString *)ref
+                          methodName:(NSString *)methodName
+                           arguments:(NSArray *)arguments
+                            instance:(WXSDKInstance *)instance;
 
 - (void)invoke;
 

@@ -116,7 +116,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallNativeModule:^id(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options) {
+    [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
         
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
@@ -125,11 +125,14 @@ _Pragma("clang diagnostic pop") \
             return nil;
         }
         
-        return nil;
+        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+        return [method invoke];
     }];
     
-    [_jsBridge registerCallNativeComponent:^id(NSString *instancdId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
-        return nil;
+    [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:componentRef methodName:methodName arguments:args instance:instance];
+        [method invoke];
     }];
 }
 
@@ -184,9 +187,8 @@ _Pragma("clang diagnostic pop") \
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
         if (task[@"component"]) {
-            NSString *componentName = task[@"component"];
             NSString *ref = task[@"ref"];
-            WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentName:componentName componentRef:ref methodName:methodName arguments:arguments instance:instance];
+            WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
         } else {
             NSString *moduleName = task[@"module"];

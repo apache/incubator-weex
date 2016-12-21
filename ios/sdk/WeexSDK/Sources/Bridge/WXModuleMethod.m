@@ -38,7 +38,8 @@
     
     id<WXModuleProtocol> moduleInstance = [self.instance moduleForClass:moduleClass];
     WXAssert(moduleInstance, @"No instance found for module name:%@, class:%@", _moduleName, moduleClass);
-    SEL selector = [WXModuleFactory methodWithModuleName:self.moduleName withMethod:self.methodName];
+    BOOL isSync;
+    SEL selector = [WXModuleFactory selectorWithModuleName:self.moduleName methodName:self.methodName isSync:&isSync];
     if (!selector) {
         NSString *errorMessage = [NSString stringWithFormat:@"method：%@ for module:%@ doesn't exist, maybe it has not been registered", self.methodName, _moduleName];
         WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
@@ -47,9 +48,13 @@
 
     NSInvocation *invocation = [self invocationWithTarget:moduleInstance selector:selector];
     
-    [self _dispatchInvovation:invocation moduleInstance:moduleInstance];
-    
-    return nil;
+    if (isSync) {
+        [invocation invoke];
+        return invocation;
+    } else {
+        [self _dispatchInvovation:invocation moduleInstance:moduleInstance];
+        return nil;
+    }
 }
 
 - (void)_dispatchInvovation:(NSInvocation *)invocation moduleInstance:(id<WXModuleProtocol>)moduleInstance
