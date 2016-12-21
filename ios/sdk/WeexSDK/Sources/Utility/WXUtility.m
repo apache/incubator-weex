@@ -340,7 +340,7 @@ static BOOL WXNotStat;
     return [NSError errorWithDomain:@"WeexErrorDomain" code:code userInfo:@{@"errMsg":message}];
 }
 
-+ (UIFont *)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
 {
     CGFloat fontSize = (isnan(size) || size == 0) ?  WX_TEXT_FONT_SIZE : size;
     UIFont *font = nil;
@@ -363,23 +363,22 @@ static BOOL WXNotStat;
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
     }
-    CGFloat weight = WXFontWeightRegular;
-    weight = [WXUtility textWeight:textWeight];
     if (!font) {
         if (fontFamily) {
             font = [UIFont fontWithName:fontFamily size:fontSize];
             if (!font) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
-                font = [UIFont systemFontOfSize:fontSize weight:weight];
+                font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
         } else {
-            font = [UIFont systemFontOfSize:fontSize weight:weight];
+            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
+    
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (textWeight == WXFontWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
+    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
@@ -389,43 +388,6 @@ static BOOL WXNotStat;
     }
     
     return font;
-}
-
-+ (CGFloat )textWeight:(WXTextWeight)type
-{
-    CGFloat weight = WXFontWeightRegular;
-    switch (type) {
-        case WXFontWeightUltraLight:
-            weight = -0.8;
-            break;
-        case WXFontWeightThin:
-            weight = -0.6;
-            break;
-        case WXFontWeightLight:
-            weight = -0.4;
-            break;
-        case WXFontWeightRegular:
-            weight = 0;
-            break;
-        case WXFontWeightMedium:
-            weight = 0.23;
-            break;
-        case WXFontWeightSemibold:
-            weight = 0.3;
-            break;
-        case WXFontWeightBold:
-            weight = 0.4;
-            break;
-        case WXFontWeightHeavy:
-            weight = 0.56;
-            break;
-        case WXFontWeightBlack:
-            weight = 0.62;
-            break;
-        default:
-            break;
-    }
-    return weight;
 }
 
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock

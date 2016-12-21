@@ -20,19 +20,6 @@ typedef NS_ENUM(NSUInteger, WXTextStyle) {
     WXTextStyleItalic
 };
 
-typedef NS_ENUM(NSUInteger, WXTextWeight) {
-    WXFontWeightRegular = 0,
-    WXFontWeightUltraLight,
-    WXFontWeightThin,
-    WXFontWeightLight,
-    WXFontWeightMedium,
-    WXFontWeightSemibold,
-    WXFontWeightBold,
-    WXFontWeightHeavy,
-    WXFontWeightBlack
-
-};
-
 typedef NS_ENUM(NSInteger, WXTextDecoration) {
     WXTextDecorationNone = 0,
     WXTextDecorationUnderline,
