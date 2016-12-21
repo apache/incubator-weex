@@ -105,7 +105,7 @@
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
-    WXTextWeight _fontWeight;
+    CGFloat _fontWeight;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
