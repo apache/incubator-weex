@@ -44,6 +44,7 @@
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
     [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
+    [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
