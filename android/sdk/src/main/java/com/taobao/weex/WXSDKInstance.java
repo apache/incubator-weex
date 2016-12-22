@@ -1334,6 +1334,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKManager.getInstance().callback(getInstanceId(),callback,params,isOnce);
   }
 
+  public WXPerformance getWXPerformance(){
+    return mWXPerformance;
+  }
 
   public Map<String, Serializable> getUserTrackParams() {
     return mUserTrackParams;
