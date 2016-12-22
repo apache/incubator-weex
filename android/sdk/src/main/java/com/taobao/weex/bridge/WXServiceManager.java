@@ -214,10 +214,10 @@ public class WXServiceManager {
         if (TextUtils.isEmpty(serviceName) || TextUtils.isEmpty(service)) return false;
 
         String param1 = "register: global.registerService, unregister: global.unregisterService";
-        String param2 = "serviceName: "+serviceName;
+        String param2 = "serviceName: \"" + serviceName + "\"";
         for (String key: options.keySet()) {
             String value = options.get(key);
-            param2 += ", " + key + ": " + value;
+            param2 += ", " + key + ": \"" + value + "\"";
         }
         String serviceJs = String.format("(function(service, options){ %s })({ %s }, { %s })", service, param1, param2);
 
