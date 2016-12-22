@@ -6,6 +6,7 @@ chai.use(sinonChai)
 
 import App from '../../../../frameworks/legacy/app'
 import { Element, Document } from '../../../../runtime/vdom'
+import CallbackManager from '../../../../runtime/callback-manager'
 
 describe('App Instance', () => {
   const oriDocumentHandler = Document.handler
@@ -14,7 +15,8 @@ describe('App Instance', () => {
 
   beforeEach(() => {
     Document.handler = sendTasksSpy
-    app = new App(Date.now() + '')
+    const id = Date.now() + ''
+    app = new App(id, {}, new CallbackManager(id))
   })
 
   afterEach(() => {

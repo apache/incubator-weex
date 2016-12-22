@@ -46,12 +46,6 @@ export function destroy (app) {
     destroyVm(app.vm)
   }
 
-  if (app.channels) {
-    for (const key in app.channels) {
-      app.channels[key].close()
-    }
-  }
-
   app.id = ''
   app.options = null
   app.blocks = null
@@ -61,7 +55,6 @@ export function destroy (app) {
   app.customComponentMap = null
   app.commonModules = null
   app.callbacks = null
-  app.channels = null
 }
 
 /**

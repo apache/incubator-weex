@@ -1,7 +1,9 @@
 import { init as initTaskHandler } from './task-center'
 import { registerElement } from './vdom/element-types'
+import { services } from './service'
 
 let frameworks
+let runtimeConfig
 
 const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
 
@@ -36,24 +38,53 @@ const instanceMap = {}
  */
 function createInstance (id, code, config, data) {
   let info = instanceMap[id]
+
   if (!info) {
+    // Init instance info.
     info = checkVersion(code) || {}
     if (!frameworks[info.framework]) {
       info.framework = 'Weex'
     }
-    info.created = Date.now()
-    instanceMap[id] = info
+
+    // Init instance config.
     config = JSON.parse(JSON.stringify(config || {}))
     config.bundleVersion = info.version
     config.env = JSON.parse(JSON.stringify(global.WXEnvironment || {}))
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
-    return frameworks[info.framework].createInstance(id, code, config, data)
+
+    // Init callback manager
+    const callbacks = new runtimeConfig.CallbackManager(id)
+
+    const env = {
+      info,
+      config,
+      callbacks
+    }
+    env.framework = info.framework
+    env.created = Date.now()
+    env.services = {}
+    instanceMap[id] = env
+
+    // Init JavaScript services for this instance.
+    const serviceObjects = Object.create(null)
+    services.forEach(service => {
+      const create = service.options.create
+      if (create) {
+        const result = create(id, env, runtimeConfig)
+        Object.assign(serviceObjects, result)
+      }
+    })
+    env.services = serviceObjects
+
+    return frameworks[info.framework].createInstance(id, code, config, data, env)
   }
   return new Error(`invalid instance id "${id}"`)
 }
 
 const methods = {
-  createInstance
+  createInstance,
+  registerService: services.register,
+  unregisterService: services.unregister
 }
 
 /**
@@ -94,9 +125,26 @@ function genInstance (methodName) {
     const info = instanceMap[id]
     if (info && frameworks[info.framework]) {
       const result = frameworks[info.framework][methodName](...args)
-      if (methodName === 'destroyInstance') {
+
+      // Lifecycle methods
+      if (methodName === 'refreshInstance') {
+        services.forEach(service => {
+          const refresh = service.options.refresh
+          if (refresh) {
+            refresh(id, { info, runtime: runtimeConfig })
+          }
+        })
+      }
+      else if (methodName === 'destroyInstance') {
+        services.forEach(service => {
+          const destroy = service.options.destroy
+          if (destroy) {
+            destroy(id, { info, runtime: runtimeConfig })
+          }
+        })
         delete instanceMap[id]
       }
+
       return result
     }
     return new Error(`invalid instance id "${id}"`)
@@ -121,7 +169,8 @@ function adaptInstance (methodName, nativeMethodName) {
 }
 
 export default function init (config) {
-  frameworks = config.frameworks || {}
+  runtimeConfig = config || {}
+  frameworks = runtimeConfig.frameworks || {}
   initTaskHandler()
 
   // Init each framework by `init` method and `config` which contains three
