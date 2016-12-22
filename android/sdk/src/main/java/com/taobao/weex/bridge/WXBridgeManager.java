@@ -1159,6 +1159,21 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }, null);
   }
 
+  public void registerService(final String service) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          mWXBridge.registerService(service);
+        } catch (Throwable e) {
+          WXLogUtils.e("[WXBridgeManager] invokeRegisterService:", e);
+          commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK,WXErrorCode.WX_ERR_JS_EXECUTE,"invokeRegisterService");
+        }
+      }
+    });
+
+  }
+
   private boolean isJSThread() {
     return mJSThread != null && mJSThread.getId() == Thread.currentThread().getId();
   }

@@ -202,42 +202,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.bridge;
 
-import com.taobao.weex.bridge.WXJSObject;
-import com.taobao.weex.bridge.WXParams;
+import android.text.TextUtils;
 
-/**
- * Bridge interface, native bridge and debug bridge both need to implement this interface
- */
-public interface IWXBridge extends IWXObject {
+import java.util.Map;
 
-  int DESTROY_INSTANCE = -1;
-  int INSTANCE_RENDERING = 1;
-  int INSTANCE_RENDERING_ERROR = 0;
+public class WXServiceManager {
 
-  /**
-   * init Weex
-   *
-   * @param framework assets/main.js
-   * @return
-   */
-  int initFramework(String framework, WXParams params);
+    public static boolean registerService(String serviceName, String service, Map<String, String> options) {
+        if (TextUtils.isEmpty(serviceName) || TextUtils.isEmpty(service)) return false;
 
-  /**
-   * execute javascript function
-   */
-  int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
+        String param1 = "register: global.registerService, unregister: global.unregisterService";
+        String param2 = "serviceName: "+serviceName;
+        for (String key: options.keySet()) {
+            String value = options.get(key);
+            param2 += ", " + key + ": " + value;
+        }
+        String serviceJs = String.format("(function(service, options){ %s })({ %s }, { %s })", service, param1, param2);
 
-  int registerService(String javascript);
+        WXBridgeManager.getInstance().registerService(serviceJs);
+        return true;
+    }
 
-  /**
-   * js call native
-
-   */
-  int callNative(String instanceId, String tasks, String callback);
-
-  int callAddElement(String instanceId, String ref,String dom,String index, String callback);
-
-  void reportJSException(String instanceId, String func, String exception);
 }
