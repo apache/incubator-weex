@@ -79,7 +79,6 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     }
     urlStr = newUrlStr;
     NSDictionary *headers = [options objectForKey:@"headers"];
-    NSString *body = [options objectForKey:@"body"];
     NSString *type = [options objectForKey:@"type"];
     NSURL *url = [NSURL URLWithString:urlStr];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -95,8 +94,27 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         NSString *value = [headers objectForKey:header];
         [request setValue:value forHTTPHeaderField:header];
     }
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
 
+    if ([options objectForKey:@"body"]) {
+        NSData * body = nil;
+        if ([[options objectForKey:@"body"] isKindOfClass:[NSString class]]) {
+            // compatible with the string body
+            body = [[options objectForKey:@"body"] dataUsingEncoding:NSUTF8StringEncoding];
+        }
+        if ([[options objectForKey:@"body"] isKindOfClass:[NSDictionary class]]) {
+            body = [[WXUtility JSONString:[options objectForKey:@"body"]] dataUsingEncoding:NSUTF8StringEncoding];
+        }
+        if (!body) {
+            [callbackRsp setObject:@(-1) forKey:@"status"];
+            [callbackRsp setObject:@false forKey:@"ok"];
+            callback(callbackRsp);
+                
+            return;
+        }
+        
+        [request setHTTPBody:body];
+    }
+  
     [callbackRsp setObject:@{ @"OPENED": @1 } forKey:@"readyState"];
     
     progressCallback(callbackRsp, TRUE);

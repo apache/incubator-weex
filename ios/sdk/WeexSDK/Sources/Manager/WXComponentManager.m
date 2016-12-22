@@ -462,7 +462,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
-            [instance creatFinish];
             instance.renderFinish(rootView);
         }
     }];

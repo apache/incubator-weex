@@ -514,6 +514,23 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     return YES;
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+   //if the view which the otherGestureRecognizer works on is a scrollview and also it is scrollEnabled vertically ,at this time,we should not block the guesture from being recognized by the otherGestureRecognize
+    if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        if ([otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
+            UIScrollView* scrollview = (UIScrollView *)otherGestureRecognizer.view;
+            if (scrollview.scrollEnabled) {
+                UIPanGestureRecognizer* panRcgn= (UIPanGestureRecognizer *)gestureRecognizer;
+                //check offset for confirming vertival movement
+                if (fabs([panRcgn translationInView:panRcgn.view].y) > fabs([panRcgn translationInView:panRcgn.view].x)*16) {
+                    return YES;
+                }
+            }
+        }
+    }
+    return NO;
+}
+
 
 - (void)didPan:(UIPanGestureRecognizer *)panGesture
 {
@@ -526,11 +543,12 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
                 _scrolling = NO;
                 _decelerating = NO;
                 _previousTranslation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
-                
+        
                 [_delegate sliderNeighborWillBeginDragging:self];
                 break;
             }
             case UIGestureRecognizerStateEnded:
+
             case UIGestureRecognizerStateCancelled:
             case UIGestureRecognizerStateFailed:
             {
@@ -566,6 +584,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             }
             case UIGestureRecognizerStateChanged:
             {
+             
                 CGFloat translation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
                 CGFloat velocity = _vertical? [panGesture velocityInView:self].y: [panGesture velocityInView:self].x;
                 
@@ -1423,6 +1442,22 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 - (UIView *)loadView
 {
     return _sliderView;
+}
+
+- (void)dealloc
+{
+    _sliderView.delegate = nil;
+    _sliderView.dataSource = nil;
+    if (_autoPlay) {
+        [self _stopAutoPlayTimer];
+    }
+    _sliderView = nil;
+    [self.items removeAllObjects];
+}
+
+- (void)viewDidUnload
+{
+    [self.items removeAllObjects];
 }
 
 - (void)viewDidLoad
