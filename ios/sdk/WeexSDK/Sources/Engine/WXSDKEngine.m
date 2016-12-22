@@ -14,6 +14,7 @@
 #import "WXAppConfiguration.h"
 #import "WXNetworkDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
+#import "WXURLRewriteDefaultImpl.h"
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXMonitor.h"
@@ -40,7 +41,8 @@
     [self registerModule:@"storage" withClass:NSClassFromString(@"WXStorageModule")];
     [self registerModule:@"clipboard" withClass:NSClassFromString(@"WXClipboardModule")];
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
-	[self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
+    [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
+    [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -99,13 +101,16 @@
     WXAssert(name && clazz, @"Fail to register the component, please check if the parameters are correct ！");
     
     [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
-    
+    NSMutableDictionary *dict = [WXComponentFactory componentMethodMapsWithName:name];
+    dict[@"type"] = name;
     if (properties) {
         NSMutableDictionary *props = [properties mutableCopy];
-        props[@"type"] = name;
+        if ([dict[@"methods"] count]) {
+            [props addEntriesFromDictionary:dict];
+        }
         [[WXSDKManager bridgeMgr] registerComponents:@[props]];
     } else {
-        [[WXSDKManager bridgeMgr] registerComponents:@[name]];
+        [[WXSDKManager bridgeMgr] registerComponents:@[dict]];
     }
 }
 
@@ -116,6 +121,7 @@
 {
     [self registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
+    [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
@@ -125,15 +131,21 @@
     [WXHandlerFactory registerHandler:handler withProtocol:protocol];
 }
 
++ (id)handlerForProtocol:(Protocol *)protocol
+{
+    WXAssert(protocol, @"Fail to get the handler, please check if the parameters are correct ！");
+    
+    return  [WXHandlerFactory handlerForProtocol:protocol];
+}
+
 # pragma mark SDK Initialize
 
 + (void)initSDKEnviroment
 {
     WX_MONITOR_PERF_START(WXPTInitalize)
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
-  
-    NSBundle *bundle = [NSBundle bundleForClass:self];
-    NSString *filePath = [bundle pathForResource:@"main" ofType:@"js"];
+    
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnviroment:script];
     
@@ -189,6 +201,18 @@
     return [WXSDKManager bridgeMgr].topInstance;
 }
 
+
+static NSDictionary *_customEnvironment;
++ (void)setCustomEnvironment:(NSDictionary *)environment
+{
+    _customEnvironment = environment;
+}
+
++ (NSDictionary *)customEnvironment
+{
+    return _customEnvironment;
+}
+
 # pragma mark Debug
 
 + (void)unload
@@ -222,7 +246,6 @@
 + (void)connectDevToolServer:(NSString *)URL
 {
     [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
-
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {
