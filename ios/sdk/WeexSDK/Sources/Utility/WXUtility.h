@@ -202,7 +202,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  *
  * @param textSize.
  *
- * @param textWeight. The type of WXTextWeight (Normal or Bold).
+ * @param textWeight.
  *
  * @param textStyle. The type of WXTextStyle (Normal or Italic).
  *
@@ -211,7 +211,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  * @return A font object according to the above params.
  *
  */
-+ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily;
++ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily;
 
 /**
  * @abstract download remote font from specified url
