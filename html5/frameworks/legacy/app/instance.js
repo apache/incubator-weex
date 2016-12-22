@@ -20,15 +20,6 @@ export default function App (id, options, callbackManager) {
   this.commonModules = {}
 
   // callbackManager
-  // this.callbacks = callbackManager
-  // this.uid = 0
-  callbackManager = callbackManager || {
-    callbacks: [],
-    lastCallbackId: 0,
-    close: function () {
-      this.callbacks = null
-    }
-  }
   Object.defineProperty(this, 'callbacks', {
     get: function () { return callbackManager.callbacks },
     set: function (v) { if (!v) callbackManager.close() }

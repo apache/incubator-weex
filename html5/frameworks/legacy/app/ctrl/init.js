@@ -22,7 +22,7 @@ import { updateActions } from './misc'
  * @param  {string} code
  * @param  {object} data
  */
-export function init (app, code, data, serviceObjects) {
+export function init (app, code, data, services) {
   console.debug('[JS Framework] Intialize an instance with:\n', data)
   let result
 
@@ -118,7 +118,7 @@ export function init (app, code, data, serviceObjects) {
     __weex_require__: bundleRequireModule,
     __weex_viewmodel__: bundleVm,
     weex: weexGlobalObject
-  }, timerAPIs, serviceObjects)
+  }, timerAPIs, services)
   callFunction(globalObjects, functionBody)
 
   return result
