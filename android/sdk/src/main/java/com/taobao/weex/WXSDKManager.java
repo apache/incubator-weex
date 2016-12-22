@@ -195,6 +195,10 @@ public class WXSDKManager {
     return sManager;
   }
 
+  public static int getInstanceViewPortWidth(String instanceId){
+    return getInstance().getSDKInstance(instanceId).getViewPortWidth();
+  }
+
   static void setInstance(WXSDKManager manager){
     sManager = manager;
   }

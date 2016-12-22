@@ -583,8 +583,8 @@ class WXDomStatement {
     }
     if (isRoot) {
       WXDomObject.prepareRoot(domObject,
-                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId)),
-                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId)));
+                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId),WXSDKManager.getInstanceViewPortWidth(mInstanceId)),
+                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId),WXSDKManager.getInstanceViewPortWidth(mInstanceId)));
     } else if ((parent = mRegistry.get(parentRef)) == null) {
       instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
       return;
@@ -1150,7 +1150,7 @@ class WXDomStatement {
         int width=(int)domObject.getLayoutWidth();
         int height=(int)domObject.getLayoutHeight();
         animationBean.styles.init(animationBean.styles.transformOrigin,
-                                  animationBean.styles.transform,width,height);
+                                  animationBean.styles.transform,width,height,WXSDKManager.getInstance().getSDKInstance(mInstanceId).getViewPortWidth());
       }
       return animationBean;
     } catch (RuntimeException e) {
@@ -1170,7 +1170,7 @@ class WXDomStatement {
           int width = (int) domObject.getLayoutWidth();
           int height = (int) domObject.getLayoutHeight();
           animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height);
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstance().getSDKInstance(mInstanceId).getViewPortWidth());
           return animationBean;
         }
       }catch (RuntimeException e){

@@ -217,7 +217,6 @@ import android.view.View.OnTouchListener;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.gesture.WXGestureType.GestureInfo;
 import com.taobao.weex.ui.view.gesture.WXGestureType.HighLevelGesture;
@@ -464,8 +463,8 @@ public class WXGesture implements OnTouchListener {
     globalEventOffset.set((int) eventX, (int) eventY);
     component.getRealView().getGlobalVisibleRect(globalRect, globalOffset);
     globalEventOffset.offset(globalOffset.x, globalOffset.y);
-    return new PointF(WXViewUtils.getWebPxByWidth(globalEventOffset.x),
-                      WXViewUtils.getWebPxByWidth(globalEventOffset.y));
+    return new PointF(WXViewUtils.getWebPxByWidth(globalEventOffset.x,component.getInstance().getViewPortWidth()),
+                      WXViewUtils.getWebPxByWidth(globalEventOffset.y,component.getInstance().getViewPortWidth()));
   }
 
   /**
@@ -510,8 +509,8 @@ public class WXGesture implements OnTouchListener {
     locLeftTop.set(0, 0);
     component.computeVisiblePointInViewCoordinate(locLeftTop);
     locEventOffset.offset(locLeftTop.x, locLeftTop.y);
-    return new PointF(WXViewUtils.getWebPxByWidth(locEventOffset.x),
-                      WXViewUtils.getWebPxByWidth(locEventOffset.y));
+    return new PointF(WXViewUtils.getWebPxByWidth(locEventOffset.x,component.getInstance().getViewPortWidth()),
+                      WXViewUtils.getWebPxByWidth(locEventOffset.y,component.getInstance().getViewPortWidth()));
   }
 
   private static class GestureHandler extends android.os.Handler {

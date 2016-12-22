@@ -446,7 +446,7 @@ public class WXSliderNeighbor extends WXSlider {
                 alpha = (1- mNeighborAlpha) * factor + mNeighborAlpha;
 
                 float translation = (page.getMeasuredWidth()-realView.getMeasuredWidth()*mNeighborScale)/4;
-                translation += ((page.getMeasuredWidth()-realView.getMeasuredWidth()*WX_DEFAULT_MAIN_NEIGHBOR_SCALE)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace))/2 ;
+                translation += ((page.getMeasuredWidth()-realView.getMeasuredWidth()*WX_DEFAULT_MAIN_NEIGHBOR_SCALE)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace,getInstance().getViewPortWidth()))/2 ;
                 if(position > 0){
                     translation = (position*translation);
                     realView.setTranslationX(-translation);
