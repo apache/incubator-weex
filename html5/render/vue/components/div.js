@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   render (createElement) {
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
@@ -14,4 +15,4 @@ export default Base.extend({
       staticClass: 'weex-div'
     }, this.$slots.default)
   }
-})
+}

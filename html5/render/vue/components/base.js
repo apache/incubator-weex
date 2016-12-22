@@ -1,3 +1,5 @@
+// import Vue from 'vue'
+
 const supportedEvents = [
   'click'
   // 'touchstart', 'touchmove', 'touchend'

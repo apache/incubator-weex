@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     checked: {
       type: [Boolean, String],
@@ -53,4 +54,4 @@ export default Base.extend({
       }
     }, [createElement('small', { staticClass: 'weex-switch-inner' })])
   }
-})
+}

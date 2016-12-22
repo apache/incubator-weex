@@ -1,8 +1,9 @@
-import Scrollable from './scrollable'
+import { base, scrollable } from '../../mixins'
 import { validateStyles } from '../../validator'
 import { debounce, bind, extend } from '../../utils'
 
-export default Scrollable.extend({
+export default {
+  mixins: [base, scrollable],
   props: {
     scrollDirection: {
       type: [String],
@@ -72,4 +73,4 @@ export default Scrollable.extend({
       createElement('mark', { ref: 'bottomMark', staticClass: 'weex-scroller-bottom-mark' })
     ])
   }
-})
+}

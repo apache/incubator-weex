@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     src: {
       type: String,
@@ -35,4 +36,4 @@ export default Base.extend({
       style: cssText
     })
   }
-})
+}

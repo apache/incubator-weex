@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     value: String,
     placeholder: String,
@@ -38,4 +39,4 @@ export default Base.extend({
       staticClass: 'weex-textarea'
     })
   }
-})
+}

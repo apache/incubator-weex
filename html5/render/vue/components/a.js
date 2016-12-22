@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     href: String
   },
@@ -21,4 +22,3 @@ export default Base.extend({
     }, this.$slots.default)
   }
 }
-)

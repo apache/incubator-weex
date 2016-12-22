@@ -1,13 +1,12 @@
-import Scrollable from '../scrollable'
+import { base, event, scrollable } from '../../../mixins'
 import { validateStyles } from '../../../validator'
-import { debounce, throttle, bind, extend, createMixin } from '../../../utils'
+import { debounce, throttle, bind, extend } from '../../../utils'
 import refresh from './refresh'
 import loading from './loading'
-import * as eventMethods from '../../../methods/event'
 import listMixin from './listMixin'
 
-export default Scrollable.extend({
-  mixins: [createMixin(eventMethods), listMixin],
+export default {
+  mixins: [base, event, scrollable, listMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],
@@ -98,4 +97,4 @@ export default Scrollable.extend({
       })
     }, this.createChildren(createElement))
   }
-})
+}

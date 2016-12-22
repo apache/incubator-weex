@@ -1,4 +1,4 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 /**
@@ -15,7 +15,8 @@ function getTextStyle (props = {}) {
   }
 }
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     lines: [Number, String],
     value: [String]
@@ -34,4 +35,4 @@ export default Base.extend({
       staticStyle: getTextStyle(this)
     }, this.$slots.default || [this.value])
   }
-})
+}

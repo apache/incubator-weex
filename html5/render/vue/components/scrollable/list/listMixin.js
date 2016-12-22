@@ -41,7 +41,8 @@ export default {
     },
 
     handleTouchStart (event) {
-      event.preventDefault()
+      // console.log('list touch start')
+      // event.preventDefault()
       event.stopPropagation()
       if (this._loading || this._refresh) {
         const touch = event.changedTouches[0]
@@ -57,7 +58,7 @@ export default {
     },
 
     handleTouchMove (event) {
-      event.preventDefault()
+      // event.preventDefault()
       event.stopPropagation()
       // console.log('touch move')
       if (this._touchParams) {
@@ -76,7 +77,7 @@ export default {
     },
 
     handleTouchEnd (event) {
-      event.preventDefault()
+      // event.preventDefault()
       event.stopPropagation()
       // console.log('touch end')
       if (this._touchParams) {

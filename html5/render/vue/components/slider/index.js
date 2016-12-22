@@ -1,12 +1,11 @@
-import Base from '../base'
+import { base, event } from '../../mixins'
 import { validateStyles } from '../../validator'
-import { throttle, bind, extend, createMixin } from '../../utils'
+import { throttle, bind, extend } from '../../utils'
 import indicator from './indicator'
-import * as eventMethods from '../../methods/event'
 import slideMixin from './slideMixin'
 
-export default Base.extend({
-  mixins: [createMixin(eventMethods), slideMixin],
+export default {
+  mixins: [base, event, slideMixin],
   // components: { indicator },
   props: {
     'auto-play': {
@@ -128,4 +127,4 @@ export default Base.extend({
       ]
     )
   }
-})
+}

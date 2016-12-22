@@ -1,7 +1,8 @@
-import Base from './base'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
-export default Base.extend({
+export default {
+  mixins: [base],
   props: {
     type: {
       type: String,
@@ -49,4 +50,4 @@ export default Base.extend({
       staticClass: 'weex-input'
     })
   }
-})
+}
