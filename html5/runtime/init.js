@@ -1,9 +1,8 @@
 import { registerElement } from './vdom/element-types'
 import { services } from './service'
-import runtimeConfig from './config'
-import CallbackManager from './callback-manager'
 
 let frameworks
+let runtimeConfig
 
 const versionRegExp = /^\s*\/\/ *(\{[^}]*\}) *\r?\n/
 
@@ -53,7 +52,7 @@ function createInstance (id, code, config, data) {
     console.debug(`[JS Framework] create an ${info.framework}@${config.bundleVersion} instance from ${config.bundleVersion}`)
 
     // Init callback manager
-    const callbacks = new CallbackManager(id)
+    const callbacks = new runtimeConfig.CallbackManager(id)
 
     const env = {
       info,
@@ -82,7 +81,9 @@ function createInstance (id, code, config, data) {
 }
 
 const methods = {
-  createInstance
+  createInstance,
+  registerService: services.register,
+  unregisterService: services.unregister
 }
 
 /**
@@ -167,7 +168,8 @@ function adaptInstance (methodName, nativeMethodName) {
 }
 
 export default function init (config) {
-  frameworks = config.frameworks || {}
+  runtimeConfig = config || {}
+  frameworks = runtimeConfig.frameworks || {}
 
   // Init each framework by `init` method and `config` which contains three
   // virtual-DOM Class: `Document`, `Element` & `Comment`, and a JS bridge method:
