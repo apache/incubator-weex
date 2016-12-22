@@ -144,9 +144,8 @@
 {
     WX_MONITOR_PERF_START(WXPTInitalize)
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
-  
-    NSBundle *bundle = [NSBundle bundleForClass:self];
-    NSString *filePath = [bundle pathForResource:@"main" ofType:@"js"];
+    
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnviroment:script];
     

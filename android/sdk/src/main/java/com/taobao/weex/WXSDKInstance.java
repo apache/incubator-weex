@@ -207,6 +207,7 @@ package com.taobao.weex;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
@@ -284,6 +285,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
+  private WXGlobalEventReceiver mGlobalEventReceiver=null;
 
   /**
    * Render strategy.
@@ -748,6 +750,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityCreate can not be call!");
     }
 
+    mGlobalEventReceiver=new WXGlobalEventReceiver(this);
+    getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
 
   @Override
@@ -1141,6 +1145,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
     WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
 
+    if(mGlobalEventReceiver!=null){
+      getContext().unregisterReceiver(mGlobalEventReceiver);
+      mGlobalEventReceiver=null;
+    }
     if(mRootComp != null ) {
       mRootComp.destroy();
       destroyView(mRenderContainer);

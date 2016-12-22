@@ -239,10 +239,9 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     super.onCreate(savedInstanceState);
     createWeexInstance();
     mInstance.onActivityCreate();
-    getWindow().setFormat(PixelFormat.TRANSLUCENT);
-
     mWxAnalyzerDelegate = new WXAnalyzerDelegate(this);
     mWxAnalyzerDelegate.onCreate();
+    getWindow().setFormat(PixelFormat.TRANSLUCENT);
   }
 
   protected final void setContainer(ViewGroup container){
