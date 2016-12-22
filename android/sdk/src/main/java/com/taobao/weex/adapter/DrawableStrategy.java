@@ -205,15 +205,9 @@
 
 package com.taobao.weex.adapter;
 
-import android.graphics.drawable.Drawable;
 
-public interface IDrawableLoader {
+public class DrawableStrategy {
 
-  public interface DrawableTarget {
-
-    void setDrawable(Drawable drawable, boolean resetBounds);
-  }
-
-  public void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
+  public int width;
+  public int height;
 }
-
