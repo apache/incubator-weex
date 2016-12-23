@@ -1,6 +1,6 @@
 import { init as initTaskHandler } from './task-center'
 import { registerElement } from './vdom/element-types'
-import { services } from './service'
+import { services, register, unregister } from './service'
 
 let frameworks
 let runtimeConfig
@@ -83,8 +83,8 @@ function createInstance (id, code, config, data) {
 
 const methods = {
   createInstance,
-  registerService: services.register,
-  unregisterService: services.unregister
+  registerService: register,
+  unregisterService: unregister
 }
 
 /**
