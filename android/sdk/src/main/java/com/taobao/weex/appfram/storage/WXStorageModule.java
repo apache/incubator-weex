@@ -229,7 +229,7 @@ public class WXStorageModule extends WXSDKEngine.DestroyableModule implements IW
     @Override
     @JSMethod(uiThread = false)
     public void setItem(String key, String value, @Nullable final JSCallback callback) {
-        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+        if (TextUtils.isEmpty(key) || value == null) {
             StorageResultHandler.handleInvalidParam(callback);
             return;
         }
@@ -334,8 +334,9 @@ public class WXStorageModule extends WXSDKEngine.DestroyableModule implements IW
     }
 
     @Override
+    @JSMethod(uiThread = false)
     public void setItemPersistent(String key, String value, @Nullable final JSCallback callback) {
-        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+        if (TextUtils.isEmpty(key) || value == null) {
             StorageResultHandler.handleInvalidParam(callback);
             return;
         }
