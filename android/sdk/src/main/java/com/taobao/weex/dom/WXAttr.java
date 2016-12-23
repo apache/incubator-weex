@@ -206,10 +206,13 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
+import android.text.TextUtils;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -405,6 +408,20 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       return "vertical";
     }
     return scrollDirection.toString();
+  }
+
+  public float getElevation(int viewPortW) {
+    Object obj = get(Constants.Name.ELEVATION);
+    float ret = Float.NaN;
+    if (obj != null) {
+      String number = obj.toString();
+      if (!TextUtils.isEmpty(number)) {
+        ret = WXViewUtils.getRealSubPxByWidth(WXUtils.getFloat(number),viewPortW);
+      } else {
+        ret = 0;
+      }
+    }
+    return ret;
   }
 
   @Override

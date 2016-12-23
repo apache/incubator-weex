@@ -137,6 +137,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -690,6 +691,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         if (visibility != null)
           setVisibility(visibility);
         return true;
+      case Constants.Name.ELEVATION:
+        if(param!=null) {
+          updateElevation();
+        }
+        return true;
       case PROP_FIXED_SIZE:
         String fixedSize = WXUtils.getString(param, PROP_FS_MATCH_PARENT);
         setFixedSize(fixedSize);
@@ -1131,6 +1137,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       } else if (TextUtils.equals(visibility, Constants.Value.HIDDEN)) {
         view.setVisibility(View.GONE);
       }
+    }
+  }
+
+  /**
+   * This is an experimental feature for elevation of material design.
+   */
+  private void updateElevation() {
+    float elevation = getDomObject().getAttrs().getElevation(getInstance().getViewPortWidth());
+    if (!Float.isNaN(elevation)) {
+      ViewCompat.setElevation(getHostView(), elevation);
     }
   }
 
