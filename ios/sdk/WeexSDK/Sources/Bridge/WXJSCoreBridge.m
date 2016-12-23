@@ -169,7 +169,8 @@
         WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, moduleNameString, methodNameString, argsArray);
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
-        return [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
+        JSValue *returnValue = [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
+        return returnValue;
     };
 }
 
