@@ -209,7 +209,7 @@
     NSIndexPath *toIndexPath = [self indexPathForCell:(WXCellComponent*)cellComponent sections:_completedSections];
     CGRect cellRect = [_tableView rectForRowAtIndexPath:toIndexPath];
     contentOffsetY += cellRect.origin.y;
-    contentOffsetY += offset * WXScreenResizeRadio();
+    contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
     
     if (contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
         contentOffset.y = _tableView.contentSize.height - _tableView.frame.size.height;

@@ -140,7 +140,7 @@
             _color = [WXConvert UIColor:styles[@"color"]];
         }
         if (styles[@"fontSize"]) {
-            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
         if (styles[@"fontWeight"]) {
             _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -333,7 +333,7 @@
         [_textView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {
-        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
     if (styles[@"fontWeight"]) {
         _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -450,7 +450,7 @@
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (_placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, _placeholderString.length)];
@@ -480,7 +480,7 @@
 
 - (void)setTextFont
 {
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     [_textView setFont:font];
 }
 

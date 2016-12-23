@@ -308,7 +308,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     return @"Unknown";
 }
 
-#pragma mark - Deperecated
+#pragma mark - Deprecated
 
 - (void)sendHttp:(NSDictionary*)param callback:(WXModuleCallback)callback
 {

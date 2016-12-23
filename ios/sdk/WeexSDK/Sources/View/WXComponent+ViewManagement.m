@@ -156,7 +156,7 @@
     if (styles[@"transform"]) {
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             _transform = [WXConvert NSString:styles[@"transform"]];
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            _layer.transform = [[[WXTransform alloc] initWithInstance:self.weexInstance] getTransform:_transform withView:_view withOrigin:_transformOrigin];
             [_layer setNeedsDisplay];
         }
     }
