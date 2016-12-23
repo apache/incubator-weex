@@ -208,7 +208,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
         NSMutableString *newURL = [_placeholdSrc mutableCopy];
-        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeLink, self.weexInstance, &newURL)
+        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance, &newURL)
         
         __weak typeof(self) weakSelf = self;
         self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
@@ -242,7 +242,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp)};
         NSMutableString * newURL = [imageSrc mutableCopy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeLink, self.weexInstance, &newURL)
+        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance, &newURL)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {

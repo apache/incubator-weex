@@ -24,7 +24,8 @@
  *  750px Adaptive
  */
 typedef CGFloat WXPixelType;
-+ (WXPixelType)WXPixelType:(id)value;
+// @prameter scaleFactor: please use weexInstance's pixelScaleFactor property
++ (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 + (css_flex_direction_t)css_flex_direction_t:(id)value;
 + (css_align_t)css_align_t:(id)value;
@@ -62,5 +63,11 @@ typedef BOOL WXClipType;
 + (CAMediaTimingFunction *)CAMediaTimingFunction:(id)value;
 
 + (WXVisibility)WXVisibility:(id)value;
+
+@end
+
+@interface WXConvert (Deprecated)
+
++ (WXPixelType)WXPixelType:(id)value DEPRECATED_MSG_ATTRIBUTE("Use [WXConvert WXPixelType:scaleFactor:] instead");
 
 @end

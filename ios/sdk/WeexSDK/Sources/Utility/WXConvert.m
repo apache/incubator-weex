@@ -70,11 +70,11 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return nil;
 }
 
-+ (WXPixelType)WXPixelType:(id)value
++ (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor
 {
     CGFloat pixel = [self CGFloat:value];
     
-    return pixel * WXScreenResizeRadio();
+    return pixel * scaleFactor;
 }
 
 #pragma mark CSS Layout
@@ -653,6 +653,17 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     }
     
     return  WXVisibilityShow;
+}
+
+@end
+
+@implementation WXConvert (Deprecated)
+
++ (WXPixelType)WXPixelType:(id)value
+{
+    CGFloat pixel = [self CGFloat:value];
+    
+    return pixel * WXScreenResizeRadio();
 }
 
 @end
