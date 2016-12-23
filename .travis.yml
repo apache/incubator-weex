@@ -1,3 +1,0 @@
-language: objective-c
-xcode_project: ios/sdk/WeexSDK.xcodeproj # path to your xcodeproj folder
-xcode_scheme: WeexSDKTests
