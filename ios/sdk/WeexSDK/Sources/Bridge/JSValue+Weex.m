@@ -17,22 +17,23 @@
         return nil;
     }
     
-    char returnType[255];
-    strcpy(returnType, [invocation.methodSignature methodReturnType]);
+    const char * returnType = [invocation.methodSignature methodReturnType];
     
     JSValue *returnValue;
     switch (returnType[0] == _C_CONST ? returnType[1] : returnType[0]) {
         case _C_VOID: {
             // 1.void
-            returnValue = nil;
+            returnValue = [JSValue valueWithUndefinedInContext:context];
             break;
         }
         
         case _C_ID: {
             // 2.id
-            id result;
-            [invocation getReturnValue:&result];
-            returnValue = [JSValue valueWithObject:result inContext:context];
+            void *value;
+            [invocation getReturnValue:&value];
+            id object = (__bridge id)value;
+        
+            returnValue = [JSValue valueWithObject:[object copy] inContext:context];
             break;
         }
         
@@ -78,7 +79,7 @@
         case _C_CHARPTR:
         case _C_PTR:
         case _C_CLASS: {
-            returnValue = nil;
+            returnValue = [JSValue valueWithUndefinedInContext:context];
             break;
         }
     }
