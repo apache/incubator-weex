@@ -243,7 +243,7 @@ class WXBridge implements IWXBridge {
    *
    * @param javascript  code
    */
-  public native int registerService(String javascript);
+  public native int execJSService(String javascript);
 
   /**
    * JavaScript uses this methods to call Android code

@@ -136,9 +136,14 @@ import com.taobao.weex.common.TypeModuleFactory;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.dom.*;
-import com.taobao.weex.ui.module.WXMetaModule;
-import com.taobao.weex.ui.module.WXModalUIModule;
+import com.taobao.weex.dom.BasicEditTextDomObject;
+import com.taobao.weex.dom.TextAreaEditTextDomObject;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXDomRegistry;
+import com.taobao.weex.dom.WXListDomObject;
+import com.taobao.weex.dom.WXScrollerDomObject;
+import com.taobao.weex.dom.WXSwitchDomObject;
+import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -169,6 +174,7 @@ import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
@@ -464,8 +470,12 @@ public class WXSDKEngine {
     return registerModule(moduleName, moduleClass,false);
   }
 
-  public static boolean registerService(String serviceName, String service, Map<String, String> options) {
-    return WXServiceManager.registerService(serviceName, service, options);
+  public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
+    return WXServiceManager.registerService(name, serviceScript, options);
+  }
+
+  public static boolean unRegisterService(String name) {
+    return WXServiceManager.unRegisterService(name);
   }
 
   /**

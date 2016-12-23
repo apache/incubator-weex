@@ -210,18 +210,26 @@ import java.util.Map;
 
 public class WXServiceManager {
 
-    public static boolean registerService(String serviceName, String service, Map<String, String> options) {
-        if (TextUtils.isEmpty(serviceName) || TextUtils.isEmpty(service)) return false;
+    public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(serviceScript)) return false;
 
         String param1 = "register: global.registerService, unregister: global.unregisterService";
-        String param2 = "serviceName: \"" + serviceName + "\"";
+        String param2 = "serviceName: \"" + name + "\"";
         for (String key: options.keySet()) {
             String value = options.get(key);
             param2 += ", " + key + ": \"" + value + "\"";
         }
-        String serviceJs = String.format("(function(service, options){ %s })({ %s }, { %s })", service, param1, param2);
+        String serviceJs = String.format("(function(service, options){ %s })({ %s }, { %s })", serviceScript, param1, param2);
 
-        WXBridgeManager.getInstance().registerService(serviceJs);
+        WXBridgeManager.getInstance().execJSService(serviceJs);
+        return true;
+    }
+
+    public static boolean unRegisterService(String name) {
+        if (TextUtils.isEmpty(name)) return false;
+
+        String js = String.format("global.unregisterService( \"%s\" );", name);
+        WXBridgeManager.getInstance().execJSService(js);
         return true;
     }
 
