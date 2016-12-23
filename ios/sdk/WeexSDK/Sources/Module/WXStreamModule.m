@@ -94,6 +94,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         NSString *value = [headers objectForKey:header];
         [request setValue:value forHTTPHeaderField:header];
     }
+
     if ([options objectForKey:@"body"]) {
         NSData * body = nil;
         if ([[options objectForKey:@"body"] isKindOfClass:[NSString class]]) {
@@ -113,6 +114,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         
         [request setHTTPBody:body];
     }
+  
     [callbackRsp setObject:@{ @"OPENED": @1 } forKey:@"readyState"];
     
     progressCallback(callbackRsp, TRUE);
