@@ -266,7 +266,7 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public int registerService(String javascript) {
+    public int execJSService(String javascript) {
         return 0;
     }
 
