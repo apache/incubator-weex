@@ -320,7 +320,7 @@ static BOOL WXNotStat;
     return [NSError errorWithDomain:@"WeexErrorDomain" code:code userInfo:@{@"errMsg":message}];
 }
 
-+ (UIFont *)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
 {
     CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
     UIFont *font = nil;
@@ -348,17 +348,17 @@ static BOOL WXNotStat;
             font = [UIFont fontWithName:fontFamily size:fontSize];
             if (!font) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
-                font = [UIFont systemFontOfSize:fontSize];
+                font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
         } else {
-            font = [UIFont systemFontOfSize:fontSize];
+            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
-    
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
+    
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (textWeight == WXTextWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
+    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];

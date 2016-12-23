@@ -478,16 +478,35 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return WXTextStyleNormal;
 }
 
-+ (WXTextWeight)WXTextWeight:(id)value
++ (CGFloat)WXTextWeight:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
         NSString *string = (NSString *)value;
         if ([string isEqualToString:@"normal"])
-            return WXTextWeightNormal;
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
         else if ([string isEqualToString:@"bold"])
-            return WXTextWeightBold;
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
+        else if ([string isEqualToString:@"100"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.8:UIFontWeightUltraLight;
+        else if ([string isEqualToString:@"200"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.6:UIFontWeightThin;
+        else if ([string isEqualToString:@"300"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.4:UIFontWeightLight;
+        else if ([string isEqualToString:@"400"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
+        else if ([string isEqualToString:@"500"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.23:UIFontWeightMedium;
+        else if ([string isEqualToString:@"600"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.3:UIFontWeightSemibold;
+        else if ([string isEqualToString:@"700"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
+        else if ([string isEqualToString:@"800"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.56:UIFontWeightHeavy;
+        else if ([string isEqualToString:@"900"])
+            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.62:UIFontWeightBlack;
+
     }
-    return WXTextWeightNormal;
+    return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
 }
 
 + (WXTextDecoration)WXTextDecoration:(id)value
