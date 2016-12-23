@@ -8,6 +8,7 @@
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -187,6 +188,10 @@
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
+        }
+        
+        if (_backgroundImage) {
+            [self setGradientLayer];
         }
         
         if (_transform) {
