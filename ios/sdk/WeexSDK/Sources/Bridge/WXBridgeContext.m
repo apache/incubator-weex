@@ -48,6 +48,8 @@ _Pragma("clang diagnostic pop") \
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
 @property (nonatomic, strong) NSMutableArray *methodQueue;
+// store template service
+@property (nonatomic, strong) NSMutableDictionary *jsServiceDic;
 
 @end
 
@@ -59,6 +61,7 @@ _Pragma("clang diagnostic pop") \
     if (self) {
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
+        _jsServiceDic = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -245,6 +248,8 @@ _Pragma("clang diagnostic pop") \
     
     [self.jsBridge executeJSFramework:script];
     
+    [self executeAllJsService];
+    
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);
     
     if ([self.jsBridge exception]) {
@@ -288,6 +293,41 @@ _Pragma("clang diagnostic pop") \
     
     [sendQueue addObject:method];
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
+}
+
+- (void)executeAllJsService
+{
+    WXAssertBridgeThread();
+    
+    // TODO: for in executeJSServices
+    for(NSString *name in _jsServiceDic) {
+        NSString *script = [_jsServiceDic objectForKey:name];
+        [self executeJsService:script withName:name];
+    }
+}
+
+- (void)executeJsService:(NSString *)script withName: (NSString *)name
+{
+    WXAssertBridgeThread();
+    if(!self.frameworkLoadFinished) {
+        [_jsServiceDic setObject:script forKey:name];
+        return;
+    }
+    
+    WXAssert(script, @"param script required!");
+    [self.jsBridge executeJs: script];
+    
+    if(_jsServiceDic[name]) {
+        [_jsServiceDic removeObjectForKey:name];
+    }
+    
+    if ([self.jsBridge exception]) {
+        NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];
+        WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, message);
+    } else {
+        // success
+    };
+    
 }
 
 - (void)registerModules:(NSDictionary *)modules

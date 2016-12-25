@@ -113,6 +113,11 @@
     [self callJSMethod:@"evalFramework" args:@[frameworkScript]];
 }
 
+- (void)executeJs:(NSString *)script
+{
+    [self executeJs:script];
+}
+
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     if (![method isEqualToString:@"__logger"]) {

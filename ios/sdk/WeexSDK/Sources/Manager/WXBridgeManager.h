@@ -13,6 +13,8 @@
 
 @interface WXBridgeManager : NSObject
 
++ (instancetype)sharedManager;
+
 /**
  *  return instance at the top of the stack.
  **/
@@ -66,6 +68,20 @@
  *  @param script    :   script code
  **/
 - (void)executeJsFramework:(NSString *)script;
+
+/**
+ *  Register JS service Script
+ *  @param name      :   service name
+ *  @param script    :   script code
+ *  @param options   :   service options
+ **/
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options;
+
+/**
+ *  Unregister JS service Script
+ *  @param script    :   script code
+ **/
+- (void)unregisterService:(NSString *)name;
 
 /**
  *  Execute JS Method

@@ -11,6 +11,7 @@
 #import "WXLog.h"
 #import "WXAssert.h"
 #import "WXBridgeMethod.h"
+#import "WXServiceFactory.h"
 
 @interface WXBridgeManager ()
 
@@ -188,13 +189,28 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     });
 }
 
-- (void)executeJsMethod:(WXBridgeMethod *)method
+
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    if (!method) return;
+    if (!name || !serviceScript || !options) return;
+    
+    NSString *script = [WXServiceFactory registerService:name withService:serviceScript withOptions:options];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
-        [weakSelf.bridgeCtx executeJsMethod:method];
+        [weakSelf.bridgeCtx executeJsService:script withName:@""];
+    });
+}
+
+- (void)unregisterService:(NSString *)name
+{
+    if (!name) return;
+    
+    NSString *script = [WXServiceFactory unregisterService:name];
+    
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }
 
