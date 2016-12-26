@@ -13,8 +13,6 @@
 
 @interface WXBridgeManager : NSObject
 
-+ (instancetype)sharedManager;
-
 /**
  *  return instance at the top of the stack.
  **/

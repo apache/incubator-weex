@@ -309,9 +309,6 @@ _Pragma("clang diagnostic pop") \
 - (void)executeJsService:(NSString *)script withName:(NSString *)name
 {
     if(self.frameworkLoadFinished) {
-        // TODO - FOR DEBUG DELETE IT!! simulator registerService. because jsfm not work now.
-        [self.jsBridge executeJs: @"var global = { registerService: function(){ console.log('registerService') }, unregisterService: function(){ console.log('unregisterService') } }"];
-        
         WXAssert(script, @"param script required!");
         [self.jsBridge executeJs: script];
         

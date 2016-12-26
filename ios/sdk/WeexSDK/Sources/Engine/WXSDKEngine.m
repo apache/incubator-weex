@@ -119,12 +119,12 @@
 # pragma mark Service Register
 + (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    [[WXBridgeManager sharedManager] registerService:name withService:serviceScript withOptions:options];
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
 }
 
 + (void)unregisterService:(NSString *)name
 {
-    [[WXBridgeManager sharedManager] unregisterService:name];
+    [[WXSDKManager bridgeMgr] unregisterService:name];
 }
 
 # pragma mark Handler Register
