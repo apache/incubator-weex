@@ -45,10 +45,10 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(233)
-	var __weex_template__ = __webpack_require__(249)
-	var __weex_style__ = __webpack_require__(250)
-	var __weex_script__ = __webpack_require__(251)
+	__webpack_require__(234)
+	var __weex_template__ = __webpack_require__(250)
+	var __weex_style__ = __webpack_require__(251)
+	var __weex_script__ = __webpack_require__(252)
 
 	__weex_define__('@weex-component/4ee2a41c614b4058c24278d8a41a24eb', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -67,7 +67,7 @@
 
 /***/ },
 
-/***/ 231:
+/***/ 232:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -87,7 +87,7 @@
 
 /***/ },
 
-/***/ 232:
+/***/ 233:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -117,11 +117,11 @@
 
 /***/ },
 
-/***/ 233:
+/***/ 234:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(231)
-	var __weex_script__ = __webpack_require__(232)
+	var __weex_template__ = __webpack_require__(232)
+	var __weex_script__ = __webpack_require__(233)
 
 	__weex_define__('@weex-component/banner', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -137,7 +137,7 @@
 
 /***/ },
 
-/***/ 249:
+/***/ 250:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -263,7 +263,7 @@
 
 /***/ },
 
-/***/ 250:
+/***/ 251:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -289,7 +289,7 @@
 
 /***/ },
 
-/***/ 251:
+/***/ 252:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";

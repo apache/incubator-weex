@@ -69,8 +69,9 @@
         _styles = styles ? [NSMutableDictionary dictionaryWithDictionary:styles] : [NSMutableDictionary dictionary];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
-        
         _subcomponents = [NSMutableArray array];
+        
+        _absolutePosition = CGPointMake(NAN, NAN);
         
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
