@@ -133,6 +133,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -169,6 +170,7 @@ public class WXSDKManager {
 
   private IWXUserTrackAdapter mIWXUserTrackAdapter;
   private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
+  private IDrawableLoader mDrawableLoader;
   private IWXHttpAdapter mIWXHttpAdapter;
   private IWXDebugAdapter mIWXDebugAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
@@ -191,6 +193,10 @@ public class WXSDKManager {
       }
     }
     return sManager;
+  }
+
+  public static int getInstanceViewPortWidth(String instanceId){
+    return getInstance().getSDKInstance(instanceId).getViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -319,6 +325,10 @@ public class WXSDKManager {
     return mIWXImgLoaderAdapter;
   }
 
+  public IDrawableLoader getDrawableLoader() {
+    return mDrawableLoader;
+  }
+
   public @NonNull IWXHttpAdapter getIWXHttpAdapter() {
     if (mIWXHttpAdapter == null) {
       mIWXHttpAdapter = new DefaultWXHttpAdapter();
@@ -337,6 +347,7 @@ public class WXSDKManager {
     this.mIWXDebugAdapter = config.getDebugAdapter();
     this.mIWXHttpAdapter = config.getHttpAdapter();
     this.mIWXImgLoaderAdapter = config.getImgAdapter();
+    this.mDrawableLoader = config.getDrawableLoader();
     this.mIWXStorageAdapter = config.getStorageAdapter();
     this.mIWXUserTrackAdapter = config.getUtAdapter();
     this.mURIAdapter = config.getURIAdapter();

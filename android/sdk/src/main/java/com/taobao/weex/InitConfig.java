@@ -204,6 +204,7 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -216,6 +217,7 @@ import com.taobao.weex.appfram.storage.IWXStorageAdapter;
  */
 public class InitConfig {
   private IWXHttpAdapter httpAdapter;
+  private IDrawableLoader drawableLoader;
   private IWXImgLoaderAdapter imgAdapter;
   private IWXUserTrackAdapter utAdapter;
   private IWXDebugAdapter debugAdapter;
@@ -229,6 +231,10 @@ public class InitConfig {
 
   public IWXImgLoaderAdapter getImgAdapter() {
     return imgAdapter;
+  }
+
+  public IDrawableLoader getDrawableLoader() {
+    return drawableLoader;
   }
 
   public IWXUserTrackAdapter getUtAdapter() {
@@ -256,6 +262,7 @@ public class InitConfig {
   public static class Builder{
     IWXHttpAdapter httpAdapter;
     IWXImgLoaderAdapter imgAdapter;
+    IDrawableLoader drawableLoader;
     IWXUserTrackAdapter utAdapter;
     IWXDebugAdapter debugAdapter;
     IWXStorageAdapter storageAdapter;
@@ -272,6 +279,11 @@ public class InitConfig {
 
     public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
       this.imgAdapter = imgAdapter;
+      return this;
+    }
+
+    public Builder setDrawableLoader(IDrawableLoader drawableLoader){
+      this.drawableLoader=drawableLoader;
       return this;
     }
 
@@ -304,6 +316,7 @@ public class InitConfig {
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
       config.imgAdapter = this.imgAdapter;
+      config.drawableLoader = this.drawableLoader;
       config.utAdapter = this.utAdapter;
       config.debugAdapter=this.debugAdapter;
       config.storageAdapter = this.storageAdapter;

@@ -207,6 +207,7 @@ package com.taobao.weex;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
@@ -216,6 +217,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -238,7 +240,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
+import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
@@ -253,6 +257,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
@@ -280,6 +285,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean isDestroy=false;
   private Map<String,Serializable> mUserTrackParams;
   private NativeInvokeHelper mNativeInvokeHelper;
+  private boolean isCommit=false;
+  private WXGlobalEventReceiver mGlobalEventReceiver=null;
+
+  /*
+   *  store custom ViewPort Width
+   */
+  public void setViewPortWidth(int mViewPortWidth) {
+    this.mViewPortWidth = mViewPortWidth;
+  }
+
+  public int getViewPortWidth() {
+    return mViewPortWidth;
+  }
+
+  private int mViewPortWidth = 750;
 
   /**
    * Render strategy.
@@ -692,6 +712,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
   }
 
+  public IDrawableLoader getDrawableLoader() {
+    return WXSDKManager.getInstance().getDrawableLoader();
+  }
+
   public URIAdapter getURIAdapter(){
     return WXSDKManager.getInstance().getURIAdapter();
   }
@@ -744,6 +768,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityCreate can not be call!");
     }
 
+    mGlobalEventReceiver=new WXGlobalEventReceiver(this);
+    getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
 
   @Override
@@ -761,7 +787,18 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   @Override
   public void onActivityPause() {
-
+    onViewDisappear();
+    if(!isCommit){
+      Set<String> componentTypes= WXComponentFactory.getComponentTypesByInstanceId(getInstanceId());
+      if(componentTypes!=null && componentTypes.contains(WXBasicComponentType.SCROLLER)){
+        mWXPerformance.useScroller=1;
+      }
+      mWXPerformance.maxDeepViewLayer=getMaxDeepLayer();
+      if (mUserTrackAdapter != null) {
+        mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
+      }
+      isCommit=true;
+    }
     // module listen Activity onActivityPause
     WXModuleManager.onActivityPause(getInstanceId());
     if(mRootComp != null) {
@@ -769,8 +806,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
-
-    onViewDisappear();
   }
 
 
@@ -942,20 +977,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         public void run() {
           if (mRenderListener != null && mContext != null) {
             mRenderListener.onRenderSuccess(WXSDKInstance.this, width, height);
-
-            if (WXEnvironment.isApkDebugable()) {
-              WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-            }
             if (mUserTrackAdapter != null) {
-              mWXPerformance.maxDeepViewLayer=mMaxDeepLayer;
-              if(getScrollView()!=null){
-                mWXPerformance.useScroller=1;
-              }
-              mUserTrackAdapter.commit(mContext, null, IWXUserTrackAdapter.LOAD, mWXPerformance, getUserTrackParams());
               WXPerformance performance=new WXPerformance();
               performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
               performance.args=getBundleUrl();
               mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
+            }
+            if (WXEnvironment.isApkDebugable()) {
+              WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
           }
         }
@@ -1132,6 +1161,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public synchronized void destroy() {
     WXSDKManager.getInstance().destroyInstance(mInstanceId);
+    WXComponentFactory.removeComponentTypesByInstanceId(getInstanceId());
+
+    if(mGlobalEventReceiver!=null){
+      getContext().unregisterReceiver(mGlobalEventReceiver);
+      mGlobalEventReceiver=null;
+    }
 
     if(mRootComp != null ) {
       mRootComp.destroy();
@@ -1143,6 +1178,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if(mGlobalEvents!=null){
       mGlobalEvents.clear();
     }
+
 
     mNestedInstanceInterceptor = null;
     mUserTrackAdapter = null;
@@ -1218,8 +1254,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width);
-    float realHeight = WXViewUtils.getWebPxByWidth(height);
+    float realWidth = WXViewUtils.getWebPxByWidth(width,getViewPortWidth());
+    float realHeight = WXViewUtils.getWebPxByWidth(height,getViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {
@@ -1301,6 +1337,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
     mGlobalEvents.remove(eventName);
+  }
+
+  /**
+   * module event
+   * @return
+   */
+  public void fireModuleEvent(String callback,Map<String,Object> params,boolean isOnce){
+    WXSDKManager.getInstance().callback(getInstanceId(),callback,params,isOnce);
   }
 
   public WXPerformance getWXPerformance(){

@@ -110,8 +110,9 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.taobao.weappplus_sdk.BuildConfig;
@@ -125,7 +126,6 @@ import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
-import com.taobao.weex.utils.WXResourceUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -141,6 +141,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
@@ -232,5 +234,18 @@ public class WXImageTest {
     PowerMockito.when(mWXImage.getDomObject().getAttrs().getImageSharpen()).thenReturn(WXImageSharpen.SHARPEN);
     mWXImage.setSrc("");
 
+  }
+
+  @Test
+  public void testSetImageBitmap(){
+    ImageView imageView = mWXImage.initComponentHostView(Robolectric.setupActivity(TestActivity.class));
+    imageView.setLayoutParams(new ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT));
+    imageView.setImageBitmap(null);
+    assertNull(imageView.getDrawable());
+
+    imageView.setImageBitmap(Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565));
+    assertNotNull(imageView.getDrawable());
   }
 }

@@ -57,17 +57,22 @@ public class WXTextDomObject extends WXDomObject {
    */
   private static class SetSpanOperation {
 
-    protected int start, end;
-    protected Object what;
+    protected final int start, end, flag;
+    protected final Object what;
 
     SetSpanOperation(int start, int end, Object what) {
+      this(start, end, what, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+    }
+
+    SetSpanOperation(int start, int end, Object what, int flag) {
       this.start = start;
       this.end = end;
       this.what = what;
+      this.flag = flag;
     }
 
     public void execute(Spannable sb) {
-      sb.setSpan(what, start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+      sb.setSpan(what, start, end, flag);
     }
   }
 
@@ -246,7 +251,7 @@ public class WXTextDomObject extends WXDomObject {
         }
       }
       if (style.containsKey(Constants.Name.FONT_SIZE)) {
-        mFontSize = WXStyle.getFontSize(style);
+        mFontSize = WXStyle.getFontSize(style,getViewPortWidth());
       }
       if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
         mFontWeight = WXStyle.getFontWeight(style);
@@ -266,7 +271,7 @@ public class WXTextDomObject extends WXDomObject {
       }
       mAlignment = WXStyle.getTextAlignment(style);
       textOverflow = WXStyle.getTextOverflow(style);
-      int lineHeight = WXStyle.getLineHeight(style);
+      int lineHeight = WXStyle.getLineHeight(style,getViewPortWidth());
       if (lineHeight != UNSET) {
         mLineHeight = lineHeight;
       }
@@ -359,23 +364,27 @@ public class WXTextDomObject extends WXDomObject {
    * @param text the give raw text.
    * @return an Spanned contains text and spans
    */
-  private
+  protected
   @NonNull
   Spanned createSpanned(String text) {
     if (!TextUtils.isEmpty(text)) {
       SpannableString spannable = new SpannableString(text);
-      List<SetSpanOperation> ops = createSetSpanOperation(spannable.length());
-      if (mFontSize == UNSET) {
-        ops.add(new SetSpanOperation(0, spannable.length(),
-                                     new AbsoluteSizeSpan(WXText.sDEFAULT_SIZE)));
-      }
-      Collections.reverse(ops);
-      for (SetSpanOperation op : ops) {
-        op.execute(spannable);
-      }
+      updateSpannable(spannable, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
       return spannable;
     }
     return new SpannableString("");
+  }
+
+  protected void updateSpannable(Spannable spannable, int spanFlag) {
+    List<SetSpanOperation> ops = createSetSpanOperation(spannable.length(), spanFlag);
+    if (mFontSize == UNSET) {
+      ops.add(new SetSpanOperation(0, spannable.length(),
+                                   new AbsoluteSizeSpan(WXText.sDEFAULT_SIZE), spanFlag));
+    }
+    Collections.reverse(ops);
+    for (SetSpanOperation op : ops) {
+      op.execute(spannable);
+    }
   }
 
   /**
@@ -384,34 +393,35 @@ public class WXTextDomObject extends WXDomObject {
    * @param end the end character of the text.
    * @return a task list which contains {@link SetSpanOperation}.
    */
-  private List<SetSpanOperation> createSetSpanOperation(int end) {
+  private List<SetSpanOperation> createSetSpanOperation(int end, int spanFlag) {
     List<SetSpanOperation> ops = new LinkedList<>();
     int start = 0;
     if (end >= start) {
       if (mTextDecoration == WXTextDecoration.UNDERLINE) {
         ops.add(new SetSpanOperation(start, end,
-                                     new UnderlineSpan()));
+                                     new UnderlineSpan(), spanFlag));
       }
       if (mTextDecoration == WXTextDecoration.LINETHROUGH) {
         ops.add(new SetSpanOperation(start, end,
-                                     new StrikethroughSpan()));
+                                     new StrikethroughSpan(), spanFlag));
       }
       if (mIsColorSet) {
         ops.add(new SetSpanOperation(start, end,
-                                     new ForegroundColorSpan(mColor)));
+                                     new ForegroundColorSpan(mColor), spanFlag));
       }
       if (mFontSize != UNSET) {
-        ops.add(new SetSpanOperation(start, end, new AbsoluteSizeSpan(mFontSize)));
+        ops.add(new SetSpanOperation(start, end, new AbsoluteSizeSpan(mFontSize), spanFlag));
       }
       if (mFontStyle != UNSET
           || mFontWeight != UNSET
           || mFontFamily != null) {
         ops.add(new SetSpanOperation(start, end,
-                                     new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily)));
+                                     new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily),
+                                     spanFlag));
       }
-      ops.add(new SetSpanOperation(start, end, new AlignmentSpan.Standard(mAlignment)));
+      ops.add(new SetSpanOperation(start, end, new AlignmentSpan.Standard(mAlignment), spanFlag));
       if (mLineHeight != UNSET) {
-        ops.add(new SetSpanOperation(start, end, new WXLineHeightSpan(mLineHeight)));
+        ops.add(new SetSpanOperation(start, end, new WXLineHeightSpan(mLineHeight), spanFlag));
       }
     }
     return ops;

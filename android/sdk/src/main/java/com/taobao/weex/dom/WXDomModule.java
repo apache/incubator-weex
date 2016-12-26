@@ -656,12 +656,12 @@ public final class WXDomModule extends WXModule {
         Map<String, String> sizes = new HashMap<>();
         Rect rect=new Rect();
         ((View)mWXSDKInstance.getRootView().getParent()).getGlobalVisibleRect(rect);
-        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width())));
-        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height())));
-        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom)));
-        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left)));
-        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right)));
-        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top)));
+        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width(),mWXSDKInstance.getViewPortWidth())));
+        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height(),mWXSDKInstance.getViewPortWidth())));
+        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top,mWXSDKInstance.getViewPortWidth())));
         options.put("size", sizes);
         options.put("result", true);
         WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);

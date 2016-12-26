@@ -121,10 +121,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.common.Constants;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -133,10 +133,46 @@ public class WXNavigatorModule extends WXModule {
 
     public static final String MSG_SUCCESS = "WX_SUCCESS";
     public static final String MSG_FAILED = "WX_FAILED";
+    public static final String MSG_PARAM_ERR = "WX_PARAM_ERR";
     private final static String INSTANCE_ID = "instanceId";
     private final static String TAG = "Navigator";
     private final static String WEEX = "com.taobao.android.intent.category.WEEX";
     private final static String URL = "url";
+
+    @JSMethod(uiThread = true)
+    public void open(JSONObject options, JSCallback success, JSCallback failure) {
+        if (options != null) {
+            String url = options.getString("url");
+            JSCallback callback = success;
+            JSONObject result = new JSONObject();
+            if (!TextUtils.isEmpty(url)) {
+                Uri rawUri = Uri.parse(url);
+                String scheme = rawUri.getScheme();
+                if (TextUtils.isEmpty(scheme) || "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+                    this.push(options.toJSONString(), success);
+                } else {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, rawUri);
+                        mWXSDKInstance.getContext().startActivity(intent);
+                        result.put("result", MSG_SUCCESS);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        result.put("result", MSG_FAILED);
+                        result.put("message", "open page failed");
+                        callback = failure;
+                    }
+                }
+            } else {
+                result.put("result", MSG_PARAM_ERR);
+                result.put("message", "param error");
+                callback = failure;
+            }
+
+            if(callback != null){
+                callback.invoke(result);
+            }
+        }
+    }
 
     @JSMethod(uiThread = true)
     public void push(String param, JSCallback callback) {
@@ -301,7 +337,14 @@ public class WXNavigatorModule extends WXModule {
 
     private boolean changeVisibilityOfActionBar(Context context, int visibility) {
         boolean result = false;
-        if (mWXSDKInstance.getContext() instanceof AppCompatActivity) {
+        boolean hasAppCompatActivity = false;
+        try {
+            Class.forName("android.support.v7.app.AppCompatActivity");
+            hasAppCompatActivity = true;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (hasAppCompatActivity && mWXSDKInstance.getContext() instanceof AppCompatActivity) {
             android.support.v7.app.ActionBar actionbar = ((AppCompatActivity) mWXSDKInstance.getContext()).getSupportActionBar();
             if (actionbar != null) {
                 switch (visibility) {

@@ -205,12 +205,11 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -228,15 +227,14 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
+import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.WXDomUtils;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -340,17 +338,11 @@ public class WXImage extends WXComponent<ImageView> {
    * Process local scheme, load drawable.
    * @param rewrited
    */
-  private void setLocalSrc(Uri rewrited){
-    Resources resources = getContext().getResources();
-    List<String> segments = rewrited.getPathSegments();
-    if(segments.size() != 1){
-      WXLogUtils.e("Local src format is invalid.");
-      return;
-    }
+  private void setLocalSrc(Uri rewrited) {
     ImageView imageView;
-    int id = resources.getIdentifier(segments.get(0),"drawable",getContext().getPackageName());
-    if(id != 0 && (imageView = getHostView()) != null){
-      imageView.setImageDrawable(ResourcesCompat.getDrawable(resources,id,null));
+    Drawable localDrawable = ImgURIUtil.getDrawableFromLoaclSrc(getContext(), rewrited);
+    if (localDrawable != null && (imageView = getHostView()) != null) {
+      imageView.setImageDrawable(localDrawable);
     }
   }
 
@@ -385,22 +377,19 @@ public class WXImage extends WXComponent<ImageView> {
       imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
         @Override
         public void onImageFinish(String url, ImageView imageView, boolean result, Map extra) {
-          if (!result && imageView != null) {
-            imageView.setImageDrawable(null);
-          }
+          if (getDomObject() != null && getDomObject().getEvents().contains(Constants.Event.ONLOAD)) {
+            Map<String, Object> params = new HashMap<String, Object>();
+            Map<String, Object> size = new HashMap<>(2);
+            if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
+              size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
+              size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
+            }
 
-          Map<String, Object> size = new HashMap<>(2);
-
-          if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
-            size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
-            size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
-          }
-
-          if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("success", result);
-            params.put("size", size);
-            fireEvent(Constants.Event.ONLOAD, params);
+            if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
+              params.put("success", result);
+              params.put("size", size);
+              fireEvent(Constants.Event.ONLOAD, params);
+            }
           }
         }
       });

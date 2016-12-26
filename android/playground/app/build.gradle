@@ -8,7 +8,7 @@ android {
         applicationId "com.alibaba.weex"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 5
+        versionCode 13
         versionName "0.5.2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk{
@@ -106,6 +106,6 @@ dependencies {
     compile 'com.android.support:support-annotations:23.2.1'
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     //compile 'com.google.android.gms:play-services-appindexing:8.1.0'
-    compile 'com.taobao.android:weex_inspector:0.0.8.1'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+    compile 'com.taobao.android:weex_inspector:0.8.0.0@aar'
 }

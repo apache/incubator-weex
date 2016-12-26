@@ -113,6 +113,8 @@ package com.taobao.weex;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
+import java.util.Map;
+
 /**
  * Created by lixinke on 16/8/25.
  */
@@ -131,5 +133,12 @@ public class WXGlobalEventModule extends WXModule {
   @JSMethod
   public void removeEventListener(String eventName){
     mWXSDKInstance.removeEventListener(eventName);
+  }
+
+
+  @Override
+  public void addEventListener(String eventName, String callback, Map<String, Object> options) {
+    super.addEventListener(eventName, callback, options);
+    addEventListener(eventName,callback);
   }
 }

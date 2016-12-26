@@ -206,6 +206,7 @@ package com.taobao.weex.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -339,12 +340,13 @@ public class WXViewUtils {
     return 0;
   }
 
-  public static int getScreenWidth(Context cxt) {
-    if(cxt!=null){
-      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
+  public static int getScreenWidth(Context ctx) {
+    if(ctx!=null){
+      Resources res = ctx.getResources();
+      int width = res.getDisplayMetrics().widthPixels;
 
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = WXEnvironment.sApplication.getResources()
+        int height = res
                 .getDisplayMetrics()
                 .heightPixels;
         width = height > width ?width:height;
@@ -365,26 +367,36 @@ public class WXViewUtils {
    * @param pxValue the raw distance from JS or CSS. The result will be rounded to a closet int.
    * @return the actual distance in the screen.
    */
+
+  @Deprecated
   public static float getRealPxByWidth(float pxValue) {
+     return getRealPxByWidth(pxValue,750);
+  }
+  public static float getRealPxByWidth(float pxValue,int customViewport) {
     if (Float.isNaN(pxValue)) {
       return pxValue;
     }
     if (mUseWebPx) {
       return (float) Math.rint(pxValue);
     } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
+      float realPx = (pxValue * getScreenWidth() / customViewport);
       return realPx > 0.005 && realPx < 1 ? 1 : (float) Math.rint(realPx);
     }
   }
 
+  @Deprecated
   public static float getRealSubPxByWidth(float pxValue) {
+    return getRealSubPxByWidth(pxValue,750);
+  }
+
+  public static float getRealSubPxByWidth(float pxValue,int customViewport) {
     if (Float.isNaN(pxValue)) {
       return pxValue;
     }
     if (mUseWebPx) {
       return (float) Math.rint(pxValue);
     } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
+      float realPx = (pxValue * getScreenWidth() / customViewport);
       return realPx > 0.005 && realPx < 1 ? 1 : realPx;
     }
   }
@@ -392,22 +404,31 @@ public class WXViewUtils {
   /**
    *  Internal interface that just for debug, you should never call this method because of accuracy loss obviously
    */
+  @Deprecated
   public static float getWeexPxByReal(float pxValue) {
+    return getWeexPxByReal(pxValue,750);
+  }
+
+  public static float getWeexPxByReal(float pxValue,int customViewport) {
     if (Float.isNaN(pxValue)) {
       return pxValue;
     }
     if (mUseWebPx) {
       return (float) Math.rint(pxValue);
     } else {
-      return pxValue * WXEnvironment.sDefaultWidth / getScreenWidth();
+      return pxValue * customViewport / getScreenWidth();
     }
   }
 
-  public static int getRealPxByWidth2(float pxValue) {
+  @Deprecated
+  public static float getRealPxByWidth2(float pxValue) {
+    return getRealPxByWidth2(pxValue,750);
+  }
+  public static int getRealPxByWidth2(float pxValue,int customViewport) {
     if (mUseWebPx) {
       return (int) pxValue;
     } else {
-      float realPx = (pxValue * getScreenWidth() / WXEnvironment.sDefaultWidth);
+      float realPx = (pxValue * getScreenWidth() / customViewport);
       return realPx > 0.005 && realPx < 1 ? 1 : (int) realPx - 1;
     }
   }
@@ -420,14 +441,19 @@ public class WXViewUtils {
    * @param pxValue the raw distance of native. The result will be rounded to a closet int.
    * @return the distance in JS,CSS where the screenWidth is 750 px.
    */
+  @Deprecated
   public static float getWebPxByWidth(float pxValue) {
+    return getWebPxByWidth(pxValue,750);
+  }
+
+  public static float getWebPxByWidth(float pxValue,int customViewport) {
     if (pxValue < -1.9999 && pxValue > -2.005) {
       return Float.NaN;
     }
     if (mUseWebPx) {
       return pxValue;
     } else {
-      float realPx = (pxValue * WXEnvironment.sDefaultWidth / getScreenWidth());
+      float realPx = (pxValue * customViewport / getScreenWidth());
       return realPx > 0.005 && realPx < 1 ? 1 : realPx;
     }
   }
