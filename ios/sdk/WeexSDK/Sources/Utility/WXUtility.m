@@ -93,9 +93,9 @@ CGFloat WXScreenScale(void)
     return _scale;
 }
 
-CGSize WXScreenSize(void)
+CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor)
 {
-    return [UIScreen mainScreen].bounds.size;
+    return WXCeilPixelValue(value * scaleFactor);
 }
 
 CGFloat WXRoundPixelValue(CGFloat value)
@@ -116,26 +116,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return floor(value * scale) / scale;
 }
 
-CGFloat WXPixelResize(CGFloat value)
-{
-    return WXCeilPixelValue(value * WXScreenResizeRadio());
-}
-
-CGRect WXPixelFrameResize(CGRect value)
-{
-    CGRect new = CGRectMake(value.origin.x * WXScreenResizeRadio(),
-                            value.origin.y * WXScreenResizeRadio(),
-                            value.size.width * WXScreenResizeRadio(),
-                            value.size.height * WXScreenResizeRadio());
-    return new;
-}
-
-CGPoint WXPixelPointResize(CGPoint value)
-{
-    CGPoint new = CGPointMake(value.x * WXScreenResizeRadio(),
-                              value.y * WXScreenResizeRadio());
-    return new;
-}
 static BOOL WXNotStat;
 @implementation WXUtility
 
@@ -168,8 +148,8 @@ static BOOL WXNotStat;
     NSString *appVersion = [WXAppConfiguration appVersion] ? : @"";
     NSString *appName = [WXAppConfiguration appName] ? : @"";
     
-    CGFloat deviceWidth = [[UIScreen mainScreen] bounds].size.width;
-    CGFloat deviceHeight = [[UIScreen mainScreen] bounds].size.height;
+    CGFloat deviceWidth = [self portraitScreenSize].width;
+    CGFloat deviceHeight = [self portraitScreenSize].height;
     CGFloat scale = [[UIScreen mainScreen] scale];
     
     NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
@@ -345,9 +325,9 @@ static BOOL WXNotStat;
     return [NSError errorWithDomain:@"WeexErrorDomain" code:code userInfo:@{@"errMsg":message}];
 }
 
-+ (UIFont *)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
 {
-    CGFloat fontSize = (isnan(size) || size == 0) ?  WX_TEXT_FONT_SIZE : size;
+    CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
     UIFont *font = nil;
     
     WXThreadSafeMutableDictionary *fontFace = [[WXRuleManager sharedInstance] getRule:@"fontFace"];
@@ -373,17 +353,17 @@ static BOOL WXNotStat;
             font = [UIFont fontWithName:fontFamily size:fontSize];
             if (!font) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
-                font = [UIFont systemFontOfSize:fontSize];
+                font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
         } else {
-            font = [UIFont systemFontOfSize:fontSize];
+            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
-    
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
+    
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (textWeight == WXTextWeightBold) ? (traits | UIFontDescriptorTraitBold) : traits;
+    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
@@ -500,30 +480,30 @@ static BOOL WXNotStat;
     return model;
 }
 
-CGFloat WXScreenResizeRadio(void)
++ (CGSize)portraitScreenSize
 {
-    return [WXUtility screenResizeScale];
-}
-
-+ (CGFloat)screenResizeScale
-{
-    static CGFloat resizeScale;
+    static CGSize portraitScreenSize;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        CGSize size = WXScreenSize();
-        CGFloat deviceWidth;
-        if (size.width > size.height) {
-            // Landscape
-            deviceWidth = size.height;
-        } else {
-            deviceWidth = size.width;
-        }
-        
-        resizeScale = deviceWidth / WXDefaultScreenWidth;
+        CGSize screenSize = [UIScreen mainScreen].bounds.size;
+        portraitScreenSize = CGSizeMake(MIN(screenSize.width, screenSize.height),
+                                        MAX(screenSize.width, screenSize.height));
     });
     
-    return resizeScale;
+    return portraitScreenSize;
 }
+
++ (CGFloat)defaultPixelScaleFactor
+{
+    static CGFloat defaultScaleFactor;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaultScaleFactor = [self portraitScreenSize].width / WXDefaultScreenWidth;
+    });
+    
+    return defaultScaleFactor;
+}
+
 
 #pragma mark - get deviceID
 + (NSString *)getDeviceID {
@@ -672,3 +652,32 @@ CGFloat WXScreenResizeRadio(void)
 }
 
 @end
+
+
+//Deprecated
+CGFloat WXScreenResizeRadio(void)
+{
+    return [WXUtility defaultPixelScaleFactor];
+}
+
+CGFloat WXPixelResize(CGFloat value)
+{
+    return WXCeilPixelValue(value * WXScreenResizeRadio());
+}
+
+CGRect WXPixelFrameResize(CGRect value)
+{
+    CGRect new = CGRectMake(value.origin.x * WXScreenResizeRadio(),
+                            value.origin.y * WXScreenResizeRadio(),
+                            value.size.width * WXScreenResizeRadio(),
+                            value.size.height * WXScreenResizeRadio());
+    return new;
+}
+
+CGPoint WXPixelPointResize(CGPoint value)
+{
+    CGPoint new = CGPointMake(value.x * WXScreenResizeRadio(),
+                              value.y * WXScreenResizeRadio());
+    return new;
+}
+

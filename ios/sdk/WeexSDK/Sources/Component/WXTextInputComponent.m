@@ -61,7 +61,7 @@
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
-@property (nonatomic) WXTextWeight fontWeight;
+@property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, copy) NSString *inputType;
 
@@ -144,7 +144,7 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if (styles[@"fontSize"]) {
-            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
         if (styles[@"fontWeight"]) {
             _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -336,7 +336,7 @@ WX_EXPORT_METHOD(@selector(blur))
        [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
     }
     if (styles[@"fontSize"]) {
-        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
     if (styles[@"fontWeight"]) {
         _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -526,7 +526,7 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)setTextFont
 {
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     [_inputView setFont:font];
 }
 
