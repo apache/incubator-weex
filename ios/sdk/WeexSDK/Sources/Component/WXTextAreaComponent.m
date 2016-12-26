@@ -67,7 +67,7 @@
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
-@property (nonatomic) WXTextWeight fontWeight;
+@property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
@@ -140,7 +140,7 @@ WX_EXPORT_METHOD(@selector(blur))
             _color = [WXConvert UIColor:styles[@"color"]];
         }
         if (styles[@"fontSize"]) {
-            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
         if (styles[@"fontWeight"]) {
             _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -338,7 +338,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [_textView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {
-        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
     if (styles[@"fontWeight"]) {
         _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -453,7 +453,7 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (_placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, _placeholderString.length)];
@@ -483,7 +483,7 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)setTextFont
 {
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     [_textView setFont:font];
 }
 

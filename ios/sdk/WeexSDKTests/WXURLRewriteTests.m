@@ -79,7 +79,7 @@ static id _mockNSBundle;
 - (void)testFileURL {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSURL *fileURL = [bundle URLForResource:@"testRootView" withExtension:@"js"];
-    NSURL *rewriteURL = [_rewriteHandler rewriteURL:fileURL.absoluteString withResourceType:WXResourceTypeBundle withInstance:_instance];
+    NSURL *rewriteURL = [_rewriteHandler rewriteURL:fileURL.absoluteString withResourceType:WXResourceTypeMainBundle withInstance:_instance];
     XCTAssertEqualObjects(fileURL.absoluteString, [rewriteURL absoluteString]);
 }
 
@@ -87,7 +87,7 @@ static id _mockNSBundle;
     NSString *testURL = @"local://testRootView.js";
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSURL *fileURL = [bundle URLForResource:@"testRootView" withExtension:@"js"];
-    NSURL *rewriteURL = [_rewriteHandler rewriteURL:testURL withResourceType:WXResourceTypeBundle withInstance:_instance];
+    NSURL *rewriteURL = [_rewriteHandler rewriteURL:testURL withResourceType:WXResourceTypeMainBundle withInstance:_instance];
     XCTAssertEqualObjects(fileURL.absoluteString, [rewriteURL absoluteString]);
 }
 
