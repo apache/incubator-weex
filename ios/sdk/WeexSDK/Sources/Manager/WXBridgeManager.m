@@ -207,7 +207,7 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
-        [weakSelf.bridgeCtx executeJsService:script withName:@""];
+        [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }
 

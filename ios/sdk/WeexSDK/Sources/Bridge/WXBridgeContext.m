@@ -49,7 +49,7 @@ _Pragma("clang diagnostic pop") \
 //store some methods temporarily before JSFramework is loaded
 @property (nonatomic, strong) NSMutableArray *methodQueue;
 // store template service
-@property (nonatomic, strong) NSMutableDictionary *jsServiceDic;
+@property (nonatomic, strong) NSMutableArray *jsServiceQueue;
 
 @end
 
@@ -61,7 +61,7 @@ _Pragma("clang diagnostic pop") \
     if (self) {
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
-        _jsServiceDic = [NSMutableDictionary dictionary];
+        _jsServiceQueue = [NSMutableArray new];
     }
     return self;
 }
@@ -248,8 +248,6 @@ _Pragma("clang diagnostic pop") \
     
     [self.jsBridge executeJSFramework:script];
     
-    [self executeAllJsService];
-    
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);
     
     if ([self.jsBridge exception]) {
@@ -259,6 +257,8 @@ _Pragma("clang diagnostic pop") \
         WX_MONITOR_SUCCESS(WXMTJSFramework);
         //the JSFramework has been load successfully.
         self.frameworkLoadFinished = YES;
+        
+        [self executeAllJsService];
         
         JSValue *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
         if (frameworkVersion && [frameworkVersion isString]) {
@@ -297,37 +297,36 @@ _Pragma("clang diagnostic pop") \
 
 - (void)executeAllJsService
 {
-    WXAssertBridgeThread();
-    
-    // TODO: for in executeJSServices
-    for(NSString *name in _jsServiceDic) {
-        NSString *script = [_jsServiceDic objectForKey:name];
+    for(NSDictionary *service in _jsServiceQueue) {
+        NSString *script = [service valueForKey:@"script"];
+        NSString *name = [service valueForKey:@"name"];
         [self executeJsService:script withName:name];
     }
+    
+    [_jsServiceQueue removeAllObjects];
 }
 
-- (void)executeJsService:(NSString *)script withName: (NSString *)name
+- (void)executeJsService:(NSString *)script withName:(NSString *)name
 {
-    WXAssertBridgeThread();
-    if(!self.frameworkLoadFinished) {
-        [_jsServiceDic setObject:script forKey:name];
-        return;
+    if(self.frameworkLoadFinished) {
+        // TODO - FOR DEBUG DELETE IT!! simulator registerService. because jsfm not work now.
+        [self.jsBridge executeJs: @"var global = { registerService: function(){ console.log('registerService') }, unregisterService: function(){ console.log('unregisterService') } }"];
+        
+        WXAssert(script, @"param script required!");
+        [self.jsBridge executeJs: script];
+        
+        if ([self.jsBridge exception]) {
+            NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];
+            WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, message);
+        } else {
+            // success
+        }
+    }else {
+        [_jsServiceQueue addObject:@{
+                                     @"name": name,
+                                     @"script": script
+                                     }];
     }
-    
-    WXAssert(script, @"param script required!");
-    [self.jsBridge executeJs: script];
-    
-    if(_jsServiceDic[name]) {
-        [_jsServiceDic removeObjectForKey:name];
-    }
-    
-    if ([self.jsBridge exception]) {
-        NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];
-        WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, message);
-    } else {
-        // success
-    };
-    
 }
 
 - (void)registerModules:(NSDictionary *)modules

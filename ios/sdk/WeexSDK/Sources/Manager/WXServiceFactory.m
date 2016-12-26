@@ -66,14 +66,22 @@
 }
 
 - (NSString *) getServiceScript:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options {
+    NSError *error;
+    
+    // setup options for service
     NSMutableDictionary *optionDic = [NSMutableDictionary dictionaryWithDictionary:options];
     [optionDic setObject:name forKey:@"serviceName"];
-    NSDictionary *funcDic = @{
-                              @"register": @"global.registerService",
-                              @"unregister": @"global.unregisterService"
-                              };
-    NSString *script = [NSString stringWithFormat:@";(fucntion(service, options){ %@ })(%@, %@);"
-                        , serviceScript, funcDic, optionDic];
+    NSData *optionsData = [NSJSONSerialization dataWithJSONObject:optionDic options:NSJSONWritingPrettyPrinted error:&error];
+    NSString *optionsString = [[NSString alloc] initWithData:optionsData encoding:NSUTF8StringEncoding];
+    
+    // setup global function to service
+    NSString *funcString = @"{"
+                            @"register: global.registerService,"
+                            @"unregister: global.unregisterService"
+                            @"}";
+    
+    NSString *script = [NSString stringWithFormat:@";(function(service, options){ %@ })(%@, %@);"
+                        , serviceScript, funcString, optionsString];
     return script;
 }
 
