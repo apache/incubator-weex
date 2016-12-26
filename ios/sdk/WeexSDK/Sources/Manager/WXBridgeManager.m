@@ -189,6 +189,15 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     });
 }
 
+- (void)executeJsMethod:(WXBridgeMethod *)method
+{
+    if (!method) return;
+    
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx executeJsMethod:method];
+    });
+}
 
 - (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
