@@ -70,11 +70,6 @@
 - (void)registerModules:(NSDictionary *)modules;
 
 /**
- *  Execute All JS Service
- *  @param method    :   JS services
- **/
-- (void)executeAllJsService;
-/**
  *  Execute JS Service
  *  @param method    :   JS services name
  *  @param method    :   JS services script

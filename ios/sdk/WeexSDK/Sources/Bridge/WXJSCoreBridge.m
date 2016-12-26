@@ -139,7 +139,7 @@
     _jsContext[@"callNative"] = callNativeBlock;
 }
 
-- (void)executeJs:(NSString *)script
+- (void)executeJavascript:(NSString *)script
 {
     WXAssertParam(script);
     [_jsContext evaluateScript:script];

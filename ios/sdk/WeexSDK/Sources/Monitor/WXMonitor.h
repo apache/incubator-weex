@@ -22,8 +22,7 @@ typedef enum : NSUInteger {
     WXPTFirstScreenRender,
     WXPTAllRender,
     WXPTBundleSize,
-    WXPTEnd,
-    WXPTServiceExecute
+    WXPTEnd
 } WXPerformanceTag;
 
 typedef enum : NSUInteger {

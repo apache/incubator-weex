@@ -37,35 +37,43 @@
 }
 
 #pragma mark Public
-+ (NSString *)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
+/**
+ * @abstract Unregisters a component for a given name
+ *
+ * @param name The service name to register
+ *
+ * @return script
+ *
+ */
++ (NSString *)registerServiceScript:(NSString *)name withRawScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
-    NSDictionary *dic = [[self sharedInstance] registerService:name withService:serviceScript withOptions:options];
+    NSDictionary *dic = [[self sharedInstance] registerServiceScript:name withRawScript:serviceScript withOptions:options];
     return [dic objectForKey:@"script"];
 }
 
 
-+ (NSString *)unregisterService:(NSString *)name
++ (NSString *)unregisterServiceScript:(NSString *)name
 {
-    return [[self sharedInstance] getUnregisterServiceScript:name];
+    return [[self sharedInstance] unregisterServiceScript:name];
 }
 
 
 #pragma mark Private
 
-- (NSDictionary *)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
+- (NSDictionary *)registerServiceScript:(NSString *)name withRawScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
     WXAssert(name && options && serviceScript, @"name or options or code must not be nil for registering service.");
     
     NSDictionary *serverConfig = @{
                                    @"name": name,
                                    @"options": options,
-                                   @"script": [self getServiceScript:name withService:serviceScript withOptions:options]
+                                   @"script": [self registerService:name withRawScript:serviceScript withOptions:options]
                                    };
     
     return serverConfig;
 }
 
-- (NSString *) getServiceScript:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options {
+- (NSString *) registerService:(NSString *)name withRawScript:(NSString *)serviceScript withOptions:(NSDictionary *)options {
     NSError *error;
     
     // setup options for service
@@ -85,7 +93,7 @@
     return script;
 }
 
-- (NSString *) getUnregisterServiceScript: (NSString *) name
+- (NSString *) unregisterServiceScript: (NSString *) name
 {
     NSString *script = [NSString stringWithFormat:@";global.unregisterService(%@);", name];
     return script;

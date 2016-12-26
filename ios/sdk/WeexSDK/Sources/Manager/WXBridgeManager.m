@@ -75,6 +75,7 @@ static NSThread *WXBridgeThread;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        
         WXBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBridgeThread setName:WX_BRIDGE_THREAD_NAME];
         if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
@@ -203,7 +204,7 @@ void WXPerformBlockOnBridgeThread(void (^block)())
 {
     if (!name || !serviceScript || !options) return;
     
-    NSString *script = [WXServiceFactory registerService:name withService:serviceScript withOptions:options];
+    NSString *script = [WXServiceFactory registerServiceScript:name withRawScript:serviceScript withOptions:options];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
@@ -215,7 +216,7 @@ void WXPerformBlockOnBridgeThread(void (^block)())
 {
     if (!name) return;
     
-    NSString *script = [WXServiceFactory unregisterService:name];
+    NSString *script = [WXServiceFactory unregisterServiceScript:name];
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){

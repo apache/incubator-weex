@@ -26,7 +26,7 @@ typedef NSInteger (^WXJSCallAddElement)(NSString *instanceId,  NSString *parentR
  * Executes the js code in javascript engine
  * You can do some setup in this method
  */
-- (void)executeJs:(NSString *)script;
+- (void)executeJavascript:(NSString *)script;
 
 /**
  * Executes global js method with specific arguments

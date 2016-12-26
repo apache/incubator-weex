@@ -310,7 +310,7 @@ _Pragma("clang diagnostic pop") \
 {
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
-        [self.jsBridge executeJs: script];
+        [self.jsBridge executeJavascript:script];
         
         if ([self.jsBridge exception]) {
             NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];

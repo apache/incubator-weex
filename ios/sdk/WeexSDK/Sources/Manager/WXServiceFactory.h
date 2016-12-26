@@ -11,7 +11,7 @@
 @interface WXServiceFactory : NSObject
 
 /**
- * @abstract Registers a component for a given name, options and js code
+ * @abstract Registers a service for a given name, js code and options
  *
  * @param name The service name to register
  *
@@ -19,9 +19,20 @@
  *
  * @param code service js code to invoke
  *
+ * @return script
+ *
  */
-+ (NSString *)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options;
++ (NSString *)registerServiceScript:(NSString *)name withRawScript:(NSString *)serviceScript withOptions:(NSDictionary *)options;
 
-+ (NSString *)unregisterService:(NSString *)name;
+
+/**
+ * @abstract Unregisters a component for a given name
+ *
+ * @param name The service name to register
+ *
+ * @return script
+ *
+ */
++ (NSString *)unregisterServiceScript:(NSString *)name;
 
 @end
