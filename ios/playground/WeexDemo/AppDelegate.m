@@ -37,7 +37,6 @@
     self.window.rootViewController = [[WXRootViewController alloc] initWithRootViewController:[self demoController]];
     [self.window makeKeyAndVisible];
     
-    // Override point for customization after application launch.
     [self startSplashScreen];
     
     return YES;

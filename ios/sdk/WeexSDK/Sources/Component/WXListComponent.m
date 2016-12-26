@@ -36,6 +36,20 @@
     [self.wx_component layoutDidFinish];
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+    // FIXME: side effect caused by hooking _adjustContentOffsetIfNecessary.
+    // When UITableView is pulled down and finger releases，contentOffset will be set from -xxxx to about -0.5(greater than -0.5), then contentOffset will be reset to zero by calling _adjustContentOffsetIfNecessary.
+    // So hooking _adjustContentOffsetIfNecessary will always cause remaining 1px space between list's top and navigator.
+    // Demo: http://dotwe.org/895630945793a9a044e49abe39cbb77f
+    // Have to reset contentOffset to zero manually here.
+    if (fabs(contentOffset.y) < 0.5) {
+        contentOffset.y = 0;
+    }
+    
+    [super setContentOffset:contentOffset];
+}
+
 @end
 
 @interface WXHeaderComponent : WXComponent
@@ -603,7 +617,11 @@
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        //(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero after insert cells, any other more elegant way?
+        // FIXME:(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero by calling _adjustContentOffsetIfNecessary after insert cells.
+        // So if you pull down list while list is rendering, the list will be flickering.
+        // Demo:    
+        // Have to hook _adjustContentOffsetIfNecessary here.
+        // Any other more elegant way?
         NSString *a = @"ntOffsetIfNe";
         NSString *b = @"adjustConte";
         
