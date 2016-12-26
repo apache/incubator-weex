@@ -8,6 +8,7 @@
 
 #import "WXComponent+GradientColor.h"
 #import "WXComponent_internal.h"
+#import "WXConvert.h"
 
 @implementation  WXComponent (GradientColor)
 
@@ -21,39 +22,13 @@
             return;
         }
         
-        WXGradientType gradientType = [self gradientType:array[0]];
+        WXGradientType gradientType = [WXConvert gradientType:array[0]];
         UIColor *startColor = [WXConvert UIColor:array[1]];
         UIColor *endColor = [WXConvert UIColor:array[2]];
         
         UIImage *bgImg = [self gradientColorImageFromColors:@[startColor, endColor] gradientType:gradientType imgSize:_view.frame.size];
         _view.backgroundColor = [UIColor colorWithPatternImage:bgImg];
     }
-}
-
-- (WXGradientType)gradientType:(NSString *)value
-{
-    WXGradientType type = WXGradientTypeToRight;
-    
-    if ([value isEqualToString:@"totop"]) {
-        type = WXGradientTypeToTop;
-    }
-    else if ([value isEqualToString:@"tobottom"]) {
-        type = WXGradientTypeToBottom;
-    }
-    else if ([value isEqualToString:@"toleft"]) {
-        type = WXGradientTypeToLeft;
-    }
-    if ([value isEqualToString:@"toright"]) {
-        type = WXGradientTypeToRight;
-    }
-    else if ([value isEqualToString:@"totopleft"]) {
-        type = WXGradientTypeToTopleft;
-    }
-    else if ([value isEqualToString:@"tobottomright"]) {
-        type = WXGradientTypeToBottomright;
-    }
-    
-    return type;
 }
 
 - (UIImage *)gradientColorImageFromColors:(NSArray*)colors gradientType:(WXGradientType)gradientType imgSize:(CGSize)imgSize;{

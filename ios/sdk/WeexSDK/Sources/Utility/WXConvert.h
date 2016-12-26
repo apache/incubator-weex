@@ -64,6 +64,8 @@ typedef BOOL WXClipType;
 
 + (WXVisibility)WXVisibility:(id)value;
 
++ (WXGradientType)gradientType:(id)value;
+
 @end
 
 @interface WXConvert (Deprecated)

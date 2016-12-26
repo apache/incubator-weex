@@ -9,21 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
-
-typedef NS_ENUM(NSInteger, WXGradientType) {
-    WXGradientTypeToTop,
-    WXGradientTypeToBottom,
-    WXGradientTypeToLeft,
-    WXGradientTypeToRight,
-    WXGradientTypeToTopleft,
-    WXGradientTypeToBottomright,
-};
+#import "WXType.h"
 
 @interface WXComponent (GradientColor)
 
 - (void)setGradientLayer;
-
-- (WXGradientType)gradientType:(NSString *)value;
 
 - (UIImage *)gradientColorImageFromColors:(NSArray*)colors gradientType:(WXGradientType)gradientType imgSize:(CGSize)imgSize;
 
