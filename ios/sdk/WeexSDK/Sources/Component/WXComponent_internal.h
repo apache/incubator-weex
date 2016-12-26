@@ -34,6 +34,7 @@
      *  View
      */
     UIColor *_backgroundColor;
+    NSString *_backgroundImage;
     WXClipType _clipToBounds;
     UIView *_view;
     CGFloat _opacity;

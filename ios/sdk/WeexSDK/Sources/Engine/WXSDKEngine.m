@@ -12,9 +12,10 @@
 #import "WXComponentFactory.h"
 
 #import "WXAppConfiguration.h"
-#import "WXNetworkDefaultImpl.h"
+#import "WXResourceRequestHandlerDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
+
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXMonitor.h"
@@ -43,6 +44,7 @@
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
     [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
+    [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -119,7 +121,7 @@
 // register some default handlers when the engine initializes.
 + (void)_registerDefaultHandlers
 {
-    [self registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
+    [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
 }
@@ -129,6 +131,13 @@
     WXAssert(handler && protocol, @"Fail to register the handler, please check if the parameters are correct ！");
     
     [WXHandlerFactory registerHandler:handler withProtocol:protocol];
+}
+
++ (id)handlerForProtocol:(Protocol *)protocol
+{
+    WXAssert(protocol, @"Fail to get the handler, please check if the parameters are correct ！");
+    
+    return  [WXHandlerFactory handlerForProtocol:protocol];
 }
 
 # pragma mark SDK Initialize
@@ -194,6 +203,18 @@
     return [WXSDKManager bridgeMgr].topInstance;
 }
 
+
+static NSDictionary *_customEnvironment;
++ (void)setCustomEnvironment:(NSDictionary *)environment
+{
+    _customEnvironment = environment;
+}
+
++ (NSDictionary *)customEnvironment
+{
+    return _customEnvironment;
+}
+
 # pragma mark Debug
 
 + (void)unload
@@ -227,7 +248,6 @@
 + (void)connectDevToolServer:(NSString *)URL
 {
     [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
-
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {

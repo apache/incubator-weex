@@ -47,15 +47,17 @@
         methods: {
             goback: function() {
                 var webElement = this.$el('webview');
-                webElement.goBack();           
-            },
+                $webview.goBack(webElement.ref);
+             },
             goforward: function() {
-                var webElement = this.$el('webview');   
-                webElement.goForward();
+                var $webview = require('@weex-module/webview');
+                var webElement = this.$el('webview');
+                $webview.goForward(webElement.ref);
             },
             refresh: function() {
-                var webElement = this.$el('webview');   
-                webElement.reload();
+                var $webview = require('@weex-module/webview');
+                var webElement = this.$el('webview');
+                $webview.reload(webElement.ref);
             },
             startload: function(e) {
 

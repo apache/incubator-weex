@@ -85,10 +85,7 @@
     _currentIndex = currentIndex;
     [self.indicator setCurrentPoint:_currentIndex];
     
-    [self _resortItemViews];
-    [self _resetItemFrames];
-    [self _scroll2Center];
-    [self setNeedsLayout];
+    [self _configSubViews];
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:didScrollToItemAtIndex:)]) {
         [self.delegate sliderView:self didScrollToItemAtIndex:_currentIndex];
@@ -161,22 +158,28 @@
     self.scrollView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.scrollView.contentSize = CGSizeMake(self.itemViews.count * self.frame.size.width, self.frame.size.height);
     
-    [self _resortItemViews];
-    [self _resetItemFrames];
-    [self _scroll2Center];
-    [self setNeedsLayout];
+    [self _configSubViews];
 }
 
 #pragma mark Private Methods
 
+- (void)_configSubViews {
+    [self _resortItemViews];
+    [self _resetItemFrames];
+    [self _scroll2Center];
+    [self _resetItemCountLessThanOrEqualToTwo];
+    [self setNeedsLayout];
+}
+
 - (void)_resortItemViews
 {
-    if (self.itemViews.count <= 2) return;
+    if (self.itemViews.count <= 1) return;
     
     NSInteger center = [self _centerItemIndex];
     NSInteger index = 0;
     
     if (self.currentIndex >= 0) {
+        [self _validateCurrentIndex];
         if (self.currentIndex > center) {
             index = self.currentIndex - center;
         } else {
@@ -212,13 +215,11 @@
         itemView.frame = frame;
         xOffset += frame.size.width;
     }
-    
-    
 }
 
 - (NSInteger)_centerItemIndex
 {
-    if (self.itemViews.count > 2) {
+    if (self.itemViews.count > 1) {
         return self.itemViews.count % 2 ? self.itemViews.count / 2 : self.itemViews.count / 2 - 1;
     }
     return 0;
@@ -226,10 +227,30 @@
 
 - (void)_scroll2Center
 {
-    if (self.itemViews.count > 2) {
+    if (self.itemViews.count > 1) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
         [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
     }
+}
+
+- (void)_resetItemCountLessThanOrEqualToTwo {
+    if (self.itemViews.count > 0 && self.itemViews.count <= 2) {
+        [self _validateCurrentIndex];
+        for (UIView *itemView in self.itemViews) {
+            if (itemView.tag == _currentIndex) {
+                [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+                break;
+            }
+        }
+    }
+}
+
+- (BOOL)_validateCurrentIndex {
+    if (_currentIndex > 0 && _currentIndex < self.itemViews.count) {
+        return YES;
+    }
+    _currentIndex = 0;
+    return NO;
 }
 
 - (BOOL)_isItemViewVisiable:(UIView *)itemView
@@ -293,8 +314,8 @@
 @property (nonatomic, assign) BOOL  autoPlay;
 @property (nonatomic, assign) NSUInteger interval;
 @property (nonatomic, assign) NSInteger index;
-@property (nonatomic, assign) CGFloat lastXDeviationPercent;
-@property (nonatomic, assign) CGFloat scrollAccuracy;
+@property (nonatomic, assign) CGFloat lastOffsetXRatio;
+@property (nonatomic, assign) CGFloat offsetXAccuracy;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
 @property (nonatomic, strong) NSMutableArray *childrenView;
@@ -315,7 +336,7 @@
         _sliderScrollEvent = NO;
         _interval = 3000;
         _childrenView = [NSMutableArray new];
-        _lastXDeviationPercent = 0;
+        _lastOffsetXRatio = 0;
         
         if (attributes[@"autoPlay"]) {
             _autoPlay = [attributes[@"autoPlay"] boolValue];
@@ -329,8 +350,8 @@
             _index = [attributes[@"index"] integerValue];
         }
         
-        if (attributes[@"xDeviationAccuracy"]) {
-            _scrollAccuracy = [WXConvert CGFloat:attributes[@"xDeviationAccuracy"]];
+        if (attributes[@"offsetXAccuracy"]) {
+            _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
         
         self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
@@ -458,8 +479,8 @@
         [_sliderView scroll2ItemView:self.currentIndex animated:YES];
     }
     
-    if (attributes[@"xDeviationAccuracy"]) {
-        _scrollAccuracy = [WXConvert CGFloat:attributes[@"xDeviationAccuracy"]];
+    if (attributes[@"offsetXAccuracy"]) {
+        _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
     }
 }
 
@@ -539,10 +560,10 @@
     if (_sliderScrollEvent) {
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
-        CGFloat XDeviationPercent = (XDeviation / width);
-        if (ABS(XDeviationPercent - _lastXDeviationPercent) >= _scrollAccuracy) {
-            _lastXDeviationPercent = XDeviationPercent;
-            [self fireEvent:@"scroll" params:@{@"XDeviationPercent":[NSNumber numberWithFloat:XDeviationPercent]} domChanges:nil];
+        CGFloat offsetXRatio = (XDeviation / width);
+        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+            _lastOffsetXRatio = offsetXRatio;
+            [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
     }
 }
