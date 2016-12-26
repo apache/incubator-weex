@@ -10,6 +10,7 @@
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
+#import "WXBridgeManager.h"
 
 #import "WXAppConfiguration.h"
 #import "WXResourceRequestHandlerDefaultImpl.h"
@@ -116,6 +117,18 @@
     }
 }
 
+
+# pragma mark Service Register
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript WithOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+}
+
++ (void)unregisterService:(NSString *)name
+{
+    [[WXSDKManager bridgeMgr] unregisterService:name];
+}
+
 # pragma mark Handler Register
 
 // register some default handlers when the engine initializes.
@@ -131,6 +144,13 @@
     WXAssert(handler && protocol, @"Fail to register the handler, please check if the parameters are correct ！");
     
     [WXHandlerFactory registerHandler:handler withProtocol:protocol];
+}
+
++ (id)handlerForProtocol:(Protocol *)protocol
+{
+    WXAssert(protocol, @"Fail to get the handler, please check if the parameters are correct ！");
+    
+    return  [WXHandlerFactory handlerForProtocol:protocol];
 }
 
 # pragma mark SDK Initialize
@@ -196,6 +216,18 @@
     return [WXSDKManager bridgeMgr].topInstance;
 }
 
+
+static NSDictionary *_customEnvironment;
++ (void)setCustomEnvironment:(NSDictionary *)environment
+{
+    _customEnvironment = environment;
+}
+
++ (NSDictionary *)customEnvironment
+{
+    return _customEnvironment;
+}
+
 # pragma mark Debug
 
 + (void)unload
@@ -229,7 +261,6 @@
 + (void)connectDevToolServer:(NSString *)URL
 {
     [[WXSDKManager bridgeMgr] connectToDevToolWithUrl:[NSURL URLWithString:URL]];
-
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {

@@ -58,3 +58,11 @@ typedef NS_ENUM(NSInteger, WXPositionType) {
     WXPositionTypeFixed
 };
 
+typedef NS_ENUM(NSInteger, WXGradientType) {
+    WXGradientTypeToTop = 0,
+    WXGradientTypeToBottom,
+    WXGradientTypeToLeft,
+    WXGradientTypeToRight,
+    WXGradientTypeToTopleft,
+    WXGradientTypeToBottomright,
+};

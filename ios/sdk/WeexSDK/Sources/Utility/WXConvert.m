@@ -174,7 +174,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         colorCache.countLimit = 64;
     });
     
-    if ([value isKindOfClass:[NSNull class]]) {
+    if ([value isKindOfClass:[NSNull class]] || !value) {
         return nil;
     }
     
@@ -653,6 +653,37 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     }
     
     return  WXVisibilityShow;
+}
+
+#pragma mark Gradient Color
+
++ (WXGradientType)gradientType:(id)value
+{
+    WXGradientType type = WXGradientTypeToRight;
+    
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *string = (NSString *)value;
+        
+        if ([string isEqualToString:@"totop"]) {
+            type = WXGradientTypeToTop;
+        }
+        else if ([string isEqualToString:@"tobottom"]) {
+            type = WXGradientTypeToBottom;
+        }
+        else if ([string isEqualToString:@"toleft"]) {
+            type = WXGradientTypeToLeft;
+        }
+        if ([string isEqualToString:@"toright"]) {
+            type = WXGradientTypeToRight;
+        }
+        else if ([string isEqualToString:@"totopleft"]) {
+            type = WXGradientTypeToTopleft;
+        }
+        else if ([string isEqualToString:@"tobottomright"]) {
+            type = WXGradientTypeToBottomright;
+        }
+    }
+    return type;
 }
 
 @end
