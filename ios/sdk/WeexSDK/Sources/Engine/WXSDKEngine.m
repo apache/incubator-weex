@@ -119,7 +119,7 @@
 
 
 # pragma mark Service Register
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript WithOptions:(NSDictionary *)options
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
 {
     [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
 }
