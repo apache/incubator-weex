@@ -1296,6 +1296,30 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
 
         Object requestType=response.extendParams.get("requestType");
         mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
+
+        if("network".equals(requestType) && mUserTrackAdapter!=null){
+          WXPerformance performance=new WXPerformance();
+          if(!TextUtils.isEmpty(mBundleUrl)){
+            try {
+              performance.args= Uri.parse(mBundleUrl).buildUpon().clearQuery().toString();
+            } catch (Exception e) {
+              performance.args=pageName;
+            }
+          }
+          if(!"200".equals(response.statusCode)){
+            performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
+            performance.appendErrMsg(response.errorCode);
+            performance.appendErrMsg("|");
+            performance.appendErrMsg(response.errorMsg);
+          }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
+            performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
+            performance.appendErrMsg(response.statusCode);
+            performance.appendErrMsg("|template is null!");
+          }else {
+            performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
+          }
+          mUserTrackAdapter.commit(getContext(),null,IWXUserTrackAdapter.JS_DOWNLOAD,performance,null);
+        }
       }
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
@@ -1307,7 +1331,6 @@ public class WXSDKInstance implements IWXActivityStateListener, View.OnLayoutCha
       } else {
         onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
       }
-
     }
   }
 
