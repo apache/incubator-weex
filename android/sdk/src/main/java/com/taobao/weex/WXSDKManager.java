@@ -368,5 +368,22 @@ public class WXSDKManager {
     return mIWXStorageAdapter;
   }
 
+  /**
+   * Weex embedders can use <code>notifyTrimMemory</code> to reduce
+   * memory at a proper time.
+   *
+   * It's not a good idea to reduce memory at any time, because
+   * memory trimming is a expense operation, and V8 needs to do
+   * a full GC and all the inline caches get to be cleared.
+   *
+   * The embedder needs to make some scheduling strategies to
+   * ensure that the embedded application is just on an idle time.
+   * If the application use the same js bundle to render pages,
+   * it's not a good idea to trim memory every time of exiting
+   * pages.
+   */
+  public void notifyTrimMemory() {
+    mBridgeManager.notifyTrimMemory();
+  }
 
 }

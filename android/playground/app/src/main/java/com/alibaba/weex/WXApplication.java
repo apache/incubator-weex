@@ -1,6 +1,8 @@
 package com.alibaba.weex;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
@@ -13,6 +15,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXException;
 
 public class WXApplication extends Application {
@@ -58,6 +61,47 @@ public class WXApplication extends Application {
     } catch (WXException e) {
       e.printStackTrace();
     }
+
+    registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+      @Override
+      public void onActivityCreated(Activity activity, Bundle bundle) {
+
+      }
+
+      @Override
+      public void onActivityStarted(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityResumed(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityPaused(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivityStopped(Activity activity) {
+
+      }
+
+      @Override
+      public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+      }
+
+      @Override
+      public void onActivityDestroyed(Activity activity) {
+        // The demo code of calling 'notifyTrimMemory()'
+        if (false) {
+          // We assume that the application is on an idle time.
+          WXSDKManager.getInstance().notifyTrimMemory();
+        }
+      }
+    });
 
   }
 
