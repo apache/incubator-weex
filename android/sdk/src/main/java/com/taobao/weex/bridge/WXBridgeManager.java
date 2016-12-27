@@ -327,6 +327,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private List<Map<String, Object>> mRegisterComponentFailList = new ArrayList<>(8);
   private List<Map<String, Object>> mRegisterModuleFailList = new ArrayList<>(8);
+  private List<String> mRegisterServiceFailList = new ArrayList<>(8);
 
   private List<String> mDestroyedInstanceId = new ArrayList<>();
 
@@ -1119,6 +1120,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (mRegisterComponentFailList.size() > 0) {
       invokeRegisterComponents(mRegisterComponentFailList);
     }
+    if (mRegisterServiceFailList.size() > 0) {
+      for (String service : mRegisterServiceFailList) {
+        invokeExecJSService(service);
+      }
+    }
   }
 
   /**
@@ -1157,6 +1163,29 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         invokeRegisterComponents(components);
       }
     }, null);
+  }
+
+  public void execJSService(final String service) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        invokeExecJSService(service);
+      }
+    });
+  }
+
+  private void invokeExecJSService(String service) {
+    try {
+      if (!isJSFrameworkInit()) {
+        WXLogUtils.e("[WXBridgeManager] invoke execJSService: framework.js uninitialized.");
+        mRegisterServiceFailList.add(service);
+        return;
+      }
+      mWXBridge.execJSService(service);
+    } catch (Throwable e) {
+      WXLogUtils.e("[WXBridgeManager] invokeRegisterService:", e);
+      commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK,WXErrorCode.WX_ERR_JS_EXECUTE,"invokeRegisterService");
+    }
   }
 
   private boolean isJSThread() {

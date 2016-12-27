@@ -265,7 +265,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   }
 
-  interface OnClickListener{
+  public interface OnClickListener{
     void onHostViewClick();
   }
 

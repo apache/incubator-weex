@@ -202,42 +202,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.common;
+package com.taobao.weex.bridge;
 
-import com.taobao.weex.bridge.WXJSObject;
-import com.taobao.weex.bridge.WXParams;
+import android.text.TextUtils;
 
-/**
- * Bridge interface, native bridge and debug bridge both need to implement this interface
- */
-public interface IWXBridge extends IWXObject {
+import java.util.Map;
 
-  int DESTROY_INSTANCE = -1;
-  int INSTANCE_RENDERING = 1;
-  int INSTANCE_RENDERING_ERROR = 0;
+public class WXServiceManager {
 
-  /**
-   * init Weex
-   *
-   * @param framework assets/main.js
-   * @return
-   */
-  int initFramework(String framework, WXParams params);
+    public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(serviceScript)) return false;
 
-  /**
-   * execute javascript function
-   */
-  int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
+        String param1 = "register: global.registerService, unregister: global.unregisterService";
+        String param2 = "serviceName: \"" + name + "\"";
+        for (String key: options.keySet()) {
+            String value = options.get(key);
+            param2 += ", " + key + ": \"" + value + "\"";
+        }
+        String serviceJs = String.format("(function(service, options){ %s })({ %s }, { %s })", serviceScript, param1, param2);
 
-  int execJSService(String javascript);
+        WXBridgeManager.getInstance().execJSService(serviceJs);
+        return true;
+    }
 
-  /**
-   * js call native
+    public static boolean unRegisterService(String name) {
+        if (TextUtils.isEmpty(name)) return false;
 
-   */
-  int callNative(String instanceId, String tasks, String callback);
+        String js = String.format("global.unregisterService( \"%s\" );", name);
+        WXBridgeManager.getInstance().execJSService(js);
+        return true;
+    }
 
-  int callAddElement(String instanceId, String ref,String dom,String index, String callback);
-
-  void reportJSException(String instanceId, String func, String exception);
 }
