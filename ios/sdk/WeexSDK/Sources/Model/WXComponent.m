@@ -8,6 +8,7 @@
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -69,8 +70,9 @@
         _styles = styles ? [NSMutableDictionary dictionaryWithDictionary:styles] : [NSMutableDictionary dictionary];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
-        
         _subcomponents = [NSMutableArray array];
+        
+        _absolutePosition = CGPointMake(NAN, NAN);
         
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
@@ -189,8 +191,12 @@
             _view.backgroundColor = _backgroundColor;
         }
         
+        if (_backgroundImage) {
+            [self setGradientLayer];
+        }
+        
         if (_transform) {
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            _layer.transform = [[[WXTransform alloc] initWithInstance:self.weexInstance] getTransform:_transform withView:_view withOrigin:_transformOrigin];
         }
         
         _view.wx_component = self;

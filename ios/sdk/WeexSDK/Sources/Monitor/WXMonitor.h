@@ -30,6 +30,7 @@ typedef enum : NSUInteger {
     WXMTJSDownload,
     WXMTJSBridge,
     WXMTNativeRender,
+    WXMTJSService,
 } WXMonitorTag;
 
 
