@@ -139,6 +139,12 @@
     _jsContext[@"callNative"] = callNativeBlock;
 }
 
+- (void)executeJavascript:(NSString *)script
+{
+    WXAssertParam(script);
+    [_jsContext evaluateScript:script];
+}
+
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
