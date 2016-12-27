@@ -114,7 +114,7 @@
     self.isAccessibilityElement = YES;
     
     [self addSubview:_contentView];
-     
+    
     if (_dataSource) {
         [self reloadData];
     }
@@ -543,12 +543,11 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
                 _scrolling = NO;
                 _decelerating = NO;
                 _previousTranslation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
-        
+                
                 [_delegate sliderNeighborWillBeginDragging:self];
                 break;
             }
             case UIGestureRecognizerStateEnded:
-
             case UIGestureRecognizerStateCancelled:
             case UIGestureRecognizerStateFailed:
             {
@@ -584,7 +583,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             }
             case UIGestureRecognizerStateChanged:
             {
-             
                 CGFloat translation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
                 CGFloat velocity = _vertical? [panGesture velocityInView:self].y: [panGesture velocityInView:self].x;
                 
@@ -1383,7 +1381,9 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     WXPixelType neighborSpace;
     CGFloat neighborAlpha;
     CGFloat neighborScale;
+    CGFloat currentItemScale;
 }
+
 @property (nonatomic, strong) WXSliderNeighborView *sliderView;
 @property (nonatomic, assign) BOOL  autoPlay;
 @property (nonatomic, assign) NSUInteger interval;
@@ -1395,6 +1395,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 @property (nonatomic) CGRect itemRect;
 @end
 
+#define DEFAULT_NEIGHBOR_SCALE 0.8
+#define DEFAULT_CURRENT_ITEM_SCALE 0.9
+#define DEFAULT_NEIGHBOR_ALPHA 0.6
+#define DEFAULT_ANIMATION_DURATION 0.3
+#define DEFAULT_NEIGHBOR_SPACE 25
+
+
 @implementation WXSliderNeighborComponent
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
@@ -1404,32 +1411,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         _sliderView.delegate = self;
         _sliderView.dataSource = self;
         _interval = 3000;
-        [self setNeighborSpace:attributes];
-        [self setNeighborAlpha:attributes];
-        [self setNeighborScale:attributes];
         _items = [NSMutableArray array];
         _itemRect = CGRectNull;
-        
-        if (attributes[@"autoPlay"]) {
-            _autoPlay = [attributes[@"autoPlay"] boolValue];
-        }
-
-        if (attributes[@"interval"]) {
-            _interval = [attributes[@"interval"] integerValue];
-        }
-
-        if (attributes[@"index"]) {
-            _index = [attributes[@"index"] integerValue];
-            _currentIndex = _index;
-        }
-        if (attributes[@"autoPlay"]) {
-            _autoPlay = [attributes[@"autoPlay"] boolValue];
-        }
-
-        if (attributes[@"interval"]) {
-            _interval = [attributes[@"interval"] integerValue];
-        }
-    
+        self->neighborAlpha = DEFAULT_NEIGHBOR_ALPHA;
+        self->neighborScale = DEFAULT_NEIGHBOR_SCALE;
+        self->currentItemScale = DEFAULT_CURRENT_ITEM_SCALE;
+        self->neighborSpace = [WXConvert WXPixelType:@(DEFAULT_NEIGHBOR_SPACE) scaleFactor:self.weexInstance.pixelScaleFactor];
+        [self setAttributes:attributes];
     }
     self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
     
@@ -1526,7 +1514,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 }
 
 #pragma mark attributes update
-- (void)updateAttributes:(NSDictionary *)attributes
+- (void)setAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"index"]) {
         _index = [attributes[@"index"] integerValue];
@@ -1540,7 +1528,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             [self _stopAutoPlayTimer];
         }
     }
-    
     if (attributes[@"interval"]) {
         _interval = [attributes[@"interval"] integerValue];
         
@@ -1553,14 +1540,20 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     if (attributes[@"neighborScale"]) {
         [self setNeighborScale:attributes];
     }
+    if (attributes[@"currentItemScale"]) {
+        [self setCurrentItemScale:attributes];
+    }
     if (attributes[@"neighborAlpha"]) {
         [self setNeighborAlpha:attributes];
     }
-    
     if (attributes[@"neighborSpace"]) {
         [self setNeighborSpace:attributes];
     }
-    
+}
+
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    [self setAttributes:attributes];
     [self.sliderView setCurrentItemIndex:_index];
     [self updateSliderPage:YES];
 }
@@ -1594,8 +1587,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 - (void)setNeighborSpace:(NSDictionary *)attributes{
     if(attributes[@"neighborSpace"]) {
         self->neighborSpace = [WXConvert WXPixelType:attributes[@"neighborSpace"] scaleFactor:self.weexInstance.pixelScaleFactor];
-    } else {
-        self->neighborSpace = [WXConvert WXPixelType:@(25) scaleFactor:self.weexInstance.pixelScaleFactor];
     }
 }
 
@@ -1604,8 +1595,14 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         self->neighborAlpha = [WXConvert CGFloat:attributes[@"neighborAlpha"]];
         self->neighborAlpha = self->neighborAlpha >= 0 ? self->neighborAlpha : 0;
         self->neighborAlpha = self->neighborAlpha <= 1 ? self->neighborAlpha: 1;
-    } else {
-        self->neighborAlpha = 0.6;
+    }
+}
+
+- (void)setCurrentItemScale:(NSDictionary *)attributes {
+    if (attributes[@"currentItemScale"]) {
+        self->currentItemScale = [WXConvert CGFloat:attributes[@"currentItemScale"]];
+        self->currentItemScale = self->currentItemScale >= 0 ? self->currentItemScale : 0;
+        self->currentItemScale = self->currentItemScale <= 1 ? self->currentItemScale: 1;
     }
 }
 
@@ -1615,9 +1612,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         self->neighborScale = [WXConvert CGFloat:attributes[@"neighborScale"]];
         self->neighborScale = self->neighborScale >= 0? self->neighborScale : 0;
         self->neighborScale = self->neighborScale <= 1? self->neighborScale :1;
-        
-    } else {
-        self->neighborScale = 0.8;
     }
 }
 
@@ -1735,7 +1729,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     float duration = 0;
     __weak typeof(self) weakSelf = self;
     if (animate) {
-        duration = 0.3;
+        duration = DEFAULT_ANIMATION_DURATION;
     }
     
     [UIView animateWithDuration:duration animations:^{
@@ -1743,14 +1737,13 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         if (strongSelf) {
             currentView.alpha = 1.0;
             
-            if (fabs(strongSelf->neighborScale - 0) > CGFLOAT_MIN) {
-                transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(0.9, 0.9));
+            if (fabs(strongSelf->currentItemScale) > CGFLOAT_MIN) {
+                transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(strongSelf->currentItemScale, strongSelf->currentItemScale));
             }
             currentView.transform = transfrom;
             transfrom = CGAffineTransformIdentity;
-            
-            if (fabs(strongSelf->neighborScale - 0) <= CGFLOAT_MIN) {
-                strongSelf->neighborScale = 0.8;
+            if (fabs(strongSelf->neighborScale) <= CGFLOAT_MIN) {
+                strongSelf->neighborScale = DEFAULT_NEIGHBOR_SCALE;
             }
             
             CGFloat tx = 0.5*_itemRect.size.width*((1-self->neighborScale)+(1-0.9))-self->neighborSpace;

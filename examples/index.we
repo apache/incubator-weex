@@ -25,6 +25,7 @@
         {name: 'component/list/list-basic', title: 'List (Basic)'},
         {name: 'component/list/list-demo', title: 'List (Advanced)'},
         {name: 'component/slider/index', title: 'Slider'},
+        {name: 'component/slider-neighbor/index', title: 'Slider Neighbor'},
         {name: 'component/a-demo', title: 'A'},
         {name: 'component/video-demo', title: 'Video'},
         {name: 'component/countdown-demo', title: 'Countdown'},
