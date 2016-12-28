@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Message;
 import android.text.TextUtils;
@@ -238,6 +238,7 @@ import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -866,7 +867,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return false;
   }
 
-  public void onActivityResult(int requestCode, int resultCode, Intent data){
+  public boolean onBackPressed() {
+    WXComponent comp = getRootComponent();
+    if(comp != null) {
+      WXEvent events= comp.getDomObject().getEvents();
+      boolean hasBackPressed = events.contains(Constants.Event.BACKPRESSED);
+      if (hasBackPressed) {
+        WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.BACKPRESSED,null, null);
+      }
+      return hasBackPressed;
+    }
+    return false;
+  }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
     WXModuleManager.onActivityResult(getInstanceId(),requestCode,resultCode,data);
 
     if(mRootComp != null) {
