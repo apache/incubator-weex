@@ -342,10 +342,19 @@ typedef enum : NSUInteger {
         params = [NSDictionary dictionary];
     }
     NSDictionary * userInfo = @{
-            @"weexInstance":self,
+            @"weexInstance":self.instanceId,
             @"param":params
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
+}
+
+- (CGFloat)pixelScaleFactor
+{
+    if (self.viewportWidth > 0) {
+        return [WXUtility portraitScreenSize].width / self.viewportWidth;
+    } else {
+        return [WXUtility defaultPixelScaleFactor];
+    }
 }
 
 - (NSURL *)completeURL:(NSString *)url
@@ -353,7 +362,9 @@ typedef enum : NSUInteger {
     if (!_scriptURL) {
         return [NSURL URLWithString:url];
     }
-    
+    if ([url hasPrefix:@"//"] && [_scriptURL isFileURL]) {
+        return [NSURL URLWithString:url];
+    }
     if (!url) {
         return nil;
     }

@@ -110,7 +110,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    
+  
     [self configPlaceHolder:attributes];
     
     if (attributes[@"resize"]) {
@@ -250,7 +250,10 @@ static dispatch_queue_t WXImageUpdateQueue;
                     __strong typeof(self) strongSelf = weakSelf;
                     
                     if (weakSelf.imageLoadEvent) {
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @"false" : @"true"}];
+                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);

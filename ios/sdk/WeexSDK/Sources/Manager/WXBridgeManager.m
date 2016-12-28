@@ -13,6 +13,7 @@
 #import "WXBridgeMethod.h"
 #import "WXCallJSMethod.h"
 #import "WXSDKManager.h"
+#import "WXServiceFactory.h"
 
 @interface WXBridgeManager ()
 
@@ -76,6 +77,7 @@ static NSThread *WXBridgeThread;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        
         WXBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBridgeThread setName:WX_BRIDGE_THREAD_NAME];
         if(WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
@@ -197,6 +199,30 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx executeJsMethod:method];
+    });
+}
+
+- (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
+{
+    if (!name || !serviceScript || !options) return;
+    
+    NSString *script = [WXServiceFactory registerServiceScript:name withRawScript:serviceScript withOptions:options];
+    
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx executeJsService:script withName:name];
+    });
+}
+
+- (void)unregisterService:(NSString *)name
+{
+    if (!name) return;
+    
+    NSString *script = [WXServiceFactory unregisterServiceScript:name];
+    
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }
 
