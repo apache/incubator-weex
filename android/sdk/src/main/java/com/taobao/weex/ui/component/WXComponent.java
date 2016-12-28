@@ -1055,6 +1055,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
+          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
