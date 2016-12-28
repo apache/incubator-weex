@@ -3,7 +3,7 @@ import sinon from 'sinon'
 
 import service from '../../../services/broadcast-channel/index'
 import { MessageEvent } from '../../../services/broadcast-channel/message-event'
-const { BroadcastChannel } = service.create('foo')
+const { BroadcastChannel } = service.create('foo').instance
 
 describe('BroadcastChannel', () => {
   it('is a function', () => {

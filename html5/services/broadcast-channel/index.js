@@ -95,7 +95,9 @@ export default {
       }
     }
     serviceObject.BroadcastChannel.prototype = BroadcastChannel.prototype
-    return serviceObject
+    return {
+      instance: serviceObject
+    }
   },
   destroy: (id, env) => {
     instances[id].forEach(channel => channel.close())

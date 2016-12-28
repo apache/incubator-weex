@@ -26,6 +26,26 @@ function checkVersion (code) {
   return info
 }
 
+function createServices (id, env, config) {
+  // Init JavaScript services for this instance.
+  const serviceMap = Object.create(null)
+  serviceMap.service = Object.create(null)
+  services.forEach(({ name, options }) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[JS Runtime] create service ${name}.`)
+    }
+    const create = options.create
+    if (create) {
+      const result = create(id, env, config)
+      Object.assign(serviceMap.service, result)
+      Object.assign(serviceMap, result.instance)
+    }
+  })
+  delete serviceMap.service.instance
+  Object.freeze(serviceMap.service)
+  return serviceMap
+}
+
 const instanceMap = {}
 
 /**
@@ -58,23 +78,12 @@ function createInstance (id, code, config, data) {
     const env = {
       info,
       config,
-      callbacks
+      callbacks,
+      created: Date.now(),
+      framework: info.framework
     }
-    env.framework = info.framework
-    env.created = Date.now()
-    env.services = {}
+    env.services = createServices(id, env, runtimeConfig)
     instanceMap[id] = env
-
-    // Init JavaScript services for this instance.
-    const serviceObjects = Object.create(null)
-    services.forEach(service => {
-      const create = service.options.create
-      if (create) {
-        const result = create(id, env, runtimeConfig)
-        Object.assign(serviceObjects, result)
-      }
-    })
-    env.services = serviceObjects
 
     return frameworks[info.framework].createInstance(id, code, config, data, env)
   }
