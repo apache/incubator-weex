@@ -202,24 +202,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.appfram.websocket;
+package com.alibaba.weex.commons.adapter;
 
-import android.support.annotation.Nullable;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapterFactory;
 
 /**
- * Created by moxun on 16/12/27.
+ * Created by moxun on 16/12/28.
  */
 
-public interface IWXWebSocketAdapter {
-    void connect(String url, @Nullable String protocol, EventListener listener);
-    void send(String data);
-    void close(int code, String reason);
-    void destroy();
-
-    interface EventListener {
-        void onOpen();
-        void onMessage(String data);
-        void onClose(int code, String reason);
-        void onError(String msg);
+public class DefaultWebSocketAdapterFactory implements IWXWebSocketAdapterFactory {
+    @Override
+    public IWXWebSocketAdapter createWebSocketAdapter() {
+        return new DefaultWebSocketAdapter();
     }
 }

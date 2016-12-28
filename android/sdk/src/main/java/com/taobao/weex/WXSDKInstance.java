@@ -210,6 +210,7 @@ import android.graphics.Color;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -222,6 +223,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
@@ -726,6 +728,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public IWXHttpAdapter getWXHttpAdapter() {
     return WXSDKManager.getInstance().getIWXHttpAdapter();
+  }
+
+  public @Nullable IWXWebSocketAdapter getWXWebSocketAdapter() {
+    return WXSDKManager.getInstance().getIWXWebSocketAdapter();
   }
 
   @Deprecated

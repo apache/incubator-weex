@@ -205,6 +205,12 @@
 package com.taobao.weex.appfram.websocket;
 
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by moxun on 16/12/27.
@@ -212,10 +218,107 @@ import com.taobao.weex.WXSDKEngine;
 
 public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
 
-    IWXWebSocketAdapter webSocketAdapter;
+    private static final String TAG = "WXWebSocketModule";
+    private IWXWebSocketAdapter webSocketAdapter;
+    private JSCallback onOpen;
+    private JSCallback onMessage;
+    private JSCallback onClose;
+    private JSCallback onError;
+    private IWXWebSocketAdapter.EventListener eventListener = new IWXWebSocketAdapter.EventListener() {
+        @Override
+        public void onOpen() {
+            if (onOpen != null) {
+                onOpen.invoke("onopen");
+            }
+        }
+
+        @Override
+        public void onMessage(String data) {
+            if (onMessage != null) {
+                Map<String, String> msg = new HashMap<>(1);
+                msg.put("data", data);
+                onMessage.invokeAndKeepAlive(msg);
+            }
+        }
+
+        @Override
+        public void onClose(int code, String reason) {
+            if (onClose != null) {
+                Map<String, Object> msg = new HashMap<>(2);
+                msg.put("code", code);
+                msg.put("reason", reason);
+                onClose.invoke(msg);
+            }
+        }
+
+        @Override
+        public void onError(String msg) {
+            if (onError != null) {
+                Map<String, String> info = new HashMap<>(1);
+                info.put("data", msg);
+                onError.invokeAndKeepAlive(info);
+            }
+        }
+    };
+
+    @JSMethod
+    public void WebSocket(String url, String protocol) {
+        webSocketAdapter = mWXSDKInstance.getWXWebSocketAdapter();
+        reportErrorIfNoAdapter();
+        if (webSocketAdapter != null) {
+            webSocketAdapter.connect(url, protocol, eventListener);
+        }
+    }
+
+    @JSMethod
+    public void send(String data) {
+        reportErrorIfNoAdapter();
+        if (webSocketAdapter != null) {
+            webSocketAdapter.send(data);
+        }
+    }
+
+    @JSMethod
+    public void close(int code, String reason) {
+        reportErrorIfNoAdapter();
+        if (webSocketAdapter != null) {
+            webSocketAdapter.close(code, reason);
+        }
+    }
+
+    @JSMethod
+    public void onopen(JSCallback callback) {
+        this.onOpen = callback;
+    }
+
+    @JSMethod
+    public void onmessage(JSCallback callback) {
+        this.onMessage = callback;
+    }
+
+    @JSMethod
+    public void onclose(JSCallback callback) {
+        this.onClose = callback;
+    }
+
+    @JSMethod
+    public void onerror(JSCallback callback) {
+        this.onError = callback;
+    }
 
     @Override
     public void destroy() {
+        if (webSocketAdapter != null) {
+            webSocketAdapter.destroy();
+        }
+    }
 
+    private void reportErrorIfNoAdapter() {
+        if (webSocketAdapter == null) {
+            if (eventListener != null) {
+                eventListener.onError("No implementation found for IWXWebSocketAdapter");
+            }
+            WXLogUtils.e(TAG, "No implementation found for IWXWebSocketAdapter");
+        }
     }
 }

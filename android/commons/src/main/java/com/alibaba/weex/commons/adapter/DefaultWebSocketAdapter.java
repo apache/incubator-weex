@@ -213,7 +213,6 @@ import com.squareup.okhttp.ws.WebSocket;
 import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
-import com.taobao.weex.bridge.JSCallback;
 
 import java.io.IOException;
 
@@ -227,31 +226,29 @@ import okio.BufferedSource;
 public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
 
     private WebSocket ws;
-    private OkHttpClient okHttpClient;
-    private JSCallback onOpen;
-    private JSCallback onMessage;
-    private JSCallback onClose;
-    private JSCallback onError;
-
-    private DefaultWebSocketAdapter() {
-        okHttpClient = new OkHttpClient();
-    }
+    private EventListener eventListener;
 
     @Override
-    public void WebSocket(String url, @Nullable String protocol) {
+    public void connect(String url, @Nullable String protocol, EventListener listener) {
+        this.eventListener = listener;
+        OkHttpClient okHttpClient = new OkHttpClient();
+
         Request wsRequest = new Request.Builder()
                 .url(url)
+                .addHeader("protocol", protocol)
                 .build();
 
         WebSocketCall.create(okHttpClient, wsRequest).enqueue(new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Request request, Response response) throws IOException {
                 ws = webSocket;
+                eventListener.onOpen();
             }
 
             @Override
             public void onMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
-
+                eventListener.onMessage(payload.readUtf8());
+                payload.close();
             }
 
             @Override
@@ -261,43 +258,60 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
 
             @Override
             public void onClose(int code, String reason) {
-
+                eventListener.onClose(code, reason);
             }
 
             @Override
             public void onFailure(IOException e) {
-
+                e.printStackTrace();
+                eventListener.onError(e.getMessage());
             }
         });
     }
 
     @Override
     public void send(String data) {
-
+        if (ws != null) {
+            try {
+                Buffer buffer = new Buffer().writeUtf8(data);
+                ws.sendMessage(WebSocket.PayloadType.TEXT, buffer.buffer());
+                buffer.flush();
+                buffer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                reportError(e.getMessage());
+            }
+        } else {
+            reportError("WebSocket is not ready");
+        }
     }
 
     @Override
     public void close(int code, String reason) {
-
+        if (ws != null) {
+            try {
+                ws.close(code, reason);
+            } catch (Exception e) {
+                e.printStackTrace();
+                reportError(e.getMessage());
+            }
+        }
     }
 
     @Override
-    public void onopen(JSCallback callback) {
-        this.onOpen = callback;
+    public void destroy() {
+        if (ws != null) {
+            try {
+                ws.close(1001, "CLOSE_GOING_AWAY");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    @Override
-    public void onmessage(JSCallback callback) {
-        this.onMessage = callback;
-    }
-
-    @Override
-    public void onclose(JSCallback callback) {
-        this.onClose = callback;
-    }
-
-    @Override
-    public void onerror(JSCallback callback) {
-
+    private void reportError(String message) {
+        if (eventListener != null) {
+            eventListener.onError(message);
+        }
     }
 }

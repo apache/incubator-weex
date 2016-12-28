@@ -211,7 +211,7 @@ import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
-import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapterFactory;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -224,7 +224,7 @@ public class InitConfig {
   private IWXDebugAdapter debugAdapter;
   private IWXStorageAdapter storageAdapter;
   private URIAdapter mURIAdapter;
-  private IWXWebSocketAdapter webSocketAdapter;
+  private IWXWebSocketAdapterFactory webSocketAdapterFactory;
   private String framework;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -258,8 +258,8 @@ public class InitConfig {
     return mURIAdapter;
   }
 
-  public IWXWebSocketAdapter getWebSocketAdapter() {
-    return webSocketAdapter;
+  public IWXWebSocketAdapterFactory getWebSocketAdapterFactory() {
+    return webSocketAdapterFactory;
   }
 
   private InitConfig() {
@@ -274,7 +274,7 @@ public class InitConfig {
     IWXStorageAdapter storageAdapter;
     URIAdapter mURIAdapter;
     String framework;
-    IWXWebSocketAdapter webSocketAdapter;
+    IWXWebSocketAdapterFactory webSocketAdapterFactory;
     public Builder(){
 
     }
@@ -319,8 +319,8 @@ public class InitConfig {
       return this;
     }
 
-    public Builder setWebSocketAdapter(IWXWebSocketAdapter adapter) {
-      this.webSocketAdapter = adapter;
+    public Builder setWebSocketAdapterFactory(IWXWebSocketAdapterFactory factory) {
+      this.webSocketAdapterFactory = factory;
       return this;
     }
 
@@ -334,7 +334,7 @@ public class InitConfig {
       config.storageAdapter = this.storageAdapter;
       config.framework=this.framework;
       config.mURIAdapter = this.mURIAdapter;
-      config.webSocketAdapter = this.webSocketAdapter;
+      config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       return config;
     }
   }
