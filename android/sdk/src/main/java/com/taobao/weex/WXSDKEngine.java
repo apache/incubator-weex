@@ -127,6 +127,7 @@ import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.appfram.pickers.WXPickersModule;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.storage.WXStorageModule;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
 import com.taobao.weex.bridge.ModuleFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
@@ -543,6 +544,10 @@ public class WXSDKEngine {
 
   public static IWXStorageAdapter getIWXStorageAdapter() {
     return WXSDKManager.getInstance().getIWXStorageAdapter();
+  }
+
+  public static IWXWebSocketAdapter getIWXWebSocketAdapter() {
+    return WXSDKManager.getInstance().getIWXWebSocketAdapter();
   }
 
 

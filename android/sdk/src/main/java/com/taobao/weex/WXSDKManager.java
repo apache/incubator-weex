@@ -129,6 +129,7 @@ package com.taobao.weex;
 
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.adapter.DefaultUriAdapter;
@@ -142,6 +143,7 @@ import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.storage.DefaultWXStorage;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
+import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.WXRefreshData;
@@ -177,6 +179,7 @@ public class WXSDKManager {
 
   private IWXStorageAdapter mIWXStorageAdapter;
   private URIAdapter mURIAdapter;
+  private IWXWebSocketAdapter mIWXWebSocketAdapter;
 
   private WXSDKManager() {
     mWXRenderManager = new WXRenderManager();
@@ -351,6 +354,7 @@ public class WXSDKManager {
     this.mIWXStorageAdapter = config.getStorageAdapter();
     this.mIWXUserTrackAdapter = config.getUtAdapter();
     this.mURIAdapter = config.getURIAdapter();
+    this.mIWXWebSocketAdapter = config.getWebSocketAdapter();
   }
 
   public IWXDebugAdapter getIWXDebugAdapter() {
@@ -368,5 +372,11 @@ public class WXSDKManager {
     return mIWXStorageAdapter;
   }
 
+  public @Nullable IWXWebSocketAdapter getIWXWebSocketAdapter() {
+    if (mIWXWebSocketAdapter == null) {
+
+    }
+    return mIWXWebSocketAdapter;
+  }
 
 }

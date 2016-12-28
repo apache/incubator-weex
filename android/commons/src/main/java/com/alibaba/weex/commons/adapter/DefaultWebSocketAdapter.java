@@ -202,140 +202,102 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.alibaba.weex.commons.adapter;
 
-import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXDebugAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.appfram.storage.IWXStorageAdapter;
+import android.support.annotation.Nullable;
+
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.ws.WebSocket;
+import com.squareup.okhttp.ws.WebSocketCall;
+import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
+import com.taobao.weex.bridge.JSCallback;
+
+import java.io.IOException;
+
+import okio.Buffer;
+import okio.BufferedSource;
 
 /**
- * Created by sospartan on 5/31/16.
+ * Created by moxun on 16/12/27.
  */
-public class InitConfig {
-  private IWXHttpAdapter httpAdapter;
-  private IDrawableLoader drawableLoader;
-  private IWXImgLoaderAdapter imgAdapter;
-  private IWXUserTrackAdapter utAdapter;
-  private IWXDebugAdapter debugAdapter;
-  private IWXStorageAdapter storageAdapter;
-  private URIAdapter mURIAdapter;
-  private IWXWebSocketAdapter webSocketAdapter;
-  private String framework;
 
-  public IWXHttpAdapter getHttpAdapter() {
-    return httpAdapter;
-  }
+public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
 
-  public IWXImgLoaderAdapter getImgAdapter() {
-    return imgAdapter;
-  }
+    private WebSocket ws;
+    private OkHttpClient okHttpClient;
+    private JSCallback onOpen;
+    private JSCallback onMessage;
+    private JSCallback onClose;
+    private JSCallback onError;
 
-  public IDrawableLoader getDrawableLoader() {
-    return drawableLoader;
-  }
+    private DefaultWebSocketAdapter() {
+        okHttpClient = new OkHttpClient();
+    }
 
-  public IWXUserTrackAdapter getUtAdapter() {
-    return utAdapter;
-  }
+    @Override
+    public void WebSocket(String url, @Nullable String protocol) {
+        Request wsRequest = new Request.Builder()
+                .url(url)
+                .build();
 
-  public IWXDebugAdapter getDebugAdapter(){
-    return debugAdapter;
-  }
-  public String getFramework() {
-    return framework;
-  }
+        WebSocketCall.create(okHttpClient, wsRequest).enqueue(new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Request request, Response response) throws IOException {
+                ws = webSocket;
+            }
 
-  public IWXStorageAdapter getStorageAdapter() {
-    return storageAdapter;
-  }
+            @Override
+            public void onMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
 
-  public URIAdapter getURIAdapter() {
-    return mURIAdapter;
-  }
+            }
 
-  public IWXWebSocketAdapter getWebSocketAdapter() {
-    return webSocketAdapter;
-  }
+            @Override
+            public void onPong(Buffer payload) {
 
-  private InitConfig() {
-  }
+            }
 
-  public static class Builder{
-    IWXHttpAdapter httpAdapter;
-    IWXImgLoaderAdapter imgAdapter;
-    IDrawableLoader drawableLoader;
-    IWXUserTrackAdapter utAdapter;
-    IWXDebugAdapter debugAdapter;
-    IWXStorageAdapter storageAdapter;
-    URIAdapter mURIAdapter;
-    String framework;
-    IWXWebSocketAdapter webSocketAdapter;
-    public Builder(){
+            @Override
+            public void onClose(int code, String reason) {
+
+            }
+
+            @Override
+            public void onFailure(IOException e) {
+
+            }
+        });
+    }
+
+    @Override
+    public void send(String data) {
 
     }
 
-    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
-      this.httpAdapter = httpAdapter;
-      return this;
+    @Override
+    public void close(int code, String reason) {
+
     }
 
-    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
-      this.imgAdapter = imgAdapter;
-      return this;
+    @Override
+    public void onopen(JSCallback callback) {
+        this.onOpen = callback;
     }
 
-    public Builder setDrawableLoader(IDrawableLoader drawableLoader){
-      this.drawableLoader=drawableLoader;
-      return this;
+    @Override
+    public void onmessage(JSCallback callback) {
+        this.onMessage = callback;
     }
 
-    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
-      this.utAdapter = utAdapter;
-      return this;
+    @Override
+    public void onclose(JSCallback callback) {
+        this.onClose = callback;
     }
 
-    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
-      this.debugAdapter=debugAdapter;
-      return this;
-    }
+    @Override
+    public void onerror(JSCallback callback) {
 
-    public Builder setStorageAdapter(IWXStorageAdapter storageAdapter) {
-      this.storageAdapter = storageAdapter;
-      return this;
     }
-
-    public Builder setURIAdapter(URIAdapter URIAdapter) {
-      mURIAdapter = URIAdapter;
-      return this;
-    }
-
-    public Builder setFramework(String framework){
-      this.framework=framework;
-      return this;
-    }
-
-    public Builder setWebSocketAdapter(IWXWebSocketAdapter adapter) {
-      this.webSocketAdapter = adapter;
-      return this;
-    }
-
-    public InitConfig build(){
-      InitConfig config =  new InitConfig();
-      config.httpAdapter = this.httpAdapter;
-      config.imgAdapter = this.imgAdapter;
-      config.drawableLoader = this.drawableLoader;
-      config.utAdapter = this.utAdapter;
-      config.debugAdapter=this.debugAdapter;
-      config.storageAdapter = this.storageAdapter;
-      config.framework=this.framework;
-      config.mURIAdapter = this.mURIAdapter;
-      config.webSocketAdapter = this.webSocketAdapter;
-      return config;
-    }
-  }
 }
