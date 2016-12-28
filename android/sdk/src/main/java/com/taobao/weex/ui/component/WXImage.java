@@ -383,6 +383,9 @@ public class WXImage extends WXComponent<ImageView> {
             if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
               size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
               size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
+            } else {
+              size.put("naturalWidth", 0);
+              size.put("naturalHeight", 0);
             }
 
             if (getDomObject() != null && containsEvent(Constants.Event.ONLOAD)) {
