@@ -32,7 +32,6 @@
     // Use XCTAssert and related functions to verify your tests produce the correct results.
 }
 
-
 - (void)testWXSDKManager {
     id bridgeMgr = [WXSDKManager bridgeMgr];
     XCTAssertNotNil(bridgeMgr);
