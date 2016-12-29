@@ -54,7 +54,7 @@
  * @param code service js code to invoke
  *
  */
-+ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript WithOptions:(NSDictionary *)options;
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options;
 
 /**
  * @abstract Registers a component for a given name, options and js code
