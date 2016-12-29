@@ -8,6 +8,7 @@ import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
+import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
@@ -46,6 +47,7 @@ public class WXApplication extends Application {
       WXSDKEngine.registerComponent("richtext", RichText.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
+      WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);

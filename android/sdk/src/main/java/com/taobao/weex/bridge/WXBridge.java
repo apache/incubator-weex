@@ -339,11 +339,11 @@ class WXBridge implements IWXBridge {
    * @return  the result
    */
   @Override
-  public String callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
+  public Object callNativeModule(String instanceId, String module, String method, byte [] arguments, byte [] options) {
 
     JSONArray argArray = JSON.parseArray(new String(arguments));
     Object object =  WXBridgeManager.getInstance().callNativeModule(instanceId,module,method,argArray,options);
-    return object != null ? WXJsonUtils.fromObjectToJSONString(object):"";
+    return new WXJSObject(object);
   }
 
   /**
