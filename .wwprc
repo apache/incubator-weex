@@ -27,6 +27,7 @@
     "event",
     "geolocation",
     "globalEvent",
+    "meta",
     "modal",
     "navigator",
     "pageInfo",
