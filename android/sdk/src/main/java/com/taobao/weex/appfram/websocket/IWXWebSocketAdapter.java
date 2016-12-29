@@ -219,7 +219,7 @@ public interface IWXWebSocketAdapter {
     interface EventListener {
         void onOpen();
         void onMessage(String data);
-        void onClose(int code, String reason);
+        void onClose(int code, String reason, boolean wasClean);
         void onError(String msg);
     }
 }

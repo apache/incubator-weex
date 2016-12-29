@@ -219,6 +219,11 @@ import java.util.Map;
 public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
 
     private static final String TAG = "WXWebSocketModule";
+    private static final String KEY_DATA = "data";
+    private static final String KEY_CODE = "code";
+    private static final String KEY_REASON = "reason";
+    private static final String KEY_WAS_CLEAN = "wasClean";
+
     private IWXWebSocketAdapter webSocketAdapter;
     private JSCallback onOpen;
     private JSCallback onMessage;
@@ -228,7 +233,7 @@ public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
         @Override
         public void onOpen() {
             if (onOpen != null) {
-                onOpen.invoke("onopen");
+                onOpen.invoke(new HashMap<>(0));
             }
         }
 
@@ -236,17 +241,18 @@ public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
         public void onMessage(String data) {
             if (onMessage != null) {
                 Map<String, String> msg = new HashMap<>(1);
-                msg.put("data", data);
+                msg.put(KEY_DATA, data);
                 onMessage.invokeAndKeepAlive(msg);
             }
         }
 
         @Override
-        public void onClose(int code, String reason) {
+        public void onClose(int code, String reason, boolean wasClean) {
             if (onClose != null) {
-                Map<String, Object> msg = new HashMap<>(2);
-                msg.put("code", code);
-                msg.put("reason", reason);
+                Map<String, Object> msg = new HashMap<>(3);
+                msg.put(KEY_CODE, code);
+                msg.put(KEY_REASON, reason);
+                msg.put(KEY_WAS_CLEAN, wasClean);
                 onClose.invoke(msg);
             }
         }
@@ -255,7 +261,7 @@ public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
         public void onError(String msg) {
             if (onError != null) {
                 Map<String, String> info = new HashMap<>(1);
-                info.put("data", msg);
+                info.put(KEY_DATA, msg);
                 onError.invokeAndKeepAlive(info);
             }
         }

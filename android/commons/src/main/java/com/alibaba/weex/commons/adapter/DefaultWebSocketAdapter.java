@@ -214,6 +214,7 @@ import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import okio.Buffer;
@@ -233,10 +234,13 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
         this.eventListener = listener;
         OkHttpClient okHttpClient = new OkHttpClient();
 
-        Request wsRequest = new Request.Builder()
-                .url(url)
-                .addHeader("protocol", protocol)
-                .build();
+        Request.Builder builder = new Request.Builder();
+
+        if (protocol != null) {
+            builder.addHeader("protocol", protocol);
+        }
+
+        Request wsRequest = builder.url(url).build();
 
         WebSocketCall.create(okHttpClient, wsRequest).enqueue(new WebSocketListener() {
             @Override
@@ -258,13 +262,17 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
 
             @Override
             public void onClose(int code, String reason) {
-                eventListener.onClose(code, reason);
+                eventListener.onClose(code, reason, true);
             }
 
             @Override
             public void onFailure(IOException e) {
                 e.printStackTrace();
-                eventListener.onError(e.getMessage());
+                if (e instanceof EOFException) {
+                    eventListener.onClose(1000, null, true);
+                } else {
+                    eventListener.onError(e.getMessage());
+                }
             }
         });
     }
@@ -277,7 +285,7 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
                 ws.sendMessage(WebSocket.PayloadType.TEXT, buffer.buffer());
                 buffer.flush();
                 buffer.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 reportError(e.getMessage());
             }
