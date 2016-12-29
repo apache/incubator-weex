@@ -319,7 +319,7 @@ $export$1.P = 8;   // proto
 $export$1.B = 16;  // bind
 $export$1.W = 32;  // wrap
 $export$1.U = 64;  // safe
-$export$1.R = 128; // real proto method for `library` 
+$export$1.R = 128; // real proto method for `library`
 var _export = $export$1;
 
 var toString$1 = {}.toString;
@@ -11190,6 +11190,9 @@ function requireModule (app, name) {
         {
           console.debug(("[JS Framework] callNativeModule " + name + "#" + methodName));
         }
+        nativeLog("--callNativeModule--name",name);
+        nativeLog("--callNativeModule--methodName",methodName);
+        nativeLog("--callNativeModule--args",args);
         return callNativeModule(app.id, name, methodName, args, {}, '-1')
       }
       return app.callTasks({

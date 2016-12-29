@@ -41,7 +41,7 @@ public class SyncTestModule extends WXModule {
         list.add("222");
         list.add("test");
         Map map = new HashMap();
-        map.put("11","test11");
+        map.put(11,"test11");
         map.put("22","test22");
         list.add(map);
         return list;

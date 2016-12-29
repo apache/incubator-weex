@@ -242,7 +242,7 @@ public class WXJSObject {
             type = String;
         } else if (object instanceof Object) {
             type = JSON;
-            data = WXJsonUtils.fromObjectToJSONString(object);
+            data = WXJsonUtils.fromObjectToJSONString(object,true);
         }
     }
 
