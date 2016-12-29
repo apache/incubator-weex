@@ -42,7 +42,11 @@ export function registerElement (type, methods) {
     XElement.prototype[methodName] = function (...args) {
       const taskCenter = getTaskCenter(this.docId)
       if (taskCenter) {
-        taskCenter.send('component', { ref: this.ref, component: type, method: methodName }, args)
+        return taskCenter.send('component', {
+          ref: this.ref,
+          component: type,
+          method: methodName
+        }, args)
       }
     }
   })
@@ -59,4 +63,3 @@ export function clearElementTypes () {
     delete elementTypes[type]
   }
 }
-
