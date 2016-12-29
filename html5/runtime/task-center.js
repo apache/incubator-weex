@@ -1,8 +1,12 @@
 let fallback = function () {}
 
+// The API of TaskCenter would be re-design.
 export class TaskCenter {
   constructor (id, sendTasks) {
-    this.instanceId = id
+    Object.defineProperty(this, 'instanceId', {
+      enumerable: true,
+      value: id
+    })
     fallback = sendTasks || function () {}
   }
 
@@ -14,9 +18,21 @@ export class TaskCenter {
         return this[action](this.instanceId, args)
       case 'component':
         return this.componentHandler(this.instanceId, ref, method, args, { component })
-      case 'module':
+      default:
         return this.moduleHandler(this.instanceId, module, method, args, {})
     }
+  }
+
+  callDOM (action, args) {
+    return this[action](this.instanceId, args)
+  }
+
+  callComponent (ref, method, args) {
+    return this.componentHandler(this.instanceId, ref, method, args, {})
+  }
+
+  callModule (module, method, args) {
+    return this.moduleHandler(this.instanceId, module, method, args, {})
   }
 }
 
