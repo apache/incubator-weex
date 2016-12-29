@@ -74,6 +74,8 @@
 		59D3CA471CFC3CC0008835DC /* WXSliderComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 59D3CA461CFC3CC0008835DC /* WXSliderComponent.m */; };
 		59D3CA4A1CFC3CE1008835DC /* NSTimer+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = 59D3CA481CFC3CE1008835DC /* NSTimer+Weex.h */; };
 		59D3CA4B1CFC3CE1008835DC /* NSTimer+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = 59D3CA491CFC3CE1008835DC /* NSTimer+Weex.m */; };
+		740451EA1E14BB26004157CB /* WXServiceFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 740451E81E14BB26004157CB /* WXServiceFactory.h */; };
+		740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 740451E91E14BB26004157CB /* WXServiceFactory.m */; };
 		7408C48E1CFB345D000BCCD0 /* WXComponent+Events.h in Headers */ = {isa = PBXBuildFile; fileRef = 7408C48C1CFB345D000BCCD0 /* WXComponent+Events.h */; };
 		7408C48F1CFB345D000BCCD0 /* WXComponent+Events.m in Sources */ = {isa = PBXBuildFile; fileRef = 7408C48D1CFB345D000BCCD0 /* WXComponent+Events.m */; };
 		740938EC1D3D075700DBB801 /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */; };
@@ -343,6 +345,8 @@
 		59D3CA461CFC3CC0008835DC /* WXSliderComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSliderComponent.m; sourceTree = "<group>"; };
 		59D3CA481CFC3CE1008835DC /* NSTimer+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Weex.h"; sourceTree = "<group>"; };
 		59D3CA491CFC3CE1008835DC /* NSTimer+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Weex.m"; sourceTree = "<group>"; };
+		740451E81E14BB26004157CB /* WXServiceFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXServiceFactory.h; sourceTree = "<group>"; };
+		740451E91E14BB26004157CB /* WXServiceFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXServiceFactory.m; sourceTree = "<group>"; };
 		7408C48C1CFB345D000BCCD0 /* WXComponent+Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+Events.h"; sourceTree = "<group>"; };
 		7408C48D1CFB345D000BCCD0 /* WXComponent+Events.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+Events.m"; sourceTree = "<group>"; };
 		740938EA1D3D026600DBB801 /* WXComponentTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXComponentTests.m; sourceTree = "<group>"; };
@@ -830,6 +834,8 @@
 		77D1611A1C02DD3C0010B15B /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				740451E81E14BB26004157CB /* WXServiceFactory.h */,
+				740451E91E14BB26004157CB /* WXServiceFactory.m */,
 				DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */,
 				DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */,
 				C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */,
@@ -1075,6 +1081,7 @@
 				59597F981D2A041700EE9317 /* WXDebugLoggerBridge.h in Headers */,
 				77D161241C02DDD10010B15B /* WXSDKInstance.h in Headers */,
 				74A4BAA61CB4F98300195969 /* WXStreamModule.h in Headers */,
+				740451EA1E14BB26004157CB /* WXServiceFactory.h in Headers */,
 				744BEA591D0520F300452B5D /* WXComponent+Layout.h in Headers */,
 				74A4BA5B1CABBBD000195969 /* WXDebugTool.h in Headers */,
 				2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */,
@@ -1370,6 +1377,7 @@
 				DCF087621DCAE161005CD6EB /* WXInvocationConfig.m in Sources */,
 				77D161311C02DE4E0010B15B /* WXComponent.m in Sources */,
 				74862F7A1E02B88D00B7A041 /* JSValue+Weex.m in Sources */,
+				740451EB1E14BB26004157CB /* WXServiceFactory.m in Sources */,
 				77E659DB1C07F594008B8775 /* WXDomModule.m in Sources */,
 				D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */,
 				594C28921CF9E61A009793A4 /* WXAnimationModule.m in Sources */,
