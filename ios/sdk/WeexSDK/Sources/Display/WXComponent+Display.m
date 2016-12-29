@@ -16,6 +16,7 @@
 #import "WXThreadSafeCounter.h"
 #import "UIBezierPath+Weex.h"
 #import "WXRoundedRect.h"
+#import "WXSDKInstance.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -435,10 +436,45 @@ do {\
     }\
 } while (0);
     
+// TODO: refactor this hopefully
+#define WX_CHECK_BORDER_PROP_PIXEL(prop, direction1, direction2, direction3, direction4)\
+do {\
+    BOOL needsDisplay = NO; \
+    NSString *styleProp= WX_NSSTRING(WX_CONCAT(border, prop));\
+    if (styles[styleProp]) {\
+        _border##direction1##prop = _border##direction2##prop = _border##direction3##prop = _border##direction4##prop = [WXConvert WXPixelType:styles[styleProp] scaleFactor:self.weexInstance.pixelScaleFactor];\
+    needsDisplay = YES;\
+    }\
+    NSString *styleDirection1Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction1, prop));\
+    if (styles[styleDirection1Prop]) {\
+        _border##direction1##prop = [WXConvert WXPixelType:styles[styleDirection1Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection2Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction2, prop));\
+    if (styles[styleDirection2Prop]) {\
+        _border##direction2##prop = [WXConvert WXPixelType:styles[styleDirection2Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection3Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction3, prop));\
+    if (styles[styleDirection3Prop]) {\
+        _border##direction3##prop = [WXConvert WXPixelType:styles[styleDirection3Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection4Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction4, prop));\
+    if (styles[styleDirection4Prop]) {\
+        _border##direction4##prop = [WXConvert WXPixelType:styles[styleDirection4Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    if (needsDisplay && updating) {\
+        [self setNeedsDisplay];\
+    }\
+} while (0);
+    
+    
     WX_CHECK_BORDER_PROP(Style, Top, Left, Bottom, Right, WXBorderStyle)
     WX_CHECK_BORDER_PROP(Color, Top, Left, Bottom, Right, UIColor)
-    WX_CHECK_BORDER_PROP(Width, Top, Left, Bottom, Right, WXPixelType)
-    WX_CHECK_BORDER_PROP(Radius, TopLeft, TopRight, BottomLeft, BottomRight, WXPixelType)
+    WX_CHECK_BORDER_PROP_PIXEL(Width, Top, Left, Bottom, Right)
+    WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
     if (updating) {
         BOOL nowNeedsDrawBorder = [self _needsDrawBorder];

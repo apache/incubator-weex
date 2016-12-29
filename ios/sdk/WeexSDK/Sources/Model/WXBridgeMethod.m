@@ -45,7 +45,7 @@
     }
     
     NSArray *arguments = _arguments;
-    if (signature.numberOfArguments - 2 != arguments.count) {
+    if (signature.numberOfArguments - 2 < arguments.count) {
         NSString *errorMessage = [NSString stringWithFormat:@"%@, the parameters in calling method [%@] and registered method [%@] are not consistent！", target, _methodName, NSStringFromSelector(selector)];
         WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
         return nil;
@@ -83,38 +83,5 @@
     
     return invocation;
 }
-//
-//- (instancetype)initWihData:(NSDictionary *)data
-//{
-//    self = [super init];
-//    if(self){
-//        _module = [data valueForKey:@"module"];
-//        _method = [data valueForKey:@"method"];
-//        _arguments = [data valueForKey:@"args"];
-//        if (data[@"component"]) {
-//            self.targets = [NSMutableDictionary new];
-//            [self.targets setValue:data[@"component"] forKey:@"component"];
-//            [self.targets setValue:data[@"ref"]?:@"" forKey:@"ref"];
-//        }
-//    }
-//    return self;
-//}
-//
-//- (instancetype)initWithInstance:(NSString *)instance data:(NSMutableDictionary *)data
-//{
-//    self = [self initWihData:data];
-//    if (self) {
-//        _instance = instance;
-//    }
-//    return self;
-//}
-//
-//- (NSDictionary *)dataDesc
-//{
-//    NSString *module = _module ? : @"";
-//    NSString *method = _method ? : @"";
-//    NSArray *arguments = _arguments ? : @[];
-//    return @{@"module":module, @"method":method, @"args":arguments};
-//}
 
 @end

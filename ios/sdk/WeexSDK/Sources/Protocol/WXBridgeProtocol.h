@@ -24,6 +24,12 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)executeJSFramework:(NSString *)frameworkScript;
 
 /**
+ * Executes the js code in javascript engine
+ * You can do some setup in this method
+ */
+- (void)executeJavascript:(NSString *)script;
+
+/**
  * Executes global js method with specific arguments
  */
 - (JSValue *)callJSMethod:(NSString *)method args:(NSArray*)args;

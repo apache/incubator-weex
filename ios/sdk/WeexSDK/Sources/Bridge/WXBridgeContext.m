@@ -50,6 +50,8 @@ _Pragma("clang diagnostic pop") \
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
 @property (nonatomic, strong) NSMutableArray *methodQueue;
+// store template service
+@property (nonatomic, strong) NSMutableArray *jsServiceQueue;
 
 @end
 
@@ -61,6 +63,7 @@ _Pragma("clang diagnostic pop") \
     if (self) {
         _methodQueue = [NSMutableArray new];
         _frameworkLoadFinished = NO;
+        _jsServiceQueue = [NSMutableArray new];
     }
     return self;
 }
@@ -291,6 +294,8 @@ _Pragma("clang diagnostic pop") \
         //the JSFramework has been load successfully.
         self.frameworkLoadFinished = YES;
         
+        [self executeAllJsService];
+        
         JSValue *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
         if (frameworkVersion && [frameworkVersion isString]) {
             [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
@@ -324,6 +329,37 @@ _Pragma("clang diagnostic pop") \
     
     [sendQueue addObject:method];
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
+}
+
+- (void)executeAllJsService
+{
+    for(NSDictionary *service in _jsServiceQueue) {
+        NSString *script = [service valueForKey:@"script"];
+        NSString *name = [service valueForKey:@"name"];
+        [self executeJsService:script withName:name];
+    }
+    
+    [_jsServiceQueue removeAllObjects];
+}
+
+- (void)executeJsService:(NSString *)script withName:(NSString *)name
+{
+    if(self.frameworkLoadFinished) {
+        WXAssert(script, @"param script required!");
+        [self.jsBridge executeJavascript:script];
+        
+        if ([self.jsBridge exception]) {
+            NSString *message = [NSString stringWithFormat:@"JSService executes error: %@", [self.jsBridge exception]];
+            WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, message);
+        } else {
+            // success
+        }
+    }else {
+        [_jsServiceQueue addObject:@{
+                                     @"name": name,
+                                     @"script": script
+                                     }];
+    }
 }
 
 - (void)registerModules:(NSDictionary *)modules
@@ -414,6 +450,5 @@ _Pragma("clang diagnostic pop") \
         [self performSelector:@selector(_sendQueueLoop) withObject:nil];
     }
 }
-
 
 @end

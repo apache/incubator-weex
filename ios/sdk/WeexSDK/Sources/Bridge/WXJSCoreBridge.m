@@ -140,6 +140,12 @@
     _jsContext[@"callNative"] = callNativeBlock;
 }
 
+- (void)executeJavascript:(NSString *)script
+{
+    WXAssertParam(script);
+    [_jsContext evaluateScript:script];
+}
+
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement
 {
     id callAddElementBlock = ^(JSValue *instanceId, JSValue *ref, JSValue *element, JSValue *index, JSValue *ifCallback) {
@@ -169,7 +175,8 @@
         WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, moduleNameString, methodNameString, argsArray);
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
-        return [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
+        JSValue *returnValue = [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
+        return returnValue;
     };
 }
 
