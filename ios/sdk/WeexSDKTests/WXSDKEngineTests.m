@@ -97,10 +97,6 @@
 }
 
 - (void)testComponentFactory {
-    
-    Class cls = [WXComponentFactory classWithComponentName:@"abc"];
-    XCTAssertNil(cls);
-
     NSDictionary *component = @{@"name": @"div", @"class": @"WXComponent"};
     [WXComponentFactory registerComponents: [NSArray arrayWithObjects:component, nil]];
     
@@ -110,7 +106,7 @@
     XCTAssertEqualObjects(config[@"name"], @"div");
     XCTAssertEqualObjects(config[@"clazz"], @"WXComponent");
     
-    cls = [WXComponentFactory classWithComponentName:@"abc"];
+    Class cls = [WXComponentFactory classWithComponentName:@"abc"];
     XCTAssertEqualObjects(NSStringFromClass(cls), @"WXComponent");
     
     [WXComponentFactory unregisterAllComponents];
