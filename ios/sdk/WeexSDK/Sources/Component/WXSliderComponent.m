@@ -319,6 +319,7 @@
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
 @property (nonatomic, strong) NSMutableArray *childrenView;
+@property (nonatomic, assign) BOOL scrollable;
 
 @end
 
@@ -350,6 +351,8 @@
             _index = [attributes[@"index"] integerValue];
         }
         
+        _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
+
         if (attributes[@"offsetXAccuracy"]) {
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
@@ -372,6 +375,7 @@
     _sliderView.delegate = self;
     _sliderView.scrollView.pagingEnabled = YES;
     _sliderView.exclusiveTouch = YES;
+    _sliderView.scrollView.scrollEnabled = _scrollable;
     
     if (_autoPlay) {
         [self _startAutoPlayTimer];
@@ -477,6 +481,11 @@
         
         self.currentIndex = _index;
         [_sliderView scroll2ItemView:self.currentIndex animated:YES];
+    }
+    
+    if (attributes[@"scrollable"]) {
+        _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
+        ((WXSliderView *)self.view).scrollView.scrollEnabled = _scrollable;
     }
     
     if (attributes[@"offsetXAccuracy"]) {

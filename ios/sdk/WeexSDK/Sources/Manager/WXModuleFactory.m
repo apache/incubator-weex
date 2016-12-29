@@ -83,24 +83,27 @@ static WXModuleFactory *_sharedInstance = nil;
     return NSClassFromString(config.clazz);
 }
 
-- (SEL)_methodWithModuleName:(NSString *)name withMethod:(NSString *)method
+- (SEL)_selectorWithModuleName:(NSString *)name methodName:(NSString *)method isSync:(BOOL *)isSync
 {
     WXAssert(name && method, @"Fail to find selector with module name and method, please check if the parameters are correct ！");
     
-    NSString *selStr = nil; SEL selector = nil;
+    NSString *selectorString = nil;;
     WXModuleConfig *config = nil;
     
     [_moduleLock lock];
     config = [_moduleMap objectForKey:name];
-    if (config.methods) {
-        selStr = [config.methods objectForKey:method];
+    if (config.syncMethods) {
+        selectorString = [config.syncMethods objectForKey:method];
+        if (selectorString && isSync) {
+            *isSync = YES;
+        }
     }
-    if (selStr) {
-        selector = NSSelectorFromString(selStr);
+    if (!selectorString && config.asyncMethods) {
+        selectorString = [config.asyncMethods objectForKey:method];;
     }
     [_moduleLock unlock];
     
-    return selector;
+    return NSSelectorFromString(selectorString);
 }
 
 - (NSString *)_registerModule:(NSString *)name withClass:(Class)clazz
@@ -131,7 +134,8 @@ static WXModuleFactory *_sharedInstance = nil;
     void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         [methods addObject:mKey];
     };
-    [config.methods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.syncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
     [_moduleLock unlock];
     
     return dict;
@@ -160,9 +164,9 @@ static WXModuleFactory *_sharedInstance = nil;
     return [[self _sharedInstance] _classWithModuleName:name];
 }
 
-+ (SEL)methodWithModuleName:(NSString *)name withMethod:(NSString *)method
++ (SEL)selectorWithModuleName:(NSString *)name methodName:(NSString *)method isSync:(BOOL *)isSync
 {
-    return [[self _sharedInstance] _methodWithModuleName:name withMethod:method];
+    return [[self _sharedInstance] _selectorWithModuleName:name methodName:method isSync:isSync];
 }
 
 + (NSString *)registerModule:(NSString *)name withClass:(Class)clazz

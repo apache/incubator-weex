@@ -7,16 +7,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import <WeexSDK/WXModuleProtocol.h>
 
-extern bool WXTransform3DApproximateToTransform(CATransform3D a,CATransform3D b);
-
-extern bool WXRectApproximateToRect(CGRect a,CGRect b);
-
-@interface TestSupportUtils : NSObject
-/**
- *设置等待时间
- */
-+(void)waitSecs:(NSTimeInterval)secs;
+@interface WXSyncTestModule : NSObject <WXModuleProtocol>
 
 @end
