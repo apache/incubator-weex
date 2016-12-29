@@ -373,7 +373,7 @@ public class WXSDKEngine {
       registerModule("globalEvent",WXGlobalEventModule.class);
       registerModule("picker", WXPickersModule.class);
       registerModule("meta", WXMetaModule.class,true);
-      registerModule("webSocket", WXWebSocketModule.class);
+      registerModule("WebSocket", WXWebSocketModule.class);
 
 
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
