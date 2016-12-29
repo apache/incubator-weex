@@ -82,12 +82,6 @@
 - (void)unregisterService:(NSString *)name;
 
 /**
- *  Execute JS Method
- *  @param method    :   object of bridge method
- **/
-- (void)executeJsMethod:(WXBridgeMethod *)method;
-
-/**
  *  Register Modules Method
  *  @param modules   :   module list
  **/
@@ -98,8 +92,6 @@
  *  @param components:   component list
  **/
 - (void)registerComponents:(NSArray* )components;
-
-- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params DEPRECATED_MSG_ATTRIBUTE("Use fireEvent:ref:type:params:domChanges: method instead.");
 
 /**
  *  FireEvent
@@ -152,5 +144,8 @@
  *  Reset Environment
  **/
 - (void)resetEnvironment;
+
+- (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params DEPRECATED_MSG_ATTRIBUTE("Use fireEvent:ref:type:params:domChanges: method instead.");
+- (void)executeJsMethod:(WXBridgeMethod *)method DEPRECATED_MSG_ATTRIBUTE();
 
 @end

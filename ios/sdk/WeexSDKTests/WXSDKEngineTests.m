@@ -57,7 +57,7 @@
     Class cls = [WXModuleFactory classWithModuleName:@"stream"];
     XCTAssertEqualObjects(NSStringFromClass(cls), @"WXStreamModule");
     
-    SEL selector = [WXModuleFactory methodWithModuleName:@"stream" withMethod:@"fetch"];
+    SEL selector = [WXModuleFactory selectorWithModuleName:@"stream" methodName:@"fetch" isSync:nil];
     XCTAssertEqualObjects(NSStringFromSelector(selector), @"fetch:callback:progressCallback:");
 }
 
