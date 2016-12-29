@@ -14,6 +14,8 @@
 #import "WXCallJSMethod.h"
 #import "WXSDKManager.h"
 #import "WXServiceFactory.h"
+#import "WXResourceRequest.h"
+#import "WXResourceLoader.h"
 
 @interface WXBridgeManager ()
 
@@ -200,6 +202,25 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     WXPerformBlockOnBridgeThread(^(){
         [weakSelf.bridgeCtx executeJsMethod:method];
     });
+}
+
+-(void)registerService:(NSString *)name withServiceUrl:(NSURL *)serviceScriptUrl withOptions:(NSDictionary *)options
+{
+    if (!name || !serviceScriptUrl || !options) return;
+    __weak typeof(self) weakSelf = self;
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:serviceScriptUrl resourceType:WXResourceTypeServiceBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
+    WXResourceLoader *serviceBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
+    serviceBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        NSString *jsServiceString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        [strongSelf registerService:name withService:jsServiceString withOptions:options];
+    };
+    
+    serviceBundleLoader.onFailed = ^(NSError *loadError) {
+        WXLogError(@"No script URL found");
+    };
+    
+    [serviceBundleLoader start];
 }
 
 - (void)registerService:(NSString *)name withService:(NSString *)serviceScript withOptions:(NSDictionary *)options
