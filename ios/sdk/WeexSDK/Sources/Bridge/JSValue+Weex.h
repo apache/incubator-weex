@@ -6,11 +6,10 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import <Foundation/Foundation.h>
-#import "WXBridgeMethod.h"
+#import <JavaScriptCore/JavaScriptCore.h>
 
-@interface WXModuleManager : NSObject
+@interface JSValue (Weex)
 
-- (void)dispatchMethod:(WXBridgeMethod *)method;
++ (JSValue *)wx_valueWithReturnValueFromInvocation:(NSInvocation *)invocation inContext:(JSContext *)context;
 
 @end
