@@ -161,6 +161,7 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     _inputView = [[WXTextInputView alloc] init];
     _datePickerManager = [[WXDatePickerManager alloc] init];
+    _datePickerManager.delegate = self;
     return _inputView;
 }
 
