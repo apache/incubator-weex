@@ -266,6 +266,11 @@ public class WXAnimationModule extends WXModule {
     if(component == null){
       return;
     }
+    if (component.getHostView() == null) {
+      AnimationHolder holder = new AnimationHolder(animationBean, callback);
+      component.postAnimation(holder);
+      return;
+    }
     try {
       Animator animator = createAnimator(animationBean, component.getHostView(),mWXSDKInstance.getViewPortWidth());
       if (animator != null) {
@@ -399,6 +404,21 @@ public class WXAnimationModule extends WXModule {
       }
     }
     return null;
+  }
+
+  //add by moxun on 12/26/2016
+  public static class AnimationHolder {
+    private WXAnimationBean wxAnimationBean;
+    private String callback;
+
+    public void execute(WXSDKInstance mInstance, WXComponent component) {
+      WXAnimationModule.startAnimation(mInstance, component, wxAnimationBean, callback);
+    }
+
+    private AnimationHolder(WXAnimationBean wxAnimationBean, String callback) {
+      this.wxAnimationBean = wxAnimationBean;
+      this.callback = callback;
+    }
   }
 
 }

@@ -134,6 +134,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -156,6 +157,7 @@ import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
+import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -210,6 +212,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private List<OnFocusChangeListener> mFocusChangeListeners;
   private String mCurrentRef;
   private Set<String> mAppendEvents = new HashSet<>();
+  private WXAnimationModule.AnimationHolder mAnimationHolder;
+
+  //Holding the animation bean when component is uninitialized
+  public void postAnimation(WXAnimationModule.AnimationHolder holder) {
+    this.mAnimationHolder = holder;
+  }
 
   private OnClickListener mClickEventListener = new OnClickListener() {
     @Override
@@ -905,9 +913,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   /**
-   * After view init.
+   * Called after host view init. <br>
+   * Any overriding methods should invoke this method at the right time, to ensure the cached animation can be triggered correctly.
+   * (the animation will be cached when {@link #isLazy()} is true)
+   * @param host the host view
    */
-  protected void onHostViewInitialized(T host){}
+  @CallSuper
+  protected void onHostViewInitialized(T host){
+    if (mAnimationHolder != null) {
+      //Performs cached animation
+      mAnimationHolder.execute(mInstance, this);
+    }
+  }
 
   public T getHostView() {
     return mHost;
@@ -1055,6 +1072,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
+          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
           getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));

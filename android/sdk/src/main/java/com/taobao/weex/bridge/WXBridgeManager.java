@@ -284,6 +284,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String METHOD_FIRE_EVENT = "fireEvent";
   public static final String METHOD_CALLBACK = "callback";
   public static final String METHOD_REFRESH_INSTANCE = "refreshInstance";
+  public static final String METHOD_NOTIFY_TRIM_MEMORY = "notifyTrimMemory";
 
   public static final String KEY_METHOD = "method";
   public static final String KEY_ARGS = "args";
@@ -1276,6 +1277,18 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     Map<String,Object> domMap=new HashMap<>();
     domMap.put(WXDomModule.WXDOM,WXDomModule.METHODS);
     registerModules(domMap);
+  }
+
+  public void notifyTrimMemory() {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        if (!isJSFrameworkInit())
+          return;
+
+        invokeExecJS("", null, METHOD_NOTIFY_TRIM_MEMORY, new WXJSObject[0]);
+      }
+    });
   }
 
 }
