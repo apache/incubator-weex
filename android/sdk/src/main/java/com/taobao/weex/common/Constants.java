@@ -386,6 +386,7 @@ public class Constants {
     String CHANGE = "change";
     String ONPULLING_DOWN = "pullingdown";
     String SCROLL = "scroll";
+    String BACKPRESSED = "backpressed";
   }
 
   public interface Scheme {
