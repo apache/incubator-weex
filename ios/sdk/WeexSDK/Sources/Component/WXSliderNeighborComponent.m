@@ -1683,7 +1683,11 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 - (UIView *)sliderNeighbor:(WXSliderNeighborView *)sliderNeighbor viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
     
     if (!view) {
-        view = self.items[index];
+        if (index < [self.items count]) {
+            view = self.items[index];
+        }else {
+            return nil;
+        }
     } else {
         view.tag = 1;
     }
