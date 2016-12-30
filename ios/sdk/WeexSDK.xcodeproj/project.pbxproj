@@ -127,8 +127,6 @@
 		7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 746319281C71B92600EFEBD4 /* WXModalUIModule.m */; };
 		7469869F1C4E2C000054A57E /* NSArray+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = 7469869D1C4E2C000054A57E /* NSArray+Weex.h */; };
 		746986A01C4E2C010054A57E /* NSArray+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = 7469869E1C4E2C000054A57E /* NSArray+Weex.m */; };
-		746A2F3F1DF808E6004719D0 /* WXLocationModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 746A2F3D1DF808E6004719D0 /* WXLocationModule.h */; };
-		746A2F401DF808E6004719D0 /* WXLocationModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 746A2F3E1DF808E6004719D0 /* WXLocationModule.m */; };
 		747A787C1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h in Headers */ = {isa = PBXBuildFile; fileRef = 747A787A1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h */; };
 		747A787D1D1BAAC900DED9D0 /* WXComponent+ViewManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = 747A787B1D1BAAC900DED9D0 /* WXComponent+ViewManagement.m */; };
 		74862F791E02B88D00B7A041 /* JSValue+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = 74862F771E02B88D00B7A041 /* JSValue+Weex.h */; };
@@ -397,8 +395,6 @@
 		7469869B1C4DEAC20054A57E /* libicucore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.tbd; path = usr/lib/libicucore.tbd; sourceTree = SDKROOT; };
 		7469869D1C4E2C000054A57E /* NSArray+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+Weex.h"; sourceTree = "<group>"; };
 		7469869E1C4E2C000054A57E /* NSArray+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Weex.m"; sourceTree = "<group>"; };
-		746A2F3D1DF808E6004719D0 /* WXLocationModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXLocationModule.h; sourceTree = "<group>"; };
-		746A2F3E1DF808E6004719D0 /* WXLocationModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXLocationModule.m; sourceTree = "<group>"; };
 		747A787A1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+ViewManagement.h"; sourceTree = "<group>"; };
 		747A787B1D1BAAC900DED9D0 /* WXComponent+ViewManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+ViewManagement.m"; sourceTree = "<group>"; };
 		74862F771E02B88D00B7A041 /* JSValue+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JSValue+Weex.h"; sourceTree = "<group>"; };
@@ -960,8 +956,6 @@
 				D362F94E1C83EDA20003F546 /* WXWebViewModule.m */,
 				D334510A1D3E19B80083598A /* WXCanvasModule.h */,
 				D334510B1D3E19B80083598A /* WXCanvasModule.m */,
-				746A2F3D1DF808E6004719D0 /* WXLocationModule.h */,
-				746A2F3E1DF808E6004719D0 /* WXLocationModule.m */,
 				74BB5FB71DFEE81A004FC3DF /* WXMetaModule.h */,
 				74BB5FB81DFEE81A004FC3DF /* WXMetaModule.m */,
 			);
@@ -1062,7 +1056,6 @@
 				7469869F1C4E2C000054A57E /* NSArray+Weex.h in Headers */,
 				74CC7A201C2BF9DC00829368 /* WXListComponent.h in Headers */,
 				74FD6E041C7C0E9600DBEB6D /* WXScrollerProtocol.h in Headers */,
-				746A2F3F1DF808E6004719D0 /* WXLocationModule.h in Headers */,
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
 				59D3CA411CF9ED57008835DC /* Layout.h in Headers */,
@@ -1439,7 +1432,6 @@
 				D33451091D3E19480083598A /* WXCanvasComponent.m in Sources */,
 				74A4BA971CB365D100195969 /* WXAppConfiguration.m in Sources */,
 				59A583091CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m in Sources */,
-				746A2F401DF808E6004719D0 /* WXLocationModule.m in Sources */,
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
