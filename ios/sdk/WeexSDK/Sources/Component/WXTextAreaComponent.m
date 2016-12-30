@@ -393,11 +393,11 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -427,10 +427,8 @@ WX_EXPORT_METHOD(@selector(blur))
     }else{
         [self setPlaceholderAttributedString];
     }
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
-        }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
     }
 }
 
@@ -467,7 +465,8 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect newFrame = _placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.y = 6;
+    newFrame.origin.x = 4; // the cursor origin.x
+    newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }

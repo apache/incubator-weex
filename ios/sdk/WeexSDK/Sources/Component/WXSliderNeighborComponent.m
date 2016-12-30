@@ -1393,9 +1393,11 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) NSInteger currentIndex;
 @property (nonatomic) CGRect itemRect;
+@property (nonatomic, assign) BOOL scrollable;
+
 @end
 
-#define DEFAULT_NEIGHBOR_SCALE 0.8
+#define DEFAULT_NEIGHBOR_ITEM_SCALE 0.8
 #define DEFAULT_CURRENT_ITEM_SCALE 0.9
 #define DEFAULT_NEIGHBOR_ALPHA 0.6
 #define DEFAULT_ANIMATION_DURATION 0.3
@@ -1407,17 +1409,16 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         _sliderChangeEvent = NO;
-        _sliderView = [[WXSliderNeighborView alloc] init];
-        _sliderView.delegate = self;
-        _sliderView.dataSource = self;
         _interval = 3000;
         _items = [NSMutableArray array];
         _itemRect = CGRectNull;
         self->neighborAlpha = DEFAULT_NEIGHBOR_ALPHA;
-        self->neighborScale = DEFAULT_NEIGHBOR_SCALE;
+        self->neighborScale = DEFAULT_NEIGHBOR_ITEM_SCALE;
         self->currentItemScale = DEFAULT_CURRENT_ITEM_SCALE;
         self->neighborSpace = [WXConvert WXPixelType:@(DEFAULT_NEIGHBOR_SPACE) scaleFactor:self.weexInstance.pixelScaleFactor];
+        _scrollable = YES;
         [self setAttributes:attributes];
+    
     }
     self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
     
@@ -1429,6 +1430,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 - (UIView *)loadView
 {
+    _sliderView = [[WXSliderNeighborView alloc] init];
     return _sliderView;
 }
 
@@ -1454,6 +1456,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     _sliderView.delegate = self;
     _sliderView.dataSource = self;
     _sliderView.contentView.clipsToBounds = YES;
+    _sliderView.scrollEnabled = _scrollable;
     if (_autoPlay) {
         [self _startAutoPlayTimer];
     } else {
@@ -1548,6 +1551,10 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
     }
     if (attributes[@"neighborSpace"]) {
         [self setNeighborSpace:attributes];
+    }
+    if (attributes[@"scrollable"]) {
+        _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
+        ((WXSliderNeighborView *)self.view).scrollEnabled = _scrollable;
     }
 }
 
@@ -1743,7 +1750,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
             currentView.transform = transfrom;
             transfrom = CGAffineTransformIdentity;
             if (fabs(strongSelf->neighborScale) <= CGFLOAT_MIN) {
-                strongSelf->neighborScale = DEFAULT_NEIGHBOR_SCALE;
+                strongSelf->neighborScale = DEFAULT_NEIGHBOR_ITEM_SCALE;
             }
             
             CGFloat tx = 0.5*_itemRect.size.width*((1-self->neighborScale)+(1-0.9))-self->neighborSpace;

@@ -8,9 +8,10 @@
 
 #import <JavaScriptCore/JavaScriptCore.h>
 
-typedef NSInteger (^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
-typedef NSInteger (^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
-
+typedef NSInteger(^WXJSCallNative)(NSString *instance, NSArray *tasks, NSString *callback);
+typedef NSInteger(^WXJSCallAddElement)(NSString *instanceId,  NSString *parentRef, NSDictionary *elementData, NSInteger index);
+typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
+typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
 
 @protocol WXBridgeProtocol <NSObject>
 
@@ -46,13 +47,24 @@ typedef NSInteger (^WXJSCallAddElement)(NSString *instanceId,  NSString *parentR
 @optional
 
 /**
+ * Called when garbage collection is wanted by sdk.
+ */
+- (void)garbageCollect;
+
+/**
  * Register callback when addElement tasks occur
  */
 - (void)registerCallAddElement:(WXJSCallAddElement)callAddElement;
 
 /**
- * Called when garbage collection is wanted by sdk.
+ * Register callback for global js function `callNativeModule`
  */
-- (void)garbageCollect;
+- (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock;
+
+/**
+ * Register callback for global js function `callNativeComponent`
+ */
+- (void)registerCallNativeComponent:(WXJSCallNativeComponent)callNativeComponentBlock;
+
 
 @end
