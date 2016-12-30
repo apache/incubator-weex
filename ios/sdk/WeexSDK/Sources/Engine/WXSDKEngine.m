@@ -10,6 +10,7 @@
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
+#import "WXBridgeManager.h"
 
 #import "WXAppConfiguration.h"
 #import "WXResourceRequestHandlerDefaultImpl.h"
@@ -114,6 +115,23 @@
     } else {
         [[WXSDKManager bridgeMgr] registerComponents:@[dict]];
     }
+}
+
+
+# pragma mark Service Register
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+}
+
++ (void)unregisterService:(NSString *)name
+{
+    [[WXSDKManager bridgeMgr] unregisterService:name];
 }
 
 # pragma mark Handler Register

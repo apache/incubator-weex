@@ -45,6 +45,38 @@
 + (void)registerComponent:(NSString *)name withClass:(Class)clazz withProperties:(NSDictionary *)properties;
 
 /**
+ * @abstract Registers a component for a given name, options and js code
+ *
+ * @param name The service name to register
+ *
+ * @param options The service options to register
+ *
+ * @param code service js code to invoke
+ *
+ */
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options;
+
+/**
+ * @abstract Registers a component for a given name, options and js url
+ *
+ * @param name The service name to register
+ *
+ * @param options The service options to register
+ *
+ * @param url The service url to register
+ *
+ */
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options;
+
+/**
+ * @abstract Registers a component for a given name, options and js code
+ *
+ * @param name The name of register service
+ *
+ */
++ (void)unregisterService:(NSString *)name;
+
+/**
  * @abstract Registers a handler for a given handler instance and specific protocol
  *
  * @param handler The handler instance to register
@@ -53,6 +85,7 @@
  *
  */
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
+
 
 /**
  * @abstract Returns a given handler instance for specific protocol
