@@ -265,8 +265,10 @@ public class WXViewUtils {
     } else {
       return View.generateViewId();
     }
-
   }
+
+  private static int mScreenWidth;
+  private static int mScreenHeight;
 
 
   public static int getWeexHeight(String instanceId){
@@ -283,29 +285,7 @@ public class WXViewUtils {
     return -3;
   }
 
-  @Deprecated
-  public static int getScreenHeight() {
-    if(WXEnvironment.sApplication!=null){
-      return WXEnvironment.sApplication.getResources()
-              .getDisplayMetrics()
-              .heightPixels;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-  }
 
-  public static int getScreenHeight(Context cxt) {
-    if(cxt!=null){
-      return cxt.getResources().getDisplayMetrics().heightPixels;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
-
-  }
 
   public static int getWeexWidth(String instanceId){
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
@@ -323,40 +303,40 @@ public class WXViewUtils {
 
   @Deprecated
   public static int getScreenWidth( ) {
-    if(WXEnvironment.sApplication!=null) {
-      int width = WXEnvironment.sApplication.getResources().getDisplayMetrics().widthPixels;
-
-      if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = WXEnvironment.sApplication.getResources()
-                .getDisplayMetrics()
-                .heightPixels;
-        width = height > width ?width:height;
-      }
-      return width;
-    }
-    if(WXEnvironment.isApkDebugable()){
-      throw new WXRuntimeException("Error Context is null When getScreenHeight");
-    }
-    return 0;
+    return getScreenWidth(WXEnvironment.sApplication);
   }
 
   public static int getScreenWidth(Context ctx) {
     if(ctx!=null){
       Resources res = ctx.getResources();
-      int width = res.getDisplayMetrics().widthPixels;
+      mScreenWidth = res.getDisplayMetrics().widthPixels;
 
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
-        int height = res
+        mScreenHeight = res
                 .getDisplayMetrics()
                 .heightPixels;
-        width = height > width ?width:height;
+        mScreenWidth = mScreenHeight > mScreenWidth ? mScreenWidth : mScreenHeight;
       }
-      return width;
-    }
-    if(WXEnvironment.isApkDebugable()){
+    } else if(WXEnvironment.isApkDebugable()){
       throw new WXRuntimeException("Error Context is null When getScreenHeight");
     }
-    return 0;
+    return mScreenWidth;
+  }
+
+
+  @Deprecated
+  public static int getScreenHeight() {
+    return getScreenHeight(WXEnvironment.sApplication);
+  }
+
+  public static int getScreenHeight(Context cxt) {
+    if(cxt!=null){
+       mScreenHeight =cxt.getResources().getDisplayMetrics().heightPixels;
+    } else if (WXEnvironment.isApkDebugable()){
+      throw new WXRuntimeException("Error Context is null When getScreenHeight");
+    }
+    return mScreenHeight;
+
   }
 
   /**
