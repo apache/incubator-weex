@@ -1,2 +1,4 @@
-language: objective-c
-script: xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
+language: node_js
+node_js:
+    - "7"
+script: "npm run test:cover"
