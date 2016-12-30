@@ -79,7 +79,7 @@ describe('dom listener details', () => {
     expect(spy.args[0]).eql([[{
       module: 'dom', method: 'createBody',
       args: [{ type: 'r', ref: '_root', attr: { a: 1 }, style: { b: 2 }}]
-    }]])
+    }], '-1'])
     done()
   })
 
@@ -110,7 +110,7 @@ describe('dom listener details', () => {
     expect(spy.args[0]).eql([[{
       module: 'dom', method: 'createBody',
       args: [{ type: 'r', ref: '_root', attr: { a: 1 }, style: { b: 2 }}]
-    }]])
+    }], '-1'])
     done()
   })
 
@@ -194,7 +194,7 @@ describe('dom listener details', () => {
     expect(spy.args[0]).eql([[{
       module: 'dom', method: 'createBody',
       args: [body.toJSON()]
-    }]])
+    }], '-1'])
 
     const el = doc.createElement('a')
     el.setAttr('x', 1)
@@ -204,7 +204,7 @@ describe('dom listener details', () => {
     expect(spy.args[1]).eql([[{
       module: 'dom', method: 'addElement',
       args: ['_root', el.toJSON(), -1]
-    }]])
+    }], '-1'])
 
     const el2 = doc.createElement('b')
     doc.body.insertBefore(el2, el) // [el2, el]
@@ -216,11 +216,11 @@ describe('dom listener details', () => {
     expect(spy.args[2]).eql([[{
       module: 'dom', method: 'addElement',
       args: ['_root', el2.toJSON(), 0]
-    }]])
+    }], '-1'])
     expect(spy.args[3]).eql([[{
       module: 'dom', method: 'addElement',
       args: ['_root', el3.toJSON(), 2]
-    }]])
+    }], '-1'])
 
     done()
   })

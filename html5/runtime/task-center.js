@@ -43,7 +43,7 @@ export function init () {
     const method = DOM_METHODS[name]
     proto[name] = method ?
       (id, args) => method(id, ...args) :
-      (id, args) => fallback(id, [{ module: 'dom', method: name, args }])
+      (id, args) => fallback(id, [{ module: 'dom', method: name, args }], '-1')
   }
 
   proto.componentHandler = global.callNativeComponent ||
