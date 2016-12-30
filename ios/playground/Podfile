@@ -1,6 +1,4 @@
-#source 'git@github.com/CocoaPods/Specs.git'
-source "https://github.com/CocoaPods/Old-Specs”
-
+source 'git@github.com/CocoaPods/Specs.git'
 platform :ios, '7.0'
 #inhibit_all_warnings!
 
