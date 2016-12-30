@@ -6,9 +6,11 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import <Foundation/Foundation.h>
-#import "WXModuleProtocol.h"
+#import "SRWebSocket.h"
+#import <objc/runtime.h>
 
-@interface WXLocationModule : NSObject <WXModuleProtocol>
+@interface SRWebSocket (Weex)
+
+@property (nonatomic, copy) NSString *identifier;
 
 @end
