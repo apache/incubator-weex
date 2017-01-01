@@ -13,7 +13,6 @@ for (const serviceName in services) {
 
 runtime.freezePrototype()
 runtime.setNativeConsole()
-runtime.setNativeTimer()
 
 // register framework meta info
 global.frameworkVersion = native

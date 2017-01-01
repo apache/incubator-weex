@@ -324,7 +324,6 @@ describe('framework entry', () => {
       const textRef = json.children[0].ref
       framework.refreshInstance(instanceId, { showText: false })
       expect(callNativeSpy.callCount).to.be.equal(2)
-      console.log(callNativeSpy.firstCall.args)
       expect(callNativeSpy.firstCall.args[0]).to.be.equal(instanceId)
       expect(callNativeSpy.firstCall.args[1]).to.deep.equal([{
         module: 'dom',
