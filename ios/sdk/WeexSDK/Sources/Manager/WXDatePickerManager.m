@@ -70,8 +70,9 @@
 - (void)updateDatePicker:(NSDictionary *)attributes
 {
     NSString *type = [WXConvert NSString:attributes[@"type"]];
-    if(_type)
+    if(type)
     {
+        _type = type;
         if( [_type isEqualToString:@"date"])
         {
             self.datePicker.datePickerMode = UIDatePickerModeDate;
