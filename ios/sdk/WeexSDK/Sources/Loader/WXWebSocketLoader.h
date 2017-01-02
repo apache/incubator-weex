@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WXWebSocketLoader : NSObject
+@interface WXWebSocketLoader : NSObject<NSCopying>
 
 @property (nonatomic, copy) void (^onOpen)();
 @property (nonatomic, copy) void (^onReceiveMessage)(id);

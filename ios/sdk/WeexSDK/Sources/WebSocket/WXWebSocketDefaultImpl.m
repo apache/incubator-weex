@@ -17,90 +17,94 @@
 
 @implementation WXWebSocketDefaultImpl
 {
-    WXThreadSafeMutableDictionary<NSString *, id<WXWebSocketDelegate>> *_delegates;
+    WXThreadSafeMutableDictionary<NSString *, SRWebSocket *> *_webSockets;
 }
 
 #pragma mark - WXWebSocketHandler
-- (void)open:(WXWebSocketModel *)webSocketModel withDelegate:(id<WXWebSocketDelegate>)delegate
+- (void)open:(NSString *)url protocol:(NSString *)protocol identifier:(NSString *)identifier withDelegate:(id<WXWebSocketDelegate>)delegate
 {
-    if(!_delegates)
+    if(!_webSockets)
     {
-        _delegates = [WXThreadSafeMutableDictionary new];
+        _webSockets = [WXThreadSafeMutableDictionary new];
     }
-    if(webSocketModel.identifier){
-        [_delegates removeObjectForKey:webSocketModel.identifier];
-        SRWebSocket *webSocket = webSocketModel.webSocket;
+    if([_webSockets objectForKey:identifier]){
+        SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
         webSocket.delegate = nil;
         [webSocket close];
         
     }
     NSArray *protols;
-    if([webSocketModel.protocol length]>0){
-       protols = [NSArray arrayWithObject:webSocketModel.protocol];
+    if([protocol length]>0){
+       protols = [NSArray arrayWithObject:protocol];
     }
-    SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURL:[NSURL URLWithString:webSocketModel.url] protocols:protols];
+    SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURL:[NSURL URLWithString:url] protocols:protols];
     webSocket.delegate = self;
     [webSocket open];
-    webSocketModel.webSocket = webSocket;
-    webSocket.identifier = webSocketModel.identifier;
-    [_delegates setObject:delegate forKey:webSocket.identifier];
+    webSocket.wx_Identifier = identifier;
+    webSocket.wx_WebSocketDelegate = delegate;
+    [_webSockets setObject:webSocket forKey:identifier];
 }
 
-- (void)send:(WXWebSocketModel *)webSocketModel data:(NSString *)data
+- (void)send:(NSString *)identifier data:(NSString *)data
 {
-    [webSocketModel.webSocket send:data];
+    SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
+    if(webSocket) {
+        [webSocket send:data];
+    }
 }
 
-- (void)close:(WXWebSocketModel *)webSocketModel
+- (void)close:(NSString *)identifier
 {
-    [webSocketModel.webSocket close];
+    SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
+    if(webSocket) {
+        [webSocket close];
+    }
 }
 
-- (void)close:(WXWebSocketModel *)webSocketModel code:(NSString *)code reason:(NSString *)reason
+- (void)close:(NSString *)identifier code:(NSString *)code reason:(NSString *)reason
 {
-    [webSocketModel.webSocket closeWithCode:[code integerValue] reason:reason];
+    SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
+    if(webSocket) {
+        [webSocket closeWithCode:code reason:reason];
+    }
 }
 
-- (void)clear:(WXWebSocketModel *)webSocketModel
+- (void)clear:(NSString *)identifier
 {
-    if ([webSocketModel.identifier isKindOfClass:[NSString class]]) {
-        SRWebSocket *websocket = webSocketModel.webSocket;
-        websocket.delegate = nil;
-        [websocket close];
-        [_delegates removeObjectForKey:webSocketModel.identifier];
+    SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
+    if(webSocket) {
+        webSocket.delegate = nil;
+        [webSocket close];
+        [_webSockets removeObjectForKey:identifier];
     }
 }
 
 #pragma mark -SRWebSocketDelegate
 - (void)webSocketDidOpen:(SRWebSocket *)webSocket;
 {
-    id<WXWebSocketDelegate> delegate = [_delegates objectForKey:webSocket.identifier];
-    if (delegate && [delegate respondsToSelector:@selector(didOpen)]) {
-        [delegate didOpen];
+    if (webSocket.wx_WebSocketDelegate && [webSocket.wx_WebSocketDelegate respondsToSelector:@selector(didOpen)]) {
+        [webSocket.wx_WebSocketDelegate didOpen];
     }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
 {
-    id<WXWebSocketDelegate> delegate = [_delegates objectForKey:webSocket.identifier];
-    if (delegate && [delegate respondsToSelector:@selector(didFailWithError:)]) {
-        [delegate didFailWithError:error];
+    if (webSocket.wx_WebSocketDelegate && [webSocket.wx_WebSocketDelegate respondsToSelector:@selector(didFailWithError:)]) {
+        [webSocket.wx_WebSocketDelegate didFailWithError:error];
     }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message;
 {
-    id<WXWebSocketDelegate> delegate = [_delegates objectForKey:webSocket.identifier];
-    if (delegate && [delegate respondsToSelector:@selector(didReceiveMessage:)]) {
-        [delegate didReceiveMessage:message];
+    if (webSocket.wx_WebSocketDelegate && [webSocket.wx_WebSocketDelegate respondsToSelector:@selector(didReceiveMessage:)]) {
+        [webSocket.wx_WebSocketDelegate didReceiveMessage:message];
     }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;
 {
-    id<WXWebSocketDelegate> delegate = [_delegates objectForKey:webSocket.identifier];
-    if (delegate && [delegate respondsToSelector:@selector(didCloseWithCode:reason:wasClean:)]) {
-        [delegate didCloseWithCode:code reason:reason wasClean:wasClean];
+    if (webSocket.wx_WebSocketDelegate && [webSocket.wx_WebSocketDelegate respondsToSelector:@selector(didCloseWithCode:reason:wasClean:)]) {
+        [webSocket.wx_WebSocketDelegate didCloseWithCode:code reason:reason wasClean:wasClean];
     }
 }
 @end
