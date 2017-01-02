@@ -1,7 +1,7 @@
 import indicator from './loading-indicator'
 
 export default {
-  name: 'loading',
+  name: 'refresh',
   data () {
     return {
       height: 0
@@ -9,24 +9,22 @@ export default {
   },
   methods: {
     show () {
-      this.$emit('loading')
-      console.log('will emit loading')
+      this.$emit('refresh')
       this.height = '120px'
       this.visibility = 'visible'
-      console.log(this, this.height)
     },
     reset () {
       this.height = 0
       this.visibility = 'hidden'
-      this.$emit('loadingfinish')
+      this.$emit('refreshfinish')
     }
   },
   render (createElement) {
     return createElement('aside', {
-      ref: 'indicator',
-      attrs: { 'weex-type': 'loading' },
+      ref: 'refresh',
+      attrs: { 'weex-type': 'refresh' },
       style: { height: this.height, visibility: this.visibility },
-      staticClass: 'weex-loading'
+      staticClass: 'weex-refresh'
     }, [createElement(indicator)])
   }
 }

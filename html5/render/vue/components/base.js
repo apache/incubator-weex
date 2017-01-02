@@ -19,6 +19,6 @@ export default Vue.extend({
     createStyle () {}
   },
   render () {
-    console.warn('[Vue Renderer] Do not create base component directly.')
+    console.warn('[Vue Render] Do not create base component directly.')
   }
 })

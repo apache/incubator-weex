@@ -46,11 +46,8 @@ export default {
     formatChildren (createElement) {
       const children = this.$slots.default || []
       return children.filter(vnode => {
-        // console.log(vnode)
         if (!vnode.tag) return false
         if (vnode.componentOptions && vnode.componentOptions.tag === 'indicator') {
-          // console.log(vnode)
-          // console.trace()
           this._indicator = createElement(indicator, {
             staticClass: vnode.data.staticClass,
             staticStyle: vnode.data.staticStyle,

@@ -27,6 +27,22 @@ export default {
       }
     },
 
+    handleScroll (event) {
+      this._cells.forEach((vnode, index) => {
+        const visible = this.isCellVisible(vnode.elm)
+        if (visible !== vnode._visible) {
+          const type = visible ? 'appear' : 'disappear'
+          vnode._visible = visible
+
+          // TODO: dispatch CustomEvent
+          vnode.elm.dispatchEvent(new Event(type), {})
+        }
+      })
+      if (this.reachBottom()) {
+        this.$emit('loadmore', event)
+      }
+    },
+
     reachTop () {
       const wrapper = this.$refs.wrapper
       return (!!wrapper) && (wrapper.scrollTop <= 0)

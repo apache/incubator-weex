@@ -1,3 +1,4 @@
+import { extend } from '../utils'
 
 const supportedEvents = [
   'click'
@@ -13,6 +14,21 @@ export default {
       })
       return eventMap
     },
-    createStyle () {}
+
+    // get styles from vnode
+    getClassStyle () {
+      const context = this.$vnode.context
+      if (context && context.$options) {
+        const styles = context.$options.style
+        const staticClass = this.$vnode.data ? this.$vnode.data.staticClass : null
+        if (Array.isArray(staticClass)) {
+          return staticClass.reduce((res, name) => {
+            return extend(res, styles[name])
+          }, {})
+        }
+        return {}
+      }
+      return {}
+    }
   }
 }

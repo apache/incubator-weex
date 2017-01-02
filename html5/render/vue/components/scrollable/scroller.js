@@ -1,6 +1,7 @@
 import { base, scrollable } from '../../mixins'
 import { validateStyles } from '../../validator'
 import { debounce, bind, extend } from '../../utils'
+import * as shared from './shared'
 
 export default {
   mixins: [base, scrollable],
@@ -29,20 +30,24 @@ export default {
   },
 
   methods: {
-    handleScroll (event) {
-      this._cells.forEach((vnode, index) => {
-        const visible = this.isCellVisible(vnode.elm)
-        if (visible !== vnode._visible) {
-          const type = visible ? 'appear' : 'disappear'
-          vnode._visible = visible
-
-          // TODO: dispatch CustomEvent
-          vnode.elm.dispatchEvent(new Event(type), {})
+    createChildren (h) {
+      const slots = this.$slots.default || []
+      this._cells = slots.filter(vnode => {
+        if (!vnode.tag || !vnode.componentOptions) return false
+        switch (vnode.componentOptions.tag) {
+          case 'loading': this._loading = shared.createLoading(this, h); return false
+          case 'refresh': this._refresh = shared.createRefresh(this, h); return false
         }
+        return true
       })
-      if (this.reachBottom()) {
-        this.$emit('loadmore', event)
-      }
+      return [
+        this._refresh,
+        h('html:div', {
+          ref: 'inner',
+          staticClass: 'weex-scroller-inner'
+        }, this._cells),
+        this._loading
+      ]
     }
   },
 
@@ -64,13 +69,6 @@ export default {
       on: extend(this.createEventMap(), {
         scroll: debounce(bind(this.handleScroll, this), 100)
       })
-    }, [
-      createElement('mark', { ref: 'topMark', staticClass: 'weex-scroller-top-mark' }),
-      createElement('html:div', {
-        ref: 'inner',
-        staticClass: 'weex-scroller-inner'
-      }, this._cells),
-      createElement('mark', { ref: 'bottomMark', staticClass: 'weex-scroller-bottom-mark' })
-    ])
+    }, this.createChildren(createElement))
   }
 }

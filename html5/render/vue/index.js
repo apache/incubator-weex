@@ -16,10 +16,10 @@ function install (Vue) {
   /* istanbul ignore next */
   if (process.env.NODE_ENV === 'development') {
     if (semver.lt(Vue.version, '2.1.5')) {
-      console.warn(`[Vue Renderer] The version of Vue should be ` +
+      console.warn(`[Vue Render] The version of Vue should be ` +
         `greater than 2.1.5, current is ${Vue.version}.`)
     }
-    console.log(`[Vue Renderer] Registered components: `
+    console.log(`[Vue Render] Registered components: `
       + `[${Object.keys(components).join(', ')}].`)
   }
 }

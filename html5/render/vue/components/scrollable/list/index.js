@@ -1,8 +1,7 @@
 import { base, event, scrollable } from '../../../mixins'
 import { validateStyles } from '../../../validator'
 import { debounce, throttle, bind, extend } from '../../../utils'
-import refresh from './refresh'
-import loading from './loading'
+import * as shared from '../shared'
 import listMixin from './listMixin'
 
 export default {
@@ -24,49 +23,19 @@ export default {
   },
 
   methods: {
-    handleScroll (event) {
-      this._cells.forEach((vnode, index) => {
-        const visible = this.isCellVisible(vnode.elm)
-        if (visible !== vnode._visible) {
-          const type = visible ? 'appear' : 'disappear'
-          vnode._visible = visible
-
-          // TODO: dispatch CustomEvent
-          vnode.elm.dispatchEvent(new Event(type), {})
-        }
-      })
-      if (this.reachBottom()) {
-        this.$emit('loadmore', this.createCustomEvent('loadmore'))
-      }
-    },
-
-    createChildren (createElement) {
+    createChildren (h) {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {
-        // console.log(vnode.tag)
         if (!vnode.tag || !vnode.componentOptions) return false
-        const tagName = vnode.componentOptions.tag
-        if (tagName === 'loading') {
-          this._loading = createElement(loading, {
-            on: {
-              loading: () => this.$emit('loading', this.createCustomEvent('loading'))
-            }
-          })
-          return false
-        }
-        if (tagName === 'refresh') {
-          this._refresh = createElement(refresh, {
-            on: {
-              refresh: () => this.$emit('refresh', this.createCustomEvent('refresh'))
-            }
-          })
-          return false
+        switch (vnode.componentOptions.tag) {
+          case 'loading': this._loading = shared.createLoading(this, h); return false
+          case 'refresh': this._refresh = shared.createRefresh(this, h); return false
         }
         return true
       })
       return [
         this._refresh,
-        createElement('html:div', {
+        h('html:div', {
           ref: 'inner',
           staticClass: 'weex-list-inner'
         }, this._cells),
