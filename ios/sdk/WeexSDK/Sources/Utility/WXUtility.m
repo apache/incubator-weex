@@ -653,12 +653,10 @@ static BOOL WXNotStat;
 
 + (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString
 {
-    if([string length] ==0)
-    {
+    if([string length] ==0) {
         return 0;
     }
-    if([subString length] ==0)
-    {
+    if([subString length] ==0) {
         return 0;
     }
     NSError *error = NULL;
