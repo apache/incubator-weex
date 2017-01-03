@@ -11,6 +11,7 @@
 #import "WXWebSocketHandler.h"
 #import "WXHandlerFactory.h"
 #import "WXWebSocketLoader.h"
+#import "WXConvert.h"
 
 @interface WXWebSocketModule()
 
@@ -37,6 +38,10 @@ WX_EXPORT_METHOD(@selector(onclose:))
 
 - (void)WebSocket:(NSString *)url protocol:(NSString *)protocol
 {
+    if(loader)
+    {
+        [loader clear];
+    }
     loader = [[WXWebSocketLoader alloc] initWithUrl:url protocol:protocol];
     __weak typeof(self) weakSelf = self;
     loader.onReceiveMessage = ^(id message) {
@@ -101,7 +106,7 @@ WX_EXPORT_METHOD(@selector(onclose:))
         [loader close];
         return;
     }
-    [loader close:code reason:reason];
+    [loader close:[code integerValue] reason:reason];
 }
 
 - (void)onerror:(WXModuleKeepAliveCallback)callback
