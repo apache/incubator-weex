@@ -809,7 +809,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,"WXApplicationDidBecomeActiveEvent");
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
     mContext.sendBroadcast(intent);
   }
 
@@ -827,7 +827,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,"WXApplicationWillResignActiveEvent");
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
     mContext.sendBroadcast(intent);
 
     onViewAppear();

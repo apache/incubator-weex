@@ -387,6 +387,9 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
     String SCROLL = "scroll";
     String BACKPRESSED = "backpressed";
+    String RESUME_EVENT="WXApplicationWillResignActiveEvent";
+    String PAUSE_EVENT="WXApplicationDidBecomeActiveEvent";
+
   }
 
   public interface Scheme {
