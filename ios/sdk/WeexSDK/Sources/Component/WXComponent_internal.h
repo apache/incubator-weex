@@ -41,6 +41,13 @@
     WXVisibility  _visibility;
     
     /**
+     *  PseudoClass
+     */
+    NSMutableDictionary *_pseudoClassStyles;
+    BOOL _isListenPseudoTouch;
+    BOOL _isPseudoClassExist;
+    
+    /**
      *  Events
      */
     BOOL _appearEvent;
@@ -157,6 +164,8 @@
 
 - (void)_initEvents:(NSArray *)events;
 
+- (void)_initPseudoEvents:(BOOL)isListenPseudoTouch;
+
 - (void)_removeAllEvents;
 
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
@@ -167,4 +176,7 @@
 
 - (void)_resetNativeBorderRadius;
 
+- (void)_updatePseudoClassStyles:(NSString *)key;
+
+- (void)_restoreViewStyles;
 @end

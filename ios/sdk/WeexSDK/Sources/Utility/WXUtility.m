@@ -651,6 +651,23 @@ static BOOL WXNotStat;
     return str;
 }
 
++ (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString
+{
+    if([string length] ==0)
+    {
+        return 0;
+    }
+    if([subString length] ==0)
+    {
+        return 0;
+    }
+    NSError *error = NULL;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:subString options:NSRegularExpressionCaseInsensitive error:&error];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
+    return numberOfMatches;
+    
+}
+
 @end
 
 

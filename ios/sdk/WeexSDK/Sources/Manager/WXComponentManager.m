@@ -301,7 +301,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *styles = data[@"style"];
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
-    
+        
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);

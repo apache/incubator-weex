@@ -25,6 +25,7 @@
 #import "WXTransform.h"
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
+#import "WXComponent+PseudoClassManagement.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -67,7 +68,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
-        _styles = styles ? [NSMutableDictionary dictionaryWithDictionary:styles] : [NSMutableDictionary dictionary];
+        _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
         _subcomponents = [NSMutableArray array];
@@ -122,6 +123,16 @@
     pthread_mutex_unlock(&_propertyMutex);
     
     return styles;
+}
+
+- (NSDictionary *)pseudoClassStyles
+{
+    NSDictionary *pseudoClassStyles;
+    pthread_mutex_lock(&_propertyMutex);
+    pseudoClassStyles = _pseudoClassStyles;
+    pthread_mutex_unlock(&_propertyMutex);
+    
+    return pseudoClassStyles;
 }
 
 - (NSString *)type
@@ -204,6 +215,7 @@
         _layer.wx_component = self;
         
         [self _initEvents:self.events];
+        [self _initPseudoEvents:_isListenPseudoTouch];
         
         if (_positionType == WXPositionTypeSticky) {
             [self.ancestorScroller addStickyComponent:self];
