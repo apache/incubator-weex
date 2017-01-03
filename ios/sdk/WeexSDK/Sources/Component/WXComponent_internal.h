@@ -49,9 +49,14 @@
     NSMutableArray *_swipeGestures;
     UILongPressGestureRecognizer *_longPressGesture;
     UIPanGestureRecognizer *_panGesture;
+    
     BOOL _listenPanStart;
     BOOL _listenPanMove;
     BOOL _listenPanEnd;
+    
+    BOOL _listenHorizontalPan;
+    BOOL _listenVerticalPan;
+    
     WXTouchGestureRecognizer* _touchGesture;
     
     /**

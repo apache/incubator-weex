@@ -140,6 +140,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(panmove, addPanMoveEvent)
     WX_ADD_EVENT(panend, addPanEndEvent)
     
+    WX_ADD_EVENT(horizontalpan, addHorizontalPanEvent)
+    WX_ADD_EVENT(verticalpan, addVerticalPanEvent)
+    
     WX_ADD_EVENT(touchstart, addTouchStartEvent)
     WX_ADD_EVENT(touchmove, addTouchMoveEvent)
     WX_ADD_EVENT(touchend, addTouchEndEvent)
@@ -160,6 +163,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(panstart, removePanStartEvent)
     WX_REMOVE_EVENT(panmove, removePanMoveEvent)
     WX_REMOVE_EVENT(panend, removePanEndEvent)
+    
+    WX_REMOVE_EVENT(horizontalpan, removeHorizontalPanEvent)
+    WX_REMOVE_EVENT(verticalpan, removeVerticalPanEvent)
     
     WX_REMOVE_EVENT(touchstart, removeTouchStartEvent)
     WX_REMOVE_EVENT(touchmove, removeTouchMoveEvent)
@@ -357,7 +363,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
 }
 
-#pragma makr - Pan
+#pragma mark - Pan
 
 - (void)addPanGesture
 {
@@ -386,23 +392,44 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self addPanGesture];
 }
 
+- (void)addHorizontalPanEvent
+{
+    _listenHorizontalPan = YES;
+    [self addPanGesture];
+}
+
+- (void)addVerticalPanEvent
+{
+    _listenVerticalPan = YES;
+    [self addPanGesture];
+}
+
+
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
+    NSString *state = @"";
     NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLoacation identifier:gesture.wx_identifier];
     
     if (gesture.state == UIGestureRecognizerStateBegan) {
         eventName = @"panstart";
+        state = @"start";
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
         eventName = @"panend";
+        state = @"end";
         gesture.wx_identifier = nil;
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
         eventName = @"panmove";
+        state = @"move";
     }
     
-    if (eventName) {
+    if (_listenHorizontalPan) {
+        [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    } else if (_listenVerticalPan) {
+        [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    } else if (eventName) {
         [self fireEvent:eventName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
 }
@@ -425,9 +452,24 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self checkRemovePanGesture];
 }
 
+- (void)removeHorizontalPanEvent
+{
+    _listenHorizontalPan = NO;
+    [self checkRemovePanGesture];
+}
+
+- (void)removeVerticalPanEvent
+{
+    _listenVerticalPan = NO;
+    [self checkRemovePanGesture];
+}
+
 - (void)checkRemovePanGesture
 {
-    if (_panGesture && !_listenPanStart && !_listenPanMove && !_listenPanEnd) {
+    if (_panGesture
+        && !_listenPanStart && !_listenPanMove && !_listenPanEnd
+        && !_listenHorizontalPan && !_listenVerticalPan
+        ) {
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -507,6 +549,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
+    if (gestureRecognizer == _panGesture) {
+        CGPoint translation = [_panGesture translationInView:self.view];
+        if (_listenHorizontalPan && !_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+            return NO;
+        }
+    }
     return YES;
 }
 
@@ -524,13 +572,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(@"UITextTapRecognizer")]) {
         return YES;
     }
-    
-//#ifdef DEBUG
-//    if ([gestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]
-//        || [otherGestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]) {
-//        return YES;
-//    }
-//#endif
     
     return NO;
 }

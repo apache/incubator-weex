@@ -586,6 +586,20 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return WXScrollDirectionVertical;
 }
 
++ (UITableViewRowAnimation)UITableViewRowAnimation:(id)value
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *string = (NSString *)value;
+        if ([string isEqualToString:@"none"]) {
+            return UITableViewRowAnimationNone;
+        } else if ([string isEqualToString:@"default"]) {
+            return UITableViewRowAnimationFade;
+        }
+    }
+    
+    return UITableViewRowAnimationNone;
+}
+
 #pragma mark Animation
 
 + (UIViewAnimationOptions)UIViewAnimationTimingFunction:(id)value
