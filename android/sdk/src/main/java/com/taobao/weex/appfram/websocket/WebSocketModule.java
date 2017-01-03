@@ -202,140 +202,132 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.appfram.websocket;
 
-import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXDebugAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.appfram.storage.IWXStorageAdapter;
-import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by sospartan on 5/31/16.
+ * Created by moxun on 16/12/27.
  */
-public class InitConfig {
-  private IWXHttpAdapter httpAdapter;
-  private IDrawableLoader drawableLoader;
-  private IWXImgLoaderAdapter imgAdapter;
-  private IWXUserTrackAdapter utAdapter;
-  private IWXDebugAdapter debugAdapter;
-  private IWXStorageAdapter storageAdapter;
-  private URIAdapter mURIAdapter;
-  private IWebSocketAdapterFactory webSocketAdapterFactory;
-  private String framework;
 
-  public IWXHttpAdapter getHttpAdapter() {
-    return httpAdapter;
-  }
+public class WebSocketModule extends WXSDKEngine.DestroyableModule {
 
-  public IWXImgLoaderAdapter getImgAdapter() {
-    return imgAdapter;
-  }
+    private static final String TAG = "WebSocketModule";
+    private static final String KEY_DATA = "data";
+    private static final String KEY_CODE = "code";
+    private static final String KEY_REASON = "reason";
+    private static final String KEY_WAS_CLEAN = "wasClean";
 
-  public IDrawableLoader getDrawableLoader() {
-    return drawableLoader;
-  }
+    private IWebSocketAdapter webSocketAdapter;
+    private JSCallback onOpen;
+    private JSCallback onMessage;
+    private JSCallback onClose;
+    private JSCallback onError;
+    private IWebSocketAdapter.EventListener eventListener = new IWebSocketAdapter.EventListener() {
+        @Override
+        public void onOpen() {
+            if (onOpen != null) {
+                onOpen.invoke(new HashMap<>(0));
+            }
+        }
 
-  public IWXUserTrackAdapter getUtAdapter() {
-    return utAdapter;
-  }
+        @Override
+        public void onMessage(String data) {
+            if (onMessage != null) {
+                Map<String, String> msg = new HashMap<>(1);
+                msg.put(KEY_DATA, data);
+                onMessage.invokeAndKeepAlive(msg);
+            }
+        }
 
-  public IWXDebugAdapter getDebugAdapter(){
-    return debugAdapter;
-  }
-  public String getFramework() {
-    return framework;
-  }
+        @Override
+        public void onClose(int code, String reason, boolean wasClean) {
+            if (onClose != null) {
+                Map<String, Object> msg = new HashMap<>(3);
+                msg.put(KEY_CODE, code);
+                msg.put(KEY_REASON, reason);
+                msg.put(KEY_WAS_CLEAN, wasClean);
+                onClose.invoke(msg);
+            }
+        }
 
-  public IWXStorageAdapter getStorageAdapter() {
-    return storageAdapter;
-  }
+        @Override
+        public void onError(String msg) {
+            if (onError != null) {
+                Map<String, String> info = new HashMap<>(1);
+                info.put(KEY_DATA, msg);
+                onError.invokeAndKeepAlive(info);
+            }
+        }
+    };
 
-  public URIAdapter getURIAdapter() {
-    return mURIAdapter;
-  }
-
-  public IWebSocketAdapterFactory getWebSocketAdapterFactory() {
-    return webSocketAdapterFactory;
-  }
-
-  private InitConfig() {
-  }
-
-  public static class Builder{
-    IWXHttpAdapter httpAdapter;
-    IWXImgLoaderAdapter imgAdapter;
-    IDrawableLoader drawableLoader;
-    IWXUserTrackAdapter utAdapter;
-    IWXDebugAdapter debugAdapter;
-    IWXStorageAdapter storageAdapter;
-    URIAdapter mURIAdapter;
-    String framework;
-    IWebSocketAdapterFactory webSocketAdapterFactory;
-    public Builder(){
-
+    @JSMethod
+    public void WebSocket(String url, String protocol) {
+        if (webSocketAdapter != null) {
+            webSocketAdapter.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
+        }
+        webSocketAdapter = mWXSDKInstance.getWXWebSocketAdapter();
+        if (!reportErrorIfNoAdapter()) {
+            webSocketAdapter.connect(url, protocol, eventListener);
+        }
     }
 
-    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
-      this.httpAdapter = httpAdapter;
-      return this;
+    @JSMethod
+    public void send(String data) {
+        if (!reportErrorIfNoAdapter()) {
+            webSocketAdapter.send(data);
+        }
     }
 
-    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
-      this.imgAdapter = imgAdapter;
-      return this;
+    @JSMethod
+    public void close(int code, String reason) {
+        if (!reportErrorIfNoAdapter()) {
+            webSocketAdapter.close(code, reason);
+        }
     }
 
-    public Builder setDrawableLoader(IDrawableLoader drawableLoader){
-      this.drawableLoader=drawableLoader;
-      return this;
+    @JSMethod
+    public void onopen(JSCallback callback) {
+        this.onOpen = callback;
     }
 
-    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
-      this.utAdapter = utAdapter;
-      return this;
+    @JSMethod
+    public void onmessage(JSCallback callback) {
+        this.onMessage = callback;
     }
 
-    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
-      this.debugAdapter=debugAdapter;
-      return this;
+    @JSMethod
+    public void onclose(JSCallback callback) {
+        this.onClose = callback;
     }
 
-    public Builder setStorageAdapter(IWXStorageAdapter storageAdapter) {
-      this.storageAdapter = storageAdapter;
-      return this;
+    @JSMethod
+    public void onerror(JSCallback callback) {
+        this.onError = callback;
     }
 
-    public Builder setURIAdapter(URIAdapter URIAdapter) {
-      mURIAdapter = URIAdapter;
-      return this;
+    @Override
+    public void destroy() {
+        if (webSocketAdapter != null) {
+            webSocketAdapter.destroy();
+        }
+        eventListener = null;
     }
 
-    public Builder setFramework(String framework){
-      this.framework=framework;
-      return this;
+    private boolean reportErrorIfNoAdapter() {
+        if (webSocketAdapter == null) {
+            if (eventListener != null) {
+                eventListener.onError("No implementation found for IWebSocketAdapter");
+            }
+            WXLogUtils.e(TAG, "No implementation found for IWebSocketAdapter");
+            return true;
+        }
+        return false;
     }
-
-    public Builder setWebSocketAdapterFactory(IWebSocketAdapterFactory factory) {
-      this.webSocketAdapterFactory = factory;
-      return this;
-    }
-
-    public InitConfig build(){
-      InitConfig config =  new InitConfig();
-      config.httpAdapter = this.httpAdapter;
-      config.imgAdapter = this.imgAdapter;
-      config.drawableLoader = this.drawableLoader;
-      config.utAdapter = this.utAdapter;
-      config.debugAdapter=this.debugAdapter;
-      config.storageAdapter = this.storageAdapter;
-      config.framework=this.framework;
-      config.mURIAdapter = this.mURIAdapter;
-      config.webSocketAdapterFactory = this.webSocketAdapterFactory;
-      return config;
-    }
-  }
 }

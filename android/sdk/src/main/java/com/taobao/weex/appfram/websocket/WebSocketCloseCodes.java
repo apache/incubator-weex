@@ -202,140 +202,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
-
-import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXDebugAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.appfram.storage.IWXStorageAdapter;
-import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+package com.taobao.weex.appfram.websocket;
 
 /**
- * Created by sospartan on 5/31/16.
+ * Created by moxun on 17/1/3.
+ * @link {https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent}
  */
-public class InitConfig {
-  private IWXHttpAdapter httpAdapter;
-  private IDrawableLoader drawableLoader;
-  private IWXImgLoaderAdapter imgAdapter;
-  private IWXUserTrackAdapter utAdapter;
-  private IWXDebugAdapter debugAdapter;
-  private IWXStorageAdapter storageAdapter;
-  private URIAdapter mURIAdapter;
-  private IWebSocketAdapterFactory webSocketAdapterFactory;
-  private String framework;
 
-  public IWXHttpAdapter getHttpAdapter() {
-    return httpAdapter;
-  }
+public enum WebSocketCloseCodes {
+    CLOSE_NORMAL(1000),
+    CLOSE_GOING_AWAY(1001),
+    CLOSE_PROTOCOL_ERROR(1002),
+    CLOSE_UNSUPPORTED(1003),
+    CLOSE_NO_STATUS(1005),
+    CLOSE_ABNORMAL(1006),
+    UNSUPPORTED_DATA(1007),
+    POLICY_VIOLATION(1008),
+    CLOSE_TOO_LARGE(1009),
+    MISSING_EXTENSION(1010),
+    INTERNAL_ERROR(1011),
+    SERVICE_RESTART(1012),
+    TRY_AGAIN_LATER(1013),
+    TLS_HANDSHAKE(1015);
 
-  public IWXImgLoaderAdapter getImgAdapter() {
-    return imgAdapter;
-  }
+    private int code;
 
-  public IDrawableLoader getDrawableLoader() {
-    return drawableLoader;
-  }
-
-  public IWXUserTrackAdapter getUtAdapter() {
-    return utAdapter;
-  }
-
-  public IWXDebugAdapter getDebugAdapter(){
-    return debugAdapter;
-  }
-  public String getFramework() {
-    return framework;
-  }
-
-  public IWXStorageAdapter getStorageAdapter() {
-    return storageAdapter;
-  }
-
-  public URIAdapter getURIAdapter() {
-    return mURIAdapter;
-  }
-
-  public IWebSocketAdapterFactory getWebSocketAdapterFactory() {
-    return webSocketAdapterFactory;
-  }
-
-  private InitConfig() {
-  }
-
-  public static class Builder{
-    IWXHttpAdapter httpAdapter;
-    IWXImgLoaderAdapter imgAdapter;
-    IDrawableLoader drawableLoader;
-    IWXUserTrackAdapter utAdapter;
-    IWXDebugAdapter debugAdapter;
-    IWXStorageAdapter storageAdapter;
-    URIAdapter mURIAdapter;
-    String framework;
-    IWebSocketAdapterFactory webSocketAdapterFactory;
-    public Builder(){
-
+    WebSocketCloseCodes(int code) {
+        this.code = code;
     }
 
-    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
-      this.httpAdapter = httpAdapter;
-      return this;
+    public int getCode() {
+        return code;
     }
-
-    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
-      this.imgAdapter = imgAdapter;
-      return this;
-    }
-
-    public Builder setDrawableLoader(IDrawableLoader drawableLoader){
-      this.drawableLoader=drawableLoader;
-      return this;
-    }
-
-    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
-      this.utAdapter = utAdapter;
-      return this;
-    }
-
-    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
-      this.debugAdapter=debugAdapter;
-      return this;
-    }
-
-    public Builder setStorageAdapter(IWXStorageAdapter storageAdapter) {
-      this.storageAdapter = storageAdapter;
-      return this;
-    }
-
-    public Builder setURIAdapter(URIAdapter URIAdapter) {
-      mURIAdapter = URIAdapter;
-      return this;
-    }
-
-    public Builder setFramework(String framework){
-      this.framework=framework;
-      return this;
-    }
-
-    public Builder setWebSocketAdapterFactory(IWebSocketAdapterFactory factory) {
-      this.webSocketAdapterFactory = factory;
-      return this;
-    }
-
-    public InitConfig build(){
-      InitConfig config =  new InitConfig();
-      config.httpAdapter = this.httpAdapter;
-      config.imgAdapter = this.imgAdapter;
-      config.drawableLoader = this.drawableLoader;
-      config.utAdapter = this.utAdapter;
-      config.debugAdapter=this.debugAdapter;
-      config.storageAdapter = this.storageAdapter;
-      config.framework=this.framework;
-      config.mURIAdapter = this.mURIAdapter;
-      config.webSocketAdapterFactory = this.webSocketAdapterFactory;
-      return config;
-    }
-  }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.alibaba.weex.commons.adapter.DefaultWebSocketAdapterFactory;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
 import com.alibaba.weex.extend.component.RichText;
@@ -41,6 +42,7 @@ public class WXApplication extends Application {
                                //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
                                .setImgAdapter(new ImageAdapter())
                                .setDebugAdapter(new PlayDebugAdapter())
+                               .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
                                .build()
                           );
 
