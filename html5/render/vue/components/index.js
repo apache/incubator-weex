@@ -12,6 +12,7 @@ import slider from './slider'
 import indicator from './warning'
 import refresh from './warning'
 import loading from './warning'
+import LoadingIndicator from './scrollable/loading-indicator'
 import text from './text'
 import textarea from './textarea'
 import video from './video'
@@ -31,6 +32,7 @@ export {
   indicator,
   refresh,
   loading,
+  LoadingIndicator,
   text,
   textarea,
   video,

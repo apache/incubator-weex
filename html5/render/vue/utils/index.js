@@ -1,3 +1,5 @@
+export * from './func'
+
 /**
  * Create a cached version of a pure function.
  */
@@ -50,62 +52,6 @@ export function extend (to, _from) {
     to[key] = _from[key]
   }
   return to
-}
-
-/**
- * Simple bind, faster than native
- *
- * @param {Function} fn
- * @param {Object} ctx
- * @return {Function}
- */
-export function bind (fn, ctx) {
-  return function (a) {
-    const l = arguments.length
-    return l
-      ? l > 1
-        ? fn.apply(ctx, arguments)
-        : fn.call(ctx, a)
-      : fn.call(ctx)
-  }
-}
-
-export function debounce (func, wait) {
-  let timerId
-  function later () {
-    timerId = null
-    func.apply(null)
-  }
-  return function () {
-    clearTimeout(timerId)
-    timerId = setTimeout(later, wait)
-  }
-}
-
-export function throttle (func, wait) {
-  let last = 0
-  return function (...args) {
-    const context = this
-    const time = new Date().getTime()
-    if (time - last > wait) {
-      func.apply(context, args)
-      last = time
-    }
-  }
-}
-
-export function createMixin (...mixins) {
-  const mixinMethods = {}
-  mixins.forEach(methods => {
-    for (const key in methods) {
-      mixinMethods[key] = function (...args) {
-        return methods[key].apply(this, [this, ...args])
-      }
-    }
-  })
-  return {
-    methods: mixinMethods
-  }
 }
 
 export function appendStyle (css, styleId, replace) {

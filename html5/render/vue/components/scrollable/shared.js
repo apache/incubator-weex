@@ -1,22 +1,21 @@
+// import header from './header'
 import refresh from './refresh'
 import loading from './loading'
 
-export function createLoading (context, createElement) {
+// export function createHeader (context, createElement) {
+//   return createElement(header)
+// }
+
+export function createLoading (context, createElement, vnode) {
+  const options = vnode.componentOptions
   return createElement(loading, {
-    on: {
-      loading: () => {
-        context.$emit('loading', context.createCustomEvent('loading'))
-      }
-    }
-  })
+    on: Object.assign({}, options.listeners)
+  }, options.children)
 }
 
-export function createRefresh (context, createElement) {
+export function createRefresh (context, createElement, vnode) {
+  const options = vnode.componentOptions
   return createElement(refresh, {
-    on: {
-      refresh: () => {
-        context.$emit('refresh', context.createCustomEvent('loading'))
-      }
-    }
-  })
+    on: Object.assign({}, options.listeners)
+  }, options.children)
 }

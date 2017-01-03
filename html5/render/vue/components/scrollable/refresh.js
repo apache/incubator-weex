@@ -1,7 +1,8 @@
-import indicator from './loading-indicator'
+import LoadingIndicator from './loading-indicator'
 
 export default {
-  name: 'refresh',
+  // name: 'refresh',
+  components: { LoadingIndicator },
   data () {
     return {
       height: 0
@@ -25,6 +26,6 @@ export default {
       attrs: { 'weex-type': 'refresh' },
       style: { height: this.height, visibility: this.visibility },
       staticClass: 'weex-refresh'
-    }, [createElement(indicator)])
+    }, this.$slots.default)
   }
 }

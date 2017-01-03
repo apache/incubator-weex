@@ -11,11 +11,11 @@ export default {
       if (i === Number(this.active)) {
         classNames.push('weex-indicator-item-active')
       }
-      children.push(createElement('menuitem', {
+      children.push(createElement('mark', {
         staticClass: classNames.join(' ')
       }))
     }
-    return createElement('menu', {
+    return createElement('nav', {
       attrs: { 'weex-type': 'indicator' },
       staticClass: 'weex-indicator'
     }, children)

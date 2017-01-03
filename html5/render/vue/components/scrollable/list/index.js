@@ -28,8 +28,8 @@ export default {
       this._cells = slots.filter(vnode => {
         if (!vnode.tag || !vnode.componentOptions) return false
         switch (vnode.componentOptions.tag) {
-          case 'loading': this._loading = shared.createLoading(this, h); return false
-          case 'refresh': this._refresh = shared.createRefresh(this, h); return false
+          case 'loading': this._loading = shared.createLoading(this, h, vnode); return false
+          case 'refresh': this._refresh = shared.createRefresh(this, h, vnode); return false
         }
         return true
       })

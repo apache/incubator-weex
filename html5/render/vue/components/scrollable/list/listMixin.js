@@ -16,8 +16,8 @@ export default {
 
     done () {
       this.moveTo(0)
-      this._refresh && this._refresh.reset()
-      this._loading && this._loading.reset()
+      this._refresh && this._refresh.child.reset()
+      this._loading && this._loading.child.reset()
     },
 
     showRefresh () {
@@ -69,6 +69,7 @@ export default {
 
     handleTouchEnd (event) {
       // event.preventDefault()
+      console.log('handleTouchEnd')
       event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner
@@ -81,7 +82,7 @@ export default {
             this.showLoading()
           }
           else {
-            this.moveTo(0)
+            this.done(0)
           }
         }
       }

@@ -1,10 +1,11 @@
 import { base, scrollable } from '../../mixins'
 import { validateStyles } from '../../validator'
-import { debounce, bind, extend } from '../../utils'
+import { debounce, throttle, bind, extend } from '../../utils'
 import * as shared from './shared'
+import listMixin from './list/listMixin'
 
 export default {
-  mixins: [base, scrollable],
+  mixins: [base, scrollable, listMixin],
   props: {
     scrollDirection: {
       type: [String],
@@ -35,8 +36,8 @@ export default {
       this._cells = slots.filter(vnode => {
         if (!vnode.tag || !vnode.componentOptions) return false
         switch (vnode.componentOptions.tag) {
-          case 'loading': this._loading = shared.createLoading(this, h); return false
-          case 'refresh': this._refresh = shared.createRefresh(this, h); return false
+          case 'loading': this._loading = shared.createLoading(this, h, vnode); return false
+          case 'refresh': this._refresh = shared.createRefresh(this, h, vnode); return false
         }
         return true
       })
@@ -67,7 +68,10 @@ export default {
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
       on: extend(this.createEventMap(), {
-        scroll: debounce(bind(this.handleScroll, this), 100)
+        scroll: debounce(bind(this.handleScroll, this), 30),
+        touchstart: this.handleTouchStart,
+        touchmove: throttle(bind(this.handleTouchMove, this), 25),
+        touchend: this.handleTouchEnd
       })
     }, this.createChildren(createElement))
   }

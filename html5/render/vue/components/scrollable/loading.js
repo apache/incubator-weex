@@ -1,7 +1,8 @@
-import indicator from './loading-indicator'
+import LoadingIndicator from './loading-indicator'
 
 export default {
-  name: 'loading',
+  // name: 'loading',
+  components: { LoadingIndicator },
   data () {
     return {
       height: 0
@@ -25,6 +26,6 @@ export default {
       attrs: { 'weex-type': 'loading' },
       style: { height: this.height, visibility: this.visibility },
       staticClass: 'weex-loading'
-    }, [createElement(indicator)])
+    }, this.$slots.default)
   }
 }
