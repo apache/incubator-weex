@@ -160,8 +160,6 @@ WX_EXPORT_METHOD(@selector(blur))
 - (UIView *)loadView
 {
     _inputView = [[WXTextInputView alloc] init];
-    _datePickerManager = [[WXDatePickerManager alloc] init];
-    _datePickerManager.delegate = self;
     return _inputView;
 }
 
@@ -514,6 +512,10 @@ WX_EXPORT_METHOD(@selector(blur))
     }else if ([_inputType isEqualToString:@"url"]) {
         [_inputView setKeyboardType:UIKeyboardTypeURL];
     }else if ([self isDateType]) {
+        if (!_datePickerManager) {
+            _datePickerManager = [[WXDatePickerManager alloc] init];
+            _datePickerManager.delegate = self;
+        }
         [_datePickerManager updateDatePicker:_attr];
     }
 }
