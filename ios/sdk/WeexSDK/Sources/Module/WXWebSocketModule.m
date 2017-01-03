@@ -11,6 +11,7 @@
 #import "WXWebSocketHandler.h"
 #import "WXHandlerFactory.h"
 #import "WXWebSocketLoader.h"
+#import "WXConvert.h"
 
 @interface WXWebSocketModule()
 
@@ -105,7 +106,7 @@ WX_EXPORT_METHOD(@selector(onclose:))
         [loader close];
         return;
     }
-    [loader close:code reason:reason];
+    [loader close:[code integerValue] reason:reason];
 }
 
 - (void)onerror:(WXModuleKeepAliveCallback)callback

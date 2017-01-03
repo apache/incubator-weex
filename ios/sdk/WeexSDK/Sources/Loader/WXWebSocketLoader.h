@@ -19,6 +19,6 @@
 - (void)open;
 - (void)send:(NSString *)data;
 - (void)close;
-- (void)close:(NSString *)code reason:(NSString *)reason;
+- (void)close:(NSInteger)code reason:(NSString *)reason;
 - (void)clear;
 @end

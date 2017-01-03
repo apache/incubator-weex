@@ -61,7 +61,7 @@
     }
 }
 
-- (void)close:(NSString *)identifier code:(NSString *)code reason:(NSString *)reason
+- (void)close:(NSString *)identifier code:(NSInteger)code reason:(NSString *)reason
 {
     SRWebSocket *webSocket = [_webSockets objectForKey:identifier];
     if(webSocket) {

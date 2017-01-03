@@ -8,7 +8,6 @@
 
 #import "WXWebSocketLoader.h"
 #import "WXWebSocketHandler.h"
-#import "WXWebSocketModel.h"
 #import "WXHandlerFactory.h"
 #import "WXLog.h"
 
@@ -94,7 +93,7 @@
     }
 }
 
-- (void)close:(NSString *)code reason:(NSString *)reason
+- (void)close:(NSInteger)code reason:(NSString *)reason
 {
     id<WXWebSocketHandler> requestHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXWebSocketHandler)];
     if (requestHandler) {
