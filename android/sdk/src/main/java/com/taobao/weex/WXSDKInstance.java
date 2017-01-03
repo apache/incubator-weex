@@ -807,6 +807,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
+
+    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,"WXApplicationDidBecomeActiveEvent");
+    mContext.sendBroadcast(intent);
   }
 
 
@@ -821,6 +825,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
+
+    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,"WXApplicationWillResignActiveEvent");
+    mContext.sendBroadcast(intent);
 
     onViewAppear();
   }
