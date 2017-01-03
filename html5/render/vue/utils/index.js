@@ -136,3 +136,20 @@ const OBJECT_STRING = '[object Object]'
 export function isPlainObject (obj) {
   return toString.call(obj) === OBJECT_STRING
 }
+
+export function nextFrame (callback) {
+  const runner = window.requestAnimationFrame
+    || window.webkitRequestAnimationFrame
+    || (cb => setTimeout(cb, 16))
+  runner(callback)
+}
+
+export function toCSSText (object) {
+  let cssText = ''
+  if (object) {
+    for (const key in object) {
+      cssText += `${hyphenate(key)}:${object[key]};`
+    }
+  }
+  return cssText
+}

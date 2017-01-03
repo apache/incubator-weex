@@ -37,10 +37,11 @@ export default {
 
       extend(event, props)
 
-      Object.defineProperty(event, 'target', {
-        enumerable: true,
-        value: context || null
-      })
+      // TODO: event.target is readonly
+      // Object.defineProperty(event, 'target', {
+      //   enumerable: true,
+      //   value: context || null
+      // })
 
       return event
     },

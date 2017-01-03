@@ -1,6 +1,6 @@
-// TODO: parse UA
 const ua = navigator.userAgent
 
+// TODO: parse UA
 const env = {
   platform: 'Web',
   userAgent: ua,
@@ -32,7 +32,7 @@ const units = {
 }
 
 Object.freeze(units)
-Object.freeze(WXEnvironment)
+Object.freeze(env)
 
 window.CSS_UNIT = units
 window.WXEnvironment = env

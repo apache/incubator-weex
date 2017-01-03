@@ -13,10 +13,10 @@ import 'core-js/modules/es6.promise'
 import './WXEnvironment'
 export * from './viewport'
 
-import api from '../../browser/extend/api'
+import { init } from '../modules'
 import * as weex from './weex'
 
-api.init(weex)
+init(weex)
 
 Object.freeze(weex)
 window.weex = weex
