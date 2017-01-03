@@ -10,16 +10,13 @@ import 'core-js/modules/es6.string.iterator'
 import 'core-js/modules/web.dom.iterable'
 import 'core-js/modules/es6.promise'
 
+import './WXEnvironment'
 export * from './viewport'
 
 import api from '../../browser/extend/api'
 import * as weex from './weex'
-import WXEnvironment from './WXEnvironment'
 
 api.init(weex)
 
 Object.freeze(weex)
-Object.freeze(WXEnvironment)
-
 window.weex = weex
-window.WXEnvironment = WXEnvironment

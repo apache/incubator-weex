@@ -12,16 +12,20 @@ export default {
         return ['play', 'pause'].indexOf(value) !== -1
       }
     },
-    // auto-play ?
+
     autoplay: {
       type: [String, Boolean],
       default: false
     },
+    autoPlay: {
+      type: [String, Boolean],
+      default: false
+    },
 
-    // playsinline: {
-    //   type: [String, Boolean],
-    //   default: false
-    // },
+    playsinline: {
+      type: [String, Boolean],
+      default: false
+    },
     controls: {
       type: [String, Boolean],
       default: false
@@ -39,6 +43,7 @@ export default {
       attrs: {
         'weex-type': 'video',
         autoplay: (this.autoplay !== 'false' && this.autoplay !== false),
+        autoPlay: (this.autoplay !== 'false' && this.autoplay !== false),
         controls: this.controls,
         src: this.src
       },

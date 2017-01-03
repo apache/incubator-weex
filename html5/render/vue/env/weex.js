@@ -1,9 +1,14 @@
 import * as utils from '../utils'
+import { requireModule } from '../modules'
 export { utils }
 
 const weexModules = {}
 
 export function require (moduleName) {
+  const module = requireModule(moduleName)
+  if (module) {
+    return module
+  }
   return weexModules[moduleName]
 }
 
