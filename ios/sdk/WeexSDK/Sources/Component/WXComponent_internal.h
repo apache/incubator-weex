@@ -45,7 +45,6 @@
      */
     NSMutableDictionary *_pseudoClassStyles;
     BOOL _isListenPseudoTouch;
-    BOOL _isPseudoClassExist;
     
     /**
      *  Events

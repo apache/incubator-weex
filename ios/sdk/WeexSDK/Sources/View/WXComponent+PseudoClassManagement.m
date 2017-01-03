@@ -19,7 +19,6 @@
     if (styles && [styles count] > 0 ) {
         for (NSString *key in styles){
             if([key rangeOfString:@":"].location != NSNotFound){
-                _isPseudoClassExist = YES;
                 if ([key rangeOfString:@"active"].location != NSNotFound) { //all active listen
                     _isListenPseudoTouch = YES;
                 }
