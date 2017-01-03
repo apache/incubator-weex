@@ -213,6 +213,7 @@ public class Constants {
   }
 
   public interface Name {
+
     String DEFAULT_WIDTH = "defaultWidth";
     String DEFAULT_HEIGHT = "defaultHeight";
     String HREF = "href";
@@ -387,8 +388,8 @@ public class Constants {
     String ONPULLING_DOWN = "pullingdown";
     String SCROLL = "scroll";
     String BACKPRESSED = "backpressed";
-    String RESUME_EVENT="WXApplicationWillResignActiveEvent";
-    String PAUSE_EVENT="WXApplicationDidBecomeActiveEvent";
+    String RESUME_EVENT = "WXApplicationWillResignActiveEvent";
+    String PAUSE_EVENT = "WXApplicationDidBecomeActiveEvent";
 
   }
 
