@@ -249,21 +249,6 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
-#pragma mark - private method
--(UIColor *)convertColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }else {
-        color = [UIColor blackColor];
-    }
-    return color;
-}
-
 #pragma mark - add-remove Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -427,10 +412,8 @@ WX_EXPORT_METHOD(@selector(blur))
     }else{
         [self setPlaceholderAttributedString];
     }
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
-        }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
     }
 }
 
@@ -467,7 +450,8 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect newFrame = _placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.y = 6;
+    newFrame.origin.x = 4; // the cursor origin.x
+    newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }

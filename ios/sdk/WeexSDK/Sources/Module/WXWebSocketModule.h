@@ -7,18 +7,9 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "WXModuleProtocol.h"
+#import "SRWebSocket.h"
 
-@protocol WXDatePickerManagerDelegate <NSObject>
-@optional
-- (void)fetchDatePickerValue:(NSString *)value;
-@end
-
-@interface WXDatePickerManager : NSObject
-
-@property (nonatomic, weak) id<WXDatePickerManagerDelegate> delegate;
-
--(void)show;
--(void)hide;
--(void)updateDatePicker:(NSDictionary *)attributes;
+@interface WXWebSocketModule : NSObject <WXModuleProtocol>
 
 @end
