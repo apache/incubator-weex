@@ -66,6 +66,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, strong) NSDictionary *styles;
 
 /**
+ *  @abstract The component's pseudoClassStyles.
+ */
+@property (nonatomic, readonly, strong) NSDictionary *pseudoClassStyles;
+
+/**
  *  @abstract The component's attributes.
  */
 @property (nonatomic, readonly, strong) NSDictionary *attributes;
