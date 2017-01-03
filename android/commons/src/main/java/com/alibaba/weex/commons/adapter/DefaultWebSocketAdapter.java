@@ -212,7 +212,8 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ws.WebSocket;
 import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
-import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.WebSocketCloseCodes;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -224,7 +225,7 @@ import okio.BufferedSource;
  * Created by moxun on 16/12/27.
  */
 
-public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
+public class DefaultWebSocketAdapter implements IWebSocketAdapter {
 
     private WebSocket ws;
     private EventListener eventListener;
@@ -237,12 +238,12 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
         Request.Builder builder = new Request.Builder();
 
         if (protocol != null) {
-            builder.addHeader("protocol", protocol);
+            builder.addHeader(HEADER_SEC_WEBSOCKET_PROTOCOL, protocol);
         }
 
-        Request wsRequest = builder.url(url).build();
+        builder.url(url);
 
-        WebSocketCall.create(okHttpClient, wsRequest).enqueue(new WebSocketListener() {
+        WebSocketCall.create(okHttpClient, builder.build()).enqueue(new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Request request, Response response) throws IOException {
                 ws = webSocket;
@@ -269,7 +270,7 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
             public void onFailure(IOException e) {
                 e.printStackTrace();
                 if (e instanceof EOFException) {
-                    eventListener.onClose(1000, null, true);
+                    eventListener.onClose(WebSocketCloseCodes.CLOSE_NORMAL.getCode(), WebSocketCloseCodes.CLOSE_NORMAL.name(), true);
                 } else {
                     eventListener.onError(e.getMessage());
                 }
@@ -310,7 +311,7 @@ public class DefaultWebSocketAdapter implements IWXWebSocketAdapter {
     public void destroy() {
         if (ws != null) {
             try {
-                ws.close(1001, "CLOSE_GOING_AWAY");
+                ws.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
             } catch (Exception e) {
                 e.printStackTrace();
             }

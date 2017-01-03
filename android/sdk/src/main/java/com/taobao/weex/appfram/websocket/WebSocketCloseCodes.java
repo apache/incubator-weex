@@ -204,22 +204,34 @@
  */
 package com.taobao.weex.appfram.websocket;
 
-import android.support.annotation.Nullable;
-
 /**
- * Created by moxun on 16/12/27.
+ * Created by moxun on 17/1/3.
+ * @link {https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent}
  */
 
-public interface IWXWebSocketAdapter {
-    void connect(String url, @Nullable String protocol, EventListener listener);
-    void send(String data);
-    void close(int code, String reason);
-    void destroy();
+public enum WebSocketCloseCodes {
+    CLOSE_NORMAL(1000),
+    CLOSE_GOING_AWAY(1001),
+    CLOSE_PROTOCOL_ERROR(1002),
+    CLOSE_UNSUPPORTED(1003),
+    CLOSE_NO_STATUS(1005),
+    CLOSE_ABNORMAL(1006),
+    UNSUPPORTED_DATA(1007),
+    POLICY_VIOLATION(1008),
+    CLOSE_TOO_LARGE(1009),
+    MISSING_EXTENSION(1010),
+    INTERNAL_ERROR(1011),
+    SERVICE_RESTART(1012),
+    TRY_AGAIN_LATER(1013),
+    TLS_HANDSHAKE(1015);
 
-    interface EventListener {
-        void onOpen();
-        void onMessage(String data);
-        void onClose(int code, String reason, boolean wasClean);
-        void onError(String msg);
+    private int code;
+
+    WebSocketCloseCodes(int code) {
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

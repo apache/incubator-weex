@@ -223,7 +223,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
@@ -731,7 +731,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return WXSDKManager.getInstance().getIWXHttpAdapter();
   }
 
-  public @Nullable IWXWebSocketAdapter getWXWebSocketAdapter() {
+  public @Nullable
+  IWebSocketAdapter getWXWebSocketAdapter() {
     return WXSDKManager.getInstance().getIWXWebSocketAdapter();
   }
 

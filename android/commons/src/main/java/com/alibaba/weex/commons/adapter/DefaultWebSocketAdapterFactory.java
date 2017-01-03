@@ -204,16 +204,16 @@
  */
 package com.alibaba.weex.commons.adapter;
 
-import com.taobao.weex.appfram.websocket.IWXWebSocketAdapter;
-import com.taobao.weex.appfram.websocket.IWXWebSocketAdapterFactory;
+import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
+import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 
 /**
  * Created by moxun on 16/12/28.
  */
 
-public class DefaultWebSocketAdapterFactory implements IWXWebSocketAdapterFactory {
+public class DefaultWebSocketAdapterFactory implements IWebSocketAdapterFactory {
     @Override
-    public IWXWebSocketAdapter createWebSocketAdapter() {
+    public IWebSocketAdapter createWebSocketAdapter() {
         return new DefaultWebSocketAdapter();
     }
 }

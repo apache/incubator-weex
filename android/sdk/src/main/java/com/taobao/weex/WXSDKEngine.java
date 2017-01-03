@@ -127,7 +127,7 @@ import com.taobao.weex.appfram.navigator.WXNavigatorModule;
 import com.taobao.weex.appfram.pickers.WXPickersModule;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.storage.WXStorageModule;
-import com.taobao.weex.appfram.websocket.WXWebSocketModule;
+import com.taobao.weex.appfram.websocket.WebSocketModule;
 import com.taobao.weex.bridge.ModuleFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
@@ -373,7 +373,7 @@ public class WXSDKEngine {
       registerModule("globalEvent",WXGlobalEventModule.class);
       registerModule("picker", WXPickersModule.class);
       registerModule("meta", WXMetaModule.class,true);
-      registerModule("WebSocket", WXWebSocketModule.class);
+      registerModule("WebSocket", WebSocketModule.class);
 
 
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);

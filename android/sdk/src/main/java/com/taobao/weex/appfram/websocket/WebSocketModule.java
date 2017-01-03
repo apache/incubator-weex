@@ -216,20 +216,20 @@ import java.util.Map;
  * Created by moxun on 16/12/27.
  */
 
-public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
+public class WebSocketModule extends WXSDKEngine.DestroyableModule {
 
-    private static final String TAG = "WXWebSocketModule";
+    private static final String TAG = "WebSocketModule";
     private static final String KEY_DATA = "data";
     private static final String KEY_CODE = "code";
     private static final String KEY_REASON = "reason";
     private static final String KEY_WAS_CLEAN = "wasClean";
 
-    private IWXWebSocketAdapter webSocketAdapter;
+    private IWebSocketAdapter webSocketAdapter;
     private JSCallback onOpen;
     private JSCallback onMessage;
     private JSCallback onClose;
     private JSCallback onError;
-    private IWXWebSocketAdapter.EventListener eventListener = new IWXWebSocketAdapter.EventListener() {
+    private IWebSocketAdapter.EventListener eventListener = new IWebSocketAdapter.EventListener() {
         @Override
         public void onOpen() {
             if (onOpen != null) {
@@ -270,27 +270,24 @@ public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
     @JSMethod
     public void WebSocket(String url, String protocol) {
         if (webSocketAdapter != null) {
-            webSocketAdapter.close(1001, "CLOSE_GOING_AWAY");
+            webSocketAdapter.close(WebSocketCloseCodes.CLOSE_GOING_AWAY.getCode(), WebSocketCloseCodes.CLOSE_GOING_AWAY.name());
         }
         webSocketAdapter = mWXSDKInstance.getWXWebSocketAdapter();
-        reportErrorIfNoAdapter();
-        if (webSocketAdapter != null) {
+        if (!reportErrorIfNoAdapter()) {
             webSocketAdapter.connect(url, protocol, eventListener);
         }
     }
 
     @JSMethod
     public void send(String data) {
-        reportErrorIfNoAdapter();
-        if (webSocketAdapter != null) {
+        if (!reportErrorIfNoAdapter()) {
             webSocketAdapter.send(data);
         }
     }
 
     @JSMethod
     public void close(int code, String reason) {
-        reportErrorIfNoAdapter();
-        if (webSocketAdapter != null) {
+        if (!reportErrorIfNoAdapter()) {
             webSocketAdapter.close(code, reason);
         }
     }
@@ -320,14 +317,17 @@ public class WXWebSocketModule extends WXSDKEngine.DestroyableModule {
         if (webSocketAdapter != null) {
             webSocketAdapter.destroy();
         }
+        eventListener = null;
     }
 
-    private void reportErrorIfNoAdapter() {
+    private boolean reportErrorIfNoAdapter() {
         if (webSocketAdapter == null) {
             if (eventListener != null) {
-                eventListener.onError("No implementation found for IWXWebSocketAdapter");
+                eventListener.onError("No implementation found for IWebSocketAdapter");
             }
-            WXLogUtils.e(TAG, "No implementation found for IWXWebSocketAdapter");
+            WXLogUtils.e(TAG, "No implementation found for IWebSocketAdapter");
+            return true;
         }
+        return false;
     }
 }

@@ -204,10 +204,31 @@
  */
 package com.taobao.weex.appfram.websocket;
 
+import android.support.annotation.Nullable;
+
 /**
- * Created by moxun on 16/12/28.
+ * Created by moxun on 16/12/27.
  */
 
-public interface IWXWebSocketAdapterFactory {
-    IWXWebSocketAdapter createWebSocketAdapter();
+public interface IWebSocketAdapter {
+
+    String HEADER_SEC_WEBSOCKET_PROTOCOL = "Sec-WebSocket-Protocol";
+
+    void connect(String url, @Nullable String protocol, EventListener listener);
+
+    void send(String data);
+
+    void close(int code, String reason);
+
+    void destroy();
+
+    interface EventListener {
+        void onOpen();
+
+        void onMessage(String data);
+
+        void onClose(int code, String reason, boolean wasClean);
+
+        void onError(String msg);
+    }
 }
