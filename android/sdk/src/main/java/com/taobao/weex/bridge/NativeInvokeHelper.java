@@ -232,7 +232,6 @@ public final class NativeInvokeHelper {
         public void run() {
           try {
             invoker.invoke(target, params);
-
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
