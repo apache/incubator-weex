@@ -107,8 +107,6 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  **/
 - (void)scrollToComponent:(NSString *)ref options:(NSDictionary *)options;
 
-- (void)dispatchComponentMethod:(WXBridgeMethod*)method;
-
 ///--------------------------------------
 /// @name Life Cycle
 ///--------------------------------------

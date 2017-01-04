@@ -34,6 +34,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 @property (nonatomic, strong) NSString *imageSrc;
 @property (nonatomic, strong) NSString *placeholdSrc;
+@property (nonatomic, assign) CGFloat blurRadius;
 @property (nonatomic, assign) UIViewContentMode resizeMode;
 @property (nonatomic, assign) WXImageQuality imageQuality;
 @property (nonatomic, assign) WXImageSharp imageSharp;
@@ -60,6 +61,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         }
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
+        [self configFilter:styles];
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
@@ -71,6 +73,27 @@ static dispatch_queue_t WXImageUpdateQueue;
 - (void)configPlaceHolder:(NSDictionary*)attributes {
     if (attributes[@"placeHolder"] || attributes[@"placeholder"]) {
         _placeholdSrc = [[WXConvert NSString:attributes[@"placeHolder"]?:attributes[@"placeholder"]]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
+}
+
+- (void)configFilter:(NSDictionary *)styles {
+    if (styles[@"filter"]) {
+        NSString *filter = styles[@"filter"];
+        
+        NSString *pattern = @"blur\\((\\d+)(px)?\\)";
+        NSError *error = nil;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                               options:NSRegularExpressionCaseInsensitive
+                                                                                 error:&error];
+        NSArray *matches = [regex matchesInString:filter options:0 range:NSMakeRange(0, filter.length)];
+        if (matches && matches.count > 0) {
+            NSTextCheckingResult *match = matches[matches.count - 1];
+            NSRange matchRange = [match rangeAtIndex:1];
+            NSString *matchString = [filter substringWithRange:matchRange];
+            if (matchString && matchString.length > 0) {
+                _blurRadius = [matchString doubleValue];
+            }
+        }
     }
 }
 
@@ -102,6 +125,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         [self updateImage];
     }
+    [self configFilter:styles];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -110,7 +134,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
-    
+  
     [self configPlaceHolder:attributes];
     
     if (attributes[@"resize"]) {
@@ -208,7 +232,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     if (placeholderSrc) {
         WXLogDebug(@"Updating image, component:%@, placeholder:%@ ", self.ref, placeholderSrc);
         NSMutableString *newURL = [_placeholdSrc mutableCopy];
-        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeLink, self.weexInstance, &newURL)
+        WX_REWRITE_URL(_placeholdSrc, WXResourceTypeImage, self.weexInstance, &newURL)
         
         __weak typeof(self) weakSelf = self;
         self.placeholderOperation = [[self imageLoader] downloadImageWithURL:newURL imageFrame:self.calculatedFrame userInfo:nil completed:^(UIImage *image, NSError *error, BOOL finished) {
@@ -240,9 +264,9 @@ static dispatch_queue_t WXImageUpdateQueue;
     NSString *imageSrc = self.imageSrc;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
-        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp)};
+        NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
         NSMutableString * newURL = [imageSrc mutableCopy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeLink, self.weexInstance, &newURL)
+        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance, &newURL)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
@@ -250,7 +274,10 @@ static dispatch_queue_t WXImageUpdateQueue;
                     __strong typeof(self) strongSelf = weakSelf;
                     
                     if (weakSelf.imageLoadEvent) {
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @"false" : @"true"}];
+                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
