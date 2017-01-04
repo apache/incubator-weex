@@ -330,6 +330,7 @@ public class Constants {
     String OFFSET_X_ACCURACY = "offsetXAccuracy";
     String OFFSET_X_RATIO = "offsetXRatio";
     String ELEVATION = "elevation";
+    String SCROLLABLE = "scrollable";
   }
 
   public interface Value {
