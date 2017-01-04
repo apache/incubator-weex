@@ -11,7 +11,9 @@
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
 #import "WXView.h"
+#import "WXAssert.h"
 #import "WXSDKInstance.h"
+#import "WXComponent+PseudoClassManagement.h"
 
 @interface WXTextAreaView : UITextView
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -71,6 +73,8 @@
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
+@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
+
 //event
 @property (nonatomic) BOOL inputEvent;
 @property (nonatomic) BOOL focusEvent;
@@ -81,9 +85,6 @@
 @property (nonatomic, assign) CGSize keyboardSize;
 @property (nonatomic, assign) CGRect rootViewOriginFrame;
 
-//private
-@property(nonatomic) NSRange selectedRange; //save selectedrange. because re layout change textview selectedRange
-
 @end
 
 @implementation WXTextAreaComponent {
@@ -91,6 +92,9 @@
     UIEdgeInsets _padding;
     NSTextStorage* _textStorage;
 }
+
+WX_EXPORT_METHOD(@selector(focus))
+WX_EXPORT_METHOD(@selector(blur))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -235,26 +239,17 @@
     [_textView setClipsToBounds:YES];
 }
 
-#pragma mark - private method
--(UIColor *)convertColor:(id)value
+-(void)focus
 {
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }else {
-        color = [UIColor blackColor];
+    if (self.textView) {
+        [self.textView becomeFirstResponder];
     }
-    return color;
 }
 
--(void)correctCursor
+-(void)blur
 {
-    if(self.selectedRange.location != 0 && self.textView.selectedRange.location != self.selectedRange.location)
-    {
-        self.textView.selectedRange = self.selectedRange;
+    if (self.textView) {
+        [self.textView resignFirstResponder];
     }
 }
 
@@ -317,7 +312,6 @@
         if (value) {
             _textValue = value;
             _textView.text = _textValue;
-            [self correctCursor];
             if([value length] > 0) {
                 _placeHolderLabel.text = @"";
             }
@@ -370,6 +364,41 @@
     }
 }
 
+#pragma mark update touch styles
+- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+{
+    WXAssertMainThread();
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    for (NSString *k in pseudoClassStyles) {
+        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
+            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
+        }
+    }
+    for (NSString *k in pseudoClassStyles) {
+        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
+            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
+        }
+    }
+    if ([styles count]>0) {
+        [self _updateViewStyles:styles];
+    }
+    self.updatedPseudoClassStyles = styles;
+}
+
+#pragma mark reset
+- (void)recoveryPseudoStyles:(NSDictionary *)styles
+{
+    NSMutableDictionary *resetStyles = [styles mutableCopy];
+    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
+        for (NSString *key in self.updatedPseudoClassStyles) {
+            if (![styles objectForKey:key] && [key length]>0) {
+                [resetStyles setObject:@"" forKey:key];
+            }
+        }
+    }
+    [self _updateViewStyles:resetStyles];
+}
+
 #pragma mark measure frame
 - (CGSize (^)(CGSize))measureBlock
 {
@@ -388,11 +417,11 @@
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -422,23 +451,19 @@
     }else{
         [self setPlaceholderAttributedString];
     }
-    self.selectedRange = textView.selectedRange;
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":textView.text}];
-        }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
     }
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
-    self.selectedRange = NSMakeRange(0, 0);
     if (![textView.text length]) {
         [self setPlaceholderAttributedString];
     }
     if (_changeEvent) {
         if (![[textView text] isEqualToString:_changeEventString]) {
-            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[_textView text]}}];
+            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
         }
     }
     if (_blurEvent) {
@@ -464,7 +489,8 @@
     CGRect newFrame = _placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.y = 6;
+    newFrame.origin.x = 4; // the cursor origin.x
+    newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }

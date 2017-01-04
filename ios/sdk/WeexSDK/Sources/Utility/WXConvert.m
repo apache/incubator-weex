@@ -174,7 +174,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         colorCache.countLimit = 64;
     });
     
-    if ([value isKindOfClass:[NSNull class]]) {
+    if ([value isKindOfClass:[NSNull class]] || !value) {
         return nil;
     }
     
@@ -584,6 +584,20 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
             return WXScrollDirectionHorizontal;
     }
     return WXScrollDirectionVertical;
+}
+
++ (UITableViewRowAnimation)UITableViewRowAnimation:(id)value
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *string = (NSString *)value;
+        if ([string isEqualToString:@"none"]) {
+            return UITableViewRowAnimationNone;
+        } else if ([string isEqualToString:@"default"]) {
+            return UITableViewRowAnimationFade;
+        }
+    }
+    
+    return UITableViewRowAnimationNone;
 }
 
 #pragma mark Animation

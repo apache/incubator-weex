@@ -301,7 +301,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *styles = data[@"style"];
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
-    
+        
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -417,33 +417,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [self _addUITask:^{
         [scrollerComponent scrollToComponent:toComponent withOffset:offset];
     }];
-}
-
-- (void)dispatchComponentMethod:(WXBridgeMethod *)method
-{
-    if (!method) {
-        return;
-    }
-    Class componentClazz = [WXComponentFactory classWithComponentName:method.targets[@"component"]];
-    if (!componentClazz) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist！", method.module];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return;
-    }
-    WXPerformBlockOnComponentThread(^{
-        WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
-        WXComponent *componentInstance = [weexInstance componentForRef:method.targets[@"ref"]];
-        
-        [self _executeComponentMethod:componentInstance withMethod:method];
-    });
-}
-
-- (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
-{
-    NSInvocation * invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:target method:method];
-    WXPerformBlockOnMainThread(^{
-        [invocation invoke];
-    });
 }
 
 #pragma mark Life Cycle
