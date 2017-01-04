@@ -1,6 +1,7 @@
 import '../styles/reset.css'
 import '../styles/components.css'
 
+// import 'lazyimg'
 import '../../browser/render/gesture'
 
 import '../../../shared/arrayFrom'

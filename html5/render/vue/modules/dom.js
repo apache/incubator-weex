@@ -1,9 +1,8 @@
-// import scroll from 'scroll-to'
 import { camelToKebab, appendStyle } from '../utils'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
-  if (vnode.weexType === 'scroller') {
+  if (vnode.weexType === 'scroller' || vnode.weexType === 'list') {
     return vnode
   }
   return getParentScroller(vnode.$parent)

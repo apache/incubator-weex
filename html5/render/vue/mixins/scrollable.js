@@ -9,6 +9,7 @@ export default {
         })
       }
     },
+
     isCellVisible (elem) {
       if (!this.wrapperHeight) {
         this.computeWrapperSize()

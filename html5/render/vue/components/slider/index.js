@@ -61,6 +61,7 @@ export default {
         return true
       }).map(vnode => {
         return createElement('li', {
+          ref: 'cells',
           staticClass: 'weex-slider-cell'
         }, [vnode])
       })
@@ -68,6 +69,9 @@ export default {
   },
 
   created () {
+    this.weexType = 'slider'
+    this.currentIndex = 0
+    this.innerOffset = 0
     this._indicator = null
     this.$nextTick(() => {
       this.updateLayout()
@@ -92,6 +96,8 @@ export default {
 
       this._autoPlayTimer = setTimeout(autoPlayFn, interval)
     }
+
+    this.reorder()
   },
 
   render (createElement) {
@@ -100,8 +106,8 @@ export default {
       validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
     }
 
-    const innerElements = this.formatChildren(createElement)
-    this.frameCount = innerElements.length
+    this._cells = this.formatChildren(createElement)
+    this.frameCount = this._cells.length
 
     return createElement(
       'nav',
@@ -119,7 +125,7 @@ export default {
         createElement('ul', {
           ref: 'inner',
           staticClass: 'weex-slider-inner'
-        }, innerElements),
+        }, this._cells),
         this._indicator
       ]
     )

@@ -1,5 +1,6 @@
 import { base, event, scrollable } from '../../../mixins'
 import { validateStyles } from '../../../validator'
+// import { watchIfNeeded } from '../../../utils/appear'
 import { debounce, throttle, bind, extend } from '../../../utils'
 import * as shared from '../shared'
 import listMixin from './listMixin'
@@ -42,6 +43,13 @@ export default {
         this._loading
       ]
     }
+  },
+
+  mounted () {
+    // console.log(this)
+    this.$nextTick(() => {
+      watchComponent(this)
+    })
   },
 
   render (createElement) {

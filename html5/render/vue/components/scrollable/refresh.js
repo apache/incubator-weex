@@ -6,6 +6,7 @@ export default {
   props: {
     display: {
       type: String,
+      default: 'show',
       validator (value) {
         return ['show', 'hide'].indexOf(value) !== -1
       }
@@ -27,6 +28,16 @@ export default {
       this.height = 0
       this.visibility = 'hidden'
       this.$emit('refreshfinish')
+    },
+    getChildren () {
+      const children = this.$slots.default || []
+      if (this.display === 'show') {
+        return children
+      }
+      return children.filter(vnode => {
+        return vnode.componentOptions
+          && vnode.componentOptions.tag !== 'loading-indicator'
+      })
     }
   },
   render (createElement) {
@@ -35,6 +46,6 @@ export default {
       attrs: { 'weex-type': 'refresh' },
       style: { height: this.height, visibility: this.visibility },
       staticClass: 'weex-refresh'
-    }, this.$slots.default)
+    }, this.getChildren())
   }
 }

@@ -1,3 +1,4 @@
+import { extend } from '../../utils'
 // import header from './header'
 import refresh from './refresh'
 import loading from './loading'
@@ -8,14 +9,14 @@ import loading from './loading'
 
 export function createLoading (context, createElement, vnode) {
   const options = vnode.componentOptions
-  return createElement(loading, {
-    on: Object.assign({}, options.listeners)
-  }, options.children)
+  return createElement(loading, extend({
+    on: options.listeners
+  }, vnode.data), options.children)
 }
 
 export function createRefresh (context, createElement, vnode) {
   const options = vnode.componentOptions
-  return createElement(refresh, {
-    on: Object.assign({}, options.listeners)
-  }, options.children)
+  return createElement(refresh, extend({
+    on: options.listeners
+  }, vnode.data), options.children)
 }

@@ -1,6 +1,6 @@
 import semver from 'semver'
-import * as components from './components'
 import { setViewport } from './env'
+import * as components from './components'
 
 function install (Vue) {
   setViewport()
