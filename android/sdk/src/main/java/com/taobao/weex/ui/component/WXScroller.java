@@ -673,9 +673,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   private void procAppear(int x, int y, int oldx,
                           int oldy) {
-    String direction = y - oldy > 0 ? "up" : "down";
-    if (mOrientation == Constants.Orientation.HORIZONTAL) {
-      direction = x - oldx > 0 ? "right" : "left";
+    int moveY = y - oldy;
+    int moveX = x - oldx;
+    String direction = moveY > 0 ? Constants.Value.DIRECTION_UP :
+            moveY < 0 ? Constants.Value.DIRECTION_DOWN : null;
+    if (mOrientation == Constants.Orientation.HORIZONTAL && moveX != 0) {
+      direction = moveX > 0 ? Constants.Value.DIRECTION_RIGHT : Constants.Value.DIRECTION_LEFT;
     }
 
     for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {

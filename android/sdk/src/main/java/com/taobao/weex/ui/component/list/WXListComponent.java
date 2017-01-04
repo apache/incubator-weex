@@ -1086,9 +1086,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
-    String direction = directionY > 0 ? "up" : "down";
-    if (getOrientation() == Constants.Orientation.HORIZONTAL) {
-      direction = directionX > 0 ? "left" : "right";
+    String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
+            directionY < 0 ? Constants.Value.DIRECTION_DOWN : null;
+    if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
+      direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
 
     while (it.hasNext()) {
