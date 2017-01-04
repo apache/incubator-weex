@@ -15,6 +15,7 @@
 #import "WXImgLoaderDefaultImpl.h"
 #import "DemoDefine.h"
 #import "WXScannerVC.h"
+#import "WXSyncTestModule.h"
 #import <WeexSDK/WeexSDK.h>
 #import <AVFoundation/AVFoundation.h>
 #import <ATSDK/ATManager.h>
@@ -37,7 +38,6 @@
     self.window.rootViewController = [[WXRootViewController alloc] initWithRootViewController:[self demoController]];
     [self.window makeKeyAndVisible];
     
-    // Override point for customization after application launch.
     [self startSplashScreen];
     
     return YES;
@@ -80,6 +80,7 @@
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
+    [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];

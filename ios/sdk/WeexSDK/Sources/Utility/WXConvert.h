@@ -58,6 +58,7 @@ typedef BOOL WXClipType;
 + (NSTextAlignment)NSTextAlignment:(id)value;
 
 + (WXScrollDirection)WXScrollDirection:(id)value;
++ (UITableViewRowAnimation)UITableViewRowAnimation:(id)value;
 
 + (UIViewAnimationOptions)UIViewAnimationTimingFunction:(id)value;
 + (CAMediaTimingFunction *)CAMediaTimingFunction:(id)value;

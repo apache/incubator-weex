@@ -41,6 +41,12 @@
     WXVisibility  _visibility;
     
     /**
+     *  PseudoClass
+     */
+    NSMutableDictionary *_pseudoClassStyles;
+    BOOL _isListenPseudoTouch;
+    
+    /**
      *  Events
      */
     BOOL _appearEvent;
@@ -49,9 +55,14 @@
     NSMutableArray *_swipeGestures;
     UILongPressGestureRecognizer *_longPressGesture;
     UIPanGestureRecognizer *_panGesture;
+    
     BOOL _listenPanStart;
     BOOL _listenPanMove;
     BOOL _listenPanEnd;
+    
+    BOOL _listenHorizontalPan;
+    BOOL _listenVerticalPan;
+    
     WXTouchGestureRecognizer* _touchGesture;
     
     /**
@@ -157,6 +168,8 @@
 
 - (void)_initEvents:(NSArray *)events;
 
+- (void)_initPseudoEvents:(BOOL)isListenPseudoTouch;
+
 - (void)_removeAllEvents;
 
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
@@ -167,4 +180,7 @@
 
 - (void)_resetNativeBorderRadius;
 
+- (void)_updatePseudoClassStyles:(NSString *)key;
+
+- (void)_restoreViewStyles;
 @end
