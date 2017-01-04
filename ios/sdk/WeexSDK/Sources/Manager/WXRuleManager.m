@@ -84,7 +84,6 @@ static WXRuleManager *_sharedInstance = nil;
                 return;
             }
             [fontFamily setObject:fontSrc forKey:@"src"];
-            [_fontStorage setObject:fontFamily forKey:rule[@"fontFamily"]];
             // remote font file
             NSString *fontfile = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[fontURL absoluteString]]];
             if ([WXUtility isFileExist:fontfile]) {
@@ -96,6 +95,7 @@ static WXRuleManager *_sharedInstance = nil;
             [WXUtility getIconfont:fontURL completion:^(NSURL * _Nonnull url, NSError * _Nullable error) {
                 if (!error && url) {
                     // load success
+                    [weakSelf.fontStorage setObject:fontFamily forKey:rule[@"fontFamily"]];
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
                 } else {
