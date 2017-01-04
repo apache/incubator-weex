@@ -26,8 +26,13 @@
         UIColor *startColor = [WXConvert UIColor:array[1]];
         UIColor *endColor = [WXConvert UIColor:array[2]];
         
-        UIImage *bgImg = [self gradientColorImageFromColors:@[startColor, endColor] gradientType:gradientType imgSize:_view.frame.size];
-        _view.backgroundColor = [UIColor colorWithPatternImage:bgImg];
+        __weak typeof(self) weakSelf = self;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            UIImage *bgImg = [weakSelf gradientColorImageFromColors:@[startColor, endColor] gradientType:gradientType imgSize:weakSelf.view.frame.size];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.view.backgroundColor = [UIColor colorWithPatternImage:bgImg];
+            });
+        });
     }
 }
 

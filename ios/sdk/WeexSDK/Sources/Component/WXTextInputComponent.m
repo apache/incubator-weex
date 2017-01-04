@@ -11,6 +11,9 @@
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
 #import "WXDefine.h"
+#import "WXAssert.h"
+#import "WXComponent_internal.h"
+#import "WXComponent+PseudoClassManagement.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -63,6 +66,7 @@
 @property (nonatomic) BOOL autofocus;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
+@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -530,6 +534,41 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     _border = border;
     [_inputView setBorder:border];
+}
+
+#pragma mark update touch styles
+- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+{
+    WXAssertMainThread();
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    for (NSString *k in pseudoClassStyles) {
+        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
+            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
+        }
+    }
+    for (NSString *k in pseudoClassStyles) {
+        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
+            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
+        }
+    }
+    if ([styles count]>0) {
+        [self _updateViewStyles:styles];
+    }
+    self.updatedPseudoClassStyles = styles;
+}
+
+#pragma mark reset
+- (void)recoveryPseudoStyles:(NSMutableDictionary *)styles
+{
+    NSMutableDictionary *resetStyles = [styles mutableCopy];
+    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
+        for (NSString *key in self.updatedPseudoClassStyles) {
+            if (![styles objectForKey:key] && [key length]>0) {
+                [resetStyles setObject:@"" forKey:key];
+            }
+        }
+    }
+    [self _updateViewStyles:resetStyles];
 }
 
 #pragma mark keyboard

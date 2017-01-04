@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "WXModuleProtocol.h"
-#import "WXWebSocketModel.h"
 
 @protocol WXWebSocketDelegate<NSObject>
 - (void)didOpen;
@@ -19,9 +18,9 @@
 
 @protocol WXWebSocketHandler<NSObject>
 
-- (void)open:(WXWebSocketModel *)webSocketModel withDelegate:(id<WXWebSocketDelegate>)delegate;
-- (void)send:(WXWebSocketModel *)webSocketModel data:(NSString *)data;
-- (void)close:(WXWebSocketModel *)webSocketModel;
-- (void)close:(WXWebSocketModel *)webSocketModel code:(NSString *)code reason:(NSString *)reason;
-- (void)clear:(WXWebSocketModel *)webSocketModel;
+- (void)open:(NSString *)url protocol:(NSString *)protocol identifier:(NSString *)identifier withDelegate:(id<WXWebSocketDelegate>)delegate;
+- (void)send:(NSString *)identifier data:(NSString *)data;
+- (void)close:(NSString *)identifier;
+- (void)close:(NSString *)identifier code:(NSInteger)code reason:(NSString *)reason;
+- (void)clear:(NSString *)identifier;
 @end
