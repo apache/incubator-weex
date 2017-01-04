@@ -445,6 +445,22 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
+  public boolean isRounded() {
+    return mBorderRadius != null &&
+           (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS), 0) ||
+            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS), 0) ||
+            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS), 0) ||
+            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS), 0));
+  }
+
+  public
+  @NonNull
+  Path getContentPath(@NonNull RectF borderBox) {
+    Path contentClip = new Path();
+    prepareBorderPath(0, 0, 0, 0, borderBox, contentClip);
+    return contentClip;
+  }
+
   private float getBorderRadius(@Nullable SparseArray<Float> borderRadius, int position) {
     return BorderUtil.fetchFromSparseArray(borderRadius, position, DEFAULT_BORDER_RADIUS);
   }

@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.dom;
 
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
@@ -294,16 +295,20 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public static int getFontWeight(Map<String, Object> style) {
     int typeface = android.graphics.Typeface.NORMAL;
-    if (style == null) {
-      return typeface;
-    }
-    Object temp = style.get(Constants.Name.FONT_WEIGHT);
-    if (temp == null) {
-      return typeface;
-    }
-    String fontWeight = temp.toString();
-    if (fontWeight.equals(Constants.Value.BOLD)) {
-      typeface = android.graphics.Typeface.BOLD;
+    if (style != null) {
+      Object temp = style.get(Constants.Name.FONT_WEIGHT);
+      if (temp != null) {
+        String fontWeight = temp.toString();
+        switch (fontWeight){
+          case "600":
+          case "700":
+          case "800":
+          case "900":
+          case Constants.Value.BOLD:
+            typeface=Typeface.BOLD;
+            break;
+        }
+      }
     }
     return typeface;
   }
@@ -324,15 +329,15 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return typeface;
   }
 
-  public static int getFontSize(Map<String, Object> style) {
+  public static int getFontSize(Map<String, Object> style,int viewPortW) {
     if (style == null) {
-      return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE);
+      return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,viewPortW);
     }
     int fontSize = WXUtils.getInt(style.get(Constants.Name.FONT_SIZE));
     if (fontSize <= 0) {
       fontSize = WXText.sDEFAULT_SIZE;
     }
-    return (int) WXViewUtils.getRealPxByWidth(fontSize);
+    return (int) WXViewUtils.getRealPxByWidth(fontSize,viewPortW);
   }
 
   public static String getFontFamily(Map<String, Object> style) {
@@ -375,7 +380,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return WXUtils.getInt(style.get(Constants.Name.LINES));
   }
 
-  public static int getLineHeight(Map<String, Object> style){
+  public static int getLineHeight(Map<String, Object> style,int viewPortW){
     if (style == null) {
       return UNSET;
     }
@@ -384,7 +389,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
       lineHeight = UNSET;
       return lineHeight;
     }
-    return (int) WXViewUtils.getRealPxByWidth(lineHeight);
+    return (int) WXViewUtils.getRealPxByWidth(lineHeight,viewPortW);
   }
   /*
    * flexbox

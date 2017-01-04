@@ -357,11 +357,11 @@ public class WXStreamModule extends WXModule {
         if(callback != null) {
           Map<String, Object> resp = new HashMap<>();
           if(response == null|| "-1".equals(response.statusCode)){
-            resp.put(STATUS,"-1");
+            resp.put(STATUS,-1);
             resp.put(STATUS_TEXT,Status.ERR_CONNECT_FAILED);
           }else {
-            resp.put(STATUS, response.statusCode);
             int code = Integer.parseInt(response.statusCode);
+            resp.put(STATUS, code);
             resp.put("ok", (code >= 200 && code <= 299));
             if (response.originalData == null) {
               resp.put("data", null);

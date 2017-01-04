@@ -240,6 +240,14 @@ class WXBridge implements IWXBridge {
    */
   public native int execJS(String instanceId, String namespace, String function, WXJSObject[] args);
 
+
+  /**
+   * register Weex Service
+   *
+   * @param javascript  code
+   */
+  public native int execJSService(String javascript);
+
   /**
    * JavaScript uses this methods to call Android code
    *
