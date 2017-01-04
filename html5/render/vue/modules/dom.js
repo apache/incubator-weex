@@ -1,6 +1,14 @@
 // import scroll from 'scroll-to'
 import { camelToKebab, appendStyle } from '../utils'
 
+function getParentScroller (vnode) {
+  if (!vnode) return null
+  if (vnode.weexType === 'scroller') {
+    return vnode
+  }
+  return getParentScroller(vnode.$parent)
+}
+
 export default {
   /**
    * scrollToElement
@@ -9,7 +17,14 @@ export default {
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
   scrollToElement: function (vnode, options) {
-    // TODO
+    // TODO: more reliable
+    const scroller = getParentScroller(vnode)
+    if (scroller && scroller.$el && vnode.$el) {
+      const offset = vnode.$el.offsetTop + options.offset
+
+      // TODO: add animation
+      scroller.$el.scrollTop = offset
+    }
   },
 
   /**

@@ -69,7 +69,6 @@ export default {
 
     handleTouchEnd (event) {
       // event.preventDefault()
-      console.log('handleTouchEnd')
       event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner

@@ -3,6 +3,14 @@ import LoadingIndicator from './loading-indicator'
 export default {
   // name: 'refresh',
   components: { LoadingIndicator },
+  props: {
+    display: {
+      type: String,
+      validator (value) {
+        return ['show', 'hide'].indexOf(value) !== -1
+      }
+    }
+  },
   data () {
     return {
       height: 0
@@ -10,6 +18,7 @@ export default {
   },
   methods: {
     show () {
+      // TODO: no fixed height
       this.$emit('refresh')
       this.height = '120px'
       this.visibility = 'visible'

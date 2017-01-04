@@ -45,6 +45,8 @@ export default {
   },
 
   render (createElement) {
+    this.weexType = 'list'
+
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
       validateStyles('list', this.$vnode.data && this.$vnode.data.staticStyle)

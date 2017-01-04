@@ -1,7 +1,7 @@
 import { extend } from '../utils'
 
 const supportedEvents = [
-  'click'
+  'click', 'longpress', 'appear', 'disappear'
   // 'touchstart', 'touchmove', 'touchend'
 ]
 

@@ -1,6 +1,8 @@
 import '../styles/reset.css'
 import '../styles/components.css'
 
+import '../../browser/render/gesture'
+
 import '../../../shared/arrayFrom'
 import '../../../shared/objectAssign'
 import '../../../shared/objectSetPrototypeOf'

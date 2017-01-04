@@ -17,6 +17,11 @@ export default {
     loadmoreoffset: {
       type: [String, Number],
       default: 0
+    },
+    // TODO: support loadmore retry
+    loadmoreretry: {
+      type: [String, Number],
+      default: 0
     }
   },
 
@@ -49,10 +54,18 @@ export default {
         }, this._cells),
         this._loading
       ]
+    },
+    scrollTo (vnode) {
+      if (vnode && vnode.$el) {
+        // TODO: add animation
+        this.$el.scrollTop = vnode.$el.offsetTop
+      }
     }
   },
 
   render (createElement) {
+    this.weexType = 'scroller'
+
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
       validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)

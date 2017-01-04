@@ -1,9 +1,9 @@
 * {
-  /*all: initial;*/
   color: initial;
   cursor: initial;
   direction: initial;
   font: initial;
+  font-family: initial;
   font-size: initial;
   font-style: initial;
   font-variant: initial;
@@ -14,9 +14,6 @@
   visibility: initial;
   white-space: initial;
   word-spacing: initial;
-
-  /*font-family: initial;*/
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 *,
@@ -64,3 +61,5 @@ figure {
 textarea {
   resize: none;
 }
+
+/*# sourceMappingURL=reset.css.map */
