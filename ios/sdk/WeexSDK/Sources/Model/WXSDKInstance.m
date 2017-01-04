@@ -403,7 +403,7 @@ typedef enum : NSUInteger {
     });
     BOOL once = [[option objectForKey:@"once"] boolValue];
     NSMutableDictionary * observer = nil;
-    NSMutableDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once)};
+    NSDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once)};
     if(![self checkModuleEventRegistered:event moduleClassName:moduleClassName]) {
         //had not registered yet
         observer = [NSMutableDictionary new];
