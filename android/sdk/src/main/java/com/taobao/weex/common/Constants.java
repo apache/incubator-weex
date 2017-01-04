@@ -213,6 +213,7 @@ public class Constants {
   }
 
   public interface Name {
+
     String DEFAULT_WIDTH = "defaultWidth";
     String DEFAULT_HEIGHT = "defaultHeight";
     String HREF = "href";
@@ -328,6 +329,8 @@ public class Constants {
     String NAV_BAR_VISIBILITY = "hidden";
     String OFFSET_X_ACCURACY = "offsetXAccuracy";
     String OFFSET_X_RATIO = "offsetXRatio";
+    String ELEVATION = "elevation";
+    String SCROLLABLE = "scrollable";
   }
 
   public interface Value {
@@ -358,6 +361,10 @@ public class Constants {
     String PLAY = "play";
     String PAUSE = "pause";
     String STOP = "stop";
+    String DIRECTION_LEFT = "left";
+    String DIRECTION_RIGHT = "right";
+    String DIRECTION_UP = "up";
+    String DIRECTION_DOWN = "down";
   }
 
   public interface Event {
@@ -385,6 +392,10 @@ public class Constants {
     String CHANGE = "change";
     String ONPULLING_DOWN = "pullingdown";
     String SCROLL = "scroll";
+    String BACKPRESSED = "backpressed";
+    String RESUME_EVENT = "WXApplicationWillResignActiveEvent";
+    String PAUSE_EVENT = "WXApplicationDidBecomeActiveEvent";
+
   }
 
   public interface Scheme {

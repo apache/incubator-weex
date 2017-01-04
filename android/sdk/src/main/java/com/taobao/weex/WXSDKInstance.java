@@ -210,6 +210,7 @@ import android.graphics.Color;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -217,10 +218,12 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.NativeInvokeHelper;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
@@ -237,6 +240,7 @@ import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -286,6 +290,19 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
+
+  /*
+   *  store custom ViewPort Width
+   */
+  public void setViewPortWidth(int mViewPortWidth) {
+    this.mViewPortWidth = mViewPortWidth;
+  }
+
+  public int getViewPortWidth() {
+    return mViewPortWidth;
+  }
+
+  private int mViewPortWidth = 750;
 
   /**
    * Render strategy.
@@ -698,6 +715,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return WXSDKManager.getInstance().getIWXImgLoaderAdapter();
   }
 
+  public IDrawableLoader getDrawableLoader() {
+    return WXSDKManager.getInstance().getDrawableLoader();
+  }
+
   public URIAdapter getURIAdapter(){
     return WXSDKManager.getInstance().getURIAdapter();
   }
@@ -708,6 +729,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public IWXHttpAdapter getWXHttpAdapter() {
     return WXSDKManager.getInstance().getIWXHttpAdapter();
+  }
+
+  public @Nullable
+  IWebSocketAdapter getWXWebSocketAdapter() {
+    return WXSDKManager.getInstance().getIWXWebSocketAdapter();
   }
 
   @Deprecated
@@ -788,6 +814,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
+
+    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
+    mContext.sendBroadcast(intent);
   }
 
 
@@ -802,6 +832,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
+
+    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
+    mContext.sendBroadcast(intent);
 
     onViewAppear();
   }
@@ -848,7 +882,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return false;
   }
 
-  public void onActivityResult(int requestCode, int resultCode, Intent data){
+  public boolean onBackPressed() {
+    WXComponent comp = getRootComponent();
+    if(comp != null) {
+      WXEvent events= comp.getDomObject().getEvents();
+      boolean hasBackPressed = events.contains(Constants.Event.BACKPRESSED);
+      if (hasBackPressed) {
+        WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.BACKPRESSED,null, null);
+      }
+      return hasBackPressed;
+    }
+    return false;
+  }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
     WXModuleManager.onActivityResult(getInstanceId(),requestCode,resultCode,data);
 
     if(mRootComp != null) {
@@ -1235,8 +1282,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width);
-    float realHeight = WXViewUtils.getWebPxByWidth(height);
+    float realWidth = WXViewUtils.getWebPxByWidth(width,getViewPortWidth());
+    float realHeight = WXViewUtils.getWebPxByWidth(height,getViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {
@@ -1328,6 +1375,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXSDKManager.getInstance().callback(getInstanceId(),callback,params,isOnce);
   }
 
+  public WXPerformance getWXPerformance(){
+    return mWXPerformance;
+  }
 
   public Map<String, Serializable> getUserTrackParams() {
     return mUserTrackParams;
@@ -1424,6 +1474,30 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
         Object requestType=response.extendParams.get("requestType");
         mWXPerformance.requestType=requestType instanceof String?(String)requestType:"";
+
+        if("network".equals(requestType) && mUserTrackAdapter!=null){
+          WXPerformance performance=new WXPerformance();
+          if(!TextUtils.isEmpty(mBundleUrl)){
+            try {
+              performance.args= Uri.parse(mBundleUrl).buildUpon().clearQuery().toString();
+            } catch (Exception e) {
+              performance.args=pageName;
+            }
+          }
+          if(!"200".equals(response.statusCode)){
+            performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
+            performance.appendErrMsg(response.errorCode);
+            performance.appendErrMsg("|");
+            performance.appendErrMsg(response.errorMsg);
+          }else if("200".equals(response.statusCode) && (response.originalData==null || response.originalData.length<=0)){
+            performance.errCode=WXErrorCode.WX_ERR_JSBUNDLE_DOWNLOAD.getErrorCode();
+            performance.appendErrMsg(response.statusCode);
+            performance.appendErrMsg("|template is null!");
+          }else {
+            performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
+          }
+          mUserTrackAdapter.commit(getContext(),null,IWXUserTrackAdapter.JS_DOWNLOAD,performance,null);
+        }
       }
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
@@ -1435,7 +1509,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       } else {
         onRenderError(WXRenderErrorCode.WX_NETWORK_ERROR, response.errorMsg);
       }
-
     }
   }
 

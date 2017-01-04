@@ -235,6 +235,7 @@ import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
@@ -248,6 +249,7 @@ import com.taobao.weex.ui.view.listview.adapter.TransformItemDecoration;
 import com.taobao.weex.ui.view.listview.adapter.WXRecyclerViewOnScrollListener;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
@@ -280,6 +282,7 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
 
+  private boolean scrollable = true;
   private ArrayMap<String, Long> mRefToViewType;
   private SparseArray<ArrayList<WXComponent>> mViewTypes;
   protected BounceRecyclerView bounceRecyclerView;
@@ -503,8 +506,20 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
     switch (key){
       case LOADMOREOFFSET:
         return true;
+      case Constants.Name.SCROLLABLE:
+        boolean scrollable = WXUtils.getBoolean(param, true);
+        setScrollable(scrollable);
+        return true;
     }
     return super.setProperty(key, param);
+  }
+
+  @WXComponentProp(name = Constants.Name.SCROLLABLE)
+  public void setScrollable(boolean scrollable) {
+      View inner = getHostView().getInnerView();
+      if(inner instanceof WXRecyclerView) {
+          ((WXRecyclerView) inner).setScrollable(scrollable);
+      };
   }
 
   private void setAppearanceWatch(WXComponent component, int event, boolean enable) {
@@ -1086,9 +1101,10 @@ public class WXListComponent extends WXVContainer<BounceRecyclerView> implements
   public void notifyAppearStateChange(int firstVisible, int lastVisible, int directionX, int directionY) {
     //notify appear state
     Iterator<AppearanceHelper> it = mAppearComponents.values().iterator();
-    String direction = directionY > 0 ? "up" : "down";
-    if (getOrientation() == Constants.Orientation.HORIZONTAL) {
-      direction = directionX > 0 ? "left" : "right";
+    String direction = directionY > 0 ? Constants.Value.DIRECTION_UP :
+            directionY < 0 ? Constants.Value.DIRECTION_DOWN : null;
+    if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
+      direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
 
     while (it.hasNext()) {

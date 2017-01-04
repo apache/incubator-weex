@@ -210,6 +210,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.MotionEvent;
+
 import com.taobao.weex.common.WXThread;
 
 public class WXRecyclerView extends RecyclerView {
@@ -218,8 +220,18 @@ public class WXRecyclerView extends RecyclerView {
   public static final int TYPE_GRID_LAYOUT = 2;
   public static final int TYPE_STAGGERED_GRID_LAYOUT = 3;
 
+  private boolean scrollable = true;
+
   public WXRecyclerView(Context context) {
     super(context);
+  }
+
+  public boolean isScrollable() {
+    return scrollable;
+  }
+
+  public void setScrollable(boolean scrollable) {
+    this.scrollable = scrollable;
   }
 
   @Override
@@ -269,4 +281,11 @@ public class WXRecyclerView extends RecyclerView {
     }
   }
 
+  @Override
+  public boolean onTouchEvent(MotionEvent e) {
+    if(!scrollable) {
+      return true;
+    }
+    return super.onTouchEvent(e);
+  }
 }
