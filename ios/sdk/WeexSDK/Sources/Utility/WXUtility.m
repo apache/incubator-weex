@@ -389,7 +389,6 @@ static BOOL WXNotStat;
     
     // remote font url
     NSURLSession *session = [NSURLSession sharedSession];
-    
     NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSURL * downloadPath = nil;
         NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse*)response;
