@@ -81,6 +81,11 @@ typedef enum : NSUInteger {
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; id = %@; rootView = %@; url= %@>", NSStringFromClass([self class]), self, _instanceId, _rootView, _scriptURL];
+}
+
 #pragma mark Public Mehtods
 
 - (UIView *)rootView
@@ -337,7 +342,7 @@ typedef enum : NSUInteger {
         params = [NSDictionary dictionary];
     }
     NSDictionary * userInfo = @{
-            @"weexInstance":self,
+            @"weexInstance":self.instanceId,
             @"param":params
     };
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
@@ -357,7 +362,9 @@ typedef enum : NSUInteger {
     if (!_scriptURL) {
         return [NSURL URLWithString:url];
     }
-    
+    if ([url hasPrefix:@"//"] && [_scriptURL isFileURL]) {
+        return [NSURL URLWithString:url];
+    }
     if (!url) {
         return nil;
     }
@@ -369,12 +376,24 @@ typedef enum : NSUInteger {
 
 - (void)addObservers
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void)removeObservers
 {
     [self removeObserver:self forKeyPath:@"state"];
+}
+
+- (void)applicationWillResignActive:(NSNotification*)notification
+{
+    [self fireGlobalEvent:WX_APPLICATION_WILL_RESIGN_ACTIVE params:nil];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification*)notification
+{
+    [self fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
 }
 
 - (WXComponentManager *)componentManager

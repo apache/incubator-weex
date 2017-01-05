@@ -12,6 +12,7 @@
 #import "WXAppConfiguration.h"
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXRuleManager.h"
+#import "WXSDKEngine.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <sys/utsname.h>
@@ -163,6 +164,10 @@ static BOOL WXNotStat;
                                     @"scale":@(scale),
                                     @"logLevel":[WXLog logLevelString] ?: @"error"
                                 }];
+    if ([WXSDKEngine customEnvironment]) {
+        [data addEntriesFromDictionary:[WXSDKEngine customEnvironment]];
+    }
+    
     return data;
 }
 
@@ -644,6 +649,21 @@ static BOOL WXNotStat;
     [dateFormatter setDateFormat:@"HH:mm"];
     NSString *str = [dateFormatter stringFromDate:date];
     return str;
+}
+
++ (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString
+{
+    if([string length] ==0) {
+        return 0;
+    }
+    if([subString length] ==0) {
+        return 0;
+    }
+    NSError *error = NULL;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:subString options:NSRegularExpressionCaseInsensitive error:&error];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:string options:0 range:NSMakeRange(0, [string length])];
+    return numberOfMatches;
+    
 }
 
 @end

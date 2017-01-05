@@ -10,11 +10,14 @@
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
 #import "WXSDKInstance.h"
+#import "WXComponentManager.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKManager.h"
+#import "WXSDKInstance_private.h"
 #import <objc/runtime.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
+#import "WXComponent+PseudoClassManagement.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -71,6 +74,7 @@
 @property (nonatomic, assign) BOOL listenTouchMove;
 @property (nonatomic, assign) BOOL listenTouchEnd;
 @property (nonatomic, assign) BOOL listenTouchCancel;
+@property (nonatomic, assign) BOOL listenPseudoTouch;
 
 - (instancetype)initWithComponent:(WXComponent *)component NS_DESIGNATED_INITIALIZER;
 
@@ -127,6 +131,13 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
 }
 
+- (void)_initPseudoEvents:(BOOL)isListenPseudoTouch
+{
+    if(isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = YES;
+    }
+}
+
 - (void)_addEventOnMainThread:(NSString *)addEventName
 {
     WX_ADD_EVENT(appear, addAppearEvent)
@@ -139,6 +150,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(panstart, addPanStartEvent)
     WX_ADD_EVENT(panmove, addPanMoveEvent)
     WX_ADD_EVENT(panend, addPanEndEvent)
+    
+    WX_ADD_EVENT(horizontalpan, addHorizontalPanEvent)
+    WX_ADD_EVENT(verticalpan, addVerticalPanEvent)
     
     WX_ADD_EVENT(touchstart, addTouchStartEvent)
     WX_ADD_EVENT(touchmove, addTouchMoveEvent)
@@ -161,11 +175,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(panmove, removePanMoveEvent)
     WX_REMOVE_EVENT(panend, removePanEndEvent)
     
+    WX_REMOVE_EVENT(horizontalpan, removeHorizontalPanEvent)
+    WX_REMOVE_EVENT(verticalpan, removeVerticalPanEvent)
+    
     WX_REMOVE_EVENT(touchstart, removeTouchStartEvent)
     WX_REMOVE_EVENT(touchmove, removeTouchMoveEvent)
     WX_REMOVE_EVENT(touchend, removeTouchEndEvent)
     WX_REMOVE_EVENT(touchcancel, removeTouchCancelEvent)
     
+    if(_isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = NO;
+    }
+
     [self removeEvent:removeEventName];
 }
 
@@ -181,6 +202,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self removeTouchEndEvent];
     [self removeTouchCancelEvent];
     [self removeSwipeEvent];
+    [self removePseudoTouchEvent];
+
 }
 
 #pragma mark - Appear & Disappear
@@ -207,6 +230,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     _disappearEvent = NO;
     [self.ancestorScroller removeScrollToListener:self];
+}
+
+- (void)removePseudoTouchEvent
+{
+    _touchGesture.listenPseudoTouch = NO;
+    [self checkRemoveTouchGesture];
 }
 
 #pragma mark - Click Event
@@ -357,7 +386,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
 }
 
-#pragma makr - Pan
+#pragma mark - Pan
 
 - (void)addPanGesture
 {
@@ -386,23 +415,44 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self addPanGesture];
 }
 
+- (void)addHorizontalPanEvent
+{
+    _listenHorizontalPan = YES;
+    [self addPanGesture];
+}
+
+- (void)addVerticalPanEvent
+{
+    _listenVerticalPan = YES;
+    [self addPanGesture];
+}
+
+
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
+    NSString *state = @"";
     NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLoacation identifier:gesture.wx_identifier];
     
     if (gesture.state == UIGestureRecognizerStateBegan) {
         eventName = @"panstart";
+        state = @"start";
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
         eventName = @"panend";
+        state = @"end";
         gesture.wx_identifier = nil;
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
         eventName = @"panmove";
+        state = @"move";
     }
     
-    if (eventName) {
+    if (_listenHorizontalPan) {
+        [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    } else if (_listenVerticalPan) {
+        [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    } else if (eventName) {
         [self fireEvent:eventName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
 }
@@ -425,9 +475,24 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self checkRemovePanGesture];
 }
 
+- (void)removeHorizontalPanEvent
+{
+    _listenHorizontalPan = NO;
+    [self checkRemovePanGesture];
+}
+
+- (void)removeVerticalPanEvent
+{
+    _listenVerticalPan = NO;
+    [self checkRemovePanGesture];
+}
+
 - (void)checkRemovePanGesture
 {
-    if (_panGesture && !_listenPanStart && !_listenPanMove && !_listenPanEnd) {
+    if (_panGesture
+        && !_listenPanStart && !_listenPanMove && !_listenPanEnd
+        && !_listenHorizontalPan && !_listenVerticalPan
+        ) {
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -492,7 +557,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)checkRemoveTouchGesture
 {
-    if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel) {
+    if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel && !_touchGesture.listenPseudoTouch) {
         _touchGesture.delegate = nil;
         _touchGesture = nil;
     }
@@ -507,6 +572,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
+    if (gestureRecognizer == _panGesture) {
+        CGPoint translation = [_panGesture translationInView:self.view];
+        if (_listenHorizontalPan && !_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+            return NO;
+        }
+    }
     return YES;
 }
 
@@ -524,13 +595,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(@"UITextTapRecognizer")]) {
         return YES;
     }
-    
-//#ifdef DEBUG
-//    if ([gestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]
-//        || [otherGestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]) {
-//        return YES;
-//    }
-//#endif
     
     return NO;
 }
@@ -586,6 +650,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if (_listenTouchStart) {
         [self fireTouchEvent:@"touchstart" withTouches:touches];
     }
+    if(_listenPseudoTouch) {
+        [_component updateTouchPseudoClassStyles:_component.pseudoClassStyles];
+    }
+
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -605,6 +673,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if (_listenTouchEnd) {
         [self fireTouchEvent:@"touchend" withTouches:touches];
     }
+    if(_listenPseudoTouch) {
+        [self recoveryPseudoStyles:_component.styles];
+    }
+
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -613,6 +685,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     
     if (_listenTouchCancel) {
         [self fireTouchEvent:@"touchcancel" withTouches:touches];
+    }
+    if(_listenPseudoTouch) {
+        [self recoveryPseudoStyles:_component.styles];
     }
 }
 
@@ -631,6 +706,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];
+}
+
+- (void)recoveryPseudoStyles:(NSDictionary *)styles
+{
+    [_component recoveryPseudoStyles:styles];
 }
 
 - (void)touchResponse:(UIGestureRecognizer *)gesture
