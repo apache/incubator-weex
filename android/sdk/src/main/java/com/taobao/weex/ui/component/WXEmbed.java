@@ -255,9 +255,15 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         webView.setLayoutParams(params);
         webView.getSettings().setJavaScriptEnabled(true);
 
+        //WebView Remote Code Execution Vulnerability
+        webView.removeJavascriptInterface("searchBoxJavaBridge_");
+        webView.removeJavascriptInterface("accessibility");
+        webView.removeJavascriptInterface("accessibilityTraversal");
+        webView.getSettings().setSavePassword(false);
+
         container.removeAllViews();
         container.addView(webView);
-        webView.loadUrl(((WXEmbed)comp).src);
+        webView.loadUrl(((WXEmbed) comp).src);
       }else{
         super.onException(comp,errCode,msg);
       }
