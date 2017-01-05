@@ -237,6 +237,7 @@ WX_EXPORT_METHOD(@selector(blur))
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+    [self handlePseudoClass];
 }
 
 -(void)focus
@@ -365,7 +366,27 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    if ([_textView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    [self updatePseudoClassStyles:styles];
+}
+
+- (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles
 {
     WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
@@ -396,6 +417,7 @@ WX_EXPORT_METHOD(@selector(blur))
             }
         }
     }
+    [self _updateCSSNodeStyles:resetStyles];
     [self _updateViewStyles:resetStyles];
 }
 
@@ -442,6 +464,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+    [self handlePseudoClass];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -468,6 +491,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 

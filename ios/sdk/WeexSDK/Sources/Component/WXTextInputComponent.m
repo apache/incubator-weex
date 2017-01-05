@@ -194,6 +194,7 @@ WX_EXPORT_METHOD(@selector(blur))
     toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
     
     _inputView.inputAccessoryView = toolbar;
+    [self handlePseudoClass];
 }
 
 - (void)viewWillLoad
@@ -396,6 +397,7 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
     }
+    [self handlePseudoClass];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -421,6 +423,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 
@@ -537,7 +542,27 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    if ([_inputView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    [self updatePseudoClassStyles:styles];
+}
+
+- (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles
 {
     WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
@@ -552,6 +577,7 @@ WX_EXPORT_METHOD(@selector(blur))
         }
     }
     if ([styles count]>0) {
+        [self _updateCSSNodeStyles:styles];
         [self _updateViewStyles:styles];
     }
     self.updatedPseudoClassStyles = styles;
@@ -568,6 +594,7 @@ WX_EXPORT_METHOD(@selector(blur))
             }
         }
     }
+    [self _updateCSSNodeStyles:resetStyles];
     [self _updateViewStyles:resetStyles];
 }
 

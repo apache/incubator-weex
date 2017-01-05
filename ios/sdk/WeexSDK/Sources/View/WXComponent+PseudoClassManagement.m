@@ -31,7 +31,7 @@
     return newStyles;
 }
 
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+- (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles
 {
     WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
@@ -41,6 +41,7 @@
         }
     }
     if ([styles count]>0) {
+        [self _updateCSSNodeStyles:styles];
         [self _updateViewStyles:styles];
     }
 }
@@ -52,9 +53,23 @@
     return subKey;
 }
 
+-(NSMutableDictionary *)getPseudoClassStyles:(NSString *)key
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    if (_pseudoClassStyles && [_pseudoClassStyles count] > 0 ) {
+        for (NSString *k in _pseudoClassStyles){
+            if ([k rangeOfString:key].location != NSNotFound) { //all active listen
+                [styles setObject:_pseudoClassStyles[k] forKey:k];
+            }
+        }
+    }
+    return styles;
+}
+
 - (void)recoveryPseudoStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
+    [self _updateCSSNodeStyles:styles];
     [self _updateViewStyles:styles];
 }
 
