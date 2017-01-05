@@ -5,7 +5,7 @@ import Geolocation from '../../browser/extend/api/geolocation'
 import PageInfo from '../../browser/extend/api/pageInfo'
 import Storage from '../../browser/extend/api/storage'
 import Stream from '../../browser/extend/api/stream'
-// import Clipboard from '../../browser/extend/api/clipboard'
+import Clipboard from '../../browser/extend/api/clipboard'
 // import GlobalEvent from '../../browser/extend/api/globalEvent'
 
 // custom modules
@@ -38,6 +38,6 @@ export function init (weex) {
   weex.install(PageInfo)
   weex.install(Storage)
   weex.install(Stream)
-  // weex.install(Clipboard)
+  weex.install(Clipboard)
   // weex.install(GlobalEvent)
 }

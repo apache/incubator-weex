@@ -431,6 +431,11 @@ figure, img, .weex-image, .weex-img {
   box-shadow: #64bd63 0px 0px 0px 40px inset;
 }
 
+.weex-switch-checked.weex-switch-disabled {
+  background-color: #A0CCA0;
+  box-shadow: #A0CCA0 0px 0px 0px 40px inset;
+}
+
 .weex-switch-disabled {
   background-color: #EEEEEE;
 }

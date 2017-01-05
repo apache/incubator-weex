@@ -1,6 +1,13 @@
 import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
+function trimTextNode (children) {
+  if (Array.isArray(children)) {
+    return children.filter(vnode => !!vnode.tag)
+  }
+  return children
+}
+
 export default {
   mixins: [base],
   render (createElement) {
@@ -13,6 +20,6 @@ export default {
       attrs: { 'weex-type': 'div' },
       on: this.createEventMap(),
       staticClass: 'weex-div'
-    }, this.$slots.default)
+    }, trimTextNode(this.$slots.default))
   }
 }

@@ -1,4 +1,5 @@
 export * from './func'
+export * from './component'
 
 /**
  * Create a cached version of a pure function.

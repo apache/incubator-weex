@@ -4,8 +4,8 @@ import { validateStyles } from '../validator'
 /**
  * Get text styles
  */
-function getTextStyle (props = {}) {
-  const lines = parseInt(props.lines) || 0
+function getTextStyle (context = {}) {
+  const lines = parseInt(context.lines) || 0
   if (lines > 0) {
     return {
       overflow: 'hidden',

@@ -16,10 +16,14 @@ export default {
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
   scrollToElement: function (vnode, options) {
-    // TODO: more reliable
     const scroller = getParentScroller(vnode)
+
     if (scroller && scroller.$el && vnode.$el) {
-      const offset = vnode.$el.offsetTop + options.offset
+      let offset = vnode.$el.offsetTop
+
+      if (options && options.offset) {
+        offset += Number(options.offset)
+      }
 
       // TODO: add animation
       scroller.$el.scrollTop = offset

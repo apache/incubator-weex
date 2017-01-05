@@ -100,16 +100,10 @@ export default {
       const inner = this.$refs.inner
       if (this._touchParams) {
         const { offsetX } = this._touchParams
-        // console.log('touch pageX:', touch.pageX, ', offsetX:', offsetX)
         if (inner) {
           const reset = Math.abs(offsetX / this.wrapperWidth) < 0.2
           const direction = offsetX > 0 ? 1 : -1
-          let newIndex = reset ? this.currentIndex : (this.currentIndex - direction)
-
-          // if (this.frameCount < 3) {
-          //   newIndex = this.normalizeIndex(newIndex)
-          // }
-          // console.log('reset:', reset, ', newIndex:', newIndex)
+          const newIndex = reset ? this.currentIndex : (this.currentIndex - direction)
           this.slideTo(newIndex)
         }
       }
