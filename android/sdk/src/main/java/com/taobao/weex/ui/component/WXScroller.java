@@ -556,6 +556,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         if (result != null)
           setShowScrollbar(result);
         return true;
+      case Constants.Name.SCROLLABLE:
+        boolean scrollable = WXUtils.getBoolean(param, true);
+        setScrollable(scrollable);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -569,6 +573,16 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       getInnerView().setVerticalScrollBarEnabled(show);
     } else {
       getInnerView().setHorizontalScrollBarEnabled(show);
+    }
+  }
+
+  @WXComponentProp(name = Constants.Name.SCROLLABLE)
+  public void setScrollable(boolean scrollable) {
+    View hostView = getInnerView();
+    if(hostView instanceof WXHorizontalScrollView) {
+      ((WXHorizontalScrollView)hostView).setScrollable(scrollable);
+    }else if(hostView instanceof WXScrollView) {
+      ((WXScrollView)hostView).setScrollable(scrollable);
     }
   }
 
@@ -673,9 +687,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    */
   private void procAppear(int x, int y, int oldx,
                           int oldy) {
-    String direction = y - oldy > 0 ? "up" : "down";
-    if (mOrientation == Constants.Orientation.HORIZONTAL) {
-      direction = x - oldx > 0 ? "right" : "left";
+    int moveY = y - oldy;
+    int moveX = x - oldx;
+    String direction = moveY > 0 ? Constants.Value.DIRECTION_UP :
+            moveY < 0 ? Constants.Value.DIRECTION_DOWN : null;
+    if (mOrientation == Constants.Orientation.HORIZONTAL && moveX != 0) {
+      direction = moveX > 0 ? Constants.Value.DIRECTION_RIGHT : Constants.Value.DIRECTION_LEFT;
     }
 
     for (Entry<String, AppearanceHelper> item : mAppearanceComponents.entrySet()) {

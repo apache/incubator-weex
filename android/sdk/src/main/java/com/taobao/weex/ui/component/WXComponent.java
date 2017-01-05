@@ -606,7 +606,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       Object param = entry.getValue();
       String value = WXUtils.getString(param, null);
       if (TextUtils.isEmpty(value)) {
-        param = convertEmptyProperty(key);
+        param = convertEmptyProperty(key, value);
       }
       if (!setProperty(key, param)) {
         if (mHolder == null) {
@@ -1308,10 +1308,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param propName
      */
   @CheckResult
-  protected Object convertEmptyProperty(String propName) {
+  protected Object convertEmptyProperty(String propName, Object originalValue) {
     if (Constants.Name.BACKGROUND_COLOR.equals(propName)) {
       return "transparent";
     }
-    return null;
+    return originalValue;
   }
 }
