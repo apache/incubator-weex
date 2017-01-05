@@ -1,6 +1,11 @@
 {
   "name": "weex",
   "version": "0.4.0",
+  "subversion": {
+    "browser": "0.5.0",
+    "framework": "0.19.3",
+    "transformer": ">=0.1.5 <0.5"
+  },
   "description": "A framework for building Mobile cross-platform UI",
   "license": "Apache-2.0",
   "repository": {
@@ -32,16 +37,18 @@
   },
   "scripts": {
     "postinstall": "bash ./bin/install-hooks.sh",
-    "build:native": "rollup -c build/rollup.config.js",
-    "build:browser": "wwp && rollup -c build/rollup.browser.config.js",
+    "build:native": "node build/build.js native",
+    "build:runtime": "node build/build.js runtime",
+    "build:browser": "wwp && node build/build.js browser",
     "build:browser:common": "rollup -c build/rollup.browser.common.config.js",
     "build:examples": "webpack --config build/webpack.examples.config.js",
     "build:test": "webpack --config build/webpack.test.config.js",
     "build": "npm run build:native && npm run build:browser && npm run build:examples && npm run build:test",
     "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
     "dist": "npm run dist:browser",
-    "dev:native": "rollup -w -c build/rollup.config.js",
-    "dev:browser": "rollup -w -c build/rollup.browser.config.js",
+    "dev:native": "node build/build.js native --watch",
+    "dev:runtime": "node build/build.js runtime --watch",
+    "dev:browser": "wwp && node build/build.js native --watch",
     "dev:examples": "webpack --watch --config build/webpack.examples.config.js",
     "dev:test": "webpack --watch --config build/webpack.test.config.js",
     "lint": "eslint html5",
@@ -59,11 +66,6 @@
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples"
   },
-  "subversion": {
-    "browser": "0.5.0",
-    "framework": "0.16.18",
-    "transformer": ">=0.1.5 <0.4"
-  },
   "dependencies": {
     "animationjs": "^0.1.5",
     "core-js": "^2.4.0",
@@ -77,7 +79,8 @@
     "semver": "^5.1.0",
     "weex-components": "^0.2.0",
     "weex-picker": "^0.1.0",
-    "weex-vue-framework": "2.0.5-weex.1"
+    "weex-rax-framework": "0.0.10",
+    "weex-vue-framework": "2.1.8-weex.1"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
@@ -112,10 +115,8 @@
     "uglify-js": "^2.6.4",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
-    "weex-loader": "^0.3.1",
-    "weex-vdom-tester": "^0.1.2",
-    "weex-vue-components": "^0.1.0",
-    "weex-vue-loader": "^0.1.1",
+    "weex-loader": "^0.4.0",
+    "weex-vdom-tester": "^0.2.0",
     "wwp": "^0.3.5"
   }
 }
