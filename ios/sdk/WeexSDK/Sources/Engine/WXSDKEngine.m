@@ -47,7 +47,7 @@
     [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
-    [self registerModule:@"WebSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
+    [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz

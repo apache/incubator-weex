@@ -13,19 +13,46 @@
 @implementation  WXComponent (GradientColor)
 
 - (void)setGradientLayer {
+    //parse gradient-color, linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
     if ([_backgroundImage hasPrefix:@"linear-gradient"] && [_backgroundImage hasSuffix:@")"] ) {
-        NSRange range = NSMakeRange(16, _backgroundImage.length-17);
+        NSRange range = NSMakeRange(16, _backgroundImage.length - 17);
         NSString *str = [_backgroundImage substringWithRange:range];
         NSArray *array = [str componentsSeparatedByString:@","];
+        WXGradientType gradientType;
+        UIColor *startColor, *endColor;
         
-        if ([array count] != 3) {
+        if ([array count] == 3) {
+            gradientType = [WXConvert gradientType:array[0]];
+            startColor = [WXConvert UIColor:array[1]];
+            endColor = [WXConvert UIColor:array[2]];
+        }
+        else if ([array count] > 3){
+            NSString *gradientTypeStr = array[0];
+            NSString *subStr = [str substringFromIndex:gradientTypeStr.length + 1];
+            
+            if ([subStr hasPrefix:@"rgb"]) {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                range = [subStr rangeOfString:@")"];
+                NSString *startColorStr = [subStr substringToIndex:range.location + 1];
+                NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
+                startColor = [WXConvert UIColor:startColorStr];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+            else {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                startColor = [WXConvert UIColor:array[1]];
+                
+                NSString *startColorStr = array[1];
+                NSString *endColorStr = [subStr substringFromIndex:startColorStr.length + 1];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+        }
+        else {
             return;
         }
-        
-        WXGradientType gradientType = [WXConvert gradientType:array[0]];
-        UIColor *startColor = [WXConvert UIColor:array[1]];
-        UIColor *endColor = [WXConvert UIColor:array[2]];
-        
+    
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             UIImage *bgImg = [weakSelf gradientColorImageFromColors:@[startColor, endColor] gradientType:gradientType imgSize:weakSelf.view.frame.size];
