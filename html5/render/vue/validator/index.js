@@ -1,6 +1,6 @@
 import * as styleValidator from './style'
 import * as propValidator from './prop'
-import { hyphenate, camelize } from '../utils'
+import { hyphenate, camelize, isPlainObject } from '../utils'
 import { isSupportedStyle } from './check'
 
 let onfail = function nope () {}
@@ -8,7 +8,7 @@ let showConsole = true
 
 function warn (...args) {
   const message = args.join(' ')
-  showConsole && console.log(message)
+  showConsole && console.warn(message)
   onfail(message)
   return message
 }
@@ -31,10 +31,19 @@ export function configure (configs = {}) {
  */
 export function validateStyles (type, styles = {}) {
   let isValid = true
+
+  if (isPlainObject(type)) {
+    styles = type
+    type = '*'
+  }
+
   for (const key in styles) {
     if (!isSupportedStyle(type, hyphenate(key))) {
       isValid = false
-      warn(`[Style Validator] <${type}> is not support to use the "${key}" style.`)
+      warn((type === '*')
+        ? `[Style Validator] Not support to use the "${key}" style property.`
+        : `[Style Validator] <${type}> is not support to use the "${key}" style property.`
+      )
     }
     else {
       const validator = styleValidator[camelize(key)] || styleValidator.common

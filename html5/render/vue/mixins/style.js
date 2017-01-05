@@ -1,4 +1,7 @@
 import { extend } from '../utils'
+import { validateStyles } from '../validator'
+
+let warned = false
 
 function normalize (value) {
   // TODO: add more reliable check
@@ -8,24 +11,17 @@ function normalize (value) {
   return value
 }
 
-function normalizeStyle (styles) {
-  const realStyle = {}
-  if (styles) {
-    for (const key in styles) {
-      realStyle[key] = normalize(styles[key])
-    }
-  }
-  return realStyle
-}
-
 function getStyleMap (component) {
-  if (component && component.$vnode) {
-    const context = component.$vnode.context
-    if (context && context.$options) {
-      return context.$options.style || {}
+  if (component && component.$vnode && component.$vnode.context) {
+    const $options = component.$vnode.context.$options
+    if ($options && $options.style) {
+      if (!warned) {
+        console.warn(`[Vue Render] Please use vue-loader to compile the .vue file.`)
+        warned = true
+      }
+      return $options.style
     }
   }
-  return {}
 }
 
 function getStaticClass (component) {
@@ -37,23 +33,28 @@ function getStaticClass (component) {
 function getComponentStyle (context) {
   const styleMap = getStyleMap(context)
   const staticClass = getStaticClass(context)
-  if (Array.isArray(staticClass)) {
+
+  if (styleMap && Array.isArray(staticClass)) {
     const styles = staticClass.reduce((res, name) => {
       return extend(res, styleMap[name])
     }, {})
-    return normalizeStyle(styles)
-  }
-  return {}
-}
 
-function appendStyle (element, styles) {
-  for (const key in styles) {
-    element.style[key] = styles[key]
+    const realStyle = {}
+    for (const key in styles) {
+      realStyle[key] = normalize(styles[key])
+    }
+    return realStyle
   }
 }
 
 export default {
   mounted () {
-    appendStyle(this.$el, getComponentStyle(this))
+    const styles = getComponentStyle(this)
+    if (this.$el && styles) {
+      validateStyles(this.$options && this.$options._componentTag, styles)
+      for (const key in styles) {
+        this.$el.style[key] = styles[key]
+      }
+    }
   }
 }

@@ -5,6 +5,9 @@ const supportedProperties = {
 }
 
 const supportedStyles = {
+  '*': [
+    '@box-model', '@border', '@flexbox', '@font', '@colors', '@text'
+  ],
   '@box-model': [
     'width', 'height', 'position',
     'padding-top', 'padding-bottom', 'padding-left', 'padding-right',
@@ -18,18 +21,13 @@ const supportedStyles = {
     'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius'
   ],
   '@flexbox': [
-    'display', 'flex', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap'
+    'flex', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap'
   ],
-  '@font': [
-    'font-size', 'font-weight', 'font-style', 'font-family'
-  ],
-  '@colors': [
-    'color', 'background-color', 'opacity'
-  ],
-  text: [
-    '@box-model', '@border', '@flexbox', '@font', '@colors',
-    'text-align', 'text-decoration', 'text-overflow'
-  ]
+  '@font': ['font-size', 'font-weight', 'font-style', 'font-family'],
+  '@text': ['text-align', 'text-decoration', 'text-overflow'],
+  '@colors': ['color', 'background-color', 'opacity'],
+
+  text: ['@box-model', '@border', '@font', '@colors', '@text']
 }
 
 /**
@@ -48,10 +46,8 @@ export function flatten (array) {
  * @param {Object} dict
  */
 export function checkSupported (type, value, dict = {}) {
-  if (type && value && dict[type]) {
-    return flatten(dict[type].map(k => dict[k] || k)).indexOf(value) !== -1
-  }
-  return true
+  const tagType = dict[type] ? type : '*'
+  return flatten(dict[tagType].map(k => dict[k] || k)).indexOf(value) !== -1
 }
 
 /**
