@@ -388,7 +388,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  public boolean callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
+    public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
     return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
   }
 
@@ -469,8 +469,49 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     mJSHandler.removeMessages(what, obj);
   }
 
+    public Object callNativeModule(String instanceId, String module, String method, JSONArray arguments, Object options) {
+
+        if (WXEnvironment.isApkDebugable()) {
+            mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+                    .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+            WXLogUtils.d(mLodBuilder.substring(0));
+            mLodBuilder.setLength(0);
+        }
+
+        try {
+            return WXModuleManager.callModuleMethod(instanceId, module,
+                    method, arguments);
+
+        } catch (Exception e) {
+            WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+            commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
+        }
+
+        return null;
+    }
+
+    public Object callNativeComponent(String instanceId, String componentRef, String method, JSONArray arguments, Object options) {
+        if (WXEnvironment.isApkDebugable()) {
+            mLodBuilder.append("[WXBridgeManager] callNativeComponent >>>> instanceId:").append(instanceId)
+                    .append(", componentRef:").append(componentRef).append(", method:").append(method).append(", arguments:").append(arguments);
+            WXLogUtils.d(mLodBuilder.substring(0));
+            mLodBuilder.setLength(0);
+        }
+        try {
+
+            WXDomModule dom = getDomModule(instanceId);
+            dom.invokeMethod(componentRef, method, arguments);
+
+        } catch (Exception e) {
+            WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
+            commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE, "[WXBridgeManager] callNativeModule exception " + e.getCause());
+        }
+        return null;
+    }
+
   /**
    * Dispatch the native task to be executed.
+     *
    * @param instanceId {@link WXSDKInstance#mInstanceId}
    * @param tasks tasks to be executed
    * @param callback next tick id
@@ -999,7 +1040,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
                        WXJsonUtils.fromObjectToJSONString(tasks))};
   }
 
-  private void invokeInitFramework(Message msg) {
+  private void invokeInitFramework(Message msg) {   
     String framework = "";
     if (msg.obj != null) {
       framework = (String) msg.obj;

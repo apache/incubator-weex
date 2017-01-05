@@ -308,33 +308,32 @@ public class WXModuleManager {
     return true;
   }
 
-  static boolean callModuleMethod(final String instanceId, String moduleStr, String methodStr, JSONArray args) {
+  static Object callModuleMethod(final String instanceId, String moduleStr, String methodStr, JSONArray args) {
     ModuleFactory factory = sModuleFactoryMap.get(moduleStr);
     if(factory == null){
       WXLogUtils.e("[WXModuleManager] module factory not found.");
-      return false;
+      return null;
     }
     final WXModule wxModule = findModule(instanceId, moduleStr,factory);
     if (wxModule == null) {
-      return false;
+      return null;
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     wxModule.mWXSDKInstance = instance;
 
     final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
-      instance
+     return instance
           .getNativeInvokeHelper()
           .invoke(wxModule,invoker,args);
     } catch (Exception e) {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
-      return false;
+      return null;
     } finally {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
         wxModule.mWXSDKInstance = null;
       }
     }
-    return true;
   }
 
 

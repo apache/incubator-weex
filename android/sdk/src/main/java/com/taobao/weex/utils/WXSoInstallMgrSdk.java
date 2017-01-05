@@ -285,8 +285,6 @@ public class WXSoInstallMgrSdk {
 
     boolean InitSuc = false;
 
-    if (checkSoIsValid(libName, ARMEABI_Size) || checkSoIsValid(libName, X86_Size)) {
-
       /**
        * Load library with {@link System#loadLibrary(String)}
        */
@@ -333,7 +331,6 @@ public class WXSoInstallMgrSdk {
         InitSuc = false;
         e.printStackTrace();
       }
-    }
     return InitSuc;
   }
 
