@@ -33,7 +33,8 @@
     "pageInfo",
     "storage",
     "stream",
-    "webview"
+    "webview",
+    "webSocket"
   ],
   "npm": [
     "weex-picker"

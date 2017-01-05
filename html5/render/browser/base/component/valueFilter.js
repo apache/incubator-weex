@@ -30,6 +30,12 @@ export function getFilters (key) {
           return parseInt(parseFloat(match)) + 'px'
         })
       }
+      if (key.match(/^border$/) && val.match(/^\d+(?:px)?\s+/)) {
+        val = val.replace(/^(\d+(?:px)?)/, function ($0, $1) {
+          const v = parseFloat($1)
+          return v + 'px'
+        })
+      }
       return val
     }
   }
