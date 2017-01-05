@@ -259,6 +259,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         webView.removeJavascriptInterface("searchBoxJavaBridge_");
         webView.removeJavascriptInterface("accessibility");
         webView.removeJavascriptInterface("accessibilityTraversal");
+        webView.getSettings().setSavePassword(false);
 
         container.removeAllViews();
         container.addView(webView);
