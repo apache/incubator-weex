@@ -30,19 +30,6 @@
 
 - (NSInvocation *)invoke
 {
-    if ([self.methodName isEqualToString:@"addEventListener"]) {
-        if([self.arguments[0] isKindOfClass:[NSString class]] && self.arguments[1] && self.arguments[2]) {
-            [self.instance addModuleEventObservers:self.arguments[0] callback:self.arguments[1] option:self.arguments[2] moduleClassName:_moduleName];
-        }
-        return nil;
-    }
-    if ([self.methodName isEqualToString:@"removeEventListener"]) {
-        if ([self.arguments[0] isKindOfClass:[NSString class]]) {
-            [self.instance removeModuleEventObserver:self.arguments[0] moduleClassName:_moduleName];
-        }
-        return nil;
-    }
-    
     Class moduleClass =  [WXModuleFactory classWithModuleName:_moduleName];
     if (!moduleClass) {
         NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist, maybe it has not been registered", _moduleName];
@@ -52,6 +39,19 @@
     
     id<WXModuleProtocol> moduleInstance = [self.instance moduleForClass:moduleClass];
     WXAssert(moduleInstance, @"No instance found for module name:%@, class:%@", _moduleName, moduleClass);
+    if (![moduleInstance isKindOfClass:NSClassFromString(@"WXGlobalEventModule")] && [self.methodName isEqualToString:@"addEventListener"]) {
+        if([self.arguments[0] isKindOfClass:[NSString class]] && self.arguments[1] && self.arguments[2]) {
+            [self.instance addModuleEventObservers:self.arguments[0] callback:self.arguments[1] option:self.arguments[2] moduleClassName:NSStringFromClass(moduleClass)];
+        }
+        return nil;
+    }
+    if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
+        if ([self.arguments[0] isKindOfClass:[NSString class]]) {
+            [self.instance removeModuleEventObserver:self.arguments[0] moduleClassName:_moduleName];
+        }
+        return nil;
+    }
+    
     BOOL isSync;
     SEL selector = [WXModuleFactory selectorWithModuleName:self.moduleName methodName:self.methodName isSync:&isSync];
     if (!selector) {

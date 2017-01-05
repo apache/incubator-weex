@@ -227,7 +227,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  * fire module event;
  */
-- (void)fireModuleEvent:(id)module eventName:(NSString *)eventName params:(NSDictionary*)params;
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 
 /**
  * fire global event

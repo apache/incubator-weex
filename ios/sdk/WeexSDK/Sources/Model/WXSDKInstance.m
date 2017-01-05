@@ -26,8 +26,6 @@
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
 
-#define WX_MODULE_EVENT_FIRE_NOTIFICATION  @"WX_MODULE_EVENT_FIRE_NOTIFICATION"
-
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
 NSTimeInterval JSLibInitTime = 0;
@@ -53,6 +51,7 @@ typedef enum : NSUInteger {
 
 - (void)dealloc
 {
+    [_moduleEventObservers removeAllObjects];
     [self removeObservers];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -352,7 +351,7 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
-- (void)fireModuleEvent:(id)module eventName:(NSString *)eventName params:(NSDictionary*)params
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params
 {
     NSDictionary * userInfo = @{
                                 @"moduleId":NSStringFromClass(module)?:@"",
@@ -389,7 +388,7 @@ typedef enum : NSUInteger {
 
 - (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName
 {
-    NSDictionary * observer = _moduleEventObservers[moduleClassName];
+    NSDictionary * observer = [_moduleEventObservers objectForKey:moduleClassName];
     return observer && observer[event]? YES:NO;
 }
 
@@ -397,18 +396,13 @@ typedef enum : NSUInteger {
 
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moduleEventNotification:) name:WX_MODULE_EVENT_FIRE_NOTIFICATION object:nil];
-    });
     BOOL once = [[option objectForKey:@"once"] boolValue];
     NSMutableDictionary * observer = nil;
     NSDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once)};
     if(![self checkModuleEventRegistered:event moduleClassName:moduleClassName]) {
         //had not registered yet
         observer = [NSMutableDictionary new];
-        
-        [observer setObject:@{event:@[callbackInfo]} forKey:moduleClassName];
+        [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
         [_moduleEventObservers addEntriesFromDictionary:observer];
     } else {
         observer = _moduleEventObservers[moduleClassName];
@@ -426,7 +420,7 @@ typedef enum : NSUInteger {
 
 - (void)moduleEventNotification:(NSNotification *)notification
 {
-    NSDictionary * moduleEventObserversCpy = [_moduleEventObservers copy];
+    NSMutableDictionary *moduleEventObserversCpy = (NSMutableDictionary *)CFBridgingRelease(CFPropertyListCreateDeepCopy(kCFAllocatorDefault, (CFDictionaryRef)_moduleEventObservers, kCFPropertyListMutableContainers));// deep
     NSDictionary * userInfo = notification.userInfo;
     NSMutableArray * listeners = [moduleEventObserversCpy[userInfo[@"moduleId"]] objectForKey:userInfo[@"eventName"]];
     if (![listeners isKindOfClass:[NSArray class]]) {
@@ -441,8 +435,8 @@ typedef enum : NSUInteger {
         // if callback function is not once, then it is keepalive
         if (once) {
             NSMutableArray * moduleEventListener = [_moduleEventObservers[userInfo[@"moduleId"]] objectForKey:userInfo[@"eventName"]];
-            [moduleEventListener removeObjectAtIndex:i];
-            if ([_moduleEventObservers count] == 0) {
+            [moduleEventListener removeObject:callbackInfo];
+            if ([moduleEventListener count] == 0) {
                 [self removeModuleEventObserver:userInfo[@"eventName"] moduleClassName:userInfo[@"moduleId"]];
             }
             // if callback function is once. clear it after fire it.
@@ -452,6 +446,7 @@ typedef enum : NSUInteger {
 
 - (void)addObservers
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moduleEventNotification:) name:WX_MODULE_EVENT_FIRE_NOTIFICATION object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
