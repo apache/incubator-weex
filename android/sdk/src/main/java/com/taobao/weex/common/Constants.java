@@ -248,6 +248,7 @@ public class Constants {
 
 
     String BACKGROUND_COLOR = "backgroundColor";
+    String BACKGROUND_IMAGE = "backgroundImage";
     String OPACITY = "opacity";
     String BORDER_RADIUS = "borderRadius";
     String BORDER_WIDTH = "borderWidth";
