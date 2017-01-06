@@ -9,6 +9,8 @@
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent_internal.h"
 #import "WXAssert.h"
+#import "WXComponentManager.h"
+#import "WXSDKInstance_private.h"
 
 @implementation WXComponent (PseudoClassManagement)
 
@@ -36,13 +38,26 @@
     WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
     for (NSString *k in pseudoClassStyles) {
-        if([k rangeOfString:@"active"].location != NSNotFound){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+        [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
     }
     if ([styles count]>0) {
-        [self _updateCSSNodeStyles:styles];
-        [self _updateViewStyles:styles];
+        __weak typeof(self) weakSelf = self;
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = weakSelf.weexInstance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager updatePseudoClassStyles:styles forComponent:self.ref];
+        });
+    }
+    
+    if (styles && [styles count] > 0) {
+        if(!_updatedPseudoClassStyles) {
+            _updatedPseudoClassStyles = [NSMutableDictionary new];
+        }
+        for (NSString *key in styles) {
+            [_updatedPseudoClassStyles setObject:styles[key] forKey:key];
+        }
     }
 }
 
@@ -69,8 +84,24 @@
 - (void)recoveryPseudoStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
-    [self _updateCSSNodeStyles:styles];
-    [self _updateViewStyles:styles];
+    __weak typeof(self) weakSelf = self;
+    NSMutableDictionary *resetStyles = [styles mutableCopy];
+    if(_updatedPseudoClassStyles && [_updatedPseudoClassStyles count]>0){
+        for (NSString *key in _updatedPseudoClassStyles) {
+            if (![styles objectForKey:key] && [key length]>0) {
+                [resetStyles setObject:@"" forKey:key];
+            }
+        }
+    }
+    WXPerformBlockOnComponentThread(^{
+        WXComponentManager *manager = weakSelf.weexInstance.componentManager;
+        if (!manager.isValid) {
+            return;
+        }
+        [manager updatePseudoClassStyles:resetStyles forComponent:self.ref];
+    });
+    [self needsLayout];
+
 }
 
 @end

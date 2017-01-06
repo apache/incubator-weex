@@ -44,6 +44,7 @@
      *  PseudoClass
      */
     NSMutableDictionary *_pseudoClassStyles;
+    NSMutableDictionary *_updatedPseudoClassStyles;
     BOOL _isListenPseudoTouch;
     
     /**
@@ -122,7 +123,7 @@
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes;

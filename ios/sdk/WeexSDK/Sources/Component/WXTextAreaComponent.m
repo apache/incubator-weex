@@ -73,7 +73,6 @@
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
-@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -384,41 +383,6 @@ WX_EXPORT_METHOD(@selector(blur))
         [styles addEntriesFromDictionary:recordStyles];
     }
     [self updatePseudoClassStyles:styles];
-}
-
-- (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles
-{
-    WXAssertMainThread();
-    NSMutableDictionary *styles = [NSMutableDictionary new];
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
-    }
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
-    }
-    if ([styles count]>0) {
-        [self _updateViewStyles:styles];
-    }
-    self.updatedPseudoClassStyles = styles;
-}
-
-#pragma mark reset
-- (void)recoveryPseudoStyles:(NSDictionary *)styles
-{
-    NSMutableDictionary *resetStyles = [styles mutableCopy];
-    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
-        for (NSString *key in self.updatedPseudoClassStyles) {
-            if (![styles objectForKey:key] && [key length]>0) {
-                [resetStyles setObject:@"" forKey:key];
-            }
-        }
-    }
-    [self _updateCSSNodeStyles:resetStyles];
-    [self _updateViewStyles:resetStyles];
 }
 
 #pragma mark measure frame
