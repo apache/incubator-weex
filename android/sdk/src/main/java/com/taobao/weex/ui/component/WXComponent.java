@@ -132,6 +132,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.annotation.CallSuper;
@@ -653,6 +654,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         if (bgColor != null)
           setBackgroundColor(bgColor);
         return true;
+      case Constants.Name.BACKGROUND_IMAGE:
+        String bgImage = WXUtils.getString(param,null);
+        if(bgImage!=null){
+          setBackgroundImage(bgImage);
+        }
+        return true;
       case Constants.Name.OPACITY:
         Float opacity = WXUtils.getFloat(param,null);
         if (opacity != null)
@@ -1039,6 +1046,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  public void setBackgroundImage(String bgImage) {
+    if (!TextUtils.isEmpty(bgImage) && mHost != null) {
+      Shader shader = WXResourceUtils.getShader(bgImage, mDomObj.getLayoutWidth(), mDomObj.getLayoutHeight());
+      getOrCreateBorder().setImage(shader);
+    }
+  }
+
   public void setOpacity(float opacity) {
     if (opacity >= 0 && opacity <= 1 && mHost.getAlpha() != opacity) {
       mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -1291,6 +1305,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
     public int width;
     public int height;
+  }
+
+  /**
+   * Determine whether the current component needs to be placed in the real View tree
+   * @return false component add subview
+   */
+  public boolean isVirtualComponent(){
+    return false;
+  }
+  public void removeVirtualComponent() {
   }
 
   public boolean hasScrollParent(WXComponent component) {

@@ -309,6 +309,16 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public String callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
+        return null;
+    }
+
+    @Override
+    public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
+
+    }
+
+    @Override
     public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {
         if (type != WebSocket.PayloadType.TEXT) {
             WXLogUtils.w("Websocket received unexpected message with payload of type " + type);

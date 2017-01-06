@@ -240,4 +240,8 @@ public interface IWXBridge extends IWXObject {
   int callAddElement(String instanceId, String ref,String dom,String index, String callback);
 
   void reportJSException(String instanceId, String func, String exception);
+
+  Object callNativeModule(String instanceId, String module, String method,  byte [] arguments,  byte [] options);
+
+  void callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
 }

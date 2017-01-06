@@ -886,9 +886,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXComponent comp = getRootComponent();
     if(comp != null) {
       WXEvent events= comp.getDomObject().getEvents();
-      boolean hasBackPressed = events.contains(Constants.Event.BACKPRESSED);
+      boolean hasBackPressed = events.contains(Constants.Event.CLICKBACKITEM);
       if (hasBackPressed) {
-        WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.BACKPRESSED,null, null);
+        WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.CLICKBACKITEM,null, null);
       }
       return hasBackPressed;
     }
