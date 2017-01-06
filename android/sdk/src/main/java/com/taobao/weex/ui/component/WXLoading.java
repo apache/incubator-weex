@@ -219,6 +219,9 @@ import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * div component
  */
@@ -240,6 +243,17 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   public void onLoading() {
     if (getDomObject().getEvents().contains(Constants.Event.ONLOADING)) {
       fireEvent(Constants.Event.ONLOADING);
+    }
+  }
+
+  @Override
+  public void onPullingUp(float dy, int pullOutDistance, float viewHeight) {
+    if (getDomObject().getEvents() != null && getDomObject().getEvents().contains(Constants.Event.ONPULLING_UP)) {
+      Map<String, Object> data = new HashMap<>();
+      data.put(Constants.Name.DISTANCE_Y, dy);
+      data.put(Constants.Name.PULLING_DISTANCE, pullOutDistance);
+      data.put(Constants.Name.VIEW_HEIGHT, viewHeight);
+      fireEvent(Constants.Event.ONPULLING_UP, data);
     }
   }
 
