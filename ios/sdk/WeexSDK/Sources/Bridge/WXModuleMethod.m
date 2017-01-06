@@ -12,6 +12,7 @@
 #import "WXModuleProtocol.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
+#import "WXSDKInstance_private.h"
 
 @implementation WXModuleMethod
 
@@ -38,6 +39,19 @@
     
     id<WXModuleProtocol> moduleInstance = [self.instance moduleForClass:moduleClass];
     WXAssert(moduleInstance, @"No instance found for module name:%@, class:%@", _moduleName, moduleClass);
+    if (![moduleInstance isKindOfClass:NSClassFromString(@"WXGlobalEventModule")] && [self.methodName isEqualToString:@"addEventListener"]) {
+        if([self.arguments[0] isKindOfClass:[NSString class]] && self.arguments[1] && self.arguments[2]) {
+            [self.instance addModuleEventObservers:self.arguments[0] callback:self.arguments[1] option:self.arguments[2] moduleClassName:NSStringFromClass(moduleClass)];
+        }
+        return nil;
+    }
+    if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
+        if ([self.arguments[0] isKindOfClass:[NSString class]]) {
+            [self.instance removeModuleEventObserver:self.arguments[0] moduleClassName:_moduleName];
+        }
+        return nil;
+    }
+    
     BOOL isSync;
     SEL selector = [WXModuleFactory selectorWithModuleName:self.moduleName methodName:self.methodName isSync:&isSync];
     if (!selector) {
