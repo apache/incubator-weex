@@ -398,8 +398,8 @@ public class Constants {
     String ONPULLING_UP = "pullingup";
     String SCROLL = "scroll";
     String CLICKBACKITEM = "clickbackitem";
-    String RESUME_EVENT = "WXApplicationWillResignActiveEvent";
-    String PAUSE_EVENT = "WXApplicationDidBecomeActiveEvent";
+    String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
+    String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
   }
 
   public interface Scheme {

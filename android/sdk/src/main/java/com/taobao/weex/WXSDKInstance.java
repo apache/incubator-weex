@@ -817,6 +817,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
     intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
     mContext.sendBroadcast(intent);
   }
 
@@ -835,6 +836,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
     intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
+    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
     mContext.sendBroadcast(intent);
 
     onViewAppear();

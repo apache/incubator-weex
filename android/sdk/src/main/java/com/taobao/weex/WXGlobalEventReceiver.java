@@ -217,6 +217,7 @@ public class WXGlobalEventReceiver extends BroadcastReceiver {
   public static final String EVENT_NAME = "eventName";
   public static final String EVENT_PARAMS = "eventParams";
   public static final String EVENT_ACTION = "wx_global_action";
+  public static final String EVENT_WX_INSTANCEID = "wx_instanceid";
 
   private WXSDKInstance mWXSDKInstance;
 
@@ -231,7 +232,10 @@ public class WXGlobalEventReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     String eventName = intent.getStringExtra(EVENT_NAME);
     String params = intent.getStringExtra(EVENT_PARAMS);
+    String instanceId = intent.getStringExtra(EVENT_WX_INSTANCEID);
     HashMap<String, Object> maps = JSON.parseObject(params, HashMap.class);
-    mWXSDKInstance.fireGlobalEventCallback(eventName, maps);
+    if (null == instanceId || (instanceId != null && instanceId.equals(mWXSDKInstance.getInstanceId()))) {
+      mWXSDKInstance.fireGlobalEventCallback(eventName, maps);
+    }
   }
 }
