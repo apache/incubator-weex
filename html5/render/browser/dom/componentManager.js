@@ -2,7 +2,6 @@
 
 'use strict'
 
-// const FrameUpdater = require('./frameUpdater')
 import { watchIfNeeded } from './appearWatcher'
 import { isArray } from '../utils'
 // const lazyload = require('./lazyload')
