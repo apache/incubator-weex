@@ -127,7 +127,6 @@ ComponentManager.prototype = {
     if (this.componentMap['_root']) {
       return
     }
-    element = element.toJSON()
 
     const nodeType = element.type
     element.type = 'root'
@@ -280,9 +279,8 @@ ComponentManager.prototype = {
    * @param {obj} element (data of the component)
    * @param {number} index
    */
-  addElement (element, parentRef, index) {
+  addElement (parentRef, element, index) {
     // fire event for rendering dom on body elment.
-    element = element.toJSON()
     this.rendering()
 
     const parent = this.componentMap[parentRef]
@@ -321,23 +319,23 @@ ComponentManager.prototype = {
     component.unbindEvents([type])
   },
 
-  setAttr (ref, key, value) {
+  updateAttrs (ref, attrs) {
     const component = this.componentMap[ref]
     if (!component) {
       return console.error(`[h5-render] component of ref '${ref}' does not exist.`)
     }
-    component.updateAttrs({ [key]: value })
+    component.updateAttrs(attrs)
   },
 
-  setStyle (ref, key, value) {
-    const component = this.componentMap[ref]
-    if (!component) {
-      return console.error(`[h5-render] component of ref '${ref}' does not exist.`)
-    }
-    component.updateStyle({ [key]: value })
-  },
+  // setStyle (ref, key, value) {
+  //   const component = this.componentMap[ref]
+  //   if (!component) {
+  //     return console.error(`[h5-render] component of ref '${ref}' does not exist.`)
+  //   }
+  //   component.updateStyle({ [key]: value })
+  // },
 
-  setStyles (ref, style) {
+  updateStyle (ref, style) {
     const component = this.componentMap[ref]
     if (!component) {
       return console.error(`[h5-render] component of ref '${ref}' does not exist.`)
@@ -366,18 +364,7 @@ ComponentManager.prototype = {
     // do lazyload if needed
     component.fireLazyload()
     // lazyload.startIfNeeded(component);
-  },
-
-  createFinish (callback) {
-    window.dispatchEvent(new Event('weex:createfinish'))
-  },
-
-  updateFinish (callback) {
-    window.dispatchEvent(new Event('weex:updatefinish'))
-  },
-
-  refreshFinish (callback) {
-    window.dispatchEvent(new Event('weex:refreshfinish'))
   }
 
 }
+
