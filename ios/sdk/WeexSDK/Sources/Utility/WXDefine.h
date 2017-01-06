@@ -79,6 +79,8 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
     return NSStringFromSelector(method); \
 }
 
+#define WX_MODULE_EVENT_FIRE_NOTIFICATION  @"WX_MODULE_EVENT_FIRE_NOTIFICATION"
+
 /**
  *  @abstract export public method
  */

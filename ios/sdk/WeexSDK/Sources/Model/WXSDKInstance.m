@@ -46,10 +46,12 @@ typedef enum : NSUInteger {
     WXResourceLoader *_mainBundleLoader;
     WXComponentManager *_componentManager;
     WXRootView *_rootView;
+    WXThreadSafeMutableDictionary *_moduleEventObservers;
 }
 
 - (void)dealloc
 {
+    [_moduleEventObservers removeAllObjects];
     [self removeObservers];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -75,6 +77,7 @@ typedef enum : NSUInteger {
         _moduleInstances = [NSMutableDictionary new];
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
+        _moduleEventObservers = [WXThreadSafeMutableDictionary new];
        
         [self addObservers];
     }
@@ -348,6 +351,17 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] postNotificationName:eventName object:self userInfo:userInfo];
 }
 
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params
+{
+    NSDictionary * userInfo = @{
+                                @"moduleId":NSStringFromClass(module)?:@"",
+                                @"param":params?:@{},
+                                @"eventName":eventName
+                                };
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_MODULE_EVENT_FIRE_NOTIFICATION object:self userInfo:userInfo];
+}
+
 - (CGFloat)pixelScaleFactor
 {
     if (self.viewportWidth > 0) {
@@ -372,10 +386,67 @@ typedef enum : NSUInteger {
     return [NSURL URLWithString:url relativeToURL:_scriptURL];
 }
 
+- (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName
+{
+    NSDictionary * observer = [_moduleEventObservers objectForKey:moduleClassName];
+    return observer && observer[event]? YES:NO;
+}
+
 #pragma mark Private Methods
+
+- (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
+{
+    BOOL once = [[option objectForKey:@"once"] boolValue];
+    NSMutableDictionary * observer = nil;
+    NSDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once)};
+    if(![self checkModuleEventRegistered:event moduleClassName:moduleClassName]) {
+        //had not registered yet
+        observer = [NSMutableDictionary new];
+        [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
+        [_moduleEventObservers addEntriesFromDictionary:observer];
+    } else {
+        observer = _moduleEventObservers[moduleClassName];
+        [[observer objectForKey:event] addObject:callbackInfo];
+    }
+}
+
+- (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName
+{
+    if (![self checkModuleEventRegistered:event moduleClassName:moduleClassName]) {
+        return;
+    }
+    [_moduleEventObservers[moduleClassName] removeObjectForKey:event];
+}
+
+- (void)moduleEventNotification:(NSNotification *)notification
+{
+    NSMutableDictionary *moduleEventObserversCpy = (NSMutableDictionary *)CFBridgingRelease(CFPropertyListCreateDeepCopy(kCFAllocatorDefault, (CFDictionaryRef)_moduleEventObservers, kCFPropertyListMutableContainers));// deep
+    NSDictionary * userInfo = notification.userInfo;
+    NSMutableArray * listeners = [moduleEventObserversCpy[userInfo[@"moduleId"]] objectForKey:userInfo[@"eventName"]];
+    if (![listeners isKindOfClass:[NSArray class]]) {
+        return;
+        // something wrong
+    }
+    for (int i = 0;i < [listeners count]; i ++) {
+        NSDictionary * callbackInfo = listeners[i];
+        NSString *callbackId = callbackInfo[@"callbackId"];
+        BOOL once = [callbackInfo[@"once"] boolValue];
+        [[WXSDKManager bridgeMgr] callBack:self.instanceId funcId:callbackId params:userInfo[@"param"] keepAlive:!once];
+        // if callback function is not once, then it is keepalive
+        if (once) {
+            NSMutableArray * moduleEventListener = [_moduleEventObservers[userInfo[@"moduleId"]] objectForKey:userInfo[@"eventName"]];
+            [moduleEventListener removeObject:callbackInfo];
+            if ([moduleEventListener count] == 0) {
+                [self removeModuleEventObserver:userInfo[@"eventName"] moduleClassName:userInfo[@"moduleId"]];
+            }
+            // if callback function is once. clear it after fire it.
+        }
+    }
+}
 
 - (void)addObservers
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moduleEventNotification:) name:WX_MODULE_EVENT_FIRE_NOTIFICATION object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [self addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:nil];
