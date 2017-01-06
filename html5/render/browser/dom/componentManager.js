@@ -364,6 +364,18 @@ ComponentManager.prototype = {
     // do lazyload if needed
     component.fireLazyload()
     // lazyload.startIfNeeded(component);
+  },
+
+  createFinish (callback) {
+    window.dispatchEvent(new Event('weex:createfinish'))
+  },
+
+  updateFinish (callback) {
+    window.dispatchEvent(new Event('weex:updatefinish'))
+  },
+
+  refreshFinish (callback) {
+    window.dispatchEvent(new Event('weex:refreshfinish'))
   }
 
 }

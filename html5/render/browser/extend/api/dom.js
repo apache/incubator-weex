@@ -1,5 +1,3 @@
-/* global Event */
-
 'use strict'
 
 import scroll from 'scroll-to'
@@ -146,15 +144,15 @@ const dom = {
   },
 
   createFinish (callback) {
-    window.dispatchEvent(new Event('weex:createfinish'))
+    return this.getComponentManager().createFinish()
   },
 
   updateFinish (callback) {
-    window.dispatchEvent(new Event('weex:updatefinish'))
+    return this.getComponentManager().updateFinish()
   },
 
   refreshFinish (callback) {
-    window.dispatchEvent(new Event('weex:refreshfinish'))
+    return this.getComponentManager().refreshFinish()
   }
 }
 
