@@ -286,9 +286,17 @@ public class WebSocketModule extends WXSDKEngine.DestroyableModule {
     }
 
     @JSMethod
-    public void close(int code, String reason) {
+    public void close(String code, String reason) {
         if (!reportErrorIfNoAdapter()) {
-            webSocketAdapter.close(code, reason);
+            int codeNumber = WebSocketCloseCodes.CLOSE_NORMAL.getCode();
+            if (code != null) {
+                try {
+                    codeNumber = Integer.parseInt(code);
+                } catch (NumberFormatException e) {
+                    //ignore
+                }
+            }
+            webSocketAdapter.close(codeNumber, reason);
         }
     }
 
