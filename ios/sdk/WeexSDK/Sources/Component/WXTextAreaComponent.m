@@ -73,7 +73,6 @@
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
-@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -237,6 +236,7 @@ WX_EXPORT_METHOD(@selector(blur))
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+    [self handlePseudoClass];
 }
 
 -(void)focus
@@ -365,38 +365,24 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
 {
-    WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    if ([_textView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    if ([styles count]>0) {
-        [self _updateViewStyles:styles];
-    }
-    self.updatedPseudoClassStyles = styles;
-}
-
-#pragma mark reset
-- (void)recoveryPseudoStyles:(NSDictionary *)styles
-{
-    NSMutableDictionary *resetStyles = [styles mutableCopy];
-    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
-        for (NSString *key in self.updatedPseudoClassStyles) {
-            if (![styles objectForKey:key] && [key length]>0) {
-                [resetStyles setObject:@"" forKey:key];
-            }
-        }
-    }
-    [self _updateViewStyles:resetStyles];
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark measure frame
@@ -442,6 +428,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+    [self handlePseudoClass];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -468,6 +455,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 

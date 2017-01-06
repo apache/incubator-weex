@@ -10,6 +10,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXSDKInstance_private.h"
 #import "WXDefine.h"
 #import "WXAssert.h"
 #import "WXComponent_internal.h"
@@ -66,7 +67,6 @@
 @property (nonatomic) BOOL autofocus;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
-@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -194,6 +194,7 @@ WX_EXPORT_METHOD(@selector(blur))
     toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
     
     _inputView.inputAccessoryView = toolbar;
+    [self handlePseudoClass];
 }
 
 - (void)viewWillLoad
@@ -396,6 +397,7 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
     }
+    [self handlePseudoClass];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -421,6 +423,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 
@@ -537,38 +542,24 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
 {
-    WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    if ([_inputView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    if ([styles count]>0) {
-        [self _updateViewStyles:styles];
-    }
-    self.updatedPseudoClassStyles = styles;
-}
-
-#pragma mark reset
-- (void)recoveryPseudoStyles:(NSMutableDictionary *)styles
-{
-    NSMutableDictionary *resetStyles = [styles mutableCopy];
-    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
-        for (NSString *key in self.updatedPseudoClassStyles) {
-            if (![styles objectForKey:key] && [key length]>0) {
-                [resetStyles setObject:@"" forKey:key];
-            }
-        }
-    }
-    [self _updateViewStyles:resetStyles];
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark keyboard

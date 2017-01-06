@@ -22,6 +22,15 @@
  */
 -(NSString *)getPseudoKey:(NSString *)key;
 
+/**
+ *  @abstract get pseudo class styles through key.
+ *
+ *  @param key      the key to search pseudo class
+ *  
+ *  @return pseudo class.
+ */
+-(NSMutableDictionary *)getPseudoClassStyles:(NSString *)key;
+
 ///--------------------------------------
 /// @name Updating PseudoClass
 ///--------------------------------------
@@ -32,7 +41,7 @@
  * @param styles The updated style dictionary
  * @discussion It can be overrided to handle specific style updating. The method is called on the main thread.
  **/
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles;
+- (void)updatePseudoClassStyles:(NSDictionary *)pseudoClassStyles;
 
 ///--------------------------------------
 /// @name recovery styles
