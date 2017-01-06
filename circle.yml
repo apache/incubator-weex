@@ -1,4 +1,10 @@
 machine:
+  pre:
+    - sudo service mongodb stop
+    - sudo service mysql stop
+    - sudo service postgresql stop
+    - sudo service rabbitmq-server stop
+    - sudo service couchdb stop
   node:
    version: 7
   environment:
