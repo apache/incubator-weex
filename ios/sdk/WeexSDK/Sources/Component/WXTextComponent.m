@@ -434,9 +434,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
     
     [self fillCSSStyles:styles];
     

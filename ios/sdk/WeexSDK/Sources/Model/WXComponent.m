@@ -373,11 +373,13 @@
 
 #pragma mark Updating
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    pthread_mutex_lock(&_propertyMutex);
-    [_styles addEntriesFromDictionary:styles];
-    pthread_mutex_unlock(&_propertyMutex);
+    if (isUpdateStyles) {
+        pthread_mutex_lock(&_propertyMutex);
+        [_styles addEntriesFromDictionary:styles];
+        pthread_mutex_unlock(&_propertyMutex);
+    }
     [self _updateCSSNodeStyles:styles];
     [self _resetCSSNodeStyles:resetStyles];
 }

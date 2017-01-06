@@ -73,7 +73,6 @@
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
-@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -83,7 +82,6 @@
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -169,7 +167,6 @@ WX_EXPORT_METHOD(@selector(blur))
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             _border = border;
         }
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -237,6 +234,7 @@ WX_EXPORT_METHOD(@selector(blur))
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+    [self handlePseudoClass];
 }
 
 -(void)focus
@@ -365,38 +363,24 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
 {
-    WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    if ([_textView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    if ([styles count]>0) {
-        [self _updateViewStyles:styles];
-    }
-    self.updatedPseudoClassStyles = styles;
-}
-
-#pragma mark reset
-- (void)recoveryPseudoStyles:(NSDictionary *)styles
-{
-    NSMutableDictionary *resetStyles = [styles mutableCopy];
-    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
-        for (NSString *key in self.updatedPseudoClassStyles) {
-            if (![styles objectForKey:key] && [key length]>0) {
-                [resetStyles setObject:@"" forKey:key];
-            }
-        }
-    }
-    [self _updateViewStyles:resetStyles];
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark measure frame
@@ -442,6 +426,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+    [self handlePseudoClass];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -468,6 +453,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 
@@ -531,9 +519,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -552,7 +537,7 @@ WX_EXPORT_METHOD(@selector(blur))
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }
@@ -567,11 +552,11 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
+        CGFloat offset = textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -579,10 +564,6 @@ WX_EXPORT_METHOD(@selector(blur))
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }

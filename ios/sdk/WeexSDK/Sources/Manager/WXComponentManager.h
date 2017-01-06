@@ -87,6 +87,16 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  **/
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
 
+///--------------------------------------
+/// @name Updating pseudo class
+///--------------------------------------
+
+/**
+ * @abstract update  pseudo class styles
+ **/
+
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
+
 /**
  * @abstract update attributes
  **/

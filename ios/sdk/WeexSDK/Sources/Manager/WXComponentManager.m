@@ -338,6 +338,16 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
+    [self handleStyles:styles forComponent:ref isUpdateStyles:YES];
+}
+
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref
+{
+    [self handleStyles:styles forComponent:ref isUpdateStyles:NO];
+}
+
+- (void)handleStyles:(NSDictionary *)styles forComponent:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles
+{
     WXAssertParam(styles);
     WXAssertParam(ref);
     
@@ -347,7 +357,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSMutableDictionary *normalStyles = [NSMutableDictionary new];
     NSMutableArray *resetStyles = [NSMutableArray new];
     [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
-    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
+    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
     }];

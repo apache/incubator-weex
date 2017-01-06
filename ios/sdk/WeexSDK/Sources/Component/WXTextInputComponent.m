@@ -10,6 +10,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXSDKInstance_private.h"
 #import "WXDefine.h"
 #import "WXAssert.h"
 #import "WXComponent_internal.h"
@@ -66,7 +67,6 @@
 @property (nonatomic) BOOL autofocus;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
-@property (nonatomic, copy) NSMutableDictionary *updatedPseudoClassStyles;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -82,7 +82,6 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -154,8 +153,6 @@ WX_EXPORT_METHOD(@selector(blur))
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             [self setBorder:border];
         }
-        
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -194,6 +191,7 @@ WX_EXPORT_METHOD(@selector(blur))
     toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
     
     _inputView.inputAccessoryView = toolbar;
+    [self handlePseudoClass];
 }
 
 - (void)viewWillLoad
@@ -396,6 +394,7 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
     }
+    [self handlePseudoClass];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -422,6 +421,9 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
     }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
+    }
 }
 
 - (void)textFiledEditChanged:(NSNotification *)notifi
@@ -436,11 +438,11 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -448,10 +450,6 @@ WX_EXPORT_METHOD(@selector(blur))
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }
@@ -537,38 +535,24 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 
 #pragma mark update touch styles
-- (void)updateTouchPseudoClassStyles:(NSDictionary *)pseudoClassStyles
+-(void)handlePseudoClass
 {
-    WXAssertMainThread();
     NSMutableDictionary *styles = [NSMutableDictionary new];
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 1){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    for (NSString *k in pseudoClassStyles) {
-        if([WXUtility getSubStringNumber:k subString:@":"] == 2){
-            [styles setObject:pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
-        }
+    if ([_inputView isFirstResponder]){
+        styles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStyles:@"focus"];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    if ([styles count]>0) {
-        [self _updateViewStyles:styles];
-    }
-    self.updatedPseudoClassStyles = styles;
-}
-
-#pragma mark reset
-- (void)recoveryPseudoStyles:(NSMutableDictionary *)styles
-{
-    NSMutableDictionary *resetStyles = [styles mutableCopy];
-    if(self.updatedPseudoClassStyles && [self.updatedPseudoClassStyles count]>0){
-        for (NSString *key in self.updatedPseudoClassStyles) {
-            if (![styles objectForKey:key] && [key length]>0) {
-                [resetStyles setObject:@"" forKey:key];
-            }
-        }
-    }
-    [self _updateViewStyles:resetStyles];
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark keyboard
@@ -586,9 +570,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -607,7 +588,7 @@ WX_EXPORT_METHOD(@selector(blur))
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }

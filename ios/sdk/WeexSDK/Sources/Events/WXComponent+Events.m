@@ -651,7 +651,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         [self fireTouchEvent:@"touchstart" withTouches:touches];
     }
     if(_listenPseudoTouch) {
-        [_component updateTouchPseudoClassStyles:_component.pseudoClassStyles];
+        [_component updatePseudoClassStyles:_component.pseudoClassStyles];
     }
 
 }

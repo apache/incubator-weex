@@ -125,7 +125,7 @@ static WXModuleFactory *_sharedInstance = nil;
 - (NSMutableDictionary *)_moduleMethodMapsWithName:(NSString *)name
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    NSMutableArray *methods = [NSMutableArray array];
+    NSMutableArray *methods = [self _defaultModuleMethod];
     
     [_moduleLock lock];
     [dict setValue:methods forKey:name];
@@ -139,6 +139,12 @@ static WXModuleFactory *_sharedInstance = nil;
     [_moduleLock unlock];
     
     return dict;
+}
+
+// module common method
+- (NSMutableArray*)_defaultModuleMethod
+{
+    return [NSMutableArray arrayWithObjects:@"addEventListener",@"removeAllEventListeners", nil];
 }
 
 - (NSDictionary *)_getModuleConfigs {
