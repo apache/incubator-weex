@@ -31,7 +31,7 @@ export function init (app, code, data, services) {
   const bundleBootstrap = (name, config, _data) => {
     result = bootstrap(app, name, config, _data || data)
     updateActions(app)
-    app.doc.listener.createFinish()
+    app.doc.taskCenter.createFinish()
     console.debug(`[JS Framework] After intialized an instance(${app.id})`)
   }
   const bundleVm = Vm
