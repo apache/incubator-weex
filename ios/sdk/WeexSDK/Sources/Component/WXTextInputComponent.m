@@ -82,7 +82,6 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -154,8 +153,6 @@ WX_EXPORT_METHOD(@selector(blur))
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             [self setBorder:border];
         }
-        
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -441,11 +438,11 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -453,10 +450,6 @@ WX_EXPORT_METHOD(@selector(blur))
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }
@@ -577,9 +570,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -598,7 +588,7 @@ WX_EXPORT_METHOD(@selector(blur))
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }
