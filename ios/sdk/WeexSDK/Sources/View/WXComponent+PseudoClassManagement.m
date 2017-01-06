@@ -48,6 +48,7 @@
                 return;
             }
             [manager updatePseudoClassStyles:styles forComponent:self.ref];
+            [manager startComponentTasks];
         });
     }
     
@@ -99,9 +100,8 @@
             return;
         }
         [manager updatePseudoClassStyles:resetStyles forComponent:self.ref];
+        [manager startComponentTasks];
     });
-    [self needsLayout];
-
 }
 
 @end
