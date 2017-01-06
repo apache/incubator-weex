@@ -21,6 +21,7 @@ test:
 dependencies:
   cache_directories:
     - "node_modules"
+    - ~/.gradle
 
 notify:
   webhooks:
