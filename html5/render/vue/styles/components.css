@@ -3,7 +3,11 @@ a, .weex-a {
   text-decoration: none;
 }
 
-.weex-div, .weex-container {
+body > .weex-div {
+  min-height: 100%;
+}
+
+.weex-div {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -26,73 +30,16 @@ a, .weex-a {
           align-content: flex-start;
 }
 
-textarea, .weex-textarea {
+input, textarea, .weex-input, .weex-textarea {
   font-size: 32px;
+}
+input:focus, textarea:focus, .weex-input:focus, .weex-textarea:focus {
+  outline: none;
 }
 
 figure, img, .weex-image, .weex-img {
   display: block;
   background-repeat: no-repeat;
-}
-
-.weex-list-wrapper {
-  position: relative;
-  overflow: scroll;
-}
-.weex-list-wrapper.with-loading, .weex-list-wrapper.with-refresh {
-  background-color: #888888;
-}
-
-.weex-list-inner {
-  background-color: #FFFFFF;
-}
-
-.weex-list-top-mark {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
-}
-
-.weex-list-bottom-mark {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
-}
-
-.weex-refresh,
-.weex-loading {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  width: 100%;
-  height: 0;
-  overflow: hidden;
-  position: absolute;
-  visibility: hidden;
-  z-index: 100;
-}
-
-.weex-refresh {
-  top: 0;
-}
-
-.weex-loading {
-  bottom: 0;
-  bottom: -212px;
 }
 
 .weex-toast {
@@ -239,7 +186,16 @@ figure, img, .weex-image, .weex-img {
   border-right: 1px solid #ddd;
 }
 
+body > .weex-list,
+body > .weex-scroller {
+  height: 100%;
+}
+
 .weex-scroller-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   overflow: scroll;
 }
 .weex-scroller-wrapper.weex-scroller-horizontal {
@@ -256,16 +212,80 @@ figure, img, .weex-image, .weex-img {
   float: left;
 }
 
-.weex-scroller-top-mark {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
+.weex-list-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  overflow: scroll;
+}
+.weex-list-wrapper.with-loading, .weex-list-wrapper.with-refresh {
+  background-color: #888888;
 }
 
-.weex-scroller-bottom-mark {
+.weex-list-inner,
+.weex-scroller-inner {
+  background-color: #FFFFFF;
+  min-height: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+
+.weex-cell {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.weex-refresh,
+.weex-loading {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   width: 100%;
   height: 0;
+  overflow: hidden;
+  position: absolute;
   visibility: hidden;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.weex-refresh {
+  top: 0;
+}
+
+.weex-loading {
+  bottom: 0;
+  bottom: -212px;
 }
 
 .weex-slider-wrapper {
@@ -339,6 +359,8 @@ figure, img, .weex-image, .weex-img {
   /* 12px */
   width: 1em;
   height: 1em;
+  left: -60%;
+  top: 40%;
   border-radius: 50%;
   position: relative;
   text-indent: -9999em;
@@ -472,5 +494,3 @@ p, .weex-text {
   border: none;
   box-sizing: border-box;
 }
-
-/*# sourceMappingURL=components.css.map */

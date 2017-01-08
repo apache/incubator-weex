@@ -12,6 +12,7 @@ export function require (moduleName) {
   return weexModules[moduleName]
 }
 
+// TODO: rename to registerModule
 export function registerApiModule (name, module, meta) {
   if (!weexModules[name]) {
     weexModules[name] = {}
@@ -21,6 +22,10 @@ export function registerApiModule (name, module, meta) {
       weexModules[name][key] = utils.bind(module[key], this)
     }
   }
+}
+
+export function registerModule (...args) {
+  return registerApiModule(...args)
 }
 
 export const sender = {

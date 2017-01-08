@@ -1,4 +1,5 @@
 import { base } from '../mixins'
+import { extend, mapFormEvents } from '../utils'
 import { validateStyles } from '../validator'
 
 export default {
@@ -9,10 +10,9 @@ export default {
       default: 'text',
       validator (value) {
         return [
-          'button', 'email', 'number', 'password', 'search',
-          'tel', 'text', 'url', 'tel'
+          'email', 'number', 'password', 'search', 'tel', 'text', 'url'
           // unsupported type:
-          // checkbox, color, date, datetime, file, hidden, image,
+          // button, checkbox, color, date, datetime, file, hidden, image,
           // month, radio, range, reset, submit, time, week,
         ].indexOf(value) !== -1
       }
@@ -46,7 +46,7 @@ export default {
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
-      on: this.createEventMap(['input', 'change', 'focus', 'blur']),
+      on: extend(this.createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-input'
     })
   }

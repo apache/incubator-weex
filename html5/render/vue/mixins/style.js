@@ -3,12 +3,19 @@ import { validateStyles } from '../validator'
 
 let warned = false
 
-function normalize (value) {
-  // TODO: add more reliable check
-  if (typeof value === 'number') {
-    return value + 'px'
+function normalize (styles) {
+  const realStyle = {}
+  for (const key in styles) {
+    let value = styles[key]
+
+    // TODO: add more reliable check
+    if (typeof value === 'number') {
+      value += 'px'
+    }
+
+    realStyle[key] = value
   }
-  return value
+  return realStyle
 }
 
 function getStyleMap (component) {
@@ -26,7 +33,8 @@ function getStyleMap (component) {
 
 function getStaticClass (component) {
   if (component && component.$vnode && component.$vnode.data) {
-    return component.$vnode.data.staticClass
+    const data = component.$vnode.data
+    return [].concat(data.staticClass, data.class)
   }
 }
 
@@ -39,22 +47,25 @@ function getComponentStyle (context) {
       return extend(res, styleMap[name])
     }, {})
 
-    const realStyle = {}
+    return normalize(styles)
+  }
+}
+
+function mergeStyles (context) {
+  const styles = getComponentStyle(context)
+  if (context.$el && styles) {
+    validateStyles(context.$options && context.$options._componentTag, styles)
     for (const key in styles) {
-      realStyle[key] = normalize(styles[key])
+      context.$el.style[key] = styles[key]
     }
-    return realStyle
   }
 }
 
 export default {
   mounted () {
-    const styles = getComponentStyle(this)
-    if (this.$el && styles) {
-      validateStyles(this.$options && this.$options._componentTag, styles)
-      for (const key in styles) {
-        this.$el.style[key] = styles[key]
-      }
-    }
+    mergeStyles(this)
+  },
+  beforeUpdate () {
+    mergeStyles(this)
   }
 }

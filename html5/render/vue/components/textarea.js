@@ -1,4 +1,5 @@
 import { base } from '../mixins'
+import { extend, mapFormEvents } from '../utils'
 import { validateStyles } from '../validator'
 
 export default {
@@ -35,8 +36,8 @@ export default {
         placeholder: this.placeholder,
         rows: this.rows
       },
-      on: this.createEventMap(['input', 'change', 'focus', 'blur']),
+      on: extend(this.createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-textarea'
-    })
+    }, this.value)
   }
 }

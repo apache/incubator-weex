@@ -47,7 +47,10 @@ export function flatten (array) {
  */
 export function checkSupported (type, value, dict = {}) {
   const tagType = dict[type] ? type : '*'
-  return flatten(dict[tagType].map(k => dict[k] || k)).indexOf(value) !== -1
+  if (Array.isArray(dict[tagType])) {
+    return flatten(dict[tagType].map(k => dict[k] || k)).indexOf(value) !== -1
+  }
+  return false
 }
 
 /**

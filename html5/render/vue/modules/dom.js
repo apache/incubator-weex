@@ -21,8 +21,12 @@ export default {
     if (scroller && scroller.$el && vnode.$el) {
       let offset = vnode.$el.offsetTop
 
-      if (options && options.offset) {
-        offset += Number(options.offset)
+      if (options) {
+        offset += Number(options.offset) || 0
+      }
+      else if (process.env.NODE_ENV === 'development') {
+        console.warn('[Vue Render] The second parameter of "scrollToElement" is required, '
+          + 'otherwise it may not works well on native.')
       }
 
       // TODO: add animation

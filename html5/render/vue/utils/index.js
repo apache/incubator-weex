@@ -1,4 +1,5 @@
 export * from './func'
+export * from './event'
 export * from './component'
 
 /**

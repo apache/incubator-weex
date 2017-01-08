@@ -18,14 +18,11 @@ describe('check', () => {
       custom: ['@shared', 'c']
     }
 
-    expect(checkSupported('custom', 'a')).to.be.true
-    expect(checkSupported('custom', 'd')).to.be.true
-    expect(checkSupported('unknown', 'a', list)).to.be.true
-
     expect(checkSupported('custom', 'a', list)).to.be.true
     expect(checkSupported('custom', 'b', list)).to.be.true
     expect(checkSupported('custom', 'c', list)).to.be.true
     expect(checkSupported('custom', 'd', list)).to.be.false
+    expect(checkSupported('unknown', 'a', list)).to.be.false
   })
 
   it('isSupportedStyle', () => {
@@ -35,7 +32,7 @@ describe('check', () => {
   })
 
   it('isSupportedProp', () => {
-    expect(isSupportedProp('text', 'width')).to.be.true
-    expect(isSupportedProp('text', 'border')).to.be.true
+    expect(isSupportedProp('text', 'width')).to.be.false
+    expect(isSupportedProp('text', 'border')).to.be.false
   })
 })
