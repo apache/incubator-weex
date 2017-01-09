@@ -314,9 +314,11 @@
         if (cell.deleteAnimation == UITableViewRowAnimationNone) {
             [UIView performWithoutAnimation:^{
                 [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self handleAppear];
             }];
         } else {
             [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.deleteAnimation];
+            [self handleAppear];
         }
     }];
 }
@@ -348,14 +350,17 @@
             if (cell.insertAnimation == UITableViewRowAnimationNone) {
                 [UIView performWithoutAnimation:^{
                     [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                    [self handleAppear];
                 }];
             } else {
                 [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.insertAnimation];
+                [self handleAppear];
             }
         } else {
             WXLogInfo(@"Reload cell:%@ at indexPath:%@", cell.ref, indexPath);
             [UIView performWithoutAnimation:^{
                 [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self handleAppear];
             }];
         }
     }];
@@ -403,6 +408,7 @@
         [self insertCell:cell forIndexPath:toIndexPath withSections:_completedSections];
         [UIView performWithoutAnimation:^{
             [_tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+            [self handleAppear];
         }];
     }];
 }

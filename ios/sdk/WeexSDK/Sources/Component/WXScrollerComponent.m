@@ -469,8 +469,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
-#pragma mark  Private Methods
-
 - (void)handleAppear
 {
     if (![self isViewLoaded]) {
@@ -488,6 +486,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         [self scrollToTarget:target scrollRect:scrollRect];
     }
 }
+
+#pragma mark  Private Methods
 
 - (void)scrollToTarget:(WXScrollToTarget *)target scrollRect:(CGRect)rect
 {
