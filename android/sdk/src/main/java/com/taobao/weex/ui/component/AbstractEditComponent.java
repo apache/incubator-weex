@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -215,6 +216,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -266,7 +268,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       @Override
       public void onFocusChange(boolean hasFocus) {
         if (!hasFocus) {
-          hideSoftKeyboard();
+          decideSoftKeyboard();
         }
       }
     });
@@ -720,13 +722,31 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @Override
-  protected Object convertEmptyProperty(String propName) {
+  protected Object convertEmptyProperty(String propName, Object originalValue) {
     switch (propName) {
       case Constants.Name.FONT_SIZE:
         return WXText.sDEFAULT_SIZE;
       case Constants.Name.COLOR:
         return "black";
     }
-    return super.convertEmptyProperty(propName);
+    return super.convertEmptyProperty(propName, originalValue);
+  }
+
+  private void decideSoftKeyboard() {
+    View hostView;
+    if ((hostView = getHostView()) != null) {
+      final Context context = getContext();
+      if (context != null && context instanceof Activity) {
+        hostView.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            View currentFocus = ((Activity) context).getCurrentFocus();
+            if (!(currentFocus instanceof EditText)) {
+              mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
+            }
+          }
+        }, 16);
+      }
+    }
   }
 }

@@ -213,7 +213,6 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -243,8 +242,8 @@ public class TypeModuleFactory<T extends WXModule> implements ModuleFactory<T> {
           if (anno != null) {
             if(anno instanceof JSMethod) {
               JSMethod methodAnnotation = (JSMethod) anno;
-              String name = JSMethod.NOT_SET.equals(methodAnnotation.alias())?method.getName():methodAnnotation.alias();
-              methodMap.put(name, new MethodInvoker(method,methodAnnotation.uiThread()));
+              String name = JSMethod.NOT_SET.equals(methodAnnotation.alias())? method.getName():methodAnnotation.alias();
+              methodMap.put(name, new MethodInvoker(method, methodAnnotation.uiThread()));
               break;
             }else if(anno instanceof WXModuleAnno) {
               WXModuleAnno methodAnnotation = (WXModuleAnno)anno;

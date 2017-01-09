@@ -424,7 +424,9 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     }
     WXComponent child = getChild(indexToCreate);
     child.createView();
-    addSubView(child.getHostView(),indexToCreate);
+    if(!child.isVirtualComponent()){
+      addSubView(child.getHostView(),indexToCreate);
+    }
   }
 
   protected void addSubView(View child, int index) {
@@ -452,7 +454,11 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
             && child.getDomObject().isFixed()){
       getInstance().removeFixedView(child.getHostView());
     }else if(getRealView() != null) {
-      getRealView().removeView(child.getHostView());
+      if(!child.isVirtualComponent()){
+        getRealView().removeView(child.getHostView());
+      }else{
+        child.removeVirtualComponent();
+      }
     }
     if(destroy) {
       child.destroy();

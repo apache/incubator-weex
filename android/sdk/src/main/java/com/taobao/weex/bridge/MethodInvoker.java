@@ -228,8 +228,8 @@ public class MethodInvoker implements Invoker {
   }
 
   @Override
-  public void invoke(Object receiver, Object... params) throws InvocationTargetException, IllegalAccessException {
-    mMethod.invoke(receiver,params);
+  public Object invoke(Object receiver, Object... params) throws InvocationTargetException, IllegalAccessException {
+    return mMethod.invoke(receiver,params);
   }
 
   @Override
