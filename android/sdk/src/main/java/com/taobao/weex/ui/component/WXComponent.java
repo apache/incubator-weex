@@ -334,11 +334,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return null;
   }
 
-  protected final void fireEvent(String type){
+  public final void fireEvent(String type){
     fireEvent(type,null);
   }
 
-  protected final void fireEvent(String type, Map<String, Object> params){
+  public final void fireEvent(String type, Map<String, Object> params){
     fireEvent(type,params,null);
   }
 
