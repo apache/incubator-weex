@@ -197,6 +197,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self removePanStartEvent];
     [self removePanMoveEvent];
     [self removePanEndEvent];
+    [self removeHorizontalPanEvent];
+    [self removeVerticalPanEvent];
+    
     [self removeTouchStartEvent];
     [self removeTouchMoveEvent];
     [self removeTouchEndEvent];
