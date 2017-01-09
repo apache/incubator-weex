@@ -654,7 +654,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         [self fireTouchEvent:@"touchstart" withTouches:touches];
     }
     if(_listenPseudoTouch) {
-        [_component updatePseudoClassStyles:_component.pseudoClassStyles];
+        NSMutableDictionary *styles = [_component getPseudoClassStyles:@"active"];
+        [_component updatePseudoClassStyles:styles];
     }
 
 }

@@ -408,7 +408,6 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    
     [self _updateViewStyles:styles];
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
@@ -429,6 +428,11 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
+}
+
+- (void)renderFinish
+{
+    [self.supercomponent renderFinish];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
