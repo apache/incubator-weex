@@ -67,7 +67,11 @@
 
 - (WXDisplayCompeletionBlock)displayCompeletionBlock
 {
-    return nil;
+    return ^(CALayer *layer, BOOL finished) {
+        if (self.weexInstance.trackCompoent) {
+            [self renderFinish];
+        }
+    };
 }
 
 #pragma mark Private
