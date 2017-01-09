@@ -78,6 +78,7 @@ typedef enum : NSUInteger {
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
+        _trackCompoent = NO;
        
         [self addObservers];
     }
