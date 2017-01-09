@@ -69,7 +69,7 @@
         Method *methodList = class_copyMethodList(object_getClass(currentClass), &methodCount);
         for (unsigned int i = 0; i < methodCount; i++) {
             NSString *selStr = [NSString stringWithCString:sel_getName(method_getName(methodList[i])) encoding:NSUTF8StringEncoding];
-            BOOL isSyncMethod;
+            BOOL isSyncMethod = NO;
             if ([selStr hasPrefix:@"wx_export_method_sync_"]) {
                 isSyncMethod = YES;
             } else if ([selStr hasPrefix:@"wx_export_method_"]) {

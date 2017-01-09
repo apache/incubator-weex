@@ -171,7 +171,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
         NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
         UIView *rootView = manager.weexInstance.rootView;
-        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView.superview.superview];
+        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         if ([ref isEqualToString:@"viewport"]) {
             [callbackRsp setObject:@(true) forKey:@"result"];
