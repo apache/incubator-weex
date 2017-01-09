@@ -211,6 +211,7 @@ import android.view.View;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
@@ -219,8 +220,8 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 
 /**
@@ -264,6 +265,10 @@ public final class WXDomModule extends WXModule {
       REMOVE_ELEMENT, ADD_ELEMENT, MOVE_ELEMENT, ADD_EVENT, REMOVE_EVENT, CREATE_FINISH,
       REFRESH_FINISH, UPDATE_FINISH, SCROLL_TO_ELEMENT, ADD_RULE,GET_COMPONENT_RECT,
       INVOKE_METHOD};
+
+  public WXDomModule(WXSDKInstance instance){
+    mWXSDKInstance = instance;
+  }
 
   public void callDomMethod(JSONObject task) {
     if (task == null) {
@@ -347,7 +352,6 @@ public final class WXDomModule extends WXModule {
             return;
           }
           addRule((String) args.get(0), (JSONObject) args.get(1));
-          break;
         case GET_COMPONENT_RECT:
           if(args == null){
             return;
@@ -652,12 +656,12 @@ public final class WXDomModule extends WXModule {
         Map<String, String> sizes = new HashMap<>();
         Rect rect=new Rect();
         ((View)mWXSDKInstance.getRootView().getParent()).getGlobalVisibleRect(rect);
-        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width())));
-        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height())));
-        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom)));
-        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left)));
-        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right)));
-        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top)));
+        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width(),mWXSDKInstance.getViewPortWidth())));
+        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height(),mWXSDKInstance.getViewPortWidth())));
+        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right,mWXSDKInstance.getViewPortWidth())));
+        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top,mWXSDKInstance.getViewPortWidth())));
         options.put("size", sizes);
         options.put("result", true);
         WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);

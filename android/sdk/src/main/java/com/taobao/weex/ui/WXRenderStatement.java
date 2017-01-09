@@ -204,13 +204,9 @@
  */
 package com.taobao.weex.ui;
 
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -246,7 +242,6 @@ class WXRenderStatement {
   /**
    * The container for weex root view.
    */
-  private WXVContainer mGodComponent;
 
   public WXRenderStatement(WXSDKInstance instance) {
     mWXSDKInstance = instance;
@@ -258,9 +253,6 @@ class WXRenderStatement {
    */
   public void destroy() {
     mWXSDKInstance = null;
-    if (mGodComponent != null) {
-      mGodComponent.destroy();
-    }
     mRegistry.clear();
   }
 
@@ -274,7 +266,7 @@ class WXRenderStatement {
    */
   void createBody(WXComponent component) {
     long start = System.currentTimeMillis();
-    component.createView(mGodComponent, -1);
+    component.createView();
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
     }
@@ -292,9 +284,9 @@ class WXRenderStatement {
         mWXSDKInstance.setRootScrollView((ScrollView) scroller.getInnerView());
       }
     }
-    mWXSDKInstance.setRootView(mGodComponent.getRealView());
+    mWXSDKInstance.onRootCreated(component);
     if (mWXSDKInstance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
-      mWXSDKInstance.onViewCreated(mGodComponent);
+      mWXSDKInstance.onCreateFinish();
     }
   }
 
@@ -302,27 +294,9 @@ class WXRenderStatement {
     if (mWXSDKInstance == null) {
       return null;
     }
-    WXDomObject domObject = new WXDomObject();
-    WXDomObject.prepareGod(domObject);
-    mGodComponent = (WXVContainer) WXComponentFactory.newInstance(mWXSDKInstance, domObject, null);
-    mGodComponent.createView(null, -1);
-    if (mGodComponent == null) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("rootView failed!");
-      }
-      //TODO error callback
-      return null;
-    }
-    FrameLayout frameLayout = (FrameLayout) mGodComponent.getHostView();
-    ViewGroup.LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-    frameLayout.setLayoutParams(layoutParams);
-    frameLayout.setBackgroundColor(Color.TRANSPARENT);
 
-    mGodComponent.getRealView().addOnLayoutChangeListener(getWXSDKInstance());
-    WXComponent component = generateComponentTree(dom, mGodComponent);
-    mGodComponent.addChild(component);
-    mRegistry.put(component.getRef(), component);
-    return component;
+    WXComponent rootComp = generateComponentTree(dom, null);
+    return rootComp;
   }
 
   /**
@@ -372,7 +346,7 @@ class WXRenderStatement {
     if(comp == null || !(comp instanceof WXVContainer)){
       return null;
     }
-    return generateComponentTree(dom, (WXVContainer) mRegistry.get(parentRef));
+    return generateComponentTree(dom, (WXVContainer) comp);
   }
 
   /**
@@ -383,9 +357,9 @@ class WXRenderStatement {
     if (parent == null || component == null) {
       return;
     }
-    
+
     parent.addChild(component, index);
-    component.createView(parent, index);
+    parent.createChildViewAt(index);
     component.applyLayoutAndEvent(component);
     component.bindData(component);
   }
@@ -400,7 +374,7 @@ class WXRenderStatement {
     }
     WXVContainer parent = component.getParent();
     clearRegistryForComponent(component);
-    parent.remove(component);
+    parent.remove(component,true);
     mRegistry.remove(ref);
     return component;
   }
@@ -503,7 +477,7 @@ class WXRenderStatement {
       String offset = options.get("offset") == null ? "0" : options.get("offset").toString();
       if (offset != null) {
         try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset));
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset),mWXSDKInstance.getViewPortWidth());
         }catch (Exception e ){
            WXLogUtils.e("Float parseFloat error :"+e.getMessage());
         }
@@ -523,7 +497,7 @@ class WXRenderStatement {
    */
   void createFinish(int width, int height) {
     if (mWXSDKInstance.getRenderStrategy() == WXRenderStrategy.APPEND_ONCE) {
-      mWXSDKInstance.onViewCreated(mGodComponent);
+      mWXSDKInstance.onCreateFinish();
     }
     mWXSDKInstance.onRenderSuccess(width, height);
   }
@@ -546,11 +520,10 @@ class WXRenderStatement {
 
 
   private WXComponent generateComponentTree(WXDomObject dom, WXVContainer parent) {
-    if (dom == null || parent == null) {
+    if (dom == null ) {
       return null;
     }
-    WXComponent component = WXComponentFactory.newInstance(mWXSDKInstance, dom,
-                                                           parent);
+    WXComponent component = WXComponentFactory.newInstance(mWXSDKInstance, dom,parent);
 
     mRegistry.put(dom.getRef(), component);
     if (component instanceof WXVContainer) {
@@ -578,12 +551,12 @@ class WXRenderStatement {
     if (component != null) {
       Map<String, String> size = new HashMap<>();
       Rect sizes = component.getComponentSize();
-      size.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.width())));
-      size.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.height())));
-      size.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.bottom)));
-      size.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.left)));
-      size.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.right)));
-      size.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.top)));
+      size.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.width(),mWXSDKInstance.getViewPortWidth())));
+      size.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.height(),mWXSDKInstance.getViewPortWidth())));
+      size.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.bottom,mWXSDKInstance.getViewPortWidth())));
+      size.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.left,mWXSDKInstance.getViewPortWidth())));
+      size.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.right,mWXSDKInstance.getViewPortWidth())));
+      size.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.top,mWXSDKInstance.getViewPortWidth())));
       options.put("size", size);
       options.put("result", true);
     } else {

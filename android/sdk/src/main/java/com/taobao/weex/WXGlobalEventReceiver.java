@@ -217,6 +217,7 @@ public class WXGlobalEventReceiver extends BroadcastReceiver {
   public static final String EVENT_NAME = "eventName";
   public static final String EVENT_PARAMS = "eventParams";
   public static final String EVENT_ACTION = "wx_global_action";
+  public static final String EVENT_WX_INSTANCEID = "wx_instanceid";
 
   private WXSDKInstance mWXSDKInstance;
 

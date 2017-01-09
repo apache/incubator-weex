@@ -237,6 +237,7 @@ public class WXEnvironment {
   public static String WXSDK_VERSION = BuildConfig.buildVersion;
   public static Application sApplication;
   public static final String DEV_Id = getDevId();
+  @Deprecated
   public static int sDefaultWidth = 750;
   public volatile static boolean JsFrameworkInit = false;
 
@@ -248,6 +249,7 @@ public class WXEnvironment {
    */
   public static boolean sDebugMode = false;
   public static String sDebugWsUrl = "";
+  public static boolean sDebugServerConnectable = true;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
   public static long sJSLibInitTime = 0;
@@ -260,7 +262,7 @@ public class WXEnvironment {
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
-  private static boolean isPerf = false;
+  public static boolean isPerf = false;
 
   public static boolean sShow3DLayer=true;
 
@@ -307,6 +309,10 @@ public class WXEnvironment {
       WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
     }
     return versionName;
+  }
+
+  public static Map<String, String> getCustomOptions() {
+    return options;
   }
 
   public static void addCustomOptions(String key, String value) {

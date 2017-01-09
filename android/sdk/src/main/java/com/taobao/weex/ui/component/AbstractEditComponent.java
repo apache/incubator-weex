@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -215,6 +216,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -266,7 +268,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       @Override
       public void onFocusChange(boolean hasFocus) {
         if (!hasFocus) {
-          hideSoftKeyboard();
+          decideSoftKeyboard();
         }
       }
     });
@@ -309,7 +311,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     String alignStr = (String) getDomObject().getStyles().get(Constants.Name.TEXT_ALIGN);
     int textAlign = getTextAlign(alignStr);
     if (textAlign <= 0) {
-      textAlign = Gravity.LEFT;
+      textAlign = Gravity.START;
     }
     editText.setGravity(textAlign | getVerticalGravity());
     int colorInt = WXResourceUtils.getColor("#999999");
@@ -317,7 +319,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       editText.setHintTextColor(colorInt);
     }
 
-    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles()));
+    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getViewPortWidth()));
     editText.setText(getDomObject().getAttrs().optString(Constants.Name.VALUE));
   }
 
@@ -468,6 +470,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         if (maxlength != null)
           setMaxLength(maxlength);
         return true;
+      case Constants.Name.MAXLENGTH:
+        Integer maxLength = WXUtils.getInteger(param, null);
+        if (maxLength != null)
+          setMaxLength(maxLength);
+          return true;
       case Constants.Name.MAX:
         setMax(String.valueOf(param));
         return true;
@@ -552,7 +559,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   @WXComponentProp(name = Constants.Name.FONT_SIZE)
   public void setFontSize(String fontSize) {
     if (getHostView() != null && fontSize != null ) {
-      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles()));
+      getHostView().setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getViewPortWidth()));
     }
   }
 
@@ -560,7 +567,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   public void setTextAlign(String textAlign) {
     int align = getTextAlign(textAlign);
     if (align > 0) {
-      getHostView().setGravity(align | Gravity.CENTER_VERTICAL);
+      getHostView().setGravity(align | getVerticalGravity());
     }
   }
 
@@ -674,16 +681,16 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   private int getTextAlign(String textAlign) {
-    int align = Gravity.LEFT;
+    int align = Gravity.START;
     if (TextUtils.isEmpty(textAlign)) {
       return align;
     }
     if (textAlign.equals(Constants.Value.LEFT)) {
-      align = Gravity.LEFT;
+      align = Gravity.START;
     } else if (textAlign.equals(Constants.Value.CENTER)) {
       align = Gravity.CENTER;
     } else if (textAlign.equals(Constants.Value.RIGHT)) {
-      align = Gravity.RIGHT;
+      align = Gravity.END;
     }
     return align;
   }
@@ -715,13 +722,31 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @Override
-  protected Object convertEmptyProperty(String propName) {
+  protected Object convertEmptyProperty(String propName, Object originalValue) {
     switch (propName) {
       case Constants.Name.FONT_SIZE:
         return WXText.sDEFAULT_SIZE;
       case Constants.Name.COLOR:
         return "black";
     }
-    return super.convertEmptyProperty(propName);
+    return super.convertEmptyProperty(propName, originalValue);
+  }
+
+  private void decideSoftKeyboard() {
+    View hostView;
+    if ((hostView = getHostView()) != null) {
+      final Context context = getContext();
+      if (context != null && context instanceof Activity) {
+        hostView.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            View currentFocus = ((Activity) context).getCurrentFocus();
+            if (!(currentFocus instanceof EditText)) {
+              mInputMethodManager.hideSoftInputFromWindow(getHostView().getWindowToken(), 0);
+            }
+          }
+        }, 16);
+      }
+    }
   }
 }

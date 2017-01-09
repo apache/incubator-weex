@@ -314,7 +314,6 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
       return;
     headerViewStack.push(headerView);
     headComponent.removeSticky();
-
     final ViewGroup parent = (ViewGroup) getParent();
     if(parent != null){
       parent.post(WXThread.secure(new Runnable() {

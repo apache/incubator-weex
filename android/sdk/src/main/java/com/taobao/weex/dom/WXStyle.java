@@ -204,6 +204,9 @@
  */
 package com.taobao.weex.dom;
 
+import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
 
@@ -218,16 +221,29 @@ import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Store value of component style
  *
  */
-public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
+public class WXStyle implements Map<String, Object>,Cloneable {
 
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
+
+  private @NonNull final ArrayMap<String,Object> map;
+
+  public WXStyle(){
+    map = new ArrayMap<>();
+  }
+
+  public WXStyle(@NonNull Map<String,Object> standardMap) {
+    this();
+    map.putAll(standardMap);
+  }
 
   public int getBlur() {
     try {
@@ -279,16 +295,20 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
 
   public static int getFontWeight(Map<String, Object> style) {
     int typeface = android.graphics.Typeface.NORMAL;
-    if (style == null) {
-      return typeface;
-    }
-    Object temp = style.get(Constants.Name.FONT_WEIGHT);
-    if (temp == null) {
-      return typeface;
-    }
-    String fontWeight = temp.toString();
-    if (fontWeight.equals(Constants.Value.BOLD)) {
-      typeface = android.graphics.Typeface.BOLD;
+    if (style != null) {
+      Object temp = style.get(Constants.Name.FONT_WEIGHT);
+      if (temp != null) {
+        String fontWeight = temp.toString();
+        switch (fontWeight){
+          case "600":
+          case "700":
+          case "800":
+          case "900":
+          case Constants.Value.BOLD:
+            typeface=Typeface.BOLD;
+            break;
+        }
+      }
     }
     return typeface;
   }
@@ -309,15 +329,15 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
     return typeface;
   }
 
-  public static int getFontSize(Map<String, Object> style) {
+  public static int getFontSize(Map<String, Object> style,int viewPortW) {
     if (style == null) {
-      return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE);
+      return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,viewPortW);
     }
     int fontSize = WXUtils.getInt(style.get(Constants.Name.FONT_SIZE));
     if (fontSize <= 0) {
       fontSize = WXText.sDEFAULT_SIZE;
     }
-    return (int) WXViewUtils.getRealPxByWidth(fontSize);
+    return (int) WXViewUtils.getRealPxByWidth(fontSize,viewPortW);
   }
 
   public static String getFontFamily(Map<String, Object> style) {
@@ -360,7 +380,7 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
     return WXUtils.getInt(style.get(Constants.Name.LINES));
   }
 
-  public static int getLineHeight(Map<String, Object> style){
+  public static int getLineHeight(Map<String, Object> style,int viewPortW){
     if (style == null) {
       return UNSET;
     }
@@ -369,7 +389,7 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
       lineHeight = UNSET;
       return lineHeight;
     }
-    return (int) WXViewUtils.getRealPxByWidth(lineHeight);
+    return (int) WXViewUtils.getRealPxByWidth(lineHeight,viewPortW);
   }
   /*
    * flexbox
@@ -425,6 +445,10 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
     return WXUtils.getFloat(get(Constants.Name.WIDTH));
   }
 
+  public float getDefaultWidth() {
+    return WXUtils.getFloat(get(Constants.Name.DEFAULT_WIDTH));
+  }
+
   public float getMinWidth() {
     return WXUtils.getFloat(get(Constants.Name.MIN_WIDTH));
   }
@@ -435,6 +459,10 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
 
   public float getHeight() {
     return WXUtils.getFloat(get(Constants.Name.HEIGHT));
+  }
+
+  public float getDefaultHeight() {
+    return WXUtils.getFloat(get(Constants.Name.DEFAULT_HEIGHT));
   }
 
   public float getMinHeight() {
@@ -470,11 +498,7 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
 
   //TODO fix : only when set backgroundColor
   public float getBorderWidth() {
-    float temp = WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
-    if (WXUtils.isUndefined(temp)) {
-      return Float.NaN;
-    }
-    return temp;
+    return WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
   }
 
   public float getBorderRightWidth() {
@@ -497,6 +521,14 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
   public String getBorderStyle() {
     Object borderStyle = get(Constants.Name.BORDER_STYLE);
     return borderStyle == null ? null : borderStyle.toString();
+  }
+
+  public float getMargin(){
+    return WXUtils.getFloat(get(Constants.Name.MARGIN));
+  }
+
+  public float getPadding(){
+    return WXUtils.getFloat(get(Constants.Name.PADDING));
   }
 
   /*
@@ -640,5 +672,83 @@ public class WXStyle extends SafePutConcurrentHashMap<String, Object> {
   public String getOverflow() {
     Object obj = get(Constants.Name.OVERFLOW);
     return obj == null ? Constants.Value.VISIBLE : obj.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return map.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    return map.hashCode();
+  }
+
+  @Override
+  public void clear() {
+    map.clear();
+  }
+
+  @Override
+  public boolean containsKey(Object key) {
+    return map.containsKey(key);
+  }
+
+  @Override
+  public boolean containsValue(Object value) {
+    return map.containsValue(value);
+  }
+
+  @NonNull
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    return map.entrySet();
+  }
+
+  @Override
+  public Object get(Object key) {
+    return map.get(key);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
+  @NonNull
+  @Override
+  public Set<String> keySet() {
+    return map.keySet();
+  }
+
+  @Override
+  public Object put(String key, Object value) {
+    return map.put(key,value);
+  }
+
+  @Override
+  public void putAll(Map<? extends String, ?> map) {
+    this.map.putAll(map);
+  }
+
+  @Override
+  public Object remove(Object key) {
+    return map.remove(key);
+  }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
+
+  @NonNull
+  @Override
+  public Collection<Object> values() {
+    return map.values();
+  }
+
+  @Override
+  protected WXStyle clone(){
+    return new WXStyle(map);
   }
 }

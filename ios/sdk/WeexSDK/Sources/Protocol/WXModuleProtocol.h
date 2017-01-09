@@ -24,6 +24,7 @@
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
 typedef void (^WXModuleCallback)(id result);
+typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 
 /**
  * @abstract the module callback , result can be string or dictionary.
