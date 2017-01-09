@@ -12,7 +12,7 @@ machine:
 test:
   override:
    # - npm run test
-    - cd android/playground && ./gradlew assemble -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
+    - cd android/playground && ./gradlew assembleDebug -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
     - cd android/sdk && ./gradlew clean testDebugUnitTest -PdisableCov=true -PtargetSDK=19 -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
