@@ -266,7 +266,6 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)updateContentImageWithFailedBlock:(void(^)(NSString *, NSError *))downloadFailedBlock
 {
-    
     NSString *imageSrc = self.imageSrc;
     if (imageSrc) {
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
@@ -303,6 +302,14 @@ static dispatch_queue_t WXImageUpdateQueue;
                 });
             }];
         });
+    }
+}
+
+- (void)readyToRender
+{
+    // when the imageView.image is not nil and then it is rendered
+    if (((UIImageView*)self.view).image) {
+        [super readyToRender];
     }
 }
 
