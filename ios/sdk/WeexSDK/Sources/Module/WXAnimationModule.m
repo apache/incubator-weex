@@ -12,29 +12,7 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 
-const NSString * kAnimationCompletionBlock = @"kAnimationCompletionBlock";
-
-@interface CAAnimation (WXAnimaiton)
-
-@property (nonatomic, strong) void (^wx_finishBlock)();
-
-@end
-
-@implementation CAAnimation (WXAnimaiton)
-
-- (void (^)())wx_finishBlock
-{
-    return [self valueForKey:kAnimationCompletionBlock];
-}
-
-- (void)setWx_finishBlock:(void (^)())wx_finishBlock
-{
-    [self setValue:wx_finishBlock forKey:kAnimationCompletionBlock];
-}
-
-@end
-
-@interface WXAnimationModule () <CAAnimationDelegate>
+@interface WXAnimationModule ()
 
 @end
 
@@ -118,6 +96,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction begin];
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
     [CATransaction setCompletionBlock:^{
+        if (isUsingCAAnimation) {
+            CGAffineTransform originTransform = CATransform3DGetAffineTransform(layer.transform);
+            layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(originTransform, rotateAngle * M_PI / 180));
+        }
         if (callback) {
             callback(@"SUCCESS");
         }
@@ -132,12 +114,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         rotationAnimation.cumulative = YES;
         rotationAnimation.fillMode = kCAFillModeForwards;
         rotationAnimation.removedOnCompletion = NO;
-        rotationAnimation.delegate = self;
-        rotationAnimation.wx_finishBlock = ^(){
-            CGAffineTransform originTransform = CATransform3DGetAffineTransform(layer.transform);
-            layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(originTransform, rotateAngle * M_PI / 180));
-        };
-        
         
         [layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     }
@@ -171,13 +147,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
 
     [CATransaction commit];
-}
-
-- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
-{
-    if (anim.wx_finishBlock) {
-        anim.wx_finishBlock();
-    }
 }
 
 - (CGFloat)getRotateAngleFromTransForm:(CATransform3D)transform
