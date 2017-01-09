@@ -556,7 +556,6 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_disabled){
         disabledStr = @"disabled";
     }
-    NSString *focusStr = @"focus";
     if ([_inputView isFirstResponder]) {
         NSString *focusStr = @"focus";
         recordStyles = [NSMutableDictionary new];

@@ -384,11 +384,10 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_disabled){
         disabledStr = @"disabled";
     }
-    NSString *focusStr = @"focus";
     if ([_textView isFirstResponder]) {
         NSString *focusStr = @"focus";
         recordStyles = [NSMutableDictionary new];
-        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus",@"enabled"]];
+        recordStyles = [self getPseudoClassStylesByKeys:@[focusStr,disabledStr]];
         [styles addEntriesFromDictionary:recordStyles];
     }
     [self updatePseudoClassStyles:styles];
