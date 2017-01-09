@@ -134,6 +134,10 @@ public class WXNavigatorModule extends WXModule {
     public static final String MSG_SUCCESS = "WX_SUCCESS";
     public static final String MSG_FAILED = "WX_FAILED";
     public static final String MSG_PARAM_ERR = "WX_PARAM_ERR";
+
+    public static final String CALLBACK_RESULT = "result";
+    public static final String CALLBACK_MESSAGE = "message";
+
     private final static String INSTANCE_ID = "instanceId";
     private final static String TAG = "Navigator";
     private final static String WEEX = "com.taobao.android.intent.category.WEEX";
@@ -142,35 +146,52 @@ public class WXNavigatorModule extends WXModule {
     @JSMethod(uiThread = true)
     public void open(JSONObject options, JSCallback success, JSCallback failure) {
         if (options != null) {
-            String url = options.getString("url");
+            String url = options.getString(Constants.Value.URL);
             JSCallback callback = success;
             JSONObject result = new JSONObject();
             if (!TextUtils.isEmpty(url)) {
                 Uri rawUri = Uri.parse(url);
                 String scheme = rawUri.getScheme();
-                if (TextUtils.isEmpty(scheme) || "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+                if (TextUtils.isEmpty(scheme) || Constants.Scheme.HTTP.equalsIgnoreCase(scheme) || Constants.Scheme.HTTPS.equalsIgnoreCase(scheme)) {
                     this.push(options.toJSONString(), success);
                 } else {
                     try {
                         Intent intent = new Intent(Intent.ACTION_VIEW, rawUri);
                         mWXSDKInstance.getContext().startActivity(intent);
-                        result.put("result", MSG_SUCCESS);
+                        result.put(CALLBACK_RESULT, MSG_SUCCESS);
                     } catch (Throwable e) {
                         e.printStackTrace();
-                        result.put("result", MSG_FAILED);
-                        result.put("message", "open page failed");
+                        result.put(CALLBACK_RESULT, MSG_FAILED);
+                        result.put(CALLBACK_MESSAGE, "open page failed");
                         callback = failure;
                     }
                 }
             } else {
-                result.put("result", MSG_PARAM_ERR);
-                result.put("message", "param error");
+                result.put(CALLBACK_RESULT, MSG_PARAM_ERR);
+                result.put(CALLBACK_MESSAGE, "param error");
                 callback = failure;
             }
 
             if(callback != null){
                 callback.invoke(result);
             }
+        }
+    }
+
+    @JSMethod(uiThread = true)
+    public void close(JSONObject options, JSCallback success, JSCallback failure) {
+        JSONObject result = new JSONObject();
+        JSCallback callback = null;
+        if (mWXSDKInstance.getContext() instanceof Activity) {
+            callback = success;
+            ((Activity) mWXSDKInstance.getContext()).finish();
+        } else {
+            result.put(CALLBACK_RESULT, MSG_FAILED);
+            result.put(CALLBACK_MESSAGE, "close page failed");
+            callback = failure;
+        }
+        if (callback != null) {
+            callback.invoke(result);
         }
     }
 
