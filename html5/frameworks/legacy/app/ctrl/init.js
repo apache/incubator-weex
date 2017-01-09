@@ -53,7 +53,7 @@ export function init (app, code, data, services) {
     config: app.options,
     define: bundleDefine,
     bootstrap: bundleBootstrap,
-    require: bundleRequireModule,
+    requireModule: bundleRequireModule,
     document: bundleDocument,
     Vm: bundleVm
   }
