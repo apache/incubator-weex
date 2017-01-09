@@ -42,6 +42,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 @property (nonatomic, strong) id<WXImageOperationProtocol> imageOperation;
 @property (nonatomic, strong) id<WXImageOperationProtocol> placeholderOperation;
 @property (nonatomic) BOOL imageLoadEvent;
+@property (nonatomic) BOOL imageDownloadFinish;
 
 @end
 
@@ -65,6 +66,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
+        _imageDownloadFinish = NO;
     }
     
     return self;
@@ -200,6 +202,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 {
     if (![src isEqualToString:_imageSrc]) {
         _imageSrc = src;
+        _imageDownloadFinish = NO;
         [self updateImage];
     }
 }
@@ -211,6 +214,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         [self cancelImage];
         
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error){
+            weakSelf.imageDownloadFinish = YES;
             WXLogError(@"Error downloading image:%@, detail:%@", url, [error localizedDescription]);
         };
         
@@ -220,9 +224,8 @@ static dispatch_queue_t WXImageUpdateQueue;
         if (!weakSelf.imageSrc && !weakSelf.placeholdSrc) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.layer.contents = nil;
-                if (self.weexInstance.trackCompoent) {
-                    [self readyToRender];
-                }
+                weakSelf.imageDownloadFinish = YES;
+                [weakSelf notifyReadyToRender];
             });
         }
     });
@@ -246,6 +249,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     downloadFailedBlock(placeholderSrc,error);
                     if ([strongSelf isViewLoaded] && !viewImage) {
                         ((UIImageView *)(strongSelf.view)).image = nil;
+                        [self notifyReadyToRender];
                     }
                     return;
                 }
@@ -255,9 +259,8 @@ static dispatch_queue_t WXImageUpdateQueue;
                 
                 if ([strongSelf isViewLoaded] && !viewImage) {
                     ((UIImageView *)strongSelf.view).image = image;
-                    if (strongSelf.weexInstance.trackCompoent) {
-                        [strongSelf readyToRender];
-                    }
+                    weakSelf.imageDownloadFinish = YES;
+                    [self notifyReadyToRender];
                 }
             });
         }];
@@ -286,6 +289,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
+                        [strongSelf notifyReadyToRender];
                         return ;
                     }
                     
@@ -295,9 +299,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     
                     if ([strongSelf isViewLoaded]) {
                         ((UIImageView *)strongSelf.view).image = image;
-                        if (strongSelf.weexInstance.trackCompoent) {
-                            [strongSelf readyToRender];
-                        }
+                        [strongSelf notifyReadyToRender];
                     }
                 });
             }];
@@ -307,9 +309,16 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)readyToRender
 {
-    // when the imageView.image is not nil and then it is rendered
-    if (((UIImageView*)self.view).image) {
+    // when image download completely (success or failed)
+    if (_imageDownloadFinish) {
         [super readyToRender];
+    }
+}
+
+- (void)notifyReadyToRender
+{
+    if (self.weexInstance.trackCompoent) {
+        [self readyToRender];
     }
 }
 
