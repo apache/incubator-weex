@@ -221,6 +221,7 @@ import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.FontDO;
 import com.taobao.weex.utils.TypefaceUtil;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
@@ -428,13 +429,13 @@ public final class WXDomManager {
    * @param ref the given dom object
    * @param style the given style.
    */
-  void updateStyle(String instanceId, String ref, JSONObject style) {
+  void updateStyle(String instanceId, String ref, JSONObject style, boolean byPesudo) {
     throwIfNotDomThread();
     WXDomStatement statement = mDomRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
-    statement.updateStyle(ref, style);
+    statement.updateStyle(ref, style, byPesudo);
   }
 
   /**

@@ -135,10 +135,12 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.View;
@@ -146,6 +148,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -155,10 +158,16 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
+import com.taobao.weex.ui.component.pesudo.PesudoStatus;
+import com.taobao.weex.ui.component.pesudo.TouchActivePseudoListener;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -182,7 +191,7 @@ import java.util.Set;
  * abstract component
  *
  */
-public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener {
+public abstract class  WXComponent<T extends View> implements IWXObject, IWXActivityStateListener,OnActivePseudoListner {
 
   public static final String PROP_FIXED_SIZE = "fixedSize";
   public static final String PROP_FS_MATCH_PARENT = "m";
@@ -214,6 +223,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private String mCurrentRef;
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
+  private PesudoStatus mPesudoStatus = new PesudoStatus();
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -570,6 +580,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     for (int i = 0; i < count; ++i) {
       addEvent(mDomObj.getEvents().get(i));
     }
+    setActiveTouchListener();
   }
 
   public void updateExtra(Object extra) {
@@ -641,8 +652,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     switch (key) {
       case Constants.Name.DISABLED:
         Boolean disabled = WXUtils.getBoolean(param,null);
-        if (disabled != null)
+        if (disabled != null) {
           setDisabled(disabled);
+          setPseudoClassStatus(Constants.PESUDO.DISABLED, disabled);
+        }
         return true;
       case Constants.Name.POSITION:
         String position = WXUtils.getString(param,null);
@@ -775,7 +788,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
     mAppendEvents.add(type);
-    if (type.equals(Constants.Event.CLICK) && getRealView() != null) {
+
+    View view = getRealView();
+    if (type.equals(Constants.Event.CLICK) && view != null) {
       addClickListener(mClickEventListener);
     } else if ((type.equals( Constants.Event.FOCUS) || type.equals( Constants.Event.BLUR)) ) {
       addFocusChangeListener(new OnFocusChangeListener() {
@@ -785,16 +800,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
         }
       });
-    } else if (getRealView() != null &&
+    } else if (view != null &&
                needGestureDetector(type)) {
-      if (getRealView() instanceof WXGestureObservable) {
+      if (view instanceof WXGestureObservable) {
         if (wxGesture == null) {
           wxGesture = new WXGesture(this, mContext);
         }
         mGestureType.add(type);
-        ((WXGestureObservable) getRealView()).registerGestureListener(wxGesture);
+        ((WXGestureObservable) view).registerGestureListener(wxGesture);
       } else {
-        WXLogUtils.e(getRealView().getClass().getSimpleName() + " don't implement " +
+        WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
                      "WXGestureObservable, so no gesture is supported.");
       }
     } else {
@@ -805,7 +820,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       if (type.equals(Constants.Event.DISAPPEAR) && scroller != null) {
         scroller.bindDisappearEvent(this);
       }
-
     }
   }
 
@@ -931,6 +945,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);
     }
+    setActiveTouchListener();
   }
 
   public T getHostView() {
@@ -1337,5 +1352,56 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return "transparent";
     }
     return originalValue;
+  }
+
+  private void setActiveTouchListener(){
+    boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PESUDO.ACTIVE);
+    View view;
+    if(hasActivePesudo && (view = getRealView()) != null) {
+      boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || wxGesture != null;
+      view.setOnTouchListener(new TouchActivePseudoListener(this,!hasTouchConsumer));
+    }
+  }
+
+  @Override
+  public void updateActivePseudo(boolean isSet) {
+    setPseudoClassStatus(Constants.PESUDO.ACTIVE,isSet);
+  }
+
+  /**
+   *
+   * @param clzName like ':active' or ':active:enabled'
+   * @param status
+   */
+  protected void setPseudoClassStatus(String clzName,boolean status){
+    WXStyle styles = getDomObject().getStyles();
+    Map<String, Map<String,Object>> pesudoStyles = styles.getPesudoStyles();
+
+    if(pesudoStyles == null || pesudoStyles.size() == 0){
+      return;
+    }
+    Map<String,Object> resultStyles = mPesudoStatus.updateStatusAndGetUpdateStyles(
+        clzName,
+        status,
+        pesudoStyles,
+        styles.getPesudoResetStyles());
+    updateStyleByPesudo(resultStyles);
+  }
+
+  private void updateStyleByPesudo(Map<String,Object> styles){
+    Message message = Message.obtain();
+    WXDomTask task = new WXDomTask();
+    task.instanceId = getInstanceId();
+    if (task.args == null) {
+      task.args = new ArrayList<>();
+    }
+
+    JSONObject styleJson = new JSONObject(styles);
+    task.args.add(getRef());
+    task.args.add(styleJson);
+    task.args.add(true);//flag pesudo
+    message.obj = task;
+    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 }

@@ -822,9 +822,10 @@ class WXDomStatement {
    * @param ref Reference of the dom.
    * @param style the new style. This style is only a part of the full style, and will be merged
    *              into styles
+   * @param byPesudo updateStyle by pesduo class
    * @see #updateAttrs(String, JSONObject)
    */
-  void updateStyle(String ref, JSONObject style) {
+  void updateStyle(String ref, JSONObject style, boolean byPesudo) {
     if (mDestroy || style == null) {
       return;
     }
@@ -843,7 +844,7 @@ class WXDomStatement {
     animations.add(new Pair<>(ref, animationMap));
 
     if(!style.isEmpty()){
-      domObject.updateStyle(style);
+      domObject.updateStyle(style, byPesudo);
       domObject.traverseTree(ApplyStyleConsumer.getInstance());
       updateStyle(domObject, style);
     }

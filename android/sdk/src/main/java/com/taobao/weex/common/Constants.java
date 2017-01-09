@@ -402,6 +402,13 @@ public class Constants {
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
   }
 
+  public interface PESUDO {
+    String ACTIVE = ":active";
+    String ENABLED = ":enabled";
+    String DISABLED = ":disabled";
+    String FOCUS = ":focus";
+  }
+
   public interface Scheme {
 
     String FILE = "file";

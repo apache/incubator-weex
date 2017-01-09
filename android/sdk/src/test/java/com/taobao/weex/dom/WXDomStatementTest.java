@@ -353,8 +353,8 @@ public class WXDomStatementTest {
     obj.put("ref","100");
     stmt.addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.updateStyle("100",new JSONObject());
-    stmt.updateStyle("100",null);
+    stmt.updateStyle("100",new JSONObject(),false);
+    stmt.updateStyle("100",null,false);
 
     stmt.batch();
   }
