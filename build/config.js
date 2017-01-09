@@ -85,7 +85,6 @@ function getConfig (name, minify) {
     dest: minify ? opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
     format: opt.format,
     banner: opt.banner,
-    sourceMap: 'inline',
     plugins: opt.plugins.concat([
       json(),
       replace({
