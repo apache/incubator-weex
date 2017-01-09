@@ -442,7 +442,6 @@
 
 - (void)readyToRender
 {
-    NSLog(@"%@ %s", self, __PRETTY_FUNCTION__);
     [self.supercomponent readyToRender];
 }
 
