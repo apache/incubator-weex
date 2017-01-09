@@ -12,6 +12,32 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 
+const NSString * kAnimationCompletionBlock = @"kAnimationCompletionBlock";
+
+@interface CAAnimation (WXAnimaiton)
+
+@property (nonatomic, strong) void (^wx_finishBlock)();
+
+@end
+
+@implementation CAAnimation (WXAnimaiton)
+
+- (void (^)())wx_finishBlock
+{
+    return [self valueForKey:kAnimationCompletionBlock];
+}
+
+- (void)setWx_finishBlock:(void (^)())wx_finishBlock
+{
+    [self setValue:wx_finishBlock forKey:kAnimationCompletionBlock];
+}
+
+@end
+
+@interface WXAnimationModule () <CAAnimationDelegate>
+
+@end
+
 @implementation WXAnimationModule
 
 @synthesize weexInstance;
@@ -60,7 +86,8 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             WXTransform *wxTransform = [[WXTransform alloc] initWithInstance:self.weexInstance];
             transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin isTransformRotate:NO];
             rotateAngle = [wxTransform getRotateAngle];
-            if (rotateAngle > M_PI+0.0001) {
+            CGFloat originAngle = [self getRotateAngleFromTransForm:layer.transform];
+            if (fabs(originAngle - rotateAngle) > M_PI + 0.0001) {
                 /**
                  Rotate >= 180 degree not working on UIView block animation, have not found any more elegant solution than using CAAnimation
                  See http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
@@ -100,10 +127,17 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         CABasicAnimation* rotationAnimation;
         rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
         rotationAnimation.toValue = [NSNumber numberWithFloat: rotateAngle];
+        rotationAnimation.fromValue = @([self getRotateAngleFromTransForm:layer.transform]);
         rotationAnimation.duration = duration;
         rotationAnimation.cumulative = YES;
         rotationAnimation.fillMode = kCAFillModeForwards;
         rotationAnimation.removedOnCompletion = NO;
+        rotationAnimation.delegate = self;
+        rotationAnimation.wx_finishBlock = ^(){
+            CGAffineTransform originTransform = CATransform3DGetAffineTransform(layer.transform);
+            layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(originTransform, rotateAngle * M_PI / 180));
+        };
+        
         
         [layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     }
@@ -137,6 +171,21 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
 
     [CATransaction commit];
+}
+
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
+{
+    if (anim.wx_finishBlock) {
+        anim.wx_finishBlock();
+    }
+}
+
+- (CGFloat)getRotateAngleFromTransForm:(CATransform3D)transform
+{
+    CGAffineTransform cgTransform = CATransform3DGetAffineTransform(transform);
+    CGFloat radians = atan2f(cgTransform.b, cgTransform.a);
+    CGFloat degrees = radians * (180 / M_PI);
+    return degrees;
 }
 
 @end
