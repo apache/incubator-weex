@@ -347,6 +347,10 @@
         [self.weexInstance.componentManager removeFixedComponent:self];
         self->_isNeedJoinLayoutSystem = YES;
     }
+    
+    if (_weexInstance.trackCompoent) {
+        [self readyToRender];
+    }
 }
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
@@ -408,13 +412,15 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    
     [self _updateViewStyles:styles];
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
     
     [self updateStyles:styles];
     [self resetStyles:resetStyles];
+    if (_weexInstance.trackCompoent) {
+        [self readyToRender];
+    }
 }
 
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes
@@ -424,11 +430,20 @@
     [self _updateNavBarAttributes:attributes];
     
     [self updateAttributes:attributes];
+    if (_weexInstance.trackCompoent) {
+        [self readyToRender];
+    }
 }
 
 - (void)updateStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
+}
+
+- (void)readyToRender
+{
+    NSLog(@"%@ %s", self, __PRETTY_FUNCTION__);
+    [self.supercomponent readyToRender];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

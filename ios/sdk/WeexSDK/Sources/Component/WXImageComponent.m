@@ -220,6 +220,9 @@ static dispatch_queue_t WXImageUpdateQueue;
         if (!weakSelf.imageSrc && !weakSelf.placeholdSrc) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.layer.contents = nil;
+                if (self.weexInstance.trackCompoent) {
+                    [self readyToRender];
+                }
             });
         }
     });
@@ -252,6 +255,9 @@ static dispatch_queue_t WXImageUpdateQueue;
                 
                 if ([strongSelf isViewLoaded] && !viewImage) {
                     ((UIImageView *)strongSelf.view).image = image;
+                    if (strongSelf.weexInstance.trackCompoent) {
+                        [strongSelf readyToRender];
+                    }
                 }
             });
         }];
@@ -290,6 +296,9 @@ static dispatch_queue_t WXImageUpdateQueue;
                     
                     if ([strongSelf isViewLoaded]) {
                         ((UIImageView *)strongSelf.view).image = image;
+                        if (strongSelf.weexInstance.trackCompoent) {
+                            [strongSelf readyToRender];
+                        }
                     }
                 });
             }];

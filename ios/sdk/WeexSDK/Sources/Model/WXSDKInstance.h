@@ -146,6 +146,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, assign, readonly) CGFloat pixelScaleFactor;
 
 /**
+ * track component render
+ */
+@property (nonatomic, assign)BOOL trackCompoent;
+/**
  * Renders weex view with bundle url.
  *
  * @param url The url of bundle rendered to a weex view.
