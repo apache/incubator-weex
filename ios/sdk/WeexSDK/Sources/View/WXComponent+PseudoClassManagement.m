@@ -11,6 +11,7 @@
 #import "WXAssert.h"
 #import "WXComponentManager.h"
 #import "WXSDKInstance_private.h"
+#import "WXUtility.h"
 
 @implementation WXComponent (PseudoClassManagement)
 
@@ -64,6 +65,9 @@
 
 -(NSString *)getPseudoKey:(NSString *)key
 {
+    if ([key rangeOfString:@":"].location == NSNotFound) {
+        return key;
+    }
     NSRange range = [key rangeOfString:@":"];
     NSString *subKey = [key substringToIndex:range.location];
     return subKey;
@@ -72,13 +76,46 @@
 -(NSMutableDictionary *)getPseudoClassStyles:(NSString *)key
 {
     NSMutableDictionary *styles = [NSMutableDictionary new];
+    [styles addEntriesFromDictionary:[self getPseudoClassStyles:key level:1]];
+    [styles addEntriesFromDictionary:[self getPseudoClassStyles:key level:2]];
+    return styles;
+}
+
+-(NSMutableDictionary *)getPseudoClassStyles:(NSString *)key level:(NSInteger )level
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
     if (_pseudoClassStyles && [_pseudoClassStyles count] > 0 ) {
         for (NSString *k in _pseudoClassStyles){
-            if ([k rangeOfString:key].location != NSNotFound) { //all active listen
+            if ([k rangeOfString:key].location != NSNotFound && [WXUtility getSubStringNumber:k subString:@":"] == level) {
                 [styles setObject:_pseudoClassStyles[k] forKey:k];
             }
         }
     }
+    return styles;
+}
+
+-(NSMutableDictionary *)getPseudoClassStylesByKeys:(NSArray *)keys
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    if(keys && [keys count]>0) {
+        if (_pseudoClassStyles && [_pseudoClassStyles count] > 0 ) {
+            for (NSString *k in _pseudoClassStyles){
+                if([WXUtility getSubStringNumber:k subString:@":"] == [keys count]){
+                    BOOL isContain = YES;
+                    for(NSString *pKey in keys){
+                        if ([k rangeOfString:pKey].location == NSNotFound) {
+                            isContain = NO;
+                            break;
+                        }
+                    }
+                    if (isContain) {
+                        [styles setObject:_pseudoClassStyles[k] forKey:k];
+                    }
+                }
+            }
+        }
+    }
+    
     return styles;
 }
 

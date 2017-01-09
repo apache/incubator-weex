@@ -368,16 +368,27 @@ WX_EXPORT_METHOD(@selector(blur))
     NSMutableDictionary *styles = [NSMutableDictionary new];
     NSMutableDictionary *recordStyles = [NSMutableDictionary new];
     if(_disabled){
-        recordStyles = [self getPseudoClassStyles:@"disabled"];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"disabled"]];
         [styles addEntriesFromDictionary:recordStyles];
     }else {
-        styles = [NSMutableDictionary new];
-        recordStyles = [self getPseudoClassStyles:@"enabled"];
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"enabled"]];
         [styles addEntriesFromDictionary:recordStyles];
     }
     if ([_textView isFirstResponder]){
-        styles = [NSMutableDictionary new];
-        recordStyles = [self getPseudoClassStyles:@"focus"];
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    NSString *disabledStr = @"enabled";
+    if (_disabled){
+        disabledStr = @"disabled";
+    }
+    NSString *focusStr = @"focus";
+    if ([_textView isFirstResponder]) {
+        NSString *focusStr = @"focus";
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus",@"enabled"]];
         [styles addEntriesFromDictionary:recordStyles];
     }
     [self updatePseudoClassStyles:styles];
