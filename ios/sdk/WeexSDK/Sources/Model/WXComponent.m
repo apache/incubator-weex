@@ -430,9 +430,9 @@
     WXAssertMainThread();
 }
 
-- (void)readyToRender
+- (void)renderFinish
 {
-    [self.supercomponent readyToRender];
+    [self.supercomponent renderFinish];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

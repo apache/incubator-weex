@@ -69,7 +69,7 @@
 {
     return ^(CALayer *layer, BOOL finished) {
         if (self.weexInstance.trackCompoent) {
-            [self readyToRender];
+            [self renderFinish];
         }
     };
 }

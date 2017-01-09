@@ -225,7 +225,7 @@ static dispatch_queue_t WXImageUpdateQueue;
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.layer.contents = nil;
                 weakSelf.imageDownloadFinish = YES;
-                [weakSelf notifyReadyToRender];
+                [weakSelf notifyRenderFinish];
             });
         }
     });
@@ -249,7 +249,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     downloadFailedBlock(placeholderSrc,error);
                     if ([strongSelf isViewLoaded] && !viewImage) {
                         ((UIImageView *)(strongSelf.view)).image = nil;
-                        [self notifyReadyToRender];
+                        [self notifyRenderFinish];
                     }
                     return;
                 }
@@ -260,7 +260,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                 if ([strongSelf isViewLoaded] && !viewImage) {
                     ((UIImageView *)strongSelf.view).image = image;
                     weakSelf.imageDownloadFinish = YES;
-                    [self notifyReadyToRender];
+                    [self notifyRenderFinish];
                 }
             });
         }];
@@ -289,7 +289,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
-                        [strongSelf notifyReadyToRender];
+                        [strongSelf notifyRenderFinish];
                         return ;
                     }
                     
@@ -299,7 +299,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     
                     if ([strongSelf isViewLoaded]) {
                         ((UIImageView *)strongSelf.view).image = image;
-                        [strongSelf notifyReadyToRender];
+                        [strongSelf notifyRenderFinish];
                     }
                 });
             }];
@@ -307,18 +307,18 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
 }
 
-- (void)readyToRender
+- (void)renderFinish
 {
     // when image download completely (success or failed)
     if (_imageDownloadFinish) {
-        [super readyToRender];
+        [super renderFinish];
     }
 }
 
-- (void)notifyReadyToRender
+- (void)notifyRenderFinish
 {
     if (self.weexInstance.trackCompoent) {
-        [self readyToRender];
+        [self renderFinish];
     }
 }
 
