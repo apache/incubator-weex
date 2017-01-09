@@ -26,10 +26,19 @@
  *  @abstract get pseudo class styles through key.
  *
  *  @param key      the key to search pseudo class
- *  
+ *
  *  @return pseudo class.
  */
 -(NSMutableDictionary *)getPseudoClassStyles:(NSString *)key;
+
+/**
+ *  @abstract get pseudo class styles through keys.
+ *
+ *  @param keys      the keys to search pseudo class
+ *  
+ *  @return pseudo class.
+ */
+-(NSMutableDictionary *)getPseudoClassStylesByKeys:(NSArray *)keys;
 
 ///--------------------------------------
 /// @name Updating PseudoClass
