@@ -87,7 +87,7 @@
     if (_pseudoClassStyles && [_pseudoClassStyles count] > 0 ) {
         for (NSString *k in _pseudoClassStyles){
             if ([k rangeOfString:key].location != NSNotFound && [WXUtility getSubStringNumber:k subString:@":"] == level) {
-                [styles setObject:_pseudoClassStyles[k] forKey:k];
+                [styles setObject:_pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
             }
         }
     }
@@ -109,7 +109,7 @@
                         }
                     }
                     if (isContain) {
-                        [styles setObject:_pseudoClassStyles[k] forKey:k];
+                        [styles setObject:_pseudoClassStyles[k] forKey:[self getPseudoKey:k]];
                     }
                 }
             }
