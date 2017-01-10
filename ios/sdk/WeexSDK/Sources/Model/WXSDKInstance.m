@@ -468,8 +468,8 @@ typedef enum : NSUInteger {
         NSString *callbackId = callbackInfo[@"callbackId"];
         BOOL once = [callbackInfo[@"once"] boolValue];
         NSDictionary * retData = @{@"type":userInfo[@"eventName"],
-                                               @"module":callbackInfo[@"moduleName"],
-                                               @"data":userInfo[@"param"]};
+                                   @"module":callbackInfo[@"moduleName"],
+                                   @"data":userInfo[@"param"]};
         [[WXSDKManager bridgeMgr] callBack:self.instanceId funcId:callbackId params:retData keepAlive:!once];
         // if callback function is not once, then it is keepalive
         if (once) {
