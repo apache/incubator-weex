@@ -424,7 +424,7 @@ class WXRenderStatement {
   void addEvent(String ref, String type) {
     WXComponent component = mRegistry.get(ref);
     if (component == null) {
-      return;
+      return ;
     }
     component.addEvent(type);
   }
@@ -435,7 +435,7 @@ class WXRenderStatement {
   void removeEvent(String ref, String type) {
     WXComponent component = mRegistry.get(ref);
     if (component == null) {
-      return;
+      return ;
     }
     component.removeEvent(type);
   }

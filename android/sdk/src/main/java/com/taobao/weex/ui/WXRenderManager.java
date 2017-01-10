@@ -396,7 +396,7 @@ public class WXRenderManager {
   public void addEvent(String instanceId, String ref, String type) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
-      return;
+      return ;
     }
     statement.addEvent(ref, type);
   }
@@ -404,7 +404,7 @@ public class WXRenderManager {
   public void removeEvent(String instanceId, String ref, String type) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
-      return;
+      return ;
     }
     statement.removeEvent(ref, type);
   }
