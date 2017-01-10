@@ -214,14 +214,18 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.ImageDrawable;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
-public class WXImageView extends ImageView implements WXGestureObservable {
+public class WXImageView extends ImageView implements WXGestureObservable,
+                                                      IRenderStatus<WXImage> {
 
+  private WeakReference<WXImage> mWeakReference;
   private WXGesture wxGesture;
   private float[] borderRadius;
   private boolean gif;
@@ -252,6 +256,12 @@ public class WXImageView extends ImageView implements WXGestureObservable {
         }
       }
       super.setImageDrawable(wrapDrawable);
+      if (mWeakReference != null) {
+        WXImage component = mWeakReference.get();
+        if (component != null) {
+          component.readyToRender();
+        }
+      }
     }
   }
 
@@ -289,5 +299,10 @@ public class WXImageView extends ImageView implements WXGestureObservable {
     if (changed) {
       setImageDrawable(getDrawable(), gif);
     }
+  }
+
+  @Override
+  public void holdComponent(WXImage component) {
+    mWeakReference = new WeakReference<>(component);
   }
 }

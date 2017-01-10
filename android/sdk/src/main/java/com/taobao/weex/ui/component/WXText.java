@@ -248,7 +248,9 @@ public class WXText extends WXComponent<WXTextView> {
 
   @Override
   protected WXTextView initComponentHostView(@NonNull Context context) {
-    return new WXTextView(context);
+    WXTextView textView =new WXTextView(context);
+    textView.holdComponent(this);
+    return textView;
   }
 
   @Override

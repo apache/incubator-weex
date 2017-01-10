@@ -290,7 +290,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
-
+  private boolean trackComponent;
   /*
    *  store custom ViewPort Width
    */
@@ -338,6 +338,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
 
   private int mMaxDeepLayer;
+
+  public boolean isTrackComponent() {
+    return trackComponent;
+  }
+
+  public void setTrackComponent(boolean trackComponent) {
+    this.trackComponent = trackComponent;
+  }
 
   public interface OnInstanceVisibleListener{
     void onAppear();

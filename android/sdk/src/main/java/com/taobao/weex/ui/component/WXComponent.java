@@ -640,6 +640,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         }
       }
     }
+    readyToRender();
   }
 
   /**
@@ -1314,6 +1315,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public void setUsing(boolean using) {
     isUsing = using;
+  }
+
+  public void readyToRender() {
+    if (mParent != null && getInstance().isTrackComponent()) {
+      mParent.readyToRender();
+    }
   }
 
   public static class MeasureOutput {
