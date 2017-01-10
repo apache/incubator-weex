@@ -785,6 +785,26 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  /**
+   * Add new event to component,this will post a task to DOM thread to add event.
+   * @param type
+   */
+  protected void appendEventToDOM(String type){
+    Message message = Message.obtain();
+    WXDomTask task = new WXDomTask();
+    task.instanceId = getInstanceId();
+    task.args = new ArrayList<>();
+    task.args.add(getRef());
+    task.args.add(type);
+    message.obj = task;
+    message.what = WXDomHandler.MsgType.WX_DOM_ADD_EVENT;
+    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+  }
+
+  /**
+   * Do not use this method to add event, this only apply event already add to DomObject.
+   * @param type
+   */
   public void addEvent(String type) {
     if (TextUtils.isEmpty(type)) {
       return;
@@ -1402,9 +1422,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     Message message = Message.obtain();
     WXDomTask task = new WXDomTask();
     task.instanceId = getInstanceId();
-    if (task.args == null) {
-      task.args = new ArrayList<>();
-    }
+    task.args = new ArrayList<>();
 
     JSONObject styleJson = new JSONObject(styles);
     task.args.add(getRef());
