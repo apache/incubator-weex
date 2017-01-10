@@ -210,9 +210,12 @@ import android.view.Menu;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.ui.component.WXComponent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -263,12 +266,12 @@ public abstract class WXModule implements IWXObject {
 
     /** end **/
 
-  private Map<String, String> mEvents = new HashMap<>();
+  private Map<String, List<String>> mEvents = new HashMap<>();
   private Map<String, Boolean> mKeepAlives = new HashMap<>();
 
 
 
-  @WXModuleAnno
+  @JSMethod
   public void addEventListener(String eventName, String callback, Map<String, Object> options) {
     if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(callback)) {
       return;
@@ -281,21 +284,26 @@ public abstract class WXModule implements IWXObject {
       }
     }
     mKeepAlives.put(callback, isOnce);
-    mEvents.put(eventName, callback);
+    if(mEvents.get(eventName)==null){
+      mEvents.put(eventName,new ArrayList<String>());
+    }
+    mEvents.get(eventName).add(callback);
   }
 
-  @WXModuleAnno
-  public void removeEventListener(String eventName) {
+  @JSMethod
+  public void removeAllEventListeners(String eventName) {
     if (mEvents.containsKey(eventName)) {
-      String callback = mEvents.remove(eventName);
-      mKeepAlives.remove(callback);
+      List<String> callbacks = mEvents.remove(eventName);
+      for(String callback:callbacks){
+        mKeepAlives.remove(callback);
+      }
     }
   }
 
   /**
    * Check whether the EventName has been registered
    */
-  public String getEventCallback(String eventName) {
+  public List<String> getEventCallbacks(String eventName) {
     return mEvents.get(eventName);
   }
 

@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
+import java.util.List;
+
 
 public class WXEventModule extends WXModule {
 
@@ -21,7 +23,7 @@ public class WXEventModule extends WXModule {
     }
     String scheme = Uri.parse(url).getScheme();
     StringBuilder builder = new StringBuilder();
-    if (TextUtils.equals("http",scheme) || TextUtils.equals("https",scheme) || TextUtils.equals("file",scheme)) {
+    if (TextUtils.equals("http", scheme) || TextUtils.equals("https", scheme) || TextUtils.equals("file", scheme)) {
       builder.append(url);
     } else {
       builder.append("http:");
@@ -33,10 +35,11 @@ public class WXEventModule extends WXModule {
     intent.addCategory(WEEX_CATEGORY);
     mWXSDKInstance.getContext().startActivity(intent);
 
-    String callbacks=getEventCallback("event");
-    if(callbacks!=null){
-      mWXSDKInstance.fireModuleEvent(callbacks,null,isOnce(callbacks));
+    List<String> callbacks = getEventCallbacks("event");
+    if (callbacks != null) {
+      for (String callback : callbacks) {
+        mWXSDKInstance.fireModuleEvent(callback, null, isOnce(callback));
+      }
     }
-
   }
 }
