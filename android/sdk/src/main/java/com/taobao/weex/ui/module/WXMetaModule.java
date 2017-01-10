@@ -211,6 +211,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.net.URLDecoder;
 
@@ -221,16 +222,21 @@ import java.net.URLDecoder;
 public class WXMetaModule extends WXModule {
 
     public static final String WIDTH = "width";
+    public static final String DEVICE_WIDTH = "device-width";
 
-    @JSMethod(uiThread=false)
+    @JSMethod(uiThread = false)
     public void setViewport(String param) {
         if (!TextUtils.isEmpty(param)) {
             try {
                 param = URLDecoder.decode(param, "utf-8");
                 JSONObject jsObj = JSON.parseObject(param);
-                int width = jsObj.getInteger(WIDTH);
-                if (width > 0) {
-                    mWXSDKInstance.setViewPortWidth(width);
+                if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
+                    mWXSDKInstance.setViewPortWidth(WXViewUtils.getScreenWidth(mWXSDKInstance.getContext()));
+                } else {
+                    int width = jsObj.getInteger(WIDTH);
+                    if (width > 0) {
+                        mWXSDKInstance.setViewPortWidth(width);
+                    }
                 }
             } catch (Exception e) {
                 WXLogUtils.e("[WXModalUIModule] alert param parse error ", e);

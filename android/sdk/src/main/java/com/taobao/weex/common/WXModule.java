@@ -206,6 +206,7 @@ package com.taobao.weex.common;
 
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.Menu;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -255,6 +256,8 @@ public abstract class WXModule implements IWXObject {
   public void onActivityDestroy(){}
 
   public boolean onActivityBack() {return false;}
+
+  public boolean onCreateOptionsMenu(Menu menu){return false;}
 
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {}
 

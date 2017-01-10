@@ -143,6 +143,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -1238,6 +1239,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void onActivityResult(int requestCode, int resultCode, Intent data){
 
   }
+
+  public boolean onCreateOptionsMenu(Menu menu){return false;}
 
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 

@@ -213,6 +213,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -799,6 +800,17 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityStart can not be call!");
     }
 
+  }
+
+  public boolean onCreateOptionsMenu(Menu menu) {
+
+    WXModuleManager.onCreateOptionsMenu(getInstanceId(),menu);
+    if(mRootComp != null) {
+      mRootComp.onCreateOptionsMenu(menu);
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely,onActivityStart can not be call!");
+    }
+    return true;
   }
 
   @Override
