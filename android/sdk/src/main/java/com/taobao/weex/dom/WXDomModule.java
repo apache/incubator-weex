@@ -352,6 +352,7 @@ public final class WXDomModule extends WXModule {
             return;
           }
           addRule((String) args.get(0), (JSONObject) args.get(1));
+          break;
         case GET_COMPONENT_RECT:
           if(args == null){
             return;
