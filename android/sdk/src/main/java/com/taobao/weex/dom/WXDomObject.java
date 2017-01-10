@@ -222,6 +222,7 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -374,8 +375,8 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     this.mRef = (String) map.get("ref");
     Object style = map.get("style");
     if (style != null && style instanceof JSONObject) {
-      WXStyle styles = new WXStyle((JSONObject) style);
-      //WXJsonUtils.putAll(styles, (JSONObject) style);
+      WXStyle styles = new WXStyle();
+      styles.putAll((JSONObject) style,false);
       this.mStyles = styles;
     }
     Object attr = map.get("attr");
@@ -591,14 +592,18 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
     super.dirty();
   }
 
-  public void updateStyle(Map<String, Object> styles) {
+  public void updateStyle(Map<String, Object> styles){
+    updateStyle(styles,false);
+  }
+
+  public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
     if (styles == null || styles.isEmpty()) {
       return;
     }
     if (mStyles == null) {
       mStyles = new WXStyle();
     }
-    mStyles.putAll(styles);
+    mStyles.putAll(styles,byPesudo);
     super.dirty();
   }
 

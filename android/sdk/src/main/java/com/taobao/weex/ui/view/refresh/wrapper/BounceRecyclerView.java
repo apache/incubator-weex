@@ -205,8 +205,10 @@
 package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.OrientationHelper;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -214,16 +216,19 @@ import android.view.ViewParent;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.list.WXCell;
+import com.taobao.weex.ui.view.gesture.WXGesture;
+import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
 import java.util.Stack;
 
-public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
+public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements WXGestureObservable {
 
   private RecyclerViewBaseAdapter adapter = null;
   private Stack<View> headerViewStack = new Stack<>();
   private Stack<WXCell> headComponentStack = new Stack<>();
+  private WXGesture mGesture;
 
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
@@ -243,6 +248,15 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
     if (getInnerView() != null) {
       getInnerView().setAdapter(adapter);
     }
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    boolean result = super.onTouchEvent(event);
+    if (mGesture != null) {
+      result |= mGesture.onTouch(this, event);
+    }
+    return result;
   }
 
   public RecyclerViewBaseAdapter getAdapter() {
@@ -364,5 +378,11 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> {
       ((ViewGroup) getParent()).removeView(headerView);
       headComponent.recoverySticky();
     }
+  }
+
+  @Override
+  public void registerGestureListener(@Nullable WXGesture wxGesture) {
+    mGesture = wxGesture;
+    getInnerView().registerGestureListener(wxGesture);
   }
 }

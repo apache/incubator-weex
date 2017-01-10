@@ -252,7 +252,12 @@ public class WXDomHandler implements Handler.Callback {
         mWXDomManager.updateAttrs(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
         break;
       case MsgType.WX_DOM_UPDATE_STYLE:
-        mWXDomManager.updateStyle(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
+        mWXDomManager.updateStyle(
+            task.instanceId,
+            (String) task.args.get(0),
+            (JSONObject) task.args.get(1),
+            task.args.size() > 2 && (boolean) task.args.get(2)
+        );
         break;
       case MsgType.WX_DOM_ADD_DOM:
         mWXDomManager.addDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1), (Integer) task.args.get(2));

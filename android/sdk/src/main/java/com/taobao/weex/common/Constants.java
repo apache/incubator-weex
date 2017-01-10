@@ -332,6 +332,9 @@ public class Constants {
     String OFFSET_X_RATIO = "offsetXRatio";
     String ELEVATION = "elevation";
     String SCROLLABLE = "scrollable";
+    String DISTANCE_Y = "dy";
+    String PULLING_DISTANCE = "pullingDistance";
+    String VIEW_HEIGHT = "viewHeight";
   }
 
   public interface Value {
@@ -392,10 +395,18 @@ public class Constants {
     String ONLOAD = "load";
     String CHANGE = "change";
     String ONPULLING_DOWN = "pullingdown";
+    String ONPULLING_UP = "pullingup";
     String SCROLL = "scroll";
     String CLICKBACKITEM = "clickbackitem";
-    String RESUME_EVENT = "WXApplicationWillResignActiveEvent";
-    String PAUSE_EVENT = "WXApplicationDidBecomeActiveEvent";
+    String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
+    String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
+  }
+
+  public interface PESUDO {
+    String ACTIVE = ":active";
+    String ENABLED = ":enabled";
+    String DISABLED = ":disabled";
+    String FOCUS = ":focus";
   }
 
   public interface Scheme {
