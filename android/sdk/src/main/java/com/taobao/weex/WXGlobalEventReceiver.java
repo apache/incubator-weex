@@ -208,7 +208,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.alibaba.fastjson.JSON;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.HashMap;
 
@@ -232,10 +232,12 @@ public class WXGlobalEventReceiver extends BroadcastReceiver {
   public void onReceive(Context context, Intent intent) {
     String eventName = intent.getStringExtra(EVENT_NAME);
     String params = intent.getStringExtra(EVENT_PARAMS);
-    String instanceId = intent.getStringExtra(EVENT_WX_INSTANCEID);
-    HashMap<String, Object> maps = JSON.parseObject(params, HashMap.class);
-    if (null == instanceId || (instanceId != null && instanceId.equals(mWXSDKInstance.getInstanceId()))) {
+    HashMap<String, Object> maps = null;
+    try {
+      maps = com.alibaba.fastjson.JSON.parseObject(params, HashMap.class);
       mWXSDKInstance.fireGlobalEventCallback(eventName, maps);
+    } catch (Exception e) {
+      WXLogUtils.e("global-receive",e);
     }
   }
 }

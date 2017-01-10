@@ -21,7 +21,7 @@ public class WXEventModule extends WXModule {
     }
     String scheme = Uri.parse(url).getScheme();
     StringBuilder builder = new StringBuilder();
-    if (TextUtils.equals("http",scheme) || TextUtils.equals("https",scheme) || TextUtils.equals("file",scheme)) {
+    if (TextUtils.equals("http", scheme) || TextUtils.equals("https", scheme) || TextUtils.equals("file", scheme)) {
       builder.append(url);
     } else {
       builder.append("http:");
@@ -33,10 +33,8 @@ public class WXEventModule extends WXModule {
     intent.addCategory(WEEX_CATEGORY);
     mWXSDKInstance.getContext().startActivity(intent);
 
-    String callbacks=getEventCallback("event");
-    if(callbacks!=null){
-      mWXSDKInstance.fireModuleEvent(callbacks,null,isOnce(callbacks));
+    if (mWXSDKInstance.checkModuleEventRegistered("event", this)) {
+      mWXSDKInstance.fireModuleEvent("event", this, null);
     }
-
   }
 }

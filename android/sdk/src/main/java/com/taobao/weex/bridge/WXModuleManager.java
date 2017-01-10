@@ -206,6 +206,7 @@ package com.taobao.weex.bridge;
 
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
@@ -483,6 +484,21 @@ public class WXModuleManager {
         }
       }
     }
+  }
+
+  public static boolean onCreateOptionsMenu(String instanceId,Menu menu) {
+    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onCreateOptionsMenu(menu);
+        } else {
+          WXLogUtils.w("onActivityResult can not find the " + key + " module");
+        }
+      }
+    }
+    return false;
   }
 
   public static void onRequestPermissionsResult(String instanceId ,int requestCode, String[] permissions, int[] grantResults) {

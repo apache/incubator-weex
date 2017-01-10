@@ -537,7 +537,7 @@ public class WXSliderNeighbor extends WXSlider {
     }
 
     // Here is the trick.
-    class ZoomTransformer implements ViewPager.PageTransformer {
+     class ZoomTransformer implements ViewPager.PageTransformer {
         @Override
         public void transformPage(View page, float position) {
             int pagePosition = mAdapter.getPagePosition(page);

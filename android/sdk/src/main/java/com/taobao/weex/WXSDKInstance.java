@@ -213,6 +213,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -225,12 +226,14 @@ import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.NativeInvokeHelper;
+import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
@@ -290,7 +293,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private NativeInvokeHelper mNativeInvokeHelper;
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
-
+  private boolean trackComponent;
   /*
    *  store custom ViewPort Width
    */
@@ -338,6 +341,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
 
   private int mMaxDeepLayer;
+
+  public boolean isTrackComponent() {
+    return trackComponent;
+  }
+
+  public void setTrackComponent(boolean trackComponent) {
+    this.trackComponent = trackComponent;
+  }
 
   public interface OnInstanceVisibleListener{
     void onAppear();
@@ -791,6 +802,17 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityStart can not be call!");
     }
 
+  }
+
+  public boolean onCreateOptionsMenu(Menu menu) {
+
+    WXModuleManager.onCreateOptionsMenu(getInstanceId(),menu);
+    if(mRootComp != null) {
+      mRootComp.onCreateOptionsMenu(menu);
+    }else{
+      WXLogUtils.w("Warning :Component tree has not build completely,onActivityStart can not be call!");
+    }
+    return true;
   }
 
   @Override
@@ -1370,11 +1392,42 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /**
-   * module event
-   * @return
+   * Notifies WEEX that this event has occurred
+   * @param eventName WEEX register event
+   * @param module Events occur in this Module
+   * @param params The parameters to be notified to WEEX are required
    */
-  public void fireModuleEvent(String callback,Map<String,Object> params,boolean isOnce){
-    WXSDKManager.getInstance().callback(getInstanceId(),callback,params,isOnce);
+  public void fireModuleEvent(String eventName, WXModule module,Map<String, Object> params) {
+    if (TextUtils.isEmpty(eventName) || module == null) {
+      return;
+    }
+    List<String> callbacks = module.getEventCallbacks(eventName);
+    if (callbacks != null) {
+      for (String callback : callbacks) {
+        SimpleJSCallback jsCallback = new SimpleJSCallback(mInstanceId, callback);
+        if (module.isOnce(callback)) {
+          jsCallback.invokeAndKeepAlive(params);
+        } else {
+          jsCallback.invoke(params);
+        }
+      }
+    }
+  }
+
+  /**
+   * Check whether the current module registered the event
+   * @param eventName EventName register in weex
+   * @param module Events occur in this Module
+   * @return  register->true
+   */
+  public boolean checkModuleEventRegistered(String eventName,WXModule module) {
+    if (module != null) {
+      List<String> events = module.getEventCallbacks(eventName);
+      if (events != null && events.size() > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public WXPerformance getWXPerformance(){

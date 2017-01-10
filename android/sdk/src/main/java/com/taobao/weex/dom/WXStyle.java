@@ -222,6 +222,7 @@ import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,15 +235,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
 
-  private @NonNull final ArrayMap<String,Object> map;
+  private @NonNull final Map<String,Object> map;
+  private Map<String,Map<String,Object>> mPesudoStyleMap = new ArrayMap<>();// clz_group:{styleMap}
+  private Map<String,Object> mPesudoResetStyleMap = new ArrayMap<>();
+
 
   public WXStyle(){
     map = new ArrayMap<>();
-  }
-
-  public WXStyle(@NonNull Map<String,Object> standardMap) {
-    this();
-    map.putAll(standardMap);
   }
 
   public int getBlur() {
@@ -731,6 +730,56 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     this.map.putAll(map);
   }
 
+  /**
+   * Used by Dom Thread， new and update styles.
+   * @param map
+   * @param byPesudo
+   */
+  public void putAll(Map<? extends String, ?> map, boolean byPesudo) {
+    this.map.putAll(map);
+    if (!byPesudo) {
+      this.mPesudoResetStyleMap.putAll(map);
+      processPesudoClasses(map);
+    }
+  }
+
+
+  public Map<String, Object> getPesudoResetStyles() {
+    return mPesudoResetStyleMap;
+  }
+
+  public Map<String, Map<String, Object>> getPesudoStyles() {
+    return mPesudoStyleMap;
+  }
+
+  <T extends String, V> void processPesudoClasses(Map<T, V> styles) {
+    Iterator<Map.Entry<T, V>> iterator = styles.entrySet().iterator();
+    Map<String, Map<String, Object>> pesudoStyleMap = mPesudoStyleMap;
+    while (iterator.hasNext()) {
+      Map.Entry<T, V> entry = iterator.next();
+      //Key Format: "style-prop:pesudo_clz1:pesudo_clz2"
+      String key = entry.getKey();
+      int i;
+      if ((i = key.indexOf(":")) > 0) {
+        String clzName = key.substring(i);
+        if (clzName.equals(Constants.PESUDO.ENABLED)) {
+          //enabled, use as regular style
+          this.mPesudoResetStyleMap.put(key.substring(0, i), entry.getValue());
+          continue;
+        } else {
+          clzName = clzName.replace(Constants.PESUDO.ENABLED, "");//remove ':enabled' which is ignored
+        }
+
+        Map<String, Object> stylesMap = pesudoStyleMap.get(clzName);
+        if (stylesMap == null) {
+          stylesMap = new ArrayMap<>();
+          pesudoStyleMap.put(clzName, stylesMap);
+        }
+        stylesMap.put(key.substring(0, i), entry.getValue());
+      }
+    }
+  }
+
   @Override
   public Object remove(Object key) {
     return map.remove(key);
@@ -749,6 +798,16 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   protected WXStyle clone(){
-    return new WXStyle(map);
+    WXStyle style = new WXStyle();
+    style.map.putAll(this.map);
+
+    for(Entry<String,Map<String,Object>> entry:this.mPesudoStyleMap.entrySet()){
+      Map<String,Object> valueClone = new ArrayMap<>();
+      valueClone.putAll(entry.getValue());
+      style.mPesudoStyleMap.put(entry.getKey(),valueClone);
+    }
+
+    style.mPesudoResetStyleMap.putAll(this.mPesudoResetStyleMap);
+    return style;
   }
 }

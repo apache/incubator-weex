@@ -216,6 +216,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
@@ -822,9 +823,10 @@ class WXDomStatement {
    * @param ref Reference of the dom.
    * @param style the new style. This style is only a part of the full style, and will be merged
    *              into styles
+   * @param byPesudo updateStyle by pesduo class
    * @see #updateAttrs(String, JSONObject)
    */
-  void updateStyle(String ref, JSONObject style) {
+  void updateStyle(String ref, JSONObject style, boolean byPesudo) {
     if (mDestroy || style == null) {
       return;
     }
@@ -843,7 +845,7 @@ class WXDomStatement {
     animations.add(new Pair<>(ref, animationMap));
 
     if(!style.isEmpty()){
-      domObject.updateStyle(style);
+      domObject.updateStyle(style, byPesudo);
       domObject.traverseTree(ApplyStyleConsumer.getInstance());
       updateStyle(domObject, style);
     }
@@ -913,7 +915,7 @@ class WXDomStatement {
       return;
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    WXDomObject domObject = mRegistry.get(ref);
+    final WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
         instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDEVENT);
@@ -921,15 +923,16 @@ class WXDomStatement {
       return;
     }
     domObject.addEvent(type);
-    //sync dom change to component
-    AddDomInfo info = mAddDom.get(ref);
-    WXComponent component = info.component;
-    component.updateDom(domObject);
     mNormalTasks.add(new IWXRenderTask() {
 
       @Override
       public void execute() {
-        mWXRenderManager.addEvent(mInstanceId, ref, type);
+        WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId,ref);
+        if(comp != null){
+          //sync dom change to component
+          comp.updateDom(domObject);
+          mWXRenderManager.addEvent(mInstanceId, ref, type);
+        }
       }
 
       @Override
@@ -957,7 +960,7 @@ class WXDomStatement {
       return;
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    WXDomObject domObject = mRegistry.get(ref);
+    final WXDomObject domObject = mRegistry.get(ref);
     if (domObject == null) {
       if (instance != null) {
         instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEEVENT);
@@ -965,15 +968,18 @@ class WXDomStatement {
       return;
     }
     domObject.removeEvent(type);
-    //sync dom change to component
-    AddDomInfo info = mAddDom.get(ref);
-    WXComponent component = info.component;
-    component.updateDom(domObject);
+
     mNormalTasks.add(new IWXRenderTask() {
 
       @Override
       public void execute() {
-        mWXRenderManager.removeEvent(mInstanceId, ref, type);
+        WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId,ref);
+        if(comp != null){
+          //sync dom change to component
+          comp.updateDom(domObject);
+          mWXRenderManager.removeEvent(mInstanceId, ref, type);
+        }
+
       }
 
       @Override
@@ -1234,12 +1240,12 @@ class WXDomStatement {
     }
   }
 
-  public void getComponentSize(final String ref, final String callback) {
+  public void getComponentSize(final String ref, final JSCallback callback) {
     if (mDestroy) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Component does not exist");
-      WXSDKManager.getInstance().callback(mInstanceId, callback, options);
+      callback.invoke(options);
       return;
     }
 
@@ -1255,6 +1261,7 @@ class WXDomStatement {
         return "getComponentSize";
       }
     });
+    mDirty=true;
 
   }
 

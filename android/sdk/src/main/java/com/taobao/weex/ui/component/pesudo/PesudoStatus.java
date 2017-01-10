@@ -202,140 +202,116 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui.component.pesudo;
 
-import android.graphics.Typeface;
+import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 
 import com.taobao.weex.common.Constants;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
-
-
 /**
- * Description:
- *
- * Created by rowandjj(chuyi)<br/>
+ * Created by sospartan on 05/01/2017.
  */
 
-public class WXStyleTest {
-    WXStyle style;
+public class PesudoStatus {
 
-    @Before
-    public void setUp() throws Exception {
-        style = new WXStyle();
+  /**
+   * See {@link com.taobao.weex.common.Constants.PESUDO}
+   */
+  private int[] mStatuses = new int[4];
+
+  private static final int UNSET = 0;
+  private static final int SET = 1;
+
+  static final int CLASS_ACTIVE = 0;
+  static final int CLASS_FOCUS = 1;
+  static final int CLASS_ENABLED = 2;
+  static final int CLASS_DISABLED = 3;
+
+  public PesudoStatus(){
+    for (int i = 0; i < mStatuses.length; i++) {
+        mStatuses[i] = UNSET;
+    }
+  }
+
+  /**
+   *
+   * @param clzName See {@link com.taobao.weex.common.Constants.PESUDO}
+   * @param status
+   */
+  public void setStatus(String clzName,boolean status){
+    switch (clzName){
+      case Constants.PESUDO.ACTIVE:
+        setStatus(PesudoStatus.CLASS_ACTIVE,status);
+        break;
+      case Constants.PESUDO.DISABLED:
+        setStatus(PesudoStatus.CLASS_DISABLED,status);
+        break;
+      case Constants.PESUDO.ENABLED:
+        setStatus(PesudoStatus.CLASS_ENABLED,status);
+        break;
+      case Constants.PESUDO.FOCUS:
+        setStatus(PesudoStatus.CLASS_FOCUS,status);
+        break;
+    }
+  }
+
+  void setStatus(int clz,boolean status){
+    mStatuses[clz] = status?SET:UNSET;
+  }
+
+  public boolean isSet(int clz){
+    return mStatuses[clz] == SET;
+  }
+
+  public @Nullable String getStatuses(){
+    StringBuilder sb = new StringBuilder();
+    if(isSet(CLASS_ACTIVE)){
+      sb.append(Constants.PESUDO.ACTIVE);
+    }
+    if(isSet(CLASS_DISABLED)){
+      sb.append(Constants.PESUDO.DISABLED);
+    }
+    //enabled is ignored
+
+    if(isSet(CLASS_FOCUS) && !isSet(CLASS_DISABLED)){
+      sb.append(Constants.PESUDO.FOCUS);
+    }
+    return sb.length()==0?null:sb.toString();
+  }
+
+  public Map<String,Object> updateStatusAndGetUpdateStyles(String clzName,
+                                                           boolean status,
+                                                           Map<String, Map<String,Object>> pesudoStyles,
+                                                           Map<String,Object> originalStyles){
+    String prevStatusesStr = getStatuses();//before change
+    setStatus(clzName,status);
+    String statusesStr = getStatuses();//after change
+
+    Map<String,Object> updateStyles = pesudoStyles.get(statusesStr);
+    Map<String,Object> prevUpdateStyles = pesudoStyles.get(prevStatusesStr);
+
+    /**
+     * NEW INSTANCE, DO NOT USE MAP OBJECT FROM pesudoStyles
+     */
+    Map<String,Object> resultStyles = new ArrayMap<>();
+    if(prevStatusesStr != null){
+      resultStyles.putAll(prevUpdateStyles);
     }
 
-
-    @Test
-    public void testBlur() {
-        assertEquals(0,style.size());
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(5px)");
-        assertEquals(5,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1)");
-        assertEquals(1,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1dp)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"bur(1px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1px");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(-1)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(-1px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(100px)");
-        assertEquals(10,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1p0px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"7");
-        assertEquals(0,style.getBlur());
+    //reset
+    for (String key : resultStyles.keySet()) {
+      resultStyles.put(key, originalStyles.containsKey(key) ? originalStyles.get(key) : "");
     }
 
-    @Test
-    public void testFontWeight(){
-        WXStyle none = new WXStyle();
-        assertThat(WXStyle.getFontWeight(none), is(Typeface.NORMAL));
-
-        WXStyle normal = new WXStyle();
-        normal.put(Constants.Name.FONT_WEIGHT, Constants.Value.NORMAL);
-        assertThat(WXStyle.getFontWeight(normal), is(Typeface.NORMAL));
-
-        WXStyle bold = new WXStyle();
-        bold.put(Constants.Name.FONT_WEIGHT, Constants.Value.BOLD);
-        assertThat(WXStyle.getFontWeight(bold), is(Typeface.BOLD));
-
-        WXStyle illegal = new WXStyle();
-        illegal.put(Constants.Name.FONT_WEIGHT, "f");
-        assertThat(WXStyle.getFontWeight(illegal), is(Typeface.NORMAL));
-
-        WXStyle number100 = new WXStyle();
-        number100.put(Constants.Name.FONT_WEIGHT, "100");
-        assertThat(WXStyle.getFontWeight(number100), is(Typeface.NORMAL));
-
-        WXStyle number200 = new WXStyle();
-        number200.put(Constants.Name.FONT_WEIGHT, "200");
-        assertThat(WXStyle.getFontWeight(number200), is(Typeface.NORMAL));
-
-        WXStyle number300 = new WXStyle();
-        number300.put(Constants.Name.FONT_WEIGHT, "300");
-        assertThat(WXStyle.getFontWeight(number300), is(Typeface.NORMAL));
-
-        WXStyle number400 = new WXStyle();
-        number400.put(Constants.Name.FONT_WEIGHT, "400");
-        assertThat(WXStyle.getFontWeight(number400), is(Typeface.NORMAL));
-
-        WXStyle number500 = new WXStyle();
-        number500.put(Constants.Name.FONT_WEIGHT, "500");
-        assertThat(WXStyle.getFontWeight(number500), is(Typeface.NORMAL));
-
-        WXStyle number600 = new WXStyle();
-        number600.put(Constants.Name.FONT_WEIGHT, "600");
-        assertThat(WXStyle.getFontWeight(number600), is(Typeface.BOLD));
-
-        WXStyle number700 = new WXStyle();
-        number700.put(Constants.Name.FONT_WEIGHT, "700");
-        assertThat(WXStyle.getFontWeight(number700), is(Typeface.BOLD));
-
-        WXStyle number800 = new WXStyle();
-        number800.put(Constants.Name.FONT_WEIGHT, "800");
-        assertThat(WXStyle.getFontWeight(number800), is(Typeface.BOLD));
-
-        WXStyle number900 = new WXStyle();
-        number900.put(Constants.Name.FONT_WEIGHT, "900");
-        assertThat(WXStyle.getFontWeight(number900), is(Typeface.BOLD));
+    //apply new update
+    if(updateStyles != null) {
+      for (Map.Entry<String, Object> entry : updateStyles.entrySet()) {
+        resultStyles.put(entry.getKey(), entry.getValue());
+      }
     }
-
-    @After
-    public void tearDown() throws Exception {
-        style.clear();
-    }
-
-    @Test
-    public void testPesudoParsing() throws Exception {
-        Map<String,Object> styles = new HashMap<>();
-        styles.put("color","#FF0000");
-        styles.put("color:active","#008000");
-        styles.put("fontSize:active:some_clz",20);
-        styles.put("color:active:enabled",15);
-        styles.put("color:active:disabled","#008000");
-        styles.put("fontSize:active:disabled",30);
-
-        WXStyle style = new WXStyle();
-        style.putAll(styles,false);
-
-        assertEquals(style.getPesudoStyles().get(":active").keySet().size(),1);
-        assertEquals(style.getPesudoStyles().get(":active:some_clz").get("fontSize"),20);
-        assertEquals(style.getPesudoStyles().get(":active:disabled").get("fontSize"),30);
-        assertEquals(style.getPesudoStyles().get(":active:disabled").keySet().size(),2);
-    }
+    return resultStyles;
+  }
 }

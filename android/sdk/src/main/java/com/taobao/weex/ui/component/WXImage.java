@@ -267,6 +267,7 @@ public class WXImage extends WXComponent<ImageView> {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
       view.setCropToPadding(true);
     }
+    view.holdComponent(this);
     return view;
   }
 
@@ -437,6 +438,7 @@ public class WXImage extends WXComponent<ImageView> {
           imageDrawable.setCornerRadii(borderRadius);
         }
       }
+      readyToRender();
     }
   }
 }

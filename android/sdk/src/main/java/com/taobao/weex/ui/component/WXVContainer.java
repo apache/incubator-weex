@@ -205,6 +205,7 @@
 package com.taobao.weex.ui.component;
 
 import android.content.Intent;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -564,6 +565,16 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       getChild(i).onActivityResult(requestCode,resultCode,data);
     }
 
+  }
+
+  public boolean onCreateOptionsMenu(Menu menu){
+    super.onCreateOptionsMenu(menu);
+
+    int count = childCount();
+    for (int i = 0; i < count; i++) {
+      getChild(i).onCreateOptionsMenu(menu);
+    }
+    return false;
   }
 
 

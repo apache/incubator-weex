@@ -278,6 +278,7 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
     Map<String, Object> options = new HashMap<>();
     options.put(WXSDKInstance.BUNDLE_URL, source);
+    mInstance.setTrackComponent(true);
     mInstance.render(
       getPageName(),
       template,
@@ -296,6 +297,7 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
     Map<String, Object> options = new HashMap<>();
     options.put(WXSDKInstance.BUNDLE_URL, url);
+    mInstance.setTrackComponent(true);
     mInstance.renderByUrl(
       getPageName(),
       url,
