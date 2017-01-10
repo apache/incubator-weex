@@ -156,17 +156,6 @@ WX_EXPORT_METHOD(@selector(blur))
         if (styles[@"textAlign"]) {
             _textAlign = [WXConvert NSTextAlignment:styles[@"textAlign"]] ;
         }
-        
-        _padding = UIEdgeInsetsZero;
-        _border = UIEdgeInsetsZero;
-        UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-            _padding = padding;
-        }
-        UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-            _border = border;
-        }
     }
     
     return self;
@@ -229,8 +218,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     [_textView setTextAlignment:_textAlign];
     [self setTextFont];
-    [_textView setBorder:_border];
-    [_textView setPadding:_padding];
+    _padding = UIEdgeInsetsZero;
+    _border = UIEdgeInsetsZero;
+    [self updatePattern];
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
@@ -249,6 +239,18 @@ WX_EXPORT_METHOD(@selector(blur))
     if (self.textView) {
         [self.textView resignFirstResponder];
     }
+}
+
+- (void)setPadding:(UIEdgeInsets)padding
+{
+    _padding = padding;
+    [_textView setPadding:padding];
+}
+
+- (void)setBorder:(UIEdgeInsets)border
+{
+    _border = border;
+    [_textView setBorder:border];
 }
 
 #pragma mark - add-remove Event
@@ -349,16 +351,19 @@ WX_EXPORT_METHOD(@selector(blur))
         _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
     }
     [self setPlaceholderAttributedString];
-    
+    [self updatePattern];
+}
+
+-(void)updatePattern
+{
     UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-        _padding = padding;
+        [self setPadding:padding];
     }
     
     UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
     if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-        _border = border;
-        [_textView setBorder:_border];
+        [self setBorder:border];
     }
 }
 
