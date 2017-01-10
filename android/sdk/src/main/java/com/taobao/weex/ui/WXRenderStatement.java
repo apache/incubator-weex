@@ -213,6 +213,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -545,7 +546,7 @@ class WXRenderStatement {
     WXAnimationModule.startAnimation(mWXSDKInstance, mRegistry.get(ref), animationBean, callBack);
   }
 
-  public void getComponentSize(String ref, String callback) {
+  public void getComponentSize(String ref, JSCallback callback) {
     WXComponent component = mRegistry.get(ref);
     Map<String, Object> options = new HashMap<>();
     if (component != null) {
@@ -562,6 +563,6 @@ class WXRenderStatement {
     } else {
       options.put("errMsg", "Component does not exist");
     }
-    WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+    callback.invoke(options);
   }
 }

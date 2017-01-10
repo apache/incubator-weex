@@ -204,15 +204,15 @@
  */
 package com.taobao.weex.dom;
 
-import android.graphics.Rect;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
@@ -220,8 +220,8 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -643,33 +643,36 @@ public final class WXDomModule extends WXModule {
    * @param callback function id
    */
   public void getComponentRect(String ref, String callback) {
-    if (TextUtils.isEmpty(ref) || TextUtils.isEmpty(callback)) {
+    if (mWXSDKInstance == null) {
+      return;
+    }
+    SimpleJSCallback jsCallback = new SimpleJSCallback(mWXSDKInstance.getInstanceId(), callback);
+    if (TextUtils.isEmpty(ref)) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Illegal parameter");
-      WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+      jsCallback.invoke(options);
       return;
     } else if ("viewport".equalsIgnoreCase(ref)) {
-      if(mWXSDKInstance!=null && mWXSDKInstance.getRootView()!=null
-         && mWXSDKInstance.getRootView().getParent()!=null){
+      if (mWXSDKInstance.getContainerView() != null) {
         Map<String, Object> options = new HashMap<>();
         Map<String, String> sizes = new HashMap<>();
-        Rect rect=new Rect();
-        ((View)mWXSDKInstance.getRootView().getParent()).getGlobalVisibleRect(rect);
-        sizes.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(rect.width(),mWXSDKInstance.getViewPortWidth())));
-        sizes.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(rect.height(),mWXSDKInstance.getViewPortWidth())));
-        sizes.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(rect.bottom,mWXSDKInstance.getViewPortWidth())));
-        sizes.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(rect.left,mWXSDKInstance.getViewPortWidth())));
-        sizes.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(rect.right,mWXSDKInstance.getViewPortWidth())));
-        sizes.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(rect.top,mWXSDKInstance.getViewPortWidth())));
+        int[] location = new int[2];
+        mWXSDKInstance.getContainerView().getLocationOnScreen(location);
+        sizes.put("left", "0");
+        sizes.put("top", "0");
+        sizes.put("right", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
+        sizes.put("bottom", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
+        sizes.put("width", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
+        sizes.put("height", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
         options.put("size", sizes);
         options.put("result", true);
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
-      }else{
+        jsCallback.invoke(options);
+      } else {
         Map<String, Object> options = new HashMap<>();
         options.put("result", false);
         options.put("errMsg", "Component does not exist");
-        WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(), callback, options);
+        jsCallback.invoke(options);
       }
     } else {
       Message msg = Message.obtain();
@@ -677,10 +680,15 @@ public final class WXDomModule extends WXModule {
       task.instanceId = mWXSDKInstance.getInstanceId();
       task.args = new ArrayList<>();
       task.args.add(ref);
-      task.args.add(callback);
+      task.args.add(jsCallback);
       msg.what = WXDomHandler.MsgType.WX_COMPONENT_SIZE;
       msg.obj = task;
       WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
     }
+  }
+
+  @NonNull
+  private String getWebPxValue(int value) {
+    return String.valueOf(WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getViewPortWidth()));
   }
 }

@@ -140,7 +140,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -252,9 +251,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public Rect getComponentSize() {
-     Rect size=new Rect();
-    if(mHost!=null){
-      mHost.getGlobalVisibleRect(size);
+    Rect size = new Rect();
+    if (mHost != null) {
+      int[] location = new int[2];
+      int[] anchor = new int[2];
+      mHost.getLocationOnScreen(location);
+      mInstance.getContainerView().getLocationOnScreen(anchor);
+      int left = location[0] - anchor[0];
+      int top = location[1] - anchor[1];
+      int width = (int) mDomObj.getLayoutWidth();
+      int height = (int) mDomObj.getLayoutHeight();
+      size.set(left, top, left + width, top + height);
     }
     return size;
   }

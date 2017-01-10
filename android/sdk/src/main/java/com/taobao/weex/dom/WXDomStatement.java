@@ -216,6 +216,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
@@ -1235,12 +1236,12 @@ class WXDomStatement {
     }
   }
 
-  public void getComponentSize(final String ref, final String callback) {
+  public void getComponentSize(final String ref, final JSCallback callback) {
     if (mDestroy) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Component does not exist");
-      WXSDKManager.getInstance().callback(mInstanceId, callback, options);
+      callback.invoke(options);
       return;
     }
 
