@@ -317,7 +317,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)notifyRenderFinish
 {
-    if (self.weexInstance.trackCompoent) {
+    if (self.weexInstance.trackComponent) {
         [self renderFinish];
     }
 }
