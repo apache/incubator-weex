@@ -276,11 +276,11 @@ public abstract class WXModule implements IWXObject {
     if (TextUtils.isEmpty(eventName) || TextUtils.isEmpty(callback)) {
       return;
     }
-    boolean isOnce = true;
+    boolean isOnce = false;
     if (options != null && options.size() > 0 && options.containsKey("once")) {
       Object temp = options.get("once");
-      if ("false".equals(temp)) {
-        isOnce = false;
+      if ("true".equals(temp)) {
+        isOnce = true;
       }
     }
     mKeepAlives.put(callback, isOnce);
