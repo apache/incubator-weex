@@ -49,10 +49,10 @@
     if (![moduleInstance respondsToSelector:selector]) {
         // if not implement the selector, then dispatch default module method
         if ([self.methodName isEqualToString:@"addEventListener"]) {
-            [self.instance _addModuleEventObserversWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
+            [self.instance _addModuleEventObserversWithModuleMethod:self];
         }
         if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
-            [self.instance _removeModuleEventObserverWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
+            [self.instance _removeModuleEventObserverWithModuleMethod:self];
         }
         return nil;
     }

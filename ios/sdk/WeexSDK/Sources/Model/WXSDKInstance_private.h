@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 #import "WXComponentManager.h"
+#import "WXModuleMethod.h"
 
 @interface WXSDKInstance ()
 
@@ -22,8 +23,8 @@
 @property (nonatomic, readonly, strong) WXComponentManager *componentManager;
 
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
-- (void)_addModuleEventObserversWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName;
+- (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod*)method;
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName;
-- (void)_removeModuleEventObserverWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName;
+- (void)_removeModuleEventObserverWithModuleMethod:(WXModuleMethod*)method;
 
 @end
