@@ -1256,6 +1256,7 @@ class WXDomStatement {
         return "getComponentSize";
       }
     });
+    mDirty=true;
 
   }
 

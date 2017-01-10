@@ -274,61 +274,63 @@ public final class WXDomModule extends WXModule {
     if (task == null) {
       return;
     }
-
     String method = (String) task.get(WXBridgeManager.METHOD);
     JSONArray args = (JSONArray) task.get(WXBridgeManager.ARGS);
+    callDomMethod(method,args);
+  }
+  
+  public Object callDomMethod(String method, JSONArray args) {
 
     if (method == null) {
-      return;
+      return null;
     }
-
     try {
       switch (method) {
         case CREATE_BODY:
           if (args == null) {
-            return;
+            return null;
           }
           createBody((JSONObject) args.get(0));
           break;
         case UPDATE_ATTRS:
           if (args == null) {
-            return;
+            return null;
           }
           updateAttrs((String) args.get(0), (JSONObject) args.get(1));
           break;
         case UPDATE_STYLE:
           if (args == null) {
-            return;
+            return null;
           }
           updateStyle((String) args.get(0), (JSONObject) args.get(1));
           break;
         case REMOVE_ELEMENT:
           if (args == null) {
-            return;
+            return null;
           }
           removeElement((String) args.get(0));
           break;
         case ADD_ELEMENT:
           if (args == null) {
-            return;
+            return null;
           }
           addElement((String) args.get(0), (JSONObject) args.get(1), (Integer) args.get(2));
           break;
         case MOVE_ELEMENT:
           if (args == null) {
-            return;
+            return null;
           }
           moveElement((String) args.get(0), (String) args.get(1), (Integer) args.get(2));
           break;
         case ADD_EVENT:
           if (args == null) {
-            return;
+            return null;
           }
           addEvent((String) args.get(0), (String) args.get(1));
           break;
         case REMOVE_EVENT:
           if (args == null) {
-            return;
+            return null;
           }
           removeEvent((String) args.get(0), (String) args.get(1));
           break;
@@ -343,25 +345,25 @@ public final class WXDomModule extends WXModule {
           break;
         case SCROLL_TO_ELEMENT:
           if (args == null) {
-            return;
+            return null;
           }
           scrollToElement((String) args.get(0), (JSONObject) args.get(1));
           break;
         case ADD_RULE:
           if (args == null) {
-            return;
+            return null;
           }
           addRule((String) args.get(0), (JSONObject) args.get(1));
           break;
         case GET_COMPONENT_RECT:
           if(args == null){
-            return;
+            return null;
           }
           getComponentRect((String) args.get(0),(String) args.get(1));
           break;
         case INVOKE_METHOD:
           if(args == null){
-            return;
+            return null;
           }
           invokeMethod((String) args.get(0),(String) args.get(1),(JSONArray) args.get(2));
           break;
@@ -374,6 +376,7 @@ public final class WXDomModule extends WXModule {
     } catch (ClassCastException cce) {
       WXLogUtils.e("Dom module call arguments format error!!");
     }
+    return null;
   }
 
   /**
