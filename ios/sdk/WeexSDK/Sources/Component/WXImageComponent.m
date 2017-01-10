@@ -298,6 +298,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     }
                     
                     if ([strongSelf isViewLoaded]) {
+                        strongSelf.imageDownloadFinish = YES;
                         ((UIImageView *)strongSelf.view).image = image;
                         [strongSelf notifyRenderFinish];
                     }
