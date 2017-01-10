@@ -45,10 +45,10 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(163)
-	var __weex_template__ = __webpack_require__(167)
-	var __weex_style__ = __webpack_require__(168)
-	var __weex_script__ = __webpack_require__(169)
+	__webpack_require__(161)
+	var __weex_template__ = __webpack_require__(165)
+	var __weex_style__ = __webpack_require__(166)
+	var __weex_script__ = __webpack_require__(167)
 
 	__weex_define__('@weex-component/ea51bd2d36d6d5354af97da097043629', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -67,12 +67,12 @@
 
 /***/ },
 
-/***/ 163:
+/***/ 161:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(164)
-	var __weex_style__ = __webpack_require__(165)
-	var __weex_script__ = __webpack_require__(166)
+	var __weex_template__ = __webpack_require__(162)
+	var __weex_style__ = __webpack_require__(163)
+	var __weex_script__ = __webpack_require__(164)
 
 	__weex_define__('@weex-component/slider-item', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -90,7 +90,7 @@
 
 /***/ },
 
-/***/ 164:
+/***/ 162:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -105,7 +105,7 @@
 
 /***/ },
 
-/***/ 165:
+/***/ 163:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -117,7 +117,7 @@
 
 /***/ },
 
-/***/ 166:
+/***/ 164:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -139,7 +139,7 @@
 
 /***/ },
 
-/***/ 167:
+/***/ 165:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -157,7 +157,7 @@
 
 /***/ },
 
-/***/ 168:
+/***/ 166:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -171,7 +171,7 @@
 
 /***/ },
 
-/***/ 169:
+/***/ 167:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";

@@ -10,7 +10,11 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance.h"
+#import "WXSDKInstance_private.h"
 #import "WXDefine.h"
+#import "WXAssert.h"
+#import "WXComponent_internal.h"
+#import "WXComponent+PseudoClassManagement.h"
 
 @interface WXTextInputView : UITextField
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -54,16 +58,22 @@
 
 @property (nonatomic, strong) WXTextInputView *inputView;
 @property (nonatomic, strong) WXDatePickerManager *datePickerManager;
+@property (nonatomic, strong) NSDictionary *attr;
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;
-@property (nonatomic, strong) NSString *placeholder;
+@property (nonatomic, strong) NSString *placeholderString;
 @property (nonatomic) NSNumber *maxLength;
+@property (nonatomic) NSString * value;
+@property (nonatomic) BOOL autofocus;
+@property (nonatomic) BOOL disabled;
+@property (nonatomic, copy) NSString *inputType;
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
-@property (nonatomic, copy) NSString *inputType;
+@property (nonatomic, strong) UIColor *colorForStyle;
+@property (nonatomic)NSTextAlignment textAlignForStyle;
 
 //event
 @property (nonatomic) BOOL inputEvent;
@@ -72,7 +82,6 @@
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -98,51 +107,23 @@ WX_EXPORT_METHOD(@selector(blur))
         _focusEvent = NO;
         _blurEvent = NO;
         _changeEvent = NO;
-        
-        _inputView = [[WXTextInputView alloc] init];
-        _datePickerManager = [[WXDatePickerManager alloc] init];
-        _datePickerManager.delegate = self;
-        if (attributes[@"type"]) {
-            NSString *type = [WXConvert NSString:attributes[@"type"]];
-            if (type) {
-                [self setType: type];
-            }
+        // handle attributes
+        _autofocus = [attributes[@"autofocus"] boolValue];
+        _disabled = [attributes[@"disabled"] boolValue];
+        _value = [WXConvert NSString:attributes[@"value"]]?:@"";
+        _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
+        if(attributes[@"type"]) {
+            _inputType = [WXConvert NSString:attributes[@"type"]];
+            _attr = attributes;
         }
-        
-        if (attributes[@"autofocus"]) {
-            [self setAutofocus:[attributes[@"autofocus"] boolValue]];
-        }
-        if (attributes[@"disabled"]) {
-            [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
-        }
-        if (attributes[@"value"]) {
-            NSString* value = [WXConvert NSString:attributes[@"value"]];
-            if (value) {
-                _inputView.text = value;
-            }
-        }
-        if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
-        {
-            [_datePickerManager configDatePicker:attributes];
-        }
-        if (attributes[@"placeholder"]) {
-            NSString *placeHolder = [WXConvert NSString:attributes[@"placeholder"]];
-            if (placeHolder) {
-                _placeholder = placeHolder;
-            }
-        }
-        if (!_placeholder) {
-            _placeholder = @"";
-        }
-        
         if (attributes[@"maxlength"]) {
             _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
         
+        // handle styles
         if (styles[@"color"]) {
-            [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+            _colorForStyle = [WXConvert UIColor:styles[@"color"]];
         }
-        
         if (styles[@"fontSize"]) {
             _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
@@ -156,7 +137,7 @@ WX_EXPORT_METHOD(@selector(blur))
             _fontFamily = styles[@"fontFamily"];
         }
         if (styles[@"textAlign"]) {
-            [_inputView setTextAlignment:[WXConvert NSTextAlignment:styles[@"textAlign"]]] ;
+            _textAlignForStyle = [WXConvert NSTextAlignment:styles[@"textAlign"]];
         }
         
         if (styles[@"placeholderColor"]) {
@@ -164,8 +145,6 @@ WX_EXPORT_METHOD(@selector(blur))
         }else {
             _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
         }
-        [self setPlaceholderAttributedString];
-        [self setTextFont];
         UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
         if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
             [self setPadding:padding];
@@ -174,15 +153,14 @@ WX_EXPORT_METHOD(@selector(blur))
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             [self setBorder:border];
         }
-        
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
 }
 
--(UIView *)loadView
+- (UIView *)loadView
 {
+    _inputView = [[WXTextInputView alloc] init];
     return _inputView;
 }
 
@@ -197,6 +175,15 @@ WX_EXPORT_METHOD(@selector(blur))
     _border = UIEdgeInsetsZero;
     _inputView.delegate = self;
     _inputView.userInteractionEnabled = YES;
+    [self setType];
+    _inputView.text = _value;
+    [self setAutofocus:_autofocus];
+    [self setTextFont];
+    [self setPlaceholderAttributedString];
+    [_inputView setTextAlignment:_textAlignForStyle];
+    [_inputView setTextColor:_colorForStyle];
+    [_inputView setText:_value];
+    [_inputView setEnabled:!_disabled];
     
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -204,6 +191,7 @@ WX_EXPORT_METHOD(@selector(blur))
     toolbar.items = [NSArray arrayWithObjects:space, barButton, nil];
     
     _inputView.inputAccessoryView = toolbar;
+    [self handlePseudoClass];
 }
 
 - (void)viewWillLoad
@@ -226,33 +214,16 @@ WX_EXPORT_METHOD(@selector(blur))
 
 -(void)focus
 {
-    if(self.view)
-    {
-        [self.view becomeFirstResponder];
+    if(self.inputView) {
+        [self.inputView becomeFirstResponder];
     }
 }
 
 -(void)blur
 {
-    if(self.view)
-    {
-        [self.view resignFirstResponder];
+    if(self.inputView) {
+        [self.inputView resignFirstResponder];
     }
-}
-
-#pragma mark - private method
--(UIColor *)convertColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }else {
-        color = [UIColor blackColor];
-    }
-    return color;
 }
 
 #pragma mark - Add Event
@@ -294,40 +265,26 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
+    _attr = attributes;
     if (attributes[@"type"]) {
-        NSString *type = [WXConvert NSString:attributes[@"type"]];
-        if (type) {
-            [self setType: type];
-        }
+        _inputType = [WXConvert NSString:attributes[@"type"]];
     }
-    if (attributes[@"autofocus"]) {
-        [self setAutofocus:[attributes[@"autofocus"] boolValue]];
-    }
-    if (attributes[@"disabled"]) {
-        [_inputView setEnabled:![attributes[@"disabled"] boolValue]];
-    }
+    [self setType];
+    _autofocus = [attributes[@"autofocus"] boolValue];
+    [self setAutofocus:_autofocus];
+    _disabled = [attributes[@"disabled"] boolValue];
+    [_inputView setEnabled:!_disabled];
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
     if (attributes[@"placeholder"]) {
-        NSString* placeholder = [WXConvert NSString:attributes[@"placeholder"]];
-        if (placeholder) {
-            _inputView.placeholder = _placeholder;
-            _placeholder = placeholder;
-        }
+        _placeholderString = [WXConvert NSString:attributes[@"placeholder"]]?:@"";
+        [self setPlaceholderAttributedString];
     }
     if (attributes[@"value"]) {
-        NSString* value = [WXConvert NSString:attributes[@"value"]];
-        if (value) {
-            _inputView.text = value;
-        }
+        _value = [WXConvert NSString:attributes[@"value"]]?:@"";
+        [_inputView setText:_value];
     }
-    if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
-    {
-        [_datePickerManager updateDatePicker:attributes];
-    }
-    
-    [self setPlaceholderAttributedString];
 }
 
 #pragma mark - upate styles
@@ -335,7 +292,8 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)updateStyles:(NSDictionary *)styles
 {
     if (styles[@"color"]) {
-       [_inputView setTextColor:[WXConvert UIColor:styles[@"color"]]];
+        _colorForStyle = [WXConvert UIColor:styles[@"color"]];
+       [_inputView setTextColor:_colorForStyle];
     }
     if (styles[@"fontSize"]) {
         _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
@@ -349,8 +307,11 @@ WX_EXPORT_METHOD(@selector(blur))
     if (styles[@"fontFamily"]) {
         _fontFamily = [WXConvert NSString:styles[@"fontFamily"]];
     }
+    [self setTextFont];
+    
     if (styles[@"textAlign"]) {
-        [_inputView setTextAlignment:[WXConvert NSTextAlignment:styles[@"textAlign"]]] ;
+        _textAlignForStyle = [WXConvert NSTextAlignment:styles[@"textAlign"]];
+        [_inputView setTextAlignment:_textAlignForStyle] ;
     }
     if (styles[@"placeholderColor"]) {
         _placeholderColor = [WXConvert UIColor:styles[@"placeholderColor"]];
@@ -368,8 +329,6 @@ WX_EXPORT_METHOD(@selector(blur))
     if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
         [self setBorder:border];
     }
-    
-    [self setTextFont];
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -388,11 +347,11 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -402,20 +361,8 @@ WX_EXPORT_METHOD(@selector(blur))
     };
 }
 
--(UIColor *)covertColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }
-    return color;
-}
-
-#pragma mark -
 #pragma mark WXDatePickerManagerDelegate
+
 -(void)fetchDatePickerValue:(NSString *)value
 {
     _inputView.text = value;
@@ -447,6 +394,7 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_focusEvent) {
         [self fireEvent:@"focus" params:nil];
     }
+    [self handlePseudoClass];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -473,6 +421,9 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
     }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
+    }
 }
 
 - (void)textFiledEditChanged:(NSNotification *)notifi
@@ -487,11 +438,11 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect inputFrame = [_inputView.superview convertRect:_inputView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
+        CGFloat offset = inputFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-inputFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -499,18 +450,14 @@ WX_EXPORT_METHOD(@selector(blur))
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }
 
 
-#pragma mark
+#pragma mark private method
 
--(BOOL)isDateType
+- (BOOL)isDateType
 {
     if([_inputType isEqualToString:@"date"] || [_inputType isEqualToString:@"time"])
         return YES;
@@ -519,11 +466,9 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)setPlaceholderAttributedString
 {
-    if (_placeholderColor) {
-        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholder];
-        [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholder.length)];
-        [_inputView setAttributedPlaceholder:attributedString];
-    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
+    [_inputView setAttributedPlaceholder:attributedString];
 }
 
 - (void)setTextFont
@@ -553,26 +498,27 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
-- (void)setType:(NSString*)type
+- (void)setType
 {
     [_inputView setKeyboardType:UIKeyboardTypeDefault];
     [_inputView setSecureTextEntry:NO];
-    _inputType = type;
     
-    if ([type isEqualToString:@"text"]) {
+    if ([_inputType isEqualToString:@"text"]) {
         [_inputView setKeyboardType:UIKeyboardTypeDefault];
-    }
-    else if ([type isEqualToString:@"password"]) {
+    }else if ([_inputType isEqualToString:@"password"]) {
         [_inputView setSecureTextEntry:YES];
-    }
-    else if ([type isEqualToString:@"tel"]) {
+    }else if ([_inputType isEqualToString:@"tel"]) {
         [_inputView setKeyboardType:UIKeyboardTypePhonePad];
-    }
-    else if ([type isEqualToString:@"email"]) {
+    }else if ([_inputType isEqualToString:@"email"]) {
         [_inputView setKeyboardType:UIKeyboardTypeEmailAddress];
-    }
-    else if ([type isEqualToString:@"url"]) {
+    }else if ([_inputType isEqualToString:@"url"]) {
         [_inputView setKeyboardType:UIKeyboardTypeURL];
+    }else if ([self isDateType]) {
+        if (!_datePickerManager) {
+            _datePickerManager = [[WXDatePickerManager alloc] init];
+            _datePickerManager.delegate = self;
+        }
+        [_datePickerManager updateDatePicker:_attr];
     }
 }
 
@@ -586,6 +532,37 @@ WX_EXPORT_METHOD(@selector(blur))
 {
     _border = border;
     [_inputView setBorder:border];
+}
+
+#pragma mark update touch styles
+-(void)handlePseudoClass
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"disabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"enabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    if ([_inputView isFirstResponder]){
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    NSString *disabledStr = @"enabled";
+    if (_disabled){
+        disabledStr = @"disabled";
+    }
+    if ([_inputView isFirstResponder]) {
+        NSString *focusStr = @"focus";
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[focusStr,disabledStr]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark keyboard
@@ -603,9 +580,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -624,7 +598,7 @@ WX_EXPORT_METHOD(@selector(blur))
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }

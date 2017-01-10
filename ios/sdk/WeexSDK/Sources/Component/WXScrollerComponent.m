@@ -44,6 +44,7 @@
     CGFloat _loadMoreOffset;
     CGFloat _previousLoadMoreContentHeight;
     CGPoint _lastContentOffset;
+    BOOL _scrollable;
     
     // vertical & horizontal
     WXScrollDirection _scrollDirection;
@@ -91,6 +92,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert CGFloat:attributes[@"loadmoreoffset"]] : 0;
         _loadmoreretry = attributes[@"loadmoreretry"] ? [WXConvert NSUInteger:attributes[@"loadmoreretry"]] : 0;
         _listenLoadMore = [events containsObject:@"loadmore"];
+        _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
 
         _scrollerCSSNode = new_css_node();
         
@@ -123,6 +125,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     scrollView.clipsToBounds = YES;
     scrollView.showsVerticalScrollIndicator = _showScrollBar;
     scrollView.showsHorizontalScrollIndicator = _showScrollBar;
+    scrollView.scrollEnabled = _scrollable;
     
     if (self.ancestorScroller) {
         scrollView.scrollsToTop = NO;
@@ -174,6 +177,10 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         }
         self.loadmoreretry = loadmoreretry;
     }
+    if (attributes[@"scrollable"]) {
+        _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
+        ((UIScrollView *)self.view).scrollEnabled = _scrollable;
+    }
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -215,7 +222,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     CGFloat scrollOffsetY = ((UIScrollView *)self.view).contentOffset.y;
     for(WXComponent *component in self.stickyArray) {
-        if (CGPointEqualToPoint(component->_absolutePosition, CGPointZero)) {
+        if (isnan(component->_absolutePosition.x) && isnan(component->_absolutePosition.y)) {
             component->_absolutePosition = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view];
         }
         CGPoint relativePosition = component->_absolutePosition;
@@ -462,8 +469,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
-#pragma mark  Private Methods
-
 - (void)handleAppear
 {
     if (![self isViewLoaded]) {
@@ -481,6 +486,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         [self scrollToTarget:target scrollRect:scrollRect];
     }
 }
+
+#pragma mark  Private Methods
 
 - (void)scrollToTarget:(WXScrollToTarget *)target scrollRect:(CGRect)rect
 {
