@@ -48,15 +48,15 @@
     }
     if (![moduleInstance respondsToSelector:selector] && [self.methodName isEqualToString:@"addEventListener"]) {
         if([self.arguments[0] isKindOfClass:[NSString class]] && [self.arguments count] == 3) {
-            [self.instance addModuleEventObservers:self.arguments[0] callback:self.arguments[1] option:self.arguments[2] moduleClassName:NSStringFromClass(moduleClass)];
-            return nil;
+            [self.instance _addModuleEventObserversWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
         }
+        return nil;
     }
     if (![moduleInstance respondsToSelector:selector] && [self.methodName isEqualToString:@"removeAllEventListeners"]) {
         if ([self.arguments count] &&[self.arguments[0] isKindOfClass:[NSString class]]) {
             [self.instance removeModuleEventObserver:self.arguments[0] moduleClassName:_moduleName];
-            return nil;
         }
+        return nil;
     }
     
     NSInvocation *invocation = [self invocationWithTarget:moduleInstance selector:selector];

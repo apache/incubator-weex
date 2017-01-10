@@ -395,6 +395,19 @@ typedef enum : NSUInteger {
 
 #pragma mark Private Methods
 
+- (void)_addModuleEventObserversWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName
+{
+    if ([arguments count] < 2) {
+        WXLogError(@"please check your method parameter!!");
+        return;
+    }
+    NSMutableArray * methodArguments = [arguments mutableCopy];
+    if ([arguments count] == 2) {
+        [methodArguments addObject:@{@"once": @false}];
+    }
+    [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:methodArguments[2] moduleClassName:moduleClassName];
+}
+
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
 {
     BOOL once = [[option objectForKey:@"once"] boolValue];
