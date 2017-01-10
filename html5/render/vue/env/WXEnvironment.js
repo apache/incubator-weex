@@ -1,14 +1,14 @@
-const ua = navigator.userAgent
+import 'envd'
 
-// TODO: parse UA
+const lib = window.lib
 const env = {
   platform: 'Web',
-  userAgent: ua,
-  appName: navigator.appName,
-  appVersion: navigator.appVersion,
-  weexVersion: '',
-  osName: '',
-  osVersion: '',
+  weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
+  userAgent: navigator.userAgent,
+  appName: lib.env.aliapp ? lib.env.aliapp.appname : null,
+  appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
+  osName: lib.env.browser ? lib.env.browser.name : null,
+  osVersion: lib.env.browser ? lib.env.browser.version.val : null,
   deviceWidth: window.innerWidth,
   deviceHeight: window.innerHeight
 }

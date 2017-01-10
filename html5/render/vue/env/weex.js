@@ -1,17 +1,24 @@
 import * as utils from '../utils'
-import { requireModule } from '../modules'
+import { requireWeexModule } from '../modules'
 export { utils }
 
 const weexModules = {}
 
-export function require (moduleName) {
-  const module = requireModule(moduleName)
+export function requireModule (moduleName) {
+  const module = requireWeexModule(moduleName)
   if (module) {
     return module
   }
   return weexModules[moduleName]
 }
 
+// @deprecated
+export function require (...args) {
+  console.log(`[Vue Render] "weex.require" is deprecated, please use "weex.requireModule" instead.`)
+  return requireModule(...args)
+}
+
+// @deprecated
 // TODO: rename to registerModule
 export function registerApiModule (name, module, meta) {
   if (!weexModules[name]) {

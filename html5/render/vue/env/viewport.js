@@ -12,12 +12,15 @@ export function setViewport (config = {}) {
   const doc = window.document
 
   if (doc) {
-    const screenWidth = window.screen.width
     const viewportWidth = parseViewportWidth(config)
-    const scale = screenWidth / viewportWidth
 
+    // set root font-size
+    doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
+
+    const screenWidth = window.screen.width
+    const scale = screenWidth / viewportWidth
     const contents = [
-      `width=${DEFAULT_VIEWPORT_WIDTH}`,
+      `width=${viewportWidth}`,
       `initial-scale=${scale}`,
       `maximum-scale=${scale}`,
       `minimum-scale=${scale}`,
@@ -30,9 +33,6 @@ export function setViewport (config = {}) {
       meta.setAttribute('name', 'viewport')
       document.querySelector('head').appendChild(meta)
     }
-
-    // set
-    doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
 
     meta.setAttribute('content', contents.join(','))
   }

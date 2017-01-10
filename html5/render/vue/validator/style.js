@@ -23,7 +23,7 @@ export function opacity (value) {
 }
 
 export function display (value) {
-  return ['block', 'flex'].indexOf(value) !== -1
+  return ['flex'].indexOf(value) !== -1
 }
 
 export function flexDirection (value) {
@@ -76,7 +76,13 @@ export function common (value, key) {
     return isCSSColor(value)
   }
 
+  // check width and height
   if (/^(width|height)$/.test(String(key))) {
+    return isCSSLength(value)
+  }
+
+  // check postions
+  if (/^(top|right|bottom|left)$/.test(String(key))) {
     return isCSSLength(value)
   }
 
@@ -90,6 +96,7 @@ export function common (value, key) {
     return ['solid', 'dashed', 'dotted'].indexOf(value) !== -1
   }
 
+  // check margins and paddings
   if (/^((margin|padding)-)?(top|right|bottom|left)/.test(String(key))) {
     return isCSSLength(value)
   }

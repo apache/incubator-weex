@@ -21,7 +21,7 @@ const modules = {
   webview
 }
 
-export function requireModule (name) {
+export function requireWeexModule (name) {
   if (modules[name]) {
     return modules[name]
   }

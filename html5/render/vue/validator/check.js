@@ -27,7 +27,7 @@ const supportedStyles = {
   '@text': ['text-align', 'text-decoration', 'text-overflow'],
   '@colors': ['color', 'background-color', 'opacity'],
 
-  text: ['@box-model', '@border', '@font', '@colors', '@text']
+  text: ['@box-model', '@border', '@font', '@colors', '@text', 'lines']
 }
 
 /**
