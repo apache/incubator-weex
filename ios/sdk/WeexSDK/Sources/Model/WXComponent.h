@@ -341,6 +341,11 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
 - (WXDisplayBlock)displayBlock;
 
 /**
+ * renderFinish
+ */
+- (void)renderFinish;
+
+/**
  * @abstract Return a block to be called while drawing is finished.
  *
  * @discussion The block returned will be called on main thread.

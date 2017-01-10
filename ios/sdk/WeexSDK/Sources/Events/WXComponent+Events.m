@@ -440,22 +440,35 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLoacation identifier:gesture.wx_identifier];
     
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        eventName = @"panstart";
+        if (_listenPanStart) {
+            eventName = @"panstart";
+        }
         state = @"start";
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
-        eventName = @"panend";
+        if (_listenPanEnd) {
+            eventName = @"panend";
+        }
         state = @"end";
         gesture.wx_identifier = nil;
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
-        eventName = @"panmove";
+        if (_listenPanMove) {
+             eventName = @"panmove";
+        }
         state = @"move";
     }
     
-    if (_listenHorizontalPan) {
+    
+    CGPoint translation = [_panGesture translationInView:self.view];
+    
+    if (_listenHorizontalPan && fabs(translation.y) <= fabs(translation.x)) {
         [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
-    } else if (_listenVerticalPan) {
+    }
+        
+    if (_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
         [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
-    } else if (eventName) {
+    }
+        
+    if (eventName) {
         [self fireEvent:eventName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
 }

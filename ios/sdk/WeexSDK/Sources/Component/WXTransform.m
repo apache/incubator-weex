@@ -198,8 +198,9 @@
 - (void)doRotate:(NSArray *)value
 {
     float rotateAngle = [self getAngle:value[0]];
-    
-    if (_isTransformRotate || rotateAngle <= M_PI+0.0001) {
+    CGAffineTransform cgTransform = CATransform3DGetAffineTransform(_view.layer.transform);
+    float originAngle = atan2f(cgTransform.b, cgTransform.a) * (180 / M_PI);
+    if (_isTransformRotate || fabs(rotateAngle - originAngle) <= M_PI+0.0001){
         _transform = CGAffineTransformRotate(_transform, rotateAngle);
     }
 
