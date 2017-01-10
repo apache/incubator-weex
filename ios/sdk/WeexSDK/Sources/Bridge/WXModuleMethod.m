@@ -46,15 +46,13 @@
         WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
         return nil;;
     }
-    if (![moduleInstance respondsToSelector:selector] && [self.methodName isEqualToString:@"addEventListener"]) {
-        if([self.arguments[0] isKindOfClass:[NSString class]]) {
+    if (![moduleInstance respondsToSelector:selector]) {
+        // if not implement the selector, then dispatch default module method
+        if ([self.methodName isEqualToString:@"addEventListener"]) {
             [self.instance _addModuleEventObserversWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
         }
-        return nil;
-    }
-    if (![moduleInstance respondsToSelector:selector] && [self.methodName isEqualToString:@"removeAllEventListeners"]) {
-        if ([self.arguments count] &&[self.arguments[0] isKindOfClass:[NSString class]]) {
-            [self.instance removeModuleEventObserver:self.arguments[0] moduleClassName:_moduleName];
+        if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
+            [self.instance _removeModuleEventObserverWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
         }
         return nil;
     }

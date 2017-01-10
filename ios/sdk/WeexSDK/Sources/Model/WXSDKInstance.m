@@ -401,6 +401,10 @@ typedef enum : NSUInteger {
         WXLogError(@"please check your method parameter!!");
         return;
     }
+    if(![arguments[0] isKindOfClass:[NSString class]]) {
+        // arguments[0] will be event name, so it must be a string type value here.
+        return;
+    }
     NSMutableArray * methodArguments = [arguments mutableCopy];
     if ([arguments count] == 2) {
         [methodArguments addObject:@{@"once": @false}];
@@ -422,6 +426,13 @@ typedef enum : NSUInteger {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];
     }
+}
+
+- (void)_removeModuleEventObserverWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName {
+    if (![arguments count] && [arguments[0] isKindOfClass:[NSString class]]) {
+        return;
+    }
+    [self removeModuleEventObserver:arguments[0] moduleClassName:moduleClassName];
 }
 
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName

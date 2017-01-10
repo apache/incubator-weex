@@ -24,5 +24,6 @@
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary*)option moduleClassName:(NSString*)moduleClassName;
 - (void)_addModuleEventObserversWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName;
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName;
+- (void)_removeModuleEventObserverWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName;
 
 @end
