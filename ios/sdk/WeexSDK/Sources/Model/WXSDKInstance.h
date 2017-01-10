@@ -146,6 +146,10 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, assign, readonly) CGFloat pixelScaleFactor;
 
 /**
+ * track component render
+ */
+@property (nonatomic, assign)BOOL trackCompoent;
+/**
  * Renders weex view with bundle url.
  *
  * @param url The url of bundle rendered to a weex view.
@@ -217,6 +221,17 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * Number of components created, must be called on component thread by calling WXPerformBlockOnComponentThread
  */
 - (NSUInteger)numberOfComponents;
+
+
+/**
+ * check whether the module eventName is registered
+ */
+- (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName;
+
+/**
+ * fire module event;
+ */
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 
 /**
  * fire global event

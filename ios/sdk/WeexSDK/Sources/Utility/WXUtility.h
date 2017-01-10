@@ -337,6 +337,11 @@ CGFloat WXCeilPixelValue(CGFloat value);
  */
 + (NSString *_Nullable)timeToString:(NSDate *_Nullable)date;
 
+/**
+ *  @abstract get the repeat  subtring number of string.
+ *
+ */
++ (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString;
 
 /**
  *  @abstract Returns a resized pixel which is caculated according to the WXScreenResizeRadio.
@@ -344,11 +349,10 @@ CGFloat WXCeilPixelValue(CGFloat value);
  */
 CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor);
 
-
 CGFloat WXScreenResizeRadio(void) DEPRECATED_MSG_ATTRIBUTE("Use [WXUtility defaultPixelScaleFactor] instead");
 CGFloat WXPixelResize(CGFloat value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
 CGRect WXPixelFrameResize(CGRect value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
 CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
-
++ (UIFont  * _Nullable )fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString * _Nullable)fontFamily DEPRECATED_MSG_ATTRIBUTE("Use +[WXUtility fontWithSize:textWeight:textStyle:fontFamily:scaleFactor:]");
 
 @end

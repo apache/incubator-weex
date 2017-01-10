@@ -168,11 +168,10 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
-    
     [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
         NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
         UIView *rootView = manager.weexInstance.rootView;
-        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView.superview.superview];
+        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         if ([ref isEqualToString:@"viewport"]) {
             [callbackRsp setObject:@(true) forKey:@"result"];
@@ -192,7 +191,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                     [callbackRsp setObject:@(false) forKey:@"result"];
                     [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
                 } else {
-                    CGRect componentRect = [component.view.superview convertRect:component.calculatedFrame toView:rootView.superview.superview];
+                    CGRect componentRect = [component.view.superview convertRect:component.calculatedFrame toView:rootView];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                     [callbackRsp setObject:@{
                                              @"width":@(componentRect.size.width / scaleFactor),

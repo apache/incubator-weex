@@ -292,11 +292,11 @@ do {\
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -324,6 +324,19 @@ do {\
     }
     
     // set font
+    if (!_fontFamily) {
+        NSString *regex = @".*[\\u4e00-\\u9faf].*";//Has Simplified Chinese char
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+        if ([pred evaluateWithObject:string]) {
+            if ([[UIDevice currentDevice].systemVersion floatValue] < 9.0) {
+                //“Heiti SC” font is "[UIFont systemFontOfSize:]" for Simplified Chinese before iOS 9.0.
+                _fontFamily = @"Heiti SC";
+            } else {
+                //“PingFang SC” font is "[UIFont systemFontOfSize:]" for Simplified Chinese from iOS 9.0.
+                _fontFamily = @"PingFang SC";
+            }
+        }
+    }
     UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (font) {
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
@@ -421,9 +434,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
     
     [self fillCSSStyles:styles];
     

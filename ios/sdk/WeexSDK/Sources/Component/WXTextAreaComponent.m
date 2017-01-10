@@ -11,7 +11,9 @@
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
 #import "WXView.h"
+#import "WXAssert.h"
 #import "WXSDKInstance.h"
+#import "WXComponent+PseudoClassManagement.h"
 
 @interface WXTextAreaView : UITextView
 @property (nonatomic, assign) UIEdgeInsets border;
@@ -71,6 +73,7 @@
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
+
 //event
 @property (nonatomic) BOOL inputEvent;
 @property (nonatomic) BOOL focusEvent;
@@ -79,10 +82,6 @@
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
-
-//private
-@property(nonatomic) NSRange selectedRange; //save selectedrange. because re layout change textview selectedRange
 
 @end
 
@@ -91,6 +90,9 @@
     UIEdgeInsets _padding;
     NSTextStorage* _textStorage;
 }
+
+WX_EXPORT_METHOD(@selector(focus))
+WX_EXPORT_METHOD(@selector(blur))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -165,7 +167,6 @@
         if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
             _border = border;
         }
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -233,28 +234,20 @@
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+    [self handlePseudoClass];
 }
 
-#pragma mark - private method
--(UIColor *)convertColor:(id)value
+-(void)focus
 {
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }else {
-        color = [UIColor blackColor];
+    if (self.textView) {
+        [self.textView becomeFirstResponder];
     }
-    return color;
 }
 
--(void)correctCursor
+-(void)blur
 {
-    if(self.selectedRange.location != 0 && self.textView.selectedRange.location != self.selectedRange.location)
-    {
-        self.textView.selectedRange = self.selectedRange;
+    if (self.textView) {
+        [self.textView resignFirstResponder];
     }
 }
 
@@ -317,7 +310,6 @@
         if (value) {
             _textValue = value;
             _textView.text = _textValue;
-            [self correctCursor];
             if([value length] > 0) {
                 _placeHolderLabel.text = @"";
             }
@@ -370,6 +362,37 @@
     }
 }
 
+#pragma mark update touch styles
+-(void)handlePseudoClass
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"disabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"enabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    if ([_textView isFirstResponder]){
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    NSString *disabledStr = @"enabled";
+    if (_disabled){
+        disabledStr = @"disabled";
+    }
+    if ([_textView isFirstResponder]) {
+        NSString *focusStr = @"focus";
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[focusStr,disabledStr]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    [self updatePseudoClassStyles:styles];
+}
+
 #pragma mark measure frame
 - (CGSize (^)(CGSize))measureBlock
 {
@@ -388,11 +411,11 @@
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -413,6 +436,7 @@
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+    [self handlePseudoClass];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -422,27 +446,26 @@
     }else{
         [self setPlaceholderAttributedString];
     }
-    self.selectedRange = textView.selectedRange;
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":textView.text}];
-        }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
     }
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
-    self.selectedRange = NSMakeRange(0, 0);
     if (![textView.text length]) {
         [self setPlaceholderAttributedString];
     }
     if (_changeEvent) {
         if (![[textView text] isEqualToString:_changeEventString]) {
-            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[_textView text]}}];
+            [self fireEvent:@"change" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
         }
     }
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
+    }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
     }
 }
 
@@ -464,7 +487,8 @@
     CGRect newFrame = _placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.y = 6;
+    newFrame.origin.x = 4; // the cursor origin.x
+    newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
 }
@@ -505,9 +529,6 @@
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -526,7 +547,7 @@
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }
@@ -541,11 +562,11 @@
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
+        CGFloat offset = textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -553,10 +574,6 @@
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }
