@@ -209,7 +209,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
@@ -466,13 +466,13 @@ public class WXRenderManager {
     return instances;
   }
 
-  public void getComponentSize(String instanceId, String ref, String callback) {
+  public void getComponentSize(String instanceId, String ref, JSCallback callback) {
     WXRenderStatement statement = mRegistries.get(instanceId);
     if (statement == null) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Component does not exist");
-      WXSDKManager.getInstance().callback(instanceId, callback, options);
+      callback.invoke(options);
       return;
     }
     statement.getComponentSize(ref, callback);

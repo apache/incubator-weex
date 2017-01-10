@@ -7,8 +7,6 @@ import android.text.TextUtils;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
-import java.util.List;
-
 
 public class WXEventModule extends WXModule {
 
@@ -35,11 +33,8 @@ public class WXEventModule extends WXModule {
     intent.addCategory(WEEX_CATEGORY);
     mWXSDKInstance.getContext().startActivity(intent);
 
-    List<String> callbacks = getEventCallbacks("event");
-    if (callbacks != null) {
-      for (String callback : callbacks) {
-        mWXSDKInstance.fireModuleEvent(callback, null, isOnce(callback));
-      }
+    if (mWXSDKInstance.checkModuleEventRegistered("event", this)) {
+      mWXSDKInstance.fireModuleEvent("event", this, null);
     }
   }
 }
