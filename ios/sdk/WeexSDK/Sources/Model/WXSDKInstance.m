@@ -395,7 +395,7 @@ typedef enum : NSUInteger {
 
 #pragma mark Private Methods
 
-- (void)_addModuleEventObserversWith:(WXModuleMethod *)method
+- (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod *)method
 {
     if ([method.arguments count] < 2) {
         WXLogError(@"please check your method parameter!!");
@@ -417,7 +417,7 @@ typedef enum : NSUInteger {
     NSMutableDictionary * option = [methodArguments[3] mutableCopy];
     [option setObject:method.moduleName forKey:@"moduleName"];
     // the value for moduleName in option is for the need of callback
-    [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:option moduleClassName:NSClassFromString(moduleClass)];
+    [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:option moduleClassName:NSStringFromClass(moduleClass)];
 }
 
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
@@ -437,11 +437,13 @@ typedef enum : NSUInteger {
     }
 }
 
-- (void)_removeModuleEventObserverWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName {
-    if (![arguments count] && [arguments[0] isKindOfClass:[NSString class]]) {
+- (void)_removeModuleEventObserverWithModuleMethod:(WXModuleMethod *)method
+{
+    if (![method.arguments count] && [method.arguments[0] isKindOfClass:[NSString class]]) {
         return;
     }
-    [self removeModuleEventObserver:arguments[0] moduleClassName:moduleClassName];
+    Class moduleClass =  [WXModuleFactory classWithModuleName:method.moduleName];
+    [self removeModuleEventObserver:method.arguments[0] moduleClassName:NSStringFromClass(moduleClass)];
 }
 
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName
@@ -465,7 +467,7 @@ typedef enum : NSUInteger {
         NSDictionary * callbackInfo = listeners[i];
         NSString *callbackId = callbackInfo[@"callbackId"];
         BOOL once = [callbackInfo[@"once"] boolValue];
-        NSMutableDictionary * retData = @{@"type":userInfo[@"eventName"],
+        NSDictionary * retData = @{@"type":userInfo[@"eventName"],
                                                @"module":callbackInfo[@"moduleName"],
                                                @"data":userInfo[@"param"]};
         [[WXSDKManager bridgeMgr] callBack:self.instanceId funcId:callbackId params:retData keepAlive:!once];
