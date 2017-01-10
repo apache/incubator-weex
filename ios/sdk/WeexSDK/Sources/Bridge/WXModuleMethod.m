@@ -47,7 +47,7 @@
         return nil;;
     }
     if (![moduleInstance respondsToSelector:selector] && [self.methodName isEqualToString:@"addEventListener"]) {
-        if([self.arguments[0] isKindOfClass:[NSString class]] && [self.arguments count] == 3) {
+        if([self.arguments[0] isKindOfClass:[NSString class]]) {
             [self.instance _addModuleEventObserversWithArguments:self.arguments moduleClassName:NSStringFromClass(moduleClass)];
         }
         return nil;
