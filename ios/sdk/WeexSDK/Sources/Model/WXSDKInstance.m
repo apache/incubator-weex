@@ -78,7 +78,7 @@ typedef enum : NSUInteger {
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
-        _trackCompoent = NO;
+        _trackComponent = NO;
        
         [self addObservers];
     }
@@ -395,6 +395,23 @@ typedef enum : NSUInteger {
 
 #pragma mark Private Methods
 
+- (void)_addModuleEventObserversWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName
+{
+    if ([arguments count] < 2) {
+        WXLogError(@"please check your method parameter!!");
+        return;
+    }
+    if(![arguments[0] isKindOfClass:[NSString class]]) {
+        // arguments[0] will be event name, so it must be a string type value here.
+        return;
+    }
+    NSMutableArray * methodArguments = [arguments mutableCopy];
+    if ([arguments count] == 2) {
+        [methodArguments addObject:@{@"once": @false}];
+    }
+    [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:methodArguments[2] moduleClassName:moduleClassName];
+}
+
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
 {
     BOOL once = [[option objectForKey:@"once"] boolValue];
@@ -409,6 +426,13 @@ typedef enum : NSUInteger {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];
     }
+}
+
+- (void)_removeModuleEventObserverWithArguments:(NSArray*)arguments moduleClassName:(NSString*)moduleClassName {
+    if (![arguments count] && [arguments[0] isKindOfClass:[NSString class]]) {
+        return;
+    }
+    [self removeModuleEventObserver:arguments[0] moduleClassName:moduleClassName];
 }
 
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName

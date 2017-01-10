@@ -298,6 +298,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                     }
                     
                     if ([strongSelf isViewLoaded]) {
+                        strongSelf.imageDownloadFinish = YES;
                         ((UIImageView *)strongSelf.view).image = image;
                         [strongSelf notifyRenderFinish];
                     }
@@ -317,7 +318,7 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)notifyRenderFinish
 {
-    if (self.weexInstance.trackCompoent) {
+    if (self.weexInstance.trackComponent) {
         [self renderFinish];
     }
 }
