@@ -208,11 +208,19 @@
         return;
     }
     
-    [self _registerDefaultComponents];
-    [self _registerDefaultModules];
-    [self _registerDefaultHandlers];
+    [self registerDefaults];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
+}
+
++ (void)registerDefaults
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self _registerDefaultComponents];
+        [self _registerDefaultModules];
+        [self _registerDefaultHandlers];
+    });
 }
 
 + (NSString*)SDKEngineVersion

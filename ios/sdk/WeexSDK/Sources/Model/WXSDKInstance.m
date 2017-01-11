@@ -25,6 +25,7 @@
 #import "WXResourceRequest.h"
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
+#import "WXSDKEngine.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -172,6 +173,9 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
+    
+    // ensure default modules/components/handlers are ready before create instance
+    [WXSDKEngine registerDefaults];
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     

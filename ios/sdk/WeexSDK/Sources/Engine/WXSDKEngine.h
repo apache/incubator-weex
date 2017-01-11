@@ -13,7 +13,12 @@
 @interface WXSDKEngine : NSObject
 
 /**
- *  @abstract Registers a module for a given name
+ *  @abstract Register default modules/components/handlers, they will be reigstered only once.
+ **/
++ (void)registerDefaults;
+
+/**
+ *  @abstract Register a module for a given name
  *
  *  @param name The module name to register
  *
