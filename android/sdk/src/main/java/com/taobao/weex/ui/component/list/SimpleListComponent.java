@@ -207,133 +207,25 @@ package com.taobao.weex.ui.component.list;
 import android.content.Context;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.Component;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.WXBaseRefresh;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXLoading;
-import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
-import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
-import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 
 /**
- * Unlike other components, there is immutable bi-directional association between View and
- * ViewHolder, while only mutable and temporal uni-directional association between view and
- * components. The association only exist from {@link #onBindViewHolder(ListBaseViewHolder, int)} to
- * {@link #onViewRecycled(ListBaseViewHolder)}. In other situations, the association may not valid
- * or not even exist.
+ * A simple list component based on regular recyclerview, do not support refreshing and loading.
+ * Created by sospartan on 13/12/2016.
+ *
  */
-@Component(lazyload = false)
+public class SimpleListComponent extends BasicListComponent<SimpleRecyclerView>{
 
-public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
-  private String TAG = "WXListComponent";
-
-  @Deprecated
-  public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
-  }
-
-  public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
+  public SimpleListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
     super(instance, node, parent);
   }
 
   @Override
-  protected BounceRecyclerView generateListView(Context context, int orientation) {
-    return new BounceRecyclerView(context, orientation);
-  }
-
-  @Override
-  public void addChild(WXComponent child, int index) {
-    super.addChild(child, index);
-    if (child == null || index < -1) {
-      return;
-    }
-    setRefreshOrLoading(child);
-  }
-
-
-  /**
-   * Setting refresh view and loading view
-   *
-   * @param child the refresh_view or loading_view
-   */
-  private boolean setRefreshOrLoading(final WXComponent child) {
-
-    if (getHostView() == null) {
-      WXLogUtils.e(TAG, "setRefreshOrLoading: HostView == null !!!!!! check list attr has append =tree");
-      return true;
-    }
-    if (child instanceof WXRefresh) {
-      getHostView().setOnRefreshListener((WXRefresh) child);
-      getHostView().postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          getHostView().setHeaderView(child);
-        }
-      }, 100);
-      return true;
-    }
-
-    if (child instanceof WXLoading) {
-      getHostView().setOnLoadingListener((WXLoading) child);
-      getHostView().postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          getHostView().setFooterView(child);
-        }
-      }, 100);
-      return true;
-    }
-
-    return false;
-  }
-
-  @Override
-  public void createChildViewAt(int index) {
-    int indexToCreate = index;
-    if (indexToCreate < 0) {
-      indexToCreate = childCount() - 1;
-      if (indexToCreate < 0) {
-        return;
-      }
-    }
-    final WXComponent child = getChild(indexToCreate);
-    if (child instanceof WXBaseRefresh) {
-      child.createView();
-      if (child instanceof WXRefresh) {
-        getHostView().setOnRefreshListener((WXRefresh) child);
-        getHostView().postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            getHostView().setHeaderView(child);
-          }
-        }, 100);
-      } else if (child instanceof WXLoading) {
-        getHostView().setOnLoadingListener((WXLoading) child);
-        getHostView().postDelayed(new Runnable() {
-          @Override
-          public void run() {
-            getHostView().setFooterView(child);
-          }
-        }, 100);
-      }
-    } else {
-      super.createChildViewAt(indexToCreate);
-    }
-  }
-
-  public void remove(WXComponent child, boolean destroy) {
-    super.remove(child, destroy);
-    removeFooterOrHeader(child);
-  }
-
-  private void removeFooterOrHeader(WXComponent child) {
-    if (child instanceof WXLoading) {
-      getHostView().removeFooterView(child);
-    } else if (child instanceof WXRefresh) {
-      getHostView().removeHeaderView(child);
-    }
+  protected SimpleRecyclerView generateListView(Context context, int orientation) {
+    SimpleRecyclerView view = new SimpleRecyclerView(context);
+    view.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, orientation);
+    return view;
   }
 }

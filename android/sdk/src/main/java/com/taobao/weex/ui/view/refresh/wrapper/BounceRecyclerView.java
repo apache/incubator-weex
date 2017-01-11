@@ -215,6 +215,7 @@ import android.view.ViewParent;
 
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.list.ListComponentView;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -223,7 +224,7 @@ import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
 import java.util.Stack;
 
-public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements WXGestureObservable {
+public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements ListComponentView,WXGestureObservable {
 
   private RecyclerViewBaseAdapter adapter = null;
   private Stack<View> headerViewStack = new Stack<>();
@@ -243,11 +244,15 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     super(context, attrs, OrientationHelper.VERTICAL);
   }
 
-  public void setAdapter(RecyclerViewBaseAdapter adapter) {
+  public void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter) {
     this.adapter = adapter;
     if (getInnerView() != null) {
       getInnerView().setAdapter(adapter);
     }
+  }
+
+  public RecyclerViewBaseAdapter getRecyclerViewBaseAdapter() {
+    return adapter;
   }
 
   @Override
@@ -258,11 +263,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     }
     return result;
   }
-
-  public RecyclerViewBaseAdapter getAdapter() {
-    return adapter;
-  }
-
+    
   @Override
   public WXRecyclerView setInnerView(Context context) {
     WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
