@@ -224,6 +224,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -234,6 +235,7 @@ import static org.junit.Assert.*;
  * Created by sospartan on 7/20/16.
  */
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 @PrepareForTest({})
 public class WXSDKEngineTest {
 
