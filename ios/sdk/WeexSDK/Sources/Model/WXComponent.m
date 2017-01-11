@@ -430,10 +430,10 @@
     WXAssertMainThread();
 }
 
-- (void)readyToShow
+- (void)readyToRender
 {
     if (self.weexInstance.trackComponent) {
-        [self.supercomponent readyToShow];
+        [self.supercomponent readyToRender];
     }
 }
 
