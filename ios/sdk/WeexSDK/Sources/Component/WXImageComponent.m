@@ -214,7 +214,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         [self cancelImage];
        
         void(^downloadFailed)(NSString *, NSError *) = ^void(NSString *url, NSError *error) {
-            weakSelf.imageDownloadFinish = YES;  
+            weakSelf.imageDownloadFinish = YES;
             WXLogError(@"Error downloading image:%@, detail:%@", url, [error localizedDescription]);
         };
         
