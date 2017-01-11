@@ -15,44 +15,7 @@
 #import "WXSDKInstance.h"
 #import "WXComponent+PseudoClassManagement.h"
 
-@interface WXTextAreaView : UITextView
-@property (nonatomic, assign) UIEdgeInsets border;
-@property (nonatomic, assign) UIEdgeInsets padding;
-@end
-
-@implementation WXTextAreaView
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _padding = UIEdgeInsetsZero;
-        _border = UIEdgeInsetsZero;
-    }
-    return self;
-}
-
-- (CGRect)textRectForBounds:(CGRect)bounds
-{
-    bounds.size.width -= self.padding.left + self.border.left;
-    bounds.origin.x += self.padding.left + self.border.left;
-    
-    bounds.size.height -= self.padding.top + self.border.top;
-    bounds.origin.y += self.padding.top + self.border.top;
-    
-    bounds.size.width -= self.padding.right + self.border.right;
-    
-    bounds.size.height -= self.padding.bottom + self.border.bottom;
-    
-    return bounds;
-}
-
-- (CGRect)editingRectForBounds:(CGRect)bounds
-{
-    return [self textRectForBounds:bounds];
-}
-
-@end
+typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
 @property (nonatomic, strong) WXTextAreaView *textView;
@@ -67,6 +30,7 @@
 @property (nonatomic, strong)NSString *textValue;
 @property (nonatomic) NSUInteger rows;
 //style
+
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
 @property (nonatomic) CGFloat fontWeight;
@@ -103,6 +67,8 @@ WX_EXPORT_METHOD(@selector(blur))
         _blurEvent = NO;
         _changeEvent = NO;
         _clickEvent = NO;
+        _padding = UIEdgeInsetsZero;
+        _border = UIEdgeInsetsZero;
         
         if (attributes[@"autofocus"]) {
             _autofocus = [attributes[@"autofocus"] boolValue];
@@ -185,7 +151,7 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 - (UIView *)loadView
 {
-    return [[WXTextAreaView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    return [[WXTextAreaView alloc] init];
 }
 - (void)viewDidLoad
 {
@@ -227,30 +193,18 @@ WX_EXPORT_METHOD(@selector(blur))
     [self handlePseudoClass];
 }
 
--(void)focus
+- (void)focus
 {
     if (self.textView) {
         [self.textView becomeFirstResponder];
     }
 }
 
--(void)blur
+- (void)blur
 {
     if (self.textView) {
         [self.textView resignFirstResponder];
     }
-}
-
-- (void)setPadding:(UIEdgeInsets)padding
-{
-    _padding = padding;
-    [_textView setPadding:padding];
-}
-
-- (void)setBorder:(UIEdgeInsets)border
-{
-    _border = border;
-    [_textView setBorder:border];
 }
 
 #pragma mark - add-remove Event
@@ -354,21 +308,8 @@ WX_EXPORT_METHOD(@selector(blur))
     [self updatePattern];
 }
 
--(void)updatePattern
-{
-    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-    if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-        [self setPadding:padding];
-    }
-    
-    UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-    if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-        [self setBorder:border];
-    }
-}
-
 #pragma mark update touch styles
--(void)handlePseudoClass
+- (void)handlePseudoClass
 {
     NSMutableDictionary *styles = [NSMutableDictionary new];
     NSMutableDictionary *recordStyles = [NSMutableDictionary new];
@@ -474,7 +415,7 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
-#pragma mark - set properties
+#pragma mark - private method
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
@@ -496,6 +437,39 @@ WX_EXPORT_METHOD(@selector(blur))
     newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
+}
+
+- (void)updatePattern
+{
+    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
+    if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
+        [self setPadding:padding];
+    }
+    
+    UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
+    if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
+        [self setBorder:border];
+    }
+}
+
+- (void)setPadding:(UIEdgeInsets)padding
+{
+    _padding = padding;
+    [self _updateTextContentInset];
+}
+
+- (void)setBorder:(UIEdgeInsets)border
+{
+    _border = border;
+    [self _updateTextContentInset];
+}
+
+- (void)_updateTextContentInset
+{
+    [_textView setTextContainerInset:UIEdgeInsetsMake(_padding.top + _border.top,
+                                                      _padding.left + _border.left,
+                                                      _padding.bottom + _border.bottom,
+                                                      _border.right + _border.right)];
 }
 
 - (void)setAutofocus
