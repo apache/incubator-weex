@@ -287,6 +287,12 @@ public class WXEnvironment {
     configs.put(WXConfig.sysModel, SYS_MODEL);
     configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
     configs.put(WXConfig.logLevel,sLogLevel.getName());
+    try {
+      options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+    }catch (NullPointerException e){
+      //There is little chance of NullPointerException as sApplication may be null.
+      WXLogUtils.e("WXEnvironment scale Exception: ", e);
+    }
     configs.putAll(options);
     if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
        configs.put(WXConfig.appName, sApplication.getPackageName());
