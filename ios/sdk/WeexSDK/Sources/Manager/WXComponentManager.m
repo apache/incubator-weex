@@ -374,6 +374,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
     [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     [self _addUITask:^{
+        [component readyToShow];
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
     }];
 }
@@ -388,6 +389,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     [component _updateAttributesOnComponentThread:attributes];
     [self _addUITask:^{
+        [component readyToShow];
         [component _updateAttributesOnMainThread:attributes];
     }];
 }

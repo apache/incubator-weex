@@ -406,6 +406,8 @@ do {\
         pthread_mutex_unlock(&_textStorageMutex);
     }
     
+    [self readyToShow]; // notify super component
+    
     return textStorage;
 }
 
