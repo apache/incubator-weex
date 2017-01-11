@@ -273,6 +273,21 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         [component removeFromSuperview];
     }];
+    
+    [self _checkFixedSubcomponentToRemove:component];
+}
+
+- (void)_checkFixedSubcomponentToRemove:(WXComponent *)component
+{
+    for (WXComponent *subcomponent in component.subcomponents) {
+        if (subcomponent->_positionType == WXPositionTypeFixed) {
+             [self _addUITask:^{
+                 [subcomponent removeFromSuperview];
+             }];
+        }
+        
+        [self _checkFixedSubcomponentToRemove:subcomponent];
+    }
 }
 
 - (WXComponent *)componentForRef:(NSString *)ref
@@ -301,7 +316,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *styles = data[@"style"];
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
-    
+        
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -338,6 +353,16 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
+    [self handleStyles:styles forComponent:ref isUpdateStyles:YES];
+}
+
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref
+{
+    [self handleStyles:styles forComponent:ref isUpdateStyles:NO];
+}
+
+- (void)handleStyles:(NSDictionary *)styles forComponent:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles
+{
     WXAssertParam(styles);
     WXAssertParam(ref);
     
@@ -347,9 +372,10 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSMutableDictionary *normalStyles = [NSMutableDictionary new];
     NSMutableArray *resetStyles = [NSMutableArray new];
     [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
-    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
+    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
+        [component readyToRender];
     }];
 }
 
@@ -364,6 +390,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [component _updateAttributesOnComponentThread:attributes];
     [self _addUITask:^{
         [component _updateAttributesOnMainThread:attributes];
+        [component readyToRender];
     }];
 }
 
@@ -417,33 +444,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [self _addUITask:^{
         [scrollerComponent scrollToComponent:toComponent withOffset:offset];
     }];
-}
-
-- (void)dispatchComponentMethod:(WXBridgeMethod *)method
-{
-    if (!method) {
-        return;
-    }
-    Class componentClazz = [WXComponentFactory classWithComponentName:method.targets[@"component"]];
-    if (!componentClazz) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist！", method.module];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return;
-    }
-    WXPerformBlockOnComponentThread(^{
-        WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
-        WXComponent *componentInstance = [weexInstance componentForRef:method.targets[@"ref"]];
-        
-        [self _executeComponentMethod:componentInstance withMethod:method];
-    });
-}
-
-- (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
-{
-    NSInvocation * invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:target method:method];
-    WXPerformBlockOnMainThread(^{
-        [invocation invoke];
-    });
 }
 
 #pragma mark Life Cycle

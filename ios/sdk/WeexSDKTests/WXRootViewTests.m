@@ -41,7 +41,7 @@
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSString *path = [bundle pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    [WXSDKEngine initSDKEnviroment:script];
+    [WXSDKEngine initSDKEnvironment:script];
     [WXLog setLogLevel:WXLogLevelDebug];
     
     NSString *jsPath = [bundle pathForResource:@"testRootView" ofType:@"js"];
@@ -122,7 +122,7 @@
         [expectation4 fulfill];
     };
     
-    [self waitForExpectationsWithTimeout:5.0 handler:^(NSError *error) {
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *error) {
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }

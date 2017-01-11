@@ -10,7 +10,7 @@
 
 
 bool WXIsDoubleApproximate(double x, double y) {
-    return fabs(x - y) < 0.0001;
+    return fabs(x - y) < 0.001;
 }
 
 bool WXTransform3DApproximateToTransform(CATransform3D a,CATransform3D b)

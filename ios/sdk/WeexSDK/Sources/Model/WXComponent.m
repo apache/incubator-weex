@@ -8,6 +8,7 @@
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -24,6 +25,7 @@
 #import "WXTransform.h"
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
+#import "WXComponent+PseudoClassManagement.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -66,7 +68,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
-        _styles = styles ? [NSMutableDictionary dictionaryWithDictionary:styles] : [NSMutableDictionary dictionary];
+        _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
         _subcomponents = [NSMutableArray array];
@@ -121,6 +123,16 @@
     pthread_mutex_unlock(&_propertyMutex);
     
     return styles;
+}
+
+- (NSDictionary *)pseudoClassStyles
+{
+    NSDictionary *pseudoClassStyles;
+    pthread_mutex_lock(&_propertyMutex);
+    pseudoClassStyles = _pseudoClassStyles;
+    pthread_mutex_unlock(&_propertyMutex);
+    
+    return pseudoClassStyles;
 }
 
 - (NSString *)type
@@ -190,8 +202,12 @@
             _view.backgroundColor = _backgroundColor;
         }
         
+        if (_backgroundImage) {
+            [self setGradientLayer];
+        }
+        
         if (_transform) {
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            _layer.transform = [[[WXTransform alloc] initWithInstance:self.weexInstance] getTransform:_transform withView:_view withOrigin:_transformOrigin];
         }
         
         _view.wx_component = self;
@@ -199,6 +215,7 @@
         _layer.wx_component = self;
         
         [self _initEvents:self.events];
+        [self _initPseudoEvents:_isListenPseudoTouch];
         
         if (_positionType == WXPositionTypeSticky) {
             [self.ancestorScroller addStickyComponent:self];
@@ -356,11 +373,13 @@
 
 #pragma mark Updating
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    pthread_mutex_lock(&_propertyMutex);
-    [_styles addEntriesFromDictionary:styles];
-    pthread_mutex_unlock(&_propertyMutex);
+    if (isUpdateStyles) {
+        pthread_mutex_lock(&_propertyMutex);
+        [_styles addEntriesFromDictionary:styles];
+        pthread_mutex_unlock(&_propertyMutex);
+    }
     [self _updateCSSNodeStyles:styles];
     [self _resetCSSNodeStyles:resetStyles];
 }
@@ -389,7 +408,6 @@
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
 {
     WXAssertMainThread();
-    
     [self _updateViewStyles:styles];
     [self _resetStyles:resetStyles];
     [self _handleBorders:styles isUpdating:YES];
@@ -410,6 +428,13 @@
 - (void)updateStyles:(NSDictionary *)styles
 {
     WXAssertMainThread();
+}
+
+- (void)readyToRender
+{
+    if (self.weexInstance.trackComponent) {
+        [self.supercomponent readyToRender];
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

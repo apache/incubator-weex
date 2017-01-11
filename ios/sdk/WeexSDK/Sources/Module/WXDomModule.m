@@ -168,21 +168,20 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
-    
     [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
         NSMutableDictionary * callbackRsp = [[NSMutableDictionary alloc] init];
         UIView *rootView = manager.weexInstance.rootView;
-        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView.superview.superview];
-        CGFloat resize = WXScreenResizeRadio();
+        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
+        CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         if ([ref isEqualToString:@"viewport"]) {
             [callbackRsp setObject:@(true) forKey:@"result"];
             [callbackRsp setObject:@{
-                                     @"width":@(rootRect.size.width/resize),
-                                     @"height":@(rootRect.size.height/resize),
-                                     @"bottom":@(CGRectGetMaxY(rootRect)/WXScreenResizeRadio()),
-                                     @"left":@(rootRect.origin.x/resize),
-                                     @"right":@(CGRectGetMaxX(rootRect)/resize),
-                                     @"top":@(rootRect.origin.y/resize)
+                                     @"width":@(rootRect.size.width / scaleFactor),
+                                     @"height":@(rootRect.size.height / scaleFactor),
+                                     @"bottom":@(CGRectGetMaxY(rootRect) / scaleFactor),
+                                     @"left":@(rootRect.origin.x / scaleFactor),
+                                     @"right":@(CGRectGetMaxX(rootRect) / scaleFactor),
+                                     @"top":@(rootRect.origin.y / scaleFactor)
                                      } forKey:@"size"];
             callback(callbackRsp, false);
         }else {
@@ -192,15 +191,15 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                     [callbackRsp setObject:@(false) forKey:@"result"];
                     [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
                 } else {
-                    CGRect componentRect = [component.view.superview convertRect:component.calculatedFrame toView:rootView.superview.superview];
+                    CGRect componentRect = [component.view.superview convertRect:component.calculatedFrame toView:rootView];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                     [callbackRsp setObject:@{
-                                             @"width":@(componentRect.size.width /resize),
-                                             @"height":@(componentRect.size.height / resize),
-                                             @"bottom":@(CGRectGetMaxY(componentRect) / resize),
-                                             @"left":@(componentRect.origin.x / resize),
-                                             @"right":@(CGRectGetMaxX(componentRect) / resize),
-                                             @"top":@(componentRect.origin.y / resize)
+                                             @"width":@(componentRect.size.width / scaleFactor),
+                                             @"height":@(componentRect.size.height / scaleFactor),
+                                             @"bottom":@(CGRectGetMaxY(componentRect) / scaleFactor),
+                                             @"left":@(componentRect.origin.x / scaleFactor),
+                                             @"right":@(CGRectGetMaxX(componentRect) / scaleFactor),
+                                             @"top":@(componentRect.origin.y / scaleFactor)
                                              } forKey:@"size"];
                 }
                 callback(callbackRsp, false);
