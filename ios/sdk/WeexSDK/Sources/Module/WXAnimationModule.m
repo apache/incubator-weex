@@ -99,7 +99,6 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
     [CATransaction setCompletionBlock:^{
         if (isUsingCAAnimation) {
-            CGAffineTransform originTransform = CATransform3DGetAffineTransform(layer.transform);
             layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(CGAffineTransformIdentity, rotateAngle));
         }
         if (callback) {
