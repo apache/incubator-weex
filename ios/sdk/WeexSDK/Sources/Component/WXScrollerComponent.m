@@ -333,7 +333,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (BOOL)isNeedLoadMore
 {
-    if (_loadMoreOffset >= 0.0) {
+    if (_loadMoreOffset >= 0.0 && ((UIScrollView *)self.view).contentOffset.y >= 0) {
         return _previousLoadMoreContentHeight != ((UIScrollView *)self.view).contentSize.height && ((UIScrollView *)self.view).contentSize.height - ((UIScrollView *)self.view).contentOffset.y -  self.view.frame.size.height <= _loadMoreOffset;
     }
     
