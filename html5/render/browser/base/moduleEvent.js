@@ -1,8 +1,8 @@
 
 /**
- * save the original listener's callbackId for 'addEventListener'.
+ * save the original listener for 'addEventListener'.
  * this is the dipaching listener which is waiting for feed.
- * map structure: moduleName -> eventName -> { ids: [], handler: func }.
+ * map structure: moduleName -> eventName -> [handlers].
  */
 const handlerMap = {}
 
