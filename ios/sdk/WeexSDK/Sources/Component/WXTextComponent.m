@@ -423,6 +423,7 @@ do {\
             if (_isUsingTextStorageLock) {
                 pthread_mutex_unlock(&_textStorageMutex);
             }
+            [self readyToShow]; // notify super component
             [self setNeedsDisplay];
         }
     }];
