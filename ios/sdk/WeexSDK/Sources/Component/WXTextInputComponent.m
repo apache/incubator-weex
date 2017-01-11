@@ -145,14 +145,6 @@ WX_EXPORT_METHOD(@selector(blur))
         }else {
             _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
         }
-        UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-            [self setPadding:padding];
-        }
-        UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-            [self setBorder:border];
-        }
     }
     
     return self;
@@ -184,6 +176,7 @@ WX_EXPORT_METHOD(@selector(blur))
     [_inputView setTextColor:_colorForStyle];
     [_inputView setText:_value];
     [_inputView setEnabled:!_disabled];
+    [self updatePattern];
     
     UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeKeyboard)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -319,7 +312,12 @@ WX_EXPORT_METHOD(@selector(blur))
         _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
     }
     [self setPlaceholderAttributedString];
+    [self updatePattern];
     
+}
+
+-(void)updatePattern
+{
     UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         [self setPadding:padding];
