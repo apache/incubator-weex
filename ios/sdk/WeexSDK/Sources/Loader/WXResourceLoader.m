@@ -135,7 +135,7 @@
 
 - (void)request:(WXResourceRequest *)request didReceiveData:(NSData *)data
 {
-    WXLogDebug(@"request:%@ didReceiveDataLength:%ld", request, data.length);
+    WXLogDebug(@"request:%@ didReceiveDataLength:%ld", request, (unsigned long)data.length);
     
     if (!_data) {
         _data = [NSMutableData new];

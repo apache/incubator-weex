@@ -25,6 +25,7 @@
 #import "WXResourceRequest.h"
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
+#import "WXSDKEngine.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -78,7 +79,7 @@ typedef enum : NSUInteger {
         _styleConfigs = [NSMutableDictionary new];
         _attrConfigs = [NSMutableDictionary new];
         _moduleEventObservers = [WXThreadSafeMutableDictionary new];
-        _trackCompoent = NO;
+        _trackComponent = NO;
        
         [self addObservers];
     }
@@ -172,6 +173,9 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
+    
+    // ensure default modules/components/handlers are ready before create instance
+    [WXSDKEngine registerDefaults];
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
@@ -307,7 +311,7 @@ typedef enum : NSUInteger {
     [data setObject:[NSString stringWithFormat:@"%ld",(long)state] forKey:@"state"];
     //[[WXSDKManager bridgeMgr] updateState:self.instanceId data:data];
     
-    [[NSNotificationCenter defaultCenter]postNotificationName:WX_INSTANCE_NOTIFICATION_UPDATE_STATE object:self userInfo:data];
+    [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_NOTIFICATION_UPDATE_STATE object:self userInfo:data];
 }
 
 - (id)moduleForClass:(Class)moduleClass
@@ -395,11 +399,37 @@ typedef enum : NSUInteger {
 
 #pragma mark Private Methods
 
+- (void)_addModuleEventObserversWithModuleMethod:(WXModuleMethod *)method
+{
+    if ([method.arguments count] < 2) {
+        WXLogError(@"please check your method parameter!!");
+        return;
+    }
+    if(![method.arguments[0] isKindOfClass:[NSString class]]) {
+        // arguments[0] will be event name, so it must be a string type value here.
+        return;
+    }
+    NSMutableArray * methodArguments = [method.arguments mutableCopy];
+    if ([methodArguments count] == 2) {
+        [methodArguments addObject:@{@"once": @false}];
+    }
+    if (![methodArguments[2] isKindOfClass:[NSDictionary class]]) {
+        //arguments[2] is the option value, so it must be a dictionary.
+        return;
+    }
+    Class moduleClass =  [WXModuleFactory classWithModuleName:method.moduleName];
+    NSMutableDictionary * option = [methodArguments[3] mutableCopy];
+    [option setObject:method.moduleName forKey:@"moduleName"];
+    // the value for moduleName in option is for the need of callback
+    [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:option moduleClassName:NSStringFromClass(moduleClass)];
+}
+
 - (void)addModuleEventObservers:(NSString*)event callback:(NSString*)callbackId option:(NSDictionary *)option moduleClassName:(NSString*)moduleClassName
 {
     BOOL once = [[option objectForKey:@"once"] boolValue];
+    NSString * moduleName = [option objectForKey:@"moduleName"];
     NSMutableDictionary * observer = nil;
-    NSDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once)};
+    NSDictionary * callbackInfo = @{@"callbackId":callbackId,@"once":@(once),@"moduleName":moduleName};
     if(![self checkModuleEventRegistered:event moduleClassName:moduleClassName]) {
         //had not registered yet
         observer = [NSMutableDictionary new];
@@ -409,6 +439,15 @@ typedef enum : NSUInteger {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];
     }
+}
+
+- (void)_removeModuleEventObserverWithModuleMethod:(WXModuleMethod *)method
+{
+    if (![method.arguments count] && [method.arguments[0] isKindOfClass:[NSString class]]) {
+        return;
+    }
+    Class moduleClass =  [WXModuleFactory classWithModuleName:method.moduleName];
+    [self removeModuleEventObserver:method.arguments[0] moduleClassName:NSStringFromClass(moduleClass)];
 }
 
 - (void)removeModuleEventObserver:(NSString*)event moduleClassName:(NSString*)moduleClassName
@@ -432,7 +471,10 @@ typedef enum : NSUInteger {
         NSDictionary * callbackInfo = listeners[i];
         NSString *callbackId = callbackInfo[@"callbackId"];
         BOOL once = [callbackInfo[@"once"] boolValue];
-        [[WXSDKManager bridgeMgr] callBack:self.instanceId funcId:callbackId params:userInfo[@"param"] keepAlive:!once];
+        NSDictionary * retData = @{@"type":userInfo[@"eventName"],
+                                   @"module":callbackInfo[@"moduleName"],
+                                   @"data":userInfo[@"param"]};
+        [[WXSDKManager bridgeMgr] callBack:self.instanceId funcId:callbackId params:retData keepAlive:!once];
         // if callback function is not once, then it is keepalive
         if (once) {
             NSMutableArray * moduleEventListener = [_moduleEventObservers[userInfo[@"moduleId"]] objectForKey:userInfo[@"eventName"]];

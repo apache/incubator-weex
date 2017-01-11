@@ -273,6 +273,21 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         [component removeFromSuperview];
     }];
+    
+    [self _checkFixedSubcomponentToRemove:component];
+}
+
+- (void)_checkFixedSubcomponentToRemove:(WXComponent *)component
+{
+    for (WXComponent *subcomponent in component.subcomponents) {
+        if (subcomponent->_positionType == WXPositionTypeFixed) {
+             [self _addUITask:^{
+                 [subcomponent removeFromSuperview];
+             }];
+        }
+        
+        [self _checkFixedSubcomponentToRemove:subcomponent];
+    }
 }
 
 - (WXComponent *)componentForRef:(NSString *)ref
@@ -360,6 +375,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
+        [component readyToRender];
     }];
 }
 
@@ -374,6 +390,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [component _updateAttributesOnComponentThread:attributes];
     [self _addUITask:^{
         [component _updateAttributesOnMainThread:attributes];
+        [component readyToRender];
     }];
 }
 

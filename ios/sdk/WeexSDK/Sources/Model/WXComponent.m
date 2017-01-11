@@ -430,9 +430,11 @@
     WXAssertMainThread();
 }
 
-- (void)renderFinish
+- (void)readyToRender
 {
-    [self.supercomponent renderFinish];
+    if (self.weexInstance.trackComponent) {
+        [self.supercomponent readyToRender];
+    }
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

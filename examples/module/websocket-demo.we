@@ -57,7 +57,7 @@
     require('weex-components');
     var navigator = require('@weex-module/navigator');
     var modal = require('@weex-module/modal');
-    var websocket = require('@weex-module/WebSocket');
+    var websocket = require('@weex-module/webSocket');
     module.exports = {
         data: {
             connectinfo: '',

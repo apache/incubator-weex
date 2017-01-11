@@ -148,7 +148,7 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  * track component render
  */
-@property (nonatomic, assign)BOOL trackCompoent;
+@property (nonatomic, assign)BOOL trackComponent;
 /**
  * Renders weex view with bundle url.
  *
