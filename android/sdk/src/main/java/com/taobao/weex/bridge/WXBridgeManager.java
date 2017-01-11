@@ -295,7 +295,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public static final String MODULE = "module";
   public static final String METHOD = "method";
   public static final String ARGS = "args";
-  private static final String UNDEFINED = "-1";
+  private static final String NON_CALLBACK = "-1";
+  private static final String UNDEFINED = "undefined";
+
   private static final int INIT_FRAMEWORK_OK = 1;
 
   private static long LOW_MEM_VALUE = 80;
@@ -579,7 +581,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       }
     }
 
-    if (UNDEFINED.equals(callback)) {
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick
@@ -612,7 +614,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       domModule.addElement(ref, domObject, Integer.parseInt(index));
     }
 
-    if (UNDEFINED.equals(callback)) {
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
     // get next tick

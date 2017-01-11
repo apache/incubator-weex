@@ -145,6 +145,8 @@ import com.taobao.weex.dom.WXListDomObject;
 import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
+import com.taobao.weex.ui.component.list.SimpleListComponent;
+import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -176,7 +178,6 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXMetaModule;
-import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
@@ -345,6 +346,7 @@ public class WXSDKEngine {
         true,
         WXBasicComponentType.SLIDER_NEIGHBOR
       );
+      registerComponent(SimpleListComponent.class,false,"simplelist");
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
