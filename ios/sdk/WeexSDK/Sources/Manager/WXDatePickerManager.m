@@ -63,72 +63,16 @@
         [self.datePickerView addSubview:datePicker];
         [self.datePickerView addSubview:toolBar];
         [self.backgroudView addSubview:self.datePickerView];
-        
     }
     return self;
 }
 
--(void)configDatePicker:(NSDictionary *)attributes
+- (void)updateDatePicker:(NSDictionary *)attributes
 {
     NSString *type = [WXConvert NSString:attributes[@"type"]];
     if(type)
     {
         _type = type;
-        if( [type isEqualToString:@"date"])
-        {
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
-            NSString *value = [WXConvert NSString:attributes[@"value"]];
-            if(value)
-            {
-                NSDate *date = [WXUtility dateStringToDate:value];
-                if(date)
-                {
-                    self.datePicker.date =date;
-                }
-            }
-            NSString *max = [WXConvert NSString:attributes[@"max"]];
-            if(max)
-            {
-                NSDate *date = [WXUtility dateStringToDate:max];
-                if(date)
-                {
-                    self.datePicker.maximumDate =date;
-                }
-            }
-            NSString *min = [WXConvert NSString:attributes[@"min"]];
-            if(min)
-            {
-                NSDate *date = [WXUtility dateStringToDate:min];
-                if(date)
-                {
-                    self.datePicker.minimumDate =date;
-                }
-            }
-        }else if([type isEqualToString:@"time"])
-        {
-            self.datePicker.datePickerMode = UIDatePickerModeTime;
-            NSString *value = [WXConvert NSString:attributes[@"value"]];
-            if(value)
-            {
-                NSDate *date = [WXUtility timeStringToDate:value];
-                if(date)
-                {
-                    self.datePicker.date = date;
-                }
-            }
-        }
-    }
-}
-
--(void)updateDatePicker:(NSDictionary *)attributes
-{
-    NSString *type = [WXConvert NSString:attributes[@"type"]];
-    if(type)
-    {
-        _type = type;
-    }
-    if(_type)
-    {
         if( [_type isEqualToString:@"date"])
         {
             self.datePicker.datePickerMode = UIDatePickerModeDate;

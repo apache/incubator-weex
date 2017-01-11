@@ -7,10 +7,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "WXBridgeMethod.h"
+#import "WXModuleProtocol.h"
+#import "SRWebSocket.h"
 
-@interface WXModuleManager : NSObject
-
-- (void)dispatchMethod:(WXBridgeMethod *)method;
+@interface WXWebSocketModule : NSObject <WXModuleProtocol>
 
 @end
