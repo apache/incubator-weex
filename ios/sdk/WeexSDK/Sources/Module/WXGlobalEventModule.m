@@ -73,6 +73,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_eventCallback removeAllObjects];
 }
 
 @end

@@ -110,8 +110,8 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.common.WXModuleAnno;
 
 import java.util.Map;
 
@@ -121,7 +121,7 @@ import java.util.Map;
 public class WXGlobalEventModule extends WXModule {
 
 
-  @WXModuleAnno(runOnUIThread = false)
+  @JSMethod
   public void addEventListener(String eventName, String callback) {
     mWXSDKInstance.addEventListener(eventName,callback);
   }
@@ -130,7 +130,7 @@ public class WXGlobalEventModule extends WXModule {
     mWXSDKInstance.removeEventListener(eventName,callback);
   }
 
-  @WXModuleAnno(runOnUIThread = false)
+  @JSMethod
   public void removeEventListener(String eventName){
     mWXSDKInstance.removeEventListener(eventName);
   }

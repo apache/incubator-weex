@@ -229,6 +229,8 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private long intervalTime = 3 * 1000;
   private WXSmoothScroller mScroller;
   private boolean needLoop = true;
+  private boolean scrollable = true;
+  private int mState = ViewPager.SCROLL_STATE_IDLE;
 
   private Runnable scrollAction = new Runnable() {
     @Override
@@ -263,6 +265,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
 
       @Override
       public void onPageScrollStateChanged(int state) {
+        mState = state;
         WXCirclePageAdapter adapter = getCirclePageAdapter();
         int currentItemInternal = WXCircleViewPager.super.getCurrentItem();
         if (needLoop && state == ViewPager.SCROLL_STATE_IDLE && adapter.getCount() > 1) {
@@ -312,13 +315,27 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     return getRealCurrentItem();
   }
 
+  public int superGetCurrentItem() {
+    return super.getCurrentItem();
+  }
+
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
+    if(!scrollable) {
+      return true;
+    }
     boolean result = super.onTouchEvent(ev);
     if (wxGesture != null) {
       result |= wxGesture.onTouch(this, ev);
     }
     return result;
+  }
+
+  @Override
+  public void scrollTo(int x, int y) {
+    if(scrollable || mState != ViewPager.SCROLL_STATE_DRAGGING) {
+      super.scrollTo(x, y);
+    }
   }
 
   /**
@@ -449,5 +466,13 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
       }
     }
+  }
+
+  public boolean isScrollable() {
+    return scrollable;
+  }
+
+  public void setScrollable(boolean scrollable) {
+    this.scrollable = scrollable;
   }
 }

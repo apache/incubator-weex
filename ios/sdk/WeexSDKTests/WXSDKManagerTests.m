@@ -37,10 +37,6 @@
     XCTAssertNotNil(bridgeMgr);
     XCTAssertTrue([bridgeMgr isKindOfClass:NSClassFromString(@"WXBridgeManager")]);
     
-    id moduleMgr = [WXSDKManager moduleMgr];
-    XCTAssertNotNil(moduleMgr);
-    XCTAssertTrue([moduleMgr isKindOfClass:NSClassFromString(@"WXModuleManager")]);
-    
     [WXSDKManager storeInstance:[WXSDKInstance new] forID:@"0"];
     WXSDKInstance *instance0 = [WXSDKManager instanceForID:@"0"];
     XCTAssertNotNil(instance0);

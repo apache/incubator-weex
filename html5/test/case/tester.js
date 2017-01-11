@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai'
 const expect = chai.expect
 chai.use(sinonChai)
 
-import { createRuntime, createApp, getCode } from './prepare'
+import { createRuntime, createApp, getCode, CallbackManager } from './prepare'
 
 describe('test input and output', function () {
   let runtime
@@ -41,10 +41,12 @@ describe('test input and output', function () {
       const output = getCode('basic/' + name + '.output.js')
       const result = eval('(' + output + ')')
 
-      app.$create(source)
+      app.$create(source, new CallbackManager('foo'))
       expect(app.getRealRoot()).eql(result)
       app.$destroy()
     }
+
+    it('global Weex object', () => checkOutput(app, 'global-weex-object'))
 
     it('single case', () => checkOutput(app, 'foo'))
     it('foo2 case', () => checkOutput(app, 'foo2'))
@@ -106,17 +108,17 @@ describe('test input and output', function () {
 
       it('global variable 1', () => {
         const sourceCode = readSource('global-variable1')
-        expect(() => app.$create(sourceCode)).to.throw(ReferenceError)
+        expect(() => app.$create(sourceCode, new CallbackManager('foo'))).to.throw(ReferenceError)
       })
 
       it('global variable 2', () => {
         const sourceCode = readSource('global-variable2')
-        expect(() => app.$create(sourceCode)).to.throw(ReferenceError)
+        expect(() => app.$create(sourceCode, new CallbackManager('foo'))).to.throw(ReferenceError)
       })
 
       it('global variable 3', () => {
         const sourceCode = readSource('global-variable3')
-        expect(() => app.$create(sourceCode)).to.throw(ReferenceError)
+        expect(() => app.$create(sourceCode, new CallbackManager('foo'))).to.throw(ReferenceError)
       })
     })
   })
@@ -142,7 +144,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -164,7 +166,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       const actual = app.getRealRoot()
       expect(actual).eql(expected)
@@ -181,7 +183,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       app.$refresh({
         titlelist: [
           { text: 'Hello World2' },
@@ -199,7 +201,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       app.$refresh({ showTitle: false })
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
@@ -212,7 +214,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       app.$refresh({
         titlelist: [
           { showTitle: false, title: 'Hello World1' },
@@ -231,7 +233,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -245,7 +247,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -262,7 +264,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       expect(app.getRealRoot()).eql({ type: 'container' })
 
       app.$refresh({ ext: { showbar1: false }})
@@ -277,7 +279,7 @@ describe('test input and output', function () {
       const name = 'transformer2'
       const sourceCode = readSource(name)
 
-      const result = app.$create(sourceCode)
+      const result = app.$create(sourceCode, new CallbackManager('foo'))
       expect(result).to.be.an.instanceof(Error)
       app.$destroy()
     })
@@ -286,7 +288,7 @@ describe('test input and output', function () {
       const name = 'transformer3'
       const sourceCode = readSource(name)
 
-      const result = app.$create(sourceCode)
+      const result = app.$create(sourceCode, new CallbackManager('foo'))
       expect(result).to.be.an.instanceof(Error)
       app.$destroy()
     })
@@ -296,7 +298,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -349,8 +351,8 @@ describe('test input and output', function () {
       const expectedA = eval('(' + readOutput(nameA) + ')')
       const expectedB = eval('(' + readOutput(nameB) + ')')
 
-      appA.$create(sourceCodeA)
-      appB.$create(sourceCodeB)
+      appA.$create(sourceCodeA, new CallbackManager('foo'))
+      appB.$create(sourceCodeB, new CallbackManager('foo'))
 
       expect(appB.getRealRoot()).eql(expectedB)
 
@@ -369,11 +371,11 @@ describe('test input and output', function () {
       const expectedFine = eval('(' + readOutput(nameFine) + ')')
 
       // should throw
-      expect(() => { appA.$create(sourceCodeError) }).to.throw(TypeError)
+      expect(() => { appA.$create(sourceCodeError, new CallbackManager('foo')) }).to.throw(TypeError)
       appA.$destroy()
 
       // not throw
-      appB.$create(sourceCodeFine)
+      appB.$create(sourceCodeFine, new CallbackManager('foo'))
       expect(appB.getRealRoot()).eql(expectedFine)
 
       appB.$destroy()
@@ -414,7 +416,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -435,7 +437,7 @@ describe('test input and output', function () {
       const sourceCode = readSource(name)
       const outputCode = readOutput(name)
 
-      app.$create(sourceCode)
+      app.$create(sourceCode, new CallbackManager('foo'))
       const expected = eval('(' + outputCode + ')')
       expect(app.getRealRoot()).eql(expected)
 
@@ -457,7 +459,7 @@ describe('test input and output', function () {
       function run (calls) {
         callNativeSpy.reset()
         callNativeHandler = genCallNativeWrapper(calls)
-        app.$create(sourceCode)
+        app.$create(sourceCode, new CallbackManager('foo'))
         app.$destroy()
         expect(callNativeSpy.callCount).eql(calls + 2)
       }
@@ -476,7 +478,7 @@ describe('test input and output', function () {
       function run (calls) {
         callNativeSpy.reset()
         callNativeHandler = genCallNativeWrapper(calls)
-        app.$create(sourceCode)
+        app.$create(sourceCode, new CallbackManager('foo'))
         app.$destroy()
         expect(callNativeSpy.callCount).eql(calls + 2)
       }

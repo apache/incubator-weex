@@ -209,10 +209,9 @@ import android.util.Pair;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.BaseMethodInvoker;
 import com.taobao.weex.bridge.Invoker;
 import com.taobao.weex.bridge.MethodInvoker;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
@@ -340,7 +339,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
             }
             if (anno instanceof WXComponentProp) {
               String name = ((WXComponentProp) anno).name();
-              methods.put(name, new MethodInvoker(method));
+              methods.put(name, new MethodInvoker(method,true));
               break;
             }else if(anno instanceof JSMethod){
               JSMethod methodAnno = (JSMethod)anno;
@@ -348,7 +347,7 @@ public class SimpleComponentHolder implements IFComponentHolder{
               if(JSMethod.NOT_SET.equals(name)){
                 name = method.getName();
               }
-              mInvokers.put(name, new BaseMethodInvoker(method,methodAnno.uiThread()));
+              mInvokers.put(name, new MethodInvoker(method,methodAnno.uiThread()));
               break;
             }
           }
