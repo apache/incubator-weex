@@ -41,11 +41,7 @@
     WXAssert(moduleInstance, @"No instance found for module name:%@, class:%@", _moduleName, moduleClass);
     BOOL isSync = NO;
     SEL selector = [WXModuleFactory selectorWithModuleName:self.moduleName methodName:self.methodName isSync:&isSync];
-    if (!selector) {
-        NSString *errorMessage = [NSString stringWithFormat:@"method：%@ for module:%@ doesn't exist, maybe it has not been registered", self.methodName, _moduleName];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return nil;;
-    }
+   
     if (![moduleInstance respondsToSelector:selector]) {
         // if not implement the selector, then dispatch default module method
         if ([self.methodName isEqualToString:@"addEventListener"]) {
@@ -54,6 +50,12 @@
         if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
             [self.instance _removeModuleEventObserverWithModuleMethod:self];
         }
+        return nil;
+    }
+    
+    if (!selector) {
+        NSString *errorMessage = [NSString stringWithFormat:@"method：%@ for module:%@ doesn't exist, maybe it has not been registered", self.methodName, _moduleName];
+        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
         return nil;
     }
     
