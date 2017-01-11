@@ -11,7 +11,8 @@ machine:
     version: 'oraclejdk8'
 test:
   override:
-   # - npm run test
+    - npm run build
+    - npm run test
     - cd android/playground && ./gradlew assembleDebug :weex_sdk:testDebugUnitTest -PdisableCov=true -PtargetSDK=19 -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
