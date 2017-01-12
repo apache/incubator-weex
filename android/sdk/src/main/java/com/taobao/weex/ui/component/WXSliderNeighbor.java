@@ -398,14 +398,14 @@ public class WXSliderNeighbor extends WXSlider {
                 return;
             }
             //make sure View's width & height are measured.
-            currentPage.post(WXThread.secure(new Runnable() {
+            currentPage.postDelayed(WXThread.secure(new Runnable() {
                 @Override
                 public void run() {
                     //change left and right page's translation
                     updateNeighbor(currentPage, alpha, scale);
 
                 }
-            }));
+            }), 17);
 
             // make sure only display view current, left, right.
             int left = (curPos == 0) ? pageViews.size()-1 : curPos-1;
