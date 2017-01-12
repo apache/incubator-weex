@@ -278,7 +278,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private boolean scrollable = true;
   private ArrayMap<String, Long> mRefToViewType;
   private SparseArray<ArrayList<WXComponent>> mViewTypes;
-  protected BounceRecyclerView bounceRecyclerView;
   private WXRecyclerViewOnScrollListener mViewOnScrollListener = new WXRecyclerViewOnScrollListener(this);
 
   private static final int MAX_VIEWTYPE_ALLOW_CACHE = 9;
@@ -556,6 +555,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void scrollTo(WXComponent component, final int offset) {
+    T bounceRecyclerView = getHostView();
     if (bounceRecyclerView == null) {
       return;
     }
@@ -598,7 +598,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void onBeforeScroll(int dx, int dy) {
-    if (mStickyMap == null) {
+    T bounceRecyclerView = getHostView();
+    if (mStickyMap == null || bounceRecyclerView == null) {
       return;
     }
     HashMap<String, WXComponent> stickyMap = mStickyMap.get(getRef());
@@ -659,11 +660,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public int getScrollY() {
+    T bounceRecyclerView = getHostView();
     return bounceRecyclerView == null ? 0 : bounceRecyclerView.getInnerView().getScrollY();
   }
 
   @Override
   public int getScrollX() {
+    T bounceRecyclerView = getHostView();
     return bounceRecyclerView == null ? 0 : bounceRecyclerView.getInnerView().getScrollX();
   }
 
