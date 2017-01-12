@@ -222,6 +222,7 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -239,16 +240,17 @@ public class WXSliderNeighbor extends WXSlider {
     public static final String NEIGHBOR_SCALE = "neighborScale"; // the init scale of neighbor page
     public static final String NEIGHBOR_ALPHA = "neighborAlpha"; // the init alpha of neighbor page
     public static final String NEIGHBOR_SPACE = "neighborSpace"; // the init space of neighbor page
+    public static final String CURRENT_ITEM_SCALE = "currentItemScale"; // the scale of middle item
 
     private static final int DEFAULT_NEIGHBOR_SPACE = 25;
     private static final float DEFAULT_NEIGHBOR_SCALE = 0.8F;
     private static final float DEFAULT_NEIGHBOR_ALPHA = 0.6F;
+    private static final float DEFAULT_CURRENT_ITEM_SCALE = 0.9F;
 
     private float mNeighborScale = DEFAULT_NEIGHBOR_SCALE;
     private float mNeighborAlpha = DEFAULT_NEIGHBOR_ALPHA;
     private float mNeighborSpace = DEFAULT_NEIGHBOR_SPACE;
-
-    private static final float WX_DEFAULT_MAIN_NEIGHBOR_SCALE = 0.9f;
+    private float mCurrentItemScale = DEFAULT_CURRENT_ITEM_SCALE;
 
     private ZoomTransformer mCachedTransformer;
 
@@ -390,7 +392,7 @@ public class WXSliderNeighbor extends WXSlider {
 
         if(pageViews.size() > 0) {
             final View currentPage = pageViews.get(curPos);
-            updateScaleAndAlpha(((ViewGroup)currentPage).getChildAt(0),1.0F,WX_DEFAULT_MAIN_NEIGHBOR_SCALE);
+            updateScaleAndAlpha(((ViewGroup)currentPage).getChildAt(0), 1.0F, mCurrentItemScale);
 
             if(pageViews.size() < 2) {
                 return;
@@ -497,6 +499,23 @@ public class WXSliderNeighbor extends WXSlider {
         }
     }
 
+    @WXComponentProp(name = CURRENT_ITEM_SCALE)
+    @SuppressWarnings("unused")
+    public void setCurrentItemScale(String input) {
+        float currentItemScale = DEFAULT_CURRENT_ITEM_SCALE;
+        if (!TextUtils.isEmpty(input)) {
+            try {
+                currentItemScale = Float.parseFloat(input);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        if(this.mCurrentItemScale != currentItemScale) {
+            this.mCurrentItemScale = currentItemScale;
+            updateAdapterScaleAndAlpha(-1, -1);
+        }
+    }
+
     @Override
     protected boolean setProperty(String key, Object param) {
         String input;
@@ -519,6 +538,12 @@ public class WXSliderNeighbor extends WXSlider {
                     setNeighborSpace(input);
                 }
                 return true;
+            case CURRENT_ITEM_SCALE:
+                input = WXUtils.getString(param, null);
+                if (input != null) {
+                    setCurrentItemScale(input);
+                }
+                return true;
         }
         return super.setProperty(key, param);
     }
@@ -532,7 +557,7 @@ public class WXSliderNeighbor extends WXSlider {
         }
         View realView = ((ViewGroup)hostPage).getChildAt(0);
         float translation = (hostPage.getMeasuredWidth()-realView.getMeasuredWidth()*mNeighborScale)/4;
-        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth()*WX_DEFAULT_MAIN_NEIGHBOR_SCALE)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace))/2 ;
+        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth() * mCurrentItemScale)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace))/2 ;
         return translation;
     }
 
@@ -572,7 +597,7 @@ public class WXSliderNeighbor extends WXSlider {
 
             if (position >= -1 && position <= 1) {
                 float factor = Math.abs(Math.abs(position) - 1);
-                scale = mNeighborScale + factor * (WX_DEFAULT_MAIN_NEIGHBOR_SCALE- mNeighborScale);
+                scale = mNeighborScale + factor * (mCurrentItemScale - mNeighborScale);
                 alpha = (1- mNeighborAlpha) * factor + mNeighborAlpha;
 
                 float translation = calculateTranslation(page);
