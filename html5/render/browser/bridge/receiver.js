@@ -16,7 +16,7 @@ function callNativeComponent (instanceId, ref, method, args, options) {
 }
 
 // sync call native module api.
-function callNativeModule (instanceId, module, method, args) {
+function callNativeModule (instanceId, module, method, args, options) {
   return processCall(instanceId, { module, method, args })
 }
 
