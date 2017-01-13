@@ -5,6 +5,21 @@ import protocol from './protocol'
 import { isArray } from '../utils'
 import Sender from './sender'
 
+// sync call native component method.
+function callNativeComponent (instanceId, ref, method, args, options) {
+  return processCall(instanceId, {
+    component: options.component,
+    ref,
+    method,
+    args
+  })
+}
+
+// sync call native module api.
+function callNativeModule (instanceId, module, method, args) {
+  return processCall(instanceId, { module, method, args })
+}
+
 // callNative: jsFramework will call this method to talk to
 // this renderer.
 // params:
@@ -35,7 +50,7 @@ function callNative (instanceId, tasks, callbackId) {
 
 function processCall (instanceId, call) {
   const isComponent = typeof call.module === 'undefined'
-  isComponent ? componentCall(instanceId, call) : moduleCall(instanceId, call)
+  const res = isComponent ? componentCall(instanceId, call) : moduleCall(instanceId, call)
 
   const callbackId = call.callbackId
   if ((callbackId
@@ -45,6 +60,9 @@ function processCall (instanceId, call) {
     && callbackId !== -1) {
     performNextTick(instanceId, callbackId)
   }
+
+  // for sync call.
+  return res
 }
 
 function moduleCall (instanceId, call) {
@@ -60,7 +78,7 @@ function moduleCall (instanceId, call) {
     return
   }
 
-  method.apply(global.weex.getInstance(instanceId), args)
+  return method.apply(global.weex.getInstance(instanceId), args)
 }
 
 function componentCall (instanceId, call) {
@@ -80,7 +98,7 @@ function componentCall (instanceId, call) {
     return console.error(`[h5-render] component ${componentName} doesn't have a method named ${methodName}.`)
   }
 
-  method.apply(elem, args)
+  return method.apply(elem, args)
 }
 
 function performNextTick (instanceId, callbackId) {
@@ -99,6 +117,8 @@ function nativeLog () {
 
 function exportsBridgeMethodsToGlobal () {
   global.callNative = callNative
+  global.callNativeComponent = callNativeComponent
+  global.callNativeModule = callNativeModule
   global.nativeLog = nativeLog
 }
 
