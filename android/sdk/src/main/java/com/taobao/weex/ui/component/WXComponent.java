@@ -224,6 +224,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
+  private boolean mIsDestoryed = false;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -1290,6 +1291,12 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (mDomObj != null) {
       mDomObj = null;
     }
+
+    mIsDestoryed = true;
+  }
+
+  public boolean isDestoryed() {
+    return mIsDestoryed;
   }
 
   /**
