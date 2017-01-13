@@ -348,6 +348,28 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         }
     }
 
+    public void removeFooterView(WXComponent loading){
+        setLoadmoreEnable(false);
+        if(swipeLayout!=null){
+            if(swipeLayout.getFooterView()!=null){
+                swipeLayout.setLoadingHeight(0);
+                swipeLayout.getFooterView().removeView(loading.getHostView());
+                swipeLayout.finishPullLoad();
+            }
+        }
+    }
+    //TODO There are bugs, will be more than a rolling height
+    public void removeHeaderView(WXComponent refresh){
+        setRefreshEnable(false);
+        if(swipeLayout!=null){
+            if(swipeLayout.getHeaderView()!=null){
+                swipeLayout.setRefreshHeight(0);
+                swipeLayout.getHeaderView().removeView(refresh.getHostView());
+                swipeLayout.finishPullRefresh();
+            }
+        }
+    }
+
     public void setRefreshEnable(boolean enable) {
         if (swipeLayout != null)
             swipeLayout.setPullRefreshEnable(enable);

@@ -211,8 +211,8 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.common.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.view.IWebView;
@@ -225,6 +225,9 @@ import java.util.Map;
 
 public class WXWeb extends WXComponent {
 
+    public static final String GO_BACK = "goBack";
+    public static final String GO_FORWARD = "goForward";
+    public static final String RELOAD = "reload";
     protected IWebView mWebView;
 
     @Deprecated
@@ -234,10 +237,10 @@ public class WXWeb extends WXComponent {
 
     public WXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
         super(instance, dom, parent, isLazy);
-        createView();
+        createWebView();
     }
 
-    protected void  createView(){
+    protected void  createWebView(){
         mWebView = new WXWebView(getContext());
     }
 
@@ -255,7 +258,7 @@ public class WXWeb extends WXComponent {
                 if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("title", title);
-                    getInstance().fireEvent(getRef(), Constants.Event.RECEIVEDTITLE, params);
+                    fireEvent(Constants.Event.RECEIVEDTITLE, params);
                 }
             }
 
@@ -264,7 +267,7 @@ public class WXWeb extends WXComponent {
                 if ( getDomObject().getEvents().contains(Constants.Event.PAGESTART)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("url", url);
-                    getInstance().fireEvent(getRef(), Constants.Event.PAGESTART, params);
+                    fireEvent(Constants.Event.PAGESTART, params);
                 }
             }
 
@@ -275,7 +278,7 @@ public class WXWeb extends WXComponent {
                     params.put("url", url);
                     params.put("canGoBack", canGoBack);
                     params.put("canGoForward", canGoForward);
-                    getInstance().fireEvent(getRef(), Constants.Event.PAGEFINISH, params);
+                    fireEvent(Constants.Event.PAGEFINISH, params);
                 }
             }
         });
@@ -322,11 +325,11 @@ public class WXWeb extends WXComponent {
 
     public void setAction(String action) {
         if (!TextUtils.isEmpty(action)) {
-            if (action.equals("goBack")) {
+            if (action.equals(GO_BACK)) {
                 goBack();
-            } else if (action.equals("goForward")) {
+            } else if (action.equals(GO_FORWARD)) {
                 goForward();
-            } else if (action.equals("reload")) {
+            } else if (action.equals(RELOAD)) {
                 reload();
             }
         }
@@ -337,7 +340,7 @@ public class WXWeb extends WXComponent {
             Map<String, Object> params = new HashMap<>();
             params.put("type", type);
             params.put("errorMsg", message);
-            getInstance().fireEvent(getRef(), Constants.Event.ERROR, params);
+            fireEvent(Constants.Event.ERROR, params);
         }
     }
 
