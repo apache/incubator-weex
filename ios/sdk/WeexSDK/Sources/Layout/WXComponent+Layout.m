@@ -119,7 +119,8 @@
             strongSelf.view.frame = strongSelf.calculatedFrame;
             
             if (strongSelf->_transform) {
-                strongSelf.layer.transform = [[WXTransform new] getTransform:strongSelf->_transform withView:strongSelf.view withOrigin:strongSelf->_transformOrigin];
+                WXTransform *transform = [[WXTransform alloc] initWithInstance:strongSelf.weexInstance];
+                strongSelf.layer.transform = [transform getTransform:strongSelf->_transform withView:strongSelf.view withOrigin:strongSelf->_transformOrigin];
             }
             
             [strongSelf setNeedsDisplay];
@@ -199,22 +200,38 @@ do {\
     id value = styles[@#key];\
     if (value) {\
         typeof(_cssNode->style.cssProp) convertedValue = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
-        if([@"WXPixelType" isEqualToString:@#type] && isnan(convertedValue)) {\
-            WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
-        } else { \
-            _cssNode->style.cssProp = convertedValue;\
-            [self setNeedsLayout];\
-        } \
+        _cssNode->style.cssProp = convertedValue;\
+        [self setNeedsLayout];\
     }\
 } while(0);
 
-#define WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(key, cssProp, type) \
+#define WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp)\
 do {\
-    WX_STYLE_FILL_CSS_NODE(key, cssProp[CSS_TOP], type)\
-    WX_STYLE_FILL_CSS_NODE(key, cssProp[CSS_LEFT], type)\
-    WX_STYLE_FILL_CSS_NODE(key, cssProp[CSS_RIGHT], type)\
-    WX_STYLE_FILL_CSS_NODE(key, cssProp[CSS_BOTTOM], type)\
+    id value = styles[@#key];\
+    if (value) {\
+        CGFloat pixel = [self WXPixelType:value];\
+        if (isnan(pixel)) {\
+            WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
+        } else {\
+            _cssNode->style.cssProp = pixel;\
+            [self setNeedsLayout];\
+        }\
+    }\
 } while(0);
+
+#define WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(key, cssProp)\
+do {\
+    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_TOP])\
+    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_LEFT])\
+    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_RIGHT])\
+    WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp[CSS_BOTTOM])\
+} while(0);
+
+
+- (CGFloat)WXPixelType:(id)value
+{
+    return [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];
+}
 
 - (void)_fillCSSNode:(NSDictionary *)styles;
 {
@@ -228,39 +245,39 @@ do {\
     
     // position
     WX_STYLE_FILL_CSS_NODE(position, position_type, css_position_type_t)
-    WX_STYLE_FILL_CSS_NODE(top, position[CSS_TOP], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(left, position[CSS_LEFT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(right, position[CSS_RIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(bottom, position[CSS_BOTTOM], WXPixelType)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(top, position[CSS_TOP])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(left, position[CSS_LEFT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(right, position[CSS_RIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position[CSS_BOTTOM])
     
     // dimension
-    WX_STYLE_FILL_CSS_NODE(width, dimensions[CSS_WIDTH], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(height, dimensions[CSS_HEIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(minWidth, minDimensions[CSS_WIDTH], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(minHeight, minDimensions[CSS_HEIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(maxWidth, maxDimensions[CSS_WIDTH], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(maxHeight, maxDimensions[CSS_HEIGHT], WXPixelType)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(width, dimensions[CSS_WIDTH])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(height, dimensions[CSS_HEIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(minWidth, minDimensions[CSS_WIDTH])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(minHeight, minDimensions[CSS_HEIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(maxWidth, maxDimensions[CSS_WIDTH])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(maxHeight, maxDimensions[CSS_HEIGHT])
     
     // margin
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(margin, margin, WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(marginTop, margin[CSS_TOP], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(marginLeft, margin[CSS_LEFT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(marginRight, margin[CSS_RIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(marginBottom, margin[CSS_BOTTOM], WXPixelType)
+    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(margin, margin)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(marginTop, margin[CSS_TOP])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(marginLeft, margin[CSS_LEFT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(marginRight, margin[CSS_RIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(marginBottom, margin[CSS_BOTTOM])
     
     // border
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(borderWidth, border, WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(borderTopWidth, border[CSS_TOP], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(borderLeftWidth, border[CSS_LEFT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(borderRightWidth, border[CSS_RIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(borderBottomWidth, border[CSS_BOTTOM], WXPixelType)
+    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(borderWidth, border)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(borderTopWidth, border[CSS_TOP])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(borderLeftWidth, border[CSS_LEFT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(borderRightWidth, border[CSS_RIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(borderBottomWidth, border[CSS_BOTTOM])
     
     // padding
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(padding, padding, WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(paddingTop, padding[CSS_TOP], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(paddingLeft, padding[CSS_LEFT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(paddingRight, padding[CSS_RIGHT], WXPixelType)
-    WX_STYLE_FILL_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], WXPixelType)
+    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(padding, padding)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingTop, padding[CSS_TOP])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingLeft, padding[CSS_LEFT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingRight, padding[CSS_RIGHT])
+    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingBottom, padding[CSS_BOTTOM])
 }
 
 #define WX_STYLE_RESET_CSS_NODE(key, cssProp, defaultValue)\

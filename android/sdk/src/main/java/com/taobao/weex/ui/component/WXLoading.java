@@ -209,7 +209,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.list.WXListComponent;
@@ -219,11 +219,16 @@ import com.taobao.weex.ui.view.refresh.core.WXSwipeLayout;
 import com.taobao.weex.ui.view.refresh.wrapper.BaseBounceView;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * div component
  */
 @Component(lazyload = false)
 public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadingListener {
+
+  public static final String HIDE = "hide";
 
   public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
@@ -237,7 +242,18 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   @Override
   public void onLoading() {
     if (getDomObject().getEvents().contains(Constants.Event.ONLOADING)) {
-      getInstance().fireEvent(getRef(), Constants.Event.ONLOADING);
+      fireEvent(Constants.Event.ONLOADING);
+    }
+  }
+
+  @Override
+  public void onPullingUp(float dy, int pullOutDistance, float viewHeight) {
+    if (getDomObject().getEvents() != null && getDomObject().getEvents().contains(Constants.Event.ONPULLING_UP)) {
+      Map<String, Object> data = new HashMap<>();
+      data.put(Constants.Name.DISTANCE_Y, dy);
+      data.put(Constants.Name.PULLING_DISTANCE, pullOutDistance);
+      data.put(Constants.Name.VIEW_HEIGHT, viewHeight);
+      fireEvent(Constants.Event.ONPULLING_UP, data);
     }
   }
 
@@ -256,7 +272,7 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   @WXComponentProp(name = Constants.Name.DISPLAY)
   public void setDisplay(String display) {
     if (!TextUtils.isEmpty(display)) {
-      if (display.equals("hide")) {
+      if (display.equals(HIDE)) {
         if (getParent() instanceof WXListComponent || getParent() instanceof WXScroller) {
           if (((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
             ((BaseBounceView) getParent().getHostView()).finishPullLoad();

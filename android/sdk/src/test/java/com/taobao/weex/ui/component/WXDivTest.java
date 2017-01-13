@@ -257,8 +257,7 @@ public class WXDivTest {
         Mockito.when(spy.getPadding()).thenReturn(new Spacing());
         Mockito.when(spy.getEvents()).thenReturn(new WXEvent());
         Mockito.when(spy.clone()).thenReturn(divDom);
-        divDom.ref = "1";
-
+        TestDomObject.setRef(divDom,"1");
         mWXDiv = new WXDiv(instance, divDom, null);
         mWXDiv.initView();
     }
@@ -271,7 +270,7 @@ public class WXDivTest {
         WXDomObject testDom = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom.clone()).thenReturn(testDom);
-        testDom.ref = "2";
+        TestDomObject.setRef(testDom,"2");
         WXText child1 = new WXText(instance, testDom, mWXDiv);
         child1.initView();
 
@@ -282,7 +281,7 @@ public class WXDivTest {
         WXDomObject testDom2 = Mockito.spy(new WXDomObject());
         Mockito.when(testDom2.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom2.clone()).thenReturn(testDom2);
-        testDom2.ref = "3";
+        TestDomObject.setRef(testDom2,"3");
         child2 = new WXText(instance, testDom2, mWXDiv);
         child2.initView();
 
@@ -294,7 +293,7 @@ public class WXDivTest {
         WXDomObject testDom3 = Mockito.mock(WXDomObject.class);
         Mockito.when(testDom3.getPadding()).thenReturn(new Spacing());
         Mockito.when(testDom3.clone()).thenReturn(testDom3);
-        testDom3.ref = "4";
+        TestDomObject.setRef(testDom3,"4");
         WXText child3 = new WXText(instance, testDom3, mWXDiv);
         child3.initView();
 
@@ -307,7 +306,7 @@ public class WXDivTest {
     @Test
     public void testRemove(){
         testAddChild();
-        mWXDiv.remove(child2);
+        mWXDiv.remove(child2,true);
 
         assertEquals(2, mWXDiv.childCount());
     }
