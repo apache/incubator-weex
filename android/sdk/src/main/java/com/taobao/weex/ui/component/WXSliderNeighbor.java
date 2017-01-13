@@ -554,7 +554,7 @@ public class WXSliderNeighbor extends WXSlider {
         }
         View realView = ((ViewGroup)hostPage).getChildAt(0);
         float translation = (hostPage.getMeasuredWidth()-realView.getMeasuredWidth()*mNeighborScale)/4;
-        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth() * mCurrentItemScale)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace))/2 ;
+        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth() * mCurrentItemScale)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace, getInstance().getViewPortWidth()))/2 ;
         return translation;
     }
 
