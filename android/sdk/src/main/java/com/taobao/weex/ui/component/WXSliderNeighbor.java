@@ -267,11 +267,8 @@ public class WXSliderNeighbor extends WXSlider {
     @Override
     public void bindData(WXComponent component) {
         super.bindData(component);
-        if(mAdapter.getRealCount() > 3){
-            mViewPager.setOffscreenPageLimit(2);
-        }else if(mAdapter.getRealCount() == 3){
-            mViewPager.setOffscreenPageLimit(1);
-        }
+        // should not set setOffscreenPageLimit
+        // mViewPager.setOffscreenPageLimit(2);
     }
 
     @Override
