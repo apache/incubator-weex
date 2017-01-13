@@ -188,7 +188,7 @@ figure, img, .weex-image, .weex-img {
 
 body > .weex-list,
 body > .weex-scroller {
-  height: 100%;
+  min-height: 100%;
 }
 
 .weex-scroller-wrapper {
@@ -228,6 +228,7 @@ body > .weex-scroller {
 .weex-scroller-inner {
   background-color: #FFFFFF;
   min-height: 100%;
+  width: 100%;
   overflow: hidden;
   display: -webkit-box;
   display: -webkit-flex;
@@ -397,6 +398,7 @@ body > .weex-scroller {
     box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #ffffff;
   }
 }
+
 @keyframes weex-spinner {
   0%,
   100% {
