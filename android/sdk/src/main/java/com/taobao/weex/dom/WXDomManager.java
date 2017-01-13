@@ -215,6 +215,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -428,13 +429,13 @@ public final class WXDomManager {
    * @param ref the given dom object
    * @param style the given style.
    */
-  void updateStyle(String instanceId, String ref, JSONObject style) {
+  void updateStyle(String instanceId, String ref, JSONObject style, boolean byPesudo) {
     throwIfNotDomThread();
     WXDomStatement statement = mDomRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
-    statement.updateStyle(ref, style);
+    statement.updateStyle(ref, style, byPesudo);
   }
 
   /**
@@ -577,7 +578,7 @@ public final class WXDomManager {
    * @param ref ref
    * @param callback callback
    */
-  public void getComponentSize(String instanceId, String ref, String callback) {
+  public void getComponentSize(String instanceId, String ref, JSCallback callback) {
     if (!isDomThread()) {
       throw new WXRuntimeException("getComponentSize operation must be done in dom thread");
     }
@@ -586,7 +587,7 @@ public final class WXDomManager {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Component does not exist");
-      WXSDKManager.getInstance().callback(instanceId, callback, options);
+      callback.invoke(options);
       return;
     }
     statement.getComponentSize(ref, callback);

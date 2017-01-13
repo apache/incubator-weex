@@ -224,6 +224,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -238,6 +239,7 @@ import static junit.framework.Assert.*;
  */
 @RunWith(RobolectricTestRunner.class)
 @PrepareForTest({WXStreamModule.class, IWXHttpAdapter.class})
+@Config(manifest= Config.NONE)
 public class WXStreamModuleTest {
 
   @Before
@@ -364,6 +366,8 @@ public class WXStreamModuleTest {
       }
     });
     streamModule.fetch("{method: 'POST',url: 'http://httpbin.org/post',type:'json'}",finish,null);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS),302);
+    assertEquals(finish.mData.get(WXStreamModule.STATUS).getClass(),Integer.class);
     assertEquals(finish.mData.get(WXStreamModule.STATUS_TEXT),Status.getStatusText("302"));
   }
 
