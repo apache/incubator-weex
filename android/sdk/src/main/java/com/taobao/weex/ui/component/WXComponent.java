@@ -215,6 +215,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private int mPreRealHeight = 0;
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
+  private int mStickyOffset = 0;
   private WXGesture wxGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
@@ -258,8 +259,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       int[] anchor = new int[2];
       mHost.getLocationOnScreen(location);
       mInstance.getContainerView().getLocationOnScreen(anchor);
+
       int left = location[0] - anchor[0];
-      int top = location[1] - anchor[1];
+      int top = (location[1] - mStickyOffset) - anchor[1];
       int width = (int) mDomObj.getLayoutWidth();
       int height = (int) mDomObj.getLayoutHeight();
       size.set(left, top, left + width, top + height);
@@ -1445,5 +1447,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     message.obj = task;
     message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
     WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+  }
+
+  public int getStickyOffset() {
+    return mStickyOffset;
+  }
+
+  /**
+   * Sets the offset for the sticky
+   * @param stickyOffset child[y]-parent[y]
+   */
+  public void setStickyOffset(int stickyOffset) {
+    mStickyOffset = stickyOffset;
   }
 }

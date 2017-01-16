@@ -232,6 +232,7 @@ public abstract class WXModule implements IWXObject {
 
 
   public WXSDKInstance mWXSDKInstance;
+  private String mModuleName;
 
 
   protected final WXComponent findComponent(String ref){
@@ -309,5 +310,13 @@ public abstract class WXModule implements IWXObject {
 
   public boolean isOnce(String callback){
     return mKeepAlives.get(callback);
+  }
+
+  public String getModuleName() {
+    return mModuleName;
+  }
+
+  public void setModuleName(String moduleName) {
+    mModuleName = moduleName;
   }
 }
