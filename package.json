@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.19.3",
+    "framework": "0.19.6",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -43,6 +43,7 @@
     "build:browser:common": "rollup -c build/rollup.browser.common.config.js",
     "build:examples": "webpack --config build/webpack.examples.config.js",
     "build:test": "webpack --config build/webpack.test.config.js",
+    "build:ui-test": "webpack --config build/webpack.macacatest.config.js",
     "build": "npm run build:native && npm run build:browser && npm run build:examples && npm run build:test",
     "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
     "dist": "npm run dist:browser",
@@ -59,6 +60,7 @@
     "test:cover": "babel-istanbul cover --report text node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:e2e": "npm run build:browser && node html5/test/e2e/runner.js",
     "serve": "serve ./ -p 12580",
+    "serve:ui-test": "serve ./test/build/ -p 12581",
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
@@ -79,10 +81,14 @@
     "semver": "^5.1.0",
     "weex-components": "^0.2.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.0.10",
+    "weex-rax-framework": "0.1.0",
     "weex-vue-framework": "2.1.8-weex.1"
   },
   "devDependencies": {
+    "xml2map": "^1.0.2",
+    "macaca-cli": "^1.1.0",
+    "webdriver-client": "~1.0.0",
+    "macaca-utils": "^0.1.9",
     "babel-core": "^6.17.0",
     "babel-istanbul": "^0.11.0",
     "babel-loader": "^6.2.5",

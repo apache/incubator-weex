@@ -205,12 +205,16 @@
 package com.taobao.weex.utils;
 
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Class for parse color
@@ -436,6 +440,111 @@ public class WXResourceUtils {
     return resultColor;
   }
 
+  /**
+   * Assembly gradients
+   * @param image gradient values contains direction、colors
+   * @param width component width
+   * @param height component height
+   * @return gradient shader
+   */
+  public static Shader getShader(String image, float width, float height) {
+    List<String> valueList = parseGradientValues(image);
+    if (valueList != null && valueList.size() == 3) {
+      float[] points = parseGradientDirection(valueList.get(0), width, height);
+      Shader shader = new LinearGradient(points[0], points[1],
+                                         points[2], points[3],
+                                         getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
+                                         Shader.TileMode.REPEAT);
+      return shader;
+    }
+    return null;
+  }
+
+  /**
+   * parse gradient values contains direction、colors
+   * @param image gradient values
+   * @return split values by comma
+   */
+  @NonNull
+  private static List<String> parseGradientValues(String image) {
+    if (TextUtils.isEmpty(image)) {
+      return null;
+    }
+    image.trim();
+    if(image.startsWith("linear-gradient")){
+      String valueStr = image.substring(image.indexOf("(") + 1, image.lastIndexOf(")"));
+      StringTokenizer tokenizer = new StringTokenizer(valueStr, ",");
+      List<String> values = new ArrayList<>();
+      String temp = null;
+      while (tokenizer.hasMoreTokens()) {
+        String token = tokenizer.nextToken();
+        if (token.contains("(")) {
+          temp = token + ",";
+          continue;
+        }
+        if (token.contains(")")) {
+          temp += token;
+          values.add(temp);
+          temp = null;
+          continue;
+        }
+        if (temp != null) {
+          temp += (token + ",");
+          continue;
+        }
+        values.add(token);
+      }
+      return values;
+    }
+    return null;
+  }
+
+  /**
+   * parse gradient direction
+   * @param direction gradient direction
+   * @param width component width
+   * @param height component height
+   * @return gradient points
+   */
+  private static float[] parseGradientDirection(String direction, float width, float height) {
+    int x1 = 0, y1 = 1, x2 = 2, y2 = 3;
+    float[] points = {0, 0, 0, 0};
+
+    if (!TextUtils.isEmpty(direction)) {
+      direction = direction.replaceAll("\\s*", "").toLowerCase();
+    }
+
+    switch (direction) {
+      //to right
+      case "toright":
+        points[x2] = width;
+        break;
+      //to left
+      case "toleft":
+        points[x1] = width;
+        break;
+      //to bottom
+      case "tobottom":
+        points[y2] = height;
+        break;
+      //to top
+      case "totop":
+        points[y1] = height;
+        break;
+      //to bottom right
+      case "tobottomright":
+        points[x2] = width;
+        points[y2] = height;
+        break;
+      //to top left
+      case "totopleft":
+        points[x1] = width;
+        points[y1] = height;
+        break;
+    }
+    return points;
+  }
+
   enum ColorConvertHandler {
     NAMED_COLOR_HANDLER {
       @Override
@@ -509,6 +618,7 @@ public class WXResourceUtils {
 
     /**
      * Parse color to #RRGGBB or #AARRGGBB. The parsing algorithm depends on sub-class.
+     *
      * @param rawColor color, maybe functional RGB(RGBA), #RGB, keywords color or transparent
      * @return #RRGGBB or #AARRGGBB
      */
@@ -516,6 +626,7 @@ public class WXResourceUtils {
 
     /**
      * Parse alpha gradient of color from range 0-1 to range 0-255
+     *
      * @param alpha the alpha value, in range 0-1
      * @return the alpha value, in range 0-255
      */
