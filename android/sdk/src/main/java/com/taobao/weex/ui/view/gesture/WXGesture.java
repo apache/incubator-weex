@@ -255,6 +255,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
   private long panDownTime = -1;
   private WXGestureType mPendingPan = null;//event type to notify when action_up or action_cancel
   private int mParentOrientation =-1;
+  private boolean mIsPreventMoveEvent = false;
 
   public WXGesture(WXComponent wxComponent, Context context) {
     this.component = wxComponent;
@@ -281,6 +282,10 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
   private boolean hasSameOrientationWithParent(){
     return (mParentOrientation == Constants.Orientation.HORIZONTAL && component.containsGesture(HighLevelGesture.HORIZONTALPAN))
         || (mParentOrientation == Constants.Orientation.VERTICAL && component.containsGesture(HighLevelGesture.VERTICALPAN));
+  }
+
+  public void setPreventMoveEvent(boolean preventMoveEvent) {
+    mIsPreventMoveEvent = preventMoveEvent;
   }
 
   @Override
@@ -352,9 +357,13 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     String state = null;
     if (mPendingPan == HighLevelGesture.HORIZONTALPAN || mPendingPan == HighLevelGesture.VERTICALPAN) {
       state = getPanEventAction(motionEvent);
+
     }
 
     if (component.containsGesture(mPendingPan)) {
+      if(mIsPreventMoveEvent && MOVE.equals(state)){
+        return true;
+      }
       List<Map<String, Object>> list = createMultipleFireEventParam(motionEvent, state);
       for (Map<String, Object> map : list) {
         component.fireEvent(mPendingPan.toString(), map);

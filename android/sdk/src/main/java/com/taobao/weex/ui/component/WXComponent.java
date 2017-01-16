@@ -216,7 +216,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private int mPreRealLeft = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
-  private WXGesture wxGesture;
+  private WXGesture mGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
@@ -662,6 +662,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
      */
   protected boolean setProperty(String key, Object param) {
     switch (key) {
+      case Constants.Name.PREVENT_MOVE_EVENT:
+        if(mGesture != null){
+          mGesture.setPreventMoveEvent(WXUtils.getBoolean(param,false));
+        }
+        return true;
       case Constants.Name.DISABLED:
         Boolean disabled = WXUtils.getBoolean(param,null);
         if (disabled != null) {
@@ -835,11 +840,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     } else if (view != null &&
                needGestureDetector(type)) {
       if (view instanceof WXGestureObservable) {
-        if (wxGesture == null) {
-          wxGesture = new WXGesture(this, mContext);
+        if (mGesture == null) {
+          mGesture = new WXGesture(this, mContext);
+          boolean isPreventMove = WXUtils.getBoolean(getDomObject().getAttrs().get(Constants.Name.PREVENT_MOVE_EVENT),false);
+          mGesture.setPreventMoveEvent(isPreventMove);
         }
         mGestureType.add(type);
-        ((WXGestureObservable) view).registerGestureListener(wxGesture);
+        ((WXGestureObservable) view).registerGestureListener(mGesture);
       } else {
         WXLogUtils.e(view.getClass().getSimpleName() + " don't implement " +
                      "WXGestureObservable, so no gesture is supported.");
@@ -1040,7 +1047,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     mAppendEvents.clear();//only clean append events, not dom's events.
     mGestureType.clear();
-    wxGesture = null;
+    mGesture = null;
     if (getRealView() != null &&
         getRealView() instanceof WXGestureObservable) {
       ((WXGestureObservable) getRealView()).registerGestureListener(null);
@@ -1404,7 +1411,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PESUDO.ACTIVE);
     View view;
     if(hasActivePesudo && (view = getRealView()) != null) {
-      boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || wxGesture != null;
+      boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || mGesture != null;
       view.setOnTouchListener(new TouchActivePseudoListener(this,!hasTouchConsumer));
     }
   }
