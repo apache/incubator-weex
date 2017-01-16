@@ -1413,9 +1413,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       for (String callback : callbacks) {
         SimpleJSCallback jsCallback = new SimpleJSCallback(mInstanceId, callback);
         if (module.isOnce(callback)) {
-          jsCallback.invokeAndKeepAlive(event);
-        } else {
           jsCallback.invoke(event);
+        } else {
+          jsCallback.invokeAndKeepAlive(event);
         }
       }
     }
