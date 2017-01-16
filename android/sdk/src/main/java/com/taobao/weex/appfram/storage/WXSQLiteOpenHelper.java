@@ -228,7 +228,6 @@ public class WXSQLiteOpenHelper extends SQLiteOpenHelper {
     static SimpleDateFormat sDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
 
-
     private Context mContext;
     private SQLiteDatabase mDb;
 
