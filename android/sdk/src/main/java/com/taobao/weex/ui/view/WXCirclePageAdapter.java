@@ -312,6 +312,10 @@ public class WXCirclePageAdapter extends PagerAdapter {
     return POSITION_NONE;
   }
 
+  public int getPagePosition(View page) {
+    return views.indexOf(page);
+  }
+
   public int getItemIndex(Object object) {
     if (object instanceof View) {
       return views.indexOf(object);
