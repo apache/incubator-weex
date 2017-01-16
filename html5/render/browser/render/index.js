@@ -15,6 +15,10 @@ const { framework, transformer } = subversion
 global.frameworkVersion = framework
 global.transformerVersion = transformer
 
+// init bridge.
+import { Sender, receiver } from '../bridge'
+receiver.init()
+
 // init frameworks
 import Listener from '../dom/componentManager'
 runtime.config.Document.Listener = Listener
@@ -34,7 +38,6 @@ for (const methodName in globalMethods) {
 import config from './config'
 import { load } from './loader'
 import * as utils from '../utils'
-import { Sender, receiver } from '../bridge'
 import Component from '../base/component'
 import Atomic from '../base/atomic'
 import ComponentManager from '../dom/componentManager'
@@ -126,7 +129,6 @@ export default function Weex (options) {
   })
 
   this.data = options.data
-  receiver.init(this)
   this.sender = new Sender(this)
 
   _weexInstance[this.instanceId] = this
