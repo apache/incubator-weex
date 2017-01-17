@@ -24,8 +24,6 @@ GEM
       terminal-table (~> 1)
     danger-plugin-api (1.0.0)
       danger (> 2.0)
-    danger-prose (2.0.3)
-      danger
     danger-xcode_summary (0.1.0)
       danger-plugin-api (~> 1.0)
     faraday (0.11.0)
@@ -57,7 +55,6 @@ PLATFORMS
 
 DEPENDENCIES
   danger
-  danger-prose
   danger-xcode_summary
   xcpretty
   xcpretty-json-formatter
