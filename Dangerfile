@@ -4,8 +4,8 @@ warn("Big PR") if git.lines_of_code > 500
 xcode_summary.ignored_files = '**/Pods/**'
 xcode_summary.report 'ios/sdk/xcodebuild.json'
 
-clorox.level = "failure"
-clorox.check ["YourProject", "YourProjectNotificationExtension"]
+prose.check_spelling "ios/sdk/**/*.h"
+prose.check_spelling "ios/sdk/**/*.m"
 
 # Find reviewers without parsing blame information
 # from files matching to 'Pods/*'

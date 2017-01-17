@@ -22,10 +22,10 @@ GEM
       kramdown (~> 1.5)
       octokit (~> 4.2)
       terminal-table (~> 1)
-    danger-clorox (2.0.2)
-      danger
     danger-plugin-api (1.0.0)
       danger (> 2.0)
+    danger-prose (2.0.3)
+      danger
     danger-xcode_summary (0.1.0)
       danger-plugin-api (~> 1.0)
     faraday (0.11.0)
@@ -57,7 +57,7 @@ PLATFORMS
 
 DEPENDENCIES
   danger
-  danger-clorox
+  danger-prose
   danger-xcode_summary
   xcpretty
   xcpretty-json-formatter
