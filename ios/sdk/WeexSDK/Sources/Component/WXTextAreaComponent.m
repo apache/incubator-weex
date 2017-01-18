@@ -215,7 +215,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         return;
     }
     [self.textView becomeFirstResponder];
-    UITextRange *startPos =  [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionStart];
+    UITextPosition *startPos =  [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionStart];
     UITextPosition *endPos = [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionEnd];
     UITextRange *textRange = [self.textView textRangeFromPosition:startPos
                                                         toPosition:endPos];
@@ -224,7 +224,6 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 
 -(void)getSelectionRange:(WXCallback)callback
 {
-    UITextRange *range = self.textView.selectedTextRange;
     NSInteger selectionStart = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.start];
     NSInteger selectionEnd = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.end];
     NSDictionary *res = @{@"selectionStart":@(selectionStart),@"selectionEnd":@(selectionEnd)};
