@@ -135,7 +135,7 @@
 		74862F7E1E03A0F300B7A041 /* WXModuleMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 74862F7C1E03A0F300B7A041 /* WXModuleMethod.m */; };
 		74862F811E03A24500B7A041 /* WXComponentMethod.h in Headers */ = {isa = PBXBuildFile; fileRef = 74862F7F1E03A24500B7A041 /* WXComponentMethod.h */; };
 		74862F821E03A24500B7A041 /* WXComponentMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 74862F801E03A24500B7A041 /* WXComponentMethod.m */; };
-		74896F301D1AC79400D1D593 /* NSObject+WXSwizzle.h in Headers */ = {isa = PBXBuildFile; fileRef = 74896F2E1D1AC79400D1D593 /* NSObject+WXSwizzle.h */; };
+		74896F301D1AC79400D1D593 /* NSObject+WXSwizzle.h in Headers */ = {isa = PBXBuildFile; fileRef = 74896F2E1D1AC79400D1D593 /* NSObject+WXSwizzle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		74896F311D1AC79400D1D593 /* NSObject+WXSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 74896F2F1D1AC79400D1D593 /* NSObject+WXSwizzle.m */; };
 		748B25181C44A6F9005D491E /* WXSDKInstance_private.h in Headers */ = {isa = PBXBuildFile; fileRef = 748B25161C44A6F9005D491E /* WXSDKInstance_private.h */; };
 		74915F471C8EB02B00BEBCC0 /* WXAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 74915F451C8EB02B00BEBCC0 /* WXAssert.h */; };
