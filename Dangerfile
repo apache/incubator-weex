@@ -4,11 +4,6 @@ warn("Big PR") if git.lines_of_code > 500
 xcode_summary.ignored_files = '**/Pods/**'
 xcode_summary.report 'ios/sdk/xcodebuild.json'
 
-
-# oc_files = (git.modified_files + git.added_files).select do |line|
-  line.end_with?(".h") || line.end_with?(".m") || line.end_with?(".mm")
-end
-
 # prose.check_spelling oc_files
 
 # Find reviewers without parsing blame information
