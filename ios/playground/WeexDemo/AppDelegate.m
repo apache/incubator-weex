@@ -16,6 +16,7 @@
 #import "DemoDefine.h"
 #import "WXScannerVC.h"
 #import "WXSyncTestModule.h"
+#import "UIView+UIThreadCheck.h"
 #import <WeexSDK/WeexSDK.h>
 #import <AVFoundation/AVFoundation.h>
 #import <ATSDK/ATManager.h>
@@ -39,6 +40,11 @@
     [self.window makeKeyAndVisible];
     
     [self startSplashScreen];
+    
+#if DEBUG
+    // check if there are any UI changes on main thread.
+    [UIView wx_checkUIThread];
+#endif
     
     return YES;
 }
