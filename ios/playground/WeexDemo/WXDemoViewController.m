@@ -93,6 +93,10 @@
 - (void)dealloc
 {
     [_instance destroyInstance];
+#if DEBUG
+    [_instance forceGarbageCollection];
+#endif
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
