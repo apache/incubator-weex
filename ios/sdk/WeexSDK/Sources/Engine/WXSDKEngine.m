@@ -7,6 +7,7 @@
  */
 
 #import "WXSDKEngine.h"
+#import "WXDebugTool.h"
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
@@ -268,6 +269,12 @@ static NSDictionary *_customEnvironment;
     [self _originalRegisterHandlers:handlers];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    
+    NSDictionary *jsSerices = [WXDebugTool jsServiceCache];
+    for(NSString *serviceName in jsSerices) {
+        NSString *script = [jsSerices objectForKey:serviceName];
+        [WXSDKEngine registerService:serviceName withScript:script withOptions:@{}];
+    }
 }
 
 + (void)connectDebugServer:(NSString*)URL

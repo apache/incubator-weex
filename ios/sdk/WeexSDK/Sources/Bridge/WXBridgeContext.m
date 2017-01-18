@@ -50,7 +50,7 @@ _Pragma("clang diagnostic pop") \
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
 @property (nonatomic, strong) NSMutableArray *methodQueue;
-// store template service
+// store service
 @property (nonatomic, strong) NSMutableArray *jsServiceQueue;
 
 @end
@@ -344,6 +344,8 @@ _Pragma("clang diagnostic pop") \
 
 - (void)executeJsService:(NSString *)script withName:(NSString *)name
 {
+    [WXDebugTool cacheJsService:script withName:name];
+    
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
         [self.jsBridge executeJavascript:script];

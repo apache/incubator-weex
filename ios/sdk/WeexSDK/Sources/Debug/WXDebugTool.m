@@ -22,7 +22,31 @@ static BOOL WXIsDevToolDebug;
 static NSString* WXDebugrepBundleJS;
 static NSString* WXDebugrepJSFramework;
 
+
+@interface WXDebugTool ()
+// store service
+@property (nonatomic, strong) NSMutableDictionary *jsServiceDic;
+
+@end
+
 @implementation WXDebugTool
+
++ (instancetype)sharedInstance {
+    static id _sharedInstance = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&oncePredicate, ^{
+        _sharedInstance = [[self alloc] init];
+    });
+    return _sharedInstance;
+}
+
+- (instancetype)init
+{
+    if(self = [super init]){
+        _jsServiceDic = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
 
 //+ (void)showFPS
 //{
@@ -110,6 +134,21 @@ static NSString* WXDebugrepJSFramework;
         
         [loader start];
     }
+}
+
++ (BOOL) cacheJsService: (NSString *)script withName: (NSString *)name
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] setObject:script forKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
++ (NSDictionary *) jsServiceCache
+{
+    return [NSDictionary dictionaryWithDictionary:[[self sharedInstance] jsServiceDic]];
 }
 
 @end
