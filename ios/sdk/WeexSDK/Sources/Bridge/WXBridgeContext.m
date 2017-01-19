@@ -344,8 +344,6 @@ _Pragma("clang diagnostic pop") \
 
 - (void)executeJsService:(NSString *)script withName:(NSString *)name
 {
-    [WXDebugTool cacheJsService:script withName:name];
-    
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
         [self.jsBridge executeJavascript:script];
