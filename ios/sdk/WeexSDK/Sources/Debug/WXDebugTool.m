@@ -146,6 +146,16 @@ static NSString* WXDebugrepJSFramework;
     }
 }
 
++ (BOOL) removeCacheJsService: (NSString *)name
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] removeObjectForKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
 + (NSDictionary *) jsServiceCache
 {
     return [NSDictionary dictionaryWithDictionary:[[self sharedInstance] jsServiceDic]];

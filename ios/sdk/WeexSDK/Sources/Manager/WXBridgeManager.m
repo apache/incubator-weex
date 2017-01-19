@@ -254,6 +254,8 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
+        // save it when execute
+        [WXDebugTool removeCacheJsService:name];
         [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }

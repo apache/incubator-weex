@@ -33,6 +33,8 @@
 
 + (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options;
 
++ (BOOL) removeCacheJsService: (NSString *)name;
+
 + (NSDictionary *) jsServiceCache;
 
 @end
