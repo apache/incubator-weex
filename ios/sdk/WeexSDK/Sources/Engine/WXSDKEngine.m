@@ -275,7 +275,7 @@ static NSDictionary *_customEnvironment;
         NSDictionary *_service = [jsSerices objectForKey:_serviceName];
         NSString *_name = [_service objectForKey:@"name"];
         NSString *_script = [_service objectForKey:@"script"];
-        NSString *_options = [_service objectForKey:@"options"];
+        NSDictionary *_options = [_service objectForKey:@"options"];
         [WXSDKEngine registerService:_name withScript:_script withOptions:_options];
     }
 }
