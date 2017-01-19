@@ -191,8 +191,8 @@ describe('check style value', () => {
   })
 
   it('display', () => {
-    expect(style.display('block')).to.be.true
     expect(style.display('flex')).to.be.true
+    expect(style.display('block')).to.be.false
     expect(style.display('unknown')).to.be.false
   })
 
