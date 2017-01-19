@@ -16,6 +16,7 @@
 #import "WXServiceFactory.h"
 #import "WXResourceRequest.h"
 #import "WXResourceLoader.h"
+#import "WXDebugTool.h"
 
 @interface WXBridgeManager ()
 
@@ -239,6 +240,8 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
+        // save it when execute
+        [WXDebugTool cacheJsService:name withScript:serviceScript withOptions:options];
         [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }
@@ -251,6 +254,8 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThread(^(){
+        // save it when execute
+        [WXDebugTool removeCacheJsService:name];
         [weakSelf.bridgeCtx executeJsService:script withName:name];
     });
 }
