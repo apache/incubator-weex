@@ -31,9 +31,8 @@
 
 + (NSString*)getReplacedJSFramework;
 
-+ (BOOL) cacheJsService: (NSString *)script withName: (NSString *)name;
++ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options;
 
 + (NSDictionary *) jsServiceCache;
-
 
 @end

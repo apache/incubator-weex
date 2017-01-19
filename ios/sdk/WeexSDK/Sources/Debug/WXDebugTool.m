@@ -136,10 +136,10 @@ static NSString* WXDebugrepJSFramework;
     }
 }
 
-+ (BOOL) cacheJsService: (NSString *)script withName: (NSString *)name
++ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options
 {
     if(WXIsDebug) {
-        [[[self sharedInstance] jsServiceDic] setObject:script forKey:name];
+        [[[self sharedInstance] jsServiceDic] setObject:@{ @"name": name, @"script": script, @"options": options } forKey:name];
         return YES;
     }else {
         return NO;
