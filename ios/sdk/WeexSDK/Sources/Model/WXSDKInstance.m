@@ -300,6 +300,11 @@ typedef enum : NSUInteger {
     });
 }
 
+- (void)forceGarbageCollection
+{
+    [[WXSDKManager bridgeMgr] forceGarbageCollection];
+}
+
 - (void)updateState:(WXState)state
 {
     if (!self.instanceId) {

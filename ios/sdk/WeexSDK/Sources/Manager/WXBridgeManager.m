@@ -164,6 +164,14 @@ void WXPerformBlockOnBridgeThread(void (^block)())
     });
 }
 
+- (void)forceGarbageCollection
+{
+    __weak typeof(self) weakSelf = self;
+    WXPerformBlockOnBridgeThread(^(){
+        [weakSelf.bridgeCtx forceGarbageCollection];
+    });
+}
+
 - (void)refreshInstance:(NSString *)instance
                    data:(NSDictionary *)data
 {

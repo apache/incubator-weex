@@ -208,6 +208,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 - (void)destroyInstance;
 
 /**
+ * Trigger full GC, for dev and debug only.
+ **/
+- (void)forceGarbageCollection;
+
+/**
  * get module instance by class
  */
 - (id)moduleForClass:(Class)moduleClass;

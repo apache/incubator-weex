@@ -38,6 +38,7 @@
 #import "WXBaseViewController.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
+#import "NSObject+WXSwizzle.h"
 #import "Layout.h"
 
 #endif /* __OBJC__ */
