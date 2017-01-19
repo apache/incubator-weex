@@ -298,6 +298,10 @@ do {\
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
             computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
+        if ([WXUtility isBlankString:textStorage.string]) {
+            //  if the text value is empty or nil, then set the height is 0.
+            computedSize.height = 0;
+        }
         
         return (CGSize) {
             WXCeilPixelValue(computedSize.width),
