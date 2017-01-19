@@ -271,9 +271,12 @@ static NSDictionary *_customEnvironment;
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
     
     NSDictionary *jsSerices = [WXDebugTool jsServiceCache];
-    for(NSString *serviceName in jsSerices) {
-        NSString *script = [jsSerices objectForKey:serviceName];
-        [WXSDKEngine registerService:serviceName withScript:script withOptions:@{}];
+    for(NSString *_serviceName in jsSerices) {
+        NSDictionary *_service = [jsSerices objectForKey:_serviceName];
+        NSString *_name = [_service objectForKey:@"name"];
+        NSString *_script = [_service objectForKey:@"script"];
+        NSString *_options = [_service objectForKey:@"options"];
+        [WXSDKEngine registerService:_name withScript:_script withOptions:_options];
     }
 }
 
