@@ -20,7 +20,6 @@
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        _indicator = [[UIActivityIndicatorView alloc] init];
         if (styles[@"color"]) {
             [self setColor:[WXConvert UIColor:styles[@"color"]]];
         }
@@ -38,6 +37,7 @@
 
 - (UIView *)loadView
 {
+    _indicator = [[UIActivityIndicatorView alloc] init];
     return _indicator;
 }
 

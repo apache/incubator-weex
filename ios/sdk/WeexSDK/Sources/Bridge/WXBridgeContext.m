@@ -50,7 +50,7 @@ _Pragma("clang diagnostic pop") \
 @property (nonatomic) BOOL frameworkLoadFinished;
 //store some methods temporarily before JSFramework is loaded
 @property (nonatomic, strong) NSMutableArray *methodQueue;
-// store template service
+// store service
 @property (nonatomic, strong) NSMutableArray *jsServiceQueue;
 
 @end
