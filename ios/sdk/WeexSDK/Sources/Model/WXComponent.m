@@ -229,7 +229,7 @@
         [self viewDidLoad];
         
         if (_lazyCreateView) {
-            [self _buildViewHierachyLazily];
+            [self _buildViewHierarchyLazily];
         }
         
         [self _handleFirstScreenTime];
@@ -238,7 +238,7 @@
     }
 }
 
-- (void)_buildViewHierachyLazily
+- (void)_buildViewHierarchyLazily
 {
     if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
         NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;

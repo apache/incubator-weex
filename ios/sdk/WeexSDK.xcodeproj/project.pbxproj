@@ -107,8 +107,8 @@
 		742AD7341DF98C45007DC46C /* WXResourceResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 742AD72B1DF98C45007DC46C /* WXResourceResponse.m */; };
 		742AD73A1DF98C8B007DC46C /* WXResourceLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7381DF98C8B007DC46C /* WXResourceLoader.h */; };
 		742AD73B1DF98C8B007DC46C /* WXResourceLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 742AD7391DF98C8B007DC46C /* WXResourceLoader.m */; };
-		743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.h in Headers */ = {isa = PBXBuildFile; fileRef = 743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.h */; };
-		743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.m in Sources */ = {isa = PBXBuildFile; fileRef = 743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.m */; };
+		743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h */; };
+		743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m */; };
 		744BEA551D05178F00452B5D /* WXComponent+Display.h in Headers */ = {isa = PBXBuildFile; fileRef = 744BEA531D05178F00452B5D /* WXComponent+Display.h */; };
 		744BEA561D05178F00452B5D /* WXComponent+Display.m in Sources */ = {isa = PBXBuildFile; fileRef = 744BEA541D05178F00452B5D /* WXComponent+Display.m */; };
 		744BEA591D0520F300452B5D /* WXComponent+Layout.h in Headers */ = {isa = PBXBuildFile; fileRef = 744BEA571D0520F300452B5D /* WXComponent+Layout.h */; };
@@ -385,8 +385,8 @@
 		742AD72B1DF98C45007DC46C /* WXResourceResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WXResourceResponse.m; path = Network/WXResourceResponse.m; sourceTree = "<group>"; };
 		742AD7381DF98C8B007DC46C /* WXResourceLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WXResourceLoader.h; path = Loader/WXResourceLoader.h; sourceTree = "<group>"; };
 		742AD7391DF98C8B007DC46C /* WXResourceLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WXResourceLoader.m; path = Loader/WXResourceLoader.m; sourceTree = "<group>"; };
-		743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSimulatorShortcutMananger.h; sourceTree = "<group>"; };
-		743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSimulatorShortcutMananger.m; sourceTree = "<group>"; };
+		743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSimulatorShortcutManager.h; sourceTree = "<group>"; };
+		743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSimulatorShortcutManager.m; sourceTree = "<group>"; };
 		744BEA531D05178F00452B5D /* WXComponent+Display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+Display.h"; sourceTree = "<group>"; };
 		744BEA541D05178F00452B5D /* WXComponent+Display.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+Display.m"; sourceTree = "<group>"; };
 		744BEA571D0520F300452B5D /* WXComponent+Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "WXComponent+Layout.h"; path = "Layout/WXComponent+Layout.h"; sourceTree = "<group>"; };
@@ -938,8 +938,8 @@
 				7469869E1C4E2C000054A57E /* NSArray+Weex.m */,
 				746319001C60AFC100EFEBD4 /* WXThreadSafeCounter.h */,
 				746319011C60AFC100EFEBD4 /* WXThreadSafeCounter.m */,
-				743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.h */,
-				743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.m */,
+				743933B21C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h */,
+				743933B31C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m */,
 				74915F451C8EB02B00BEBCC0 /* WXAssert.h */,
 				74915F461C8EB02B00BEBCC0 /* WXAssert.m */,
 				74A4BA941CB365D100195969 /* WXAppConfiguration.h */,
@@ -1102,7 +1102,7 @@
 				59D3CA411CF9ED57008835DC /* Layout.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
 				77D1614F1C02E3880010B15B /* WXUtility.h in Headers */,
-				743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.h in Headers */,
+				743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h in Headers */,
 				74862F811E03A24500B7A041 /* WXComponentMethod.h in Headers */,
 				74915F471C8EB02B00BEBCC0 /* WXAssert.h in Headers */,
 				2A8E658A1C7C7AA20025C7B7 /* WXVideoComponent.h in Headers */,
@@ -1427,7 +1427,7 @@
 				77D161631C02ED790010B15B /* WXLog.m in Sources */,
 				744BEA5A1D0520F300452B5D /* WXComponent+Layout.m in Sources */,
 				59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */,
-				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutMananger.m in Sources */,
+				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */,
 				74BB5FBA1DFEE81A004FC3DF /* WXMetaModule.m in Sources */,
 				741081201CED585A001BC6E5 /* WXComponentManager.m in Sources */,
 				1D3000F21D40B9AC004F3B4F /* WXClipboardModule.m in Sources */,

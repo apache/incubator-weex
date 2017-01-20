@@ -54,12 +54,11 @@
 - (void)unload;
 
 /**
- *  Update Instacne State Method
+ *  Update Instance State Method
  *  @param instance  :   instance id
  *  @param data      :   parameters
  **/
-- (void)updateState:(NSString *)instance
-               data:(id)data;
+- (void)updateState:(NSString *)instance data:(id)data;
 
 /**
  *  Execute JSFramework Script
@@ -119,7 +118,7 @@
  *  @param instanceId instanceId
  *  @param funcId     funcId
  *  @param params     params
- *  @param iflast     indicate that whether this func will be reused
+ *  @param keepAlive  indicate that whether this func will be reused
  */
 - (void)callBack:(NSString *)instanceId funcId:(NSString *)funcId params:(id)params keepAlive:(BOOL)keepAlive;
 
@@ -145,7 +144,7 @@
 
 /**
  *  Log To WebSocket
- *  @param flag      :   the tag to indentify
+ *  @param flag      :   the tag to identify
  *  @param message   :   message to output
  **/
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message;
