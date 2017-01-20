@@ -67,7 +67,8 @@ const amdService = {
            */
           const args = deps.map(depName => require(depName))
           ret = servMod.factory(...args)
-        } else {
+        }
+        else {
           ret = servMod.factory(amdObject.require, exports, module)
         }
         servMod.cached = ret || module.exports
