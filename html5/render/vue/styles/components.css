@@ -31,7 +31,7 @@ body > .weex-div {
 }
 
 input, textarea, .weex-input, .weex-textarea {
-  font-size: 32px;
+  font-size: 0.4267rem;
 }
 input:focus, textarea:focus, .weex-input:focus, .weex-textarea:focus {
   outline: none;
@@ -193,6 +193,7 @@ body > .weex-scroller {
 
 .weex-scroller-wrapper {
   display: block;
+  position: relative;
   overflow: scroll;
 }
 .weex-scroller-wrapper.weex-scroller-horizontal {
@@ -280,7 +281,7 @@ body > .weex-scroller {
 
 .weex-loading {
   bottom: 0;
-  bottom: -212px;
+  bottom: -2.8267rem;
 }
 
 .weex-slider-wrapper {
@@ -310,21 +311,21 @@ body > .weex-scroller {
 
 .weex-indicator {
   position: absolute;
-  right: 30px;
-  bottom: 10px;
+  right: 0.4rem;
+  bottom: 0.1333rem;
   margin: 0;
-  padding: 10px 20px;
+  padding: 0.1333rem 0.2667rem;
 }
 
 .weex-indicator-item {
   display: inline-block;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 0.2667rem;
+  height: 0.2667rem;
   background-color: #BBBBBB;
 }
 .weex-indicator-item + .weex-indicator-item {
-  margin-left: 10px;
+  margin-left: 0.1333rem;
 }
 
 .weex-indicator-item-active {
@@ -333,8 +334,8 @@ body > .weex-scroller {
 
 .weex-refresh-indicator,
 .weex-loading-indicator {
-  width: 76px;
-  height: 76px;
+  width: 1rem;
+  height: 1rem;
   -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
@@ -350,7 +351,7 @@ body > .weex-scroller {
 .weex-loading-indicator:before {
   display: block;
   content: '';
-  font-size: 12px;
+  font-size: 0.16rem;
   /* 12px */
   width: 1em;
   height: 1em;
@@ -361,8 +362,8 @@ body > .weex-scroller {
   text-indent: -9999em;
   -webkit-animation: weex-spinner 1.1s infinite ease;
           animation: weex-spinner 1.1s infinite ease;
-  -webkit-transform: translate3d(76px, 0, 0);
-          transform: translate3d(76px, 0, 0);
+  -webkit-transform: translate3d(1rem, 0, 0);
+          transform: translate3d(1rem, 0, 0);
 }
 
 @-webkit-keyframes weex-spinner {
@@ -433,12 +434,12 @@ body > .weex-scroller {
   box-sizing: content-box;
   background-clip: content-box;
   color: #64bd63;
-  width: 100px;
-  height: 60px;
+  width: 1.3333rem;
+  height: 0.8rem;
   background-color: white;
   border-color: #dfdfdf;
-  box-shadow: #dfdfdf 0px 0px 0px 0px inset;
-  border-radius: 60px;
+  box-shadow: #dfdfdf 0 0 0 0 inset;
+  border-radius: 0.8rem;
   -webkit-transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
           transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
 }
@@ -446,12 +447,12 @@ body > .weex-scroller {
 .weex-switch-checked {
   background-color: #64bd63;
   border-color: #64bd63;
-  box-shadow: #64bd63 0px 0px 0px 40px inset;
+  box-shadow: #64bd63 0 0 0 0.5333rem inset;
 }
 
 .weex-switch-checked.weex-switch-disabled {
   background-color: #A0CCA0;
-  box-shadow: #A0CCA0 0px 0px 0px 40px inset;
+  box-shadow: #A0CCA0 0 0 0 0.5333rem inset;
 }
 
 .weex-switch-disabled {
@@ -459,8 +460,8 @@ body > .weex-scroller {
 }
 
 .weex-switch-inner {
-  width: 60px;
-  height: 60px;
+  width: 0.8rem;
+  height: 0.8rem;
   background: #fff;
   border-radius: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -472,12 +473,12 @@ body > .weex-scroller {
 }
 
 .weex-switch-checked > .weex-switch-inner {
-  left: 40px;
+  left: 0.5333rem;
 }
 
 p, .weex-text {
   white-space: pre-wrap;
-  font-size: 32px;
+  font-size: 0.4267rem;
   word-wrap: break-word;
   display: -webkit-box;
   -webkit-box-orient: vertical;

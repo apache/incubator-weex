@@ -20,7 +20,7 @@ export default {
   methods: {
     show () {
       this.$emit('loading')
-      this.height = '120px'
+      this.height = '1.6rem'
       this.visibility = 'visible'
     },
     reset () {

@@ -21,7 +21,7 @@ export default {
     show () {
       // TODO: no fixed height
       this.$emit('refresh')
-      this.height = '120px'
+      this.height = '1.6rem'
       this.visibility = 'visible'
     },
     reset () {

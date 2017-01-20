@@ -21,14 +21,14 @@ export default {
     },
 
     showRefresh () {
-      this.moveTo('120px')
+      this.moveTo('1.6rem')
       if (this._refresh && this._refresh.child) {
         this._refresh.child.show()
       }
     },
 
     showLoading () {
-      this.moveTo('-120px')
+      this.moveTo('-1.6rem')
       if (this._loading && this._loading.child) {
         this._loading.child.show()
       }
