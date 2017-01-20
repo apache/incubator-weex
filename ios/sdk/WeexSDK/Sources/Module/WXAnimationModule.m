@@ -45,7 +45,12 @@
 
 @end
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 100000
+// CAAnimationDelegate is not available before iOS 10 SDK
+@interface WXAnimationDelegate ()
+#else
 @interface WXAnimationDelegate : NSObject <CAAnimationDelegate>
+#endif
 
 @property (nonatomic, copy) void (^finishBlock)(BOOL);
 @property (nonatomic, strong) WXAnimationInfo *animationInfo;
