@@ -61,6 +61,8 @@ GEM
       kramdown (~> 1.5)
       octokit (~> 4.2)
       terminal-table (~> 1)
+    danger-clorox (2.0.2)
+      danger
     danger-plugin-api (1.0.0)
       danger (> 2.0)
     danger-xcode_summary (0.1.0)
@@ -114,6 +116,7 @@ PLATFORMS
 DEPENDENCIES
   cocoapods
   danger
+  danger-clorox
   danger-xcode_summary
   xcpretty
   xcpretty-json-formatter
