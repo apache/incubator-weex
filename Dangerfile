@@ -1,7 +1,7 @@
 # Warn when there is a big PR
 warn("Big PR") if git.lines_of_code > 500
 
-has_app_changes = !git.modified_files.grep(/WeexSDK/Source/).empty?
+has_app_changes = !git.modified_files.grep(/WeexSDK\/Source/).empty?
 has_test_changes = !git.modified_files.grep(/WeexSDKTests/).empty?
 
 # Non-trivial amounts of app changes without tests
