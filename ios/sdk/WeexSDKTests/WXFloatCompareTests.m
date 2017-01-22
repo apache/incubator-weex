@@ -25,30 +25,57 @@
     [super tearDown];
 }
 
-- (void)testWXEq {
+- (void)testWXFloatEqual {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
     float a = 0.1;
     double b = 0.1;
-    BOOL boolval = WXEq(a, b);
+    BOOL boolval = WXFloatEqual(a, b);
     XCTAssertTrue(boolval);
 }
 
-- (void)testWXLt {
+- (void)testWXFloatEqualWithPrecision {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    float a = 0.1;
+    double b = 0.1;
+    BOOL boolval = WXFloatEqualWithPrecision(a, b , 0.01);
+    XCTAssertTrue(boolval);
+}
+
+- (void)testWXFloatLessThan {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
     float a = 0.1;
     double b = 0.2;
-    BOOL boolval = WXLt(a, b);
+    BOOL boolval = WXFloatLessThan(a, b);
     XCTAssertTrue(boolval);
 }
 
-- (void)testWXGt {
+- (void)testWXFloatLessThanWithPrecision {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    float a = 0.1;
+    double b = 0.2;
+    BOOL boolval = WXFloatLessThanWithPrecision(a, b, 0.01);
+    XCTAssertTrue(boolval);
+}
+
+- (void)testWXFloatGreaterThan {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
     float a = 0.2;
     double b = 0.1;
-    BOOL boolval = WXGt(a, b);
+    BOOL boolval = WXFloatGreaterThan(a, b);
+    XCTAssertTrue(boolval);
+}
+
+- (void)testWXFloatGreaterThanWithPrecision {
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    float a = 0.2;
+    double b = 0.1;
+    BOOL boolval = WXFloatGreaterThanWithPrecision(a, b,0.01);
     XCTAssertTrue(boolval);
 }
 

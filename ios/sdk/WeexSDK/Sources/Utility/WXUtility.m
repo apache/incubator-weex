@@ -702,14 +702,22 @@ CGPoint WXPixelPointResize(CGPoint value)
     return new;
 }
 
-BOOL WXEq(CGFloat a, CGFloat b) {
-    return fabs(a - b) <= 1e-6;
+BOOL WXFloatEqual(CGFloat a, CGFloat b) {
+    return WXFloatEqualWithPrecision(a, b,FLT_EPSILON);
+}
+BOOL WXFloatEqualWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return fabs(a - b) <= precision;
+}
+BOOL WXFloatLessThan(CGFloat a, CGFloat b) {
+    return WXFloatLessThanWithPrecision(a, b, FLT_EPSILON);
+}
+BOOL WXFloatLessThanWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return a-b < - precision;
 }
 
-BOOL WXLt(CGFloat a, CGFloat b) {
-    return a-b < -(1e-6);
+BOOL WXFloatGreaterThan(CGFloat a, CGFloat b) {
+    return WXFloatGreaterThanWithPrecision(a, b, FLT_EPSILON);
 }
-
-BOOL WXGt(CGFloat a, CGFloat b) {
-    return a-b > (1e-6);
+BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return a-b > precision;
 }

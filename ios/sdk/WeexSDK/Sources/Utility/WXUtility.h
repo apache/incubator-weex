@@ -361,16 +361,31 @@ CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelS
  *  @abstract compare float a and b, if a equal b, return true,or reture false.
  *
  */
-BOOL WXEq(CGFloat a, CGFloat b);
+BOOL WXFloatEqual(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision, if a equal b, return true,or reture false.
+ *
+ */
+BOOL WXFloatEqualWithPrecision(CGFloat a, CGFloat b ,double precision);
 /**
  *  @abstract compare float a and b, if a less than b, return true,or reture false.
  *
  */
-BOOL WXLt(CGFloat a, CGFloat b);
+BOOL WXFloatLessThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b,user give the compare precision, if a less than b,return true,or reture false.
+ *
+ */
+BOOL WXFloatLessThanWithPrecision(CGFloat a, CGFloat b,double precision);
 /**
  *  @abstract compare float a and b, if a great than b, return true,or reture false.
  *
  */
-BOOL WXGt(CGFloat a, CGFloat b);
+BOOL WXFloatGreaterThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision,if a great than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 
 @end
