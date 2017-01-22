@@ -205,29 +205,36 @@
 package com.taobao.weex.ui.module;
 
 import android.os.Message;
+
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
 import com.taobao.weex.common.WXJSBridgeMsgType;
-import com.taobao.weex.utils.WXFileUtils;
+import com.taobao.weex.common.WXThread;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by sospartan on 7/28/16.
@@ -246,11 +253,15 @@ public class WXTimerModuleTest {
 
   @Before
   public void setup() throws Exception{
+    WXSDKEngine.initialize(RuntimeEnvironment.application, new InitConfig.Builder().build());
+    bridge = Mockito.mock(WXBridgeManager.class);
+    when(bridge.getJSLooper()).thenReturn(new WXThread("x").getLooper());
+    WXBridgeManagerTest.setBridgeManager(bridge);
+
     module = new WXTimerModule();
     module.mWXSDKInstance = WXSDKInstanceTest.createInstance();
 
-    bridge = Mockito.mock(WXBridgeManager.class);
-    WXBridgeManagerTest.setBridgeManager(bridge);
+
 
   }
 
