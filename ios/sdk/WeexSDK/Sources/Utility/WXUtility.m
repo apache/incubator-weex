@@ -702,3 +702,14 @@ CGPoint WXPixelPointResize(CGPoint value)
     return new;
 }
 
+BOOL WXEq(CGFloat a, CGFloat b) {
+    return fabs(a - b) <= 1e-6;
+}
+
+BOOL WXLt(CGFloat a, CGFloat b) {
+    return a-b < -(1e-6);
+}
+
+BOOL WXGt(CGFloat a, CGFloat b) {
+    return a-b > (1e-6);
+}
