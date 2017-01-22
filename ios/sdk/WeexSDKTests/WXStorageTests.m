@@ -181,7 +181,7 @@
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
             NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+            XCTAssertTrue(ABS(tsNow - ts) <= 1);
 
             [NSThread sleepForTimeInterval:2];
             
@@ -190,7 +190,7 @@
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
                 NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+                XCTAssertTrue(ABS(tsNow - ts) <= 1);
 
                 [NSThread sleepForTimeInterval:2];
                 
@@ -200,7 +200,7 @@
                     NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                     NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
                     NSTimeInterval ts = [infoDic[@"key3"][@"ts"] doubleValue];
-                    XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
+                    XCTAssertTrue(ABS(tsNow - ts) <= 1);
                     
                     [NSThread sleepForTimeInterval:2];
                 }];
