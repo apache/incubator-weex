@@ -37,7 +37,7 @@ end
 for file_path in oc_files do
   contents = File.read(file_path)
   if not has_copyright_header(contents, copyright_header_components)
-    fail("Objective-C file '#{file_path}' do not have the copyright header.")
+    fail("Objective-C file '#{file_path}' does not have the copyright header.")
   end
 end
 
