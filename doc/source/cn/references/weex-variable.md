@@ -25,7 +25,7 @@ has_chapter_content: true
     * `deviceWidth: number`: 设备宽度，默认为 750。
     * `deviceHeight: number`: 设备高度。
 
-## `weex.require(module: string): Object`
+## `weex.requireModule(module: string): Object`
 
 获取某个 native module 的所有方法，比如：
 
@@ -34,7 +34,7 @@ has_chapter_content: true
   <div><text>Hello World</text></div>
 </template>
 <script>
-  var modal = weex.require('modal')
+  var modal = weex.requireModule('modal')
   modal.toast({
     message: 'I am a toast.',
     duration: 3
