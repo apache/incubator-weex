@@ -34,10 +34,18 @@
      *  View
      */
     UIColor *_backgroundColor;
+    NSString *_backgroundImage;
     WXClipType _clipToBounds;
     UIView *_view;
     CGFloat _opacity;
     WXVisibility  _visibility;
+    
+    /**
+     *  PseudoClass
+     */
+    NSMutableDictionary *_pseudoClassStyles;
+    NSMutableDictionary *_updatedPseudoClassStyles;
+    BOOL _isListenPseudoTouch;
     
     /**
      *  Events
@@ -48,9 +56,14 @@
     NSMutableArray *_swipeGestures;
     UILongPressGestureRecognizer *_longPressGesture;
     UIPanGestureRecognizer *_panGesture;
+    
     BOOL _listenPanStart;
     BOOL _listenPanMove;
     BOOL _listenPanEnd;
+    
+    BOOL _listenHorizontalPan;
+    BOOL _listenVerticalPan;
+    
     WXTouchGestureRecognizer* _touchGesture;
     
     /**
@@ -110,7 +123,7 @@
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles;
 - (void)_updateAttributesOnComponentThread:(NSDictionary *)attributes;
 - (void)_updateStylesOnMainThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles;
 - (void)_updateAttributesOnMainThread:(NSDictionary *)attributes;
@@ -156,6 +169,8 @@
 
 - (void)_initEvents:(NSArray *)events;
 
+- (void)_initPseudoEvents:(BOOL)isListenPseudoTouch;
+
 - (void)_removeAllEvents;
 
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
@@ -166,4 +181,7 @@
 
 - (void)_resetNativeBorderRadius;
 
+- (void)_updatePseudoClassStyles:(NSString *)key;
+
+- (void)_restoreViewStyles;
 @end

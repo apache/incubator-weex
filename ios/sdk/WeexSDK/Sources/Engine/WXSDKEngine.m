@@ -10,15 +10,18 @@
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
+#import "WXBridgeManager.h"
 
 #import "WXAppConfiguration.h"
-#import "WXNetworkDefaultImpl.h"
+#import "WXResourceRequestHandlerDefaultImpl.h"
 #import "WXNavigationDefaultImpl.h"
 #import "WXURLRewriteDefaultImpl.h"
+#import "WXWebSocketDefaultImpl.h"
+
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXMonitor.h"
-#import "WXSimulatorShortcutMananger.h"
+#import "WXSimulatorShortcutManager.h"
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXUtility.h"
@@ -43,6 +46,8 @@
     [self registerModule:@"globalEvent" withClass:NSClassFromString(@"WXGlobalEventModule")];
     [self registerModule:@"canvas" withClass:NSClassFromString(@"WXCanvasModule")];
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
+    [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
+    [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
@@ -97,7 +102,7 @@
     if (!name || !clazz) {
         return;
     }
-    
+
     WXAssert(name && clazz, @"Fail to register the component, please check if the parameters are correct ！");
     
     [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
@@ -114,14 +119,33 @@
     }
 }
 
+
+# pragma mark Service Register
++ (void)registerService:(NSString *)name withScript:(NSString *)serviceScript withOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withService:serviceScript withOptions:options];
+}
+
++ (void)registerService:(NSString *)name withScriptUrl:(NSURL *)serviceScriptUrl WithOptions:(NSDictionary *)options
+{
+    [[WXSDKManager bridgeMgr] registerService:name withServiceUrl:serviceScriptUrl withOptions:options];
+}
+
++ (void)unregisterService:(NSString *)name
+{
+    [[WXSDKManager bridgeMgr] unregisterService:name];
+}
+
 # pragma mark Handler Register
 
 // register some default handlers when the engine initializes.
 + (void)_registerDefaultHandlers
 {
-    [self registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
+    [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
+    [self registerHandler:[WXWebSocketDefaultImpl new] withProtocol:@protocol(WXWebSocketHandler)];
+
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
@@ -140,21 +164,21 @@
 
 # pragma mark SDK Initialize
 
-+ (void)initSDKEnviroment
++ (void)initSDKEnvironment
 {
     WX_MONITOR_PERF_START(WXPTInitalize)
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
-    [WXSDKEngine initSDKEnviroment:script];
+    [WXSDKEngine initSDKEnvironment:script];
     
     WX_MONITOR_PERF_END(WXPTInitalizeSync)
     
 #if TARGET_OS_SIMULATOR
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [WXSimulatorShortcutMananger registerSimulatorShortcutWithKey:@"i" modifierFlags:UIKeyModifierCommand | UIKeyModifierAlternate action:^{
+        [WXSimulatorShortcutManager registerSimulatorShortcutWithKey:@"i" modifierFlags:UIKeyModifierCommand | UIKeyModifierAlternate action:^{
             NSURL *URL = [NSURL URLWithString:@"http://localhost:8687/launchDebugger"];
             NSURLRequest *request = [NSURLRequest requestWithURL:URL];
             
@@ -177,18 +201,26 @@
 #endif
 }
 
-+ (void)initSDKEnviroment:(NSString *)script
++ (void)initSDKEnvironment:(NSString *)script
 {
     if (!script || script.length <= 0) {
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
     
-    [self _registerDefaultComponents];
-    [self _registerDefaultModules];
-    [self _registerDefaultHandlers];
+    [self registerDefaults];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
+}
+
++ (void)registerDefaults
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self _registerDefaultComponents];
+        [self _registerDefaultModules];
+        [self _registerDefaultHandlers];
+    });
 }
 
 + (NSString*)SDKEngineVersion
@@ -276,6 +308,20 @@ static NSDictionary *_customEnvironment;
         [self registerHandler:mObj withProtocol:NSProtocolFromString(mKey)];
     };
     [handlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
+}
+
+@end
+
+@implementation WXSDKEngine (Deprecated)
+
++ (void)initSDKEnviroment
+{
+    [self initSDKEnvironment];
+}
+
++ (void)initSDKEnviroment:(NSString *)script
+{
+    [self initSDKEnvironment:script];
 }
 
 @end

@@ -34,7 +34,7 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 - (void)startComponentTasks;
 
 /**
- * @abstract tell the component mananger that instance root view's frame has been changed
+ * @abstract tell the component manager that instance root view's frame has been changed
  **/
 - (void)rootViewFrameDidChange:(CGRect)frame;
 
@@ -87,6 +87,16 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  **/
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
 
+///--------------------------------------
+/// @name Updating pseudo class
+///--------------------------------------
+
+/**
+ * @abstract update  pseudo class styles
+ **/
+
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref;
+
 /**
  * @abstract update attributes
  **/
@@ -106,8 +116,6 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  * @abstract scroll to specific component
  **/
 - (void)scrollToComponent:(NSString *)ref options:(NSDictionary *)options;
-
-- (void)dispatchComponentMethod:(WXBridgeMethod*)method;
 
 ///--------------------------------------
 /// @name Life Cycle
