@@ -80,6 +80,7 @@ menu:
   advanced: Advanced
   baichuan: AliBaichuan
   github: GitHub
+  legacy: Legacy
 playground:
   content: Weex Native Runtime showcase & Weex we file preview.
 categories: Categories

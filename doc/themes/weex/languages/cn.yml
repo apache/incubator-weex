@@ -79,6 +79,7 @@ menu:
   advanced: 高阶知识
   baichuan: 阿里百川
   github: GitHub
+  legacy: 旧文档
 playground:
   content: Weex Native 运行时实例 & Weex 文件预览工具。
 categories: Categories

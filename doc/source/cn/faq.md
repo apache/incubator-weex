@@ -6,6 +6,15 @@ layout: post
 
 # 常见问题解答
 
+## 如何查阅旧文档？
+
+你可以通过文档左侧目录最后一项 “旧文档” 进入对于的历史文档页面。也可以直接访问以下链接访问：
+
+- [Guide](./v-0.10/guide/index.html)
+- [手册](./v-0.10/references/index.html)
+- [高阶知识](./v-0.10/advanced/index.html)
+- [工具](./v-0.10/tools/index.html)
+
 ## Windows 指令错误
 
 请先安装 [Git for Windows](https://git-scm.com/download/win)，在 [For Windows](https://github.com/alibaba/weex/tree/dev#for-windows) 中查看更多信息。
