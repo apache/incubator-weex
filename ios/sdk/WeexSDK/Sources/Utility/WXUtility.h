@@ -357,4 +357,35 @@ CGRect WXPixelFrameResize(CGRect value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelSca
 CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
 + (UIFont  * _Nullable )fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString * _Nullable)fontFamily DEPRECATED_MSG_ATTRIBUTE("Use +[WXUtility fontWithSize:textWeight:textStyle:fontFamily:scaleFactor:]");
 
+/**
+ *  @abstract compare float a and b, if a equal b, return true,or reture false.
+ *
+ */
+BOOL WXFloatEqual(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision, if a equal b, return true,or reture false.
+ *
+ */
+BOOL WXFloatEqualWithPrecision(CGFloat a, CGFloat b ,double precision);
+/**
+ *  @abstract compare float a and b, if a less than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatLessThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b,user give the compare precision, if a less than b,return true,or reture false.
+ *
+ */
+BOOL WXFloatLessThanWithPrecision(CGFloat a, CGFloat b,double precision);
+/**
+ *  @abstract compare float a and b, if a great than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatGreaterThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision,if a great than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
+
 @end
