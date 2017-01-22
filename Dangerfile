@@ -14,31 +14,32 @@ end
 # xcode_summary.report 'ios/sdk/xcodebuild.json'
 
 # Fails build when Copyright header is not included
-oc_files = (git.modified_files + git.added_files).select do |line|
-  line.end_with?(".h") || line.end_with?(".m") || line.end_with?(".mm")
+oc_files = (git.modified_files + git.added_files).uniq.select do |file_path|
+  file_path.end_with?(".h") || file_path.end_with?(".m") || file_path.end_with?(".mm")
 end
 
 copyright_header_components = Array.[](
   /Created by Weex./,
-  /Copyright \\(c\\) .*, Alibaba, Inc. All rights reserved./,
+  /Copyright \(c\) .*, Alibaba, Inc. All rights reserved./,
   /This source code is licensed under the Apache Licence 2.0./,
   /For the full copyright and license information,please view the LICENSE file in the root directory of this source tree./
 )
 
-no_copyright_files = oc_files.select do |file_path|
-  contents = File.read(file_path)
-  for line in copyright_header_components
+def has_copyright_header contents, copyright
+  for line in copyright do
     if not contents =~ line
-      return true
+      return false
     end
   end
-
-  return false
+  return true
 end
 
-message(no_copyright_files)
-
-
+for file_path in oc_files do
+  contents = File.read(file_path)
+  if not has_copyright_header(contents, copyright_header_components)
+    fail("OC file do not have the copyright header", file:file_path);
+  end
+end
 
 # prose.check_spelling oc_files
 
@@ -46,16 +47,8 @@ message(no_copyright_files)
 # from files matching to 'Pods/*'
 # mention.run(2, ["Pods/*"], [])
 
-message("Test Message")
-
 # warn("Please add your name", file: "CHANGELOG.md", line: 4)
 
 # fail("Our linter has failed.")
 
 # markdown("## xxxxx")
-
-
-
-
-
-
