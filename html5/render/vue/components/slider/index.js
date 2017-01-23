@@ -6,7 +6,6 @@ import slideMixin from './slideMixin'
 
 export default {
   mixins: [base, event, slideMixin],
-  // components: { indicator },
   props: {
     'auto-play': {
       type: [String, Boolean],
@@ -76,6 +75,11 @@ export default {
     this.$nextTick(() => {
       this.updateLayout()
     })
+  },
+
+  beforeUpdate () {
+    this.updateLayout()
+    this.reorder()
   },
 
   mounted () {
