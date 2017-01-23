@@ -544,7 +544,7 @@ typedef enum : NSUInteger {
 
 - (void)finishPerformance
 {
-    //deperacated
+    //deprecated
 }
 
 - (void)creatFinish
