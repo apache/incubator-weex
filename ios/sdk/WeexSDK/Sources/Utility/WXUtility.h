@@ -202,7 +202,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  *
  * @param textSize.
  *
- * @param textWeight. The type of WXTextWeight (Normal or Bold).
+ * @param textWeight.
  *
  * @param textStyle. The type of WXTextStyle (Normal or Italic).
  *
@@ -211,7 +211,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
  * @return A font object according to the above params.
  *
  */
-+ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily;
++ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily scaleFactor:(CGFloat)scaleFactor;
 
 /**
  * @abstract download remote font from specified url
@@ -221,24 +221,21 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (void)getIconfont:(NSURL * _Nonnull)fontURL completion:( void(^ _Nullable )(NSURL * _Nonnull url, NSError * _Nullable error)) completionBlock;
 
 /**
+ * @abstract Returns the main screen's size when the device is in portrait mode,.
+ */
++ (CGSize)portraitScreenSize;
+
+/**
+ * @abstract Returns the default pixel scale factor
+ * @discussion If orientation is equal to landscape, the value is caculated as follows: WXScreenSize().height / WXDefaultScreenWidth, otherwise, WXScreenSize().width / WXDefaultScreenWidth.
+ */
++ (CGFloat)defaultPixelScaleFactor;
+
+/**
  * @abstract Returns the scale of the main screen.
  *
  */
 CGFloat WXScreenScale();
-
-/**
- * @abstract Returns the metrics of the main screen.
- *
- */
-CGSize WXScreenSize();
-
-/**
- * @abstract Returns the resize radio of the main screen. 
- *
- * @discussion If orientation is equal to landscape, the value is caculated as follows: WXScreenSize().height / WXDefaultScreenWidth, otherwise, WXScreenSize().width / WXDefaultScreenWidth.
- *
- */
-CGFloat WXScreenResizeRadio(void);
 
 /**
  * @abstract Returns a Round float coordinates to the main screen pixel.
@@ -257,24 +254,6 @@ CGFloat WXFloorPixelValue(CGFloat value);
  *
  */
 CGFloat WXCeilPixelValue(CGFloat value);
-
-/**
- *  @abstract Returns a resized pixel which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGFloat WXPixelResize(CGFloat value);
-
-/**
- *  @abstract Returns a resized frame which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGRect WXPixelFrameResize(CGRect value);
-
-/**
- *  @abstract Returns a resized point which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGPoint WXPixelPointResize(CGPoint value);
 
 /**
  *  @abstract check whether the file is exist
@@ -357,5 +336,23 @@ CGPoint WXPixelPointResize(CGPoint value);
  *
  */
 + (NSString *_Nullable)timeToString:(NSDate *_Nullable)date;
+
+/**
+ *  @abstract get the repeat  subtring number of string.
+ *
+ */
++ (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString;
+
+/**
+ *  @abstract Returns a resized pixel which is caculated according to the WXScreenResizeRadio.
+ *
+ */
+CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor);
+
+CGFloat WXScreenResizeRadio(void) DEPRECATED_MSG_ATTRIBUTE("Use [WXUtility defaultPixelScaleFactor] instead");
+CGFloat WXPixelResize(CGFloat value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
+CGRect WXPixelFrameResize(CGRect value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
+CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
++ (UIFont  * _Nullable )fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString * _Nullable)fontFamily DEPRECATED_MSG_ATTRIBUTE("Use +[WXUtility fontWithSize:textWeight:textStyle:fontFamily:scaleFactor:]");
 
 @end

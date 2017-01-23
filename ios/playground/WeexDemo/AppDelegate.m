@@ -15,6 +15,7 @@
 #import "WXImgLoaderDefaultImpl.h"
 #import "DemoDefine.h"
 #import "WXScannerVC.h"
+#import "WXSyncTestModule.h"
 #import <WeexSDK/WeexSDK.h>
 #import <AVFoundation/AVFoundation.h>
 #import <ATSDK/ATManager.h>
@@ -65,6 +66,18 @@
 #endif
 }
 
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    NSString *newUrlStr = url.absoluteString;
+    if([url.scheme isEqualToString:@"wxpage"]) {
+        newUrlStr = [newUrlStr stringByReplacingOccurrencesOfString:@"wxpage://" withString:@"http://"];
+    }
+    UIViewController * viewController = [self demoController];
+    ((WXDemoViewController*)viewController).url = [NSURL URLWithString:newUrlStr];
+    [(WXRootViewController*)self.window.rootViewController pushViewController:viewController animated:YES];
+    return YES;
+}
+
 #pragma mark weex
 - (void)initWeexSDK
 {
@@ -72,13 +85,14 @@
     [WXAppConfiguration setAppName:@"WeexDemo"];
     [WXAppConfiguration setExternalUserAgent:@"ExternalUA"];
     
-    [WXSDKEngine initSDKEnviroment];
+    [WXSDKEngine initSDKEnvironment];
     
     [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)];
     [WXSDKEngine registerHandler:[WXEventModule new] withProtocol:@protocol(WXEventModuleProtocol)];
     
     [WXSDKEngine registerComponent:@"select" withClass:NSClassFromString(@"WXSelectComponent")];
     [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
+    [WXSDKEngine registerModule:@"syncTest" withClass:[WXSyncTestModule class]];
     
 #if !(TARGET_IPHONE_SIMULATOR)
     [self checkUpdate];

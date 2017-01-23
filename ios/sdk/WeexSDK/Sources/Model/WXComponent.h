@@ -66,6 +66,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, strong) NSDictionary *styles;
 
 /**
+ *  @abstract The component's pseudoClassStyles.
+ */
+@property (nonatomic, readonly, strong) NSDictionary *pseudoClassStyles;
+
+/**
  *  @abstract The component's attributes.
  */
 @property (nonatomic, readonly, strong) NSDictionary *attributes;
@@ -334,6 +339,11 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
  *
  */
 - (WXDisplayBlock)displayBlock;
+
+/**
+ * readyToRender
+ */
+- (void)readyToRender;
 
 /**
  * @abstract Return a block to be called while drawing is finished.

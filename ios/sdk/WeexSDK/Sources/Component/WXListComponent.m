@@ -223,7 +223,7 @@
     NSIndexPath *toIndexPath = [self indexPathForCell:(WXCellComponent*)cellComponent sections:_completedSections];
     CGRect cellRect = [_tableView rectForRowAtIndexPath:toIndexPath];
     contentOffsetY += cellRect.origin.y;
-    contentOffsetY += offset * WXScreenResizeRadio();
+    contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
     
     if (contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
         contentOffset.y = _tableView.contentSize.height - _tableView.frame.size.height;
@@ -311,9 +311,15 @@
         [self removeCellForIndexPath:indexPath withSections:_completedSections];
         
         WXLogDebug(@"Delete cell:%@ at indexPath:%@", cell.ref, indexPath);
-        [UIView performWithoutAnimation:^{
-            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        }];
+        if (cell.deleteAnimation == UITableViewRowAnimationNone) {
+            [UIView performWithoutAnimation:^{
+                [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self handleAppear];
+            }];
+        } else {
+            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.deleteAnimation];
+            [self handleAppear];
+        }
     }];
 }
 
@@ -341,13 +347,20 @@
         if (!isReload) {
             WXLogDebug(@"Insert cell:%@ at indexPath:%@", cell.ref, indexPath);
             _completedSections = completedSections;
-            [UIView performWithoutAnimation:^{
-                [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-            }];
+            if (cell.insertAnimation == UITableViewRowAnimationNone) {
+                [UIView performWithoutAnimation:^{
+                    [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                    [self handleAppear];
+                }];
+            } else {
+                [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.insertAnimation];
+                [self handleAppear];
+            }
         } else {
             WXLogInfo(@"Reload cell:%@ at indexPath:%@", cell.ref, indexPath);
             [UIView performWithoutAnimation:^{
                 [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self handleAppear];
             }];
         }
     }];
@@ -395,6 +408,7 @@
         [self insertCell:cell forIndexPath:toIndexPath withSections:_completedSections];
         [UIView performWithoutAnimation:^{
             [_tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+            [self handleAppear];
         }];
     }];
 }
