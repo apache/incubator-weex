@@ -5,10 +5,11 @@ const env = {
   platform: 'Web',
   weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
   userAgent: navigator.userAgent,
-  appName: lib.env.aliapp ? lib.env.aliapp.appname : null,
-  appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
+  appName: lib.env.aliapp ? lib.env.aliapp.appname : navigator.appName,
+  appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : navigator.appVersion,
   osName: lib.env.browser ? lib.env.browser.name : null,
   osVersion: lib.env.browser ? lib.env.browser.version.val : null,
+  deviceModel: lib.env.os.name || null,
   deviceWidth: window.innerWidth,
   deviceHeight: window.innerHeight
 }

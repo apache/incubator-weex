@@ -6,6 +6,11 @@ import styleMixin from './mixins/style'
 function install (Vue) {
   setViewport()
 
+  Vue.prototype.$getConfig = () => {
+    console.warn('[Vue Render] "this.$getConfig" is deprecated, please use "weex.config" instead.')
+    return window.weex.config
+  }
+
   const htmlRegex = /^html:/i
   Vue.config.isReservedTag = tag => htmlRegex.test(tag)
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
