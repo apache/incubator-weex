@@ -191,32 +191,12 @@ body > .weex-scroller {
   min-height: 100%;
 }
 
+.weex-list-wrapper,
 .weex-scroller-wrapper {
   display: block;
   position: relative;
-  overflow: scroll;
-}
-.weex-scroller-wrapper.weex-scroller-horizontal {
-  overflow: hidden;
-}
-
-.weex-scroller-horizontal .weex-scroller-inner {
-  display: block;
-  width: auto;
-  height: 100%;
-}
-.weex-scroller-horizontal .weex-scroller-inner > * {
-  display: block;
-  float: left;
-}
-
-.weex-list-wrapper {
-  display: block;
-  position: relative;
-  overflow: scroll;
-}
-.weex-list-wrapper.with-loading, .weex-list-wrapper.with-refresh {
-  background-color: #888888;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .weex-list-inner,
@@ -240,11 +220,26 @@ body > .weex-scroller {
           justify-content: flex-start;
 }
 
+.weex-scroller-wrapper.weex-scroller-horizontal {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.weex-scroller-horizontal .weex-scroller-inner {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+.weex-scroller-horizontal .weex-scroller-inner > * {
+  float: left;
+}
+
 .weex-cell {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  width: 100%;
 }
 
 .weex-refresh,
