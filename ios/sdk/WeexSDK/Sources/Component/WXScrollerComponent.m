@@ -473,13 +473,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 {
     [_loadingComponent.view setHidden:NO];
     [_refreshComponent.view setHidden:NO];
+    
     //refresh
-    if (_refreshComponent && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
+    if (_refreshComponent && scrollView.contentOffset.y < 0 && scrollView.contentOffset.y + _refreshComponent.calculatedFrame.size.height < _refreshComponent.calculatedFrame.origin.y) {
         [_refreshComponent refresh];
     }
     
     //loading
-    if (_loadingComponent &&
+    if (_loadingComponent && scrollView.contentOffset.y > 0 &&
         scrollView.contentOffset.y + scrollView.frame.size.height > _loadingComponent.view.frame.origin.y + _loadingComponent.calculatedFrame.size.height) {
         [_loadingComponent loading];
     }

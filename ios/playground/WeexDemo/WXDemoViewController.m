@@ -47,6 +47,7 @@
     [self setupNaviBar];
     [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
+    [self.view setClipsToBounds:YES];
     
     _weexHeight = self.view.frame.size.height - 64;
     
