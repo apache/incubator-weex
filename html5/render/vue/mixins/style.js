@@ -3,6 +3,11 @@ import { validateStyles } from '../validator'
 
 let warned = false
 
+function getWarnText (prop) {
+  return `[Vue Rneder] "${prop}" is not a standard CSS property,`
+    + 'it may not support very well on weex vue render.'
+}
+
 function normalize (styles) {
   const realStyle = {}
   for (const key in styles) {
@@ -11,6 +16,17 @@ function normalize (styles) {
     // TODO: add more reliable check
     if (typeof value === 'number') {
       value += 'px'
+    }
+
+    // warn for unsupported properties
+    switch (key) {
+      case 'lines':
+      case 'item-color':
+      case 'itemColor':
+      case 'item-selected-color':
+      case 'itemSelectedColor':
+      case 'item-size':
+      case 'itemSize': console.warn(getWarnText(key)); break
     }
 
     realStyle[key] = value
@@ -23,8 +39,10 @@ function getStyleMap (component) {
     const $options = component.$vnode.context.$options
     if ($options && $options.style) {
       if (!warned) {
-        console.warn(`[Vue Render] Please use vue-loader to compile the .vue file.`)
         warned = true
+        console.error('[Invalid Bundle Format] This bundle format is '
+          + 'generated for Android and iOS platform, '
+          + 'please use "vue-loader" to compile the ".vue" file on the web.')
       }
       return $options.style
     }

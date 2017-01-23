@@ -6,7 +6,8 @@ const supportedProperties = {
 
 const supportedStyles = {
   '*': [
-    '@box-model', '@border', '@flexbox', '@font', '@colors', '@text'
+    '@box-model', '@border', '@position', '@flexbox', '@font', '@text', '@bg',
+    'lines', 'item-size', 'item-color', 'item-selected-color'
   ],
   '@box-model': [
     'width', 'height', 'position',
@@ -20,14 +21,29 @@ const supportedStyles = {
     'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
     'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius'
   ],
+  '@position': ['position', 'top', 'left', 'right', 'bottom'],
   '@flexbox': [
     'flex', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap'
   ],
-  '@font': ['font-size', 'font-weight', 'font-style', 'font-family'],
-  '@text': ['text-align', 'text-decoration', 'text-overflow'],
-  '@colors': ['color', 'background-color', 'opacity'],
+  '@font': ['font-size', 'font-weight', 'font-style', 'font-family', 'line-height'],
+  '@text': ['text-align', 'text-decoration', 'text-overflow', 'color'],
+  '@bg': ['background-color', 'opacity'],
 
-  text: ['@box-model', '@border', '@font', '@colors', '@text', 'lines']
+  'a': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'div': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'text': ['@box-model', '@border', '@position', '@font', '@text', '@bg', 'lines'],
+  'slider': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'switch': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'indicator': ['@box-model', '@border', '@position', '@flexbox', '@bg', 'item-size', 'item-color', 'item-selected-color'],
+  'input': ['@box-model', '@border', '@position', '@font', '@text', '@bg'],
+  'textarea': ['@box-model', '@border', '@position', '@font', '@text', '@bg', 'rows'],
+  'scroller': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'loading': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'refresh': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'list': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'cell': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'video': ['@box-model', '@border', '@position', '@flexbox', '@bg'],
+  'web': ['@box-model', '@border', '@position', '@flexbox', '@bg']
 }
 
 /**
