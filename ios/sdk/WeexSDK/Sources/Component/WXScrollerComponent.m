@@ -46,6 +46,7 @@
     CGFloat _previousLoadMoreContentHeight;
     CGFloat _offsetAccuracy;
     CGPoint _lastContentOffset;
+    CGPoint _lastScrollEventFiredOffset;
     BOOL _scrollable;
 
     // vertical & horizontal
@@ -89,6 +90,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _stickyArray = [NSMutableArray array];
         _listenerArray = [NSMutableArray array];
         _scrollEvent = NO;
+        _lastScrollEventFiredOffset = CGPointMake(0, 0);
         _scrollDirection = attributes[@"scrollDirection"] ? [WXConvert WXScrollDirection:attributes[@"scrollDirection"]] : WXScrollDirectionVertical;
         _showScrollBar = attributes[@"showScrollbar"] ? [WXConvert BOOL:attributes[@"showScrollbar"]] : YES;
         _loadMoreOffset = attributes[@"loadmoreoffset"] ? [WXConvert CGFloat:attributes[@"loadmoreoffset"]] : 0;
@@ -422,43 +424,31 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
     }
-    
+    _lastContentOffset = scrollView.contentOffset;
+
     // check sticky
     [self adjustSticky];
     [self handleLoadMore];
     [self handleAppear];
     
-//    CGFloat vx = scrollView.contentInset.left + scrollView.contentOffset.x;
-//    CGFloat vy = scrollView.contentInset.top + scrollView.contentOffset.y;
-//    CGFloat vw = scrollView.frame.size.width - scrollView.contentInset.left - scrollView.contentInset.right;
-//    CGFloat vh = scrollView.frame.size.height - scrollView.contentInset.top - scrollView.contentInset.bottom;
-//    CGRect scrollRect = CGRectMake(vx, vy, vw, vh);;
-//    
-//    // notify action for appear & disappear
-//    for(WXScrollToTarget *target in self.listenerArray){
-//        [self scrollToTarget:target scrollRect:scrollRect];
-//    }
-    
     if (self.onScroll) {
         self.onScroll(scrollView);
     }
     if (_scrollEvent) {
-        NSMutableDictionary *scrollEventParams = [[NSMutableDictionary alloc] init];
-        NSDictionary *frameSizeData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:scrollView.frame.size.width],@"width",[NSNumber numberWithFloat:scrollView.frame.size.height],@"height", nil];
         NSDictionary *contentSizeData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:scrollView.contentSize.width],@"width",[NSNumber numberWithFloat:scrollView.contentSize.height],@"height", nil];
         //contentOffset values are replaced by (-contentOffset.x,-contentOffset.y) ,in order to be consistent with Android client.
         NSDictionary *contentOffsetData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:-scrollView.contentOffset.x],@"x",[NSNumber numberWithFloat:-scrollView.contentOffset.y],@"y", nil];
         float distance = 0;
         if (_scrollDirection == WXScrollDirectionHorizontal) {
-            distance = scrollView.contentOffset.x - _lastContentOffset.x;
+            distance = scrollView.contentOffset.x - _lastScrollEventFiredOffset.x;
         } else {
-            distance = scrollView.contentOffset.y - _lastContentOffset.y;
+            distance = scrollView.contentOffset.y - _lastScrollEventFiredOffset.y;
         }
         if (ABS(distance) >= _offsetAccuracy) {
-            [self fireEvent:@"scroll" params:@{@"frameSize":frameSizeData,@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+            [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
+            _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
     }
-    _lastContentOffset = scrollView.contentOffset;
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
