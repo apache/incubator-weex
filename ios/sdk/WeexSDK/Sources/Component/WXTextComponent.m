@@ -105,7 +105,7 @@
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
-    WXTextWeight _fontWeight;
+    CGFloat _fontWeight;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
@@ -154,6 +154,8 @@ static BOOL _isUsingTextStorageLock = NO;
     }
 }
 
+
+
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
 do {\
     id value = styles[@#key];\
@@ -166,18 +168,30 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_FILL_TEXT_PIXEL(key, prop, needLayout)\
+do {\
+    id value = styles[@#key];\
+    if (value) {\
+        _##prop = [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];\
+        [self setNeedsRepaint];\
+    if (needLayout) {\
+        [self setNeedsLayout];\
+    }\
+}\
+} while(0);
+
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
     WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
-    WX_STYLE_FILL_TEXT(fontSize, fontSize, WXPixelType, YES)
+    WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
     WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES)
     WX_STYLE_FILL_TEXT(lines, lines, NSUInteger, YES)
     WX_STYLE_FILL_TEXT(textAlign, textAlign, NSTextAlignment, NO)
     WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
-    WX_STYLE_FILL_TEXT(lineHeight, lineHeight, WXPixelType, YES)
+    WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
@@ -310,7 +324,20 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    if (!_fontFamily) {
+        NSString *regex = @".*[\\u4e00-\\u9faf].*";//Has Simplified Chinese char
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+        if ([pred evaluateWithObject:string]) {
+            if ([[UIDevice currentDevice].systemVersion floatValue] < 9.0) {
+                //“Heiti SC” font is "[UIFont systemFontOfSize:]" for Simplified Chinese before iOS 9.0.
+                _fontFamily = @"Heiti SC";
+            } else {
+                //“PingFang SC” font is "[UIFont systemFontOfSize:]" for Simplified Chinese from iOS 9.0.
+                _fontFamily = @"PingFang SC";
+            }
+        }
+    }
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (font) {
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
     }
@@ -396,6 +423,7 @@ do {\
             if (_isUsingTextStorageLock) {
                 pthread_mutex_unlock(&_textStorageMutex);
             }
+            [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
     }];
@@ -407,9 +435,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
     
     [self fillCSSStyles:styles];
     
