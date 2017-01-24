@@ -16,6 +16,7 @@
 #import "WXThreadSafeCounter.h"
 #import "UIBezierPath+Weex.h"
 #import "WXRoundedRect.h"
+#import "WXSDKInstance.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -64,7 +65,7 @@
     return displayBlock;
 }
 
-- (WXDisplayCompeletionBlock)displayCompeletionBlock
+- (WXDisplayCompletionBlock)displayCompletionBlock
 {
     return nil;
 }
@@ -88,11 +89,11 @@
     } else {
         displayBlock = [self displayBlock];
     }
-    WXDisplayCompeletionBlock compeletionBlock = [self displayCompeletionBlock];
+    WXDisplayCompletionBlock completionBlock = [self displayCompletionBlock];
     
     if (!displayBlock) {
-        if (compeletionBlock) {
-            compeletionBlock(layer, NO);
+        if (completionBlock) {
+            completionBlock(layer, NO);
         }
         return;
     }
@@ -106,9 +107,9 @@
         
         [WXDisplayQueue addBlock:^{
             if (isCancelled()) {
-                if (compeletionBlock) {
+                if (completionBlock) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        compeletionBlock(layer, NO);
+                        completionBlock(layer, NO);
                     });
                 }
                 return;
@@ -118,16 +119,16 @@
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (isCancelled()) {
-                    if (compeletionBlock) {
-                        compeletionBlock(layer, NO);
+                    if (completionBlock) {
+                        completionBlock(layer, NO);
                     }
                     return;
                 }
                 
                 layer.contents = (id)(image.CGImage);
                 
-                if (compeletionBlock) {
-                    compeletionBlock(layer, YES);
+                if (completionBlock) {
+                    completionBlock(layer, YES);
                 }
             });
             
@@ -139,8 +140,8 @@
         
         _layer.contents = (id)image.CGImage;
         
-        if (compeletionBlock) {
-            compeletionBlock(layer, YES);
+        if (completionBlock) {
+            completionBlock(layer, YES);
         }
     }
 }
@@ -390,7 +391,7 @@
 - (void)_handleBorders:(NSDictionary *)styles isUpdating:(BOOL)updating
 {
     if (!updating) {
-        // init with defalut value
+        // init with default value
         _borderTopStyle = _borderRightStyle = _borderBottomStyle = _borderLeftStyle = WXBorderStyleSolid;
         _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];
         _borderTopWidth = _borderLeftWidth = _borderRightWidth = _borderBottomWidth = 0;
@@ -435,10 +436,45 @@ do {\
     }\
 } while (0);
     
+// TODO: refactor this hopefully
+#define WX_CHECK_BORDER_PROP_PIXEL(prop, direction1, direction2, direction3, direction4)\
+do {\
+    BOOL needsDisplay = NO; \
+    NSString *styleProp= WX_NSSTRING(WX_CONCAT(border, prop));\
+    if (styles[styleProp]) {\
+        _border##direction1##prop = _border##direction2##prop = _border##direction3##prop = _border##direction4##prop = [WXConvert WXPixelType:styles[styleProp] scaleFactor:self.weexInstance.pixelScaleFactor];\
+    needsDisplay = YES;\
+    }\
+    NSString *styleDirection1Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction1, prop));\
+    if (styles[styleDirection1Prop]) {\
+        _border##direction1##prop = [WXConvert WXPixelType:styles[styleDirection1Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection2Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction2, prop));\
+    if (styles[styleDirection2Prop]) {\
+        _border##direction2##prop = [WXConvert WXPixelType:styles[styleDirection2Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection3Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction3, prop));\
+    if (styles[styleDirection3Prop]) {\
+        _border##direction3##prop = [WXConvert WXPixelType:styles[styleDirection3Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    NSString *styleDirection4Prop = WX_NSSTRING(WX_CONCAT_TRIPLE(border, direction4, prop));\
+    if (styles[styleDirection4Prop]) {\
+        _border##direction4##prop = [WXConvert WXPixelType:styles[styleDirection4Prop] scaleFactor:self.weexInstance.pixelScaleFactor];\
+        needsDisplay = YES;\
+    }\
+    if (needsDisplay && updating) {\
+        [self setNeedsDisplay];\
+    }\
+} while (0);
+    
+    
     WX_CHECK_BORDER_PROP(Style, Top, Left, Bottom, Right, WXBorderStyle)
     WX_CHECK_BORDER_PROP(Color, Top, Left, Bottom, Right, UIColor)
-    WX_CHECK_BORDER_PROP(Width, Top, Left, Bottom, Right, WXPixelType)
-    WX_CHECK_BORDER_PROP(Radius, TopLeft, TopRight, BottomLeft, BottomRight, WXPixelType)
+    WX_CHECK_BORDER_PROP_PIXEL(Width, Top, Left, Bottom, Right)
+    WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
     if (updating) {
         BOOL nowNeedsDrawBorder = [self _needsDrawBorder];

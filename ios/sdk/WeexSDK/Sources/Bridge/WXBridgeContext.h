@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class WXBridgeMethod;
+@class WXCallJSMethod;
 @class WXSDKInstance;
 
 @interface WXBridgeContext : NSObject
@@ -45,7 +45,7 @@
                    data:(id)data;
 
 /**
- *  Update Instacne State Method
+ *  Update Instance State Method
  *  @param instance  :   instance id
  *  @param data      :   parameters
  **/
@@ -62,12 +62,19 @@
  *  Execute JS Method
  *  @param method    :   object of bridge method
  **/
-- (void)executeJsMethod:(WXBridgeMethod *)method;
+- (void)executeJsMethod:(WXCallJSMethod *)method;
 /**
  *  Register Modules Method
  *  @param modules   :   module list
  **/
 - (void)registerModules:(NSDictionary *)modules;
+
+/**
+ *  Execute JS Service
+ *  @param method    :   JS services name
+ *  @param method    :   JS services script
+ **/
+- (void)executeJsService:(NSString *)script withName: (NSString *)name;
 
 /**
  *  Register Components Method
@@ -89,7 +96,7 @@
 
 /**
  *  Log To WebSocket
- *  @param flag      :   the tag to indentify
+ *  @param flag      :   the tag to identify
  *  @param message   :   message to output
  **/
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message;

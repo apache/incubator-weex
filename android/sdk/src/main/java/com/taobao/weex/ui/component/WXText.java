@@ -210,7 +210,7 @@ import android.text.Layout;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
@@ -248,7 +248,9 @@ public class WXText extends WXComponent<WXTextView> {
 
   @Override
   protected WXTextView initComponentHostView(@NonNull Context context) {
-    return new WXTextView(context);
+    WXTextView textView =new WXTextView(context);
+    textView.holdComponent(this);
+    return textView;
   }
 
   @Override
@@ -312,13 +314,13 @@ public class WXText extends WXComponent<WXTextView> {
   }
 
   @Override
-  protected Object convertEmptyProperty(String propName) {
+  protected Object convertEmptyProperty(String propName, Object originalValue) {
     switch (propName) {
       case Constants.Name.FONT_SIZE:
         return WXText.sDEFAULT_SIZE;
       case Constants.Name.COLOR:
         return "black";
     }
-    return super.convertEmptyProperty(propName);
+    return super.convertEmptyProperty(propName, originalValue);
   }
 }

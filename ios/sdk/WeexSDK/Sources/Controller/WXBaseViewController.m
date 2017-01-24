@@ -60,7 +60,7 @@
 }
 
 /**
- *  We assume that the initial state of viewController's navigitonBar is hidden.  By setting the attribute of
+ *  We assume that the initial state of viewController's navigtionBar is hidden.  By setting the attribute of
  *  'dataRole' equal to 'navbar', the navigationBar hidden will be NO.
  */
 - (void)viewDidLoad
@@ -74,6 +74,36 @@
     if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
         self.navigationController.navigationBarHidden = YES;
     }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [_instance fireGlobalEvent:WX_APPLICATION_WILL_RESIGN_ACTIVE params:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
+    [self _updateInstanceState:WeexInstanceAppear];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [self _updateInstanceState:WeexInstanceDisappear];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    [self _updateInstanceState:WeexInstanceMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)refreshWeex
+{
+    [self _renderWithURL:_sourceURL];
 }
 
 - (void)addEdgePop
@@ -99,30 +129,6 @@
     return YES;
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    [self _updateInstanceState:WeexInstanceAppear];
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    [self _updateInstanceState:WeexInstanceDisappear];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    [self _updateInstanceState:WeexInstanceMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)refreshWeex
-{
-    [self _renderWithURL:_sourceURL];
-}
-
 - (void)_renderWithURL:(NSURL *)sourceURL
 {
     if (!sourceURL) {
@@ -143,7 +149,7 @@
     } else {
         newURL = [NSString stringWithFormat:@"%@?random=%d", sourceURL.absoluteString, arc4random()];
     }
-    [_instance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":sourceURL} data:nil];
+    [_instance renderWithURL:[NSURL URLWithString:newURL] options:@{@"bundleUrl":sourceURL.absoluteString} data:nil];
     
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
@@ -174,11 +180,11 @@
     }
 }
 
-- (void)_appStateDidChange:(NSNotification *)nofity
+- (void)_appStateDidChange:(NSNotification *)notify
 {
-    if ([nofity.name isEqualToString:@"UIApplicationDidBecomeActiveNotification"]) {
+    if ([notify.name isEqualToString:@"UIApplicationDidBecomeActiveNotification"]) {
         [self _updateInstanceState:WeexInstanceForeground];
-    } else if([nofity.name isEqualToString:@"UIApplicationDidEnterBackgroundNotification"]) {
+    } else if([notify.name isEqualToString:@"UIApplicationDidEnterBackgroundNotification"]) {
         [self _updateInstanceState:WeexInstanceBackground]; ;
     }
 }

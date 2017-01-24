@@ -12,7 +12,7 @@
         <receiver
                 android:name="com.taobao.weex.WXGlobalEventReceiver"
                 android:enabled="true"
-                android:exported="true">
+                android:exported="false">
         </receiver>
     </application>
 

@@ -12,6 +12,10 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 
+@interface WXAnimationModule ()
+
+@end
+
 @implementation WXAnimationModule
 
 @synthesize weexInstance;
@@ -57,16 +61,19 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     for (NSString *property in styles) {
         if ([property isEqualToString:@"transform"]) {
             NSString *transformOrigin = styles[@"transformOrigin"];
-            WXTransform *wxTransform = [WXTransform new];
+            WXTransform *wxTransform = [[WXTransform alloc] initWithInstance:self.weexInstance];
             transform = [wxTransform getTransform:styles[property] withView:view withOrigin:transformOrigin isTransformRotate:NO];
             rotateAngle = [wxTransform getRotateAngle];
-            if (rotateAngle > M_PI+0.0001) {
+            CGFloat originAngle = [self getRotateAngleFromTransForm:layer.transform];
+            originAngle = originAngle < 0 ? (originAngle + 2 * M_PI) : originAngle;
+            if (fabs(originAngle - rotateAngle) > M_PI + 0.0001) {
                 /**
                  Rotate >= 180 degree not working on UIView block animation, have not found any more elegant solution than using CAAnimation
                  See http://stackoverflow.com/questions/9844925/uiview-infinite-360-degree-rotation-animation
                  **/
                 isUsingCAAnimation = YES;
             }
+            
             isAnimateTransform = YES;
         } else if ([property isEqualToString:@"backgroundColor"]) {
             backgroundColor = [WXConvert CGColor:styles[property]];
@@ -75,10 +82,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             opacity = [styles[property] floatValue];
             isAnimateOpacity = YES;
         } else if ([property isEqualToString:@"width"]) {
-            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, [WXConvert WXPixelType:styles[property]], newFrame.size.height);
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, [WXConvert WXPixelType:styles[property] scaleFactor:self.weexInstance.pixelScaleFactor], newFrame.size.height);
             isAnimateFrame = YES;
         } else if ([property isEqualToString:@"height"]) {
-            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, newFrame.size.width, [WXConvert WXPixelType:styles[property]]);
+            newFrame = CGRectMake(newFrame.origin.x, newFrame.origin.y, newFrame.size.width, [WXConvert WXPixelType:styles[property] scaleFactor:self.weexInstance.pixelScaleFactor]);
             isAnimateFrame = YES;
         }
     }
@@ -91,6 +98,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [CATransaction begin];
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
     [CATransaction setCompletionBlock:^{
+        if (isUsingCAAnimation) {
+            layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(CGAffineTransformIdentity, rotateAngle));
+        }
         if (callback) {
             callback(@"SUCCESS");
         }
@@ -100,6 +110,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         CABasicAnimation* rotationAnimation;
         rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
         rotationAnimation.toValue = [NSNumber numberWithFloat: rotateAngle];
+        
+        CGFloat originAngle = [self getRotateAngleFromTransForm:layer.transform];
+        originAngle = originAngle < 0 ? (originAngle + 2 * M_PI) : originAngle;
+        rotationAnimation.fromValue = @(originAngle);
         rotationAnimation.duration = duration;
         rotationAnimation.cumulative = YES;
         rotationAnimation.fillMode = kCAFillModeForwards;
@@ -137,6 +151,13 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     
 
     [CATransaction commit];
+}
+
+- (CGFloat)getRotateAngleFromTransForm:(CATransform3D)transform
+{
+    CGAffineTransform cgTransform = CATransform3DGetAffineTransform(transform);
+    CGFloat radians = atan2f(cgTransform.b, cgTransform.a);
+    return radians;
 }
 
 @end
