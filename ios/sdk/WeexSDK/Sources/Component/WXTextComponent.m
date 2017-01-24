@@ -348,7 +348,10 @@ do {\
     if (_fontFamily) {
         NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
         NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
-        if (fontSrc) {
+        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
+        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        //custom localSrc is cached
+        if (!fontLocalSrc && fontSrc) {
             // if use custom font, when the custom font download finish, refresh text.
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         }
