@@ -319,8 +319,11 @@ do {\
     return _text;
 }
 
-- (void)repaintText
+- (void)repaintText:(NSNotification *)notification
 {
+    if (![_fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
+        return;
+    }
     [self setNeedsRepaint];
     WXPerformBlockOnComponentThread(^{
         [self.weexInstance.componentManager startComponentTasks];
@@ -347,7 +350,7 @@ do {\
         NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
         if (fontSrc) {
             // if use custom font, when the custom font download finish, refresh text.
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         }
     }
     
