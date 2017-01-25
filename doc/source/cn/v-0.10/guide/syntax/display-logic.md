@@ -42,6 +42,32 @@ _注意事项：`if="condition"` 和 `if="{% raw %}{{condition}}{% endraw %}"` �
 
 _注意事项：`if` 不能用在 `<template>` 的根组件上，否则将无法被 Weex 正常的识别和处理。_
 
+###  `if` 不会阻断子元素的数据更新
+
+下面这个例子在数据更新后 `item` 或 `item.image` 不存在的情况下会报错：
+
+```html
+<template>
+  <div if="{{(item && item.image)}}" style="width: 200; height: 200;">
+    <image style="width: 100; height: 100;" src="{{item.image.url}}"></image>
+  </div>
+</template>
+```
+
+原因在于 Weex 本身的机制是数据更新在 DOM 更新之前，因此 `if` 数据更新之后，不支持阻断其子元素的数据更新，即 `if` 数据更新为 `false` 之后，内部的子元素仍然会触发自身的数据更新，找不到对应字段，导致报错，可参考这个 [issue](https://github.com/alibaba/weex/issues/1758)。
+
+因此，有两种解决方案：
+
+- 为 `img` 组件的 `src` 也增加容错方案：
+
+  ```html
+  <div if="{{(item && item.image)}}" style="width: 200; height: 200;">
+    <image style="width: 100; height: 100;" src="{{item && item.image && item.image.url}}"></image>
+  </div>
+  ```
+
+- 如果是在 `repeat` 的列表中，还可以使用 `track-by`强制不复用子元素解决。
+
 ## `repeat`
 
 `repeat` 特性用于重复渲染一组相同的组件。它绑定的数据类型必须为数组，数组里的每一项数据可以体现在不同的组件特性、样式、事件绑定等。例如：
