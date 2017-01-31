@@ -22,7 +22,7 @@ import { updateActions } from './misc'
  * @param  {string} code
  * @param  {object} data
  */
-export function init (app, code, data, services) {
+export function init (app, code, data, services, weexGlobalObject) {
   console.debug('[JS Framework] Intialize an instance with:\n', data)
   let result
 
@@ -49,14 +49,14 @@ export function init (app, code, data, services) {
   /* istanbul ignore next */
   const bundleRequireModule = name => app.requireModule(removeWeexPrefix(name))
 
-  const weexGlobalObject = {
+  weexGlobalObject = weexGlobalObject || {
     config: app.options,
-    define: bundleDefine,
-    bootstrap: bundleBootstrap,
     requireModule: bundleRequireModule,
-    document: bundleDocument,
-    Vm: bundleVm
+    document: app.doc
   }
+  weexGlobalObject.define = bundleDefine
+  weexGlobalObject.bootstrap = bundleBootstrap
+  weexGlobalObject.Vm = bundleVm
 
   Object.freeze(weexGlobalObject)
 
