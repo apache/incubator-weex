@@ -12,7 +12,7 @@ import renderer from '../config'
  * @param {object} options
  * @param {object} callbackManager
  */
-export default function App (id, options, callbackManager) {
+export default function App (id, options, callbackManager, weex) {
   this.id = id
   this.options = options || {}
   this.vm = null
@@ -31,7 +31,8 @@ export default function App (id, options, callbackManager) {
   this.callbackManager = callbackManager
 
   // document
-  this.doc = new renderer.Document(
+  const { document } = weex || {}
+  this.doc = document || new renderer.Document(
     id,
     this.options.bundleUrl,
     null,
