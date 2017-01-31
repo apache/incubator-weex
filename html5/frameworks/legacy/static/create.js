@@ -14,7 +14,7 @@ import { resetTarget } from '../core/dep'
  * @param  {object} info { created, ... services, callbacks }
  */
 export function createInstance (id, code, options, data, info) {
-  const { services, callbacks } = info || {}
+  const { services, callbacks, weex } = info || {}
   resetTarget()
   let instance = instanceMap[id]
   /* istanbul ignore else */
@@ -22,9 +22,9 @@ export function createInstance (id, code, options, data, info) {
   let result
   /* istanbul ignore else */
   if (!instance) {
-    instance = new App(id, options, callbacks)
+    instance = new App(id, options, callbacks, weex)
     instanceMap[id] = instance
-    result = initApp(instance, code, data, services)
+    result = initApp(instance, code, data, services, weex)
   }
   else {
     result = new Error(`invalid instance id "${id}"`)
