@@ -57,7 +57,7 @@ a file named 'hello-world-weex.we' will be created in current directory
 ```
 $weex your_best_weex.we  -o .
 ```
-`your_best_weex.we` will be transformd to JS Bundle file `your_best_weex.js` and saved in your current directory
+`your_best_weex.we` will be transformed to JS Bundle file `your_best_weex.js` and saved in your current directory
 
 #### transform a `we file` to JS Bundle , watch this file ，auto run transformer if any change happens.
 ```
