@@ -5,7 +5,7 @@ function buildAndroid {
     builddir=$dir'/android/playground'
     current_dir=$PWD;
     cd $builddir;
-    ./gradlew clean assembleDebug;
+    ./gradlew assembleDebug;
     cd $current_dir;
     pwd
 }
