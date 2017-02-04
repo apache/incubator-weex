@@ -9,29 +9,21 @@ var util = require("./util.js");
 
 describe('weex mobile index', function () {
   this.timeout(1 * 30 * 1000);
-
   var driver = wd(util.getConfig()).initPromiseChain();
-
-  var windowSize = driver.getWindowSize();
-
   driver.configureHttp({
     timeout: 100000
   });
-  // driver.initDriver()
 
   before(function () {
-    console.log("run before");
     return driver
       .initDriver()
-      // .sleep(1000)
-      // .get('wxpage://' + util.getDeviceHost() +'/index.js')
+      .get('wxpage://' + util.getDeviceHost() +'/index.js')
       .sleep(1000);
   });
 
 
   it('#1 Index', () => {
     return driver
-    .get('wxpage://' + util.getDeviceHost() +'/index.js').sleep(1000)
     .elementByXPath('//div/text[1]')
     .text()
     .then((text)=>{

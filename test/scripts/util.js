@@ -41,6 +41,6 @@ module.exports = {
         return isIOS? iOSOpts : androidOpts;
     },
     getDeviceHost:function(){
-        return getIpAddress+":12581";
+        return getIpAddress()+":12581";
     }
 }
