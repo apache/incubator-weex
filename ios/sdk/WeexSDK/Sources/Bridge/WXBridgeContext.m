@@ -267,6 +267,8 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     WXAssertParam(instance);
     
+    if (!data) return;
+    
     [self callJSMethod:@"refreshInstance" args:@[instance, data]];
 }
 
