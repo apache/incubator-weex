@@ -37,16 +37,17 @@ function runiOS {
     platform=ios macaca run -d $1 --verbose
 }
 
-#validate macaca 
-
-
-#get platform
-
-#get test folder
-
-#setup devices
-
-#run tests
-runAndroid ./test/scripts/
-runiOS ./test/scripts/
+platform_android='android'
+ platform=${1:-$platform_android}
+ 
+ #get test folder
+ 
+ #setup devices
+ 
+ #run tests
+ if [ $platform = $platform_android ]; then
+     runAndroid ./test/scripts/
+ else
+     runIOS ./test/scripts/
+ fi
 
