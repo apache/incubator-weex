@@ -27,7 +27,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[1]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'hello world.')
+      assert.equal(text,'hello world.')
     })
   })
 
@@ -38,7 +38,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[2]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'btn click.')
+      assert.equal(text,'btn click.')
     })
   })
 
@@ -51,7 +51,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[2]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'input blur.')
+      assert.equal(text,'input blur.')
     })
   })
 
