@@ -225,6 +225,7 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
@@ -749,5 +750,34 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }, 16);
       }
     }
+  }
+
+  @JSMethod
+  public void setSelectionRange(int selectionStart, int selectionEnd) {
+    EditText hostView;
+    if ((hostView = getHostView()) != null) {
+      focus();
+      hostView.setSelection(selectionStart, selectionEnd);
+    }
+  }
+
+  @JSMethod
+  public void getSelectionRange(JSCallback callback) {
+    EditText hostView;
+    Map<String, Object> result = new HashMap<>(2);
+    if ((hostView = getHostView()) != null) {
+      int start = hostView.getSelectionStart();
+      int end = hostView.getSelectionEnd();
+
+      if (!hostView.hasFocus()) {
+        //The default behavior, same as iOS and web
+        start = 0;
+        end = 0;
+      }
+
+      result.put(Constants.Name.SELECTION_START, start);
+      result.put(Constants.Name.SELECTION_END, end);
+    }
+    callback.invoke(result);
   }
 }
