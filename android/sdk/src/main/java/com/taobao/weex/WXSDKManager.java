@@ -417,6 +417,19 @@ public class WXSDKManager {
     mBridgeManager.notifyTrimMemory();
   }
 
+  /**
+   * Weex embedders can use <code>notifySerializeCodeCache</code> to
+   * serialize code caches if the jsfm has the alility to compile 'new Function'
+   * against js bundles on the weex native side.
+   *
+   * It's a good time to serialize a code cache after exiting a weex page.
+   * Then, the next time of entering the same weex page, V8 would compile
+   * 'new Function' against the code cache deseriazed from the js bundle.
+   */
+  public void notifySerializeCodeCache() {
+    mBridgeManager.notifySerializeCodeCache();
+  }
+
   public @Nullable
   IWebSocketAdapter getIWXWebSocketAdapter() {
     if (mIWebSocketAdapterFactory != null) {
