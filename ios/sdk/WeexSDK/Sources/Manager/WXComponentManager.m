@@ -174,17 +174,17 @@ static NSThread *WXComponentThread;
 
 static bool rootNodeIsDirty(void *context)
 {
-    WXComponentManager *mananger = (__bridge WXComponentManager *)(context);
-    return [mananger->_rootComponent needsLayout];
+    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
+    return [manager->_rootComponent needsLayout];
 }
 
 static css_node_t * rootNodeGetChild(void *context, int i)
 {
-    WXComponentManager *mananger = (__bridge WXComponentManager *)(context);
+    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
     if (i == 0) {
-        return mananger->_rootComponent.cssNode;
-    } else if(mananger->_fixedComponents.count > 0) {
-        return ((WXComponent *)((mananger->_fixedComponents)[i-1])).cssNode;
+        return manager->_rootComponent.cssNode;
+    } else if(manager->_fixedComponents.count > 0) {
+        return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
     }
     
     return NULL;
@@ -273,6 +273,21 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         }
         [component removeFromSuperview];
     }];
+    
+    [self _checkFixedSubcomponentToRemove:component];
+}
+
+- (void)_checkFixedSubcomponentToRemove:(WXComponent *)component
+{
+    for (WXComponent *subcomponent in component.subcomponents) {
+        if (subcomponent->_positionType == WXPositionTypeFixed) {
+             [self _addUITask:^{
+                 [subcomponent removeFromSuperview];
+             }];
+        }
+        
+        [self _checkFixedSubcomponentToRemove:subcomponent];
+    }
 }
 
 - (WXComponent *)componentForRef:(NSString *)ref
@@ -307,11 +322,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssert(component, @"Component build failed for data:%@", data);
     
     [_indexDict setObject:component forKey:component.ref];
-    
+    [component readyToRender];// notify redyToRender event when init
     return component;
 }
-
-#pragma mark Updating
 
 #pragma mark Reset
 -(BOOL)isShouldReset:(id )value
@@ -338,6 +351,16 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 
 - (void)updateStyles:(NSDictionary *)styles forComponent:(NSString *)ref
 {
+    [self handleStyles:styles forComponent:ref isUpdateStyles:YES];
+}
+
+- (void)updatePseudoClassStyles:(NSDictionary *)styles forComponent:(NSString *)ref
+{
+    [self handleStyles:styles forComponent:ref isUpdateStyles:NO];
+}
+
+- (void)handleStyles:(NSDictionary *)styles forComponent:(NSString *)ref isUpdateStyles:(BOOL)isUpdateStyles
+{
     WXAssertParam(styles);
     WXAssertParam(ref);
     
@@ -347,9 +370,10 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSMutableDictionary *normalStyles = [NSMutableDictionary new];
     NSMutableArray *resetStyles = [NSMutableArray new];
     [self filterStyles:styles normalStyles:normalStyles resetStyles:resetStyles];
-    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles];
+    [component _updateStylesOnComponentThread:normalStyles resetStyles:resetStyles isUpdateStyles:isUpdateStyles];
     [self _addUITask:^{
         [component _updateStylesOnMainThread:normalStyles resetStyles:resetStyles];
+        [component readyToRender];
     }];
 }
 
@@ -364,6 +388,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     [component _updateAttributesOnComponentThread:attributes];
     [self _addUITask:^{
         [component _updateAttributesOnMainThread:attributes];
+        [component readyToRender];
     }];
 }
 
@@ -413,37 +438,14 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     }
 
     CGFloat offset = [[options objectForKey:@"offset"] floatValue];
+    BOOL animated = YES;
+    if ([options objectForKey:@"animated"]) {
+        animated = [[options objectForKey:@"animated"] boolValue];
+    }
     
     [self _addUITask:^{
-        [scrollerComponent scrollToComponent:toComponent withOffset:offset];
+        [scrollerComponent scrollToComponent:toComponent withOffset:offset animated:animated];
     }];
-}
-
-- (void)dispatchComponentMethod:(WXBridgeMethod *)method
-{
-    if (!method) {
-        return;
-    }
-    Class componentClazz = [WXComponentFactory classWithComponentName:method.targets[@"component"]];
-    if (!componentClazz) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist！", method.module];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return;
-    }
-    WXPerformBlockOnComponentThread(^{
-        WXSDKInstance *weexInstance = [WXSDKManager instanceForID:method.instance];
-        WXComponent *componentInstance = [weexInstance componentForRef:method.targets[@"ref"]];
-        
-        [self _executeComponentMethod:componentInstance withMethod:method];
-    });
-}
-
-- (void)_executeComponentMethod:(id)target withMethod:(WXBridgeMethod*)method
-{
-    NSInvocation * invocation = [[WXInvocationConfig sharedInstance] invocationWithTargetMethod:target method:method];
-    WXPerformBlockOnMainThread(^{
-        [invocation invoke];
-    });
 }
 
 #pragma mark Life Cycle
@@ -462,7 +464,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
-            [instance creatFinish];
             instance.renderFinish(rootView);
         }
     }];

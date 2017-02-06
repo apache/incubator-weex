@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+@class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -46,7 +47,7 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, weak) NSString *parentNodeRef;
 
 /**
- * The unique id to indentify current weex instance.
+ * The unique id to identify current weex instance.
  **/
 @property (nonatomic, strong) NSString *instanceId;
 
@@ -83,49 +84,49 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  *  The callback triggered when the instance finishes creating the body.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onCreate)(UIView *);
 
 /**
  *  The callback triggered when the root container's frame has changed.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onLayoutChange)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes rendering.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^renderFinish)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes refreshing weex view.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^refreshFinish)(UIView *);
 
 /**
  *  The callback triggered when the instance fails to render.
  *
- *  @param error The error code .
+ *  @return A block that takes a NSError argument, which is the error occured
  **/
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
 
 /**
  *  The callback triggered when the instacne executes scrolling .
  *
- *  @param contentOffset The point at which the origin of the content view is offset from the origin of the scroll view
+ *  @return A block that takes a CGPoint argument, which is content offset of the scroller
  **/
 @property (nonatomic, copy) void (^onScroll)(CGPoint contentOffset);
 
 /**
  * the callback to be run repeatedly while the instance is rendering.
  *
- * @param renderRect The view's frame that is just rendered.
+ * @return A block that takes a CGRect argument, which is the rect rendered
  **/
 @property (nonatomic, copy) void (^onRenderProgress)(CGRect renderRect);
 
@@ -140,6 +141,15 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *userInfo;
 
 /**
+ *  scale factor from css unit to device pixel.
+ */
+@property (nonatomic, assign, readonly) CGFloat pixelScaleFactor;
+
+/**
+ * track component render
+ */
+@property (nonatomic, assign)BOOL trackComponent;
+/**
  * Renders weex view with bundle url.
  *
  * @param url The url of bundle rendered to a weex view.
@@ -151,20 +161,39 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *
  * @param url The url of bundle rendered to a weex view.
  *
- * @param options The params passed by user, sometimes you should pass the value of "bundleUrl".
+ * @param options The params passed by user
  *
- * @param data The data the bundle needs when rendered.
+ * @param data The data the bundle needs when rendered.  Defalut is nil.
  **/
 - (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data;
+
+///**
+// * Renders weex view with resource request.
+// *
+// * @param request The resource request specifying the URL to render with.
+// *
+// * @param options The params passed by user.
+// *
+// * @param data The data the bundle needs when rendered.  Defalut is nil.
+// **/
+//- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 
 /**
  * Renders weex view with source string of bundle and some others.
  *
- * @param options The params passed by user, sometimes you should pass the value of "bundleUrl".
+ * @param options The params passed by user.
  *
- * @param data The data the bundle needs when rendered.
+ * @param data The data the bundle needs when rendered. Defalut is nil.
  **/
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data;
+
+/**
+ * Reload the js bundle from the current URL and rerender.
+ *
+ * @param forcedReload when this parameter is true, the js bundle will always be reloaded from the server. If it is false, the instance may reload the js bundle from its cache. Default is false.
+ *
+ **/
+- (void)reload:(BOOL)forcedReload;
 
 /**
  * Refreshes current instance with data.
@@ -177,6 +206,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * Destroys current instance.
  **/
 - (void)destroyInstance;
+
+/**
+ * Trigger full GC, for dev and debug only.
+ **/
+- (void)forceGarbageCollection;
 
 /**
  * get module instance by class
@@ -192,6 +226,17 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * Number of components created, must be called on component thread by calling WXPerformBlockOnComponentThread
  */
 - (NSUInteger)numberOfComponents;
+
+
+/**
+ * check whether the module eventName is registered
+ */
+- (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName;
+
+/**
+ * fire module event;
+ */
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 
 /**
  * fire global event
@@ -212,12 +257,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
 
 
+/** 
+ * Deprecated 
+ */
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);
 
-- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
+@end
 
+@interface WXSDKInstance (Deprecated)
+
+- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
 - (void)reloadData:(id)data  DEPRECATED_MSG_ATTRIBUTE("Use refreshInstance: method instead.");
 - (void)creatFinish DEPRECATED_MSG_ATTRIBUTE();
 

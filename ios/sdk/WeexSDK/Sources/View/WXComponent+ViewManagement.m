@@ -8,6 +8,7 @@
 
 #import "WXComponent+ViewManagement.h"
 #import "WXComponent_internal.h"
+#import "WXComponent+GradientColor.h"
 #import "WXAssert.h"
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
@@ -93,12 +94,14 @@
 - (void)_initViewPropertyWithStyles:(NSDictionary *)styles
 {
     _backgroundColor = styles[@"backgroundColor"] ? [WXConvert UIColor:styles[@"backgroundColor"]] : [UIColor clearColor];
+    _backgroundImage = styles[@"backgroundImage"] ? [[WXConvert NSString:styles[@"backgroundImage"]]stringByReplacingOccurrencesOfString:@" " withString:@""]: nil;
     _opacity = styles[@"opacity"] ? [WXConvert CGFloat:styles[@"opacity"]] : 1.0;
     _clipToBounds = styles[@"overflow"] ? [WXConvert WXClipType:styles[@"overflow"]] : NO;
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
     _positionType = styles[@"position"] ? [WXConvert WXPositionType:styles[@"position"]] : WXPositionTypeRelative;
-    _transform = styles[@"transform"] ? [WXConvert NSString:styles[@"transform"]] : nil;
-    _transformOrigin = styles[@"transformOrigin"] ? [WXConvert NSString:styles[@"transformOrigin"]] : nil;
+    _transform = styles[@"transform"] || styles[@"transformOrigin"] ?
+    [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance] :
+    [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
 }
 
 - (void)_updateViewStyles:(NSDictionary *)styles
@@ -108,6 +111,15 @@
         _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
+    
+    if (styles[@"backgroundImage"]) {
+        _backgroundImage = styles[@"backgroundImage"] ? [[WXConvert NSString:styles[@"backgroundImage"]]stringByReplacingOccurrencesOfString:@" " withString:@""]: nil;
+        
+        if (_backgroundImage) {
+            [self setGradientLayer];
+        }
+    }
+    
     if (styles[@"opacity"]) {
         _opacity = [WXConvert CGFloat:styles[@"opacity"]];
         _layer.opacity = _opacity;
@@ -149,14 +161,10 @@
         }
     }
     
-    if (styles[@"transformOrigin"]) {
-        _transformOrigin = [WXConvert NSString:styles[@"transformOrigin"]];
-    }
-    
-    if (styles[@"transform"]) {
+    if (styles[@"transformOrigin"] || styles[@"transform"]) {
+        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-            _transform = [WXConvert NSString:styles[@"transform"]];
-            _layer.transform = [[WXTransform new] getTransform:_transform withView:_view withOrigin:_transformOrigin];
+            [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];
         }
     }
@@ -166,6 +174,7 @@
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
+        [self setNeedsDisplay];
     }
 }
 

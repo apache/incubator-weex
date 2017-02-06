@@ -95,7 +95,7 @@
 
 + (SEL)methodWithComponentName:(NSString *)name withMethod:(NSString *)method
 {
-    return [[self sharedInstance] _methodWithComponnetName:name withMethod:method];
+    return [[self sharedInstance] _methodWithComponetName:name withMethod:method];
 }
 
 + (NSMutableDictionary *)componentMethodMapsWithName:(NSString *)name
@@ -117,13 +117,13 @@
     void (^mBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         [methods addObject:mKey];
     };
-    [config.methods enumerateKeysAndObjectsUsingBlock:mBlock];
+    [config.asyncMethods enumerateKeysAndObjectsUsingBlock:mBlock];
     [_configLock unlock];
     
     return dict;
 }
 
-- (SEL)_methodWithComponnetName:(NSString *)name withMethod:(NSString *)method
+- (SEL)_methodWithComponetName:(NSString *)name withMethod:(NSString *)method
 {
     WXAssert(name && method, @"Fail to find selector with module name and method, please check if the parameters are correct ！");
     
@@ -132,8 +132,8 @@
     
     [_configLock lock];
     config = [_componentConfigs objectForKey:name];
-    if (config.methods) {
-        selStr = [config.methods objectForKey:method];
+    if (config.asyncMethods) {
+        selStr = [config.asyncMethods objectForKey:method];
     }
     if (selStr) {
         selector = NSSelectorFromString(selStr);

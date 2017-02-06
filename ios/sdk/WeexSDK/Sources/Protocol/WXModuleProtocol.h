@@ -24,11 +24,10 @@
  * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
 typedef void (^WXModuleCallback)(id result);
-typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 
 /**
  * @abstract the module callback , result can be string or dictionary.
- * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed unitl instance destroyed, so you can call it repetitious.
+ * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed until instance destroyed, so you can call it repetitious.
  */
 typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 

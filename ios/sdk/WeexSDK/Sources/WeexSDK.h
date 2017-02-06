@@ -18,6 +18,9 @@
 #import "WXSDKError.h"
 #import "WXSDKEngine.h"
 #import "WXRootViewController.h"
+#import "WXResourceResponse.h"
+#import "WXResourceRequestHandler.h"
+#import "WXResourceRequest.h"
 #import "WXNetworkProtocol.h"
 #import "WXNavigationProtocol.h"
 #import "WXMonitor.h"
@@ -37,6 +40,7 @@
 #import "WXBaseViewController.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
+#import "NSObject+WXSwizzle.h"
 #import "Layout.h"
 
 #endif /* __OBJC__ */

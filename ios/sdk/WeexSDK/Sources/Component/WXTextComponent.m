@@ -12,6 +12,8 @@
 #import "WXLayer.h"
 #import "WXUtility.h"
 #import "WXConvert.h"
+#import "WXRuleManager.h"
+#import "WXDefine.h"
 #import <pthread/pthread.h>
 
 @interface WXText : UIView
@@ -105,7 +107,7 @@
     UIColor *_color;
     NSString *_fontFamily;
     CGFloat _fontSize;
-    WXTextWeight _fontWeight;
+    CGFloat _fontWeight;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
@@ -152,7 +154,10 @@ static BOOL _isUsingTextStorageLock = NO;
         pthread_mutex_destroy(&_textStorageMutex);
         pthread_mutexattr_destroy(&_textStorageMutexAttr);
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
+
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
 do {\
@@ -166,18 +171,30 @@ do {\
     }\
 } while(0);
 
+#define WX_STYLE_FILL_TEXT_PIXEL(key, prop, needLayout)\
+do {\
+    id value = styles[@#key];\
+    if (value) {\
+        _##prop = [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];\
+        [self setNeedsRepaint];\
+    if (needLayout) {\
+        [self setNeedsLayout];\
+    }\
+}\
+} while(0);
+
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
     WX_STYLE_FILL_TEXT(color, color, UIColor, NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
-    WX_STYLE_FILL_TEXT(fontSize, fontSize, WXPixelType, YES)
+    WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
     WX_STYLE_FILL_TEXT(fontStyle, fontStyle, WXTextStyle, YES)
     WX_STYLE_FILL_TEXT(lines, lines, NSUInteger, YES)
     WX_STYLE_FILL_TEXT(textAlign, textAlign, NSTextAlignment, NO)
     WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
-    WX_STYLE_FILL_TEXT(lineHeight, lineHeight, WXPixelType, YES)
+    WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
@@ -278,11 +295,15 @@ do {\
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        }
+        if ([WXUtility isBlankString:textStorage.string]) {
+            //  if the text value is empty or nil, then set the height is 0.
+            computedSize.height = 0;
         }
         
         return (CGSize) {
@@ -298,6 +319,21 @@ do {\
     return _text;
 }
 
+- (void)repaintText:(NSNotification *)notification
+{
+    if (![_fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
+        return;
+    }
+    [self setNeedsRepaint];
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager startComponentTasks];
+        WXPerformBlockOnMainThread(^{
+            [self setNeedsLayout];
+            [self setNeedsDisplay];
+        });
+    });
+}
+
 - (NSAttributedString *)buildAttributeString
 {
     NSString *string = [self text] ?: @"";
@@ -305,12 +341,24 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    if(_color){
+    if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }
     
+    if (_fontFamily) {
+        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
+        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
+        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        //custom localSrc is cached
+        if (!fontLocalSrc && fontSrc) {
+            // if use custom font, when the custom font download finish, refresh text.
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        }
+    }
+    
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (font) {
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, string.length)];
     }
@@ -396,6 +444,7 @@ do {\
             if (_isUsingTextStorageLock) {
                 pthread_mutex_unlock(&_textStorageMutex);
             }
+            [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
     }];
@@ -407,9 +456,9 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles
+- (void)_updateStylesOnComponentThread:(NSDictionary *)styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:(BOOL)isUpdateStyles
 {
-    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles];
+    [super _updateStylesOnComponentThread:styles resetStyles:(NSMutableArray *)resetStyles isUpdateStyles:isUpdateStyles];
     
     [self fillCSSStyles:styles];
     

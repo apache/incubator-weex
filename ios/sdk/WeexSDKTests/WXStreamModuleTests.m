@@ -9,7 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "WXStreamModule.h"
 #import <WeexSDK/WeexSDK.h>
-#import "WXNetworkDefaultImpl.h"
+#import "WXResourceRequestHandlerDefaultImpl.h"
 
 @interface WXStreamModuleTests : XCTestCase
 @property (nonatomic, strong)  WXStreamModule *streamModule;
@@ -22,43 +22,13 @@
 - (void)setUp {
     [super setUp];
     _streamModule = [[WXStreamModule alloc] init];
-    [WXSDKEngine registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
+    [WXSDKEngine registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     _exp = [self expectationWithDescription:@"SendRequestSuccess Unit Test Error!"];
 }
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
-}
-
-- (void)testSendHttpGet {
-    
-    NSDictionary *getOption = @{
-        @"method" : @"GET",
-        @"url"    : @"http://httpbin.org/get"
-    };
-    [self sendHttp:getOption];
-    
-}
-- (void)testSendHttpPost {
-    NSDictionary *postOption = @{
-        @"method" : @"POST",
-        @"url"    : @"http://httpbin.org/post",
-        @"body"   : @"username=weex&&password=weex"
-    };
-    [self sendHttp:postOption];
-}
-
-- (void)sendHttp:(NSDictionary*)options {
-    __block id callbackResult = nil;
-    [_streamModule sendHttp:options callback:^(id result) {
-        callbackResult = result;
-        [_exp fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:10 handler:^(NSError * error) {
-        XCTAssertNotNil(callbackResult);
-    }];
-    
 }
 
 - (void)fetch:(NSDictionary*)options {
