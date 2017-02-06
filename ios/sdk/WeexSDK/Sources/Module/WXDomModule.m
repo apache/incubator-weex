@@ -168,7 +168,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
-    [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         UIView *rootView = manager.weexInstance.rootView;
         CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         if ([ref isEqualToString:@"viewport"]) {
