@@ -206,6 +206,7 @@ package com.taobao.weex.ui.module;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.VisibleForTesting;
 
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -231,6 +232,11 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   public WXTimerModule() {
     handler = new Handler(WXBridgeManager.getInstance().getJSLooper(), this);
+  }
+
+  @VisibleForTesting
+  void setHandler(Handler handler) {
+    this.handler = handler;
   }
 
   @JSMethod(uiThread = false)
@@ -263,7 +269,6 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void destroy() {
     if (handler != null) {
       WXLogUtils.d("timer","Timer Module removeAllMessagess: ");
-      //handler.removeCallbacksAndMessages(null);
     }
   }
 

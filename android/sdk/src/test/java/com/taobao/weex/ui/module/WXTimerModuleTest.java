@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.module;
 
+import android.os.Handler;
 import android.os.Message;
 
 import com.taobao.weappplus_sdk.BuildConfig;
@@ -212,7 +213,6 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
-import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXThread;
 
 import org.junit.Before;
@@ -225,89 +225,100 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by sospartan on 7/28/16.
- */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
-@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest(WXBridgeManager.class)
 public class WXTimerModuleTest {
 
+  public final static int VALID_FUNC_ID = 20;
+  public final static int INVALID_FUNC_ID = 0;
+  public final static int DELAY = 50;
+  public final static int IMMEDIATELY = 0;
+  public final static int INVALID_DELAY = -30;
+
   @Rule
   public PowerMockRule rule = new PowerMockRule();
-
   WXTimerModule module;
-  WXBridgeManager bridge;
+  ShadowLooper mLooper;
 
   @Before
-  public void setup() throws Exception{
+  public void setup() throws Exception {
     WXSDKEngine.initialize(RuntimeEnvironment.application, new InitConfig.Builder().build());
-    bridge = Mockito.mock(WXBridgeManager.class);
-    when(bridge.getJSLooper()).thenReturn(new WXThread("x").getLooper());
+    WXBridgeManager bridge = Mockito.mock(WXBridgeManager.class);
+    when(bridge.getJSLooper()).thenReturn(new WXThread("js").getLooper());
     WXBridgeManagerTest.setBridgeManager(bridge);
 
-    module = new WXTimerModule();
+    module = Mockito.spy(new WXTimerModule());
     module.mWXSDKInstance = WXSDKInstanceTest.createInstance();
-
-
-
+    Handler handler = new Handler(WXBridgeManager.getInstance().getJSLooper(), module);
+    mLooper = Shadows.shadowOf(handler.getLooper());
+    module.setHandler(handler);
   }
 
   @Test
-  public void testSetTimeout() throws Exception {
-    module.setTimeout(1,2);
-    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)2));
-
-    reset(bridge);
-    module.setTimeout(0,0);
-    Mockito.verify(bridge,never()).sendMessageDelayed(any(Message.class),anyLong());
-
-
+  public void testSetTimeoutDelay() throws Exception {
+    module.setTimeout(VALID_FUNC_ID, DELAY);
+    mLooper.idle(DELAY);
+    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
   }
 
   @Test
-  public void testSetInterval() throws Exception {
-    module.setInterval(0,1);
-    Mockito.verify(bridge,never()).sendMessageDelayed(any(Message.class),anyLong());
+  public void testSetTimeoutImmediately() throws Exception {
+    module.setTimeout(VALID_FUNC_ID, IMMEDIATELY);
+    mLooper.idle(IMMEDIATELY);
+    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
+  }
 
-    reset(bridge);
-    module.setInterval(1,-1);
-    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)0));
+  @Test
+  public void testSetTimeoutError() throws Exception {
+    module.setTimeout(INVALID_FUNC_ID, DELAY);
+    mLooper.idle(DELAY);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
 
-    reset(bridge);
-    module.setInterval(1,2);
-    Mockito.verify(bridge,times(1)).sendMessageDelayed(any(Message.class),eq((long)2));
+  @Test
+  public void testSetIntervalError() throws Exception {
+    module.setInterval(INVALID_FUNC_ID, DELAY);
+    mLooper.idle(DELAY);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void testSetIntervalImmediately() throws Exception {
+    module.setInterval(VALID_FUNC_ID, INVALID_DELAY);
+    mLooper.idle(IMMEDIATELY);
+    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void testSetIntervalDelay() {
+    module.setInterval(VALID_FUNC_ID, DELAY);
+    mLooper.idle(DELAY);
+    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
   }
 
   @Test
   public void testClearTimeout() throws Exception {
-    module.clearTimeout(0);
-    Mockito.verify(bridge,never()).removeMessage(anyInt(),anyInt());
-
-    reset(bridge);
-    module.clearTimeout(1);
-    Mockito.verify(bridge,times(1)).removeMessage(eq(WXJSBridgeMsgType.MODULE_TIMEOUT),eq(1));
+    module.setTimeout(VALID_FUNC_ID, DELAY);
+    module.clearTimeout(VALID_FUNC_ID);
+    mLooper.idle(DELAY);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
   @Test
   public void testClearInterval() throws Exception {
-    module.clearInterval(0);
-    Mockito.verify(bridge,never()).removeMessage(anyInt(),anyInt());
-
-    reset(bridge);
-    module.clearInterval(1);
-    Mockito.verify(bridge,times(1)).removeMessage(eq(WXJSBridgeMsgType.MODULE_INTERVAL),eq(1));
+    module.setInterval(VALID_FUNC_ID, DELAY);
+    module.clearInterval(VALID_FUNC_ID);
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 }
