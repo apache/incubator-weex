@@ -14,6 +14,29 @@ function runAndroid {
     platform=android macaca run -d $1
 }
 
+function buildiOS {
+    builddir=$(pwd)'/ios/playground'
+    current_dir=$PWD
+    cd $builddir
+    product=$(PWD)'/build/Debug-iphoneos/WeexDemo.app'
+    pod install --silent
+    [ -f product ] && rm -rf product
+
+    xcodebuild clean build -quiet -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme Pods-WeexDemo SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    xcodebuild clean build -quiet -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme WeexSDK SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    xcodebuild clean build -quiet -arch x86_64 -configuration RELEASE -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme WeexDemo SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    echo $product
+    cd $current_dir;
+}
+
+function runiOS {
+    echo 'Run in iOS...'
+    echo $1
+    buildiOS
+
+    platform=ios macaca run -d $1 --verbose
+}
+
 #validate macaca 
 
 
@@ -25,4 +48,5 @@ function runAndroid {
 
 #run tests
 runAndroid ./test/scripts/
+runiOS ./test/scripts/
 
