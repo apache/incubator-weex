@@ -229,6 +229,8 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -295,16 +297,38 @@ public class WXTimerModuleTest {
 
   @Test
   public void testSetIntervalImmediately() throws Exception {
+    long start, end, duration;
     module.setInterval(VALID_FUNC_ID, INVALID_DELAY);
-    mLooper.idle(IMMEDIATELY);
-    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
+
+    start=mLooper.getScheduler().getCurrentTime();
+    mLooper.runOneTask();
+    end=mLooper.getScheduler().getCurrentTime();
+    duration = end-start;
+
+    assertThat(duration, is((long)IMMEDIATELY));
+
+    mLooper.runOneTask();
+    mLooper.runOneTask();
+    mLooper.runOneTask();
+    mLooper.runOneTask();
+    Mockito.verify(module, times(5)).handleMessage(any(Message.class));
   }
 
   @Test
   public void testSetIntervalDelay() {
+    long start, end, duration;
     module.setInterval(VALID_FUNC_ID, DELAY);
-    mLooper.idle(DELAY);
-    Mockito.verify(module, times(1)).handleMessage(any(Message.class));
+
+    start=mLooper.getScheduler().getCurrentTime();
+    mLooper.runOneTask();
+    end=mLooper.getScheduler().getCurrentTime();
+    duration = end-start;
+
+    assertThat(duration, is((long)DELAY));
+
+    mLooper.runOneTask();
+    mLooper.runOneTask();
+    Mockito.verify(module, times(3)).handleMessage(any(Message.class));
   }
 
   @Test
@@ -319,6 +343,7 @@ public class WXTimerModuleTest {
   public void testClearInterval() throws Exception {
     module.setInterval(VALID_FUNC_ID, DELAY);
     module.clearInterval(VALID_FUNC_ID);
+    mLooper.idle(DELAY);
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 }
