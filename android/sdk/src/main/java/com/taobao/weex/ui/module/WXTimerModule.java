@@ -206,6 +206,7 @@ package com.taobao.weex.ui.module;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.IntRange;
 import android.support.annotation.VisibleForTesting;
 
 import com.taobao.weex.annotation.JSMethod;
@@ -241,17 +242,17 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   }
 
   @JSMethod(uiThread = false)
-  public void setTimeout(int funcId, int delay) {
+  public void setTimeout(@IntRange(from = 1) int funcId, @IntRange(from = 0) int delay) {
     postMessage(WXJSBridgeMsgType.MODULE_TIMEOUT, funcId, delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
   }
 
   @JSMethod(uiThread = false)
-  public void setInterval(int funcId, int interval) {
+  public void setInterval(@IntRange(from = 1) int funcId, @IntRange(from = 0) int interval) {
     postMessage(WXJSBridgeMsgType.MODULE_INTERVAL, funcId, interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
   }
 
   @JSMethod(uiThread = false)
-  public void clearTimeout(int funcId) {
+  public void clearTimeout(@IntRange(from = 1) int funcId) {
     if (funcId <= 0) {
       return;
     }
@@ -259,7 +260,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   }
 
   @JSMethod(uiThread = false)
-  public void clearInterval(int funcId) {
+  public void clearInterval(@IntRange(from = 1) int funcId) {
     if (funcId <= 0) {
       return;
     }
@@ -320,7 +321,9 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
                        WXJsonUtils.fromObjectToJSONString(tasks))};
   }
 
-  private void postMessage(int what, int funcId, int interval, int instanceId) {
+  private void postMessage(int what,
+                           @IntRange(from = 1) int funcId,
+                           @IntRange(from = 0) int interval, int instanceId) {
     if (interval < 0 || funcId <= 0) {
       WXLogUtils.e(TAG, "interval < 0 or funcId <=0");
     } else {
