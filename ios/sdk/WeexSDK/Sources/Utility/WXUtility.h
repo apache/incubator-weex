@@ -12,7 +12,7 @@
 #import "WXType.h"
 #import "WXLog.h"
 
-// The default screen width which helps us to caculate the real size or scale in different devices.
+// The default screen width which helps us to calculate the real size or scale in different devices.
 static const CGFloat WXDefaultScreenWidth = 750.0;
 
 #define WX_ENUMBER_CASE(_invoke, idx, code, obj, _type, op, _flist) \
@@ -104,7 +104,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (void)setNotStat:(BOOL)notStat;
 + (BOOL)notStat;
 /**
- * @abstract Returns the environment of current application, you can get some nessary properties such as appVersion、sdkVersion、appName etc.
+ * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
  * @return A dictionary object which contains these properties.
  *
@@ -122,7 +122,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (NSString *_Nonnull)userAgent;
 
 /**
- * @abstract JSON Decode Mehthod
+ * @abstract JSON Decode Method
  *
  * @param json String.
  *
@@ -134,7 +134,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 #define WXDecodeJson(json)  [WXUtility objectFromJSON:json]
 
 /**
- * @abstract JSON Encode Mehthod
+ * @abstract JSON Encode Method
  *
  * @param object Object.
  *
@@ -158,7 +158,7 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 #define WXJSONObjectFromData(data) [WXUtility JSONObject:data error:nil]
 /**
- * @abstract JSON Object Copy Mehthod
+ * @abstract JSON Object Copy Method
  *
  * @param object Object.
  *
@@ -285,7 +285,7 @@ CGFloat WXCeilPixelValue(CGFloat value);
  */
 + (NSString *_Nonnull)libraryDirectory;
 
-#define WXLibararyPath  [WXUtility libraryDirectory]
+#define WXLibraryPath  [WXUtility libraryDirectory]
 
 /**
  *  @abstract Returns the global cache whose size is 5M.
@@ -340,13 +340,13 @@ CGFloat WXCeilPixelValue(CGFloat value);
 + (NSString *_Nullable)timeToString:(NSDate *_Nullable)date;
 
 /**
- *  @abstract get the repeat  subtring number of string.
+ *  @abstract get the repeat substring number of string.
  *
  */
 + (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString;
 
 /**
- *  @abstract Returns a resized pixel which is caculated according to the WXScreenResizeRadio.
+ *  @abstract Returns a resized pixel which is calculated according to the WXScreenResizeRadio.
  *
  */
 CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor);

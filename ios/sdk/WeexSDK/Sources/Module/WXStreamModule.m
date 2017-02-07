@@ -112,7 +112,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         [callbackRsp setObject:@{ @"LOADING" : @3 } forKey:@"readyState"];
         received += [data length];
         [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
-        if(progressCallback) {
+        if (progressCallback) {
             progressCallback(callbackRsp, TRUE);
         }
     };

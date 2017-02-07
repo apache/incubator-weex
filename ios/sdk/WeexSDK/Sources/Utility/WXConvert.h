@@ -24,7 +24,7 @@
  *  750px Adaptive
  */
 typedef CGFloat WXPixelType;
-// @prameter scaleFactor: please use weexInstance's pixelScaleFactor property
+// @parameter scaleFactor: please use weexInstance's pixelScaleFactor property
 + (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 + (css_flex_direction_t)css_flex_direction_t:(id)value;

@@ -189,7 +189,7 @@
         NSArray *argsArray = [args toArray];
         NSDictionary *optionsDic = [options toDictionary];
         
-        WXLogDebug(@"callNativeModule...%@,%@,%@,%@", instanceIdString, componentNameString, methodNameString, argsArray);
+        WXLogDebug(@"callNativeComponent...%@,%@,%@,%@", instanceIdString, componentNameString, methodNameString, argsArray);
         
         callNativeComponentBlock(instanceIdString, componentNameString, methodNameString, argsArray, optionsDic);
     };

@@ -34,7 +34,7 @@
         if (attributes[@"display"]) {
             if ([attributes[@"display"] isEqualToString:@"show"]) {
                 _displayState = YES;
-            } else if ([attributes[@"display"] isEqualToString:@"hide"]){
+            } else if ([attributes[@"display"] isEqualToString:@"hide"]) {
                 _displayState = NO;
             } else {
                 WXLogError(@"");
@@ -48,7 +48,7 @@
 - (void)viewDidLoad
 {
      _initFinished = YES;
-    [self.view setFrame: (CGRect){
+    [self.view setFrame: (CGRect) {
         .size = self.calculatedFrame.size,
         .origin.x = self.calculatedFrame.origin.x,
         .origin.y = self.view.frame.origin.y - CGRectGetHeight(self.calculatedFrame)
@@ -97,7 +97,7 @@
     if (attributes[@"display"]) {
         if ([attributes[@"display"] isEqualToString:@"show"]) {
             _displayState = YES;
-        } else if ([attributes[@"display"] isEqualToString:@"hide"]){
+        } else if ([attributes[@"display"] isEqualToString:@"hide"]) {
             _displayState = NO;
         } else {
             WXLogError(@"");
