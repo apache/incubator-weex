@@ -3,7 +3,7 @@
  *   version: "0.4.0.20170207",
  *   create: "20170207145011",
  *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
- *   digest: "30aadc9d6e61d74a5eb0b31e0f125301"
+ *   digest: "f896450c2023a601771c46369fe5d72c"
  * }
  !*/
 /******/ (function(modules) { // webpackBootstrap
@@ -52,10 +52,10 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(222)
-	var __weex_script__ = __webpack_require__(223)
+	var __weex_template__ = __webpack_require__(185)
+	var __weex_script__ = __webpack_require__(186)
 
-	__weex_define__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/a62071d3ca8239528c69d72539119e08', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -66,7 +66,7 @@
 
 	})
 
-	__weex_bootstrap__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf',undefined,undefined)
+	__weex_bootstrap__('@weex-component/a62071d3ca8239528c69d72539119e08',undefined,undefined)
 
 /***/ },
 /* 1 */,
@@ -2131,139 +2131,71 @@
 /* 182 */,
 /* 183 */,
 /* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(190), __esModule: true };
-
-/***/ },
-/* 190 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var core  = __webpack_require__(34)
-	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-/***/ },
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */
+/* 185 */
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "scroller",
+	  "type": "div",
+	  "style": {
+	    "flexDirection": "column",
+	    "alignItems": "center",
+	    "justifyContent": "center"
+	  },
 	  "children": [
 	    {
-	      "type": "wxc-panel",
+	      "type": "image",
 	      "attr": {
-	        "title": "storage API",
-	        "type": "primary"
+	        "src": "http://gw.alicdn.com/mt/TB1GJDuMVXXXXbMaXXXXXXXXXXX-200-200.png"
+	      },
+	      "style": {
+	        "width": 200,
+	        "height": 200,
+	        "margin": 30
+	      }
+	    },
+	    {
+	      "type": "text",
+	      "style": {
+	        "fontSize": 40
+	      },
+	      "attr": {
+	        "value": "你访问的资源不存在"
+	      }
+	    },
+	    {
+	      "type": "text",
+	      "style": {
+	        "fontSize": 30,
+	        "margin": 30,
+	        "color": "#999999"
+	      },
+	      "attr": {
+	        "value": "去看看其他页面吧"
+	      }
+	    },
+	    {
+	      "type": "div",
+	      "style": {
+	        "borderWidth": 3,
+	        "borderRadius": 8,
+	        "borderColor": "#A9A9A9"
+	      },
+	      "events": {
+	        "click": "go_home"
 	      },
 	      "children": [
 	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "setItem"
+	          "type": "text",
+	          "style": {
+	            "fontSize": 45,
+	            "marginTop": 16,
+	            "marginBottom": 16,
+	            "marginLeft": 45,
+	            "marginRight": 45
 	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.setItemResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "getItem"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.getItemResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "length"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.lengthResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "getAllKeys"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.getAllKeysResult}
-	              }
-	            }
-	          ]
-	        },
-	        {
-	          "type": "wxc-panel",
-	          "attr": {
-	            "title": "removeItem"
-	          },
-	          "children": [
-	            {
-	              "type": "text",
-	              "attr": {
-	                "value": function () {return this.removeItemResult}
-	              }
-	            }
-	          ]
+	            "value": "去首页"
+	          }
 	        }
 	      ]
 	    }
@@ -2271,63 +2203,19 @@
 	}
 
 /***/ },
-/* 223 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = function(module, exports, __weex_require__){'use strict';
-
-	var _stringify = __webpack_require__(189);
-
-	var _stringify2 = _interopRequireDefault(_stringify);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	module.exports = function(module, exports, __weex_require__){"use strict";
 
 	__webpack_require__(4);
 	module.exports = {
-	  data: function () {return {
-	    setItemResult: 'loading',
-	    getItemResult: 'loading',
-	    removeItemResult: 'loading',
-	    lengthResult: 'loading',
-	    getAllKeysResult: 'loading'
-	  }},
-	  ready: function ready() {
-	    var storage = __weex_require__('@weex-module/storage');
-	    var me = this;
-
-	    storage.setItem('foo', 'foo-value', function (e) {
-	      console.log('set [foo<->foo-value]:' + (0, _stringify2.default)(e));
-	      me.setItemResult = 'foo:' + (0, _stringify2.default)(e) + '\n';
-	    });
-	    storage.setItem('bar', 'bar-value', function (e) {
-	      console.log('set [bar<->bar-value]:' + (0, _stringify2.default)(e));
-	      me.setItemResult = me.setItemResult + 'bar:' + (0, _stringify2.default)(e);
-	    });
-
-	    storage.getItem('foo', function (e) {
-	      console.log('get foo result:' + (0, _stringify2.default)(e));
-	      me.getItemResult = 'get foo,value is ' + e.data + '\n';
-	    });
-	    storage.getItem('bar', function (e) {
-	      console.log('get bar result:' + (0, _stringify2.default)(e));
-	      me.getItemResult += 'get bar,value is ' + e.data;
-	    });
-
-	    storage.length(function (e) {
-	      console.log('length:' + (0, _stringify2.default)(e));
-	      me.lengthResult = 'current length is ' + e.data;
-	    });
-
-	    storage.getAllKeys(function (e) {
-	      console.log('getAllKeys:' + (0, _stringify2.default)(e));
-	      me.getAllKeysResult = (0, _stringify2.default)(e.data);
-	    });
-
-	    storage.removeItem('foo', function (e) {
-	      console.log('remove foo:' + (0, _stringify2.default)(e));
-	      me.removeItemResult = 'remove item foo ' + e.result;
-	    });
-	  }
+	    data: function () {return {}},
+	    methods: {
+	        go_home: function go_home(event) {
+	            this.$openURL("https://www.taobao.com");
+	        }
+	    }
 	};}
 	/* generated by weex-loader */
 

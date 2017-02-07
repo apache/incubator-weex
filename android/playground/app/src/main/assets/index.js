@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "e8ac3f0bfa40656cf157fd3a3564569b"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -520,8 +528,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2064,14 +2071,14 @@
 
 	var _symbol2 = _interopRequireDefault(_symbol);
 
-	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj; };
+	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
 	  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	} : function (obj) {
-	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	};
 
 /***/ },
@@ -2958,7 +2965,7 @@
 	module.exports = {
 	  data: function () {return {
 	    root: 'examples',
-	    items: [{ name: 'hello', title: 'Hello World' }, { name: 'style/index', title: 'Common Style' }, { name: 'animation', title: 'Animation' }, { name: 'component/text-demo', title: 'Text' }, { name: 'component/image-demo', title: 'Image' }, { name: 'component/input-demo', title: 'Input' }, { name: 'component/scroller-demo', title: 'Scroller' }, { name: 'component/list/list-basic', title: 'List (Basic)' }, { name: 'component/list/list-demo', title: 'List (Advanced)' }, { name: 'component/slider/index', title: 'Slider' }, { name: 'component/a-demo', title: 'A' }, { name: 'component/video-demo', title: 'Video' }, { name: 'component/countdown-demo', title: 'Countdown' }, { name: 'component/marquee-demo', title: 'Marquee' }, { name: 'component/web-demo', title: 'Web' }, { name: 'component/navigator-demo', title: 'Navigator' }, { name: 'component/tabbar/tabbar-demo', title: 'Tabbar' }, { name: 'component/process-bar-demo', title: 'ProcessBar' }, { name: 'module/instance-api', title: 'Instance API' }, { name: 'module/modal', title: 'Modal' }, { name: 'module/stream-demo', title: 'Stream' }, { name: 'module/storage-demo', title: 'Storage' }, { name: 'module/picker-demo', title: 'Picker' }, { name: 'module/componentRect', title: 'componentRect' }, { name: 'module/clipboard', title: 'Clipboard' }, { name: 'showcase/new-fashion/index', title: 'Activity' }, { name: 'showcase/calculator', title: 'Calculator' }, { name: 'showcase/minesweeper', title: 'Minesweeper' }, { name: 'showcase/ui', title: 'UI Gallery' }, { name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown' }]
+	    items: [{ name: 'hello', title: 'Hello World' }, { name: 'style/index', title: 'Common Style' }, { name: 'animation', title: 'Animation' }, { name: 'component/text-demo', title: 'Text' }, { name: 'component/image-demo', title: 'Image' }, { name: 'component/input-demo', title: 'Input' }, { name: 'component/scroller-demo', title: 'Scroller' }, { name: 'component/list/list-basic', title: 'List (Basic)' }, { name: 'component/list/list-demo', title: 'List (Advanced)' }, { name: 'component/slider/index', title: 'Slider' }, { name: 'component/slider-neighbor/index', title: 'Slider Neighbor' }, { name: 'component/a-demo', title: 'A' }, { name: 'component/video-demo', title: 'Video' }, { name: 'component/countdown-demo', title: 'Countdown' }, { name: 'component/marquee-demo', title: 'Marquee' }, { name: 'component/web-demo', title: 'Web' }, { name: 'component/navigator-demo', title: 'Navigator' }, { name: 'component/tabbar/tabbar-demo', title: 'Tabbar' }, { name: 'component/process-bar-demo', title: 'ProcessBar' }, { name: 'module/instance-api', title: 'Instance API' }, { name: 'module/modal', title: 'Modal' }, { name: 'module/stream-demo', title: 'Stream' }, { name: 'module/websocket-demo', title: 'WebSocket' }, { name: 'module/storage-demo', title: 'Storage' }, { name: 'module/picker-demo', title: 'Picker' }, { name: 'module/componentRect', title: 'componentRect' }, { name: 'module/clipboard', title: 'Clipboard' }, { name: 'showcase/new-fashion/index', title: 'Activity' }, { name: 'showcase/calculator', title: 'Calculator' }, { name: 'showcase/minesweeper', title: 'Minesweeper' }, { name: 'showcase/ui', title: 'UI Gallery' }, { name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown' }]
 	  }}
 	};}
 	/* generated by weex-loader */

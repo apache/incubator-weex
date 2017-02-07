@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "60e0ac6f9addf1998f3da89084bda019"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45,10 +53,10 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)
-	var __weex_template__ = __webpack_require__(253)
-	var __weex_style__ = __webpack_require__(254)
-	var __weex_script__ = __webpack_require__(255)
+	__webpack_require__(244)
+	var __weex_template__ = __webpack_require__(260)
+	var __weex_style__ = __webpack_require__(261)
+	var __weex_script__ = __webpack_require__(262)
 
 	__weex_define__('@weex-component/4ee2a41c614b4058c24278d8a41a24eb', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -67,7 +75,7 @@
 
 /***/ },
 
-/***/ 235:
+/***/ 242:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -87,7 +95,7 @@
 
 /***/ },
 
-/***/ 236:
+/***/ 243:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -117,11 +125,11 @@
 
 /***/ },
 
-/***/ 237:
+/***/ 244:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(235)
-	var __weex_script__ = __webpack_require__(236)
+	var __weex_template__ = __webpack_require__(242)
+	var __weex_script__ = __webpack_require__(243)
 
 	__weex_define__('@weex-component/banner', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -137,7 +145,7 @@
 
 /***/ },
 
-/***/ 253:
+/***/ 260:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -263,7 +271,7 @@
 
 /***/ },
 
-/***/ 254:
+/***/ 261:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -289,7 +297,7 @@
 
 /***/ },
 
-/***/ 255:
+/***/ 262:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";

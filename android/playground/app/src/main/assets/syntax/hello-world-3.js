@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "d17529103bef3c2b364ebc625ab45512"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45,8 +53,8 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(308)
-	var __weex_style__ = __webpack_require__(309)
+	var __weex_template__ = __webpack_require__(315)
+	var __weex_style__ = __webpack_require__(316)
 
 	__weex_define__('@weex-component/695862caffb746fa67bb70cbd1bb819e', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -60,7 +68,7 @@
 
 /***/ },
 
-/***/ 308:
+/***/ 315:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -72,7 +80,7 @@
 	    {
 	      "type": "image",
 	      "attr": {
-	        "src": "http://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
+	        "src": "https://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
 	      },
 	      "classList": [
 	        "logo"
@@ -92,7 +100,7 @@
 
 /***/ },
 
-/***/ 309:
+/***/ 316:
 /***/ function(module, exports) {
 
 	module.exports = {

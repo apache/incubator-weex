@@ -3,7 +3,7 @@
  *   version: "0.4.0.20170207",
  *   create: "20170207145011",
  *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
- *   digest: "30aadc9d6e61d74a5eb0b31e0f125301"
+ *   digest: "64b954b29134bc939e901ff8f26a1ada"
  * }
  !*/
 /******/ (function(modules) { // webpackBootstrap
@@ -52,10 +52,11 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(222)
-	var __weex_script__ = __webpack_require__(223)
+	var __weex_template__ = __webpack_require__(226)
+	var __weex_style__ = __webpack_require__(227)
+	var __weex_script__ = __webpack_require__(228)
 
-	__weex_define__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/f1edaa994f4c5a505cfb7f32ca9ee569', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -64,9 +65,11 @@
 
 	    __weex_module__.exports.template = __weex_template__
 
+	    __weex_module__.exports.style = __weex_style__
+
 	})
 
-	__weex_bootstrap__('@weex-component/6f110d391fd7b90c9a19583f6ee1a7cf',undefined,undefined)
+	__weex_bootstrap__('@weex-component/f1edaa994f4c5a505cfb7f32ca9ee569',undefined,undefined)
 
 /***/ },
 /* 1 */,
@@ -2135,22 +2138,8 @@
 /* 186 */,
 /* 187 */,
 /* 188 */,
-/* 189 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(190), __esModule: true };
-
-/***/ },
-/* 190 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var core  = __webpack_require__(34)
-	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-/***/ },
+/* 189 */,
+/* 190 */,
 /* 191 */,
 /* 192 */,
 /* 193 */,
@@ -2182,7 +2171,11 @@
 /* 219 */,
 /* 220 */,
 /* 221 */,
-/* 222 */
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2191,20 +2184,71 @@
 	    {
 	      "type": "wxc-panel",
 	      "attr": {
-	        "title": "storage API",
+	        "title": "websocket",
 	        "type": "primary"
 	      },
 	      "children": [
 	        {
-	          "type": "wxc-panel",
+	          "type": "input",
 	          "attr": {
-	            "title": "setItem"
+	            "type": "text",
+	            "placeholder": "please input message to send",
+	            "autofocus": "false",
+	            "value": ""
+	          },
+	          "classList": [
+	            "input"
+	          ],
+	          "events": {
+	            "change": "onchange",
+	            "input": "oninput"
+	          },
+	          "id": "input"
+	        },
+	        {
+	          "type": "div",
+	          "style": {
+	            "flexDirection": "row",
+	            "justifyContent": "center"
 	          },
 	          "children": [
 	            {
-	              "type": "text",
+	              "type": "wxc-button",
 	              "attr": {
-	                "value": function () {return this.setItemResult}
+	                "value": "connect",
+	                "size": "small",
+	                "type": "primary"
+	              },
+	              "events": {
+	                "click": "connect"
+	              }
+	            },
+	            {
+	              "type": "wxc-button",
+	              "attr": {
+	                "value": "send",
+	                "size": "small",
+	                "type": "primary"
+	              },
+	              "events": {
+	                "click": "send"
+	              },
+	              "style": {
+	                "marginLeft": 20
+	              }
+	            },
+	            {
+	              "type": "wxc-button",
+	              "attr": {
+	                "value": "close",
+	                "size": "small",
+	                "type": "primary"
+	              },
+	              "events": {
+	                "click": "close"
+	              },
+	              "style": {
+	                "marginLeft": 20
 	              }
 	            }
 	          ]
@@ -2212,13 +2256,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "getItem"
+	            "title": "method = send"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.getItemResult}
+	                "value": function () {return this.sendinfo}
 	              }
 	            }
 	          ]
@@ -2226,13 +2270,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "length"
+	            "title": "method = onopen"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.lengthResult}
+	                "value": function () {return this.onopeninfo}
 	              }
 	            }
 	          ]
@@ -2240,13 +2284,13 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "getAllKeys"
+	            "title": "method = onmessage"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.getAllKeysResult}
+	                "value": function () {return this.onmessage}
 	              }
 	            }
 	          ]
@@ -2254,13 +2298,41 @@
 	        {
 	          "type": "wxc-panel",
 	          "attr": {
-	            "title": "removeItem"
+	            "title": "method = onclose"
 	          },
 	          "children": [
 	            {
 	              "type": "text",
 	              "attr": {
-	                "value": function () {return this.removeItemResult}
+	                "value": function () {return this.oncloseinfo}
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "method = onerror"
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "attr": {
+	                "value": function () {return this.onerrorinfo}
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "method = close"
+	          },
+	          "children": [
+	            {
+	              "type": "text",
+	              "attr": {
+	                "value": function () {return this.closeinfo}
 	              }
 	            }
 	          ]
@@ -2271,63 +2343,72 @@
 	}
 
 /***/ },
-/* 223 */
+/* 227 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  "input": {
+	    "fontSize": 40,
+	    "height": 80,
+	    "width": 600
+	  }
+	}
+
+/***/ },
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
-	var _stringify = __webpack_require__(189);
-
-	var _stringify2 = _interopRequireDefault(_stringify);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	__webpack_require__(4);
+	var navigator = __weex_require__('@weex-module/navigator');
+	var modal = __weex_require__('@weex-module/modal');
+	var websocket = __weex_require__('@weex-module/webSocket');
 	module.exports = {
-	  data: function () {return {
-	    setItemResult: 'loading',
-	    getItemResult: 'loading',
-	    removeItemResult: 'loading',
-	    lengthResult: 'loading',
-	    getAllKeysResult: 'loading'
-	  }},
-	  ready: function ready() {
-	    var storage = __weex_require__('@weex-module/storage');
-	    var me = this;
-
-	    storage.setItem('foo', 'foo-value', function (e) {
-	      console.log('set [foo<->foo-value]:' + (0, _stringify2.default)(e));
-	      me.setItemResult = 'foo:' + (0, _stringify2.default)(e) + '\n';
-	    });
-	    storage.setItem('bar', 'bar-value', function (e) {
-	      console.log('set [bar<->bar-value]:' + (0, _stringify2.default)(e));
-	      me.setItemResult = me.setItemResult + 'bar:' + (0, _stringify2.default)(e);
-	    });
-
-	    storage.getItem('foo', function (e) {
-	      console.log('get foo result:' + (0, _stringify2.default)(e));
-	      me.getItemResult = 'get foo,value is ' + e.data + '\n';
-	    });
-	    storage.getItem('bar', function (e) {
-	      console.log('get bar result:' + (0, _stringify2.default)(e));
-	      me.getItemResult += 'get bar,value is ' + e.data;
-	    });
-
-	    storage.length(function (e) {
-	      console.log('length:' + (0, _stringify2.default)(e));
-	      me.lengthResult = 'current length is ' + e.data;
-	    });
-
-	    storage.getAllKeys(function (e) {
-	      console.log('getAllKeys:' + (0, _stringify2.default)(e));
-	      me.getAllKeysResult = (0, _stringify2.default)(e.data);
-	    });
-
-	    storage.removeItem('foo', function (e) {
-	      console.log('remove foo:' + (0, _stringify2.default)(e));
-	      me.removeItemResult = 'remove item foo ' + e.result;
-	    });
-	  }
+	    data: function () {return {
+	        connectinfo: '',
+	        sendinfo: '',
+	        onopeninfo: '',
+	        onmessage: '',
+	        oncloseinfo: '',
+	        onerrorinfo: '',
+	        closeinfo: '',
+	        txtInput: '',
+	        navBarHeight: 88,
+	        title: 'Navigator',
+	        dir: 'examples',
+	        baseURL: ''
+	    }},
+	    methods: {
+	        connect: function connect() {
+	            websocket.WebSocket('ws://115.29.193.48:8088', '');
+	            var self = this;
+	            websocket.onopen = function (e) {
+	                self.onopeninfo = e;
+	            };
+	            websocket.onmessage = function (e) {
+	                self.onmessage = e.data;
+	            };
+	            websocket.onerror = function (e) {
+	                self.onerrorinfo = e.data;
+	            };
+	            websocket.onclose = function (e) {
+	                self.onerrorinfo = e.code;
+	            };
+	        },
+	        send: function send(e) {
+	            var input = this.$el('input');
+	            input.blur();
+	            websocket.send(this.txtInput);
+	            this.sendinfo = this.txtInput;
+	        },
+	        oninput: function oninput(event) {
+	            this.txtInput = event.value;
+	        },
+	        close: function close(e) {
+	            websocket.close();
+	        }
+	    }
 	};}
 	/* generated by weex-loader */
 

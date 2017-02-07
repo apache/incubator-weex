@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "f54326da72a6fac3bf3c2e602e3d6204"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -45,9 +53,9 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(359)
-	var __weex_style__ = __webpack_require__(360)
-	var __weex_script__ = __webpack_require__(361)
+	var __weex_template__ = __webpack_require__(366)
+	var __weex_style__ = __webpack_require__(367)
+	var __weex_script__ = __webpack_require__(368)
 
 	__weex_define__('@weex-component/01700b62cc1ab66f2cbfd893c5c95eaf', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -66,7 +74,7 @@
 
 /***/ },
 
-/***/ 359:
+/***/ 366:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -124,7 +132,7 @@
 
 /***/ },
 
-/***/ 360:
+/***/ 367:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -146,7 +154,7 @@
 
 /***/ },
 
-/***/ 361:
+/***/ 368:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
