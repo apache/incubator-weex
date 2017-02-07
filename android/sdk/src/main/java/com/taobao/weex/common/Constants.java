@@ -336,6 +336,11 @@ public class Constants {
     String PULLING_DISTANCE = "pullingDistance";
     String VIEW_HEIGHT = "viewHeight";
     String PREVENT_MOVE_EVENT = "preventMoveEvent";
+    String OFFSET_ACCURACY = "offsetAccuracy";
+    String CONTENT_SIZE = "contentSize";
+    String CONTENT_OFFSET = "contentOffset";
+    String X = "x";
+    String Y = "y";
   }
 
   public interface Value {
