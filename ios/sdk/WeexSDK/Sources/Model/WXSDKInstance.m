@@ -249,7 +249,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(loadError);
+            weakSelf.onFailed(error);
         }
     };
     
