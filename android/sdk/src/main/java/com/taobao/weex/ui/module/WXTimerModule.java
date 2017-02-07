@@ -270,7 +270,8 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   @Override
   public void destroy() {
     if (handler != null) {
-      WXLogUtils.d(TAG, "Timer Module removeAllMessagess: ");
+      WXLogUtils.d(TAG, "Timer Module removeAllMessages: ");
+      handler.removeCallbacksAndMessages(null);
     }
   }
 
