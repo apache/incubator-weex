@@ -426,7 +426,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if (scrollView.dragging) {
         [_refreshComponent pullingdown:@{
-            DISTANCE_Y: @(ABS(scrollView.contentOffset.y - _lastContentOffset.y)),
+            DISTANCE_Y: @(fabs(scrollView.contentOffset.y - _lastContentOffset.y)),
             PULLING_DISTANCE: @(scrollView.contentOffset.y),
             @"type":@"pullingdown"
             }];
