@@ -8,7 +8,7 @@ var os = require('os');
 var util = require("./util.js");
 
 describe('weex mobile index', function () {
-  this.timeout(1 * 30 * 1000);
+  this.timeout(1 * 60 * 1000);
   var driver = wd(util.getConfig()).initPromiseChain();
   driver.configureHttp({
     timeout: 100000
@@ -27,7 +27,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[1]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'hello world.')
+      assert.equal(text,'hello world.')
     })
   })
 
@@ -38,7 +38,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[2]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'btn click.')
+      assert.equal(text,'btn click.')
     })
   })
 
@@ -51,7 +51,7 @@ describe('weex mobile index', function () {
     .elementByXPath('//div/text[2]')
     .text()
     .then((text)=>{
-      assert.equal(text.description,'input blur.')
+      assert.equal(text,'input blur.')
     })
   })
 
