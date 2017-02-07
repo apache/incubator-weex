@@ -49,6 +49,7 @@ export function destroy (app) {
   app.options = null
   app.blocks = null
   app.vm = null
+  app.doc.taskCenter.destroyCallback()
   app.doc.destroy()
   app.doc = null
   app.customComponentMap = null

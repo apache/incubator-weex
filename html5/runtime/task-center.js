@@ -21,6 +21,10 @@ export class TaskCenter {
     return this.callbackManager.consume(callbackId, data, ifKeepAlive)
   }
 
+  destroyCallback () {
+    return this.callbackManager.close()
+  }
+
   typof (v) {
     const s = Object.prototype.toString.call(v)
     return s.substring(8, s.length - 1).toLowerCase()
@@ -28,7 +32,7 @@ export class TaskCenter {
 
   /**
    * Normalize a value. Specially, if the value is a function, then generate a function id
-   * and save it to `app.callbacks`, at last return the function id.
+   * and save it to `CallbackManager`, at last return the function id.
    * @param  {any}        v
    * @param  {object}     app
    * @return {primitive}
