@@ -225,7 +225,7 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
@@ -762,7 +762,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @JSMethod
-  public void getSelectionRange(JSCallback callback) {
+  public void getSelectionRange(String callbackId) {
     EditText hostView;
     Map<String, Object> result = new HashMap<>(2);
     if ((hostView = getHostView()) != null) {
@@ -778,6 +778,6 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       result.put(Constants.Name.SELECTION_START, start);
       result.put(Constants.Name.SELECTION_END, end);
     }
-    callback.invoke(result);
+    WXBridgeManager.getInstance().callback(getInstanceId(), callbackId, result, false);
   }
 }
