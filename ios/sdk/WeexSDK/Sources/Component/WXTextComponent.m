@@ -375,7 +375,7 @@ do {\
         paragraphStyle.alignment = _textAlign;
     }
     
-    if (_lineHeight ) {
+    if (_lineHeight) {
         paragraphStyle.maximumLineHeight = _lineHeight;
         paragraphStyle.minimumLineHeight = _lineHeight;
     }
