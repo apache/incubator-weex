@@ -375,7 +375,7 @@ do {\
         paragraphStyle.alignment = _textAlign;
     }
     
-    if (_lineHeight) {
+    if (_lineHeight ) {
         paragraphStyle.maximumLineHeight = _lineHeight;
         paragraphStyle.minimumLineHeight = _lineHeight;
     }
@@ -383,6 +383,11 @@ do {\
     if (_lineHeight || _textAlign) {
         [attributedString addAttribute:NSParagraphStyleAttributeName
                                  value:paragraphStyle
+                                 range:(NSRange){0, attributedString.length}];
+    }
+    if (_lineHeight > font.lineHeight) {
+        [attributedString addAttribute:NSBaselineOffsetAttributeName
+                                 value:@((_lineHeight - font.lineHeight)/ 2)
                                  range:(NSRange){0, attributedString.length}];
     }
 
