@@ -228,6 +228,7 @@ import static com.taobao.weex.bridge.WXBridgeManager.METHOD_CALL_JS;
 
 public class WXTimerModule extends WXModule implements Destroyable, Handler.Callback {
 
+  private final static String TAG = "timer";
   private Handler handler;
 
   public WXTimerModule() {
@@ -268,7 +269,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   @Override
   public void destroy() {
     if (handler != null) {
-      WXLogUtils.d("timer","Timer Module removeAllMessagess: ");
+      WXLogUtils.d(TAG, "Timer Module removeAllMessagess: ");
     }
   }
 
@@ -278,7 +279,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     WXJSObject[] args;
     if (msg != null) {
       int what = msg.what;
-      WXLogUtils.d("timer","Timer Module handleMessage : "+msg.what);
+      WXLogUtils.d(TAG, "Timer Module handleMessage : " + msg.what);
       switch (what) {
         case WXJSBridgeMsgType.MODULE_TIMEOUT:
           if (msg.obj == null) {
@@ -320,17 +321,15 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   }
 
   private void postMessage(int what, int funcId, int interval, int instanceId) {
-    if (interval < 0) {
-      interval = 0;
+    if (interval < 0 || funcId <= 0) {
+      WXLogUtils.e(TAG, "interval < 0 or funcId <=0");
+    } else {
+      Message message = Message.obtain();
+      message.what = what;
+      message.arg1 = instanceId;
+      message.arg2 = interval;
+      message.obj = funcId;
+      handler.sendMessageDelayed(message, interval);
     }
-    if (funcId <= 0) {
-      return;
-    }
-    Message message = Message.obtain();
-    message.what = what;
-    message.arg1 = instanceId;
-    message.arg2 = interval;
-    message.obj = funcId;
-    handler.sendMessageDelayed(message, interval);
   }
 }

@@ -246,7 +246,7 @@ public class WXTimerModuleTest {
   public final static int INVALID_FUNC_ID = 0;
   public final static int DELAY = 50;
   public final static int IMMEDIATELY = 0;
-  public final static int INVALID_DELAY = -30;
+  public final static int INVALID_DELAY = -50;
 
   @Rule
   public PowerMockRule rule = new PowerMockRule();
@@ -282,30 +282,44 @@ public class WXTimerModuleTest {
   }
 
   @Test
-  public void testSetTimeoutError() throws Exception {
+  public void testSetTimeoutError1() throws Exception {
     module.setTimeout(INVALID_FUNC_ID, DELAY);
     mLooper.idle(DELAY);
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
   @Test
-  public void testSetIntervalError() throws Exception {
+  public void testSetTimeoutError2() throws Exception {
+    module.setTimeout(VALID_FUNC_ID, INVALID_DELAY);
+    mLooper.runToEndOfTasks();
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
+
+  @Test
+  public void testSetIntervalError1() throws Exception {
     module.setInterval(INVALID_FUNC_ID, DELAY);
     mLooper.idle(DELAY);
     Mockito.verify(module, never()).handleMessage(any(Message.class));
   }
 
   @Test
+  public void testSetIntervalError2() throws Exception {
+    module.setInterval(VALID_FUNC_ID, INVALID_DELAY);
+    mLooper.runToEndOfTasks();
+    Mockito.verify(module, never()).handleMessage(any(Message.class));
+  }
+
+  @Test
   public void testSetIntervalImmediately() throws Exception {
     long start, end, duration;
-    module.setInterval(VALID_FUNC_ID, INVALID_DELAY);
+    module.setInterval(VALID_FUNC_ID, DELAY);
 
-    start=mLooper.getScheduler().getCurrentTime();
+    start = mLooper.getScheduler().getCurrentTime();
     mLooper.runOneTask();
-    end=mLooper.getScheduler().getCurrentTime();
-    duration = end-start;
+    end = mLooper.getScheduler().getCurrentTime();
+    duration = end - start;
 
-    assertThat(duration, is((long)IMMEDIATELY));
+    assertThat(duration, is((long) DELAY));
 
     mLooper.runOneTask();
     mLooper.runOneTask();
@@ -319,12 +333,12 @@ public class WXTimerModuleTest {
     long start, end, duration;
     module.setInterval(VALID_FUNC_ID, DELAY);
 
-    start=mLooper.getScheduler().getCurrentTime();
+    start = mLooper.getScheduler().getCurrentTime();
     mLooper.runOneTask();
-    end=mLooper.getScheduler().getCurrentTime();
-    duration = end-start;
+    end = mLooper.getScheduler().getCurrentTime();
+    duration = end - start;
 
-    assertThat(duration, is((long)DELAY));
+    assertThat(duration, is((long) DELAY));
 
     mLooper.runOneTask();
     mLooper.runOneTask();
