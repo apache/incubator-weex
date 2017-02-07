@@ -297,6 +297,7 @@ public class Constants {
     String SHOW_SCROLLBAR = "showScrollbar";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
+    String RECYCLE = "recycle";
     String LOADMORERETRY = "loadmoreretry";
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
