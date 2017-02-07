@@ -271,7 +271,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         if (!hasFocus) {
           decideSoftKeyboard();
         }
-        setPseudoClassStatus(Constants.PESUDO.FOCUS,hasFocus);
+        setPseudoClassStatus(Constants.PSEUDO.FOCUS,hasFocus);
       }
     });
   }

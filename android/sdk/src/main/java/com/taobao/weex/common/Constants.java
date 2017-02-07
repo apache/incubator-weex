@@ -405,7 +405,7 @@ public class Constants {
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
   }
 
-  public interface PESUDO {
+  public interface PSEUDO {
     String ACTIVE = ":active";
     String ENABLED = ":enabled";
     String DISABLED = ":disabled";
