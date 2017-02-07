@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,97 +202,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.taobao.weex.ui.view.border;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PointF;
-import android.support.annotation.NonNull;
+import android.support.annotation.IntDef;
 
 import com.taobao.weex.dom.flex.Spacing;
 
-/**
- * Edge for border. Every border has four edges, and each edge has a previous corner and a post
- * corner.
- */
-class BorderEdge {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-  private
-  @NonNull
-  final BorderCorner mPreCorner;
-  private
-  @NonNull
-  final BorderCorner mPostCorner;
+@Retention(RetentionPolicy.SOURCE)
+@IntDef({
+    Spacing.ALL,
+    Spacing.TOP,
+    Spacing.RIGHT,
+    Spacing.BOTTOM,
+    Spacing.LEFT})
+public @interface BorderWidthStyleColorType {
 
-  private final int mEdge;
-  private final float mBorderWidth;
-
-  BorderEdge(@NonNull BorderCorner preCorner, @NonNull BorderCorner postCorner,
-             @BorderWidthStyleColorType int edge, float
-      borderWidth) {
-    mPreCorner = preCorner;
-    mPostCorner = postCorner;
-    mEdge = edge;
-    mBorderWidth = borderWidth;
-  }
-
-  /**
-   * Draw the edge on the canvas with the specified paint.
-   * @param canvas the canvas where the edge will be drawn.
-   * @param paint the paint which is used to draw.
-   */
-  void drawEdge(@NonNull Canvas canvas, @NonNull Paint paint) {
-    PointF lineStart = mPreCorner.getCornerEnd();
-    Path path;
-    if (mPreCorner.hasOuterCorner()) {
-      path = new Path();
-      if (mPreCorner.hasInnerCorner()) {
-        path.addArc(mPreCorner.getOvalIfInnerCornerExist(),
-                    mPreCorner.getAngleBisectorDegree(),
-                    BorderCorner.SWEEP_ANGLE);
-      } else {
-        paint.setStrokeWidth(mPreCorner.getOuterCornerRadius());
-        path.addArc(mPreCorner.getOvalIfInnerCornerNotExist(),
-                    mPreCorner.getAngleBisectorDegree(),
-                    BorderCorner.SWEEP_ANGLE);
-      }
-      canvas.drawPath(path, paint);
-    } else {
-      PointF actualStart = mPreCorner.getSharpCornerStart();
-      canvas.drawLine(actualStart.x, actualStart.y, lineStart.x, lineStart.y, paint);
-    }
-
-    paint.setStrokeWidth(mBorderWidth);
-    PointF lineEnd = mPostCorner.getCornerStart();
-    canvas.drawLine(lineStart.x, lineStart.y, lineEnd.x, lineEnd.y, paint);
-
-    if (mPostCorner.hasOuterCorner()) {
-      path = new Path();
-      if (mPostCorner.hasInnerCorner()) {
-        path.addArc(mPostCorner.getOvalIfInnerCornerExist(),
-                    mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                    BorderCorner.SWEEP_ANGLE);
-      } else {
-        paint.setStrokeWidth(mPostCorner.getOuterCornerRadius());
-        path.addArc(mPostCorner.getOvalIfInnerCornerNotExist(),
-                    mPostCorner.getAngleBisectorDegree() - BorderCorner.SWEEP_ANGLE,
-                    BorderCorner.SWEEP_ANGLE);
-      }
-      canvas.drawPath(path, paint);
-    } else {
-      PointF actualEnd = mPostCorner.getSharpCornerEnd();
-      canvas.drawLine(lineEnd.x, lineEnd.y, actualEnd.x, actualEnd.y, paint);
-    }
-  }
-
-  /**
-   * The index of the edge
-   * @return index of edge. May be one of
-   * {@link Spacing#TOP},{@link Spacing#BOTTOM},{@link Spacing#RIGHT},{@link Spacing#LEFT}.
-   */
-  public @BorderWidthStyleColorType
-  int getEdge() {
-    return mEdge;
-  }
 }
