@@ -83,6 +83,7 @@
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.1.0",
     "weex-vue-framework": "2.1.8-weex.1",
+    "weex-styler":"0.1.8",
     "weex-wd": "^1.0.4"
   },
   "devDependencies": {
