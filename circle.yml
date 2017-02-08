@@ -22,6 +22,7 @@ test:
     - npm run test
     - cd android && ./run-ci.sh
     - circle-android wait-for-boot
+    - ./test/serve.sh &
     - ./test/run.sh
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
