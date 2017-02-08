@@ -12,15 +12,13 @@ machine:
   environment:
     QEMU_AUDIO_DRV: none
 test:
-  pre:
-    - emulator -avd circleci-android24 -no-window:
-        background: true
-        parallel: true
-    
   override:
     - npm run build
     - npm run test
     - cd android && ./run-ci.sh
+    - emulator -avd circleci-android24 -no-window:
+        background: true
+        parallel: true
     - circle-android wait-for-boot
     - ./test/serve.sh &
     - ./test/run.sh
