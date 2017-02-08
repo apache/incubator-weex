@@ -48,6 +48,6 @@ platform_android='android'
  if [ $platform = $platform_android ]; then
      runAndroid ./test/scripts/
  else
-     runIOS ./test/scripts/
+     runiOS ./test/scripts/
  fi
 
