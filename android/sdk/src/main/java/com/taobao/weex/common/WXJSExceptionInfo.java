@@ -318,7 +318,9 @@ public class WXJSExceptionInfo {
   @Override
   public String toString() {
     StringBuffer buffer = new StringBuffer();
-    buffer.append("instanceId:").append(mInstanceId)
+    buffer.append("WeexSDKVersion:").append(mWeexVersion)
+        .append(" JSFrameworkVersion:").append(mJsFrameworkVersion)
+        .append(" instanceId:").append(mInstanceId)
         .append(" bundleUrl:").append(mBundleUrl)
         .append(" errCode:").append(mErrCode)
         .append(" function:").append(mFunction)
