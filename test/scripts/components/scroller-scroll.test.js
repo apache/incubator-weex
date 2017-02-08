@@ -5,7 +5,7 @@ var assert = require('chai').assert
 var wd = require('weex-wd')
 var path = require('path');
 var os = require('os');
-var util = require("./util.js");
+var util = require("../util.js");
 
 describe('weex mobile index', function () {
   this.timeout(1 * 60 * 1000);
