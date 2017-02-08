@@ -205,6 +205,8 @@
 package com.taobao.weex.common;
 
 
+import com.taobao.weex.WXEnvironment;
+
 import java.util.Map;
 
 public class WXJSExceptionInfo {
@@ -235,9 +237,16 @@ public class WXJSExceptionInfo {
    */
   private Map<String,String> mExtParams;
 
-  public WXJSExceptionInfo(){
+  /**
+   * weex sdk version
+   */
+  private String mWeexVersion = WXEnvironment.WXSDK_VERSION;
 
-  }
+  /**
+   * js framework verison
+   */
+  private String mJsFrameworkVersion = WXEnvironment.JS_LIB_SDK_VERSION;
+
 
   public WXJSExceptionInfo(String instanceId, String bundleUrl, String errCode, String function, String exception, Map<String,String> extParams) {
     this.mInstanceId = instanceId;
@@ -295,6 +304,16 @@ public class WXJSExceptionInfo {
   public void setExtParams(Map<String, String> extParams) {
     mExtParams = extParams;
   }
+
+  public String getWeexVersion() {
+    return mWeexVersion;
+  }
+
+
+  public String getJsFrameworkVersion() {
+    return mJsFrameworkVersion;
+  }
+
 
   @Override
   public String toString() {
