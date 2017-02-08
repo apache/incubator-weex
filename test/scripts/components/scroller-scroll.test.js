@@ -24,10 +24,9 @@ describe('weex mobile index', function () {
 
   it('#1 Drag scroller', () => {
     return driver
-    .elementByXPath('//div/scroller')
-    .touch('drag', {fromX:200, fromY:600, toX:200, toY: 200})
+    .touch('drag', {fromX:200, fromY:500, toX:200, toY: 200})
     .sleep(2000)
-    .touch('drag', {fromX:200, fromY:600, toX:100, toY:200})
+    .touch('drag', {fromX:200, fromY:500, toX:100, toY:200})
     .elementByXPath('//div/text')
     .text()
     .then((text)=>{
