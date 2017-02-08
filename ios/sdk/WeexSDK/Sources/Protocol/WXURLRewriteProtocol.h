@@ -7,17 +7,9 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "WXResourceRequest.h"
 
 @class WXSDKInstance;
-
-typedef enum : NSUInteger {
-    WXResourceTypeBundle,
-    WXResourceTypeImage,
-    WXResourceTypeFont,
-    WXResourceTypeVideo,
-    WXResourceTypeLink,
-    WXResourceTypeOthers
-} WXResourceType;
 
 #define WX_REWRITE_URL(url, resourceType, instance, newUrl)\
 do {\

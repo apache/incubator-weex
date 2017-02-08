@@ -4,13 +4,9 @@ import sinonChai from 'sinon-chai'
 const { expect } = chai
 chai.use(sinonChai)
 
-global.callNative = function () {}
-global.callAddElement = function () {}
-
 import * as ctrl from '../../../../frameworks/legacy/app/ctrl'
 import Differ from '../../../../frameworks/legacy/app/differ'
 import { Document } from '../../../../runtime/vdom'
-import Listener from '../../../../runtime/listener'
 
 describe('the api of app', () => {
   let app
@@ -26,15 +22,14 @@ describe('the api of app', () => {
       registerComponent: function () {},
       // define: sinon.spy(),
       // bootstrap: sinon.stub(),
-      callbacks: {
-        1: spy2
-      },
       vm: {},
       differ: new Differ(id)
     }
 
-    app.doc = new Document(id, '', spy1, Listener)
+    app.doc = new Document(id, '', spy1)
     app.doc.createBody('div')
+
+    app.doc.taskCenter.callbackManager.add(spy2)
     // app.bootstrap.returns()
 
     return app
@@ -129,8 +124,6 @@ describe('the api of app', () => {
       const data = { a: 'b' }
       ctrl.callback(app, '1', data, true)
       expect(spy2.calledOnce).to.be.true
-      expect(spy2.args[0][0]).to.deep.equal(data)
-      expect(app.callbacks[1]).to.be.a('function')
 
       const task = spy1.firstCall.args[0][0]
       expect(task.module).to.be.equal('dom')
@@ -142,44 +135,15 @@ describe('the api of app', () => {
       const data = { a: 'b' }
       ctrl.callback(app, '1', data, true)
       expect(spy2.calledTwice).to.be.true
-      expect(spy2.args[0][0]).to.deep.equal(data)
-      expect(app.callbacks[1]).to.be.a('function')
 
       ctrl.callback(app, '1', data, false)
       expect(spy2.calledThrice).to.be.true
-      expect(spy2.args[0][0]).to.deep.equal(data)
-      expect(app.callbacks[1]).to.be.undefined
     })
 
     it('error', () => {
       const data = null
       const result = ctrl.callback(app, '1', data, true)
       expect(result).to.be.an.instanceof(Error)
-    })
-  })
-
-  describe('updateActions', () => {
-    let originalCallNative
-
-    before(() => {
-      originalCallNative = global.callNative
-      global.callNative = function () {}
-    })
-
-    after(() => {
-      global.callNative = originalCallNative
-    })
-
-    it('update actions in listener', () => {
-      app.doc.listener.updates = [
-        {
-          method () {},
-          args: [undefined, null, /\.x/i, new Date(), 2, '3', true, ['']]
-        }
-      ]
-      ctrl.updateActions(app)
-
-      expect(app.doc.listener.updates).to.deep.equal([])
     })
   })
 
@@ -219,7 +183,6 @@ describe('the api of app', () => {
       expect(app.vm).to.be.null
       expect(app.doc).to.be.null
       expect(app.customComponentMap).to.be.null
-      expect(app.callbacks).to.be.null
     })
     it('the incomplete data', () => {
       const appx = createApp()
@@ -230,7 +193,6 @@ describe('the api of app', () => {
       expect(appx.vm).to.be.null
       expect(appx.doc).to.be.null
       expect(appx.customComponentMap).to.be.null
-      expect(appx.callbacks).to.be.null
     })
     it('clear vms', () => {
       const appy = createApp()
@@ -245,7 +207,6 @@ describe('the api of app', () => {
       expect(appy.vm).to.be.null
       expect(appy.doc).to.be.null
       expect(appy.customComponentMap).to.be.null
-      expect(appy.callbacks).to.be.null
     })
   })
 })

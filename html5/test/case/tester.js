@@ -46,6 +46,8 @@ describe('test input and output', function () {
       app.$destroy()
     }
 
+    it('global Weex object', () => checkOutput(app, 'global-weex-object'))
+
     it('single case', () => checkOutput(app, 'foo'))
     it('foo2 case', () => checkOutput(app, 'foo2'))
     it('foo3 case', () => checkOutput(app, 'foo3'))
@@ -77,6 +79,9 @@ describe('test input and output', function () {
     it('repeat with array no-kv case', () => checkOutput(app, 'repeat-array-no-kv'))
     it('repeat with array non-obj case', () => checkOutput(app, 'repeat-array-non-obj'))
     it('repeat watch case', () => checkOutput(app, 'repeat-watch'))
+
+    it('id case', () => checkOutput(app, 'id'))
+    it('dynamic id case', () => checkOutput(app, 'dynamic-id'))
 
     it('reset style case', () => checkOutput(app, 'reset-style'))
     it('dynamic type case', () => checkOutput(app, 'dynamic-type'))
