@@ -8,9 +8,9 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXJSException.h"
+#import "WXJSExceptionInfo.h"
 
-@implementation WXJSException
+@implementation WXJSExceptionInfo
 
 - (instancetype)initWithInstanceId:(NSString *)instanceId
                          bundleUrl:(NSString *)bundleUrl

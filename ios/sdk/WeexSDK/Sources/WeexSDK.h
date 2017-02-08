@@ -30,7 +30,7 @@
 #import "WXListComponent.h"
 #import "WXLayoutDefine.h"
 #import "WXJSExceptionProtocol.h"
-#import "WXJSException.h"
+#import "WXJSExceptionInfo.h"
 #import "WXImgLoaderProtocol.h"
 #import "WXEventModuleProtocol.h"
 #import "WXDefine.h"

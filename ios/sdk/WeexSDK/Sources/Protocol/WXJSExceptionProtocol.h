@@ -6,9 +6,9 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXJSException.h"
+#import "WXJSExceptionInfo.h"
 
-@protocol WXJSExceptionProtocol<WXModuleProtocol>
+@protocol WXJSExceptionProtocol<NSObject>
 
 /**
  * report js exception
@@ -16,6 +16,6 @@
  * @param exception {@link WXJSException}
  */
 
-- (void)onJSException:(WXJSException *)exception;
+- (void)onJSException:(WXJSExceptionInfo *)exception;
 
 @end

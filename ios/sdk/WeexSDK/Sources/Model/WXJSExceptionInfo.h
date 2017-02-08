@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WXJSException : NSObject
+@interface WXJSExceptionInfo : NSObject
 /**
  * instance id
  */
