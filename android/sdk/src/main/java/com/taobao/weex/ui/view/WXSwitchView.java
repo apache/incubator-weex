@@ -206,6 +206,7 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.support.v7.widget.SwitchCompat;
+import android.view.Gravity;
 import android.view.MotionEvent;
 
 import com.taobao.weex.ui.view.gesture.WXGesture;
@@ -217,6 +218,8 @@ public class WXSwitchView extends SwitchCompat implements WXGestureObservable {
 
   public WXSwitchView(Context context) {
     super(context);
+    setShowText(false);
+    setGravity(Gravity.CENTER_VERTICAL);
   }
 
   @Override

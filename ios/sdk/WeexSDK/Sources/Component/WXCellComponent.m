@@ -23,6 +23,8 @@
     
     if (self) {
         _async = attributes[@"async"] ? [WXConvert BOOL:attributes[@"async"]] : YES;
+        _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
+        _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -59,6 +61,14 @@
 {
     if (attributes[@"async"]) {
         _async = [WXConvert BOOL:attributes[@"async"]];
+    }
+    
+    if (attributes[@"insertAnimation"]) {
+        _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
+    }
+    
+    if (attributes[@"deleteAnimation"]) {
+        _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
     }
 }
 
