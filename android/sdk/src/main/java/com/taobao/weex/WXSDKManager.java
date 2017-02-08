@@ -369,6 +369,7 @@ public class WXSDKManager {
     this.mIWXUserTrackAdapter = config.getUtAdapter();
     this.mURIAdapter = config.getURIAdapter();
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
+    this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
   }
 
   public IWXDebugAdapter getIWXDebugAdapter() {
