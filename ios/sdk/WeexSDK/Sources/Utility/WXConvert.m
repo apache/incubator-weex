@@ -48,7 +48,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     if ([value isKindOfClass:[NSString class]]) {
         NSString *valueString = (NSString *)value;
-        if ([valueString hasSuffix:@"px"]) {
+        if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
             valueString = [valueString substringToIndex:(valueString.length - 2)];
         }
         return [valueString doubleValue];
@@ -74,6 +74,9 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     CGFloat pixel = [self CGFloat:value];
     
+    if ([value isKindOfClass:[NSString class]] && [value hasSuffix:@"wx"]) {
+        return pixel;
+    }
     return pixel * scaleFactor;
 }
 
