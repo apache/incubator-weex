@@ -138,6 +138,7 @@ import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -177,6 +178,10 @@ public class WXSDKManager {
   private IWXHttpAdapter mIWXHttpAdapter;
   private IWXDebugAdapter mIWXDebugAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
+
+
+
+  private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
   private IWXStorageAdapter mIWXStorageAdapter;
   private URIAdapter mURIAdapter;
@@ -331,6 +336,14 @@ public class WXSDKManager {
 
   public IDrawableLoader getDrawableLoader() {
     return mDrawableLoader;
+  }
+
+  public IWXJSExceptionAdapter getIWXJSExceptionAdapter() {
+    return mIWXJSExceptionAdapter;
+  }
+
+   void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+    mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
   }
 
   public @NonNull IWXHttpAdapter getIWXHttpAdapter() {

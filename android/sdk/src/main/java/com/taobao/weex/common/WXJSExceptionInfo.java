@@ -202,153 +202,109 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex;
+package com.taobao.weex.common;
 
-import com.taobao.weex.adapter.IDrawableLoader;
-import com.taobao.weex.adapter.IWXDebugAdapter;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.adapter.IWXImgLoaderAdapter;
-import com.taobao.weex.adapter.IWXJSExceptionAdapter;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.adapter.URIAdapter;
-import com.taobao.weex.appfram.storage.IWXStorageAdapter;
-import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 
-/**
- * Created by sospartan on 5/31/16.
- */
-public class InitConfig {
-  private IWXHttpAdapter httpAdapter;
-  private IDrawableLoader drawableLoader;
-  private IWXImgLoaderAdapter imgAdapter;
-  private IWXUserTrackAdapter utAdapter;
-  private IWXDebugAdapter debugAdapter;
-  private IWXStorageAdapter storageAdapter;
-  private URIAdapter mURIAdapter;
-  private IWebSocketAdapterFactory webSocketAdapterFactory;
-  private IWXJSExceptionAdapter mJSExceptionAdapter;
-  private String framework;
+import java.util.Map;
 
-  public IWXHttpAdapter getHttpAdapter() {
-    return httpAdapter;
+public class WXJSExceptionInfo {
+
+  /**
+   * instance id
+   */
+  private String mInstanceId;
+  /**
+   * The URL where the exception occurred
+   */
+  private String mBundleUrl;
+  /**
+   * error code
+   */
+  private String mErrCode;
+  /**
+   * The function name of the exception
+   */
+  private String mFunction;
+  /**
+   * Exception details
+   */
+  private String mException;
+
+  /**
+   * Extended field
+   */
+  private Map<String,String> mExtParams;
+
+  public WXJSExceptionInfo(){
+
   }
 
-  public IWXImgLoaderAdapter getImgAdapter() {
-    return imgAdapter;
+  public WXJSExceptionInfo(String instanceId, String bundleUrl, String errCode, String function, String exception, Map<String,String> extParams) {
+    this.mInstanceId = instanceId;
+    this.mBundleUrl = bundleUrl;
+    this.mErrCode = errCode;
+    this.mFunction = function;
+    this.mException = exception;
+    this.mExtParams = extParams;
   }
 
-  public IDrawableLoader getDrawableLoader() {
-    return drawableLoader;
+  public String getInstanceId() {
+    return mInstanceId;
   }
 
-  public IWXUserTrackAdapter getUtAdapter() {
-    return utAdapter;
+  public void setInstanceId(String instanceId) {
+    mInstanceId = instanceId;
   }
 
-  public IWXDebugAdapter getDebugAdapter(){
-    return debugAdapter;
-  }
-  public String getFramework() {
-    return framework;
+  public String getBundleUrl() {
+    return mBundleUrl;
   }
 
-  public IWXStorageAdapter getStorageAdapter() {
-    return storageAdapter;
+  public void setBundleUrl(String bundleUrl) {
+    mBundleUrl = bundleUrl;
   }
 
-  public URIAdapter getURIAdapter() {
-    return mURIAdapter;
+  public String getErrCode() {
+    return mErrCode;
   }
 
-  public IWebSocketAdapterFactory getWebSocketAdapterFactory() {
-    return webSocketAdapterFactory;
+  public void setErrCode(String errCode) {
+    mErrCode = errCode;
   }
 
-  public IWXJSExceptionAdapter getJSExceptionAdapter() {
-    return mJSExceptionAdapter;
+  public String getFunction() {
+    return mFunction;
   }
 
-  private InitConfig() {
+  public void setFunction(String function) {
+    mFunction = function;
   }
 
-  public static class Builder{
-    IWXHttpAdapter httpAdapter;
-    IWXImgLoaderAdapter imgAdapter;
-    IDrawableLoader drawableLoader;
-    IWXUserTrackAdapter utAdapter;
-    IWXDebugAdapter debugAdapter;
-    IWXStorageAdapter storageAdapter;
-    URIAdapter mURIAdapter;
-    IWXJSExceptionAdapter mJSExceptionAdapter;
-    String framework;
-    IWebSocketAdapterFactory webSocketAdapterFactory;
-    public Builder(){
+  public String getException() {
+    return mException;
+  }
 
-    }
+  public void setException(String exception) {
+    mException = exception;
+  }
 
-    public Builder setHttpAdapter(IWXHttpAdapter httpAdapter) {
-      this.httpAdapter = httpAdapter;
-      return this;
-    }
+  public Map<String, String> getExtParams() {
+    return mExtParams;
+  }
 
-    public Builder setImgAdapter(IWXImgLoaderAdapter imgAdapter) {
-      this.imgAdapter = imgAdapter;
-      return this;
-    }
+  public void setExtParams(Map<String, String> extParams) {
+    mExtParams = extParams;
+  }
 
-    public Builder setDrawableLoader(IDrawableLoader drawableLoader){
-      this.drawableLoader=drawableLoader;
-      return this;
-    }
-
-    public Builder setUtAdapter(IWXUserTrackAdapter utAdapter) {
-      this.utAdapter = utAdapter;
-      return this;
-    }
-
-    public Builder setDebugAdapter(IWXDebugAdapter debugAdapter){
-      this.debugAdapter=debugAdapter;
-      return this;
-    }
-
-    public Builder setStorageAdapter(IWXStorageAdapter storageAdapter) {
-      this.storageAdapter = storageAdapter;
-      return this;
-    }
-
-    public Builder setURIAdapter(URIAdapter URIAdapter) {
-      mURIAdapter = URIAdapter;
-      return this;
-    }
-
-    public Builder setJSExceptionAdapter(IWXJSExceptionAdapter JSExceptionAdapter) {
-      mJSExceptionAdapter = JSExceptionAdapter;
-      return this;
-    }
-
-    public Builder setFramework(String framework){
-      this.framework=framework;
-      return this;
-    }
-
-    public Builder setWebSocketAdapterFactory(IWebSocketAdapterFactory factory) {
-      this.webSocketAdapterFactory = factory;
-      return this;
-    }
-
-    public InitConfig build(){
-      InitConfig config =  new InitConfig();
-      config.httpAdapter = this.httpAdapter;
-      config.imgAdapter = this.imgAdapter;
-      config.drawableLoader = this.drawableLoader;
-      config.utAdapter = this.utAdapter;
-      config.debugAdapter=this.debugAdapter;
-      config.storageAdapter = this.storageAdapter;
-      config.framework=this.framework;
-      config.mURIAdapter = this.mURIAdapter;
-      config.webSocketAdapterFactory = this.webSocketAdapterFactory;
-      config.mJSExceptionAdapter=this.mJSExceptionAdapter;
-      return config;
-    }
+  @Override
+  public String toString() {
+    StringBuffer buffer = new StringBuffer();
+    buffer.append("instanceId:").append(mInstanceId)
+        .append(" bundleUrl:").append(mBundleUrl)
+        .append(" errCode:").append(mErrCode)
+        .append(" function:").append(mFunction)
+        .append(" exception:").append(mException)
+        .append(" extParams:").append(mExtParams);
+    return buffer.toString();
   }
 }
