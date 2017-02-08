@@ -9,11 +9,20 @@ machine:
    version: 7
   java:
     version: 'oraclejdk8'
+  environment:
+    QEMU_AUDIO_DRV: none
 test:
+  pre:
+    - emulator -avd circleci-android24 -no-window:
+        background: true
+        parallel: true
+    
   override:
     - npm run build
     - npm run test
     - cd android && ./run-ci.sh
+    - circle-android wait-for-boot
+    - ./test/run.sh
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports
