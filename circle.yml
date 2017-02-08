@@ -11,13 +11,14 @@ machine:
     version: 'oraclejdk8'
   environment:
     QEMU_AUDIO_DRV: none
+    ANDROID_HOME: /usr/local/android-sdk-linux
 test:
   override:
     - npm run build
     - npm run test
     - cd android && ./run-ci.sh
-    - npm install -g macaca-cli
-    - npm install -g macaca-android
+    - npm install macaca-cli --save-dev
+    - npm install macaca-android --save-dev
     - emulator -avd circleci-android22 -no-window:
         background: true
         parallel: true
