@@ -385,6 +385,11 @@ do {\
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
     }
+    if (_lineHeight > font.lineHeight) {
+        [attributedString addAttribute:NSBaselineOffsetAttributeName
+                                 value:@((_lineHeight - font.lineHeight)/ 2)
+                                 range:(NSRange){0, attributedString.length}];
+    }
 
     return attributedString;
 }
