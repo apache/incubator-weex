@@ -206,6 +206,8 @@ package com.taobao.weex.ui.component;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -259,6 +261,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private List<WXComponent> mRefreshs=new ArrayList<>();
   private int mChildrenLayoutOffset = 0;//Use for offset children layout
   private String mLoadMoreRetry = "";
+  private int mOffsetAccuracy = 10;
+  private Point mLastReport = new Point(-1, -1);
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -324,6 +328,75 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     } else {
       return getHostView();
     }
+  }
+
+  @Override
+  public void addEvent(String type) {
+    super.addEvent(type);
+    if (Constants.Event.SCROLL.equals(type) && getInnerView() != null && getInnerView() instanceof WXScrollView) {
+      ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {
+        @Override
+        public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
+          if (shouldReport(x, y)) {
+            Rect frame = scrollView.getContentFrame();
+
+            Map<String, Object> event = new HashMap<>(2);
+            Map<String, Object> contentSize = new HashMap<>(2);
+            Map<String, Object> contentOffset = new HashMap<>(2);
+
+            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(frame.width(), getInstance().getViewPortWidth()));
+            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(frame.height(), getInstance().getViewPortWidth()));
+
+            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(x, getInstance().getViewPortWidth()));
+            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(y, getInstance().getViewPortWidth()));
+
+            event.put(Constants.Name.CONTENT_SIZE, contentSize);
+            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+            fireEvent(Constants.Event.SCROLL, event);
+          }
+        }
+
+        @Override
+        public void onScrollToBottom(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+
+        @Override
+        public void onScrollStopped(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+
+        @Override
+        public void onScroll(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+      });
+    }
+  }
+
+  private boolean shouldReport(int x, int y) {
+    if (mLastReport.x == -1 && mLastReport.y == -1) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    if (mOrientation == Constants.Orientation.HORIZONTAL
+            && Math.abs(x - mLastReport.x) >= mOffsetAccuracy) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    if (mOrientation == Constants.Orientation.VERTICAL
+            && Math.abs(y - mLastReport.y) >= mOffsetAccuracy) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -567,6 +640,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
         return true;
+      case Constants.Name.OFFSET_ACCURACY:
+        int accuracy = WXUtils.getInteger(param, 10);
+        setOffsetAccuracy(accuracy);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -592,6 +669,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     }else if(hostView instanceof WXScrollView) {
       ((WXScrollView)hostView).setScrollable(scrollable);
     }
+  }
+
+  @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
+  public void setOffsetAccuracy(int accuracy) {
+    float realPx = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getViewPortWidth());
+    this.mOffsetAccuracy = (int) realPx;
   }
 
   @Override
