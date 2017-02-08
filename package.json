@@ -83,7 +83,7 @@
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.1.0",
     "weex-vue-framework": "2.1.8-weex.1",
-    "weex-wd": "^1.0.4"
+    "weex-wd": "^1.0.6"
   },
   "devDependencies": {
     "xml2map": "^1.0.2",

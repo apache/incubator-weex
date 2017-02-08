@@ -25,9 +25,21 @@ describe('weex mobile index', function () {
   it('#1 Drag list', () => {
     return driver
     .elementByXPath('//div/list')
-    .touch('drag', {fromX:200, fromY:600, toX:200, toY: 200})
+    .touch('drag', {
+        fromX: 200,
+        fromY: 600,
+        toX: 200,
+        toY: 200,
+        duration: 0.5
+      })
     .sleep(2000)
-    .touch('drag', {fromX:200, fromY:600, toX:100, toY:200})
+    .touch('drag', {
+      fromX:200, 
+      fromY:600, 
+      toX:100, 
+      toY:200,
+      duration: 0.5
+  })
     .elementByXPath('//div/text')
     .text()
     .then((text)=>{
