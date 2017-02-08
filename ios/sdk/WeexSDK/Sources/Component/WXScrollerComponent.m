@@ -443,7 +443,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
     if (_scrollEvent) {
         CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-        NSMutableDictionary *scrollEventParams = [[NSMutableDictionary alloc] init];
         NSDictionary *contentSizeData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"width",[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor],@"height", nil];
         //contentOffset values are replaced by (-contentOffset.x,-contentOffset.y) ,in order to be consistent with Android client.
         NSDictionary *contentOffsetData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"x",[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor],@"y", nil];
