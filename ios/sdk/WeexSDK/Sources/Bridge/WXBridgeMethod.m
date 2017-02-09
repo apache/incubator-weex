@@ -36,19 +36,15 @@
 -(void)checkParameter:(id)obj parameterType:(const char *)parameterType order:(int)order
 {
     BOOL check = YES;
-    
-    if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0)
-    {
+    if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0) {
         check =  [obj isKindOfClass:[NSNumber class]];
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be int,float or double>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
-    if(strcmp(parameterType,"@")==0)
-    {
+    if(strcmp(parameterType,"@")==0) {
         check =  [obj isKindOfClass:[NSArray class]] || [obj isKindOfClass:[NSDictionary class]] ||[obj isKindOfClass:[NSString class]];
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@ ;the number %d parameter type is not right,it should be array ,map or string>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
-    if(strcmp(parameterType,"@?")==0)
-    {
+    if(strcmp(parameterType,"@?")==0) {
         const char *blockType = @encode(typeof(^{}));
         check =  !strcmp(parameterType, blockType);
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
@@ -85,7 +81,9 @@
     for (int i = 0; i < arguments.count; i ++ ) {
         id obj = arguments[i];
         const char *parameterType = [signature getArgumentTypeAtIndex:i + 2];
+#ifdef DEBUG
         [self checkParameter:obj parameterType:parameterType order:i];
+#endif
         static const char *blockType = @encode(typeof(^{}));
         id argument;
         if (!strcmp(parameterType, blockType)) {
