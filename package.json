@@ -45,7 +45,7 @@
     "build:examples": "webpack --config build/webpack.examples.config.js",
     "build:test": "webpack --config build/webpack.test.config.js",
     "build:ui-test": "webpack --config build/webpack.macacatest.config.js",
-    "build": "npm run build:native && npm run build:browser && npm run build:examples && npm run build:test",
+    "build": "npm run build:native && npm run build:browser && npm run build:vue && npm run build:examples && npm run build:test",
     "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
     "dist": "npm run dist:browser",
     "dev:native": "node build/build.js native --watch",
@@ -88,10 +88,6 @@
     "weex-vue-framework": "2.1.8-weex.1"
   },
   "devDependencies": {
-    "xml2map": "^1.0.2",
-    "macaca-cli": "^1.1.0",
-    "webdriver-client": "~1.0.0",
-    "macaca-utils": "^0.1.9",
     "babel-core": "^6.17.0",
     "babel-istanbul": "^0.11.0",
     "babel-loader": "^6.2.5",
@@ -111,6 +107,8 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.8.0",
+    "macaca-cli": "^1.1.0",
+    "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
     "nightwatch": "^0.9.4",
     "phantomjs-prebuilt": "^2.1.7",
@@ -130,13 +128,15 @@
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.4",
-    "vue": "2.1.6",
+    "vue": "^2.1.10",
     "vue-loader": "^10.0.1",
-    "vue-template-compiler": "^2.1.3",
+    "vue-template-compiler": "^2.1.10",
+    "webdriver-client": "~1.0.0",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
-    "wwp": "^0.3.5"
+    "wwp": "^0.3.5",
+    "xml2map": "^1.0.2"
   }
 }
