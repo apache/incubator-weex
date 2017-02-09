@@ -17,7 +17,7 @@ test:
     # - npm run build
     # - npm run test
     - ./test/setup-android-ci.sh
-    - $ANDROID_HOME/tools/emulator -avd weexavd -no-skin -no-audio -no-window:
+    - $ANDROID_HOME/tools/emulator -avd circleci-android21 -no-skin -no-audio -no-window:
             background: true
     - ps -ef
     # - emulator -avd weexavd -no-audio -no-window:

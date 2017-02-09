@@ -11,7 +11,8 @@ function buildAndroid {
 }
 function runAndroid {
     buildAndroid
-    platform=android macaca run -d $1
+    ps -ef
+    platform=android macaca run -d $1 --verbose
 }
 
 function buildiOS {
