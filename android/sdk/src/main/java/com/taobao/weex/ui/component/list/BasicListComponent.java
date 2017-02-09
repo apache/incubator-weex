@@ -207,6 +207,7 @@ package com.taobao.weex.ui.component.list;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -282,6 +283,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final int MAX_VIEWTYPE_ALLOW_CACHE = 9;
   private static boolean mAllowCacheViewHolder = true;
   private static boolean mDownForBidCacheViewHolder = false;
+
+  private int mOffsetAccuracy = 10;
+  private Point mLastReport = new Point(-1, -1);
 
   /**
    * Map for storing component that is sticky.
@@ -502,6 +506,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
         return true;
+      case Constants.Name.OFFSET_ACCURACY:
+        int accuracy = WXUtils.getInteger(param, 10);
+        setOffsetAccuracy(accuracy);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -513,6 +521,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if(inner != null) {
       inner.setScrollable(scrollable);
     }
+  }
+
+  @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
+  public void setOffsetAccuracy(int accuracy) {
+    float real = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getViewPortWidth());
+    this.mOffsetAccuracy = (int) real;
   }
 
   @Override
@@ -1108,5 +1122,56 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @JSMethod
   public void resetLoadmore() {
     mLoadMoreRetry = "";
+  }
+
+  @Override
+  public void addEvent(String type) {
+    super.addEvent(type);
+    if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
+      WXRecyclerView innerView = getHostView().getInnerView();
+      innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+          super.onScrolled(recyclerView, dx, dy);
+          int offsetX = recyclerView.computeHorizontalScrollOffset();
+          int offsetY = recyclerView.computeVerticalScrollOffset();
+          if (shouldReport(offsetX, offsetY)) {
+            int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
+            int contentHeight = recyclerView.computeVerticalScrollRange();
+
+            Map<String, Object> event = new HashMap<>(2);
+            Map<String, Object> contentSize = new HashMap<>(2);
+            Map<String, Object> contentOffset = new HashMap<>(2);
+
+            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getViewPortWidth()));
+            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getViewPortWidth()));
+
+            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getViewPortWidth()));
+            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getViewPortWidth()));
+
+            event.put(Constants.Name.CONTENT_SIZE, contentSize);
+            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+            fireEvent(Constants.Event.SCROLL, event);
+          }
+        }
+      });
+    }
+  }
+
+  private boolean shouldReport(int offsetX, int offsetY) {
+    if (mLastReport.x == -1 && mLastReport.y == -1) {
+      mLastReport.x = offsetX;
+      mLastReport.y = offsetY;
+      return true;
+    }
+
+    if (Math.abs(mLastReport.x - offsetX) >= mOffsetAccuracy || Math.abs(mLastReport.y - offsetY) >= mOffsetAccuracy) {
+      mLastReport.x = offsetX;
+      mLastReport.y = offsetY;
+      return true;
+    }
+
+    return false;
   }
 }

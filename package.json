@@ -83,12 +83,11 @@
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.1.0",
     "weex-vue-framework": "2.1.8-weex.1",
-    "weex-wd": "^1.0.4"
+    "weex-styler":"0.1.8"
   },
   "devDependencies": {
     "xml2map": "^1.0.2",
-    "macaca-cli": "^1.1.0",
-    "webdriver-client": "~1.0.0",
+    "weex-wd": "^1.0.6",
     "macaca-utils": "^0.1.9",
     "babel-core": "^6.17.0",
     "babel-istanbul": "^0.11.0",

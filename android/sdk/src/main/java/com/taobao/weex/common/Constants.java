@@ -338,6 +338,11 @@ public class Constants {
     String PREVENT_MOVE_EVENT = "preventMoveEvent";
     String SELECTION_START = "selectionStart";
     String SELECTION_END = "selectionEnd";
+    String OFFSET_ACCURACY = "offsetAccuracy";
+    String CONTENT_SIZE = "contentSize";
+    String CONTENT_OFFSET = "contentOffset";
+    String X = "x";
+    String Y = "y";
   }
 
   public interface Value {

@@ -320,10 +320,14 @@ public class WXSliderNeighbor extends WXSlider {
 
         updateAdapterScaleAndAlpha(mNeighborAlpha, mNeighborScale); // we need to set neighbor view status when added.
 
-        // prevent a bug of init status. ZoomTransformer no called as excepted.
-        mViewPager.beginFakeDrag();
-        mViewPager.fakeDragBy(1); // must be 1
-        mViewPager.endFakeDrag();
+        try {
+            // prevent a bug of init status. ZoomTransformer no called as excepted.
+            mViewPager.beginFakeDrag();
+            mViewPager.fakeDragBy(1); // must be 1
+            mViewPager.endFakeDrag();
+        }catch (IndexOutOfBoundsException e){
+            //do nothing
+        }
 
     }
 
