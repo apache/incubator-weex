@@ -606,7 +606,7 @@
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
         CGFloat offsetXRatio = (XDeviation / width);
-        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+        if (fabsf(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
             _lastOffsetXRatio = offsetXRatio;
             [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
@@ -661,7 +661,7 @@
     CGFloat width = scrollView.frame.size.width;
     CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
     CGFloat offsetXRatio = (XDeviation / width);
-    if (ABS(offsetXRatio) < 0.5) {
+    if (fabsf(offsetXRatio) < 0.5) {
         [self sliderView:self.sliderView scrollViewDidCancelDraging:self.sliderView.scrollView];
     }
 }
