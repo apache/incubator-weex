@@ -19,11 +19,13 @@ test:
     - ./test/setup-android-ci.sh
     - $ANDROID_HOME/tools/emulator -avd weexavd -no-skin -no-audio -no-window:
             background: true
+    - ps -ef
     # - emulator -avd weexavd -no-audio -no-window:
     #     background: true
     #     parallel: true
     # - cd android && ./run-ci.sh
     - circle-android wait-for-boot
+    - ps -ef
     - ./test/run-android-ci.sh
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
