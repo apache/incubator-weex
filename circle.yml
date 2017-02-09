@@ -14,12 +14,13 @@ machine:
     ANDROID_HOME: /usr/local/android-sdk-linux
 test:
   override:
-    - npm run build
-    - npm run test
-    - emulator -avd circleci-android22 -no-window:
+    # - npm run build
+    # - npm run test
+    - ./test/setup-android-ci.sh
+    - emulator -avd weexavd -no-audio -no-window:
         background: true
         parallel: true
-    - cd android && ./run-ci.sh
+    # - cd android && ./run-ci.sh
     - circle-android wait-for-boot
     - ./test/run-android-ci.sh
   post:
