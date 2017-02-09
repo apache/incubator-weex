@@ -32,7 +32,7 @@
     return [NSString stringWithFormat:@"<%@: %p; instance = %@; method = %@; arguments= %@>", NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments];
 }
 
-//check parameter:NSNumber contains int,float,double;object contains nsarray,nsstring,nsdictionary ;
+//check parameter:NSNumber contains int,float,double;object contains nsarray,nsstring,nsdictionary ;block is block
 -(void)checkParameter:(id)obj parameterType:(const char *)parameterType order:(int)order
 {
     BOOL check = YES;
@@ -40,18 +40,18 @@
     if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0)
     {
         check =  [obj isKindOfClass:[NSNumber class]];
-        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,should be number>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be int,float or double>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
     if(strcmp(parameterType,"@")==0)
     {
         check =  [obj isKindOfClass:[NSArray class]] || [obj isKindOfClass:[NSDictionary class]] ||[obj isKindOfClass:[NSString class]];
-        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@ ;the number %d parameter type is not right,should be array ,map or string>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@ ;the number %d parameter type is not right,it should be array ,map or string>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
     if(strcmp(parameterType,"@?")==0)
     {
         const char *blockType = @encode(typeof(^{}));
         check =  !strcmp(parameterType, blockType);
-        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
 }
 
