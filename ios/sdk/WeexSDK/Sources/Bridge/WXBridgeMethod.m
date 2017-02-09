@@ -32,6 +32,28 @@
     return [NSString stringWithFormat:@"<%@: %p; instance = %@; method = %@; arguments= %@>", NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments];
 }
 
+//check parameter:NSNumber contains int,float,double;object contains nsarray,nsstring,nsdictionary ;
+-(void)checkParameter:(id)obj parameterType:(const char *)parameterType order:(int)order
+{
+    BOOL check = YES;
+    if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0)
+    {
+        check =  [obj isKindOfClass:[NSNumber class]];
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,should be number>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+    }
+    if(strcmp(parameterType,"@")==0)
+    {
+        check =  [obj isKindOfClass:[NSArray class]] || [obj isKindOfClass:[NSDictionary class]] ||[obj isKindOfClass:[NSString class]];
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@ ;the number %d parameter type is not right,should be array ,map or string>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+    }
+    if(strcmp(parameterType,"@?")==0)
+    {
+        static const char *blockType = @encode(typeof(^{}));
+        check =  !strcmp(parameterType, blockType);
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+    }
+}
+
 - (NSInvocation *)invocationWithTarget:(id)target selector:(SEL)selector
 {
     WXAssert(target, @"No target for method:%@", self);
@@ -62,6 +84,7 @@
     for (int i = 0; i < arguments.count; i ++ ) {
         id obj = arguments[i];
         const char *parameterType = [signature getArgumentTypeAtIndex:i + 2];
+        [self checkParameter:obj parameterType:parameterType order:i];
         static const char *blockType = @encode(typeof(^{}));
         id argument;
         if (!strcmp(parameterType, blockType)) {
