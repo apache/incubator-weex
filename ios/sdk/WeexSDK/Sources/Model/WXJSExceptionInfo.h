@@ -29,11 +29,18 @@
  * exception detail;
  */
 @property(nonatomic,strong) NSString * exception;
-
 /**
  * extend filed
  */
 @property(nonatomic,strong) NSMutableDictionary * userInfo;
+/**
+ * weex sdk version
+ */
+@property(nonatomic,strong, readonly) NSString * sdkVersion;
+/**
+ * js framework verison
+ */
+@property(nonatomic,strong, readonly) NSString * jsfmVersion;
 
 /**
  * @abstract Initializes a WXJSException instance
