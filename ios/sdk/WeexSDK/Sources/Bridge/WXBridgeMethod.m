@@ -36,6 +36,7 @@
 -(void)checkParameter:(id)obj parameterType:(const char *)parameterType order:(int)order
 {
     BOOL check = YES;
+    
     if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0)
     {
         check =  [obj isKindOfClass:[NSNumber class]];
@@ -48,7 +49,7 @@
     }
     if(strcmp(parameterType,"@?")==0)
     {
-        static const char *blockType = @encode(typeof(^{}));
+        const char *blockType = @encode(typeof(^{}));
         check =  !strcmp(parameterType, blockType);
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
     }
