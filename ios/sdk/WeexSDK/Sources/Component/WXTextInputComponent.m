@@ -124,8 +124,8 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         if (attributes[@"maxlength"]) {
             _maxLength = [NSNumber numberWithUnsignedInteger:[attributes[@"maxlength"] integerValue]];
         }
-        if (attributes[@"returnkeytype"]) {
-            _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnkeytype"]];
+        if (attributes[@"returnKeyType"]) {
+            _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         }
         
         // handle styles
@@ -316,8 +316,8 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
         [_inputView setText:_value];
     }
-    if (attributes[@"returnkeytype"]) {
-        _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnkeytype"]];
+    if (attributes[@"returnKeyType"]) {
+        _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         [_inputView setReturnKeyType:_returnKeyType];
     }
 }

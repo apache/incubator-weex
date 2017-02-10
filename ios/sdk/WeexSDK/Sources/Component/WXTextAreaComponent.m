@@ -92,8 +92,8 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
                 _placeholderString = placeHolder;
             }
         }
-        if (attributes[@"returnkeytype"]) {
-            _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnkeytype"]];
+        if (attributes[@"returnKeyType"]) {
+            _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         }
         if (!_placeholderString) {
             _placeholderString = @"";
@@ -307,8 +307,8 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
             }
         }
     }
-    if (attributes[@"returnkeytype"]) {
-        _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnkeytype"]];
+    if (attributes[@"returnKeyType"]) {
+        _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         [_textView setReturnKeyType:_returnKeyType];
     }
 }
