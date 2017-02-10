@@ -174,6 +174,7 @@
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
+        _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
 }
