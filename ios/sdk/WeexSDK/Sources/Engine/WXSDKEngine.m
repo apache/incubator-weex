@@ -208,20 +208,18 @@
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
-    
-    [self registerDefaults];
-    
-    [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaults];
+        [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    });
 }
 
 + (void)registerDefaults
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self _registerDefaultComponents];
-        [self _registerDefaultModules];
-        [self _registerDefaultHandlers];
-    });
+    [self _registerDefaultComponents];
+    [self _registerDefaultModules];
+    [self _registerDefaultHandlers];
 }
 
 + (NSString*)SDKEngineVersion
