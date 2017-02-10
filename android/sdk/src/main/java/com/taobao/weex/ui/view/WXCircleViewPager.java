@@ -217,6 +217,7 @@ import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
 /**
@@ -474,19 +475,22 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   }
 
   private static final class ScrollAction implements Runnable {
-    private WXCircleViewPager target;
+    private WeakReference<WXCircleViewPager> targetRef;
     private long intervalTime;
     private ScrollAction(WXCircleViewPager target, long intervalTime) {
-      this.target = target;
+      this.targetRef = new WeakReference<>(target);
       this.intervalTime = intervalTime;
     }
 
     @Override
     public void run() {
       WXLogUtils.d("[CircleViewPager] trigger auto play action");
-      target.superSetCurrentItem(target.superGetCurrentItem() + 1, true);
-      target.removeCallbacks(this);
-      target.postDelayed(this, intervalTime);
+      WXCircleViewPager target;
+      if ((target = targetRef.get()) != null) {
+        target.superSetCurrentItem(target.superGetCurrentItem() + 1, true);
+        target.removeCallbacks(this);
+        target.postDelayed(this, intervalTime);
+      }
     }
   }
 }
