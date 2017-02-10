@@ -9,6 +9,7 @@
  */
 
 #import "WXJSExceptionInfo.h"
+#import "WXAppConfiguration.h"
 
 @implementation WXJSExceptionInfo
 
@@ -26,11 +27,13 @@
         self.exception = exception;
         self.userInfo = userInfo;
         self.functionName = functionName;
+        _jsfmVersion = [WXAppConfiguration JSFrameworkVersion];
+        _sdkVersion = WX_SDK_VERSION;
     }
     return self;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"instanceId:%@ bundleUrl:%@ errorCode:%@  functionName:%@ exception:%@ userInfo:%@", _instanceId?:@"", _bundleUrl?:@"", _errorCode?:@"", _functionName?:@"", _exception?:@"", _userInfo?:@""];
+    return [NSString stringWithFormat:@"instanceId:%@ bundleUrl:%@ errorCode:%@ functionName:%@ exception:%@ userInfo:%@ jsfmVersion:%@ sdkVersion:%@", _instanceId?:@"", _bundleUrl?:@"", _errorCode?:@"", _functionName?:@"", _exception?:@"", _userInfo?:@"", _jsfmVersion, _sdkVersion];
 }
 @end
