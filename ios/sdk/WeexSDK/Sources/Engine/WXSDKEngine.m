@@ -254,13 +254,18 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+    [self restartWithScript:script];
+}
+
++ (void)restartWithScript:(NSString*)script
+{
     NSDictionary *components = [WXComponentFactory componentConfigs];
     NSDictionary *modules = [WXModuleFactory moduleConfigs];
     NSDictionary *handlers = [WXHandlerFactory handlerConfigs];
     [WXSDKManager unload];
     [WXComponentFactory unregisterAllComponents];
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
-    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     
     [self _originalRegisterComponents:components];
     [self _originalRegisterModules:modules];
