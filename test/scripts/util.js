@@ -44,6 +44,6 @@ module.exports = {
         return getIpAddress()+":12581";
     },
     getTimeoutMills:function(){
-        return 5 * 60 * 1000;
+        return 10 * 60 * 1000;
     }
 }
