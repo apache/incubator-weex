@@ -343,6 +343,7 @@ public class Constants {
     String CONTENT_OFFSET = "contentOffset";
     String X = "x";
     String Y = "y";
+    String RETURN_KEY_TYPE = "returnKeyType";
   }
 
   public interface Value {
@@ -408,6 +409,7 @@ public class Constants {
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
+    String RETURN = "return";
   }
 
   public interface PSEUDO {
