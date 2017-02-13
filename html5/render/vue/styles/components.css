@@ -201,14 +201,13 @@ body > .weex-scroller {
 
 .weex-list-inner,
 .weex-scroller-inner {
-  background-color: #FFFFFF;
-  min-height: 100%;
-  width: 100%;
-  overflow: hidden;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
@@ -239,6 +238,7 @@ body > .weex-scroller {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  position: relative;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
