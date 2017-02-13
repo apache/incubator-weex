@@ -32,13 +32,19 @@ export function getFilters (key) {
         }
       }
       if (key.match(/transform/) && val.match(/translate/)) {
-        return val.replace(/\d*\.?\d+px/g, function (match) {
+        let ret = val.replace(/\d*\.?\d+px/g, function (match) {
           return parseInt(parseFloat(match)) + 'px'
         })
+        if (ret.match(/wx/)) {
+          ret = ret.replace(/\d*\.?\d+wx/g, function (match) {
+            return parseInt(parseFloat(match)) * global.WXEnvironment.devicePixelRatio + 'px'
+          })
+        }
+        return ret
       }
-      if (key.match(/^border$/) && val.match(/^\d+(?:px)?\s+/)) {
-        val = val.replace(/^(\d+(?:px)?)/, function ($0, $1) {
-          const v = parseFloat($1)
+      if (key.match(/^border$/) && val.match(/^\d+(?:[w,p]x)?\s+/)) {
+        val = val.replace(/^(\d+(?:[w,p]x)?)/, function ($0, $1) {
+          const v = parseFloat($1) * (val.match(/^\d+(?:wx)+/) ? global.WXEnvironment.devicePixelRatio : 1)
           return v + 'px'
         })
       }
