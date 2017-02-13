@@ -452,7 +452,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         } else {
             distance = scrollView.contentOffset.y - _lastScrollEventFiredOffset.y;
         }
-        if (ABS(distance) >= _offsetAccuracy) {
+        if (fabsf(distance) >= _offsetAccuracy) {
             [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
             _lastScrollEventFiredOffset = scrollView.contentOffset;
         }
