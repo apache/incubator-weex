@@ -173,7 +173,9 @@ export function updateStyle (style) {
     }
   }
 
-  processPseudoClass(this, 'data-pseudo-id', pseudoData)
+  if (Object.keys(pseudoData).length > 0) {
+    processPseudoClass(this, 'data-pseudo-id', pseudoData)
+  }
 }
 
 // modify styles of pseudo class.
@@ -197,7 +199,7 @@ function processPseudoClass (component, idName, pseudoData) {
     const cssText = Object.keys(pseudoData).map(pseudo => {
       const rules = pseudoData[pseudo]
       return getCssText(`[data-pseudo-id="${pseudoId}"]${pseudo}`, rules)
-    }).join(';') + ';'
+    }).join('')
     return style.appendChild(document.createTextNode(cssText))
   }
 
