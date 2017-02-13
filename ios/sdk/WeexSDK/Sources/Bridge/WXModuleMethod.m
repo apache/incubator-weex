@@ -63,15 +63,15 @@
         [invocation invoke];
         return invocation;
     } else {
-        [self _dispatchInvovation:invocation moduleInstance:moduleInstance];
+        [self _dispatchInvocation:invocation moduleInstance:moduleInstance];
         return nil;
     }
 }
 
-- (void)_dispatchInvovation:(NSInvocation *)invocation moduleInstance:(id<WXModuleProtocol>)moduleInstance
+- (void)_dispatchInvocation:(NSInvocation *)invocation moduleInstance:(id<WXModuleProtocol>)moduleInstance
 {
     // dispatch to user specified queue or thread, default is main thread
-    dispatch_block_t dipatchBlock = ^ (){
+    dispatch_block_t dispatchBlock = ^ (){
         [invocation invoke];
     };
     
@@ -84,14 +84,14 @@
     } else {
         targetThread = [NSThread mainThread];
     }
-    
+
     WXAssert(targetQueue || targetThread, @"No queue or thread found for module:%@", moduleInstance);
     
     if (targetQueue) {
-        dispatch_async(targetQueue, dipatchBlock);
+        dispatch_async(targetQueue, dispatchBlock);
     } else {
         WXPerformBlockOnThread(^{
-            dipatchBlock();
+            dispatchBlock();
         }, targetThread);
     }
 }

@@ -313,7 +313,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addEvent:(NSString *)eventName;
 
 /**
- * @abstract Called when removing an event frome the component
+ * @abstract Called when removing an event from the component
  *
  * @param eventName The removed event's name
  * @discussion It can be overrided to handle specific event removing. The method is called on the main thread.
@@ -325,7 +325,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///--------------------------------------
 
 typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
-typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
+typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
 
 /**
  * @abstract Marks the view as needing display. The method should be called on the main thread.
@@ -351,7 +351,7 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on main thread.
  *
  */
-- (WXDisplayCompeletionBlock)displayCompeletionBlock;
+- (WXDisplayCompletionBlock)displayCompletionBlock;
 
 @end
 
