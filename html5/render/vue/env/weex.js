@@ -7,9 +7,10 @@ const weexModules = {}
 export default {
   utils,
   units: window.CSS_UNIT,
-  config: utils.extend({
+  config: {
+    env: window.WXEnvironment,
     bundleUrl: location.href
-  }, window.WXEnvironment),
+  },
 
   requireModule (moduleName) {
     const module = requireWeexModule(moduleName)
