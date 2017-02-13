@@ -45,5 +45,8 @@ module.exports = {
     },
     getTimeoutMills:function(){
         return 10 * 60 * 1000;
+    },
+    getGETActionSleepTimeMills:function(){
+        return 2000;
     }
 }
