@@ -1,5 +1,6 @@
 a, .weex-a {
   display: block;
+  position: relative;
   text-decoration: none;
 }
 
@@ -12,6 +13,7 @@ body > .weex-div {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  position: relative;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
@@ -31,6 +33,7 @@ body > .weex-div {
 }
 
 input, textarea, .weex-input, .weex-textarea {
+  position: relative;
   font-size: 0.4267rem;
 }
 input:focus, textarea:focus, .weex-input:focus, .weex-textarea:focus {
@@ -39,6 +42,7 @@ input:focus, textarea:focus, .weex-input:focus, .weex-textarea:focus {
 
 figure, img, .weex-image, .weex-img {
   display: block;
+  position: relative;
   background-repeat: no-repeat;
 }
 
@@ -319,6 +323,7 @@ body > .weex-scroller {
 
 .weex-indicator-item {
   display: inline-block;
+  position: relative;
   border-radius: 50%;
   width: 0.2667rem;
   height: 0.2667rem;
@@ -334,6 +339,7 @@ body > .weex-scroller {
 
 .weex-refresh-indicator,
 .weex-loading-indicator {
+  position: relative;
   width: 1rem;
   height: 1rem;
   -webkit-box-align: center;
@@ -477,15 +483,17 @@ body > .weex-scroller {
 }
 
 p, .weex-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  position: relative;
   white-space: pre-wrap;
   font-size: 0.4267rem;
   word-wrap: break-word;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
   overflow: visible;
 }
 
 .weex-web {
+  position: relative;
   width: 100%;
   height: 100%;
   border: none;
