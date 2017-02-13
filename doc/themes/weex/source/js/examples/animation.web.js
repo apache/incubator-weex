@@ -205,7 +205,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.wrapper[data-v-10636f94] {\n  height: 100%;\n}\n.box[data-v-10636f94] {\n  width: 250px;\n  height: 250px;\n  background-color: #DDD;\n}\n", ""]);
+	exports.push([module.id, "\n.box[data-v-10636f94] {\n  width: 250px;\n  height: 250px;\n  background-color: #DDD;\n}\n", ""]);
 
 	// exports
 
@@ -514,7 +514,7 @@
 	      animation.transition(testEl, {
 	        styles: {
 	          color: '#FF0000',
-	          transform: 'translate(250, 100)',
+	          transform: 'translate(250px, 100px)',
 	          transformOrigin: 'center center'
 	        },
 	        duration: 800, //ms

@@ -80,7 +80,11 @@ version: 2.1
 
 ## 事件
 
-- `load` <sup class="wx-v">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。
+- `load` <sup class="wx-v">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)
+
+  - 事件对象
+    - `success`: 当图片成功加载时为`true`，否则为`false`
+    - `size`: 图片的原始尺寸，包含两个参数：`naturalWidth` 代表图片的原始宽度像素值，`naturalHeight` 代表图片的原始高度值。这两个参数的默认值都为`0`
 
 - 通用事件
 

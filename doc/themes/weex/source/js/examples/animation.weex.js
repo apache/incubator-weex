@@ -148,7 +148,6 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "wrapper": {},
 	  "box": {
 	    "width": 250,
 	    "height": 250,
@@ -182,7 +181,7 @@
 	      animation.transition(testEl, {
 	        styles: {
 	          color: '#FF0000',
-	          transform: 'translate(250, 100)',
+	          transform: 'translate(250px, 100px)',
 	          transformOrigin: 'center center'
 	        },
 	        duration: 800, //ms

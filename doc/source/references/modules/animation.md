@@ -80,7 +80,7 @@ properties of `transform`:
         animation.transition(testEl, {
           styles: {
             color: '#FF0000',
-            transform: 'translate(250, 100)',
+            transform: 'translate(250px, 100px)',
             transformOrigin: 'center center'
           },
           duration: 800, //ms
@@ -94,11 +94,7 @@ properties of `transform`:
   }
 </script>
 
-
 <style scoped>
-  .wrapper {
-    height: 100%;
-  }
   .box {
     width: 250px;
     height: 250px;
