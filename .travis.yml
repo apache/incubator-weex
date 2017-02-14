@@ -8,14 +8,9 @@ osx_image: xcode8
 jdk: oraclejdk8
 env:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
-android:
-  components:
-    - build-tools-23.0.2
-    - android-23
-    - extra-android-m2repository
-    - extra-android-support
 before_install:
-  - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
+  - ls /usr/lib/jvm
+  # - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - export CHROME_BIN=chromium-browser
   # - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
@@ -32,8 +27,7 @@ before_install:
   - npm install -g macaca-cli
   #- npm install -g macaca-ios
   - echo $JAVA_HOME
-  - ls $JAVA_HOME
-  - npm install -g macaca-android
+  - "JAVA_HOME=$(/usr/libexec/java_home) npm install -g macaca-android"
   - npm install
 before_script:
   - "export DISPLAY=:99.0"
