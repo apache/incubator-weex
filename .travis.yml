@@ -6,6 +6,8 @@ addons:
 rvm: 2.0.0
 osx_image: xcode8
 jdk: oraclejdk8
+env:
+  - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 android:
   components:
     - build-tools-23.0.2
