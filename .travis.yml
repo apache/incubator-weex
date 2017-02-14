@@ -19,7 +19,7 @@ before_install:
   - export CHROME_BIN=chromium-browser
   - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
   - brew install android-sdk
-  - export ANDROID_HOME = /usr/local/opt/android-sdk
+  - export ANDROID_HOME=/usr/local/opt/android-sdk
   - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
   - echo yes | android update sdk --all --filter build-tools-23.0.2 --no-ui --force
   - export DISPLAY=:99.0
