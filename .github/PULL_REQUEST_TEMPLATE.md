@@ -4,10 +4,7 @@ Notes: Weex will move into Apache Software Foundation (ASF) on Feb 24 2017.
 
 Our new GitHub repo is https://github.com/apache/incubator-weex
 
-You can continue to discuss with us through ASF Mailing List:
-http://mail-archives.apache.org/mod_mbox/#weex.incubator
-or StackOverflow:
-http://stackoverflow.com/questions/tagged/weex
+After Feb 24 2017, we only accept pull requests from https://github.com/apache/incubator-weex
 
 Thank you for your support.
 
@@ -15,8 +12,7 @@ Thank you for your support.
 
 注意：Weex 将于 2017-02-24 迁移至 Apache 基金会
 
-届时我们会使用新的 GitHub 仓库：https://github.com/apache/incubator-weex
-同时欢迎大家在 SegmentFault 的 Weex 版块进行中文讨论 https://segmentfault.com/t/weex
+届时我们会使用新的 GitHub 仓库：https://github.com/apache/incubator-weex 并在那里继续接受大家的 pull request。
 
 更多详情请关注：https://github.com/weexteam/article/issues/130
 
