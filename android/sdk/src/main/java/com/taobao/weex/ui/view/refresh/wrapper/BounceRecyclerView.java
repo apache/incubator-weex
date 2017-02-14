@@ -229,6 +229,13 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   private Stack<View> headerViewStack = new Stack<>();
   private Stack<WXCell> headComponentStack = new Stack<>();
   private WXGesture mGesture;
+  private int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
+
+
+  public BounceRecyclerView setLayoutType(int layoutType){
+    mLayoutType = layoutType;
+    return this;
+  }
 
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
@@ -237,6 +244,11 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
 
   public BounceRecyclerView(Context context, int orientation) {
     super(context, orientation);
+  }
+
+  public BounceRecyclerView(Context context, int layoutType,int orientation) {
+    super(context, orientation);
+    mLayoutType = layoutType;
   }
 
   public BounceRecyclerView(Context context, AttributeSet attrs) {
@@ -266,7 +278,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   @Override
   public WXRecyclerView setInnerView(Context context) {
     WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
-    wxRecyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
+    wxRecyclerView.initView(context, WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT, getOrientation());
     return wxRecyclerView;
   }
 

@@ -210,6 +210,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -217,6 +218,8 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import static java.lang.Boolean.parseBoolean;
 
 /**
  * store value of component attribute
@@ -332,7 +335,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
       return true;
     }
     try {
-      return Boolean.parseBoolean(String.valueOf(obj));
+      return parseBoolean(String.valueOf(obj));
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] recycle:", e);
     }
@@ -346,7 +349,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
 
     try {
-      return Boolean.parseBoolean(String.valueOf(obj));
+      return parseBoolean(String.valueOf(obj));
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] showIndicators:", e);
     }
@@ -360,7 +363,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
 
     try {
-      return Boolean.parseBoolean(String.valueOf(obj));
+      return parseBoolean(String.valueOf(obj));
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] autoPlay:", e);
     }
@@ -409,7 +412,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
 
     try {
-      return Boolean.parseBoolean(String.valueOf(obj));
+      return parseBoolean(String.valueOf(obj));
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] recycleImage:", e);
     }
@@ -436,6 +439,21 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
     return ret;
   }
+
+  public int getLayoutType(){
+    Object obj = get(Constants.Name.LAYOUT);
+    if (obj == null) {
+      return WXRecyclerView.TYPE_LINEAR_LAYOUT;
+    }
+
+    try {
+      return Integer.parseInt(String.valueOf(obj));
+    } catch (Exception e) {
+      WXLogUtils.e("[WXAttr] recycleImage:", e);
+    }
+    return WXRecyclerView.TYPE_LINEAR_LAYOUT;
+  }
+
 
   @Override
   public boolean equals(Object o) {

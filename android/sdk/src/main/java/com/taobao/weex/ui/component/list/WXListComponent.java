@@ -241,7 +241,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
-    return new BounceRecyclerView(context, orientation);
+    return new BounceRecyclerView(context, orientation).setLayoutType(mLayoutType);
   }
 
   @Override
