@@ -9,7 +9,7 @@ jdk: oraclejdk8
 env:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 before_install:
-  - ls /usr/lib/jvm
+  #- ls /usr/lib/jvm
   # - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - export CHROME_BIN=chromium-browser
