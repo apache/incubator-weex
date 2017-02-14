@@ -31,7 +31,7 @@ before_install:
   - npm install
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  # - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
   - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
   - emulator -avd test -no-audio -no-window &
