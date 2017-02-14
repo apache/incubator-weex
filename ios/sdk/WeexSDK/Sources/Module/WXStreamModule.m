@@ -84,7 +84,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     }
     
     [callbackRsp setObject:@{ @"OPENED": @1 } forKey:@"readyState"];
-    progressCallback(callbackRsp, TRUE);
+    if (progressCallback) {
+        progressCallback(callbackRsp, TRUE);
+    }
     
     WXResourceLoader *loader = [[WXResourceLoader alloc] initWithRequest:request];
     __weak typeof(self) weakSelf = self;
@@ -97,7 +99,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
             statusText = [WXStreamModule getStatusText:httpResponse.statusCode];
             [callbackRsp setObject:statusText forKey:@"statusText"];
             [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
-            progressCallback(callbackRsp, TRUE);
+            if (progressCallback) {
+                progressCallback(callbackRsp, TRUE);
+            }
         }
     };
     
@@ -105,7 +109,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         [callbackRsp setObject:@{ @"LOADING" : @3 } forKey:@"readyState"];
         received += [data length];
         [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
-        progressCallback(callbackRsp, TRUE);
+        if (progressCallback) {
+            progressCallback(callbackRsp, TRUE);
+        }
     };
     
     loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {

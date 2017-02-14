@@ -100,7 +100,9 @@ static NSThread *WXComponentThread;
     [[NSRunLoop currentRunLoop] addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
     
     while (!_stopRunning) {
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        @autoreleasepool {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
     }
 }
 
@@ -174,17 +176,17 @@ static NSThread *WXComponentThread;
 
 static bool rootNodeIsDirty(void *context)
 {
-    WXComponentManager *mananger = (__bridge WXComponentManager *)(context);
-    return [mananger->_rootComponent needsLayout];
+    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
+    return [manager->_rootComponent needsLayout];
 }
 
 static css_node_t * rootNodeGetChild(void *context, int i)
 {
-    WXComponentManager *mananger = (__bridge WXComponentManager *)(context);
+    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
     if (i == 0) {
-        return mananger->_rootComponent.cssNode;
-    } else if(mananger->_fixedComponents.count > 0) {
-        return ((WXComponent *)((mananger->_fixedComponents)[i-1])).cssNode;
+        return manager->_rootComponent.cssNode;
+    } else if(manager->_fixedComponents.count > 0) {
+        return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
     }
     
     return NULL;
