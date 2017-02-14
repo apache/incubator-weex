@@ -29,14 +29,15 @@ before_install:
   - nvm install 4.2.1
   - brew install ios-webkit-debug-proxy
   - npm install -g macaca-cli
-  - npm install -g macaca-ios
+  #- npm install -g macaca-ios
+  - npm install -g macaca-android
   - npm install
 before_script:
   - "export DISPLAY=:99.0"
   # - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
   - android list targets 
-  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t android-19 --abi default/x86
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
