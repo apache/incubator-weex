@@ -5,8 +5,7 @@ addons:
     - xvfb
 rvm: 2.0.0
 osx_image: xcode8
-jdk:
-  - openjdk7
+jdk: oraclejdk8
 android:
   components:
     - build-tools-23.0.2
@@ -17,7 +16,7 @@ before_install:
   - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - export CHROME_BIN=chromium-browser
-  - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+  # - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
   - brew install android-sdk
   - export ANDROID_HOME=/usr/local/opt/android-sdk
   - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
@@ -30,6 +29,8 @@ before_install:
   - brew install ios-webkit-debug-proxy
   - npm install -g macaca-cli
   #- npm install -g macaca-ios
+  - echo $JAVA_HOME
+  - ls $JAVA_HOME
   - npm install -g macaca-android
   - npm install
 before_script:
