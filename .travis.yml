@@ -1,7 +1,25 @@
 language: objective-c
+addons:
+  apt:
+    packages:
+    - xvfb
 rvm: 2.0.0
 osx_image: xcode8
+jdk:
+  - openjdk7
+android:
+  components:
+    - build-tools-23.0.2
+    - android-23
+    - extra-android-m2repository
+    - extra-android-support
 before_install:
+  - export CHROME_BIN=chromium-browser
+  - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+  - export ANDROID_HOME=/usr/local/android-sdk
+  - echo yes | android update sdk --all --filter build-tools-23.0.2 --no-ui --force
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
   - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - brew install nvm
@@ -11,8 +29,13 @@ before_install:
   - npm install -g macaca-cli
   - npm install -g macaca-ios
   - npm install
+  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
 script:
   #- xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
   #- bundle exec danger
   - ./test/serve.sh &
-  - ./test/run.sh ios
+  # - ./test/run.sh ios
+  - ./test/run.sh
