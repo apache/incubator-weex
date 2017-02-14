@@ -14,6 +14,8 @@ android:
     - extra-android-m2repository
     - extra-android-support
 before_install:
+  - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
+  - brew update
   - export CHROME_BIN=chromium-browser
   - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
   - brew install android-sdk
@@ -22,8 +24,6 @@ before_install:
   - echo yes | android update sdk --all --filter build-tools-23.0.2 --no-ui --force
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
-  - brew update
   - brew install nvm
   - source $(brew --prefix nvm)/nvm.sh
   - nvm install 4.2.1
