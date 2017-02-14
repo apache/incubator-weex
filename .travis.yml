@@ -23,6 +23,7 @@ before_install:
   - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
   - echo yes | android update sdk --all --filter build-tools-23.0.2 --no-ui --force
   - echo yes | android update sdk --all --filter android-19 --no-ui --force
+  - echo yes | android update sdk --all --filter sys-img-x86-android-19 --no-ui --force
   - brew install nvm
   - source $(brew --prefix nvm)/nvm.sh
   - nvm install 4.2.1
