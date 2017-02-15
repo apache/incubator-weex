@@ -1,4 +1,4 @@
-const DEFAULT_VIEWPORT_WIDTH = 750
+const DEFAULT_VIEWPORT_WIDTH = process.env.VIEWPORT_WIDTH
 
 function parseViewportWidth (config) {
   let width = DEFAULT_VIEWPORT_WIDTH

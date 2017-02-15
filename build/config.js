@@ -88,6 +88,7 @@ function getConfig (name, minify) {
     plugins: opt.plugins.concat([
       json(),
       replace({
+        'process.env.VIEWPORT_WIDTH': 750,
         'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         'process.env.VUE_ENV': JSON.stringify('WEEX'),
         'process.env.NODE_DEBUG': false
