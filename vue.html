@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Weex Vue Demo</title>
+  <meta name="viewport" content="width=750, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="format-detection" content="telephone=no, email=no" />
+
+  <!-- <script src="./node_modules/vue/dist/vue.runtime.min.js"></script> -->
+  <script src="./node_modules/vue/dist/vue.runtime.js"></script>
+  <!-- <script src="./node_modules/weex-vue-render/index.min.js"></script> -->
+  <script src="./packages/weex-vue-render/index.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    (function () {
+      function getUrlParam (key) {
+        var reg = new RegExp('[?|&]' + key + '=([^&]+)')
+        var match = location.search.match(reg)
+        return match && match[1]
+      }
+
+      var loader = getUrlParam('loader') || 'xhr'
+      var page = getUrlParam('page') || 'examples/build/index.js'
+
+      // jsonp callback name should be specified or be the default
+      // value 'weexJsonpCallback' if the 'jsonp' loader is used.
+      var JSONP_CALLBACK_NAME = 'weexJsonpCallback'
+      debugger;
+      var bundle = document.createElement('script')
+      bundle.src = page
+      document.body.appendChild(bundle)
+    })();
+  </script>
+  <!-- <script src="./dist/vue-bundle.web.js"></script> -->
+</body>
+</html>
