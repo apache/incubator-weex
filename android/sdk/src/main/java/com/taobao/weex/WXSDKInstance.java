@@ -301,11 +301,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     this.mViewPortWidth = mViewPortWidth;
   }
 
-  public int getViewPortWidth() {
+  public static int getViewPortWidth() {
     return mViewPortWidth;
   }
 
-  private int mViewPortWidth = 750;
+  private static volatile int mViewPortWidth = 750;
 
   /**
    * Render strategy.
