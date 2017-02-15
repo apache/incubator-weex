@@ -20,7 +20,7 @@ function buildiOS {
     current_dir=$PWD
     cd $builddir
     product=$(PWD)'/build/Debug-iphoneos/WeexDemo.app'
-    pod update --silent
+    pod update
     [ -f product ] && rm -rf product
 
     xcodebuild clean build -quiet -workspace WeexDemo.xcworkspace -sdk iphonesimulator -scheme Pods-WeexDemo SYMROOT=$(PWD)/build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
