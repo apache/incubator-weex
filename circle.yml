@@ -16,17 +16,19 @@ test:
   override:
     # - npm run build
     # - npm run test
-    - ./test/setup-android-ci.sh
-    - $ANDROID_HOME/tools/emulator -avd circleci-android22 -no-skin -no-audio -no-window:
-            background: true
+    - source test/setup-android-ci.sh && installAndroidSDK
     - ps -ef
     # - emulator -avd weexavd -no-audio -no-window:
     #     background: true
     #     parallel: true
     # - cd android && ./run-ci.sh
-    - circle-android wait-for-boot
-    - ps -ef
-    - ./test/run-android-ci.sh
+    - createAVD
+    - emulator -avd test -no-audio -no-window &
+    - ./test/serve.sh &
+    - npm install -g macaca-cli 
+    - npm install -g macaca-android
+    - waitForEmulator
+    - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports

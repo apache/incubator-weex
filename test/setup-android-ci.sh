@@ -6,6 +6,7 @@ function installAndroidSDK {
     echo yes | android update sdk --all --no-ui --force -t 1 #tools
     echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
     echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
+    echo yes | android update sdk --all --no-ui --force -t 35 #sdk android-23
     echo yes | android update sdk --all --no-ui --force -t 96 #sys-img
     echo yes | android update sdk --all --no-ui --force -t 160 #support
 }
