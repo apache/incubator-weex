@@ -6,9 +6,12 @@ function installAndroidSDK {
     echo yes | android update sdk --all --no-ui --force -t 1 #tools
     echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
     echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
-    echo yes | android update sdk --all --no-ui --force -t 97 #sys-img
+    echo yes | android update sdk --all --no-ui --force -t 96 #sys-img
     echo yes | android update sdk --all --no-ui --force -t 160 #support
-    echo yes | android update sdk --all --no-ui --force -t 173 #x86 accelerator
+}
+
+function createAVD{
+    echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 }
 
 function waitForEmulator {
