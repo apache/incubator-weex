@@ -42,56 +42,56 @@ boolean result = WXSDKEngine.registerService(SERVICE_NAME, SERVICE_JS_CODE, opti
 // options: native inject options
 // options.serviceName is native options name
 service.register(options.serviceName, {
-    /**
-     * JS Service lifecycle. JS Service `create` will before then each instance lifecycle `create`. The return param `instance` is Weex protected param. This object will return to instance global. Other params will in the `services` at instance.
-     *
-     * @param  {String} id  instance id
-     * @param  {Object} env device environment
-     * @return {Object}
-     */
-    create: function(id, env, config) {
-        return {
-            instance: {
-                InstanceService: function(weex) {
-                    var modal = weex.requireModule('modal')
-                    return {
-                        toast: function(title) {
-                            modal.toast({ message: title })
-                        }
-                    }
-                }
-            },
-            NormalService: function(weex) {
-                var modal = weex.requireModule('modal')
-                return {
-                    toast: function(title) {
-                        modal.toast({ message: title })
-                    }
-                }
+  /**
+    * JS Service lifecycle. JS Service `create` will before then each instance lifecycle `create`. The return param `instance` is Weex protected param. This object will return to instance global. Other params will in the `services` at instance.
+    *
+    * @param  {String} id  instance id
+    * @param  {Object} env device environment
+    * @return {Object}
+    */
+  create: function(id, env, config) {
+    return {
+      instance: {
+        InstanceService: function(weex) {
+          var modal = weex.requireModule('modal')
+          return {
+            toast: function(title) {
+              modal.toast({ message: title })
             }
+          }
         }
-    },
-
-    /**
-     * JS Service lifecycle. JS Service `refresh` will before then each instance lifecycle `refresh`. If you want to reset variable or something on instance refresh.
-     *
-     * @param  {String} id  instance id
-     * @param  {Object} env device environment
-     */
-    refresh: function(id, env, config){
-
-    },
-
-    /**
-     * JS Service lifecycle. JS Service `destroy` will before then each instance lifecycle `destroy`. You can deleted variable here. If you doesn't detete variable define in JS Service. The variable will always in the js runtime. It's would be memory leak risk.
-     *
-     * @param  {String} id  instance id
-     * @param  {Object} env device environment
-     * @return {Object}
-     */
-    destroy: function(id, env) {
-
+      },
+      NormalService: function(weex) {
+        var modal = weex.requireModule('modal')
+        return {
+          toast: function(title) {
+            modal.toast({ message: title })
+          }
+        }
+      }
     }
+  },
+
+  /**
+    * JS Service lifecycle. JS Service `refresh` will before then each instance lifecycle `refresh`. If you want to reset variable or something on instance refresh.
+    *
+    * @param  {String} id  instance id
+    * @param  {Object} env device environment
+    */
+  refresh: function(id, env, config){
+
+  },
+
+  /**
+    * JS Service lifecycle. JS Service `destroy` will before then each instance lifecycle `destroy`. You can deleted variable here. If you doesn't detete variable define in JS Service. The variable will always in the js runtime. It's would be memory leak risk.
+    *
+    * @param  {String} id  instance id
+    * @param  {Object} env device environment
+    * @return {Object}
+    */
+  destroy: function(id, env) {
+
+  }
 })
 ```
 
@@ -102,11 +102,11 @@ var _InstanceService = new InstanceService(weex)
 var _NormalService = new service.normalService(weex)
 
 module.exports = {
-    created: fucntion() {
-		// called modal module to toast something
-		_InstanceService.toast('Instance JS Service')
-        _NormalService.toast('Normal JS Service')
-	}
+  created: fucntion() {
+    // called modal module to toast something
+    _InstanceService.toast('Instance JS Service')
+    _NormalService.toast('Normal JS Service')
+  }
 }
 </script>
 ```
