@@ -17,12 +17,12 @@ before_install:
   - brew install android-sdk
   - export ANDROID_HOME=/usr/local/opt/android-sdk
   - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-  - echo yes | android update sdk --all -t 1 --no-ui --force #tools
-  - echo yes | android update sdk --all -t 2 --no-ui --force #platform tools
-  - echo yes | android update sdk --all -t 11 --no-ui --force #build-tool
-  - echo yes | android update sdk --all -t 39 --no-ui --force #sdk android-19
-  - echo yes | android update sdk --all -t 97 --no-ui --force #sys-img
-  - echo yes | android update sdk --all -t 160 #support
+  - echo yes | android update sdk --all --no-ui --force -t 1 #tools
+  - echo yes | android update sdk --all --no-ui --force -t 2 #platform tools
+  - echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
+  - echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
+  - echo yes | android update sdk --all --no-ui --force -t 97 #sys-img
+  - echo yes | android update sdk --all --no-ui --force -t 160 #support
   - brew install nvm
   - source $(brew --prefix nvm)/nvm.sh
   - nvm install 4.2.1
