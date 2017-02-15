@@ -376,6 +376,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           WXLogUtils.e("initWXBridge HackAssertionException ", e);
         }
       }
+
+      WXServiceManager.execAllCacheJsService();
     }
     if (remoteDebug && mWxDebugProxy != null) {
       mWXBridge = mWxDebugProxy.getWXBridge();
