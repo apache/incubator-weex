@@ -6,8 +6,6 @@ addons:
 rvm: 2.0.0
 osx_image: xcode8
 jdk: oraclejdk8
-env:
-  - JAVA_HOME=/usr/lib/jvm/java-8-oracle
 cache:
   directories:
   - node_modules
@@ -39,4 +37,4 @@ script:
   - ./test/serve.sh &
   # - ./test/run.sh ios
   - waitForEmulator #android-wait-for-emulator
-  - ./test/run.sh
+  - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"

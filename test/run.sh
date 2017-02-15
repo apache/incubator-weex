@@ -1,4 +1,4 @@
-# /bin/bash -eu
+#!/bin/bash -eu
 
 function buildAndroid {
     dir=$(pwd)
