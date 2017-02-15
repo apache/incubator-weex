@@ -16,7 +16,7 @@ test:
   override:
     - npm run build
     - npm run test
-    - source test/setup-android-ci.sh && prepareEmulator
+    - source test/setup-android-ci.sh && prepareEmulator:
           background: true
     - cd android && ./run-ci.sh
     - ./test/serve.sh:
