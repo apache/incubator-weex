@@ -8,6 +8,7 @@ function installAndroidSDK {
     echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
     echo yes | android update sdk --all --no-ui --force -t 97 #sys-img
     echo yes | android update sdk --all --no-ui --force -t 160 #support
+    echo yes | android update sdk --all --no-ui --force -t 173 #x86 accelerator
 }
 
 function waitForEmulator {
