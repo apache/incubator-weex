@@ -22,12 +22,12 @@ test:
     #     background: true
     #     parallel: true
     # - cd android && ./run-ci.sh
-    - createAVD
-    - emulator -avd test -no-audio -no-window &
-    - ./test/serve.sh &
-    - npm install -g macaca-cli 
-    - npm install -g macaca-android
-    - waitForEmulator
+    - source test/setup-android-ci.sh && createAVD
+    - emulator -avd test -no-audio -no-window 
+          background:true
+    - ./test/serve.sh
+          background:true
+    - source test/setup-android-ci.sh && waitForEmulator
     - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
@@ -38,6 +38,9 @@ dependencies:
     - "node_modules"
     - ~/.gradle
     - ~/.m2
+  pre:
+    - npm install -g macaca-cli 
+    - npm install -g macaca-android
 
 notify:
   webhooks:
