@@ -13,6 +13,10 @@ function createAVD {
     echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 }
 
+function startAVD {
+  emulator -avd test -no-audio -no-window
+}
+
 function waitForEmulator {
   local bootanim=""
   export PATH=$(dirname $(dirname $(which android)))/platform-tools:$PATH
@@ -22,4 +26,10 @@ function waitForEmulator {
     echo "emulator status=$bootanim"
   done
   adb shell input keyevent 82 &
+}
+
+function prepareEmulator {
+    installAndroidSDK
+    createAVD
+    startAVD
 }

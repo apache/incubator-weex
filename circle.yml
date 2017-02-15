@@ -16,9 +16,7 @@ test:
   override:
     - npm run build
     - npm run test
-    - source test/setup-android-ci.sh && installAndroidSDK
-    - source test/setup-android-ci.sh && createAVD
-    - emulator -avd test -no-audio -no-window: 
+    - source test/setup-android-ci.sh && prepareEmulator
           background: true
     - cd android && ./run-ci.sh
     - ./test/serve.sh:

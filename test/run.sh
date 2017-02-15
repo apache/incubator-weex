@@ -11,7 +11,6 @@ function buildAndroid {
 }
 function runAndroid {
     buildAndroid
-    ps -ef
     platform=android macaca run -d $1 --verbose
 }
 
