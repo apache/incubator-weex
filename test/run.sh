@@ -33,7 +33,8 @@ function runiOS {
     echo 'Run in iOS...'
     echo $1
     buildiOS
-
+    sleep 1m 
+    
     platform=ios macaca run -d $1 --verbose
 }
 
