@@ -8,7 +8,9 @@ version: 2.1
 
 # JS Service
 
-JS service and Weex instance are parallel in js runtime. Weex instance lifecycle will invoke JS service lifecycle.
+JS service and Weex instance are parallel in js runtime. Weex instance lifecycle will invoke JS service lifecycle. Currently provide create, refresh, destroy of lifecycle.
+
+!!!Important: JS Service is very powerful. Please be careful to use.
 
 
 ## Register JS Service
@@ -24,30 +26,34 @@ HashMap<String, String> options = new HashMap<>()
 options.put("k1", "v1")
 String SERVICE_NAME = "SERVICE_NAME"
 String SERVICE_JS_CODE = "SERVICE_JS_CODE"
-boolean result = WXSDKEngine.registerService(SERVICE_NAME, SERVICE_JS_CODE, options);
+boolean result = WXSDKEngine.registerService(SERVICE_NAME, SERVICE_JS_CODE, options)
 ```
 
 ### Web
 ```html
-<!-- Should be inject after then jsfm -->
-<script src="JS_SERVICE_CODE_URL"></script>
+<!-- Should be loaded after then jsfm -->
+<script src="SERVICE_JS_CODE_URL"></script>
 ```
 
 
 
-## Write a js service
+## Write a JS Service
 ```javascript
 // options: native inject options
 // options.serviceName is native options name
-var modal = weex.requireModule('modal')
-
 service.register(options.serviceName, {
-
-    // service lifecycle. create instance
+    /**
+     * JS Service lifecycle. JS Service `create` will before then each instance lifecycle `create`. The return param `instance` is Weex protected param. This object will return to instance global. Other params will in the `services` at instance.
+     *
+     * @param  {String} id  instance id
+     * @param  {Object} env device environment
+     * @return {Object}
+     */
     create: function(id, env, config) {
         return {
             instance: {
                 InstanceService: function(weex) {
+                    var modal = weex.requireModule('modal')
                     return {
                         toast: function(title) {
                             modal.toast({ message: title })
@@ -56,6 +62,7 @@ service.register(options.serviceName, {
                 }
             },
             NormalService: function(weex) {
+                var modal = weex.requireModule('modal')
                 return {
                     toast: function(title) {
                         modal.toast({ message: title })
@@ -65,26 +72,37 @@ service.register(options.serviceName, {
         }
     },
 
-    // service lifecycle. refresh instance
+    /**
+     * JS Service lifecycle. JS Service `refresh` will before then each instance lifecycle `refresh`. If you want to reset variable or something on instance refresh.
+     *
+     * @param  {String} id  instance id
+     * @param  {Object} env device environment
+     */
     refresh: function(id, env, config){
 
     },
 
-    // service lifecycle. destroy instance
+    /**
+     * JS Service lifecycle. JS Service `destroy` will before then each instance lifecycle `destroy`. You can deleted variable here. If you doesn't detete variable define in JS Service. The variable will always in the js runtime. It's would be memory leak risk.
+     *
+     * @param  {String} id  instance id
+     * @param  {Object} env device environment
+     * @return {Object}
+     */
     destroy: function(id, env) {
 
     }
 })
 ```
 
-## Using js service (vuejs)
+## Using JS Service (vuejs)
 ```
 <script>
 var _InstanceService = new InstanceService(weex)
 var _NormalService = new service.normalService(weex)
 
 module.exports = {
-	created: fucntion() {
+    created: fucntion() {
 		// called modal module to toast something
 		_InstanceService.toast('Instance JS Service')
         _NormalService.toast('Normal JS Service')
