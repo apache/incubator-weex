@@ -1,3 +1,35 @@
-echo y | android update sdk --no-ui --all --filter extra-android-m2repository
-echo no | android create avd --force -n weexavd -t android-19 --abi armeabi-v7a
-$ANDROID_HOME/tools/emulator avd -list-avds
+function installAndroidSDK {
+    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+    echo yes | android update sdk --all --no-ui --force -t 2 #platform tools
+    echo yes | android update sdk --all --no-ui --force -t 1 #tools
+    echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
+    echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
+    echo yes | android update sdk --all --no-ui --force -t 35 #sdk android-23
+    echo yes | android update sdk --all --no-ui --force -t 96 #sys-img
+    echo yes | android update sdk --all --no-ui --force -t 160 #support
+}
+
+function createAVD {
+    echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
+}
+
+function startAVD {
+  emulator -avd test -no-audio -no-window
+}
+
+function waitForEmulator {
+  local bootanim=""
+  export PATH=$(dirname $(dirname $(which android)))/platform-tools:$PATH
+  until [[ "$bootanim" =~ "stopped" ]]; do
+    sleep 5
+    bootanim=$(adb -e shell getprop init.svc.bootanim 2>&1)
+    echo "emulator status=$bootanim"
+  done
+  adb shell input keyevent 82 &
+}
+
+function prepareEmulator {
+    installAndroidSDK
+    createAVD
+    startAVD
+}

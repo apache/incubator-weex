@@ -14,19 +14,16 @@ machine:
     ANDROID_HOME: /usr/local/android-sdk-linux
 test:
   override:
-    # - npm run build
-    # - npm run test
-    - ./test/setup-android-ci.sh
-    - $ANDROID_HOME/tools/emulator -avd circleci-android22 -no-skin -no-audio -no-window:
-            background: true
-    - ps -ef
-    # - emulator -avd weexavd -no-audio -no-window:
-    #     background: true
-    #     parallel: true
-    # - cd android && ./run-ci.sh
-    - circle-android wait-for-boot
-    - ps -ef
-    - ./test/run-android-ci.sh
+    - npm run build
+    - npm run test
+    - source test/setup-android-ci.sh && prepareEmulator:
+          background: true
+    - cd android && ./run-ci.sh
+    - ./test/serve.sh:
+          background: true
+    - source test/setup-android-ci.sh && waitForEmulator
+    - npm install macaca-android --save-dev
+    - "run_in_ci=true ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports
@@ -36,6 +33,8 @@ dependencies:
     - "node_modules"
     - ~/.gradle
     - ~/.m2
+  pre:
+    - npm install -g macaca-cli 
 
 notify:
   webhooks:

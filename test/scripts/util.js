@@ -19,6 +19,11 @@ var androidOpts = {
 };
 
 const isIOS = platform === 'ios';
+const isRunInCI = process.env.run_in_ci?true:false;
+
+if(isRunInCI){
+    console.log("Running in CI Envirment");
+}
 
 function getIpAddress(){
     let ifs = os.networkInterfaces()
@@ -45,7 +50,7 @@ module.exports = {
     getTimeoutMills:function(){
         return 10 * 60 * 1000;
     },
-    getGETActionSleepTimeMills:function(){
-        return 5000;
+    getGETActionWaitTimeMills:function(){
+        return (isRunInCI ? 30 : 5 ) * 1000;
     }
 }
