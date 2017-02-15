@@ -24,9 +24,9 @@ test:
     # - cd android && ./run-ci.sh
     - source test/setup-android-ci.sh && createAVD
     - emulator -avd test -no-audio -no-window 
-          background:true
+          background: true
     - ./test/serve.sh
-          background:true
+          background: true
     - source test/setup-android-ci.sh && waitForEmulator
     - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
   post:

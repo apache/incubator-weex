@@ -9,11 +9,15 @@ jdk: oraclejdk8
 cache:
   directories:
   - node_modules
+  - $HOME/.m2
+  - $HOME/.gradle
 before_install:
   #- ls /usr/lib/jvm
   # - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - export CHROME_BIN=chromium-browser
+  - brew install android-sdk
+  - export ANDROID_HOME=/usr/local/opt/android-sdk
   - source test/setup-android-ci.sh && installAndroidSDK
   - brew install nvm
   - source $(brew --prefix nvm)/nvm.sh
