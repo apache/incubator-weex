@@ -10,7 +10,7 @@ function installAndroidSDK {
     echo yes | android update sdk --all --no-ui --force -t 160 #support
 }
 
-function createAVD{
+function createAVD {
     echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
 }
 
