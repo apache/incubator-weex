@@ -19,6 +19,7 @@ var androidOpts = {
 };
 
 const isIOS = platform === 'ios';
+const isRunInCI = process.env.run_in_ci?true:false;
 
 function getIpAddress(){
     let ifs = os.networkInterfaces()
@@ -46,6 +47,6 @@ module.exports = {
         return 10 * 60 * 1000;
     },
     getGETActionSleepTimeMills:function(){
-        return 30 * 1000;
+        return (isRunInCI ? 30 : 5 ) * 1000;
     }
 }

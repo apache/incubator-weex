@@ -14,22 +14,18 @@ machine:
     ANDROID_HOME: /usr/local/android-sdk-linux
 test:
   override:
-    # - npm run build
-    # - npm run test
+    - npm run build
+    - npm run test
     - source test/setup-android-ci.sh && installAndroidSDK
-    - ps -ef
-    # - emulator -avd weexavd -no-audio -no-window:
-    #     background: true
-    #     parallel: true
-    # - cd android && ./run-ci.sh
     - source test/setup-android-ci.sh && createAVD
     - emulator -avd test -no-audio -no-window: 
           background: true
+    - cd android && ./run-ci.sh
     - ./test/serve.sh:
           background: true
     - source test/setup-android-ci.sh && waitForEmulator
     - npm install macaca-android --save-dev
-    - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
+    - ./test/run.sh
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports
