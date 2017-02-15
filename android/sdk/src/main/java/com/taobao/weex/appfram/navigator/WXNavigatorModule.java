@@ -331,13 +331,16 @@ public class WXNavigatorModule extends WXModule {
         if (!TextUtils.isEmpty(param)) {
             if (WXSDKEngine.getActivityNavBarSetter() != null) {
                 if (WXSDKEngine.getActivityNavBarSetter().setNavBarTitle(param)) {
-                    callback.invoke(MSG_SUCCESS);
+                    if (callback != null) {
+                        callback.invoke(MSG_SUCCESS);
+                    }
                     return;
                 }
             }
         }
-
-        callback.invoke(MSG_FAILED);
+        if (callback != null) {
+            callback.invoke(MSG_FAILED);
+        }
     }
 
     @JSMethod
