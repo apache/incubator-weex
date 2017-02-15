@@ -8,28 +8,22 @@ osx_image: xcode8
 jdk: oraclejdk8
 env:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+cache:
+  directories:
+  - node_modules
 before_install:
   #- ls /usr/lib/jvm
   # - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
   - export CHROME_BIN=chromium-browser
-  # - export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
-  - brew install android-sdk
-  - export ANDROID_HOME=/usr/local/opt/android-sdk
-  - export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-  - echo yes | android update sdk --all --no-ui --force -t 1 #tools
-  - echo yes | android update sdk --all --no-ui --force -t 2 #platform tools
-  - echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
-  - echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
-  - echo yes | android update sdk --all --no-ui --force -t 97 #sys-img
-  - echo yes | android update sdk --all --no-ui --force -t 160 #support
+  - source test/setup-android-ci.sh && installAndroidSDK
   - brew install nvm
   - source $(brew --prefix nvm)/nvm.sh
   - nvm install 4.2.1
   - brew install ios-webkit-debug-proxy
   - npm install -g macaca-cli
   #- npm install -g macaca-ios
-  - echo $JAVA_HOME
+  # - echo $JAVA_HOME
   - "JAVA_HOME=$(/usr/libexec/java_home) npm install -g macaca-android"
   - npm install
 before_script:
@@ -39,11 +33,10 @@ before_script:
   - android list targets 
   - echo no | android create avd --force -n test -t android-19 --abi default/x86
   - emulator -avd test -no-audio -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
 script:
   #- xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
   #- bundle exec danger
   - ./test/serve.sh &
   # - ./test/run.sh ios
+  - waitForEmulator #android-wait-for-emulator
   - ./test/run.sh
