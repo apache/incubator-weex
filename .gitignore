@@ -5,6 +5,7 @@
 
 # Created by Builder
 examples/build
+examples/web-entry
 test/build
 weex_tmp
 coverage
@@ -43,3 +44,4 @@ doc/db.json
 doc/node_modules/
 doc/public/
 doc/.deploy*/
+
