@@ -24,18 +24,12 @@
         return match && match[1]
       }
 
-      var loader = getUrlParam('loader') || 'xhr'
-      var page = getUrlParam('page') || 'examples/build/index.js'
+      var page = getUrlParam('page') || 'examples/build/vue-web/vue/index.js'
 
-      // jsonp callback name should be specified or be the default
-      // value 'weexJsonpCallback' if the 'jsonp' loader is used.
-      var JSONP_CALLBACK_NAME = 'weexJsonpCallback'
-      debugger;
       var bundle = document.createElement('script')
       bundle.src = page
       document.body.appendChild(bundle)
     })();
   </script>
-  <!-- <script src="./dist/vue-bundle.web.js"></script> -->
 </body>
 </html>
