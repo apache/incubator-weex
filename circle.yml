@@ -13,16 +13,16 @@ machine:
     QEMU_AUDIO_DRV: none
     ANDROID_HOME: /usr/local/android-sdk-linux
 test:
+  pre:
+  - source test/setup-android-ci.sh && prepareEmulator > emulator_log:
+          background: true
   override:
     - npm run build
     - npm run test
-    - source test/setup-android-ci.sh && prepareEmulator:
-          background: true
     - cd android && ./run-ci.sh
     - ./test/serve.sh:
           background: true
     - source test/setup-android-ci.sh && waitForEmulator
-    - npm install macaca-android --save-dev
     - "run_in_ci=true ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
@@ -35,6 +35,7 @@ dependencies:
     - ~/.m2
   pre:
     - npm install -g macaca-cli 
+    - npm install macaca-android --save-dev
 
 notify:
   webhooks:

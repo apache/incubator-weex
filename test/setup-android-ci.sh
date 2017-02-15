@@ -10,11 +10,11 @@ function installAndroidSDK {
 }
 
 function createAVD {
-    echo no | android create avd --force -n test -t android-19 --abi default/armeabi-v7a
+    echo no | android create avd --force -n weexavd -t android-19 --abi default/armeabi-v7a
 }
 
 function startAVD {
-  emulator -avd test -no-audio -no-window
+  emulator -avd weexavd -no-audio -no-window
 }
 
 function waitForEmulator {
