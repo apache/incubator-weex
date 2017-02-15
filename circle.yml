@@ -23,7 +23,7 @@ test:
           background: true
     - source test/setup-android-ci.sh && waitForEmulator
     - npm install macaca-android --save-dev
-    - "run_in_ci=true ./test/run.sh""
+    - "run_in_ci=true ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports
