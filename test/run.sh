@@ -33,8 +33,9 @@ function runiOS {
     echo 'Run in iOS...'
     echo $1
     buildiOS
-    sleep 1m 
-    
+    sleep 1m
+    echo 'killAll Simulator......'
+    killAll Simulator
     platform=ios macaca run -d $1 --verbose
 }
 
