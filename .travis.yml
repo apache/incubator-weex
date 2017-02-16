@@ -10,11 +10,10 @@ cache:
 before_install:
   - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
   - brew update
+  - source test/setup-android-ci.sh && installAndroidSDK
+  - createAndStartAVD &
   - brew install nvm
   - export CHROME_BIN=chromium-browser
-  - brew install android-sdk
-  - export ANDROID_HOME=/usr/local/opt/android-sdk
-  - source test/setup-android-ci.sh && prepareEmulator &
   - source $(brew --prefix nvm)/nvm.sh
   - nvm install 4.2.1
   - brew install ios-webkit-debug-proxy

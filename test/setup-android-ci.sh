@@ -1,4 +1,6 @@
 function installAndroidSDK {
+    brew install android-sdk
+    export ANDROID_HOME=/usr/local/opt/android-sdk
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
     echo yes | android update sdk --all --no-ui --force -t 2 #platform tools
     echo yes | android update sdk --all --no-ui --force -t 1 #tools
@@ -30,6 +32,11 @@ function waitForEmulator {
 
 function prepareEmulator {
     installAndroidSDK
+    createAVD
+    startAVD
+}
+
+function createAndStartAVD {
     createAVD
     startAVD
 }
