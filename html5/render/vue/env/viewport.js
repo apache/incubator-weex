@@ -1,4 +1,4 @@
-const DEFAULT_VIEWPORT_WIDTH = 750
+const DEFAULT_VIEWPORT_WIDTH = process.env.VIEWPORT_WIDTH
 
 function parseViewportWidth (config) {
   let width = DEFAULT_VIEWPORT_WIDTH
@@ -17,7 +17,12 @@ export function setViewport (config = {}) {
     // set root font-size
     doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
 
-    const screenWidth = window.screen.width
+    /**
+     * why not to use window.screen.width to get screenWidth ? Because in some
+     * old webkit browser on android system it get the device pixel width, which
+     * is the screenWidth multiply by the device pixel ratio.
+     */
+    const screenWidth = document.documentElement.getBoundingClientRect().width
     const scale = screenWidth / viewportWidth
     const contents = [
       `width=${viewportWidth}`,
