@@ -24,7 +24,15 @@
         return match && match[1]
       }
 
-      var page = getUrlParam('page') || 'examples/build/vue-web/vue/index.js'
+      var page = getUrlParam('page')
+      var defaultPage = 'examples/build/vue-web/vue/index.js'
+      if (!page) {
+        var url = location.href.replace(/\?|$/, function(f) {
+          var query = '?page=' + defaultPage
+          return f ? query + '&' : query
+        })
+        location.href = url
+      }
 
       var bundle = document.createElement('script')
       bundle.src = page
