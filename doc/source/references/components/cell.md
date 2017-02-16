@@ -17,13 +17,13 @@ This type of component supports all kinds of weex component as its child compone
 
 ### Attributes
 
-**common attributes**: check out the [common attributes](../references/common-attrs.md).
+**common attributes**: check out the [common attributes](../common-attrs.html).
 
 **Notes:** you can't give `<cell>` a `flex` value. Width of `<cell>` is equal to the width of its parent component `<list>`, and you don't need to specify its height.
 
 ### Styles
 
-**common styles**: check out the [common styles](../common-attrs.html)
+**common styles**: check out the [common styles](../common-style.html)
 
 - support flexbox related styles
 - support box model related styles
