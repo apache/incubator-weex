@@ -8,6 +8,8 @@ version: 2.1
 
 # JS Service
 
+<span class="weex-version">v0.9.5+</span>
+
 JS service and Weex instance are parallel in js runtime. Weex instance lifecycle will invoke JS service lifecycle. Currently provide create, refresh, destroy of lifecycle.
 
 !!!Important: JS Service is very powerful. Please be careful to use.
@@ -96,7 +98,7 @@ service.register(options.serviceName, {
 ```
 
 ## Using JS Service (vuejs)
-```
+```html
 <script>
 var _InstanceService = new InstanceService(weex)
 var _NormalService = new service.normalService(weex)
