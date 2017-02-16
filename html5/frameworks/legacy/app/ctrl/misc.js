@@ -10,7 +10,6 @@
  * corresponded with the API of instance manager (framework.js)
  */
 import { extend, typof } from '../../util/index'
-import renderer from '../../config'
 
 /**
  * Refresh an app with data to its root component options.
@@ -22,16 +21,14 @@ export function refresh (app, data) {
             `in instance[${app.id}]`)
   const vm = app.vm
   if (vm && data) {
-    // app.doc.close()
     if (typeof vm.refreshData === 'function') {
       vm.refreshData(data)
     }
     else {
       extend(vm, data)
     }
-    updateActions(app)
-    app.doc.listener.refreshFinish()
-    // app.doc.open()
+    app.differ.flush()
+    app.doc.taskCenter.send('dom', { action: 'refreshFinish' }, [])
     return
   }
   return new Error(`invalid data "${data}"`)
@@ -52,11 +49,11 @@ export function destroy (app) {
   app.options = null
   app.blocks = null
   app.vm = null
+  app.doc.taskCenter.destroyCallback()
   app.doc.destroy()
   app.doc = null
   app.customComponentMap = null
   app.commonModules = null
-  app.callbacks = null
 }
 
 /**
@@ -131,11 +128,9 @@ export function fireEvent (app, ref, type, e, domChanges) {
   }
   const el = app.doc.getRef(ref)
   if (el) {
-    // app.doc.close()
     const result = app.doc.fireEvent(el, type, e, domChanges)
-    updateActions(app)
-    app.doc.listener.updateFinish()
-    // app.doc.open()
+    app.differ.flush()
+    app.doc.taskCenter.send('dom', { action: 'updateFinish' }, [])
     return result
   }
   return new Error(`invalid element reference "${ref}"`)
@@ -151,19 +146,10 @@ export function fireEvent (app, ref, type, e, domChanges) {
 export function callback (app, callbackId, data, ifKeepAlive) {
   console.debug(`[JS Framework] Invoke a callback(${callbackId}) with`, data,
             `in instance(${app.id})`)
-  const callback = app.callbacks[callbackId]
-  if (typeof callback === 'function') {
-    // app.doc.close()
-    callback(data)
-    if (typeof ifKeepAlive === 'undefined' || ifKeepAlive === false) {
-      app.callbacks[callbackId] = undefined
-    }
-    updateActions(app)
-    app.doc.listener.updateFinish()
-    // app.doc.open()
-    return
-  }
-  return new Error(`invalid callback id "${callbackId}"`)
+  const result = app.doc.taskCenter.callback(callbackId, data, ifKeepAlive)
+  updateActions(app)
+  app.doc.taskCenter.send('dom', { action: 'updateFinish' }, [])
+  return result
 }
 
 /**
@@ -172,14 +158,6 @@ export function callback (app, callbackId, data, ifKeepAlive) {
  */
 export function updateActions (app) {
   app.differ.flush()
-  const tasks = []
-  if (app.doc && app.doc.listener && app.doc.listener.updates.length) {
-    tasks.push(...app.doc.listener.updates)
-    app.doc.listener.updates = []
-  }
-  if (tasks.length) {
-    return callTasks(app, tasks)
-  }
 }
 
 /**
@@ -188,50 +166,23 @@ export function updateActions (app) {
  * @param  {array}  tasks
  */
 export function callTasks (app, tasks) {
+  let result
+
   /* istanbul ignore next */
   if (typof(tasks) !== 'array') {
     tasks = [tasks]
   }
 
-  tasks.forEach((task) => {
-    task.args = task.args.map(arg => normalize(arg, app))
+  tasks.forEach(task => {
+    result = app.doc.taskCenter.send(
+      'module',
+      {
+        module: task.module,
+        method: task.method
+      },
+      task.args
+    )
   })
 
-  return renderer.sendTasks(app.id, tasks, '-1')
-}
-
-/**
- * Normalize a value. Specially, if the value is a function, then generate a function id
- * and save it to `app.callbacks`, at last return the function id.
- * @param  {any}        v
- * @param  {object}     app
- * @return {primitive}
- */
-function normalize (v, app) {
-  const type = typof(v)
-
-  switch (type) {
-    case 'undefined':
-    case 'null':
-      return ''
-    case 'regexp':
-      return v.toString()
-    case 'date':
-      return v.toISOString()
-    case 'number':
-    case 'string':
-    case 'boolean':
-    case 'array':
-    case 'object':
-      if (v instanceof renderer.Element) {
-        return v.ref
-      }
-      return v
-    case 'function':
-      app.callbacks[++app.uid] = v
-      return app.uid.toString()
-    /* istanbul ignore next */
-    default:
-      return JSON.stringify(v)
-  }
+  return result
 }

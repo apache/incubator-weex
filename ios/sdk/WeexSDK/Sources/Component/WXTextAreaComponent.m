@@ -11,46 +11,11 @@
 #import "WXConvert.h"
 #import "WXComponent_internal.h"
 #import "WXView.h"
+#import "WXAssert.h"
 #import "WXSDKInstance.h"
+#import "WXComponent+PseudoClassManagement.h"
 
-@interface WXTextAreaView : UITextView
-@property (nonatomic, assign) UIEdgeInsets border;
-@property (nonatomic, assign) UIEdgeInsets padding;
-@end
-
-@implementation WXTextAreaView
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _padding = UIEdgeInsetsZero;
-        _border = UIEdgeInsetsZero;
-    }
-    return self;
-}
-
-- (CGRect)textRectForBounds:(CGRect)bounds
-{
-    bounds.size.width -= self.padding.left + self.border.left;
-    bounds.origin.x += self.padding.left + self.border.left;
-    
-    bounds.size.height -= self.padding.top + self.border.top;
-    bounds.origin.y += self.padding.top + self.border.top;
-    
-    bounds.size.width -= self.padding.right + self.border.right;
-    
-    bounds.size.height -= self.padding.bottom + self.border.bottom;
-    
-    return bounds;
-}
-
-- (CGRect)editingRectForBounds:(CGRect)bounds
-{
-    return [self textRectForBounds:bounds];
-}
-
-@end
+typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
 @property (nonatomic, strong) WXTextAreaView *textView;
@@ -65,12 +30,14 @@
 @property (nonatomic, strong)NSString *textValue;
 @property (nonatomic) NSUInteger rows;
 //style
+
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
-@property (nonatomic) WXTextWeight fontWeight;
+@property (nonatomic) CGFloat fontWeight;
 @property (nonatomic, strong) NSString *fontFamily;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic) NSTextAlignment textAlign;
+
 //event
 @property (nonatomic) BOOL inputEvent;
 @property (nonatomic) BOOL focusEvent;
@@ -79,7 +46,6 @@
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
-@property (nonatomic, assign) CGRect rootViewOriginFrame;
 
 @end
 
@@ -101,6 +67,8 @@ WX_EXPORT_METHOD(@selector(blur))
         _blurEvent = NO;
         _changeEvent = NO;
         _clickEvent = NO;
+        _padding = UIEdgeInsetsZero;
+        _border = UIEdgeInsetsZero;
         
         if (attributes[@"autofocus"]) {
             _autofocus = [attributes[@"autofocus"] boolValue];
@@ -140,7 +108,7 @@ WX_EXPORT_METHOD(@selector(blur))
             _color = [WXConvert UIColor:styles[@"color"]];
         }
         if (styles[@"fontSize"]) {
-            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+            _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
         if (styles[@"fontWeight"]) {
             _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -154,18 +122,6 @@ WX_EXPORT_METHOD(@selector(blur))
         if (styles[@"textAlign"]) {
             _textAlign = [WXConvert NSTextAlignment:styles[@"textAlign"]] ;
         }
-        
-        _padding = UIEdgeInsetsZero;
-        _border = UIEdgeInsetsZero;
-        UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-            _padding = padding;
-        }
-        UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-        if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-            _border = border;
-        }
-        _rootViewOriginFrame = CGRectNull;
     }
     
     return self;
@@ -195,7 +151,7 @@ WX_EXPORT_METHOD(@selector(blur))
 }
 - (UIView *)loadView
 {
-    return [[WXTextAreaView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    return [[WXTextAreaView alloc] init];
 }
 - (void)viewDidLoad
 {
@@ -228,40 +184,27 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     [_textView setTextAlignment:_textAlign];
     [self setTextFont];
-    [_textView setBorder:_border];
-    [_textView setPadding:_padding];
+    _padding = UIEdgeInsetsZero;
+    _border = UIEdgeInsetsZero;
+    [self updatePattern];
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
+    [self handlePseudoClass];
 }
 
--(void)focus
+- (void)focus
 {
     if (self.textView) {
         [self.textView becomeFirstResponder];
     }
 }
 
--(void)blur
+- (void)blur
 {
     if (self.textView) {
         [self.textView resignFirstResponder];
     }
-}
-
-#pragma mark - private method
--(UIColor *)convertColor:(id)value
-{
-    UIColor *color = [WXConvert UIColor:value];
-    if(value) {
-        NSString *str = [WXConvert NSString:value];
-        if(str && [@"" isEqualToString:str]) {
-            color = [UIColor blackColor];
-        }
-    }else {
-        color = [UIColor blackColor];
-    }
-    return color;
 }
 
 #pragma mark - add-remove Event
@@ -338,7 +281,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [_textView setTextColor:_color];
     }
     if (styles[@"fontSize"]) {
-        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"]];
+        _fontSize = [WXConvert WXPixelType:styles[@"fontSize"] scaleFactor:self.weexInstance.pixelScaleFactor];
     }
     if (styles[@"fontWeight"]) {
         _fontWeight = [WXConvert WXTextWeight:styles[@"fontWeight"]];
@@ -362,17 +305,38 @@ WX_EXPORT_METHOD(@selector(blur))
         _placeholderColor = [UIColor colorWithRed:0x99/255.0 green:0x99/255.0 blue:0x99/255.0 alpha:1.0];
     }
     [self setPlaceholderAttributedString];
-    
-    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
-    if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
-        _padding = padding;
+    [self updatePattern];
+}
+
+#pragma mark update touch styles
+- (void)handlePseudoClass
+{
+    NSMutableDictionary *styles = [NSMutableDictionary new];
+    NSMutableDictionary *recordStyles = [NSMutableDictionary new];
+    if(_disabled){
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"disabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }else {
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"enabled"]];
+        [styles addEntriesFromDictionary:recordStyles];
     }
-    
-    UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
-    if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
-        _border = border;
-        [_textView setBorder:_border];
+    if ([_textView isFirstResponder]){
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[@"focus"]];
+        [styles addEntriesFromDictionary:recordStyles];
     }
+    NSString *disabledStr = @"enabled";
+    if (_disabled){
+        disabledStr = @"disabled";
+    }
+    if ([_textView isFirstResponder]) {
+        NSString *focusStr = @"focus";
+        recordStyles = [NSMutableDictionary new];
+        recordStyles = [self getPseudoClassStylesByKeys:@[focusStr,disabledStr]];
+        [styles addEntriesFromDictionary:recordStyles];
+    }
+    [self updatePseudoClassStyles:styles];
 }
 
 #pragma mark measure frame
@@ -393,11 +357,11 @@ WX_EXPORT_METHOD(@selector(blur))
         }
         
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.width = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
         }
         
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.width = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
         
         return (CGSize) {
@@ -418,6 +382,7 @@ WX_EXPORT_METHOD(@selector(blur))
         [self fireEvent:@"click" params:nil];
     }
     [textView becomeFirstResponder];
+    [self handlePseudoClass];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -427,10 +392,8 @@ WX_EXPORT_METHOD(@selector(blur))
     }else{
         [self setPlaceholderAttributedString];
     }
-    if (textView.markedTextRange == nil) {
-        if (_inputEvent) {
-            [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
-        }
+    if (_inputEvent) {
+        [self fireEvent:@"input" params:@{@"value":[textView text]} domChanges:@{@"attrs":@{@"value":[textView text]}}];
     }
 }
 
@@ -447,13 +410,16 @@ WX_EXPORT_METHOD(@selector(blur))
     if (_blurEvent) {
         [self fireEvent:@"blur" params:nil];
     }
+    if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
+        [self recoveryPseudoStyles:self.styles];
+    }
 }
 
-#pragma mark - set properties
+#pragma mark - private method
 - (void)setPlaceholderAttributedString
 {
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:_placeholderString];
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     if (_placeholderColor) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_placeholderColor range:NSMakeRange(0, _placeholderString.length)];
         [attributedString addAttribute:NSFontAttributeName value:font range:NSMakeRange(0, _placeholderString.length)];
@@ -467,9 +433,43 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect newFrame = _placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
     newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.y = 6;
+    newFrame.origin.x = 4; // the cursor origin.x
+    newFrame.origin.y = 7; // the cursor origin.y
     _placeHolderLabel.frame = newFrame;
     _placeHolderLabel.attributedText = attributedString;
+}
+
+- (void)updatePattern
+{
+    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
+    if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
+        [self setPadding:padding];
+    }
+    
+    UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
+    if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
+        [self setBorder:border];
+    }
+}
+
+- (void)setPadding:(UIEdgeInsets)padding
+{
+    _padding = padding;
+    [self _updateTextContentInset];
+}
+
+- (void)setBorder:(UIEdgeInsets)border
+{
+    _border = border;
+    [self _updateTextContentInset];
+}
+
+- (void)_updateTextContentInset
+{
+    [_textView setTextContainerInset:UIEdgeInsetsMake(_padding.top + _border.top,
+                                                      _padding.left + _border.left,
+                                                      _padding.bottom + _border.bottom,
+                                                      _border.right + _border.right)];
 }
 
 - (void)setAutofocus
@@ -483,7 +483,7 @@ WX_EXPORT_METHOD(@selector(blur))
 
 - (void)setTextFont
 {
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
     [_textView setFont:font];
 }
 
@@ -508,9 +508,6 @@ WX_EXPORT_METHOD(@selector(blur))
     _keyboardSize = end.size;
     UIView * rootView = self.weexInstance.rootView;
     CGRect screenRect = [[UIScreen mainScreen] bounds];
-    if (CGRectIsNull(_rootViewOriginFrame)) {
-        _rootViewOriginFrame = rootView.frame;
-    }
     CGRect keyboardRect = (CGRect){
         .origin.x = 0,
         .origin.y = CGRectGetMaxY(screenRect) - _keyboardSize.height - 54,
@@ -529,7 +526,7 @@ WX_EXPORT_METHOD(@selector(blur))
         return;
     }
     UIView * rootView = self.weexInstance.rootView;
-    if (rootView.frame.origin.y < 0) {
+    if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
     }
@@ -544,11 +541,11 @@ WX_EXPORT_METHOD(@selector(blur))
 - (void)setViewMovedUp:(BOOL)movedUp
 {
     UIView *rootView = self.weexInstance.rootView;
-    CGRect rect = _rootViewOriginFrame;
+    CGRect rect = self.weexInstance.frame;
     CGRect rootViewFrame = rootView.frame;
     CGRect textAreaFrame = [_textView.superview convertRect:_textView.frame toView:rootView];
     if (movedUp) {
-        CGFloat offset =textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
+        CGFloat offset = textAreaFrame.origin.y-(rootViewFrame.size.height-_keyboardSize.height-textAreaFrame.size.height);
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
@@ -556,10 +553,6 @@ WX_EXPORT_METHOD(@selector(blur))
                 .size = rootViewFrame.size
             };
         }
-    }else {
-        // revert back to the origin state
-        rect = _rootViewOriginFrame;
-        _rootViewOriginFrame = CGRectNull;
     }
     self.weexInstance.rootView.frame = rect;
 }

@@ -17,7 +17,8 @@ export default function App (id, options) {
   this.vm = null
   this.customComponentMap = {}
   this.commonModules = {}
-  this.callbacks = {}
+
+  // document
   this.doc = new renderer.Document(
     id,
     this.options.bundleUrl,
@@ -25,5 +26,4 @@ export default function App (id, options) {
     renderer.Listener
   )
   this.differ = new Differ(id)
-  this.uid = 0
 }

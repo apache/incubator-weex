@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+@class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -140,6 +141,15 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *userInfo;
 
 /**
+ *  scale factor from css unit to device pixel.
+ */
+@property (nonatomic, assign, readonly) CGFloat pixelScaleFactor;
+
+/**
+ * track component render
+ */
+@property (nonatomic, assign)BOOL trackComponent;
+/**
  * Renders weex view with bundle url.
  *
  * @param url The url of bundle rendered to a weex view.
@@ -151,20 +161,39 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *
  * @param url The url of bundle rendered to a weex view.
  *
- * @param options The params passed by user, sometimes you should pass the value of "bundleUrl".
+ * @param options The params passed by user
  *
- * @param data The data the bundle needs when rendered.
+ * @param data The data the bundle needs when rendered.  Defalut is nil.
  **/
 - (void)renderWithURL:(NSURL *)url options:(NSDictionary *)options data:(id)data;
+
+///**
+// * Renders weex view with resource request.
+// *
+// * @param request The resource request specifying the URL to render with.
+// *
+// * @param options The params passed by user.
+// *
+// * @param data The data the bundle needs when rendered.  Defalut is nil.
+// **/
+//- (void)renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 
 /**
  * Renders weex view with source string of bundle and some others.
  *
- * @param options The params passed by user, sometimes you should pass the value of "bundleUrl".
+ * @param options The params passed by user.
  *
- * @param data The data the bundle needs when rendered.
+ * @param data The data the bundle needs when rendered. Defalut is nil.
  **/
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data;
+
+/**
+ * Reload the js bundle from the current URL and rerender.
+ *
+ * @param forcedReload when this parameter is true, the js bundle will always be reloaded from the server. If it is false, the instance may reload the js bundle from its cache. Default is false.
+ *
+ **/
+- (void)reload:(BOOL)forcedReload;
 
 /**
  * Refreshes current instance with data.
@@ -193,6 +222,17 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  */
 - (NSUInteger)numberOfComponents;
 
+
+/**
+ * check whether the module eventName is registered
+ */
+- (BOOL)checkModuleEventRegistered:(NSString*)event moduleClassName:(NSString*)moduleClassName;
+
+/**
+ * fire module event;
+ */
+- (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
+
 /**
  * fire global event
  */
@@ -212,12 +252,18 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, strong) NSMutableDictionary *performanceDict;
 
 
+/** 
+ * Deprecated 
+ */
 @property (nonatomic, strong) NSDictionary *properties DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, assign) NSTimeInterval networkTime DEPRECATED_MSG_ATTRIBUTE();
 @property (nonatomic, copy) void (^updateFinish)(UIView *);
 
-- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
+@end
 
+@interface WXSDKInstance (Deprecated)
+
+- (void)finishPerformance DEPRECATED_MSG_ATTRIBUTE();
 - (void)reloadData:(id)data  DEPRECATED_MSG_ATTRIBUTE("Use refreshInstance: method instead.");
 - (void)creatFinish DEPRECATED_MSG_ATTRIBUTE();
 
