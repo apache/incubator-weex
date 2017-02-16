@@ -261,12 +261,15 @@ WX_EXPORT_METHOD(@selector(blur))
     _attr = attributes;
     if (attributes[@"type"]) {
         _inputType = [WXConvert NSString:attributes[@"type"]];
+        [self setType];
     }
-    [self setType];
-    _autofocus = [attributes[@"autofocus"] boolValue];
-    [self setAutofocus:_autofocus];
-    _disabled = [attributes[@"disabled"] boolValue];
-    [_inputView setEnabled:!_disabled];
+    if (attributes[@"autofocus"]) {
+        self.autofocus = [attributes[@"autofocus"] boolValue];
+    }
+    if (attributes[@"disabled"]) {
+        _disabled = [attributes[@"disabled"] boolValue];
+        [_inputView setEnabled:!_disabled];
+    }
     if (attributes[@"maxlength"]) {
         _maxLength = [NSNumber numberWithInteger:[attributes[@"maxlength"] integerValue]];
     }
@@ -572,7 +575,7 @@ WX_EXPORT_METHOD(@selector(blur))
     CGRect begin = [[[notification userInfo] objectForKey:@"UIKeyboardFrameBeginUserInfoKey"] CGRectValue];
     
     CGRect end = [[[notification userInfo] objectForKey:@"UIKeyboardFrameEndUserInfoKey"] CGRectValue];
-    if(begin.size.height <= 44 ){
+    if(begin.size.height <= 44) {
         return;
     }
     _keyboardSize = end.size;
