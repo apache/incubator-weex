@@ -34,7 +34,7 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 - (void)startComponentTasks;
 
 /**
- * @abstract tell the component mananger that instance root view's frame has been changed
+ * @abstract tell the component manager that instance root view's frame has been changed
  **/
 - (void)rootViewFrameDidChange:(CGRect)frame;
 
