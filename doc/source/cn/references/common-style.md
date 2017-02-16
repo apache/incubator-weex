@@ -293,6 +293,163 @@ Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 
 </style>
 ```
 
+## 伪类 <span class="api-version">v0.9.5+</span>
+
+Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
+
+所有组件都支持 `active`, 但只有 `input` 组件和 `textarea` 组件支持 `focus`, `enabled`, `diabled`。
+
+### 规则
+
+- 同时生效生效的时候，优先级高覆盖优先级低
+
+   - 例如：`input:active:enabled` 和 `input:active` 同时生效，前者覆盖后者
+
+- 互联规则如下所示
+
+  ![rule](https://img.alicdn.com/tps/TB1KGwIPpXXXXbxXFXXXXXXXXXX-400-205.png)
+
+### Example
+
+```html
+<template>
+  <div class="wrapper">
+    <image :src="logoUrl" class="logo"></image>
+  </div>
+</template>
+
+<style scoped>
+  .wrapper {
+    align-items: center; 
+    margin-top: 120px;
+  }
+  .title {
+    font-size: 48px;
+  }
+  .logo {
+    width: 360px; 
+    height: 82px;
+    background-color: red;
+  }
+  .logo:active {
+    width: 180px; 
+    height: 82px;
+    background-color: green;
+  }
+</style>
+
+<script>
+  export default {
+    props: {
+      logoUrl: {
+        default: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png'
+      },
+      target: {
+        default: 'World'
+      }
+    },
+    methods: {
+      update (e) {
+        this.target = 'Weex';
+      }
+    }
+  };
+</script>
+```
+
+[试一下](http://dotwe.org/vue/df2c8f254620d6d30d0906ee75fe5b99)
+
+## 线性渐变 <span class="api-version">v0.10+</span>
+
+Weex 支持线性渐变背景，具体介绍可参考 [W3C description of the gradient](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Images/Using_CSS_gradients)。
+
+所有组件均支持线性渐变。
+
+### 使用
+
+ 你可以通过 `background-image` 属性创建线性渐变。
+
+```css
+background-image: linear-gradient(to top,#a80077,#66ff00);
+```
+
+目前暂不支持 `radial-gradient`（径向渐变）。
+
+Weex 目前只支持两种颜色的渐变，渐变方向如下：
+
+* to right
+  从左向右渐变
+* to left
+  从右向左渐变
+* to bottom
+  从上到下渐变
+* to top
+  从下到上渐变
+* to bottom right
+  从左上角到右下角
+* to top left
+  从右下角到左上角
+
+### Note
+
+- `background-image` 优先级高于 `background-color`，这意味着同时设置 `background-image` 和 `background-color`，`background-color` 被覆盖。
+- 不要使用 `background` 简写.
+
+### 示例
+
+```html
+<template>
+  <scroller style="background-color: #3a3a3a">
+    <div class="container1" style="background-image:linear-gradient(to right,#a80077,#66ff00);">
+      <text class="direction">to right</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to left,#a80077,#66ff00);">
+      <text class="direction">to left</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to bottom,#a80077,#66ff00);">
+      <text class="direction">to bottom</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to top,#a80077,#66ff00);">
+      <text class="direction">to top</text>
+    </div>
+    <div style="flex-direction: row;align-items: center;justify-content: center">
+      <div class="container2" style="background-image:linear-gradient(to bottom right,#a80077,#66ff00);">
+        <text class="direction">to bottom right</text>
+      </div>
+      <div class="container2" style="background-image:linear-gradient(to top left,#a80077,#66ff00);">
+        <text class="direction">to top left</text>
+      </div>
+    </div>
+  </scroller>
+</template>
+<style>
+  .container1 {
+    margin: 10px;
+    width: 730px;
+    height: 200px;
+    align-items: center;
+    justify-content: center;
+    border: solid;
+    border-radius: 10px;
+  }
+
+  .container2 {
+    margin: 10px;
+    width: 300px;
+    height: 300px;
+    align-items: center;
+    justify-content: center;
+    border: solid;
+    border-radius: 10px;
+  }
+
+  .direction {
+    font-size: 40px;
+    color: white;
+  }
+</style>
+```
+
 ## 其他基本样式
 
 - `opacity {number}`：取值范围为 [0, 1] 区间。默认值是 1，即完全不透明；0 是完全透明；0.5 是 50% 的透明度。

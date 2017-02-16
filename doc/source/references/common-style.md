@@ -186,6 +186,165 @@ we can use properties below to control placement of weex tag
 </template>
 ```
 
+## Pseudo class <span class="api-version">v0.9.5+</span>
+
+Weex support four pseudo-classes: `active`, `focus`, `disabled`, `enabled`
+
+All components support `active`, but only the input component and the textarea component support `focus`, `enabled`, `diabled`.
+
+### Rule
+
+- the high priority override low priority when rules take effect at the same time
+
+   - such as: "input:active:enabled" will override "input:active"
+
+- the interconnection rule as follow
+
+  ![rule](https://img.alicdn.com/tps/TB1KGwIPpXXXXbxXFXXXXXXXXXX-400-205.png)
+
+### Example
+
+```html
+<template>
+  <div class="wrapper">
+    <image :src="logoUrl" class="logo"></image>
+  </div>
+</template>
+
+<style scoped>
+  .wrapper {
+    align-items: center; 
+    margin-top: 120px;
+  }
+  .title {
+    font-size: 48px;
+  }
+  .logo {
+    width: 360px; 
+    height: 82px;
+    background-color: red;
+  }
+  .logo:active {
+    width: 180px; 
+    height: 82px;
+    background-color: green;
+  }
+</style>
+
+<script>
+  export default {
+    props: {
+      logoUrl: {
+        default: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png'
+      },
+      target: {
+        default: 'World'
+      }
+    },
+    methods: {
+      update (e) {
+        this.target = 'Weex';
+      }
+    }
+  };
+</script>
+```
+
+[Try it](http://dotwe.org/vue/df2c8f254620d6d30d0906ee75fe5b99)
+
+## linear-gradient <span class="api-version">v0.10+</span>
+
+Weex support linear-gradient background, You can see [W3C description of the gradient](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Images/Using_CSS_gradients).
+
+### Supported components
+
+All components in Weex support gradients
+
+### Usage
+
+You can use linear gradient by `background-image` property.
+
+```css
+background-image: linear-gradient(to top,#a80077,#66ff00);
+```
+
+`radial-gradient` is not currently supported, do not use it.
+
+Weex currently supports two color gradients. The direction of the gradient is as follows: 
+
+* to right
+  From left to right
+* to left 
+  From right to left
+* to bottom 
+  From top to bottom
+* to top 
+  From bottom to top
+* to bottom right 
+  From the upper left corner to the lower right corner
+* to top left 
+  From the lower right corner to the upper left corner
+
+### Note
+
+- `background-image` and `background-color` are set at the same time, `background-image` precedes `background-color`.
+- Do not use shorthand property such as `background`.
+
+### Example
+
+```html
+<template>
+  <scroller style="background-color: #3a3a3a">
+    <div class="container1" style="background-image:linear-gradient(to right,#a80077,#66ff00);">
+      <text class="direction">to right</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to left,#a80077,#66ff00);">
+      <text class="direction">to left</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to bottom,#a80077,#66ff00);">
+      <text class="direction">to bottom</text>
+    </div>
+    <div class="container1" style="background-image:linear-gradient(to top,#a80077,#66ff00);">
+      <text class="direction">to top</text>
+    </div>
+    <div style="flex-direction: row;align-items: center;justify-content: center">
+      <div class="container2" style="background-image:linear-gradient(to bottom right,#a80077,#66ff00);">
+        <text class="direction">to bottom right</text>
+      </div>
+      <div class="container2" style="background-image:linear-gradient(to top left,#a80077,#66ff00);">
+        <text class="direction">to top left</text>
+      </div>
+    </div>
+  </scroller>
+</template>
+<style>
+  .container1 {
+    margin: 10px;
+    width: 730px;
+    height: 200px;
+    align-items: center;
+    justify-content: center;
+    border: solid;
+    border-radius: 10px;
+  }
+
+  .container2 {
+    margin: 10px;
+    width: 300px;
+    height: 300px;
+    align-items: center;
+    justify-content: center;
+    border: solid;
+    border-radius: 10px;
+  }
+
+  .direction {
+    font-size: 40px;
+    color: white;
+  }
+</style>
+```
+
 ## Other Common Style
 
 - `opacity`
