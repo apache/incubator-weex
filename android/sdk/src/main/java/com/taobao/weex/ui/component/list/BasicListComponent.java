@@ -574,6 +574,73 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   @Override
+  public void scrollTo(WXComponent component, Map<String, Object> options) {
+    float offsetFloat = 0;
+    boolean smooth = true;
+
+    if (options != null) {
+      String offsetStr = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
+      smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+      if (offsetStr != null) {
+        try {
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
+        }catch (Exception e ){
+          WXLogUtils.e("Float parseFloat error :"+e.getMessage());
+        }
+      }
+    }
+
+    final int offset = (int) offsetFloat;
+
+    T bounceRecyclerView = getHostView();
+    if (bounceRecyclerView == null) {
+      return;
+    }
+
+    WXComponent parent = component;
+    WXCell cell = null;
+    while (parent != null) {
+      if (parent instanceof WXCell) {
+        cell = (WXCell) parent;
+        break;
+      }
+      parent = parent.getParent();
+    }
+    if (cell != null) {
+      final int pos = mChildren.indexOf(cell);
+      final WXRecyclerView view = bounceRecyclerView.getInnerView();
+
+      if (!smooth) {
+        RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+          //GridLayoutManager is also instance of LinearLayoutManager
+          ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+          ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
+        }
+        //Any else?
+      } else {
+        view.smoothScrollToPosition(pos);
+        if (offset != 0) {
+          view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+              if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                if (getOrientation() == Constants.Orientation.VERTICAL) {
+                  recyclerView.smoothScrollBy(0, offset);
+                } else {
+                  recyclerView.smoothScrollBy(offset, 0);
+                }
+                recyclerView.removeOnScrollListener(this);
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
+  @Override
   public void onBeforeScroll(int dx, int dy) {
     T bounceRecyclerView = getHostView();
     if (mStickyMap == null || bounceRecyclerView == null) {
@@ -1131,72 +1198,5 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     return false;
-  }
-
-  @Override
-  public void scrollTo(WXComponent component, Map<String, Object> options) {
-    float offsetFloat = 0;
-    boolean smooth = true;
-
-    if (options != null) {
-      String offsetStr = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
-      smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
-      if (offsetStr != null) {
-        try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
-        }catch (Exception e ){
-          WXLogUtils.e("Float parseFloat error :"+e.getMessage());
-        }
-      }
-    }
-
-    final int offset = (int) offsetFloat;
-
-    T bounceRecyclerView = getHostView();
-    if (bounceRecyclerView == null) {
-      return;
-    }
-
-    WXComponent parent = component;
-    WXCell cell = null;
-    while (parent != null) {
-      if (parent instanceof WXCell) {
-        cell = (WXCell) parent;
-        break;
-      }
-      parent = parent.getParent();
-    }
-    if (cell != null) {
-      final int pos = mChildren.indexOf(cell);
-      final WXRecyclerView view = bounceRecyclerView.getInnerView();
-
-      if (!smooth) {
-        RecyclerView.LayoutManager layoutManager = view.getLayoutManager();
-        if (layoutManager instanceof LinearLayoutManager) {
-          //GridLayoutManager is also instance of LinearLayoutManager
-          ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-          ((StaggeredGridLayoutManager) layoutManager).scrollToPositionWithOffset(pos, -offset);
-        }
-        //Any else?
-      } else {
-        view.smoothScrollToPosition(pos);
-        if (offset != 0) {
-          view.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-              if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                if (getOrientation() == Constants.Orientation.VERTICAL) {
-                  recyclerView.smoothScrollBy(0, offset);
-                } else {
-                  recyclerView.smoothScrollBy(offset, 0);
-                }
-                recyclerView.removeOnScrollListener(this);
-              }
-            }
-          });
-        }
-      }
-    }
   }
 }
