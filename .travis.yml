@@ -15,7 +15,7 @@ before_install:
   - brew install nvm
   - export CHROME_BIN=chromium-browser
   - source $(brew --prefix nvm)/nvm.sh
-  - nvm install 4.2.1
+  - nvm install 7.0.0
   - brew install ios-webkit-debug-proxy
   - npm install -g macaca-cli
   #- npm install -g macaca-ios
@@ -30,7 +30,7 @@ script:
   - npm run test
   - ./test/serve.sh 2&>1 > /dev/null &
   # - "run_in_ci=true ./test/run.sh ios"
-  - cd android && ./run-ci.sh
+  - cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
   - waitForEmulator #android-wait-for-emulator
   - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
   
