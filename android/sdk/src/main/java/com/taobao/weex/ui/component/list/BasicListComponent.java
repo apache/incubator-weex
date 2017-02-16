@@ -1136,11 +1136,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void scrollTo(WXComponent component, Map<String, Object> options) {
     float offsetFloat = 0;
-    boolean smoothTmp = true;
+    boolean smooth = true;
 
     if (options != null) {
       String offsetStr = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
-      smoothTmp = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+      smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
       if (offsetStr != null) {
         try {
           offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
@@ -1151,7 +1151,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     final int offset = (int) offsetFloat;
-    final boolean smooth = smoothTmp;
 
     T bounceRecyclerView = getHostView();
     if (bounceRecyclerView == null) {
@@ -1186,7 +1185,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           view.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-              WXLogUtils.e("ONSCROLL", newState + "");
               if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 if (getOrientation() == Constants.Orientation.VERTICAL) {
                   recyclerView.smoothScrollBy(0, offset);
