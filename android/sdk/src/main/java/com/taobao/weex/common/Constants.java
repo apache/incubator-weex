@@ -343,6 +343,8 @@ public class Constants {
     String CONTENT_OFFSET = "contentOffset";
     String X = "x";
     String Y = "y";
+    String OFFSET = "offset";
+    String ANIMATED = "animated";
   }
 
   public interface Value {
