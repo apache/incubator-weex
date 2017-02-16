@@ -791,6 +791,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
             ((WXHorizontalScrollView) getInnerView()).scrollBy(x, 0);
           }
         }
+        getInnerView().invalidate();
       }
     }, 16);
   }

@@ -215,6 +215,9 @@ import android.support.v7.widget.RecyclerView;
  */
 
 public class ExtendedLinearLayoutManager extends LinearLayoutManager{
+
+    private RecyclerView.SmoothScroller smoothScroller;
+
     public ExtendedLinearLayoutManager(Context context) {
         super(context, VERTICAL, false);
     }
@@ -226,7 +229,9 @@ public class ExtendedLinearLayoutManager extends LinearLayoutManager{
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state,
                                        int position) {
-        RecyclerView.SmoothScroller smoothScroller = new ExtendedLinearLayoutManager.TopSnappedSmoothScroller(recyclerView.getContext());
+        if (smoothScroller == null) {
+            smoothScroller = new ExtendedLinearLayoutManager.TopSnappedSmoothScroller(recyclerView.getContext());
+        }
         smoothScroller.setTargetPosition(position);
         startSmoothScroll(smoothScroller);
     }
