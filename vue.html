@@ -31,7 +31,7 @@
           var query = '?page=' + defaultPage
           return f ? query + '&' : query
         })
-        location.href = url
+        return location.href = url
       }
 
       var bundle = document.createElement('script')
