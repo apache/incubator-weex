@@ -44,7 +44,7 @@ describe('list scroll event', function () {
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
-      assert.equal(y > 400,true)
+      assert.equal(y > 10,true)
     })
   })
 });

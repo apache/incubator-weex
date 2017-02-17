@@ -7,10 +7,10 @@ var platform = process.env.platform || 'android';
 platform = platform.toLowerCase();
 
 var iOSOpts = {
-  deviceName: 'iPhone 5s',
+  deviceName: 'iPhone 6',
   platformName: 'iOS',
   //reuse:2,
-  app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
+  app: path.join(__dirname, '..', '../ios/playground/WeexDemo.app.zip')
 };
 
 var androidOpts = {
