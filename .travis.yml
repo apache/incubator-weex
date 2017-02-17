@@ -32,5 +32,5 @@ script:
   # - "run_in_ci=true ./test/run.sh ios"
   - cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
   - waitForEmulator #android-wait-for-emulator
-  - "JAVA_HOME=$(/usr/libexec/java_home) ./test/run.sh"
+  - "JAVA_HOME=$(/usr/libexec/java_home) run_in_ci=true ./test/run.sh"
   
