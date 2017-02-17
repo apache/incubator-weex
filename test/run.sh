@@ -36,6 +36,7 @@ function runiOS {
     sleep 1m
     echo 'killAll Simulator......'
     killAll Simulator
+    ps -ef
     platform=ios macaca run -d $1 --verbose
 }
 
