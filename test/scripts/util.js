@@ -10,7 +10,7 @@ var iOSOpts = {
   deviceName: 'iPhone 6',
   platformName: 'iOS',
   //reuse:2,
-  app: path.join(__dirname, '..', '../ios/playground/WeexDemo.app.zip')
+  app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
 };
 
 var androidOpts = {
