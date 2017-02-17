@@ -337,6 +337,16 @@ public class Constants {
     String PULLING_DISTANCE = "pullingDistance";
     String VIEW_HEIGHT = "viewHeight";
     String PREVENT_MOVE_EVENT = "preventMoveEvent";
+    String SELECTION_START = "selectionStart";
+    String SELECTION_END = "selectionEnd";
+    String OFFSET_ACCURACY = "offsetAccuracy";
+    String CONTENT_SIZE = "contentSize";
+    String CONTENT_OFFSET = "contentOffset";
+    String X = "x";
+    String Y = "y";
+    String RETURN_KEY_TYPE = "returnKeyType";
+    String OFFSET = "offset";
+    String ANIMATED = "animated";
   }
 
   public interface Value {
@@ -402,9 +412,10 @@ public class Constants {
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
+    String RETURN = "return";
   }
 
-  public interface PESUDO {
+  public interface PSEUDO {
     String ACTIVE = ":active";
     String ENABLED = ":enabled";
     String DISABLED = ":disabled";
