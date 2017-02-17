@@ -60,7 +60,9 @@ android {
     testOptions {
         reportDir = "$project.buildDir/test/report"
     }
-
+    dexOptions {
+        preDexLibraries false
+    }
 }
 
 
