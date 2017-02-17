@@ -413,8 +413,10 @@
         [self removeCellForIndexPath:fromIndexPath withSections:_completedSections];
         [self insertCell:cell forIndexPath:toIndexPath withSections:_completedSections];
         [UIView performWithoutAnimation:^{
+            [_tableView beginUpdates];
             [_tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
             [self handleAppear];
+            [_tableView endUpdates];
         }];
     }];
 }
