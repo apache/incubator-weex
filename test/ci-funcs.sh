@@ -13,7 +13,7 @@ function setup {
         installAndroidSDK
         createAndStartAVD &
         export DISPLAY=:99.0
-    elif [ $target = $target_ios]
+    elif [ $target = $target_ios ]
     then
         setupBasic
         npm install -g macaca-ios
@@ -46,7 +46,7 @@ function test_cpt {
         cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
         waitForEmulator
         JAVA_HOME=$(/usr/libexec/java_home) run_in_ci=true ./test/run.sh
-    elif [ $target = $target_ios]
+    elif [ $target = $target_ios ]
     then
         ./test/serve.sh 2&>1 > /dev/null &
         xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
