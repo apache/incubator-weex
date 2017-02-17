@@ -234,45 +234,45 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
    <image style="your-custom-style" src="image-remote-source" resize="contain/cover/stretch"></image>
    ```
 ##### component 方法
-  WeexSDK 0.9.5 之后支持了在js中直接调用component的方法，这里提供一个例子，
-  
-  - 自定义一个WXMyCompoenent 的组件
-  
-	 ```
-	 @implementation WXMyComponent
-	 	WX_EXPORT_METHOD(@selector(focus)) // 暴露该方法给js
-	 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
-	 {
-	     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
-	         // handle your attributes
-	         // handle your styles
-	     }
-	     
-	     return self;
-	 }
-	 
-	 - (void)focus
-	   {
-	   		NSLog(@"you got it");
-	   }
-	 @end
-	 ```
-	
-	- 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]] `
-	- 在weex 文件中调用
+WeexSDK 0.9.5 之后支持了在js中直接调用component的方法，这里提供一个例子，
 
-		```
-		<template>
-	     		<mycomponent id='mycomponent'></mycomponent>
-	 	</template>
-		<script>
-		   module.exports = {
-		    	created: function() {
-		    		this.$el('mycomponent').focus();
-		    		}
-		   }
-		</script>
- 		``` 
+- 自定义一个WXMyCompoenent 的组件
+
+    ```
+    @implementation WXMyComponent
+    WX_EXPORT_METHOD(@selector(focus)) // 暴露该方法给js
+    - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+    {
+        if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+            // handle your attributes
+            // handle your styles
+        }
+        
+        return self;
+    }
+    
+    - (void)focus
+    {
+        NSLog(@"you got it");
+    }
+    @end
+    ```
+	
+- 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]] `
+- 在weex 文件中调用
+
+  ```html
+  <template>
+    <mycomponent id='mycomponent'></mycomponent>
+  </template>
+  <script>
+    module.exports = {
+      created: function() {
+        this.$el('mycomponent').focus();
+      }
+    }
+  </script>
+  ``` 
  
  
  

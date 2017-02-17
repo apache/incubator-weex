@@ -95,19 +95,19 @@ public class MyViewComponent extends WXComponent{
   public MyViewComponent(WXSDKInstance instance, WXDomObject dom,
                      WXVContainer parent, String instanceId, boolean isLazy)
    {
-	   public MyViewComponent(WXSDKInstance instance, WXDomObject dom,
-	     WXVContainer parent, String instanceId, boolean isLazy) {
-	    super(instance, dom, parent, instanceId, isLazy);
-	   }
+     public MyViewComponent(WXSDKInstance instance, WXDomObject dom,
+       WXVContainer parent, String instanceId, boolean isLazy) {
+      super(instance, dom, parent, instanceId, isLazy);
+     }
 
-	   @Override
-	   protected void initView() {
-	      mHost = new TextView(mContext);
-	   }
-	   @WXComponentProp(name=WXDomPropConstant.WX_ATTR_VALUE)
-	   public void setMyViewValue(String value) {
-	      ((TextView)mHost).setText(value);
-	   }
+     @Override
+     protected void initView() {
+        mHost = new TextView(mContext);
+     }
+     @WXComponentProp(name=WXDomPropConstant.WX_ATTR_VALUE)
+     public void setMyViewValue(String value) {
+        ((TextView)mHost).setText(value);
+     }
 }
 ```
 
@@ -160,30 +160,30 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   }
 }
 ```
-#### Component Method
- from WeexSDK `0.9.5`, you can define your component method
 
- for example, define a method in component:
+#### Component Method
+from WeexSDK `0.9.5`, you can define your component method
+
+for example, define a method in component:
+
+```java
+@JSMethod
+public void focus(){
+//method implementation
+}
+```
+
+after your registration for your own custom component, now you can call it in your js file.
  
- ```java
- 
- @JSMethod
- public void focus(){
- 	//method implementation
- }
- 
- ```
- after your registration for your own custom component, now you can call it in your js file.
- 
- ```html
+```html
 <template>
- 		<mycomponent id='mycomponent'></mycomponent>
+  <mycomponent id='mycomponent'></mycomponent>
 </template>
 <script>
-   module.exports = {
-    	created: function() {
-    		this.$el('mycomponent').focus();
-    		}
-   }
+  module.exports = {
+    created: function() {
+      this.$el('mycomponent').focus();
+    }
+  }
 </script>
 ``` 

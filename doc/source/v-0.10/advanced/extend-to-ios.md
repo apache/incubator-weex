@@ -281,23 +281,23 @@ for example:
  
  - (void)focus
    {
-   		NSLog(@"you got it");
+      NSLog(@"you got it");
    }
 @end
 ```
    
- after your registration for your own custom component, now you can call it in your js file.
+after your registration for your own custom component, now you can call it in your js file.
  
-```
+```html
 <template>
- 		<mycomponent id='mycomponent'></mycomponent>
+  <mycomponent id='mycomponent'></mycomponent>
 </template>
 <script>
-   module.exports = {
-    	created: function() {
-    		this.$el('mycomponent').focus();
-    		}
-   }
+  module.exports = {
+    created: function() {
+      this.$el('mycomponent').focus();
+    }
+  }
 </script>
 ``` 
 

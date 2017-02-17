@@ -149,21 +149,21 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
  ```java
  @JSMethod
  public void focus(){
- 	//method implementation
+ //method implementation
  }
  ```
 - 注册组之后，你可以在weex 文件中调用
   
   ```html
 	<template>
- 		<mycomponent id='mycomponent'></mycomponent>
+    <mycomponent id='mycomponent'></mycomponent>
 	</template>
 	<script>
-   		module.exports = {
-    		created: function() {
-    			this.$el('mycomponent').focus();
-    		}
-   		}
+    module.exports = {
+      created: function() {
+        this.$el('mycomponent').focus();
+      }
+    }
 	</script>
 	```
 	
