@@ -58,6 +58,7 @@ function setup_cpt {
     else
         gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
     fi
+    printEnvInfo
 }
 
 function setupBasic {
@@ -70,13 +71,24 @@ function setupBasic {
     npm install -g macaca-cli
 }
 
+function printEnvInfo {
+    node -v
+    nvm ls
+    printenv
+}
+
 function test_cpt {
+    echo 'start test ......'
+    printEnvInfo
+
     target_android='android'
     target_ios='ios'
     target_danger='danger'
     target_jsfm='jsfm'
 
     target=${1:-$target_android}
+    echo "test target: $target"
+    nvm use 7.0.0
     
     if [ $target = $target_android ]; then
         ./test/serve.sh 2&>1 > /dev/null &
