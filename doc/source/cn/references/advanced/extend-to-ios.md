@@ -254,23 +254,24 @@ return [[WXImageView alloc] init];
 	 
 	 - (void)focus
 	   {
-	   		NSLog(@"you got it");
+          NSLog(@"you got it");
 	   }
 	 @end
 	 ```
 	
-	- 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]] `
+	- 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]]`
+
 	- 在weex 文件中调用
 
-		```
-		<template>
-	     		<mycomponent id='mycomponent'></mycomponent>
+      ```
+        <template>
+          <mycomponent id='mycomponent'></mycomponent>
 	 	</template>
 		<script>
-		   module.exports = {
-		    	created: function() {
-		    		this.$el('mycomponent').focus();
+          module.exports = {
+            created:function() {
+                      this.$el('mycomponent').focus();
 		    		}
-		   }
+          }
 		</script>
- 		``` 
+      ``` 
