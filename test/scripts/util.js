@@ -51,6 +51,6 @@ module.exports = {
         return 10 * 60 * 1000;
     },
     getGETActionWaitTimeMills:function(){
-        return (isRunInCI ? 30 : 5 ) * 1000;
+        return (isRunInCI ? 120 : 5 ) * 1000;
     }
 }
