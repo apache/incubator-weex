@@ -344,6 +344,8 @@ public class Constants {
     String X = "x";
     String Y = "y";
     String RETURN_KEY_TYPE = "returnKeyType";
+    String OFFSET = "offset";
+    String ANIMATED = "animated";
   }
 
   public interface Value {
