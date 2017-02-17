@@ -7,15 +7,14 @@ env:
         - TEST_SUITE=android
         - TEST_SUITE=ios
         - TEST_SUITE=danger
+        - TEST_SUITE=jsfm
 cache:
   directories:
   - node_modules
   - $HOME/.m2
   - $HOME/.gradle
 before_install:
-  - source test/ci-funcs.sh && setup $TEST_SUITE
+  - source test/ci-funcs.sh && setup_cpt $TEST_SUITE
 script:
-  - npm run build
-  - npm run test
   - test_cpt $TEST_SUITE
   
