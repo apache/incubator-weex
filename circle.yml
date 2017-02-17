@@ -9,21 +9,11 @@ machine:
    version: 7
   java:
     version: 'oraclejdk8'
-  environment:
-    QEMU_AUDIO_DRV: none
-    ANDROID_HOME: /usr/local/android-sdk-linux
 test:
-  pre:
-  - source test/setup-android-ci.sh && prepareEmulator > emulator_log:
-          background: true
   override:
     - npm run build
     - npm run test
     - cd android && ./run-ci.sh
-    - ./test/serve.sh:
-          background: true
-    - source test/setup-android-ci.sh && waitForEmulator
-    - "run_in_ci=true ./test/run.sh"
   post:
     - cp -r android/playground/app/build/outputs $CIRCLE_ARTIFACTS/playground # playground artifacts
     - cp -r android/sdk/build/reports $CIRCLE_ARTIFACTS/sdk_reports
@@ -33,9 +23,6 @@ dependencies:
     - "node_modules"
     - ~/.gradle
     - ~/.m2
-  pre:
-    - npm install -g macaca-cli 
-    - npm install macaca-android --save-dev
 
 notify:
   webhooks:
