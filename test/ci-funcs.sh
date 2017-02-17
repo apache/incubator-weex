@@ -58,7 +58,6 @@ function setup_cpt {
     else
         gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
     fi
-    printEnvInfo
 }
 
 function setupBasic {
@@ -78,8 +77,7 @@ function printEnvInfo {
 }
 
 function test_cpt {
-    echo 'start test ......'
-    printEnvInfo
+    echo 'cilog:start test ......'
 
     target_android='android'
     target_ios='ios'
@@ -87,8 +85,7 @@ function test_cpt {
     target_jsfm='jsfm'
 
     target=${1:-$target_android}
-    echo "test target: $target"
-    nvm use 7.0.0
+    echo "cilog: target: $target"
     
     if [ $target = $target_android ]; then
         ./test/serve.sh 2&>1 > /dev/null &
