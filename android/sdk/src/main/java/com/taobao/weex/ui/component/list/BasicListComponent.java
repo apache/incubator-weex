@@ -284,6 +284,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static boolean mDownForBidCacheViewHolder = false;
 
   protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
+  protected int mColumnCount = 1;
 
   /**
    * Map for storing component that is sticky.
@@ -295,9 +296,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   public BasicListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
     super(instance, node, parent);
     stickyHelper = new WXStickyHelper(this);
-    if(node!=null && node.getAttrs() !=null) {
-      mLayoutType = node.getAttrs().getLayoutType();
-    }
   }
 
   /**
@@ -823,7 +821,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
     if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
       holder.getComponent().bindData(component);
-//              holder.getComponent().refreshData(component);
     }
 
   }

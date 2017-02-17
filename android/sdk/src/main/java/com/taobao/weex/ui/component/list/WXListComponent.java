@@ -237,11 +237,16 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
   public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent);
+    if(node!=null && node.getAttrs() !=null) {
+      mLayoutType = node.getAttrs().getLayoutType();
+      mColumnCount = node.getAttrs().getColumnCount();
+    }
   }
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
-    return new BounceRecyclerView(context, orientation).setLayoutType(mLayoutType);
+
+    return new BounceRecyclerView(context,mLayoutType,mColumnCount,orientation);
   }
 
   @Override

@@ -274,38 +274,26 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
     if (layoutManagerType == null) {
       if (layoutManager instanceof LinearLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
+        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+        listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
+                ,lastVisibleItemPosition
+                ,dx
+                ,dy);
       } else if (layoutManager instanceof GridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
+        lastVisibleItemPosition = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
       } else if (layoutManager instanceof StaggeredGridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
-      } else {
-        throw new RuntimeException(
-            "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
-      }
-    }
-
-    switch (layoutManagerType) {
-      case LINEAR:
-        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager)
-            .findLastVisibleItemPosition();
-        listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
-            ,lastVisibleItemPosition
-            ,dx
-            ,dy);
-        break;
-      case GRID:
-        lastVisibleItemPosition = ((GridLayoutManager) layoutManager)
-            .findLastVisibleItemPosition();
-        break;
-      case STAGGERED_GRID:
-        StaggeredGridLayoutManager staggeredGridLayoutManager
-            = (StaggeredGridLayoutManager) layoutManager;
+        StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
         if (lastPositions == null) {
           lastPositions = new int[staggeredGridLayoutManager.getSpanCount()];
         }
         staggeredGridLayoutManager.findLastVisibleItemPositions(lastPositions);
         lastVisibleItemPosition = findMax(lastPositions);
-        break;
+      } else {
+        throw new RuntimeException(
+            "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
+      }
     }
   }
 

@@ -302,6 +302,12 @@ public class Constants {
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
     String LAYOUT = "layout";
+    String MULTI_COLUMN= "multi-column";
+    String COLUMN_WIDTH= "columnWidth";
+    String COLUMN_COUNT= "columnCount";
+    String COLUMN_GAP= "columnGap";
+
+    String GRID= "grid";
     String OVERFLOW = "overflow";
     String TYPE = "type";
     String PLACEHOLDER = "placeholder";

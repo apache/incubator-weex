@@ -223,7 +223,6 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   public static final int TYPE_GRID_LAYOUT = 2;
   public static final int TYPE_STAGGERED_GRID_LAYOUT = 3;
   private WXGesture mGesture;
-
   private boolean scrollable = true;
 
   public WXRecyclerView(Context context) {
@@ -242,18 +241,20 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   public boolean postDelayed(Runnable action, long delayMillis) {
     return super.postDelayed(WXThread.secure(action), delayMillis);
   }
-
+  public void initView(Context context, int type,int orientation) {
+    initView(context,type,0,orientation);
+  }
   /**
    *
    * @param context
    * @param type
    * @param orientation should be {@link OrientationHelper#HORIZONTAL} or {@link OrientationHelper#VERTICAL}
    */
-  public void initView(Context context, int type,int orientation) {
+  public void initView(Context context, int type,int spanCount,int orientation) {
     if (type == TYPE_GRID_LAYOUT) {
-      setLayoutManager(new GridLayoutManager(context, 2,orientation,false));
+      setLayoutManager(new GridLayoutManager(context, spanCount,orientation,false));
     } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new StaggeredGridLayoutManager(2, orientation));
+      setLayoutManager(new StaggeredGridLayoutManager(spanCount, orientation));
     } else if (type == TYPE_LINEAR_LAYOUT) {
       setLayoutManager(new LinearLayoutManager(context,orientation,false){
 

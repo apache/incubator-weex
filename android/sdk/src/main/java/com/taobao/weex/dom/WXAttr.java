@@ -440,6 +440,34 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return ret;
   }
 
+  public int getColumnWidth(){
+
+    Object obj = get(Constants.Name.COLUMN_WIDTH);
+    if (obj == null) {
+      return 0;
+    }
+
+    try {
+      return Integer.parseInt(String.valueOf(obj));
+    } catch (Exception e) {
+      WXLogUtils.e("[WXAttr] getColumnWidth:", e);
+    }
+    return 0;
+  }
+
+  public int getColumnCount() {
+
+    Object obj = get(Constants.Name.COLUMN_COUNT);
+    if (obj == null) {
+      return 1;
+    }
+    try {
+      return Integer.parseInt(String.valueOf(obj));
+    } catch (Exception e) {
+      WXLogUtils.e("[WXAttr] getColumnCount:", e);
+      return 1;
+    }
+  }
   public int getLayoutType(){
     Object obj = get(Constants.Name.LAYOUT);
     if (obj == null) {
@@ -447,9 +475,16 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
 
     try {
-      return Integer.parseInt(String.valueOf(obj));
+      switch(String.valueOf(obj)){
+        case Constants.Name.MULTI_COLUMN :
+          return  WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
+        case Constants.Name.GRID :
+          return  WXRecyclerView.TYPE_GRID_LAYOUT;
+        default:
+          return WXRecyclerView.TYPE_LINEAR_LAYOUT;
+      }
     } catch (Exception e) {
-      WXLogUtils.e("[WXAttr] recycleImage:", e);
+      WXLogUtils.e("[WXAttr] getLayoutType:", e);
     }
     return WXRecyclerView.TYPE_LINEAR_LAYOUT;
   }
