@@ -606,6 +606,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       parent = parent.getParent();
     }
+
     if (cell != null) {
       final int pos = mChildren.indexOf(cell);
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
