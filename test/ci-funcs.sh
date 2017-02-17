@@ -40,11 +40,11 @@ function setup_cpt {
     
     if [ $target = $target_android ]; then
         setupBasic
-        "JAVA_HOME=$(/usr/libexec/java_home) npm install -g macaca-android"
-        npm install
         installAndroidSDK
+        JAVA_HOME=$(/usr/libexec/java_home) npm install -g macaca-android
         createAVD
         startAVD &
+        npm install
         export DISPLAY=:99.0
     elif [ $target = $target_ios ]
     then
