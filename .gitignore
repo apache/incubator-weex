@@ -5,10 +5,12 @@
 
 # Created by Builder
 examples/build
+examples/web-entry
 test/build
 weex_tmp
 coverage
 dist
+packages
 
 # Node
 logs
