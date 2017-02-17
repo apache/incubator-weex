@@ -35,7 +35,8 @@ function runiOS {
     buildiOS
     sleep 1m
     echo 'killAll Simulator......'
-    killAll Simulator || echo 'killall failed' 
+    killAll Simulator || echo 'killall failed'
+    ps -ef
     platform=ios macaca run -d $1 --verbose
 }
 
