@@ -1,7 +1,7 @@
 import { extend } from '../utils'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
-let warned = false
+// let warned = false
 
 function getHeadStyleMap () {
   return Array.from(document.styleSheets)
@@ -13,7 +13,8 @@ function getHeadStyleMap () {
         if (match && match[1]) {
           pre[match[1]] = rule.cssText.match(/{([^}]+)}/)[1].trim().split(';')
             .reduce((styleObj, statement) => {
-              if (statement = statement.trim()) {
+              statement = statement.trim()
+              if (statement) {
                 const resArr = statement.split(':').map((part) => part.trim())
                 styleObj[resArr[0]] = resArr[1]
               }
@@ -25,36 +26,36 @@ function getHeadStyleMap () {
     }, {})
 }
 
-function getWarnText (prop) {
-  return `[Vue Rneder] "${prop}" is not a standard CSS property,`
-    + 'it may not support very well on weex vue render.'
-}
+// function getWarnText (prop) {
+//   return `[Vue Rneder] "${prop}" is not a standard CSS property,`
+//     + 'it may not support very well on weex vue render.'
+// }
 
-function normalize (styles) {
-  const realStyle = {}
-  for (const key in styles) {
-    let value = styles[key]
+// function normalize (styles) {
+//   const realStyle = {}
+//   for (const key in styles) {
+//     let value = styles[key]
 
-    // TODO: add more reliable check
-    if (typeof value === 'number') {
-      value += 'px'
-    }
+//     // TODO: add more reliable check
+//     if (typeof value === 'number') {
+//       value += 'px'
+//     }
 
-    // warn for unsupported properties
-    switch (key) {
-      case 'lines':
-      case 'item-color':
-      case 'itemColor':
-      case 'item-selected-color':
-      case 'itemSelectedColor':
-      case 'item-size':
-      case 'itemSize': console.warn(getWarnText(key)); break
-    }
+//     // warn for unsupported properties
+//     switch (key) {
+//       case 'lines':
+//       case 'item-color':
+//       case 'itemColor':
+//       case 'item-selected-color':
+//       case 'itemSelectedColor':
+//       case 'item-size':
+//       case 'itemSize': console.warn(getWarnText(key)); break
+//     }
 
-    realStyle[key] = value
-  }
-  return realStyle
-}
+//     realStyle[key] = value
+//   }
+//   return realStyle
+// }
 
 // function getStyleMap (component) {
 //   if (component && component.$vnode && component.$vnode.context) {
@@ -135,16 +136,12 @@ export default {
       if (weex.styleMap) {
         classNames.forEach(className => {
           const styleObj = weex.styleMap[className] || {}
-          Object.keys(styleObj).forEach(key => {
-            style[key] = styleObj[key]
-          })
+          extend(style, styleObj)
         })
       }
 
       // apply static inline styles.
-      Object.keys(staticStyle).forEach(key => {
-        style[key] = staticStyle[key]
-      })
+      extend(style, staticStyle)
 
       return style
     },

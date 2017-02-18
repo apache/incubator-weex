@@ -22,11 +22,10 @@ function _render (context, h) {
  */
 function _reLayout (context) {
   const el = context.$el
-  const rect = context.$el.getBoundingClientRect()
   const mergedStyle = context.$vnode.data.mergedStyle
   const ctRect = extend({}, context.getParentRect())
   extend(ctRect, { left: 0, top: 0 })
-  let { width: ctWidth, height: ctHeight, left, top } = ['width', 'height', 'left', 'top']
+  const { width: ctWidth, height: ctHeight, left, top } = ['width', 'height', 'left', 'top']
     .reduce((pre, name) => {
       pre[name] = parseFloat(mergedStyle[name] || ctRect[name])
       return pre
@@ -35,7 +34,8 @@ function _reLayout (context) {
 
   if (el.children.length === 1) {
     width = size = window.getComputedStyle(el.children[0])
-  } else {
+  }
+  else {
     const itemComputedStyle = window.getComputedStyle(el.children[1])
     const padding = parseFloat(itemComputedStyle.marginLeft)
     size = parseFloat(itemComputedStyle.width)
