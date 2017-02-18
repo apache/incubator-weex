@@ -317,10 +317,8 @@ body > .weex-scroller {
 
 .weex-indicator {
   position: absolute;
-  right: 0.4rem;
-  bottom: 0.1333rem;
   margin: 0;
-  padding: 0.1333rem 0.2667rem;
+  padding: 0;
 }
 
 .weex-indicator-item {
