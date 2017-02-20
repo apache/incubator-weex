@@ -824,7 +824,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   public void onViewRecycled(ListBaseViewHolder holder) {
     long begin = System.currentTimeMillis();
     holder.setComponentUsing(false);
-    recycleViewList.add(holder);
+    if(holder.canRecycled()) {
+      recycleViewList.add(holder);
+    } else {
+      WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
+    }
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "Recycle holder " + (System.currentTimeMillis() - begin) + "  Thread:" + Thread.currentThread().getName());
     }
