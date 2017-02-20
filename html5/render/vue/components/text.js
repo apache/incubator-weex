@@ -6,10 +6,11 @@ import { extend } from '../utils'
  * Get text styles
  */
 function getTextStyle (context = {}) {
+  const propLines = parseInt(context.lines) || 0
   const vnode = context.$vnode || {}
   const staticStyle = vnode.data && vnode.data.staticStyle || {}
   const mergedStyle = vnode.data && vnode.data.mergedStyle || {}
-  const lines = parseInt(mergedStyle.lines) || 0
+  const lines = parseInt(mergedStyle.lines) || propLines
   if (lines > 0) {
     return extend(staticStyle, {
       overflow: 'hidden',
