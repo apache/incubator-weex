@@ -539,6 +539,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       default:
         break;
     }
+
+    //remove focus and hide keyboard first, the ImeOptions will take effect when show keyboard next time
+    blur();
     getHostView().setImeOptions(mEditorAction);
   }
 
