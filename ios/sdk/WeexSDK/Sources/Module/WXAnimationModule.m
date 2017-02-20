@@ -135,7 +135,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                    Here comes the black magic: In the scale transformation, change the z parameter to anything different from 1.0, the jump is gone.
                    See http://stackoverflow.com/questions/27931421/cgaffinetransform-scale-and-translation-jump-before-animation
                  **/
-                layer.transform = CATransform3DScale(transform, 1, 1, 1.00001);
+                CGFloat sz = 1.00001;
+                if ([args[@"fixScale"] boolValue]) {
+                    sz = 1.0 + CGFLOAT_MIN;
+                }
+                layer.transform = CATransform3DScale(transform, 1, 1, sz);
             }
             if (isAnimateBackgroundColor) {
                 layer.backgroundColor = backgroundColor;
