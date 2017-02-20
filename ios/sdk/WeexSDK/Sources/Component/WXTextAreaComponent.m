@@ -99,7 +99,9 @@ typedef UITextView WXTextAreaView;
     NSInteger selectionStart = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.start];
     NSInteger selectionEnd = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.end];
     NSDictionary *res = @{@"selectionStart":@(selectionStart),@"selectionEnd":@(selectionEnd)};
-    callback(res);
+    if (callback) {
+        callback(res);
+    }
 }
 
 -(void)setKeyboardType:(UIKeyboardType)keyboardType
