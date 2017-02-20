@@ -364,7 +364,6 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     [self setPlaceholderAttributedString];
     [self updatePattern];
-    
 }
 
 -(void)updatePattern
