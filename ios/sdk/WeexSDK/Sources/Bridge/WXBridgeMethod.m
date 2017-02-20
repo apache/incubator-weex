@@ -52,7 +52,7 @@
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be int>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
 #endif
         NSInteger value = [WXConvert NSInteger:obj];
-        return [NSNumber numberWithInt:value];
+        return [NSNumber numberWithInteger:value];
     } else if(strcmp(parameterType,@encode(id))==0) {
 #ifdef DEBUG
         check =  [obj isKindOfClass:[NSArray class]] || [obj isKindOfClass:[NSDictionary class]] ||[obj isKindOfClass:[NSString class]];
