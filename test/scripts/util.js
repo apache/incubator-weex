@@ -48,7 +48,7 @@ module.exports = {
         return getIpAddress()+":12581";
     },
     getTimeoutMills:function(){
-        return 10 * 60 * 1000;
+        return ( isRunInCI ? 60 : 10 ) * 60 * 1000;
     },
     getGETActionWaitTimeMills:function(){
         return (isRunInCI ? 120 : 5 ) * 1000;

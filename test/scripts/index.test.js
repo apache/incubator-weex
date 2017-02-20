@@ -21,6 +21,12 @@ describe('weex mobile index', function () {
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),100);
   });
 
+  after(function () {
+      return driver
+      .sleep(1000)
+      .quit()
+  })
+
 
   it('#1 Index', () => {
     return driver
@@ -42,7 +48,7 @@ describe('weex mobile index', function () {
     })
   })
 
-  it('#2 Input Blur', () => {
+  it('#3 Input Blur', () => {
     return driver
     .elementByXPath('//div/input')
     .click()
