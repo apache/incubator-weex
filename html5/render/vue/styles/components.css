@@ -239,6 +239,11 @@ body > .weex-scroller {
   float: left;
 }
 
+.sticky {
+  position: fixed;
+  z-index: 9999;
+}
+
 .weex-cell {
   display: -webkit-box;
   display: -webkit-flex;
