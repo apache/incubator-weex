@@ -220,7 +220,7 @@
             break;
         }
         if ([cellComponent isKindOfClass:[WXHeaderComponent class]]) {
-            NSUInteger toIndex = [self indexForHeader:cellComponent sections:_completedSections];
+            NSUInteger toIndex = [self indexForHeader:(WXHeaderComponent *)cellComponent sections:_completedSections];
             cellRect = [_tableView rectForSection:toIndex];
             break;
         }
