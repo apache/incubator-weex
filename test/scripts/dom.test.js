@@ -18,7 +18,7 @@ describe('weex mobile index', function () {
     return driver
       .initDriver()
       .get('wxpage://' + util.getDeviceHost() +'/dom-operation.js')
-      .waitForElementByXPath('//div/div[1]',util.getGETActionWaitTimeMills(),100);
+      .waitForElementByXPath('//div/text[2]',util.getGETActionWaitTimeMills(),100);
   });
 
   after(function () {
