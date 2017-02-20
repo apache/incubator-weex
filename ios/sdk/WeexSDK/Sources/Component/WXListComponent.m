@@ -220,7 +220,7 @@
             break;
         }
         if ([cellComponent isKindOfClass:[WXHeaderComponent class]]) {
-            NSUInteger toIndex = [self indexForHeader:cellComponent sections:_completedSections];
+            NSUInteger toIndex = [self indexForHeader:(WXHeaderComponent *)cellComponent sections:_completedSections];
             cellRect = [_tableView rectForSection:toIndex];
             break;
         }
@@ -445,7 +445,10 @@
         if (cell.contentView.subviews.count > 0) {
             UIView *wxCellView = [cell.contentView.subviews firstObject];
             // Must invoke synchronously otherwise it will remove the view just added.
-            [wxCellView.wx_component _unloadViewWithReusing:YES];
+            WXCellComponent *cellComponent = (WXCellComponent *)wxCellView.wx_component;
+            if (cellComponent.isRecycle) {
+                [wxCellView.wx_component _unloadViewWithReusing:YES];
+            }
         }
     }
 }
@@ -494,7 +497,6 @@
     if (!cellView) {
         cellView = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
         cellView.backgroundColor = [UIColor clearColor];
-    } else {
     }
     
     WXCellComponent *cell = [self cellForIndexPath:indexPath];
