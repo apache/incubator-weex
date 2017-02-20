@@ -20,5 +20,4 @@ import weex from './weex'
 
 init(weex)
 
-Object.freeze(weex)
 window.weex = weex
