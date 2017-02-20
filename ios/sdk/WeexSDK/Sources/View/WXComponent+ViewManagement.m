@@ -162,7 +162,9 @@
     }
     
     if (styles[@"transformOrigin"] || styles[@"transform"]) {
-        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance];
+        id transform = styles[@"transform"] ? : self.styles[@"transform"];
+        id transformOrigin = styles[@"transformOrigin"] ? : self.styles[@"transformOrigin"];
+        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:transform] origin:transformOrigin instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];
