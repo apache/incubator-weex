@@ -8,7 +8,7 @@ has_chapter_content: true
 
 # 快速上手
 
-Vue.js 是 Evan You 开发的渐进式 JavaScript 框架，在易用性、灵活性和性能等方面都非常优秀。开发者能够通过撰写 `*.vue` 文件，基于  `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。本章会教你如何搭建本地开发环境进行 Weex 开发。
+[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi) which is very ease and flexible to use. Developers can write `*.vue` files with friendly `<template>`, `<style>`, `<script>` tags to build componentized web app.本章会教你如何搭建本地开发环境进行 Weex 开发。
 
 开始之前，希望你能对 Weex 和 Vue 有基本的了解，推荐阅读 Weex Tutorial 和 Vue Introduction 了解更多信息。
 
