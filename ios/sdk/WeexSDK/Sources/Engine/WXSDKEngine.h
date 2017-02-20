@@ -13,7 +13,7 @@
 @interface WXSDKEngine : NSObject
 
 /**
- *  @abstract Register default modules/components/handlers, they will be reigstered only once.
+ *  @abstract Register default modules/components/handlers, they will be registered only once.
  **/
 + (void)registerDefaults;
 
@@ -101,7 +101,7 @@
 + (id)handlerForProtocol:(Protocol *)protocol;
 
 /**
- * @abstract Initializes the global sdk enviroment
+ * @abstract Initializes the global sdk environment
  *
  * @discussion Injects main.js in app bundle as default JSFramework script.
  *
@@ -109,7 +109,7 @@
 + (void)initSDKEnvironment;
 
 /**
- * @abstract Initializes the enviroment with a given JSFramework script.
+ * @abstract Initializes the environment with a given JSFramework script.
  *
  **/
 + (void)initSDKEnvironment:(NSString *)script;
@@ -126,6 +126,11 @@
 + (void)restart;
 
 /**
+ * @abstract restart Weex Engine with specify jsfm.
+ **/
++ (void)restartWithScript:(NSString*)script;
+
+/**
  * @abstract Returns the version of SDK
  *
  **/
@@ -138,7 +143,7 @@
 + (WXSDKInstance *)topInstance;
 
 /**
- * @abstract Add custom envionment variables 
+ * @abstract Add custom environment variables
  * @discuss These variables can be obtained by $getConfig().env
  *
  **/

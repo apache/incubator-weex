@@ -33,10 +33,14 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
 {
     WXThreadSafeMutableArray * array = nil;
     if (_eventCallback[event]) {
-        [_eventCallback[event] addObject:callback];
+        if (callback) {
+            [_eventCallback[event] addObject:callback];
+        }
     } else {
         array = [[WXThreadSafeMutableArray alloc] init];
-        [array addObject:callback];
+        if (callback) {
+            [array addObject:callback];
+        }
         _eventCallback[event] = array;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fireGlobalEvent:) name:event object:nil];
     }
@@ -58,7 +62,7 @@ WX_EXPORT_METHOD(@selector(removeEventListener:))
     NSString * userWeexInstanceId = userInfo[@"weexInstance"];
     /*
      1. The userWeexInstanceId param will be passed by globalEvent module notification.
-     2. The notification is posted by native user using Notificationcenter, native user don't need care about what the userWeexInstanceId is. What you do is to addEventListener in weex file using globalEvent module, and then post notification anywhere.
+     2. The notification is posted by native user using NotificationCenter, native user don't need care about what the userWeexInstanceId is. What you do is to addEventListener in weex file using globalEvent module, and then post notification anywhere.
      */
     WXSDKInstance * userWeexInstance = [WXSDKManager instanceForID:userWeexInstanceId];
      // In case that userInstanceId exists but instance has been dealloced

@@ -24,7 +24,7 @@
  *  750px Adaptive
  */
 typedef CGFloat WXPixelType;
-// @prameter scaleFactor: please use weexInstance's pixelScaleFactor property
+// @parameter scaleFactor: please use weexInstance's pixelScaleFactor property
 + (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 + (css_flex_direction_t)css_flex_direction_t:(id)value;
@@ -56,6 +56,7 @@ typedef BOOL WXClipType;
 + (CGFloat)WXTextWeight:(id)value;
 + (WXTextDecoration)WXTextDecoration:(id)value;
 + (NSTextAlignment)NSTextAlignment:(id)value;
++ (UIReturnKeyType)UIReturnKeyType:(id)value;
 
 + (WXScrollDirection)WXScrollDirection:(id)value;
 + (UITableViewRowAnimation)UITableViewRowAnimation:(id)value;

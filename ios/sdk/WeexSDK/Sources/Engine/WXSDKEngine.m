@@ -22,7 +22,7 @@
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXMonitor.h"
-#import "WXSimulatorShortcutMananger.h"
+#import "WXSimulatorShortcutManager.h"
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXUtility.h"
@@ -103,7 +103,7 @@
     if (!name || !clazz) {
         return;
     }
-    
+
     WXAssert(name && clazz, @"Fail to register the component, please check if the parameters are correct ！");
     
     [WXComponentFactory registerComponent:name withClass:clazz withPros:properties];
@@ -170,7 +170,7 @@
     WX_MONITOR_PERF_START(WXPTInitalize)
     WX_MONITOR_PERF_START(WXPTInitalizeSync)
     
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
     
@@ -179,7 +179,7 @@
 #if TARGET_OS_SIMULATOR
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [WXSimulatorShortcutMananger registerSimulatorShortcutWithKey:@"i" modifierFlags:UIKeyModifierCommand | UIKeyModifierAlternate action:^{
+        [WXSimulatorShortcutManager registerSimulatorShortcutWithKey:@"i" modifierFlags:UIKeyModifierCommand | UIKeyModifierAlternate action:^{
             NSURL *URL = [NSURL URLWithString:@"http://localhost:8687/launchDebugger"];
             NSURLRequest *request = [NSURLRequest requestWithURL:URL];
             
@@ -208,20 +208,18 @@
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
-    
-    [self registerDefaults];
-    
-    [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaults];
+        [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    });
 }
 
 + (void)registerDefaults
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self _registerDefaultComponents];
-        [self _registerDefaultModules];
-        [self _registerDefaultHandlers];
-    });
+    [self _registerDefaultComponents];
+    [self _registerDefaultModules];
+    [self _registerDefaultHandlers];
 }
 
 + (NSString*)SDKEngineVersion
@@ -256,13 +254,18 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+    [self restartWithScript:script];
+}
+
++ (void)restartWithScript:(NSString*)script
+{
     NSDictionary *components = [WXComponentFactory componentConfigs];
     NSDictionary *modules = [WXModuleFactory moduleConfigs];
     NSDictionary *handlers = [WXHandlerFactory handlerConfigs];
     [WXSDKManager unload];
     [WXComponentFactory unregisterAllComponents];
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"js"];
-    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     
     [self _originalRegisterComponents:components];
     [self _originalRegisterModules:modules];

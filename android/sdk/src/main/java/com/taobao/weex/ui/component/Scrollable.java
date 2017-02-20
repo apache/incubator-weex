@@ -206,6 +206,8 @@ package com.taobao.weex.ui.component;
 
 import android.view.ViewGroup;
 
+import java.util.Map;
+
 /**
  * Created by sospartan on 7/5/16.
  */
@@ -225,11 +227,19 @@ public interface Scrollable {
 
   ViewGroup getView();
 
-  void scrollTo(WXComponent component, int offset);
+  void scrollTo(WXComponent component, Map<String, Object> options);
 
   String getRef();
 
   int getScrollY();
 
   int getScrollX();
+
+  /**
+   *
+   * @return {@link com.taobao.weex.common.Constants.Orientation#HORIZONTAL} or {@link com.taobao.weex.common.Constants.Orientation#VERTICAL}
+   */
+  int getOrientation();
+
+  boolean isScrollable();
 }

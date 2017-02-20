@@ -6,11 +6,16 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "WXJSExceptionInfo.h"
 
-@interface WXSimulatorShortcutMananger : NSObject
+@protocol WXJSExceptionProtocol<NSObject>
 
-+ (void)registerSimulatorShortcutWithKey:(NSString *)key modifierFlags:(UIKeyModifierFlags)flags action:(dispatch_block_t)action;
+/**
+ * report js exception
+ *
+ * @param exception {@link WXJSException}
+ */
+
+- (void)onJSException:(WXJSExceptionInfo *)exception;
 
 @end

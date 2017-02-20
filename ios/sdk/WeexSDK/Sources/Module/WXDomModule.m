@@ -41,7 +41,7 @@ WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 
-- (void)performBlockOnComponentMananger:(void(^)(WXComponentManager *))block
+- (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
     if (!block) {
         return;
@@ -49,12 +49,12 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     __weak typeof(self) weakSelf = self;
     
     WXPerformBlockOnComponentThread(^{
-        WXComponentManager *mananger = weakSelf.weexInstance.componentManager;
-        if (!mananger.isValid) {
+        WXComponentManager *manager = weakSelf.weexInstance.componentManager;
+        if (!manager.isValid) {
             return;
         }
-        [mananger startComponentTasks];
-        block(mananger);
+        [manager startComponentTasks];
+        block(manager);
     });
 }
 - (void)performSelectorOnRuleManager:(void(^)(void))block{
@@ -73,84 +73,84 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 - (void)createBody:(NSDictionary *)body
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createRoot:body];
     }];
 }
 
 - (void)addElement:(NSString *)parentRef element:(NSDictionary *)element atIndex:(NSInteger)index
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
     }];
 }
 
 - (void)removeElement:(NSString *)ref
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager removeComponent:ref];
     }];
 }
 
 - (void)moveElement:(NSString *)elemRef parentRef:(NSString *)parentRef index:(NSInteger)index
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager moveComponent:elemRef toSuper:parentRef atIndex:index];
     }];
 }
 
 - (void)addEvent:(NSString *)elemRef event:(NSString *)event
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addEvent:event toComponent:elemRef];
     }];
 }
 
 - (void)removeEvent:(NSString *)elemRef event:(NSString *)event
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager removeEvent:event fromComponent:elemRef];
     }];
 }
 
 - (void)createFinish
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
 }
 
 - (void)updateFinish
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager updateFinish];
     }];
 }
 
 - (void)refreshFinish
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager refreshFinish];
     }];
 }
 
 - (void)scrollToElement:(NSString *)elemRef options:(NSDictionary *)dict
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager scrollToComponent:elemRef options:dict];
     }];
 }
 
 -(void)updateStyle:(NSString *)elemRef styles:(NSDictionary *)styles
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager updateStyles:styles forComponent:elemRef];
     }];
 }
 
 - (void)updateAttrs:(NSString *)elemRef attrs:(NSDictionary *)attrs
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager updateAttributes:attrs forComponent:elemRef];
     }];
 }
@@ -168,15 +168,17 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 }
 
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
-    [self performBlockOnComponentMananger:^(WXComponentManager * manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         UIView *rootView = manager.weexInstance.rootView;
         CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         if ([ref isEqualToString:@"viewport"]) {
             NSMutableDictionary * callbackRsp = nil;
             callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
             [callbackRsp setObject:@(true) forKey:@"result"];
-            callback(callbackRsp, false);
-        }else {
+            if (callback) {
+                callback(callbackRsp, false);
+            }
+        } else {
             WXComponent *component = [manager componentForRef:ref];
             __weak typeof (self) weakSelf = self;
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -184,22 +186,24 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
                     [callbackRsp setObject:@(false) forKey:@"result"];
-                    [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found",ref] forKey:@"errMsg"];
+                    [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found", ref] forKey:@"errMsg"];
                 } else {
                     CGRect componentRect = [component.view.superview convertRect:component.view.frame toView:rootView];
                     callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }
-                callback(callbackRsp, false);
+                if (callback) {
+                    callback(callbackRsp, false);
+                }
             });
-           
+
         }
     }];
 }
 
-- (void)destoryInstance
+- (void)destroyInstance
 {
-    [self performBlockOnComponentMananger:^(WXComponentManager *manager) {
+    [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager unload];
     }];
 }

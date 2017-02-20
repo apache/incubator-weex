@@ -86,12 +86,12 @@ _Pragma("clang diagnostic pop") \
     
     _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
     
-    [self registerGlobalFuntions];
+    [self registerGlobalFunctions];
     
     return _jsBridge;
 }
 
-- (void)registerGlobalFuntions
+- (void)registerGlobalFunctions
 {
     __weak typeof(self) weakSelf = self;
     [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {

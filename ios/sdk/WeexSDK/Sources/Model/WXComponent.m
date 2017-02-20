@@ -229,7 +229,7 @@
         [self viewDidLoad];
         
         if (_lazyCreateView) {
-            [self _buildViewHierachyLazily];
+            [self _buildViewHierarchyLazily];
         }
         
         [self _handleFirstScreenTime];
@@ -238,7 +238,7 @@
     }
 }
 
-- (void)_buildViewHierachyLazily
+- (void)_buildViewHierarchyLazily
 {
     if (self.supercomponent && !((WXComponent *)self.supercomponent)->_lazyCreateView) {
         NSArray *subcomponents = ((WXComponent *)self.supercomponent).subcomponents;
@@ -357,10 +357,10 @@
 
 - (id<WXScrollerProtocol>)ancestorScroller
 {
-    if(!_ancestorScroller){
+    if(!_ancestorScroller) {
         WXComponent *supercomponent = self.supercomponent;
         while (supercomponent) {
-            if([supercomponent conformsToProtocol:@protocol(WXScrollerProtocol)]){
+            if([supercomponent conformsToProtocol:@protocol(WXScrollerProtocol)]) {
                 _ancestorScroller = (id<WXScrollerProtocol>)supercomponent;
                 break;
             }

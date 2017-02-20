@@ -31,7 +31,7 @@
         if (attributes[@"display"]) {
             if ([attributes[@"display"] isEqualToString:@"show"]) {
                 _displayState = YES;
-            } else if ([attributes[@"display"] isEqualToString:@"hide"]){
+            } else if ([attributes[@"display"] isEqualToString:@"hide"]) {
                 _displayState = NO;
             } else {
                 WXLogError(@"");
@@ -101,7 +101,7 @@
 
 - (void)loading
 {
-    if (!_loadingEvent)
+    if (!_loadingEvent || _displayState)
         return;
     
     [self fireEvent:@"loading" params:nil];

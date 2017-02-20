@@ -47,7 +47,7 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, weak) NSString *parentNodeRef;
 
 /**
- * The unique id to indentify current weex instance.
+ * The unique id to identify current weex instance.
  **/
 @property (nonatomic, strong) NSString *instanceId;
 

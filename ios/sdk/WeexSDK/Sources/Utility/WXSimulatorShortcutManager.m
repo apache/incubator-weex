@@ -6,13 +6,13 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXSimulatorShortcutMananger.h"
+#import "WXSimulatorShortcutManager.h"
 #import "WXUtility.h"
 #import <objc/message.h>
 
 #if TARGET_OS_SIMULATOR
 
-@interface UIEvent (WXSimulatorShortcutMananger)
+@interface UIEvent (WXSimulatorShortcutManager)
 
 @property (nonatomic, strong) NSString *_modifiedInput;
 @property (nonatomic, strong) NSString *_unmodifiedInput;
@@ -54,14 +54,14 @@
 @end
 
 
-@implementation WXSimulatorShortcutMananger
+@implementation WXSimulatorShortcutManager
 {
     NSCache *_actions;
 }
 
 + (instancetype)sharedManager
 {
-    static WXSimulatorShortcutMananger *_sharedInstance = nil;
+    static WXSimulatorShortcutManager *_sharedInstance = nil;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
         _sharedInstance = [[self alloc] init];
@@ -79,7 +79,7 @@
 + (void)registerSimulatorShortcutWithKey:(NSString *)key modifierFlags:(UIKeyModifierFlags)flags action:(dispatch_block_t)action
 {
     WXKeyInput *keyInput = [WXKeyInput keyInputForKey:key flags:flags];
-    [[WXSimulatorShortcutMananger sharedManager]->_actions setObject:action forKey:keyInput];
+    [[WXSimulatorShortcutManager sharedManager]->_actions setObject:action forKey:keyInput];
 }
 
 - (void)handleKeyUIEvent:(UIEvent *)event
@@ -88,19 +88,19 @@
     NSString *modifiedInput = nil;
     NSString *unmodifiedInput = nil;
     UIKeyModifierFlags flags = 0;
-    if ([event respondsToSelector:@selector(_isKeyDown)]) {
+    if ([event respondsToSelector:NSSelectorFromString(@"_isKeyDown")]) {
         isKeyDown = [event _isKeyDown];
     }
     
-    if ([event respondsToSelector:@selector(_modifiedInput)]) {
+    if ([event respondsToSelector:NSSelectorFromString(@"_modifiedInput")]) {
         modifiedInput = [event _modifiedInput];
     }
     
-    if ([event respondsToSelector:@selector(_unmodifiedInput)]) {
+    if ([event respondsToSelector:NSSelectorFromString(@"_unmodifiedInput")]) {
         unmodifiedInput = [event _unmodifiedInput];
     }
     
-    if ([event respondsToSelector:@selector(_modifierFlags)]) {
+    if ([event respondsToSelector:NSSelectorFromString(@"_modifierFlags")]) {
         flags = [event _modifierFlags];
     }
     

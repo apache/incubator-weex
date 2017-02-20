@@ -50,7 +50,7 @@
                    data:(id)data;
 
 /**
- *  Update Instacne State Method
+ *  Update Instance State Method
  *  @param instance  :   instance id
  *  @param data      :   parameters
  **/
@@ -101,7 +101,7 @@
 
 /**
  *  Log To WebSocket
- *  @param flag      :   the tag to indentify
+ *  @param flag      :   the tag to identify
  *  @param message   :   message to output
  **/
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message;

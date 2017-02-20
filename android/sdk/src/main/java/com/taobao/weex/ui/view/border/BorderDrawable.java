@@ -218,6 +218,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
@@ -386,17 +387,10 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  /**
-   * This method is only used for Unit test, do not call this method, use
-   * {@link #getBorderRadius(SparseArray, int)} instead.
-   * @param position the index of the edge
-   * @return the radius considering border-overlapping of the corner.
-   */
-  @Deprecated
+  @VisibleForTesting
   float getBorderRadius(int position) {
     return getBorderRadius(mOverlappingBorderRadius, position);
   }
-
 
   public
   @NonNull
