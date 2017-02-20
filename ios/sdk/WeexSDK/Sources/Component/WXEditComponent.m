@@ -185,6 +185,24 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
 }
 
+-(void)setSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
+{
+    if(selectionStart>self.text.length || selectionEnd>self.text.length) {
+        return;
+    }
+    [self.view becomeFirstResponder];
+    [self setEditSelectionRange:selectionStart selectionEnd:selectionEnd];
+}
+
+-(void)getSelectionRange:(WXCallback)callback
+{
+    NSDictionary *res = [self getEditSelectionRange];
+    if(callback) {
+        callback(res);
+    }
+}
+
+
 #pragma mark - Overwrite Method
 -(NSString *)text
 {
@@ -219,12 +237,13 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 {
 }
 
--(void)setSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
+-(void)setEditSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
 {
 }
 
--(void)getSelectionRange:(WXCallback)callback
+-(NSDictionary *)getEditSelectionRange
 {
+    return @{};
 }
 
 -(void)setKeyboardType:(UIKeyboardType)keyboardType

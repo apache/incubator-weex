@@ -127,12 +127,8 @@
     [_inputView setFont:font];
 }
 
--(void)setSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
+-(void)setEditSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
 {
-    if(selectionStart>self.inputView.text.length || selectionEnd>self.inputView.text.length) {
-        return;
-    }
-    [self.inputView becomeFirstResponder];
     UITextPosition *startPos =  [self.inputView positionFromPosition:self.inputView.beginningOfDocument offset:selectionStart];
     UITextPosition *endPos = [self.inputView positionFromPosition:self.inputView.beginningOfDocument offset:selectionEnd];
     UITextRange *textRange = [self.inputView textRangeFromPosition:startPos
@@ -140,14 +136,12 @@
     self.inputView.selectedTextRange = textRange;
 }
 
--(void)getSelectionRange:(WXCallback)callback
+-(NSDictionary *)getEditSelectionRange
 {
     NSInteger selectionStart = [self.inputView offsetFromPosition:self.inputView.beginningOfDocument toPosition:self.inputView.selectedTextRange.start];
     NSInteger selectionEnd = [self.inputView offsetFromPosition:self.inputView.beginningOfDocument toPosition:self.inputView.selectedTextRange.end];
     NSDictionary *res = @{@"selectionStart":@(selectionStart),@"selectionEnd":@(selectionEnd)};
-    if(callback) {
-        callback(res);
-    }
+    return res;
 }
 
 @end

@@ -12,7 +12,6 @@ typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
 
-//attribute
 @property (nonatomic, strong) WXTextAreaView *textView;
 
 @end
@@ -81,11 +80,8 @@ typedef UITextView WXTextAreaView;
     [_textView setInputAccessoryView:inputAccessoryView];
 }
 
--(void)setSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
+-(void)setEditSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
 {
-    if(selectionStart>self.textView.text.length || selectionEnd>self.textView.text.length) {
-        return;
-    }
     [self.textView becomeFirstResponder];
     UITextPosition *startPos =  [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionStart];
     UITextPosition *endPos = [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionEnd];
@@ -94,14 +90,12 @@ typedef UITextView WXTextAreaView;
     self.textView.selectedTextRange = textRange;
 }
 
--(void)getSelectionRange:(WXCallback)callback
+-(NSDictionary *)getEditSelectionRange
 {
     NSInteger selectionStart = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.start];
     NSInteger selectionEnd = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.end];
     NSDictionary *res = @{@"selectionStart":@(selectionStart),@"selectionEnd":@(selectionEnd)};
-    if (callback) {
-        callback(res);
-    }
+    return res;
 }
 
 -(void)setKeyboardType:(UIKeyboardType)keyboardType
