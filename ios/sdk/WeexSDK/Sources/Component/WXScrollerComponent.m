@@ -438,12 +438,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     UIEdgeInsets inset = [scrollView contentInset];
-    if ([_refreshComponent displayState]) {
-        inset.top = _refreshComponent.view.frame.size.height;
-    }
-    else {
-        inset.top = 0;
-    }
+    
+    // currently only set contentInset when loading
+//    if ([_refreshComponent displayState]) {
+//        inset.top = _refreshComponent.view.frame.size.height;
+//    }
+//    else {
+//        inset.top = 0;
+//    }
     if ([_loadingComponent displayState]) {
         inset.bottom = _loadingComponent.view.frame.size.height;
     } else {
