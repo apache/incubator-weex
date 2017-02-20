@@ -254,11 +254,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 {
 }
 
--(void)setViewPadding:(UIEdgeInsets)padding
+-(void)setEditPadding:(UIEdgeInsets)padding
 {
 }
 
--(void)setViewBorder:(UIEdgeInsets)border
+-(void)setEditBorder:(UIEdgeInsets)border
 {
 }
 
@@ -668,13 +668,13 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 - (void)setPadding:(UIEdgeInsets)padding
 {
     _padding = padding;
-    [self setViewPadding:padding];
+    [self setEditPadding:padding];
 }
 
 - (void)setBorder:(UIEdgeInsets)border
 {
     _border = border;
-    [self setViewBorder:border];
+    [self setEditBorder:border];
 }
 
 #pragma mark update touch styles

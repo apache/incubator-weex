@@ -108,11 +108,11 @@
 {
     _inputView.secureTextEntry = secureTextEntry;
 }
--(void)setViewPadding:(UIEdgeInsets)padding
+-(void)setEditPadding:(UIEdgeInsets)padding
 {
     [_inputView setPadding:padding];
 }
--(void)setViewBorder:(UIEdgeInsets)border
+-(void)setEditBorder:(UIEdgeInsets)border
 {
     [_inputView setBorder:border];
 }

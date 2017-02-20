@@ -108,12 +108,12 @@ typedef UITextView WXTextAreaView;
     [_textView setSecureTextEntry:secureTextEntry];
 }
 
--(void)setViewPadding:(UIEdgeInsets)padding
+-(void)setEditPadding:(UIEdgeInsets)padding
 {
     [self _updateTextContentInset];
 }
 
--(void)setViewBorder:(UIEdgeInsets)border
+-(void)setEditBorder:(UIEdgeInsets)border
 {
     [self _updateTextContentInset];
 }
