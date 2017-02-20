@@ -21,3 +21,4 @@ import weex from './weex'
 init(weex)
 
 window.weex = weex
+window.global = window

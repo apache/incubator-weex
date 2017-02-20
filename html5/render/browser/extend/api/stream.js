@@ -19,7 +19,7 @@ function _jsonp (config, callback, progressCallback) {
     console.error('[h5-render] config.url should be set in _jsonp for \'fetch\' API.')
   }
 
-  window[cbName] = (function (cb) {
+  global[cbName] = (function (cb) {
     return function (response) {
       callback({
         status: 200,
@@ -27,7 +27,7 @@ function _jsonp (config, callback, progressCallback) {
         statusText: 'OK',
         data: response
       })
-      delete window[cb]
+      delete global[cb]
     }
   })(cbName)
 
@@ -53,7 +53,7 @@ function _jsonp (config, callback, progressCallback) {
         statusText: '',
         data: ''
       })
-      delete window[cb]
+      delete global[cb]
     }
   })(cbName)
   const head = document.getElementsByTagName('head')[0]
