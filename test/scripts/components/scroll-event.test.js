@@ -21,6 +21,12 @@ describe('list scroll event', function () {
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),100)
   });
 
+  after(function () {
+      return driver
+      .sleep(1000)
+      .quit()
+  })
+
 
   it('#1 Drag list', () => {
     return driver
@@ -62,6 +68,12 @@ describe('scroller scroll event', function () {
       .get('wxpage://' + util.getDeviceHost() +'/scroller-scroll.js')
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),100)
   });
+
+  after(function () {
+      return driver
+      .sleep(1000)
+      .quit()
+  })
 
 
   it('#1 Drag scroller', () => {
