@@ -6,20 +6,21 @@ var os = require('os')
 var platform = process.env.platform || 'android';
 platform = platform.toLowerCase();
 
+const isIOS = platform === 'ios';
+const isRunInCI = process.env.run_in_ci?true:false;
+
 var iOSOpts = {
   deviceName: 'iPhone 6',
   platformName: 'iOS',
-  //reuse:2,
+  slowEnv: isRunInCI,
   app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
 };
 
 var androidOpts = {
   platformName: 'Android',
+  slowEnv: isRunInCI,
   app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground.apk`)
 };
-
-const isIOS = platform === 'ios';
-const isRunInCI = process.env.run_in_ci?true:false;
 
 if(isRunInCI){
     console.log("Running in CI Envirment");
