@@ -11,7 +11,7 @@ function buildAndroid {
 }
 function runAndroid {
     buildAndroid
-    platform=android macaca run -d $1 --verbose
+    platform=android macaca run -d $1
 }
 
 function buildiOS {
@@ -40,7 +40,7 @@ function runiOS {
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     ps -ef
-    platform=ios macaca run -d $1 --verbose
+    platform=ios macaca run -d $1
 }
 
 platform_android='android'
