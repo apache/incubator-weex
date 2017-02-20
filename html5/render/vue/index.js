@@ -1,4 +1,4 @@
-import semver from 'semver'
+// import semver from 'semver'
 import { setViewport } from './env'
 import * as components from './components'
 import styleMixin from './mixins/style'
