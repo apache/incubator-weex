@@ -1,5 +1,5 @@
 ---
-title: Intro 
+title: Intro
 type: guide
 order: 4
 has_chapter_content: false
