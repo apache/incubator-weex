@@ -17,6 +17,7 @@ export default {
    */
   scrollToElement: function (vnode, options) {
     const scroller = getParentScroller(vnode)
+    const scrollDirection = scroller.scrollDirection || 'vertical'
 
     if (scroller && scroller.$el && vnode.$el) {
       // get the 'weex-scroller-inner' div.
@@ -26,8 +27,10 @@ export default {
       const dSuffix = ({
         horizontal: 'Left',
         vertical: 'Top'
-      })[scroller.scrollDirection || 'vertical']
+      })[scrollDirection]
       let offset = vnode.$el[`offset${dSuffix}`]
+
+      const scrollCt = scrollDirection === 'horizontal' ? innerScroller : scroller.$el
 
       if (options) {
         offset += Number(options.offset) || 0
@@ -38,7 +41,7 @@ export default {
       }
 
       // TODO: add animation
-      innerScroller[`scroll${dSuffix}`] = offset
+      scrollCt[`scroll${dSuffix}`] = offset
     }
   },
 
