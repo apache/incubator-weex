@@ -217,9 +217,12 @@
 
 + (void)registerDefaults
 {
-    [self _registerDefaultComponents];
-    [self _registerDefaultModules];
-    [self _registerDefaultHandlers];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self _registerDefaultComponents];
+        [self _registerDefaultModules];
+        [self _registerDefaultHandlers];
+    });
 }
 
 + (NSString*)SDKEngineVersion

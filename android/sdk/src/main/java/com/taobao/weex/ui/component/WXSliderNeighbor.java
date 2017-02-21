@@ -302,7 +302,7 @@ public class WXSliderNeighbor extends WXSlider {
     }
 
     @Override
-    protected void addSubView(View view, int index) {
+    protected void addSubView(View view, final int index) {
         if (view == null || mAdapter == null) {
             return;
         }
@@ -320,15 +320,26 @@ public class WXSliderNeighbor extends WXSlider {
 
         updateAdapterScaleAndAlpha(mNeighborAlpha, mNeighborScale); // we need to set neighbor view status when added.
 
-        try {
-            // prevent a bug of init status. ZoomTransformer no called as excepted.
-            mViewPager.beginFakeDrag();
-            mViewPager.fakeDragBy(1); // must be 1
-            mViewPager.endFakeDrag();
-        }catch (IndexOutOfBoundsException e){
-            //do nothing
-        }
-
+        mViewPager.postDelayed(WXThread.secure(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(mViewPager.getRealCount() > 0 && index > 2) { // index > 2 mean more than two times, then need a fake drag
+                        // prevent a bug of init status. ZoomTransformer no called as excepted.
+                        mViewPager.beginFakeDrag();
+                        mViewPager.fakeDragBy(1); // must be 1
+                    }
+                }catch (IndexOutOfBoundsException e){
+                    // do nothing
+                } finally {
+                    try {
+                        mViewPager.endFakeDrag();
+                    }catch (Exception e) {
+                        // do nothing
+                    }
+                }
+            }
+        }), 50);
     }
 
     private void updateScaleAndAlpha(View view, float alpha, float scale) {
