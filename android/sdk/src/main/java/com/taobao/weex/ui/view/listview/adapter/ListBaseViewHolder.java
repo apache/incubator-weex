@@ -231,6 +231,13 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
     mViewType = viewType;
   }
 
+
+  public boolean canRecycled(){
+    if (mComponent!=null && mComponent.get() != null) {
+        return mComponent.get().canRecycled();
+    }
+    return true;
+  }
   public View getView() {
     return itemView;
   }
@@ -239,8 +246,7 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
     return mViewType;
   }
   public void setComponentUsing(boolean using){
-    if(mComponent!=null)
-      if (mComponent.get() != null)
+    if(mComponent!=null && mComponent.get() != null)
         mComponent.get().setUsing(using);
   }
   public WXComponent getComponent(){

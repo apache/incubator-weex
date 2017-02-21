@@ -297,6 +297,7 @@ public class Constants {
     String SHOW_SCROLLBAR = "showScrollbar";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
+    String RECYCLE = "recycle";
     String LOADMORERETRY = "loadmoreretry";
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
@@ -343,6 +344,9 @@ public class Constants {
     String CONTENT_OFFSET = "contentOffset";
     String X = "x";
     String Y = "y";
+    String RETURN_KEY_TYPE = "returnKeyType";
+    String OFFSET = "offset";
+    String ANIMATED = "animated";
   }
 
   public interface Value {
@@ -408,6 +412,7 @@ public class Constants {
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
+    String RETURN = "return";
   }
 
   public interface PSEUDO {
