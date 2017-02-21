@@ -225,7 +225,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
-  private boolean mIsDestoryed = false;
+  private boolean mIsDestroyed = false;
+  private boolean mCanRecycled = true;
+
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -319,6 +321,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mParent = parent;
     mDomObj = dom.clone();
     mCurrentRef = mDomObj.getRef();
+    mCanRecycled = dom.canRecycled();
     mGestureType = new HashSet<>();
     ++mComponentNum;
     onCreate();
@@ -1301,11 +1304,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mDomObj = null;
     }
 
-    mIsDestoryed = true;
+    mIsDestroyed = true;
   }
 
   public boolean isDestoryed() {
-    return mIsDestoryed;
+    return mIsDestroyed;
   }
 
   /**
@@ -1458,6 +1461,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   public int getStickyOffset() {
     return mStickyOffset;
+  }
+
+  public boolean canRecycled(){
+    return mCanRecycled;
   }
 
   /**

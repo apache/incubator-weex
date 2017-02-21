@@ -5,7 +5,7 @@ echo ''
 echo 'packing weex-html5 for distribution...'
 
 src_dir=./html5
-base_dir=./dist/weex-html5
+base_dir=./packages/weex-html5
 dist_dir=${base_dir}/dist
 
 # get version of weex-html5 from subversion of main package.json.
