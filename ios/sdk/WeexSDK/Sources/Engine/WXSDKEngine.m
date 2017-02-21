@@ -7,6 +7,7 @@
  */
 
 #import "WXSDKEngine.h"
+#import "WXDebugTool.h"
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
@@ -207,20 +208,18 @@
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
-    
-    [self registerDefaults];
-    
-    [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaults];
+        [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    });
 }
 
 + (void)registerDefaults
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self _registerDefaultComponents];
-        [self _registerDefaultModules];
-        [self _registerDefaultHandlers];
-    });
+    [self _registerDefaultComponents];
+    [self _registerDefaultModules];
+    [self _registerDefaultHandlers];
 }
 
 + (NSString*)SDKEngineVersion
@@ -255,19 +254,33 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+    [self restartWithScript:script];
+}
+
++ (void)restartWithScript:(NSString*)script
+{
     NSDictionary *components = [WXComponentFactory componentConfigs];
     NSDictionary *modules = [WXModuleFactory moduleConfigs];
     NSDictionary *handlers = [WXHandlerFactory handlerConfigs];
     [WXSDKManager unload];
     [WXComponentFactory unregisterAllComponents];
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
-    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     
     [self _originalRegisterComponents:components];
     [self _originalRegisterModules:modules];
     [self _originalRegisterHandlers:handlers];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    
+    NSDictionary *jsSerices = [WXDebugTool jsServiceCache];
+    for(NSString *serviceName in jsSerices) {
+        NSDictionary *service = [jsSerices objectForKey:serviceName];
+        NSString *serviceName = [service objectForKey:@"name"];
+        NSString *serviceScript = [service objectForKey:@"script"];
+        NSDictionary *serviceOptions = [service objectForKey:@"options"];
+        [WXSDKEngine registerService:serviceName withScript:serviceScript withOptions:serviceOptions];
+    }
 }
 
 + (void)connectDebugServer:(NSString*)URL

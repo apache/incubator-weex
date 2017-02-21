@@ -225,7 +225,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
-  private boolean mIsDestoryed = false;
+  private boolean mIsDestroyed = false;
+  private boolean mCanRecycled = true;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -319,6 +320,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mParent = parent;
     mDomObj = dom.clone();
     mCurrentRef = mDomObj.getRef();
+    mCanRecycled = dom.canRecycled();
     mGestureType = new HashSet<>();
     ++mComponentNum;
     onCreate();
@@ -671,7 +673,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         Boolean disabled = WXUtils.getBoolean(param,null);
         if (disabled != null) {
           setDisabled(disabled);
-          setPseudoClassStatus(Constants.PESUDO.DISABLED, disabled);
+          setPseudoClassStatus(Constants.PSEUDO.DISABLED, disabled);
         }
         return true;
       case Constants.Name.POSITION:
@@ -1301,11 +1303,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       mDomObj = null;
     }
 
-    mIsDestoryed = true;
+    mIsDestroyed = true;
   }
 
   public boolean isDestoryed() {
-    return mIsDestoryed;
+    return mIsDestroyed;
   }
 
   /**
@@ -1408,7 +1410,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   private void setActiveTouchListener(){
-    boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PESUDO.ACTIVE);
+    boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PSEUDO.ACTIVE);
     View view;
     if(hasActivePesudo && (view = getRealView()) != null) {
       boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || mGesture != null;
@@ -1418,7 +1420,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   @Override
   public void updateActivePseudo(boolean isSet) {
-    setPseudoClassStatus(Constants.PESUDO.ACTIVE,isSet);
+    setPseudoClassStatus(Constants.PSEUDO.ACTIVE,isSet);
   }
 
   /**
@@ -1460,6 +1462,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mStickyOffset;
   }
 
+  public boolean canRecycled(){
+    return mCanRecycled;
+  }
+  
   /**
    * Sets the offset for the sticky
    * @param stickyOffset child[y]-parent[y]

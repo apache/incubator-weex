@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -1220,7 +1220,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       getContext().unregisterReceiver(mGlobalEventReceiver);
       mGlobalEventReceiver=null;
     }
-
     if(mRootComp != null ) {
       mRootComp.destroy();
       destroyView(mRenderContainer);

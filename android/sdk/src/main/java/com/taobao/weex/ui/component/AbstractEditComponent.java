@@ -225,6 +225,7 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
@@ -233,7 +234,9 @@ import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -248,6 +251,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private String mMax = null;
   private String mMin = null;
   private String mLastValue = "";
+  private int mEditorAction = EditorInfo.IME_ACTION_DONE;
+  private String mReturnKeyType = null;
+  private List<TextView.OnEditorActionListener> mEditorActionListeners;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -270,7 +276,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         if (!hasFocus) {
           decideSoftKeyboard();
         }
-        setPseudoClassStatus(Constants.PESUDO.FOCUS,hasFocus);
+        setPseudoClassStatus(Constants.PSEUDO.FOCUS,hasFocus);
       }
     });
   }
@@ -351,10 +357,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }
       });
 
-      getHostView().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+      addEditorActionListener(new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-          if (actionId == EditorInfo.IME_ACTION_DONE) {
+          if (actionId == mEditorAction) {
             CharSequence newValue = text.getText();
             newValue = newValue == null ? "" : newValue;
             if (!newValue.toString().equals(mLastValue)) {
@@ -393,6 +399,22 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         @Override
         public void afterTextChanged(Editable s) {
 
+        }
+      });
+    }
+
+    if (Constants.Event.RETURN.equals(type)) {
+      addEditorActionListener(new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+          if (actionId == mEditorAction) {
+            Map<String, Object> ret = new HashMap<>(2);
+            ret.put("returnKeyType", mReturnKeyType);
+            ret.put("value", v.getText().toString());
+            fireEvent(Constants.Event.RETURN, ret);
+            return true;
+          }
+          return false;
         }
       });
     }
@@ -482,8 +504,45 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       case Constants.Name.MIN:
         setMin(String.valueOf(param));
         return true;
+      case Constants.Name.RETURN_KEY_TYPE:
+        setReturnKeyType(String.valueOf(param));
+        return true;
     }
     return super.setProperty(key, param);
+  }
+
+  @WXComponentProp(name = Constants.Name.RETURN_KEY_TYPE)
+  public void setReturnKeyType(String type) {
+    if (getHostView() == null) {
+      return;
+    }
+    mReturnKeyType = type;
+    switch (type) {
+      case ReturnTypes.DEFAULT:
+        mEditorAction = EditorInfo.IME_ACTION_UNSPECIFIED;
+        break;
+      case ReturnTypes.GO:
+        mEditorAction = EditorInfo.IME_ACTION_GO;
+        break;
+      case ReturnTypes.NEXT:
+        mEditorAction = EditorInfo.IME_ACTION_NEXT;
+        break;
+      case ReturnTypes.SEARCH:
+        mEditorAction = EditorInfo.IME_ACTION_SEARCH;
+        break;
+      case ReturnTypes.SEND:
+        mEditorAction = EditorInfo.IME_ACTION_SEND;
+        break;
+      case ReturnTypes.DONE:
+        mEditorAction = EditorInfo.IME_ACTION_DONE;
+        break;
+      default:
+        break;
+    }
+
+    //remove focus and hide keyboard first, the ImeOptions will take effect when show keyboard next time
+    blur();
+    getHostView().setImeOptions(mEditorAction);
   }
 
   @WXComponentProp(name = Constants.Name.PLACEHOLDER)
@@ -749,5 +808,66 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }, 16);
       }
     }
+  }
+
+  @JSMethod
+  public void setSelectionRange(int selectionStart, int selectionEnd) {
+    EditText hostView;
+    if ((hostView = getHostView()) != null) {
+      focus();
+      hostView.setSelection(selectionStart, selectionEnd);
+    }
+  }
+
+  @JSMethod
+  public void getSelectionRange(String callbackId) {
+    EditText hostView;
+    Map<String, Object> result = new HashMap<>(2);
+    if ((hostView = getHostView()) != null) {
+      int start = hostView.getSelectionStart();
+      int end = hostView.getSelectionEnd();
+
+      if (!hostView.hasFocus()) {
+        //The default behavior, same as iOS and web
+        start = 0;
+        end = 0;
+      }
+
+      result.put(Constants.Name.SELECTION_START, start);
+      result.put(Constants.Name.SELECTION_END, end);
+    }
+    WXBridgeManager.getInstance().callback(getInstanceId(), callbackId, result, false);
+  }
+
+  protected final void addEditorActionListener(TextView.OnEditorActionListener listener) {
+    TextView view;
+    if (listener != null && (view = getHostView()) != null) {
+      if (mEditorActionListeners == null) {
+        mEditorActionListeners = new ArrayList<>();
+        view.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+          private boolean handled = true;
+
+          @Override
+          public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            for (TextView.OnEditorActionListener l : mEditorActionListeners) {
+              if (l != null) {
+                handled = handled & l.onEditorAction(v, actionId, event);
+              }
+            }
+            return handled;
+          }
+        });
+      }
+      mEditorActionListeners.add(listener);
+    }
+  }
+
+  private interface ReturnTypes {
+    String DEFAULT = "default";
+    String GO = "go";
+    String NEXT = "next";
+    String SEARCH = "search";
+    String SEND = "send";
+    String DONE = "done";
   }
 }

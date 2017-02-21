@@ -210,6 +210,7 @@ import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -233,11 +234,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomModule;
-import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXFileUtils;
-import com.taobao.weex.utils.WXHack;
-import com.taobao.weex.utils.WXHack.HackDeclaration.HackAssertionException;
-import com.taobao.weex.utils.WXHack.HackedClass;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -245,6 +242,8 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -358,25 +357,36 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void initWXBridge(boolean remoteDebug) {
-    if (WXEnvironment.isApkDebugable()) {
-      if (remoteDebug) {
-        WXEnvironment.sDebugServerConnectable = true;
-      }
+    if (remoteDebug) {
+      WXEnvironment.sDebugServerConnectable = true;
+    }
 
-      if (mWxDebugProxy != null) {
-        mWxDebugProxy.stop(false);
-      }
-      if (WXEnvironment.sDebugServerConnectable) {
-        try {
-          HackedClass<Object> debugProxyClass = WXHack.into("com.taobao.weex.devtools.debug.DebugServerProxy");
-          mWxDebugProxy = (IWXDebugProxy) debugProxyClass.constructor(Context.class, WXBridgeManager.class)
-              .getInstance(WXEnvironment.getApplication(), WXBridgeManager.this);
-          if (mWxDebugProxy != null) {
-            mWxDebugProxy.start();
+    if (mWxDebugProxy != null) {
+      mWxDebugProxy.stop(false);
+    }
+    if (WXEnvironment.sDebugServerConnectable) {
+      try {
+        Class clazz =  Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+        if (clazz != null) {
+          Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
+          if (constructor != null) {
+            mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
+                WXEnvironment.getApplication(), WXBridgeManager.this);
+            if (mWxDebugProxy != null) {
+              mWxDebugProxy.start();
+            }
           }
-        } catch (HackAssertionException e) {
-          WXLogUtils.e("initWXBridge HackAssertionException ", e);
         }
+      } catch (ClassNotFoundException e) {
+        // ignore
+      } catch (NoSuchMethodException e) {
+        // ignore
+      } catch (InstantiationException e) {
+        // ignore
+      } catch (IllegalAccessException e) {
+        // ignore
+      } catch (InvocationTargetException e) {
+        // ignore
       }
     }
     if (remoteDebug && mWxDebugProxy != null) {
@@ -995,21 +1005,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXJSObject[] args = {obj};
         invokeExecJS("", null, METHOD_SET_TIMEOUT, args);
         break;
-      case WXJSBridgeMsgType.MODULE_TIMEOUT:
-        if(msg.obj == null){
-          break;
-        }
-        args = createTimerArgs(msg.arg1, (Integer) msg.obj, false);
-        invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
-        break;
-      case WXJSBridgeMsgType.MODULE_INTERVAL:
-        if(msg.obj == null){
-          break;
-        }
-        WXTimerModule.setInterval((Integer) msg.obj, msg.arg2, msg.arg1);
-        args = createTimerArgs(msg.arg1, (Integer) msg.obj, true);
-        invokeExecJS(String.valueOf(msg.arg1), null, METHOD_CALL_JS, args);
-        break;
       default:
         break;
     }
@@ -1020,7 +1015,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     invokeExecJS(instanceId, namespace, function, args, true);
   }
 
-  private void invokeExecJS(String instanceId, String namespace, String function,
+  public void invokeExecJS(String instanceId, String namespace, String function,
                             WXJSObject[] args,boolean logTaskDetail){
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("callJS >>>> instanceId:").append(instanceId)
@@ -1031,21 +1026,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       mLodBuilder.setLength(0);
     }
     mWXBridge.execJS(instanceId, namespace, function, args);
-  }
-
-  private WXJSObject[] createTimerArgs(int instanceId, int funcId, boolean keepAlive) {
-    ArrayList<Object> argsList = new ArrayList<>();
-    argsList.add(funcId);
-    argsList.add(new HashMap<>());
-    argsList.add(keepAlive);
-    WXHashMap<String, Object> task = new WXHashMap<>();
-    task.put(KEY_METHOD, METHOD_CALLBACK);
-    task.put(KEY_ARGS, argsList);
-    Object[] tasks={task};
-    return new WXJSObject[]{
-        new WXJSObject(WXJSObject.String, String.valueOf(instanceId)),
-        new WXJSObject(WXJSObject.JSON,
-                       WXJsonUtils.fromObjectToJSONString(tasks))};
   }
 
   private void invokeInitFramework(Message msg) {   
@@ -1346,6 +1326,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         invokeExecJS("", null, METHOD_NOTIFY_TRIM_MEMORY, new WXJSObject[0]);
       }
     });
+  }
+
+  public
+  @Nullable
+  Looper getJSLooper() {
+    Looper ret = null;
+    if (mJSThread != null) {
+      ret = mJSThread.getLooper();
+    }
+    return ret;
   }
 
 }
