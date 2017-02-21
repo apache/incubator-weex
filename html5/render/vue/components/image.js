@@ -44,7 +44,8 @@ export default {
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': this.src
+        'img-src': this.src,
+        'img-placeholder': this.placeholder
       },
       on: this.createEventMap(['load']),
       staticClass: 'weex-image',
