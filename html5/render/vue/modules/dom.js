@@ -17,9 +17,16 @@ export default {
    */
   scrollToElement: function (vnode, options) {
     const scroller = getParentScroller(vnode)
+    const scrollDirection = scroller.scrollDirection || 'vertical'
 
     if (scroller && scroller.$el && vnode.$el) {
-      let offset = vnode.$el.offsetTop
+      // if it's a list, then the listVnode.scrollDirection is undefined. just
+      // assum it is the default value 'vertical'.
+      const dSuffix = ({
+        horizontal: 'Left',
+        vertical: 'Top'
+      })[scrollDirection]
+      let offset = vnode.$el[`offset${dSuffix}`]
 
       if (options) {
         offset += Number(options.offset) || 0
@@ -30,7 +37,7 @@ export default {
       }
 
       // TODO: add animation
-      scroller.$el.scrollTop = offset
+      scroller.$el[`scroll${dSuffix}`] = offset
     }
   },
 
