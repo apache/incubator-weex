@@ -19,18 +19,19 @@ typedef UITextView WXTextAreaView;
 @implementation WXTextAreaComponent {
     UIEdgeInsets _border;
     UIEdgeInsets _padding;
-    NSTextStorage* _textStorage;
 }
 
 -(void)viewDidLoad
 {
-    [super viewDidLoad];
+    _padding = UIEdgeInsetsZero;
+    _border = UIEdgeInsetsZero;
     if (self.placeholderString) {
         self.placeHolderLabel = [[UILabel alloc] init];
         self.placeHolderLabel.numberOfLines = 0;
         [_textView addSubview:self.placeHolderLabel];
     }
     _textView.delegate = self;
+    [super viewDidLoad];
 }
 
 - (UIView *)loadView
@@ -110,11 +111,13 @@ typedef UITextView WXTextAreaView;
 
 -(void)setEditPadding:(UIEdgeInsets)padding
 {
+    _padding = padding;
     [self _updateTextContentInset];
 }
 
 -(void)setEditBorder:(UIEdgeInsets)border
 {
+    _border = border;
     [self _updateTextContentInset];
 }
 

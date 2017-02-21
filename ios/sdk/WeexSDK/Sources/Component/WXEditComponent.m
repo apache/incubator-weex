@@ -52,12 +52,7 @@
 {
     UIEdgeInsets _border;
     UIEdgeInsets _padding;
-    NSTextStorage* _textStorage;
 }
-
-@synthesize border = _border;
-@synthesize padding = _padding;
-@synthesize textStorage = _textStorage;
 
 WX_EXPORT_METHOD(@selector(focus))
 WX_EXPORT_METHOD(@selector(blur))
