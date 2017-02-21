@@ -369,7 +369,7 @@ public class WXSDKEngine {
       registerModule("webview", WXWebViewModule.class, true);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);
-      registerModule("timer", WXTimerModule.class, true);
+      registerModule("timer", WXTimerModule.class, false);
       registerModule("storage", WXStorageModule.class, true);
       registerModule("clipboard", WXClipboardModule.class, true);
       registerModule("globalEvent",WXGlobalEventModule.class);

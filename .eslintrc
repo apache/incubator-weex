@@ -11,6 +11,7 @@
   },
 
   "globals": {
+    "weex": false,
     "document": false,
     "navigator": false,
     "window": false,
