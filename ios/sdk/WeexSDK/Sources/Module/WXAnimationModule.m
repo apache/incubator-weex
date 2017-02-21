@@ -134,8 +134,14 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                    I assume it's a bug in Core Animation.
                    Here comes the black magic: In the scale transformation, change the z parameter to anything different from 1.0, the jump is gone.
                    See http://stackoverflow.com/questions/27931421/cgaffinetransform-scale-and-translation-jump-before-animation
+                   
+                   if this make your view blur, you can specify the 'fixScale' option value 
                  **/
-                layer.transform = CATransform3DScale(transform, 1, 1, 1.00001);
+                CGFloat sz = 1.00001;
+                if ([args[@"fixScale"] boolValue]) {
+                    sz = 1.0;
+                }
+                layer.transform = CATransform3DScale(transform, 1, 1, sz);
             }
             if (isAnimateBackgroundColor) {
                 layer.backgroundColor = backgroundColor;

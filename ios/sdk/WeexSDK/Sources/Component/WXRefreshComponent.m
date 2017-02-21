@@ -117,7 +117,10 @@
         offset.y = -self.calculatedFrame.size.height;
         [_indicator start];
     } else {
-        offset.y = 0;
+        if (ABS(offset.y) <= self.calculatedFrame.size.height) {
+            offset.y = 0;
+        }
+        
         [_indicator stop];
     }
     [scrollerProtocol setContentOffset:offset animated:YES];
