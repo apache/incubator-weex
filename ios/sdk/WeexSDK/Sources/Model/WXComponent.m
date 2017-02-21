@@ -26,6 +26,7 @@
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
+#import "WXBoxShadow.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -200,6 +201,7 @@
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
+            [WXBoxShadow configLayer:self.view boxShadow:_boxShadow];
         }
         
         if (_backgroundImage) {

@@ -40,6 +40,7 @@
     UIView *_view;
     CGFloat _opacity;
     WXVisibility  _visibility;
+    WXBoxShadow *_boxShadow;
     
     /**
      *  PseudoClass
