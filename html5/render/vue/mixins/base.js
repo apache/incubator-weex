@@ -7,18 +7,18 @@ const supportedEvents = [
 
 const scrollableTypes = ['scroller', 'list']
 
-function watchLazyload (context) {
-  [
-    'scroll',
-    'transitionend',
-    'webkitTransitionEnd',
-    'animationend',
-    'webkitAnimationEnd',
-    'resize'
-  ].forEach(evt => {
-    fireLazyload(document.body)
-  })
-}
+// function watchLazyload (context) {
+//   [
+//     'scroll',
+//     'transitionend',
+//     'webkitTransitionEnd',
+//     'animationend',
+//     'webkitAnimationEnd',
+//     'resize'
+//   ].forEach(evt => {
+//     fireLazyload(document.body)
+//   })
+// }
 
 function _getParentScroller (vnode) {
   if (!vnode) return null
@@ -50,7 +50,6 @@ export default {
     fireLazyload () {
       const scroller = this.getParentScroller()
       fireLazyload(scroller && scroller.$el || document.body)
-      }
     }
   }
 }
