@@ -35,6 +35,13 @@ Other attributes please check out the [common attributes](../common-attrs.html)
 
 * placeholder-color: the color of placeholder. Default value is '#999999'.
 
+* Pseudo-class<span class="api-version">v0.9.5+</span>: `input` component support the following pseudo-classes:
+
+  * `active`
+  * `focus`
+  * `disabled`
+  * `enabled`
+
 * text styles: checkout [text styles](../text-style.html)
 
   * support 'color' style.
