@@ -48,6 +48,9 @@ typedef UITextView WXTextAreaView;
 - (void)setText:(NSString *)text
 {
     _textView.text = text;
+    if ([text length] >0) {
+        self.placeHolderLabel.text = @"";
+    }
 }
 
 -(void)setTextColor:(UIColor *)color
@@ -135,9 +138,8 @@ typedef UITextView WXTextAreaView;
     self.placeHolderLabel.clipsToBounds = NO;
     CGRect newFrame = self.placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
-    newFrame.size.width = _textView.frame.size.width;
+    newFrame.size.width = _textView.frame.size.width-8;
     newFrame.origin.x = 4; // the cursor origin.x
-    newFrame.origin.y = 7; // the cursor origin.y
     self.placeHolderLabel.frame = newFrame;
     self.placeHolderLabel.attributedText = attributedString;
 }
@@ -154,6 +156,13 @@ typedef UITextView WXTextAreaView;
                                                       _padding.left + _border.left,
                                                       _padding.bottom + _border.bottom,
                                                       _border.right + _border.right)];
+    
+    //when textview update, placeHolderLabel update too
+    CGRect newFrame = self.placeHolderLabel.frame;
+    newFrame.size.width = self.textView.frame.size.width - (_padding.left + _border.left);
+    newFrame.origin.x = 4 + _padding.left + _border.left; // the cursor origin.x
+    newFrame.origin.y = _padding.top + _border.top;
+    self.placeHolderLabel.frame = newFrame;
 }
 
 @end

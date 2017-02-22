@@ -128,7 +128,6 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     _border = UIEdgeInsetsZero;
     self.userInteractionEnabled = YES;
     [self setType];
-    self.text = _value;
     [self setAutofocus:_autofocus];
     [self setTextFont];
     [self setPlaceholderAttributedString];
