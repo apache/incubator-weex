@@ -388,6 +388,8 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       } catch (InvocationTargetException e) {
         // ignore
       }
+
+      WXServiceManager.execAllCacheJsService();
     }
     if (remoteDebug && mWxDebugProxy != null) {
       mWXBridge = mWxDebugProxy.getWXBridge();

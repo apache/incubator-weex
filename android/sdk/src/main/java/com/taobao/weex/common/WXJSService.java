@@ -202,64 +202,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.bridge;
+package com.taobao.weex.common;
 
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
-
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.common.WXJSService;
-
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class WXServiceManager {
+public class WXJSService implements IWXObject {
+    private String name;
+    private String script;
+    private Map<String, String> options = new HashMap<>();
 
-    private static Map<String, WXJSService> sInstanceJSServiceMap = new HashMap<>();
-
-    public static boolean registerService(String name, String serviceScript, Map<String, String> options) {
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(serviceScript)) return false;
-
-        String param1 = "register: global.registerService, unregister: global.unregisterService";
-        String param2 = "serviceName: \"" + name + "\"";
-        for (String key: options.keySet()) {
-            // TODO - why always string?
-            String value = options.get(key);
-            param2 += ", " + key + ": \"" + value + "\"";
-        }
-        String serviceJs = String.format(";(function(service, options){ ;%s; })({ %s }, { %s });", serviceScript, param1, param2);
-
-        if(WXEnvironment.isApkDebugable()) {
-            WXJSService service = new WXJSService();
-            service.setName(name);
-            service.setScript(serviceScript);
-            service.setOptions(options);
-            sInstanceJSServiceMap.put(name, service);
-        }
-
-        WXBridgeManager.getInstance().execJSService(serviceJs);
-        return true;
+    public String getName() { return name; }
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public static boolean unRegisterService(String name) {
-        if (TextUtils.isEmpty(name)) return false;
-
-        if(WXEnvironment.isApkDebugable()) {
-            sInstanceJSServiceMap.remove(name);
-        }
-
-        String js = String.format("global.unregisterService( \"%s\" );", name);
-        WXBridgeManager.getInstance().execJSService(js);
-        return true;
+    public String getScript() { return script; }
+    public void setScript(String script) {
+        this.script = script;
     }
 
-
-    public static void execAllCacheJsService() {
-        for (String serviceName: sInstanceJSServiceMap.keySet()) {
-            WXJSService service = sInstanceJSServiceMap.get(serviceName);
-            registerService(service.getName(), service.getScript(), service.getOptions());
-        }
+    public Map<String, String> getOptions() { return options; }
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
     }
 }
