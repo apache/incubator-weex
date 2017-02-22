@@ -348,7 +348,7 @@ static BOOL WXNotStat;
             CGDataProviderRelease(fontDataProvider);
             CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
             CFRelease(graphicFont);
-            font = (__bridge UIFont*)smallFont;
+            font = (__bridge_transfer UIFont*)smallFont;
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
