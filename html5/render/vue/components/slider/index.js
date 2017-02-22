@@ -1,11 +1,11 @@
-import { base, event } from '../../mixins'
+import { base } from '../../mixins'
 import { validateStyles } from '../../validator'
 import { throttle, bind, extend } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 export default {
-  mixins: [base, event, slideMixin],
+  mixins: [base, slideMixin],
   props: {
     'auto-play': {
       type: [String, Boolean],

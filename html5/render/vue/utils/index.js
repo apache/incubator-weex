@@ -47,16 +47,6 @@ export function camelToKebab (name) {
   })
 }
 
-/**
- * Mix properties into target object.
- */
-export function extend (to, _from) {
-  for (const key in _from) {
-    to[key] = _from[key]
-  }
-  return to
-}
-
 export function appendStyle (css, styleId, replace) {
   let style = document.getElementById(styleId)
   if (style && replace) {

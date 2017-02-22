@@ -1,3 +1,5 @@
+import { createEvent } from '../../utils'
+
 const TRANSITION_TIME = 200
 
 export default {
@@ -24,7 +26,9 @@ export default {
 
       if (newIndex !== this.currentIndex) {
         this.currentIndex = newIndex
-        this.$emit('change', this.createEvent('change', {
+        // replace $el with { attr, style } is a legacy usage. Is it necessary to
+        // do this ? Or just tell devers to use inline functions to access attrs ?
+        this.$emit('change', createEvent(this.$el, 'change', {
           index: this.currentIndex
         }))
         setTimeout(() => { this.reorder() }, TRANSITION_TIME)

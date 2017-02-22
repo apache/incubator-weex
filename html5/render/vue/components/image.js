@@ -1,4 +1,4 @@
-import { base, event } from '../mixins'
+import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 function getImgStyle (context) {
@@ -9,11 +9,14 @@ function getImgStyle (context) {
 }
 
 export default {
-  mixins: [base, event],
+  mixins: [base],
   props: {
     src: {
       type: String,
       required: true
+    },
+    placeholder: {
+      type: String
     },
     resize: {
       validator (value) {
@@ -47,7 +50,7 @@ export default {
         'img-src': this.src,
         'img-placeholder': this.placeholder
       },
-      on: this.createEventMap(['load']),
+      on: this.createEventMap(['load', 'error']),
       staticClass: 'weex-image',
       staticStyle: getImgStyle(this)
       // style: cssText

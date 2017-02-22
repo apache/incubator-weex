@@ -1,4 +1,5 @@
 import { isElementVisible } from './component'
+import { createEvent, dispatchEvent } from './event'
 
 function preLoadImg (src, loadCallback, errorCallback) {
   const img = new Image()
@@ -16,16 +17,15 @@ export function applySrc (item, src, placeholderSrc) {
   preLoadImg(src, function () {
     item.style.backgroundImage = `url(${src})`
     const { width: naturalWidth, height: naturalHeight } = this
-    context.$emit(context.createEvent(item, 'load', {
-      naturalWidth, naturalHeight
-    }))
+    dispatchEvent(item, createEvent(item, 'load', { naturalWidth, naturalHeight }))
     finallCb()
   }, function () {
-    context.$emit(context.createEvent(item, 'error'))
-    if (!placeholderSrc) { return }
-    preLoadImg(placeholderSrc, function () {
-      item.style.backgroundImage = `url(${placeholderSrc})`
-    })
+    dispatchEvent(item, createEvent(item, 'error'))
+    if (placeholderSrc) {
+      preLoadImg(placeholderSrc, function () {
+        item.style.backgroundImage = `url(${placeholderSrc})`
+      })
+    }
     finallCb()
   })
 }

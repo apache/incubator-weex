@@ -1,19 +1,35 @@
 import { extend } from '../../utils'
+import { base } from '../../mixins'
+
+function getIndicatorItemStyle (config, isActive) {
+  const itemColor = config['item-color']
+  const itemSelectedColor = config['item-selected-color']
+  const itemSize = config['item-size']
+  const style = {}
+  style['background-color'] = isActive ? itemSelectedColor : itemColor
+  style['width'] = style['height'] = itemSize
+  return style
+}
 
 function _render (context, h) {
   const children = []
+  // const _scopeId = context.getScopeId()
+  const { mergedStyle } = context.$vnode.data
   for (let i = 0; i < Number(context.count); ++i) {
     const classNames = ['weex-indicator-item']
+    let isActive = false
     if (i === Number(context.active)) {
       classNames.push('weex-indicator-item-active')
+      isActive = true
     }
     children.push(h('mark', {
-      staticClass: classNames.join(' ')
+      staticClass: classNames.join(' '),
+      staticStyle: getIndicatorItemStyle(mergedStyle, isActive)
     }))
   }
   return h('nav', {
     attrs: { 'weex-type': 'indicator' },
-    staticClass: 'weex-indicator'
+    staticClass: 'weex-indicator',
   }, children)
 }
 
@@ -50,6 +66,7 @@ function _reLayout (context) {
 
 export default {
   name: 'indicator',
+  mixins: [base],
   props: {
     count: [Number, String],
     active: [Number, String]

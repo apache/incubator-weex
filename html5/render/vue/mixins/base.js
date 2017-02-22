@@ -28,23 +28,38 @@ function _getParentScroller (vnode) {
   return _getParentScroller(vnode.$parent)
 }
 
-export default {
+export default { 
   mounted () {
     watchAppear(this)
     // watchLazyload(this)
   },
 
   methods: {
+    getTopContext () {
+      let ctx = this
+      let vnode = ctx.$vnode
+      while (vnode) {
+        ctx = vnode.context
+        vnode = ctx.$vnode
+      }
+      return ctx
+    },
+
+    getScopeId () {
+      const ctx = this.getTopContext()
+      return ctx.$options._scopeId
+    },
+
+    getParentScroller () {
+      return _getParentScroller(this.$vnode)
+    },
+
     createEventMap (extras = []) {
       const eventMap = {}
       supportedEvents.concat(extras).forEach(name => {
         eventMap[name] = event => this.$emit(name, event)
       })
       return eventMap
-    },
-
-    getParentScroller () {
-      return _getParentScroller(this.$vnode)
     },
 
     fireLazyload () {
