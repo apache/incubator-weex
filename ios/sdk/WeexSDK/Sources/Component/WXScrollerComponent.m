@@ -428,6 +428,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         [_refreshComponent pullingdown:@{
             DISTANCE_Y: @(fabs(scrollView.contentOffset.y - _lastContentOffset.y)),
             PULLING_DISTANCE: @(scrollView.contentOffset.y),
+            VIEW_HEIGHT: @(_refreshComponent.view.frame.size.height),
             @"type":@"pullingdown"
             }];
     }
