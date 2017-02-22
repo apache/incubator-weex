@@ -69,7 +69,7 @@ register global event.
 var globalEvent = require('@weex-module/globalEvent');
 globalEvent.addEventListener("geolocation", function (e) {
 	console.log("get geolocation")
-	});
+});
 ```
 
 ### removeEventListener(String eventName)

@@ -9,5 +9,4 @@ chapter_title: Common Options
 
 # iOS APIs
 
-## Native APIs
-
+Work in progresss.
