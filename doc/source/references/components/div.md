@@ -19,7 +19,7 @@ This type of component supports all kinds of weex component as its child compone
 
 ### Attributes
 
-There is no specific attribute for this component other than the [common attributes](../common-attrs.html).
+There is no specific attribute for this component.
 
 ### Styles
 

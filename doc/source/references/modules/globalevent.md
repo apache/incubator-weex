@@ -44,7 +44,7 @@ document.dispatchEvent(evt)
 ```java
 Map<String,Object> params=new HashMap<>();
 params.put("key","value");
-mWXSDKInstance.fireGlobalEventCallback("geolocation",params);
+mWXSDKInstance.fireGlobalEventCallback("geolocation", params);
 ```
 #### iOS
 

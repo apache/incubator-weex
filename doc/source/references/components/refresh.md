@@ -23,8 +23,6 @@ Any other components, like the text and img components, can be put inside the re
 
 * display has value of show or hide.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 
 ### Styles
 common styles: check out [common styles for components](../common-style.html)

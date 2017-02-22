@@ -44,7 +44,7 @@ version: 2.1
 
 | 名称 | 描述 | 值类型 | 默认值 | 示例 |
 | ---- | ---- | ---- | ---- | ---- |
-| `translate`/`translateX`/`translateY` | 指定元素将已被移动到的新位置 | 像素值或百分比 | 无 |
+| `translate`/`translateX`/`translateY` | 指定元素移动的偏移量 | 像素值或百分比 | 无 |
 | `rotate` | 指定元素将被旋转的角度，单位是度 | number | 无 |
 | `scale`/`scaleX`/`scaleY` | 按比例放大或缩小元素 | number | 无 |
 
