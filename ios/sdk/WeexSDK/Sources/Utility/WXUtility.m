@@ -354,7 +354,7 @@ static BOOL WXNotStat;
             if (graphicFont) {
                 CFRelease(graphicFont);
             }
-            font = (__bridge UIFont*)smallFont;
+            font = (__bridge_transfer UIFont*)smallFont;
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
