@@ -28,6 +28,7 @@ typedef UITextView WXTextAreaView;
 @property (nonatomic) BOOL autofocus;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, strong)NSString *textValue;
+@property(nonatomic) UIReturnKeyType returnKeyType;
 @property (nonatomic) NSUInteger rows;
 //style
 
@@ -43,6 +44,7 @@ typedef UITextView WXTextAreaView;
 @property (nonatomic) BOOL focusEvent;
 @property (nonatomic) BOOL blurEvent;
 @property (nonatomic) BOOL changeEvent;
+@property (nonatomic) BOOL returnEvent;
 @property (nonatomic) BOOL clickEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
@@ -57,6 +59,8 @@ typedef UITextView WXTextAreaView;
 
 WX_EXPORT_METHOD(@selector(focus))
 WX_EXPORT_METHOD(@selector(blur))
+WX_EXPORT_METHOD(@selector(setSelectionRange:selectionEnd:))
+WX_EXPORT_METHOD(@selector(getSelectionRange:))
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
@@ -67,6 +71,7 @@ WX_EXPORT_METHOD(@selector(blur))
         _blurEvent = NO;
         _changeEvent = NO;
         _clickEvent = NO;
+        _returnEvent = NO;
         _padding = UIEdgeInsetsZero;
         _border = UIEdgeInsetsZero;
         
@@ -86,6 +91,9 @@ WX_EXPORT_METHOD(@selector(blur))
             if (placeHolder) {
                 _placeholderString = placeHolder;
             }
+        }
+        if (attributes[@"returnKeyType"]) {
+            _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         }
         if (!_placeholderString) {
             _placeholderString = @"";
@@ -187,6 +195,7 @@ WX_EXPORT_METHOD(@selector(blur))
     _padding = UIEdgeInsetsZero;
     _border = UIEdgeInsetsZero;
     [self updatePattern];
+    [_textView setReturnKeyType:_returnKeyType];
     
     [_textView setNeedsDisplay];
     [_textView setClipsToBounds:YES];
@@ -207,6 +216,27 @@ WX_EXPORT_METHOD(@selector(blur))
     }
 }
 
+-(void)setSelectionRange:(NSInteger)selectionStart selectionEnd:(NSInteger)selectionEnd
+{
+    if(selectionStart>self.textView.text.length || selectionEnd>self.textView.text.length) {
+        return;
+    }
+    [self.textView becomeFirstResponder];
+    UITextPosition *startPos =  [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionStart];
+    UITextPosition *endPos = [self.textView positionFromPosition:self.textView.beginningOfDocument offset:selectionEnd];
+    UITextRange *textRange = [self.textView textRangeFromPosition:startPos
+                                                        toPosition:endPos];
+    self.textView.selectedTextRange = textRange;
+}
+
+-(void)getSelectionRange:(WXCallback)callback
+{
+    NSInteger selectionStart = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.start];
+    NSInteger selectionEnd = [self.textView offsetFromPosition:self.textView.beginningOfDocument toPosition:self.textView.selectedTextRange.end];
+    NSDictionary *res = @{@"selectionStart":@(selectionStart),@"selectionEnd":@(selectionEnd)};
+    callback(res);
+}
+
 #pragma mark - add-remove Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -224,6 +254,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = YES;
+    }
+    if ([eventName isEqualToString:@"return"]) {
+        _returnEvent = YES;
     }
 }
 
@@ -243,6 +276,9 @@ WX_EXPORT_METHOD(@selector(blur))
     }
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = NO;
+    }
+    if ([eventName isEqualToString:@"return"]) {
+        _returnEvent = NO;
     }
 }
 
@@ -270,6 +306,10 @@ WX_EXPORT_METHOD(@selector(blur))
                 _placeHolderLabel.text = @"";
             }
         }
+    }
+    if (attributes[@"returnKeyType"]) {
+        _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
+        [_textView setReturnKeyType:_returnKeyType];
     }
 }
 
@@ -413,6 +453,17 @@ WX_EXPORT_METHOD(@selector(blur))
     if(self.pseudoClassStyles && [self.pseudoClassStyles count]>0){
         [self recoveryPseudoStyles:self.styles];
     }
+}
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+{
+    if ([text isEqualToString:@"\n"]) {
+        if (_returnEvent) {
+            NSString *typeStr = [WXUtility returnKeyType:_returnKeyType];
+            [self fireEvent:@"return" params:@{@"value":[textView text],@"returnKeyType":typeStr} domChanges:@{@"attrs":@{@"value":[textView text]}}];
+        }
+    }
+    return YES;
 }
 
 #pragma mark - private method

@@ -249,7 +249,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(loadError);
+            weakSelf.onFailed(error);
         }
     };
     
@@ -298,6 +298,11 @@ typedef enum : NSUInteger {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         });
     });
+}
+
+- (void)forceGarbageCollection
+{
+    [[WXSDKManager bridgeMgr] forceGarbageCollection];
 }
 
 - (void)updateState:(WXState)state
@@ -418,7 +423,7 @@ typedef enum : NSUInteger {
         return;
     }
     Class moduleClass =  [WXModuleFactory classWithModuleName:method.moduleName];
-    NSMutableDictionary * option = [methodArguments[3] mutableCopy];
+    NSMutableDictionary * option = [methodArguments[2] mutableCopy];
     [option setObject:method.moduleName forKey:@"moduleName"];
     // the value for moduleName in option is for the need of callback
     [self addModuleEventObservers:methodArguments[0] callback:methodArguments[1] option:option moduleClassName:NSStringFromClass(moduleClass)];

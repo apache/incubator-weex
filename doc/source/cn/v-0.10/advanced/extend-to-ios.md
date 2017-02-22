@@ -69,9 +69,10 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
    
    Weex SDK没有 图片下载，navigation 操作的能力，请大家自己实现这些 protocol
 
-4. **WXImgLoaderProtocol**  
+### handler 扩展
+   **WXImgLoaderProtocol**  
 
-   weexSDK 没有图片下载的能力，需要实现 WXImgLoaderProtocol,参考下面的例子
+   weexSDK 没有提供图片下载的能力，需要实现 WXImgLoaderProtocol,参考下面的例子
    
    ```object-c
    WXImageLoaderProtocol.h
@@ -127,3 +128,152 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
    
    [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)]
    ```
+
+#### Component 扩展
+   虽然WeexSDK中有提供内置的一些Component，但这有可能并不能满足你的需求。在之前你可能已经写了一些很酷炫native的组件，想包装一下，导入到Weex中，因此我们提供了让开发者实现自己的native Component   
+   下面将以WeexSDK 中已经存在的 Component：`image`为例子，介绍一下如何构建一个native Component.
+   假设你已经了解IOS开发  
+   1. 注册 Component  
+      注册一个component比较简单，调用 `WXSDKEngine` 中的 `registerComponent:withClass:`方法，传入组件的标签名称，还有对应的class  
+      然后你可以创建一个 `WXImageComponent` 表示`image`组件的实现     在.we 文件中，只需要写 
+          <image></image>  
+   2. 添加属性   
+      现在我们要做一些让image component更加强大的事情。既然作为一个图片的component，那它应该要有源，给他加上一个 `src`的属性，同时给它加上一个`resize`的属性（可以配置的有`contain/cover/stretch`）
+      
+  ```
+  @interface WXImageComponent ()
+  
+  @property (nonatomic, strong) NSString *imageSrc;
+  @property (nonatomic, assign) UIViewContentMode resizeMode;
+  
+  @end
+  ```
+   component中所有的style，attribute，events都会被传递到 Component的初始化方法中，所以，你可以在初始化方法中存储你感兴趣的一些属性值
+      
+  ```
+  @implementation WXImageComponent
+  
+  - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+  {
+      if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+          _imageSrc = [WXConvert NSString:attributes[@"src"]];
+          _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
+  }
+  
+      return self;
+  }
+  
+  @end
+  ```
+      
+   attribute中拿到的值的类型都是`id`,我们可以用转换方法把它转换到任何值。Weex SDK提供了一些基础的转换方法，可以参考 `WXConvert`类，或者你可以添加自己的转换函数
+   
+   1. Hooking 渲染生命周期  
+         native 的component 是由Weex管理的，weex 创建，布局，渲染，销毁。weex的component生命周期都是可以hook的，你可以在这些生命周期中去做自己的事情
+      
+  | 方法 | 描述 |
+  | :-: | --- |
+  | initWithRef:type:... | 用给定的属性初始化一个component. |
+  | layoutDidFinish | 在component完成布局时候会调用. |
+  | loadView | 创建component管理的view. |
+  | viewWillLoad | 在component的view加载之前会调用. |
+  | viewDidLoad | 在component的view加载完之后调用. |
+  | viewWillUnload | 在component的view被释放之前调用. |
+  | viewDidUnload | 在component的view被释放之后调用. |
+  | updateStyles: | 在component的style更新时候调用. |
+  | updateAttributes: | 在component的attribute更新时候调用. |
+  | addEvent: | 给component添加event的时候调用. |
+  | removeEvent: | 在event移除的时候调用. |
+      
+   在image component的例子里面，如果我们需要我们自己的image view 的话，可以复写 `loadView`这个方法.
+   
+   ```
+   - (UIView *)loadView
+   {
+       return [[WXImageView alloc] init];
+   }
+   ```
+   
+   现在我们使用 `WXImageView` 渲染 `image` component。  
+   1. 作为一个image component，我们需要拿到服务器图片，而且把它设置进image view 里. 这个操作可以在 `viewDidLoad` 方法中做，这个方法是在view已经被创建而且加载了时候weex SDK会调用到，而且`viewDidLoad`这个方法是你做额外初始化工作比如改变content mode(也就是设置resize) 的最好时间.
+   
+   ```
+   - (void)viewDidLoad
+   {
+       UIImageView *imageView = (UIImageView *)self.view;
+       imageView.contentMode = _resizeMode;
+       imageView.userInteractionEnabled = YES;
+       imageView.clipsToBounds = YES;
+       imageView.exclusiveTouch = YES;
+   
+       // Do your image fetching and updating logic
+   }
+   ```
+   
+ 1. 如果可以改变image的src,也可以hook `updateAttributes:`方法来做属性更新操作，当`updateAttributes:`或者 `updateStyles:`被调用的时候， component的view 已经加载完成
+   
+   ```
+   - (void)updateAttributes:(NSDictionary *)attributes
+   {
+       if (attributes[@"src"]) {
+           _imageSrc = [WXConvert NSString:attributes[@"src"]];
+           // Do your image updating logic
+       }
+   
+       if (attributes[@"resize"]) {
+           _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
+           self.view.contentMode = _resizeMode;
+       }
+   }
+   ```
+   
+   或许你需要考虑更多的生命周期方法去Hook，当布局完成时候，像`layoutDidFinish`，如果你想了解更多，可以参考一下`WXComponent.h` 声明的方法
+   现在你可以用在任何 .we文件里面使用 `<image>`，而且可以加上 image的属性
+   
+   ```
+   <image style="your-custom-style" src="image-remote-source" resize="contain/cover/stretch"></image>
+   ```
+##### component 方法
+WeexSDK 0.9.5 之后支持了在js中直接调用component的方法，这里提供一个例子，
+
+- 自定义一个WXMyCompoenent 的组件
+
+    ```
+    @implementation WXMyComponent
+    WX_EXPORT_METHOD(@selector(focus)) // 暴露该方法给js
+    - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+    {
+        if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+            // handle your attributes
+            // handle your styles
+        }
+        
+        return self;
+    }
+    
+    - (void)focus
+    {
+        NSLog(@"you got it");
+    }
+    @end
+    ```
+	
+- 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]] `
+- 在weex 文件中调用
+
+  ```html
+  <template>
+    <mycomponent id='mycomponent'></mycomponent>
+  </template>
+  <script>
+    module.exports = {
+      created: function() {
+        this.$el('mycomponent').focus();
+      }
+    }
+  </script>
+  ``` 
+ 
+ 
+ 
+ 

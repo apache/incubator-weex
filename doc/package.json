@@ -1,9 +1,12 @@
 {
-  "name": "hexo-site",
+  "name": "weex-site",
   "version": "0.0.0",
   "private": true,
   "hexo": {
     "version": "3.2.2"
+  },
+  "scripts": {
+    "server": "hexo server"
   },
   "dependencies": {
     "hexo": "^3.2.2",
