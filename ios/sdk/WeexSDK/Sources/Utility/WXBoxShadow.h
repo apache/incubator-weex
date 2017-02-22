@@ -7,6 +7,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "WXInnerLayer.h"
 
 @interface WXBoxShadow : NSObject
 
@@ -14,7 +15,9 @@
 @property CGSize shadowOffset;
 @property CGFloat shadowRadius;
 @property BOOL isInset;
+@property (nonatomic, strong, nullable)WXInnerLayer *innerLayer;
+@property CGFloat shadowOpacity;
 
-+(void)configLayer:(UIView *)view boxShadow:(WXBoxShadow *)boxShadow;
-+(WXBoxShadow *)getBoxShadowFromString:(NSString *)string;
++(void)configLayer:(UIView *_Nullable)view boxShadow:(WXBoxShadow *_Nullable)boxShadow;
++(WXBoxShadow *_Nullable)getBoxShadowFromString:(NSString *_Nullable)string;
 @end

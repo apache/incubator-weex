@@ -16,58 +16,95 @@
     if(!boxShadow){
         return;
     }
-    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
-    view.layer.masksToBounds = NO;
-    view.layer.shadowColor = boxShadow.shadowColor;
-    view.layer.shadowOffset = boxShadow.shadowOffset;
-    view.layer.shadowRadius = boxShadow.shadowRadius;
-    view.layer.shadowOpacity = 1.0f;
-    view.layer.shadowPath = shadowPath.CGPath;
+    if (boxShadow.isInset) {
+        if (boxShadow.innerLayer) {
+            [boxShadow.innerLayer removeFromSuperlayer];
+            boxShadow.innerLayer.frame = view.bounds;
+            [view.layer addSublayer:boxShadow.innerLayer];
+        }
+    } else {
+        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
+        view.layer.masksToBounds = NO;
+        view.layer.shadowColor = boxShadow.shadowColor;
+        view.layer.shadowOffset = boxShadow.shadowOffset;
+        view.layer.shadowRadius = boxShadow.shadowRadius;
+        view.layer.shadowOpacity = boxShadow.shadowOpacity;
+        view.layer.shadowPath = shadowPath.CGPath;
+    }
 }
 
-+(WXBoxShadow *)getBoxShadowFromString:(NSString *)string
++ (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
 {
-    NSError *error = nil;
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSError *error = nil;
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s{2,}" options:NSRegularExpressionCaseInsensitive error:&error];
     
     NSArray *arr = [regex matchesInString:string options:NSMatchingReportCompletion range:NSMakeRange(0, [string length])];
     
     arr = [[arr reverseObjectEnumerator] allObjects];
-    
     for (NSTextCheckingResult *str in arr) {
         string = [string stringByReplacingCharactersInRange:[str range] withString:@" "];
     }
-    NSMutableArray *array = [[string componentsSeparatedByString:@" "] mutableCopy];
+    NSArray *array = [string componentsSeparatedByString:@" "];
+    return array;
+}
+
++(WXBoxShadow *)getBoxShadowFromString:(NSString *)string
+{
+    if ([string length] == 0) {
+        return nil;
+    }
+    WXBoxShadow *boxShadow = [WXBoxShadow new];
+    boxShadow.shadowOpacity = 1.0f;
     
-    if (array && [array count] > 0) {
-        WXBoxShadow *boxShadow = [WXBoxShadow new];
-        if ([@"inset" isEqualToString: array[0]])
+    //parse color
+    if ([string rangeOfString:@"rgb"].location != NSNotFound) {
+        NSRange begin = [string rangeOfString:@"rgb"];
+        NSRange end = [string rangeOfString:@")"];
+        if (begin.location < end.location) {
+            NSRange range = NSMakeRange(begin.location, end.location-begin.location + 1);
+            NSString *str = [string substringWithRange:range];
+            NSString *colorStr = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+            boxShadow.shadowColor = [WXConvert UIColor:colorStr].CGColor;
+            string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
+        }
+    } else {
+        NSArray *boxShadowElements = [self getBoxShadowElementsByBlank:string];
+        NSString *str = [boxShadowElements lastObject];
+        boxShadow.shadowColor = [WXConvert UIColor:str].CGColor;
+        string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
+    }
+
+    // parse remain BoxShadow Elements
+    NSMutableArray *remainBoxShadowElements = [[self getBoxShadowElementsByBlank:string] mutableCopy];
+    
+    if (remainBoxShadowElements && [remainBoxShadowElements count] > 0) {
+        if ([@"inset" isEqualToString: remainBoxShadowElements[0]])
         {
             boxShadow.isInset = YES;
-            [array removeObjectAtIndex:0];
+            [remainBoxShadowElements removeObjectAtIndex:0];
             
         }
         
-        for (int i = 0; i < [array count]-1; i++) {
+        for (int i = 0; i < [remainBoxShadowElements count]; i++) {
             switch (i) {
                 case 0:
                 {
                     CGSize size = boxShadow.shadowOffset;
-                    size.width = [WXConvert CGFloat:array[0]];
+                    size.width = [WXConvert CGFloat:remainBoxShadowElements[0]];
                     boxShadow.shadowOffset = size;
                 }
                     break;
                 case 1:
                 {
                     CGSize size = boxShadow.shadowOffset;
-                    size.height = [WXConvert CGFloat:array[1]];
+                    size.height = [WXConvert CGFloat:remainBoxShadowElements[1]];
                     boxShadow.shadowOffset = size;
                 }
                     break;
                 case 2:
                 {
-                    boxShadow.shadowRadius = [WXConvert CGFloat:array[2]];
+                    boxShadow.shadowRadius = [WXConvert CGFloat:remainBoxShadowElements[2]];
                 }
                     break;
                     
@@ -75,10 +112,18 @@
                     break;
             }
         }
-        boxShadow.shadowColor = [WXConvert UIColor:[array lastObject]].CGColor;
-        return boxShadow;
+        
+        if (boxShadow.isInset) {
+            if (!boxShadow.innerLayer) {
+                boxShadow.innerLayer = [[WXInnerLayer alloc] init];
+            }
+            boxShadow.innerLayer.boxShadowColor = boxShadow.shadowColor;
+            boxShadow.innerLayer.boxShadowOffset = boxShadow.shadowOffset;
+            boxShadow.innerLayer.boxShadowRadius = boxShadow.shadowRadius;
+            boxShadow.innerLayer.boxShadowOpacity = boxShadow.shadowOpacity;
+        }
     }
-    return nil;
+    return boxShadow;
 }
 
 
