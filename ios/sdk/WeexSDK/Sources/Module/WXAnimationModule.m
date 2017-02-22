@@ -140,7 +140,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                    Here comes the black magic: In the scale transformation, change the z parameter to anything different from 1.0, the jump is gone.
                    See http://stackoverflow.com/questions/27931421/cgaffinetransform-scale-and-translation-jump-before-animation
                  
-                   this maybe will blur your view, we will revert the sz when the animation finish.
+                   this maybe blur your view, we will revert the sz when the animation finish.
                  **/
                 layer.transform = CATransform3DScale(transform, 1, 1, sz);
             }
