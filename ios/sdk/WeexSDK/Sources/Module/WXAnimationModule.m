@@ -12,6 +12,7 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 
+const CGFloat sz = 1.00001;
 @interface WXAnimationModule ()
 
 @end
@@ -95,11 +96,15 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
        but they don’t allow you to specify your own cubic Bézier curve. 
        CATransaction can be used instead to force these animations to use the supplied CAMediaTimingFunction to pace animations.
      **/
+    __weak typeof(self) weakSelf = self;
     [CATransaction begin];
     [CATransaction setAnimationTimingFunction:[WXConvert CAMediaTimingFunction:args[@"timingFunction"]]];
     [CATransaction setCompletionBlock:^{
         if (isUsingCAAnimation) {
             layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformRotate(CGAffineTransformIdentity, rotateAngle));
+        }
+        if ([weakSelf revertSZ]) {
+            layer.transform = CATransform3DScale(layer.transform, 1, 1, 1/sz);
         }
         if (callback) {
             callback(@"SUCCESS");
@@ -134,13 +139,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                    I assume it's a bug in Core Animation.
                    Here comes the black magic: In the scale transformation, change the z parameter to anything different from 1.0, the jump is gone.
                    See http://stackoverflow.com/questions/27931421/cgaffinetransform-scale-and-translation-jump-before-animation
-                   
-                   if this make your view blur, you can specify the 'fixScale' option value 
+                 
+                   this maybe will blur your view, we will revert the sz when the animation finish.
                  **/
-                CGFloat sz = 1.00001;
-                if ([args[@"fixScale"] boolValue]) {
-                    sz = 1.0;
-                }
                 layer.transform = CATransform3DScale(transform, 1, 1, sz);
             }
             if (isAnimateBackgroundColor) {
@@ -164,6 +165,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     CGAffineTransform cgTransform = CATransform3DGetAffineTransform(transform);
     CGFloat radians = atan2f(cgTransform.b, cgTransform.a);
     return radians;
+}
+
+- (BOOL)revertSZ
+{
+    return YES;
 }
 
 @end
