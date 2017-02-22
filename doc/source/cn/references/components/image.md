@@ -64,6 +64,8 @@ version: 2.1
 
   ![mobile_preview](../images/image_1.jpg)
 
+- `placeholder`: <span class="api-version">v0.9+</span> &lt;string&gt; 当源图片下载中时显示一张占位图。
+
   [体验一下](http://dotwe.org/049213ab3364a86637e211c0329cdc50)
 
 ## 样式
@@ -80,7 +82,7 @@ version: 2.1
 
 ## 事件
 
-- `load` <sup class="wx-v">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)
+- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)
 
   - 事件对象
     - `success`: 当图片成功加载时为`true`，否则为`false`

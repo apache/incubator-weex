@@ -39,7 +39,7 @@ function runiOS {
     sleep 1m
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
-    ps -ef
+    # ps -ef
     platform=ios macaca run -d $1
 }
 

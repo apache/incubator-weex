@@ -1,7 +1,7 @@
 ---
 title: Using Vuex & vue-router   
 type: references
-order: 9.2
+order: 10.2
 version: 2.1
 ---
 

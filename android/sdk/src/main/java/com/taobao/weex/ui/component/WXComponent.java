@@ -228,7 +228,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mIsDestroyed = false;
   private boolean mCanRecycled = true;
 
-
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
     this.mAnimationHolder = holder;
@@ -1466,7 +1465,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public boolean canRecycled(){
     return mCanRecycled;
   }
-
+  
   /**
    * Sets the offset for the sticky
    * @param stickyOffset child[y]-parent[y]
