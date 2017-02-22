@@ -1,8 +1,9 @@
-import { base, event } from '../mixins'
+import { base } from '../mixins'
+import { createEvent } from '../utils'
 import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base, event],
+  mixins: [base],
   props: {
     src: String
   },
@@ -27,9 +28,9 @@ export default {
 
   mounted () {
     if (this.$el) {
-      this.$emit('pagefinish', this.createCustomEvent(this, 'pagestart', { url: this.src }))
+      this.$emit('pagestart', createEvent(this.$el, 'pagestart', { url: this.src }))
       this.$el.addEventListener('load', event => {
-        this.$emit('pagefinish', this.createCustomEvent(this, 'pagefinish', { url: this.src }))
+        this.$emit('pagefinish', createEvent(this.$el, 'pagefinish', { url: this.src }))
       })
     }
   },
