@@ -87,8 +87,8 @@
       if (pick.contains(target)) {
         var lang = target.getAttribute('data-lang')
 
-        if (window.localStorage) {
-          window.localStorage.setItem('lang', lang)
+        if (window.sessionStorage) {
+          window.sessionStorage.setItem('lang', lang)
         }
 
         location.href = target.href
