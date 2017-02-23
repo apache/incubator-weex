@@ -15,6 +15,7 @@
 @implementation WXCellComponent
 {
     NSIndexPath *_indexPathBeforeMove;
+    BOOL _isUseContainerWidth;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -38,12 +39,18 @@
     
 }
 
+- (BOOL)isEqual:(id)object
+{
+    WXCellComponent *cell = object;
+    return self == cell && self.isLayoutComplete == cell.isLayoutComplete && CGRectEqualToRect(self.calculatedFrame, cell.calculatedFrame);
+}
+
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
     [super _frameDidCalculated:isChanged];
     
     if (isChanged) {
-        [self.list cellDidLayout:self];
+        [self.delegate cellDidLayout:self];
     }
 }
 
@@ -54,7 +61,7 @@
             [super displayCompletionBlock](layer, finished);
         }
         
-        [self.list cellDidRendered:self];
+        [self.delegate cellDidRendered:self];
     };
 }
 
@@ -79,8 +86,8 @@
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
-    if (self.list == newSupercomponent) {
-        [self.list cell:self didMoveToIndex:index];
+    if (self.delegate == newSupercomponent) {
+        [self.delegate cell:self didMoveToIndex:index];
         [super _removeFromSupercomponent];
         [newSupercomponent _insertSubcomponent:self atIndex:index];
     } else {
@@ -92,7 +99,7 @@
 {
     [super _removeFromSupercomponent];
     
-    [self.list cellDidRemove:self];
+    [self.delegate cellDidRemove:self];
 }
 
 - (void)removeFromSuperview
@@ -102,8 +109,10 @@
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
-    if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) && self.list) {
-        self.cssNode->style.dimensions[CSS_WIDTH] = self.list.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    if (self.delegate && (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) || _isUseContainerWidth)) {
+        self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate cellWidthForLayout:self];
+        //TODO: set _isUseContainerWidth to NO if updateStyles have width
+        _isUseContainerWidth = YES;
     }
     
     if ([self needsLayout]) {
