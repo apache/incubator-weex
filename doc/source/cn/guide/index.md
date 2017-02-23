@@ -8,11 +8,27 @@ has_chapter_content: true
 
 # 快速上手
 
-[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi) which is very ease and flexible to use. Developers can write `*.vue` files with friendly `<template>`, `<style>`, `<script>` tags to build componentized web app.本章会教你如何搭建本地开发环境进行 Weex 开发。
+Weex 是一套简单易用的跨平台开发方案，能以 web 的开发体验构建高性能、可扩展的 native 应用，为了做到这些，Weex 与  Vue 合作，使用 Vue 作为上层框架，并遵循 W3C 标准实现了统一的 JSEngine 和 DOM API，这样一来，你甚至可以使用其他框架驱动 Weex，打造三端一致的 native 应用。
 
-开始之前，希望你能对 Weex 和 Vue 有基本的了解，推荐阅读 Weex Tutorial 和 Vue Introduction 了解更多信息。
+## Vue 是什么？
 
-## 第一步：安装依赖
+Vue.js 是 Evan You 开发的渐进式 JavaScript 框架，在易用性、灵活性和性能等方面都非常优秀。开发者能够通过撰写 `*.vue` 文件，基于 `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。
+
+## Hello World
+
+尝试 Weex 最简单的方法是使用 [Playground App](https://alibaba.github.io/weex/download.html) 和在 [dotWe](http://dotwe.org) 编写一个 [Hello World](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) 例子。你不需要考虑安装开发环境或编写 native 代码，只需要做下面两件事：
+
+- 为你的手机安装 [Playground App](https://alibaba.github.io/weex/download.html)，当然，Weex 是跨平台的框架，你依然可以使用浏览器进行预览，只是这样你就无法感受到 native 优秀的体验了。
+- 在新标签页中打开 [Hello World](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) 例子，点击预览，然后用  Playground 扫码即可。
+
+
+![mobile_preview](https://img.alicdn.com/tps/TB1Ymw3OpXXXXcvXpXXXXXXXXXX-500-1013.jpg)
+
+很简单，我们可以看到语法就是我们熟悉的 Vue。你可以修改这个例子，再次扫码尝试。
+
+## 搭建开发环境
+
+### 第一步：安装依赖
 
 Weex 官方提供了 weex-toolkit 的脚手架工具来辅助开发和调试。首先，你需要 Node.js 和 weex-toolkit。
 
@@ -64,7 +80,7 @@ $ sudo cnpm install -g weex-toolkit@beta
 
 ![](https://img.alicdn.com/tps/TB1kHFrOFXXXXaYXXXXXXXXXXXX-615-308.jpg)
 
-## 第二步：初始化
+### 第二步：初始化
 
 然后初始化 Weex 项目：
 
@@ -74,7 +90,7 @@ $ weex init awesome-project
 
 执行完命令后，在 `awesome-project` 目录中就创建了一个使用 Weex 和 Vue 的模板项目。
 
-## 第三步：开发
+### 第三步：开发
 
 之后我们进入项目所在路径，weex-toolkit 已经为我们生成了标准项目结构。
 
@@ -120,6 +136,4 @@ $ weex init awesome-project
 </style>
 ```
 
-我们暂时不去关心 Weex 的技术细节，仅看大致的代码结构。是不是觉得这些语法有些眼熟？没错，Weex 语法同 [Vue](https://github.com/vuejs/vue) 完全一样，甚至连文件名也是 `.vue`，如果你熟悉 Vue，你会很快适应 Weex 的开发。
-
-关于 Weex 语法部分，你可以直接参考 [Vue Guide](https://vuejs.org/v2/guide/)，这里不再重复介绍。
+关于 Weex 语法部分，你可以直接参考 [Vue Guide](https://vuejs.org/v2/guide/)，这里不再重复介绍。如果您想了解有关技术详情的更多信息，请继续阅读下一节。并且不要忘记在 dotWe 写代码并随时预览。
