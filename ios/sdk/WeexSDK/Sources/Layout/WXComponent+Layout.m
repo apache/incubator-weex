@@ -118,6 +118,9 @@
             
             strongSelf.view.frame = strongSelf.calculatedFrame;
             if (![WXBoxShadow EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                if (!_originalBoxShadow) {
+                    _originalBoxShadow = [WXBoxShadow getViewBoxShadow:strongSelf.view];
+                }
                 [WXBoxShadow configViewLayer:strongSelf.view boxShadow:_boxShadow lastBoxShadow:_lastBoxShadow originalBoxShadow:_originalBoxShadow];
             }
             
