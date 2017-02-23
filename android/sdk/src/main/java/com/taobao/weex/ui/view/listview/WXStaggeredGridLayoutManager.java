@@ -202,39 +202,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.listview;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXCell;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 
 /**
- * The same as sticky cell
+ * Created by zhengshihan on 2017/2/20.
  */
-@Component(lazyload = false)
-public class WXHeader extends WXCell {
 
-  @Deprecated
-  public WXHeader(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
-  }
+public class WXStaggeredGridLayoutManager extends StaggeredGridLayoutManager {
 
-  public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-    if(WXBasicComponentType.LIST.equals((parent.getDomObject().getType()))){
-      setSticky(Constants.Value.STICKY);
+    public WXStaggeredGridLayoutManager(int spanCount, int orientation) {
+        super(spanCount, orientation);
+        offsetChildrenHorizontal(200);
     }
-  }
 
-  @Override
-  public boolean isLazy() {
-    return false;
-  }
+    @Override
+    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        super.onLayoutChildren(recycler, state);
 
-  @Override
-  public boolean isSticky() {
-    return true;
-  }
+    }
+
+    @Override
+    public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
+        super.onItemsAdded(recyclerView, positionStart, itemCount);
+
+    }
+
+    @Override
+    public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount, Object payload) {
+        super.onItemsUpdated(recyclerView, positionStart, itemCount, payload);
+    }
 }

@@ -281,7 +281,9 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
                 ,dy);
       } else if (layoutManager instanceof GridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
-        lastVisibleItemPosition = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
+        GridLayoutManager gridLayoutManager = ((GridLayoutManager) layoutManager);
+        lastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition();
+
       } else if (layoutManager instanceof StaggeredGridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
         StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;

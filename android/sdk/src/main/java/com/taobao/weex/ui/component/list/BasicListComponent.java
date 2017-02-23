@@ -213,6 +213,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -288,6 +289,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
   protected int mColumnCount = 1;
+  protected float mColumnGap = 0;
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
@@ -678,8 +680,17 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
-          if ((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager) {
+          layoutManager = getHostView().getInnerView().getLayoutManager();
+          if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            int pos = mChildren.indexOf(cell);
+
+            if (pos <= fVisible) {
+              beforeFirstVisibleItem = true;
+            }
+          } else if(layoutManager instanceof StaggeredGridLayoutManager){
+            int [] firstItems= new int[3];
+            int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
             int pos = mChildren.indexOf(cell);
 
             if (pos <= fVisible) {

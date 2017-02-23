@@ -208,12 +208,16 @@ import android.content.Context;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
@@ -235,18 +239,23 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     this(instance, dom, parent, isLazy);
   }
 
+
   public WXListComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent);
-    if(node!=null && node.getAttrs() !=null) {
-      mLayoutType = node.getAttrs().getLayoutType();
-      mColumnCount = node.getAttrs().getColumnCount();
+    if (node != null && node instanceof WXRecyclerDomObject) {
+      WXRecyclerDomObject domObject = (WXRecyclerDomObject) node;
+      domObject.preCalculateCellWidth();
+      mLayoutType = domObject.getLayoutType();
+      mColumnCount = domObject.getColumnCount();
+      mColumnGap = domObject.getColumnGap();
+
     }
   }
 
   @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
 
-    return new BounceRecyclerView(context,mLayoutType,mColumnCount,orientation);
+    return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
   }
 
   @Override
@@ -294,6 +303,31 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
 
     return false;
   }
+
+  @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
+  public void setColumnCount(int columnCount) throws InterruptedException {
+    WXLogUtils.w("zshshr","setColumnCount :  "+"htread:"+Thread.currentThread().getName());
+    mColumnCount = columnCount;
+    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  }
+
+  @WXComponentProp(name = Constants.Name.COLUMN_GAP)
+  public void setColumnGap(float columnGap) throws InterruptedException {
+    mColumnGap = columnGap;
+    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  }
+
+  @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
+  public void showScrollbar(boolean isShow) throws InterruptedException {
+    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+    wxRecyclerView.setScrollbarFadingEnabled(isShow);
+    wxRecyclerView.setVerticalScrollBarEnabled(isShow);
+
+    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  }
+
 
   @Override
   public void createChildViewAt(int index) {

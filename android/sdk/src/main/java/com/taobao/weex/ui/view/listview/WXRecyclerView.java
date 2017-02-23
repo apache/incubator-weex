@@ -204,14 +204,16 @@
  */
 package com.taobao.weex.ui.view.listview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
 
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -241,48 +243,31 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     return super.postDelayed(WXThread.secure(action), delayMillis);
   }
   public void initView(Context context, int type,int orientation) {
-    initView(context,type,0,orientation);
+    initView(context,type, Constants.Value.COLUMN_COUNT_NORMAL,Constants.Value.COLUMN_GAP_NORMAL,orientation);
   }
+
+
   /**
    *
    * @param context
    * @param type
    * @param orientation should be {@link OrientationHelper#HORIZONTAL} or {@link OrientationHelper#VERTICAL}
    */
-  public void initView(Context context, int type,int spanCount,int orientation) {
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+  public void initView(Context context, int type, int spanCount, float columnGap, int orientation) {
     if (type == TYPE_GRID_LAYOUT) {
       setLayoutManager(new GridLayoutManager(context, spanCount,orientation,false));
     } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new StaggeredGridLayoutManager(spanCount, orientation));
+      setLayoutManager(new WXStaggeredGridLayoutManager(spanCount, orientation));
+      addItemDecoration(new WXSpaceItemDecoration(columnGap));
+
     } else if (type == TYPE_LINEAR_LAYOUT) {
-      setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false){
-
-        @Override
-        public boolean supportsPredictiveItemAnimations() {
-          return false;
-        }
-
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-          try {
-            super.onLayoutChildren(recycler, state);
-          } catch (IndexOutOfBoundsException e) {
-             e.printStackTrace();
-
-          }
-        }
-
-        @Override
-        public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-          try {
-            return super.scrollVerticallyBy(dy, recycler, state);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          return 0;
-        }
-
-      });
+      setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false));
     }
+
+    setVerticalScrollBarEnabled(true);
+    setScrollable(true);
+    setScrollBarSize(10); 
   }
 
   @Override

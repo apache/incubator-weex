@@ -294,7 +294,6 @@ public class Constants {
     String RESIZE_MODE = "resizeMode";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
-    String SHOW_SCROLLBAR = "showScrollbar";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
     String RECYCLE = "recycle";
@@ -302,12 +301,10 @@ public class Constants {
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
     String LAYOUT = "layout";
-    String MULTI_COLUMN= "multi-column";
     String COLUMN_WIDTH= "columnWidth";
     String COLUMN_COUNT= "columnCount";
     String COLUMN_GAP= "columnGap";
-
-    String GRID= "grid";
+    String SHOW_SCROLLBAR= "showScrollbar";
     String OVERFLOW = "overflow";
     String TYPE = "type";
     String PLACEHOLDER = "placeholder";
@@ -354,12 +351,18 @@ public class Constants {
     String RETURN_KEY_TYPE = "returnKeyType";
     String OFFSET = "offset";
     String ANIMATED = "animated";
+    String AUTO = "auto";
   }
 
   public interface Value {
 
     int NAV_BAR_SHOWN = 0;
     int NAV_BAR_HIDDEN = 1;
+    int AUTO = -1;
+    int COLUMN_GAP_NORMAL = 32;
+    int COLUMN_COUNT_NORMAL = 1;
+    String MULTI_COLUMN= "multi-column";
+    String GRID= "grid";
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
@@ -388,6 +391,7 @@ public class Constants {
     String DIRECTION_RIGHT = "right";
     String DIRECTION_UP = "up";
     String DIRECTION_DOWN = "down";
+
   }
 
   public interface Event {

@@ -221,6 +221,7 @@ import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
 import java.util.Stack;
 
+
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements ListComponentView,WXGestureObservable {
 
   private RecyclerViewBaseAdapter adapter = null;
@@ -228,28 +229,25 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   private Stack<WXCell> headComponentStack = new Stack<>();
   private WXGesture mGesture;
   private int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
-  private int mSpanCount = 1;
+  private int mColumnCount = 1;
+  private float mColumnGap = 1;
 
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
     return super.postDelayed(WXThread.secure(action), delayMillis);
   }
 
-  public BounceRecyclerView(Context context,int type,int spanCount,int orientation) {
+  public BounceRecyclerView(Context context,int type,int columnCount,float columnGap,int orientation) {
     super(context, orientation);
     mLayoutType = type;
-    mSpanCount = spanCount;
+    mColumnCount = columnCount;
+    mColumnGap = columnGap;
     init(context);
   }
-
   public BounceRecyclerView(Context context,int type,int orientation) {
     super(context, orientation);
     mLayoutType = type;
     init(context);
-  }
-
-  public BounceRecyclerView(Context context, int orientation) {
-    super(context, orientation);
   }
 
   public void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter) {
@@ -275,7 +273,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   @Override
   public WXRecyclerView setInnerView(Context context) {
     WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
-    wxRecyclerView.initView(context, mLayoutType,mSpanCount,getOrientation());
+    wxRecyclerView.initView(context, mLayoutType,mColumnCount,mColumnGap,getOrientation());
     return wxRecyclerView;
   }
 

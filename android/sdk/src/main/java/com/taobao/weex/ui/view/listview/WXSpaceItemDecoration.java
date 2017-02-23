@@ -202,39 +202,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui.component;
+package com.taobao.weex.ui.view.listview;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.component.list.WXCell;
+import android.graphics.Rect;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 /**
- * The same as sticky cell
+ * Created by zhengshihan on 2017/2/20.
  */
-@Component(lazyload = false)
-public class WXHeader extends WXCell {
 
-  @Deprecated
-  public WXHeader(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent,isLazy);
-  }
+public class WXSpaceItemDecoration extends RecyclerView.ItemDecoration {
+    private float space;
 
-  public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
-    if(WXBasicComponentType.LIST.equals((parent.getDomObject().getType()))){
-      setSticky(Constants.Value.STICKY);
+    public WXSpaceItemDecoration(float space) {
+        this.space = space;
     }
-  }
 
-  @Override
-  public boolean isLazy() {
-    return false;
-  }
-
-  @Override
-  public boolean isSticky() {
-    return true;
-  }
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+        outRect.right = (int)space/2;
+        outRect.left = (int)space/2;
+    }
 }

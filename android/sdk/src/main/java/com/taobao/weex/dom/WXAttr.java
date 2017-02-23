@@ -440,34 +440,69 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return ret;
   }
 
-  public int getColumnWidth(){
+  public float getColumnWidth(){
 
     Object obj = get(Constants.Name.COLUMN_WIDTH);
     if (obj == null) {
-      return 0;
+      return Constants.Value.AUTO;
+    }
+
+    String value = String.valueOf(obj);
+    if(Constants.Name.AUTO.equals(value)){
+      return Constants.Value.AUTO;
     }
 
     try {
-      return Integer.parseInt(String.valueOf(obj));
+      float columnWidth = Float.parseFloat(value);
+      return columnWidth > 0 ? columnWidth : 0;
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] getColumnWidth:", e);
     }
-    return 0;
+    return Constants.Value.AUTO;
   }
 
   public int getColumnCount() {
 
     Object obj = get(Constants.Name.COLUMN_COUNT);
     if (obj == null) {
-      return 1;
+      return Constants.Value.AUTO;
     }
+
+    String value = String.valueOf(obj);
+    if(Constants.Name.AUTO.equals(value)){
+      return Constants.Value.AUTO;
+    }
+
     try {
-      return Integer.parseInt(String.valueOf(obj));
+      int columnCount = Integer.parseInt(value);
+      return columnCount > 0 ? columnCount : Constants.Value.AUTO;
     } catch (Exception e) {
       WXLogUtils.e("[WXAttr] getColumnCount:", e);
-      return 1;
+      return Constants.Value.AUTO;
     }
   }
+
+  public float getColumnGap() {
+
+    Object obj = get(Constants.Name.COLUMN_GAP);
+    if (obj == null) {
+      return Constants.Value.COLUMN_GAP_NORMAL;
+    }
+
+    String value = String.valueOf(obj);
+    if (Constants.Name.AUTO.equals(value)) {
+      return Constants.Value.COLUMN_GAP_NORMAL;
+    }
+
+    try {
+      float columnGap = Float.parseFloat(value);
+      return columnGap >= 0 ? columnGap : Constants.Value.AUTO;
+    } catch (Exception e) {
+      WXLogUtils.e("[WXAttr] getColumnGap:", e);
+    }
+    return Constants.Value.COLUMN_GAP_NORMAL;
+  }
+
   public int getLayoutType(){
     Object obj = get(Constants.Name.LAYOUT);
     if (obj == null) {
@@ -476,9 +511,9 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
     try {
       switch(String.valueOf(obj)){
-        case Constants.Name.MULTI_COLUMN :
+        case Constants.Value.MULTI_COLUMN :
           return  WXRecyclerView.TYPE_STAGGERED_GRID_LAYOUT;
-        case Constants.Name.GRID :
+        case Constants.Value.GRID :
           return  WXRecyclerView.TYPE_GRID_LAYOUT;
         default:
           return WXRecyclerView.TYPE_LINEAR_LAYOUT;
