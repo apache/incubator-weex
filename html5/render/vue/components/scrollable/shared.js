@@ -9,14 +9,14 @@ import loading from './loading'
 
 export function createLoading (context, createElement, vnode) {
   const options = vnode.componentOptions
-  return createElement(loading, extend({
+  return createElement(loading, extend(vnode.data, {
     on: options.listeners
-  }, vnode.data), options.children)
+  }), options.children)
 }
 
 export function createRefresh (context, createElement, vnode) {
   const options = vnode.componentOptions
-  return createElement(refresh, extend({
+  return createElement(refresh, extend(vnode.data, {
     on: options.listeners
-  }, vnode.data), options.children)
+  }), options.children)
 }
