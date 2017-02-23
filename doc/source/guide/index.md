@@ -29,4 +29,52 @@ It's too easy，right? Let's focus on the syntax, obviously this is vue.
 
 You can try to modify the Hello World, then generate a new QR code to scan.
 
+## Set up development environment 
+
+You will need Node.js and the Weex CLi.
+
+You can installing Node using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active node.js versions). Run the following commands in a Terminal after installing nvm:
+
+```bash
+$ nvm install 6.10.0
+$ nvm use 6.10.0
+```
+
+Node.js comes with npm, which lets you install the Weex Cli.
+
+Run the following command in a Terminal:
+
+```bash
+$ npm install -g weex-toolkit@beta
+```
+
+**NOTE: ** If you get an error like "permission error",  try installing with `sudo`.
+
+
+Then you can use the weex command to verify that the installation is successful:
+
+![](https://img.alicdn.com/tps/TB1kHFrOFXXXXaYXXXXXXXXXXXX-615-308.jpg)
+
+### Generate a new Weex project
+
+You can use CLi to generate a Weex project called "awesome-project". Run the following command in a Terminal:
+
+```bash
+$ weex init awesome-project
+```
+
+Then we enter the awesome-project folder, the CLi has been for us to generate a standard project structure.
+
+### Usage
+
+We enter the awesome-project folder and install dependencies with the following commands:
+
+```bash
+npm install
+```
+
+Then we run `npm run dev` and `npm run serve` to start watch mode and static server.
+
+Finally, we can see the Weex page in `http://localhost:8080/index.html`.
+
 If you're curious to learn more about technical details, continue on to the next. And don't forget to write code at [dotWe](https://dotwe.org) and preview at anytime.

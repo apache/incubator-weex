@@ -21,6 +21,29 @@
   %>
   <title><% if (title){ %><%= title %> | <% } %><%= config.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <script>
+  ;(function(){
+    var currentOrigin = location.origin,
+        currentPathname = location.pathname,
+        currentLang = navigator.language,
+        selectedLang = '';
+
+    if (!currentLang) {
+      currentLang = navigator.browserLanguage;
+    }
+
+    if (window.localStorage) {
+      selectedLang = window.localStorage.getItem('lang')
+    }
+
+    if (currentLang.indexOf('zh') >= 0 
+      && currentPathname.indexOf('/cn/') != 0
+      && !selectedLang) {
+      location.href = currentOrigin + '/cn' + currentPathname;
+    }
+
+  })();
+  </script>
   <%- open_graph({twitter_id: theme.twitter, google_plus: theme.google_plus, fb_admins: theme.fb_admins, fb_app_id: theme.fb_app_id}) %>
   <% if (theme.rss){ %>
     <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">

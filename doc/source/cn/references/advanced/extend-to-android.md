@@ -55,6 +55,24 @@ JS 调用如下：
 </script>
 ```
 
+#### 支持 synchronous/asynchronous 回调
+
+你可以添加 `@JSMethod(uiThread = false或true)` 注释来选择 moudle 的回调模式。请参见以下示例：
+
+```java
+  // as sync-callback mode
+@JSMethod (uiThread = false)
+public void testSyncCall(){
+    WXLogUtils.d("WXComponentSyncTest : Thread.currentThread().getName());
+}
+
+// as async-callback mode
+@JSMethod (uiThread = true)
+public void testAsyncCall(){
+    WXLogUtils.e("WXComponentASynTest : Thread.currentThread().getName() );
+}
+```
+
 ## Component 扩展
 
 1. Component 扩展类必须集成 WXComponent.
