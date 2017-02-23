@@ -12,7 +12,7 @@
 
 @implementation WXBoxShadow
 
-+(WXBoxShadow *)getViewBoxShadow:(UIView *_Nullable)view
++(WXBoxShadow *_Nullable)getViewBoxShadow:(UIView *_Nullable)view
 {
     WXBoxShadow *boxShadow = [WXBoxShadow new];
     boxShadow.shadowColor = view.layer.shadowColor;

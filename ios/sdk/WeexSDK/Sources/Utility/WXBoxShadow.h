@@ -25,7 +25,7 @@
  *
  *  @return A WXBoxShadow object
  */
-+(WXBoxShadow *)getViewBoxShadow:(UIView *_Nullable)view;
++(WXBoxShadow *_Nullable)getViewBoxShadow:(UIView *_Nullable)view;
 
 /**
  *  @abstract compare boxshadow
