@@ -13,7 +13,6 @@ export function applySrc (item, src, placeholderSrc) {
   function finallCb () {
     item.removeAttribute('img-src')
   }
-  const context = item.__vue__
   preLoadImg(src, function () {
     item.style.backgroundImage = `url(${src})`
     const { width: naturalWidth, height: naturalHeight } = this
