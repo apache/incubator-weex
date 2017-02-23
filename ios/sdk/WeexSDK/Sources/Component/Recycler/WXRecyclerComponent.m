@@ -273,7 +273,7 @@ typedef enum : NSUInteger {
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    WXLogError(@"section number:%zi", [self.dataController numberOfSections]);
+    WXLogDebug(@"section number:%zi", [self.dataController numberOfSections]);
     return [self.dataController numberOfSections];
 }
 
@@ -414,12 +414,24 @@ typedef enum : NSUInteger {
 
 - (void)cellDidRemove:(WXCellComponent *)cell
 {
-    
+    if (cell.isLayoutComplete) {
+        WXPerformBlockOnMainThread(^{
+            [self.collectionView.collectionViewLayout invalidateLayout];
+            [self performUpdatesWithCompletion:^(BOOL finished) {
+            }];
+        });
+    }
 }
 
 - (void)cell:(WXCellComponent *)cell didMoveToIndex:(NSUInteger)index
 {
-    
+    if (cell.isLayoutComplete) {
+        WXPerformBlockOnMainThread(^{
+            [self.collectionView.collectionViewLayout invalidateLayout];
+            [self performUpdatesWithCompletion:^(BOOL finished) {
+            }];
+        });
+    }
 }
 
 #pragma makrk - private
