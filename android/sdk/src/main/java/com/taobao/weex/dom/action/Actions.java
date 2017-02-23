@@ -202,122 +202,113 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.dom.action;
 
-import android.text.TextUtils;
-
-import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.annotation.Config;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.dom.DOMAction;
+import static com.taobao.weex.dom.WXDomModule.*;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 01/03/2017.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
 
-    RenderActionContextImpl mWXRenderStatement;
+public class Actions {
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new RenderActionContextImpl(instance);
+  public static DOMAction get(String actionName,JSONArray args){
+    switch (actionName) {
+      case CREATE_BODY:
+        if (args == null) {
+          return null;
+        }
+        return new CreateBodyAction(args.getJSONObject(0));
+      case UPDATE_ATTRS:
+        if (args == null) {
+          return null;
+        }
+        return new UpdateAttributeAction(args.getString(0),args.getJSONObject(1));
+      case UPDATE_STYLE:
+        if (args == null) {
+          return null;
+        }
+        return new UpdateStyleAction(args.getString(0),args.getJSONObject(1));
+      case REMOVE_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new RemoveElementAction(args.getString(0));
+      case ADD_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new AddElementAction(args.getJSONObject(1),args.getString(0),args.getInteger(2));
+      case MOVE_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new MoveElementAction(args.getString(0),args.getString(1),args.getInteger(2));
+      case ADD_EVENT:
+        if (args == null) {
+          return null;
+        }
+        return new AddEventAction(args.getString(0),args.getString(1));
+      case REMOVE_EVENT:
+        if (args == null) {
+          return null;
+        }
+        return new RemoveEventAction(args.getString(0),args.getString(1));
+      case CREATE_FINISH:
+        return new CreateFinishAction();
+      case REFRESH_FINISH:
+        return new RefreshFinishAction();
+      case UPDATE_FINISH:
+        return new UpdateFinishAction();
+      case SCROLL_TO_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new ScrollToElementAction(args.getString(0),args.getJSONObject(1));
+      case ADD_RULE:
+        if (args == null) {
+          return null;
+        }
+        return new AddRuleAction(args.getString(0),args.getJSONObject(1));
+      case GET_COMPONENT_RECT:
+        if(args == null){
+          return null;
+        }
+        return new GetComponentRectAction(args.getString(0),args.getString(1));
+      case INVOKE_METHOD:
+        if(args == null){
+          return null;
+        }
+        return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
     }
 
-    public void testCreateBody() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
-    }
-
-    public void testSetPadding() throws Exception {
-
-    }
-
-    public void testSetLayout() throws Exception {
-
-    }
-
-    public void testSetExtra() throws Exception {
-
-    }
-
-    public void testAddComponent() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
+    return null;
+  }
 
 
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
+  public static DOMAction getInvokeMethod(String ref,String method,JSONArray args){
+    return new InvokeMethodAction(ref,method,args);
+  }
 
-    }
+  /**
+   * Bridge will get this action directly.
+   * @param data
+   * @param parentRef
+   * @param index
+   * @return
+   */
+  public static DOMAction getAddElement(JSONObject data, String parentRef, int index){
+    return new AddElementAction(data,parentRef,index);
+  }
 
-    public void testAddComponent1() throws Exception {
+  public static DOMAction getUpdateStyle(String ref, JSONObject data, boolean byPesudo){
+    return new UpdateStyleAction(ref,data,byPesudo);
+  }
 
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
+  public static DOMAction getAddEvent(String ref, String type) {
+    return new AddEventAction(ref,type);
+  }
 }

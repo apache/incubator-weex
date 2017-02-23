@@ -210,7 +210,10 @@ import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.WXSDKManagerTest;
 import com.taobao.weex.bridge.WXBridgeManagerTest;
+import com.taobao.weex.dom.action.TestActions;
 import com.taobao.weex.ui.WXRenderManager;
 
 import org.junit.After;
@@ -231,7 +234,7 @@ import org.robolectric.shadows.ShadowLooper;
 @PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
 public class WXDomStatementTest {
 
-  WXDomStatement stmt;
+  DOMActionContextImpl stmt;
   WXRenderManager rednerManager;
   WXSDKInstance instance;
 
@@ -244,7 +247,8 @@ public class WXDomStatementTest {
     instance = WXSDKInstanceTest.createInstance();
     rednerManager = new WXRenderManager();
     rednerManager.registerInstance(instance);//
-    stmt = new WXDomStatement(instance.getInstanceId(),rednerManager );
+    WXSDKManagerTest.setRenderManager(rednerManager);
+    stmt = new DOMActionContextImpl(instance.getInstanceId(),rednerManager );
   }
 
   @After
@@ -256,7 +260,51 @@ public class WXDomStatementTest {
     JSONObject body = new JSONObject();
     body.put("type","div");
     body.put("ref",WXDomObject.ROOT);
-    stmt.createBody(body);
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(), TestActions.body(body),true);
+  }
+
+  void addDom(JSONObject obj,String parentRef,int index){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.addDom(obj,parentRef,index),false);
+  }
+
+  void removeDom(String ref){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.remove(ref),false);
+  }
+
+  void updateAttrs(String ref,JSONObject data){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.updateAttr(ref,data),false);
+  }
+
+  void updateStyle(String ref,JSONObject data,boolean byPesudo){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.updateStyle(ref,data,byPesudo),false);
+  }
+
+  void moveDom(String ref,String parent,int index){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.moveDom(ref,parent,index),false);
+  }
+
+  private void scrollToDom(String s, JSONObject o) {
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.scrollTo(s,o),false);
+  }
+
+  private void addEvent(String ref,String event){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.addEvent(ref,event),false);
+  }
+
+  private void removeEvent(String ref,String event){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.removeEvent(ref,event),false);
+  }
+
+  private void updateFinish(){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.updateFinish(),false);
+  }
+
+  private void createFinish(){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.createFinish(),false);
+  }
+
+  private void refreshFinish(){
+    WXSDKManager.getInstance().getWXDomManager().executeAction(instance.getInstanceId(),TestActions.refreshFinish(),false);
   }
 
   @Test
@@ -268,7 +316,7 @@ public class WXDomStatementTest {
     root.add(new WXSwitchDomObject(),0);
     root.add(new TextAreaEditTextDomObject(),0);
     stmt.layout(root);
-    root.traverseTree(WXDomStatement.ApplyStyleConsumer.getInstance());
+    root.traverseTree(ApplyStyleConsumer.getInstance());
   }
 
   @Test
@@ -286,7 +334,7 @@ public class WXDomStatementTest {
     obj.put("type","div");
     obj.put("ref","100");
 
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
     stmt.batch();
   }
@@ -298,14 +346,14 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","101");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.moveDom("100",WXDomObject.ROOT,1);
+    moveDom("100",WXDomObject.ROOT,1);
     stmt.batch();
   }
 
@@ -316,14 +364,14 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","101");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.removeDom("101");
+    removeDom("101");
 
     stmt.batch();
   }
@@ -335,11 +383,11 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
 
-    stmt.updateAttrs("100",new JSONObject());
-    stmt.updateAttrs("100",null);
+    updateAttrs("100",new JSONObject());
+    updateAttrs("100",null);
 
     stmt.batch();
   }
@@ -351,10 +399,10 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.updateStyle("100",new JSONObject(),false);
-    stmt.updateStyle("100",null,false);
+    updateStyle("100",new JSONObject(),false);
+    updateStyle("100",null,false);
 
     stmt.batch();
   }
@@ -366,10 +414,10 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.addEvent("100","click");
-    stmt.addEvent("100",null);
+    addEvent("100","click");
+    addEvent("100",null);
 
     stmt.batch();
   }
@@ -381,11 +429,11 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.removeEvent("100",null);
-    stmt.addEvent("100","click");
-    stmt.removeEvent("100","click");
+    removeEvent("100",null);
+    addEvent("100","click");
+    removeEvent("100","click");
 
     stmt.batch();
   }
@@ -397,16 +445,18 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
 
-    stmt.scrollToDom("100",null);
+    scrollToDom("100",null);
     stmt.batch();
   }
+
+
 
   @Test
   public void testCreateFinish() throws Exception {
     createBody();
-    stmt.createFinish();
+    createFinish();
 
     stmt.batch();
   }
@@ -414,7 +464,7 @@ public class WXDomStatementTest {
   @Test
   public void testRefreshFinish() throws Exception {
     createBody();
-    stmt.refreshFinish();
+    refreshFinish();
 
     stmt.batch();
   }
@@ -423,7 +473,7 @@ public class WXDomStatementTest {
   public void testUpdateFinish() throws Exception {
     createBody();
 
-    stmt.updateFinish();
+    updateFinish();
     stmt.batch();
   }
 
@@ -434,7 +484,7 @@ public class WXDomStatementTest {
     obj = new JSONObject();
     obj.put("type","div");
     obj.put("ref","100");
-    stmt.addDom(obj,WXDomObject.ROOT,0);
+    addDom(obj,WXDomObject.ROOT,0);
     stmt.startAnimation("100","",null);
   }
 }

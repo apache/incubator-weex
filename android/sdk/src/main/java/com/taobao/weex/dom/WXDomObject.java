@@ -272,7 +272,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   private boolean mYoung = false;
 
-  /** package **/ void traverseTree(Consumer...consumers){
+  public void traverseTree(Consumer...consumers){
     if (consumers == null) {
       return;
     }
@@ -855,7 +855,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       return domObject;
   }
 
-  interface Consumer{
+  public interface Consumer{
     void accept(WXDomObject dom);
   }
 }

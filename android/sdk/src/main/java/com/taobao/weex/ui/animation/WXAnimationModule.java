@@ -355,7 +355,7 @@ public class WXAnimationModule extends WXModule {
         @Override
         public void onAnimationEnd(Animator animation) {
           if (instance == null) {
-            WXLogUtils.e("WXRenderStatement-onAnimationEnd WXSDKInstance == null NPE");
+            WXLogUtils.e("RenderActionContextImpl-onAnimationEnd WXSDKInstance == null NPE");
           } else {
             WXSDKManager.getInstance().callback(instance.getInstanceId(),
                                                 callBack,

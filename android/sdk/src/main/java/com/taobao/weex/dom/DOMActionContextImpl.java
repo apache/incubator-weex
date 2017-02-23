@@ -206,29 +206,20 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -252,13 +243,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link WXRenderManager} works as the <strong>Receiver</strong>.
  * </p>
  * <p>
- * There exists one to one correspondence between WXDomStatement and WXInstance,
+ * There exists one to one correspondence between DOMActionContextImpl and WXInstance,
  * and {@link WXDomManager} is responsible for manage the relation of correspondence.
  * </p>
  */
-class WXDomStatement {
+class DOMActionContextImpl implements DOMActionContext {
   /** package **/ final ConcurrentHashMap<String, WXDomObject> mRegistry;
   private WXDomObject.Consumer mAddDOMConsumer;
+  private WXDomObject.Consumer mUnregisterDomConsumer;
   private String mInstanceId;
   private WXRenderManager mWXRenderManager;
   private ArrayList<IWXRenderTask> mNormalTasks;
@@ -269,15 +261,15 @@ class WXDomStatement {
   private Map<String, AddDomInfo> mAddDom = new HashMap<>();
 
   /**
-   * Create an instance of {@link WXDomStatement},
-   * One {@link WXSDKInstance} corresponding to one and only one {@link WXDomStatement}.
+   * Create an instance of {@link DOMActionContextImpl},
+   * One {@link WXSDKInstance} corresponding to one and only one {@link DOMActionContextImpl}.
    * And all the instance of {@link WXDomManager} share the same {@link WXRenderManager}.
    * @param instanceId the id of the {@link WXSDKInstance}.
-   *                   One {@link WXSDKInstance} corresponding to one {@link WXDomStatement},
+   *                   One {@link WXSDKInstance} corresponding to one {@link DOMActionContextImpl},
    *                   and vice versa.
    * @param renderManager This acts as the Receiver of the command pattern
    */
-  public WXDomStatement(String instanceId, WXRenderManager renderManager) {
+  public DOMActionContextImpl(String instanceId, WXRenderManager renderManager) {
     mDestroy = false;
     mInstanceId = instanceId;
     mLayoutContext = new CSSLayoutContext();
@@ -286,6 +278,34 @@ class WXDomStatement {
     animations = new LinkedHashSet<>();
     mWXRenderManager = renderManager;
     mAddDOMConsumer = new AddDOMConsumer(mRegistry);
+    mUnregisterDomConsumer = new RemoveElementConsumer(mRegistry);
+  }
+
+  @Override
+  public String getInstanceId() {
+    return mInstanceId;
+  }
+
+  @Override
+  public WXDomObject.Consumer getAddDOMConsumer(){
+    return mAddDOMConsumer;
+  }
+
+  @Override
+  public WXDomObject.Consumer getRemoveElementConsumer() {
+    return mUnregisterDomConsumer;
+  }
+
+  @Override
+  public WXDomObject.Consumer getApplyStyleConsumer() {
+    return ApplyStyleConsumer.getInstance();
+  }
+
+  @Override
+  public void addDomInfo(String ref, WXComponent component) {
+    AddDomInfo addDomInfo = new AddDomInfo();
+    addDomInfo.component = component;
+    mAddDom.put(ref, addDomInfo);
   }
 
   /**
@@ -408,7 +428,7 @@ class WXDomStatement {
     }
   }
 
-  class ApplyUpdateConsumer implements WXDomObject.Consumer{
+  private class ApplyUpdateConsumer implements WXDomObject.Consumer{
 
     @Override
     public void accept(WXDomObject dom) {
@@ -461,43 +481,6 @@ class WXDomStatement {
   }
 
   /**
-   * Create command object for creating body according to the JSONObject. And put the command
-   * object in the queue.
-   * @param dom the jsonObject according to which to create command object.
-   */
-  void createBody(JSONObject dom) {
-    addDomInternal(dom,true,null,-1);
-  }
-
-  private class CreateBodyTask implements IWXRenderTask {
-    final WXComponent mComponent;
-
-    CreateBodyTask(WXComponent component) {
-      mComponent = component;
-    }
-
-    @Override
-    public void execute() {
-      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-      if (instance == null || instance.getContext() == null) {
-        WXLogUtils.e("instance is null or instance is destroy!");
-        return;
-      }
-      try {
-        mWXRenderManager.createBody(mInstanceId, mComponent);
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-      } catch (Exception e) {
-        WXLogUtils.e("create body failed.", e);
-      }
-    }
-
-    @Override
-    public String toString() {
-      return "createBody";
-    }
-  }
-
-  /**
    * Update all components' dom info stored in {@link #mAddDom}
    */
   private void updateDomObj() {
@@ -538,582 +521,6 @@ class WXDomStatement {
     }
   }
 
-  void invokeMethod(String ref, String method, JSONArray args){
-    if(mDestroy){
-      return;
-    }
-    WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId, ref);
-    if(comp == null){
-      WXLogUtils.e("DomStatement","target component not found.");
-      return;
-    }
-    comp.invoke(method,args);
-  }
-
-  /**
-   * Add DOM node.
-   * @param dom
-   * @param isRoot
-   * @param parentRef
-   * @param index
-   */
-  private void addDomInternal(JSONObject dom,boolean isRoot, String parentRef, final int index){
-    if (mDestroy) {
-      return;
-    }
-
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    if (instance == null) {
-      return;
-    }
-    WXErrorCode errCode = isRoot ? WXErrorCode.WX_ERR_DOM_CREATEBODY : WXErrorCode.WX_ERR_DOM_ADDELEMENT;
-    if (dom == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-    }
-
-    //only non-root has parent.
-    WXDomObject parent;
-    WXDomObject domObject = WXDomObject.parse(dom,instance);
-
-    if (domObject == null || mRegistry.containsKey(domObject.getRef())) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e("[WXDomStatement] " + (isRoot ? "createBody" : "addDom") + " error,DOM object is null or already registered!!");
-      }
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-      return;
-    }
-    if (isRoot) {
-      WXDomObject.prepareRoot(domObject,
-                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(mInstanceId),WXSDKManager.getInstanceViewPortWidth(mInstanceId)),
-                              WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(mInstanceId),WXSDKManager.getInstanceViewPortWidth(mInstanceId)));
-    } else if ((parent = mRegistry.get(parentRef)) == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-      return;
-    } else {
-      //non-root and parent exist
-      parent.add(domObject, index);
-    }
-
-    domObject.traverseTree(
-        mAddDOMConsumer,
-        ApplyStyleConsumer.getInstance()
-                          );
-
-    //Create component in dom thread
-    WXComponent component = isRoot ?
-                            mWXRenderManager.createBodyOnDomThread(mInstanceId, domObject) :
-                            mWXRenderManager.createComponentOnDomThread(mInstanceId, domObject, parentRef, index);
-    if (component == null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
-      //stop redner, some fatal happened.
-      return;
-    }
-    AddDomInfo addDomInfo = new AddDomInfo();
-    addDomInfo.component = component;
-    mAddDom.put(domObject.getRef(), addDomInfo);
-
-    IWXRenderTask task = isRoot ? new CreateBodyTask(component) : new AddDOMTask(component, parentRef, index);
-    mNormalTasks.add(task);
-    addAnimationForDomTree(domObject);
-    mDirty = true;
-
-    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-  }
-
-  /**
-   * Create a command object for adding a dom node to its parent in a specific location.
-   * If dom's parent doesn't exist or the dom has been added in current {@link WXSDKInstance},
-   * this method will return.
-   * If the above request is met, then put the command object in the queue.
-   * @param dom the dom object in the form of JSONObject
-   * @param parentRef parent to which the dom is added.
-   * @param index the location of which the dom is added.
-   */
-  void addDom(JSONObject dom, final String parentRef, final int index) {
-    addDomInternal(dom,false,parentRef,index);
-  }
-
-  private class AddDOMTask implements IWXRenderTask {
-    final WXComponent mComponent;
-    final String mParentRef;
-    final int mIndex;
-    AddDOMTask(WXComponent comp,String parentRef,int index){
-      mComponent = comp;
-      mParentRef = parentRef;
-      mIndex = index;
-    }
-
-    @Override
-    public void execute() {
-      WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-      if(instance == null || instance.getContext()== null) {
-        WXLogUtils.e("instance is null or instance is destroy!");
-        return;
-      }
-      try {
-        mWXRenderManager.addComponent(mInstanceId, mComponent, mParentRef, mIndex);
-      }catch (Exception e){
-        WXLogUtils.e("add component failed.", e);
-      }
-    }
-
-    @Override
-    public String toString() {
-      return "AddDom";
-    }
-  }
-
-  /**
-   * Create a command object for moving the specific {@link WXDomObject} to a new parent.
-   * If any of the following situation is met,
-   * <ul>
-   * <li> dom to be moved is null </li>
-   * <li> dom's parent is null </li>
-   * <li> new parent is null </li>
-   * <li> parent is under {@link CSSNode#hasNewLayout()} </li>
-   * </ul>
-   * this method will return. Otherwise, put the command object in the queue.
-   * @param ref Reference of the dom to be moved.
-   * @param parentRef Reference of the new parent DOM node
-   * @param index the index of the dom to be inserted in the new parent.
-   */
-  void moveDom(final String ref, final String parentRef, int index) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    WXDomObject domObject = mRegistry.get(ref);
-    WXDomObject parentObject = mRegistry.get(parentRef);
-    if (domObject == null || domObject.parent == null
-        || parentObject == null || parentObject.hasNewLayout()) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_MOVEELEMENT);
-      }
-      return;
-    }
-    if (domObject.parent.equals(parentObject)) {
-      if(parentObject.index(domObject) == index) {
-        return;
-      } else if(domObject.parent.index(domObject)<index){
-        index = index -1;
-      }
-    }
-
-    final int newIndex = index;
-    domObject.parent.remove(domObject);
-    parentObject.add(domObject, newIndex);
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.moveComponent(mInstanceId, ref, parentRef, newIndex);
-      }
-
-      @Override
-      public String toString() {
-        return "moveDom";
-      }
-    });
-
-    mDirty = true;
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for removing the specified {@link WXDomObject}.
-   * If the domObject is null or its parent is null, this method returns directly.
-   * Otherwise, put the command object in the queue.
-   * @param ref Reference of the dom.
-   */
-  void removeDom(final String ref) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
-      }
-      return;
-    }
-    WXDomObject parent = domObject.parent;
-    if (parent == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
-      }
-      return;
-    }
-    domObject.traverseTree(new WXDomObject.Consumer() {
-      @Override
-      public void accept(WXDomObject dom) {
-        mRegistry.remove(dom.getRef());
-      }
-    });
-    parent.remove(domObject);
-    mRegistry.remove(ref);
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.removeComponent(mInstanceId, ref);
-      }
-
-      @Override
-      public String toString() {
-        return "removeDom";
-      }
-    });
-
-    mDirty = true;
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Update the attributes according to the given attribute. Then creating a
-   * command object for updating corresponding view and put the command object in the queue.
-   * @param ref Reference of the dom.
-   * @param attrs the new style. This style is only a part of the full attribute set, and will be
-   *              merged into attributes
-   * @see #updateStyle(String, JSONObject)
-   */
-  void updateAttrs(String ref, final JSONObject attrs) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    final WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATEATTRS);
-      }
-      return;
-    }
-
-    domObject.updateAttr(attrs);
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.updateAttrs(mInstanceId, domObject.getRef(), attrs);
-      }
-
-      @Override
-      public String toString() {
-        return "updateAttr";
-      }
-    });
-    mDirty = true;
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Update styles according to the given style. Then creating a
-   * command object for updating corresponding view and put the command object in the queue.
-   * @param ref Reference of the dom.
-   * @param style the new style. This style is only a part of the full style, and will be merged
-   *              into styles
-   * @param byPesudo updateStyle by pesduo class
-   * @see #updateAttrs(String, JSONObject)
-   */
-  void updateStyle(String ref, JSONObject style, boolean byPesudo) {
-    if (mDestroy || style == null) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATESTYLE);
-      }
-      return;
-    }
-
-    Map<String, Object> animationMap= new ArrayMap<>(2);
-    animationMap.put(WXDomObject.TRANSFORM, style.remove(WXDomObject.TRANSFORM));
-    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, style.remove(WXDomObject.TRANSFORM_ORIGIN));
-    animations.add(new Pair<>(ref, animationMap));
-
-    if(!style.isEmpty()){
-      domObject.updateStyle(style, byPesudo);
-      domObject.traverseTree(ApplyStyleConsumer.getInstance());
-      updateStyle(domObject, style);
-    }
-    mDirty = true;
-
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create the command object for updating style and put it the queue. If the given style
-   * contains border-width and padding that will affect layout, then a command object for reset
-   * padding will also be created.
-   * @param domObject the given dom object
-   * @param update the given style.
-   */
-  private void updateStyle(final WXDomObject domObject, final Map<String, Object> update) {
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.updateStyle(mInstanceId, domObject.getRef(), update);
-      }
-
-      @Override
-      public String toString() {
-        return "updateStyle";
-      }
-    });
-    if (update.containsKey(Constants.Name.PADDING) ||
-        update.containsKey(Constants.Name.PADDING_TOP) ||
-        update.containsKey(Constants.Name.PADDING_LEFT) ||
-        update.containsKey(Constants.Name.PADDING_RIGHT) ||
-        update.containsKey(Constants.Name.PADDING_BOTTOM) ||
-        update.containsKey(Constants.Name.BORDER_WIDTH)) {
-      mNormalTasks.add(new IWXRenderTask() {
-
-        @Override
-        public void execute() {
-          Spacing padding = domObject.getPadding();
-          Spacing border = domObject.getBorder();
-          mWXRenderManager.setPadding(mInstanceId, domObject.getRef(), padding, border);
-        }
-
-        @Override
-        public String toString() {
-          return "setPadding";
-        }
-      });
-    }
-  }
-
-  /**
-   * Create a command object for adding a default event listener to the corresponding {@link
-   * WXDomObject} and put the command object in the queue.
-   * When the event is triggered, the eventListener will call {@link WXSDKManager#fireEvent(String, String, String)}
-   * , and the JS will handle all the operations from there.
-   *
-   * @param ref Reference of the dom.
-   * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
-   * .weex.ui.view.gesture.WXGestureType}
-   */
-  void addEvent(final String ref, final String type) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    final WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_ADDEVENT);
-      }
-      return;
-    }
-    domObject.addEvent(type);
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId,ref);
-        if(comp != null){
-          //sync dom change to component
-          comp.updateDom(domObject);
-          mWXRenderManager.addEvent(mInstanceId, ref, type);
-        }
-      }
-
-      @Override
-      public String toString() {
-        return "Add event";
-      }
-    });
-
-    mDirty = true;
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for removing the event listener of the corresponding {@link
-   * WXDomObject} and put the command event in the queue.
-   * @param ref Reference of the dom.
-   * @param type the type of the event, this may be a plain event defined in
-   * {@link com.taobao.weex.common.Constants.Event} or a gesture defined in {@link com.taobao
-   * .weex.ui.view.gesture.WXGestureType}
-   */
-  void removeEvent(final String ref, final String type) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    final WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      if (instance != null) {
-        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEEVENT);
-      }
-      return;
-    }
-    domObject.removeEvent(type);
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        WXComponent comp = mWXRenderManager.getWXComponent(mInstanceId,ref);
-        if(comp != null){
-          //sync dom change to component
-          comp.updateDom(domObject);
-          mWXRenderManager.removeEvent(mInstanceId, ref, type);
-        }
-
-      }
-
-      @Override
-      public String toString() {
-        return "removeEvent";
-      }
-    });
-
-    mDirty = true;
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for scroll the given view to the specified position.
-   * @param ref Reference of the dom.
-   * @param options the specified position
-   */
-  void scrollToDom(final String ref, final JSONObject options) {
-    if (mDestroy) {
-      return;
-    }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.scrollToComponent(mInstanceId, ref, options);
-      }
-
-      @Override
-      public String toString() {
-        return "scrollToPosition";
-      }
-    });
-
-    mDirty = true;
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for notifying {@link WXRenderManager} that the process of creating
-   * given view is finished, and put the command object in the queue.
-   */
-  void createFinish() {
-    if (mDestroy) {
-      return;
-    }
-
-    final WXDomObject root = mRegistry.get(WXDomObject.ROOT);
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.createFinish(mInstanceId,
-                                      (int) root.getLayoutWidth(),
-                                      (int) root.getLayoutHeight());
-      }
-
-      @Override
-      public String toString() {
-        return "createFinish";
-      }
-    });
-
-    mDirty = true;
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for notifying {@link WXRenderManager} that the process of refreshing
-   * given view is finished, and put the command object in the queue.
-   */
-  void refreshFinish() {
-    if (mDestroy) {
-      return;
-    }
-    final WXDomObject root = mRegistry.get(WXDomObject.ROOT);
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        int realWidth = (int) root.getLayoutWidth();
-        int realHeight = (int) root.getLayoutHeight();
-        mWXRenderManager.refreshFinish(mInstanceId, realWidth, realHeight);
-      }
-
-      @Override
-      public String toString() {
-        return "refreshFinish";
-      }
-    });
-
-    mDirty = true;
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
-  /**
-   * Create a command object for notifying {@link WXRenderManager} that the process of update
-   * given view is finished, and put the command object in the queue.
-   */
-  void updateFinish() {
-    if (mDestroy) {
-      return;
-    }
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.updateFinish(mInstanceId);
-      }
-
-      @Override
-      public String toString() {
-        return "updateFinish";
-      }
-    });
-
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
-    if (instance != null) {
-      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
-    }
-  }
-
   void startAnimation(@NonNull final String ref, @NonNull String animation,
                       @Nullable final String callBack){
     if (mDestroy) {
@@ -1140,11 +547,51 @@ class WXDomStatement {
     }
   }
 
-  private void addAnimationForDomTree(WXDomObject domObject){
-    animations.add(new Pair<String, Map<String, Object>>(domObject.getRef(),domObject.getStyles()));
-    for(int i=0;i<domObject.childCount();i++){
-      addAnimationForDomTree(domObject.getChild(i));
-    }
+  @Override
+  public void addAnimationForElement(String ref, Map<String, Object> animMap) {
+    animations.add(new Pair<>(ref,animMap));
+    mDirty = true;
+  }
+
+  @Override
+  public void postRenderTask(RenderAction statement) {
+    mNormalTasks.add(new RenderTask(statement, mWXRenderManager.getWXRenderStatement(mInstanceId)));
+    mDirty = true;
+  }
+
+  @Override
+  public void registerDOMObject(String ref, WXDomObject obj) {
+    mRegistry.put(ref,obj);
+  }
+
+  @Override
+  public void unregisterDOMObject(String ref) {
+    mRegistry.remove(ref);
+  }
+
+  @Override
+  public void registerComponent(String ref, WXComponent comp) {
+    mWXRenderManager.registerComponent(mInstanceId,ref,comp);
+  }
+
+  @Override
+  public WXComponent getCompByRef(String ref) {
+    return mWXRenderManager.getWXComponent(mInstanceId,ref);
+  }
+
+  @Override
+  public boolean isDestory() {
+    return false;
+  }
+
+  @Override
+  public WXSDKInstance getInstance() {
+    return mWXRenderManager.getWXSDKInstance(mInstanceId);
+  }
+
+  @Override
+  public WXDomObject getDomByRef(String ref) {
+    return mRegistry.get(ref);
   }
 
   private WXAnimationBean createAnimationBean(String ref, String animation){
@@ -1187,6 +634,20 @@ class WXDomStatement {
     return null;
   }
 
+  private static class RemoveElementConsumer implements WXDomObject.Consumer {
+    final ConcurrentHashMap<String, WXDomObject> mRegistry;
+
+    RemoveElementConsumer(ConcurrentHashMap<String, WXDomObject> r) {
+      mRegistry = r;
+    }
+
+
+    @Override
+    public void accept(WXDomObject dom) {
+      mRegistry.remove(dom.getRef());
+    }
+  }
+
 
   private static class AddDOMConsumer implements WXDomObject.Consumer {
     final ConcurrentHashMap<String, WXDomObject> mRegistry;
@@ -1206,63 +667,6 @@ class WXDomStatement {
         rootDom.add2FixedDomList(dom.getRef());
       }
     }
-  }
-
-  static class ApplyStyleConsumer implements WXDomObject.Consumer {
-    static ApplyStyleConsumer sInstance;
-
-    public static ApplyStyleConsumer getInstance(){
-      if(sInstance == null){
-        sInstance = new ApplyStyleConsumer();
-      }
-      return sInstance;
-    }
-
-    private ApplyStyleConsumer(){};
-
-    @Override
-    public void accept(WXDomObject dom) {
-      WXStyle style = dom.getStyles();
-
-      /** merge default styles **/
-      Map<String, String> defaults = dom.getDefaultStyle();
-      if (defaults != null) {
-        for (Map.Entry<String, String> entry : defaults.entrySet()) {
-          if (!style.containsKey(entry.getKey())) {
-            style.put(entry.getKey(), entry.getValue());
-          }
-        }
-      }
-
-      if (dom.getStyles().size() > 0) {
-        dom.applyStyleToNode();
-      }
-    }
-  }
-
-  public void getComponentSize(final String ref, final JSCallback callback) {
-    if (mDestroy) {
-      Map<String, Object> options = new HashMap<>();
-      options.put("result", false);
-      options.put("errMsg", "Component does not exist");
-      callback.invoke(options);
-      return;
-    }
-
-    mNormalTasks.add(new IWXRenderTask() {
-
-      @Override
-      public void execute() {
-        mWXRenderManager.getComponentSize(mInstanceId, ref, callback);
-      }
-
-      @Override
-      public String toString() {
-        return "getComponentSize";
-      }
-    });
-    mDirty=true;
-
   }
 
   static class AddDomInfo {

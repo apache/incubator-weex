@@ -205,23 +205,18 @@
 package com.taobao.weex.dom;
 
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.bridge.SimpleJSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -239,20 +234,20 @@ public final class WXDomModule extends WXModule {
 
   /** package **/
   // method
-  static final String CREATE_BODY = "createBody";
-  static final String UPDATE_ATTRS = "updateAttrs";
-  static final String UPDATE_STYLE = "updateStyle";
-  static final String REMOVE_ELEMENT = "removeElement";
-  static final String ADD_ELEMENT = "addElement";
-  static final String MOVE_ELEMENT = "moveElement";
-  static final String ADD_EVENT = "addEvent";
-  static final String REMOVE_EVENT = "removeEvent";
-  static final String CREATE_FINISH = "createFinish";
-  static final String REFRESH_FINISH = "refreshFinish";
-  static final String UPDATE_FINISH = "updateFinish";
-  static final String SCROLL_TO_ELEMENT = "scrollToElement";
-  static final String ADD_RULE = "addRule";
-  static final String GET_COMPONENT_RECT = "getComponentRect";
+  public static final String CREATE_BODY = "createBody";
+  public static final String UPDATE_ATTRS = "updateAttrs";
+  public static final String UPDATE_STYLE = "updateStyle";
+  public static final String REMOVE_ELEMENT = "removeElement";
+  public static final String ADD_ELEMENT = "addElement";
+  public static final String MOVE_ELEMENT = "moveElement";
+  public static final String ADD_EVENT = "addEvent";
+  public static final String REMOVE_EVENT = "removeEvent";
+  public static final String CREATE_FINISH = "createFinish";
+  public static final String REFRESH_FINISH = "refreshFinish";
+  public static final String UPDATE_FINISH = "updateFinish";
+  public static final String SCROLL_TO_ELEMENT = "scrollToElement";
+  public static final String ADD_RULE = "addRule";
+  public static final String GET_COMPONENT_RECT = "getComponentRect";
 
   public static final String WXDOM = "dom";
 
@@ -284,95 +279,14 @@ public final class WXDomModule extends WXModule {
     if (method == null) {
       return null;
     }
+    //TODO：add pooling
     try {
-      switch (method) {
-        case CREATE_BODY:
-          if (args == null) {
-            return null;
-          }
-          createBody((JSONObject) args.get(0));
-          break;
-        case UPDATE_ATTRS:
-          if (args == null) {
-            return null;
-          }
-          updateAttrs((String) args.get(0), (JSONObject) args.get(1));
-          break;
-        case UPDATE_STYLE:
-          if (args == null) {
-            return null;
-          }
-          updateStyle((String) args.get(0), (JSONObject) args.get(1));
-          break;
-        case REMOVE_ELEMENT:
-          if (args == null) {
-            return null;
-          }
-          removeElement((String) args.get(0));
-          break;
-        case ADD_ELEMENT:
-          if (args == null) {
-            return null;
-          }
-          addElement((String) args.get(0), (JSONObject) args.get(1), (Integer) args.get(2));
-          break;
-        case MOVE_ELEMENT:
-          if (args == null) {
-            return null;
-          }
-          moveElement((String) args.get(0), (String) args.get(1), (Integer) args.get(2));
-          break;
-        case ADD_EVENT:
-          if (args == null) {
-            return null;
-          }
-          addEvent((String) args.get(0), (String) args.get(1));
-          break;
-        case REMOVE_EVENT:
-          if (args == null) {
-            return null;
-          }
-          removeEvent((String) args.get(0), (String) args.get(1));
-          break;
-        case CREATE_FINISH:
-          createFinish();
-          break;
-        case REFRESH_FINISH:
-          refreshFinish();
-          break;
-        case UPDATE_FINISH:
-          updateFinish();
-          break;
-        case SCROLL_TO_ELEMENT:
-          if (args == null) {
-            return null;
-          }
-          JSONObject option =null;
-          if(args.size()>1) {
-            option = (JSONObject) args.get(1);
-          }
-          scrollToElement((String) args.get(0),option);
-          break;
-        case ADD_RULE:
-          if (args == null) {
-            return null;
-          }
-          addRule((String) args.get(0), (JSONObject) args.get(1));
-          break;
-        case GET_COMPONENT_RECT:
-          if(args == null){
-            return null;
-          }
-          getComponentRect((String) args.get(0),(String) args.get(1));
-          break;
-        case INVOKE_METHOD:
-          if(args == null){
-            return null;
-          }
-          invokeMethod((String) args.get(0),(String) args.get(1),(JSONArray) args.get(2));
-          break;
+      DOMAction action = Actions.get(method,args);
+      if(action == null){
+        WXLogUtils.e("Unknown dom action.");
       }
 
+      postAction(action,CREATE_BODY.equals(method));
     } catch (IndexOutOfBoundsException e) {
       // no enougn args
       e.printStackTrace();
@@ -394,309 +308,14 @@ public final class WXDomModule extends WXModule {
       return;
     }
 
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    List<Object> msgArgs = new ArrayList<>();
-    msgArgs.add(ref);
-    msgArgs.add(method);
-    msgArgs.add(args);
-
-    task.args = msgArgs;
-    msg.what = WXDomHandler.MsgType.WX_DOM_INVOKE;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
+    postAction(Actions.getInvokeMethod(ref,method,args),false);
   }
 
   /**
-   * Create a body for the current {@link com.taobao.weex.WXSDKInstance} according to given
-   * parameter.
-   * @param element info about how to create a body
+   *  @param action
+   * @param createContext only true when create body
    */
-  public void createBody(JSONObject element) {
-    if (element == null) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(element);
-    msg.what = WXDomHandler.MsgType.WX_DOM_CREATE_BODY;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Update attributes
-   * @param ref
-   * @param attr the expected attr
-   */
-  public void updateAttrs(String ref, JSONObject attr) {
-    if (TextUtils.isEmpty(ref) || attr == null || attr.size() < 1) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(attr);
-    msg.what = WXDomHandler.MsgType.WX_DOM_UPDATE_ATTRS;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Update DOM style.
-   * @param ref DOM reference
-   * @param style the expected style
-   */
-  public void updateStyle(String ref, JSONObject style) {
-    if (TextUtils.isEmpty(ref) || style == null || style.size() < 1) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(style);
-    msg.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Remove a node for the node tree.
-   * @param ref reference of the node to be removed.
-   */
-  public void removeElement(String ref) {
-    if (TextUtils.isEmpty(ref)) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    msg.what = WXDomHandler.MsgType.WX_DOM_REMOVE_DOM;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Add a {@link WXDomObject} to the specified parent as its given n-th child.
-   * @param parentRef reference of the parent.
-   * @param element the node to be added
-   * @param index the expected index that the new dom in its new parent
-   */
-  public void addElement(String parentRef, JSONObject element, Integer index) {
-    if (element == null
-        || TextUtils.isEmpty(parentRef)) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(parentRef);
-    task.args.add(element);
-    task.args.add(index);
-    msg.what = WXDomHandler.MsgType.WX_DOM_ADD_DOM;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Move the DomElement to the specified parent as its given n-th child.
-   * @param ref reference of the node to be moved.
-   * @param parentRef reference of the parent.
-   * @param index the expected index that the dom in its new parent
-   */
-  public void moveElement(String ref, String parentRef, Integer index) {
-    if (TextUtils.isEmpty(ref)
-        || TextUtils.isEmpty(parentRef)) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(parentRef);
-    task.args.add(index);
-    msg.what = WXDomHandler.MsgType.WX_DOM_MOVE_DOM;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Add eventListener for the specified {@link WXDomObject}
-   * @param ref reference of the node
-   * @param type the type of the event listener to be added.
-   */
-  public void addEvent(String ref, String type) {
-    if (TextUtils.isEmpty(ref) || TextUtils.isEmpty(type)) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(type);
-    msg.what = WXDomHandler.MsgType.WX_DOM_ADD_EVENT;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Remove eventListener for the specified {@link WXDomObject}
-   * @param ref reference of the node
-   * @param type the type of the event listener to be removed.
-   */
-  public void removeEvent(String ref, String type) {
-    if (TextUtils.isEmpty(ref) || TextUtils.isEmpty(type)) {
-      return;
-    }
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(type);
-    msg.what = WXDomHandler.MsgType.WX_DOM_REMOVE_EVENT;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Notify the {@link WXDomManager} that creation of dom tree is finished.
-   * This notify is given by JS.
-   */
-  public void createFinish() {
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    msg.what = WXDomHandler.MsgType.WX_DOM_CREATE_FINISH;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * Notify the {@link WXDomManager} that refreshing of dom tree is finished.
-   * This notify is given by JS.
-   */
-  public void refreshFinish() {
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    msg.what = WXDomHandler.MsgType.WX_DOM_REFRESH_FINISH;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  public void updateFinish() {
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    msg.what = WXDomHandler.MsgType.WX_DOM_UPDATE_FINISH;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-
-  /**
-   * Scroll the specified {@link WXDomObject} to given offset in given duration
-   * @param ref reference of specified dom object
-   * @param options scroll option, like {offset:0, duration:300}
-   */
-  public void scrollToElement(String ref, JSONObject options) {
-    if (TextUtils.isEmpty(ref) ) {
-      return;
-    }
-
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(ref);
-    task.args.add(options);
-    msg.what = WXDomHandler.MsgType.WX_DOM_SCROLLTO;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  public void addRule(String type, JSONObject options) {
-    if (TextUtils.isEmpty(type) || options == null) {
-      return;
-    }
-
-    Message msg = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = mWXSDKInstance.getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(type);
-    task.args.add(options);
-    msg.what = WXDomHandler.MsgType.WX_DOM_ADD_RULE;
-    msg.obj = task;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-  }
-
-  /**
-   * By ref the width and height of the component.
-   *
-   * @param ref      the refer of component
-   * @param callback function id
-   */
-  public void getComponentRect(String ref, String callback) {
-    if (mWXSDKInstance == null) {
-      return;
-    }
-    SimpleJSCallback jsCallback = new SimpleJSCallback(mWXSDKInstance.getInstanceId(), callback);
-    if (TextUtils.isEmpty(ref)) {
-      Map<String, Object> options = new HashMap<>();
-      options.put("result", false);
-      options.put("errMsg", "Illegal parameter");
-      jsCallback.invoke(options);
-      return;
-    } else if ("viewport".equalsIgnoreCase(ref)) {
-      if (mWXSDKInstance.getContainerView() != null) {
-        Map<String, Object> options = new HashMap<>();
-        Map<String, Float> sizes = new HashMap<>();
-        int[] location = new int[2];
-        mWXSDKInstance.getContainerView().getLocationOnScreen(location);
-        sizes.put("left", 0f);
-        sizes.put("top", 0f);
-        sizes.put("right", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
-        sizes.put("bottom", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
-        sizes.put("width", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
-        sizes.put("height", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
-        options.put("size", sizes);
-        options.put("result", true);
-        jsCallback.invoke(options);
-      } else {
-        Map<String, Object> options = new HashMap<>();
-        options.put("result", false);
-        options.put("errMsg", "Component does not exist");
-        jsCallback.invoke(options);
-      }
-    } else {
-      Message msg = Message.obtain();
-      WXDomTask task = new WXDomTask();
-      task.instanceId = mWXSDKInstance.getInstanceId();
-      task.args = new ArrayList<>();
-      task.args.add(ref);
-      task.args.add(jsCallback);
-      msg.what = WXDomHandler.MsgType.WX_COMPONENT_SIZE;
-      msg.obj = task;
-      WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
-    }
-  }
-
-  @NonNull
-  private float getWebPxValue(int value) {
-    return WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getInstanceViewPortWidth());
+  public void postAction(DOMAction action, boolean createContext){
+    WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(),action,createContext);
   }
 }
