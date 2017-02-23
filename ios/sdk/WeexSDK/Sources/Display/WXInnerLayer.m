@@ -12,11 +12,6 @@
 
 @dynamic boxShadowColor, boxShadowOffset, boxShadowRadius, boxShadowOpacity;
 
-- (id) init {
-    self = [super init];
-    return self;
-}
-
 + (BOOL)needsDisplayForKey:(NSString *)key {
     if ([key isEqualToString:@"boxShadowRadius"]  || [key isEqualToString:@"boxShadowOffset"] || [key isEqualToString:@"boxShadowColor"] || [key isEqualToString:@"boxShadowOpacity"]) {
         return YES;
