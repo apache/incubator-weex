@@ -31,6 +31,13 @@ Other attributes please check out the [common attributes](../common-attrs.html).
 
 ### Styles
 
+**Pseudo-class**<span class="api-version">v0.9.5+</span>: `textarea` component support the following pseudo-classes:
+
+* `active`
+* `focus`
+* `disabled`
+* `enabled`
+
 **text styles**: checkout [text styles](../text-style.html)
 
 - support `color` style.

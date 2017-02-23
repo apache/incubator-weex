@@ -222,6 +222,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manager class for weex module. There are two types of modules in weex, one is instance-level module,
@@ -241,7 +242,7 @@ public class WXModuleManager {
    * module object dictionary
    * K : instanceId, V : Modules
    */
-  private static Map<String, HashMap<String, WXModule>> sInstanceModuleMap = new HashMap<>();
+  private static Map<String, Map<String, WXModule>> sInstanceModuleMap = new ConcurrentHashMap<>();
 
   /**
    * Register module to JavaScript and Android
@@ -346,9 +347,9 @@ public class WXModuleManager {
 
     //not global module
     if (wxModule == null) {
-      HashMap<String, WXModule> moduleMap = sInstanceModuleMap.get(instanceId);
+      Map<String, WXModule> moduleMap = sInstanceModuleMap.get(instanceId);
       if (moduleMap == null) {
-        moduleMap = new HashMap<>();
+        moduleMap = new ConcurrentHashMap<>();
         sInstanceModuleMap.put(instanceId, moduleMap);
       }
       // if cannot find the Module, create a new Module and save it
@@ -373,7 +374,7 @@ public class WXModuleManager {
 
   public static void onActivityCreate(String instanceId){
 
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -389,7 +390,7 @@ public class WXModuleManager {
 
   public static void onActivityStart(String instanceId){
 
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -403,7 +404,7 @@ public class WXModuleManager {
   }
 
   public static void onActivityPause(String instanceId){
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -417,7 +418,7 @@ public class WXModuleManager {
   }
 
   public static void onActivityResume(String instanceId){
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -431,7 +432,7 @@ public class WXModuleManager {
   }
 
   public static void onActivityStop(String instanceId){
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -445,7 +446,7 @@ public class WXModuleManager {
   }
 
   public static void onActivityDestroy(String instanceId){
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -459,7 +460,7 @@ public class WXModuleManager {
   }
 
   public static boolean onActivityBack(String instanceId){
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -475,7 +476,7 @@ public class WXModuleManager {
 
   public static void onActivityResult(String instanceId,int requestCode, int resultCode, Intent data){
 
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -489,7 +490,7 @@ public class WXModuleManager {
   }
 
   public static boolean onCreateOptionsMenu(String instanceId,Menu menu) {
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -504,7 +505,7 @@ public class WXModuleManager {
   }
 
   public static void onRequestPermissionsResult(String instanceId ,int requestCode, String[] permissions, int[] grantResults) {
-    HashMap<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {
         WXModule module = modules.get(key);
@@ -519,7 +520,7 @@ public class WXModuleManager {
 
   public static void destroyInstanceModules(String instanceId) {
     sDomModuleMap.remove(instanceId);
-    HashMap<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
+    Map<String, WXModule> moduleMap = sInstanceModuleMap.remove(instanceId);
     if (moduleMap == null || moduleMap.size() < 1) {
       return;
     }

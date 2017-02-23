@@ -48,7 +48,7 @@
 	var __weex_template__ = __webpack_require__(151)
 	var __weex_script__ = __webpack_require__(152)
 
-	__weex_define__('@weex-component/4abbbff77bbabe33ce2a4c6bd84a533a', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+	__weex_define__('@weex-component/3157b803090c07c091af8fa3147f3d5c', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
 	    __weex_script__(__weex_module__, __weex_exports__, __weex_require__)
 	    if (__weex_exports__.__esModule && __weex_exports__.default) {
@@ -59,7 +59,7 @@
 
 	})
 
-	__weex_bootstrap__('@weex-component/4abbbff77bbabe33ce2a4c6bd84a533a',undefined,undefined)
+	__weex_bootstrap__('@weex-component/3157b803090c07c091af8fa3147f3d5c',undefined,undefined)
 
 /***/ },
 
@@ -67,7 +67,7 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "scroller",
+	  "type": "div",
 	  "style": {
 	    "flexDirection": "column",
 	    "backgroundColor": "#ffffff",
@@ -77,19 +77,14 @@
 	  },
 	  "children": [
 	    {
-	      "type": "tc_support_maintitle",
-	      "attr": {
-	        "title": "AG_Test_Slider-Neighbor_Auto_Play"
-	      }
-	    },
-	    {
 	      "type": "div",
 	      "style": {
-	        "height": 410,
-	        "borderWidth": 3,
+	        "width": 700,
+	        "height": 400,
+	        "borderWidth": 1,
 	        "borderStyle": "solid",
 	        "borderColor": "#000000",
-	        "margin": 10
+	        "margin": 0
 	      },
 	      "children": [
 	        {
@@ -99,75 +94,57 @@
 	            "height": 400
 	          },
 	          "attr": {
-	            "neighborScale": "0.7",
+	            "neighborScale": "0.8",
+	            "neighborSpace": "30",
+	            "currentItemScale": "0.90",
 	            "interval": "3000",
 	            "neighborAlpha": "0.8",
 	            "autoPlay": function () {return this.attr_auto_play}
 	          },
 	          "children": [
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1dzanMVXXXXXQXVXXXXXXXXXX-573-412.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1dzanMVXXXXXQXVXXXXXXXXXX-573-412.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1p9CCMVXXXXa_XFXXXXXXXXXX-450-340.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1p9CCMVXXXXa_XFXXXXXXXXXX-450-340.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1zpSiMVXXXXchXFXXXXXXXXXX-448-338.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1zpSiMVXXXXchXFXXXXXXXXXX-448-338.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1EuGIMVXXXXcoXpXXXXXXXXXX-452-337.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1EuGIMVXXXXcoXpXXXXXXXXXX-452-337.png"
+	              }
 	            },
 	            {
 	              "type": "indicator",
@@ -187,7 +164,7 @@
 	      ]
 	    },
 	    {
-	      "type": "scroller",
+	      "type": "div",
 	      "style": {
 	        "height": 100,
 	        "borderWidth": 0,

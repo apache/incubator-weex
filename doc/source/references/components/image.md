@@ -23,6 +23,7 @@ This component supports no child components.
 
 - `src`: &lt;string&gt; image source url
 - `resize`: <span class="api-version">v0.5+</span> &lt;string&gt; the 'ScaleType' of the component. The default value is ``stretch``, if this attribute is not specified. Possible values are ``cover``, ``contain``, each of which has the same meaning with w3c standard.
+- `placeholder`: <span class="api-version">v0.9+</span> &lt;string&gt; image to display while the network image src is loading.
 
 Other attributes please check out the [common attributes](../common-attrs.html).
 
@@ -44,7 +45,7 @@ Other attributes please check out the [common attributes](../common-attrs.html).
 
 - support `click` event. Check out [common events](../common-event.html)
 - support `appear` / `disappear` event. Check out [common events](../common-event.html)    
-- `load`<sup class="wx-v">v0.8+</sup> event. The `load` event fires on an image has been loaded. Only Android and iOS are supported currently. [example](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)    
+- `load`<sup class="api-version">v0.8+</sup> event. The `load` event fires on an image has been loaded. Only Android and iOS are supported currently. [example](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)    
   - event object
     - `success` : `true` if the image was loaded successfully, otherwise `false`
     - `size` : the original size of image, contains two parameters: `naturalWidth` representing the original width of image in pixels, `naturalHeight` representing the original height of image in pixels. default value. The default value for both parameters is `0`.
