@@ -178,7 +178,6 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
             CGFloat x = insets.left + (columnWidth + columnGap) * column;
             CGFloat y = [self.columnsMaxHeights[column] floatValue];
             itemAttributes.frame = CGRectMake(x, y, columnWidth, itemHeight);
-            itemAttributes.zIndex = 0;
             cellAttributes[indexPath] = itemAttributes;
             
             self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));

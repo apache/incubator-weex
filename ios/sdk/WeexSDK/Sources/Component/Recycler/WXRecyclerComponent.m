@@ -174,6 +174,7 @@ typedef enum : NSUInteger {
                 [component setNeedsLayout];
             }
             
+            [self.collectionView reloadData];
             [self.collectionView.collectionViewLayout invalidateLayout];
         }
     }
