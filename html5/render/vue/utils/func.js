@@ -1,10 +1,31 @@
 /**
  * Mix properties into target object.
  */
-export function extend (to, _from) {
-  for (const key in _from) {
-    to[key] = _from[key]
+export function extend (to, from) {
+  for (const key in from) {
+    to[key] = from[key]
   }
+  return to
+}
+
+/**
+ * Mix specified properties into target object.
+ */
+export function extendKeys (to, from, keys) {
+  (keys || []).forEach(key => {
+    to[key] = from[key]
+  })
+  return to
+}
+
+/**
+ * Extract specified properties from src to target object.
+ */
+export function extractKeys (to, from, keys) {
+  (keys || []).forEach(key => {
+    to[key] = from[key]
+    delete from[key]
+  })
   return to
 }
 

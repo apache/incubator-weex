@@ -1,4 +1,4 @@
-import { extend, hyphenate } from '../utils'
+import { extend, hyphenate, trimComment } from '../utils'
 // import { validateStyles } from '../validator'
 
 // let warned = false
@@ -30,9 +30,9 @@ function getHeadStyleMap () {
       }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
-        pre[selector] = rule.cssText.split(';')
+        pre[selector] = trimComment(rule.cssText).split(';')
           .reduce((styleObj, statement) => {
-            statement = statement.replace('*/', '').trim()
+            statement = statement.trim()
             if (statement && statement.indexOf('/*') <= -1) {
               const resArr = statement.split(':').map((part) => part.trim())
               styleObj[hyphenate(resArr[0])] = resArr[1]
