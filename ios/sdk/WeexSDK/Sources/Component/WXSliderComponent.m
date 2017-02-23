@@ -20,6 +20,8 @@
 
 - (void)sliderView:(WXSliderView *)sliderView sliderViewDidScroll:(UIScrollView *)scrollView;
 - (void)sliderView:(WXSliderView *)sliderView didScrollToItemAtIndex:(NSInteger)index;
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStartScroll:(UIScrollView *)scrollView;
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStopScroll:(UIScrollView *)scrollView;
 
 @end
 
@@ -31,6 +33,7 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray *itemViews;
 @property (nonatomic, assign) NSInteger currentIndex;
+@property (nonatomic, assign) BOOL isStartScroll;
 
 - (UIScrollView *)scrollView;
 - (void)insertItemView:(UIView *)view atIndex:(NSInteger)index;
@@ -69,6 +72,7 @@
     if (_scrollView) {
         _scrollView.delegate = nil;
     }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void)setIndicator:(WXIndicatorView *)indicator
@@ -173,7 +177,7 @@
 
 - (void)_resortItemViews
 {
-    if (self.itemViews.count <= 1) return;
+    if (self.itemViews.count <= 2) return;
     
     NSInteger center = [self _centerItemIndex];
     NSInteger index = 0;
@@ -219,7 +223,7 @@
 
 - (NSInteger)_centerItemIndex
 {
-    if (self.itemViews.count > 1) {
+    if (self.itemViews.count > 2) {
         return self.itemViews.count % 2 ? self.itemViews.count / 2 : self.itemViews.count / 2 - 1;
     }
     return 0;
@@ -227,7 +231,7 @@
 
 - (void)_scroll2Center
 {
-    if (self.itemViews.count > 1) {
+    if (self.itemViews.count > 2) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
         [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
     }
@@ -281,13 +285,15 @@
             break;
         }
     }
-    
     if (itemView) {
         self.currentIndex = itemView.tag;
     }
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    //ensure that the end of scroll is fired.
+    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -304,6 +310,15 @@
     }
 }
 
+// called when setContentOffset/scrollRectVisible:animated: finishes. called from the performselector in scrollViewDidScroll if not animating.
+-(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:scrollViewDidStopScroll:)]) {
+        [self.delegate sliderView:self scrollViewDidStopScroll:scrollView];
+    }
+}
+
+
 @end
 
 @interface WXSliderComponent ()<WXSliderViewDelegate>
@@ -318,6 +333,10 @@
 @property (nonatomic, assign) CGFloat offsetXAccuracy;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
+@property (nonatomic, assign) BOOL  sliderScrollStartEvent;
+@property (nonatomic, assign) BOOL  sliderScrollStopEvent;
+@property (nonatomic, assign) BOOL  sliderScrollCancelEvent;
+@property (nonatomic, assign) BOOL  sliderStartEventFired;
 @property (nonatomic, strong) NSMutableArray *childrenView;
 @property (nonatomic, assign) BOOL scrollable;
 
@@ -501,6 +520,15 @@
     if ([eventName isEqualToString:@"scroll"]) {
         _sliderScrollEvent = YES;
     }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _sliderScrollStartEvent = YES;
+    }
+    if ([eventName isEqualToString:@"scrollstop"]) {
+        _sliderScrollStopEvent = YES;
+    }
+    if ([eventName isEqualToString:@"dragcancel"]) {
+        _sliderScrollCancelEvent = YES;
+    }
 }
 
 - (void)removeEvent:(NSString *)eventName
@@ -510,6 +538,15 @@
     }
     if ([eventName isEqualToString:@"scroll"]) {
         _sliderScrollEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollstart"]) {
+        _sliderScrollStartEvent = NO;
+    }
+    if ([eventName isEqualToString:@"scrollstop"]) {
+        _sliderScrollStopEvent = NO;
+    }
+    if ([eventName isEqualToString:@"dragcancel"]) {
+        _sliderScrollCancelEvent = NO;
     }
 }
 
@@ -570,10 +607,13 @@
         CGFloat width = scrollView.frame.size.width;
         CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
         CGFloat offsetXRatio = (XDeviation / width);
-        if (ABS(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
+        if (fabs(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
             _lastOffsetXRatio = offsetXRatio;
             [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
+    }
+    if (!_sliderStartEventFired) {
+        [self sliderView:sliderView scrollViewDidStartScroll:scrollView];
     }
 }
 
@@ -582,6 +622,29 @@
     self.currentIndex = index;
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
+    }
+}
+
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStartScroll:(UIScrollView *)scrollView
+{
+    if (_sliderScrollStartEvent) {
+        [self fireEvent:@"scrollstart" params:nil domChanges:nil];
+    }
+    _sliderStartEventFired = YES;
+}
+
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStopScroll:(UIScrollView *)scrollView
+{
+    if (_sliderScrollStopEvent) {
+        [self fireEvent:@"scrollstop" params:nil domChanges:nil];
+    }
+    _sliderStartEventFired = NO;
+}
+
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidCancelDraging:(UIScrollView *)scrollView
+{
+    if (_sliderScrollCancelEvent) {
+        [self fireEvent:@"dragcancel" params:nil domChanges:nil];
     }
 }
 
@@ -594,6 +657,13 @@
 {
     if (_autoPlay) {
         [self _startAutoPlayTimer];
+    }
+    //DidEndDragging and index is not changed mean that cancel dragging
+    CGFloat width = scrollView.frame.size.width;
+    CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
+    CGFloat offsetXRatio = (XDeviation / width);
+    if (fabs(offsetXRatio) < 0.5) {
+        [self sliderView:self.sliderView scrollViewDidCancelDraging:self.sliderView.scrollView];
     }
 }
 

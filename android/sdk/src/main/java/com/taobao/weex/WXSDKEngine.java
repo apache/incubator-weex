@@ -120,6 +120,7 @@ import android.util.Log;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -291,6 +292,10 @@ public class WXSDKEngine {
     );
   }
 
+  public static void setJSExcetptionAdapter(IWXJSExceptionAdapter excetptionAdapter){
+    WXSDKManager.getInstance().setIWXJSExceptionAdapter(excetptionAdapter);
+  }
+
   private static void register() {
     BatchOperationHelper batchHelper = new BatchOperationHelper(WXBridgeManager.getInstance());
     try {
@@ -369,7 +374,7 @@ public class WXSDKEngine {
       registerModule("webview", WXWebViewModule.class, true);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);
-      registerModule("timer", WXTimerModule.class, true);
+      registerModule("timer", WXTimerModule.class, false);
       registerModule("storage", WXStorageModule.class, true);
       registerModule("clipboard", WXClipboardModule.class, true);
       registerModule("globalEvent",WXGlobalEventModule.class);

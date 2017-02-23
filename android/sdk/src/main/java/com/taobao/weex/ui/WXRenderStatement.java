@@ -473,23 +473,11 @@ class WXRenderStatement {
       return;
     }
 
-    float offsetFloat = 0;
-    if (options != null) {
-      String offset = options.get("offset") == null ? "0" : options.get("offset").toString();
-      if (offset != null) {
-        try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset),mWXSDKInstance.getViewPortWidth());
-        }catch (Exception e ){
-           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
-        }
-      }
-    }
-
     Scrollable scroller = component.getParentScroller();
     if (scroller == null) {
       return;
     }
-    scroller.scrollTo(component,(int)offsetFloat);
+    scroller.scrollTo(component,options);
   }
 
   /**

@@ -41,7 +41,7 @@
         <slider class="slider" append="tree"
           :interval="sliders[0].interval"
           :autoPlay="sliders[0].autoPlay">
-          <indicator style="itemColor: #dddddd;width:714;height:460;"></indicator>
+          <indicator style="itemColor: #dddddd;width:714px;height:460px;"></indicator>
           <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
@@ -49,7 +49,7 @@
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
           :autoPlay="sliders[1].autoPlay">
-          <indicator class="indicator" style="top:-140;left:-240"></indicator>
+          <indicator class="indicator" style="top:-140px;left:-240px"></indicator>
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
@@ -65,7 +65,7 @@
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
           :autoPlay="sliders[1].autoPlay">
-          <indicator style="itemColor: #dddddd;itemSize:40;top:140;left:180;width:700;height:380;"></indicator>
+          <indicator style="itemColor: #dddddd;itemSize:40px;top:140px;left:180px;width:700px;height:380px;"></indicator>
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
@@ -248,16 +248,16 @@
     flex-direction: row;
     /*margin-left: 18;*/
     /*margin-right: 18;*/
-    width: 690;
-    height: 360;
+    width: 690px;
+    height: 360px;
   }
 
   .indicator {
     position: absolute;
-    width: 690;
-    height: 420;
-    top: 140;
-    left: 240;
+    width: 690px;
+    height: 420px;
+    top: 140px;
+    left: 240px;
     itemColor: #dddddd;
     itemSelectedColor: rgb(40, 96, 144);
   }
