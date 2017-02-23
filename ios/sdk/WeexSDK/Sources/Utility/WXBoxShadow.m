@@ -61,7 +61,7 @@
     if ([string rangeOfString:@"rgb"].location != NSNotFound) {
         NSRange begin = [string rangeOfString:@"rgb"];
         NSRange end = [string rangeOfString:@")"];
-        if (begin.location < end.location) {
+        if (begin.location < end.location && end.location < [string length]) {
             NSRange range = NSMakeRange(begin.location, end.location-begin.location + 1);
             NSString *str = [string substringWithRange:range];
             NSString *colorStr = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
