@@ -264,10 +264,6 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     } else if (type == TYPE_LINEAR_LAYOUT) {
       setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false));
     }
-
-    setVerticalScrollBarEnabled(true);
-    setScrollable(true);
-    setScrollBarSize(10); 
   }
 
   @Override

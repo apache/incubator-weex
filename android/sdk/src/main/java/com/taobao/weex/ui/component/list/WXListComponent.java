@@ -307,16 +307,16 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount) throws InterruptedException {
     WXLogUtils.w("zshshr","setColumnCount :  "+"htread:"+Thread.currentThread().getName());
-    mColumnCount = columnCount;
-    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+//    mColumnCount = columnCount;
+//    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
-    mColumnGap = columnGap;
-    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
-    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+//    mColumnGap = columnGap;
+//    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+//    wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
   }
 
   @WXComponentProp(name = Constants.Name.SHOW_SCROLLBAR)
@@ -326,6 +326,12 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     wxRecyclerView.setVerticalScrollBarEnabled(isShow);
 
     wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
+  }
+
+  @WXComponentProp(name = Constants.Name.SCROLLABLE)
+  public void setScrollable(boolean scrollable) {
+    WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+    wxRecyclerView.setScrollable(scrollable);
   }
 
 
