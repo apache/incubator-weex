@@ -28,7 +28,7 @@ function _getParentScroller (vnode) {
   return _getParentScroller(vnode.$parent)
 }
 
-export default { 
+export default {
   mounted () {
     watchAppear(this)
     // watchLazyload(this)
