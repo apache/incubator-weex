@@ -69,7 +69,7 @@ typedef BOOL WXClipType;
 
 + (WXGradientType)gradientType:(id)value;
 
-+ (WXBoxShadow *)WXBoxShadow:(id)value;
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 @end
 

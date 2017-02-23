@@ -201,15 +201,19 @@
             [self _resetNativeBorderRadius];
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
-            [WXBoxShadow configLayer:self.view boxShadow:_boxShadow];
         }
-        
+
         if (_backgroundImage) {
             [self setGradientLayer];
         }
         
         if (_transform) {
             [_transform applyTransformForView:_view];
+        }
+        
+        if (_boxShadow) {
+            _originalBoxShadow = [WXBoxShadow getViewBoxShadow:self.view];
+            [WXBoxShadow configViewLayer:self.view boxShadow:_boxShadow lastBoxShadow:_lastBoxShadow originalBoxShadow:_originalBoxShadow];
         }
         
         _view.wx_component = self;
@@ -233,7 +237,7 @@
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-        
+
         [self _handleFirstScreenTime];
         
         return _view;

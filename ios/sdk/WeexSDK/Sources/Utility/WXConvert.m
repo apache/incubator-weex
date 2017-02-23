@@ -723,7 +723,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return type;
 }
 
-+ (WXBoxShadow *)WXBoxShadow:(id)value
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor
 {
     NSString *boxShadow = @"";
     if([value isKindOfClass:[NSString class]]){
@@ -735,7 +735,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         WXLogError(@"Convert Error:%@ can not be converted to boxshadow type", value);
     }
     if (boxShadow) {
-        return [WXBoxShadow getBoxShadowFromString:boxShadow];
+        return [WXBoxShadow getBoxShadowFromString:boxShadow scaleFactor:scaleFactor];
     }
     return nil;
 }

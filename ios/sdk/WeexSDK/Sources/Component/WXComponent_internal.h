@@ -40,6 +40,8 @@
     UIView *_view;
     CGFloat _opacity;
     WXVisibility  _visibility;
+    WXBoxShadow *_originalBoxShadow;
+    WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
     
     /**
