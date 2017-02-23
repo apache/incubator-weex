@@ -43,7 +43,7 @@
     },
     methods: {
       anim: function(styles, timingFunction, duration, callback) {
-        animation.transition(this.$refs.block.ref, {
+        animation.transition(this.$refs.block, {
           styles: styles,
           timingFunction: timingFunction,
           duration: duration

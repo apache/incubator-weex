@@ -1,11 +1,11 @@
-import { base, event, scrollable } from '../../../mixins'
+import { base, scrollable } from '../../../mixins'
 import { validateStyles } from '../../../validator'
 import { extend } from '../../../utils'
 import * as shared from '../shared'
 import listMixin from './listMixin'
 
 export default {
-  mixins: [base, event, scrollable, listMixin],
+  mixins: [base, scrollable, listMixin],
   props: {
     loadmoreoffset: {
       type: [String, Number],

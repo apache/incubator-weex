@@ -1,4 +1,4 @@
-import { extend } from '../utils'
+import { extend, hyphenate, trimComment } from '../utils'
 // import { validateStyles } from '../validator'
 
 // let warned = false
@@ -6,21 +6,39 @@ import { extend } from '../utils'
 function getHeadStyleMap () {
   return Array.from(document.styleSheets || [])
     .reduce((pre, styleSheet) => {
-      const rules = styleSheet.rules || styleSheet.cssRules || []
+      // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
+      // because weex's components defined non-standard style attributes, which is
+      // auto ignored when access rule.cssText.
+      const strArr = styleSheet.ownerNode.textContent.trim().split('.')
+      const len = strArr.length
+      const rules = []
+      for (let i = 0; i < len; i++) {
+        const str = strArr[i]
+        if (!str) {
+          continue
+        }
+        const match = str.match(/^([^{\s]+)\s*{\s*([^}]+)}\s*$/)
+        if (!match) {
+          // not the vue static class styles map. so acquire no rules for this styleSheet.
+          // just jump through this styleSheet and go to analyzing next.
+          return pre
+        }
+        rules.push({
+          selectorText: `.${match[1]}`,
+          cssText: match[2].trim()
+        })
+      }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
-        const match = selector.match(/^\.([^.]+)$/)
-        if (match && match[1]) {
-          pre[match[1]] = rule.cssText.match(/{([^}]+)}/)[1].trim().split(';')
-            .reduce((styleObj, statement) => {
-              statement = statement.trim()
-              if (statement) {
-                const resArr = statement.split(':').map((part) => part.trim())
-                styleObj[resArr[0]] = resArr[1]
-              }
-              return styleObj
-            }, {})
-        }
+        pre[selector] = trimComment(rule.cssText).split(';')
+          .reduce((styleObj, statement) => {
+            statement = statement.trim()
+            if (statement && statement.indexOf('/*') <= -1) {
+              const resArr = statement.split(':').map((part) => part.trim())
+              styleObj[hyphenate(resArr[0])] = resArr[1]
+            }
+            return styleObj
+          }, {})
       })
       return pre
     }, {})
@@ -128,20 +146,26 @@ export default {
     getComponentStyle () {
       const style = {}
       const data = this.$vnode && this.$vnode.data || {}
+      const _scopeId = this.getScopeId && this.getScopeId()
+      const hyphenatedStaticStyle = {}
       const staticStyle = data.staticStyle || {}
       const classNames = (data.staticClass || '').split(' ')
+
+      Object.keys(staticStyle).forEach(name => {
+        hyphenatedStaticStyle[hyphenate(name)] = staticStyle[name]
+      })
 
       // apply static class styles. This relies on getHeadStyleMap
       // being already triggered once in the hook beforeCreate.
       if (weex.styleMap) {
         classNames.forEach(className => {
-          const styleObj = weex.styleMap[className] || {}
+          const styleObj = weex.styleMap[`.${className}${_scopeId ? `[${_scopeId}]` : ''}`] || {}
           extend(style, styleObj)
         })
       }
 
       // apply static inline styles.
-      extend(style, staticStyle)
+      extend(style, hyphenatedStaticStyle)
 
       return style
     },
