@@ -28,11 +28,13 @@ export function requireWeexModule (name) {
   return null
 }
 
-export function init (weex) {
-  weex.install(Event)
-  weex.install(Geolocation)
-  weex.install(PageInfo)
-  weex.install(Storage)
-  weex.install(Stream)
-  weex.install(Clipboard)
+export default {
+  init (weex) {
+    weex.install(Event)
+    weex.install(Geolocation)
+    weex.install(PageInfo)
+    weex.install(Storage)
+    weex.install(Stream)
+    weex.install(Clipboard)
+  }
 }
