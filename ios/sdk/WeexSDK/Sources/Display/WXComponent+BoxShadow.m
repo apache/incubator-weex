@@ -25,18 +25,20 @@
     return boxShadow;
 }
 
-- (void)resetViewLayer:(UIView *_Nullable)view lastBoxShadow:(WXBoxShadow *_Nullable)lastBoxShadow  boxShadow:(WXBoxShadow *_Nullable)originalBoxShadow
+- (void)resetViewLayer
 {
-    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
-    view.layer.masksToBounds = NO;
-    view.layer.shadowColor = originalBoxShadow.shadowColor;
-    view.layer.shadowOffset = originalBoxShadow.shadowOffset;
-    view.layer.shadowRadius = originalBoxShadow.shadowRadius;
-    view.layer.shadowOpacity = originalBoxShadow.shadowOpacity;
-    view.layer.shadowPath = shadowPath.CGPath;
-    if (lastBoxShadow.innerLayer) {
-        if (lastBoxShadow.innerLayer) {
-            [lastBoxShadow.innerLayer removeFromSuperlayer];
+    UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds];
+    self.view.layer.masksToBounds = NO;
+    self.view.layer.shadowColor = _originalBoxShadow.shadowColor;
+    self.view.layer.shadowOffset = _originalBoxShadow.shadowOffset;
+    self.view.layer.shadowRadius = _originalBoxShadow.shadowRadius;
+    self.view.layer.shadowOpacity = _originalBoxShadow.shadowOpacity;
+    self.view.layer.shadowPath = shadowPath.CGPath;
+    
+    
+    if (_lastBoxShadow.isInset) {
+        if (_lastBoxShadow.innerLayer) {
+            [_lastBoxShadow.innerLayer removeFromSuperlayer];
         }
     }
 }
@@ -64,15 +66,16 @@
     if (!boxShadow && !_lastBoxShadow) {
         return;
     }
-    [self resetViewLayer:view lastBoxShadow:_lastBoxShadow boxShadow:_originalBoxShadow];
+    [self resetViewLayer];
     if (!boxShadow) {
         return;
     }
     if (boxShadow.isInset) {
         if (boxShadow.innerLayer) {
-            [boxShadow.innerLayer removeFromSuperlayer];
             boxShadow.innerLayer.frame = view.bounds;
-            [view.layer addSublayer:boxShadow.innerLayer];
+            if (![boxShadow.innerLayer superlayer] ){
+                [view.layer addSublayer:boxShadow.innerLayer];
+            }
         }
     } else {
         UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
