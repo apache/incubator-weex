@@ -389,6 +389,7 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
       registerDomObject(WXBasicComponentType.RECYCLER, WXRecyclerDomObject.class);
+      registerDomObject(WXBasicComponentType.WATERFALL, WXRecyclerDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }

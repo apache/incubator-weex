@@ -300,11 +300,12 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
     } else if (layoutManager instanceof StaggeredGridLayoutManager) {
       layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
       StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
-      if (mLastPositions == null) {
-        mLastPositions = new int[staggeredGridLayoutManager.getSpanCount()];
+      int newspanCount = staggeredGridLayoutManager.getSpanCount();
+      if (mLastPositions == null || newspanCount != mLastPositions.length ) {
+        mLastPositions = new int[newspanCount];
       }
-      if (mFirstPositions == null) {
-        mFirstPositions = new int[staggeredGridLayoutManager.getSpanCount()];
+      if (mFirstPositions == null || newspanCount != mFirstPositions.length) {
+        mFirstPositions = new int[newspanCount];
       }
       staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
       mFirstVisibleItemPosition = findMin(mFirstPositions);

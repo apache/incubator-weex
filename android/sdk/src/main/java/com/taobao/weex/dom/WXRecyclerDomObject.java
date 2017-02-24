@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.dom;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -236,6 +237,9 @@ public class WXRecyclerDomObject extends WXDomObject{
         return mColumnCount;
     }
 
+    public float getColumnWidth() {
+        return mColumnWidth;
+    }
     @Override
     public void add(WXDomObject child, int index) {
         super.add(child, index);
@@ -273,6 +277,9 @@ public class WXRecyclerDomObject extends WXDomObject{
                 mColumnWidth= ((availableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             }
             mIsPreCalculateCellWidth = true;
+            if(WXEnvironment.isApkDebugable()) {
+                WXLogUtils.d("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
+            }
 
         }
     }
@@ -290,11 +297,6 @@ public class WXRecyclerDomObject extends WXDomObject{
                 WXDomObject domObject = getChild(i);
                 if(WXBasicComponentType.CELL.equals(domObject.getType())) {
                     getChild(i).getStyles().put(Constants.Name.WIDTH, mColumnWidth);
-//                    Message message = Message.obtain();
-//                    message.what = WXDomHandler.MsgType.WX_DOM_BATCH;
-//                    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
-                    WXLogUtils.w("zshshr","updateAttr :  "+i+"thread:"+Thread.currentThread().getName());
-
                 }
             }
 

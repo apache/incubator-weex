@@ -204,24 +204,56 @@
  */
 package com.taobao.weex.ui.view.listview;
 
+import android.annotation.TargetApi;
 import android.graphics.Rect;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by zhengshihan on 2017/2/20.
  */
 
 public class WXSpaceItemDecoration extends RecyclerView.ItemDecoration {
-    private float space;
+    private float mColumnGap;
+    private int  mColumnCount;
 
-    public WXSpaceItemDecoration(float space) {
-        this.space = space;
+    public WXSpaceItemDecoration(int columnCount, float columnGap) {
+        mColumnGap = columnGap;
+        mColumnCount = columnCount;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        outRect.right = (int)space/2;
-        outRect.left = (int)space/2;
+
+        StaggeredGridLayoutManager.LayoutParams layoutParams
+                = (StaggeredGridLayoutManager.LayoutParams) view.getLayoutParams();
+
+        if (!layoutParams.isFullSpan()) {
+            int position = parent.getChildLayoutPosition(view);
+
+            if (position < 0) {
+                return;
+            }
+            int spanIndex = layoutParams.getSpanIndex();
+            spanIndex++;
+
+            int margin = (int) (mColumnGap / mColumnCount);
+            if(spanIndex % mColumnCount == 1){
+                layoutParams.setMarginEnd(margin);
+
+            }else if (spanIndex % mColumnCount ==0){
+                layoutParams.setMarginStart(margin);
+
+            } else {
+                layoutParams.setMarginEnd(margin);
+                layoutParams.setMarginStart(margin);
+            }
+
+        }
     }
 }

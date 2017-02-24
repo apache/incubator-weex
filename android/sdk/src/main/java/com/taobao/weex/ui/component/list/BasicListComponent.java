@@ -290,6 +290,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
   protected int mColumnCount = 1;
   protected float mColumnGap = 0;
+  protected float mColumnWidth = 0;
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
