@@ -26,7 +26,7 @@
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
-#import "WXBoxShadow.h"
+#import "WXComponent+BoxShadow.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -212,8 +212,7 @@
         }
         
         if (_boxShadow) {
-            _originalBoxShadow = [WXBoxShadow getViewBoxShadow:self.view];
-            [WXBoxShadow configViewLayer:self.view boxShadow:_boxShadow lastBoxShadow:_lastBoxShadow originalBoxShadow:_originalBoxShadow];
+            [self configViewLayer:self.view boxShadow:_boxShadow];
         }
         
         _view.wx_component = self;
