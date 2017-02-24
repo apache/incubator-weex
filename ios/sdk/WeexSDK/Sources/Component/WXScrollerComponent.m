@@ -424,15 +424,18 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
     }
-    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    [_refreshComponent pullingdown:@{
-        REFRESH_DISTANCE_Y: @(fabs(scrollView.contentOffset.y/scaleFactor)),
-        REFRESH_MAXHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
-        REFRESH_HEADERHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
-        @"type":@"pullingdown"
-        }];
-    
+   
     _lastContentOffset = scrollView.contentOffset;
+    
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+    if ([_refreshComponent displayState] && scrollView.dragging) {
+        [_refreshComponent pullingdown:@{
+             REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
+             REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
+             REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
+             @"type":@"pullingdown"
+         }];
+    }
 
     // check sticky
     [self adjustSticky];
