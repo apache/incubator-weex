@@ -21,8 +21,6 @@ There are no child components for the switch component.
 * checked &lt;boolean&gt; true|false, default value is false, indicating whether the button is on or not.
 * disabled &lt;boolean&gt; true|false, default value is false, indicating whether the button is enable or not.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 Notes: There are several style properties that you mustn't use on this component. And here are all the invalid properties:
 

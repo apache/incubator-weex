@@ -19,8 +19,6 @@ The video component can be used to embed video content in a weex page.
 * play-status: &lt;boolean&gt; play | pause. Use it to control video's play/pause status. Default value is pause.
 * auto-play: &lt;boolean&gt; true | false. Use it to control whether it is playing when the page initialization finished. Defalut value is false.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 common styles: check out [common styles for components](../common-style.html)
 

@@ -29,8 +29,6 @@ This component supports no child components.
 
 * `maxlength`: <span class="api-version">v0.7+</span> a number value to specify maxlength of input.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 
 * placeholder-color: the color of placeholder. Default value is '#999999'.

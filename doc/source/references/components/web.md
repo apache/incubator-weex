@@ -18,8 +18,6 @@ This component supports no child components.
 
 **src**(string): this attribute specifies the page source to load.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 
 **width**(float): the width of the component, default value is 0. This style must be specified.
@@ -29,7 +27,7 @@ Other attributes please check out the [common attributes](../common-attrs.html)
 
 ### common styles
 
-check out the [common styles](../common-attrs.html).
+check out the [common styles](../common-style.html).
 
 support flexbox related styles
 support box model related styles

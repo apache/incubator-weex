@@ -31,10 +31,6 @@ And there are two special components that can only be used inside scroller compo
 * loadmoreretry : <number> default value 0，whether to reset loadmore related UI when loadmore failed, will be deprecated in further release.
 
 
-Please checkout [Scroller Component Attributes]() to have a look at the inherited attributes from direct parent.
-
-Other attributes please check out the [common     attributes](../common-attrs.html).
-
 ## Styles
 
 common styles: check out [common styles for components](../common-style.html)

@@ -21,6 +21,49 @@
   %>
   <title><% if (title){ %><%= title %> | <% } %><%= config.title %></title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <script>
+  ;(function(){
+    var currentOrigin = location.origin,
+        currentPathname = location.pathname,
+        currentLang = navigator.language,
+        selectedLang = '';
+
+    if (!currentLang) {
+      currentLang = navigator.browserLanguage;
+    }
+
+    if (window.sessionStorage) {
+      selectedLang = window.sessionStorage.getItem('lang')
+    }
+
+    if (!selectedLang) {
+      if (currentLang.indexOf('zh') >= 0 && currentPathname.indexOf('/cn/') != 0) {
+        location.href = getUrl('cn', currentOrigin, currentPathname);
+      } else if (currentLang.indexOf('en') >= 0 && currentPathname.indexOf('/cn/') == 0) {
+        location.href = getUrl('en', currentOrigin, currentPathname);
+      }
+    }
+
+    function getUrl (lang, origin, path) {
+      if (lang == 'en') {
+        if (path.indexOf('/cn/') == 0) {
+          return origin + path.substr(3)
+        } else {
+          return origin + path
+        }
+      } else {
+        var langPath = '/' + lang + '/'
+        var pathStart = path.indexOf(langPath)
+
+        if (pathStart == 0) {
+          return origin + path
+        } else {
+          return origin + langPath + path.substr(1)
+        }
+      }
+    }
+  })();
+  </script>
   <%- open_graph({twitter_id: theme.twitter, google_plus: theme.google_plus, fb_admins: theme.fb_admins, fb_app_id: theme.fb_app_id}) %>
   <% if (theme.rss){ %>
     <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">
