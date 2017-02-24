@@ -5,6 +5,10 @@
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
   @scroll="recylerScroll"
   >
+    <refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
+      <loading-indicator class="indicator"></loading-indicator>
+      <text class="refreshText">{{refreshText}}</text>
+    </refresh>
     <header class="header" ref="header" v-if="showHeader">
       <image class="banner" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover">
         <div class="bannerInfo">
@@ -54,6 +58,23 @@
 <style>
   .page {
     background-color: #EFEFEF;
+  }
+  .refresh {
+    height: 128;
+    width: 750;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .refreshText {
+    color: #888888;
+    font-weight: bold;
+  }
+  .indicator {
+    color: #888888;
+    height: 40;
+    width: 40;
+    margin-right: 30;
   }
   .header {
   }
@@ -274,6 +295,8 @@
 
       return {
         padding: 0,
+        refreshing: false,
+        refreshText: '↓   pull to refresh...',
         columnCount: 2,
         columnGap: 12,
         columnWidth: 'auto',
@@ -407,6 +430,24 @@
           this.items.splice(this.items.length - 1, 0, this.items.splice(index, 1)[0]);
         } else {
           this.items.splice(0, 0, this.items.splice(index, 1)[0]);
+        }
+      },
+
+      onrefresh (event) {
+        this.refreshing = true
+        this.refreshText = "loading..."
+        setTimeout(() => {
+          this.refreshing = false
+          this.refreshText = '↓   pull to refresh...'
+        }, 2000)
+      },
+
+      onpullingdown (event) {
+        // console.log(`${event.pullingDistance}`)
+        if (event.pullingDistance < -64) {
+          this.refreshText = '↑   release to refresh...'
+        } else {
+          this.refreshText = '↓   pull to refresh...'
         }
       }
     }
