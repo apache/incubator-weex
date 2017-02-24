@@ -253,6 +253,10 @@ body > .weex-scroller {
   z-index: 9999;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .weex-cell {
   display: -webkit-box;
   display: -webkit-flex;
