@@ -30,7 +30,7 @@
             <div style="background-color: lightgray">
                 <text class="title" style="height: 80px ;padding: 20px;color: black">method = onmessage</text>
             </div>
-            <text style="color: black;height: 400px">{{onmessage}}</text>
+            <text style="color: black;height: 100px">{{onmessage}}</text>
             <div style="background-color: lightgray">
                 <text class="title" style="height: 80px ;padding: 20px;color: black">method = onclose</text>
             </div>
@@ -86,7 +86,7 @@
         },
         methods: {
             connect:function() {
-                websocket.WebSocket('ws://echo.websocket.org');
+                websocket.WebSocket('ws://echo.websocket.org','');
                 var self = this;
                 self.onopeninfo = 'connecting...'
                 websocket.onopen = function(e)
