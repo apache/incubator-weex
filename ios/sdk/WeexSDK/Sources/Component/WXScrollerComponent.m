@@ -424,14 +424,14 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
     }
-    if (scrollView.dragging) {
-        [_refreshComponent pullingdown:@{
-            DISTANCE_Y: @(fabs(scrollView.contentOffset.y - _lastContentOffset.y)),
-            PULLING_DISTANCE: @(scrollView.contentOffset.y),
-            VIEW_HEIGHT: @(_refreshComponent.view.frame.size.height),
-            @"type":@"pullingdown"
-            }];
-    }
+    
+    [_refreshComponent pullingdown:@{
+        REFRESH_DISTANCE_Y: @(fabs(scrollView.contentOffset.y)),
+        REFRESH_MAXHEIGHT: @(_refreshComponent.view.frame.size.height),
+        REFRESH_HEADERHEIGHT: @(_refreshComponent.view.frame.size.height),
+        @"type":@"pullingdown"
+        }];
+    
     _lastContentOffset = scrollView.contentOffset;
 
     // check sticky

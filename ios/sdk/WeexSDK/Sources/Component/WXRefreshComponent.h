@@ -8,9 +8,9 @@
 
 #import "WXComponent.h"
 
-#define  DISTANCE_Y             @"dy"
-#define  PULLING_DISTANCE       @"pullingDistance"
-#define  VIEW_HEIGHT            @"viewHeight"
+#define  REFRESH_DISTANCE_Y             @"dy"
+#define  REFRESH_HEADERHEIGHT           @"headerHeight"
+#define  REFRESH_MAXHEIGHT              @"maxHeight"
 
 @interface WXRefreshComponent : WXComponent
 
