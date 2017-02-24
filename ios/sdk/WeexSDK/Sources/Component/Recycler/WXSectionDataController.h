@@ -7,11 +7,12 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "WXDiffUtil.h"
 @class WXComponent;
 @class WXCellComponent;
 @class WXHeaderComponent;
 
-@interface WXSectionDataController : NSObject
+@interface WXSectionDataController : NSObject <WXDiffable>
 
 @property (nonatomic, strong) NSArray<WXCellComponent *> *cellComponents;
 @property (nonatomic, strong) WXHeaderComponent *headerComponent;

@@ -268,7 +268,7 @@
 
 #pragma mark - WXCellRenderDelegate
 
-- (float)cellWidthForLayout:(WXCellComponent *)cell
+- (float)containerWidthForLayout:(WXCellComponent *)cell
 {
     return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
 }

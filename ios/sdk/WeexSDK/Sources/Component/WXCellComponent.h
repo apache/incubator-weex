@@ -7,11 +7,12 @@
  */
 
 #import "WXComponent.h"
+#import "WXDiffUtil.h"
 @class WXCellComponent;
 
 @protocol WXCellRenderDelegate <NSObject>
 
-- (float)cellWidthForLayout:(WXCellComponent *)cell;
+- (float)containerWidthForLayout:(WXCellComponent *)cell;
 
 - (void)cellDidLayout:(WXCellComponent *)cell;
 
@@ -23,7 +24,7 @@
 
 @end
 
-@interface WXCellComponent : WXComponent
+@interface WXCellComponent : WXComponent <WXDiffable>
 
 @property (nonatomic, strong) NSString *scope;
 @property (nonatomic, assign) BOOL isRecycle;

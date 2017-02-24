@@ -7,6 +7,7 @@
  */
 
 #import "WXDiffUtil.h"
+#import "WXLog.h"
 
 typedef enum : NSUInteger {
     WXDiffOperationDoNothing,
@@ -59,7 +60,7 @@ typedef enum : NSUInteger {
 
 @implementation WXDiffUtil
 
-+ (WXDiffResult *)diffWithMinimumDistance:(NSArray *)newArray oldArray:(NSArray *)oldArray
++ (WXDiffResult *)diffWithMinimumDistance:(NSArray<id<WXDiffable>> *)newArray oldArray:(NSArray<id<WXDiffable>> *)oldArray
 {
     // Using the levenshtein algorithm
     // https://en.wikipedia.org/wiki/Levenshtein_distance
@@ -84,7 +85,7 @@ typedef enum : NSUInteger {
     
     for (int oldIndex = 1; oldIndex < oldSize; oldIndex ++) {
         for (int newIndex = 1; newIndex < newSize; newIndex ++) {
-            if ([oldArray[oldIndex - 1] isEqual:newArray[newIndex - 1]]) {
+            if ([oldArray[oldIndex - 1] isEqualToWXObject:newArray[newIndex - 1]]) {
                 matrix[oldIndex][newIndex] = matrix[oldIndex - 1][newIndex - 1];
             } else {
                 int updateCost = matrix[oldIndex - 1][newIndex - 1] + 1;
@@ -94,6 +95,8 @@ typedef enum : NSUInteger {
             }
         }
     }
+    
+    [self _printMatrix:matrix rowSize:oldSize columnSize:newSize];
     
     NSMutableArray *updates = [NSMutableArray array];
     NSMutableIndexSet *inserts = [NSMutableIndexSet indexSet];
@@ -160,6 +163,24 @@ typedef enum : NSUInteger {
     }
     
     return WXDiffOperationDoNothing;
+}
+
++ (void)_printMatrix:(int **)matrix rowSize:(int)rowSize columnSize:(int)columnSize
+{
+    for (int i = 0; i < rowSize; i ++) {
+        NSMutableArray *array = [NSMutableArray array];
+        for (int j = 0; j < columnSize; j ++) {
+            int value = matrix[i][j];
+            NSString *result;
+            if (value < 10) {
+                result = [NSString stringWithFormat:@"0%zi", value];
+            } else {
+                result = [NSString stringWithFormat:@"%zi", value];
+            }
+            [array addObject:result];
+        }
+        WXLogDebug(@"%@", [array componentsJoinedByString:@" "]);
+    }
 }
 
 @end

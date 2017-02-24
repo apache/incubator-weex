@@ -14,7 +14,6 @@
     BOOL _isUseContainerWidth;
 }
 
-//TODO: header remove->need reload
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
@@ -39,6 +38,13 @@
     if (isChanged) {
         [self.delegate headerDidLayout:self];
     }
+}
+
+- (void)_removeFromSupercomponent
+{
+    [super _removeFromSupercomponent];
+    
+    [self.delegate headerDidRemove:self];
 }
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents

@@ -11,6 +11,11 @@
 #import "WXCellComponent.h"
 #import "WXListComponent.h"
 #import "WXComponent_internal.h"
+#import "WXDiffUtil.h"
+
+@interface WXCellComponent ()
+
+@end
 
 @implementation WXCellComponent
 {
@@ -39,10 +44,9 @@
     
 }
 
-- (BOOL)isEqual:(id)object
+- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
 {
-    WXCellComponent *cell = object;
-    return self == cell && self.isLayoutComplete == cell.isLayoutComplete && CGRectEqualToRect(self.calculatedFrame, cell.calculatedFrame);
+    return self == object;
 }
 
 - (void)_frameDidCalculated:(BOOL)isChanged
@@ -110,7 +114,7 @@
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
     if (self.delegate && (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) || _isUseContainerWidth)) {
-        self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate cellWidthForLayout:self];
+        self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate containerWidthForLayout:self];
         //TODO: set _isUseContainerWidth to NO if updateStyles have width
         _isUseContainerWidth = YES;
     }

@@ -25,5 +25,8 @@
 - (void)performUpdatesWithNewData:(NSArray<WXSectionDataController *> *)newData
                           oldData:(NSArray<WXSectionDataController *> *)oldData
                              view:(UICollectionView *)collectionView;
+
+- (void)reloadItemsAtIndexPath:(NSIndexPath *)indexPath;
+
 @end
 

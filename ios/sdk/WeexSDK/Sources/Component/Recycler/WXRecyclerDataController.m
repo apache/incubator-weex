@@ -14,8 +14,6 @@
 @interface WXRecyclerDataController ()
 
 @property (nonatomic, strong, readwrite) NSArray<WXSectionDataController *> *sections;
-@property (nonatomic, strong, readonly) NSMapTable<WXSectionDataController *, NSNumber *> *sectionControllerToSectionIndexTable;
-@property (nonatomic, strong, readonly) NSMapTable<NSNumber *, WXSectionDataController *> *sectionToSectionControllerIndexTable;
 @property (nonatomic, strong, readonly) NSMapTable<WXCellComponent *, NSIndexPath*> *cellToIndexPathTable;
 
 @end

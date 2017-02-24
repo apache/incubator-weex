@@ -11,9 +11,11 @@
 
 @protocol WXHeaderRenderDelegate <NSObject>
 
-- (float)headerWidthForLayout:(WXHeaderComponent *)cell;
+- (float)headerWidthForLayout:(WXHeaderComponent *)header;
 
-- (void)headerDidLayout:(WXHeaderComponent *)cell;
+- (void)headerDidLayout:(WXHeaderComponent *)header;
+
+- (void)headerDidRemove:(WXHeaderComponent *)header;
 
 @end
 

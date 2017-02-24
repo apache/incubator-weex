@@ -5,7 +5,7 @@
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
   @scroll="recylerScroll"
   >
-    <header class="header" ref="header">
+    <header class="header" ref="header" v-if="showHeader">
       <image class="banner" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover">
         <div class="bannerInfo">
           <image class="avatar" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg" resize="cover"></image>
@@ -19,7 +19,7 @@
         </div>
       </image>
     </header>
-    <header class="stickyHeader">
+    <header class="stickyHeader" @click="showOrRemoveHeader">
       <div v-if="stickyHeaderType === 'none'" class="stickyWrapper">
         <text class="stickyText">Sticky Header</text>
       </div>
@@ -37,8 +37,8 @@
         <text class="stickyText">Content Offset:{{contentOffset}}</text>
       </div>
     </header>
-    <cell v-for="item in items" class="cell">
-      <div class="item" @click="onItemclick(item.behaviour)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
+    <cell v-for="(item, index) in items" :key="item.src" class="cell">
+      <div class="item" @click="onItemclick(item.behaviour, index)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
         <text v-if="item.name" class="itemName">{{item.name}}</text>
         <image class="itemPhoto" :src="item.src"></image>
         <text v-if="item.desc" class="itemDesc">{{item.desc}}</text>
@@ -257,17 +257,19 @@
         },
         {
           src:'https://gw.alicdn.com/tps/TB1ux2vPFXXXXbkXXXXXXXXXXXX-240-240.jpg',
-          behaviourName: 'listen scroll',
-          behaviour: 'listenScroll',
+          behaviourName: 'Remove cell',
+          behaviour: 'removeCell',
         },
         {
-          src:'https://gw.alicdn.com/tps/TB1tCCWPFXXXXa7aXXXXXXXXXXX-240-240.jpg'
+          src:'https://gw.alicdn.com/tps/TB1tCCWPFXXXXa7aXXXXXXXXXXX-240-240.jpg',
+          behaviourName: 'Move cell',
+          behaviour: 'moveCell',
         }
       ]
 
       let repeatItems = [];
-      for (let i = 0; i < 5; i++) {
-        repeatItems.push(...items);
+      for (let i = 0; i < 3; i++) {
+        repeatItems.push(...items)
       }
 
       return {
@@ -276,6 +278,7 @@
         columnGap: 12,
         columnWidth: 'auto',
         contentOffset: '0',
+        showHeader: true,
         showScrollbar: false,
         scrollable: true,
         showStickyHeader: false,
@@ -300,8 +303,11 @@
       recylerScroll: function(e) {
         this.contentOffset = e.contentOffset.y
       },
-      onItemclick: function (behaviour) {
-        console.log(`click...${behaviour}`)
+      showOrRemoveHeader: function() {
+        this.showHeader = !this.showHeader
+      },
+      onItemclick: function (behaviour, index) {
+        console.log(`click...${behaviour} at index ${index}`)
         switch (behaviour) {
           case 'changeColumnCount':
             this.changeColumnCount()
@@ -326,6 +332,13 @@
             break
           case 'listenScroll':
             this.listenScrollEvent()
+            break
+          case 'removeCell':
+            this.removeCell(index)
+            break
+          case 'moveCell':
+            this.moveCell(index)
+            break
         }
       },
 
@@ -383,6 +396,18 @@
 
       setRecyclerPadding: function() {
         this.padding = (this.padding == 0 ? 12 : 0);
+      },
+
+      removeCell: function(index) {
+        this.items.splice(index, 1)
+      },
+
+      moveCell: function(index) {
+        if (index == 0) {
+          this.items.splice(this.items.length - 1, 0, this.items.splice(index, 1)[0]);
+        } else {
+          this.items.splice(0, 0, this.items.splice(index, 1)[0]);
+        }
       }
     }
   }

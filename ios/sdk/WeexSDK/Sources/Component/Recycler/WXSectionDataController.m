@@ -11,10 +11,6 @@
 #import "WXHeaderComponent.h"
 #import "WXAssert.h"
 
-@interface WXSectionDataController ()
-
-@end
-
 @implementation WXSectionDataController
 
 - (NSInteger)numberOfItems
@@ -58,7 +54,7 @@
     return [super hash];
 }
 
-- (BOOL)isEqual:(id)object
+- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
 {
     if ([object isKindOfClass:[WXSectionDataController class]]) {
         WXSectionDataController *controller = (WXSectionDataController *)object;

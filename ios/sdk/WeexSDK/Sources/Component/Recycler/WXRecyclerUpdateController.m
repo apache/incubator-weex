@@ -65,6 +65,7 @@
 @property (nonatomic, copy) NSArray<WXSectionDataController *> *theNewData;
 @property (nonatomic, copy) NSArray<WXSectionDataController *> *theOldData;
 @property (nonatomic, weak) UICollectionView *collectionView;
+@property (nonatomic, strong) NSMutableSet<NSIndexPath *> *reloadIndexPaths;
 @property (nonatomic, assign) BOOL isUpdating;
 
 @end
@@ -84,10 +85,21 @@
     [self checkUpdates];
 }
 
+- (void)reloadItemsAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (!_reloadIndexPaths) {
+        _reloadIndexPaths = [NSMutableSet set];
+    }
+    
+    [_reloadIndexPaths addObject:indexPath];
+    
+    [self checkUpdates];
+}
+
 - (void)checkUpdates
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.isUpdating || (!self.theOldData && !self.theNewData)) {
+        if (self.isUpdating) {
             return ;
         }
         
@@ -111,7 +123,7 @@
     [self cleanup];
     
     WXRecyclerDiffResult *diffResult = [self diffWithNewData:newData oldData:oldData];
-    if (![diffResult hasChanges]) {
+    if (![diffResult hasChanges] && self.reloadIndexPaths.count == 0) {
         return;
     }
     
@@ -125,6 +137,7 @@
         [UIView setAnimationsEnabled:YES];
         self.isUpdating = NO;
         [self.delegate updateController:self didPerformUpdateWithFinished:finished];
+        [self.reloadIndexPaths removeAllObjects];
         [self checkUpdates];
     };
     
@@ -213,7 +226,10 @@
     
     [collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
     [collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
-    [collectionView reloadItemsAtIndexPaths:[diffResult.reloadIndexPaths allObjects]];
+    
+    NSSet *reloadIndexPaths = self.reloadIndexPaths ? [diffResult.reloadIndexPaths setByAddingObjectsFromSet:self.reloadIndexPaths] : diffResult.reloadIndexPaths;
+    
+    [collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
     
     [collectionView deleteSections:diffResult.deleteSections];
     [collectionView insertSections:diffResult.insertSections];

@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol WXDiffable <NSObject>
+
+- (BOOL)isEqualToWXObject:(id<WXDiffable>)object;
+
+@end
+
 @interface WXDiffUpdateIndex : NSObject
 
 @property (nonatomic, assign, readonly) NSUInteger oldIndex;
@@ -27,6 +33,6 @@
 
 @interface WXDiffUtil : NSObject
 
-+ (WXDiffResult *)diffWithMinimumDistance:(NSArray *)newArray oldArray:(NSArray *)oldArray;
++ (WXDiffResult *)diffWithMinimumDistance:(NSArray<id<WXDiffable>> *)newArray oldArray:(NSArray<id<WXDiffable>> *)oldArray;
 
 @end

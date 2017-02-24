@@ -214,6 +214,8 @@ typedef enum : NSUInteger {
 {
     WXAssertMainThread();
     
+    //TODO: support completion
+    
     if (![self isViewLoaded]) {
         completion(NO);
     }
@@ -261,7 +263,9 @@ typedef enum : NSUInteger {
 
 - (void)updateController:(WXRecyclerUpdateController *)controller willPerformUpdateWithNewData:(NSArray<WXSectionDataController *> *)newData
 {
-    [self.dataController updateData:newData];
+    if (newData) {
+        [self.dataController updateData:newData];
+    }
 }
 
 - (void)updateController:(WXRecyclerUpdateController *)controller didPerformUpdateWithFinished:(BOOL)finished
@@ -370,7 +374,7 @@ typedef enum : NSUInteger {
 
 #pragma mark - WXHeaderRenderDelegate
 
-- (float)headerWidthForLayout:(WXHeaderComponent *)cell
+- (float)headerWidthForLayout:(WXHeaderComponent *)header
 {
     if (_layoutType == WXRecyclerLayoutTypeMultiColumn) {
         return ((WXMultiColumnLayout *)_collectionViewlayout).computedHeaderWidth;
@@ -379,16 +383,25 @@ typedef enum : NSUInteger {
     return 0.0;
 }
 
-- (void)headerDidLayout:(WXHeaderComponent *)cell
+- (void)headerDidLayout:(WXHeaderComponent *)header
 {
     WXPerformBlockOnMainThread(^{
         [self.collectionView.collectionViewLayout invalidateLayout];
     });
 }
 
+- (void)headerDidRemove:(WXHeaderComponent *)header
+{
+    WXPerformBlockOnMainThread(^{
+        [self performUpdatesWithCompletion:^(BOOL finished) {
+            
+        }];
+    });
+}
+
 #pragma mark - WXCellRenderDelegate
 
-- (float)cellWidthForLayout:(WXCellComponent *)cell
+- (float)containerWidthForLayout:(WXCellComponent *)cell
 {
     if (_layoutType == WXRecyclerLayoutTypeMultiColumn) {
         return ((WXMultiColumnLayout *)_collectionViewlayout).computedColumnWidth;
@@ -399,11 +412,15 @@ typedef enum : NSUInteger {
 
 - (void)cellDidLayout:(WXCellComponent *)cell
 {
+    BOOL previousLayoutComplete = cell.isLayoutComplete;
     cell.isLayoutComplete = YES;
     WXPerformBlockOnMainThread(^{
-        [self.collectionView.collectionViewLayout invalidateLayout];
-        [self performUpdatesWithCompletion:^(BOOL finished) {
-        }];
+        if (previousLayoutComplete) {
+            [self.updateController reloadItemsAtIndexPath:[self.dataController indexPathForCell:cell]];
+        } else {
+            [self performUpdatesWithCompletion:^(BOOL finished) {
+            }];
+        }
     });
 }
 
@@ -416,7 +433,6 @@ typedef enum : NSUInteger {
 {
     if (cell.isLayoutComplete) {
         WXPerformBlockOnMainThread(^{
-            [self.collectionView.collectionViewLayout invalidateLayout];
             [self performUpdatesWithCompletion:^(BOOL finished) {
             }];
         });
@@ -427,7 +443,6 @@ typedef enum : NSUInteger {
 {
     if (cell.isLayoutComplete) {
         WXPerformBlockOnMainThread(^{
-            [self.collectionView.collectionViewLayout invalidateLayout];
             [self performUpdatesWithCompletion:^(BOOL finished) {
             }];
         });
@@ -499,7 +514,7 @@ typedef enum : NSUInteger {
         }
         
         if (i == components.count - 1 && cellArray.count > 0) {
-            currentSection.cellComponents = cellArray;
+            currentSection.cellComponents = [cellArray copy];
             [sectionArray addObject:currentSection];
         }
     }
