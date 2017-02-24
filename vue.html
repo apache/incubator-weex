@@ -10,14 +10,20 @@
   <meta name="format-detection" content="telephone=no, email=no" />
 
   <!-- <script src="./node_modules/vue/dist/vue.runtime.min.js"></script> -->
-  <script src="./node_modules/vue/dist/vue.runtime.js"></script>
+  <!-- <script src="./node_modules/vue/dist/vue.runtime.js"></script> -->
+  <script src="dist/vue.runtime.js"></script>
   <!-- <script src="./node_modules/weex-vue-render/index.min.js"></script> -->
   <script src="./packages/weex-vue-render/index.js"></script>
 </head>
 <body>
   <div id="root"></div>
   <script>
-    (function () {
+    /**
+     * these iife is just for the convenience for the showcase of demos.
+     * you can import a jsbundle by wrapping it in a <script> tag.
+     * e.g. <script src="examples/build/vue-web/vue/index.js"></*script>
+     */
+    ; (function () {
       function getUrlParam (key) {
         var reg = new RegExp('[?|&]' + key + '=([^&]+)')
         var match = location.search.match(reg)
@@ -37,7 +43,7 @@
       var bundle = document.createElement('script')
       bundle.src = page
       document.body.appendChild(bundle)
-    })();
+    })()
   </script>
 </body>
 </html>
