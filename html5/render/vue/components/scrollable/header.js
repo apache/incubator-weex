@@ -27,7 +27,7 @@ export default {
 
   methods: {
     addSticky (offsetY) {
-      this.$el.style.position = ''
+      this.moveUp = false
       this.sticky = true
       this.$el.style.top = offsetY + 'px'
       this.placeholder.style.display = 'block'
@@ -47,7 +47,7 @@ export default {
     },
 
     moveUp (offsetY) {
-      this.$el.style.position = 'absolute'
+      this.moveUp = true
       this.$el.style.top = offsetY + 'px'
     }
   },
@@ -63,7 +63,7 @@ export default {
       on: this.createEventMap(),
       ref: 'header',
       staticClass: 'weex-header',
-      class: { sticky: this.sticky }
+      class: { sticky: this.sticky, absolute: this.moveUp }
     }, this.$slots.default)
   }
 }
