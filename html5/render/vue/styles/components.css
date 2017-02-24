@@ -199,6 +199,7 @@ body > .weex-scroller {
 .weex-scroller-wrapper {
   display: block;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 .weex-list-wrapper {
@@ -207,7 +208,7 @@ body > .weex-scroller {
 
 .weex-list-inner,
 .weex-scroller-inner {
-  -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling: touch;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
