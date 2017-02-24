@@ -13,15 +13,6 @@
 @interface WXComponent (BoxShadow)
 
 /**
- *  @abstract get boxshadow from view
- *
- *  @param view
- *
- *  @return A WXBoxShadow object
- */
-- (WXBoxShadow *_Nullable)getViewBoxShadow:(UIView *_Nullable)view;
-
-/**
  *  @abstract compare boxshadow
  *
  *  @param boxShadow
