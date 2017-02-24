@@ -4,7 +4,8 @@ import { requireWeexModule } from '../modules'
 
 const weexModules = {}
 
-export default {
+const weex = {
+  __vue__: null,
   utils,
   units: window.CSS_UNIT,
   config: {
@@ -43,6 +44,13 @@ export default {
     }
   },
 
+  registerComponent (name, component) {
+    if (!this.__vue__) {
+      return console.log('[Vue Render] Vue is not found. Please import Vue.js before register a component.')
+    }
+    this.__vue__.component(name, component)
+  },
+
   // @deprecated
   getRoot () {},
 
@@ -61,3 +69,5 @@ export default {
     module.init(this)
   }
 }
+
+export default weex
