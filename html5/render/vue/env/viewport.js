@@ -22,7 +22,9 @@ export function setViewport (config = {}) {
      * old webkit browser on android system it get the device pixel width, which
      * is the screenWidth multiply by the device pixel ratio.
      */
-    const screenWidth = document.documentElement.getBoundingClientRect().width
+    const deRect = document.documentElement.getBoundingClientRect()
+    const screenWidth = deRect.width
+    const screenHeight = deRect.height
     const scale = screenWidth / viewportWidth
     const contents = [
       `width=${viewportWidth}`,
@@ -38,7 +40,12 @@ export function setViewport (config = {}) {
       meta.setAttribute('name', 'viewport')
       document.querySelector('head').appendChild(meta)
     }
+    meta.setAttribute('content', contents.join(','))    
 
-    meta.setAttribute('content', contents.join(','))
+    return {
+      scale,
+      deviceWidth: screenWidth,
+      deviceHeight: screenHeight
+    }
   }
 }

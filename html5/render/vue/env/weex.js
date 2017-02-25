@@ -1,4 +1,4 @@
-import './WXEnvironment'
+import './wx-env'
 import * as utils from '../utils'
 import { requireWeexModule } from '../modules'
 

@@ -1,6 +1,6 @@
 // import semver from 'semver'
 import weex from './env'
-import { setViewport, setVue } from './env'
+import { setVue } from './env'
 import * as components from './components'
 import styleMixin from './mixins/style'
 
@@ -12,7 +12,6 @@ import styleMixin from './mixins/style'
  *         - modules.
  */
 function init (Vue/*, options = {}*/) {
-  setViewport()
   setVue(Vue)
 
   Vue.prototype.$getConfig = () => {

@@ -13,7 +13,6 @@ import 'core-js/modules/es6.string.iterator'
 import 'core-js/modules/web.dom.iterable'
 import 'core-js/modules/es6.promise'
 
-export * from './viewport'
 import modules from '../modules'
 import weex from './weex'
 
