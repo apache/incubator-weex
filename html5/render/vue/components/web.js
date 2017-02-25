@@ -1,9 +1,7 @@
-import { base } from '../mixins'
 import { createEvent } from '../utils'
 import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     src: String
   },
@@ -46,7 +44,7 @@ export default {
         'weex-type': 'web',
         src: this.src
       },
-      on: this.createEventMap(['error']),
+      on: this._createEventMap(['error']),
       staticClass: 'weex-web'
     })
   }

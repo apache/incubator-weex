@@ -1,8 +1,6 @@
-import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     src: String,
     playStatus: {
@@ -47,7 +45,7 @@ export default {
         controls: this.controls,
         src: this.src
       },
-      on: this.createEventMap(['start', 'pause', 'finish', 'fail']),
+      on: this._createEventMap(['start', 'pause', 'finish', 'fail']),
       staticClass: 'weex-video'
     })
   }

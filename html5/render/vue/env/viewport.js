@@ -40,7 +40,7 @@ export function setViewport (config = {}) {
       meta.setAttribute('name', 'viewport')
       document.querySelector('head').appendChild(meta)
     }
-    meta.setAttribute('content', contents.join(','))    
+    meta.setAttribute('content', contents.join(','))
 
     return {
       scale,

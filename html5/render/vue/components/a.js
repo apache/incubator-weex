@@ -1,8 +1,6 @@
-import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     href: String
   },
@@ -17,7 +15,7 @@ export default {
         'weex-type': 'a',
         href: this.href
       },
-      on: this.createEventMap(),
+      on: this._createEventMap(),
       staticClass: 'weex-a'
     }, this.$slots.default)
   }

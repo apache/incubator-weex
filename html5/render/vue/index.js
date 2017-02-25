@@ -2,7 +2,8 @@
 import weex from './env'
 import { setVue } from './env'
 import * as components from './components'
-import styleMixin from './mixins/style'
+import { base, style } from './mixins'
+// import styleMixin from './mixins/style'
 
 /**
  * init weex.
@@ -47,8 +48,8 @@ function init (Vue/*, options = {}*/) {
   //   }
   //   console.info(`[Vue Render] Registered components: `
   //     + `[${Object.keys(components).join(', ')}].`)
-  // use style mixin.
-  Vue.mixin(styleMixin)
+  Vue.mixin(base)
+  Vue.mixin(style)
   // }
 }
 

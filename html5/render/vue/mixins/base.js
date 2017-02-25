@@ -29,32 +29,40 @@ function _getParentScroller (vnode) {
 }
 
 export default {
+  created () {
+    this._prerender()
+  },
   mounted () {
     watchAppear(this)
     // watchLazyload(this)
   },
 
+  beforeUpdate () {
+    this._prerender()
+  },
+
   methods: {
-    getTopContext () {
-      let ctx = this
-      let vnode = ctx.$vnode
-      while (vnode) {
-        ctx = vnode.context
-        vnode = ctx.$vnode
-      }
-      return ctx
+    _getTopContext () {
+      // let ctx = this
+      // let vnode = ctx.$vnode
+      // while (vnode) {
+      //   ctx = vnode.context
+      //   vnode = ctx.$vnode
+      // }
+      // return ctx
+      return this.$options._parentVnode.context
     },
 
-    getScopeId () {
-      const ctx = this.getTopContext()
+    _getScopeId () {
+      const ctx = this._getTopContext()
       return ctx.$options._scopeId
     },
 
-    getParentScroller () {
+    _getParentScroller () {
       return _getParentScroller(this.$vnode)
     },
 
-    createEventMap (extras = []) {
+    _createEventMap (extras = []) {
       const eventMap = {}
       supportedEvents.concat(extras).forEach(name => {
         eventMap[name] = event => this.$emit(name, event)
@@ -62,9 +70,15 @@ export default {
       return eventMap
     },
 
-    fireLazyload () {
-      const scroller = this.getParentScroller()
+    _fireLazyload () {
+      const scroller = this._getParentScroller()
       fireLazyload(scroller && scroller.$el || document.body)
+    },
+
+    _prerender () {
+      this._mergeStyles()
+      // process prerender hooks for components' own treatment.
+      this.beforeRender && this.beforeRender()
     }
   }
 }

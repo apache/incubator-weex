@@ -1,11 +1,11 @@
-import { base, scrollable } from '../../mixins'
+import { scrollable } from '../../mixins'
 import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
 import * as shared from './shared'
 import listMixin from './list/listMixin'
 
 export default {
-  mixins: [base, scrollable, listMixin],
+  mixins: [scrollable, listMixin],
   props: {
     scrollDirection: {
       type: [String],
@@ -83,7 +83,7 @@ export default {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      on: extend(this.createEventMap(), {
+      on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,

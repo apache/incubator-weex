@@ -1,8 +1,6 @@
-import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     checked: {
       type: [Boolean, String],

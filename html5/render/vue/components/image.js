@@ -1,7 +1,10 @@
-import { base } from '../mixins'
+import { extend } from '../utils'
 import { validateStyles } from '../validator'
 
-function getImgStyle (context) {
+/**
+ * get resize (stetch|cover|contain) related styles.
+ */
+function getResizeStyle (context) {
   const stretch = '100% 100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
@@ -9,7 +12,6 @@ function getImgStyle (context) {
 }
 
 export default {
-  mixins: [base],
   props: {
     src: {
       type: String,
@@ -23,15 +25,17 @@ export default {
         /* istanbul ignore next */
         return ['cover', 'contain', 'stretch'].indexOf(value) !== -1
       }
-    }
+    },
+    quality: String,
+    sharpen: String,
+    original: [String, Boolean]
   },
 
-  mounted: function () {
-    this.fireLazyload()
+  mounted () {
+    this._fireLazyload()
   },
 
   render (createElement) {
-    this.prerender()
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
       validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
@@ -43,17 +47,27 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
-
+    const { width, height } = this.$vnode.data.staticStyle
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': this.src,
+        'img-src': this.processImgSrc && this.processImgSrc(this.src, {
+          width: parseFloat(width),
+          height: parseFloat(height),
+          quality: this.quality,
+          sharpen: this.sharpen,
+          original: this.original
+        }) || this.src,
         'img-placeholder': this.placeholder
       },
-      on: this.createEventMap(['load', 'error']),
-      staticClass: 'weex-image',
-      staticStyle: getImgStyle(this)
-      // style: cssText
+      on: this._createEventMap(['load', 'error']),
+      staticClass: 'weex-image'
     })
+  },
+
+  methods: {
+    beforeRender () {
+      extend(this.$options._parentVnode.data.staticStyle, getResizeStyle(this))
+    }
   }
 }

@@ -1,5 +1,4 @@
 import { extend, extractKeys } from '../../utils'
-import { base } from '../../mixins'
 
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
@@ -10,7 +9,7 @@ function getIndicatorItemStyle (spec, isActive) {
 
 function _render (context, h) {
   const children = []
-  const { mergedStyle } = context.$vnode.data
+  const { staticStyle: mergedStyle } = context.$vnode.data
   context.$vnode.data.cached = {}
   extractKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
   const indicatorSpecStyle = extractKeys(
@@ -111,7 +110,6 @@ function _reLayout (context, virtualRect, ltbr) {
 
 export default {
   name: 'indicator',
-  mixins: [base],
   methods: {
     show: function () {
       this.$el.style.visibility = 'visible'
@@ -133,7 +131,6 @@ export default {
     //     staticStyle: { display: 'none' }
     //   }, [])
     // }
-    this.prerender()
     return _render(this, createElement)
   }
 }

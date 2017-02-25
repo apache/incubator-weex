@@ -1,4 +1,3 @@
-import { base } from '../mixins'
 import { validateStyles } from '../validator'
 
 function trimTextNode (children) {
@@ -9,7 +8,6 @@ function trimTextNode (children) {
 }
 
 export default {
-  mixins: [base],
   render (createElement) {
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
@@ -18,7 +16,7 @@ export default {
 
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
-      on: this.createEventMap(),
+      on: this._createEventMap(),
       staticClass: 'weex-div'
     }, trimTextNode(this.$slots.default))
   }

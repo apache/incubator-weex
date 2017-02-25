@@ -1,9 +1,6 @@
-import { base } from '../../mixins'
 import { validateStyles } from '../../validator'
 
 export default {
-  mixins: [base],
-
   data () {
     return {
       sticky: false,
@@ -61,7 +58,7 @@ export default {
 
     return createElement('html:header', {
       attrs: { 'weex-type': 'header' },
-      on: this.createEventMap(),
+      on: this._createEventMap(),
       ref: 'header',
       staticClass: 'weex-header',
       class: { sticky: this.sticky, absolute: this.move }
