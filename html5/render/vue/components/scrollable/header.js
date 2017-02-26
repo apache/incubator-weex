@@ -1,4 +1,4 @@
-import { validateStyles } from '../../validator'
+// import { validateStyles } from '../../validator'
 
 export default {
   data () {
@@ -52,9 +52,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('html:header', {
       attrs: { 'weex-type': 'header' },

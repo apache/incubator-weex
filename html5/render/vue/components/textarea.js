@@ -1,5 +1,5 @@
 import { extend, mapFormEvents } from '../utils'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 export default {
   props: {
@@ -21,9 +21,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('html:textarea', {
       attrs: {

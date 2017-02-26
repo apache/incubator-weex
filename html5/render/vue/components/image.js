@@ -31,15 +31,23 @@ export default {
     original: [String, Boolean]
   },
 
+  create () {
+    console.log('image created.')
+  },
+
+  beforeUpdate () {
+    console.log('image before update.')
+  },
+
   mounted () {
     this._fireLazyload()
   },
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     // let cssText = `background-image:url("${this.src}");`
 
@@ -67,6 +75,7 @@ export default {
 
   methods: {
     beforeRender () {
+      console.log('image before render.')
       extend(this.$options._parentVnode.data.staticStyle, getResizeStyle(this))
     }
   }

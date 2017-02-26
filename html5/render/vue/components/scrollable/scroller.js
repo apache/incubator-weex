@@ -1,5 +1,5 @@
 import { scrollable } from '../../mixins'
-import { validateStyles } from '../../validator'
+// import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
 import * as shared from './shared'
 import listMixin from './list/listMixin'
@@ -70,9 +70,9 @@ export default {
     this.weexType = 'scroller'
 
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.$slots.default || []
     this.$nextTick(() => {

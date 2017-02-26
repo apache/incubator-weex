@@ -1,4 +1,4 @@
-import { validateStyles } from '../../validator'
+// import { validateStyles } from '../../validator'
 import { throttle, bind, extend } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
@@ -108,9 +108,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length

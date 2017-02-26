@@ -1,4 +1,4 @@
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 import { extend } from '../utils'
 
 /**
@@ -29,9 +29,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
