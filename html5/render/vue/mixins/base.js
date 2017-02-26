@@ -43,14 +43,13 @@ export default {
 
   methods: {
     _getTopContext () {
-      // let ctx = this
-      // let vnode = ctx.$vnode
-      // while (vnode) {
-      //   ctx = vnode.context
-      //   vnode = ctx.$vnode
-      // }
-      // return ctx
-      return this.$options._parentVnode.context
+      let ctx = this
+      let vnode = ctx.$options._parentVnode
+      while (vnode) {
+        ctx = vnode.context
+        vnode = ctx.$options._parentVnode
+      }
+      return ctx
     },
 
     _getScopeId () {

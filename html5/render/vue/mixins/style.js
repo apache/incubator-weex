@@ -121,7 +121,7 @@ function getHeadStyleMap () {
 // }
 
 export default {
-  _beforeCreate () {
+  beforeCreate () {
     // get static class style map from document's styleSheets.
     if (!weex.styleMap) {
       weex.styleMap = getHeadStyleMap()
@@ -133,7 +133,7 @@ export default {
     // get style from staticClass and staticStyle.
     _getComponentStyle (data) {
       const style = {}
-      const _scopeId = this.getScopeId && this.getScopeId()
+      const _scopeId = this._getScopeId && this._getScopeId()
       const hyphenatedStaticStyle = {}
       const staticStyle = data.staticStyle || {}
       const classNames = (data.staticClass || '').split(' ')

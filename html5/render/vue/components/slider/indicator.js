@@ -131,6 +131,7 @@ export default {
     //     staticStyle: { display: 'none' }
     //   }, [])
     // }
+    this.$vnode.data.staticStyle = this._getComponentStyle(this.$vnode.data)
     return _render(this, createElement)
   }
 }
