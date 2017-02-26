@@ -45,8 +45,8 @@ function _render (context, h) {
  * get indicator's virtual rect (width, height), which is the .
  */
 function _getVirtualRect (context) {
-  const mergedStyle = context.$vnode.data.mergedStyle
-  const ct = context.getParentRect()
+  const mergedStyle = context.$vnode.data.staticStyle
+  const ct = context._getParentRect()
   const rect = ['width', 'height'].reduce((pre, key) => {
     const msv = mergedStyle[key]
     pre[key] = msv ? parseFloat(msv) : ct[key]
@@ -59,7 +59,7 @@ function _getVirtualRect (context) {
  * get indicator's ltbr values (without units).
  */
 function _getLtbr (context) {
-  const mergedStyle = context.$vnode.data.mergedStyle
+  const mergedStyle = context.$vnode.data.staticStyle
   return ['left', 'top', 'bottom', 'right'].reduce((pre, key) => {
     const msv = mergedStyle[key]
     // undefined, null, or '0px' -> o
