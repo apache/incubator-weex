@@ -202,126 +202,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui.view.listview;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
-
-import java.util.Map;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 
 /**
- * Created by zhengshihan on 2017/2/21.
+ * Created by zhengshihan on 2017/2/24.
  */
 
-public class WXRecyclerDomObject extends WXDomObject{
-
-
-    private int mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
-    private float mColumnWidth = Constants.Value.AUTO;
-    private float mColumnGap = Constants.Value.COLUMN_GAP_NORMAL;
-    private boolean mIsPreCalculateCellWidth =false;
-
-    public int getLayoutType(){
-        return getAttrs().getLayoutType();
-    }
-
-    public float getColumnGap() {
-        return mColumnGap;
-    }
-
-    public int getColumnCount() {
-        return mColumnCount;
-    }
-
-    public float getColumnWidth() {
-        return mColumnWidth;
-    }
-    @Override
-    public void add(WXDomObject child, int index) {
-        super.add(child, index);
-
-        if (WXBasicComponentType.CELL.equals(child.getType())) {
-            if (!mIsPreCalculateCellWidth) {
-                preCalculateCellWidth();
-            }
-            child.getStyles().put(Constants.Name.WIDTH, mColumnWidth);
-        }
-    }
-
-    public void preCalculateCellWidth(){
-
-        if (getAttrs() != null) {
-            mColumnCount = getAttrs().getColumnCount();
-            mColumnWidth = getAttrs().getColumnWidth();
-            mColumnGap =  getAttrs().getColumnGap();
-
-            float availableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
-            availableWidth = WXViewUtils.getWebPxByWidth(availableWidth,getViewPortWidth());
-
-            if (Constants.Value.AUTO == mColumnCount && Constants.Value.AUTO == mColumnWidth) {
-                mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
-            } else if (Constants.Value.AUTO == mColumnWidth && Constants.Value.AUTO != mColumnCount) {
-                mColumnWidth = (availableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
-                mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
-            } else if (Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO == mColumnCount) {
-                mColumnCount = Math.round((availableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
-                mColumnCount = mColumnCount > 0 ? mColumnCount :1;
-                mColumnWidth =((availableWidth + mColumnGap) / mColumnCount) - mColumnGap;
-            } else if(Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO != mColumnCount){
-                int columnCount = Math.round((availableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
-                mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
-                mColumnWidth= ((availableWidth + mColumnGap) / mColumnCount) - mColumnGap;
-            }
-            mIsPreCalculateCellWidth = true;
-            if(WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
-            }
-
-        }
-    }
-
-    public void updateRecyclerAttr(){
-        preCalculateCellWidth();
-        int count = getChildCount();
-        for(int i=0;i<count; i++){
-            WXDomObject domObject = getChild(i);
-            if(WXBasicComponentType.CELL.equals(domObject.getType())) {
-                getChild(i).getStyles().put(Constants.Name.WIDTH, mColumnWidth);
-            }
-        }
-    }
-
-    @Override
-    public void updateAttr(Map<String, Object> attrs) {
-        super.updateAttr(attrs);
-        if(attrs.containsKey(Constants.Name.COLUMN_COUNT)
-                || attrs.containsKey(Constants.Name.COLUMN_GAP)
-                || attrs.containsKey(Constants.Name.COLUMN_WIDTH)){
-            updateRecyclerAttr();
-        }
-    }
-
-    @Override
-    public void updateStyle(Map<String, Object> styles) {
-        super.updateStyle(styles);
-        if(styles.containsKey(Constants.Name.PADDING)
-                ||styles.containsKey(Constants.Name.PADDING_LEFT)
-                || styles.containsKey(Constants.Name.PADDING_RIGHT)){
-            preCalculateCellWidth();
-        }
-    }
-
-    @Override
-    public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
-        super.updateStyle(styles, byPesudo);
-        if(styles.containsKey(Constants.Name.PADDING)
-                ||styles.containsKey(Constants.Name.PADDING_LEFT)
-                || styles.containsKey(Constants.Name.PADDING_RIGHT)){
-            preCalculateCellWidth();
-        }
+public class WXStaggeredGridLayoutManager extends StaggeredGridLayoutManager {
+    public WXStaggeredGridLayoutManager(int spanCount, int orientation) {
+        super(spanCount, orientation);
+        setGapStrategy(GAP_HANDLING_NONE);
     }
 }

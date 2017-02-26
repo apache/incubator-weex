@@ -211,8 +211,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
-import com.taobao.weex.utils.WXLogUtils;
-
 /**
  * Created by zhengshihan on 2017/2/20.
  */
@@ -244,11 +242,11 @@ public class WXSpaceItemDecoration extends RecyclerView.ItemDecoration {
 
             int margin = (int) (mColumnGap / mColumnCount);
             if(spanIndex % mColumnCount == 1){
+                layoutParams.setMarginStart(0);
                 layoutParams.setMarginEnd(margin);
-
             }else if (spanIndex % mColumnCount ==0){
                 layoutParams.setMarginStart(margin);
-
+                layoutParams.setMarginEnd(0);
             } else {
                 layoutParams.setMarginEnd(margin);
                 layoutParams.setMarginStart(margin);

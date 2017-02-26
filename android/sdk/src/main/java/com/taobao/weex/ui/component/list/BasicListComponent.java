@@ -878,9 +878,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   }
 
+  protected void markComponentUsable(){
+    for (WXComponent component : mChildren){
+      component.setUsing(false);
+    }
+  }
   /**
    * Create an instance of {@link ListBaseViewHolder} for the given viewType (not for the given
-   * index). This method will look up for the first component that fits the viewType requirement and
+   * index). This  markComponentUsable();method will look up for the first component that fits the viewType requirement and
    * doesn't be used. Then create the certain type of view, detach the view f[rom the component.
    *
    * @param parent   the ViewGroup into which the new view will be inserted

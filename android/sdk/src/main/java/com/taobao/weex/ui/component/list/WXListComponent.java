@@ -211,6 +211,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBaseRefresh;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -222,6 +223,8 @@ import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.Map;
 
 /**
  * Unlike other components, there is immutable bi-directional association between View and
@@ -235,6 +238,8 @@ import com.taobao.weex.utils.WXLogUtils;
 public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private String TAG = "WXListComponent";
   private WXRecyclerDomObject mDomObject;
+  private float mPaddingLeft;
+  private float mPaddingRight;
 
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -253,9 +258,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       }else{
         mLayoutType = mDomObject.getLayoutType();
       }
-
-      mColumnCount = mDomObject.getColumnCount();
-      mColumnGap = mDomObject.getColumnGap();
+      updateRecyclerAttr();
 
     }
   }
@@ -308,40 +311,65 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       }, 100);
       return true;
     }
-
     return false;
+  }
+
+  private void updateRecyclerAttr(){
+    mColumnCount = mDomObject.getColumnCount();
+    mColumnGap = mDomObject.getColumnGap();
+    mColumnWidth = mDomObject.getColumnWidth();
+    mPaddingLeft =mDomObject.getPadding().get(Spacing.LEFT);
+    mPaddingRight =mDomObject.getPadding().get(Spacing.RIGHT);
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_WIDTH)
   public void setColumnWidth(int columnCount)  {
     if(mDomObject.getColumnWidth() != mColumnWidth){
+      markComponentUsable();
+      updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
       wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-      mColumnCount = mDomObject.getColumnCount();
     }
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_COUNT)
   public void setColumnCount(int columnCount){
-
     if(mDomObject.getColumnCount() != mColumnCount){
-      mColumnCount = mDomObject.getColumnCount();
+      markComponentUsable();
+      updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
       wxRecyclerView.initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
-
     }
-
   }
 
   @WXComponentProp(name = Constants.Name.COLUMN_GAP)
   public void setColumnGap(float columnGap) throws InterruptedException {
     if(mDomObject.getColumnGap() != mColumnGap) {
-      mColumnGap = mDomObject.getColumnGap();
+      markComponentUsable();
+      updateRecyclerAttr();
       WXRecyclerView wxRecyclerView = getHostView().getInnerView();
       wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
     }
   }
 
+  @Override
+  public void updateProperties(Map<String, Object> props) {
+    super.updateProperties(props);
+    if(props.containsKey(Constants.Name.PADDING)
+            ||props.containsKey(Constants.Name.PADDING_LEFT)
+            || props.containsKey(Constants.Name.PADDING_RIGHT)){
+
+      if(mPaddingLeft !=mDomObject.getPadding().get(Spacing.LEFT)
+              || mPaddingRight !=mDomObject.getPadding().get(Spacing.RIGHT)) {
+
+        markComponentUsable();
+        updateRecyclerAttr();
+        WXRecyclerView wxRecyclerView = getHostView().getInnerView();
+        wxRecyclerView.initView(getContext(), mLayoutType, mColumnCount, mColumnGap, getOrientation());
+      }
+    }
+
+  }
 
   @Override
   public void createChildViewAt(int index) {
