@@ -490,7 +490,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     }
 
     String value = String.valueOf(obj);
-    if (Constants.Name.AUTO.equals(value)) {
+    if (Constants.Name.NORMAL.equals(value)) {
       return Constants.Value.COLUMN_GAP_NORMAL;
     }
 

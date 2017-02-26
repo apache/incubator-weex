@@ -352,6 +352,7 @@ public class Constants {
     String OFFSET = "offset";
     String ANIMATED = "animated";
     String AUTO = "auto";
+    String NORMAL = "normal";
   }
 
   public interface Value {

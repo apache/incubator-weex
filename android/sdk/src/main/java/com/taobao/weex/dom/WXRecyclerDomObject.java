@@ -306,16 +306,6 @@ public class WXRecyclerDomObject extends WXDomObject{
     }
 
     @Override
-    public void updateStyle(Map<String, Object> styles) {
-        super.updateStyle(styles);
-        if(styles.containsKey(Constants.Name.PADDING)
-                ||styles.containsKey(Constants.Name.PADDING_LEFT)
-                || styles.containsKey(Constants.Name.PADDING_RIGHT)){
-            preCalculateCellWidth();
-        }
-    }
-
-    @Override
     public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
         super.updateStyle(styles, byPesudo);
         if(styles.containsKey(Constants.Name.PADDING)

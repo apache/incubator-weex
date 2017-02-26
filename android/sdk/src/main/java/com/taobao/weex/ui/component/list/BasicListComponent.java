@@ -319,7 +319,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
     int weexH = WXViewUtils.getWeexHeight(getInstanceId());
     int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - getAbsoluteY() : height;
-    return super.measure(width, outHeight);
+    return super.measure((int)(width+mColumnGap), outHeight);
   }
 
   public int getOrientation() {
@@ -1198,7 +1198,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getViewPortWidth()));
             contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getViewPortWidth()));
-
             event.put(Constants.Name.CONTENT_SIZE, contentSize);
             event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
 

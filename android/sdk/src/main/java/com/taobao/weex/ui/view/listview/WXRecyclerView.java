@@ -211,6 +211,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
 
 import com.taobao.weex.common.Constants;
@@ -258,9 +259,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     if (type == TYPE_GRID_LAYOUT) {
       setLayoutManager(new GridLayoutManager(context, columnCount,orientation,false));
     } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new WXStaggeredGridLayoutManager(columnCount, orientation));
-      addItemDecoration(new WXSpaceItemDecoration(columnCount,columnGap));
-
+      setLayoutManager(new StaggeredGridLayoutManager(columnCount, orientation));
     } else if (type == TYPE_LINEAR_LAYOUT) {
       setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false));
     }
