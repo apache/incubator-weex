@@ -47,18 +47,11 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
-    const { width, height } = this.$vnode.data.staticStyle
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': this.processImgSrc && this.processImgSrc(this.src, {
-          width: parseFloat(width),
-          height: parseFloat(height),
-          quality: this.quality,
-          sharpen: this.sharpen,
-          original: this.original
-        }) || this.src,
-        'img-placeholder': this.placeholder
+        'img-src': this._preProcessSrc(this.src),
+        'img-placeholder': this._preProcessSrc(this.placeholder)
       },
       on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image'
@@ -66,6 +59,16 @@ export default {
   },
 
   methods: {
+    _preProcessSrc (url) {
+      const { width, height } = this.$vnode.data.staticStyle
+      return this.processImgSrc && this.processImgSrc(url, {
+        width: parseFloat(width),
+        height: parseFloat(height),
+        quality: this.quality,
+        sharpen: this.sharpen,
+        original: this.original
+      }) || url
+    },
     beforeRender () {
       extend(this.$options._parentVnode.data.staticStyle, getResizeStyle(this))
     }
