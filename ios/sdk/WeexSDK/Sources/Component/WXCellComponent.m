@@ -26,6 +26,7 @@
         _isRecycle = attributes[@"recycle"] ? [WXConvert BOOL:attributes[@"recycle"]] : YES;
         _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
+        _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -74,6 +75,10 @@
     
     if (attributes[@"deleteAnimation"]) {
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
+    }
+    
+    if (attributes[@"keepScrollPosition"]) {
+        _keepScrollPosition = [WXConvert BOOL:attributes[@"keepScrollPosition"]];
     }
 }
 
