@@ -132,6 +132,10 @@
         #endif
     };
     
+    _instance.onJSException = ^(WXJSExceptionInfo* jsException){
+        // handle js exception
+    };
+    
     _instance.renderFinish = ^(UIView *view) {
          WXLogDebug(@"%@", @"Render Finish...");
         [weakSelf updateInstanceState:WeexInstanceAppear];

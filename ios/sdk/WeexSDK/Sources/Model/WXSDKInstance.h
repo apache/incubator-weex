@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+#import "WXJSExceptionInfo.h"
 @class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;
@@ -87,6 +88,12 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onCreate)(UIView *);
+
+/**
+ * The callback triggered when JSCore throws js exception during runtime
+ *  @return A block that takes a WXJSEXception argument.
+ */
+@property (nonatomic, copy) void (^onJSException)(WXJSExceptionInfo *);
 
 /**
  *  The callback triggered when the root container's frame has changed.

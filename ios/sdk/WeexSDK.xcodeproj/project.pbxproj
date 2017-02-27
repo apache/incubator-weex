@@ -265,7 +265,6 @@
 		DCC77C141D770AE300CE7288 /* WXSliderNeighborComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */; };
 		DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */; };
 		DCF087621DCAE161005CD6EB /* WXInvocationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */; };
-		DCF343641E49CA1D00A2FB34 /* WXJSExceptionProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF343631E49CA1D00A2FB34 /* WXJSExceptionProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCF343671E49CAEE00A2FB34 /* WXJSExceptionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DCF343661E49CAEE00A2FB34 /* WXJSExceptionInfo.m */; };
 /* End PBXBuildFile section */
@@ -559,7 +558,6 @@
 		DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSliderNeighborComponent.h; sourceTree = "<group>"; };
 		DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInvocationConfig.h; sourceTree = "<group>"; };
 		DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInvocationConfig.m; sourceTree = "<group>"; };
-		DCF343631E49CA1D00A2FB34 /* WXJSExceptionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionProtocol.h; sourceTree = "<group>"; };
 		DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionInfo.h; sourceTree = "<group>"; };
 		DCF343661E49CAEE00A2FB34 /* WXJSExceptionInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXJSExceptionInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -937,7 +935,6 @@
 				74A4BA841CAD453400195969 /* WXNetworkProtocol.h */,
 				59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */,
 				74EF31A91DE58AE600667A07 /* WXURLRewriteProtocol.h */,
-				DCF343631E49CA1D00A2FB34 /* WXJSExceptionProtocol.h */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -1154,7 +1151,6 @@
 				740451EA1E14BB26004157CB /* WXServiceFactory.h in Headers */,
 				744BEA591D0520F300452B5D /* WXComponent+Layout.h in Headers */,
 				74A4BA5B1CABBBD000195969 /* WXDebugTool.h in Headers */,
-				DCF343641E49CA1D00A2FB34 /* WXJSExceptionProtocol.h in Headers */,
 				2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */,
 				747A787C1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h in Headers */,
 				DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */,

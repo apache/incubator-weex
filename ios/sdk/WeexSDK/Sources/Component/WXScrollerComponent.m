@@ -424,14 +424,18 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
     }
-    if (scrollView.dragging) {
-        [_refreshComponent pullingdown:@{
-            DISTANCE_Y: @(fabs(scrollView.contentOffset.y - _lastContentOffset.y)),
-            PULLING_DISTANCE: @(scrollView.contentOffset.y),
-            @"type":@"pullingdown"
-            }];
-    }
+   
     _lastContentOffset = scrollView.contentOffset;
+    
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+    if ([_refreshComponent displayState] && scrollView.dragging) {
+        [_refreshComponent pullingdown:@{
+             REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
+             REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
+             REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
+             @"type":@"pullingdown"
+         }];
+    }
 
     // check sticky
     [self adjustSticky];
@@ -442,7 +446,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         self.onScroll(scrollView);
     }
     if (_scrollEvent) {
-        CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
         NSDictionary *contentSizeData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:scrollView.contentSize.width / scaleFactor],@"width",[NSNumber numberWithFloat:scrollView.contentSize.height / scaleFactor],@"height", nil];
         //contentOffset values are replaced by (-contentOffset.x,-contentOffset.y) ,in order to be consistent with Android client.
         NSDictionary *contentOffsetData = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:-scrollView.contentOffset.x / scaleFactor],@"x",[NSNumber numberWithFloat:-scrollView.contentOffset.y / scaleFactor],@"y", nil];
