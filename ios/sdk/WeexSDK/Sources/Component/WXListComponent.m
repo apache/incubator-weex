@@ -319,12 +319,10 @@
         WXLogDebug(@"Delete cell:%@ at indexPath:%@", cell.ref, indexPath);
         if (cell.deleteAnimation == UITableViewRowAnimationNone) {
             [UIView performWithoutAnimation:^{
-                [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-                [self handleAppear];
+                [self _deleteTableViewCellAtIndexPath:indexPath keepScrollPosition:cell.keepScrollPosition animation:UITableViewRowAnimationNone];
             }];
         } else {
-            [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.deleteAnimation];
-            [self handleAppear];
+            [self _deleteTableViewCellAtIndexPath:indexPath keepScrollPosition:cell.keepScrollPosition animation:cell.deleteAnimation];
         }
     }];
 }
@@ -355,12 +353,10 @@
             _completedSections = completedSections;
             if (cell.insertAnimation == UITableViewRowAnimationNone) {
                 [UIView performWithoutAnimation:^{
-                    [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-                    [self handleAppear];
+                    [self _insertTableViewCellAtIndexPath:indexPath keepScrollPosition:cell.keepScrollPosition animation:UITableViewRowAnimationNone];
                 }];
             } else {
-                [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:cell.insertAnimation];
-                [self handleAppear];
+                [self _insertTableViewCellAtIndexPath:indexPath keepScrollPosition:cell.keepScrollPosition animation:cell.insertAnimation];
             }
         } else {
             WXLogInfo(@"Reload cell:%@ at indexPath:%@", cell.ref, indexPath);
@@ -650,6 +646,52 @@
     }
 
     return [NSIndexPath indexPathForRow:row inSection:section];
+}
+
+- (void)_insertTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+{
+    CGFloat adjustment = 0;
+    
+    // keep the scroll position when inserting or deleting cells by adjusting the content offset
+    if (keepScrollPosition) {
+        NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
+        if ([indexPath compare:top] <= 0) {
+            adjustment = [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+        }
+    }
+    
+    [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+    
+    if (keepScrollPosition) {
+        CGPoint afterContentOffset = _tableView.contentOffset;
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
+        _tableView.contentOffset = newContentOffset;
+    }
+    
+    [self handleAppear];
+}
+
+- (void)_deleteTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+{
+    CGFloat adjustment = 0;
+    
+    // keep the scroll position when inserting or deleting cells by adjusting the content offset
+    if (keepScrollPosition) {
+        NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
+        if ([indexPath compare:top] <= 0) {
+            adjustment = [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+        }
+    }
+    
+    [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+    
+    if (keepScrollPosition) {
+        CGPoint afterContentOffset = _tableView.contentOffset;
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y - adjustment > 0 ? afterContentOffset.y - adjustment : 0);
+        _tableView.contentOffset = newContentOffset;
+    }
+    
+    [self handleAppear];
 }
 
 - (void)fixFlicker
