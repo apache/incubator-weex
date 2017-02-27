@@ -118,7 +118,6 @@
     
     if (styles[@"backgroundColor"]) {
         _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
-        _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
     
@@ -186,7 +185,6 @@
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
-        _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
     if (styles && [styles containsObject:@"boxShadow"]) {
