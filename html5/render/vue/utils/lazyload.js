@@ -30,11 +30,10 @@ export function applySrc (item, src, placeholderSrc) {
 }
 
 export function fireLazyload (container) {
-  const ct = container || document.body
-  const imgs = ct.querySelectorAll('[img-src]')
+  const imgs = (container || document.body).querySelectorAll('[img-src]')
   for (let i = 0; i < imgs.length; i++) {
     const img = imgs[i]
-    if (isElementVisible(img, ct)) {
+    if (isElementVisible(img, container)) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
   }
