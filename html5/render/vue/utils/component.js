@@ -19,10 +19,16 @@ export function hasIntersection (rect, ctRect) {
  * @param  {HTMLElement}  container  optional, the container of this el.
  */
 export function isElementVisible (el, container) {
-  const ct = container || document.body
+  const ctRect = container && container.getBoundingClientRect()
+    || {
+      top: 0,
+      left: 0,
+      bottom: window.innerHeight,
+      right: window.innerWidth
+    }
   return hasIntersection(
     el.getBoundingClientRect(),
-    ct.getBoundingClientRect())
+    ctRect)
 }
 
 export function isComponentVisible (component) {
