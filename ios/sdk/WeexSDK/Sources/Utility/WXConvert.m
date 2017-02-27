@@ -750,6 +750,22 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     } else {
         return [WXLength lengthWithInt:([value intValue] * scaleFactor) type:type];
     }
+
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor
+{
+    NSString *boxShadow = @"";
+    if([value isKindOfClass:[NSString class]]){
+        boxShadow = value;
+    } else if([value isKindOfClass:[NSNumber class]]){
+        boxShadow =  [((NSNumber *)value) stringValue];
+    } else if (value != nil) {
+        boxShadow = nil;
+        WXLogError(@"Convert Error:%@ can not be converted to boxshadow type", value);
+    }
+    if (boxShadow) {
+        return [WXBoxShadow getBoxShadowFromString:boxShadow scaleFactor:scaleFactor];
+    }
+    return nil;
 }
 
 @end

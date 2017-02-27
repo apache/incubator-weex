@@ -213,6 +213,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -285,6 +286,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static boolean mAllowCacheViewHolder = true;
   private static boolean mDownForBidCacheViewHolder = false;
 
+
+  protected int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
+  protected int mColumnCount = 1;
+  protected float mColumnGap = 0;
+  protected float mColumnWidth = 0;
+
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
 
@@ -312,7 +319,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     int screenH = WXViewUtils.getScreenHeight(WXEnvironment.sApplication);
     int weexH = WXViewUtils.getWeexHeight(getInstanceId());
     int outHeight = height > (weexH >= screenH ? screenH : weexH) ? weexH - getAbsoluteY() : height;
-    return super.measure(width, outHeight);
+    return super.measure((int)(width+mColumnGap), outHeight);
   }
 
   public int getOrientation() {
@@ -674,8 +681,17 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
-          if ((layoutManager = getHostView().getInnerView().getLayoutManager()) instanceof LinearLayoutManager) {
+          layoutManager = getHostView().getInnerView().getLayoutManager();
+          if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            int pos = mChildren.indexOf(cell);
+
+            if (pos <= fVisible) {
+              beforeFirstVisibleItem = true;
+            }
+          } else if(layoutManager instanceof StaggeredGridLayoutManager){
+            int [] firstItems= new int[3];
+            int fVisible = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
             int pos = mChildren.indexOf(cell);
 
             if (pos <= fVisible) {
@@ -858,14 +874,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
     if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
       holder.getComponent().bindData(component);
-//              holder.getComponent().refreshData(component);
     }
 
   }
 
+  protected void markComponentUsable(){
+    for (WXComponent component : mChildren){
+      component.setUsing(false);
+    }
+  }
   /**
    * Create an instance of {@link ListBaseViewHolder} for the given viewType (not for the given
-   * index). This method will look up for the first component that fits the viewType requirement and
+   * index). This  markComponentUsable();method will look up for the first component that fits the viewType requirement and
    * doesn't be used. Then create the certain type of view, detach the view f[rom the component.
    *
    * @param parent   the ViewGroup into which the new view will be inserted
@@ -1178,7 +1198,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getViewPortWidth()));
             contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getViewPortWidth()));
-
             event.put(Constants.Name.CONTENT_SIZE, contentSize);
             event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
 

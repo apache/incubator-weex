@@ -26,6 +26,7 @@
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
+#import "WXComponent+BoxShadow.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -201,13 +202,17 @@
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
         }
-        
+
         if (_backgroundImage) {
             [self setGradientLayer];
         }
         
         if (_transform) {
             [_transform applyTransformForView:_view];
+        }
+        
+        if (_boxShadow) {
+            [self configViewLayer:self.view boxShadow:_boxShadow];
         }
         
         _view.wx_component = self;
@@ -231,7 +236,7 @@
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-        
+
         [self _handleFirstScreenTime];
         
         return _view;
