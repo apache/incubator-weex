@@ -352,6 +352,12 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
   }
 
+  @WXComponentProp(name = Constants.Name.SCROLLABLE)
+  public void setScrollable(boolean scrollable) {
+    WXRecyclerView inner = getHostView().getInnerView();
+    inner.setScrollable(scrollable);
+  }
+
   @Override
   public void updateProperties(Map<String, Object> props) {
     super.updateProperties(props);
