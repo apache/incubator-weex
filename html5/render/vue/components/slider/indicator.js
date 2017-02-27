@@ -1,4 +1,4 @@
-import { extend, extractKeys } from '../../utils'
+import { extend, extendKeys } from '../../utils'
 
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
@@ -11,8 +11,8 @@ function _render (context, h) {
   const children = []
   const { staticStyle: mergedStyle } = context.$vnode.data
   context.$vnode.data.cached = {}
-  extractKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
-  const indicatorSpecStyle = extractKeys(
+  extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
+  const indicatorSpecStyle = extendKeys(
       {},
       mergedStyle,
       ['item-color', 'item-selected-color', 'item-size']
@@ -123,15 +123,6 @@ export default {
     _reLayout(this, _getVirtualRect(this), _getLtbr(this))
   },
   render (createElement) {
-    // if (!this.$vnode.context._isMounted) {
-    //   // return createElement('nav')
-    //   return createElement('nav', {
-    //     attrs: { 'weex-type': 'indicator' },
-    //     staticClass: 'weex-indicator',
-    //     staticStyle: { display: 'none' }
-    //   }, [])
-    // }
-    this.$vnode.data.staticStyle = this._getComponentStyle(this.$vnode.data)
     return _render(this, createElement)
   }
 }

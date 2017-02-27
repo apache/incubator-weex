@@ -1,5 +1,5 @@
 import { extend } from '../utils'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 /**
  * get resize (stetch|cover|contain) related styles.
@@ -29,14 +29,6 @@ export default {
     quality: String,
     sharpen: String,
     original: [String, Boolean]
-  },
-
-  create () {
-    console.log('image created.')
-  },
-
-  beforeUpdate () {
-    console.log('image before update.')
   },
 
   mounted () {
@@ -75,7 +67,6 @@ export default {
 
   methods: {
     beforeRender () {
-      console.log('image before render.')
       extend(this.$options._parentVnode.data.staticStyle, getResizeStyle(this))
     }
   }
