@@ -1,5 +1,10 @@
 import 'envd'
 
+import { setViewport } from './viewport'
+import { extend } from '../utils'
+
+const scaleInfo = setViewport()
+
 const lib = window.lib
 const env = {
   platform: 'Web',
@@ -9,13 +14,16 @@ const env = {
   appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
   osName: lib.env.browser ? lib.env.browser.name : null,
   osVersion: lib.env.browser ? lib.env.browser.version.val : null,
-  deviceModel: lib.env.os.name || null,
-  deviceWidth: window.innerWidth,
-  deviceHeight: window.innerHeight
+  deviceModel: lib.env.os.name || null
 }
 
+/**
+ * scaleInfo: scale, deviceWidth, deviceHeight.
+ */
+extend(env, scaleInfo)
+
 // 750 by default currently
-const scale = 2
+const scale = env.scale
 
 const units = {
   REM: 12 * scale,

@@ -1,9 +1,6 @@
-import { base } from '../../mixins'
-import { validateStyles } from '../../validator'
+// import { validateStyles } from '../../validator'
 
 export default {
-  mixins: [base],
-
   data () {
     return {
       sticky: false,
@@ -55,13 +52,13 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('html:header', {
       attrs: { 'weex-type': 'header' },
-      on: this.createEventMap(),
+      on: this._createEventMap(),
       ref: 'header',
       staticClass: 'weex-header',
       class: { sticky: this.sticky, absolute: this.move }

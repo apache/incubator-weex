@@ -1,45 +1,48 @@
-import { base } from '../mixins'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 import { extend } from '../utils'
 
 /**
- * Get text styles
+ * Get text special styles (lines and text-overflow).
  */
-function getTextStyle (context = {}) {
+function getTextSpecStyle (context = {}) {
   const propLines = parseInt(context.lines) || 0
-  const vnode = context.$vnode || {}
-  const staticStyle = vnode.data && vnode.data.staticStyle || {}
-  const mergedStyle = vnode.data && vnode.data.mergedStyle || {}
-  const lines = parseInt(mergedStyle.lines) || propLines
+  const propOverflow = context.textOverflow || 'ellipsis'
+  const data = context.$options._parentVnode.data
+  const staticStyle = data && data.staticStyle || {}
+  const lines = parseInt(staticStyle.lines) || propLines
+  const overflow = staticStyle['text-overflow'] || propOverflow
   if (lines > 0) {
-    return extend(staticStyle, {
+    return {
       overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      webkitLineClamp: lines
-    })
+      'text-overflow': overflow,
+      '-webkit-line-clamp': lines
+    }
   }
   return staticStyle
 }
 
 export default {
-  mixins: [base],
   props: {
     lines: [Number, String],
     value: [String]
   },
 
   render (createElement) {
-    this.prerender()
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
-      on: this.createEventMap(),
-      staticClass: 'weex-text',
-      staticStyle: getTextStyle(this)
+      on: this._createEventMap(),
+      staticClass: 'weex-text'
     }, this.$slots.default || [this.value])
+  },
+
+  methods: {
+    beforeRender () {
+      extend(this.$options._parentVnode.data.staticStyle, getTextSpecStyle(this))
+    }
   }
 }

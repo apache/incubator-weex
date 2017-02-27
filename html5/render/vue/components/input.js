@@ -1,9 +1,7 @@
-import { base } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     type: {
       type: String,
@@ -32,9 +30,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('html:input', {
       attrs: {
@@ -46,7 +44,7 @@ export default {
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
-      on: extend(this.createEventMap(), mapFormEvents(this)),
+      on: extend(this._createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-input'
     })
   }

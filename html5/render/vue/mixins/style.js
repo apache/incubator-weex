@@ -1,4 +1,4 @@
-import { extend, hyphenate, trimComment } from '../utils'
+import { extend, hyphenate, trimComment, normalizeStyles } from '../utils'
 // import { validateStyles } from '../validator'
 
 // let warned = false
@@ -128,25 +128,12 @@ export default {
       Object.freeze(weex)
     }
   },
-  // mounted () {
-  //   console.log('call mounted: merged styles')
-  //   mergeStyles(this)
-  // },
-  // beforeUpdate () {
-  //   console.log('call beforeUpdate: merged styles')
-  //   mergeStyles(this)
-  // },
 
   methods: {
-    prerender () {
-      this.mergeStyles()
-    },
-
     // get style from staticClass and staticStyle.
-    getComponentStyle () {
+    _getComponentStyle (data) {
       const style = {}
-      const data = this.$vnode && this.$vnode.data || {}
-      const _scopeId = this.getScopeId && this.getScopeId()
+      const _scopeId = this._getScopeId && this._getScopeId()
       const hyphenatedStaticStyle = {}
       const staticStyle = data.staticStyle || {}
       const classNames = (data.staticClass || '').split(' ')
@@ -167,22 +154,24 @@ export default {
       // apply static inline styles.
       extend(style, hyphenatedStaticStyle)
 
-      return style
+      // filter styles.
+      return normalizeStyles(style)
     },
 
     // merge static styles and static class styles into $vnode.data.mergedStyles.
-    mergeStyles () {
-      if (this.$vnode && this.$vnode.data) {
-        this.$vnode.data.mergedStyle = this.getComponentStyle()
-      }
+    _mergeStyles () {
+      const vnode = this.$options._parentVnode || {}
+      const data = vnode.data
+      if (!data) { return }
+      this.$options._parentVnode.data.staticStyle = this._getComponentStyle(data)
     },
 
-    getParentRect () {
+    _getParentRect () {
       const parentElm = this.$options._parentElm
       return parentElm && parentElm.getBoundingClientRect()
     },
 
-    getParentRectAsync (cb) {
+    _getParentRectAsync (cb) {
       this.$nextTick(function () {
         return cb && cb.call(this, this.getParentRectSync())
       })
