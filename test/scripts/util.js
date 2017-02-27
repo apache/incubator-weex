@@ -53,5 +53,29 @@ module.exports = {
     },
     getGETActionWaitTimeMills:function(){
         return (isRunInCI ? 120 : 5 ) * 1000;
+    },
+    createDriver:function(wd){
+        var driver = global._wxDriver;
+        if(!driver){
+            console.log('Create new driver');
+            driver = wd(this.getConfig()).initPromiseChain();
+            driver.configureHttp({
+                timeout: 100000
+            });
+            global._wxDriver = driver;
+        }
+        
+        return driver;
+    },
+    init:function(driver){
+        if(driver._isInit)
+            return driver.status()
+        else{
+            driver._isInit = true;
+            return driver.initDriver()
+        }
+    },
+    quit:function(driver){
+        return driver.sleep(1000).back().sleep(1000);
     }
 }

@@ -8,6 +8,7 @@
 
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXAssert.h"
 
 @implementation WXConvert
 
@@ -721,6 +722,50 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         }
     }
     return type;
+}
+
+#pragma mark - Length
+
++ (WXLength *)WXLength:(id)value isFloat:(BOOL)isFloat scaleFactor:(CGFloat)scaleFactor
+{
+    if (!value) {
+        return nil;
+    }
+    
+    WXLengthType type = WXLengthTypeFixed;
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"auto"]) {
+            type = WXLengthTypeAuto;
+        } else if ([value isEqualToString:@"normal"]){
+            type = WXLengthTypeNormal;
+        } else if ([value hasSuffix:@"%"]) {
+            type = WXLengthTypePercent;
+        }
+    } else if (![value isKindOfClass:[NSNumber class]]) {
+        WXAssert(NO, @"Unsupported type:%@ for WXLength", NSStringFromClass([value class]));
+    }
+    
+    if (isFloat) {
+        return [WXLength lengthWithFloat:([value floatValue] * scaleFactor) type:type];
+    } else {
+        return [WXLength lengthWithInt:([value intValue] * scaleFactor) type:type];
+    }
+
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor
+{
+    NSString *boxShadow = @"";
+    if([value isKindOfClass:[NSString class]]){
+        boxShadow = value;
+    } else if([value isKindOfClass:[NSNumber class]]){
+        boxShadow =  [((NSNumber *)value) stringValue];
+    } else if (value != nil) {
+        boxShadow = nil;
+        WXLogError(@"Convert Error:%@ can not be converted to boxshadow type", value);
+    }
+    if (boxShadow) {
+        return [WXBoxShadow getBoxShadowFromString:boxShadow scaleFactor:scaleFactor];
+    }
+    return nil;
 }
 
 @end

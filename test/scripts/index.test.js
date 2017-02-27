@@ -9,22 +9,16 @@ var util = require("./util.js");
 
 describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
+    return util.init(driver)
       .get('wxpage://' + util.getDeviceHost() +'/index.js')
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),100);
+      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000);
   });
 
   after(function () {
-      return driver
-      .sleep(1000)
-      .quit()
+      return util.quit(driver);
   })
 
 

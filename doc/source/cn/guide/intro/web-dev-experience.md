@@ -9,7 +9,7 @@ version: 2.1
 
 ## 什么是 Web 开发体验
 
-基于 Weex 的开发体验和 web 的开发体验是非常接近的，我们选择通过 HTML 或类 HTML 模板的方式来描述界面的结构和内容，通过 CSS 的方式描述界面的展现形式，用 JavaScript 来描述用户行为和业务逻辑。并且将创建、开发、调试、部署一个网页的工程机制也引入了 Weex 开发当中。
+Weex 的开发体验和 web 的开发体验是非常接近的，它通过 HTML 或基于 HTML 模板来描述界面的结构和内容，通过 CSS 的方式描述界面的展现形式，用 JavaScript 来描述用户行为和业务逻辑。同时有完整的工程机制，如创建、开发、调试、部署。
 
 ## 为什么选择 Web 开发体验
 
@@ -25,18 +25,14 @@ version: 2.1
 
 我们从以下几个方面进行介绍和梳理：
 
-* HTML 标签：目前 Weex 支持了基本的容器 (div)、文本 (text)、图片 (image)、视频 (video) 等组件，HTML 中几乎所有的块级标签都可以通过容器组件进行自定义模拟，inline 的标签则可以通过文本组件进行自定义模拟，另外 Weex 还支持了 input/textarea 这样的表单型组件
-* CSS：Weex 支持了部分常用的 CSS 属性、值类型和单位，并且会根据用户反馈和在 web 中的使用频度陆续支持更多
-* JavaScript：目前 Weex 提供了一套简化版的 DOM APIs，用来操作原生界面，同时 Weex 在陆续支持更多的 W3C Device APIs
+* HTML 标签：目前 Weex 支持了基本的容器 (div)、文本 (text)、图片 (image)、视频 (video) 等组件，HTML 中几乎所有的块级标签都可以通过容器组件进行自定义模拟，inline 的标签则可以通过文本组件进行自定义模拟，另外 Weex 还支持了 input/textarea 这样的表单型组件。
+* CSS：Weex 支持了部分常用的 CSS 属性、值类型和单位，并且会根据用户反馈和在 web 中的使用频度陆续支持更多。
+* JavaScript：目前 Weex 提供了一套简化版的 DOM APIs，用来操作原生界面，同时 Weex 在陆续支持更多的 W3C Device APIs。
 * 在框架方面，Weex 官方支持了 Vue 2.0，以及相关的 vuex, vue-router 等，同时开发者可以直接使用各种第三方 JavaScript 工具库。
 * 在工程方面，Weex 推荐 npm 包管理工具，也推荐用 webpack 进行 JS bundle 打包，并提供了 weex-devtool 开发工具，让开发者可以像调试 Chrome 一样调试 Weex 原生应用，同时 Weex 的页面发布系统、客户端缓存机制都尊重目前 Web 的最佳实践。
 
-<!-- html 支持情况 -->
+**相关链接**
 
-<!-- css 支持情况 -->
-
-<!-- js apis 支持情况 -->
-
-<!-- vue -->
-
-<!-- weex-devtool -->
+* [Weex 和 web 标准的差异](../../references/web-standards.html)
+* [使用 Vue.js](./using-vue.html)
+* [使用 Devtools](./devtools.html)
