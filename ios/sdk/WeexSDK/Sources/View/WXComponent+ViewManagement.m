@@ -102,10 +102,20 @@
     _transform = styles[@"transform"] || styles[@"transformOrigin"] ?
     [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance] :
     [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
+    _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
+    if (_boxShadow) {
+        _lastBoxShadow = _boxShadow;
+    }
 }
 
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
+    if (styles[@"boxShadow"]) {
+        _lastBoxShadow = _boxShadow;
+        _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
+        [self setNeedsDisplay];
+    }
+    
     if (styles[@"backgroundColor"]) {
         _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
         _layer.backgroundColor = _backgroundColor.CGColor;
@@ -177,6 +187,11 @@
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
         _layer.backgroundColor = _backgroundColor.CGColor;
+        [self setNeedsDisplay];
+    }
+    if (styles && [styles containsObject:@"boxShadow"]) {
+        _lastBoxShadow = _boxShadow;
+        _boxShadow = nil;
         [self setNeedsDisplay];
     }
 }

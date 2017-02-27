@@ -27,6 +27,13 @@ version: 2.1
 
 ## 样式
 
+- 伪类<span class="api-version">v0.9.5+</span>: `textarea` 支持以下伪类：
+
+  * `active`
+  * `focus`
+  * `disabled`
+  * `enabled`
+
 - text styles
   - 支持 `color`
   - 支持 `font-size`

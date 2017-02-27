@@ -11,6 +11,7 @@
 #import "WXLog.h"
 #import "WXLayoutDefine.h"
 #import "WXType.h"
+#import "WXBoxShadow.h"
 
 @interface WXConvert : NSObject
 
@@ -67,6 +68,8 @@ typedef BOOL WXClipType;
 + (WXVisibility)WXVisibility:(id)value;
 
 + (WXGradientType)gradientType:(id)value;
+
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 @end
 

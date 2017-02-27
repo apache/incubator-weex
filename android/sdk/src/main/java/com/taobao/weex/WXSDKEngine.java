@@ -120,6 +120,7 @@ import android.util.Log;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -290,6 +291,10 @@ public class WXSDKEngine {
         .setImgAdapter(imgLoaderAdapter)
         .build()
     );
+  }
+
+  public static void setJSExcetptionAdapter(IWXJSExceptionAdapter excetptionAdapter){
+    WXSDKManager.getInstance().setIWXJSExceptionAdapter(excetptionAdapter);
   }
 
   private static void register() {

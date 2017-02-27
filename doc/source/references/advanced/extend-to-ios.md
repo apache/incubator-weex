@@ -1,12 +1,12 @@
 ---
 title: Extend to iOS
 type: references
-order: 10.1
+order: 11.1
 version: 2.1
 ---
 
 # Extend to iOS
- 
+
 ### Module extend
 
 Weex SDK provides only rendering capabilities, rather than have other capabilities, such as network, picture, and URL redirection. If you want these features, you need to implement it.
@@ -15,11 +15,11 @@ For example: If you want to implement an address jumping function, you can achie
 
 #### Step to customize a module
 
-1. Module 
+1. Module
     customized must implement WXModuleProtocol
-2. A macro named `WX_EXPORT_METHOD` must be added, as it is the only way to be recognized by Weex. It takes arguments that specifies the method in module   called by JavaScript code.
+2. A macro named `WX_EXPORT_METHOD` must be added, as it is the only way to export methods to JavaScript.
 3. The weexInstance should be synthesized. Each module object is bind to a specific instance.
-4. Module methods will be invoked in UI thread, so do not put time consuming operation there. If you want to  execute the whole module methods in other     thread, please implement the method `- (NSThread *)targetExecuteThread` in protocol. In the way, tasks distributed to this module will be executed in targetExecuteThread. 
+4. Module methods will be invoked in UI thread, so do not put time consuming operation there. If you want to  execute the whole module methods in other     thread, please implement the method `- (NSThread *)targetExecuteThread` in protocol. In the way, tasks distributed to this module will be executed in targetExecuteThread.
 5. Weex params can be String or Map.
 6. Module supports to return results to Javascript in callback. This callback is type of `WXModuleCallback`, the params of which can be String or Map.
 
@@ -46,7 +46,9 @@ For example: If you want to implement an address jumping function, you can achie
 
 @end
 ```
-    
+
+In addition, `0.10.0` begins to support synchronous module API call, you can use macro `WX_EXPORT_METHOD_SYNC` to export module methods which could make JavaScript receive return values from native,  it **can only be called on JS thread**.
+
 #### Register the module
 
 You can register the customized module by calling the method `registerModule:withClass` in WXSDKEngine.
@@ -62,7 +64,7 @@ WXSDKEngine.h
 
 [WXSDKEngine registerModule:@"event" withClass:[WXEventModule class]];
 ```
-    	
+
 ### Handler extend
 
 Weex SDK doesn't have capabilitis, such as image download 、navigator operation，please implement these protocols by yourself.
@@ -102,7 +104,7 @@ Implement above protocol as follows.
     if ([url hasPrefix:@"//"]) {
         url = [@"http:" stringByAppendingString:url];
     }
-    return (id<WXImageOperationProtocol>)[[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:url] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {     
+    return (id<WXImageOperationProtocol>)[[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:url] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
     } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
     if (completedBlock) {
         completedBlock(image, error, finished);
@@ -111,7 +113,7 @@ Implement above protocol as follows.
 }
 @end
 ```
-	
+
 #### Register the handler
 
 You can register the handler which implements the protocol by calling  `registerHandler:withProtocol` in WXSDKEngine.
@@ -124,10 +126,10 @@ WXSDKEngine.h
 * @param protocol The protocol to confirm
 */
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol;
-        
+
 [WXSDKEngine registerHandler:[WXImgLoaderDefaultImpl new] withProtocol:@protocol(WXImgLoaderProtocol)];
 ```
-              
+
 ## Custom Native Components for iOS
 
 ### Component extend
@@ -176,7 +178,7 @@ All of the styles, attributes and events will be passed to the component's initi
         _imageSrc = [WXConvert NSString:attributes[@"src"]];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
     }
-    
+
     return self;
 }
 
@@ -192,12 +194,12 @@ A Native Component has a life cycle managed by Weex. Weex creates it, layout it,
 
 Weex offers component life cycle hooks that give you visibility into these key moments and the ability to act when they occur.
 
-method| description 
+method| description
 :----:|------
-initWithRef:type:...| Initializes a new component using the specified  properties. 
+initWithRef:type:...| Initializes a new component using the specified  properties.
 layoutDidFinish | Called when the component has just laid out.
-loadView   | Creates the view that the component manages.  
-viewWillLoad | Called before the load of component's view .  
+loadView   | Creates the view that the component manages.
+viewWillLoad | Called before the load of component's view .
 viewDidLoad | Called after the component's view is loaded and set.
 viewWillUnload | Called just before releasing the component's view.
 viewDidUnload | Called when the component's view is released.
@@ -230,7 +232,7 @@ As an image component, we will need to fetch the remote image and set it to the 
     imageView.userInteractionEnabled = YES;
     imageView.clipsToBounds = YES;
     imageView.exclusiveTouch = YES;
-    
+
     // Do your image fetching and updating logic
 }
 ```
@@ -245,7 +247,7 @@ If image's remote source can be changed, you can also hook the `updateAttributes
         _imageSrc = [WXConvert NSString:attributes[@"src"]];
         // Do your image updating logic
     }
-    
+
     if (attributes[@"resize"]) {
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         self.view.contentMode = _resizeMode;
@@ -260,3 +262,43 @@ Now you can use `<image>` and its attributes wherever you want in the template.
 ```html
 <image style="your-custom-style" src="image-remote-source" resize="contain/cover/stretch"></image>
 ```
+
+#### Component Method
+from WeexSDK `0.9.5`, you can define your component method by macro `WX_EXPORT_METHOD`
+for example:
+
+```
+@implementation WXMyComponent
+ +WX_EXPORT_METHOD(@selector(focus))
+ +- (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+ {
+     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
+         // handle your attributes
+         // handle your styles
+     }
+     
+     return self;
+ }
+
+ 
+ - (void)focus
+   {
+   		NSLog(@"you got it");
+   }
+@end
+```
+   
+after your registration for your own custom component, now you can call it in your js file.
+ 
+```html
+<template>
+  <mycomponent id='mycomponent'></mycomponent>
+</template>
+<script>
+  module.exports = {
+    created: function() {
+      this.$el('mycomponent').focus();
+    }
+  }
+</script>
+``` 

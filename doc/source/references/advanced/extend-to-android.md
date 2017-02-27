@@ -1,7 +1,7 @@
 ---
 title: Extend to Android
 type: references
-order: 10.2
+order: 11.2
 version: 2.1
 ---
 
@@ -158,3 +158,30 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   }
 }
 ```
+
+#### Component Method
+ from WeexSDK `0.9.5`, you can define your component method
+
+ for example, define a method in component:
+ 
+ ```java
+ @JSMethod
+ public void focus(){
+  //method implementation
+ }
+ ```
+
+ after your registration for your own custom component, now you can call it in your js file.
+ 
+ ```html
+<template>
+  <mycomponent id='mycomponent'></mycomponent>
+</template>
+<script>
+  module.exports = {
+    created: function() {
+      this.$el('mycomponent').focus();
+    }
+  }
+</script>
+``` 

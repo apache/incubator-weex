@@ -16,6 +16,7 @@
         {name: 'hello', title: 'Hello World'},
         {name: 'style/index', title: 'Common Style'},
         {name: 'animation', title: 'Animation'},
+        {name: 'linear-gradient', title: 'Gradient Color'},
 
         // component
         {name: 'component/text-demo', title: 'Text'},

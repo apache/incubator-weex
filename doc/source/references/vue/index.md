@@ -1,7 +1,7 @@
 ---
 title: Vue  
 type: references
-order: 9
+order: 10
 version: 2.1
 ---
 
