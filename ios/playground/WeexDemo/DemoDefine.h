@@ -18,7 +18,7 @@
 
 #define DEMO_URL(path) [NSString stringWithFormat:@"http://%@:12580/%s", DEMO_HOST, #path]
 
-#define HOME_URL [NSString stringWithFormat:@"http://%@:12580/examples/build/index.js", DEMO_HOST]
+#define HOME_URL [NSString stringWithFormat:@"http://%@:12580/examples/build/vue/index.js", DEMO_HOST]
 
 #define BUNDLE_URL [NSString stringWithFormat:@"file://%@/bundlejs/index.js",[NSBundle mainBundle].bundlePath]
 
