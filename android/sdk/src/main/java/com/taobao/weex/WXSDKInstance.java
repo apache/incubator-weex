@@ -447,7 +447,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *                 weexversion    Weex version(like 1.0.0)
    *                 appversion     App version(like 1.0.0)
    *                 devid        Device id(like Aqh9z8dRJNBhmS9drLG5BKCmXhecHUXIZoXOctKwFebH)
-   *                 sysversion    Device system version(like 5.4.4„ÄÅ7.0.4, should be used with os)
+   *                 sysversion    Device system version(like 5.4.4„Ä?.0.4, should be used with os)
    *                 sysmodel     Device model(like iOS:"MGA82J/A", android:"MI NOTE LTE")
    *                 Time    UNIX timestamp, UTC+08:00
    *                 TTID(Optional)
@@ -467,7 +467,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *                 weexversion    Weex version(like 1.0.0)
    *                 appversion     App version(like 1.0.0)
    *                 devid        Device id(like Aqh9z8dRJNBhmS9drLG5BKCmXhecHUXIZoXOctKwFebH)
-   *                 sysversion    Device system version(like 5.4.4„ÄÅ7.0.4, should be used with os)
+   *                 sysversion    Device system version(like 5.4.4„Ä?.0.4, should be used with os)
    *                 sysmodel     Device model(like iOS:"MGA82J/A", android:"MI NOTE LTE")
    *                 Time    UNIX timestamp, UTC+08:00
    *                 TTID(Optional)
@@ -490,7 +490,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    *                 weexversion    Weex version(like 1.0.0)
    *                 appversion     App version(like 1.0.0)
    *                 devid        Device id(like Aqh9z8dRJNBhmS9drLG5BKCmXhecHUXIZoXOctKwFebH)
-   *                 sysversion    Device system version(like 5.4.4„ÄÅ7.0.4, should be used with os)
+   *                 sysversion    Device system version(like 5.4.4„Ä?.0.4, should be used with os)
    *                 sysmodel     Device model(like iOS:"MGA82J/A", android:"MI NOTE LTE")
    *                 Time    UNIX timestamp, UTC+08:00
    *                 TTID(Optional)
@@ -1563,6 +1563,17 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
       if (response!=null && response.originalData!=null && TextUtils.equals("200", response.statusCode)) {
         String template = new String(response.originalData);
+        WXLogUtils.d("onHttpFinish response.originalData len:" + template.length());
+        int h5headtag_Findindex = template.indexOf("<!DOCTYPE html>");
+        if (h5headtag_Findindex > -1)
+        {
+          WXLogUtils.d("onHttpFinish response.originalData if of h5:");
+          onRenderError(WXRenderErrorCode.WX_TARGETFILE_IFOF_HTML_ERROR, response.errorMsg);
+        }
+        else {
+          WXLogUtils.d("onHttpFinish response.originalData of of weex and render now");
+          render(pageName, template, options, jsonInitData, flag);
+        }
         render(pageName, template, options, jsonInitData, flag);
       } else if (TextUtils.equals(WXRenderErrorCode.WX_USER_INTERCEPT_ERROR, response.statusCode)) {
         WXLogUtils.d("user intercept");
