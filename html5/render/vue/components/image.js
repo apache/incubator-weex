@@ -11,6 +11,17 @@ function getResizeStyle (context) {
   return { 'background-size': bgSize }
 }
 
+function preProcessSrc (context, url) {
+  const { width, height } = context.$vnode.data.staticStyle
+  return context.processImgSrc && context.processImgSrc(url, {
+    width: parseFloat(width),
+    height: parseFloat(height),
+    quality: context.quality,
+    sharpen: context.sharpen,
+    original: context.original
+  }) || url
+}
+
 export default {
   props: {
     src: {
@@ -47,18 +58,11 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
-    const { width, height } = this.$vnode.data.staticStyle
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': this.processImgSrc && this.processImgSrc(this.src, {
-          width: parseFloat(width),
-          height: parseFloat(height),
-          quality: this.quality,
-          sharpen: this.sharpen,
-          original: this.original
-        }) || this.src,
-        'img-placeholder': this.placeholder
+        'img-src': preProcessSrc(this, this.src),
+        'img-placeholder': preProcessSrc(this, this.placeholder)
       },
       on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image'
