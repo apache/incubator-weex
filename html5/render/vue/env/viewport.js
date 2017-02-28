@@ -1,18 +1,22 @@
-const DEFAULT_VIEWPORT_WIDTH = process.env.VIEWPORT_WIDTH
+/**
+ * viewport priority:
+ *
+ * 1. meta viewport (developer custom)
+ * 2. setViewport(config) := config.width (private code) @deprecated
+ * 3. process.env.VIEWPORT_WIDTH (buid time)
+ *
+ */
+let viewportWidth = process.env.VIEWPORT_WIDTH
 
-function parseViewportWidth (config) {
-  let width = DEFAULT_VIEWPORT_WIDTH
-  if (config && config.width) {
-    width = Number(config.width) || config.width
-  }
-  return width
-}
+const wxViewportMeta = document.querySelector('meta[name="weex-viewport"]')
+const metaWidth = wxViewportMeta && parseInt(wxViewportMeta.getAttribute('content'))
+if (metaWidth && !isNaN(metaWidth) && metaWidth > 0) { viewportWidth = metaWidth }
 
 export function setViewport (config = {}) {
   const doc = window.document
 
   if (doc) {
-    const viewportWidth = parseViewportWidth(config)
+    // const viewportWidth = parseViewportWidth(config)
 
     // set root font-size
     doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'

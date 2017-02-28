@@ -63,7 +63,7 @@ const configs = {
   'weex-vue-render': {
     moduleName: 'WeexVueRender',
     entry: absolute('html5/render/vue/index.js'),
-    dest: absolute('packages/weex-vue-render/index.js'),
+    dest: absolute('packages/weex-vue-render/dist/index.js'),
     banner: `/* 'WEEX VUE RENDER ${subversion.vueRender}, Build ${now()}. */\n\n`,
     format: 'umd',
     plugins: [
