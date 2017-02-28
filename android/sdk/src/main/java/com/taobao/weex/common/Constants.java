@@ -273,6 +273,8 @@ public class Constants {
 
     String POSITION = "position";
 
+    String KEEP_SCROLL_POSITION = "keepScrollPosition";
+
     String TEXT_DECORATION = "textDecoration";
     String TEXT_ALIGN = "textAlign";
     String FONT_WEIGHT = "fontWeight";
@@ -347,6 +349,9 @@ public class Constants {
     String RETURN_KEY_TYPE = "returnKeyType";
     String OFFSET = "offset";
     String ANIMATED = "animated";
+
+    String INSERT_CELL_ANIMATION = "insertAnimation";
+    String DELETE_CELL_ANIMATION = "deleteAnimation";
   }
 
   public interface Value {
@@ -381,6 +386,9 @@ public class Constants {
     String DIRECTION_RIGHT = "right";
     String DIRECTION_UP = "up";
     String DIRECTION_DOWN = "down";
+
+    String NONE = "none";
+    String DEFAULT = "default";
   }
 
   public interface Event {
