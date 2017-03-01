@@ -37,7 +37,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .panel {
     margin-bottom: 20px;
     background-color: #fff;

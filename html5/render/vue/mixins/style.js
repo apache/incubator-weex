@@ -1,7 +1,14 @@
-import { extend, hyphenate, trimComment, normalizeStyles } from '../utils'
+import { hyphenate, trimComment, normalizeStyles } from '../utils'
 // import { validateStyles } from '../validator'
 
 // let warned = false
+
+function hyphenateExtend (to, from) {
+  if (!from) { return }
+  for (const k in from) {
+    to[hyphenate(k)] = from[k]
+  }
+}
 
 function getHeadStyleMap () {
   return Array.from(document.styleSheets || [])
@@ -9,7 +16,7 @@ function getHeadStyleMap () {
       // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
       // because weex's components defined non-standard style attributes, which is
       // auto ignored when access rule.cssText.
-      const strArr = styleSheet.ownerNode.textContent.trim().split('.')
+      const strArr = styleSheet.ownerNode.textContent.trim().split(/\.(?!\d+)/)
       const len = strArr.length
       const rules = []
       for (let i = 0; i < len; i++) {
@@ -130,29 +137,38 @@ export default {
   },
 
   methods: {
-    // get style from staticClass and staticStyle.
+    // get style from class, staticClass, style and staticStyle.
     _getComponentStyle (data) {
       const style = {}
       const _scopeId = this._getScopeId && this._getScopeId()
-      const hyphenatedStaticStyle = {}
-      const staticStyle = data.staticStyle || {}
-      const classNames = (data.staticClass || '').split(' ')
+      const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
+      const classNames = (typeof data.class === 'string') ? [data.class] : (data.class || [])
 
-      Object.keys(staticStyle).forEach(name => {
-        hyphenatedStaticStyle[hyphenate(name)] = staticStyle[name]
+      /**
+       * merge styles. priority: high -> low
+       *  1. data.style (bound style).
+       *  2. data.staticStyle (inline styles).
+       *  3. data.class style (bound class names).
+       *  4. data.staticClass style (scoped styles or static classes).
+       */
+      staticClassNames.forEach(n => {
+        let cls = ''
+        if (_scopeId) {
+          cls = `.${n}[${_scopeId}]`
+        }
+        const ruleMap = weex.styleMap[cls] || {}
+        hyphenateExtend(style, ruleMap)
       })
-
-      // apply static class styles. This relies on getHeadStyleMap
-      // being already triggered once in the hook beforeCreate.
-      if (weex.styleMap) {
-        classNames.forEach(className => {
-          const styleObj = weex.styleMap[`.${className}${_scopeId ? `[${_scopeId}]` : ''}`] || {}
-          extend(style, styleObj)
-        })
-      }
-
-      // apply static inline styles.
-      extend(style, hyphenatedStaticStyle)
+      classNames.forEach(n => {
+        let cls = ''
+        if (_scopeId) {
+          cls = `.${n}[${_scopeId}]`
+        }
+        const ruleMap = weex.styleMap[cls] || {}
+        hyphenateExtend(style, ruleMap)
+      })
+      hyphenateExtend(style, data.staticStyle)
+      hyphenateExtend(style, data.style)
 
       // filter styles.
       return normalizeStyles(style)

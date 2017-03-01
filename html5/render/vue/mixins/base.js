@@ -61,8 +61,14 @@ export default {
     },
 
     _getScopeId () {
-      const ctx = this._getTopContext()
-      return ctx.$options._scopeId
+      let scopeId = this.$options._scopeId
+      let ctx = this
+      while (!scopeId) {
+        ctx = ctx.$options.parent
+        if (!ctx) return null
+        scopeId = ctx.$options._scopeId
+      }
+      return scopeId
     },
 
     _getParentScroller () {

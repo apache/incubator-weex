@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .list {
     height:850px
   }

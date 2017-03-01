@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .slider-page {
     flex-direction: row;
     justify-content: space-between;

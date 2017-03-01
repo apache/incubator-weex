@@ -136,7 +136,7 @@
   </list>
 </template>
 
-<style>
+<style scoped>
   .flexRow {
     flex-direction: row;
   }

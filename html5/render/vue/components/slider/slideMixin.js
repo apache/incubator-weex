@@ -64,12 +64,8 @@ export default {
     },
 
     handleTouchStart (event) {
-      event.preventDefault()
       event.stopPropagation()
-      // console.log('touch start', event)
       const touch = event.changedTouches[0]
-      // console.log('touch start', event.target, event.target.pageY)
-      // console.log('touches', touch)
       this._touchParams = {
         originalTransform: this.$refs.inner.style.transform,
         startTouchEvent: touch,
@@ -77,19 +73,41 @@ export default {
         startY: touch.pageY,
         timeStamp: event.timeStamp
       }
+      // // check if is vertical scrolling in 25 milliseconds.
+      // setTimeout(() => {
+      //   // if didn't cancel.
+      //   const tp = this._touchParams
+      //   if (tp) {
+      //     tp.isVertical = tp.offsetY > tp.offsetX
+      //     console.log('this.isVertical', tp.isVertical)
+      //   }
+      // }, 100)
     },
 
     handleTouchMove (event) {
-      event.preventDefault()
       event.stopPropagation()
-      // console.log('touch move')
+      // console.log('isVertical:', this._touchParams && this._touchParams.isVertical)
+      // if (this._touchParams && this._touchParams.isVertical) {
+        // return
+      // }
+      // else if
       if (this._touchParams) {
+        // event.preventDefault()
         const inner = this.$refs.inner
-        const { startX } = this._touchParams
+        const { startX, startY } = this._touchParams
         const touch = event.changedTouches[0]
         const offsetX = touch.pageX - startX
+        const offsetY = touch.pageY - startY
         // console.log('offsetX', offsetX, 'startX', startX, 'pageX', touch.pageX)
         this._touchParams.offsetX = offsetX
+        this._touchParams.offsetY = offsetY
+
+        // only for the first time clac.
+        // if (typeof this._touchParams.isVertical === 'undefined') {
+        //   const isVertical = offsetY > offsetX
+        //   this._touchParams.isVertical = isVertical
+        //   if (isVertical) { return }
+        // }
 
         if (inner && offsetX) {
           inner.style.transform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
@@ -98,11 +116,10 @@ export default {
     },
 
     handleTouchEnd (event) {
-      event.preventDefault()
       event.stopPropagation()
       // console.log('touch end')
       const inner = this.$refs.inner
-      if (this._touchParams) {
+      if (this._touchParams/* && !this._touchParams.isVertical*/) {
         const { offsetX } = this._touchParams
         if (inner) {
           const reset = Math.abs(offsetX / this.wrapperWidth) < 0.2

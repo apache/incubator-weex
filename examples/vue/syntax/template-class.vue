@@ -10,7 +10,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .a {font-size: 48px;}
   .b {color: #ff0000;}
 </style>
