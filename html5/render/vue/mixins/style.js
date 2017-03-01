@@ -16,12 +16,12 @@ function getHeadStyleMap () {
       // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
       // because weex's components defined non-standard style attributes, which is
       // auto ignored when access rule.cssText.
-      const strArr = styleSheet.ownerNode.textContent.trim().split(/\.(?!\d+)/)
+      const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/\.(?!\d+)/)
       const len = strArr.length
       const rules = []
       for (let i = 0; i < len; i++) {
         const str = strArr[i]
-        if (!str) {
+        if (!str || str.match(/^\s*$/)) {
           continue
         }
         const match = str.match(/^([^{\s]+)\s*{\s*([^}]+)}\s*$/)

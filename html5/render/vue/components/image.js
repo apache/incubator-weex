@@ -42,6 +42,10 @@ export default {
     original: [String, Boolean]
   },
 
+  updated () {
+    this._fireLazyload()
+  },
+
   mounted () {
     this._fireLazyload()
   },
