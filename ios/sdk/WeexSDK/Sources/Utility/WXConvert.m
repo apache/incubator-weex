@@ -750,6 +750,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     } else {
         return [WXLength lengthWithInt:([value intValue] * scaleFactor) type:type];
     }
+}
 
 + (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor
 {

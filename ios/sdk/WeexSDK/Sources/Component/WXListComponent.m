@@ -265,6 +265,10 @@
     }];
 }
 
+- (void)headerDidRemove:(WXHeaderComponent *)header
+{
+    
+}
 
 #pragma mark - WXCellRenderDelegate
 
