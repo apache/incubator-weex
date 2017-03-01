@@ -61,6 +61,7 @@ export default {
     },
 
     _getScopeId () {
+      // return closest scopeId.
       let scopeId = this.$options._scopeId
       let ctx = this
       while (!scopeId) {

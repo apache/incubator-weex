@@ -12,7 +12,13 @@ function getResizeStyle (context) {
 }
 
 function preProcessSrc (context, url) {
-  const { width, height } = context.$vnode.data.staticStyle
+  const staticStyle = context.$vnode.data.staticStyle
+  // somehow the merged style in _prerender hook is gone.
+  // just return the original src.
+  if (!staticStyle || !staticStyle.width || !staticStyle.height) {
+    return url
+  }
+  const { width, height } = staticStyle
   return context.processImgSrc && context.processImgSrc(url, {
     width: parseFloat(width),
     height: parseFloat(height),
@@ -24,19 +30,9 @@ function preProcessSrc (context, url) {
 
 export default {
   props: {
-    src: {
-      type: String,
-      required: true
-    },
-    placeholder: {
-      type: String
-    },
-    resize: {
-      validator (value) {
-        /* istanbul ignore next */
-        return ['cover', 'contain', 'stretch'].indexOf(value) !== -1
-      }
-    },
+    src: String,
+    placeholder: String,
+    resize: String,
     quality: String,
     sharpen: String,
     original: [String, Boolean]
@@ -62,6 +58,7 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
+
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
