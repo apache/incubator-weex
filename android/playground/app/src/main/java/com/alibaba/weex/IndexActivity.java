@@ -230,6 +230,7 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
@@ -361,6 +362,12 @@ public class IndexActivity extends AbstractWeexActivity {
   public void onDestroy() {
     super.onDestroy();
     LocalBroadcastManager.getInstance(this).unregisterReceiver(mReloadReceiver);
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    WXSDKManager.getInstance().takeJSHeapSnapshot("/sdcard/weex/");
   }
 
   private static String getIndexUrl() {

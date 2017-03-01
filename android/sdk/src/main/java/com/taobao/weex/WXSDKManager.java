@@ -157,6 +157,8 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +205,26 @@ public class WXSDKManager {
 
   public boolean needInitV8() {
     return mNeedInitV8;
+  }
+
+  public void takeJSHeapSnapshot(String path) {
+    File file = new File(path);
+    if (!file.exists()) {
+      if (!file.mkdir()) {
+        return;
+      }
+    }
+
+    String name = String.valueOf(sInstanceId.get());
+    String filename = path;
+
+    if (!path.endsWith(File.separator)) {
+      filename += File.separator;
+    }
+    filename += name;
+    filename += ".heapsnapshot";
+
+    mBridgeManager.takeJSHeapSnapshot(filename);
   }
 
   public static WXSDKManager getInstance() {

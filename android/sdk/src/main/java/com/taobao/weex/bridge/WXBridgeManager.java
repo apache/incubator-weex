@@ -1022,6 +1022,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXJSObject[] args = {obj};
         invokeExecJS("", null, METHOD_SET_TIMEOUT, args);
         break;
+      case WXJSBridgeMsgType.TAKE_HEAP_SNAPSHOT:
+        if (msg.obj != null) {
+          String filename = (String) msg.obj;
+          mWXBridge.takeHeapSnapshot(filename);
+        }
+        break;
       default:
         break;
     }
@@ -1366,6 +1372,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         invokeExecJS("", null, METHOD_NOTIFY_SERIALIZE_CODE_CACHE, new WXJSObject[0]);
       }
     });
+  }
+
+  public void takeJSHeapSnapshot(String filename) {
+    Message msg = mJSHandler.obtainMessage();
+    msg.obj = filename;
+    msg.what = WXJSBridgeMsgType.TAKE_HEAP_SNAPSHOT;
+    msg.setTarget(mJSHandler);
+    msg.sendToTarget();
   }
 
 }
