@@ -36,6 +36,22 @@
         <li>
           <%- partial('_partial/search-form', {id_name: 'search-input-header'}) %>
         </li>
+        <li>
+          <div class="dropdown select-lang">
+            <a href="javascript:;" class="dropdown-toggle">
+              Language
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu pick-lang">
+              <li>
+                <a href="<%= pick_lang('en') %>" data-lang="en">English</a>
+              </li>
+              <li>
+                <a href="<%= pick_lang('cn') %>" data-lang="zh-cn">中文</a>
+              </li>
+            </ul>
+          </div>
+        </li>
         <!--<li></li>-->
       </ul>
     </div>

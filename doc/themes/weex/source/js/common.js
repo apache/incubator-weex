@@ -77,23 +77,27 @@
    */
   function initPickLang () {
     document.addEventListener('DOMContentLoaded', function (e) {
-      var pick = document.querySelector('.pick-lang')
+      var pickers = document.querySelectorAll('.pick-lang')
       var elements = document.querySelectorAll('.pick-lang a')
+      var pickersArr = Array.prototype.slice.call(pickers)
 
-      pick.addEventListener('click', function (e) {
-        e.preventDefault()
-        e.stopPropagation()
+      pickersArr.forEach(function (picker) {
+        picker.addEventListener('click', function (e) {
+          e.preventDefault()
+          e.stopPropagation()
 
-        var target = e.target;
-        if (pick.contains(target)) {
-          var lang = target.getAttribute('data-lang')
+          var target = e.target;
 
-          if (window.localStorage) {
-            window.localStorage.setItem('lang', lang)
+          if (picker.contains(target)) {
+            var lang = target.getAttribute('data-lang')
+
+            if (window.localStorage) {
+              window.localStorage.setItem('lang', lang)
+            }
+
+            location.href = target.href
           }
-
-          location.href = target.href
-        }
+        })
       })
     })
   }

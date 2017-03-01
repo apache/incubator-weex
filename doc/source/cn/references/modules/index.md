@@ -8,23 +8,14 @@ version: 2.1
 
 # 内建模块
 
-## 如何使用
-
-你可以简单的通过类似 `weex.requireModule('name')` 这样的语法获取一个模块的 API，比如：
-
-```html
-<script>
-  const modal = weex.requireModule('modal')
-
-  module.exports = {
-    data: {},
-    methods: {
-      toast: function () {
-        modal.toast({
-          message: 'props: ' + event.data.join(', ')
-        })
-      }
-    }
-  }
-</script>
-```
+- [animation](./animation.html)
+- [WebSocket](./websocket.html)
+- [picker](./picker.html)
+- [clipboard](./clipboard.html)
+- [dom](./dom.html)
+- [modal](./modal.html)
+- [navigator](./navigator.html)
+- [storage](./storage.html)
+- [stream](./stream.html)
+- [webview](./webview.html)
+- [globalEvent](./globalevent.html)
