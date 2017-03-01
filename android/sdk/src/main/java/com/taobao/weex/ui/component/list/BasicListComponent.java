@@ -1224,6 +1224,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @JSMethod
   public void resetLoadmore() {
     mLoadMoreRetry = "";
+    mListCellCount = 0;
   }
 
   @Override
