@@ -73,34 +73,37 @@
   initSidebar()
 
   /**
-   * Pick lang
+   * Switch language
    */
   function initPickLang () {
-    var pick = document.querySelector('.pick-lang')
-    var elements = document.querySelectorAll('.pick-lang a')
+    document.addEventListener('DOMContentLoaded', function (e) {
+      var pick = document.querySelector('.pick-lang')
+      var elements = document.querySelectorAll('.pick-lang a')
 
-    pick.addEventListener('click', function (e) {
-      e.preventDefault()
-      e.stopPropagation()
+      pick.addEventListener('click', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
 
-      var target = e.target;
-      if (pick.contains(target)) {
-        var lang = target.getAttribute('data-lang')
+        var target = e.target;
+        if (pick.contains(target)) {
+          var lang = target.getAttribute('data-lang')
 
-        if (window.sessionStorage) {
-          window.sessionStorage.setItem('lang', lang)
+          if (window.localStorage) {
+            window.localStorage.setItem('lang', lang)
+          }
+
+          location.href = target.href
         }
-
-        location.href = target.href
-      }
+      })
     })
   }
+
   initPickLang()
 
   /**
    *  Search
    */
-  function initSearch() {
+  function initSearch () {
     var form = document.querySelector('.search-form')
     var inputElements = document.querySelectorAll('.search-input')
 

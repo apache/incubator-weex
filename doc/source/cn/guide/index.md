@@ -12,7 +12,7 @@ Weex 是一套简单易用的跨平台开发方案，能以 web 的开发体验�
 
 ## Vue 是什么？
 
-Vue.js 是 Evan You 开发的渐进式 JavaScript 框架，在易用性、灵活性和性能等方面都非常优秀。开发者能够通过撰写 `*.vue` 文件，基于 `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。
+Vue.js 是 Evan You 开发的渐进式 JavaScript 框架。开发者能够通过撰写 `*.vue` 文件，基于 `<template>`, `<style>`, `<script>` 快速构建组件化的 web 应用。
 
 ## Hello World
 
@@ -21,12 +21,43 @@ Vue.js 是 Evan You 开发的渐进式 JavaScript 框架，在易用性、灵活
 - 为你的手机安装 [Playground App](https://alibaba.github.io/weex/download.html)，当然，Weex 是跨平台的框架，你依然可以使用浏览器进行预览，只是这样你就无法感受到 native 优秀的体验了。
 - 在新标签页中打开 [Hello World](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) 例子，点击预览，然后用  Playground 扫码即可。
 
+在这个例子中，我们看到了熟悉的 HTML 语义化标签、CSS 样式和 Javascript 代码。这是一个最简单的 Weex 示例，它在页面中渲染了一个 “Hello World”。请注意，这不是一个 H5 页面，而是 native 的。
 
 ![mobile_preview](https://img.alicdn.com/tps/TB1Ymw3OpXXXXcvXpXXXXXXXXXX-500-1013.jpg)
 
-很简单，我们可以看到语法就是我们熟悉的 Vue。你可以修改这个例子，再次扫码尝试。
+### 发生了什么？
+
+就如示例代码所示：
+
+```html
+<template>
+  <div>
+    <text class="text">{{text}}</text>
+  </div>
+</template>
+
+<style>
+  .text {
+    font-size: 50;
+  }
+</style>
+
+<script>
+  export default {
+    data () {
+      return {
+        text: 'Hello World.'
+      }
+    }
+  }
+</script>
+```
+
+我们暂时不去关心 Weex 的技术细节，仅看大致的代码结构，我们可以看到语法就是我们熟悉的 Vue。你可以修改这个例子，再次扫码尝试。
 
 ## 搭建开发环境
+
+使用 dotWe 对 Weex 尝鲜是一个不错的选择，但如果你想更专业的开发 Weex， dotWe 就不怎么够用了。本节会教你如何搭建本地开发环境进行 Weex 开发。
 
 ### 第一步：安装依赖
 

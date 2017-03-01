@@ -90,7 +90,7 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
   <scroller>
     <div>
       <div style="background-color: #286090">
-        <text class="title" style="height: 80px ;padding: 20px;color: white">websocket</text>
+        <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">websocket</text>
       </div>
       <input
               type="text"
@@ -107,64 +107,54 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
         <text class="button" onclick="{{send}}">send</text>
         <text class="button" onclick="{{close}}">close</text>
       </div>
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = send</text>
+      <div style="background-color: #D3D3D3;margin-top: 20">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = send</text>
       </div>
-      <text style="color: black;height: 80px">{{sendinfo}}</text>
-
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onopen</text>
+      <text style="color: #000000;height: 80">{{sendinfo}}</text>
+      <div style="background-color: #D3D3D3">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onopen</text>
       </div>
-      <text style="color: black;height: 80px">{{onopeninfo}}</text>
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onmessage</text>
+      <text style="color: #000000;height: 80">{{onopeninfo}}</text>
+      <div style="background-color: #D3D3D3">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onmessage</text>
       </div>
-      <text style="color: black;height: 400px">{{onmessage}}</text>
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onclose</text>
+      <text style="color: #000000;height: 100">{{onmessage}}</text>
+      <div style="background-color: #D3D3D3">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onclose</text>
       </div>
-      <text style="color: black;height: 80px">{{oncloseinfo}}</text>
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = onerror</text>
+      <text style="color: #000000;height: 80">{{oncloseinfo}}</text>
+      <div style="background-color: #D3D3D3">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = onerror</text>
       </div>
-      <text style="color: black;height: 80px">{{onerrorinfo}}</text>
-
-      <div style="background-color: lightgray">
-        <text class="title" style="height: 80px ;padding: 20px;color: black">method = close</text>
+      <text style="color: #000000;height: 80">{{onerrorinfo}}</text>
+      <div style="background-color: #D3D3D3">
+        <text class="title" style="height: 80 ;padding: 20;color: #000000">method = close</text>
       </div>
-      <text style="color: black;height: 80px">{{closeinfo}}</text>
-
+      <text style="color: #000000;height: 80">{{closeinfo}}</text>
     </div>
     </div>
   </scroller>
 </template>
-
 <style>
   .input {
-    font-size: 40px;
-    height: 80px;
-    width: 600px;
+    font-size: 40;
+    height: 80;
+    width: 600;
   }
   .button {
-    font-size: 36px;
-    width: 150px;
+    font-size: 36;
+    width: 150;
     color: #41B883;
     text-align: center;
-    padding-top: 25px;
-    padding-bottom: 25px;
-    border-width: 2px;
+    padding-top: 10;
+    padding-bottom: 10;
+    border-width: 2;
     border-style: solid;
-    margin-right: 20px;
+    margin-right: 20;
     border-color: rgb(162, 217, 192);
     background-color: rgba(162, 217, 192, 0.2);
   }
 </style>
-
 <script>
   var websocket = require('@weex-module/webSocket');
   module.exports = {
@@ -184,11 +174,12 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
     },
     methods: {
       connect:function() {
-        websocket.WebSocket('ws://115.29.193.48:8088','');
+        websocket.WebSocket('ws://echo.websocket.org','');
         var self = this;
+        self.onopeninfo = 'connecting...'
         websocket.onopen = function(e)
         {
-          self.onopeninfo = JSON.stringify(e);
+          self.onopeninfo = 'websocket open';
         }
         websocket.onmessage = function(e)
         {
@@ -200,6 +191,7 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
         }
         websocket.onclose = function(e)
         {
+          self.onopeninfo = '';
           self.onerrorinfo = e.code;
         }
       },
@@ -208,7 +200,6 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
         input.blur();
         websocket.send(this.txtInput);
         this.sendinfo = this.txtInput;
-
       },
       oninput: function(event) {
         this.txtInput = event.value;
@@ -221,4 +212,4 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
 </script>
 ```
 
-[Have a try](http://dotwe.org/weex/993f33173a712fecfb61c1c4b03bcb70)
+[Have a try](http://dotwe.org/weex/0256bbfc448f0fdbe8b10ba311c947b4)
