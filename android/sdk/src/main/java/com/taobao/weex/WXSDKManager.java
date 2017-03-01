@@ -187,13 +187,22 @@ public class WXSDKManager {
   private IWXStorageAdapter mIWXStorageAdapter;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
-
   private WXValidateProcessor mWXValidateProcessor;
+  // Tell weexv8 to initialize v8, default is true.
+  private boolean mNeedInitV8 = true;
 
   private WXSDKManager() {
     mWXRenderManager = new WXRenderManager();
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  public void setNeedInitV8(boolean need) {
+    mNeedInitV8 = need;
+  }
+
+  public boolean needInitV8() {
+    return mNeedInitV8;
   }
 
   public static WXSDKManager getInstance() {
