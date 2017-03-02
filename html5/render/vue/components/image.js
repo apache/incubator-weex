@@ -1,7 +1,7 @@
 import { extend, throttle } from '../utils'
 // import { validateStyles } from '../validator'
 
-const lazyloadAwait = 25  // milliseconds.
+const lazyloadAwait = 16  // milliseconds.
 let throttleLazyload
 function getThrottleLazyload (context, wait) {
   if (!throttleLazyload) {
