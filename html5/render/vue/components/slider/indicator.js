@@ -9,7 +9,7 @@ function getIndicatorItemStyle (spec, isActive) {
 
 function _render (context, h) {
   const children = []
-  const { staticStyle: mergedStyle } = context.$vnode.data
+  const mergedStyle = context._getComponentStyle(context.$vnode.data)
   context.$vnode.data.cached = {}
   extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
   const indicatorSpecStyle = extendKeys(

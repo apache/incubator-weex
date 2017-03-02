@@ -24,7 +24,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',
@@ -35,7 +35,8 @@ export default {
         rows: this.rows
       },
       on: extend(this._createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-textarea'
+      staticClass: 'weex-textarea',
+      staticStyle: ms
     }, this.value)
   }
 }
