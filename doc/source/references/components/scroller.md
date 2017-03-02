@@ -145,4 +145,4 @@ For example, a vertical list nested in a vertical list or scroller is not allowe
 </style>
 ```
 
-[try it](../../examples/scroller.html)
+[try it](http://dotwe.org/vue/2f22f14fb711d88515e63c3f67bed46a)

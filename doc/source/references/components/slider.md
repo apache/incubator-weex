@@ -88,4 +88,4 @@ It supports all kinds of weex components as its slides, especially the `indicato
 </script>
 ```
 
-[try it](../../examples/slider.html)
+[try it](http://dotwe.org/vue/0c43ffd743c90b3bd9f5371062652e60)

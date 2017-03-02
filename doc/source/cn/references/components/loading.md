@@ -123,3 +123,5 @@ version: 2.1
   }
 </style>
 ```
+
+[Try it](http://dotwe.org/vue/d5c1b2336a703a6e6e47c303af41ffcd)

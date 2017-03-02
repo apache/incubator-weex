@@ -171,4 +171,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/scroller.html)
+[try it](http://dotwe.org/vue/2f22f14fb711d88515e63c3f67bed46a)
