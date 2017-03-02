@@ -36,7 +36,6 @@ you can use the definition below in weex box model.
     - `border-right-style`: values `solid` | `dashed` | `dotted`, default value `solid`
     - `border-bottom-style`: values `solid` | `dashed` | `dotted`, default value `solid`
   - `border-width`: `length` type, non-negative, default value `0`
-    **DO NOT** use `border-width:1`. There is a default viewport `<viewport width="750">`, if the actual width of a device is 720px, then `border-width:1` will be `border-width:0.96`. As weex **do not** support sub-pixel, this border would not be rendered.
     - `border-left-width`: `length` type, non-negative, default value `0`
     - `border-top-width`: `length` type, non-negative, default value `0`
     - `border-right-width`: `length` type, non-negative, default value `0`
@@ -54,7 +53,7 @@ you can use the definition below in weex box model.
     - `border-top-left-radius`: `length` type, non-negative, default value `0`
     - `border-top-right-radius`: `length` type, non-negative, default value `0`
 
-Notes: The rule of border-radius for a specific corner such as `border-top-left-radius` is not currently supported for component `<image>` and `<text>`.
+Notes: The rule of border-radius for a specific corner such as `border-top-left-radius` is not currently supported for component `<image>`in iOS. This only happens to iOS, it works fine on Android.
 
 Weex box model uses `border-box` as the default value of `box-sizing`, meaning the width and height properties includes content, padding and border, but not the margin.
 

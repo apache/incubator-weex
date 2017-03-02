@@ -90,7 +90,7 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
     - `border-top-right-radius {length}`：，非负值, 默认值 0
 
 
-注意：目前在 `<image>` 和 `<text>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。
+注意：目前在 `<image>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。该约束只对iOS生效，Android并不受此限制。
 
 Weex 盒模型的 `box-sizing` 默认为 `border-box`，即盒子的宽高包含内容、内边距和边框的宽度，不包含外边距的宽度。
 
