@@ -86,10 +86,12 @@ export default {
     }
   },
   render (createElement) {
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('aside', {
       ref: 'refresh',
       attrs: { 'weex-type': 'refresh' },
-      staticClass: 'weex-refresh'
+      staticClass: 'weex-refresh',
+      staticStyle: ms
     }, this.getChildren())
   }
 }

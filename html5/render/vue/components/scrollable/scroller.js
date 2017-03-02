@@ -79,10 +79,13 @@ export default {
       this.updateLayout()
     })
 
+    const ms = this._getComponentStyle(this.$vnode.data)
+
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
+      staticStyle: ms,
       on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,

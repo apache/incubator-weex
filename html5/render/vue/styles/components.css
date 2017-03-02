@@ -63,6 +63,7 @@ figure, img, .weex-image, .weex-img {
   display: block;
   position: relative;
   background-repeat: no-repeat;
+  background-position: 50% 50%;
 }
 
 .weex-toast {

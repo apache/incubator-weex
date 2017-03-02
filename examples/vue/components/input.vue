@@ -16,7 +16,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .input {
     font-size: 60px;
     height: 80px;

@@ -39,13 +39,15 @@ export default {
     //   validateStyles('web', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
 
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('iframe', {
       attrs: {
         'weex-type': 'web',
         src: this.src
       },
       on: this._createEventMap(['error']),
-      staticClass: 'weex-web'
+      staticClass: 'weex-web',
+      staticStyle: ms
     })
   }
 }

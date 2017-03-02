@@ -1,5 +1,14 @@
-import { extend } from '../utils'
+import { extend, throttle } from '../utils'
 // import { validateStyles } from '../validator'
+
+const lazyloadAwait = 16  // milliseconds.
+let throttleLazyload
+function getThrottleLazyload (context, wait) {
+  if (!throttleLazyload) {
+    throttleLazyload = throttle(context._fireLazyload, wait)
+  }
+  return throttleLazyload
+}
 
 /**
  * get resize (stetch|cover|contain) related styles.
@@ -11,8 +20,13 @@ function getResizeStyle (context) {
   return { 'background-size': bgSize }
 }
 
-function preProcessSrc (context, url) {
-  const { width, height } = context.$vnode.data.staticStyle
+function preProcessSrc (context, url, mergedStyle) {
+  // somehow the merged style in _prerender hook is gone.
+  // just return the original src.
+  if (!mergedStyle || !mergedStyle.width || !mergedStyle.height) {
+    return url
+  }
+  const { width, height } = mergedStyle
   return context.processImgSrc && context.processImgSrc(url, {
     width: parseFloat(width),
     height: parseFloat(height),
@@ -24,26 +38,20 @@ function preProcessSrc (context, url) {
 
 export default {
   props: {
-    src: {
-      type: String,
-      required: true
-    },
-    placeholder: {
-      type: String
-    },
-    resize: {
-      validator (value) {
-        /* istanbul ignore next */
-        return ['cover', 'contain', 'stretch'].indexOf(value) !== -1
-      }
-    },
+    src: String,
+    placeholder: String,
+    resize: String,
     quality: String,
     sharpen: String,
     original: [String, Boolean]
   },
 
+  updated () {
+    getThrottleLazyload(this, lazyloadAwait)()
+  },
+
   mounted () {
-    this._fireLazyload()
+    getThrottleLazyload(this, lazyloadAwait)()
   },
 
   render (createElement) {
@@ -58,20 +66,17 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
+    const ms = this._getComponentStyle(this.$vnode.data)
+
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': preProcessSrc(this, this.src),
-        'img-placeholder': preProcessSrc(this, this.placeholder)
+        'img-src': preProcessSrc(this, this.src, ms),
+        'img-placeholder': preProcessSrc(this, this.placeholder, ms)
       },
       on: this._createEventMap(['load', 'error']),
-      staticClass: 'weex-image'
+      staticClass: 'weex-image',
+      staticStyle: extend(ms, getResizeStyle(this))
     })
-  },
-
-  methods: {
-    beforeRender () {
-      extend(this.$options._parentVnode.data.staticStyle, getResizeStyle(this))
-    }
   }
 }

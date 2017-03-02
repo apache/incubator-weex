@@ -130,7 +130,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .block {
     position: absolute;
     width: 250px;

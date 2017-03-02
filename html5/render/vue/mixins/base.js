@@ -38,15 +38,9 @@ export default {
       watchLazyload()
     }
   },
-  created () {
-    this._prerender()
-  },
+
   mounted () {
     watchAppear(this)
-  },
-
-  beforeUpdate () {
-    this._prerender()
   },
 
   methods: {
@@ -61,8 +55,15 @@ export default {
     },
 
     _getScopeId () {
-      const ctx = this._getTopContext()
-      return ctx.$options._scopeId
+      // return closest scopeId.
+      let scopeId = this.$options._scopeId
+      let ctx = this
+      while (!scopeId) {
+        ctx = ctx.$options.parent
+        if (!ctx) return null
+        scopeId = ctx.$options._scopeId
+      }
+      return scopeId
     },
 
     _getParentScroller () {
@@ -80,12 +81,6 @@ export default {
     _fireLazyload () {
       const scroller = this._getParentScroller()
       fireLazyload(scroller && scroller.$el || document.body)
-    },
-
-    _prerender () {
-      this._mergeStyles()
-      // process prerender hooks for components' own treatment.
-      this.beforeRender && this.beforeRender()
     }
   }
 }

@@ -17,7 +17,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .refresh-view {
     height: 120px;
     width: 750px;

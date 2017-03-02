@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .wrap {
     overflow: hidden;
     position: relative;

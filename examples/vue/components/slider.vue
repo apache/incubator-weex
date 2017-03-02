@@ -57,7 +57,7 @@
         <slider class="slider" append="tree"
           :interval="sliders[2].interval"
           :autoPlay="sliders[2].autoPlay">
-          <indicator class="indicator" style="itemSelectedColor:rgb(217, 83, 79);"></indicator>
+          <indicator class="indicator" style="item-selected-color:rgb(217, 83, 79);"></indicator>
           <slider-page v-for="v in sliders[2].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
@@ -65,7 +65,7 @@
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
           :autoPlay="sliders[1].autoPlay">
-          <indicator style="itemColor: #dddddd;itemSize:40px;top:140px;left:180px;width:700px;height:380px;"></indicator>
+          <indicator style="itemColor: #dddddd;item-size:40px;top:140px;left:180px;width:700px;height:380px;"></indicator>
           <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
         </slider>
       </panel>
@@ -239,7 +239,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .body {
     background-color: #ffffff;
   }

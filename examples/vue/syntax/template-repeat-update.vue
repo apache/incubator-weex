@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
   .subtitle {font-size: 36px;}
   .btn {font-size: 36px; text-align: center; color: white; background-color: gray; padding: 20px; border-radius: 5px;}

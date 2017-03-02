@@ -40,7 +40,6 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('switch', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-
     return createElement('span', {
       attrs: { 'weex-type': 'switch' },
       staticClass: this.wrapperClass,

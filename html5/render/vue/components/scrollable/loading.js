@@ -78,10 +78,12 @@ export default {
     }
   },
   render (createElement) {
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },
-      staticClass: 'weex-loading'
+      staticClass: 'weex-loading',
+      staticStyle: ms
     }, this.getChildren())
   }
 }

@@ -32,17 +32,13 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    const ms = this._getComponentStyle(this.$vnode.data)
 
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
       on: this._createEventMap(),
-      staticClass: 'weex-text'
+      staticClass: 'weex-text',
+      staticStyle: extend(ms, getTextSpecStyle(this))
     }, this.$slots.default || [this.value])
-  },
-
-  methods: {
-    beforeRender () {
-      extend(this.$options._parentVnode.data.staticStyle, getTextSpecStyle(this))
-    }
   }
 }
