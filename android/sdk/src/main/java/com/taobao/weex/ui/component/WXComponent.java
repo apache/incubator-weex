@@ -443,10 +443,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         component = this;
       }
       mCurrentRef = component.getDomObject().getRef();
-      updateProperties(component.getDomObject().getStyles());
-      updateProperties(component.getDomObject().getAttrs());
+      updateStyle(component);
+      updateAttrs(component);
       updateExtra(component.getDomObject().getExtra());
     }
+  }
+
+  public void updateStyle(WXComponent component){
+    updateProperties(component.getDomObject().getStyles());
+  }
+
+  public void updateAttrs(WXComponent component){
+    updateProperties(component.getDomObject().getAttrs());
   }
 
   public void refreshData(WXComponent component){
@@ -621,6 +629,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
 
+  @Deprecated
   public void updateProperties(Map<String, Object> props) {
     if (props == null || mHost == null) {
       return;
