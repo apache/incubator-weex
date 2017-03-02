@@ -82,10 +82,6 @@ modal.toast({message: 'hello'})
 
 `overflow` 样式在 Android 默认为 `hidden` 并且无法修改，原因是 Android View framework 限制。这个问题只出现在 Android 端，iOS 端和 H5 正常。
 
-## Android 不支持 emoji
-
-由于 Android NDK 仅支持 Modified UTF-8，因此不支持 emoji。Android 6.0 以下使用 emoji 可能会导致崩溃，在 Android 6.0 以上则可能出现意外的行为。只能使用 Modified UTF-8，**不要使用 emoji**。
-
 ## 如何取消 750 像素自适应并以宽高比计算真实像素？
 
 `this.$getConfig()` 方法会返回一个对象，这个对象的 `deviceHeight` 和 `deviceWidth` 属性即实际设备宽度/高度（以像素为单位），而不是以 750 适配的。
