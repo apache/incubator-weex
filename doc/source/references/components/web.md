@@ -144,4 +144,4 @@ We use a simple Browser Demo to show how to use web component and webview module
 </style>
 ```
 
-[try it](../../examples/web.html)
+[try it](http://dotwe.org/vue/154c7fa8ac13e87ff4e7bf9862147d50)

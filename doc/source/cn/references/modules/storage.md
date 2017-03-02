@@ -176,7 +176,7 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/storage.html)
+[try it](http://dotwe.org/vue/3fdd3e2d1646ca41199d80c7be799858)
 
 ## 其它参考
 

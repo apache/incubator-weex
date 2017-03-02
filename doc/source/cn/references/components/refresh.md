@@ -120,6 +120,6 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/refresh.html)
+[try it](http://dotwe.org/vue/d3db5f344220a6339de044a5e33c502b)
 
 更多示例可查看 [`<list>`](./list.html)

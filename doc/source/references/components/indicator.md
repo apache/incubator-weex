@@ -118,4 +118,4 @@ There is no specific attribute for this component.
 </script>
 ```
 
-[try it](../../examples/indicator.html)
+[try it](http://dotwe.org/vue/d2a654c4b75f1b4d80336c8a5fe133b9)

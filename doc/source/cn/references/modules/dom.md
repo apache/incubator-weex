@@ -120,7 +120,7 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/dom-scroll.html)
+[try it](http://dotwe.org/vue/56e0d256cbb26facd958dbd6424f42b2)
 
 ### getComponentRect(ref, callback) <span class="api-version">v0.9.4+</span>
 
@@ -203,7 +203,7 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/dom-rect.html)
+[try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
 
 ## 其他
 

@@ -136,4 +136,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/modal.html)
+[try it](http://dotwe.org/vue/a7dddfb24edb72be947fc4eec3803f1d)

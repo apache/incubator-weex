@@ -43,7 +43,7 @@ version: 2.1
 
 ## 约束
 
-1. **不能**直接在 `<a>` 中添加文本。
+- **不能**直接在 `<a>` 中添加文本。
   错误示例，“click” 无法被正常渲染。
 
   ```html
@@ -62,9 +62,9 @@ version: 2.1
   </style>
   ```
 
-[体验一下](http://dotwe.org/0a22d65138691a208e3fb1f8f6392b38)
+  [体验一下](http://dotwe.org/0a22d65138691a208e3fb1f8f6392b38)
 
-2. 请不要为 `<a>` 添加 `click` 事件。我们不能确保 `click` 事件和 `href` 跳转的执行顺序。
+- 请不要为 `<a>` 添加 `click` 事件。我们不能确保 `click` 事件和 `href` 跳转的执行顺序。
 
 ## 示例
 
@@ -101,4 +101,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/a.html)
+[try it](http://dotwe.org/vue/025db54e37123ab5336a4b848397660f)

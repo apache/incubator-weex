@@ -158,4 +158,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/image.html)
+[try it](http://dotwe.org/vue/e2122bc245beafb0348d79bfd1274904)
