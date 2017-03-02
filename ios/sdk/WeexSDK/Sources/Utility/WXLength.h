@@ -12,13 +12,20 @@ typedef enum : NSUInteger {
     WXLengthTypeFixed,
     WXLengthTypePercent,
     WXLengthTypeAuto,
+    WXLengthTypeNormal
 } WXLengthType;
 
 @interface WXLength : NSObject
 
-+ (instancetype)lengthWithValue:(float)value type:(WXLengthType)type;
++ (instancetype)lengthWithFloat:(float)value type:(WXLengthType)type;
 
-- (float)valueForMaximumValue:(float)maximumValue;
++ (instancetype)lengthWithInt:(int)value type:(WXLengthType)type;
+
+- (float)valueForMaximum:(float)maximumValue;
+
+- (int)intValue;
+
+- (float)floatValue;
 
 - (BOOL)isEqualToLength:(WXLength *)length;
 
@@ -27,5 +34,7 @@ typedef enum : NSUInteger {
 - (BOOL)isPercent;
 
 - (BOOL)isAuto;
+
+- (BOOL)isNormal;
 
 @end
