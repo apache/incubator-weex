@@ -90,9 +90,16 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
     - `border-top-right-radius {length}`：，非负值, 默认值 0
 
 
-注意：目前在 `<image>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。该约束只对iOS生效，Android并不受此限制。
-
+### 注意：
 Weex 盒模型的 `box-sizing` 默认为 `border-box`，即盒子的宽高包含内容、内边距和边框的宽度，不包含外边距的宽度。
+
+目前在 `<image>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。该约束只对iOS生效，Android并不受此限制。
+
+尽管 `overflow:hidden` 在android上是默认行为，但只有下列条件都满足时，一个父view才会去clip它的子view。这个限制只对Android生效，iOS不受影响。
+* 父view是`div`, `a`, `cell`, `refresh` 或 `loading`。
+* 系统版本是Android 4.3或更高。
+* 系统版本不是Andorid 7.0。
+* 父view没有`background-image`属性或系统版本是Android 5.0或更高。
 
 ### 示例：
 

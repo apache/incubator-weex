@@ -46,18 +46,23 @@ you can use the definition below in weex box model.
     - `border-right-color`: `color` type, default value `#000000`
     - `border-bottom-color`: `color` type, default value `#000000`
   - `border-radius`: `length` type, default value `0`, (rounded borders to elements , default value is 0 meaning right angle )
-
-  Although the the default overflow style is `overflow:hidden` in android, a view will not be clipped by its parents' `border-radius`. This only happens on Android, it works fine on iOS.
     - `border-bottom-left-radius`: `length` type, non-negative, default value `0`
     - `border-bottom-right-radius`: `length` type, non-negative, default value `0`
     - `border-top-left-radius`: `length` type, non-negative, default value `0`
     - `border-top-right-radius`: `length` type, non-negative, default value `0`
 
-Notes: The rule of border-radius for a specific corner such as `border-top-left-radius` is not currently supported for component `<image>`in iOS. This only happens to iOS, it works fine on Android.
-
+### Notes
 Weex box model uses `border-box` as the default value of `box-sizing`, meaning the width and height properties includes content, padding and border, but not the margin.
 
-example:
+The rule of border-radius for a specific corner such as `border-top-left-radius` is not currently supported for component `<image>`in iOS. This only happens to iOS, it works fine on Android.
+
+Although `overflow:hidden` is default on android, a view **will not** clip its children according to `border-radius` unless all the following condtions met. This only happens on Android, it works fine on iOS.
+* The view type is `div`, `a`, `cell`, `refresh` or `loading`.
+* OS version is Android 4.3 or higher.
+* OS version is **not** Andorid 7.0
+* A view **does not** have `background-image` property nor OS version is Android 5.0 or higher.
+
+### Example
 
 ```html
 <template>
