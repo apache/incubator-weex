@@ -31,7 +31,8 @@ function _render (context, h) {
   }
   if (!context.$vnode.context._isMounted) {
     context.$nextTick(function () {
-      _reLayout(this, _getVirtualRect(this), _getLtbr(this))
+      console.log('next tick')
+      _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
     })
   }
   return h('nav', {
@@ -44,11 +45,10 @@ function _render (context, h) {
 /**
  * get indicator's virtual rect (width, height), which is the .
  */
-function _getVirtualRect (context) {
-  const mergedStyle = context.$vnode.data.staticStyle
+function _getVirtualRect (context, mergedStyle) {
   const ct = context._getParentRect()
   const rect = ['width', 'height'].reduce((pre, key) => {
-    const msv = mergedStyle[key]
+    const msv = mergedStyle && mergedStyle[key]
     pre[key] = msv ? parseFloat(msv) : ct[key]
     return pre
   }, {})
@@ -58,10 +58,9 @@ function _getVirtualRect (context) {
 /**
  * get indicator's ltbr values (without units).
  */
-function _getLtbr (context) {
-  const mergedStyle = context.$vnode.data.staticStyle
+function _getLtbr (context, mergedStyle) {
   return ['left', 'top', 'bottom', 'right'].reduce((pre, key) => {
-    const msv = mergedStyle[key]
+    const msv = mergedStyle && mergedStyle[key]
     // undefined, null, or '0px' -> o
     pre[key] = msv && parseFloat(msv) || 0
     return pre
