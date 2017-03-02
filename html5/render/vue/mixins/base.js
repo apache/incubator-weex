@@ -38,15 +38,9 @@ export default {
       watchLazyload()
     }
   },
-  created () {
-    this._prerender()
-  },
+
   mounted () {
     watchAppear(this)
-  },
-
-  beforeUpdate () {
-    this._prerender()
   },
 
   methods: {
@@ -87,12 +81,6 @@ export default {
     _fireLazyload () {
       const scroller = this._getParentScroller()
       fireLazyload(scroller && scroller.$el || document.body)
-    },
-
-    _prerender () {
-      this._mergeStyles()
-      // process prerender hooks for components' own treatment.
-      this.beforeRender && this.beforeRender()
     }
   }
 }
