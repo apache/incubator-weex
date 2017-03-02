@@ -1128,8 +1128,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (TextUtils.isEmpty(offset)) {
         offset = "0";
       }
+      float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),WXSDKInstance.getViewPortWidth());
 
-      if (offScreenY < Integer.parseInt(offset)) {
+      if (offScreenY < offsetParsed) {
         String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
         if (loadMoreRetry == null) {
           loadMoreRetry = mLoadMoreRetry;
