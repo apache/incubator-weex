@@ -218,8 +218,6 @@ import java.lang.ref.WeakReference;
  */
 public class ListBaseViewHolder extends RecyclerView.ViewHolder {
   private int mViewType;
-
-
   private boolean isRecycled = true;
   private WeakReference<WXComponent> mComponent;
 
