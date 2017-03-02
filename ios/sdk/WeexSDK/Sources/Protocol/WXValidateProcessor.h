@@ -21,7 +21,7 @@
 
 -(BOOL)needValidate:(NSURL*) bundleUrl;
 
--(BOOL)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance module:(NSString*) moduel method:(NSString *)method;
+-(BOOL)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance module:(NSString*) moduel method:(NSString *)method args:(NSArray *)args;
 
 -(WXComponentValidateResult *)validateWithWXSDKInstance:(WXSDKInstance *)wxsdkInstance component:(NSString *)componentName;
 

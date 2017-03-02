@@ -34,7 +34,7 @@
     
     if (self.instance.needValidate) {
         if ([WXSDKManager validateProcessor]) {
-          BOOL result =  [[WXSDKManager validateProcessor] validateWithWXSDKInstance:self.instance module:self.moduleName method:self.moduleName];
+            BOOL result =  [[WXSDKManager validateProcessor] validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
             if (!result) {
                 NSString *errorMessage = [NSString stringWithFormat:@"Invalid module：%@ method: %@ , please check the authority", self.moduleName,self.methodName];
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
