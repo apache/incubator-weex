@@ -53,6 +53,11 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) NSString *instanceId;
 
 /**
+ * Which indicates current instance needs to be validated or not to load,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needValidate;
+
+/**
  * The state of current instance.
  **/
 typedef NS_ENUM(NSInteger, WXState) {//state.code

@@ -319,6 +319,15 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
     
+    if (self.weexInstance.needValidate) {
+        if ([WXSDKManager validateProcessor]) {
+            WXComponentValidateResult* validateResult =  [[WXSDKManager validateProcessor] validateWithWXSDKInstance:self.weexInstance component:type];
+            if (validateResult && !validateResult.isSuccess) {
+                type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
+            }
+        }
+    }
+    
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);

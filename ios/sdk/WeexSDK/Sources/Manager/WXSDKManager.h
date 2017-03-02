@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 #import "WXBridgeManager.h"
+#import "WXValidateProcessor.h"
 
 @class WXModuleManager;
 
@@ -20,9 +21,17 @@
 + (WXBridgeManager *)bridgeMgr;
 
 /**
+ * @abstract Returns validate processor
+ **/
++ (id<WXValidateProcessor>)validateProcessor;
+
+/**
  * @abstract Returns weex instance for specific identifier
  **/
 + (WXSDKInstance *)instanceForID:(NSString *)identifier;
+
+
++ (void)registerValidateProcessor:(id<WXValidateProcessor>)validateProcessor;
 
 /**
  * @abstract Returns weex instance for specific identifier

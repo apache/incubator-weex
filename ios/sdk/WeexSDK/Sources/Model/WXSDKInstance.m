@@ -126,6 +126,8 @@ typedef enum : NSUInteger {
         return;
     }
     
+    self.needValidate = [[WXSDKManager validateProcessor] needValidate:url];
+    
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
 }

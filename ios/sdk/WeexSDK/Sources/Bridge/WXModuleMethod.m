@@ -13,6 +13,7 @@
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
+#import "WXSDKManager.h"
 
 @implementation WXModuleMethod
 
@@ -30,6 +31,18 @@
 
 - (NSInvocation *)invoke
 {
+    
+    if (self.instance.needValidate) {
+        if ([WXSDKManager validateProcessor]) {
+          BOOL result =  [[WXSDKManager validateProcessor] validateWithWXSDKInstance:self.instance module:self.moduleName method:self.moduleName];
+            if (!result) {
+                NSString *errorMessage = [NSString stringWithFormat:@"Invalid module：%@ method: %@ , please check the authority", self.moduleName,self.methodName];
+                WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
+                return nil;
+            }
+        }
+    }
+    
     Class moduleClass =  [WXModuleFactory classWithModuleName:_moduleName];
     if (!moduleClass) {
         NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist, maybe it has not been registered", _moduleName];

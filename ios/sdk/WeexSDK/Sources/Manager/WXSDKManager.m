@@ -13,6 +13,8 @@
 
 @property (nonatomic, strong) WXBridgeManager *bridgeMgr;
 
+@property (nonatomic, strong) id<WXValidateProcessor> validateProcessor;
+
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *instanceDict;
 
 @end
@@ -43,6 +45,15 @@ static WXSDKManager *_sharedInstance = nil;
     return bridgeMgr;
 }
 
++ (id<WXValidateProcessor> )validateProcessor{
+    return [self sharedInstance].validateProcessor;
+}
+
++ (void)registerValidateProcessor:(id<WXValidateProcessor>)validateProcessor{
+    [self sharedInstance].validateProcessor = validateProcessor;
+}
+
+   
 + (id)instanceForID:(NSString *)identifier
 {
     return [[self sharedInstance].instanceDict objectForKey:identifier];
