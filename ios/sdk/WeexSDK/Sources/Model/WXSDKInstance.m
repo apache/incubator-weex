@@ -187,7 +187,6 @@ typedef enum : NSUInteger {
 {
     NSURL *url = request.URL;
     _scriptURL = url;
-    _options = options;
     _jsData = data;
     NSMutableDictionary *newOptions = [options mutableCopy] ?: [NSMutableDictionary new];
     
@@ -199,7 +198,8 @@ typedef enum : NSUInteger {
         WXLogWarning(@"Error type in options with key:bundleUrl, should be of type NSString, not NSURL!");
         newOptions[bundleUrlOptionKey] = ((NSURL*)newOptions[bundleUrlOptionKey]).absoluteString;
     }
-    
+    _options = [newOptions copy];
+  
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
         self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
     }
