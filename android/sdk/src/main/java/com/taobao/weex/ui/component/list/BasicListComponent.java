@@ -229,6 +229,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
 import com.taobao.weex.ui.component.Scrollable;
@@ -285,6 +287,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
+
+  private RecyclerView.ItemAnimator mItemAnimator;
 
   /**
    * Map for storing component that is sticky.
@@ -404,6 +408,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (transforms != null) {
       bounceRecyclerView.getInnerView().addItemDecoration(parseTransforms(transforms));
     }
+
+    mItemAnimator=bounceRecyclerView.getInnerView().getItemAnimator();
 
     RecyclerViewBaseAdapter recyclerViewBaseAdapter = new RecyclerViewBaseAdapter<>(this);
     recyclerViewBaseAdapter.setHasStableIds(true);
@@ -750,9 +756,52 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     int adapterPosition = index == -1 ? mChildren.size() - 1 : index;
     T view = getHostView();
     if (view != null) {
-      view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
+      boolean isAddAnimation = isAddAnimation(child);
+      if (isAddAnimation) {
+        view.getInnerView().setItemAnimator(mItemAnimator);
+      } else {
+        view.getInnerView().setItemAnimator(null);
+      }
+      boolean isKeepScrollPosition = isKeepScrollPosition(child);
+      if (isKeepScrollPosition) {
+        view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
+      } else {
+        view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
+      }
     }
     relocateAppearanceHelper();
+  }
+
+  /**
+   * To determine whether an animation is needed
+   * @param child
+   * @return
+   */
+  private boolean isAddAnimation(WXComponent child) {
+    ImmutableDomObject domObject = child.getDomObject();
+    if (domObject != null) {
+      Object attr = domObject.getAttrs().get(Constants.Name.INSERT_CELL_ANIMATION);
+      if (Constants.Value.DEFAULT.equals(attr)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Determine if the component needs to be fixed at the time of insertion
+   * @param child Need to insert the component
+   * @return fixed=true
+   */
+  private boolean isKeepScrollPosition(WXComponent child) {
+    ImmutableDomObject domObject = child.getDomObject();
+    if (domObject != null) {
+      Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
+      if (WXUtils.getBoolean(attr, false)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 
@@ -798,11 +847,35 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (view == null) {
       return;
     }
+
+    boolean isRemoveAnimation = isRemoveAnimation(child);
+    if (isRemoveAnimation) {
+      view.getInnerView().setItemAnimator(mItemAnimator);
+    } else {
+      view.getInnerView().setItemAnimator(null);
+    }
+
     view.getRecyclerViewBaseAdapter().notifyItemRemoved(index);
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "removeChild child at " + index);
     }
     super.remove(child, destroy);
+  }
+
+  /**
+   * To determine whether an animation is needed
+   * @param child
+   * @return
+   */
+  private boolean isRemoveAnimation(WXComponent child) {
+    ImmutableDomObject domObject = child.getDomObject();
+    if (domObject != null) {
+      Object attr = domObject.getAttrs().get(Constants.Name.DELETE_CELL_ANIMATION);
+      if (Constants.Value.DEFAULT.equals(attr)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 
@@ -1055,8 +1128,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (TextUtils.isEmpty(offset)) {
         offset = "0";
       }
+      float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),WXSDKInstance.getViewPortWidth());
 
-      if (offScreenY < Integer.parseInt(offset)) {
+      if (offScreenY < offsetParsed) {
         String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
         if (loadMoreRetry == null) {
           loadMoreRetry = mLoadMoreRetry;

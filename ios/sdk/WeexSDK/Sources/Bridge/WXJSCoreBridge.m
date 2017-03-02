@@ -97,6 +97,11 @@
             context.exception = exception;
             NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
             
+            WXSDKInstance *instance = [WXSDKEngine topInstance];
+            if (instance.onJSException) {
+                WXJSExceptionInfo * jsException = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:@"" functionName:@"" exception:[NSString stringWithFormat:@"%@\n%@",[exception toString], exception[@"stack"]] userInfo:nil];
+                instance.onJSException(jsException);
+            }
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
         };
         

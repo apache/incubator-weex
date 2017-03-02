@@ -8,18 +8,18 @@ var os = require('os');
 var util = require("./util.js");
 
 describe('weex mobile index', function () {
-  this.timeout(1 * 60 * 1000);
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  this.timeout(util.getTimeoutMills());
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
+    return util.init(driver)
       .get('wxpage://' + util.getDeviceHost() +'/index.js')
-      .sleep(1000);
+      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000);
   });
+
+  after(function () {
+      return util.quit(driver);
+  })
 
 
   it('#1 Index', () => {
@@ -42,7 +42,7 @@ describe('weex mobile index', function () {
     })
   })
 
-  it('#2 Input Blur', () => {
+  it('#3 Input Blur', () => {
     return driver
     .elementByXPath('//div/input')
     .click()

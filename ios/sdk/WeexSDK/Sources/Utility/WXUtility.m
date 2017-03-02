@@ -343,12 +343,18 @@ static BOOL WXNotStat;
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
             CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
-            CFRelease(fontURL);
+            if (fontURL) {
+                CFRelease(fontURL);
+            }
             CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
-            CGDataProviderRelease(fontDataProvider);
+            if (fontDataProvider) {
+                CGDataProviderRelease(fontDataProvider);
+            }
             CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
-            CFRelease(graphicFont);
-            font = (__bridge UIFont*)smallFont;
+            if (graphicFont) {
+                CFRelease(graphicFont);
+            }
+            font = (__bridge_transfer UIFont*)smallFont;
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }

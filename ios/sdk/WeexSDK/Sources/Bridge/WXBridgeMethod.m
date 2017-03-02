@@ -13,6 +13,7 @@
 #import "WXUtility.h"
 #import "WXSDKManager.h"
 #import <objc/runtime.h>
+#import "WXConvert.h"
 
 @implementation WXBridgeMethod
 
@@ -33,22 +34,39 @@
 }
 
 //check parameter:NSNumber contains int,float,double;object contains nsarray,nsstring,nsdictionary ;block is block
--(void)checkParameter:(id)obj parameterType:(const char *)parameterType order:(int)order
+//https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html
+-(id)parseArgument:(id)obj parameterType:(const char *)parameterType order:(int)order
 {
     BOOL check = YES;
-    if(strcmp(parameterType,"f")==0 || strcmp(parameterType,"i")==0 || strcmp(parameterType,"d")==0) {
+    if (strcmp(parameterType,@encode(float))==0 || strcmp(parameterType,@encode(double))==0)
+    {
+#ifdef DEBUG
         check =  [obj isKindOfClass:[NSNumber class]];
-        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be int,float or double>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
-    }
-    if(strcmp(parameterType,"@")==0) {
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be float or double>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+#endif
+        CGFloat value = [WXConvert CGFloat:obj];
+        return [NSNumber numberWithDouble:value];
+    } else if (strcmp(parameterType,@encode(int))==0) {
+#ifdef DEBUG
+        check =  [obj isKindOfClass:[NSNumber class]];
+        WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be int>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+#endif
+        NSInteger value = [WXConvert NSInteger:obj];
+        return [NSNumber numberWithInteger:value];
+    } else if(strcmp(parameterType,@encode(id))==0) {
+#ifdef DEBUG
         check =  [obj isKindOfClass:[NSArray class]] || [obj isKindOfClass:[NSDictionary class]] ||[obj isKindOfClass:[NSString class]];
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@ ;the number %d parameter type is not right,it should be array ,map or string>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
-    }
-    if(strcmp(parameterType,"@?")==0) {
-        const char *blockType = @encode(typeof(^{}));
-        check =  !strcmp(parameterType, blockType);
+#endif
+        return obj;
+    } else if(strcmp(parameterType,@encode(typeof(^{})))==0) {
+#ifdef DEBUG
+        check =  [obj isKindOfClass:[NSString class]]; // jsfm pass string if parameter type is block
         WXAssert(check,@"<%@: %p; instance = %@; method = %@; arguments= %@; the number %d parameter type is not right,it should be block>",NSStringFromClass([self class]), self, _instance.instanceId, _methodName, _arguments,order);
+#endif
+        return obj;
     }
+    return obj;
 }
 
 - (NSInvocation *)invocationWithTarget:(id)target selector:(SEL)selector
@@ -81,9 +99,7 @@
     for (int i = 0; i < arguments.count; i ++ ) {
         id obj = arguments[i];
         const char *parameterType = [signature getArgumentTypeAtIndex:i + 2];
-#ifdef DEBUG
-        [self checkParameter:obj parameterType:parameterType order:i];
-#endif
+        obj = [self parseArgument:obj parameterType:parameterType order:i];
         static const char *blockType = @encode(typeof(^{}));
         id argument;
         if (!strcmp(parameterType, blockType)) {

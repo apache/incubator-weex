@@ -301,11 +301,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     this.mViewPortWidth = mViewPortWidth;
   }
 
-  public int getViewPortWidth() {
+  public static int getViewPortWidth() {
     return mViewPortWidth;
   }
 
-  private int mViewPortWidth = 750;
+  private static volatile int mViewPortWidth = 750;
 
   /**
    * Render strategy.
@@ -570,7 +570,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      render(pageName, WXFileUtils.loadAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
+      render(pageName, WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
       return;
     }
 

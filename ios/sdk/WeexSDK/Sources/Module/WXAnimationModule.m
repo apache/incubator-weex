@@ -45,7 +45,12 @@
 
 @end
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 100000
+// CAAnimationDelegate is not available before iOS 10 SDK
+@interface WXAnimationDelegate : NSObject 
+#else
 @interface WXAnimationDelegate : NSObject <CAAnimationDelegate>
+#endif
 
 @property (nonatomic, copy) void (^finishBlock)(BOOL);
 @property (nonatomic, strong) WXAnimationInfo *animationInfo;
@@ -68,6 +73,10 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
+        return;
+    }
+    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];

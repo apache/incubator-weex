@@ -228,7 +228,6 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mIsDestroyed = false;
   private boolean mCanRecycled = true;
 
-
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
     this.mAnimationHolder = holder;
@@ -1302,10 +1301,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     removeAllEvent();
     removeStickyStyle();
-    if (mDomObj != null) {
-      mDomObj = null;
+
+    View view;
+    if(mDomObj.isFixed() && (view = getHostView()) != null){
+      getInstance().removeFixedView(view);
     }
 
+    mDomObj = null;
     mIsDestroyed = true;
   }
 
@@ -1468,7 +1470,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public boolean canRecycled(){
     return mCanRecycled;
   }
-
+  
   /**
    * Sets the offset for the sticky
    * @param stickyOffset child[y]-parent[y]

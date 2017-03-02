@@ -23,8 +23,10 @@
     
     if (self) {
         _async = attributes[@"async"] ? [WXConvert BOOL:attributes[@"async"]] : YES;
+        _isRecycle = attributes[@"recycle"] ? [WXConvert BOOL:attributes[@"recycle"]] : YES;
         _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
+        _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -63,12 +65,20 @@
         _async = [WXConvert BOOL:attributes[@"async"]];
     }
     
+    if (attributes[@"recycle"]) {
+        _isRecycle = [WXConvert BOOL:attributes[@"recycle"]];
+    }
+    
     if (attributes[@"insertAnimation"]) {
         _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
     }
     
     if (attributes[@"deleteAnimation"]) {
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
+    }
+    
+    if (attributes[@"keepScrollPosition"]) {
+        _keepScrollPosition = [WXConvert BOOL:attributes[@"keepScrollPosition"]];
     }
 }
 
