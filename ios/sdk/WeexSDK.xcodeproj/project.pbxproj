@@ -263,6 +263,7 @@
 		DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAB35FD1D658EB700C0EA70 /* WXRuleManager.m */; };
 		DCC77C131D770AE300CE7288 /* WXSliderNeighborComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DCC77C111D770AE300CE7288 /* WXSliderNeighborComponent.m */; };
 		DCC77C141D770AE300CE7288 /* WXSliderNeighborComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */; };
+		DCDFED011E68238F00C228D7 /* WXJSExceptionProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */; };
 		DCF087621DCAE161005CD6EB /* WXInvocationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */; };
 		DCF343671E49CAEE00A2FB34 /* WXJSExceptionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -556,6 +557,7 @@
 		DCAB35FD1D658EB700C0EA70 /* WXRuleManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRuleManager.m; sourceTree = "<group>"; };
 		DCC77C111D770AE300CE7288 /* WXSliderNeighborComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSliderNeighborComponent.m; sourceTree = "<group>"; };
 		DCC77C121D770AE300CE7288 /* WXSliderNeighborComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXSliderNeighborComponent.h; sourceTree = "<group>"; };
+		DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionProtocol.h; sourceTree = "<group>"; };
 		DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInvocationConfig.h; sourceTree = "<group>"; };
 		DCF087601DCAE161005CD6EB /* WXInvocationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInvocationConfig.m; sourceTree = "<group>"; };
 		DCF343651E49CAEE00A2FB34 /* WXJSExceptionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSExceptionInfo.h; sourceTree = "<group>"; };
@@ -926,6 +928,7 @@
 			isa = PBXGroup;
 			children = (
 				59A596171CB630E50012CD52 /* WXNavigationProtocol.h */,
+				DCDFED001E68238F00C228D7 /* WXJSExceptionProtocol.h */,
 				2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */,
 				2A4445BE1CA8FD56009E7C6D /* WXTextComponentProtocol.h */,
 				775BEE701C1BD977008D1629 /* WXModuleProtocol.h */,
@@ -1231,6 +1234,7 @@
 				74B8BEFE1DC47B72004A6027 /* WXRootView.h in Headers */,
 				77E65A111C155EA8008B8775 /* WXImageComponent.h in Headers */,
 				2A60CE9C1C91733E00857B9F /* WXSwitchComponent.h in Headers */,
+				DCDFED011E68238F00C228D7 /* WXJSExceptionProtocol.h in Headers */,
 				2A4445BF1CA8FD56009E7C6D /* WXTextComponentProtocol.h in Headers */,
 				746319021C60AFC100EFEBD4 /* WXThreadSafeCounter.h in Headers */,
 				77D1613C1C02DEA60010B15B /* WXJSCoreBridge.h in Headers */,
