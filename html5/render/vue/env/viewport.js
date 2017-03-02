@@ -19,7 +19,7 @@ export function setViewport (config = {}) {
     // const viewportWidth = parseViewportWidth(config)
 
     // set root font-size
-    doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
+    // doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
 
     /**
      * why not to use window.screen.width to get screenWidth ? Because in some
