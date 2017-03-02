@@ -208,6 +208,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -218,38 +219,63 @@ import java.lang.ref.WeakReference;
  * From View to ViewHolder, this is done by set {@link android.view.ViewGroup.LayoutParams} to View.
  */
 public class ListBaseViewHolder extends RecyclerView.ViewHolder {
-  private int mViewType;
-  private WeakReference<WXComponent> mComponent;
-
-  public ListBaseViewHolder(WXComponent component, int viewType) {
-    super(component.getHostView());
-    mViewType = viewType;
-    mComponent = new WeakReference(component);
-  }
-  public ListBaseViewHolder(View view, int viewType) {
-    super(view);
-    mViewType = viewType;
-  }
+    private int mViewType;
 
 
-  public boolean canRecycled(){
-    if (mComponent!=null && mComponent.get() != null) {
-        return mComponent.get().canRecycled();
+    private boolean isRecycled = true;
+    private WeakReference<WXComponent> mComponent;
+
+    public ListBaseViewHolder(WXComponent component, int viewType) {
+        super(component.getHostView());
+        mViewType = viewType;
+        mComponent = new WeakReference(component);
     }
-    return true;
-  }
-  public View getView() {
-    return itemView;
-  }
 
-  public int getViewType() {
-    return mViewType;
-  }
-  public void setComponentUsing(boolean using){
-    if(mComponent!=null && mComponent.get() != null)
-        mComponent.get().setUsing(using);
-  }
-  public WXComponent getComponent(){
-    return mComponent != null ? mComponent.get() : null;
-  }
+    public ListBaseViewHolder(View view, int viewType) {
+        super(view);
+        mViewType = viewType;
+    }
+
+    public boolean isRecycled() {
+        return isRecycled;
+    }
+
+    public void recycled() {
+        if (mComponent != null && mComponent.get() != null) {
+            mComponent.get().recycled();
+            isRecycled = true;
+
+        }
+    }
+
+    public void bindData(WXComponent component) {
+        if (mComponent != null && mComponent.get() != null) {
+            mComponent.get().bindData(component);
+            isRecycled = false;
+        }
+    }
+
+    public boolean canRecycled() {
+        if (mComponent != null && mComponent.get() != null) {
+            return mComponent.get().canRecycled();
+        }
+        return true;
+    }
+
+    public View getView() {
+        return itemView;
+    }
+
+    public int getViewType() {
+        return mViewType;
+    }
+
+    public void setComponentUsing(boolean using) {
+        if (mComponent != null && mComponent.get() != null)
+            mComponent.get().setUsing(using);
+    }
+
+    public WXComponent getComponent() {
+        return mComponent != null ? mComponent.get() : null;
+    }
 }

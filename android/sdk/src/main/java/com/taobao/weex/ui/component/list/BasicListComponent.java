@@ -421,7 +421,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             if (holder != null
                 && holder.getComponent() != null
                 && !holder.getComponent().isUsing()) {
-              holder.getComponent().recycled();
+               holder.recycled();
             }
           }
           recycleViewList.clear();
@@ -855,8 +855,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
-      holder.getComponent().bindData(component);
-//              holder.getComponent().refreshData(component);
+      if(holder.isRecycled()) {
+        holder.bindData(component);
+      }
     }
 
   }
