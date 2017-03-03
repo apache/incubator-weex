@@ -381,9 +381,9 @@ public class WXImage extends WXComponent<ImageView> {
           if (getDomObject() != null && getDomObject().getEvents().contains(Constants.Event.ONLOAD)) {
             Map<String, Object> params = new HashMap<String, Object>();
             Map<String, Object> size = new HashMap<>(2);
-            if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
-              size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
-              size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
+            if (imageView != null && imageView instanceof Measurable) {
+              size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+              size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
             } else {
               size.put("naturalWidth", 0);
               size.put("naturalHeight", 0);
@@ -442,5 +442,10 @@ public class WXImage extends WXComponent<ImageView> {
       }
       readyToRender();
     }
+  }
+
+  public interface Measurable {
+    int getNaturalWidth();
+    int getNaturalHeight();
   }
 }
