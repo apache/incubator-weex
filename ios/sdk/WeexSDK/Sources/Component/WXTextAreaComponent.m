@@ -7,6 +7,7 @@
  */
 
 #import "WXTextAreaComponent.h"
+#import "WXUtility.h"
 
 #define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
 typedef UITextView WXTextAreaView;
@@ -32,7 +33,14 @@ typedef UITextView WXTextAreaView;
         [_textView addSubview:self.placeHolderLabel];
     }
     _textView.delegate = self;
+    [_textView setNeedsDisplay];
+    [_textView setClipsToBounds:YES];
     [super viewDidLoad];
+}
+
+- (void)viewWillUnload
+{
+    _textView = nil;
 }
 
 - (UIView *)loadView
@@ -40,6 +48,39 @@ typedef UITextView WXTextAreaView;
     _textView = [[WXTextAreaView alloc] init];
     return _textView;
 }
+
+#pragma mark measure frame
+- (CGSize (^)(CGSize))measureBlock
+{
+    __weak typeof(self) weakSelf = self;
+    return ^CGSize (CGSize constrainedSize) {
+        
+        CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:[UIFont systemFontSize]]}];
+        computedSize.height = computedSize.height * self.rows;
+        //TODO:more elegant way to use max and min constrained size
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        }
+        
+        return (CGSize) {
+            WXCeilPixelValue(computedSize.width),
+            WXCeilPixelValue(computedSize.height)
+        };
+    };
+}
+
 #pragma mark -Overwrite method
 -(NSString *)text
 {
@@ -48,6 +89,7 @@ typedef UITextView WXTextAreaView;
 
 - (void)setText:(NSString *)text
 {
+    
     _textView.text = text;
     if ([text length] >0) {
         self.placeHolderLabel.text = @"";

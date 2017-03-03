@@ -28,6 +28,8 @@
 @property(nonatomic) UIReturnKeyType returnKeyType;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
+@property (nonatomic) NSUInteger rows;
+
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -84,6 +86,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         if (attributes[@"returnKeyType"]) {
             _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         }
+        if (attributes[@"rows"]) {
+            _rows = [attributes[@"rows"] integerValue];
+        } else {
+            _rows = 2;
+        }
         
         // handle styles
         if (styles[@"color"]) {
@@ -112,6 +119,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     
     return self;
+}
+
+-(NSUInteger )rows
+{
+    return _rows;
 }
 
 #pragma mark - lifeCircle
@@ -341,6 +353,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if (attributes[@"returnKeyType"]) {
         _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         [self setReturnKeyType:_returnKeyType];
+    }
+    if (attributes[@"rows"]) {
+        _rows = [attributes[@"rows"] integerValue];
+    } else {
+        _rows = 2;
     }
 }
 

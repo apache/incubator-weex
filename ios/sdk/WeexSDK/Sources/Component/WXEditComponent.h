@@ -18,4 +18,5 @@
 @property (nonatomic, strong) NSString *placeholderString;
 @property (nonatomic, strong) UILabel *placeHolderLabel;
 
+@property (nonatomic, readonly) NSUInteger rows;
 @end
