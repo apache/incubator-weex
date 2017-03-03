@@ -87,6 +87,10 @@
 
 - (void)reloadItemsAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (!indexPath) {
+        return;
+    }
+    
     if (!_reloadIndexPaths) {
         _reloadIndexPaths = [NSMutableSet set];
     }
@@ -143,8 +147,13 @@
     
     self.isUpdating = YES;
     
+    if (!self.delegate) {
+        return;
+    }
+    
     [self.delegate updateController:self willPerformUpdateWithNewData:newData];
     
+    NSLog(@"Diff result:%@", diffResult);
     [collectionView performBatchUpdates:updates completion:completion];
 }
 

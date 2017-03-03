@@ -319,6 +319,9 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     float columnWidth ;
     float availableWidth = self.contentWidth - (insets.left + insets.right);
     computeColumnWidthAndCount(availableWidth, self.columnCount, self.columnWidth, self.columnGap, &columnCount, &columnWidth);
+    if (availableWidth <= 0) {
+        return;
+    }
     WXAssert(columnCount > 0, @"invalid column count");
     WXAssert(columnWidth > 0, @"invalid column width");
     

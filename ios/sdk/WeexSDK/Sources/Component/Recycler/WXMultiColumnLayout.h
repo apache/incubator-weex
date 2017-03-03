@@ -27,7 +27,7 @@ extern NSString * const kCollectionSupplementaryViewKindHeader;
 
 @interface WXMultiColumnLayout : UICollectionViewLayout
 
-@property (nonatomic, assign) id<WXMultiColumnLayoutDelegate> delegate;
+@property (nonatomic, weak) id<WXMultiColumnLayoutDelegate> delegate;
 
 @property (nonatomic, strong) WXLength *columnCount;
 
