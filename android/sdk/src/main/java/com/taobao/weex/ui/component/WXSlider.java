@@ -644,8 +644,24 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     @Override
     public void onPageScrollStateChanged(int state) {
-      if (state == ViewPager.SCROLL_STATE_IDLE) {
-        lastPositionOffset = 99f;
+
+      /**
+       * @homeblog@vip.qq.com
+       *
+       *  add scrollstart & scrollend event
+       *
+       */
+      switch (state) {
+        case ViewPager.SCROLL_STATE_IDLE:
+          lastPositionOffset = 99f;
+          target.fireEvent("scrollend");
+          break;
+        case ViewPager.SCROLL_STATE_DRAGGING:
+          target.fireEvent("scrollstart");
+          break;
+        case ViewPager.SCROLL_STATE_SETTLING:
+          break;
+
       }
     }
   }
