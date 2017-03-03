@@ -307,14 +307,11 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
             WXRefreshView refreshView = swipeLayout.getHeaderView();
             if (refreshView != null) {
                 ImmutableDomObject immutableDomObject = refresh.getDomObject();
-                if (immutableDomObject == null) {
+                if (immutableDomObject != null) {
                     int refreshHeight = (int) immutableDomObject.getLayoutHeight();
-
                     swipeLayout.setRefreshHeight(refreshHeight);
-
                     String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
-
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {
                             int colorInt = WXResourceUtils.getColor(bgColor);
@@ -338,13 +335,12 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
         if (swipeLayout != null) {
             WXRefreshView refreshView = swipeLayout.getFooterView();
             if (refreshView != null) {
-                ImmutableDomObject object = loading.getDomObject();
-                if (object != null) {
-                    int loadingHeight = (int) loading.getDomObject().getLayoutHeight();
+                ImmutableDomObject immutableDomObject = loading.getDomObject();
+                if (immutableDomObject != null) {
+                    int loadingHeight = (int) immutableDomObject.getLayoutHeight();
                     swipeLayout.setLoadingHeight(loadingHeight);
-                    String colorStr = (String) loading.getDomObject().getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
-
                     if (bgColor != null) {
                         if (!TextUtils.isEmpty(bgColor)) {
                             int colorInt = WXResourceUtils.getColor(bgColor);
