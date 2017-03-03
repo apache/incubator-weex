@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -570,7 +570,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      render(pageName, WXFileUtils.loadAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
+      render(pageName, WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
       return;
     }
 
@@ -1220,7 +1220,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       getContext().unregisterReceiver(mGlobalEventReceiver);
       mGlobalEventReceiver=null;
     }
-
     if(mRootComp != null ) {
       mRootComp.destroy();
       destroyView(mRenderContainer);

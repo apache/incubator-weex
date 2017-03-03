@@ -660,11 +660,11 @@ public final class WXDomModule extends WXModule {
     } else if ("viewport".equalsIgnoreCase(ref)) {
       if (mWXSDKInstance.getContainerView() != null) {
         Map<String, Object> options = new HashMap<>();
-        Map<String, String> sizes = new HashMap<>();
+        Map<String, Float> sizes = new HashMap<>();
         int[] location = new int[2];
         mWXSDKInstance.getContainerView().getLocationOnScreen(location);
-        sizes.put("left", "0");
-        sizes.put("top", "0");
+        sizes.put("left", 0f);
+        sizes.put("top", 0f);
         sizes.put("right", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
         sizes.put("bottom", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
         sizes.put("width", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
@@ -692,7 +692,7 @@ public final class WXDomModule extends WXModule {
   }
 
   @NonNull
-  private String getWebPxValue(int value) {
-    return String.valueOf(WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getViewPortWidth()));
+  private float getWebPxValue(int value) {
+    return WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getViewPortWidth());
   }
 }
