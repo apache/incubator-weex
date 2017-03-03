@@ -437,14 +437,6 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     }
   }
 
-  @Override
-  public void onActivityDestroy() {
-    super.onActivityDestroy();
-    if (getInstance() != null) {
-      getInstance().removeOnInstanceVisibleListener(this);
-    }
-  }
-
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
     getInstance().addOnInstanceVisibleListener(this);
@@ -501,6 +493,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance = null;
     }
     src = null;
+    if (getInstance() != null) {
+      getInstance().removeOnInstanceVisibleListener(this);
+    }
   }
 
   @Override
