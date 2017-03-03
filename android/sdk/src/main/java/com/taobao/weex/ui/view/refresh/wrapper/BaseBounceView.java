@@ -342,7 +342,6 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
                 if (object != null) {
                     int loadingHeight = (int) loading.getDomObject().getLayoutHeight();
                     swipeLayout.setLoadingHeight(loadingHeight);
-
                     String colorStr = (String) loading.getDomObject().getStyles().get(Constants.Name.BACKGROUND_COLOR);
                     String bgColor = WXUtils.getString(colorStr, null);
 

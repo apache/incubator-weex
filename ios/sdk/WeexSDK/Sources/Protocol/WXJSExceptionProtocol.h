@@ -6,8 +6,16 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import <Foundation/Foundation.h>
-#import "WXEditComponent.h"
+#import "WXJSExceptionInfo.h"
 
-@interface WXTextInputComponent : WXEditComponent
+@protocol WXJSExceptionProtocol <NSObject>
+
+/**
+ * report js exception
+ *
+ * @param exception WXJSExceptionInfo
+ */
+
+- (void)onJSException:(WXJSExceptionInfo*) exception;
+
 @end

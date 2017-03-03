@@ -73,6 +73,10 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
+        return;
+    }
+    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
