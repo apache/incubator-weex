@@ -89,7 +89,6 @@ typedef UITextView WXTextAreaView;
 
 - (void)setText:(NSString *)text
 {
-    
     _textView.text = text;
     if ([text length] >0) {
         self.placeHolderLabel.text = @"";
