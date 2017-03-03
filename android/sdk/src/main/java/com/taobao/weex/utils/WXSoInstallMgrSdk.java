@@ -209,6 +209,7 @@ import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXPerformance;
@@ -255,9 +256,11 @@ public class WXSoInstallMgrSdk {
   private final static int X86_Size = 4451068;
 
   static Context mContext = null;
+  private static IWXSoLoaderAdapter mSoLoader = null;
 
-  public static void init(Context c) {
+  public static void init(Context c, IWXSoLoaderAdapter loader) {
     mContext = c;
+    mSoLoader = loader;
   }
 
   public static boolean isX86(){
@@ -272,8 +275,11 @@ public class WXSoInstallMgrSdk {
 
   /**
    * Load so library.
-   * First, it will try use {@link System#loadLibrary(String)} to load library.
-   * If it fails, then it will try to extract the so library and load it from arembi in the .apk
+   *
+   * If a library loader adapter exists, use this adapter to load library,
+   * otherwise use {@link System#loadLibrary(String)} to load library.
+   * If failed to load library, try to extract the so library and load it
+   * from arembi in the .apk
    *
    * @param libName library name, like webp, not necessary to be libwep.so
    * @param version the version of the so library
@@ -290,7 +296,13 @@ public class WXSoInstallMgrSdk {
        * Load library with {@link System#loadLibrary(String)}
        */
       try {
-        System.loadLibrary(libName);
+        // If a library loader adapter exists, use this adapter to load library
+        // instead of System.loadLibrary.
+        if (mSoLoader != null) {
+          mSoLoader.doLoadLibrary(libName);
+        } else {
+          System.loadLibrary(libName);
+        }
         commit(utAdapter, null, null);
 
         InitSuc = true;
@@ -438,24 +450,35 @@ public class WXSoInstallMgrSdk {
   /**
    * Load .so library
    */
-  static boolean _loadUnzipSo(String libName, int version, IWXUserTrackAdapter utAdapter) {
+  static boolean _loadUnzipSo(String libName,
+                              int version,
+                              IWXUserTrackAdapter utAdapter) {
     boolean initSuc = false;
     try {
       if (isExist(libName, version)) {
-        System.load(_targetSoFile(libName, version));
+        // If a library loader adapter exists, use this adapter to load library
+        // instead of System.load.
+        if (mSoLoader != null) {
+          mSoLoader.doLoad(_targetSoFile(libName, version));
+        } else {
+          System.load(_targetSoFile(libName, version));
+        }
         commit(utAdapter, "2000", "Load file extract from apk successfully.");
       }
       initSuc = true;
     } catch (Throwable e) {
-      commit(utAdapter, WXErrorCode.WX_ERR_COPY_FROM_APK.getErrorCode(), WXErrorCode.WX_ERR_COPY_FROM_APK.getErrorMsg() + ":" + e.getMessage());
+      commit(utAdapter,
+             WXErrorCode.WX_ERR_COPY_FROM_APK.getErrorCode(),
+             WXErrorCode.WX_ERR_COPY_FROM_APK.getErrorMsg() + ":" + e.getMessage());
       initSuc = false;
       WXLogUtils.e("", e);
     }
     return initSuc;
   }
 
-  static boolean unZipSelectedFiles(String libName, int version, IWXUserTrackAdapter utAdapter) throws ZipException, IOException {
-
+  static boolean unZipSelectedFiles(String libName,
+      int version,
+      IWXUserTrackAdapter utAdapter) throws ZipException, IOException {
     String sourcePath = "lib/armeabi/lib" + libName + ".so";
 
     String zipPath = "";

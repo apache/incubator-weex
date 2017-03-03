@@ -120,6 +120,7 @@ import android.util.Log;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
@@ -268,7 +269,7 @@ public class WXSDKEngine {
             config.getDebugAdapter().initDebug(application);
           }
         }
-        WXSoInstallMgrSdk.init(application);
+        WXSoInstallMgrSdk.init(application, sm.getIWXSoLoaderAdapter());
         boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!isSoInitSuccess) {
           return;
