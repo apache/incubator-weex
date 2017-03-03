@@ -213,6 +213,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.WXLoadingLayout;
 import com.taobao.weex.ui.view.WXRefreshLayout;
@@ -303,21 +304,27 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
     public void setHeaderView(WXComponent refresh) {
         setRefreshEnable(true);
         if (swipeLayout != null) {
-            if (swipeLayout.getHeaderView() != null) {
-                swipeLayout.setRefreshHeight((int) refresh.getDomObject().getLayoutHeight());
+            WXRefreshView refreshView = swipeLayout.getHeaderView();
+            if (refreshView != null) {
+                ImmutableDomObject immutableDomObject = refresh.getDomObject();
+                if (immutableDomObject == null) {
+                    int refreshHeight = (int) immutableDomObject.getLayoutHeight();
 
-                String colorStr = (String) refresh.getDomObject().getStyles().get(Constants.Name.BACKGROUND_COLOR);
-                String bgColor = WXUtils.getString(colorStr, null);
+                    swipeLayout.setRefreshHeight(refreshHeight);
 
-                if (bgColor != null) {
-                    if (!TextUtils.isEmpty(bgColor)) {
-                        int colorInt = WXResourceUtils.getColor(bgColor);
-                        if (!(colorInt == Color.TRANSPARENT)) {
-                            swipeLayout.setRefreshBgColor(colorInt);
+                    String colorStr = (String) immutableDomObject.getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String bgColor = WXUtils.getString(colorStr, null);
+
+                    if (bgColor != null) {
+                        if (!TextUtils.isEmpty(bgColor)) {
+                            int colorInt = WXResourceUtils.getColor(bgColor);
+                            if (!(colorInt == Color.TRANSPARENT)) {
+                                swipeLayout.setRefreshBgColor(colorInt);
+                            }
                         }
                     }
+                    refreshView.setRefreshView(refresh.getHostView());
                 }
-                swipeLayout.getHeaderView().setRefreshView(refresh.getHostView());
             }
         }
     }
@@ -329,21 +336,26 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
     public void setFooterView(WXComponent loading) {
         setLoadmoreEnable(true);
         if (swipeLayout != null) {
-            if (swipeLayout.getFooterView() != null) {
-                swipeLayout.setLoadingHeight((int) loading.getDomObject().getLayoutHeight());
+            WXRefreshView refreshView = swipeLayout.getFooterView();
+            if (refreshView != null) {
+                ImmutableDomObject object = loading.getDomObject();
+                if (object != null) {
+                    int loadingHeight = (int) loading.getDomObject().getLayoutHeight();
+                    swipeLayout.setLoadingHeight(loadingHeight);
 
-                String colorStr = (String) loading.getDomObject().getStyles().get(Constants.Name.BACKGROUND_COLOR);
-                String bgColor = WXUtils.getString(colorStr, null);
+                    String colorStr = (String) loading.getDomObject().getStyles().get(Constants.Name.BACKGROUND_COLOR);
+                    String bgColor = WXUtils.getString(colorStr, null);
 
-                if (bgColor != null) {
-                    if (!TextUtils.isEmpty(bgColor)) {
-                        int colorInt = WXResourceUtils.getColor(bgColor);
-                        if (!(colorInt == Color.TRANSPARENT)) {
-                            swipeLayout.setLoadingBgColor(colorInt);
+                    if (bgColor != null) {
+                        if (!TextUtils.isEmpty(bgColor)) {
+                            int colorInt = WXResourceUtils.getColor(bgColor);
+                            if (!(colorInt == Color.TRANSPARENT)) {
+                                swipeLayout.setLoadingBgColor(colorInt);
+                            }
                         }
                     }
+                    refreshView.setRefreshView(loading.getHostView());
                 }
-                swipeLayout.getFooterView().setRefreshView(loading.getHostView());
             }
         }
     }
