@@ -19,6 +19,8 @@ This type of component supports all kinds of weex component as its child compone
 
 **Notes:** you can't give `<cell>` a `flex` value. Width of `<cell>` is equal to the width of its parent component `<list>`, and you don't need to specify its height.
 
+* `keep-scroll-position`: <span class="api-version">v0.11+</span> &lt;boolen&gt; List Whether to keep the last sliding position after inserting the Cell
+
 ### Styles
 
 **common styles**: check out the [common styles](../common-style.html)
