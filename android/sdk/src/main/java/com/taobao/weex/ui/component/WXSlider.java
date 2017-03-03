@@ -663,11 +663,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           break;
 
       }
-
-
-//      if (state == ViewPager.SCROLL_STATE_IDLE) {
-//        lastPositionOffset = 99f;
-//      }
     }
   }
 }
