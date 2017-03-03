@@ -11,7 +11,7 @@
 #import "WXTextComponentProtocol.h"
 #import "WXDatePickerManager.h"
 
-@interface WXEditComponent : WXComponent<WXTextComponentProtocol,WXDatePickerManagerDelegate,UITextViewDelegate,UITextFieldDelegate>
+@interface WXEditComponent : WXComponent<WXDatePickerManagerDelegate,UITextViewDelegate,UITextFieldDelegate>
 
 //attribute
 @property (nonatomic, strong) UIColor *placeholderColor;

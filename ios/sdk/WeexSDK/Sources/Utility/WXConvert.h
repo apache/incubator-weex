@@ -11,8 +11,8 @@
 #import "WXLog.h"
 #import "WXLayoutDefine.h"
 #import "WXType.h"
-#import "WXBoxShadow.h"
 
+@class WXBoxShadow;
 @interface WXConvert : NSObject
 
 + (BOOL)BOOL:(id)value;

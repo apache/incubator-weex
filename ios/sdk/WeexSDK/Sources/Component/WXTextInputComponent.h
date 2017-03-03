@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 #import "WXEditComponent.h"
 
-@interface WXTextInputComponent : WXEditComponent<WXTextComponentProtocol>
+@interface WXTextInputComponent : WXEditComponent
 @end

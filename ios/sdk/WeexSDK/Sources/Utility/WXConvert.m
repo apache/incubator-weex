@@ -8,6 +8,7 @@
 
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXBoxShadow.h"
 
 @implementation WXConvert
 

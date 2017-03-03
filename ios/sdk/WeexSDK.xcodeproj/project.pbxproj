@@ -219,6 +219,8 @@
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
+		C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
+		C4B3D6D51E6954300013F38D /* WXEditComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3D6D31E6954300013F38D /* WXEditComponent.m */; };
 		C4B834271DE69B09007AD27E /* WXPickerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B834251DE69B09007AD27E /* WXPickerModule.m */; };
 		C4B834281DE69B09007AD27E /* WXPickerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B834261DE69B09007AD27E /* WXPickerModule.h */; };
 		C4C30DE81E1B833D00786B6C /* WXComponent+PseudoClassManagement.m in Sources */ = {isa = PBXBuildFile; fileRef = C4C30DE61E1B833D00786B6C /* WXComponent+PseudoClassManagement.m */; };
@@ -514,6 +516,8 @@
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
+		C4B3D6D21E6954300013F38D /* WXEditComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEditComponent.h; sourceTree = "<group>"; };
+		C4B3D6D31E6954300013F38D /* WXEditComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXEditComponent.m; sourceTree = "<group>"; };
 		C4B834251DE69B09007AD27E /* WXPickerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXPickerModule.m; sourceTree = "<group>"; };
 		C4B834261DE69B09007AD27E /* WXPickerModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXPickerModule.h; sourceTree = "<group>"; };
 		C4C30DE61E1B833D00786B6C /* WXComponent+PseudoClassManagement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+PseudoClassManagement.m"; sourceTree = "<group>"; };
@@ -1030,6 +1034,8 @@
 		77E65A0A1C155E6E008B8775 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				C4B3D6D21E6954300013F38D /* WXEditComponent.h */,
+				C4B3D6D31E6954300013F38D /* WXEditComponent.m */,
 				2A837AAC1CD9DE9200AEDF03 /* WXLoadingComponent.h */,
 				2A837AAD1CD9DE9200AEDF03 /* WXLoadingComponent.m */,
 				2A837AAE1CD9DE9200AEDF03 /* WXLoadingIndicator.h */,
@@ -1222,6 +1228,7 @@
 				DCF087611DCAE161005CD6EB /* WXInvocationConfig.h in Headers */,
 				742AD7301DF98C45007DC46C /* WXResourceRequestHandler.h in Headers */,
 				77E65A151C155EB5008B8775 /* WXTextComponent.h in Headers */,
+				C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */,
 				74CC7A1C1C2BC5F800829368 /* WXCellComponent.h in Headers */,
 				74896F301D1AC79400D1D593 /* NSObject+WXSwizzle.h in Headers */,
 				DCF343671E49CAEE00A2FB34 /* WXJSExceptionInfo.h in Headers */,
@@ -1502,6 +1509,7 @@
 				DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */,
 				77D161251C02DDD10010B15B /* WXSDKInstance.m in Sources */,
 				74EF31AE1DE58BE200667A07 /* WXURLRewriteDefaultImpl.m in Sources */,
+				C4B3D6D51E6954300013F38D /* WXEditComponent.m in Sources */,
 				C4C30DE81E1B833D00786B6C /* WXComponent+PseudoClassManagement.m in Sources */,
 				74915F481C8EB02B00BEBCC0 /* WXAssert.m in Sources */,
 				59A596251CB6311F0012CD52 /* WXStorageModule.m in Sources */,
