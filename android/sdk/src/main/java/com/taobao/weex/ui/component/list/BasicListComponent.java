@@ -222,7 +222,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.taobao.weex.WXEnvironment;
@@ -428,7 +427,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             if (holder != null
                 && holder.getComponent() != null
                 && !holder.getComponent().isUsing()) {
-              recycleImage(holder.getView());
+               holder.recycled();
             }
           }
           recycleViewList.clear();
@@ -929,8 +928,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
     if (holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
-      holder.getComponent().bindData(component);
-//              holder.getComponent().refreshData(component);
+      if(holder.isRecycled()) {
+        holder.bindData(component);
+      }
     }
 
   }
@@ -1183,25 +1183,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         continue;
       }
       component.notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
-    }
-  }
-
-  private void recycleImage(View view) {
-    if (view instanceof ImageView) {
-      if (getInstance().getImgLoaderAdapter() != null) {
-        getInstance().getImgLoaderAdapter().setImage(null, (ImageView) view,
-            null, null);
-      } else {
-        if (WXEnvironment.isApkDebugable()) {
-          throw new WXRuntimeException("getImgLoaderAdapter() == null");
-        }
-        WXLogUtils.e("Error getImgLoaderAdapter() == null");
-      }
-
-    } else if (view instanceof ViewGroup) {
-      for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-        recycleImage(((ViewGroup) view).getChildAt(i));
-      }
     }
   }
 

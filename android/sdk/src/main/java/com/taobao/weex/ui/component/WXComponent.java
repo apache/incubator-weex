@@ -1288,7 +1288,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+  public void recycled() {
 
+  }
 
   public void destroy() {
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {

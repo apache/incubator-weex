@@ -214,6 +214,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -221,6 +222,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
@@ -229,6 +231,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.WXDomUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -360,6 +363,21 @@ public class WXImage extends WXComponent<ImageView> {
       setLocalSrc(rewrited);
     } else {
       setRemoteSrc(rewrited);
+    }
+  }
+
+  @Override
+  public void recycled() {
+    super.recycled();
+
+    if (getInstance().getImgLoaderAdapter() != null) {
+      getInstance().getImgLoaderAdapter().setImage(null, mHost,
+              null, null);
+    } else {
+      if (WXEnvironment.isApkDebugable()) {
+        throw new WXRuntimeException("getImgLoaderAdapter() == null");
+      }
+      WXLogUtils.e("Error getImgLoaderAdapter() == null");
     }
   }
 
