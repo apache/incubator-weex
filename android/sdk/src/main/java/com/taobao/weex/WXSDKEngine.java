@@ -263,13 +263,16 @@ public class WXSDKEngine {
       public void run() {
         long start = System.currentTimeMillis();
         WXSDKManager sm = WXSDKManager.getInstance();
+        sm.onSDKEngineInitialize();
         if(config != null ) {
           sm.setInitConfig(config);
           if(config.getDebugAdapter()!=null){
             config.getDebugAdapter().initDebug(application);
           }
         }
-        WXSoInstallMgrSdk.init(application, sm.getIWXSoLoaderAdapter());
+        WXSoInstallMgrSdk.init(application,
+                              sm.getIWXSoLoaderAdapter(),
+                              sm.getWXStatisticsListener());
         boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!isSoInitSuccess) {
           return;

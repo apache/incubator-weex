@@ -132,6 +132,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
@@ -189,6 +190,7 @@ public class WXSDKManager {
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
   private IWXStorageAdapter mIWXStorageAdapter;
+  private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
   private WXValidateProcessor mWXValidateProcessor;
@@ -199,6 +201,20 @@ public class WXSDKManager {
     mWXRenderManager = new WXRenderManager();
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  public void registerStatisticsListener(IWXStatisticsListener listener) {
+    mStatisticsListener = listener;
+  }
+
+  public IWXStatisticsListener getWXStatisticsListener() {
+    return mStatisticsListener;
+  }
+
+  public void onSDKEngineInitialize() {
+    if (mStatisticsListener != null) {
+      mStatisticsListener.onSDKEngineInitialize();
+    }
   }
 
   public void setNeedInitV8(boolean need) {

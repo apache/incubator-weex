@@ -849,8 +849,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   public void commitJSBridgeAlarmMonitor(String instanceId, WXErrorCode errCode, String errMsg) {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance == null || errCode == null) {
+      return;
+    }
+    // TODO: We should move WXPerformance and IWXUserTrackAdapter
+    // into a adapter level.
+    // comment out the line below to prevent commiting twice.
+    //instance.commitUTStab(WXConst.JS_BRIDGE, errCode, errMsg);
+
     IWXUserTrackAdapter adapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (instance == null || adapter == null || errCode == null) {
+    if (adapter == null) {
       return;
     }
     WXPerformance performance = new WXPerformance();
@@ -864,8 +872,17 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public void commitJSFrameworkAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {
+    if (TextUtils.isEmpty(type) || errorCode == null) {
+      return;
+    }
+    if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+      WXSDKManager.getInstance().getWXStatisticsListener().onException("0",
+          errorCode.getErrorCode(),
+          TextUtils.isEmpty(errMsg) ? errorCode.getErrorMsg() : errMsg);
+    }
+
     final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
-    if (userTrackAdapter == null || TextUtils.isEmpty(type) || errorCode == null) {
+    if (userTrackAdapter == null) {
       return;
     }
     WXPerformance performance = new WXPerformance();
@@ -1076,6 +1093,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         return;
       }
       try {
+        if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+          WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkStart();
+        }
+
         long start = System.currentTimeMillis();
         if(mWXBridge.initFramework(framework, assembleDefaultOptions())==INIT_FRAMEWORK_OK){
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
@@ -1083,6 +1104,11 @@ public class WXBridgeManager implements Callback,BactchExecutor {
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
           WXLogUtils.renderPerformanceLog("SDKInitTime", WXEnvironment.sSDKInitTime);
           mInit = true;
+
+          if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+            WXSDKManager.getInstance().getWXStatisticsListener().onJsFrameworkReady();
+          }
+
           execRegisterFailTask();
           WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
