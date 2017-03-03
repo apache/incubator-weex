@@ -1,14 +1,14 @@
-import { extend, throttle } from '../utils'
+import { extend } from '../utils'
 // import { validateStyles } from '../validator'
 
-const lazyloadAwait = 16  // milliseconds.
-let throttleLazyload
-function getThrottleLazyload (context, wait) {
-  if (!throttleLazyload) {
-    throttleLazyload = throttle(context._fireLazyload, wait)
-  }
-  return throttleLazyload
-}
+// const lazyloadAwait = 16  // milliseconds.
+// let throttleLazyload
+// function getThrottleLazyload (context, wait) {
+//   if (!throttleLazyload) {
+//     throttleLazyload = throttle(context._fireLazyload, wait)
+//   }
+//   return throttleLazyload
+// }
 
 /**
  * get resize (stetch|cover|contain) related styles.
@@ -47,11 +47,11 @@ export default {
   },
 
   updated () {
-    getThrottleLazyload(this, lazyloadAwait)()
+    this._fireLazyload()
   },
 
   mounted () {
-    getThrottleLazyload(this, lazyloadAwait)()
+    this._fireLazyload()
   },
 
   render (createElement) {
