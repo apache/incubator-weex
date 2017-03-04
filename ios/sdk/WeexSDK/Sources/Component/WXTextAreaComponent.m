@@ -58,9 +58,8 @@ typedef UITextView WXTextAreaView;
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
         
-        CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:[UIFont systemFontSize]]}];
-        computedSize.height = computedSize.height * _rows;
-        //TODO:more elegant way to use max and min constrained size
+        CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:weakSelf.textView.font.pointSize]}];
+        computedSize.height = _rows? computedSize.height *weakSelf.rows + (CorrectY + CorrectY/2):0;
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
             computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
         }
@@ -197,13 +196,6 @@ typedef UITextView WXTextAreaView;
 -(void)setRows:(NSUInteger)rows
 {
     _rows = rows;
-    //update frame by rows
-    CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:_textView.font.pointSize]}];
-    computedSize.height = computedSize.height * _rows;
-    CGRect frame = _textView.frame;
-    frame.size.height = _rows?computedSize.height + (CorrectY + CorrectY/2):0;
-    _textView.frame = frame;
-    
     [self setNeedsLayout];
 }
 
