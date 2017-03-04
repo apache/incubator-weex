@@ -8,13 +8,16 @@
 
 #import "WXTextAreaComponent.h"
 #import "WXUtility.h"
+#import "WXComponent+Layout.h"
 
 #define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
+#define CorrectY 8 // textview fill text 8 pixel from top
 typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
 
 @property (nonatomic, strong) WXTextAreaView *textView;
+@property (nonatomic) NSUInteger rows;
 
 @end
 
@@ -56,7 +59,7 @@ typedef UITextView WXTextAreaView;
     return ^CGSize (CGSize constrainedSize) {
         
         CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:[UIFont systemFontSize]]}];
-        computedSize.height = computedSize.height * self.rows;
+        computedSize.height = computedSize.height * _rows;
         //TODO:more elegant way to use max and min constrained size
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
             computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
@@ -189,6 +192,19 @@ typedef UITextView WXTextAreaView;
 -(void)setFont:(UIFont *)font
 {
     [_textView setFont:font];
+}
+
+-(void)setRows:(NSUInteger)rows
+{
+    _rows = rows;
+    //update frame by rows
+    CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:_textView.font.pointSize]}];
+    computedSize.height = computedSize.height * _rows;
+    CGRect frame = _textView.frame;
+    frame.size.height = _rows?computedSize.height + (CorrectY + CorrectY/2):0;
+    _textView.frame = frame;
+    
+    [self setNeedsLayout];
 }
 
 #pragma mark -Private Method
