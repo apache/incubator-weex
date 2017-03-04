@@ -121,11 +121,6 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     return self;
 }
 
--(NSUInteger )rows
-{
-    return _rows;
-}
-
 #pragma mark - lifeCircle
 
 - (void)viewDidLoad
@@ -147,6 +142,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     [self setTextColor:_colorForStyle];
     [self setText:_value];
     [self setEnabled:!_disabled];
+    [self setRows:_rows];
     [self setReturnKeyType:_returnKeyType];
     [self updatePattern];
     
@@ -276,6 +272,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 {
 }
 
+-(void)setRows:(NSUInteger)rows
+{
+}
+
 #pragma mark - Add Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -356,8 +356,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     if (attributes[@"rows"]) {
         _rows = [attributes[@"rows"] integerValue];
+        [self setRows:_rows];
     } else {
         _rows = 2;
+        [self setRows:_rows];
     }
 }
 
