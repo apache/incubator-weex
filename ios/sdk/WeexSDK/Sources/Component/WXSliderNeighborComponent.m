@@ -1748,11 +1748,6 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         __strong typeof(self) strongSelf = weakSelf;
         if (strongSelf) {
             currentView.alpha = 1.0;
-            if (strongSelf->currentItemScale > 1) {
-                strongSelf->currentItemScale = 1;
-            }else if(strongSelf->currentItemScale < CGFLOAT_MIN) {
-                strongSelf->currentItemScale = CGFLOAT_MIN;
-            }
             if (fabs(strongSelf->currentItemScale) > CGFLOAT_MIN) {
                 transfrom = CGAffineTransformConcat(transfrom,CGAffineTransformMakeScale(strongSelf->currentItemScale, strongSelf->currentItemScale));
             }
