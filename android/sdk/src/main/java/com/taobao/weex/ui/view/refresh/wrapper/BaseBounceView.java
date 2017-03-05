@@ -230,23 +230,22 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
 
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeLayout swipeLayout;
-    private T innerView;
+    private T mInnerView;
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
     }
 
-    public BaseBounceView(Context context, AttributeSet attrs,int orientataion) {
+    public BaseBounceView(Context context, AttributeSet attrs,int orientation) {
         super(context, attrs);
-        mOrientation = orientataion;
-        init(context);
+        mOrientation = orientation;
     }
 
     public int getOrientation(){
         return mOrientation;
     }
 
-    private void init(Context context) {
+    public void init(Context context) {
         createBounceView(context);
     }
 
@@ -275,15 +274,15 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
     }
 
     /**
-     * Init Swipelayout
+     * Init wipelayout
      */
     private WXSwipeLayout createBounceView(Context context) {
         swipeLayout = new WXSwipeLayout(context);
         swipeLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        innerView = setInnerView(context);
-        if (innerView == null)
+        mInnerView = setInnerView(context);
+        if (mInnerView == null)
             return null;
-        swipeLayout.addView(innerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        swipeLayout.addView(mInnerView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         addView(swipeLayout, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         return swipeLayout;
     }
@@ -292,7 +291,7 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
      * @return the child of swipelayout : recyclerview or scrollview
      */
     public T getInnerView() {
-        return innerView;
+        return mInnerView;
     }
 
     public abstract T setInnerView(Context context);

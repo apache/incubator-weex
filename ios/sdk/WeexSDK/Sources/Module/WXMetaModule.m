@@ -22,9 +22,9 @@ WX_EXPORT_METHOD(@selector(setViewport:))
     id viewportWidth = viewportArguments[@"width"];
     if ([viewportWidth isKindOfClass:[NSString class]]) {
         if ([viewportWidth isEqualToString:@"device-width"]) {
-            viewportWidthFloat = [WXUtility portraitScreenSize].width * WXScreenScale();
+            viewportWidthFloat = [WXUtility portraitScreenSize].width;
         } else if ([viewportWidth isEqualToString:@"device-height"]) {
-            viewportWidthFloat = [WXUtility portraitScreenSize].height * WXScreenScale();
+            viewportWidthFloat = [WXUtility portraitScreenSize].height;
         } else {
             viewportWidthFloat = [WXConvert CGFloat:viewportWidth];
         }

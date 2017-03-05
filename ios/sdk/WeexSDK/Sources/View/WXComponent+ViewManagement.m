@@ -100,7 +100,7 @@
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
     _positionType = styles[@"position"] ? [WXConvert WXPositionType:styles[@"position"]] : WXPositionTypeRelative;
     _transform = styles[@"transform"] || styles[@"transformOrigin"] ?
-    [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance] :
+    [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:styles[@"transformOrigin"]] instance:self.weexInstance] :
     [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
     _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
     if (_boxShadow) {
@@ -172,7 +172,7 @@
     
     if (styles[@"transformOrigin"] || styles[@"transform"]) {
         id transform = styles[@"transform"] ? : self.styles[@"transform"];
-        id transformOrigin = styles[@"transformOrigin"] ? : self.styles[@"transformOrigin"];
+        id transformOrigin = styles[@"transformOrigin"] ? [WXConvert NSString:styles[@"transformOrigin"]] : [WXConvert NSString:self.styles[@"transformOrigin"]];
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:transform] origin:transformOrigin instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
