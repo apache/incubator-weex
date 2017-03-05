@@ -265,23 +265,56 @@
     }
     
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
-    if (_sections.count <= indexPath.section) {
-        WXSection *section = [WXSection new];
+    
+    if ([subcomponent isKindOfClass:[WXHeaderComponent class]] || _sections.count <= indexPath.section) {
+        // conditions to insert section: insert a header or insert first cell of table view
+        // this will be updated by recycler's update controller in the future
+        WXSection *insertSection = [WXSection new];
+        BOOL keepScrollPostion = NO;
         if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
-            section.header = (WXHeaderComponent*)subcomponent;
+            WXHeaderComponent *header = (WXHeaderComponent*)subcomponent;
+            insertSection.header = header;
         }
-        //TODO: consider insert header at middle
-        [_sections addObject:section];
-        NSUInteger index = [_sections indexOfObject:section];
-        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
-        WXSection *completedSection = [section copy];
+        
+        NSUInteger insertIndex = indexPath.section;
+        WXSection *reloadSection;
+        if (insertIndex > 0 && insertIndex < _sections.count) {
+            // insert a header in the middle, one section may divide into two
+            // so the original section need to be reloaded
+            NSArray *rowsToSeparate = reloadSection.rows;
+            NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
+            if (indexPathBeforeHeader.row != _sections[insertIndex - 1].rows.count - 1) {
+                reloadSection = _sections[insertIndex - 1];
+                insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexPathBeforeHeader.row + 1, rowsToSeparate.count - indexPathBeforeHeader.row - 1)] mutableCopy];
+                reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexPathBeforeHeader.row + 1)]  mutableCopy];
+            }
+        }
+    
+        [_sections insertObject:insertSection atIndex:insertIndex];
+        WXSection *completedInsertSection = [insertSection mutableCopy];
+        WXSection *completedReloadSection;
+        if (reloadSection) {
+            completedReloadSection = [reloadSection mutableCopy];
+        }
         
         [self.weexInstance.componentManager _addUITask:^{
-            [_completedSections addObject:completedSection];
-            WXLogDebug(@"Insert section:%ld",  (unsigned long)[_completedSections indexOfObject:completedSection]);
+            WXLogDebug(@"Insert section:%ld", insertIndex);
+            [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
+            if (completedReloadSection) {
+                WXLogDebug(@"Reload section:%ld", insertIndex - 1);
+                _completedSections[insertIndex - 1] = completedReloadSection;
+            }
+            
+            [_tableView beginUpdates];
+            
             [UIView performWithoutAnimation:^{
-                [_tableView insertSections:indexSet withRowAnimation:UITableViewRowAnimationNone];
+                [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPostion animation:UITableViewRowAnimationNone];
+                if (completedReloadSection) {
+                    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:index - 1] withRowAnimation:UITableViewRowAnimationNone];
+                }
             }];
+            
+            [_tableView endUpdates];
         }];
     }
 }
@@ -646,6 +679,27 @@
     }
 
     return [NSIndexPath indexPathForRow:row inSection:section];
+}
+
+- (void)_insertTableViewSectionAtIndex:(NSUInteger)section keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+{
+    CGFloat adjustment = 0;
+    
+    // keep the scroll position when inserting or deleting cells by adjusting the content offset
+    if (keepScrollPosition) {
+        NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
+        if (section <= top.section) {
+            adjustment = [self tableView:_tableView heightForHeaderInSection:section];
+        }
+    }
+
+    [_tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
+    
+    if (keepScrollPosition) {
+        CGPoint afterContentOffset = _tableView.contentOffset;
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
+        _tableView.contentOffset = newContentOffset;
+    }
 }
 
 - (void)_insertTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
