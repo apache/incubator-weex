@@ -766,7 +766,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
       if (isKeepScrollPosition) {
         int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
-        ((LinearLayoutManager)view.getInnerView().getLayoutManager()).scrollToPosition(last);
+        view.getInnerView().getLayoutManager().scrollToPosition(last);
         view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
       } else {
         view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
