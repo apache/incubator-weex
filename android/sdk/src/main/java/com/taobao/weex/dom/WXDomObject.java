@@ -240,6 +240,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static final String ROOT = "_root";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
+  static final WXDomObject DESTROYED = new WXDomObject();
+  static{
+    DESTROYED.mRef = "_destroyed";
+  }
   private AtomicBoolean sDestroy = new AtomicBoolean();
 
   private int mViewPortWidth =750;
