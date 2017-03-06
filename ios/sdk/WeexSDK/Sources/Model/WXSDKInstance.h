@@ -33,6 +33,11 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, assign) BOOL isRootViewFrozen;
 
 /**
+ * Which indicates current instance needs to be validated or not to load,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needValidate;
+
+/**
  * The scriptURL of weex bundle.
  **/
 @property (nonatomic, strong) NSURL *scriptURL;
