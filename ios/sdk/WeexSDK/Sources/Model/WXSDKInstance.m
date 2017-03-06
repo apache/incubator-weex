@@ -26,6 +26,7 @@
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXValidateProtocol.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -125,6 +126,8 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
