@@ -227,6 +227,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;
@@ -343,13 +344,18 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       addFocusChangeListener(new OnFocusChangeListener() {
         @Override
         public void onFocusChange(boolean hasFocus) {
+          ImmutableDomObject domObject = getDomObject();
+          if(domObject == null){
+            return;
+          }
+
           if (hasFocus) {
             mLastValue = text.getText().toString();
           } else {
             CharSequence newValue = text.getText();
             newValue = newValue == null ? "" : newValue;
             if (!newValue.toString().equals(mLastValue)) {
-              String event = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+              String event = domObject.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
               fireEvent(event, newValue.toString());
               mLastValue = text.getText().toString();
             }
@@ -360,11 +366,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       addEditorActionListener(new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-          if (actionId == mEditorAction) {
+          ImmutableDomObject domObject = getDomObject();
+          if (domObject != null && actionId == mEditorAction) {
             CharSequence newValue = text.getText();
             newValue = newValue == null ? "" : newValue;
             if (!newValue.toString().equals(mLastValue)) {
-              String eventName = getDomObject().getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
+              String eventName = domObject.getEvents().contains(Constants.Event.CHANGE) ? Constants.Event.CHANGE : null;
               fireEvent(eventName, newValue.toString());
               mLastValue = text.getText().toString();
             }
@@ -386,11 +393,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-          if (mBeforeText.equals(s.toString())) {
+          ImmutableDomObject domObject = getDomObject();
+          if (mBeforeText.equals(s.toString()) || domObject == null) {
             return;
           }
 
-          String event = getDomObject().getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
+          String event = domObject.getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
           fireEvent(event, s.toString());
 
           mBeforeText = s.toString();
