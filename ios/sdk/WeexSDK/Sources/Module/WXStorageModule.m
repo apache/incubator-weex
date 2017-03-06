@@ -88,7 +88,7 @@ WX_EXPORT_METHOD(@selector(removeItem:callback:))
     if (!value) {
         [self executeRemoveItem:key];
         if (callback) {
-            callback(@{@"result":@"failed"});
+            callback(@{@"result":@"failed",@"data":@"undefined"});
         }
         return;
     }
