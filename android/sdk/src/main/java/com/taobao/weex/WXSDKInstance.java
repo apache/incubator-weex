@@ -294,6 +294,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
   private boolean trackComponent;
+  private boolean mNeedValidate = false;
+
+  public boolean isNeedValidate() {
+    return mNeedValidate;
+  }
   /*
    *  store custom ViewPort Width
    */
@@ -559,6 +564,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
 
     Map<String, Object> renderOptions = options;
     if (renderOptions == null) {
@@ -1258,6 +1266,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setBundleUrl(String url){
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
   }
 
   public void onRootCreated(WXComponent root) {

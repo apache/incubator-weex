@@ -39,6 +39,7 @@
 - (void)insertItemView:(UIView *)view atIndex:(NSInteger)index;
 - (void)removeItemView:(UIView *)view;
 - (void)scroll2ItemView:(NSInteger)index animated:(BOOL)animated;
+- (void)layoutItemViews;
 - (void)loadData;
 
 @end
@@ -157,6 +158,11 @@
     }
 }
 
+- (void)layoutItemViews {
+    [self _resortItemViews];
+    [self _resetItemFrames];
+}
+
 - (void)loadData
 {
     self.scrollView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
@@ -168,8 +174,7 @@
 #pragma mark Private Methods
 
 - (void)_configSubViews {
-    [self _resortItemViews];
-    [self _resetItemFrames];
+    [self layoutItemViews];
     [self _scroll2Center];
     [self _resetItemCountLessThanOrEqualToTwo];
     [self setNeedsLayout];
@@ -498,7 +503,8 @@
         _index = [attributes[@"index"] integerValue];
         
         self.currentIndex = _index;
-        [_sliderView scroll2ItemView:self.currentIndex animated:YES];
+        self.sliderView.currentIndex = _index;
+        [self.sliderView layoutItemViews];
     }
     
     if (attributes[@"scrollable"]) {
