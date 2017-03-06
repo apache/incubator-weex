@@ -21,17 +21,9 @@
     if (self) {
         _async = YES;
         _isNeedJoinLayoutSystem = NO;
-        _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
     }
     
     return self;
-}
-
-- (void)updateAttributes:(NSDictionary *)attributes
-{
-    if (attributes[@"keepScrollPosition"]) {
-        _keepScrollPosition = [WXConvert BOOL:attributes[@"keepScrollPosition"]];
-    }
 }
 
 - (BOOL)isSticky
