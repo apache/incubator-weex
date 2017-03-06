@@ -217,7 +217,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -684,8 +683,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
-              Log.e("showSticky","pos:"+pos);
-              Log.e("showSticky","fVisible:"+fVisible);
             }
           }
 
@@ -697,15 +694,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           int top = location[1] - parentLocation[1];
 
           boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
-          Log.e("showSticky","beforeFirstVisibleItem:"+beforeFirstVisibleItem);
-          Log.e("showSticky","top:"+top);
-          Log.e("showSticky","dy:"+dy);
-          Log.e("showSticky","showSticky:"+showSticky);
           boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
           } else if (removeSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
+          }else{
+            bounceRecyclerView.updateStickyView();
           }
           cell.setLocationFromStart(top);
         }

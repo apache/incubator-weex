@@ -323,6 +323,11 @@ class SimpleRecyclerView extends WXRecyclerView implements ListComponentView{
   }
 
   @Override
+  public void updateStickyView() {
+
+  }
+
+  @Override
   public RecyclerViewBaseAdapter getRecyclerViewBaseAdapter() {
     return mAdapter;
   }
