@@ -208,6 +208,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXHeader;
 
 import java.lang.ref.WeakReference;
 
@@ -250,6 +251,10 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
       mComponent.get().bindData(component);
       isRecycled = false;
     }
+  }
+    
+  public boolean isFullSpan() {
+    return mComponent != null && mComponent.get() instanceof WXHeader;
   }
 
   public boolean canRecycled() {
