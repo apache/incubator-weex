@@ -217,6 +217,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -229,7 +230,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
@@ -684,6 +684,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+              Log.e("showSticky","pos:"+pos);
+              Log.e("showSticky","fVisible:"+fVisible);
             }
           }
 
@@ -695,6 +697,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           int top = location[1] - parentLocation[1];
 
           boolean showSticky = beforeFirstVisibleItem && cell.getLocationFromStart() >= 0 && top <= 0 && dy >= 0;
+          Log.e("showSticky","beforeFirstVisibleItem:"+beforeFirstVisibleItem);
+          Log.e("showSticky","top:"+top);
+          Log.e("showSticky","dy:"+dy);
+          Log.e("showSticky","showSticky:"+showSticky);
           boolean removeSticky = cell.getLocationFromStart() <= 0 && top > 0 && dy <= 0;
           if (showSticky) {
             bounceRecyclerView.notifyStickyShow(cell);
@@ -762,8 +768,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       } else {
         view.getInnerView().setItemAnimator(null);
       }
-      boolean isKeepScrollPosition = isKeepScrollPosition(child);
+      boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
       if (isKeepScrollPosition) {
+        int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
+        ((LinearLayoutManager)view.getInnerView().getLayoutManager()).scrollToPosition(last);
         view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
       } else {
         view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
@@ -793,11 +801,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @param child Need to insert the component
    * @return fixed=true
    */
-  private boolean isKeepScrollPosition(WXComponent child) {
+  private boolean isKeepScrollPosition(WXComponent child,int index) {
     ImmutableDomObject domObject = child.getDomObject();
     if (domObject != null) {
       Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
-      if (WXUtils.getBoolean(attr, false)) {
+      if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
         return true;
       }
     }
