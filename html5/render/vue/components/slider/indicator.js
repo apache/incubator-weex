@@ -31,7 +31,6 @@ function _render (context, h) {
   }
   if (!context.$vnode.context._isMounted) {
     context.$nextTick(function () {
-      console.log('next tick')
       _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
     })
   }
