@@ -224,31 +224,33 @@
         // conditions to insert section: insert a header or insert first cell of table view
         // this will be updated by recycler's update controller in the future
         WXSection *insertSection = [WXSection new];
-        BOOL keepScrollPostion = NO;
+        BOOL keepScrollPosition = NO;
         if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
             WXHeaderComponent *header = (WXHeaderComponent*)subcomponent;
             insertSection.header = header;
+            keepScrollPosition = header.keepScrollPosition;
         }
         
         NSUInteger insertIndex = indexPath.section;
         WXSection *reloadSection;
-        if (insertIndex > 0 && insertIndex < _sections.count) {
+        if (insertIndex > 0 && insertIndex <= _sections.count
+            && [subcomponent isKindOfClass:[WXHeaderComponent class]]) {
             // insert a header in the middle, one section may divide into two
             // so the original section need to be reloaded
-            NSArray *rowsToSeparate = reloadSection.rows;
             NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
             if (indexPathBeforeHeader.row != _sections[insertIndex - 1].rows.count - 1) {
                 reloadSection = _sections[insertIndex - 1];
+                NSArray *rowsToSeparate = reloadSection.rows;
                 insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexPathBeforeHeader.row + 1, rowsToSeparate.count - indexPathBeforeHeader.row - 1)] mutableCopy];
                 reloadSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(0, indexPathBeforeHeader.row + 1)]  mutableCopy];
             }
         }
     
         [_sections insertObject:insertSection atIndex:insertIndex];
-        WXSection *completedInsertSection = [insertSection mutableCopy];
+        WXSection *completedInsertSection = [insertSection copy];
         WXSection *completedReloadSection;
         if (reloadSection) {
-            completedReloadSection = [reloadSection mutableCopy];
+            completedReloadSection = [reloadSection copy];
         }
         
         [self.weexInstance.componentManager _addUITask:^{
@@ -259,16 +261,18 @@
                 _completedSections[insertIndex - 1] = completedReloadSection;
             }
             
-            [_tableView beginUpdates];
-            
             [UIView performWithoutAnimation:^{
-                [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPostion animation:UITableViewRowAnimationNone];
+                [_tableView beginUpdates];
+                
+                [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+                
                 if (completedReloadSection) {
-                    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:index - 1] withRowAnimation:UITableViewRowAnimationNone];
+                    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:insertIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
                 }
+                
+                [_tableView endUpdates];
             }];
             
-            [_tableView endUpdates];
         }];
     }
 }
@@ -300,7 +304,43 @@
 
 - (void)headerDidRemove:(WXHeaderComponent *)header
 {
+    NSUInteger deleteIndex = [self indexForHeader:header sections:_sections];
+    // this will be updated by recycler's update controller in the future
+    WXSection *deleteSection = _sections[deleteIndex];
+    WXSection *reloadSection;
+    if (deleteIndex > 0 && deleteSection.rows.count > 0) {
+        // delete a header in the middle, two sections merge into one
+        // so the one section need to be reloaded
+        reloadSection = _sections[deleteIndex - 1];
+        reloadSection.rows = [[reloadSection.rows arrayByAddingObjectsFromArray:deleteSection.rows] mutableCopy];
+    }
     
+    [_sections removeObjectAtIndex:deleteIndex];
+    WXSection *completedReloadSection;
+    if (reloadSection) {
+        completedReloadSection = [reloadSection copy];
+    }
+    BOOL keepScrollPosition = header.keepScrollPosition;
+    
+    [self.weexInstance.componentManager _addUITask:^{
+        WXLogDebug(@"delete section:%ld", deleteIndex);
+        [_completedSections removeObjectAtIndex:deleteIndex];
+        if (completedReloadSection) {
+            WXLogDebug(@"Reload section:%ld", deleteIndex - 1);
+            _completedSections[deleteIndex - 1] = completedReloadSection;
+        }
+        
+        [UIView performWithoutAnimation:^{
+            [_tableView beginUpdates];
+            [self _deleteTableViewSectionAtIndex:deleteIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+            if (completedReloadSection) {
+                [_tableView reloadSections:[NSIndexSet indexSetWithIndex:deleteIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
+            }
+            
+            [_tableView endUpdates];
+        }];
+        
+    }];
 }
 
 #pragma mark - WXCellRenderDelegate
@@ -652,71 +692,77 @@
     return [NSIndexPath indexPathForRow:row inSection:section];
 }
 
-- (void)_insertTableViewSectionAtIndex:(NSUInteger)section keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+- (void)_performUpdates:(void(^)())updates withKeepScrollPosition:(BOOL)keepScrollPosition adjustmentBlock:(CGFloat(^)(NSIndexPath *topVisibleCell))adjustmentBlock
 {
     CGFloat adjustment = 0;
     
-    // keep the scroll position when inserting or deleting cells by adjusting the content offset
+    // keep the scroll position when inserting or deleting sections/rows by adjusting the content offset
     if (keepScrollPosition) {
         NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
-        if (section <= top.section) {
-            adjustment = [self tableView:_tableView heightForHeaderInSection:section];
-        }
+        adjustment = adjustmentBlock(top);
     }
-
-    [_tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
+    
+    updates();
     
     if (keepScrollPosition) {
         CGPoint afterContentOffset = _tableView.contentOffset;
         CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
         _tableView.contentOffset = newContentOffset;
     }
+    
+    [self handleAppear];
+}
+
+- (void)_insertTableViewSectionAtIndex:(NSUInteger)section keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+{
+    [self _performUpdates:^{
+        [_tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
+    } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
+        if (section <= top.section) {
+            return [self tableView:_tableView heightForHeaderInSection:section];
+        } else {
+            return 0.0;
+        }
+    }];
+}
+
+- (void)_deleteTableViewSectionAtIndex:(NSUInteger)section keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
+{
+    [self _performUpdates:^{
+        [_tableView deleteSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:animation];
+    } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
+        if (section <= top.section) {
+            return [self tableView:_tableView heightForHeaderInSection:section];
+        } else {
+            return 0.0;
+        }
+    }];
 }
 
 - (void)_insertTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
 {
-    CGFloat adjustment = 0;
-    
-    // keep the scroll position when inserting or deleting cells by adjusting the content offset
-    if (keepScrollPosition) {
-        NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
+    [self _performUpdates:^{
+        [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+    } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
         if ([indexPath compare:top] <= 0) {
-            adjustment = [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+            return [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+        } else {
+            return 0.0;
         }
-    }
-    
-    [_tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
-    
-    if (keepScrollPosition) {
-        CGPoint afterContentOffset = _tableView.contentOffset;
-        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
-        _tableView.contentOffset = newContentOffset;
-    }
-    
-    [self handleAppear];
+    }];
 }
 
 - (void)_deleteTableViewCellAtIndexPath:(NSIndexPath *)indexPath keepScrollPosition:(BOOL)keepScrollPosition animation:(UITableViewRowAnimation)animation
 {
-    CGFloat adjustment = 0;
-    
-    // keep the scroll position when inserting or deleting cells by adjusting the content offset
-    if (keepScrollPosition) {
-        NSIndexPath *top = _tableView.indexPathsForVisibleRows.firstObject;
+    [self _performUpdates:^{
+        [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
+    } withKeepScrollPosition:keepScrollPosition adjustmentBlock:^CGFloat(NSIndexPath *top) {
         if ([indexPath compare:top] <= 0) {
-            adjustment = [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+            return [self tableView:_tableView heightForRowAtIndexPath:indexPath];
+        } else {
+            return 0.0;
         }
-    }
-    
-    [_tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:animation];
-    
-    if (keepScrollPosition) {
-        CGPoint afterContentOffset = _tableView.contentOffset;
-        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y - adjustment > 0 ? afterContentOffset.y - adjustment : 0);
-        _tableView.contentOffset = newContentOffset;
-    }
-    
-    [self handleAppear];
+    }];
 }
 
 - (void)fixFlicker

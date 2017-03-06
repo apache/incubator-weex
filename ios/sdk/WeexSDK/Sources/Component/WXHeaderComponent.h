@@ -23,5 +23,6 @@
 
 @property (nonatomic, weak) id<WXHeaderRenderDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL isSticky;
+@property (nonatomic, assign, readonly) BOOL keepScrollPosition;
 
 @end
