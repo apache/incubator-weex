@@ -204,6 +204,9 @@
  */
 package com.taobao.weex.ui.component.list;
 
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 

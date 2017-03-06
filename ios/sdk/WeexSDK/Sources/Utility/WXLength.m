@@ -11,38 +11,25 @@
 
 @implementation WXLength
 {
-    float _floatValue;
-    int _intValue;
+    float _value;
     WXLengthType _type;
-    BOOL _isFloat;
 }
 
-+ (instancetype)lengthWithFloat:(float)value type:(WXLengthType)type
++ (instancetype)lengthWithValue:(float)value type:(WXLengthType)type
 {
     WXLength *length = [WXLength new];
-    length->_floatValue = value;
+    length->_value = value;
     length->_type = type;
-    length->_isFloat = YES;
     return length;
 }
 
-+ (instancetype)lengthWithInt:(int)value type:(WXLengthType)type
+- (float)valueForMaximumValue:(float)maximumValue
 {
-    WXLength *length = [WXLength new];
-    length->_intValue = value;
-    length->_type = type;
-    length->_isFloat = NO;
-    return length;
-}
-
-- (float)valueForMaximum:(float)maximumValue
-{
-    
     switch (_type) {
         case WXLengthTypeFixed:
-            return _isFloat ? _floatValue : _intValue;
+            return _value;
         case WXLengthTypePercent:
-            return maximumValue * (_isFloat ? _floatValue : _intValue) / 100.0;
+            return maximumValue * _value / 100.0;
         case WXLengthTypeAuto:
             return maximumValue;
         default:
@@ -51,22 +38,9 @@
     }
 }
 
-- (int)intValue
-{
-    WXAssert(!_isFloat, @"call `intValue` for non-int length");
-    return _intValue;
-}
-
-- (float)floatValue
-{
-    WXAssert(_isFloat,  @"call `floatValue` for non-float length");
-    return _floatValue;
-}
-
 - (BOOL)isEqualToLength:(WXLength *)length
 {
-    return length && _type == length->_type && _isFloat == length->_isFloat
-    && _floatValue == length->_floatValue && _intValue == length->_intValue;
+    return length && _type == length->_type && _value == length->_value;
 }
 
 - (BOOL)isFixed
@@ -82,11 +56,6 @@
 - (BOOL)isAuto
 {
     return _type == WXLengthTypeAuto;
-}
-
-- (BOOL)isNormal
-{
-    return _type == WXLengthTypeNormal;
 }
 
 @end

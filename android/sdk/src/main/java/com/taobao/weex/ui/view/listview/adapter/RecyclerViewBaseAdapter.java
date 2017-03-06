@@ -205,7 +205,6 @@
 package com.taobao.weex.ui.view.listview.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.ViewGroup;
 
 
@@ -214,6 +213,7 @@ import android.view.ViewGroup;
  */
 public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends RecyclerView.Adapter<T> {
 
+  private String TAG = "RecyclerViewBaseAdapter";
   private IRecyclerAdapterListener iRecyclerAdapterListener;
 
   public RecyclerViewBaseAdapter(IRecyclerAdapterListener Listener) {
@@ -222,6 +222,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public T onCreateViewHolder(ViewGroup parent, int viewType) {
+    //        WXLogUtils.d(TAG, "onCreateViewHolder viewType:" + viewType);
     if (iRecyclerAdapterListener != null) {
       return (T) iRecyclerAdapterListener.onCreateViewHolder(parent, viewType);
     }
@@ -230,21 +231,8 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
   }
 
   @Override
-  public void onViewAttachedToWindow(T holder) {
-    super.onViewAttachedToWindow(holder);
-    if( holder !=null && holder.isFullSpan()){
-      ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
-      if(lp != null
-              && lp instanceof StaggeredGridLayoutManager.LayoutParams
-              ) {
-        StaggeredGridLayoutManager.LayoutParams p = (StaggeredGridLayoutManager.LayoutParams) lp;
-        p.setFullSpan(true);
-      }
-    }
-  }
-
-  @Override
   public void onBindViewHolder(T viewHolder, int i) {
+    //        WXLogUtils.d(TAG, "onBindViewHolder position: " + i);
     if (iRecyclerAdapterListener != null) {
       iRecyclerAdapterListener.onBindViewHolder(viewHolder, i);
     }
@@ -252,6 +240,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public int getItemViewType(int position) {
+    //        WXLogUtils.d(TAG, "getItemViewType position:"+position);
     if (iRecyclerAdapterListener != null) {
       return iRecyclerAdapterListener.getItemViewType(position);
     }
@@ -273,6 +262,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public void onViewRecycled(T holder) {
+    //        WXLogUtils.d(TAG, "onViewRecycled position ");
     if (iRecyclerAdapterListener != null) {
       iRecyclerAdapterListener.onViewRecycled(holder);
     }
@@ -281,6 +271,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public boolean onFailedToRecycleView(T holder) {
+    //        WXLogUtils.d(TAG, "onFailedToRecycleView ");
     if (iRecyclerAdapterListener != null) {
       return iRecyclerAdapterListener.onFailedToRecycleView(holder);
     }

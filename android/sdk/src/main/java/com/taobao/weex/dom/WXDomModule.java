@@ -347,11 +347,7 @@ public final class WXDomModule extends WXModule {
           if (args == null) {
             return null;
           }
-          JSONObject option =null;
-          if(args.size()>1) {
-            option = (JSONObject) args.get(1);
-          }
-          scrollToElement((String) args.get(0),option);
+          scrollToElement((String) args.get(0), (JSONObject) args.get(1));
           break;
         case ADD_RULE:
           if (args == null) {
@@ -613,7 +609,7 @@ public final class WXDomModule extends WXModule {
    * @param options scroll option, like {offset:0, duration:300}
    */
   public void scrollToElement(String ref, JSONObject options) {
-    if (TextUtils.isEmpty(ref) ) {
+    if (TextUtils.isEmpty(ref) || options == null) {
       return;
     }
 

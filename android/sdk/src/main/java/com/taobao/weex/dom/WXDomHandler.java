@@ -210,7 +210,6 @@ import android.os.Message;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Handler for dom operations.
@@ -291,7 +290,6 @@ public class WXDomHandler implements Handler.Callback {
                                      (String) task.args.get(2));
         break;
       case MsgType.WX_DOM_BATCH:
-
         mWXDomManager.batch();
         mHasBatch = false;
         break;

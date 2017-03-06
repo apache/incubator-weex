@@ -10,7 +10,7 @@
 #import <WeexSDK/NSObject+WXSwizzle.h>
 
 #define WXCheckUIThread() NSAssert([NSThread isMainThread], \
-@"You must change UI on main thread!")
+@"You can not change UI on main thread!")
 
 @implementation UIView (UIThreadCheck)
 

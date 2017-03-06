@@ -19,7 +19,6 @@
           {name: root + '/components/input', title: 'Input'},
           {name: root + '/components/scroller', title: 'Scroller'},
           {name: root + '/components/list', title: 'List'},
-          {name: root + '/components/waterfall', title: 'Waterfall'},
           {name: root + '/components/slider', title: 'Slider'},
           {name: root + '/components/a', title: 'A'},
           {name: root + '/components/video', title: 'Video'},

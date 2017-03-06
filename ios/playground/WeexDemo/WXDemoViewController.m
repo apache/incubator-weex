@@ -94,8 +94,7 @@
 - (void)dealloc
 {
     [_instance destroyInstance];
-    
-#ifdef DEBUG
+#if DEBUG
     [_instance forceGarbageCollection];
 #endif
     

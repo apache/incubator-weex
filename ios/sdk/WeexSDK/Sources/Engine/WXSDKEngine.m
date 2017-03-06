@@ -72,8 +72,6 @@
     [self registerComponent:@"image" withClass:NSClassFromString(@"WXImageComponent") withProperties:nil];
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
-    [self registerComponent:@"recycler" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
-    [self registerComponent:@"waterfall" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
     
     [self registerComponent:@"header" withClass:NSClassFromString(@"WXHeaderComponent")];
     [self registerComponent:@"cell" withClass:NSClassFromString(@"WXCellComponent")];

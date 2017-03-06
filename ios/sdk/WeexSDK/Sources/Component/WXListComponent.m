@@ -8,7 +8,6 @@
 
 #import "WXListComponent.h"
 #import "WXCellComponent.h"
-#import "WXHeaderComponent.h"
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
 #import "NSArray+Weex.h"
@@ -53,6 +52,53 @@
 
 @end
 
+@interface WXHeaderComponent : WXComponent
+
+@property (nonatomic, weak) WXListComponent *list;
+
+@end
+
+@implementation WXHeaderComponent
+
+//TODO: header remove->need reload
+- (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
+{
+    self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
+    
+    if (self) {
+        _async = YES;
+        _isNeedJoinLayoutSystem = NO;
+    }
+    
+    return self;
+}
+
+- (void)_frameDidCalculated:(BOOL)isChanged
+{
+    [super _frameDidCalculated:isChanged];
+    
+    if (isChanged) {
+        [self.list headerDidLayout:self];
+    }
+}
+
+- (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
+{
+    if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) && self.list) {
+        self.cssNode->style.dimensions[CSS_WIDTH] = self.list.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    }
+    
+    if ([self needsLayout]) {
+        layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
+        if ([WXLog logLevel] >= WXLogLevelDebug) {
+            print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+        }
+    }
+    
+    [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];
+}
+
+@end
 
 @interface WXSection : NSObject<NSCopying>
 
@@ -87,7 +133,7 @@
 }
 @end
 
-@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
+@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate>
 
 @end
 
@@ -200,9 +246,9 @@
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
-        ((WXCellComponent *)subcomponent).delegate = self;
+        ((WXCellComponent *)subcomponent).list = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
-        ((WXHeaderComponent *)subcomponent).delegate = self;
+        ((WXHeaderComponent *)subcomponent).list = self;
     } else if (![subcomponent isKindOfClass:[WXRefreshComponent class]]
                && ![subcomponent isKindOfClass:[WXLoadingComponent class]]
                && subcomponent->_positionType != WXPositionTypeFixed) {
@@ -282,13 +328,6 @@
     }
 }
 
-#pragma mark - WXHeaderRenderDelegate
-
-- (float)headerWidthForLayout:(WXHeaderComponent *)cell
-{
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
-}
-
 - (void)headerDidLayout:(WXHeaderComponent *)header
 {
     [self.weexInstance.componentManager _addUITask:^{
@@ -296,19 +335,9 @@
         [_tableView beginUpdates];
         [_tableView endUpdates];
     }];
-}
-
-- (void)headerDidRemove:(WXHeaderComponent *)header
-{
     
 }
 
-#pragma mark - WXCellRenderDelegate
-
-- (float)containerWidthForLayout:(WXCellComponent *)cell
-{
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
-}
 
 - (void)cellDidRemove:(WXCellComponent *)cell
 {

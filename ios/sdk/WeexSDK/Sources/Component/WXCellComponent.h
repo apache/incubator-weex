@@ -7,31 +7,15 @@
  */
 
 #import "WXComponent.h"
-#import "WXDiffUtil.h"
-@class WXCellComponent;
+@class WXListComponent;
 
-@protocol WXCellRenderDelegate <NSObject>
-
-- (float)containerWidthForLayout:(WXCellComponent *)cell;
-
-- (void)cellDidLayout:(WXCellComponent *)cell;
-
-- (void)cellDidRendered:(WXCellComponent *)cell;
-
-- (void)cellDidRemove:(WXCellComponent *)cell;
-
-- (void)cell:(WXCellComponent *)cell didMoveToIndex:(NSUInteger)index;
-
-@end
-
-@interface WXCellComponent : WXComponent <WXDiffable>
+@interface WXCellComponent : WXComponent
 
 @property (nonatomic, strong) NSString *scope;
 @property (nonatomic, assign) BOOL isRecycle;
-@property (nonatomic, assign) BOOL isLayoutComplete;
 @property (nonatomic, assign) UITableViewRowAnimation insertAnimation;
 @property (nonatomic, assign) UITableViewRowAnimation deleteAnimation;
+@property (nonatomic, weak) WXListComponent *list;
 @property (nonatomic, assign) BOOL keepScrollPosition;
-@property (nonatomic, weak) id<WXCellRenderDelegate> delegate;
 
 @end

@@ -225,27 +225,17 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   /**
    * The last position
    */
-  private int[] mLastPositions;
-  /**
-   * The first position
-   */
-  private int[] mFirstPositions;
-
+  private int[] lastPositions;
 
   /**
    * The location of last visible item
    */
-  private int mLastVisibleItemPosition;
-
-  /**
-   * The location of last visible item
-   */
-  private int mFirstVisibleItemPosition;
+  private int lastVisibleItemPosition;
 
   /**
    * The state of scroll status
    */
-  private int mCurrentScrollState = 0;
+  private int currentScrollState = 0;
 
   private WeakReference<IOnLoadMoreListener> listener;
 
@@ -256,14 +246,14 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   @Override
   public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
     super.onScrollStateChanged(recyclerView, newState);
-    mCurrentScrollState = newState;
+    currentScrollState = newState;
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     int visibleItemCount = layoutManager.getChildCount();
     int totalItemCount = layoutManager.getItemCount();
 
     if (visibleItemCount != 0) {
-      int bottomOffset = (totalItemCount - mLastVisibleItemPosition - 1) * (recyclerView.getHeight()) / visibleItemCount;
-      if (visibleItemCount > 0 && mCurrentScrollState == RecyclerView.SCROLL_STATE_IDLE) {
+      int bottomOffset = (totalItemCount - lastVisibleItemPosition - 1) * (recyclerView.getHeight()) / visibleItemCount;
+      if (visibleItemCount > 0 && currentScrollState == RecyclerView.SCROLL_STATE_IDLE) {
         if (listener != null && listener.get() != null) {
           listener.get().onLoadMore(bottomOffset);
         }
@@ -276,49 +266,46 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
     super.onScrolled(recyclerView, dx, dy);
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     IOnLoadMoreListener l;
-    if ((l = listener.get()) != null) {
-      l.onBeforeScroll(dx, dy);
+    if((l = listener.get()) != null){
+      l.onBeforeScroll(dx,dy);
     }
 
     //  int lastVisibleItemPosition = -1;
-    if (layoutManager instanceof LinearLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
-      mLastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-      listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
-    } else if (layoutManager instanceof GridLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
-      GridLayoutManager gridLayoutManager = ((GridLayoutManager) layoutManager);
-      mLastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition();
-      listener.get().notifyAppearStateChange(((GridLayoutManager) layoutManager).findFirstVisibleItemPosition()
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
+    if (layoutManagerType == null) {
+      if (layoutManager instanceof LinearLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
+      } else if (layoutManager instanceof GridLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
+      } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
+      } else {
+        throw new RuntimeException(
+            "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
+      }
+    }
 
-    } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
-      StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
-      int newspanCount = staggeredGridLayoutManager.getSpanCount();
-      if (mLastPositions == null || newspanCount != mLastPositions.length ) {
-        mLastPositions = new int[newspanCount];
-      }
-      if (mFirstPositions == null || newspanCount != mFirstPositions.length) {
-        mFirstPositions = new int[newspanCount];
-      }
-      staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
-      mFirstVisibleItemPosition = findMin(mFirstPositions);
-      staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
-      mLastVisibleItemPosition = findMax(mLastPositions);
-      listener.get().notifyAppearStateChange(
-              mFirstVisibleItemPosition
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
-    } else {
-      throw new RuntimeException(
-              "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
+    switch (layoutManagerType) {
+      case LINEAR:
+        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager)
+            .findLastVisibleItemPosition();
+        listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
+            ,lastVisibleItemPosition
+            ,dx
+            ,dy);
+        break;
+      case GRID:
+        lastVisibleItemPosition = ((GridLayoutManager) layoutManager)
+            .findLastVisibleItemPosition();
+        break;
+      case STAGGERED_GRID:
+        StaggeredGridLayoutManager staggeredGridLayoutManager
+            = (StaggeredGridLayoutManager) layoutManager;
+        if (lastPositions == null) {
+          lastPositions = new int[staggeredGridLayoutManager.getSpanCount()];
+        }
+        staggeredGridLayoutManager.findLastVisibleItemPositions(lastPositions);
+        lastVisibleItemPosition = findMax(lastPositions);
+        break;
     }
   }
 
@@ -330,16 +317,6 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
       }
     }
     return max;
-  }
-
-  private int findMin(int[] firstPositions) {
-    int min = firstPositions[0];
-    for (int value : firstPositions) {
-      if (value < min) {
-        min = value;
-      }
-    }
-    return min;
   }
 
   public enum LAYOUT_MANAGER_TYPE {

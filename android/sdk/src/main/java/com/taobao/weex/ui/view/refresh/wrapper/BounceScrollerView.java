@@ -219,7 +219,6 @@ public class BounceScrollerView extends BaseBounceView<WXScrollView> {
 
     public BounceScrollerView(Context context, int orientation, WXScroller waScroller) {
         super(context,orientation);
-        init(context);
         if (getInnerView() != null)
             getInnerView().setWAScroller(waScroller);
     }
