@@ -326,6 +326,19 @@ public class WXAttr implements Map<String, Object>,Cloneable {
     return src.toString();
   }
 
+  public boolean canRecycled() {
+    Object obj = get(Constants.Name.RECYCLE);
+    if (obj == null) {
+      return true;
+    }
+    try {
+      return Boolean.parseBoolean(String.valueOf(obj));
+    } catch (Exception e) {
+      WXLogUtils.e("[WXAttr] recycle:", e);
+    }
+    return true;
+  }
+
   public boolean showIndicators() {
     Object obj = get(Constants.Name.SHOW_INDICATORS);
     if (obj == null) {

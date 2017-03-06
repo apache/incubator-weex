@@ -273,6 +273,8 @@ public class Constants {
 
     String POSITION = "position";
 
+    String KEEP_SCROLL_POSITION = "keepScrollPosition";
+
     String TEXT_DECORATION = "textDecoration";
     String TEXT_ALIGN = "textAlign";
     String FONT_WEIGHT = "fontWeight";
@@ -297,6 +299,7 @@ public class Constants {
     String SHOW_SCROLLBAR = "showScrollbar";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
+    String RECYCLE = "recycle";
     String LOADMORERETRY = "loadmoreretry";
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
@@ -336,6 +339,19 @@ public class Constants {
     String PULLING_DISTANCE = "pullingDistance";
     String VIEW_HEIGHT = "viewHeight";
     String PREVENT_MOVE_EVENT = "preventMoveEvent";
+    String SELECTION_START = "selectionStart";
+    String SELECTION_END = "selectionEnd";
+    String OFFSET_ACCURACY = "offsetAccuracy";
+    String CONTENT_SIZE = "contentSize";
+    String CONTENT_OFFSET = "contentOffset";
+    String X = "x";
+    String Y = "y";
+    String RETURN_KEY_TYPE = "returnKeyType";
+    String OFFSET = "offset";
+    String ANIMATED = "animated";
+
+    String INSERT_CELL_ANIMATION = "insertAnimation";
+    String DELETE_CELL_ANIMATION = "deleteAnimation";
   }
 
   public interface Value {
@@ -370,6 +386,9 @@ public class Constants {
     String DIRECTION_RIGHT = "right";
     String DIRECTION_UP = "up";
     String DIRECTION_DOWN = "down";
+
+    String NONE = "none";
+    String DEFAULT = "default";
   }
 
   public interface Event {
@@ -401,9 +420,10 @@ public class Constants {
     String CLICKBACKITEM = "clickbackitem";
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
+    String RETURN = "return";
   }
 
-  public interface PESUDO {
+  public interface PSEUDO {
     String ACTIVE = ":active";
     String ENABLED = ":enabled";
     String DISABLED = ":disabled";

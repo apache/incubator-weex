@@ -205,15 +205,16 @@
 package com.taobao.weex.http;
 
 import android.net.Uri;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.WXBridgeManager;
-import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
@@ -507,20 +508,23 @@ public class WXStreamModule extends WXModule {
 
     @Override
     public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
-      mResponse.put("readyState",2);
-      mResponse.put("status",statusCode);
+      mResponse.put("readyState", 2);
+      mResponse.put("status", statusCode);
 
-      Iterator<Map.Entry<String,List<String>>> it = headers.entrySet().iterator();
-      Map<String,String> simpleHeaders = new HashMap<>();
-      while(it.hasNext()){
-        Map.Entry<String,List<String>> entry = it.next();
-        if(entry.getValue().size()>0)
-          simpleHeaders.put(entry.getKey()==null?"_":entry.getKey(),entry.getValue().get(0));
+      Map<String, String> simpleHeaders = new HashMap<>();
+      if (headers != null) {
+        Iterator<Map.Entry<String, List<String>>> it = headers.entrySet().iterator();
+        while (it.hasNext()) {
+          Map.Entry<String, List<String>> entry = it.next();
+          if (entry.getValue().size() > 0) {
+            simpleHeaders.put(entry.getKey() == null ? "_" : entry.getKey(), entry.getValue().get(0));
+          }
+        }
       }
 
-      mResponse.put("headers",simpleHeaders);
+      mResponse.put("headers", simpleHeaders);
       mRespHeaders = simpleHeaders;
-      if(mProgressCallback!=null){
+      if (mProgressCallback != null) {
         mProgressCallback.invokeAndKeepAlive(mResponse);
       }
     }

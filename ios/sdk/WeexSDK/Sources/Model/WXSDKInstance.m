@@ -249,7 +249,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
         if (weakSelf.onFailed) {
-            weakSelf.onFailed(loadError);
+            weakSelf.onFailed(error);
         }
     };
     
@@ -298,6 +298,11 @@ typedef enum : NSUInteger {
             [WXSDKManager removeInstanceforID:strongSelf.instanceId];
         });
     });
+}
+
+- (void)forceGarbageCollection
+{
+    [[WXSDKManager bridgeMgr] forceGarbageCollection];
 }
 
 - (void)updateState:(WXState)state
@@ -434,7 +439,11 @@ typedef enum : NSUInteger {
         //had not registered yet
         observer = [NSMutableDictionary new];
         [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
-        [_moduleEventObservers addEntriesFromDictionary:observer];
+        if (_moduleEventObservers[moduleClassName]) { //support multi event
+            [_moduleEventObservers[moduleClassName] addEntriesFromDictionary:observer[moduleClassName]];
+        }else {
+            [_moduleEventObservers addEntriesFromDictionary:observer];
+        }
     } else {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];

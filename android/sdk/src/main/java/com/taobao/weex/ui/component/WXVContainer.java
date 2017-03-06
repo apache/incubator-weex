@@ -370,6 +370,19 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     super.destroy();
   }
 
+  /**
+   * recycle component resources
+   */
+  public void recycled() {
+    if (mChildren != null) {
+      int count = mChildren.size();
+      for (int i = 0; i < count; ++i) {
+        mChildren.get(i).recycled();
+      }
+    }
+    super.recycled();
+  }
+
   @Override
   public View detachViewAndClearPreInfo(){
     View original = super.detachViewAndClearPreInfo();
