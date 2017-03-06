@@ -129,7 +129,6 @@
                 XCTAssertEqual(infoDic[@"key1"][@"persistent"], @(NO));
                 XCTAssertEqual(infoDic[@"key1"][@"size"], @([@"shortValue12" length]));
                 XCTAssertTrue([indexArray containsObject:@"key1"]);
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
             }];
         }];
     });
@@ -234,7 +233,6 @@
             XCTAssertFalse([infoDic[@"key4"][@"persistent"] boolValue]);
             XCTAssertTrue([infoDic[@"key4"][@"size"] integerValue] == [longValue length]);
             XCTAssertTrue([indexArray containsObject:@"key4"]);
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.5);
             
             [self.storage getItem:@"key4" callback:^(id result) {
                 [expectation fulfill];
