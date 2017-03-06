@@ -37,7 +37,9 @@
 //https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html
 -(id)parseArgument:(id)obj parameterType:(const char *)parameterType order:(int)order
 {
+#ifdef DEBUG
     BOOL check = YES;
+#endif
     if (strcmp(parameterType,@encode(float))==0 || strcmp(parameterType,@encode(double))==0)
     {
 #ifdef DEBUG

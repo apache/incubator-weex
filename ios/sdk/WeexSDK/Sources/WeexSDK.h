@@ -29,6 +29,7 @@
 #import "WXLog.h"
 #import "WXListComponent.h"
 #import "WXLayoutDefine.h"
+#import "WXJSExceptionProtocol.h"
 #import "WXJSExceptionInfo.h"
 #import "WXImgLoaderProtocol.h"
 #import "WXEventModuleProtocol.h"

@@ -90,12 +90,6 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^onCreate)(UIView *);
 
 /**
- * The callback triggered when JSCore throws js exception during runtime
- *  @return A block that takes a WXJSEXception argument.
- */
-@property (nonatomic, copy) void (^onJSException)(WXJSExceptionInfo *);
-
-/**
  *  The callback triggered when the root container's frame has changed.
  *
  *  @return A block that takes a UIView argument, which is the root view
