@@ -70,19 +70,6 @@
     if (!_displayState) {
         [_indicator.view setHidden:YES];
     }
-    [self.view setFrame: (CGRect){
-        .size = self.calculatedFrame.size,
-        .origin.x = self.calculatedFrame.origin.x,
-        .origin.y = self.view.frame.origin.y + CGRectGetHeight(self.calculatedFrame)
-    }];
-}
-
-- (void)layoutDidFinish {
-    [self.view setFrame: (CGRect){
-        .size = self.calculatedFrame.size,
-        .origin.x = self.calculatedFrame.origin.x,
-        .origin.y = self.view.frame.origin.y + CGRectGetHeight(self.calculatedFrame)
-    }];
 }
 
 - (void)addEvent:(NSString *)eventName
