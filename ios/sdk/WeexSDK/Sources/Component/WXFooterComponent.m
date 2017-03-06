@@ -6,8 +6,8 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXScrollerComponent.h"
+#import "WXFooterComponent.h"
 
-@interface WXListComponent : WXScrollerComponent
+@implementation WXFooterComponent
 
 @end

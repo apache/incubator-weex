@@ -206,8 +206,6 @@ package com.taobao.weex.ui.view.refresh.wrapper;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.OrientationHelper;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -229,18 +227,26 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
   private Stack<View> headerViewStack = new Stack<>();
   private Stack<WXCell> headComponentStack = new Stack<>();
   private WXGesture mGesture;
+  private int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
+  private int mColumnCount = 1;
+  private float mColumnGap = 1;
 
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
     return super.postDelayed(WXThread.secure(action), delayMillis);
   }
 
-  public BounceRecyclerView(Context context, int orientation) {
+  public BounceRecyclerView(Context context,int type,int columnCount,float columnGap,int orientation) {
     super(context, orientation);
+    mLayoutType = type;
+    mColumnCount = columnCount;
+    mColumnGap = columnGap;
+    init(context);
   }
-
-  public BounceRecyclerView(Context context, AttributeSet attrs) {
-    super(context, attrs, OrientationHelper.VERTICAL);
+  public BounceRecyclerView(Context context,int type,int orientation) {
+    super(context, orientation);
+    mLayoutType = type;
+    init(context);
   }
 
   public void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter) {
@@ -262,11 +268,11 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     }
     return result;
   }
-    
+
   @Override
   public WXRecyclerView setInnerView(Context context) {
     WXRecyclerView wxRecyclerView = new WXRecyclerView(context);
-    wxRecyclerView.initView(context, WXRecyclerView.TYPE_LINEAR_LAYOUT, getOrientation());
+    wxRecyclerView.initView(context, mLayoutType,mColumnCount,mColumnGap,getOrientation());
     return wxRecyclerView;
   }
 
