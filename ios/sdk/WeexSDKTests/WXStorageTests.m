@@ -120,10 +120,6 @@
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
                 
-                NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-                NSTimeInterval ts = [infoDic[@"key1"][@"ts"] doubleValue];
-                NSLog(@"ts:%f",ts);
-                
                 XCTAssert([@"success" isEqualToString:result[@"result"]]);
                 XCTAssert([@"shortValue12" isEqualToString:dic[@"key1"]]);
                 XCTAssertEqual(infoDic[@"key1"][@"persistent"], @(NO));
@@ -223,9 +219,6 @@
             NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.filePath];
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
-            
-            NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-            NSTimeInterval ts = [infoDic[@"key4"][@"ts"] doubleValue];
             
             XCTAssertEqual(result[@"result"], @"success");
             XCTAssertNotEqual(dic[@"key4"], longValue);
