@@ -1,7 +1,7 @@
 ---
 title: 用 Weex 构建移动应用
 type: guide
-order: 4.5
+order: 5.5
 version: 2.1
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: 使用 Vue 开发 Weex 页面
 type: guide
-order: 4.3
+order: 5.3
 version: 2.1
 ---
 

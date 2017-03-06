@@ -1,7 +1,7 @@
 ---
 title: Using Devtools  
 type: guide
-order: 5.7
+order: 4.1
 version: 2.1
 ---
 

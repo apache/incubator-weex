@@ -1,7 +1,7 @@
 ---
 title: Intro
 type: guide
-order: 4
+order: 5
 has_chapter_content: false
 chapter_title: Intro
 version: 2.1

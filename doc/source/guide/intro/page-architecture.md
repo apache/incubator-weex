@@ -1,7 +1,7 @@
 ---
 title: Weex Page Architecture
 type: guide
-order: 4.6
+order: 5.6
 version: 2.1
 ---
 
