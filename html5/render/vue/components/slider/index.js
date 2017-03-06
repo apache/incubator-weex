@@ -127,7 +127,7 @@ export default {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
         staticClass: 'weex-slider weex-slider-wrapper',
-        on: extend(this._createEventMap(), {
+        on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd
