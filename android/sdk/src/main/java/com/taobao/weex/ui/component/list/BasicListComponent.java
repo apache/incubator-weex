@@ -293,7 +293,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   /**
    * Map for storing component that is sticky.
    **/
-  private Map<String, HashMap<String, WXComponent>> mStickyMap = new HashMap<>();
+  private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
   private WXStickyHelper stickyHelper;
 
 
@@ -651,7 +651,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (mStickyMap == null || bounceRecyclerView == null) {
       return;
     }
-    HashMap<String, WXComponent> stickyMap = mStickyMap.get(getRef());
+    Map<String, WXComponent> stickyMap = mStickyMap.get(getRef());
     if (stickyMap == null) {
       return;
     }

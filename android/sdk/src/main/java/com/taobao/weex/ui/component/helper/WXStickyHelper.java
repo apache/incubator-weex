@@ -209,6 +209,7 @@ import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by miomin on 16/7/7.
@@ -221,15 +222,15 @@ public class WXStickyHelper {
         this.scrollable = scrollable;
     }
 
-    public void bindStickStyle(WXComponent component, Map<String, HashMap<String, WXComponent>> mStickyMap) {
+    public void bindStickStyle(WXComponent component, Map<String, Map<String, WXComponent>> mStickyMap) {
         Scrollable scroller = component.getParentScroller();
         if (scroller == null) {
             return;
         }
-        HashMap<String, WXComponent> stickyMap = mStickyMap.get(scroller
+        Map<String, WXComponent> stickyMap = mStickyMap.get(scroller
                 .getRef());
         if (stickyMap == null) {
-            stickyMap = new HashMap<>();
+            stickyMap = new ConcurrentHashMap<>();
         }
         if (stickyMap.containsKey(component.getRef())) {
             return;
@@ -238,12 +239,12 @@ public class WXStickyHelper {
         mStickyMap.put(scroller.getRef(), stickyMap);
     }
 
-    public void unbindStickStyle(WXComponent component, Map<String, HashMap<String, WXComponent>> mStickyMap) {
+    public void unbindStickStyle(WXComponent component, Map<String, Map<String, WXComponent>> mStickyMap) {
         Scrollable scroller = component.getParentScroller();
         if (scroller == null) {
             return;
         }
-        HashMap<String, WXComponent> stickyMap = mStickyMap.get(scroller
+        Map<String, WXComponent> stickyMap = mStickyMap.get(scroller
                 .getRef());
         if (stickyMap == null) {
             return;
