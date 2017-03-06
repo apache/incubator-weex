@@ -1,11 +1,15 @@
 /**
  * Mix properties into target object.
+ * the rightest object's value has the highest priority.
  */
-export function extend (to, from) {
-  if (!from) { return to }
-  for (const key in from) {
-    to[key] = from[key]
-  }
+export function extend (to, ...args) {
+  if (!args || args.length <= 0) { return to }
+  args.forEach(from => {
+    if (typeof from !== 'object') { return }
+    for (const key in from) {
+      to[key] = from[key]
+    }
+  })
   return to
 }
 
