@@ -185,7 +185,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponentManager *manager = (__bridge WXComponentManager *)(context);
     if (i == 0) {
         return manager->_rootComponent.cssNode;
-    } else if(manager->_fixedComponents.count > 0) {
+    } else if(manager->_fixedComponents.count >= i) {
         return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
     }
     
