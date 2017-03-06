@@ -114,7 +114,7 @@ In addition, you should also pay attention to the following points:
 Because of the platform difference, you have to compile your source file in two different ways:
 
 + For the web, you can compile source files in any official way, such as Webpack + vue-loader or Browserify + vueify. and require the [weex-vue-render](https://www.npmjs.com/package/weex-vue-render), which is a group of Weex build-in components.
-+ For Android and iOS, we've provided [weex-loader](https://github.com/weepteam/weep-loader) to compile the `.vue` files. That is, use Webpack + weex-loader to generate the js bundle that is available for the native.
++ For Android and iOS, we've provided [weex-loader](https://github.com/weexteam/weex-loader) to compile the `.vue` files. That is, use Webpack + weex-loader to generate the js bundle that is available for the native.
 
 ### Use weex-loader
 
