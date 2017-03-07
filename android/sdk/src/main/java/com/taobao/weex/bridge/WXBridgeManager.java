@@ -369,7 +369,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         Class clazz =  Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
         if (clazz != null) {
           Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
-          if (constructor != null) {
+          if (constructor != null && WXEnvironment.getApplication() != null) {
             mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
                 WXEnvironment.getApplication(), WXBridgeManager.this);
             if (mWxDebugProxy != null) {
