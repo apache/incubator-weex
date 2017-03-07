@@ -1,25 +1,21 @@
 #!/user/bin/env bash
 
 echo ''
-echo ''
-echo 'cping files for vue dist...'
+echo " => writing version number into weex-vue-render's package.json..."
 
-src_dir=./html5
-vue_dir=${src_dir}/render/vue
-browser_dir=${src_dir}/render/browser
-shared_dir=${src_dir}/shared
+base_dir=./packages/weex-vue-render
 
-dist_dir=./packages/weex-vue-render/src
+# get version of weex-html5 from subversion of main package.json.
+pkg=./package.json
+dist_pkg=${base_dir}/package.json
+version=$( grep -o -E "\"vue-render\": \"([0-9.]+)\"" ${pkg} | grep -o -E "[0-9.]+" )
+echo " => version:" ${version}
 
-rm -rf ${dist_dir}
+# update package.json for weex-html5 package.
+cat ${dist_pkg} | sed "s/\"version\": \"[0-9.]*\"/\"version\": \"${version}\"/g" > ${base_dir}/tmp.json
+# cat ${dist_pkg} | sed "s/\"version\": \"[0-9.]*\"/\"version\": \"${version}\"/g;s/\"transformer\": \"[>=< 0-9.]*\"/\"transformer\": \"${transformerVersion}\"/g" > ${base_dir}/tmp.json
+rm ${dist_pkg}
+mv ${base_dir}/tmp.json ${dist_pkg}
 
-mkdir $dist_dir
-mkdir $dist_dir/render
-
-cp -fR ${browser_dir} ${dist_dir}/render/
-cp -fR ${vue_dir} ${dist_dir}/render/
-cp -fR ${shared_dir} ${dist_dir}/
-
-echo 'dist finished.'
-echo ''
+echo ' => writing finished.'
 echo ''

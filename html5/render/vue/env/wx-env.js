@@ -8,7 +8,8 @@ const scaleInfo = setViewport()
 const lib = window.lib
 const env = {
   platform: 'Web',
-  weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
+  // weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
+  weexVersion: 'process.env.WEEX_VERSION',
   userAgent: navigator.userAgent,
   appName: lib.env.aliapp ? lib.env.aliapp.appname : navigator.appName,
   appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
