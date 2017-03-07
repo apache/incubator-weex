@@ -12,7 +12,7 @@ has_chapter_content: true
 
 ## 第一步：安装依赖
 
-Weex 官方提供了 weex-toolkit 的脚手架工具来辅助开发和调试。首先，你需要 Node.js 和 weex-toolkit。
+Weex 官方提供了 weex-toolkit 的脚手架工具来辅助开发和调试。首先，你需要 Node.js 和 [Weex CLi](https://github.com/weexteam/weex-toolkit)。
 
 安装 Node.js 方式多种多样，最简单的方式是在 [Node.js 官网](https://nodejs.org/en/) 下载可执行程序直接安装即可。
 
@@ -46,12 +46,14 @@ $ weex -v
 v1.0.3
 weex-builder : v0.2.4
 weex-previewer : v1.3.4
-```	  
+```
+
 
 国内开发者可以考虑使用淘宝的 npm 镜像 —— [cnpm](https://npm.taobao.org/) 安装 weex-toolkit
 
+
 ```bash
-$ npm install -g cnpm
+$ npm install -g cnpm --registry=https://registry.npm.taobao.org
 $ cnpm install -g weex-toolkit
 ```
 

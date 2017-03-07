@@ -372,7 +372,7 @@ weexplugin
 
 ## 插件开发文档
 
-+ [开发 web 的插件教程](./doc/plugin-devloping-web.md)
++ [开发 web 的插件教程](https://github.com/weexteam/weex-pack/blob/master/doc/plugin-devloping-web.md)
 
 
 ## 示例

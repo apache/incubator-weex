@@ -10,7 +10,7 @@ has_chapter_content: true
 
 Use dotWe is a good choice, But if you want to develop locally on your own machine, you will set up your development environment.
 
-You will need Node.js and the Weex CLi.
+You will need Node.js and the [Weex CLi](https://github.com/weexteam/weex-toolkit).
 
 You can installing Node using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active node.js versions). Run the following commands in a Terminal after installing nvm:
 

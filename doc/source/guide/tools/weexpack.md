@@ -283,6 +283,8 @@ After all above steps, you could modify your application we/vue files under src 
 
 ![weexpack2](https://img.alicdn.com/tps/TB18hxjPXXXXXXgapXXXXXXXXXX-248-258.png)
 
+[Plugin development guide](https://github.com/weexteam/weex-pack/blob/master/doc/plugin-devloping-web.md)
+
 ## Examples
 
  [Create Weex One App with Weexpack](https://github.com/weexteam/weex-pack/wiki/Create-Weex-One-App-with-Weexpack)
