@@ -153,12 +153,7 @@
     }
     
     WXLogDebug(@"Diff result:%@", diffResult);
-    @try {
-        [collectionView performBatchUpdates:updates completion:completion];
-    } @catch (NSException *exception) {
-        [self.delegate updateController:self willCrashWithException:exception oldData:oldData newData:newData];
-        @throw exception;
-    }
+    [collectionView performBatchUpdates:updates completion:completion];
 }
 
 - (void)cleanup

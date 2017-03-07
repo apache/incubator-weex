@@ -273,11 +273,6 @@ typedef enum : NSUInteger {
     
 }
 
-- (void)updateController:(WXRecyclerUpdateController *)controller willCrashWithException:(NSException *)exception oldData:(NSArray<WXSectionDataController *> *)oldData newData:(NSArray<WXSectionDataController *> *)newData
-{
-    WXLogError(@"recycler update did occur an exception:%@, oldData:%@, newData:%@", exception, oldData, newData);
-}
-
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
