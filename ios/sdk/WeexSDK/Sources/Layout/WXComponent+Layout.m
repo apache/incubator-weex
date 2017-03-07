@@ -12,6 +12,7 @@
 #import "WXAssert.h"
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
+#import "WXComponent+BoxShadow.h"
 
 @implementation WXComponent (Layout)
 
@@ -117,10 +118,12 @@
             }
             
             strongSelf.view.frame = strongSelf.calculatedFrame;
+            if (![self EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                [self configViewLayer:strongSelf.view boxShadow:_boxShadow];
+            }
             
             if (strongSelf->_transform) {
-                WXTransform *transform = [[WXTransform alloc] initWithInstance:strongSelf.weexInstance];
-                strongSelf.layer.transform = [transform getTransform:strongSelf->_transform withView:strongSelf.view withOrigin:strongSelf->_transformOrigin];
+                [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
             [strongSelf setNeedsDisplay];

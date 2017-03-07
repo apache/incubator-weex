@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+#import "WXJSExceptionInfo.h"
 @class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;
@@ -30,6 +31,11 @@ extern NSString *const bundleUrlOptionKey;
  * If Component want to freeze the rootview frame, set isRootViewFrozen YES, weex will not change the rootview frame when layout,or set NO.
  **/
 @property (nonatomic, assign) BOOL isRootViewFrozen;
+
+/**
+ * Which indicates current instance needs to be validated or not to load,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needValidate;
 
 /**
  * The scriptURL of weex bundle.
@@ -84,49 +90,49 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 /**
  *  The callback triggered when the instance finishes creating the body.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onCreate)(UIView *);
 
 /**
  *  The callback triggered when the root container's frame has changed.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onLayoutChange)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes rendering.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^renderFinish)(UIView *);
 
 /**
  *  The callback triggered when the instance finishes refreshing weex view.
  *
- *  @param view The rootView.
+ *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^refreshFinish)(UIView *);
 
 /**
  *  The callback triggered when the instance fails to render.
  *
- *  @param error The error code .
+ *  @return A block that takes a NSError argument, which is the error occured
  **/
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
 
 /**
  *  The callback triggered when the instacne executes scrolling .
  *
- *  @param contentOffset The point at which the origin of the content view is offset from the origin of the scroll view
+ *  @return A block that takes a CGPoint argument, which is content offset of the scroller
  **/
 @property (nonatomic, copy) void (^onScroll)(CGPoint contentOffset);
 
 /**
  * the callback to be run repeatedly while the instance is rendering.
  *
- * @param renderRect The view's frame that is just rendered.
+ * @return A block that takes a CGRect argument, which is the rect rendered
  **/
 @property (nonatomic, copy) void (^onRenderProgress)(CGRect renderRect);
 
@@ -206,6 +212,11 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * Destroys current instance.
  **/
 - (void)destroyInstance;
+
+/**
+ * Trigger full GC, for dev and debug only.
+ **/
+- (void)forceGarbageCollection;
 
 /**
  * get module instance by class
