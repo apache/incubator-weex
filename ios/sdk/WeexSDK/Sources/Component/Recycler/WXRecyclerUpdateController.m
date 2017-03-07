@@ -148,7 +148,7 @@
     
     self.isUpdating = YES;
     
-    if (!self.delegate) {
+    if (!self.delegate || !collectionView.dataSource) {
         return;
     }
     
