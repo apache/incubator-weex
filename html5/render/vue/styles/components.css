@@ -1,4 +1,4 @@
-a, .weex-a {
+.weex-a {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -51,15 +51,15 @@ body > .weex-div {
           align-content: flex-start;
 }
 
-input, textarea, .weex-input, .weex-textarea {
+.weex-input, .weex-textarea {
   position: relative;
   font-size: 32px;
 }
-input:focus, textarea:focus, .weex-input:focus, .weex-textarea:focus {
+.weex-input:focus, .weex-textarea:focus {
   outline: none;
 }
 
-figure, img, .weex-image, .weex-img {
+.weex-image, .weex-img {
   display: block;
   position: relative;
   background-repeat: no-repeat;
@@ -264,9 +264,6 @@ body > .weex-scroller {
           
   -webkit-box-orient: horizontal;
   height: 100%;
-}
-.weex-scroller-horizontal .weex-scroller-inner > * {
-
 }
 
 .iossticky {
