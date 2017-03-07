@@ -250,8 +250,8 @@ public class WXSoInstallMgrSdk {
   private final static String ARMEABI = "armeabi"; //default
   private final static String X86 = "x86";
   private final static String MIPS = "mips";
-  private final static int ARMEABI_Size = 3542844;
-  private final static int X86_Size = 4451068;
+  private final static int ARMEABI_Size = 3583820;
+  private final static int X86_Size = 4340864;
 
   static Context mContext = null;
 
@@ -284,6 +284,7 @@ public class WXSoInstallMgrSdk {
     }
 
     boolean InitSuc = false;
+    if (checkSoIsValid(libName, ARMEABI_Size) ||checkSoIsValid(libName, X86_Size)) {
 
       /**
        * Load library with {@link System#loadLibrary(String)}
@@ -331,6 +332,7 @@ public class WXSoInstallMgrSdk {
         InitSuc = false;
         e.printStackTrace();
       }
+    }
     return InitSuc;
   }
 
