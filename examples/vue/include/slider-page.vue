@@ -1,6 +1,6 @@
 <template>
   <div class="slider-page">
-    <slider-item v-for="v in items" :image="v.image" :link="v.link"></slider-item>
+    <slider-item v-for="v in items" :key="v.link" :image="v.image" :link="v.link"></slider-item>
   </div>
 </template>
 
