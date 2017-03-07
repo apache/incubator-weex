@@ -548,11 +548,11 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     }
   }
 
-  private View procSticky(Map<String, HashMap<String, WXComponent>> mStickyMap) {
+  private View procSticky(Map<String, Map<String, WXComponent>> mStickyMap) {
     if (mStickyMap == null) {
       return null;
     }
-    HashMap<String, WXComponent> stickyMap = mStickyMap.get(mWAScroller.getRef());
+    Map<String, WXComponent> stickyMap = mStickyMap.get(mWAScroller.getRef());
     if (stickyMap == null) {
       return null;
     }
@@ -625,6 +625,10 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
   @Override
   public void registerGestureListener(WXGesture wxGesture) {
     this.wxGesture = wxGesture;
+  }
+
+  public Rect getContentFrame() {
+    return new Rect(0, 0, computeHorizontalScrollRange(), computeVerticalScrollRange());
   }
 
   public interface WXScrollViewListener {

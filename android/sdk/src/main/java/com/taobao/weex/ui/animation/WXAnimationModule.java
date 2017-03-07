@@ -257,7 +257,9 @@ public class WXAnimationModule extends WXModule {
       task.args.add(callBack);
       msg.what = WXDomHandler.MsgType.WX_ANIMATION;
       msg.obj = task;
-      WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
+      //Due to animation module rely on the result of the css-layout and the batch mechanism of
+      //css-layout, the animation.transition must be delayed the batch time.
+      WXSDKManager.getInstance().getWXDomManager().sendMessageDelayed(msg, WXDomHandler.DELAY_TIME);
     }
   }
 
@@ -307,12 +309,12 @@ public class WXAnimationModule extends WXModule {
         BorderDrawable borderDrawable;
         if ((borderDrawable=WXViewUtils.getBorderDrawable(target))!=null) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               borderDrawable.getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         } else if (target.getBackground() instanceof ColorDrawable) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               ((ColorDrawable) target.getBackground()).getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         }

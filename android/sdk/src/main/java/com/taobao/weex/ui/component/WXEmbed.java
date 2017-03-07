@@ -493,6 +493,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance = null;
     }
     src = null;
+    if (getInstance() != null) {
+      getInstance().removeOnInstanceVisibleListener(this);
+    }
   }
 
   @Override

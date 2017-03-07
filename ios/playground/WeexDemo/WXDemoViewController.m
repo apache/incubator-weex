@@ -47,6 +47,7 @@
     [self setupNaviBar];
     [self setupRightBarItem];
     self.view.backgroundColor = [UIColor whiteColor];
+    [self.view setClipsToBounds:YES];
     
     _weexHeight = self.view.frame.size.height - 64;
     
@@ -93,6 +94,11 @@
 - (void)dealloc
 {
     [_instance destroyInstance];
+    
+#ifdef DEBUG
+    [_instance forceGarbageCollection];
+#endif
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -168,7 +174,7 @@
 
 - (void)setupRightBarItem
 {
-    if ([self.url.scheme isEqualToString:@"http"]) {
+    if ([self.url.scheme hasPrefix:@"http"]) {
         [self loadRefreshCtl];
     }
 }

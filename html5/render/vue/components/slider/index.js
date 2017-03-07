@@ -44,17 +44,11 @@ export default {
 
     formatChildren (createElement) {
       const children = this.$slots.default || []
-      return children.filter(vnode => {
+      let indicatorVnode
+      const cells = children.filter(vnode => {
         if (!vnode.tag) return false
         if (vnode.componentOptions && vnode.componentOptions.tag === 'indicator') {
-          this._indicator = createElement(indicator, {
-            staticClass: vnode.data.staticClass,
-            staticStyle: vnode.data.staticStyle,
-            attrs: {
-              count: this.frameCount,
-              active: this.currentIndex
-            }
-          })
+          indicatorVnode = vnode
           return false
         }
         return true
@@ -64,6 +58,15 @@ export default {
           staticClass: 'weex-slider-cell'
         }, [vnode])
       })
+      this._indicator = createElement(indicator, {
+        staticClass: indicatorVnode.data.staticClass,
+        staticStyle: indicatorVnode.data.staticStyle,
+        attrs: {
+          count: cells.length,
+          active: this.currentIndex
+        }
+      })
+      return cells
     }
   },
 
@@ -83,7 +86,7 @@ export default {
   },
 
   mounted () {
-    if (this.autoPlay) {
+    if (this.autoPlay && this.autoPlay !== 'false') {
       const interval = Number(this.interval)
       this._lastSlideTime = Date.now()
 
@@ -105,6 +108,7 @@ export default {
   },
 
   render (createElement) {
+    this.prerender()
     /* istanbul ignore next */
     if (process.env.NODE_ENV === 'development') {
       validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
