@@ -271,7 +271,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "BasicListComponent";
   private int mListCellCount = 0;
-  private String mLoadMoreRetry = "";
+  private boolean mForceLoadmoreNextTime = false;
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
@@ -1152,16 +1152,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),WXSDKInstance.getViewPortWidth());
 
       if (offScreenY < offsetParsed) {
-        String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
-        if (loadMoreRetry == null) {
-          loadMoreRetry = mLoadMoreRetry;
-        }
 
         if (mListCellCount != mChildren.size()
-            || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
+            || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mListCellCount = mChildren.size();
-          mLoadMoreRetry = loadMoreRetry;
+          mForceLoadmoreNextTime = false;
         }
       }
     } catch (Exception e) {
@@ -1226,7 +1222,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @JSMethod
   public void resetLoadmore() {
-    mLoadMoreRetry = "";
+    mForceLoadmoreNextTime = true;
     mListCellCount = 0;
   }
 
