@@ -118,7 +118,8 @@ export default {
     active: [Number, String]
   },
   updated () {
-    _reLayout(this, _getVirtualRect(this), _getLtbr(this))
+    const mergedStyle = this._getComponentStyle(this.$vnode.data)
+    _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
   },
   render (createElement) {
     return _render(this, createElement)
