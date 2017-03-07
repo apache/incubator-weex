@@ -594,7 +594,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
       if (offsetStr != null) {
         try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), WXSDKInstance.getViewPortWidth());
         }catch (Exception e ){
           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
         }

@@ -855,15 +855,15 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   protected void onLoadMore(WXScrollView scrollView, int x, int y) {
     try {
       String offset = getDomObject().getAttrs().getLoadMoreOffset();
-
       if (TextUtils.isEmpty(offset)) {
         return;
       }
+      int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), WXSDKInstance.getViewPortWidth());
 
       int contentH = scrollView.getChildAt(0).getHeight();
       int scrollerH = scrollView.getHeight();
       int offScreenY = contentH - y - scrollerH;
-      if (offScreenY < Integer.parseInt(offset)) {
+      if (offScreenY < offsetInt) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
         }
