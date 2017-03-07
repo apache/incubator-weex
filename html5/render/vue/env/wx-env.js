@@ -41,7 +41,7 @@ const units = {
 }
 
 Object.freeze(units)
-Object.freeze(env)
+// Object.freeze(env)
 
 window.CSS_UNIT = units
 window.WXEnvironment = env
