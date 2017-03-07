@@ -79,6 +79,7 @@ typedef enum : NSUInteger {
     UICollectionViewLayout *_collectionViewlayout;
     
     UIEdgeInsets _padding;
+    NSUInteger _previousLoadMoreCellNumber;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -228,7 +229,6 @@ typedef enum : NSUInteger {
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    // TODO: refresh loading fixed
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
@@ -271,6 +271,11 @@ typedef enum : NSUInteger {
 - (void)updateController:(WXRecyclerUpdateController *)controller didPerformUpdateWithFinished:(BOOL)finished
 {
     
+}
+
+- (void)updateController:(WXRecyclerUpdateController *)controller willCrashWithException:(NSException *)exception oldData:(NSArray<WXSectionDataController *> *)oldData newData:(NSArray<WXSectionDataController *> *)newData
+{
+    WXLogError(@"recycler update did occur an exception:%@, oldData:%@, newData:%@", exception, oldData, newData);
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -449,6 +454,46 @@ typedef enum : NSUInteger {
     }
 }
 
+#pragma mark - Load More Event
+
+- (void)setLoadmoreretry:(NSUInteger)loadmoreretry
+{
+    if (loadmoreretry != self.loadmoreretry) {
+        _previousLoadMoreCellNumber = 0;
+    }
+    
+    [super setLoadmoreretry:loadmoreretry];
+}
+
+- (void)loadMore
+{
+    [super loadMore];
+    
+    _previousLoadMoreCellNumber = [self totalNumberOfCells];
+}
+
+- (BOOL)isNeedLoadMore
+{
+    BOOL superNeedLoadMore = [super isNeedLoadMore];
+    return superNeedLoadMore && _previousLoadMoreCellNumber != [self totalNumberOfCells];
+}
+
+- (NSUInteger)totalNumberOfCells
+{
+    NSUInteger cellNumber = 0;
+    NSUInteger sectionCount = [_collectionView numberOfSections];
+    for (int section = 0; section < sectionCount; section ++) {
+        cellNumber += [_collectionView numberOfItemsInSection:section];
+    }
+    
+    return cellNumber;
+}
+
+- (void)resetLoadmore{
+    [super resetLoadmore];
+    _previousLoadMoreCellNumber = 0;
+}
+
 #pragma makrk - private
 
 - (float)_floatValueForColumnGap:(WXLength *)gap
@@ -499,7 +544,7 @@ typedef enum : NSUInteger {
         WXComponent* component = components[i];
         
         if ([component isKindOfClass:[WXHeaderComponent class]]) {
-            if (i != 0) {
+            if (i != 0 && (currentSection.headerComponent || currentSection.cellComponents.count > 0)) {
                 currentSection.cellComponents = [cellArray copy];
                 [sectionArray addObject:currentSection];
                 currentSection = [WXSectionDataController new];
@@ -511,12 +556,14 @@ typedef enum : NSUInteger {
             [cellArray addObject:(WXCellComponent *)component];
         } else if ([component isKindOfClass:[WXFooterComponent class]]) {
             currentSection.footerComponent = component;
+        } else {
+            continue;
         }
-        
-        if (i == components.count - 1 && cellArray.count > 0) {
-            currentSection.cellComponents = [cellArray copy];
-            [sectionArray addObject:currentSection];
-        }
+    }
+    
+    if (cellArray.count > 0) {
+        currentSection.cellComponents = [cellArray copy];
+        [sectionArray addObject:currentSection];
     }
     
     return sectionArray;

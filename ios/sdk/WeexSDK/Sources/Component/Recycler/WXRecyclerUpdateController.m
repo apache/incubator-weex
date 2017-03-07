@@ -132,6 +132,7 @@
     }
     
     void (^updates)() = [^{
+        [self.delegate updateController:self willPerformUpdateWithNewData:newData];
         [UIView setAnimationsEnabled:NO];
         WXLogDebug(@"UICollectionView update:%@", diffResult);
         [self applyUpdate:diffResult toCollectionView:self.collectionView];
@@ -151,10 +152,13 @@
         return;
     }
     
-    [self.delegate updateController:self willPerformUpdateWithNewData:newData];
-    
     WXLogDebug(@"Diff result:%@", diffResult);
-    [collectionView performBatchUpdates:updates completion:completion];
+    @try {
+        [collectionView performBatchUpdates:updates completion:completion];
+    } @catch (NSException *exception) {
+        [self.delegate updateController:self willCrashWithException:exception oldData:oldData newData:newData];
+        @throw exception;
+    }
 }
 
 - (void)cleanup

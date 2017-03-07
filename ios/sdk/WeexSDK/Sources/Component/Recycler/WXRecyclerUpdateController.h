@@ -16,6 +16,8 @@
 
 - (void)updateController:(WXRecyclerUpdateController *)controller didPerformUpdateWithFinished:(BOOL)finished;
 
+- (void)updateController:(WXRecyclerUpdateController *)controller willCrashWithException:(NSException *)exception oldData:(NSArray<WXSectionDataController *> *)oldData newData:(NSArray<WXSectionDataController *> *)newData;
+
 @end
 
 @interface WXRecyclerUpdateController : NSObject
