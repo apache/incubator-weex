@@ -174,7 +174,7 @@
 
 - (void)setupRightBarItem
 {
-    if ([self.url.scheme isEqualToString:@"http"]) {
+    if ([self.url.scheme hasPrefix:@"http"]) {
         [self loadRefreshCtl];
     }
 }
