@@ -28,10 +28,7 @@
  *
  *  @param boxShadow the boxshadow will be set
  *
- *  @param lastboxshadow the boxshadow set last time
- *
- *  @param originalBoxShadow the view  original boxshadow
  *
  */
-- (void)configViewLayer:(UIView *_Nullable)view boxShadow:(WXBoxShadow *_Nullable)boxShadow;
+- (void)configBoxShadow:(WXBoxShadow *_Nullable)boxShadow;
 @end

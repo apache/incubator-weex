@@ -118,8 +118,8 @@
             }
             
             strongSelf.view.frame = strongSelf.calculatedFrame;
-            if (![self EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
-                [self configViewLayer:strongSelf.view boxShadow:_boxShadow];
+            if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                [strongSelf configBoxShadow:_boxShadow];
             }
             
             if (strongSelf->_transform) {
