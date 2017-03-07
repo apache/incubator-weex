@@ -392,7 +392,7 @@ static BOOL WXNotStat;
         if ([url isFileURL]) {
             // local file url
             NSError * error = nil;
-            if (![WXUtility isFileExist:url.absoluteString]) {
+            if (![WXUtility isFileExist:url.path]) {
                 error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
             }
             completionBlock(url, error);
@@ -430,7 +430,6 @@ static BOOL WXNotStat;
 
 + (BOOL)isFileExist:(NSString *)filePath
 {
-    
     return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 
