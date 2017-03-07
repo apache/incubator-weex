@@ -300,7 +300,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   /**
    * Map for storing component that is sticky.
    **/
-  private Map<String, HashMap<String, WXComponent>> mStickyMap = new HashMap<>();
+  private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
   private WXStickyHelper stickyHelper;
 
 
@@ -594,7 +594,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
       if (offsetStr != null) {
         try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), WXSDKInstance.getViewPortWidth());
         }catch (Exception e ){
           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
         }
@@ -658,7 +658,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (mStickyMap == null || bounceRecyclerView == null) {
       return;
     }
-    HashMap<String, WXComponent> stickyMap = mStickyMap.get(getRef());
+    Map<String, WXComponent> stickyMap = mStickyMap.get(getRef());
     if (stickyMap == null) {
       return;
     }
