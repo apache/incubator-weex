@@ -437,7 +437,6 @@
         CGRect renderRect = [_tableView convertRect:cellRect toView:self.weexInstance.rootView];
         self.weexInstance.onRenderProgress(renderRect);
     }
-
 }
 
 - (void)cell:(WXCellComponent *)cell didMoveToIndex:(NSUInteger)index

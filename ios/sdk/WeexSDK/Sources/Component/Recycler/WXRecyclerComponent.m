@@ -426,7 +426,22 @@ typedef enum : NSUInteger {
 
 - (void)cellDidRendered:(WXCellComponent *)cell
 {
+    if (WX_MONITOR_INSTANCE_PERF_IS_RECORDED(WXPTFirstScreenRender, self.weexInstance) && !self.weexInstance.onRenderProgress) {
+        return;
+    }
     
+    NSIndexPath *indexPath = [self.dataController indexPathForCell:cell];
+    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath];
+    CGRect cellRect = attributes.frame;
+    if (cellRect.origin.y + cellRect.size.height >= _collectionView.frame.size.height) {
+        WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, self.weexInstance);
+    }
+    
+    if (self.weexInstance.onRenderProgress) {
+        CGRect renderRect = [_collectionView convertRect:cellRect toView:self.weexInstance.rootView];
+        self.weexInstance.onRenderProgress(renderRect);
+    }
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell
