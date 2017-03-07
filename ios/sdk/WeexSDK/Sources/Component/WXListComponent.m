@@ -152,6 +152,15 @@
     _tableView.dataSource = nil;
 }
 
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    [super updateAttributes:attributes];
+    
+    if (attributes[@"reloadInterval"]) {
+        _reloadInterval = [WXConvert CGFloat:attributes[@"reloadInterval"]] / 1000;
+    }
+}
+
 - (void)setContentSize:(CGSize)contentSize
 {
     // Do Nothing
