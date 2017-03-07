@@ -33,6 +33,7 @@ export default {
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
+      Object.freeze(weex)
     }
     watchAppear(this)
   },
