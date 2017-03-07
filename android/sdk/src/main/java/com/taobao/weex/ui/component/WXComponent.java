@@ -1322,7 +1322,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       getInstance().removeFixedView(view);
     }
 
-    mDomObj = null;
+    mDomObj = ImmutableDomObject.DESTROYED;
     mIsDestroyed = true;
   }
 

@@ -1,0 +1,62 @@
+<template>
+  <scroller id="container" class="container" onscroll="onscroll">
+      <div><text>{{vp}}|{{p1}}|{{p2}}</text></div>
+    <div repeat="{{items}}" style="background-color:yellow;height:500"><text>row</text></div>
+    <div id="panel" class="fixed-panel"></div>
+    <div id="panel2" class="fixed-panel2"></div>
+  </scroller>
+</template>
+<style>
+  .container {
+    width: 750;
+  }
+  .fixed-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 200;
+    background-color: #ff0000;
+    width: 200;
+  }
+  .fixed-panel2 {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 200;
+    background-color: #ff0000;
+    width: 200;
+  }
+</style>
+<script>
+    var dom = require("@weex-module/dom")
+    module.exports = {
+        data:{
+            items:[1,1,1,1,1,1,1,1],
+            height:100,
+            vp:-1,
+            p1:-1,
+            p2:-1
+        },
+        ready:function(){
+            var self = this;
+            dom.getComponentRect(this.$el('container'),function(data){
+                self.vp = data.size.height;
+            })
+        },
+        methods:{
+            onscroll:function(e){
+                var self = this;
+                dom.getComponentRect(this.$el('container'),function(data){
+                    self.vp = Math.round(data.size.height);
+                });
+                dom.getComponentRect(this.$el('panel'),function(data){
+                    self.p1 = Math.round(data.size.top+data.size.height);
+                });
+                dom.getComponentRect(this.$el('panel2'),function(data){
+                    self.p2 = data.size.top;
+                });
+                //should vp != 0 && p1 == vp && p2 ==0
+            }
+        }
+    }
+</script>
