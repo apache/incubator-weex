@@ -117,9 +117,13 @@
                 strongSelf.layer.transform = CATransform3DIdentity;
             }
             
-            strongSelf.view.frame = strongSelf.calculatedFrame;
-            if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+            if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
+                strongSelf.view.frame = strongSelf.calculatedFrame;
                 [strongSelf configBoxShadow:_boxShadow];
+            } else {
+                if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                    [strongSelf configBoxShadow:_boxShadow];
+                }
             }
             
             if (strongSelf->_transform) {
