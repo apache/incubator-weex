@@ -554,7 +554,7 @@ typedef enum : NSUInteger {
         WXComponent* component = components[i];
         
         if ([component isKindOfClass:[WXHeaderComponent class]]) {
-            if (i != 0 && (currentSection.headerComponent || currentSection.cellComponents.count > 0)) {
+            if (i != 0 && (currentSection.headerComponent || cellArray.count > 0)) {
                 currentSection.cellComponents = [cellArray copy];
                 [sectionArray addObject:currentSection];
                 currentSection = [WXSectionDataController new];
