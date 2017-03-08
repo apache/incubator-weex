@@ -46,10 +46,12 @@ export function setViewport (config = {}) {
     }
     meta.setAttribute('content', contents.join(','))
 
+    const dpr = window.devicePixelRatio
+
     return {
       scale,
-      deviceWidth: screenWidth,
-      deviceHeight: screenHeight
+      deviceWidth: screenWidth * dpr,
+      deviceHeight: screenHeight * dpr
     }
   }
 }

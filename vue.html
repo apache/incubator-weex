@@ -3,18 +3,20 @@
 <head>
   <meta charset="utf-8">
   <title>Weex Vue Demo</title>
+
+  <!-- You should set 'weex-viewport' to your design pixel width, and the
+    viewport meta should be set like below, OTHERWISE it won't work.-->
   <meta name="weex-viewport" content="750">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-touch-fullscreen" content="yes" />
   <meta name="format-detection" content="telephone=no, email=no" />
 
-  <!-- <script src="./node_modules/vue/dist/vue.runtime.min.js"></script> -->
-   <script src="./node_modules/vue/dist/vue.runtime.js"></script> 
-  <!-- <script src="dist/vue.runtime.js"></script> -->
-  <!-- <script src="./node_modules/weex-vue-render/index.min.js"></script> -->
-  <script src="./packages/weex-vue-render/dist/index.js"></script>
+  <!-- About style below: html's height should set to 100%, and this style should be added
+    before the weex-vue-render script loaded. OTHERWISE the
+    weex.config.env.deviceHeight' will not work. -->
   <style>
     html, body {
       -ms-overflow-style: scrollbar;
@@ -25,6 +27,13 @@
       height: 100%;
     }
   </style>
+
+  <!-- <script src="./node_modules/vue/dist/vue.runtime.min.js"></script> -->
+   <script src="./node_modules/vue/dist/vue.runtime.js"></script> 
+  <!-- <script src="dist/vue.runtime.js"></script> -->
+  <!-- <script src="./node_modules/weex-vue-render/index.min.js"></script> -->
+  <script src="./packages/weex-vue-render/dist/index.js"></script>
+  <!-- <script src="./packages/weex-vue-render/dist/index.min.js"></script> -->
 </head>
 <body>
   <div id="root"></div>
