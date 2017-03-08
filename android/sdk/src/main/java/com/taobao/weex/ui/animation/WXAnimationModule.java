@@ -247,7 +247,7 @@ public class WXAnimationModule extends WXModule {
 
   @JSMethod
   public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
-    if(!TextUtils.isEmpty(ref)&&!TextUtils.isEmpty(animation)) {
+    if(!TextUtils.isEmpty(ref)&&!TextUtils.isEmpty(animation) && mWXSDKInstance!=null) {
       Message msg = Message.obtain();
       WXDomTask task = new WXDomTask();
       task.instanceId = mWXSDKInstance.getInstanceId();
