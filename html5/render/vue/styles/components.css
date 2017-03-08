@@ -519,7 +519,7 @@ p, .weex-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   position: relative;
-  white-space: pre-wrap;
+  white-space: pre;
   font-size: 32px;
   word-wrap: break-word;
   overflow: visible;
