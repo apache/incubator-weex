@@ -715,6 +715,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             bounceRecyclerView.notifyStickyShow(cell);
           } else if (removeSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
+          }else{
+            bounceRecyclerView.updateStickyView();
           }
           cell.setLocationFromStart(top);
         }
@@ -777,8 +779,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       } else {
         view.getInnerView().setItemAnimator(null);
       }
-      boolean isKeepScrollPosition = isKeepScrollPosition(child);
+      boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
       if (isKeepScrollPosition) {
+        int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
+        view.getInnerView().getLayoutManager().scrollToPosition(last);
         view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
       } else {
         view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
@@ -808,11 +812,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @param child Need to insert the component
    * @return fixed=true
    */
-  private boolean isKeepScrollPosition(WXComponent child) {
+  private boolean isKeepScrollPosition(WXComponent child,int index) {
     ImmutableDomObject domObject = child.getDomObject();
     if (domObject != null) {
       Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
-      if (WXUtils.getBoolean(attr, false)) {
+      if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
         return true;
       }
     }
