@@ -202,7 +202,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
-  protected volatile ImmutableDomObject mDomObj;
+  private volatile ImmutableDomObject mDomObj;
   private WXSDKInstance mInstance;
   private Context mContext;
 
