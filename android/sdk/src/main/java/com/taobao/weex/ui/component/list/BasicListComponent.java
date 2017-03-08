@@ -230,7 +230,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
@@ -910,6 +909,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void onViewRecycled(ListBaseViewHolder holder) {
     long begin = System.currentTimeMillis();
+     WXComponent component = holder.getComponent();
+    if (component == null
+        || (component instanceof WXRefresh)
+        || (component instanceof WXLoading)
+        || (component.getDomObject() != null && component.getDomObject().isFixed())
+        ) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
+      }
+      return;
+    }
+
     holder.setComponentUsing(false);
     if(holder.canRecycled()) {
       recycleViewList.add(holder);
