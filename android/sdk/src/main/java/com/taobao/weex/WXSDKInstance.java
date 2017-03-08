@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -294,6 +294,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
   private boolean trackComponent;
+  private boolean mNeedValidate = false;
+
+  public boolean isNeedValidate() {
+    return mNeedValidate;
+  }
   /*
    *  store custom ViewPort Width
    */
@@ -559,6 +564,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
 
     Map<String, Object> renderOptions = options;
     if (renderOptions == null) {
@@ -570,7 +578,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      render(pageName, WXFileUtils.loadAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
+      render(pageName, WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
       return;
     }
 
@@ -1220,7 +1228,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       getContext().unregisterReceiver(mGlobalEventReceiver);
       mGlobalEventReceiver=null;
     }
-
     if(mRootComp != null ) {
       mRootComp.destroy();
       destroyView(mRenderContainer);
@@ -1259,6 +1266,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setBundleUrl(String url){
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
   }
 
   public void onRootCreated(WXComponent root) {
@@ -1267,14 +1277,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void addFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().addView(fixedChild);
+    if(mRenderContainer != null) {
+      mRenderContainer.addView(fixedChild);
     }
   }
 
   public void removeFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().removeView(fixedChild);
+    if(mRenderContainer != null) {
+      mRenderContainer.removeView(fixedChild);
     }
   }
 

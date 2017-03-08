@@ -9,6 +9,7 @@
 #import "WXScrollerProtocol.h"
 #import "WXComponent.h"
 #import "WXConvert.h"
+#import "WXTransform.h"
 @class WXTouchGestureRecognizer;
 @class WXThreadSafeCounter;
 
@@ -39,6 +40,9 @@
     UIView *_view;
     CGFloat _opacity;
     WXVisibility  _visibility;
+    WXBoxShadow *_originalBoxShadow;
+    WXBoxShadow *_lastBoxShadow;
+    WXBoxShadow *_boxShadow;
     
     /**
      *  PseudoClass
@@ -100,8 +104,7 @@
     BOOL _isNeedJoinLayoutSystem;
     BOOL _lazyCreateView;
     
-    NSString *_transform;
-    NSString *_transformOrigin;
+    WXTransform *_transform;
 }
 
 ///--------------------------------------

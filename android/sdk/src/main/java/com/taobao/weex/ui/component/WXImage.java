@@ -214,6 +214,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.URIAdapter;
@@ -221,6 +222,7 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.common.WXImageStrategy;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
@@ -229,6 +231,7 @@ import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
 import com.taobao.weex.utils.WXDomUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -363,6 +366,21 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
+  @Override
+  public void recycled() {
+    super.recycled();
+
+    if (getInstance().getImgLoaderAdapter() != null) {
+      getInstance().getImgLoaderAdapter().setImage(null, mHost,
+              null, null);
+    } else {
+      if (WXEnvironment.isApkDebugable()) {
+        throw new WXRuntimeException("getImgLoaderAdapter() == null");
+      }
+      WXLogUtils.e("Error getImgLoaderAdapter() == null");
+    }
+  }
+
   private void setRemoteSrc(Uri rewrited) {
 
       WXImageStrategy imageStrategy = new WXImageStrategy();
@@ -381,9 +399,9 @@ public class WXImage extends WXComponent<ImageView> {
           if (getDomObject() != null && getDomObject().getEvents().contains(Constants.Event.ONLOAD)) {
             Map<String, Object> params = new HashMap<String, Object>();
             Map<String, Object> size = new HashMap<>(2);
-            if (imageView != null && imageView.getDrawable() != null && imageView.getDrawable() instanceof ImageDrawable) {
-              size.put("naturalWidth", ((ImageDrawable) imageView.getDrawable()).getBitmapWidth());
-              size.put("naturalHeight", ((ImageDrawable) imageView.getDrawable()).getBitmapHeight());
+            if (imageView != null && imageView instanceof Measurable) {
+              size.put("naturalWidth", ((Measurable) imageView).getNaturalWidth());
+              size.put("naturalHeight", ((Measurable) imageView).getNaturalHeight());
             } else {
               size.put("naturalWidth", 0);
               size.put("naturalHeight", 0);
@@ -442,5 +460,10 @@ public class WXImage extends WXComponent<ImageView> {
       }
       readyToRender();
     }
+  }
+
+  public interface Measurable {
+    int getNaturalWidth();
+    int getNaturalHeight();
   }
 }

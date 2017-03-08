@@ -202,7 +202,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
-  private volatile ImmutableDomObject mDomObj;
+  protected volatile ImmutableDomObject mDomObj;
   private WXSDKInstance mInstance;
   private Context mContext;
 
@@ -225,7 +225,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private Set<String> mAppendEvents = new HashSet<>();
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
-  private boolean mIsDestoryed = false;
+  private boolean mIsDestroyed = false;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -441,9 +441,23 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         component = this;
       }
       mCurrentRef = component.getDomObject().getRef();
-      updateProperties(component.getDomObject().getStyles());
-      updateProperties(component.getDomObject().getAttrs());
+      updateStyle(component);
+      updateAttrs(component);
       updateExtra(component.getDomObject().getExtra());
+    }
+  }
+
+  public void updateStyle(WXComponent component){
+    ImmutableDomObject domObject = component.getDomObject();
+    if(domObject !=null){
+      updateProperties(domObject.getStyles());
+    }
+  }
+
+  public void updateAttrs(WXComponent component){
+    ImmutableDomObject domObject = component.getDomObject();
+    if(domObject !=null){
+      updateProperties(domObject.getAttrs());
     }
   }
 
@@ -619,6 +633,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
 
+  @Deprecated
   public void updateProperties(Map<String, Object> props) {
     if (props == null || mHost == null) {
       return;
@@ -671,7 +686,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         Boolean disabled = WXUtils.getBoolean(param,null);
         if (disabled != null) {
           setDisabled(disabled);
-          setPseudoClassStatus(Constants.PESUDO.DISABLED, disabled);
+          setPseudoClassStatus(Constants.PSEUDO.DISABLED, disabled);
         }
         return true;
       case Constants.Name.POSITION:
@@ -1286,7 +1301,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+  public void recycled() {
+    if(mDomObj.isFixed())
+      return;
 
+  }
 
   public void destroy() {
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
@@ -1297,15 +1316,18 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     removeAllEvent();
     removeStickyStyle();
-    if (mDomObj != null) {
-      mDomObj = null;
+
+    View view;
+    if(mDomObj.isFixed() && (view = getHostView()) != null){
+      getInstance().removeFixedView(view);
     }
 
-    mIsDestoryed = true;
+    mDomObj = ImmutableDomObject.DESTROYED;
+    mIsDestroyed = true;
   }
 
   public boolean isDestoryed() {
-    return mIsDestoryed;
+    return mIsDestroyed;
   }
 
   /**
@@ -1408,7 +1430,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   private void setActiveTouchListener(){
-    boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PESUDO.ACTIVE);
+    boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PSEUDO.ACTIVE);
     View view;
     if(hasActivePesudo && (view = getRealView()) != null) {
       boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || mGesture != null;
@@ -1418,7 +1440,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   @Override
   public void updateActivePseudo(boolean isSet) {
-    setPseudoClassStatus(Constants.PESUDO.ACTIVE,isSet);
+    setPseudoClassStatus(Constants.PSEUDO.ACTIVE,isSet);
   }
 
   /**
@@ -1460,6 +1482,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mStickyOffset;
   }
 
+  public boolean canRecycled(){
+    return mDomObj.getAttrs().canRecycled();
+  }
+  
   /**
    * Sets the offset for the sticky
    * @param stickyOffset child[y]-parent[y]

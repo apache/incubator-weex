@@ -70,19 +70,6 @@
     if (!_displayState) {
         [_indicator.view setHidden:YES];
     }
-    [self.view setFrame: (CGRect){
-        .size = self.calculatedFrame.size,
-        .origin.x = self.calculatedFrame.origin.x,
-        .origin.y = self.view.frame.origin.y + CGRectGetHeight(self.calculatedFrame)
-    }];
-}
-
-- (void)layoutDidFinish {
-    [self.view setFrame: (CGRect){
-        .size = self.calculatedFrame.size,
-        .origin.x = self.calculatedFrame.origin.x,
-        .origin.y = self.view.frame.origin.y + CGRectGetHeight(self.calculatedFrame)
-    }];
 }
 
 - (void)addEvent:(NSString *)eventName
@@ -101,7 +88,7 @@
 
 - (void)loading
 {
-    if (!_loadingEvent)
+    if (!_loadingEvent || _displayState)
         return;
     
     [self fireEvent:@"loading" params:nil];
@@ -116,10 +103,8 @@
     CGPoint contentOffset = [scrollerProtocol contentOffset];
     if (_displayState) {
         contentOffset.y = [scrollerProtocol contentSize].height - scroller.calculatedFrame.size.height + self.calculatedFrame.size.height;
-        
         [_indicator start];
     } else {
-        _displayState = NO;
         contentOffset.y = contentOffset.y - self.calculatedFrame.size.height;
         [_indicator stop];
     }
