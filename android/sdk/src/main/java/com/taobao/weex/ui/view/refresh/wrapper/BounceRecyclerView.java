@@ -312,6 +312,14 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     }
   }
 
+  @Override
+  public void updateStickyView() {
+    if (!headComponentStack.isEmpty()) {
+      WXCell header = headComponentStack.peek();
+      header.getRealView().bringToFront();
+    }
+  }
+
   /**
    * @param component
    */
@@ -344,7 +352,7 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
         if((existedParent = (ViewGroup)headerView.getParent())!= null){
           existedParent.removeView(headerView);
         }
-        addView(headerView);
+        addView(headerView,getChildCount()-1);
         //recover translation, sometimes it will be changed on fling
         headerView.setTranslationX(translationX);
         headerView.setTranslationY(translationY);
