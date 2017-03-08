@@ -13,6 +13,9 @@ version: 2.1
 
 支持所有 Weex 的组件作为它的子组件。
 
+## 属性
+*  `keep-scroll-position {boolean}`: <span class="api-version">v0.11+</span> List 插入数据后是否保持上次滚动的位置
+
 ## 样式
 
 **注意：**
