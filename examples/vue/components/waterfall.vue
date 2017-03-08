@@ -1,9 +1,9 @@
 <template>
-  <waterfall class="page"
+  <waterfall class="page" ref="waterfall"
   v-bind:style="{padding:padding}"
   :column-width="columnWidth" :column-count="columnCount" :column-gap="columnGap"
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
-  @scroll="recylerScroll"
+  @scroll="recylerScroll" @loadmore="loadmore" loadmoreoffset=3000
   >
     <refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
       <loading-indicator class="indicator"></loading-indicator>
@@ -325,6 +325,10 @@
     methods: {
       recylerScroll: function(e) {
         this.contentOffset = e.contentOffset.y
+      },
+      loadmore: function(e) {
+        console.log('receive loadmore event')
+        // this.$refs.waterfall.resetLoadmore()
       },
       showOrRemoveHeader: function() {
         this.showHeader = !this.showHeader

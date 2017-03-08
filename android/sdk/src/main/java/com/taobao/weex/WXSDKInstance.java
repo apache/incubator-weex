@@ -1277,14 +1277,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   public void addFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().addView(fixedChild);
+    if(mRenderContainer != null) {
+      mRenderContainer.addView(fixedChild);
     }
   }
 
   public void removeFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().removeView(fixedChild);
+    if(mRenderContainer != null) {
+      mRenderContainer.removeView(fixedChild);
     }
   }
 
