@@ -1,4 +1,5 @@
 import { getThrottleLazyload, watchAppear } from '../utils'
+import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated } from '../utils/perf'
 
 const supportedEvents = [
   'click', 'longpress', 'appear', 'disappear'
@@ -27,6 +28,7 @@ export default {
     if (!lazyloadWatched) {
       watchLazyload()
     }
+    tagBeforeCreate()
   },
 
   mounted () {
@@ -36,6 +38,15 @@ export default {
       Object.freeze(weex)
     }
     watchAppear(this)
+    tagMounted()
+  },
+
+  beforeUpdate () {
+    tagBeforeUpdate()
+  },
+
+  updated () {
+    tagUpdated()
   },
 
   methods: {

@@ -66,6 +66,27 @@ export function debounce (func, wait) {
   }
 }
 
+export function depress (func, wait) {
+  let timerId
+  function later () {
+    timerId = null
+  }
+  return function () {
+    if (!timerId) {
+      func.apply()
+    }
+    clearTimeout(timerId)
+    timerId = setTimeout(later, wait)
+  }
+}
+
+/**
+ * only call func the first time after a while longer than wait.
+ */
+export function startup (func, wait) {
+
+}
+
 export function throttle (func, wait, callLastTime, tag) {
   let last = 0
   let lastTimer = null

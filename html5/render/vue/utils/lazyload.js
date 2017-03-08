@@ -2,6 +2,7 @@ import { isElementVisible } from './component'
 import { createEvent, dispatchEvent } from './event'
 import { throttle } from './func'
 import { isArray } from './type'
+import { tagImg } from './perf'
 
 function preLoadImg (src, loadCallback, errorCallback) {
   const img = new Image()
@@ -14,6 +15,7 @@ export function applySrc (item, src, placeholderSrc) {
   if (!src) { return }
   function finallCb () {
     item.removeAttribute('img-src')
+    tagImg() // tag lastest img onload time.
   }
   preLoadImg(src, function () {
     item.style.backgroundImage = `url(${src})`
