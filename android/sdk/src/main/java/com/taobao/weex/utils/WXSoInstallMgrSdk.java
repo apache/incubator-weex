@@ -208,6 +208,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
+import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.WXErrorCode;
@@ -284,7 +285,7 @@ public class WXSoInstallMgrSdk {
     }
 
     boolean InitSuc = false;
-    if (checkSoIsValid(libName, ARMEABI_Size) ||checkSoIsValid(libName, X86_Size)) {
+    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
 
       /**
        * Load library with {@link System#loadLibrary(String)}
@@ -361,7 +362,7 @@ public class WXSoInstallMgrSdk {
    * @param size  the right size of lib
    * @return true for valid  ; false for InValid
    */
-  static boolean checkSoIsValid(String libName, int size) {
+  static boolean checkSoIsValid(String libName, long size) {
     Context context = mContext;
     if (null == context) {
       return false;
