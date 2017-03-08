@@ -98,6 +98,8 @@ typedef enum : NSUInteger {
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
             
             layout.delegate = self;
+        } else {
+            _collectionViewlayout = [UICollectionViewLayout new];
         }
         
         _dataController = [WXRecyclerDataController new];
