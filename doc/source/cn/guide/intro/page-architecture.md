@@ -1,7 +1,7 @@
 ---
 title: Weex 页面结构
 type: guide
-order: 4.6
+order: 5.6
 version: 2.1
 ---
 

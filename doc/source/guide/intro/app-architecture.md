@@ -1,7 +1,7 @@
 ---
 title: Mobile App Architecture
 type: guide
-order: 4.5
+order: 5.5
 version: 2.1
 ---
 
