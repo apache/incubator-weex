@@ -12,6 +12,8 @@
 #import "WXLayer.h"
 #import "WXUtility.h"
 #import "WXConvert.h"
+#import "WXRuleManager.h"
+#import "WXDefine.h"
 #import <pthread/pthread.h>
 
 @interface WXText : UIView
@@ -152,6 +154,7 @@ static BOOL _isUsingTextStorageLock = NO;
         pthread_mutex_destroy(&_textStorageMutex);
         pthread_mutexattr_destroy(&_textStorageMutexAttr);
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -298,6 +301,10 @@ do {\
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
             computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
+        if ([WXUtility isBlankString:textStorage.string]) {
+            //  if the text value is empty or nil, then set the height is 0.
+            computedSize.height = 0;
+        }
         
         return (CGSize) {
             WXCeilPixelValue(computedSize.width),
@@ -312,6 +319,21 @@ do {\
     return _text;
 }
 
+- (void)repaintText:(NSNotification *)notification
+{
+    if (![_fontFamily isEqualToString:notification.userInfo[@"fontFamily"]]) {
+        return;
+    }
+    [self setNeedsRepaint];
+    WXPerformBlockOnComponentThread(^{
+        [self.weexInstance.componentManager startComponentTasks];
+        WXPerformBlockOnMainThread(^{
+            [self setNeedsLayout];
+            [self setNeedsDisplay];
+        });
+    });
+}
+
 - (NSAttributedString *)buildAttributeString
 {
     NSString *string = [self text] ?: @"";
@@ -321,6 +343,18 @@ do {\
     // set textColor
     if(_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
+    }
+    
+    if (_fontFamily) {
+        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
+        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
+        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        //custom localSrc is cached
+        if (!fontLocalSrc && fontSrc) {
+            // if use custom font, when the custom font download finish, refresh text.
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        }
     }
     
     // set font
@@ -351,8 +385,20 @@ do {\
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
     }
+    if ([self adjustLineHeight]) {
+        if (_lineHeight > font.lineHeight) {
+            [attributedString addAttribute:NSBaselineOffsetAttributeName
+                                     value:@((_lineHeight - font.lineHeight)/ 2)
+                                     range:(NSRange){0, attributedString.length}];
+        }
+    }
 
     return attributedString;
+}
+
+- (BOOL)adjustLineHeight
+{
+    return YES;
 }
 
 - (NSTextStorage *)textStorageWithWidth:(CGFloat)width
