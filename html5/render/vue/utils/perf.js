@@ -10,12 +10,17 @@ const perf = window._weex_perf = {
   latestMounts: [],
   earliestBeforeUpdates: [],
   latestUpdates: [],
+  latestRenderFinishes: [],
+  // createTime: earliest beforeCreate -> latest mounted.
   createTime: [],
-  updateTime: []
+  // updateTime: earliest beforeUpdate -> latest updated.
+  updateTime: [],
+  // renderTime: earliest beforeCreate/beforeUpdate -> latest img loaded.
+  renderTime: []
 }
 
-let earliestBeforeUpdateTime
-let earliestBeforeCreateTime
+let earliestBeforeUpdateTime = 0
+let earliestBeforeCreateTime = 0
 
 if (!performance.now) {
   performance.now = function () { return new Date().getTime() }
@@ -24,8 +29,18 @@ if (!performance.now) {
 /**
  * get first screen time.
  */
+const debouncedTagImg = debounce(function () {
+  const now = performance.now()
+  perf.latestRenderFinishes.push(now)
+  const start = Math.max(earliestBeforeCreateTime, earliestBeforeUpdateTime)
+  perf.renderTime.push({
+    start,
+    end: now,
+    duration: now - start
+  })
+}, 500)
 export function tagImg () {
-  perf.latestImgLoaded = performance.now()
+  debouncedTagImg()
 }
 
 /**
@@ -50,7 +65,7 @@ const debouncedTagMounted = debounce(function () {
   perf.createTime.push({
     start: earliestBeforeCreateTime,
     end: now,
-    dur: now - earliestBeforeCreateTime
+    duration: now - earliestBeforeCreateTime
   })
 }, 25)
 
@@ -80,7 +95,7 @@ const debouncedTagUpdated = debounce(function () {
   perf.updateTime.push({
     start: earliestBeforeUpdateTime,
     end: now,
-    dur: now - earliestBeforeUpdateTime
+    duration: now - earliestBeforeUpdateTime
   })
 }, 25)
 

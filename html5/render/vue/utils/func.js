@@ -54,6 +54,9 @@ export function bind (fn, ctx) {
   }
 }
 
+/**
+ * Only call the func the last time before it's not that frequently called.
+ */
 export function debounce (func, wait) {
   let timerId
   function later () {
@@ -66,6 +69,9 @@ export function debounce (func, wait) {
   }
 }
 
+/**
+ * Only call the func the first time before a series frequently function calls happen.
+ */
 export function depress (func, wait) {
   let timerId
   function later () {
@@ -81,12 +87,8 @@ export function depress (func, wait) {
 }
 
 /**
- * only call func the first time after a while longer than wait.
+ * Only call the func every time after a wait milliseconds if it's too frequently called.
  */
-export function startup (func, wait) {
-
-}
-
 export function throttle (func, wait, callLastTime, tag) {
   let last = 0
   let lastTimer = null
