@@ -374,13 +374,14 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
    * recycle component resources
    */
   public void recycled() {
-    if (mChildren != null) {
+    super.recycled();
+    if (mChildren != null && !mDomObj.isFixed() && mDomObj.getAttrs().canRecycled()) {
       int count = mChildren.size();
       for (int i = 0; i < count; ++i) {
         mChildren.get(i).recycled();
       }
     }
-    super.recycled();
+
   }
 
   @Override

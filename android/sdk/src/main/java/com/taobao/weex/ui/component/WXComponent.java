@@ -202,7 +202,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /** package **/ T mHost;
 
   private volatile WXVContainer mParent;
-  private volatile ImmutableDomObject mDomObj;
+  protected volatile ImmutableDomObject mDomObj;
   private WXSDKInstance mInstance;
   private Context mContext;
 
@@ -1302,6 +1302,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    *  end hook Activity life cycle callback
    ********************************************************/
   public void recycled() {
+    if(mDomObj.isFixed())
+      return;
 
   }
 
