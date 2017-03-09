@@ -38,11 +38,16 @@ export function setViewport (config = {}) {
     const screenWidth = deRect.width
     const screenHeight = deRect.height
     const scale = screenWidth / viewportWidth
+    
+    /**
+     * if set initial/maximum/mimimum-scale some how the page will have a bounce
+     * effect when user drag the page towards horizontal axis.
+     */
     const contents = [
       `width=${viewportWidth}`,
-      `initial-scale=${scale}`,
-      `maximum-scale=${scale}`,
-      `minimum-scale=${scale}`,
+      // `initial-scale=${scale}`,
+      // `maximum-scale=${scale}`,
+      // `minimum-scale=${scale}`,
       `user-scalable=no`
     ]
 
