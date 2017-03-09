@@ -181,4 +181,4 @@ version: 2.1
 ## 其它参考
 
 * [W3school: html5 localStorage](http://www.w3school.com.cn/html5/html_5_webstorage.asp)
-* [storage 模块完整的 Demo](https://github.com/alibaba/weex/blob/dev/examples/module/storage-demo.we)
+* [storage 模块完整的 Demo](https://github.com/apache/incubator-weex/blob/dev/examples/module/storage-demo.we)

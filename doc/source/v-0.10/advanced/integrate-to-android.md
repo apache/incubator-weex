@@ -16,8 +16,8 @@ Assuming you have the Android SDK installed, run `android` to open the Android S
 
 Make sure you have the following installed:
 
-1. Android SDK version 23 (compileSdkVersion in [`build.gradle`](https://github.com/alibaba/weex/blob/master/android/sdk/build.gradle))
-2. SDK build tools version 23.0.2 (buildToolsVersion in [`build.gradle`](https://github.com/alibaba/weex/blob/master/android/sdk/build.gradle))
+1. Android SDK version 23 (compileSdkVersion in [`build.gradle`](https://github.com/apache/incubator-weex/blob/master/android/sdk/build.gradle))
+2. SDK build tools version 23.0.2 (buildToolsVersion in [`build.gradle`](https://github.com/apache/incubator-weex/blob/master/android/sdk/build.gradle))
 3. Android Support Repository >= 17 (for Android Support Library)
 4. Android NDK (download & extraction instructions [here](http://developer.android.com/ndk/downloads/index.html))
 
@@ -201,4 +201,4 @@ That's it, your activity is ready to run some JavaScript code.
 
 ## Reference Example   
 
-[`Weex Examples`](https://github.com/alibaba/weex/tree/master/examples)
+[`Weex Examples`](https://github.com/apache/incubator-weex/tree/master/examples)
