@@ -9,6 +9,7 @@ for file in git.modified_files do
         warn("Modify public in #{file}")
       else
         fail("Modify public in #{file} without metion it in commit message. ")
+      end
     end
   end
 end
