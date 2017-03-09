@@ -275,50 +275,56 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
     super.onScrolled(recyclerView, dx, dy);
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-    IOnLoadMoreListener l;
-    if ((l = listener.get()) != null) {
-      l.onBeforeScroll(dx, dy);
+    if(listener == null){
+      return;
     }
+    IOnLoadMoreListener iOnLoadMoreListener = listener.get();
 
-    //  int lastVisibleItemPosition = -1;
-    if (layoutManager instanceof LinearLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
-      mLastVisibleItemPosition = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-      listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
-    } else if (layoutManager instanceof GridLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
-      GridLayoutManager gridLayoutManager = ((GridLayoutManager) layoutManager);
-      mLastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition();
-      listener.get().notifyAppearStateChange(((GridLayoutManager) layoutManager).findFirstVisibleItemPosition()
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
+    if(iOnLoadMoreListener!=null) {
 
-    } else if (layoutManager instanceof StaggeredGridLayoutManager) {
-      layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
-      StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
-      int newspanCount = staggeredGridLayoutManager.getSpanCount();
-      if (mLastPositions == null || newspanCount != mLastPositions.length ) {
-        mLastPositions = new int[newspanCount];
+      iOnLoadMoreListener.onBeforeScroll(dx, dy);
+
+      if (layoutManager instanceof LinearLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+        mLastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+        int firstVisible = linearLayoutManager.findFirstVisibleItemPosition();
+        iOnLoadMoreListener.notifyAppearStateChange(firstVisible
+            , mLastVisibleItemPosition
+            , dx
+            , dy);
+      } else if (layoutManager instanceof GridLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+        mLastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition();
+        iOnLoadMoreListener.notifyAppearStateChange(gridLayoutManager.findFirstVisibleItemPosition()
+            , mLastVisibleItemPosition
+            , dx
+            , dy);
+
+      } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+        layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
+        StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
+        int newSpanCount = staggeredGridLayoutManager.getSpanCount();
+        if (mLastPositions == null || newSpanCount != mLastPositions.length) {
+          mLastPositions = new int[newSpanCount];
+        }
+        if (mFirstPositions == null || newSpanCount != mFirstPositions.length) {
+          mFirstPositions = new int[newSpanCount];
+        }
+        staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
+        mFirstVisibleItemPosition = findMin(mFirstPositions);
+        staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
+        mLastVisibleItemPosition = findMax(mLastPositions);
+        iOnLoadMoreListener.notifyAppearStateChange(
+            mFirstVisibleItemPosition
+            , mLastVisibleItemPosition
+            , dx
+            , dy);
+      } else {
+        throw new RuntimeException(
+            "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
       }
-      if (mFirstPositions == null || newspanCount != mFirstPositions.length) {
-        mFirstPositions = new int[newspanCount];
-      }
-      staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
-      mFirstVisibleItemPosition = findMin(mFirstPositions);
-      staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
-      mLastVisibleItemPosition = findMax(mLastPositions);
-      listener.get().notifyAppearStateChange(
-              mFirstVisibleItemPosition
-              , mLastVisibleItemPosition
-              , dx
-              , dy);
-    } else {
-      throw new RuntimeException(
-              "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
     }
   }
 

@@ -335,7 +335,6 @@ public final class WXDomManager {
    * Batch the execution of {@link WXDomStatement}
    */
   void batch() {
-
     throwIfNotDomThread();
     Iterator<Entry<String, WXDomStatement>> iterator = mDomRegistries.entrySet().iterator();
     while (iterator.hasNext()) {

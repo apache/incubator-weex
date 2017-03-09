@@ -210,7 +210,6 @@ import android.os.Message;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Handler for dom operations.
@@ -295,7 +294,6 @@ public class WXDomHandler implements Handler.Callback {
         mWXDomManager.batch();
         mHasBatch = false;
         break;
-
       case MsgType.WX_DOM_SCROLLTO:
         mWXDomManager.scrollToDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
         break;

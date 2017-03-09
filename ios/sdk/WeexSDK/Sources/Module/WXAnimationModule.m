@@ -89,6 +89,12 @@
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
+    if (!_animationInfo.target) {
+        return;
+    }
+    
+    [_animationInfo.target.layer removeAllAnimations];
+    
     if (_finishBlock) {
         _finishBlock(flag);
     }

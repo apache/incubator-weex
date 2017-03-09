@@ -11,8 +11,8 @@
 #import "WXLog.h"
 #import "WXLayoutDefine.h"
 #import "WXType.h"
-#import "WXLength.h"
 
+@class WXLength;
 @class WXBoxShadow;
 @interface WXConvert : NSObject
 

@@ -9,6 +9,7 @@
 #import "WXConvert.h"
 #import "WXUtility.h"
 #import "WXBoxShadow.h"
+#import "WXLength.h"
 #import "WXAssert.h"
 
 @implementation WXConvert
