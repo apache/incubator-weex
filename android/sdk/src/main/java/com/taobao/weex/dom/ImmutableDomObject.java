@@ -208,6 +208,8 @@ import android.support.annotation.NonNull;
 
 import com.taobao.weex.dom.flex.Spacing;
 
+import static com.taobao.weex.dom.WXDomObject.DESTROYED;
+
 /**
  * Created by sospartan on 25/10/2016.
  */
@@ -227,4 +229,6 @@ public interface ImmutableDomObject {
   @NonNull Spacing getBorder();
   Object getExtra();
   String getType();
+
+  public final ImmutableDomObject DESTROYED = WXDomObject.DESTROYED;
 }

@@ -131,29 +131,28 @@
         return;
     }
     
-    void (^updates)() = ^{
+    void (^updates)() = [^{
+        [self.delegate updateController:self willPerformUpdateWithNewData:newData];
         [UIView setAnimationsEnabled:NO];
         WXLogDebug(@"UICollectionView update:%@", diffResult);
         [self applyUpdate:diffResult toCollectionView:self.collectionView];
-    };
+    } copy];
     
-    void (^completion)(BOOL) = ^(BOOL finished) {
+    void (^completion)(BOOL) = [^(BOOL finished) {
         [UIView setAnimationsEnabled:YES];
         self.isUpdating = NO;
         [self.delegate updateController:self didPerformUpdateWithFinished:finished];
         [self.reloadIndexPaths removeAllObjects];
         [self checkUpdates];
-    };
+    } copy];
     
     self.isUpdating = YES;
     
-    if (!self.delegate) {
+    if (!self.delegate || !collectionView.dataSource) {
         return;
     }
     
-    [self.delegate updateController:self willPerformUpdateWithNewData:newData];
-    
-    NSLog(@"Diff result:%@", diffResult);
+    WXLogDebug(@"Diff result:%@", diffResult);
     [collectionView performBatchUpdates:updates completion:completion];
 }
 

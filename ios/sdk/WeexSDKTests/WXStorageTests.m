@@ -120,16 +120,11 @@
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
                 
-                NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-                NSTimeInterval ts = [infoDic[@"key1"][@"ts"] doubleValue];
-                NSLog(@"ts:%f",ts);
-                
                 XCTAssert([@"success" isEqualToString:result[@"result"]]);
                 XCTAssert([@"shortValue12" isEqualToString:dic[@"key1"]]);
                 XCTAssertEqual(infoDic[@"key1"][@"persistent"], @(NO));
                 XCTAssertEqual(infoDic[@"key1"][@"size"], @([@"shortValue12" length]));
                 XCTAssertTrue([indexArray containsObject:@"key1"]);
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
             }];
         }];
     });
@@ -225,16 +220,12 @@
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
             
-            NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-            NSTimeInterval ts = [infoDic[@"key4"][@"ts"] doubleValue];
-            
             XCTAssertEqual(result[@"result"], @"success");
             XCTAssertNotEqual(dic[@"key4"], longValue);
             XCTAssertTrue([dic[@"key4"] isEqualToString:@"#{eulaVlluNegarotSXW}"]);
             XCTAssertFalse([infoDic[@"key4"][@"persistent"] boolValue]);
             XCTAssertTrue([infoDic[@"key4"][@"size"] integerValue] == [longValue length]);
             XCTAssertTrue([indexArray containsObject:@"key4"]);
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.5);
             
             [self.storage getItem:@"key4" callback:^(id result) {
                 [expectation fulfill];

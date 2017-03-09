@@ -254,7 +254,6 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
   }
     
   public boolean isFullSpan() {
-
     return mComponent != null && mComponent.get() instanceof WXHeader;
   }
 
