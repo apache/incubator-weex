@@ -13,8 +13,6 @@ for file in git.modified_files do
   end
 end
 
-
-
 # Warn when there is a big PR
 warn("Big PR") if git.lines_of_code > 500
 
@@ -26,9 +24,6 @@ if git.lines_of_code > 100 && has_app_changes && !has_test_changes
   warn "This PR may need tests."
 end
 
-# Shows all build errors, warnings and unit tests results generated from `xcodebuild`
-xcode_summary.ignored_files = '**/Pods/**'
-xcode_summary.report 'ios/sdk/xcodebuild.json'
 
 # Fails build when Copyright header is not included
 oc_files = (git.modified_files + git.added_files).uniq.select do |file_path|
