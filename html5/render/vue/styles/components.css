@@ -59,7 +59,7 @@ body > .weex-div {
 
 .weex-input, .weex-textarea {
   position: relative;
-  font-size: 32px;
+  font-size: 0.426667rem;
 }
 .weex-input:focus, .weex-textarea:focus {
   outline: none;
@@ -73,21 +73,21 @@ body > .weex-div {
 }
 
 .weex-toast {
-  font-size: 32px;
-  line-height: 32px;
+  font-size: 0.426667rem;
+  line-height: 0.426667rem;
   position: fixed;
   box-sizing: border-box;
   max-width: 80%;
-  bottom: 200px;
+  bottom: 2.666667rem;
   left: 50%;
-  padding: 16px;
+  padding: 0.213333rem;
   background-color: #000;
   color: #fff;
   text-align: center;
   opacity: 0.6;
   -webkit-transition: all 0.4s ease-in-out;
           transition: all 0.4s ease-in-out;
-  border-radius: 5px;
+  border-radius: 0.066667rem;
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
       transform: translateX(-50%);
@@ -107,7 +107,7 @@ body > .weex-div {
 }
 
 .weex-confirm .btn-group .btn.btn-ok {
-  border-right: 1px solid #ddd;
+  border-right: 0.013333rem solid #ddd;
 }
 
 .weex-modal-wrap {
@@ -127,9 +127,9 @@ body > .weex-div {
   z-index: 9999999999;
   top: 50%;
   left: 50%;
-  width: 500px;
-  min-height: 200px;
-  border-radius: 5px;
+  width: 6.666667rem;
+  min-height: 2.666667rem;
+  border-radius: 0.066667rem;
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
@@ -158,18 +158,18 @@ body > .weex-div {
   -ms-flex-pack: center;
       justify-content: center;
   width: 100%;
-  min-height: 140px;
+  min-height: 1.866667rem;
   box-sizing: border-box;
-  font-size: 32px;
-  line-height: 32px;
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
+  font-size: 0.426667rem;
+  line-height: 0.426667rem;
+  padding: 0.213333rem;
+  border-bottom: 0.013333rem solid #ddd;
 }
 
 .weex-modal-node .btn-group {
   width: 100%;
-  height: 60px;
-  font-size: 28px;
+  height: 0.8rem;
+  font-size: 0.373333rem;
   text-align: center;
   margin: 0;
   padding: 0;
@@ -182,8 +182,8 @@ body > .weex-div {
 
 .weex-modal-node .btn-group .btn {
   box-sizing: border-box;
-  height: 60px;
-  line-height: 60px;
+  height: 0.8rem;
+  line-height: 0.8rem;
   margin: 0;
   padding: 0;
   border: none;
@@ -194,17 +194,17 @@ body > .weex-div {
 .weex-prompt .input-wrap {
   box-sizing: border-box;
   width: 100%;
-  margin-top: 10px;
-  height: 72px;
+  margin-top: 0.133333rem;
+  height: 0.96rem;
 }
 
 .weex-prompt .input-wrap .input {
   box-sizing: border-box;
   width: 100%;
-  height: 42px;
-  line-height: 42px;
-  font-size: 32px;
-  border: 1px solid #999;
+  height: 0.56rem;
+  line-height: 0.56rem;
+  font-size: 0.426667rem;
+  border: 0.013333rem solid #999;
 }
 
 .weex-prompt .btn-group .btn {
@@ -213,7 +213,7 @@ body > .weex-div {
 }
 
 .weex-prompt .btn-group .btn.btn-ok {
-  border-right: 1px solid #ddd;
+  border-right: 0.013333rem solid #ddd;
 }
 
 body > .weex-list,
@@ -364,12 +364,12 @@ body > .weex-scroller {
   display: inline-block;
   position: relative;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 0.266667rem;
+  height: 0.266667rem;
   background-color: #BBBBBB;
 }
 .weex-indicator-item + .weex-indicator-item {
-  margin-left: 10px;
+  margin-left: 0.133333rem;
 }
 
 .weex-indicator-item-active {
@@ -379,8 +379,8 @@ body > .weex-scroller {
 .weex-refresh-indicator,
 .weex-loading-indicator {
   position: relative;
-  width: 75px;
-  height: 75px;
+  width: 1.0rem;
+  height: 1.0rem;
   -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
@@ -396,8 +396,7 @@ body > .weex-scroller {
 .weex-loading-indicator:before {
   display: block;
   content: '';
-  font-size: 12px;
-  /* 12px */
+  font-size: 0.16rem;
   width: 1em;
   height: 1em;
   left: -60%;
@@ -407,8 +406,8 @@ body > .weex-scroller {
   text-indent: -9999em;
   -webkit-animation: weex-spinner 1.1s infinite ease;
           animation: weex-spinner 1.1s infinite ease;
-  -webkit-transform: translate3d(75px, 0, 0);
-          transform: translate3d(75px, 0, 0);
+  -webkit-transform: translate3d(1.0rem, 0, 0);
+          transform: translate3d(1.0rem, 0, 0);
 }
 
 @-webkit-keyframes weex-spinner {
@@ -467,7 +466,7 @@ body > .weex-scroller {
   }
 }
 .weex-switch {
-  border: 1px solid #dfdfdf;
+  border: 0.013333rem solid #dfdfdf;
   cursor: pointer;
   display: inline-block;
   position: relative;
@@ -479,12 +478,12 @@ body > .weex-scroller {
   box-sizing: content-box;
   background-clip: content-box;
   color: #64bd63;
-  width: 100px;
-  height: 60px;
+  width: 1.333333rem;
+  height: 0.8rem;
   background-color: white;
   border-color: #dfdfdf;
   box-shadow: #dfdfdf 0 0 0 0 inset;
-  border-radius: 60px;
+  border-radius: 0.8rem;
   -webkit-transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
           transition: border 0.4s, box-shadow 0.4s, background-color 1.2s;
 }
@@ -492,12 +491,12 @@ body > .weex-scroller {
 .weex-switch-checked {
   background-color: #64bd63;
   border-color: #64bd63;
-  box-shadow: #64bd63 0 0 0 40px inset;
+  box-shadow: #64bd63 0 0 0 0.533333rem inset;
 }
 
 .weex-switch-checked.weex-switch-disabled {
   background-color: #A0CCA0;
-  box-shadow: #A0CCA0 0 0 0 40px inset;
+  box-shadow: #A0CCA0 0 0 0 0.533333rem inset;
 }
 
 .weex-switch-disabled {
@@ -505,11 +504,11 @@ body > .weex-scroller {
 }
 
 .weex-switch-inner {
-  width: 60px;
-  height: 60px;
+  width: 0.8rem;
+  height: 0.8rem;
   background: #fff;
   border-radius: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0.013333rem 0.04rem rgba(0, 0, 0, 0.4);
   position: absolute;
   top: 0;
   left: 0;
@@ -518,7 +517,7 @@ body > .weex-scroller {
 }
 
 .weex-switch-checked > .weex-switch-inner {
-  left: 40px;
+  left: 0.533333rem;
 }
 
 .weex-text {
@@ -526,7 +525,7 @@ body > .weex-scroller {
   -webkit-box-orient: vertical;
   position: relative;
   white-space: pre;
-  font-size: 32px;
+  font-size: 0.426667rem;
   word-wrap: break-word;
   overflow: visible;
 }

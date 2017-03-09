@@ -1,7 +1,7 @@
 /**
  * viewport priority:
  *
- * 1. meta viewport (developer custom)
+ * 1. meta weex-viewport (developer custom)
  * 2. setViewport(config) := config.width (private code) @deprecated
  * 3. process.env.VIEWPORT_WIDTH (buid time)
  *
@@ -12,14 +12,22 @@ const wxViewportMeta = document.querySelector('meta[name="weex-viewport"]')
 const metaWidth = wxViewportMeta && parseInt(wxViewportMeta.getAttribute('content'))
 if (metaWidth && !isNaN(metaWidth) && metaWidth > 0) { viewportWidth = metaWidth }
 
+/**
+ * set root font-size for rem units. If already been set, just skip this.
+ */
+function setRootFont(doc, width) {
+  const rootFontSize = doc.documentElement.style.fontSize
+  if (!rootFontSize) {
+    doc.documentElement.style.fontSize = width / 10 + 'px'
+  }
+}
+
 export function setViewport (config = {}) {
   const doc = window.document
 
   if (doc) {
-    // const viewportWidth = parseViewportWidth(config)
-
-    // set root font-size
-    // doc.documentElement.style.fontSize = viewportWidth / 10 + 'px'
+    // set root font for rem.
+    setRootFont(doc, viewportWidth)
 
     /**
      * why not to use window.screen.width to get screenWidth ? Because in some
