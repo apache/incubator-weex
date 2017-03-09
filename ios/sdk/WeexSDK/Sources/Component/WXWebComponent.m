@@ -23,7 +23,7 @@
 - (void)dealloc
 {
     if (self) {
-        self.delegate = nil;
+//        self.delegate = nil;
     }
 }
 
