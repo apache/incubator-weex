@@ -1,3 +1,20 @@
+# Error or Warn when delete public interface
+metion_break_change = git.commits.any? { |c| c.message =~ /'breack change'/ }
+
+for file in git.modified_files do
+  if file.end_with?("java")
+    diff = git.diff_for_file(file)
+    if diff && diff.patch =~ /^-\s*?public\s+[\s\S]+$/ 
+      if metion_break_change
+        warn("Modify public in #{file}")
+      else
+        fail("Modify public in #{file} without metion it in commit message. ")
+    end
+  end
+end
+
+
+
 # Warn when there is a big PR
 warn("Big PR") if git.lines_of_code > 500
 

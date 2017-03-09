@@ -110,7 +110,7 @@ function test_cpt {
         npm run build
         npm run test
     else
-        xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
+       # xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
         bundle exec danger
     fi
 }
