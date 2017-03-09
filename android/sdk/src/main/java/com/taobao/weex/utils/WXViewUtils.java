@@ -215,6 +215,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -307,11 +308,22 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
+  public static int getScreenDensityDpi(Context ctx){
+    if(ctx != null){
+      try{
+        Resources res = ctx.getResources();
+        return res.getDisplayMetrics().densityDpi;
+      }catch (Exception e){
+        WXLogUtils.e("getScreenDensityDpi exception:"+e.getMessage());
+      }
+    }
+    return DisplayMetrics.DENSITY_DEFAULT;
+  }
+
   public static int getScreenWidth(Context ctx) {
     if(ctx!=null){
       Resources res = ctx.getResources();
       mScreenWidth = res.getDisplayMetrics().widthPixels;
-
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
         mScreenHeight = res
                 .getDisplayMetrics()

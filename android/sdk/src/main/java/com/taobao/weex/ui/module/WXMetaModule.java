@@ -231,7 +231,7 @@ public class WXMetaModule extends WXModule {
                 param = URLDecoder.decode(param, "utf-8");
                 JSONObject jsObj = JSON.parseObject(param);
                 if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
-                    mWXSDKInstance.setViewPortWidth(WXViewUtils.getScreenWidth(mWXSDKInstance.getContext()));
+                    mWXSDKInstance.setViewPortWidth(WXViewUtils.getScreenDensityDpi(mWXSDKInstance.getContext()));
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
