@@ -58,10 +58,10 @@
     
 }
 
-- (void)configViewLayer:(UIView *_Nullable)view boxShadow:(WXBoxShadow *_Nullable)boxShadow
+- (void)configBoxShadow:(WXBoxShadow *_Nullable)boxShadow
 {
     if (!_originalBoxShadow) {
-        _originalBoxShadow = [self getViewBoxShadow:view];
+        _originalBoxShadow = [self getViewBoxShadow:self.view];
     }
     if (!boxShadow && !_lastBoxShadow) {
         return;
@@ -72,19 +72,19 @@
     }
     if (boxShadow.isInset) {
         if (boxShadow.innerLayer) {
-            boxShadow.innerLayer.frame = view.bounds;
+            boxShadow.innerLayer.frame = self.view.bounds;
             if (![boxShadow.innerLayer superlayer] ){
-                [view.layer addSublayer:boxShadow.innerLayer];
+                [self.view.layer addSublayer:boxShadow.innerLayer];
             }
         }
     } else {
-        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
-        view.layer.masksToBounds = NO;
-        view.layer.shadowColor = boxShadow.shadowColor;
-        view.layer.shadowOffset = boxShadow.shadowOffset;
-        view.layer.shadowRadius = boxShadow.shadowRadius;
-        view.layer.shadowOpacity = boxShadow.shadowOpacity;
-        view.layer.shadowPath = shadowPath.CGPath;
+        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds];
+        self.view.layer.masksToBounds = NO;
+        self.view.layer.shadowColor = boxShadow.shadowColor;
+        self.view.layer.shadowOffset = boxShadow.shadowOffset;
+        self.view.layer.shadowRadius = boxShadow.shadowRadius;
+        self.view.layer.shadowOpacity = boxShadow.shadowOpacity;
+        self.view.layer.shadowPath = shadowPath.CGPath;
     }
 }
 

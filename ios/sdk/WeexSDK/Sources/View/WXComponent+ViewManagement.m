@@ -9,6 +9,7 @@
 #import "WXComponent+ViewManagement.h"
 #import "WXComponent_internal.h"
 #import "WXComponent+GradientColor.h"
+#import "WXComponent+BoxShadow.h"
 #import "WXAssert.h"
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
@@ -113,6 +114,7 @@
     if (styles[@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
         _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
+        [self configBoxShadow:_boxShadow];
         [self setNeedsDisplay];
     }
     
