@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+#import "WXJSExceptionInfo.h"
 @class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;

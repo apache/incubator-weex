@@ -439,7 +439,11 @@ typedef enum : NSUInteger {
         //had not registered yet
         observer = [NSMutableDictionary new];
         [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
-        [_moduleEventObservers addEntriesFromDictionary:observer];
+        if (_moduleEventObservers[moduleClassName]) { //support multi event
+            [_moduleEventObservers[moduleClassName] addEntriesFromDictionary:observer[moduleClassName]];
+        }else {
+            [_moduleEventObservers addEntriesFromDictionary:observer];
+        }
     } else {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];

@@ -309,12 +309,12 @@ public class WXAnimationModule extends WXModule {
         BorderDrawable borderDrawable;
         if ((borderDrawable=WXViewUtils.getBorderDrawable(target))!=null) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               borderDrawable.getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         } else if (target.getBackground() instanceof ColorDrawable) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               ((ColorDrawable) target.getBackground()).getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         }

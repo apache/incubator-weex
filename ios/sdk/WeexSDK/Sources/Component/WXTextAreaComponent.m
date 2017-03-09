@@ -8,6 +8,7 @@
 
 #import "WXTextAreaComponent.h"
 
+#define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
 typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
@@ -48,6 +49,9 @@ typedef UITextView WXTextAreaView;
 - (void)setText:(NSString *)text
 {
     _textView.text = text;
+    if ([text length] >0) {
+        self.placeHolderLabel.text = @"";
+    }
 }
 
 -(void)setTextColor:(UIColor *)color
@@ -135,9 +139,8 @@ typedef UITextView WXTextAreaView;
     self.placeHolderLabel.clipsToBounds = NO;
     CGRect newFrame = self.placeHolderLabel.frame;
     newFrame.size.height = ceil(expectedLabelSize.size.height);
-    newFrame.size.width = _textView.frame.size.width;
-    newFrame.origin.x = 4; // the cursor origin.x
-    newFrame.origin.y = 7; // the cursor origin.y
+    newFrame.size.width = _textView.frame.size.width- CorrectX*2;
+    newFrame.origin.x = CorrectX; // the cursor origin.x
     self.placeHolderLabel.frame = newFrame;
     self.placeHolderLabel.attributedText = attributedString;
 }
@@ -154,6 +157,13 @@ typedef UITextView WXTextAreaView;
                                                       _padding.left + _border.left,
                                                       _padding.bottom + _border.bottom,
                                                       _border.right + _border.right)];
+    
+    //when textview update, placeHolderLabel update too
+    CGRect newFrame = self.placeHolderLabel.frame;
+    newFrame.size.width = self.textView.frame.size.width - (_padding.left + _border.left) -CorrectX*2;
+    newFrame.origin.x = CorrectX + _padding.left + _border.left; // the cursor origin.x
+    newFrame.origin.y = _padding.top + _border.top;
+    self.placeHolderLabel.frame = newFrame;
 }
 
 @end

@@ -1288,7 +1288,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   /********************************
    *  end hook Activity life cycle callback
    ********************************************************/
+  public void recycled() {
 
+  }
 
   public void destroy() {
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
@@ -1299,10 +1301,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     removeAllEvent();
     removeStickyStyle();
-    if (mDomObj != null) {
-      mDomObj = null;
+
+    View view;
+    if(mDomObj.isFixed() && (view = getHostView()) != null){
+      getInstance().removeFixedView(view);
     }
 
+    mDomObj = null;
     mIsDestroyed = true;
   }
 
