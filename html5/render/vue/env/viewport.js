@@ -15,7 +15,7 @@ if (metaWidth && !isNaN(metaWidth) && metaWidth > 0) { viewportWidth = metaWidth
 /**
  * set root font-size for rem units. If already been set, just skip this.
  */
-function setRootFont(doc, width) {
+function setRootFont (doc, width) {
   const rootFontSize = doc.documentElement.style.fontSize
   if (!rootFontSize) {
     doc.documentElement.style.fontSize = width / 10 + 'px'
@@ -38,7 +38,7 @@ export function setViewport (config = {}) {
     const screenWidth = deRect.width
     const screenHeight = deRect.height
     const scale = screenWidth / viewportWidth
-    
+
     /**
      * if set initial/maximum/mimimum-scale some how the page will have a bounce
      * effect when user drag the page towards horizontal axis.
