@@ -164,6 +164,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
                 break;
         }
         [callbackRsp setObject:statusText forKey:@"statusText"];
+        if (callback) {
+            callback(callbackRsp);
+        }
     };
     
     [loader start];
