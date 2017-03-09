@@ -1156,18 +1156,35 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void execRegisterFailTask() {
-    int moduleCount = mRegisterModuleFailList.size();
-    if (moduleCount > 0) {
-      for (int i = 0; i < moduleCount; ++i) {
-        invokeRegisterModules(mRegisterModuleFailList.get(i));
+
+    if (mRegisterModuleFailList.size() > 0) {
+      List<Map<String, Object>> moduleReceiver = new ArrayList<>();
+      for (int i = 0, moduleCount = mRegisterModuleFailList.size(); i < moduleCount; ++i) {
+        invokeRegisterModules(mRegisterModuleFailList.get(i), moduleReceiver);
+      }
+      mRegisterComponentFailList.clear();
+      if (moduleReceiver.size() > 0) {
+        mRegisterComponentFailList.addAll(moduleReceiver);
       }
     }
+
     if (mRegisterComponentFailList.size() > 0) {
-      invokeRegisterComponents(mRegisterComponentFailList);
+      List<Map<String, Object>> receiver = new ArrayList<>();
+      invokeRegisterComponents(mRegisterComponentFailList, receiver);
+      mRegisterComponentFailList.clear();
+      if (receiver.size() > 0) {
+        mRegisterComponentFailList.addAll(receiver);
+      }
     }
+
     if (mRegisterServiceFailList.size() > 0) {
+      List<String> receiver = new ArrayList<>();
       for (String service : mRegisterServiceFailList) {
-        invokeExecJSService(service);
+        invokeExecJSService(service, receiver);
+      }
+      mRegisterServiceFailList.clear();
+      if (receiver.size() > 0) {
+        mRegisterServiceFailList.addAll(receiver);
       }
     }
   }
@@ -1181,13 +1198,13 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   public void registerModules(final Map<String, Object> modules) {
     if (modules != null && modules.size() != 0) {
       if(isJSThread()){
-        invokeRegisterModules(modules);
+        invokeRegisterModules(modules, mRegisterModuleFailList);
       }
       else{
         post(new Runnable() {
           @Override
           public void run() {
-            invokeRegisterModules(modules);
+            invokeRegisterModules(modules, mRegisterComponentFailList);
           }
         }, null);
       }
@@ -1205,7 +1222,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
-        invokeRegisterComponents(components);
+        invokeRegisterComponents(components, mRegisterComponentFailList);
       }
     }, null);
   }
@@ -1214,16 +1231,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     post(new Runnable() {
       @Override
       public void run() {
-        invokeExecJSService(service);
+        invokeExecJSService(service, mRegisterServiceFailList);
       }
     });
   }
 
-  private void invokeExecJSService(String service) {
+  private void invokeExecJSService(String service, List<String> receiver) {
     try {
       if (!isJSFrameworkInit()) {
         WXLogUtils.e("[WXBridgeManager] invoke execJSService: framework.js uninitialized.");
-        mRegisterServiceFailList.add(service);
+        receiver.add(service);
         return;
       }
       mWXBridge.execJSService(service);
@@ -1237,12 +1254,12 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mJSThread != null && mJSThread.getId() == Thread.currentThread().getId();
   }
 
-  private void invokeRegisterModules(Map<String, Object> modules) {
+  private void invokeRegisterModules(Map<String, Object> modules, List<Map<String, Object>> failReceiver) {
     if (modules == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
         WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
       }
-      mRegisterModuleFailList.add(modules);
+      failReceiver.add(modules);
       return;
     }
 
@@ -1256,11 +1273,15 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     }
   }
 
-  private void invokeRegisterComponents(List<Map<String, Object>> components) {
+  private void invokeRegisterComponents(List<Map<String, Object>> components, List<Map<String, Object>> failReceiver) {
+    if(components == failReceiver){
+      throw new RuntimeException("Fail receiver should not use source.");
+    }
     if (!isJSFrameworkInit()) {
       WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+
       for (Map<String,Object> comp:components){
-        mRegisterComponentFailList.add(comp);
+        failReceiver.add(comp);
       }
       return;
     }
