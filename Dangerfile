@@ -1,14 +1,29 @@
 # Error or Warn when delete public interface
 metion_break_change = git.commits.any? { |c| c.message =~ /'breack change'/ }
 
+# File name match any of these patterns will be ignored.
+def is_ignored_public_check file
+  ignored_break_change_pattern = Array.[](
+    /$android\/sdk\/src\/test\/.+/,
+    /$android\/playground\/.+/,
+  )
+  for pattern in ignored_break_change_pattern do
+    if file =~ pattern
+      return true
+    end
+  end
+  return false
+end
+
+
 for file in git.modified_files do
-  if file.end_with?("java")
+  if not is_ignored_public_check(file) && file.end_with?("java")
     diff = git.diff_for_file(file)
     if diff && diff.patch =~ /^-\s*?public\s+[\s\S]+$/ 
       if metion_break_change
-        warn("Modify public in #{file}")
+        warn("Potential BREAK CHANGE. Modify public in #{file}")
       else
-        fail("Modify public in #{file} without metion it in commit message. ")
+        fail("Potential BREAK CHANGE. Modify public in #{file} without metion it in commit message. ")
       end
     end
   end
