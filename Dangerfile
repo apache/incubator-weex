@@ -4,8 +4,8 @@ metion_break_change = git.commits.any? { |c| c.message =~ /'breack change'/ }
 # File name match any of these patterns will be ignored.
 def is_ignored_public_check file
   ignored_break_change_pattern = Array.[](
-    /$android\/sdk\/src\/test\/.+/,
-    /$android\/playground\/.+/,
+    /^android\/sdk\/src\/test\/.+/,
+    /^android\/playground\/.+/,
   )
   for pattern in ignored_break_change_pattern do
     if file =~ pattern
