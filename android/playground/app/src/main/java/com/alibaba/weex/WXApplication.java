@@ -314,7 +314,7 @@ public class WXApplication extends Application {
           WXSDKManager.getInstance().notifyTrimMemory();
         }
         // The demo code of calling 'notifySerializeCodeCache()'
-        if (true) {
+        if (false) {
           WXSDKManager.getInstance().notifySerializeCodeCache();
         }
       }
