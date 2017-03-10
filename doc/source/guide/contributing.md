@@ -1,3 +1,11 @@
+---
+title: How to Contribute
+type: guide
+order: 6
+has_chapter_content: true
+version: 2.1
+---
+
 # How to Contribute
 
 Welcome to create [pull requests](https://github.com/apache/incubator-weex/compare) or join in our [mailing list](http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/) for bugfix, doc, example, suggestion and anything.
@@ -12,7 +20,7 @@ At the same time you can see the archives of all the mails through the web: [htt
 
 *If you won't follow the mailing list any more. There is another way to unsubscribe it: send an email to `dev-unsubscribe@weex.incubator.apache.org` and follow the instructions.*
 
-Besides Weex dev mailing list, we also have some other mailing lists for you. You can check them out here: [http://mail-archives.apache.org/mod_mbox/#weex.incubator](http://mail-archives.apache.org/mod_mbox/#weex.incubator)
+Besides Weex dev mailing list, we also have some other mailing lists for you. You can check them out here: http://mail-archives.apache.org/mod_mbox/#weex.incubator
 
 ## Branch Management
 
