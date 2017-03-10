@@ -245,7 +245,7 @@ import java.util.Map;
  */
 @Component(lazyload = false)
 public class WXImage extends WXComponent<ImageView> {
-
+  private String mSrc;
   public static class Ceator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         return new WXImage(instance,node,parent);
@@ -291,10 +291,18 @@ public class WXImage extends WXComponent<ImageView> {
           String src = WXUtils.getString(param, null);
           if (src != null)
             setSrc(src);
+          this.mSrc = src;
           return true;
         case Constants.Name.IMAGE_QUALITY:
           return true;
         case Constants.Name.FILTER:
+          int blurRadius = 0;
+          if(param != null && param instanceof String) {
+            blurRadius = WXUtils.getBlurRadius((String) param);
+          }
+          if(!TextUtils.isEmpty(this.mSrc)) {
+            setBlurRadius(this.mSrc,blurRadius);
+          }
           return true;
       }
     return super.setProperty(key, param);
@@ -362,7 +370,16 @@ public class WXImage extends WXComponent<ImageView> {
     if (Constants.Scheme.LOCAL.equals(rewrited.getScheme())) {
       setLocalSrc(rewrited);
     } else {
-      setRemoteSrc(rewrited);
+      setRemoteSrc(rewrited, getBlurRadiusFromStyles());
+    }
+  }
+
+  private void setBlurRadius(@NonNull String src, int blurRadius) {
+    if(getInstance() != null) {
+      Uri parsedUri = getInstance().rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
+      if(!Constants.Scheme.LOCAL.equals(parsedUri.getScheme())) {
+        setRemoteSrc(parsedUri,blurRadius);
+      }
     }
   }
 
@@ -381,7 +398,7 @@ public class WXImage extends WXComponent<ImageView> {
     }
   }
 
-  private void setRemoteSrc(Uri rewrited) {
+  private void setRemoteSrc(Uri rewrited,int blurRadius) {
 
       WXImageStrategy imageStrategy = new WXImageStrategy();
       imageStrategy.isClipping = true;
@@ -389,9 +406,7 @@ public class WXImage extends WXComponent<ImageView> {
       WXImageSharpen imageSharpen = getDomObject().getAttrs().getImageSharpen();
       imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
-      int radius = getDomObject().getStyles().getBlur();
-      radius = Math.max(0, radius);
-      imageStrategy.blurRadius = Math.min(10, radius);
+      imageStrategy.blurRadius = Math.max(0, blurRadius);
 
       imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
         @Override
@@ -459,6 +474,14 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
       readyToRender();
+    }
+  }
+
+  private int getBlurRadiusFromStyles() {
+    if(getDomObject() != null) {
+      return getDomObject().getStyles().getBlur();
+    } else {
+      return 0;
     }
   }
 

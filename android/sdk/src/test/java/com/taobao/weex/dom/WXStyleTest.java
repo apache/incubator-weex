@@ -254,7 +254,7 @@ public class WXStyleTest {
         style.put(Constants.Name.FILTER,"blur(-1px)");
         assertEquals(0,style.getBlur());
         style.put(Constants.Name.FILTER,"blur(100px)");
-        assertEquals(10,style.getBlur());
+        assertEquals(100,style.getBlur());
         style.put(Constants.Name.FILTER,"blur(1p0px)");
         assertEquals(0,style.getBlur());
         style.put(Constants.Name.FILTER,"7");

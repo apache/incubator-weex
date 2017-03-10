@@ -245,25 +245,11 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   }
 
   public int getBlur() {
-    try {
-      if(get(Constants.Name.FILTER) == null) {
-        return 0;
-      }
-      String value = get(Constants.Name.FILTER).toString().trim();
-      int start = value.indexOf("blur(");
-      int end = value.indexOf("px)");
-      if(end == -1) {
-        end = value.indexOf(")");
-      }
-      if(start == 0 && start < end) {
-        int blur = Integer.parseInt(value.substring(5,end));
-        //unlike css blur filter(https://developer.mozilla.org/en-US/docs/Web/CSS/filter),in weex
-        //we specify the blur radius in [0,10] to improve performance and avoid potential oom issue.
-        return Math.min(10,Math.max(0,blur));
-      }
-    }catch (NumberFormatException e) {
+    if(get(Constants.Name.FILTER) == null) {
+      return 0;
     }
-    return 0;
+    String value = get(Constants.Name.FILTER).toString().trim();
+    return WXUtils.getBlurRadius(value);
   }
 
   /*

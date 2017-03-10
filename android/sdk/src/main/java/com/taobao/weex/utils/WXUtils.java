@@ -513,6 +513,28 @@ public class WXUtils {
     return originValue;
   }
 
+  public static int getBlurRadius(@Nullable String blurRadius) {
+    if(blurRadius == null || "".equals(blurRadius)) {
+      return 0;
+    }
+    blurRadius = blurRadius.trim();
+    try {
+      int start = blurRadius.indexOf("blur(");
+      int end = blurRadius.indexOf("px)");
+      if(end == -1) {
+        end = blurRadius.indexOf(')');
+      }
+      if(start == 0 && start < end) {
+        int blur = Integer.parseInt(blurRadius.substring(5,end));
+        //we should not limit blur radius
+        return Math.max(0,blur);
+      }
+    }catch (NumberFormatException e) {
+      WXLogUtils.e(e.getMessage());
+    }
+    return 0;
+  }
+
   public static int parseUnitOrPercent(String raw, int unit) {
     int suffix;
     if ((suffix = raw.lastIndexOf(WXUtils.PERCENT)) != -1) {
