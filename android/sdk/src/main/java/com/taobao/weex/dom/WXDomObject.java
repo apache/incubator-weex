@@ -835,7 +835,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
       WXDomObject domObject = WXDomObjectFactory.newInstance(type);
 
-      domObject.setViewPortWidth(wxsdkInstance.getViewPortWidth());
+      domObject.setViewPortWidth(wxsdkInstance.getInstanceViewPortWidth());
 
       if(domObject == null){
         return null;

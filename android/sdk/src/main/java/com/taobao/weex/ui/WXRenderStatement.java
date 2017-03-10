@@ -540,12 +540,12 @@ class WXRenderStatement {
     if (component != null) {
       Map<String, Float> size = new HashMap<>();
       Rect sizes = component.getComponentSize();
-      size.put("width", WXViewUtils.getWebPxByWidth(sizes.width(),mWXSDKInstance.getViewPortWidth()));
-      size.put("height", WXViewUtils.getWebPxByWidth(sizes.height(),mWXSDKInstance.getViewPortWidth()));
-      size.put("bottom",WXViewUtils.getWebPxByWidth(sizes.bottom,mWXSDKInstance.getViewPortWidth()));
-      size.put("left",WXViewUtils.getWebPxByWidth(sizes.left,mWXSDKInstance.getViewPortWidth()));
-      size.put("right",WXViewUtils.getWebPxByWidth(sizes.right,mWXSDKInstance.getViewPortWidth()));
-      size.put("top",WXViewUtils.getWebPxByWidth(sizes.top,mWXSDKInstance.getViewPortWidth()));
+      size.put("width", WXViewUtils.getWebPxByWidth(sizes.width(),mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("height", WXViewUtils.getWebPxByWidth(sizes.height(),mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("bottom",WXViewUtils.getWebPxByWidth(sizes.bottom,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("left",WXViewUtils.getWebPxByWidth(sizes.left,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("right",WXViewUtils.getWebPxByWidth(sizes.right,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("top",WXViewUtils.getWebPxByWidth(sizes.top,mWXSDKInstance.getInstanceViewPortWidth()));
       options.put("size", size);
       options.put("result", true);
     } else {

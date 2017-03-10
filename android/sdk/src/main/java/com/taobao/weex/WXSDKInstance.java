@@ -347,16 +347,22 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /*
   *  store custom ViewPort Width
   */
+  @Deprecated
   public void setViewPortWidth(int viewPortWidth) {
     mViewPortWidth = viewPortWidth;
   }
 
+  @Deprecated
   public static int getViewPortWidth() {
     return mViewPortWidth;
   }
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
     this.mInstanceViewPortWidth = instanceViewPortWidth;
+  }
+
+  public int getInstanceViewPortWidth(){
+    return mInstanceViewPortWidth;
   }
 
   public interface OnInstanceVisibleListener{
@@ -1323,8 +1329,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width,getViewPortWidth());
-    float realHeight = WXViewUtils.getWebPxByWidth(height,getViewPortWidth());
+    float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
+    float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {
