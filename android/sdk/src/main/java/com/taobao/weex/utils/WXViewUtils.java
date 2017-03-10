@@ -215,7 +215,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -223,6 +222,7 @@ import android.view.ViewGroup.LayoutParams;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
@@ -308,16 +308,16 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
-  public static int getScreenDensityDpi(Context ctx){
+  public static float getScreenDensity(Context ctx){
     if(ctx != null){
       try{
         Resources res = ctx.getResources();
-        return res.getDisplayMetrics().densityDpi;
+        return res.getDisplayMetrics().density;
       }catch (Exception e){
         WXLogUtils.e("getScreenDensityDpi exception:"+e.getMessage());
       }
     }
-    return DisplayMetrics.DENSITY_DEFAULT;
+    return Constants.Value.DENSITY;
   }
 
   public static int getScreenWidth(Context ctx) {
