@@ -249,7 +249,7 @@
             // insert a header in the middle, one section may divide into two
             // so the original section need to be reloaded
             NSIndexPath *indexPathBeforeHeader = [self indexPathForSubIndex:index - 1];
-            if (indexPathBeforeHeader.row != _sections[insertIndex - 1].rows.count - 1) {
+            if (_sections[insertIndex - 1].rows.count != 0 && indexPathBeforeHeader.row < _sections[insertIndex - 1].rows.count - 1) {
                 reloadSection = _sections[insertIndex - 1];
                 NSArray *rowsToSeparate = reloadSection.rows;
                 insertSection.rows = [[rowsToSeparate subarrayWithRange:NSMakeRange(indexPathBeforeHeader.row + 1, rowsToSeparate.count - indexPathBeforeHeader.row - 1)] mutableCopy];
@@ -308,8 +308,14 @@
 {
     [self.weexInstance.componentManager _addUITask:^{
         // trigger section header update
-        [_tableView beginUpdates];
-        [_tableView endUpdates];
+        [UIView performWithoutAnimation:^{
+            [_tableView beginUpdates];
+            
+            NSUInteger reloadIndex = [self indexForHeader:header sections:_completedSections];
+            [_tableView reloadSections:[NSIndexSet indexSetWithIndex:reloadIndex] withRowAnimation:UITableViewRowAnimationNone];
+            
+            [_tableView endUpdates];
+        }];
     }];
 }
 
