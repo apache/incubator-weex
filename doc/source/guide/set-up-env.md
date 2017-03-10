@@ -1,7 +1,7 @@
 ---
 title: Set Up Development Environment 
 type: guide
-order: 2
+order: 1.1
 version: 2.1
 has_chapter_content: true
 ---
