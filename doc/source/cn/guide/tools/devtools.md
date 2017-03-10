@@ -1,7 +1,7 @@
 ---
 title: 使用 Devtools
 type: guide
-order: 4.1
+order: 5.1
 version: 2.1
 has_chapter_content: true
 ---

@@ -1,7 +1,7 @@
 ---
 title: 集成 Weex 到已有应用
 type: guide
-order: 3
+order: 1.2
 version: 2.1
 has_chapter_content: true
 ---

@@ -1,7 +1,7 @@
 ---
 title: Integrate to Your App  
 type: guide
-order: 3
+order: 1.2
 has_chapter_content: false
 chapter_title: Intro
 version: 2.1

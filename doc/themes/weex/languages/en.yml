@@ -75,10 +75,9 @@ menu:
   blog: Blog
   showcase: Showcase
   download: Download
-  resources: Download
-  tools: Service & Tools
+  resources: Resources
+  tools: Services & Tools
   advanced: Advanced
-  baichuan: AliBaichuan
   github: GitHub
   legacy: Old Syntax Doc
 playground:
