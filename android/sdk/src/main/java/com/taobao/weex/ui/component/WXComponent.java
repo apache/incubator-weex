@@ -687,8 +687,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           setBackgroundColor(bgColor);
         return true;
       case Constants.Name.BACKGROUND_IMAGE:
-        String bgImage = WXUtils.getString(param,null);
-        if(bgImage!=null){
+        String bgImage = WXUtils.getString(param, null);
+        if (bgImage != null && mHost != null) {
           setBackgroundImage(bgImage);
         }
         return true;
@@ -1102,11 +1102,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  @NonNull
   public void setBackgroundImage(String bgImage) {
-
-    if ("".equals(bgImage.trim()) && mHost != null) {
+    if ("".equals(bgImage.trim())) {
       getOrCreateBorder().setImage(null);
-    } else if (null != bgImage && mHost != null) {
+    } else {
       Shader shader = WXResourceUtils.getShader(bgImage, mDomObj.getLayoutWidth(), mDomObj.getLayoutHeight());
       getOrCreateBorder().setImage(shader);
     }
