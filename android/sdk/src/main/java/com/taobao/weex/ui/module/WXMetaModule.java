@@ -204,6 +204,7 @@
  */
 package com.taobao.weex.ui.module;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -230,8 +231,9 @@ public class WXMetaModule extends WXModule {
             try {
                 param = URLDecoder.decode(param, "utf-8");
                 JSONObject jsObj = JSON.parseObject(param);
+                Context cxt = mWXSDKInstance.getContext();
                 if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
-                    mWXSDKInstance.setViewPortWidth(WXViewUtils.getScreenDensityDpi(mWXSDKInstance.getContext()));
+                    mWXSDKInstance.setViewPortWidth((int)(WXViewUtils.getScreenWidth(cxt)/WXViewUtils.getScreenDensity(cxt)));
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
