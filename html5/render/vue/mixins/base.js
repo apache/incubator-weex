@@ -28,7 +28,9 @@ export default {
     if (!lazyloadWatched) {
       watchLazyload()
     }
-    tagBeforeCreate()
+    if (process.env.NODE_ENV === 'development') {
+      tagBeforeCreate()
+    }
   },
 
   mounted () {

@@ -4,6 +4,9 @@ import { throttle } from './func'
 import { isArray } from './type'
 import { tagImg } from './perf'
 
+const SCREEN_REC_LIMIT = 3  // just record the first 3 times for screen-render finishing.
+let doRecord = true
+
 function preLoadImg (src, loadCallback, errorCallback) {
   const img = new Image()
   img.onload = loadCallback ? loadCallback.bind(img) : null
@@ -15,7 +18,14 @@ export function applySrc (item, src, placeholderSrc) {
   if (!src) { return }
   function finallCb () {
     item.removeAttribute('img-src')
-    tagImg() // tag lastest img onload time.
+    if (doRecord) {
+      if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
+        tagImg() // tag lastest img onload time.
+      }
+      else {
+        doRecord = false
+      }
+    }
   }
   preLoadImg(src, function () {
     item.style.backgroundImage = `url(${src})`
@@ -43,6 +53,10 @@ export function fireLazyload (el) {
     if (isElementVisible(img, el)) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
+    else {
+      // alreay out of view, no need to compare any more.
+      break
+    }
   }
 }
 
@@ -58,7 +72,7 @@ export function fireLazyload (el) {
  */
 const cache = {}
 let _uid = 0
-export function getThrottleLazyload (wait = 16, el = document.body, tag) {
+export function getThrottleLazyload (wait = 16, el = document.body) {
   let id = el.dataset.throttleId
   if (!id) {
     id = _uid++

@@ -19,6 +19,8 @@ const perf = window._weex_perf = {
   renderTime: []
 }
 
+const IMG_REC_INDENT = 500  // record loading events after 500ms towards last recording.
+
 let earliestBeforeUpdateTime = 0
 let earliestBeforeCreateTime = 0
 
@@ -38,7 +40,14 @@ const debouncedTagImg = debounce(function () {
     end: now,
     duration: now - start
   })
-}, 500)
+
+  const len = perf.renderTime.length
+  perf[`screenTime${len}`] = now
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`screenTime[${len}]: ${now} ms.`)
+  }
+}, IMG_REC_INDENT)
+
 export function tagImg () {
   debouncedTagImg()
 }
@@ -67,6 +76,13 @@ const debouncedTagMounted = debounce(function () {
     end: now,
     duration: now - earliestBeforeCreateTime
   })
+
+  if (!perf.firstAllMountedTime) {
+    perf.firstAllMountedTime = now
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`first all mounted time: ${now} ms.`)
+    }
+  }
 }, 25)
 
 export function tagMounted () {
