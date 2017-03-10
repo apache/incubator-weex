@@ -1102,8 +1102,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  @NonNull
-  public void setBackgroundImage(String bgImage) {
+  public void setBackgroundImage(@NonNull String bgImage) {
     if ("".equals(bgImage.trim())) {
       getOrCreateBorder().setImage(null);
     } else {
