@@ -53,10 +53,12 @@ export function fireLazyload (el) {
     if (isElementVisible(img, el)) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
-    else {
-      // alreay out of view, no need to compare any more.
-      break
-    }
+    // In somecases there are images out of the screen in x-axis. There
+    // should not be a break point in these cases.
+    // else {
+    //   // alreay out of view, no need to compare any more.
+    //   break
+    // }
   }
 }
 
