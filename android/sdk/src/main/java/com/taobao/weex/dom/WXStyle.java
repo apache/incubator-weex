@@ -206,6 +206,7 @@ package com.taobao.weex.dom;
 
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -244,12 +245,12 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     map = new ArrayMap<>();
   }
 
-  public int getBlur() {
+  @Nullable
+  public String getBlur() {
     if(get(Constants.Name.FILTER) == null) {
-      return 0;
+      return null;
     }
-    String value = get(Constants.Name.FILTER).toString().trim();
-    return WXUtils.getBlurRadius(value);
+    return get(Constants.Name.FILTER).toString().trim();
   }
 
   /*

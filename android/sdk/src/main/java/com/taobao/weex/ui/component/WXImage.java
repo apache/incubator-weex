@@ -210,6 +210,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -230,6 +231,7 @@ import com.taobao.weex.ui.view.WXImageView;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.ImgURIUtil;
+import com.taobao.weex.utils.SingleFunctionParser;
 import com.taobao.weex.utils.WXDomUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -238,6 +240,7 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -246,6 +249,15 @@ import java.util.Map;
 @Component(lazyload = false)
 public class WXImage extends WXComponent<ImageView> {
   private String mSrc;
+  private int mBlurRadius;
+
+  private static SingleFunctionParser.FlatMapper<Integer> BLUR_RADIUS_MAPPER = new SingleFunctionParser.FlatMapper<Integer>() {
+    @Override
+    public Integer map(String raw) {
+      return WXUtils.getInteger(raw,0);
+    }
+  };
+
   public static class Ceator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         return new WXImage(instance,node,parent);
@@ -291,14 +303,13 @@ public class WXImage extends WXComponent<ImageView> {
           String src = WXUtils.getString(param, null);
           if (src != null)
             setSrc(src);
-          this.mSrc = src;
           return true;
         case Constants.Name.IMAGE_QUALITY:
           return true;
         case Constants.Name.FILTER:
           int blurRadius = 0;
           if(param != null && param instanceof String) {
-            blurRadius = WXUtils.getBlurRadius((String) param);
+            blurRadius = parseBlurRadius((String)param);
           }
           if(!TextUtils.isEmpty(this.mSrc)) {
             setBlurRadius(this.mSrc,blurRadius);
@@ -363,24 +374,46 @@ public class WXImage extends WXComponent<ImageView> {
     if (src == null) {
       return;
     }
-
+    this.mSrc = src;
     WXSDKInstance instance = getInstance();
     Uri rewrited = instance.rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
 
     if (Constants.Scheme.LOCAL.equals(rewrited.getScheme())) {
       setLocalSrc(rewrited);
     } else {
-      setRemoteSrc(rewrited, getBlurRadiusFromStyles());
+      int blur = 0;
+      if(getDomObject() != null) {
+        String blurStr = getDomObject().getStyles().getBlur();
+        blur = parseBlurRadius(blurStr);
+      }
+      setRemoteSrc(rewrited, blur);
     }
   }
 
   private void setBlurRadius(@NonNull String src, int blurRadius) {
-    if(getInstance() != null) {
+    if(getInstance() != null && blurRadius != mBlurRadius) {
       Uri parsedUri = getInstance().rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
       if(!Constants.Scheme.LOCAL.equals(parsedUri.getScheme())) {
         setRemoteSrc(parsedUri,blurRadius);
       }
     }
+  }
+
+  private int parseBlurRadius(@Nullable String rawRadius) {
+    if(rawRadius == null) {
+      return 0;
+    }
+    SingleFunctionParser<Integer> parser = new SingleFunctionParser<Integer>(rawRadius,BLUR_RADIUS_MAPPER);
+    List<Integer> list = null;
+    try {
+       list = parser.parse("blur");
+    }catch (Exception e) {
+      return 0;
+    }
+    if(list == null || list.isEmpty()) {
+      return 0;
+    }
+    return list.get(0);
   }
 
   @Override
@@ -407,6 +440,7 @@ public class WXImage extends WXComponent<ImageView> {
       imageStrategy.isSharpen = imageSharpen == WXImageSharpen.SHARPEN;
 
       imageStrategy.blurRadius = Math.max(0, blurRadius);
+      this.mBlurRadius = blurRadius;
 
       imageStrategy.setImageListener(new WXImageStrategy.ImageListener() {
         @Override
@@ -474,14 +508,6 @@ public class WXImage extends WXComponent<ImageView> {
         }
       }
       readyToRender();
-    }
-  }
-
-  private int getBlurRadiusFromStyles() {
-    if(getDomObject() != null) {
-      return getDomObject().getStyles().getBlur();
-    } else {
-      return 0;
     }
   }
 
