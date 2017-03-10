@@ -44,25 +44,6 @@ version: 2.1
 ## 约束
 
 - **不能**直接在 `<a>` 中添加文本。
-  错误示例，“click” 无法被正常渲染。
-
-  ```html
-  <template>
-    <div class="wrapper">
-      <a href="http://dotwe.org/raw/dist/a468998152ee680413588c38bd61c29e.js">
-        click
-      </a>
-    </div>
-  </template>
-
-  <style>
-  .wrapper {
-    text-align: center;
-  }
-  </style>
-  ```
-
-  [体验一下](http://dotwe.org/0a22d65138691a208e3fb1f8f6392b38)
 
 - 请不要为 `<a>` 添加 `click` 事件。我们不能确保 `click` 事件和 `href` 跳转的执行顺序。
 

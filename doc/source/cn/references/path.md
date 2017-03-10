@@ -18,7 +18,7 @@ has_chapter_content: true
 
   Weex SDK 提供 `local`  scheme 来访问打包在应用程序中的资源，此 scheme 无法在 H5 环境下使用。目前，开发者可以在 `image` 组件和字体文件中使用本地资源。 
 
-  * 在 iOS 中，Weex 会在 `bundle resources` 中查找。例如，`image` 组件的 `src` 属性为 `local：//app_icon'`， Weex 会加载 `bundle resouce` 中名为 `app_icon` 的图像资源，而字体文件也以相同的方式工作。 
+  * 在 iOS 中，Weex 会在 `bundle resources` 中查找。例如，`image` 组件的 `src` 属性为 `local:///app_icon'`， Weex 会加载 `bundle resouce` 中名为 `app_icon` 的图像资源，而字体文件也以相同的方式工作。 
 
   * 在 Android 中，`image` 组件将从 `drawable` 资源文件夹加载，如  `res/drawable-xxx`。但加载字体文件是不同的，Android 框架无法从 `res` 加载字体文件，因此 SDK 将从 `asserts` 文件夹加载它。
 
