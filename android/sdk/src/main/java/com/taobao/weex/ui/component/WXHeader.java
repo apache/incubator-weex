@@ -223,7 +223,9 @@ public class WXHeader extends WXCell {
 
   public WXHeader(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
-    setSticky(Constants.Value.STICKY);
+    if(WXBasicComponentType.LIST.equals((parent.getDomObject().getType()))){
+      setSticky(Constants.Value.STICKY);
+    }
   }
 
   @Override

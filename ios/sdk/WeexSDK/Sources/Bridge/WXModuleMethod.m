@@ -13,6 +13,8 @@
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
+#import "WXHandlerFactory.h"
+#import "WXValidateProtocol.h"
 
 @implementation WXModuleMethod
 
@@ -30,6 +32,19 @@
 
 - (NSInvocation *)invoke
 {
+    
+    if (self.instance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            BOOL result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
+            if (!result) {
+                NSString *errorMessage = [NSString stringWithFormat:@"Invalid module：%@ method: %@ , please check the authority", self.moduleName,self.methodName];
+                WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
+                return nil;
+            }
+        }
+    }
+    
     Class moduleClass =  [WXModuleFactory classWithModuleName:_moduleName];
     if (!moduleClass) {
         NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist, maybe it has not been registered", _moduleName];
@@ -41,18 +56,16 @@
     WXAssert(moduleInstance, @"No instance found for module name:%@, class:%@", _moduleName, moduleClass);
     BOOL isSync = NO;
     SEL selector = [WXModuleFactory selectorWithModuleName:self.moduleName methodName:self.methodName isSync:&isSync];
-    if (!selector) {
-        NSString *errorMessage = [NSString stringWithFormat:@"method：%@ for module:%@ doesn't exist, maybe it has not been registered", self.methodName, _moduleName];
-        WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-        return nil;;
-    }
+   
     if (![moduleInstance respondsToSelector:selector]) {
         // if not implement the selector, then dispatch default module method
         if ([self.methodName isEqualToString:@"addEventListener"]) {
             [self.instance _addModuleEventObserversWithModuleMethod:self];
-        }
-        if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
+        } else if ([self.methodName isEqualToString:@"removeAllEventListeners"]) {
             [self.instance _removeModuleEventObserverWithModuleMethod:self];
+        } else {
+            NSString *errorMessage = [NSString stringWithFormat:@"method：%@ for module:%@ doesn't exist, maybe it has not been registered", self.methodName, _moduleName];
+            WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
         }
         return nil;
     }

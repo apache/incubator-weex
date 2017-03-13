@@ -235,13 +235,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private static final long serialVersionUID = 611132641365274134L;
   public static final int UNSET = -1;
 
-  private @NonNull final Map<String,Object> map;
+  private @NonNull final Map<String,Object> mStyles;
   private Map<String,Map<String,Object>> mPesudoStyleMap = new ArrayMap<>();// clz_group:{styleMap}
   private Map<String,Object> mPesudoResetStyleMap = new ArrayMap<>();
 
 
   public WXStyle(){
-    map = new ArrayMap<>();
+    mStyles = new ArrayMap<>();
   }
 
   public int getBlur() {
@@ -675,59 +675,59 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   public boolean equals(Object o) {
-    return map.equals(o);
+    return mStyles.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return map.hashCode();
+    return mStyles.hashCode();
   }
 
   @Override
   public void clear() {
-    map.clear();
+    mStyles.clear();
   }
 
   @Override
   public boolean containsKey(Object key) {
-    return map.containsKey(key);
+    return mStyles.containsKey(key);
   }
 
   @Override
   public boolean containsValue(Object value) {
-    return map.containsValue(value);
+    return mStyles.containsValue(value);
   }
 
   @NonNull
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    return map.entrySet();
+    return mStyles.entrySet();
   }
 
   @Override
   public Object get(Object key) {
-    return map.get(key);
+    return mStyles.get(key);
   }
 
   @Override
   public boolean isEmpty() {
-    return map.isEmpty();
+    return mStyles.isEmpty();
   }
 
   @NonNull
   @Override
   public Set<String> keySet() {
-    return map.keySet();
+    return mStyles.keySet();
   }
 
   @Override
   public Object put(String key, Object value) {
-    return map.put(key,value);
+    return mStyles.put(key,value);
   }
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.map.putAll(map);
+    this.mStyles.putAll(map);
   }
 
   /**
@@ -736,7 +736,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
    * @param byPesudo
    */
   public void putAll(Map<? extends String, ?> map, boolean byPesudo) {
-    this.map.putAll(map);
+    this.mStyles.putAll(map);
     if (!byPesudo) {
       this.mPesudoResetStyleMap.putAll(map);
       processPesudoClasses(map);
@@ -762,12 +762,14 @@ public class WXStyle implements Map<String, Object>,Cloneable {
       int i;
       if ((i = key.indexOf(":")) > 0) {
         String clzName = key.substring(i);
-        if (clzName.equals(Constants.PESUDO.ENABLED)) {
+        if (clzName.equals(Constants.PSEUDO.ENABLED)) {
           //enabled, use as regular style
-          this.mPesudoResetStyleMap.put(key.substring(0, i), entry.getValue());
+          String styleKey = key.substring(0, i);
+          this.mStyles.put(styleKey, entry.getValue());
+          this.mPesudoResetStyleMap.put(styleKey, entry.getValue());
           continue;
         } else {
-          clzName = clzName.replace(Constants.PESUDO.ENABLED, "");//remove ':enabled' which is ignored
+          clzName = clzName.replace(Constants.PSEUDO.ENABLED, "");//remove ':enabled' which is ignored
         }
 
         Map<String, Object> stylesMap = pesudoStyleMap.get(clzName);
@@ -782,24 +784,24 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   @Override
   public Object remove(Object key) {
-    return map.remove(key);
+    return mStyles.remove(key);
   }
 
   @Override
   public int size() {
-    return map.size();
+    return mStyles.size();
   }
 
   @NonNull
   @Override
   public Collection<Object> values() {
-    return map.values();
+    return mStyles.values();
   }
 
   @Override
   protected WXStyle clone(){
     WXStyle style = new WXStyle();
-    style.map.putAll(this.map);
+    style.mStyles.putAll(this.mStyles);
 
     for(Entry<String,Map<String,Object>> entry:this.mPesudoStyleMap.entrySet()){
       Map<String,Object> valueClone = new ArrayMap<>();

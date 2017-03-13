@@ -120,6 +120,7 @@ import android.util.Log;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.appfram.clipboard.WXClipboardModule;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -142,11 +143,10 @@ import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomRegistry;
 import com.taobao.weex.dom.WXListDomObject;
+import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.ui.component.list.SimpleListComponent;
-import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -175,9 +175,11 @@ import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
+import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXMetaModule;
+import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
@@ -291,6 +293,10 @@ public class WXSDKEngine {
     );
   }
 
+  public static void setJSExcetptionAdapter(IWXJSExceptionAdapter excetptionAdapter){
+    WXSDKManager.getInstance().setIWXJSExceptionAdapter(excetptionAdapter);
+  }
+
   private static void register() {
     BatchOperationHelper batchHelper = new BatchOperationHelper(WXBridgeManager.getInstance());
     try {
@@ -347,7 +353,7 @@ public class WXSDKEngine {
         WXBasicComponentType.SLIDER_NEIGHBOR
       );
       registerComponent(SimpleListComponent.class,false,"simplelist");
-      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
+      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
@@ -369,7 +375,7 @@ public class WXSDKEngine {
       registerModule("webview", WXWebViewModule.class, true);
       registerModule("navigator", WXNavigatorModule.class);
       registerModule("stream", WXStreamModule.class);
-      registerModule("timer", WXTimerModule.class, true);
+      registerModule("timer", WXTimerModule.class, false);
       registerModule("storage", WXStorageModule.class, true);
       registerModule("clipboard", WXClipboardModule.class, true);
       registerModule("globalEvent",WXGlobalEventModule.class);
@@ -387,6 +393,8 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
+      registerDomObject(WXBasicComponentType.RECYCLER, WXRecyclerDomObject.class);
+      registerDomObject(WXBasicComponentType.WATERFALL, WXRecyclerDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }

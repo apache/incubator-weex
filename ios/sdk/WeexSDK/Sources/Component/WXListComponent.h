@@ -8,18 +8,6 @@
 
 #import "WXScrollerComponent.h"
 
-@class WXCellComponent;
-@class WXHeaderComponent;
 @interface WXListComponent : WXScrollerComponent
-
-- (void)cellDidRemove:(WXCellComponent *)cell;
-
-- (void)cellDidLayout:(WXCellComponent *)cell;
-
-- (void)headerDidLayout:(WXHeaderComponent *)header;
-
-- (void)cellDidRendered:(WXCellComponent *)cell;
-
-- (void)cell:(WXCellComponent *)cell didMoveToIndex:(NSUInteger)index;
 
 @end

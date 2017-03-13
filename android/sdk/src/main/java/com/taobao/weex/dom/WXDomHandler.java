@@ -219,7 +219,7 @@ public class WXDomHandler implements Handler.Callback {
   /**
    * The batch operation in dom thread will run at most once in 16ms.
    */
-  private static final int DELAY_TIME = 16;//ms
+  public static final int DELAY_TIME = 16;//ms
   private WXDomManager mWXDomManager;
   private boolean mHasBatch = false;
 
@@ -290,10 +290,10 @@ public class WXDomHandler implements Handler.Callback {
                                      (String) task.args.get(2));
         break;
       case MsgType.WX_DOM_BATCH:
+
         mWXDomManager.batch();
         mHasBatch = false;
         break;
-
       case MsgType.WX_DOM_SCROLLTO:
         mWXDomManager.scrollToDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
         break;

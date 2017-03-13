@@ -20,6 +20,8 @@
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXInvocationConfig.h"
+#import "WXHandlerFactory.h"
+#import "WXValidateProtocol.h"
 
 static NSThread *WXComponentThread;
 
@@ -185,7 +187,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponentManager *manager = (__bridge WXComponentManager *)(context);
     if (i == 0) {
         return manager->_rootComponent.cssNode;
-    } else if(manager->_fixedComponents.count > 0) {
+    } else if(manager->_fixedComponents.count >= i) {
         return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
     }
     
@@ -318,17 +320,25 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *styles = data[@"style"];
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
-        
+    
+    if (self.weexInstance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            WXComponentValidateResult* validateResult =  [validateHandler validateWithWXSDKInstance:self.weexInstance component:type];
+            if (validateResult && !validateResult.isSuccess) {
+                type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
+            }
+        }
+    }
+
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);
     
     [_indexDict setObject:component forKey:component.ref];
-    
+    [component readyToRender];// notify redyToRender event when init
     return component;
 }
-
-#pragma mark Updating
 
 #pragma mark Reset
 -(BOOL)isShouldReset:(id )value
@@ -442,9 +452,13 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     }
 
     CGFloat offset = [[options objectForKey:@"offset"] floatValue];
+    BOOL animated = YES;
+    if ([options objectForKey:@"animated"]) {
+        animated = [[options objectForKey:@"animated"] boolValue];
+    }
     
     [self _addUITask:^{
-        [scrollerComponent scrollToComponent:toComponent withOffset:offset];
+        [scrollerComponent scrollToComponent:toComponent withOffset:offset animated:animated];
     }];
 }
 

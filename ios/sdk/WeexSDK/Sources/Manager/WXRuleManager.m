@@ -13,6 +13,7 @@
 #import "WXHandlerFactory.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXComponentManager.h"
+#import "WXDefine.h"
 
 @interface WXRuleManager()
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *fontStorage;
@@ -103,8 +104,13 @@ static WXRuleManager *_sharedInstance = nil;
                     // load success
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     NSString *fontSrc = [dictForFontFamily objectForKey:@"tempSrc"];
-                    [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    if (fontSrc) {
+                        // only remote font will be mark as tempSrc
+                        [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    }
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil userInfo:@{@"fontFamily":rule[@"fontFamily"]}];
                 } else {
                     //there was some errors during loading
                     WXLogError(@"load font failed %@",error.description);
@@ -114,8 +120,8 @@ static WXRuleManager *_sharedInstance = nil;
     }
 }
 
-- (WXThreadSafeMutableDictionary *)getRule:(NSString *)type {
-    
+- (WXThreadSafeMutableDictionary *)getRule:(NSString *)type
+{
     if ([type isEqualToString:@"fontFace"]) {
         return _fontStorage;
     }

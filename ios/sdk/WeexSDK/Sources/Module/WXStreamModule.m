@@ -28,41 +28,116 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     __block NSMutableDictionary * callbackRsp =[[NSMutableDictionary alloc] init];
     __block NSString *statusText = @"ERR_CONNECT_FAILED";
     
+    //build stream request
+    WXResourceRequest * request = [self _buildRequestWithOptions:options callbackRsp:callbackRsp];
+    if (!request) {
+        if (callback) {
+            callback(callbackRsp);
+        }
+        // failed with some invaild inputs
+        return ;
+    }
+    
+    // notify to start request state
+    if (progressCallback) {
+        progressCallback(callbackRsp, TRUE);
+    }
+    
+    WXResourceLoader *loader = [[WXResourceLoader alloc] initWithRequest:request];
+    __weak typeof(self) weakSelf = self;
+    loader.onResponseReceived = ^(const WXResourceResponse *response) {
+        httpResponse = (NSHTTPURLResponse*)response;
+        if (weakSelf) {
+            [callbackRsp setObject:@{ @"HEADERS_RECEIVED" : @2 } forKey:@"readyState"];
+            [callbackRsp setObject:[NSNumber numberWithInteger:httpResponse.statusCode] forKey:@"status"];
+            [callbackRsp setObject:httpResponse.allHeaderFields forKey:@"headers"];
+            statusText = [WXStreamModule _getStatusText:httpResponse.statusCode];
+            [callbackRsp setObject:statusText forKey:@"statusText"];
+            [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
+            if (progressCallback) {
+                progressCallback(callbackRsp, TRUE);
+            }
+        }
+    };
+    
+    loader.onDataReceived = ^(NSData *data) {
+        if (weakSelf) {
+            [callbackRsp setObject:@{ @"LOADING" : @3 } forKey:@"readyState"];
+            received += [data length];
+            [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
+            if (progressCallback) {
+                progressCallback(callbackRsp, TRUE);
+            }
+        }
+    };
+    
+    loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
+        if (weakSelf) {
+            [weakSelf _loadFinishWithResponse:response data:data callbackRsp:callbackRsp];
+            if (callback) {
+                callback(callbackRsp);
+            }
+        }
+    };
+    
+    loader.onFailed = ^(NSError *error) {
+        if (weakSelf) {
+            [weakSelf _loadFailedWithError:error callbackRsp:callbackRsp];
+            if (callback) {
+                callback(callbackRsp);
+            }
+        }
+    };
+    
+    [loader start];
+}
+
+- (WXResourceRequest*)_buildRequestWithOptions:(NSDictionary*)options callbackRsp:(NSMutableDictionary*)callbackRsp
+{
+    // parse request url
+    NSString *urlStr = [options objectForKey:@"url"];
+    NSMutableString *newUrlStr = [urlStr mutableCopy];
+    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &newUrlStr)
+    urlStr = newUrlStr;
+    
+    if (!options || [WXUtility isBlankString:urlStr]) {
+        [callbackRsp setObject:@(-1) forKey:@"status"];
+        [callbackRsp setObject:@NO forKey:@"ok"];
+        
+        return nil;
+    }
+    
+    WXResourceRequest *request = [WXResourceRequest requestWithURL:[NSURL URLWithString:urlStr] resourceType:WXResourceTypeOthers referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];
+    
+    // parse http method
     NSString *method = [options objectForKey:@"method"];
     if ([WXUtility isBlankString:method]) {
         // default HTTP method is GET
         method = @"GET";
     }
-    NSString *urlStr = [options objectForKey:@"url"];
-    NSMutableString *newUrlStr = [urlStr mutableCopy];
-    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &newUrlStr)
-    
-    if (!options || [WXUtility isBlankString:urlStr]) {
-        [callbackRsp setObject:@(-1) forKey:@"status"];
-        [callbackRsp setObject:@false forKey:@"ok"];
-        callback(callbackRsp);
-        
-        return;
-    }
-    urlStr = newUrlStr;
-    NSDictionary *headers = [options objectForKey:@"headers"];
-    NSString *type = [options objectForKey:@"type"];
-    NSURL *url = [NSURL URLWithString:urlStr];
-    
-    //TODO:referrer
-    WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeOthers referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];
     request.HTTPMethod = method;
+    
+    //parse responseType
+    NSString *responseType = [options objectForKey:@"type"];
+    [callbackRsp setObject:responseType?:@"JSON" forKey:@"responseType"];
+    
+    //parse timeout
     if ([options valueForKey:@"timeout"]){
-        //ms
+        //the time unit is ms
         [request setTimeoutInterval:([[options valueForKey:@"timeout"] floatValue])/1000];
     }
+    
+    //install client userAgent
     request.userAgent = [WXUtility userAgent];
     
+    // parse custom http headers
+    NSDictionary *headers = [options objectForKey:@"headers"];
     for (NSString *header in headers) {
         NSString *value = [headers objectForKey:header];
         [request setValue:value forHTTPHeaderField:header];
     }
-
+    
+    //parse custom body
     if ([options objectForKey:@"body"]) {
         NSData * body = nil;
         if ([[options objectForKey:@"body"] isKindOfClass:[NSString class]]) {
@@ -74,98 +149,75 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         }
         if (!body) {
             [callbackRsp setObject:@(-1) forKey:@"status"];
-            [callbackRsp setObject:@false forKey:@"ok"];
-            callback(callbackRsp);
-                
-            return;
+            [callbackRsp setObject:@NO forKey:@"ok"];
+            return nil;
         }
         
         [request setHTTPBody:body];
     }
     
     [callbackRsp setObject:@{ @"OPENED": @1 } forKey:@"readyState"];
-    if (progressCallback) {
-        progressCallback(callbackRsp, TRUE);
-    }
     
-    WXResourceLoader *loader = [[WXResourceLoader alloc] initWithRequest:request];
-    __weak typeof(self) weakSelf = self;
-    loader.onResponseReceived = ^(const WXResourceResponse *response) {
-        httpResponse = (NSHTTPURLResponse*)response;
-        if (weakSelf) {
-            [callbackRsp setObject:@{ @"HEADERS_RECEIVED" : @2  } forKey:@"readyState"];
-            [callbackRsp setObject:[NSNumber numberWithInteger:httpResponse.statusCode] forKey:@"status"];
-            [callbackRsp setObject:httpResponse.allHeaderFields forKey:@"headers"];
-            statusText = [WXStreamModule getStatusText:httpResponse.statusCode];
-            [callbackRsp setObject:statusText forKey:@"statusText"];
-            [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
-            if (progressCallback) {
-                progressCallback(callbackRsp, TRUE);
-            }
-        }
-    };
-    
-    loader.onDataReceived = ^(NSData *data) {
-        [callbackRsp setObject:@{ @"LOADING" : @3 } forKey:@"readyState"];
-        received += [data length];
-        [callbackRsp setObject:[NSNumber numberWithInteger:received] forKey:@"length"];
-        if (progressCallback) {
-            progressCallback(callbackRsp, TRUE);
-        }
-    };
-    
-    loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
-        [callbackRsp removeObjectForKey:@"readyState"];
-        [callbackRsp removeObjectForKey:@"length"];
-        [callbackRsp removeObjectForKey:@"keepalive"];
-        [callbackRsp setObject:httpResponse.statusCode >= 200 && httpResponse.statusCode <= 299 ? @true : @false forKey:@"ok"];
-    
-        NSString *responseData = [self stringfromData:data encode:httpResponse.textEncodingName];
-        if ([type isEqualToString:@"json"] || [type isEqualToString:@"jsonp"]) {
-            if ([type isEqualToString:@"jsonp"]) {
-                NSUInteger start = [responseData rangeOfString:@"("].location + 1 ;
-                NSUInteger end = [responseData rangeOfString:@")" options:NSBackwardsSearch].location;
-                if (end < [responseData length] && end > start) {
-                    responseData = [responseData substringWithRange:NSMakeRange(start, end-start)];
-                }
-            }
-            id jsonObj = [self JSONObjFromData:[responseData dataUsingEncoding:NSUTF8StringEncoding]];
-            if (jsonObj) {
-                [callbackRsp setObject:jsonObj forKey:@"data"];
-            }
-            
-        } else {
-            if (responseData) {
-                [callbackRsp setObject:responseData forKey:@"data"];
-            }
-        }
-        
-        callback(callbackRsp);
-    };
-    
-    loader.onFailed = ^(NSError *error) {
-        [callbackRsp removeObjectForKey:@"readyState"];
-        [callbackRsp removeObjectForKey:@"length"];
-        [callbackRsp removeObjectForKey:@"keepalive"];
-        [callbackRsp setObject:@(-1) forKey:@"status"];
-        [callbackRsp setObject:[NSString stringWithFormat:@"%@(%ld)",[error localizedDescription], (long)[error code]] forKey:@"data"];
-        
-        switch ([error code]) {
-            case -1000:
-            case -1002:
-            case -1003:
-                statusText = @"ERR_INVALID_REQUEST";
-                break;
-            default:
-                break;
-        }
-        [callbackRsp setObject:statusText forKey:@"statusText"];
-    };
-    
-    [loader start];
+    return request;
 }
 
-- (NSString*)stringfromData:(NSData *)data encode:(NSString *)encoding
+- (void)_loadFailedWithError:(NSError*)error callbackRsp:(NSMutableDictionary*)callbackRsp
+{
+    [callbackRsp removeObjectForKey:@"readyState"];
+    [callbackRsp removeObjectForKey:@"length"];
+    [callbackRsp removeObjectForKey:@"keepalive"];
+    [callbackRsp removeObjectForKey:@"responseType"];
+    
+    [callbackRsp setObject:@(-1) forKey:@"status"];
+    [callbackRsp setObject:[NSString stringWithFormat:@"%@(%ld)",[error localizedDescription], (long)[error code]] forKey:@"data"];
+    NSString * statusText = @"";
+    
+    switch ([error code]) {
+        case -1000:
+        case -1002:
+        case -1003:
+            statusText = @"ERR_INVALID_REQUEST";
+            break;
+        default:
+            break;
+    }
+    [callbackRsp setObject:statusText forKey:@"statusText"];
+    
+}
+- (void)_loadFinishWithResponse:(WXResourceResponse*)response data:(NSData*)data callbackRsp:(NSMutableDictionary*)callbackRsp
+{
+    [callbackRsp removeObjectForKey:@"readyState"];
+    [callbackRsp removeObjectForKey:@"length"];
+    [callbackRsp removeObjectForKey:@"keepalive"];
+    
+    [callbackRsp setObject:((NSHTTPURLResponse*)response).statusCode >= 200 && ((NSHTTPURLResponse*)response).statusCode <= 299 ? @YES : @NO forKey:@"ok"];
+    
+    NSString *responseData = [self _stringfromData:data encode:((NSHTTPURLResponse*)response).textEncodingName];
+    NSString * responseType = [callbackRsp objectForKey:@"responseType"];
+    [callbackRsp removeObjectForKey:@"responseType"];
+    if (responseType) {
+        
+        if ([responseType isEqualToString:@"jsonp"]) {
+            //TODO: to be more elegant
+            NSUInteger start = [responseData rangeOfString:@"("].location + 1 ;
+            NSUInteger end = [responseData rangeOfString:@")" options:NSBackwardsSearch].location;
+            if (end < [responseData length] && end > start) {
+                responseData = [responseData substringWithRange:NSMakeRange(start, end-start)];
+            }
+        }
+        id jsonObj = [self _JSONObjFromData:[responseData dataUsingEncoding:NSUTF8StringEncoding]];
+        if (jsonObj) {
+            [callbackRsp setObject:jsonObj forKey:@"data"];
+        }
+        
+    } else {
+        if (responseData) {
+            [callbackRsp setObject:responseData forKey:@"data"];
+        }
+    }
+}
+
+- (NSString*)_stringfromData:(NSData *)data encode:(NSString *)encoding
 {
     NSMutableString *responseData = nil;
     if (data) {
@@ -183,7 +235,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     return responseData;
 }
 
-- (id)JSONObjFromData:(NSData *)data
+- (id)_JSONObjFromData:(NSData *)data
 {
     NSError * error = nil;
     id jsonObj = [WXUtility JSONObject:data error:&error];
@@ -193,7 +245,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     return jsonObj;
 }
 
-+ (NSString*)getStatusText:(NSInteger)code
++ (NSString*)_getStatusText:(NSInteger)code
 {    
     switch (code) {
         case -1:
@@ -362,7 +414,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     };
     
     loader.onFailed = ^(NSError *error) {
-        callback(nil);
+        if (callback) {
+            callback(nil);
+        }
     };
 
     [loader start];
