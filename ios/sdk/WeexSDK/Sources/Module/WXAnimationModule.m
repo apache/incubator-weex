@@ -73,6 +73,10 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
+        return;
+    }
+    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
@@ -85,6 +89,12 @@
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
+    if (!_animationInfo.target) {
+        return;
+    }
+    
+    [_animationInfo.target.layer removeAllAnimations];
+    
     if (_finishBlock) {
         _finishBlock(flag);
     }
@@ -172,16 +182,16 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             if ((wxTransform.translateX && ![wxTransform.translateX isEqualToLength:oldTransform.translateX]) || (!wxTransform.translateX && oldTransform.translateX)) {
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.translation.x";
-                newInfo.fromValue = @([oldTransform.translateX valueForMaximumValue:view.bounds.size.width]);
-                newInfo.toValue = @([wxTransform.translateX valueForMaximumValue:view.bounds.size.width]);
+                newInfo.fromValue = @([oldTransform.translateX valueForMaximum:view.bounds.size.width]);
+                newInfo.toValue = @([wxTransform.translateX valueForMaximum:view.bounds.size.width]);
                 [infos addObject:newInfo];
             }
             
             if ((wxTransform.translateY && ![wxTransform.translateY isEqualToLength:oldTransform.translateY]) || (!wxTransform.translateY && oldTransform.translateY)) {
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.translation.y";
-                newInfo.fromValue = @([oldTransform.translateY valueForMaximumValue:view.bounds.size.height]);
-                newInfo.toValue = @([wxTransform.translateY valueForMaximumValue:view.bounds.size.height]);
+                newInfo.fromValue = @([oldTransform.translateY valueForMaximum:view.bounds.size.height]);
+                newInfo.toValue = @([wxTransform.translateY valueForMaximum:view.bounds.size.height]);
                 [infos addObject:newInfo];
             }
             

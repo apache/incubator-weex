@@ -7,13 +7,17 @@
  */
 
 #import "WXTextAreaComponent.h"
+#import "WXUtility.h"
+#import "WXComponent+Layout.h"
 
 #define CorrectX 4 //textview fill text 4 pixel from left. so placeholderlabel have 4 pixel too
+#define CorrectY 8 // textview fill text 8 pixel from top
 typedef UITextView WXTextAreaView;
 
 @interface WXTextAreaComponent()
 
 @property (nonatomic, strong) WXTextAreaView *textView;
+@property (nonatomic) NSUInteger rows;
 
 @end
 
@@ -32,7 +36,14 @@ typedef UITextView WXTextAreaView;
         [_textView addSubview:self.placeHolderLabel];
     }
     _textView.delegate = self;
+    [_textView setNeedsDisplay];
+    [_textView setClipsToBounds:YES];
     [super viewDidLoad];
+}
+
+- (void)viewWillUnload
+{
+    _textView = nil;
 }
 
 - (UIView *)loadView
@@ -40,6 +51,38 @@ typedef UITextView WXTextAreaView;
     _textView = [[WXTextAreaView alloc] init];
     return _textView;
 }
+
+#pragma mark measure frame
+- (CGSize (^)(CGSize))measureBlock
+{
+    __weak typeof(self) weakSelf = self;
+    return ^CGSize (CGSize constrainedSize) {
+        
+        CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:weakSelf.textView.font.pointSize]}];
+        computedSize.height = _rows? computedSize.height *weakSelf.rows + (CorrectY + CorrectY/2):0;
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
+            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
+            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
+            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+        }
+        
+        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
+            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        }
+        
+        return (CGSize) {
+            WXCeilPixelValue(computedSize.width),
+            WXCeilPixelValue(computedSize.height)
+        };
+    };
+}
+
 #pragma mark -Overwrite method
 -(NSString *)text
 {
@@ -148,6 +191,12 @@ typedef UITextView WXTextAreaView;
 -(void)setFont:(UIFont *)font
 {
     [_textView setFont:font];
+}
+
+-(void)setRows:(NSUInteger)rows
+{
+    _rows = rows;
+    [self setNeedsLayout];
 }
 
 #pragma mark -Private Method

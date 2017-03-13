@@ -168,7 +168,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ ref=%@> %@", _type, _ref, _view];
+    return [NSString stringWithFormat:@"<%@:%p ref=%@> %@", _type, self, _ref, _view];
 }
 
 #pragma mark Property
@@ -212,7 +212,7 @@
         }
         
         if (_boxShadow) {
-            [self configViewLayer:self.view boxShadow:_boxShadow];
+            [self configBoxShadow:_boxShadow];
         }
         
         _view.wx_component = self;

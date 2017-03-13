@@ -28,6 +28,8 @@
 @property(nonatomic) UIReturnKeyType returnKeyType;
 @property (nonatomic) BOOL disabled;
 @property (nonatomic, copy) NSString *inputType;
+@property (nonatomic) NSUInteger rows;
+
 //style
 @property (nonatomic) WXPixelType fontSize;
 @property (nonatomic) WXTextStyle fontStyle;
@@ -84,6 +86,11 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         if (attributes[@"returnKeyType"]) {
             _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         }
+        if (attributes[@"rows"]) {
+            _rows = [attributes[@"rows"] integerValue];
+        } else {
+            _rows = 2;
+        }
         
         // handle styles
         if (styles[@"color"]) {
@@ -135,6 +142,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     [self setTextColor:_colorForStyle];
     [self setText:_value];
     [self setEnabled:!_disabled];
+    [self setRows:_rows];
     [self setReturnKeyType:_returnKeyType];
     [self updatePattern];
     
@@ -264,6 +272,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 {
 }
 
+-(void)setRows:(NSUInteger)rows
+{
+}
+
 #pragma mark - Add Event
 - (void)addEvent:(NSString *)eventName
 {
@@ -341,6 +353,13 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if (attributes[@"returnKeyType"]) {
         _returnKeyType = [WXConvert UIReturnKeyType:attributes[@"returnKeyType"]];
         [self setReturnKeyType:_returnKeyType];
+    }
+    if (attributes[@"rows"]) {
+        _rows = [attributes[@"rows"] integerValue];
+        [self setRows:_rows];
+    } else {
+        _rows = 2;
+        [self setRows:_rows];
     }
 }
 

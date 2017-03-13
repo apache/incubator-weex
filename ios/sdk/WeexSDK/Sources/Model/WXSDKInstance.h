@@ -33,6 +33,11 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, assign) BOOL isRootViewFrozen;
 
 /**
+ * Which indicates current instance needs to be validated or not to load,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needValidate;
+
+/**
  * The scriptURL of weex bundle.
  **/
 @property (nonatomic, strong) NSURL *scriptURL;
@@ -88,12 +93,6 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  *  @return A block that takes a UIView argument, which is the root view
  **/
 @property (nonatomic, copy) void (^onCreate)(UIView *);
-
-/**
- * The callback triggered when JSCore throws js exception during runtime
- *  @return A block that takes a WXJSEXception argument.
- */
-@property (nonatomic, copy) void (^onJSException)(WXJSExceptionInfo *);
 
 /**
  *  The callback triggered when the root container's frame has changed.

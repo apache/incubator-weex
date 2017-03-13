@@ -21,6 +21,7 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXPolyfillSet.h"
 #import "JSValue+Weex.h"
+#import "WXJSExceptionProtocol.h"
 
 #import <dlfcn.h>
 
@@ -96,11 +97,12 @@
         _jsContext.exceptionHandler = ^(JSContext *context, JSValue *exception){
             context.exception = exception;
             NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
+            id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
             
             WXSDKInstance *instance = [WXSDKEngine topInstance];
-            if (instance.onJSException) {
-                WXJSExceptionInfo * jsException = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:@"" functionName:@"" exception:[NSString stringWithFormat:@"%@\n%@",[exception toString], exception[@"stack"]] userInfo:nil];
-                instance.onJSException(jsException);
+            if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
+                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:@"" functionName:@"" exception:[NSString stringWithFormat:@"%@\n%@",[exception toString], exception[@"stack"]] userInfo:nil];
+                [jsExceptionHandler onJSException:jsExceptionInfo];
             }
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
         };
@@ -216,15 +218,15 @@ typedef void (*WXJSCGarbageCollect)(JSContextRef);
 - (void)garbageCollect
 {
     // for dev and debug only!!
-    char str[80];
-    strcpy(str, "JSSynchron");
-    strcat(str, "ousGarbageColl");
-    strcat(str, "ectForDebugging");
-    WXJSCGarbageCollect garbageCollect = dlsym(RTLD_DEFAULT, str);
-    
-    if (garbageCollect != NULL) {
-        garbageCollect(_jsContext.JSGlobalContextRef);
-    }
+//    char str[80];
+//    strcpy(str, "JSSynchron");
+//    strcat(str, "ousGarbageColl");
+//    strcat(str, "ectForDebugging");
+//    WXJSCGarbageCollect garbageCollect = dlsym(RTLD_DEFAULT, str);
+//    
+//    if (garbageCollect != NULL) {
+//        garbageCollect(_jsContext.JSGlobalContextRef);
+//    }
 }
 
 #pragma mark - Private

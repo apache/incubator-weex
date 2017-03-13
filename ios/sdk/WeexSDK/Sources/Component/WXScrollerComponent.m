@@ -423,6 +423,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _direction = @"down";
     } else if(_lastContentOffset.y < scrollView.contentOffset.y) {
         _direction = @"up";
+        [self handleLoadMore];
     }
    
     _lastContentOffset = scrollView.contentOffset;
@@ -439,7 +440,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
     // check sticky
     [self adjustSticky];
-    [self handleLoadMore];
     [self handleAppear];
     
     if (self.onScroll) {
@@ -465,12 +465,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     UIEdgeInsets inset = [scrollView contentInset];
-    if ([_refreshComponent displayState]) {
-        inset.top = _refreshComponent.view.frame.size.height;
-    }
-    else {
-        inset.top = 0;
-    }
+    
+//  currently only set contentInset when loading
+//    if ([_refreshComponent displayState]) {
+//        inset.top = _refreshComponent.view.frame.size.height;
+//    }
+//    else {
+//        inset.top = 0;
+//    }
+    
     if ([_loadingComponent displayState]) {
         inset.bottom = _loadingComponent.view.frame.size.height;
     } else {
