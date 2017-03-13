@@ -73,7 +73,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     
     loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
         if (weakSelf) {
-            [weakSelf _loadFinishWithResponse:response data:data callbackRsp:callbackRsp];
+            [weakSelf _loadFinishWithResponse:[response copy] data:data callbackRsp:callbackRsp];
             if (callback) {
                 callback(callbackRsp);
             }
