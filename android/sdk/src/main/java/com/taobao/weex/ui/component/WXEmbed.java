@@ -209,6 +209,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -328,8 +329,17 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     @Override
     public void onViewCreated(WXSDKInstance instance, View view) {
       FrameLayout hostView = mComponent.getHostView();
-      hostView.removeAllViews();
-      hostView.addView(view);
+      ViewGroup.LayoutParams params = hostView.getLayoutParams();
+      ViewParent parent = hostView.getParent();
+      if(parent != null && parent instanceof ViewGroup) {
+        ViewGroup parentGroup = (ViewGroup) parent;
+        parentGroup.removeView(hostView);
+        if(view.getParent() != null && view.getParent() instanceof ViewGroup) {
+          ((ViewGroup)view.getParent()).removeView(view);
+        }
+        view.setLayoutParams(params);
+        parentGroup.addView(view);
+      }
     }
 
     @Override
