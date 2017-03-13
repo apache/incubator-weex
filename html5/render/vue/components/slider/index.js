@@ -61,14 +61,6 @@ export default {
         indicatorVnode.data.attrs = indicatorVnode.data.attrs || {}
         indicatorVnode.data.attrs.count = cells.length
         indicatorVnode.data.attrs.active = this.currentIndex
-        // this._indicator = createElement(indicator, {
-        //   staticClass: indicatorVnode.data.staticClass,
-        //   staticStyle: indicatorVnode.data.staticStyle,
-        //   attrs: {
-        //     count: cells.length,
-        //     active: this.currentIndex
-        //   }
-        // })
         this._indicator = createElement(indicator, indicatorVnode.data)
       }
       return cells
