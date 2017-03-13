@@ -70,4 +70,13 @@ const weex = {
   }
 }
 
+['on', 'once', 'off', 'emit'].forEach(function (method) {
+  weex[method] = function (...args) {
+    if (!this._vue) {
+      this._vue = new Vue()
+    }
+    return this._vue[method](...args)
+  }
+})
+
 export default weex
