@@ -277,7 +277,7 @@ public class WXViewUtils {
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (instance != null) {
       int weexHeight = instance.getWeexHeight();
-      if (weexHeight >= 0 || weexHeight == -2) {
+      if (weexHeight > 0 || weexHeight == -2) {
         return weexHeight;
       }
       else {

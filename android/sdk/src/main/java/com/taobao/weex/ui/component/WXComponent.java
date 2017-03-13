@@ -239,10 +239,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       Map<String, Object> position = WXDataStructureUtil.newHashMapWithExpectedSize(4);
       int[] location = new int[2];
       mHost.getLocationOnScreen(location);
-      position.put("x", WXViewUtils.getWebPxByWidth(location[0],mInstance.getViewPortWidth()));
-      position.put("y", WXViewUtils.getWebPxByWidth(location[1],mInstance.getViewPortWidth()));
-      position.put("width", WXViewUtils.getWebPxByWidth(mDomObj.getLayoutWidth(),mInstance.getViewPortWidth()));
-      position.put("height", WXViewUtils.getWebPxByWidth(mDomObj.getLayoutHeight(),mInstance.getViewPortWidth()));
+      position.put("x", WXViewUtils.getWebPxByWidth(location[0],mInstance.getInstanceViewPortWidth()));
+      position.put("y", WXViewUtils.getWebPxByWidth(location[1],mInstance.getInstanceViewPortWidth()));
+      position.put("width", WXViewUtils.getWebPxByWidth(mDomObj.getLayoutWidth(),mInstance.getInstanceViewPortWidth()));
+      position.put("height", WXViewUtils.getWebPxByWidth(mDomObj.getLayoutHeight(),mInstance.getInstanceViewPortWidth()));
       param.put(Constants.Name.POSITION, position);
       fireEvent(Constants.Event.CLICK,param);
     }
@@ -1133,19 +1133,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderRadius >= 0) {
       switch (key) {
         case Constants.Name.BORDER_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_RADIUS_ALL, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_RADIUS_ALL, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_TOP_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_RIGHT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
-          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getViewPortWidth()));
+          getOrCreateBorder().setBorderRadius(BorderDrawable.BORDER_BOTTOM_LEFT_RADIUS, WXViewUtils.getRealSubPxByWidth(borderRadius,mInstance.getInstanceViewPortWidth()));
           break;
       }
     }
@@ -1155,19 +1155,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(Spacing.ALL, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_TOP_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(Spacing.TOP, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_RIGHT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(Spacing.RIGHT, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_BOTTOM_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(Spacing.BOTTOM, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getInstanceViewPortWidth()));
           break;
         case Constants.Name.BORDER_LEFT_WIDTH:
-          getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getViewPortWidth()));
+          getOrCreateBorder().setBorderWidth(Spacing.LEFT, WXViewUtils.getRealSubPxByWidth(borderWidth,getInstance().getInstanceViewPortWidth()));
           break;
       }
     }
@@ -1245,7 +1245,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * This is an experimental feature for elevation of material design.
    */
   private void updateElevation() {
-    float elevation = getDomObject().getAttrs().getElevation(getInstance().getViewPortWidth());
+    float elevation = getDomObject().getAttrs().getElevation(getInstance().getInstanceViewPortWidth());
     if (!Float.isNaN(elevation)) {
       ViewCompat.setElevation(getHostView(), elevation);
     }

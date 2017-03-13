@@ -274,7 +274,7 @@ public class WXAnimationModule extends WXModule {
       return;
     }
     try {
-      Animator animator = createAnimator(animationBean, component.getHostView(),instance.getViewPortWidth());
+      Animator animator = createAnimator(animationBean, component.getHostView(),instance.getInstanceViewPortWidth());
       if (animator != null) {
         Animator.AnimatorListener animatorCallback = createAnimatorListener(instance, callback);
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.JELLY_BEAN_MR2) {

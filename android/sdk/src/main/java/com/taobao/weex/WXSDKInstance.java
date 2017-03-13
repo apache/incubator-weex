@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -249,7 +249,6 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.WXFileUtils;
@@ -295,22 +294,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
   private boolean trackComponent;
   private boolean mNeedValidate = false;
-
-  public boolean isNeedValidate() {
-    return mNeedValidate;
-  }
-  /*
-   *  store custom ViewPort Width
-   */
-  public void setViewPortWidth(int mViewPortWidth) {
-    this.mViewPortWidth = mViewPortWidth;
-  }
-
-  public static int getViewPortWidth() {
-    return mViewPortWidth;
-  }
-
   private static volatile int mViewPortWidth = 750;
+  private int mInstanceViewPortWidth = 750;
 
   /**
    * Render strategy.
@@ -353,6 +338,31 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setTrackComponent(boolean trackComponent) {
     this.trackComponent = trackComponent;
+  }
+
+  public boolean isNeedValidate() {
+    return mNeedValidate;
+  }
+
+  /*
+  *  store custom ViewPort Width
+  */
+  @Deprecated
+  public void setViewPortWidth(int viewPortWidth) {
+    mViewPortWidth = viewPortWidth;
+  }
+
+  @Deprecated
+  public static int getViewPortWidth() {
+    return mViewPortWidth;
+  }
+
+  public void setInstanceViewPortWidth(int instanceViewPortWidth) {
+    this.mInstanceViewPortWidth = instanceViewPortWidth;
+  }
+
+  public int getInstanceViewPortWidth(){
+    return mInstanceViewPortWidth;
   }
 
   public interface OnInstanceVisibleListener{
@@ -870,6 +880,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mContext.sendBroadcast(intent);
 
     onViewAppear();
+
+    setViewPortWidth(mInstanceViewPortWidth);
   }
 
   @Override
@@ -1321,8 +1333,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width,getViewPortWidth());
-    float realHeight = WXViewUtils.getWebPxByWidth(height,getViewPortWidth());
+    float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
+    float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {

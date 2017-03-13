@@ -233,11 +233,14 @@ public class WXMetaModule extends WXModule {
                 JSONObject jsObj = JSON.parseObject(param);
                 Context cxt = mWXSDKInstance.getContext();
                 if (DEVICE_WIDTH.endsWith(jsObj.getString(WIDTH))) {
-                    mWXSDKInstance.setViewPortWidth((int)(WXViewUtils.getScreenWidth(cxt)/WXViewUtils.getScreenDensity(cxt)));
+                    int width = (int)(WXViewUtils.getScreenWidth(cxt)/WXViewUtils.getScreenDensity(cxt));
+                    mWXSDKInstance.setViewPortWidth(width);
+                    mWXSDKInstance.setInstanceViewPortWidth(width);
                 } else {
                     int width = jsObj.getInteger(WIDTH);
                     if (width > 0) {
                         mWXSDKInstance.setViewPortWidth(width);
+                        mWXSDKInstance.setInstanceViewPortWidth(width);
                     }
                 }
             } catch (Exception e) {
