@@ -43,6 +43,9 @@ export function isComponentVisible (component) {
         scroller.$el.getBoundingClientRect()
       )
     }
+    else {
+      return isElementVisible(component.$el)
+    }
   }
   return false
 }
@@ -56,10 +59,17 @@ export function watchAppear (context) {
       const on = context.$options._parentListeners
       if (on.appear || on.disappear) {
         const scroller = getParentScroller(context)
-        const element = (scroller && scroller.$el) || window
-        let lastScrollTop = element.scrollTop
+        let isWindow = false
+        let container = window
+        if (scroller && scroller.$el) {
+          container = scroller.$el
+        }
+        else {
+          isWindow = true
+        }
+        let lastScrollTop = container.scrollTop || window.pageYOffset
 
-        context._visible = isComponentVisible(context)
+        context._visible = isElementVisible(context.$el, isWindow ? document.body : container)
         if (context._visible && on.appear) {
           if (on.appear.fn) {
             on.appear = on.appear.fn
@@ -67,7 +77,7 @@ export function watchAppear (context) {
           on.appear(createEvent(context.$el, 'appear', { direction: 'down' }))
         }
         const handler = throttle(event => {
-          const visible = isComponentVisible(context)
+          const visible = isElementVisible(context.$el, isWindow ? document.body : container)
           let listener = null
           let type = null
           if (visible !== context._visible) {
@@ -83,14 +93,15 @@ export function watchAppear (context) {
             if (listener.fn) {
               listener = listener.fn
             }
+            const scrollTop = container.scrollTop || window.pageYOffset
             listener(createEvent(context.$el, type, {
-              direction: element.scrollTop > lastScrollTop ? 'down' : 'up'
+              direction: scrollTop > lastScrollTop ? 'down' : 'up'
             }))
-            lastScrollTop = element.scrollTop
+            lastScrollTop = scrollTop
           }
         }, 10)
 
-        element.addEventListener('scroll', handler, false)
+        container.addEventListener('scroll', handler, false)
       }
     }
   })
