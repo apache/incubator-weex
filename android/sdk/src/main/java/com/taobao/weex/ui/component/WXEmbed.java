@@ -339,6 +339,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         }
         view.setLayoutParams(params);
         parentGroup.addView(view);
+      } else {
+        hostView.removeAllViews();
+        hostView.addView(view);
       }
     }
 
