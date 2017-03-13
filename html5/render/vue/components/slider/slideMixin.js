@@ -59,16 +59,15 @@ export default {
             }, this.interval > TRANSITION_TIME ? this.interval : TRANSITION_TIME)
           }
         }
-        removeClone(this._clonePrev)
-        removeClone(this._cloneNext)
 
         // clone prevCell and nextCell if there is only one slide.
         if (this._cells.length <= 2) {
           this._clonePrev = prevElm.cloneNode(true)
           this._clonePrev.classList.add('weex-slide-clone-prev')
           prevElm.parentElement.insertBefore(this._clonePrev, currentElm)
+          removeClone(this._clonePrev)
           if (!this._prevFired) {
-            fireLazyload(this._clonePrev)
+            fireLazyload(this._clonePrev, true)
             this._prevFired = true
           }
           prevElm = this._clonePrev
@@ -78,8 +77,9 @@ export default {
           this._cloneNext = nextElm.cloneNode(true)
           this._cloneNext.classList.add('weex-slide-clone-next')
           nextElm.parentElement.insertBefore(this._cloneNext, currentElm)
+          removeClone(this._cloneNext)
           if (!this._nextFired) {
-            fireLazyload(this._cloneNext)
+            fireLazyload(this._cloneNext, true)
             this._nextFired = true
           }
           nextElm = this._cloneNext
