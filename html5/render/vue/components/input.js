@@ -44,6 +44,9 @@ export default {
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
+      domProps: {
+        value: this.value
+      },
       on: extend(this._createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-input',
       staticStyle: ms
