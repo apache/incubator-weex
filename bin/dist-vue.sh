@@ -1,9 +1,26 @@
 #!/user/bin/env bash
 
 echo ''
-echo " => writing version number into weex-vue-render's package.json..."
+echo ' => cping files for vue dist...'
 
 base_dir=./packages/weex-vue-render
+src_dir=./html5
+vue_dir=${src_dir}/render/vue
+browser_dir=${src_dir}/render/browser
+shared_dir=${src_dir}/shared
+
+dist_dir=./packages/weex-vue-render/src
+
+rm -rf ${dist_dir}
+
+mkdir $dist_dir
+mkdir $dist_dir/render
+
+cp -fR ${browser_dir} ${dist_dir}/render/
+cp -fR ${vue_dir} ${dist_dir}/render/
+cp -fR ${shared_dir} ${dist_dir}/
+
+echo " => writing version number into weex-vue-render's package.json..."
 
 # get version of weex-html5 from subversion of main package.json.
 pkg=./package.json
