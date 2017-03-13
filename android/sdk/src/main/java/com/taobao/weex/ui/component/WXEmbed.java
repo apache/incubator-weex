@@ -205,17 +205,19 @@
 package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.taobao.weappplus_sdk.R;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -226,8 +228,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 @Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+public class WXEmbed extends WXVContainer<FrameLayout> implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   public static final String ITEM_ID = "itemId";
 
@@ -328,21 +331,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     @Override
     public void onViewCreated(WXSDKInstance instance, View view) {
-      FrameLayout hostView = mComponent.getHostView();
-      ViewGroup.LayoutParams params = hostView.getLayoutParams();
-      ViewParent parent = hostView.getParent();
-      if(parent != null && parent instanceof ViewGroup) {
-        ViewGroup parentGroup = (ViewGroup) parent;
-        parentGroup.removeView(hostView);
-        if(view.getParent() != null && view.getParent() instanceof ViewGroup) {
-          ((ViewGroup)view.getParent()).removeView(view);
-        }
-        view.setLayoutParams(params);
-        parentGroup.addView(view);
-      } else {
-        hostView.removeAllViews();
-        hostView.addView(view);
-      }
+
     }
 
     @Override
@@ -380,6 +369,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
       }
     }
+  }
+
+  @Override
+  protected FrameLayout initComponentHostView(@NonNull Context context) {
+    return new RenderContainer(context);
   }
 
   @Override
@@ -452,6 +446,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
+    if(getHostView() instanceof RenderContainer) {
+      sdkInstance.setRenderContainer((RenderContainer) getHostView());
+    }
     getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
 
