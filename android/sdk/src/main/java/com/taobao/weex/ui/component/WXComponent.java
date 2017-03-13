@@ -226,6 +226,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private WXAnimationModule.AnimationHolder mAnimationHolder;
   private PesudoStatus mPesudoStatus = new PesudoStatus();
   private boolean mIsDestroyed = false;
+  private boolean mIsDisabled = false;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -1091,10 +1092,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void setDisabled(boolean disabled) {
+    mIsDisabled = disabled;
     if (mHost == null) {
       return;
     }
     mHost.setEnabled(!disabled);
+  }
+
+  public boolean isDisabled(){
+    return mIsDisabled;
   }
 
   public void setSticky(String sticky) {
@@ -1433,9 +1439,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     boolean hasActivePesudo = mDomObj.getStyles().getPesudoStyles().containsKey(Constants.PSEUDO.ACTIVE);
     View view;
     if(hasActivePesudo && (view = getRealView()) != null) {
-      boolean hasTouchConsumer = (mHostClickListeners != null && mHostClickListeners.size() > 0) || mGesture != null;
+      boolean hasTouchConsumer = isConsumeTouch();
       view.setOnTouchListener(new TouchActivePseudoListener(this,!hasTouchConsumer));
     }
+  }
+
+  protected boolean isConsumeTouch(){
+    return (mHostClickListeners != null && mHostClickListeners.size() > 0) || mGesture != null;
   }
 
   @Override

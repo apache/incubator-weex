@@ -282,6 +282,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     });
   }
 
+  @Override
+  protected boolean isConsumeTouch() {
+    //EditText always consume touch event except disabled.
+    return !isDisabled();
+  }
+
   private void applyOnClickListener() {
     addClickListener(new OnClickListener() {
       @Override
