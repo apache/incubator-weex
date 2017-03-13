@@ -362,6 +362,7 @@ public class Constants {
 
   public interface Value {
 
+    int DENSITY = 3;
     int NAV_BAR_SHOWN = 0;
     int NAV_BAR_HIDDEN = 1;
     int AUTO = -1;
