@@ -419,7 +419,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
                       args);
           } else {
-              return validateResult.validateInfo;
+              JSONObject validateInfo = validateResult.validateInfo;
+              WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
+              return validateInfo;
           }
       }
       return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);

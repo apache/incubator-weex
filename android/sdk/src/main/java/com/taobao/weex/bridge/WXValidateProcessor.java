@@ -227,6 +227,8 @@ public interface WXValidateProcessor {
 
         public String replacedComponent;
 
+        public JSONObject validateInfo;
+
     }
 
     class WXModuleValidateResult {
