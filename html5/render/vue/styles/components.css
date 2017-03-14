@@ -527,7 +527,7 @@ body > .weex-scroller {
   white-space: pre-wrap;  /* not using 'pre': support auto line feed. */
   font-size: 0.426667rem;
   word-wrap: break-word;
-  overflow: visible;
+  overflow: hidden; /* it'll be clipped if the height is not high enough. */
 }
 
 .weex-web {
