@@ -209,6 +209,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
+import com.taobao.weex.utils.WXLogUtils;
+
 import java.lang.ref.WeakReference;
 
 
@@ -312,15 +314,23 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
         if (mFirstPositions == null || newSpanCount != mFirstPositions.length) {
           mFirstPositions = new int[newSpanCount];
         }
-        staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
-        mFirstVisibleItemPosition = findMin(mFirstPositions);
-        staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
-        mLastVisibleItemPosition = findMax(mLastPositions);
-        iOnLoadMoreListener.notifyAppearStateChange(
-            mFirstVisibleItemPosition
-            , mLastVisibleItemPosition
-            , dx
-            , dy);
+        //avoid crash of support-v7 original bug
+        try{
+          staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
+          mFirstVisibleItemPosition = findMin(mFirstPositions);
+          staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
+          mLastVisibleItemPosition = findMax(mLastPositions);
+          iOnLoadMoreListener.notifyAppearStateChange(
+              mFirstVisibleItemPosition
+              , mLastVisibleItemPosition
+              , dx
+              , dy);
+
+        }catch(Exception e){
+          e.printStackTrace();
+          WXLogUtils.e(e.toString());
+        }
+
       } else {
         throw new RuntimeException(
             "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
