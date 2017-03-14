@@ -1,5 +1,5 @@
 // import { validateStyles } from '../../validator'
-import { throttle, bind, extend } from '../../utils'
+import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
@@ -82,6 +82,10 @@ export default {
     this.reorder()
   },
 
+  updated () {
+    fireLazyload(this.$el, true)
+  },
+
   mounted () {
     if (this.autoPlay && this.autoPlay !== 'false') {
       const interval = Number(this.interval)
@@ -102,6 +106,7 @@ export default {
     }
 
     this.reorder()
+    fireLazyload(this.$el, true)
   },
 
   render (createElement) {
@@ -109,7 +114,6 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length
 
