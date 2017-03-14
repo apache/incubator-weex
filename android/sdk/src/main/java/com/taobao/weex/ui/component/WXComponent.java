@@ -145,7 +145,6 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 
 import com.alibaba.fastjson.JSONArray;
@@ -1071,9 +1070,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     if(mHost != null) {
       mHost.setOnFocusChangeListener(null);
-      if(mHost instanceof AdapterView){
-        ((AdapterView)mHost).setOnItemClickListener(null);
-      }else {
+      if (mHostClickListeners != null && mHostClickListeners.size() > 0) {
+        mHostClickListeners.clear();
         mHost.setOnClickListener(null);
       }
     }
