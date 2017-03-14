@@ -312,15 +312,21 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
         if (mFirstPositions == null || newSpanCount != mFirstPositions.length) {
           mFirstPositions = new int[newSpanCount];
         }
-        staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
-        mFirstVisibleItemPosition = findMin(mFirstPositions);
-        staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
-        mLastVisibleItemPosition = findMax(mLastPositions);
-        iOnLoadMoreListener.notifyAppearStateChange(
-            mFirstVisibleItemPosition
-            , mLastVisibleItemPosition
-            , dx
-            , dy);
+        try{
+          staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
+          mFirstVisibleItemPosition = findMin(mFirstPositions);
+          staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
+          mLastVisibleItemPosition = findMax(mLastPositions);
+          iOnLoadMoreListener.notifyAppearStateChange(
+              mFirstVisibleItemPosition
+              , mLastVisibleItemPosition
+              , dx
+              , dy);
+
+        }catch(Exception e){
+          e.printStackTrace();
+        }
+
       } else {
         throw new RuntimeException(
             "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
