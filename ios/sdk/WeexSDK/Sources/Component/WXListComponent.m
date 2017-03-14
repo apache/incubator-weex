@@ -173,6 +173,11 @@
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
+    if (_tableView.contentSize.height <= _tableView.frame.size.height) {
+        // can not scroll
+        return;
+    }
+    
     CGPoint contentOffset = _tableView.contentOffset;
     CGFloat contentOffsetY = 0;
     

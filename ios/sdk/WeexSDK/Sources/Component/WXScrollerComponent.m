@@ -318,6 +318,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
+    
+    if ((_scrollDirection == WXScrollDirectionHorizontal && scrollView.contentSize.width <= scrollView.frame.size.width)
+        || (_scrollDirection == WXScrollDirectionVertical && scrollView.contentSize.height <= scrollView.frame.size.height)) {
+        // can not scroll
+        return;
+    }
+
     CGPoint contentOffset = scrollView.contentOffset;
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     
