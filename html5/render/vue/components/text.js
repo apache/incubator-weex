@@ -1,16 +1,22 @@
+/**
+ * @fileOverview Impl of text component.
+ *
+ * Notes about the style 'height' and 'lines':
+ * if the computed value of 'height' is bigger than 'lines', than the text will
+ * be clipped according to the 'lines'. Otherwise, it'll be the 'height'.
+ */
+
 // import { validateStyles } from '../validator'
 import { extend } from '../utils'
 
 /**
  * Get text special styles (lines and text-overflow).
  */
-function getTextSpecStyle (context = {}) {
+function getTextSpecStyle (context = {}, ms = {}) {
   const propLines = parseInt(context.lines) || 0
   const propOverflow = context.textOverflow || 'ellipsis'
-  const data = context.$options._parentVnode.data
-  const staticStyle = data && data.staticStyle || {}
-  const lines = parseInt(staticStyle.lines) || propLines
-  const overflow = staticStyle['text-overflow'] || propOverflow
+  const lines = parseInt(ms.lines) || propLines
+  const overflow = ms['text-overflow'] || propOverflow
   if (lines > 0) {
     return {
       overflow: 'hidden',
@@ -18,7 +24,6 @@ function getTextSpecStyle (context = {}) {
       '-webkit-line-clamp': lines
     }
   }
-  return staticStyle
 }
 
 export default {
@@ -38,7 +43,7 @@ export default {
       attrs: { 'weex-type': 'text' },
       on: this._createEventMap(),
       staticClass: 'weex-text',
-      staticStyle: extend(ms, getTextSpecStyle(this))
+      staticStyle: extend(ms, getTextSpecStyle(this, ms))
     }, this.$slots.default || [this.value])
   }
 }
