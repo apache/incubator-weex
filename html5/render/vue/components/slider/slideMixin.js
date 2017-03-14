@@ -1,4 +1,4 @@
-import { createEvent/*, nextFrame*/ } from '../../utils'
+import { createEvent/*, nextFrame*/, fireLazyload } from '../../utils'
 
 const TRANSITION_TIME = 200
 
@@ -48,21 +48,49 @@ export default {
       this.$nextTick(() => {
         const prevIndex = this.normalizeIndex(this.currentIndex - 1)
         const nextIndex = this.normalizeIndex(this.currentIndex + 1)
-        // TODO: clone frame when prevIndex === nextIndex
-        // if (prevIndex !== nextIndex) {
-        // }
-        const prevCell = this._cells[prevIndex]
-        const nextCell = this._cells[nextIndex]
-        if (prevCell && prevCell.elm) {
-          const prevOffset = -this.wrapperWidth - this.innerOffset
-          prevCell.elm.style.webkitTransform = `translate3d(${prevOffset}px, 0, 0)`
-          prevCell.elm.style.transform = `translate3d(${prevOffset}px, 0, 0)`
+        let prevElm = this._cells[prevIndex].elm
+        let nextElm = this._cells[nextIndex].elm
+        const currentElm = this._cells[this.currentIndex].elm
+
+        const removeClone = (clone) => {
+          if (clone) {
+            setTimeout(() => {
+              clone.parentElement.removeChild(clone)
+            }, this.interval > TRANSITION_TIME ? this.interval : TRANSITION_TIME)
+          }
         }
-        if (nextCell && nextCell.elm) {
-          const nextOffset = this.wrapperWidth - this.innerOffset
-          nextCell.elm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
-          nextCell.elm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
+
+        // clone prevCell and nextCell if there is only one slide.
+        if (this._cells.length <= 2) {
+          this._clonePrev = prevElm.cloneNode(true)
+          this._clonePrev.classList.add('weex-slide-clone-prev')
+          prevElm.parentElement.insertBefore(this._clonePrev, currentElm)
+          removeClone(this._clonePrev)
+          if (!this._prevFired) {
+            fireLazyload(this._clonePrev, true)
+            this._prevFired = true
+          }
+          prevElm = this._clonePrev
         }
+        // clone prevCell if there are only tow slides.
+        if (this._cells.length <= 1) {
+          this._cloneNext = nextElm.cloneNode(true)
+          this._cloneNext.classList.add('weex-slide-clone-next')
+          nextElm.parentElement.insertBefore(this._cloneNext, currentElm)
+          removeClone(this._cloneNext)
+          if (!this._nextFired) {
+            fireLazyload(this._cloneNext, true)
+            this._nextFired = true
+          }
+          nextElm = this._cloneNext
+        }
+
+        const prevOffset = -this.wrapperWidth - this.innerOffset
+        prevElm.style.webkitTransform = `translate3d(${prevOffset}px, 0, 0)`
+        prevElm.style.transform = `translate3d(${prevOffset}px, 0, 0)`
+        const nextOffset = this.wrapperWidth - this.innerOffset
+        nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
+        nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
       })
     },
 

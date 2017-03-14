@@ -43,7 +43,7 @@ export function applySrc (item, src, placeholderSrc) {
   })
 }
 
-export function fireLazyload (el) {
+export function fireLazyload (el, ignoreVisibility) {
   if (process.env.NODE_ENV === 'development') {
     tagBegin('fireLazyload')
   }
@@ -53,7 +53,10 @@ export function fireLazyload (el) {
   const imgs = (el || document.body).querySelectorAll('[img-src]')
   for (let i = 0; i < imgs.length; i++) {
     const img = imgs[i]
-    if (isElementVisible(img, el)) {
+    if (ignoreVisibility) {
+      applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
+    }
+    else if (isElementVisible(img, el)) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
     // In somecases there are images out of the screen in x-axis. There
