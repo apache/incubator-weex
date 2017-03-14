@@ -23,7 +23,7 @@ for file in git.modified_files do
       if metion_break_change
         warn("Potential BREAK CHANGE. Modify public in #{file}")
       else
-        fail("Potential BREAK CHANGE. Modify public in #{file} without metion it in commit message. ")
+        warn("Potential BREAK CHANGE. Modify public in #{file} without metion it in commit message. You'd better add 'break change' in your commit log. ")
       end
     end
   end
