@@ -206,6 +206,7 @@ package com.taobao.weex.dom;
 
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
@@ -244,26 +245,12 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     mStyles = new ArrayMap<>();
   }
 
-  public int getBlur() {
-    try {
-      if(get(Constants.Name.FILTER) == null) {
-        return 0;
-      }
-      String value = get(Constants.Name.FILTER).toString().trim();
-      int start = value.indexOf("blur(");
-      int end = value.indexOf("px)");
-      if(end == -1) {
-        end = value.indexOf(")");
-      }
-      if(start == 0 && start < end) {
-        int blur = Integer.parseInt(value.substring(5,end));
-        //unlike css blur filter(https://developer.mozilla.org/en-US/docs/Web/CSS/filter),in weex
-        //we specify the blur radius in [0,10] to improve performance and avoid potential oom issue.
-        return Math.min(10,Math.max(0,blur));
-      }
-    }catch (NumberFormatException e) {
+  @Nullable
+  public String getBlur() {
+    if(get(Constants.Name.FILTER) == null) {
+      return null;
     }
-    return 0;
+    return get(Constants.Name.FILTER).toString().trim();
   }
 
   /*
