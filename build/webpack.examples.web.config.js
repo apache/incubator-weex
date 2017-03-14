@@ -45,9 +45,6 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
 
 module.exports = {
   entry: entry,
-  // entry: {
-    // 'examples/build/web/vue-bundle': path.resolve('examples/vue', 'entry.js')
-  // },
   output: {
     path: '.',
     filename: '[name].js'
@@ -63,6 +60,11 @@ module.exports = {
         loaders: ['vue-loader']
       }
     ]
+  },
+  vue: {
+    autoprefixer: {
+      browsers: ['last 7 versions']
+    }
   },
   plugins: [bannerPlugin]
 }
