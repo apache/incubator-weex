@@ -16,35 +16,57 @@ const perf = window._weex_perf = {
   // updateTime: earliest beforeUpdate -> latest updated.
   updateTime: [],
   // renderTime: earliest beforeCreate/beforeUpdate -> latest img loaded.
-  renderTime: []
+  renderTime: [],
+  entries: [],
+  time: {}
 }
+
+const tmp = {}
 
 const IMG_REC_INDENT = 500  // record loading events after 500ms towards last recording.
 
 let earliestBeforeUpdateTime = 0
 let earliestBeforeCreateTime = 0
 
-if (!performance.now) {
-  performance.now = function () { return new Date().getTime() }
+function getNow () {
+  return performance.now ? performance.now() : new Date().getTime()
+}
+
+function getEntries () {
+  return performance.getEntries
+    ? performance.getEntries()
+    : [{ responseEnd: getNow() }]
 }
 
 /**
  * get first screen time.
  */
 const debouncedTagImg = debounce(function () {
-  const now = performance.now()
-  perf.latestRenderFinishes.push(now)
+  const entries = getEntries()
+  const len = entries.length
+  let i = 0, end = 0
+  while (i < len) {
+    const responseEnd = entries[i].responseEnd
+    end = end < responseEnd ? responseEnd : end
+    perf.entries.push({
+      requestStart: entries[i].requestStart,
+      responseEnd
+    })
+    i++
+  }
+  perf.latestRenderFinishes.push(end)
   const start = Math.max(earliestBeforeCreateTime, earliestBeforeUpdateTime)
   perf.renderTime.push({
     start,
-    end: now,
-    duration: now - start
+    end,
+    duration: end - start
   })
 
-  const len = perf.renderTime.length
-  perf[`screenTime${len}`] = now
+  const num = perf.renderTime.length
+  perf[`screenTime${num}`] = end
+  weex.emit('renderfinish', end)
   if (process.env.NODE_ENV === 'development') {
-    console.log(`screenTime[${len}]: ${now} ms.`)
+    console.log(`screenTime[${num}]: ${end} ms.`)
   }
 }, IMG_REC_INDENT)
 
@@ -56,7 +78,7 @@ export function tagImg () {
  * recording the earliest 'beforeCreate' time.
  */
 const depressedTagBeforeCreate = depress(function () {
-  const now = performance.now()
+  const now = getNow()
   earliestBeforeCreateTime = now
   perf.earliestBeforeCreates.push(now)
 }, 25)
@@ -69,7 +91,7 @@ export function tagBeforeCreate () {
  * recording the latest 'mounted' time.
  */
 const debouncedTagMounted = debounce(function () {
-  const now = performance.now()
+  const now = getNow()
   perf.latestMounts.push(now)
   perf.createTime.push({
     start: earliestBeforeCreateTime,
@@ -93,7 +115,7 @@ export function tagMounted () {
  * recording the earliest 'beforeUpdate' time.
  */
 const depressedTagBeforeUpdate = depress(function () {
-  const now = performance.now()
+  const now = getNow()
   earliestBeforeUpdateTime = now
   perf.earliestBeforeUpdates.push(now)
 }, 25)
@@ -106,7 +128,7 @@ export function tagBeforeUpdate () {
  * recording the latest 'updated' time.
  */
 const debouncedTagUpdated = debounce(function () {
-  const now = performance.now()
+  const now = getNow()
   perf.latestUpdates.push(now)
   perf.updateTime.push({
     start: earliestBeforeUpdateTime,
@@ -117,4 +139,16 @@ const debouncedTagUpdated = debounce(function () {
 
 export function tagUpdated () {
   debouncedTagUpdated()
+}
+
+export function tagBegin (name) {
+  tmp[name] = getNow()
+}
+
+export function tagEnd (name) {
+  let pre = perf.time[name]
+  if (!pre) {
+    pre = 0
+  }
+  perf.time[name] = pre + getNow() - tmp[name]
 }

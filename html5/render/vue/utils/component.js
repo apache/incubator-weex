@@ -88,7 +88,7 @@ export function watchAppear (context) {
             }))
             lastScrollTop = element.scrollTop
           }
-        }, 10)
+        }, 25, true)
 
         element.addEventListener('scroll', handler, false)
       }

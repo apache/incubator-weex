@@ -9,7 +9,6 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:a', {
       attrs: {
         'weex-type': 'a',
@@ -17,7 +16,7 @@ export default {
       },
       on: this._createEventMap(),
       staticClass: 'weex-a',
-      staticStyle: ms
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.$slots.default)
   }
 }

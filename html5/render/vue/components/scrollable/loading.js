@@ -1,7 +1,6 @@
 import LoadingIndicator from './loading-indicator'
 
 export default {
-  // name: 'loading',
   components: { LoadingIndicator },
   props: {
     display: {
@@ -72,12 +71,12 @@ export default {
     }
   },
   render (createElement) {
-    const ms = this._getComponentStyle(this.$vnode.data)
+    this.$parent._loading = this
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },
       staticClass: 'weex-loading',
-      staticStyle: ms
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.getChildren())
   }
 }

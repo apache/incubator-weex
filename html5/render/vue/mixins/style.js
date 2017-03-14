@@ -1,14 +1,15 @@
-import { hyphenate, trimComment, normalizeStyles } from '../utils'
+import { extend, trimComment, normalizeStyles } from '../utils'
+import { tagBegin, tagEnd } from '../utils/perf'
 // import { validateStyles } from '../validator'
 
 // let warned = false
 
-function hyphenateExtend (to, from) {
-  if (!from) { return }
-  for (const k in from) {
-    to[hyphenate(k)] = from[k]
-  }
-}
+// function hyphenateExtend (to, from) {
+//   if (!from) { return }
+//   for (const k in from) {
+//     to[hyphenate(k)] = from[k]
+//   }
+// }
 
 function getHeadStyleMap () {
   return Array.from(document.styleSheets || [])
@@ -42,7 +43,7 @@ function getHeadStyleMap () {
             statement = statement.trim()
             if (statement && statement.indexOf('/*') <= -1) {
               const resArr = statement.split(':').map((part) => part.trim())
-              styleObj[hyphenate(resArr[0])] = resArr[1]
+              styleObj[resArr[0]] = resArr[1]
             }
             return styleObj
           }, {})
@@ -60,12 +61,70 @@ export default {
   },
 
   methods: {
+
+    _normalizeInlineStyles (data) {
+      if (process.env.NODE_ENV === 'development') {
+        tagBegin('_normalizeInlineStyles')
+      }
+      const style = extend({}, data.staticStyle, data.style)
+      const res = normalizeStyles(style)
+      if (process.env.NODE_ENV === 'development') {
+        tagEnd('_normalizeInlineStyles')
+      }
+      return res
+    },
+
+    _getSize (data) {
+      const wh = {}
+      const _scopeId = this._getScopeId && this._getScopeId()
+      const style = data.style
+      const staticStyle = data.staticStyle
+      const classes = typeof data.class === 'string' ? [data.class] : (data.class || [])
+      const staticClass = typeof data.staticClass === 'string' ? [data.staticClass] : (data.staticClass || [])
+      const styleMap = weex.styleMap
+      function extendWHFrom (to, from) {
+        if (!from) { return }
+        to.width = from.width
+        to.height = from.height
+      }
+      let i, len
+      // merge from staticClass.
+      i = 0
+      len = staticClass.length
+      while (i < len) {
+        let cls = ''
+        if (_scopeId) {
+          cls = `.${staticClass[i]}[${_scopeId}]`
+        }
+        extendWHFrom(wh, styleMap[cls])
+        i++
+      }
+      // merge from classes.
+      i = 0
+      len = classes.length
+      while (i < len) {
+        let cls = ''
+        if (_scopeId) {
+          cls = `.${classes[i]}[${_scopeId}]`
+        }
+        extendWHFrom(wh, styleMap[cls])
+        i++
+      }
+      extendWHFrom(wh, staticStyle)
+      extendWHFrom(wh, style)
+      return wh
+    },
+
     // get style from class, staticClass, style and staticStyle.
     _getComponentStyle (data) {
+      if (process.env.NODE_ENV === 'development') {
+        tagBegin('_getComponentStyle')
+      }
       const style = {}
       const _scopeId = this._getScopeId && this._getScopeId()
       const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
       const classNames = (typeof data.class === 'string') ? [data.class] : (data.class || [])
+      const styleMap = weex.styleMap
 
       /**
        * merge styles. priority: high -> low
@@ -74,27 +133,32 @@ export default {
        *  3. data.class style (bound class names).
        *  4. data.staticClass style (scoped styles or static classes).
        */
-      staticClassNames.forEach(n => {
+      let i, len
+      i = 0
+      len = staticClassNames.length
+      while (i < len) {
         let cls = ''
         if (_scopeId) {
-          cls = `.${n}[${_scopeId}]`
+          cls = `.${staticClassNames[i]}[${_scopeId}]`
         }
-        const ruleMap = weex.styleMap[cls] || {}
-        hyphenateExtend(style, ruleMap)
-      })
-      classNames.forEach(n => {
+        extend(style, styleMap[cls])
+        i++
+      }
+      i = 0
+      len = classNames.length
+      while (i < len) {
         let cls = ''
         if (_scopeId) {
-          cls = `.${n}[${_scopeId}]`
+          cls = `.${classNames[i]}[${_scopeId}]`
         }
-        const ruleMap = weex.styleMap[cls] || {}
-        hyphenateExtend(style, ruleMap)
-      })
-      hyphenateExtend(style, data.staticStyle)
-      hyphenateExtend(style, data.style)
-
-      // filter styles.
-      return normalizeStyles(style)
+        extend(style, styleMap[cls])
+        i++
+      }
+      const res = normalizeStyles(extend(style, data.staticStyle, data.style))
+      if (process.env.NODE_ENV === 'development') {
+        tagEnd('_getComponentStyle')
+      }
+      return res
     },
 
     // merge static styles and static class styles into $vnode.data.mergedStyles.

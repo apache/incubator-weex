@@ -33,7 +33,6 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
@@ -45,8 +44,7 @@ export default {
         maxlength: this.maxlength
       },
       on: extend(this._createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-input',
-      staticStyle: ms
+      staticClass: 'weex-input'
     })
   }
 }

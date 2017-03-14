@@ -46,14 +46,13 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('header', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:header', {
       attrs: { 'weex-type': 'header' },
       on: this._createEventMap(),
       ref: 'header',
       staticClass: 'weex-header',
       class: { sticky: this.sticky, iossticky: this.supportSticky },
-      staticStyle: ms
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.$slots.default)
   }
 }

@@ -5,20 +5,21 @@ import { extend } from '../utils'
  * Get text special styles (lines and text-overflow).
  */
 function getTextSpecStyle (context = {}) {
-  const propLines = parseInt(context.lines) || 0
-  const propOverflow = context.textOverflow || 'ellipsis'
-  const data = context.$options._parentVnode.data
-  const staticStyle = data && data.staticStyle || {}
-  const lines = parseInt(staticStyle.lines) || propLines
-  const overflow = staticStyle['text-overflow'] || propOverflow
+  // const propLines = parseInt(context.lines) || 0
+  // const propOverflow = context.textOverflow || 'ellipsis'
+  const data = context.$vnode.data
+  const staticStyle = data.staticStyle || {}
+  const styles = extend(staticStyle, data.style || {})
+  const lines = parseInt(styles.lines) || 0
+  const overflow = styles['text-overflow'] || 'ellipsis'
   if (lines > 0) {
-    return {
+    extend(styles, {
       overflow: 'hidden',
       'text-overflow': overflow,
       '-webkit-line-clamp': lines
-    }
+    })
   }
-  return staticStyle
+  return styles
 }
 
 export default {
@@ -32,13 +33,11 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const ms = this._getComponentStyle(this.$vnode.data)
-
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
       on: this._createEventMap(),
       staticClass: 'weex-text',
-      staticStyle: extend(ms, getTextSpecStyle(this))
+      staticStyle: getTextSpecStyle(this)
     }, this.$slots.default || [this.value])
   }
 }

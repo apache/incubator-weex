@@ -56,17 +56,19 @@ export default {
     // cssText += (this.resize && this.resize !== 'stretch')
     //   ? `background-size: ${this.resize};`
     //   : `background-size: 100% 100%;`
-    const ms = this._getComponentStyle(this.$vnode.data)
-
+    const style = this._normalizeInlineStyles(this.$vnode.data)
+    // const ms = this._getComponentStyle(this.$vnode.data)
+    const wh = this._getSize(this.$vnode.data)
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': preProcessSrc(this, this.src, ms),
-        'img-placeholder': preProcessSrc(this, this.placeholder, ms)
+        'img-src': preProcessSrc(this, this.src, wh),
+        'img-placeholder': preProcessSrc(this, this.placeholder, wh)
       },
       on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image',
-      staticStyle: extend(ms, getResizeStyle(this))
+      staticStyle: extend(style, getResizeStyle(this))
+      // staticStyle: extend(ms, getResizeStyle(this))
     })
   }
 }

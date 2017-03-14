@@ -1,5 +1,5 @@
 import { getThrottleLazyload, watchAppear } from '../utils'
-import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated } from '../utils/perf'
+import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated, tagBegin, tagEnd } from '../utils/perf'
 
 const supportedEvents = [
   'click', 'longpress', 'appear', 'disappear'
@@ -89,7 +89,13 @@ export default {
     },
 
     _fireLazyload (el) {
+      if (process.env.NODE_ENV === 'development') {
+        tagBegin('base._fireLazyload')
+      }
       getThrottleLazyload(16)()
+      if (process.env.NODE_ENV === 'development') {
+        tagEnd('base._fireLazyload')
+      }
     }
   }
 }

@@ -63,10 +63,10 @@ export default {
           const offsetY = touch.pageY - startY
           this._touchParams.offsetY = offsetY
           if (reachTop && this._refresh) {
-            this._refresh.child.pullingDown(offsetY)
+            this._refresh.pullingDown(offsetY)
           }
           else if (reachBottom && this._loading) {
-            this._loading.child.pullingUp(-offsetY)
+            this._loading.pullingUp(-offsetY)
           }
         }
       }
@@ -80,10 +80,10 @@ export default {
         const { reachTop, reachBottom } = this._touchParams
         if (inner) {
           if (reachTop && this._refresh) {
-            this._refresh.child.pullingEnd()
+            this._refresh.pullingEnd()
           }
           else if (reachBottom && this._loading) {
-            this._loading.child.pullingEnd()
+            this._loading.pullingEnd()
           }
         }
       }

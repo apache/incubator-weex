@@ -1,3 +1,5 @@
+/* global Vue */
+
 import './wx-env'
 import * as utils from '../utils'
 import { requireWeexModule } from '../modules'
@@ -70,12 +72,12 @@ const weex = {
   }
 }
 
-['on', 'once', 'off', 'emit'].forEach(function (method) {
+; ['on', 'once', 'off', 'emit'].forEach(function (method) {
   weex[method] = function (...args) {
     if (!this._vue) {
       this._vue = new Vue()
     }
-    return this._vue[method](...args)
+    return this._vue[`$${method}`](...args)
   }
 })
 

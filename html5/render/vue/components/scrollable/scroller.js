@@ -1,7 +1,6 @@
 import { scrollable } from '../../mixins'
 // import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
-import * as shared from './shared'
 import listMixin from './list/listMixin'
 
 export default {
@@ -43,19 +42,13 @@ export default {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {
         if (!vnode.tag || !vnode.componentOptions) return false
-        switch (vnode.componentOptions.tag) {
-          case 'loading': this._loading = shared.createLoading(this, h, vnode); return false
-          case 'refresh': this._refresh = shared.createRefresh(this, h, vnode); return false
-        }
         return true
       })
       return [
-        this._refresh,
         h('html:div', {
           ref: 'inner',
           staticClass: 'weex-scroller-inner'
-        }, this._cells),
-        this._loading
+        }, this._cells)
       ]
     },
     scrollTo (vnode) {
@@ -79,13 +72,11 @@ export default {
       this.updateLayout()
     })
 
-    const ms = this._getComponentStyle(this.$vnode.data)
-
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      staticStyle: ms,
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data),
       on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,

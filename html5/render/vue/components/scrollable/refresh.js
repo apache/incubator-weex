@@ -2,7 +2,6 @@ import LoadingIndicator from './loading-indicator'
 import { createEvent } from '../../utils'
 
 export default {
-  // name: 'refresh',
   components: { LoadingIndicator },
   props: {
     display: {
@@ -80,12 +79,12 @@ export default {
     }
   },
   render (createElement) {
-    const ms = this._getComponentStyle(this.$vnode.data)
+    this.$parent._refresh = this
     return createElement('aside', {
       ref: 'refresh',
       attrs: { 'weex-type': 'refresh' },
       staticClass: 'weex-refresh',
-      staticStyle: ms
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.getChildren())
   }
 }

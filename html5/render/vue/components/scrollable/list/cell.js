@@ -6,12 +6,13 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const ms = this._getComponentStyle(this.$vnode.data)
+    // const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('section', {
       attrs: { 'weex-type': 'cell' },
       on: this._createEventMap(),
       staticClass: 'weex-cell',
-      staticStyle: ms
+      // staticStyle: ms
+      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.$slots.default)
   }
 }
