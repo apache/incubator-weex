@@ -44,7 +44,8 @@ function getEntries () {
 const debouncedTagImg = debounce(function () {
   const entries = getEntries()
   const len = entries.length
-  let i = 0, end = 0
+  let i = 0
+  let end = 0
   while (i < len) {
     const responseEnd = entries[i].responseEnd
     end = end < responseEnd ? responseEnd : end
