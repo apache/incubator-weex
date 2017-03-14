@@ -16,7 +16,8 @@ export default {
     slideTo (index) {
       const newIndex = this.normalizeIndex(index)
       const inner = this.$refs.inner
-      this.innerOffset += Math.sign(this.currentIndex - index) * this.wrapperWidth
+      const step = this._cells.length <= 1 ? 0 : this.currentIndex - index
+      this.innerOffset += Math.sign(step) * this.wrapperWidth
       if (inner) {
         // const match = (inner.style.transform || inner.style.webkitTransform).match(/(\d+)px/)
         // const currentOffset = parseFloat(match[1])
@@ -46,10 +47,14 @@ export default {
 
     reorder () {
       this.$nextTick(() => {
+        if (this._cells.length <= 1) {
+          return
+        }
+
         const prevIndex = this.normalizeIndex(this.currentIndex - 1)
         const nextIndex = this.normalizeIndex(this.currentIndex + 1)
         let prevElm = this._cells[prevIndex].elm
-        let nextElm = this._cells[nextIndex].elm
+        const nextElm = this._cells[nextIndex].elm
         const currentElm = this._cells[this.currentIndex].elm
 
         const removeClone = (clone) => {
@@ -60,8 +65,8 @@ export default {
           }
         }
 
-        // clone prevCell and nextCell if there is only one slide.
-        if (this._cells.length <= 2) {
+        // clone prevCell if there are only tow slides.
+        if (this._cells.length === 2) {
           this._clonePrev = prevElm.cloneNode(true)
           this._clonePrev.classList.add('weex-slide-clone-prev')
           prevElm.parentElement.insertBefore(this._clonePrev, currentElm)
@@ -71,18 +76,6 @@ export default {
             this._prevFired = true
           }
           prevElm = this._clonePrev
-        }
-        // clone prevCell if there are only tow slides.
-        if (this._cells.length <= 1) {
-          this._cloneNext = nextElm.cloneNode(true)
-          this._cloneNext.classList.add('weex-slide-clone-next')
-          nextElm.parentElement.insertBefore(this._cloneNext, currentElm)
-          removeClone(this._cloneNext)
-          if (!this._nextFired) {
-            fireLazyload(this._cloneNext, true)
-            this._nextFired = true
-          }
-          nextElm = this._cloneNext
         }
 
         const prevOffset = -this.wrapperWidth - this.innerOffset

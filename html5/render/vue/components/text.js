@@ -1,25 +1,27 @@
+/**
+ * @fileOverview Impl of text component.
+ *
+ * Notes about the style 'height' and 'lines':
+ * if the computed value of 'height' is bigger than 'lines', than the text will
+ * be clipped according to the 'lines'. Otherwise, it'll be the 'height'.
+ */
+
 // import { validateStyles } from '../validator'
 import { extend } from '../utils'
 
 /**
  * Get text special styles (lines and text-overflow).
  */
-function getTextSpecStyle (context = {}) {
-  // const propLines = parseInt(context.lines) || 0
-  // const propOverflow = context.textOverflow || 'ellipsis'
-  const data = context.$vnode.data
-  const staticStyle = data.staticStyle || {}
-  const styles = extend(staticStyle, data.style || {})
-  const lines = parseInt(styles.lines) || 0
-  const overflow = styles['text-overflow'] || 'ellipsis'
+function getTextSpecStyle (context = {}, ms = {}) {
+  const lines = parseInt(ms.lines) || 0
+  const overflow = ms['text-overflow'] || 'ellipsis'
   if (lines > 0) {
-    extend(styles, {
+    return {
       overflow: 'hidden',
       'text-overflow': overflow,
       '-webkit-line-clamp': lines
-    })
+    }
   }
-  return styles
 }
 
 export default {
@@ -33,11 +35,12 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('text', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
       on: this._createEventMap(),
       staticClass: 'weex-text',
-      staticStyle: getTextSpecStyle(this)
+      staticStyle: getTextSpecStyle(this, ms)
     }, this.$slots.default || [this.value])
   }
 }
