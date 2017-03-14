@@ -126,6 +126,8 @@
                 }
             }
             
+            [self _resetNativeBorderRadius];
+            
             if (strongSelf->_transform) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
