@@ -63,5 +63,14 @@ describe('weex mobile index', function () {
     })
   })
 
+  it('#3 Update DOM attr', ()=>{
+      return driver
+      .elementByXPath("//div/text[3]")
+      .text()
+      .then((text)=>{
+          assert.equal("finished",text);
+      })
+  })
+
   
 });

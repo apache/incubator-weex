@@ -202,122 +202,113 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.dom.action;
 
+import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.view.View;
 
-import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.SimpleJSCallback;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXViewUtils;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.annotation.Config;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 02/03/2017.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
+class GetComponentRectAction implements DOMAction, RenderAction {
+  private final String mRef;
+  private final String mCallback;
 
-    RenderActionContextImpl mWXRenderStatement;
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new RenderActionContextImpl(instance);
+  GetComponentRectAction(String ref, String callback) {
+    this.mRef = ref;
+    this.mCallback = callback;
+  }
+
+  @Override
+  public void executeDom(DOMActionContext context) {
+    JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
+    if (context.isDestory()) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      jsCallback.invoke(options);
+    } else {
+      context.postRenderTask(this);
     }
 
-    public void testCreateBody() throws Exception {
+  }
 
+  @Override
+  public void executeRender(RenderActionContext context) {
+    JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
+    if (TextUtils.isEmpty(mRef)) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Illegal parameter");
+      jsCallback.invoke(options);
+    } else if ("viewport".equalsIgnoreCase(mRef)) {
+      callbackViewport(context, jsCallback);
+    } else {
+      WXComponent component = context.getComponent(mRef);
+      Map<String, Object> options = new HashMap<>();
+      if (component != null) {
+        Map<String, String> size = new HashMap<>();
+        Rect sizes = component.getComponentSize();
+        size.put("width", getWebPxValue(sizes.width()));
+        size.put("height", getWebPxValue(sizes.height()));
+        size.put("bottom", getWebPxValue(sizes.bottom));
+        size.put("left", getWebPxValue(sizes.left));
+        size.put("right", getWebPxValue(sizes.right));
+        size.put("top", getWebPxValue(sizes.top));
+        options.put("size", size);
+        options.put("result", true);
+      } else {
+        options.put("errMsg", "Component does not exist");
+      }
+      jsCallback.invoke(options);
     }
+  }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
+  private void callbackViewport(RenderActionContext context, JSCallback jsCallback) {
+    WXSDKInstance instance = context.getInstance();
+    View container;
+    if ((container = instance.getContainerView()) != null) {
+      Map<String, Object> options = new HashMap<>();
+      Map<String, String> sizes = new HashMap<>();
+      int[] location = new int[2];
+      instance.getContainerView().getLocationOnScreen(location);
+      sizes.put("left", "0");
+      sizes.put("top", "0");
+      sizes.put("right", getWebPxValue(container.getWidth()));
+      sizes.put("bottom", getWebPxValue(container.getHeight()));
+      sizes.put("width", getWebPxValue(container.getWidth()));
+      sizes.put("height", getWebPxValue(container.getHeight()));
+      options.put("size", sizes);
+      options.put("result", true);
+      jsCallback.invoke(options);
+    } else {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      jsCallback.invoke(options);
     }
+  }
 
-    public void testSetPadding() throws Exception {
-
-    }
-
-    public void testSetLayout() throws Exception {
-
-    }
-
-    public void testSetExtra() throws Exception {
-
-    }
-
-    public void testAddComponent() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
+  @NonNull
+  private String getWebPxValue(int value) {
+    return String.valueOf(WXViewUtils.getWebPxByWidth(value, WXSDKInstance.getViewPortWidth()));
+  }
 
 
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
-    }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
 }

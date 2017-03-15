@@ -234,6 +234,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -638,7 +639,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXSDKManager.getInstance().getSDKInstance(instanceId).jsonParseTime(System.currentTimeMillis() - start);
       }
       WXDomModule domModule = getDomModule(instanceId);
-      domModule.addElement(ref, domObject, Integer.parseInt(index));
+      domModule.postAction(Actions.getAddElement(domObject, ref,Integer.parseInt(index)),false);
     }
 
     if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {

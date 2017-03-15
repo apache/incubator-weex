@@ -196,6 +196,16 @@ public class WXSDKManager {
     mBridgeManager = WXBridgeManager.getInstance();
   }
 
+  private WXSDKManager(WXRenderManager renderManager) {
+    mWXRenderManager = renderManager;
+    mWXDomManager = new WXDomManager(renderManager);
+    mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  static void initInstance(WXRenderManager renderManager){
+    sManager = new WXSDKManager(renderManager);
+  }
+
   public static WXSDKManager getInstance() {
     if (sManager == null) {
       synchronized (WXSDKManager.class) {

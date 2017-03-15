@@ -202,122 +202,101 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.dom.action;
 
-import android.text.TextUtils;
+import android.widget.ScrollView;
 
-import com.taobao.weappplus_sdk.BuildConfig;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.annotation.Config;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXScroller;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 14/02/2017.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
 
-    RenderActionContextImpl mWXRenderStatement;
+class CreateBodyAction extends AbstractAddElementAction {
+  private final JSONObject mData;
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new RenderActionContextImpl(instance);
+  CreateBodyAction(JSONObject data) {
+    mData = data;
+  }
+
+  @Override
+  public void executeDom(DOMActionContext context) {
+    addDomInternal(context, mData);
+  }
+
+  @Override
+  protected WXComponent createComponent(DOMActionContext context, WXDomObject domObject) {
+    return generateComponentTree(context, domObject, null);
+  }
+
+  @Override
+  protected void appendDomToTree(DOMActionContext context, WXDomObject domObject) {
+    String instanceId = context.getInstanceId();
+    WXDomObject.prepareRoot(domObject,
+        WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexHeight(instanceId), WXSDKManager.getInstanceViewPortWidth(instanceId)),
+        WXViewUtils.getWebPxByWidth(WXViewUtils.getWeexWidth(instanceId), WXSDKManager.getInstanceViewPortWidth(instanceId)));
+  }
+
+  @Override
+  protected WXErrorCode getErrorCode() {
+    return WXErrorCode.WX_ERR_DOM_CREATEBODY;
+  }
+
+  @Override
+  protected String getStatementName() {
+    return "createBody";
+  }
+
+
+  @Override
+  public void executeRender(RenderActionContext context) {
+    WXComponent component = context.getComponent(WXDomObject.ROOT);
+    WXSDKInstance instance = context.getInstance();
+    if (instance == null || instance.getContext() == null) {
+      WXLogUtils.e("instance is null or instance is destroy!");
+      return;
     }
+    try {
+      long start = System.currentTimeMillis();
+      component.createView();
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.renderPerformanceLog("createView", (System.currentTimeMillis() - start));
+      }
+      start = System.currentTimeMillis();
+      component.applyLayoutAndEvent(component);
+      component.bindData(component);
 
-    public void testCreateBody() throws Exception {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.renderPerformanceLog("bind", (System.currentTimeMillis() - start));
+      }
 
+      if (component instanceof WXScroller) {
+        WXScroller scroller = (WXScroller) component;
+        if (scroller.getInnerView() instanceof ScrollView) {
+          instance.setRootScrollView((ScrollView) scroller.getInnerView());
+        }
+      }
+      instance.onRootCreated(component);
+      if (instance.getRenderStrategy() != WXRenderStrategy.APPEND_ONCE) {
+        instance.onCreateFinish();
+      }
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    } catch (Exception e) {
+      WXLogUtils.e("create body failed.", e);
     }
+  }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
-    }
-
-    public void testSetPadding() throws Exception {
-
-    }
-
-    public void testSetLayout() throws Exception {
-
-    }
-
-    public void testSetExtra() throws Exception {
-
-    }
-
-    public void testAddComponent() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
-
-
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
-    }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
 }

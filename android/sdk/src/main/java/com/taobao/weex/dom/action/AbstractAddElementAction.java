@@ -202,122 +202,112 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.ui;
+package com.taobao.weex.dom.action;
 
-import android.text.TextUtils;
 
-import com.taobao.weappplus_sdk.BuildConfig;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.robolectric.annotation.Config;
+import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
- * Created by lixinke on 16/3/2.
+ * Created by sospartan on 22/02/2017.
  */
-@RunWith(PowerMockRunner.class)
-@Config(constants = BuildConfig.class)
-@PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
-public class WXRenderStatementTest {
 
-    RenderActionContextImpl mWXRenderStatement;
+abstract class AbstractAddElementAction implements DOMAction, RenderAction {
 
-    @Before
-    public void setUp() throws Exception {
-        PowerMockito.mockStatic(WXSoInstallMgrSdk.class);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.mockStatic(WXComponentFactory.class);
-        PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
-        PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
-        WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new RenderActionContextImpl(instance);
+
+  protected WXComponent generateComponentTree(DOMActionContext context, WXDomObject dom, WXVContainer parent) {
+    if (dom == null) {
+      return null;
+    }
+    WXComponent component = WXComponentFactory.newInstance(context.getInstance(), dom, parent);
+
+    context.registerComponent(dom.getRef(), component);
+    if (component instanceof WXVContainer) {
+      WXVContainer parentC = (WXVContainer) component;
+      int count = dom.childCount();
+      WXDomObject child = null;
+      for (int i = 0; i < count; ++i) {
+        child = dom.getChild(i);
+        if (child != null) {
+          parentC.addChild(generateComponentTree(context, child, parentC));
+        }
+      }
     }
 
-    public void testCreateBody() throws Exception {
+    return component;
+  }
 
+  /**
+   * Add DOM node.
+   */
+  protected void addDomInternal(DOMActionContext context, JSONObject dom) {
+    if (context.isDestory()) {
+      return;
     }
 
-    @Test
-    public void testCreateBodyOnDomThread() throws Exception {
-
+    WXSDKInstance instance = context.getInstance();
+    if (instance == null) {
+      return;
+    }
+    WXErrorCode errCode = getErrorCode();
+    if (dom == null) {
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
     }
 
-    public void testSetPadding() throws Exception {
+    //only non-root has parent.
+    WXDomObject domObject = WXDomObject.parse(dom, instance);
 
+    if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[DOMActionContextImpl] " + getStatementName() + " error,DOM object is null or already registered!!");
+      }
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+      return;
     }
+    appendDomToTree(context, domObject);
 
-    public void testSetLayout() throws Exception {
+    domObject.traverseTree(
+        context.getAddDOMConsumer(),
+        context.getApplyStyleConsumer()
+    );
 
+    //Create component in dom thread
+    WXComponent component = createComponent(context, domObject);
+    if (component == null) {
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, errCode);
+      //stop redner, some fatal happened.
+      return;
     }
+    context.addDomInfo(domObject.getRef(), component);
+    context.postRenderTask(this);
+    addAnimationForDomTree(context, domObject);
 
-    public void testSetExtra() throws Exception {
+    instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+  }
 
+  public void addAnimationForDomTree(DOMActionContext context, WXDomObject domObject) {
+    context.addAnimationForElement(domObject.getRef(), domObject.getStyles());
+    for (int i = 0; i < domObject.childCount(); i++) {
+      addAnimationForDomTree(context, domObject.getChild(i));
     }
+  }
 
-    public void testAddComponent() throws Exception {
+  protected abstract WXComponent createComponent(DOMActionContext context, WXDomObject domObject);
 
-    }
+  protected abstract void appendDomToTree(DOMActionContext context, WXDomObject domObject);
 
-    @Test
-    public void testCreateComponentOnDomThread() throws Exception {
+  protected abstract String getStatementName();
 
-
-//        PowerMockito.mockStatic(TextUtils.class);
-//        PowerMockito.mockStatic(WXComponentFactory.class);
-//        PowerMockito.when(TextUtils.isEmpty("1234")).thenReturn(true);
-//        PowerMockito.when(WXComponentFactory.newInstance(null, null, null, null)).thenReturn(PowerMockito.mock(WXDiv.class));
-//
-//        WXDomObject object = PowerMockito.mock(WXDomObject.class);
-//        WXComponent wxComponent = mWXRenderStatement.createBodyOnDomThread(object);
-//        assertNotNull(wxComponent);
-
-    }
-
-    public void testAddComponent1() throws Exception {
-
-    }
-
-    public void testRemoveComponent() throws Exception {
-
-    }
-
-    public void testMove() throws Exception {
-
-    }
-
-    public void testAddEvent() throws Exception {
-
-    }
-
-    public void testRemoveEvent() throws Exception {
-
-    }
-
-    public void testUpdateAttrs() throws Exception {
-
-    }
-
-    public void testUpdateStyle() throws Exception {
-
-    }
-
-    public void testScrollTo() throws Exception {
-
-    }
-
-    public void testCreateFinish() throws Exception {
-
-    }
-
-    public void testRefreshFinish() throws Exception {
-
-    }
+  protected abstract WXErrorCode getErrorCode();
 }
