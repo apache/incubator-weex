@@ -210,11 +210,11 @@ import com.taobao.weex.ui.IWXRenderTask;
  * Created by sospartan on 23/02/2017.
  */
 
-class RenderTask implements IWXRenderTask {
+class RenderActionTask implements IWXRenderTask {
   private final RenderAction mRenderTask;
   private final RenderActionContext mContext;
 
-  public RenderTask(RenderAction action, RenderActionContext context){
+  public RenderActionTask(RenderAction action, RenderActionContext context){
     mRenderTask = action;
     mContext = context;
   }
