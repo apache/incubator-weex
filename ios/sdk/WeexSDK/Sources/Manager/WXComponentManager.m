@@ -327,6 +327,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
             WXComponentValidateResult* validateResult =  [validateHandler validateWithWXSDKInstance:self.weexInstance component:type];
             if (validateResult && !validateResult.isSuccess) {
                 type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
+                WXLogError(@"%@",[validateResult.error.userInfo objectForKey:@"errorMsg"]);
             }
         }
     }
