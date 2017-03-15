@@ -234,6 +234,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
+import com.alibaba.weex.extend.WXInstanceStatisticsListener;
 import com.alibaba.weex.https.HotRefreshManager;
 import com.alibaba.weex.https.WXHttpManager;
 import com.alibaba.weex.https.WXHttpTask;
@@ -247,6 +248,7 @@ import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.NestedContainer;
+import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -352,12 +354,15 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance = new WXSDKInstance(this);
       mInstance.setRenderContainer(renderContainer);
       mInstance.registerRenderListener(this);
+      mInstance.registerStatisticsListener(new WXInstanceStatisticsListener());
       mInstance.setNestedInstanceInterceptor(this);
       mInstance.setTrackComponent(true);
     }
     mContainer.post(new Runnable() {
       @Override
       public void run() {
+        Trace.beginSection(mUri.toString());
+
         Activity ctx = WXPageActivity.this;
         Rect outRect = new Rect();
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
@@ -389,6 +394,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         mInstance.render(TAG, content,
             mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
+        Trace.endSection();
       }
     });
   }

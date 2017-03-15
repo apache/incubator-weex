@@ -252,6 +252,7 @@ import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
+import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -1161,7 +1162,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         @Override
         public void run() {
           if (mStatisticsListener != null && mContext != null) {
+            Trace.beginSection("onFirstScreen");
             mStatisticsListener.onFirstScreen();
+            Trace.endSection();
           }
         }
       });
