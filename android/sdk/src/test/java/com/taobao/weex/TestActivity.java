@@ -208,8 +208,8 @@ import android.app.Activity;
 /**
  * Created by sospartan on 7/27/16.
  */
-public  class TestActivity extends Activity {
-  public void test(){
+public   class TestActivity extends Activity {
+  public  void test(){
     //
   }
 }
