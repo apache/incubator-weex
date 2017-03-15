@@ -506,7 +506,7 @@ typedef enum : NSUInteger {
     _previousLoadMoreCellNumber = 0;
 }
 
-#pragma makrk - private
+#pragma mark - Private
 
 - (float)_floatValueForColumnGap:(WXLength *)gap
 {
@@ -573,7 +573,7 @@ typedef enum : NSUInteger {
         }
     }
     
-    if (cellArray.count > 0) {
+    if (cellArray.count > 0 || currentSection.headerComponent) {
         currentSection.cellComponents = [cellArray copy];
         [sectionArray addObject:currentSection];
     }
