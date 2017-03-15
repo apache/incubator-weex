@@ -63,7 +63,7 @@ function setup_cpt {
         # setupBasic
         npm install
     else
-        gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
+        npm install
     fi
 }
 
@@ -111,7 +111,7 @@ function test_cpt {
         npm run build
         npm run test
     else
-        bundle exec danger 
+        npm run danger
     fi
 }
 
