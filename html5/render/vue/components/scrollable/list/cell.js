@@ -10,7 +10,7 @@ export default {
     return createElement('section', {
       attrs: { 'weex-type': 'cell' },
       on: this._createEventMap(),
-      staticClass: 'weex-cell',
+      staticClass: 'weex-cell weex-ct',
       // staticStyle: ms
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.$slots.default)

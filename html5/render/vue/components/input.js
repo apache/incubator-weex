@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Input component.
+ * Support v-model only if vue version is large than 2.2.0
+ */
+
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
 
@@ -52,11 +57,8 @@ export default {
         placeholder: this.placeholder,
         maxlength: this.maxlength
       },
-      domProps: {
-        value: this.value
-      },
       on: extend(this._createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-input'
+      staticClass: 'weex-input weex-el'
     })
   }
 }

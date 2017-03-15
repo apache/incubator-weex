@@ -18,7 +18,7 @@ function _render (context, h) {
       ['item-color', 'item-selected-color', 'item-size']
     )
   for (let i = 0; i < Number(context.count); ++i) {
-    const classNames = ['weex-indicator-item']
+    const classNames = ['weex-indicator-item weex-el']
     let isActive = false
     if (i === Number(context.active)) {
       classNames.push('weex-indicator-item-active')
@@ -36,7 +36,7 @@ function _render (context, h) {
   }
   return h('nav', {
     attrs: { 'weex-type': 'indicator' },
-    staticClass: 'weex-indicator',
+    staticClass: 'weex-indicator weex-ct',
     staticStyle: mergedStyle
   }, children)
 }

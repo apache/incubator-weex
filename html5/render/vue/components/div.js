@@ -17,7 +17,7 @@ export default {
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
       on: this._createEventMap(),
-      staticClass: 'weex-div',
+      staticClass: 'weex-div weex-ct',
       // staticStyle: ms
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, trimTextNode(this.$slots.default))

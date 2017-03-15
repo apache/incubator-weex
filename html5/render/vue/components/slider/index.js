@@ -122,7 +122,7 @@ export default {
       {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
-        staticClass: 'weex-slider weex-slider-wrapper',
+        staticClass: 'weex-slider weex-slider-wrapper weex-ct',
         on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
@@ -132,7 +132,7 @@ export default {
       [
         createElement('ul', {
           ref: 'inner',
-          staticClass: 'weex-slider-inner'
+          staticClass: 'weex-slider-inner weex-ct'
         }, this._cells),
         this._indicator
       ]

@@ -46,7 +46,7 @@ export default {
         src: this.src
       },
       on: this._createEventMap(['start', 'pause', 'finish', 'fail']),
-      staticClass: 'weex-video'
+      staticClass: 'weex-video weex-el'
     })
   }
 }

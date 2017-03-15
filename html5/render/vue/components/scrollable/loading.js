@@ -75,7 +75,7 @@ export default {
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },
-      staticClass: 'weex-loading',
+      staticClass: 'weex-loading weex-ct',
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.getChildren())
   }

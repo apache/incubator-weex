@@ -26,7 +26,7 @@ export default {
 
   computed: {
     wrapperClass () {
-      const classArray = ['weex-scroller', 'weex-scroller-wrapper']
+      const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
       if (this.scrollDirection === 'horizontal') {
         classArray.push('weex-scroller-horizontal')
       }
@@ -47,7 +47,7 @@ export default {
       return [
         h('html:div', {
           ref: 'inner',
-          staticClass: 'weex-scroller-inner'
+          staticClass: 'weex-scroller-inner weex-ct'
         }, this._cells)
       ]
     },

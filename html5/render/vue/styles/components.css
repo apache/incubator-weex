@@ -4,28 +4,55 @@
   border-style: solid;
 }
 
-.weex-a {
+.weex-ct {
+  box-sizing: border-box;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   position: relative;
   -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -webkit-flex-grow: 0;
+  -ms-flex-grow: 0;
+  flex-grow: 0;
+  -webkit-flex-basis: auto;
+  flex-basis: auto;
   -webkit-box-align: stretch;
   -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-  box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   -webkit-align-content: flex-start;
-      -ms-flex-line-pack: start;
-          align-content: flex-start;
+  -ms-flex-line-pack: start;
+  align-content: flex-start;
+  border: 0 solid black;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.weex-el {
+  display: block;
+  box-sizing: border-box;
+  position: relative;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -webkit-flex-grow: 0;
+  -ms-flex-grow: 0;
+  flex-grow: 0;
+  -webkit-flex-basis: auto;
+  flex-basis: auto;
+  border: 0 solid black;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.weex-a {
   text-decoration: none;
 }
 
@@ -33,32 +60,7 @@ body > .weex-div {
   min-height: 100%;
 }
 
-.weex-div {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  position: relative;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
-  -webkit-box-align: stretch;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-  box-align: stretch;
-  -webkit-align-content: flex-start;
-      -ms-flex-line-pack: start;
-          align-content: flex-start;
-}
-
 .weex-input, .weex-textarea {
-  position: relative;
   font-size: 0.426667rem;
 }
 .weex-input:focus, .weex-textarea:focus {
@@ -66,8 +68,6 @@ body > .weex-div {
 }
 
 .weex-image, .weex-img {
-  display: block;
-  position: relative;
   background-repeat: no-repeat;
   background-position: 50% 50%;
 }
@@ -223,8 +223,6 @@ body > .weex-scroller {
 
 .weex-list-wrapper,
 .weex-scroller-wrapper {
-  display: block;
-  position: relative;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -235,20 +233,7 @@ body > .weex-scroller {
 .weex-list-inner,
 .weex-scroller-inner {
   -webkit-overflow-scrolling: touch;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
   width: 100%;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
 }
 
 .weex-scroller-inner::-webkit-scrollbar {
@@ -267,16 +252,8 @@ body > .weex-scroller {
   -webkit-flex-direction: row;
       -ms-flex-direction: row;
           flex-direction: row;
-          
   -webkit-box-orient: horizontal;
   height: 100%;
-}
-
-.iossticky {
-  position: -webkit-sticky !important;
-  position: sticky !important;
-  z-index: 9999;
-  top: 0;
 }
 
 .iossticky {
@@ -293,30 +270,11 @@ body > .weex-scroller {
 }
 
 .weex-cell {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  position: relative;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
   width: 100%;
 }
 
 .weex-refresh,
 .weex-loading {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
   -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
@@ -331,7 +289,6 @@ body > .weex-scroller {
 
 .weex-slider-wrapper {
   overflow: hidden;
-  position: relative;
 }
 
 .weex-slider-inner {
@@ -356,6 +313,10 @@ body > .weex-scroller {
 
 .weex-indicator {
   position: absolute;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-orient: horizontal;
   margin: 0;
   padding: 0;
 }
@@ -378,7 +339,6 @@ body > .weex-scroller {
 
 .weex-refresh-indicator,
 .weex-loading-indicator {
-  position: relative;
   width: 1.0rem;
   height: 1.0rem;
   -webkit-box-align: center;

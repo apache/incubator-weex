@@ -15,7 +15,7 @@ export default {
 
   computed: {
     wrapperClass () {
-      const classArray = ['weex-list', 'weex-list-wrapper']
+      const classArray = ['weex-list', 'weex-list-wrapper', 'weex-ct']
       this._refresh && classArray.push('with-refresh')
       this._loading && classArray.push('with-loading')
       return classArray.join(' ')
@@ -35,7 +35,7 @@ export default {
       return [
         h('html:div', {
           ref: 'inner',
-          staticClass: 'weex-list-inner'
+          staticClass: 'weex-list-inner weex-ct'
         }, this._cells)
       ]
     }

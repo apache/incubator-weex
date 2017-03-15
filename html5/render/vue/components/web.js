@@ -45,7 +45,7 @@ export default {
         src: this.src
       },
       on: this._createEventMap(['error']),
-      staticClass: 'weex-web',
+      staticClass: 'weex-web weex-el',
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     })
   }

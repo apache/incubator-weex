@@ -50,7 +50,7 @@ export default {
       attrs: { 'weex-type': 'header' },
       on: this._createEventMap(),
       ref: 'header',
-      staticClass: 'weex-header',
+      staticClass: 'weex-header weex-ct',
       class: { sticky: this.sticky, iossticky: this.supportSticky },
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.$slots.default)

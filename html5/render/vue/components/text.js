@@ -6,9 +6,6 @@
  * be clipped according to the 'lines'. Otherwise, it'll be the 'height'.
  */
 
-// import { validateStyles } from '../validator'
-import { extend } from '../utils'
-
 /**
  * Get text special styles (lines and text-overflow).
  */
@@ -39,7 +36,7 @@ export default {
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
       on: this._createEventMap(),
-      staticClass: 'weex-text',
+      staticClass: 'weex-text weex-el',
       staticStyle: getTextSpecStyle(this, ms)
     }, this.$slots.default || [this.value])
   }

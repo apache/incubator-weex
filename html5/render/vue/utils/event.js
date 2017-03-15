@@ -58,7 +58,6 @@ export function mapFormEvents (context) {
   ;['input', 'change', 'focus', 'blur'].forEach(type => {
     eventMap[type] = event => {
       if (context.$el) {
-        context.value = context.$el.value
         event.value = context.$el.value
       }
       context.$emit(type, event)

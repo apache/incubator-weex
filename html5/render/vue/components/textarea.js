@@ -34,7 +34,7 @@ export default {
         rows: this.rows
       },
       on: extend(this._createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-textarea',
+      staticClass: 'weex-textarea weex-el',
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)
     }, this.value)
   }

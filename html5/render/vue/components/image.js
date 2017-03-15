@@ -66,7 +66,7 @@ export default {
         'img-placeholder': preProcessSrc(this, this.placeholder, wh)
       },
       on: this._createEventMap(['load', 'error']),
-      staticClass: 'weex-image',
+      staticClass: 'weex-image weex-el',
       staticStyle: extend(style, getResizeStyle(this))
       // staticStyle: extend(ms, getResizeStyle(this))
     })
