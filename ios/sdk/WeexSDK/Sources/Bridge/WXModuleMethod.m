@@ -36,11 +36,18 @@
     if (self.instance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
-            BOOL result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
-            if (!result) {
-                NSString *errorMessage = [NSString stringWithFormat:@"Invalid module：%@ method: %@ , please check the authority", self.moduleName,self.methodName];
+            WXModuleValidateResult* result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
+            if (result && !result.isSuccess) {
+                NSString *errorMessage = [result.error.userInfo  objectForKey:@"errorMsg"];
+                WXLogError(@"%@", errorMessage);
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
-                return nil;
+                if ([result.error respondsToSelector:@selector(userInfo)]) {
+                    NSInvocation *invocation = [self invocationWithTarget:result.error selector:@selector(userInfo)];
+                    [invocation invoke];
+                    return invocation;
+                }else{
+                    return nil;
+                }
             }
         }
     }
