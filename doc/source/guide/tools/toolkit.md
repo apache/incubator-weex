@@ -65,7 +65,7 @@ There are two arguments. One is your code source path (a single file or a direct
 
 ### debug 
 
-weex-toolkit has the ability to extend third party script.  And Weex devtools is a custom devtools for weex that implements [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol), it is designed to help you quickly inspect your app and debug your JS bundle source in a chrome web page, both android and iOS platform are supported. So you can use weex-devtools feature by weex-toolkit.
+weex-toolkit has the ability to extend third party script.  And **[weex devtools](https://github.com/weexteam/weex-devtool)** is a custom devtools for weex that implements [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol), it is designed to help you quickly inspect your app and debug your JS bundle source in a chrome web page, both android and iOS platform are supported. So you can use weex-devtools feature by weex-toolkit.
 
 #### usage
 

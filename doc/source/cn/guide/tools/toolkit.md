@@ -88,7 +88,7 @@ weex compile src/foo.vue dist
 
 ### 调试 weex 页面
 
-weex-toolkit支持调试工具**weex devtools**，它是专门为weex定制的一款实现了[**Chrome Debugging Protocol**](https://developer.chrome.com/devtools/docs/debugger-protocol)的inspect/debug工具，能够帮助你快速查看app运行状态和调试weex中的Javascript代码，当前支持**IOS**和**Android**两个平台。
+weex-toolkit支持调试工具**[weex devtools](https://github.com/weexteam/weex-devtool)**，它是专门为weex定制的一款实现了[**Chrome Debugging Protocol**](https://developer.chrome.com/devtools/docs/debugger-protocol)的inspect/debug工具，能够帮助你快速查看app运行状态和调试weex中的Javascript代码，当前支持**IOS**和**Android**两个平台。
 
 #### 用法
 
