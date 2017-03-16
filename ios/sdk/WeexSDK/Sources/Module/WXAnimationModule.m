@@ -84,6 +84,11 @@
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
     } else if ([_animationInfo.propertyName isEqualToString:@"opacity"]) {
         _animationInfo.target.view.layer.opacity = [_animationInfo.toValue floatValue];
+    } else if ([_animationInfo.propertyName isEqualToString:@"bounds"]) {
+        //set the layer bounds
+        if(strcmp([_animationInfo.toValue objCType], @encode(CGRect)) == 0) {
+            _animationInfo.target.view.layer.bounds = [_animationInfo.toValue CGRectValue];
+        }
     }
 }
 
