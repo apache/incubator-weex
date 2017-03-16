@@ -30,7 +30,6 @@ function freezeObjProto () {
   freezeObjProtoProperty('toLocaleString')
   freezeObjProtoProperty('toString')
   freezeObjProtoProperty('valueOf')
-  freezeObjProtoProperty('__proto__')
   Object.seal(Object.prototype)
 }
 
