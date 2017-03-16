@@ -232,11 +232,14 @@
         return;
     }
     
+    // reload index paths should not inculde delete index paths, otherwise it will cause crash:
+    // Assertion failure in
+    // -[UICollectionView _endItemAnimationsWithInvalidationContext:tentativelyForReordering:animator:]
+    NSMutableSet *reloadIndexPaths = self.reloadIndexPaths ? [[diffResult.reloadIndexPaths setByAddingObjectsFromSet:self.reloadIndexPaths] mutableCopy]: [diffResult.reloadIndexPaths mutableCopy];
+    [reloadIndexPaths minusSet:diffResult.deleteIndexPaths];
+    
     [collectionView deleteItemsAtIndexPaths:[diffResult.deleteIndexPaths allObjects]];
     [collectionView insertItemsAtIndexPaths:[diffResult.insertIndexPaths allObjects]];
-    
-    NSSet *reloadIndexPaths = self.reloadIndexPaths ? [diffResult.reloadIndexPaths setByAddingObjectsFromSet:self.reloadIndexPaths] : diffResult.reloadIndexPaths;
-    
     [collectionView reloadItemsAtIndexPaths:[reloadIndexPaths allObjects]];
     
     [collectionView deleteSections:diffResult.deleteSections];
