@@ -1358,16 +1358,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     registerModules(domMap);
   }
 
+  //This method is deprecated because of performance issue.
+  @Deprecated
   public void notifyTrimMemory() {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        if (!isJSFrameworkInit())
-          return;
 
-        invokeExecJS("", null, METHOD_NOTIFY_TRIM_MEMORY, new WXJSObject[0]);
-      }
-    });
   }
 
   public
