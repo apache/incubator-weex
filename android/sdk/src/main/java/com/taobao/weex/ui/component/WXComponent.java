@@ -1070,7 +1070,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
     if(mHost != null) {
       mHost.setOnFocusChangeListener(null);
-      mHost.setOnClickListener(null);
+      if (mHostClickListeners != null && mHostClickListeners.size() > 0) {
+        mHostClickListeners.clear();
+        mHost.setOnClickListener(null);
+      }
     }
   }
 
