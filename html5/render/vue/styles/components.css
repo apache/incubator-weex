@@ -76,6 +76,7 @@ body > .weex-div {
   font-size: 0.426667rem;
   line-height: 0.426667rem;
   position: fixed;
+  z-index: 1999999999;
   box-sizing: border-box;
   max-width: 80%;
   bottom: 2.666667rem;
