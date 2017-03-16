@@ -23,6 +23,7 @@
 @property (nonatomic, assign) double duration;
 @property (nonatomic, assign) double delay;
 @property (nonatomic, strong) CAMediaTimingFunction *timingFunction;
+@property (nonatomic, assign) CGPoint originAnchorPoint;
 
 @end
 
@@ -84,11 +85,14 @@
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
     } else if ([_animationInfo.propertyName isEqualToString:@"opacity"]) {
         _animationInfo.target.view.layer.opacity = [_animationInfo.toValue floatValue];
-    } else if ([_animationInfo.propertyName isEqualToString:@"bounds"]) {
-        //set the layer bounds
-        if(strcmp([_animationInfo.toValue objCType], @encode(CGRect)) == 0) {
-            _animationInfo.target.view.layer.bounds = [_animationInfo.toValue CGRectValue];
+    } else if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
+        CGRect newBounds = _animationInfo.target.view.layer.bounds;
+        if ([_animationInfo.propertyName isEqualToString:@"bounds.size.width"]) {
+            newBounds.size = CGSizeMake([_animationInfo.toValue floatValue], newBounds.size.height);
+        }else if ([_animationInfo.propertyName isEqualToString:@"bounds.size.height"]) {
+            newBounds.size = CGSizeMake(newBounds.size.width,[_animationInfo.toValue floatValue]);
         }
+        _animationInfo.target.view.layer.bounds = newBounds;
     }
 }
 
@@ -98,6 +102,15 @@
         return;
     }
     
+    if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
+        /*
+         * http://ronnqvi.st/about-the-anchorpoint/
+         */
+        //
+        CGRect originFrame = _animationInfo.target.view.layer.frame;
+        _animationInfo.target.view.layer.anchorPoint = _animationInfo.originAnchorPoint;
+        _animationInfo.target.view.layer.frame = originFrame;
+    }
     [_animationInfo.target.layer removeAllAnimations];
     
     if (_finishBlock) {
@@ -212,18 +225,18 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @([value floatValue]);
             [infos addObject:info];
         } else if ([property isEqualToString:@"width"]) {
-            info.propertyName = @"bounds";
-            info.fromValue = [NSValue valueWithCGRect:layer.bounds];
+            info.propertyName = @"bounds.size.width";
+            info.fromValue = @(layer.bounds.size.width);
             CGRect newBounds = layer.bounds;
             newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
-            info.toValue = [NSValue valueWithCGRect:newBounds];
+            info.toValue = @(newBounds.size.width);
             [infos addObject:info];
         } else if ([property isEqualToString:@"height"]) {
-            info.propertyName = @"bounds";
-            info.fromValue = [NSValue valueWithCGRect:layer.bounds];
+            info.propertyName = @"bounds.size.height";
+            info.fromValue = @(layer.bounds.size.height);
             CGRect newBounds = layer.bounds;
             newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
-            info.toValue = [NSValue valueWithCGRect:newBounds];
+            info.toValue = @(newBounds.size.height);
             [infos addObject:info];
         }
     }
@@ -271,6 +284,16 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     animation.delegate = delegate;
     
     CALayer *layer = info.target.layer;
+    if ([info.propertyName hasPrefix:@"bounds"]) {
+        info.originAnchorPoint = layer.anchorPoint;
+        CGRect originFrame = layer.frame;
+         /*
+          * if anchorPoint changed, the origin of layer's frame will change
+          * http://ronnqvi.st/about-the-anchorpoint/
+         */
+        layer.anchorPoint = CGPointZero;
+        layer.frame = originFrame;
+    }
     [layer addAnimation:animation forKey:info.propertyName];
 }
 
