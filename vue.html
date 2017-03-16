@@ -53,22 +53,7 @@
   <script src="./packages/weex-vue-render/dist/index.min.js"></script>
 </head>
 <body>
-  <div id="info">
-  </div>
   <div id="root"></div>
-  <script>
-    var info = document.getElementById('info')
-    var isError = false
-    window.onerror = function (e) {
-      info.innerHTML = info
-      isError = true
-    }
-    setTimeout(function () {
-      if (!isError) {
-        info.innerHTML = JSON.stringify(_weex_perf, null, 2).replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;&nbsp;')
-      }
-    }, 10000)
-  </script>
   <script>
     /**
      * these iife is just for the convenience for the showcase of demos.
