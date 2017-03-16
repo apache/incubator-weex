@@ -607,6 +607,15 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
             [self fireEvent:@"return" params:@{@"value":[textView text],@"returnKeyType":typeStr} domChanges:@{@"attrs":@{@"value":[textView text]}}];
         }
     }
+    
+    if (_maxLength) {
+        NSUInteger oldLength = [textView.text length];
+        NSUInteger replacementLength = [text length];
+        NSUInteger rangeLength = range.length;
+        NSUInteger newLength = oldLength - rangeLength + replacementLength;
+        return newLength <= [_maxLength integerValue] ;
+    }
+    
     return YES;
 }
 
