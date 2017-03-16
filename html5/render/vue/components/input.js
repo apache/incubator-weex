@@ -33,6 +33,12 @@ export default {
     maxlength: [String, Number]
   },
 
+  watch: {
+    value: function () {
+      this.$el && (this.$el.value = this.value)
+    }
+  },
+
   methods: {
     focus () {
       this.$el && this.$el.focus()
