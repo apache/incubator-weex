@@ -215,7 +215,7 @@ import static com.taobao.weex.dom.WXDomModule.*;
 
 public class Actions {
 
-  public static DOMAction get(String actionName,JSONArray args){
+  public static Action get(String actionName,JSONArray args){
     switch (actionName) {
       case CREATE_BODY:
         if (args == null) {

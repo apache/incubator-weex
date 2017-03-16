@@ -554,8 +554,8 @@ class DOMActionContextImpl implements DOMActionContext {
   }
 
   @Override
-  public void postRenderTask(RenderAction statement) {
-    mNormalTasks.add(new RenderActionTask(statement, mWXRenderManager.getWXRenderStatement(mInstanceId)));
+  public void postRenderTask(RenderAction action) {
+    mNormalTasks.add(new RenderActionTask(action, mWXRenderManager.getRenderContext(mInstanceId)));
     mDirty = true;
   }
 

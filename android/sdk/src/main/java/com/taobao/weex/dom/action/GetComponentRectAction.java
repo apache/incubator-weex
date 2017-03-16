@@ -212,8 +212,6 @@ import android.view.View;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.SimpleJSCallback;
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.ui.component.WXComponent;
@@ -221,12 +219,11 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by sospartan on 02/03/2017.
  */
-class GetComponentRectAction implements DOMAction, RenderAction {
+class GetComponentRectAction implements RenderAction {
   private final String mRef;
   private final String mCallback;
 
@@ -235,25 +232,12 @@ class GetComponentRectAction implements DOMAction, RenderAction {
     this.mRef = ref;
     this.mCallback = callback;
   }
-
-  @Override
-  public void executeDom(DOMActionContext context) {
-    JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
-    if (context.isDestory()) {
-      Map<String, Object> options = new HashMap<>();
-      options.put("result", false);
-      options.put("errMsg", "Component does not exist");
-      jsCallback.invoke(options);
-    } else {
-      context.postRenderTask(this);
-    }
-
-  }
-
   @Override
   public void executeRender(RenderActionContext context) {
     JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
-    if (TextUtils.isEmpty(mRef)) {
+    if (context.getInstance().isDestroy()) {
+      //do nothing
+    }else if (TextUtils.isEmpty(mRef)) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Illegal parameter");

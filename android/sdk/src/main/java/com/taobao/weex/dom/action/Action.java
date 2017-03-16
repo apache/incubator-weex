@@ -202,15 +202,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
-
-
-import com.taobao.weex.dom.action.Action;
+package com.taobao.weex.dom.action;
 
 /**
- * Created by sospartan on 23/02/2017.
+ * Created by sospartan on 16/03/2017.
  */
 
-public interface DOMAction extends Action{
-  void executeDom(DOMActionContext context);
+public interface Action {
 }

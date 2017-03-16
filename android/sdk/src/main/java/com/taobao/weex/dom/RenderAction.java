@@ -204,10 +204,12 @@
  */
 package com.taobao.weex.dom;
 
+import com.taobao.weex.dom.action.Action;
+
 /**
  * Created by sospartan on 23/02/2017.
  */
 
-public interface RenderAction {
+public interface RenderAction extends Action{
   void executeRender(RenderActionContext context);
 }
