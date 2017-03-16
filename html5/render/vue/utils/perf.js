@@ -68,7 +68,7 @@ const debouncedTagImg = debounce(function () {
   weex.emit('renderfinish', end)
   if (process.env.NODE_ENV === 'development') {
     console.log(`screenTime[${num}]: ${end} ms.`)
-    console.log('_weex_perf:', _weex_perf)
+    console.log('_weex_perf:', window._weex_perf)
   }
 }, IMG_REC_INDENT)
 

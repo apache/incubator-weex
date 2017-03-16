@@ -1,4 +1,5 @@
 import { extend, trimComment, normalizeStyles } from '../utils'
+import { tagBegin, tagEnd } from '../utils/perf'
 // import { validateStyles } from '../validator'
 
 // let warned = false
@@ -11,12 +12,15 @@ import { extend, trimComment, normalizeStyles } from '../utils'
 // }
 
 function getHeadStyleMap () {
-  return Array.from(document.styleSheets || [])
+  if (process.env.NODE_ENV === 'development') {
+    tagBegin('getHeadStyleMap')
+  }
+  const res = Array.from(document.styleSheets || [])
     .reduce((pre, styleSheet) => {
       // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
       // because weex's components defined non-standard style attributes, which is
       // auto ignored when access rule.cssText.
-      const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/\.(?!\d+)/)
+      const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/}/)
       const len = strArr.length
       const rules = []
       for (let i = 0; i < len; i++) {
@@ -24,16 +28,24 @@ function getHeadStyleMap () {
         if (!str || str.match(/^\s*$/)) {
           continue
         }
-        const match = str.match(/^([^{\s]+)\s*{\s*([^}]+)}\s*$/)
+
+        const match = str.match(/((?:,?\s*\.[[\]\w-]+\s*)+)({[^}]+)/)
         if (!match) {
           // not the vue static class styles map. so acquire no rules for this styleSheet.
           // just jump through this styleSheet and go to analyzing next.
           return pre
         }
-        rules.push({
-          selectorText: `.${match[1]}`,
-          cssText: match[2].trim()
-        })
+        const clsNms = match[1].split(',').map(n => n.trim())
+        const cssText = match[2].replace(/[{}]/g, '').trim()
+        let clsNmsIdx = 0
+        const clsNmsLen = clsNms.length
+        while (clsNmsIdx < clsNmsLen) {
+          rules.push({
+            selectorText: clsNms[clsNmsIdx],
+            cssText
+          })
+          clsNmsIdx++
+        }
       }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
@@ -49,6 +61,10 @@ function getHeadStyleMap () {
       })
       return pre
     }, {})
+  if (process.env.NODE_ENV === 'development') {
+    tagEnd('getHeadStyleMap')
+  }
+  return res
 }
 
 export default {
