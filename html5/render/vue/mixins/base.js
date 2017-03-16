@@ -67,16 +67,16 @@ export default {
       return ctx
     },
 
-    _getScopeId () {
-      // return closest scopeId.
-      let scopeId = this.$options._scopeId
+    _getScopeIds () {
+      const arr = []
       let ctx = this
-      while (!scopeId) {
-        ctx = ctx.$options.parent
-        if (!ctx) return null
+      let scopeId
+      while (ctx) {
         scopeId = ctx.$options._scopeId
+        scopeId && arr.push(scopeId)
+        ctx = ctx.$options.parent
       }
-      return scopeId
+      return arr
     },
 
     _getParentScroller () {

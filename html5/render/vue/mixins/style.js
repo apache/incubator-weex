@@ -67,42 +67,52 @@ export default {
       return res
     },
 
+    _getScopeStyle (classNames) {
+      const scopeIds = this._getScopeIds()
+      const style = {}
+      const styleMap = weex.styleMap
+      let map
+      let cls
+      let clsNmsIdx
+      let scpIdsIdx
+      const clsNmsLen = classNames.length
+      const scpIdsLen = scopeIds.length
+      if (clsNmsLen <= 0) {
+        return {}
+      }
+      clsNmsIdx = 0
+      while (clsNmsIdx < clsNmsLen) {
+        scpIdsIdx = 0
+        while (scpIdsIdx < scpIdsLen) {
+          cls = `.${classNames[clsNmsIdx]}[${scopeIds[scpIdsIdx]}]`
+          map = styleMap[cls]
+          if (!map) {
+            scpIdsIdx++
+            continue
+          }
+          for (const k in map) {
+            style[k] = map[k]
+          }
+          scpIdsIdx++
+        }
+        clsNmsIdx++
+      }
+      return style
+    },
+
     _getSize (data) {
       const wh = {}
-      const _scopeId = this._getScopeId && this._getScopeId()
       const style = data.style
       const staticStyle = data.staticStyle
       const classes = typeof data.class === 'string' ? [data.class] : (data.class || [])
       const staticClass = typeof data.staticClass === 'string' ? [data.staticClass] : (data.staticClass || [])
-      const styleMap = weex.styleMap
+      const clsNms = staticClass.concat(classes)
       function extendWHFrom (to, from) {
         if (!from) { return }
         to.width = from.width
         to.height = from.height
       }
-      let i, len
-      // merge from staticClass.
-      i = 0
-      len = staticClass.length
-      while (i < len) {
-        let cls = ''
-        if (_scopeId) {
-          cls = `.${staticClass[i]}[${_scopeId}]`
-        }
-        extendWHFrom(wh, styleMap[cls])
-        i++
-      }
-      // merge from classes.
-      i = 0
-      len = classes.length
-      while (i < len) {
-        let cls = ''
-        if (_scopeId) {
-          cls = `.${classes[i]}[${_scopeId}]`
-        }
-        extendWHFrom(wh, styleMap[cls])
-        i++
-      }
+      extendWHFrom(this._getScopeStyle(clsNms))
       extendWHFrom(wh, staticStyle)
       extendWHFrom(wh, style)
       return wh
@@ -110,12 +120,8 @@ export default {
 
     // get style from class, staticClass, style and staticStyle.
     _getComponentStyle (data) {
-      const style = {}
-      const _scopeId = this._getScopeId && this._getScopeId()
       const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
       const classNames = (typeof data.class === 'string') ? [data.class] : (data.class || [])
-      const styleMap = weex.styleMap
-
       /**
        * merge styles. priority: high -> low
        *  1. data.style (bound style).
@@ -123,27 +129,8 @@ export default {
        *  3. data.class style (bound class names).
        *  4. data.staticClass style (scoped styles or static classes).
        */
-      let i, len
-      i = 0
-      len = staticClassNames.length
-      while (i < len) {
-        let cls = ''
-        if (_scopeId) {
-          cls = `.${staticClassNames[i]}[${_scopeId}]`
-        }
-        extend(style, styleMap[cls])
-        i++
-      }
-      i = 0
-      len = classNames.length
-      while (i < len) {
-        let cls = ''
-        if (_scopeId) {
-          cls = `.${classNames[i]}[${_scopeId}]`
-        }
-        extend(style, styleMap[cls])
-        i++
-      }
+      const clsNms = staticClassNames.concat(classNames)
+      const style = this._getScopeStyle(clsNms)
       const res = normalizeStyles(extend(style, data.staticStyle, data.style))
       return res
     },
