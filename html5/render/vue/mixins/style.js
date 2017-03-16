@@ -1,5 +1,4 @@
 import { extend, trimComment, normalizeStyles } from '../utils'
-import { tagBegin, tagEnd } from '../utils/perf'
 // import { validateStyles } from '../validator'
 
 // let warned = false
@@ -63,14 +62,8 @@ export default {
   methods: {
 
     _normalizeInlineStyles (data) {
-      if (process.env.NODE_ENV === 'development') {
-        tagBegin('_normalizeInlineStyles')
-      }
       const style = extend({}, data.staticStyle, data.style)
       const res = normalizeStyles(style)
-      if (process.env.NODE_ENV === 'development') {
-        tagEnd('_normalizeInlineStyles')
-      }
       return res
     },
 
@@ -117,9 +110,6 @@ export default {
 
     // get style from class, staticClass, style and staticStyle.
     _getComponentStyle (data) {
-      if (process.env.NODE_ENV === 'development') {
-        tagBegin('_getComponentStyle')
-      }
       const style = {}
       const _scopeId = this._getScopeId && this._getScopeId()
       const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
@@ -155,9 +145,6 @@ export default {
         i++
       }
       const res = normalizeStyles(extend(style, data.staticStyle, data.style))
-      if (process.env.NODE_ENV === 'development') {
-        tagEnd('_getComponentStyle')
-      }
       return res
     },
 

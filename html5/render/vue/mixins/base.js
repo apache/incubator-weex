@@ -28,7 +28,9 @@ export default {
     if (!lazyloadWatched) {
       watchLazyload()
     }
-    tagBeforeCreate()
+    if (process.env.NODE_ENV === 'development') {
+      tagBeforeCreate()
+    }
   },
 
   mounted () {
@@ -37,15 +39,21 @@ export default {
       weex._root.classList.add('weex-root')
     }
     watchAppear(this)
-    tagMounted()
+    if (process.env.NODE_ENV === 'development') {
+      tagMounted()
+    }
   },
 
   beforeUpdate () {
-    tagBeforeUpdate()
+    if (process.env.NODE_ENV === 'development') {
+      tagBeforeUpdate()
+    }
   },
 
   updated () {
-    tagUpdated()
+    if (process.env.NODE_ENV === 'development') {
+      tagUpdated()
+    }
   },
 
   methods: {

@@ -2,7 +2,7 @@ import { isElementVisible } from './component'
 import { createEvent, dispatchEvent } from './event'
 import { throttle } from './func'
 import { isArray } from './type'
-import { tagImg, tagBegin, tagEnd } from './perf'
+import { tagImg } from './perf'
 
 const SCREEN_REC_LIMIT = 3  // just record the first 3 times for screen-render finishing.
 let doRecord = true
@@ -44,9 +44,6 @@ export function applySrc (item, src, placeholderSrc) {
 }
 
 export function fireLazyload (el, ignoreVisibility) {
-  if (process.env.NODE_ENV === 'development') {
-    tagBegin('fireLazyload')
-  }
   if (isArray(el)) {
     return el.forEach(ct => fireLazyload(ct))
   }
@@ -65,9 +62,6 @@ export function fireLazyload (el, ignoreVisibility) {
     //   // alreay out of view, no need to compare any more.
     //   break
     // }
-  }
-  if (process.env.NODE_ENV === 'development') {
-    tagEnd('fireLazyload')
   }
 }
 
