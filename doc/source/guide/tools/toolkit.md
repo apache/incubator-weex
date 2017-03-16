@@ -7,7 +7,7 @@ version: 2.1
 
 # weex-toolkit
 
-[weex-toolkit](https://github.com/weexteam/weex-toolkit) is an official command line tool to help developers to create , debug and build their weex project.
+[weex-toolkit](https://github.com/weexteam/weex-toolkit) is an official command line tool to help developers to create, debug and build their weex project.
 
 ### Install
 use npm to install weex-toolkit:
@@ -15,7 +15,7 @@ use npm to install weex-toolkit:
 ``` bash
 $ npm install -g weex-toolkit
 ```
-if you make it， you can input "weex" in your command line terminal to test it. The right output:
+if you make it, you can input "weex" in your command line terminal to test it. The right output:
 
 
 ![weex-commands](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
@@ -25,12 +25,12 @@ if you have never installed node.js, you should go [node.js official site]( http
 If you meet some errors when installing like “permission error”, please go [weex-toolkit issues](https://github.com/weexteam/weex-toolkit/issues) to find some solution or have a discuss with us. 
 
 
-### initialize weex project
+### initialize Weex project
 ```bash
 $ weex init awesome-project
 ```
 After command running, you can find `awesome-project` directory and there are some weex templates in it. 
-There are some useful npm scripts you will use in the future：
+There are some useful npm scripts you will use in the future:
 
 - `build`: build the source code and generate the JS bundle
 - `dev`: run webpack watch configuration
@@ -42,21 +42,21 @@ When all dependences are ready, you can input `npm run dev` and run `npm run ser
 http://localhost:8080/index.html
 
 
-### preview weex page in time
+### preview Weex page in time
 
-weex-toolkit supports previewing your weex file(.we or .vue) in a watch mode. You only need specify your file path:
+weex-toolkit supports previewing your weex file(`.we` or `.vue`) in a watch mode. You only need specify your file path.
 
 ``` bash
 $ weex src/foo.vue 
 ```
-The browser will auto open the location and you could see the layout and effects of your weex page. If you have a [playground](https://weex.apache.org/cn/playground.html) app in your mobile devices , you can scan the QR code at the opened page.
-Try the command below , you’ll preview the whole directory files.
+The browser will auto open the location and you could see the layout and effects of your weex page. If you have a [Playground](https://weex.apache.org/cn/playground.html) app in your mobile devices, you can scan the QR code at the opened page.
+Try the command below, you’ll preview the whole directory files.
 
 ``` bash
 $ weex src --entry src/foo.vue
 ```
-You need to specify the directory path and the entry file(--entry)
-### build weex project
+You need to specify the directory path and the entry file(--entry).
+### build Weex project
 Use ` weex compile ` to build your single weex file or the whole project.
 ``` bash
 weex compile src/foo.vue dist
@@ -65,7 +65,7 @@ There are two arguments. One is your code source path (a single file or a direct
 
 ### debug 
 
-weex-toolkit has the ability to extend third party script.  And **[weex devtools](https://github.com/weexteam/weex-devtool)** is a custom devtools for weex that implements [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol), it is designed to help you quickly inspect your app and debug your JS bundle source in a chrome web page, both android and iOS platform are supported. So you can use weex-devtools feature by weex-toolkit.
+weex-toolkit has the ability to extend third party script.  And **[Weex devtools](https://github.com/weexteam/weex-devtool)** is a custom devtools for Weex that implements [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol), it is designed to help you quickly inspect your app and debug your JS bundle source in a Chrome web page, both android and iOS platform are supported. So you can use weex-devtools feature by weex-toolkit.
 
 #### usage
 
@@ -99,7 +99,7 @@ $ weex debug your_weex.vue
 ```
 
 this command will compile `your_weex.we` to `your_weex.js`  and start the debug server as upon command.
-`your_weex.js` will deploy on the server and displayed in `DeviceList` page as  another qrcode contain the url of your_weex.js
+`your_weex.js` will deploy on the server and displayed in `DeviceList` page as  another qrcode contain the url of your_weex.js.
 
 .
 #### start debugger with a directory of we files
@@ -109,8 +109,8 @@ this command will compile `your_weex.we` to `your_weex.js`  and start the debug 
 $weex debug your/we/path  -e index.we
 ```
 
-this command will build every file in your/we/path and deploy them on the bundle server. your directory will mapping to  http://localhost:port/weex/ 
-use -e to set the entry of these bundles. and the url of "index.we" will display on device list page as another qrcode.
+this command will build every file in `your/we/path `and deploy them on the bundle server. your directory will mapping to  http://localhost:port/weex/ 
+use -e to set the entry of these bundles. and the url of `index.we` will display on device list page as another qrcode.
 
 
 #### Features
@@ -150,28 +150,26 @@ use -e to set the entry of these bundles. and the url of "index.we" will display
 * Android
     * See the doc [Weex devtools (Android)](../../references/advanced/integrate-devtool-to-android.html), it will lead you to config and use it step by step.
 * IOS
-    * See the doc [Weex devtools (iOS)](../../references/advanced/integrate-devtool-to-ios.html), it will lead you to config and use it step by step.
+    * See the doc [Weex devtools (IOS)](../../references/advanced/integrate-devtool-to-ios.html), it will lead you to config and use it step by step.
   
 ### weex-toolkit extends weexpack command
 
+[weexpack](https://github.com/weexteam/weex-pack) helps to setup Weex application from scratch quickly. With simple commands, developers could create a Weex project, add different platform template, could install plugins from local, GitHub or Weex market, could pack up his application project and run on mobile. For those who would like to share his own plugins, he could publish them to the Weex market.
 
-
-[Weexpack](https://github.com/weexteam/weex-pack) helps to setup weex application from scratch quickly. With simple commands, developers could create a Weex project, add different platform template, could install plugins from local, GitHub or Weex market, could pack up his application project and run on mobile. For those who would like to share his own plugins, he could publish them to the Weex market.
-
-Now weex-toolkit can run the same commands of weexpack because of the new architecture. If your directory is generated by weexpack, you can build your iOS or android app.
+Now weex-toolkit can run the same commands of `weexpack` because of the new architecture. If your directory is generated by `weexpack`, you can build your iOS or android app.
 
 ### weex platform and run commands
 
 Use `platform add|remove` to add or remove Weex app template and run it in your target devices.
 
 ``` bash
-$ weex platform add iOS 
+$ weex platform add ios
 ```
 If you use these commands firstly, you might see the prompt. Just enter Y.
 
 ![install weexpack](https://gw.alicdn.com/tfs/TB19n4AQXXXXXawXVXXXXXXXXXX-577-70.png)
 
-Then run platform, you will see an iPhone simulator
+Then run platform, you will see an iPhone simulator.
 
 ``` bash
 $ weex run ios
@@ -199,4 +197,4 @@ Remove some plugins(eg:weex-chart):
 $ weex plugin remove weex-chart
 ```
 
-Learn more about [weexpack](https://github.com/weexteam/weex-pack)
+Learn more about [weexpack](https://github.com/weexteam/weex-pack).
