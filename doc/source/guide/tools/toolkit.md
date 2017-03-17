@@ -20,7 +20,7 @@ if you make it, you can input "weex" in your command line terminal to test it. T
 
 ![weex-commands](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
 
-if you have never installed node.js, you should go [node.js official site]( https://nodejs.org/en/) to download and install it. 
+if you have never installed node.js, you should go [node.js.org]( https://nodejs.org/en/) to download and install it. 
 * node engine version >= 6. You can try [n](https://github.com/tj/n) to manage your node versions*
 If you meet some errors when installing like `permission error`, please go [weex-toolkit issues](https://github.com/weexteam/weex-toolkit/issues) to find some solution or have a discuss with us. 
 
