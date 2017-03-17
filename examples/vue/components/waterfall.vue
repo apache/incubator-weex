@@ -49,6 +49,9 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
+    <header class="footer">
+      <text class="stickyText">Footer</text>
+    </header>
     <div class="fixedItem" @click="scrollToTop">
       <text class="fixedText">Top</text>
     </div>
@@ -200,6 +203,12 @@
     margin-left: 24;
     margin-right: 24;
     margin-bottom: 30;
+  }
+  .footer {
+    height: 94;
+    justify-content: center;
+    align-items: center;
+    background-color: #00cc99;
   }
 
   .fixedItem {
