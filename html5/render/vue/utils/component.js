@@ -90,7 +90,7 @@ export function watchAppear (context) {
               listener = on.disappear
               type = 'disappear'
             }
-            if (listener.fn) {
+            if (listener && listener.fn) {
               listener = listener.fn
             }
             const scrollTop = container.scrollTop || window.pageYOffset
