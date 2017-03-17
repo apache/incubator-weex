@@ -16,13 +16,13 @@ version: 2.1
 ``` bash
 $ npm install -g weex-toolkit
 ```
-安装成功后，你输入 `weex` 应该可以看到下面的提示效果;
+安装成功后，你输入 `weex` 应该可以看到下面的提示效果；
 
 ![weex-commands](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
 
 如果你本地没有安装 node.js 你可以前往[官网](https://nodejs.org/en/)下载安装。
 
-*请确保你的 node 版本是>=6,你可以使用 [n](https://github.com/tj/n) 来进行 node 的版本管理*。
+*请确保你的 node 版本是>=6，你可以使用 [n](https://github.com/tj/n) 来进行 node 的版本管理。
 
 中国用户如果npm遭遇网络问题，可以使用淘宝的 [cnpm](https://npm.taobao.org/) 镜像：
 
@@ -111,9 +111,9 @@ weex-toolkit支持调试工具。**[weex devtools](https://github.com/weexteam/w
 $ weex debug
 ```
 
-单纯启动一个调试服务器,并同时唤起Chrome浏览器打开`调试主页`.
-这个`调试主页`上会有一个二维码,使用 Playground App 扫这个二维码可以开启 Playground 调试.
-开启调试后,设备列表中会出现您的设备,根据提示进行后续的调试操作
+单纯启动一个调试服务器，并同时唤起Chrome浏览器打开`调试主页`。
+这个`调试主页`上会有一个二维码，使用 Playground App 扫这个二维码可以开启 Playground 调试。
+开启调试后,设备列表中会出现您的设备，根据提示进行后续的调试操作。
 
 #### 调试 `.we` | `.vue` 文件
 
@@ -121,10 +121,9 @@ $ weex debug
 $ weex debug your_weex.vue
 ```
 
-这个命令会将 `your_weex.vue` 编译成 `JS Bundle` 文件 部署到 debug 服务器
-并启动debug服务器如上述命令那样.打开的`调试vue主页`会多显示一个二维码,使用 Playground App
-扫这个码可以加载 `your_weex.we` .(注意要先扫描开启调试的那个码)
-这个命令会自动检测 `your_weex.we` 文件变动,如果发现内容被修改则立即重新编译部署,并刷新 `debugger` 页面
+这个命令会将 `your_weex.vue` 编译成 `JS Bundle` 文件 部署到 debug 服务器；
+并启动debug服务器如上述命令那样打开的`调试vue主页`会多显示一个二维码,使用 Playground App扫这个二维码码可以加载 `your_weex.we` .(注意要先扫描开启调试的那个二维码码)
+这个命令会自动检测 `your_weex.we` 文件变动,如果发现内容被修改则立即重新编译部署，并刷新 `debugger` 页面。
 .
 #### 调试整个bundle/we文件夹
 
@@ -220,7 +219,7 @@ $ weex plugin add weex-chart
 ```
 
 
-我们可以使用`plugin remove`移除插件,比如移除安装好的 weex-cahrt：
+我们可以使用`plugin remove`移除插件，比如移除安装好的 weex-cahrt：
 
 ``` bash
 $ weex plugin remove weex-chart
