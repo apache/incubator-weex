@@ -33,6 +33,9 @@ export default {
         placeholder: this.placeholder,
         rows: this.rows
       },
+      domProps: {
+        value: this.value
+      },
       on: extend(this._createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-textarea weex-el',
       staticStyle: this._normalizeInlineStyles(this.$vnode.data)

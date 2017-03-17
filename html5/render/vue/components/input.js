@@ -33,12 +33,6 @@ export default {
     maxlength: [String, Number]
   },
 
-  watch: {
-    value: function () {
-      this.$el && (this.$el.value = this.value)
-    }
-  },
-
   methods: {
     focus () {
       this.$el && this.$el.focus()
@@ -62,6 +56,9 @@ export default {
         autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
         maxlength: this.maxlength
+      },
+      domProps: {
+        value: this.value
       },
       on: extend(this._createEventMap(), mapFormEvents(this)),
       staticClass: 'weex-input weex-el'
