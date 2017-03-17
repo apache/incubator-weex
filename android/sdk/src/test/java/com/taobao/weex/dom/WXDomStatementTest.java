@@ -476,15 +476,4 @@ public class WXDomStatementTest {
     updateFinish();
     stmt.batch();
   }
-
-  @Test
-  public void testStartAnimation() throws Exception {
-    createBody();
-    JSONObject obj;
-    obj = new JSONObject();
-    obj.put("type","div");
-    obj.put("ref","100");
-    addDom(obj,WXDomObject.ROOT,0);
-    stmt.startAnimation("100","",null);
-  }
 }

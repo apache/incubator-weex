@@ -204,10 +204,30 @@
  */
 package com.taobao.weex.dom.action;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.DOMAction;
-import static com.taobao.weex.dom.WXDomModule.*;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.ui.animation.WXAnimationBean;
+
+import static com.taobao.weex.dom.WXDomModule.ADD_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.ADD_EVENT;
+import static com.taobao.weex.dom.WXDomModule.ADD_RULE;
+import static com.taobao.weex.dom.WXDomModule.CREATE_BODY;
+import static com.taobao.weex.dom.WXDomModule.CREATE_FINISH;
+import static com.taobao.weex.dom.WXDomModule.GET_COMPONENT_RECT;
+import static com.taobao.weex.dom.WXDomModule.INVOKE_METHOD;
+import static com.taobao.weex.dom.WXDomModule.MOVE_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.REFRESH_FINISH;
+import static com.taobao.weex.dom.WXDomModule.REMOVE_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.REMOVE_EVENT;
+import static com.taobao.weex.dom.WXDomModule.SCROLL_TO_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_ATTRS;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_FINISH;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_STYLE;
 
 /**
  * Created by sospartan on 01/03/2017.
@@ -310,5 +330,21 @@ public class Actions {
 
   public static DOMAction getAddEvent(String ref, String type) {
     return new AddEventAction(ref,type);
+  }
+
+  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull String animation,
+                                             @Nullable final String callBack){
+    return new AnimationAction(ref, animation, callBack);
+  }
+
+  public static RenderAction getAnimationAction(@NonNull String ref,
+                                                @NonNull final WXAnimationBean animationBean){
+    return new AnimationAction(ref, animationBean);
+  }
+
+  public static RenderAction getAnimationAction(@NonNull String ref,
+                                                @NonNull final WXAnimationBean animationBean,
+                                                @Nullable String callback){
+    return new AnimationAction(ref, animationBean, callback);
   }
 }
