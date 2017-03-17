@@ -204,114 +204,134 @@
  */
 package com.taobao.weex.ui.component.list;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.annotation.Component;
-import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.CSSLayout;
-import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.common.WXThread;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Root component for components in {@link WXListComponent}
+ * Created by sospartan on 17/03/2017.
  */
-@Component(lazyload = false)
 
-public class WXCell extends WXVContainer<WXFrameLayout> {
+public class StickyHeaderHelper {
+  private final ViewGroup mParent;
+  private Map<String,View> mHeaderViews = new HashMap<>(); // map for <ref,view>
+  private Map<String,WXCell> mHeaderComps = new HashMap<>(); // map for <ref,comp>
+  private String mCurrentStickyRef = null;
 
-    private int mLastLocationY = 0;
-    private ViewGroup mRealView;
-    private View mTempStickyView;
-    private View mHeadView;
-    private boolean mLazy = true;
+  public StickyHeaderHelper(ViewGroup parent){
+    this.mParent = parent;
+  }
 
-    /** used in list sticky detect **/
-    private int mScrollPositon = -1;
+  /**
+   * @param component
+   */
+  public void notifyStickyShow(WXCell component) {
+    if (component == null)
+      return;
+    mHeaderComps.put(component.getRef(),component);
+    if(mCurrentStickyRef != null){
+      WXCell cell = mHeaderComps.get(mCurrentStickyRef);
+      if(component.getScrollPositon() > cell.getScrollPositon()){
+        mCurrentStickyRef = component.getRef();
+      }
+    }else{
+      mCurrentStickyRef = component.getRef();
+    }
+    showSticky();
+  }
 
-
-    @Deprecated
-    public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-        this(instance,dom,parent,isLazy);
+  /**
+   * Bring component with bigest pos to Front
+   */
+  private void showSticky() {
+    if(mCurrentStickyRef==null){
+      WXLogUtils.e("Current Sticky ref is null.");
+      return;
     }
 
-    public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
-        super(instance, dom, parent,true );
+    WXCell headComponent = mHeaderComps.get(mCurrentStickyRef);
+    final View headerView = headComponent.getRealView();
+    if (headerView == null) {
+      WXLogUtils.e("Sticky header's real view is null.");
+      return;
     }
-
-    @Override
-    public boolean isLazy() {
-        return mLazy;
-    }
-
-    public void lazy(boolean lazy) {
-        mLazy = lazy;
-    }
-
-    /**
-     * If Cell is Sticky, need wraped FrameLayout
-     */
-    @Override
-    protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-        if (isSticky()) {
-            WXFrameLayout view = new WXFrameLayout(context);
-            mRealView = new WXFrameLayout(context);
-            view.addView(mRealView);
-            return view;
-        } else {
-            WXFrameLayout view = new WXFrameLayout(context);
-            mRealView = view;
-            return view;
+    View header = mHeaderViews.get(headComponent.getRef());
+    if( header != null){
+      //already there
+      header.bringToFront();
+    }else {
+      mHeaderViews.put(headComponent.getRef(), headerView);
+      //record translation, it should not change after transformation
+      final float translationX = headerView.getTranslationX();
+      final float translationY = headerView.getTranslationY();
+      headComponent.removeSticky();
+      mParent.post(WXThread.secure(new Runnable() {
+        @Override
+        public void run() {
+          ViewGroup existedParent;
+          if ((existedParent = (ViewGroup) headerView.getParent()) != null) {
+            existedParent.removeView(headerView);
+          }
+          mParent.addView(headerView);
+          //recover translation, sometimes it will be changed on fling
+          headerView.setTranslationX(translationX);
+          headerView.setTranslationY(translationY);
         }
+      }));
     }
+  }
 
-    public int getLocationFromStart(){
-        return mLastLocationY;
-    }
+  public void notifyStickyRemove(WXCell compToRemove) {
+    if (compToRemove == null)
+      return;
+    final WXCell component = mHeaderComps.remove(compToRemove.getRef());
+    final View headerView = mHeaderViews.remove(compToRemove.getRef());
 
-    public void setLocationFromStart(int l){
-        mLastLocationY = l;
-    }
 
-    void setScrollPositon(int pos){
-        mScrollPositon = pos;
+    if(component == null || headerView == null){
+      WXLogUtils.e(" sticky header to remove not found."+compToRemove.getRef());
+      return;
     }
+    if(mCurrentStickyRef != null && mCurrentStickyRef.equals(compToRemove.getRef())){
+      mCurrentStickyRef = null;
+    }
+    mParent.post(WXThread.secure(new Runnable() {
+      @Override
+      public void run() {
+        mParent.removeView(headerView);
+        component.recoverySticky();
+      }
+    }));
+  }
 
-    public int getScrollPositon() {
-        return mScrollPositon;
-    }
 
-    @Override
-    public ViewGroup getRealView() {
-        return mRealView;
+  public void updateStickyView(int currentStickyPos) {
+    Iterator<Map.Entry<String, WXCell>> iterator = mHeaderComps.entrySet().iterator();
+    List<WXCell> toRemove = new ArrayList<>();
+    while(iterator.hasNext()){
+      Map.Entry<String, WXCell> next = iterator.next();
+      WXCell cell = next.getValue();
+      int pos = cell.getScrollPositon();
+      if(pos > currentStickyPos){
+        toRemove.add(cell);
+      }else if(pos == currentStickyPos){
+        mCurrentStickyRef = cell.getRef();
+        View view = mHeaderViews.get(cell.getRef());
+        if(view != null){
+          view.bringToFront();
+        }
+      }
     }
-
-    public void removeSticky() {
-        mHeadView = getHostView().getChildAt(0);
-        int[] location = new int[2];
-        int[] parentLocation = new int[2];
-        getHostView().getLocationOnScreen(location);
-        getParentScroller().getView().getLocationOnScreen(parentLocation);
-        int headerViewOffsetX = location[0] - parentLocation[0];
-        int headerViewOffsetY = getParent().getHostView().getTop();
-        getHostView().removeView(mHeadView);
-        mRealView = (ViewGroup) mHeadView;
-        mTempStickyView = new FrameLayout(getContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams((int) getDomObject().getLayoutWidth(),
-                (int) getDomObject().getLayoutHeight());
-        getHostView().addView(mTempStickyView, lp);
-        mHeadView.setTranslationX(headerViewOffsetX);
-        mHeadView.setTranslationY(headerViewOffsetY);
+    for(WXCell cell:toRemove){
+      notifyStickyRemove(cell);
     }
-
-    public void recoverySticky() {
-        getHostView().removeView(mTempStickyView);
-        getHostView().addView(mHeadView);
-        mHeadView.setTranslationX(0);
-        mHeadView.setTranslationY(0);
-    }
+  }
 }
