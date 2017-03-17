@@ -46,31 +46,33 @@ export default {
     },
 
     reorder () {
+      const removeClone = (clone, prevElm) => {
+        // switch current page.
+        const curTransform = `translate3d(${-this.innerOffset}px, 0, 0)`
+        prevElm.style.transform = curTransform
+        prevElm.style.webkitTransform = curTransform
+        // remove clone node.
+        clone && clone.parentElement.removeChild(clone)
+      }
+
       this.$nextTick(() => {
         if (this._cells.length <= 1) {
           return
         }
 
+        const lastPrev = this._prevElm
         const prevIndex = this.normalizeIndex(this.currentIndex - 1)
         const nextIndex = this.normalizeIndex(this.currentIndex + 1)
-        let prevElm = this._cells[prevIndex].elm
+        let prevElm = this._prevElm = this._cells[prevIndex].elm
         const nextElm = this._cells[nextIndex].elm
         const currentElm = this._cells[this.currentIndex].elm
 
-        const removeClone = (clone) => {
-          if (clone) {
-            setTimeout(() => {
-              clone.parentElement.removeChild(clone)
-            }, this.interval > TRANSITION_TIME ? this.interval : TRANSITION_TIME)
-          }
-        }
-
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
+          this._clonePrev && removeClone(this._clonePrev, lastPrev)
           this._clonePrev = prevElm.cloneNode(true)
           this._clonePrev.classList.add('weex-slide-clone-prev')
           prevElm.parentElement.insertBefore(this._clonePrev, currentElm)
-          removeClone(this._clonePrev)
           if (!this._prevFired) {
             fireLazyload(this._clonePrev, true)
             this._prevFired = true
