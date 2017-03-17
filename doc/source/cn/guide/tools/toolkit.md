@@ -60,13 +60,13 @@ $ weex init awesome-project
 
 ### 实时预览
 
-`weex-toolkit` 支持预览你当前开发的weex页面(`.we`或者`.vue`)，你只需要指定预览的文件路径即可:
+`weex-toolkit` 支持预览你当前开发的weex页面(`.we`或者`.vue`)，你只需要指定预览的文件路径即可：
 
 ``` bash
 $ weex src/foo.vue 
 ```
 
-浏览器会自动弹出页面，这个时候你可以看到你所编辑的 Weex页面的具体效果和页面布局。如果你使用 [playground](https://weex.apache.org/cn/playground.html) 扫描右边的二维码，就能够看到 Weex 在 Android/IOS 设备上的效果了。
+浏览器会自动弹出页面，这个时候你可以看到你所编辑的 Weex页面的具体效果和页面布局。如果你使用 [Playground](https://weex.apache.org/cn/playground.html) 扫描右边的二维码，就能够看到 Weex 在 Android/IOS 设备上的效果了。
 
 如果你需要预览整个项目目录，你可以输入这样的命令:
 
@@ -122,12 +122,12 @@ $ weex debug your_weex.vue
 ```
 
 这个命令会将 `your_weex.vue` 编译成 `JS Bundle` 文件 部署到 debug 服务器；
-并启动debug服务器如上述命令那样打开的`调试vue主页`会多显示一个二维码,使用 Playground App扫这个二维码码可以加载 `your_weex.we` .(注意要先扫描开启调试的那个二维码码)
-这个命令会自动检测 `your_weex.we` 文件变动,如果发现内容被修改则立即重新编译部署，并刷新 `debugger` 页面。
+并启动debug服务器如上述命令那样打开的`调试vue主页`会多显示一个二维码，使用 Playground App扫这个二维码码可以加载 `your_weex.we` (注意要先扫描开启调试的那个二维码码)。
+这个命令会自动检测 `your_weex.we` 文件变动，如果发现内容被修改则立即重新编译部署，并刷新 `debugger` 页面。
 .
 #### 调试整个bundle/we文件夹
 
-同样你也可以调试整个目录的文件，你只需要传入目录的路径和 入口文件即可
+同样你也可以调试整个目录的文件，你只需要传入目录的路径和入口文件即可；
 
 ```
 $weex debug your/we/path  -e index.we
@@ -181,7 +181,7 @@ $weex debug your/we/path  -e index.we
   
 ### weex-toolkit 对 weexpack 的水平扩展
 
-[weexpack](https://github.com/weexteam/weex-pack) 是基于 Weex 快速搭建应用原型的利器。它能够帮助开发者通过命令行创建 Weex 工程，添加相应平台的 Weex app 模版，并基于模版从本地、GitHub 或者 Weex 应用市场安装插件，快速打包 Weex 应用并安装到手机运行，对于具有分享精神的开发者而言还能够创建 Weex 插件模版并发布插件到 Weex 应用市场。
+[weexpack](https://github.com/weexteam/weex-pack) 是基于 Weex 快速搭建应用原型的利器。它能够帮助开发者通过命令行创建 Weex 工程，添加相应平台的 Weex app 模版，并基于模版从本地，GitHub 或者 Weex 应用市场安装插件，快速打包 Weex 应用并安装到手机运行，对于具有分享精神的开发者而言还能够创建 Weex 插件模版并发布插件到 Weex 应用市场。
 
 现在使用 `weex-toolkit` 同样支持对 `weexpack` 的命令调用,如果你当前的项目与 `weexpack` 生成的项目目录一致，那么你可以直接实现对于 `platform` 的操作，从而构建具体的 Android/IOS app 。
 
