@@ -234,7 +234,11 @@ public class Trace {
     // If you turn sEnabled on, weex would trace logs on Java side
     // as well as on V8 side, please take care of turning sEnabled on
     // to avoid performance impact.
-    sEnabled = com.taobao.weappplus_sdk.BuildConfig.ENABLE_TRACE;
+    // FIXME: weex sdk may use another build files to build and cause
+    // compiling errors if these build files don't contain any
+    // ENABLE_TRACE, just comment out the line below.
+    //sEnabled = com.taobao.weappplus_sdk.BuildConfig.ENABLE_TRACE;
+    sEnabled = false;
 
     if (sEnabled == true && OsVersion.isAtLeastJB_MR2()) {
       sTrace = new TraceJBMR2();
