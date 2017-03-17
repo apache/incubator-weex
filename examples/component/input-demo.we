@@ -93,6 +93,28 @@
                         id="input1"
                 />
             </wxc-panel>
+            <wxc-panel title="input keybord event type" type="primary">
+                  <input
+                          type="text"
+                          placeholder="search..."
+                          class="input"
+                          value=""
+                          id="search-input"
+                          return-key-type="next"
+                          onreturn="return"
+                  />
+            </wxc-panel>
+            <wxc-panel title="input keybord event type" type="primary">
+                  <textarea
+                          type="text"
+                          placeholder="search..."
+                          class="input"
+                          value=""
+                          id="search-textarea"
+                          return-key-type="next"
+                          onreturn="return"
+                  />
+            </wxc-panel>
         </scroller>
     </div>
 </template>
@@ -133,6 +155,9 @@
             },
             blur: function () {
                 this.$el('input1').blur();
+            },
+            return: function(event) {
+                console.log('onreturn', event.returnKeyType);
             }
         }
     };

@@ -1,12 +1,9 @@
-/**
- * @fileOverview Input component.
- * Support v-model only if vue version is large than 2.2.0
- */
-
+import { base, inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
-// import { validateStyles } from '../validator'
+import { validateStyles } from '../validator'
 
 export default {
+  mixins: [base, inputCommon],
   props: {
     type: {
       type: String,
@@ -30,23 +27,16 @@ export default {
       type: [String, Boolean],
       default: false
     },
-    maxlength: [String, Number]
-  },
-
-  methods: {
-    focus () {
-      this.$el && this.$el.focus()
-    },
-    blur () {
-      this.$el && this.$el.blur()
-    }
+    maxlength: [String, Number],
+    retunrKeytype: String
   },
 
   render (createElement) {
     /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
+    if (process.env.NODE_ENV === 'development') {
+      validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
+    }
+    const events = extend(this.createEventMap(), mapFormEvents(this))
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
@@ -55,13 +45,11 @@ export default {
         disabled: (this.disabled !== 'false' && this.disabled !== false),
         autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
-        maxlength: this.maxlength
+        maxlength: this.maxlength,
+        'returnKeyType': this.returnKeyType
       },
-      domProps: {
-        value: this.value
-      },
-      on: extend(this._createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-input weex-el'
+      on: this.createKeyboardEvent(events),
+      staticClass: 'weex-input'
     })
   }
 }
