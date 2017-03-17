@@ -348,8 +348,8 @@ static BOOL WXNotStat;
                 if (error) {
                     CFRelease(error);
                     error = nil;
-                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
-                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
                 }
                 NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
                 // length of descriptors here will be only one.
@@ -357,9 +357,6 @@ static BOOL WXNotStat;
                     font = [UIFont fontWithDescriptor:desc size:fontSize];
                 }
                 CFRelease(fontURL);
-                if (error) {
-                    CFRelease(error);
-                }
             }
             
         }else {
