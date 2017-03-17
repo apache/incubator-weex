@@ -104,17 +104,6 @@
                           onreturn="return"
                   />
             </wxc-panel>
-            <wxc-panel title="input keybord event type" type="primary">
-                  <textarea
-                          type="text"
-                          placeholder="search..."
-                          class="input"
-                          value=""
-                          id="search-textarea"
-                          return-key-type="next"
-                          onreturn="return"
-                  />
-            </wxc-panel>
         </scroller>
     </div>
 </template>
