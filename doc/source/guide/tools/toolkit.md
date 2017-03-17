@@ -7,7 +7,7 @@ version: 2.1
 
 # weex-toolkit
 
-[weex-toolkit](https://github.com/weexteam/weex-toolkit) is an official command line tool to help developers to create, debug and build their weex project.
+[weex-toolkit](https://github.com/weexteam/weex-toolkit) is an official command line tool to help developers to create, debug and build their Weex project.
 
 ### Install
 use npm to install weex-toolkit:
@@ -22,14 +22,14 @@ if you make it, you can input "weex" in your command line terminal to test it. T
 
 if you have never installed node.js, you should go [node.js official site]( https://nodejs.org/en/) to download and install it. 
 * node engine version >= 6. You can try [n](https://github.com/tj/n) to manage your node versions*
-If you meet some errors when installing like “permission error”, please go [weex-toolkit issues](https://github.com/weexteam/weex-toolkit/issues) to find some solution or have a discuss with us. 
+If you meet some errors when installing like `permission error`, please go [weex-toolkit issues](https://github.com/weexteam/weex-toolkit/issues) to find some solution or have a discuss with us. 
 
 
 ### initialize Weex project
 ```bash
 $ weex init awesome-project
 ```
-After command running, you can find `awesome-project` directory and there are some weex templates in it. 
+After command running, you can find `awesome-project` directory and there are some Weex templates in it. 
 There are some useful npm scripts you will use in the future:
 
 - `build`: build the source code and generate the JS bundle
@@ -44,18 +44,18 @@ http://localhost:8080/index.html
 
 ### preview Weex page in time
 
-weex-toolkit supports previewing your weex file(`.we` or `.vue`) in a watch mode. You only need specify your file path.
+weex-toolkit supports previewing your Weex file(`.we` or `.vue`) in a watch mode. You only need specify your file path.
 
 ``` bash
 $ weex src/foo.vue 
 ```
-The browser will auto open the location and you could see the layout and effects of your weex page. If you have a [Playground](https://weex.apache.org/cn/playground.html) app in your mobile devices, you can scan the QR code at the opened page.
+The browser will auto open the location and you could see the layout and effects of your Weex page. If you have a [Playground](https://weex.apache.org/cn/playground.html) app in your mobile devices, you can scan the QR code at the opened page.
 Try the command below, you’ll preview the whole directory files.
 
 ``` bash
 $ weex src --entry src/foo.vue
 ```
-You need to specify the directory path and the entry file(--entry).
+You need to specify the directory path and the entry file(`--entry`).
 ### build Weex project
 Use ` weex compile ` to build your single weex file or the whole project.
 ``` bash
@@ -92,7 +92,7 @@ $ weex debug
 this command will start debug server and launch a chrome opening `DeviceList` page.
 this page will display a qrcode ,you can use `Playground App` scan it for starting debug.
 
-#### debug .we|.vue file
+#### debug `.we` | `.vue` file
 
 ```
 $ weex debug your_weex.vue
@@ -110,7 +110,7 @@ $weex debug your/we/path  -e index.we
 ```
 
 this command will build every file in `your/we/path `and deploy them on the bundle server. your directory will mapping to  http://localhost:port/weex/ 
-use -e to set the entry of these bundles. and the url of `index.we` will display on device list page as another qrcode.
+use `-e` to set the entry of these bundles. and the url of `index.we` will display on device list page as another qrcode.
 
 
 #### Features
@@ -176,11 +176,9 @@ $ weex run ios
 ```
 
 
-
-
 ### weex plugin commands
 
-If you want to use some plugins on the [weex market] (https://market.weex-project.io/), weex-toolkit is the right choice.
+If you want to use some plugins on the [weex market](https://market.dotwe.org), weex-toolkit is the right choice.
 
 ```bash
 $ weex plugin add plugin_name
@@ -191,10 +189,10 @@ You need to specify the plugin name from market like "weex-chart":
 $ weex plugin add weex-chart
 ```
 
-Remove some plugins(eg:weex-chart):
+Remove some plugins(eg: weex-chart):
 
 ``` bash
 $ weex plugin remove weex-chart
 ```
 
-Learn more about [weexpack](https://github.com/weexteam/weex-pack).
+Learn more about [weexpack](https://github.com/weexteam/weex-pack) .
