@@ -14,31 +14,27 @@ function clearRefs (json) {
 describe('vanilla test', () => {
   it('standard APIs', () => {
     expect(vanilla.init).to.be.a('function')
-    expect(vanilla.registerComponents).to.be.a('function')
-    expect(vanilla.registerModules).to.be.a('function')
-    expect(vanilla.registerMethods).to.be.a('function')
-    expect(vanilla.prepareInstance).to.be.a('function')
+    expect(vanilla.reset).to.be.a('function')
     expect(vanilla.createInstance).to.be.a('function')
-    expect(vanilla.refreshInstance).to.be.a('function')
     expect(vanilla.destroyInstance).to.be.a('function')
+    expect(vanilla.refreshInstance).to.be.a('function')
     expect(vanilla.getRoot).to.be.a('function')
     expect(vanilla.receiveTasks).to.be.a('function')
+    expect(vanilla.registerModules).to.be.a('function')
+    expect(vanilla.registerComponents).to.be.a('function')
   })
 
   it('empty functions', () => {
     expect(vanilla.registerComponents()).to.be.undefined
     expect(vanilla.registerModules()).to.be.undefined
-    expect(vanilla.registerMethods()).to.be.undefined
-    expect(vanilla.prepareInstance()).to.be.undefined
-    expect(vanilla.refreshInstance()).to.be.undefined
   })
 
   it('create & destroy instance', () => {
     const id = 'basic-demo'
     vanilla.init(runtime.config)
     vanilla.createInstance(id, `
-      var body = document.createBody()
-      var div = document.createElement('div')
+      var body = weex.document.createBody()
+      var div = weex.document.createElement('div')
       body.appendChild(div)
     `, {})
     vanilla.destroyInstance(id)
@@ -47,10 +43,10 @@ describe('vanilla test', () => {
   it('getRoot', () => {
     const id = 'sample-demo'
     const code = `
-      var body = document.createBody()
-      var div = document.createElement('div')
+      var body = weex.document.createBody()
+      var div = weex.document.createElement('div')
       div.setStyle('color', 'red')
-      var span = document.createElement('span')
+      var span = weex.document.createElement('span')
       span.setAttr('value', 'text node')
       div.appendChild(span)
       body.appendChild(div)
@@ -96,11 +92,11 @@ describe('vanilla test', () => {
     before(() => {
       vanilla.init(runtime.config)
       vanilla.createInstance(id, `
-        var body = document.createBody()
+        var body = weex.document.createBody()
         body.addEvent('click', function() {
           this.setStyle('width', '200')
         })
-        document.addCallback(function(message) {
+        weex.document.addCallback(function(message) {
           body.setAttr('from', message)
         })
         `, {})
