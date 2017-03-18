@@ -238,7 +238,8 @@
 {
     if (self.itemViews.count > 2) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
-        [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        //[self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        [self.scrollView setContentOffset:CGPointMake(itemView.frame.origin.x, itemView.frame.origin.y) animated:NO];
     }
 }
 
