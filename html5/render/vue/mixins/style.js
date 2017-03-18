@@ -128,7 +128,7 @@ export default {
         to.width = from.width
         to.height = from.height
       }
-      extendWHFrom(this._getScopeStyle(clsNms))
+      extendWHFrom(wh, this._getScopeStyle(clsNms))
       extendWHFrom(wh, staticStyle)
       extendWHFrom(wh, style)
       return wh
