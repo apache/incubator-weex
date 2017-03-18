@@ -34,6 +34,12 @@
   min-width: 0;
 }
 
+.weex-ct.horizontal {
+  -webkit-box-orient: horizontal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+}
+
 .weex-el {
   display: block;
   box-sizing: border-box;
