@@ -50,7 +50,7 @@ export function fireLazyload (el, ignoreVisibility) {
   const imgs = (el || document.body).querySelectorAll('[img-src]')
   for (let i = 0; i < imgs.length; i++) {
     const img = imgs[i]
-    if (ignoreVisibility) {
+    if (typeof ignoreVisibility === 'boolean' && ignoreVisibility) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
     }
     else if (isElementVisible(img, el)) {
