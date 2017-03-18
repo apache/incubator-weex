@@ -120,13 +120,15 @@ export default {
       const wh = {}
       const style = data.style
       const staticStyle = data.staticStyle
-      const classes = typeof data.class === 'string' ? [data.class] : (data.class || [])
-      const staticClass = typeof data.staticClass === 'string' ? [data.staticClass] : (data.staticClass || [])
+      const classes = (data.class || '').split(' ')
+      const staticClass = (data.staticClass || '').split(' ')
+      // const classes = typeof data.class === 'string' ? [data.class] : (data.class || [])
+      // const staticClass = typeof data.staticClass === 'string' ? [data.staticClass] : (data.staticClass || [])
       const clsNms = staticClass.concat(classes)
       function extendWHFrom (to, from) {
         if (!from) { return }
-        to.width = from.width
-        to.height = from.height
+        from.width && (to.width = from.width)
+        from.height && (to.height = from.height)
       }
       extendWHFrom(wh, this._getScopeStyle(clsNms))
       extendWHFrom(wh, staticStyle)
@@ -136,8 +138,10 @@ export default {
 
     // get style from class, staticClass, style and staticStyle.
     _getComponentStyle (data) {
-      const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
-      const classNames = (typeof data.class === 'string') ? [data.class] : (data.class || [])
+      const staticClassNames = (data.staticClass || '').split(' ')
+      const classNames = (data.class || '').split(' ')
+      // const staticClassNames = (typeof data.staticClass === 'string') ? [data.staticClass] : (data.staticClass || [])
+      // const classNames = (typeof data.class === 'string') ? [data.class] : (data.class || [])
       /**
        * merge styles. priority: high -> low
        *  1. data.style (bound style).
