@@ -37,7 +37,7 @@ weex-previewer : v1.3.4
 
 Then you can use the weex command to verify that the installation is successful:
 
-![](https://img.alicdn.com/tps/TB1kHFrOFXXXXaYXXXXXXXXXXXX-615-308.jpg)
+![](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
 
 ### Generate a new Weex project
 
