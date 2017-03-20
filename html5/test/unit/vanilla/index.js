@@ -33,8 +33,8 @@ describe('vanilla test', () => {
     const id = 'basic-demo'
     vanilla.init(runtime.config)
     vanilla.createInstance(id, `
-      var body = weex.document.createBody()
-      var div = weex.document.createElement('div')
+      var body = document.createBody()
+      var div = document.createElement('div')
       body.appendChild(div)
     `, {})
     vanilla.destroyInstance(id)
@@ -43,10 +43,10 @@ describe('vanilla test', () => {
   it('getRoot', () => {
     const id = 'sample-demo'
     const code = `
-      var body = weex.document.createBody()
-      var div = weex.document.createElement('div')
+      var body = document.createBody()
+      var div = document.createElement('div')
       div.setStyle('color', 'red')
-      var span = weex.document.createElement('span')
+      var span = document.createElement('span')
       span.setAttr('value', 'text node')
       div.appendChild(span)
       body.appendChild(div)
@@ -92,12 +92,9 @@ describe('vanilla test', () => {
     before(() => {
       vanilla.init(runtime.config)
       vanilla.createInstance(id, `
-        var body = weex.document.createBody()
+        var body = document.createBody()
         body.addEvent('click', function() {
           this.setStyle('width', '200')
-        })
-        weex.document.addCallback(function(message) {
-          body.setAttr('from', message)
         })
         `, {})
     })
@@ -130,21 +127,6 @@ describe('vanilla test', () => {
         args: ['_root', 'click']
       }])
       expect(vanilla.getRoot(id).style).to.deep.equal({ width: '200' })
-    })
-
-    it('callback', () => {
-      vanilla.receiveTasks(id, [{
-        method: 'callback',
-        args: ['1', 'callback']
-      }])
-      expect(vanilla.getRoot(id).attr).to.deep.equal({ from: 'callback' })
-
-      // last callback
-      vanilla.receiveTasks(id, [{
-        method: 'callback',
-        args: ['1', 'last message', true]
-      }])
-      expect(vanilla.getRoot(id).attr).to.deep.equal({ from: 'last message' })
     })
   })
 })

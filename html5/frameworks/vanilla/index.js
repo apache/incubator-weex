@@ -91,9 +91,12 @@ export function createInstance (
   // It will declare some instance variables like HTML5 Timer APIs etc.
   const instanceVars = Object.assign({
     weex: weexInstanceVar,
-    // deprecated
-    __weex_require_module__: weexInstanceVar.requireModule // eslint-disable-line
+    document // alias for `weex.document`
   }, timerAPIs)
+
+  // wrap IFFE and use strict mode
+  appCode = `(function(global){"use strict";\n ${appCode} \n})(Object.create(this))`
+
   callFunction(instanceVars, appCode)
 
   // Send `createFinish` signal to native.
