@@ -216,6 +216,6 @@ public interface ListComponentView {
   void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter);
   void notifyStickyShow(WXCell component);
   void notifyStickyRemove(WXCell component);
-  void updateStickyView();
+  void updateStickyView(int currentStickyPos);
   RecyclerViewBaseAdapter getRecyclerViewBaseAdapter();
 }
