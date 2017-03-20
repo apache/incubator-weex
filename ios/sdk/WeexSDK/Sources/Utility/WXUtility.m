@@ -358,7 +358,6 @@ static BOOL WXNotStat;
                 }
                 CFRelease(fontURL);
             }
-            
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -366,19 +365,27 @@ static BOOL WXNotStat;
     if (!font) {
         if (fontFamily) {
             font = [UIFont fontWithName:fontFamily size:fontSize];
-            if (!font) {
+        }
+        if (!font) {
+            if (fontFamily) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
+            }
+            if(WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+                font = [UIFont systemFontOfSize:fontSize];
+            } else {
                 font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
-        } else {
-            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
+    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }else {
+        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];

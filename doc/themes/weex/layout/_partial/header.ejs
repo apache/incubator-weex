@@ -9,32 +9,48 @@
         <li><a href="<%= url_for_lang('references') %>"><%= _p('menu.references') %></a></li>
         <li><a href="<%= url_for_lang('faq.html') %>"><%= _p('menu.faq') %></a></li>
         <li class="dropdown">
-            <a href="javascript:;"><%= _p('menu.resources') %></a>
+            <a href="javascript:;"><%= _p('menu.tools') %></a>
             <ul class="dropdown-menu subnav">
               <li>
                 <a href="<%= url_for_lang('playground.html') %>">Playground</a>
               </li>
               <li>
-                <a href="https://www.npmjs.com/package/weex-devtool" target="_blank">Devtool</a>
+                <a href="<%= url_for_lang('guide/tools/devtools.html') %>">Devtools</a>
               </li>
               <li>
-                <a href="https://www.npmjs.com/package/weexpack" target="_blank">Weexpack</a>
+                <a href="<%= url_for_lang('guide/tools/weexpack.html') %>">Weexpack</a>
               </li>
               <li>
-                <a href="http://dotwe.org" target="_blank">Snippets</a>
+                <a href="http://dotwe.org" target="_blank">Code Snippets</a>
               </li>
               <li>
-                <a href="https://market.weex-project.io/" target="_blank">Market</a>
+                <a href="https://market.dotwe.org" target="_blank">Market</a>
               </li>
             </ul>
         </li>
       </ul>
       <ul class="info">
-        <li><a href="https://github.com/alibaba/weex/" target="_blank"><span class="btn-github iconfont icon-github"></span></a></li>
+        <li><a href="https://github.com/apache/incubator-weex/" target="_blank"><span class="btn-github iconfont icon-github"></span></a></li>
       </ul>
       <ul class="tools">
         <li>
           <%- partial('_partial/search-form', {id_name: 'search-input-header'}) %>
+        </li>
+        <li>
+          <div class="dropdown select-lang">
+            <a href="javascript:;" class="dropdown-toggle">
+              Language
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu pick-lang">
+              <li>
+                <a href="<%= pick_lang('en') %>" data-lang="en">English</a>
+              </li>
+              <li>
+                <a href="<%= pick_lang('cn') %>" data-lang="zh-cn">中文</a>
+              </li>
+            </ul>
+          </div>
         </li>
         <!--<li></li>-->
       </ul>

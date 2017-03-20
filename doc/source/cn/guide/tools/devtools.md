@@ -1,13 +1,24 @@
 ---
 title: 使用 Devtools
 type: guide
-order: 4.7
+order: 5.1
 version: 2.1
+has_chapter_content: true
 ---
 
 # Devtools
 
-**weex devtools**是专门为weex定制的一款实现了[**Chrome Debugging Protocol**](https://developer.chrome.com/devtools/docs/debugger-protocol)的inspect/debug工具，能够帮助你快速查看app运行状态和调试weex中的Javascript代码，当前支持**IOS**和**Android**两个平台。
+**weex devtools** 是专门为 Weex 定制的一款实现了 [**Chrome Debugging Protocol**](https://developer.chrome.com/devtools/docs/debugger-protocol) 的 inspect/debug 工具，能够帮助你快速查看 app 运行状态和调试 weex 中的 Javascript 代码，当前支持 **iOS** 和 **Android** 两个平台。
+
+1. 支持 Android 和 iOS 调试
+2. 支持真机和模拟器
+3. 可以检查 native Elements, vdom, network, Console, Resource
+4. 可以调试 js/wx/Rx 等前端源码文件
+5. 支持同时在前端文件和 native (Android／iOS) 文件上断点调试
+6. 支持远程调试，不需要真机 USB 连接电脑
+7. 支持 screencast 和 select element 功能
+8. 支持同时调试多个应用和客户端
+
 ## 安装
 
 ```
@@ -22,16 +33,17 @@ $ npm install  -g  weex-toolkit
 
 ```
 -h, --help           显示帮助
--V, --verbose        显示debug服务器运行时的各种log
+-V, --verbose        显示 debug 服务器运行时的各种 log
 -v, --version        显示版本
--p, --port [port]    设置debug服务器端口号 默认为8088
--e, --entry [entry]  debug一个目录时,这个参数指定整个目录的入口bundle文件,这个bundle文件的地址会显示在debug主页上(作为二维码)
--m, --mode [mode]    设置构建we文件的方式,transformer 最基础的风格适合单文件,loader:wepack风格 适合模块化的多文件.默认为transformer
+-p, --port [port]    设置 debug 服务器端口号 默认为 8088
+-e, --entry [entry]  debug 一个目录时,这个参数指定整个目录的入口 bundle 文件,这个 bundle 文件的地址会显示在debug主页上(作为二维码)
+-m, --mode [mode]    设置构建we文件的方式, transformer 最基础的风格适合单文件, loader:wepack 风格 适合模块化的多文件。默认为 transformer
 ```
+
 #### 开启调试
 
 ```
-$weex debug
+$ weex debug
 ```
 
 单纯启动一个调试服务器,并同时唤起chrome浏览器打开`调试主页`.
