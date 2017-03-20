@@ -8,7 +8,7 @@ has_chapter_content: true
 
 # Get Started
 
-Weex is a framework for building Mobile cross-platform high performance UI applications. Developers can leverage their existing knowledge of VueJS (a powerful JavaScript view library), by writing `*.vue` files to build native applications or pages. This page will help you write a **Weex** application in 2 minutes.
+Weex is a framework for building Mobile cross-platform high performance UI applications. Developers can leverage their existing knowledge of VueJS (a powerful JavaScript view library), by writing `*.vue` files to build native applications or pages. This page will help you to write a **Weex** application in 2 minutes.
 
 ## Introduction to VueJS
 
