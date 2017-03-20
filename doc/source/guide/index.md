@@ -12,7 +12,7 @@ Weex is a framework for building Mobile cross-platform high performance UI appli
 
 ## Introduction to VueJS
 
->[Vue](https://vuejs.org/) (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. >Unlike other monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable. The core >library is focused on the view layer only, and is very easy to pick up and integrate with other libraries or >existing projects. On the other hand, Vue is also perfectly capable of powering sophisticated Single-Page Applications when used in combination with modern tooling and supporting libraries.
+>[Vue](https://vuejs.org/) (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. Unlike other monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable. The core library is focused on the view layer only, and is very easy to pick up and integrate with other libraries or existing projects. On the other hand, Vue is also perfectly capable of powering sophisticated Single-Page Applications when used in combination with modern tooling and supporting libraries.
 
 **VueJS is developed by [Evan You](https://twitter.com/youyuxi).**
 
