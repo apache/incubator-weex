@@ -353,7 +353,7 @@ static BOOL WXNotStat;
                 }
                 NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
                 // length of descriptors here will be only one.
-                for (NSFontDescriptor *desc in descriptors) {
+                for (UIFontDescriptor *desc in descriptors) {
                     font = [UIFont fontWithDescriptor:desc size:fontSize];
                 }
                 CFRelease(fontURL);
