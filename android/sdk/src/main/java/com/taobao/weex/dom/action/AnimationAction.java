@@ -1,4 +1,4 @@
-/**
+/*
  *
  *                                  Apache License
  *                            Version 2.0, January 2004
@@ -202,170 +202,262 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
 
-import android.os.Handler;
-import android.os.Message;
+package com.taobao.weex.dom.action;
 
-import com.taobao.weex.WXEnvironment;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.view.animation.PathInterpolatorCompat;
+import android.text.TextUtils;
+import android.util.Pair;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
+
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.animation.BackgroundColorProperty;
+import com.taobao.weex.ui.animation.DimensionUpdateListener;
+import com.taobao.weex.ui.animation.WXAnimationBean;
+import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.view.border.BorderDrawable;
+import com.taobao.weex.utils.SingleFunctionParser;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.List;
 
-/**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
- */
-public final class WXDomManager {
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
+class AnimationAction implements DOMAction, RenderAction {
 
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
+  private final static String TAG = "AnimationAction";
+  @NonNull
+  private final String ref;
+
+  @Nullable
+  private
+  final String animation;
+
+  @Nullable
+  private
+  final String callback;
+
+  @Nullable
+  private
+  WXAnimationBean mAnimationBean;
+
+  AnimationAction(@NonNull final String ref, @Nullable String animation,
+                  @Nullable final String callBack) {
+    this.ref = ref;
+    this.animation = animation;
+    this.callback = callBack;
   }
 
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
+  AnimationAction(@NonNull String ref, @NonNull WXAnimationBean animationBean) {
+    this(ref, animationBean, null);
   }
 
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
+  AnimationAction(@NonNull String ref, @NonNull WXAnimationBean animationBean,
+                  @Nullable final String callBack) {
+    this.ref = ref;
+    this.mAnimationBean = animationBean;
+    this.callback = callBack;
+    this.animation = null;
   }
 
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
-  /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
+  @Override
+  public void executeDom(DOMActionContext context) {
+    try {
+      WXDomObject domObject;
+      if (!context.isDestory() &&
+          !TextUtils.isEmpty(animation) &&
+          (domObject = context.getDomByRef(ref)) != null) {
+        WXAnimationBean animationBean = JSONObject.parseObject(animation, WXAnimationBean.class);
+        if (animationBean != null && animationBean.styles != null) {
+          int width = (int) domObject.getLayoutWidth();
+          int height = (int) domObject.getLayoutHeight();
+          animationBean.styles.init(animationBean.styles.transformOrigin,
+                                    animationBean.styles.transform, width, height,
+                                    context.getInstance().getInstanceViewPortWidth());
+          mAnimationBean = animationBean;
+          context.postRenderTask(this);
         }
-      });
+      }
+    } catch (RuntimeException e) {
+      WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
     }
   }
 
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
-  }
-
-  /**
-   * Destroy current instance
-   */
-  public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
-  }
-
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
-  }
-
-  /**
-   * Batch the execution of {@link DOMActionContextImpl}
-   */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
+  @Override
+  public void executeRender(RenderActionContext context) {
+    WXSDKInstance instance;
+    if (mAnimationBean != null && (instance = context.getInstance()) != null) {
+      startAnimation(instance, context.getComponent(ref));
     }
   }
 
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
-  }
-
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
+  private void startAnimation(@NonNull WXSDKInstance instance, @Nullable WXComponent component) {
+    if (component != null) {
+      if (component.getHostView() == null) {
+        WXAnimationModule.AnimationHolder holder = new WXAnimationModule.AnimationHolder(mAnimationBean, callback);
+        component.postAnimation(holder);
+      } else {
+        try {
+          Animator animator = createAnimator(component.getHostView(), instance
+              .getInstanceViewPortWidth());
+          if (animator != null) {
+            Animator.AnimatorListener animatorCallback = createAnimatorListener(instance, callback);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+              component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
+            Interpolator interpolator = createTimeInterpolator();
+            if (animatorCallback != null) {
+              animator.addListener(animatorCallback);
+            }
+            if (interpolator != null) {
+              animator.setInterpolator(interpolator);
+            }
+            animator.setDuration(mAnimationBean.duration);
+            animator.start();
+          }
+        } catch (RuntimeException e) {
+          WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
+        }
       }
     }
-    action.executeDom(context);
-
   }
 
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
-      return;
+  private
+  @Nullable
+  ObjectAnimator createAnimator(final View target, final int viewPortWidth) {
+    if (target == null) {
+      return null;
     }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
+    WXAnimationBean.Style style = mAnimationBean.styles;
+    if (style != null) {
+      ObjectAnimator animator;
+      List<PropertyValuesHolder> holders = style.getHolders();
+      if (!TextUtils.isEmpty(style.backgroundColor)) {
+        BorderDrawable borderDrawable;
+        if ((borderDrawable = WXViewUtils.getBorderDrawable(target)) != null) {
+          holders.add(PropertyValuesHolder.ofObject(
+              new BackgroundColorProperty(), new ArgbEvaluator(),
+              borderDrawable.getColor(),
+              WXResourceUtils.getColor(style.backgroundColor)));
+        } else if (target.getBackground() instanceof ColorDrawable) {
+          holders.add(PropertyValuesHolder.ofObject(
+              new BackgroundColorProperty(), new ArgbEvaluator(),
+              ((ColorDrawable) target.getBackground()).getColor(),
+              WXResourceUtils.getColor(style.backgroundColor)));
+        }
+      }
+      if (style.getPivot() != null) {
+        Pair<Float, Float> pair = style.getPivot();
+        target.setPivotX(pair.first);
+        target.setPivotY(pair.second);
+      }
+      animator = ObjectAnimator.ofPropertyValuesHolder(
+          target, holders.toArray(new PropertyValuesHolder[holders.size()]));
+      animator.setStartDelay(mAnimationBean.delay);
+      if (target.getLayoutParams() != null &&
+          (!TextUtils.isEmpty(style.width) || !TextUtils.isEmpty(style.height))) {
+        DimensionUpdateListener listener = new DimensionUpdateListener(target);
+        ViewGroup.LayoutParams layoutParams = target.getLayoutParams();
+        if (!TextUtils.isEmpty(style.width)) {
+          listener.setWidth(layoutParams.width,
+                            (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.width), viewPortWidth));
+        }
+        if (!TextUtils.isEmpty(style.height)) {
+          listener.setHeight(layoutParams.height,
+                             (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.height), viewPortWidth));
+        }
+        animator.addUpdateListener(listener);
+      }
+      return animator;
+    } else {
+      return null;
+    }
+  }
+
+  private
+  @Nullable
+  Animator.AnimatorListener createAnimatorListener(final WXSDKInstance instance, @Nullable final String callBack) {
+    if (!TextUtils.isEmpty(callBack)) {
+      return new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          if (instance == null) {
+            WXLogUtils.e("RenderActionContextImpl-onAnimationEnd WXSDKInstance == null NPE");
+          } else {
+            WXSDKManager.getInstance().callback(instance.getInstanceId(),
+                                                callBack,
+                                                new HashMap<String, Object>());
+          }
+        }
+      };
+    } else {
+      return null;
+    }
+  }
+
+  private
+  @Nullable
+  Interpolator createTimeInterpolator() {
+    String interpolator = mAnimationBean.timingFunction;
+    if (!TextUtils.isEmpty(interpolator)) {
+      switch (interpolator) {
+        case WXAnimationBean.EASE_IN:
+          return new AccelerateInterpolator();
+        case WXAnimationBean.EASE_OUT:
+          return new DecelerateInterpolator();
+        case WXAnimationBean.EASE_IN_OUT:
+          return new AccelerateDecelerateInterpolator();
+        case WXAnimationBean.LINEAR:
+          return new LinearInterpolator();
+        default:
+          //Parse cubic-bezier
+          try {
+            SingleFunctionParser<Float> parser = new SingleFunctionParser<>(
+                mAnimationBean.timingFunction,
+                new SingleFunctionParser.FlatMapper<Float>() {
+                  @Override
+                  public Float map(String raw) {
+                    return Float.parseFloat(raw);
+                  }
+                });
+            List<Float> params = parser.parse(WXAnimationBean.CUBIC_BEZIER);
+            if (params != null && params.size() == WXAnimationBean.NUM_CUBIC_PARAM) {
+              return PathInterpolatorCompat.create(
+                  params.get(0), params.get(1), params.get(2), params.get(3));
+            } else {
+              return null;
+            }
+          } catch (RuntimeException e) {
+            return null;
+          }
+      }
+    }
+    return null;
   }
 }

@@ -202,170 +202,97 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.dom.action;
 
-import android.os.Handler;
-import android.os.Message;
+import android.support.v4.util.ArrayMap;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.ui.component.WXComponent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * Created by sospartan on 28/02/2017.
  */
-public final class WXDomManager {
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
+class UpdateStyleAction implements DOMAction, RenderAction {
+  private final String mRef;
+  private final JSONObject mData;
+  private final boolean mIsCausedByPesudo;
 
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
+  private Spacing mPadding;
+  private Spacing mBorder;
+
+  UpdateStyleAction(String ref, JSONObject data) {
+    this(ref, data, false);
   }
 
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
+  UpdateStyleAction(String ref, JSONObject data, boolean byPesudo) {
+    this.mRef = ref;
+    this.mData = data;
+    this.mIsCausedByPesudo = byPesudo;
+  }
+
+  @Override
+  public void executeDom(DOMActionContext context) {
+    if (context.isDestory() || mData == null) {
       return;
     }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
-  /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
-        }
-      });
-    }
-  }
-
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
-  }
-
-  /**
-   * Destroy current instance
-   */
-  public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
-  }
-
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
-  }
-
-  /**
-   * Batch the execution of {@link DOMActionContextImpl}
-   */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
-    }
-  }
-
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
-  }
-
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
+    WXSDKInstance instance = context.getInstance();
+    WXDomObject domObject = context.getDomByRef(mRef);
+    if (domObject == null) {
+      if (instance != null) {
+        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_UPDATESTYLE);
       }
-    }
-    action.executeDom(context);
-
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
       return;
     }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
+    mPadding = domObject.getPadding();
+    mBorder = domObject.getBorder();
+
+    Map<String, Object> animationMap = new ArrayMap<>(2);
+    animationMap.put(WXDomObject.TRANSFORM, mData.remove(WXDomObject.TRANSFORM));
+    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.remove(WXDomObject.TRANSFORM_ORIGIN));
+
+    context.addAnimationForElement(mRef, animationMap);
+
+    if (!mData.isEmpty()) {
+      domObject.updateStyle(mData, mIsCausedByPesudo);
+      domObject.traverseTree(context.getApplyStyleConsumer());
+      context.postRenderTask(this);
+    }
+
+    if (instance != null) {
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
+    }
+  }
+
+  @Override
+  public void executeRender(RenderActionContext context) {
+    WXComponent component = context.getComponent(mRef);
+    if (component == null) {
+      return;
+    }
+    component.updateProperties(mData);
+
+    if (mData.containsKey(Constants.Name.PADDING) ||
+        mData.containsKey(Constants.Name.PADDING_TOP) ||
+        mData.containsKey(Constants.Name.PADDING_LEFT) ||
+        mData.containsKey(Constants.Name.PADDING_RIGHT) ||
+        mData.containsKey(Constants.Name.PADDING_BOTTOM) ||
+        mData.containsKey(Constants.Name.BORDER_WIDTH)) {
+      Spacing padding = mPadding;
+      Spacing border = mBorder;
+      component.setPadding(padding, border);
+    }
   }
 }

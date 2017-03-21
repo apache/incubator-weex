@@ -10,13 +10,15 @@
         </div>
         <text onclick="onclick">display</text>
         <text onclick="onclick2">display</text>
+        <text onclick="onclick3">{{text}}</text>
     </div>
 </template>
 <script>
     module.exports = {
         data:{
             display:false,
-            repeat_items:[1,2,3,4,5]
+            repeat_items:[1,2,3,4,5],
+            text:"display"
         },
         methods:{
           onclick:function(){
@@ -26,6 +28,7 @@
           onclick2:function(){
             this.display = false;
             this.repeat_items.pop();
+            this.text = "finished"
           }
         }
     }

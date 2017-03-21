@@ -220,16 +220,16 @@ public class DimensionUpdateListener implements ValueAnimator.AnimatorUpdateList
   private Pair<Integer, Integer> height;
   private IntEvaluator intEvaluator;
 
-  DimensionUpdateListener(@NonNull View view) {
+  public DimensionUpdateListener(@NonNull View view) {
     this.view = view;
     intEvaluator = new IntEvaluator();
   }
 
-  void setWidth(int from, int to) {
+  public void setWidth(int from, int to) {
     width = new Pair<>(from, to);
   }
 
-  void setHeight(int from, int to) {
+  public void setHeight(int from, int to) {
     height = new Pair<>(from, to);
   }
 
