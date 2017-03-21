@@ -1094,6 +1094,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mDomObj.getStyles().isSticky();
   }
 
+  public boolean isFixed() {
+    return mDomObj.getStyles().isFixed();
+  }
+
   public void setDisabled(boolean disabled) {
     mIsDisabled = disabled;
     if (mHost == null) {
@@ -1498,7 +1502,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public boolean canRecycled(){
-    return mDomObj.getAttrs().canRecycled();
+    return (!isFixed() || !isSticky()) && mDomObj.getAttrs().canRecycled();
   }
   
   /**

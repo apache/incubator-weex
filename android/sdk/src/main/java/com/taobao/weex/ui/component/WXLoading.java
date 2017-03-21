@@ -261,6 +261,11 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
   }
 
   @Override
+  public boolean canRecycled() {
+    return false;
+  }
+
+  @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.DISPLAY:
