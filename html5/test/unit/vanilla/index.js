@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 
+import sinon from 'sinon'
 import vanilla from '../../../frameworks/vanilla'
 import runtime from '../../../runtime'
 
@@ -12,6 +13,22 @@ function clearRefs (json) {
 }
 
 describe('vanilla test', () => {
+  // In case there did has callNative in the environment
+  const originalCallNative = global.callNative
+  const callNativeSpy = sinon.spy()
+
+  before(() => {
+    global.callNative = callNativeSpy
+  })
+
+  afterEach(() => {
+    callNativeSpy.reset()
+  })
+
+  after(() => {
+    global.callNative = originalCallNative
+  })
+
   it('standard APIs', () => {
     expect(vanilla.init).to.be.a('function')
     expect(vanilla.reset).to.be.a('function')

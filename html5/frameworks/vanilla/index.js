@@ -129,7 +129,7 @@ export function refreshInstance (instanceId, data) {
  */
 export function getRoot (instanceId) {
   const instance = instances[instanceId]
-  return instance.document.$el.toJSON()
+  return instance.document.body.toJSON()
 }
 
 /**
