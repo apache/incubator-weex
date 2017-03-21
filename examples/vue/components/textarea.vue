@@ -17,7 +17,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .textarea {
     font-size: 30px;
     height: 280px;
