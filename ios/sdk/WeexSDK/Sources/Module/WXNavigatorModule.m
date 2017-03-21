@@ -159,7 +159,10 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
     UIViewController *container = self.weexInstance.viewController;
     
     NSMutableDictionary *mutableParam = [param mutableCopy];
-    [mutableParam setObject:self.weexInstance.instanceId forKey:@"instanceId"];
+    
+    if (self.weexInstance.instanceId) {
+        [mutableParam setObject:self.weexInstance.instanceId forKey:@"instanceId"];
+    }
     
     [navigator setNavigationItemWithParam:mutableParam position:position completion:^(NSString *code, NSDictionary *responseData) {
         if (callback && code) {
