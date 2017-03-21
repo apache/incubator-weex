@@ -468,6 +468,14 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     this.scrollable = scrollable;
   }
 
+  private void showNextItem() {
+    if (getRealCount() == 2 && superGetCurrentItem() == 1) {
+      superSetCurrentItem(0, true);
+    } else {
+      superSetCurrentItem(superGetCurrentItem() + 1, true);
+    }
+  }
+
   @Override
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
@@ -487,7 +495,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       WXLogUtils.d("[CircleViewPager] trigger auto play action");
       WXCircleViewPager target;
       if ((target = targetRef.get()) != null) {
-        target.superSetCurrentItem(target.superGetCurrentItem() + 1, true);
+        target.showNextItem();
         target.removeCallbacks(this);
         target.postDelayed(this, intervalTime);
       }
