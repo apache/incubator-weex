@@ -1,38 +1,29 @@
 <template>
   <scroller>
-    <panel title="input" type="primary">
-      <input
-        type="text"
-        placeholder="Text Input"
-        class="input"
+    <panel title="textarea" type="primary">
+      <textarea
+        class="textarea"
         autofocus="true"
-        value=""
+        return-key-type="done"
+        @return="onreturn"
         @change="onchange"
         @input="oninput"
       />
       <text>oninput: {{txtInput}}</text>
       <text>onchange: {{txtChange}}</text>
-    </panel>
-    <panel title="test input enter key type" type="primary">
-      <input
-        type="text"
-        placeholder="search ..."
-        class="input"
-        autofocus="true"
-        return-key-type="search"
-        @return="onreturn"
-      />
       <text>enter key type: {{returnType}}</text>
-      <text>Action: {{msg}}</text>
+      <text>action: {{msg}}</text>
     </panel>
   </scroller>
 </template>
 
 <style scoped>
-  .input {
-    font-size: 60px;
-    height: 80px;
+  .textarea {
+    font-size: 30px;
+    height: 280px;
     width: 400px;
+    border-width: 2px;
+    border-color: #ccc;
   }
 </style>
 
@@ -53,21 +44,13 @@
     methods: {
       onchange: function(event) {
         this.txtChange = event.value;
-        modal.toast({
-          message: 'onchange: ' + event.value,
-          duration: 2
-        })
       },
       oninput: function(event) {
         this.txtInput = event.value;
-        modal.toast({
-          message: 'onitput: ' + event.value,
-          duration: 1
-        })
       },
       onreturn: function(event) {
         this.returnType = event.returnKeyType;
-        this.msg = 'You are ' + this.returnType + ' ' + event.value;
+        this.msg = 'You are "' + this.returnType + '" ' + event.value;
       }
     }
   };

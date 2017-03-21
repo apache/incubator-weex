@@ -2,11 +2,12 @@
  * @fileOverview Input component.
  * Support v-model only if vue version is large than 2.2.0
  */
-
+import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
 
 export default {
+  mixins: [inputCommon],
   props: {
     type: {
       type: String,
@@ -30,7 +31,8 @@ export default {
       type: [String, Boolean],
       default: false
     },
-    maxlength: [String, Number]
+    maxlength: [String, Number],
+    returnKeyType: String
   },
 
   methods: {
@@ -47,6 +49,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    const events = extend(this._createEventMap(), mapFormEvents(this))
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',
@@ -55,12 +58,13 @@ export default {
         disabled: (this.disabled !== 'false' && this.disabled !== false),
         autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
-        maxlength: this.maxlength
+        maxlength: this.maxlength,
+        'returnKeyType': this.returnKeyType
       },
       domProps: {
         value: this.value
       },
-      on: extend(this._createEventMap(), mapFormEvents(this)),
+      on: this.createKeyboardEvent(events),
       staticClass: 'weex-input weex-el'
     })
   }
