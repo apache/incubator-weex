@@ -219,6 +219,8 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
+        [self _setWXComponentA11yInfo:_attributes];
+        
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
         
@@ -428,6 +430,7 @@
     [self _updateNavBarAttributes:attributes];
     
     [self updateAttributes:attributes];
+    [self _setWXComponentA11yInfo:attributes];
 }
 
 - (void)updateStyles:(NSDictionary *)styles
@@ -445,6 +448,23 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     WXAssertMainThread();
+    
+}
+
+- (void)_setWXComponentA11yInfo:(NSDictionary *)attributes
+{
+    if (attributes[@"role"]){
+        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        self.view.accessibilityTraits = _role;
+    }
+    if (attributes[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        self.view.accessibilityElementsHidden = _ariaHidden;
+    }
+    if (attributes[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        self.view.accessibilityValue = _ariaLabel;
+    }
 }
 
 #pragma mark Reset
