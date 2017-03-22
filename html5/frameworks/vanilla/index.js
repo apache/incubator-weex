@@ -141,6 +141,11 @@ export function getRoot (instanceId) {
  */
 export function receiveTasks (instanceId, tasks) {
   const instance = instances[instanceId]
+
+  // break if parameters is invalid
+  if (instance == null) return
+  if (!Array.isArray(tasks)) return
+
   const { callbacks, document } = instance
   tasks.forEach(task => {
     // `fireEvent` case: find the event target and fire.
