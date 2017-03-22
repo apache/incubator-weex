@@ -178,7 +178,8 @@ export function registerModules (newModules) {
     newModules[name].forEach(method => {
       if (typeof method === 'string') {
         modules[name][method] = true
-      } else {
+      }
+      else {
         modules[name][method.name] = method.args
       }
     })
@@ -197,7 +198,8 @@ export function registerComponents (newComponents) {
       }
       if (typeof component === 'string') {
         components[component] = true
-      } else if (typeof component === 'object' && typeof component.type === 'string') {
+      }
+      else if (typeof component === 'object' && typeof component.type === 'string') {
         components[component.type] = component
       }
     })
