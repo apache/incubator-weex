@@ -1,7 +1,7 @@
 os:
   - osx
   - linux
-language: ruby
+language: nodejs
 rvm: 2.0.0
 env:
   - TEST_SUITE=ios
@@ -13,7 +13,7 @@ matrix:
     exclude:
       - os: linux
         env: TEST_SUITE=ios
-      - os: linux
+      - os: osx
         env: TEST_SUITE=danger
       - os: osx
         env: TEST_SUITE=jsfm

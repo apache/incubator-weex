@@ -238,27 +238,10 @@ public class WXStyleTest {
     @Test
     public void testBlur() {
         assertEquals(0,style.size());
-        assertEquals(0,style.getBlur());
+        assertEquals(null,style.getBlur());
         style.put(Constants.Name.FILTER,"blur(5px)");
-        assertEquals(5,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1)");
-        assertEquals(1,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1dp)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"bur(1px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1px");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(-1)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(-1px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(100px)");
-        assertEquals(10,style.getBlur());
-        style.put(Constants.Name.FILTER,"blur(1p0px)");
-        assertEquals(0,style.getBlur());
-        style.put(Constants.Name.FILTER,"7");
-        assertEquals(0,style.getBlur());
+        assertEquals("blur(5px)",style.getBlur());
+
     }
 
     @Test

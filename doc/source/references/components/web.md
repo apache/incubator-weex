@@ -18,8 +18,6 @@ This component supports no child components.
 
 **src**(string): this attribute specifies the page source to load.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 
 **width**(float): the width of the component, default value is 0. This style must be specified.
@@ -29,7 +27,7 @@ Other attributes please check out the [common attributes](../common-attrs.html)
 
 ### common styles
 
-check out the [common styles](../common-attrs.html).
+check out the [common styles](../common-style.html).
 
 support flexbox related styles
 support box model related styles
@@ -146,4 +144,4 @@ We use a simple Browser Demo to show how to use web component and webview module
 </style>
 ```
 
-[try it](../../examples/web.html)
+[try it](http://dotwe.org/vue/154c7fa8ac13e87ff4e7bf9862147d50)

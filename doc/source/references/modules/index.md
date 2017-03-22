@@ -7,23 +7,14 @@ version: 2.1
 
 # Built-in Modules
 
-## How to use
-
-You can use a simply way like `requireModule('name')` to access the apis of module. e.g.
-
-```html
-<script>
-  const modal = weex.requireModule('modal')
-
-  module.exports = {
-    data: {},
-    methods: {
-      toast: function () {
-        modal.toast({
-          message: 'props: ' + event.data.join(', ')
-        })
-      }
-    }
-  }
-</script>
-```
+- [animation](./animation.html)
+- [WebSocket](./websocket.html)
+- [picker](./picker.html)
+- [clipboard](./clipboard.html)
+- [dom](./dom.html)
+- [modal](./modal.html)
+- [navigator](./navigator.html)
+- [storage](./storage.html)
+- [stream](./stream.html)
+- [webview](./webview.html)
+- [globalEvent](./globalevent.html)

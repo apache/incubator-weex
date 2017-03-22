@@ -13,6 +13,7 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXComponent+GradientColor.h"
 
 @implementation WXComponent (Layout)
 
@@ -117,15 +118,24 @@
                 strongSelf.layer.transform = CATransform3DIdentity;
             }
             
-            strongSelf.view.frame = strongSelf.calculatedFrame;
-            if (![self EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
-                [self configViewLayer:strongSelf.view boxShadow:_boxShadow];
+            if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
+                strongSelf.view.frame = strongSelf.calculatedFrame;
+                [strongSelf configBoxShadow:_boxShadow];
+            } else {
+                if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                    [strongSelf configBoxShadow:_boxShadow];
+                }
             }
+            
+            [self _resetNativeBorderRadius];
             
             if (strongSelf->_transform) {
                 [strongSelf->_transform applyTransformForView:strongSelf.view];
             }
             
+            if (strongSelf->_backgroundImage) {
+                [strongSelf setGradientLayer];
+            }
             [strongSelf setNeedsDisplay];
         }];
     }

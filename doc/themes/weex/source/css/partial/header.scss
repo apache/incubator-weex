@@ -79,12 +79,17 @@
   }
 
   .info li {
-    margin-left: 50px;
+    margin-left: 40px;
   }
 
-  .tools li {
-    position: relative;
-    margin-left: 4em;
+  .tools {
+    > li {
+      margin-left: 30px;
+      position: relative;
+    }
+    .search-form {
+      width: 120px;
+    }
   }
 
   .dropdown {
@@ -100,5 +105,24 @@
         padding: 5px 10px;
       }
     }
+  }
+
+  .select-lang {
+    width: 90px;
+  }
+
+  .select-lang .dropdown-toggle {
+    color: #00293D;
+  }
+
+  .select-lang .dropdown-menu {
+    width: 105px;
+    left: 0;
+  }
+
+  .caret {
+    display: inline-block;
+    margin-left: 2px;
+    @include triangle-down($border-gray, 4px);
   }
 }

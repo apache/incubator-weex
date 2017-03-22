@@ -182,9 +182,12 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
             
             self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
         }
+        
+        currentHeight = [self _maxHeightForAllColumns];
+        [self _columnsReachToHeight:currentHeight];
     }
     
-    currentHeight = [self _maxHeightForAllColumns] + insets.bottom;
+    currentHeight = currentHeight + insets.bottom;
     [self _columnsReachToHeight:currentHeight];
     
     self.layoutAttributes[kMultiColumnLayoutHeader] = headersAttributes;

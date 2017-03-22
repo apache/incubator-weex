@@ -205,6 +205,7 @@
 package com.taobao.weex.bridge;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 
 /**
@@ -212,8 +213,8 @@ import com.taobao.weex.WXSDKInstance;
  */
 public interface WXValidateProcessor {
 
-    boolean onModuleValidate(WXSDKInstance wxsdkInstance, String moduleStr,
-                             String methodStr, JSONArray params);
+    WXModuleValidateResult onModuleValidate(WXSDKInstance wxsdkInstance, String moduleStr,
+                                            String methodStr, JSONArray params);
 
     WXComponentValidateResult onComponentValidate(WXSDKInstance wxsdkInstance,
                                                   String componentName);
@@ -225,6 +226,16 @@ public interface WXValidateProcessor {
         public boolean isSuccess;
 
         public String replacedComponent;
+
+        public JSONObject validateInfo;
+
+    }
+
+    class WXModuleValidateResult {
+
+        public boolean isSuccess;
+
+        public JSONObject validateInfo;
 
     }
 }

@@ -218,15 +218,15 @@ typedef void (*WXJSCGarbageCollect)(JSContextRef);
 - (void)garbageCollect
 {
     // for dev and debug only!!
-    char str[80];
-    strcpy(str, "JSSynchron");
-    strcat(str, "ousGarbageColl");
-    strcat(str, "ectForDebugging");
-    WXJSCGarbageCollect garbageCollect = dlsym(RTLD_DEFAULT, str);
-    
-    if (garbageCollect != NULL) {
-        garbageCollect(_jsContext.JSGlobalContextRef);
-    }
+//    char str[80];
+//    strcpy(str, "JSSynchron");
+//    strcat(str, "ousGarbageColl");
+//    strcat(str, "ectForDebugging");
+//    WXJSCGarbageCollect garbageCollect = dlsym(RTLD_DEFAULT, str);
+//    
+//    if (garbageCollect != NULL) {
+//        garbageCollect(_jsContext.JSGlobalContextRef);
+//    }
 }
 
 #pragma mark - Private

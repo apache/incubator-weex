@@ -79,6 +79,7 @@ typedef enum : NSUInteger {
     UICollectionViewLayout *_collectionViewlayout;
     
     UIEdgeInsets _padding;
+    NSUInteger _previousLoadMoreCellNumber;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -97,11 +98,14 @@ typedef enum : NSUInteger {
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
             
             layout.delegate = self;
+        } else {
+            _collectionViewlayout = [UICollectionViewLayout new];
         }
         
         _dataController = [WXRecyclerDataController new];
         _updateController = [WXRecyclerUpdateController new];
         _updateController.delegate = self;
+        [self fixFlicker];
     }
     
     return self;
@@ -228,7 +232,6 @@ typedef enum : NSUInteger {
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
-    // TODO: refresh loading fixed
     if ([subcomponent isKindOfClass:[WXCellComponent class]]) {
         ((WXCellComponent *)subcomponent).delegate = self;
     } else if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
@@ -426,7 +429,22 @@ typedef enum : NSUInteger {
 
 - (void)cellDidRendered:(WXCellComponent *)cell
 {
+    if (WX_MONITOR_INSTANCE_PERF_IS_RECORDED(WXPTFirstScreenRender, self.weexInstance) && !self.weexInstance.onRenderProgress) {
+        return;
+    }
     
+    NSIndexPath *indexPath = [self.dataController indexPathForCell:cell];
+    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath];
+    CGRect cellRect = attributes.frame;
+    if (cellRect.origin.y + cellRect.size.height >= _collectionView.frame.size.height) {
+        WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, self.weexInstance);
+    }
+    
+    if (self.weexInstance.onRenderProgress) {
+        CGRect renderRect = [_collectionView convertRect:cellRect toView:self.weexInstance.rootView];
+        self.weexInstance.onRenderProgress(renderRect);
+    }
 }
 
 - (void)cellDidRemove:(WXCellComponent *)cell
@@ -449,7 +467,47 @@ typedef enum : NSUInteger {
     }
 }
 
-#pragma makrk - private
+#pragma mark - Load More Event
+
+- (void)setLoadmoreretry:(NSUInteger)loadmoreretry
+{
+    if (loadmoreretry != self.loadmoreretry) {
+        _previousLoadMoreCellNumber = 0;
+    }
+    
+    [super setLoadmoreretry:loadmoreretry];
+}
+
+- (void)loadMore
+{
+    [super loadMore];
+    
+    _previousLoadMoreCellNumber = [self totalNumberOfCells];
+}
+
+- (BOOL)isNeedLoadMore
+{
+    BOOL superNeedLoadMore = [super isNeedLoadMore];
+    return superNeedLoadMore && _previousLoadMoreCellNumber != [self totalNumberOfCells];
+}
+
+- (NSUInteger)totalNumberOfCells
+{
+    NSUInteger cellNumber = 0;
+    NSUInteger sectionCount = [_collectionView numberOfSections];
+    for (int section = 0; section < sectionCount; section ++) {
+        cellNumber += [_collectionView numberOfItemsInSection:section];
+    }
+    
+    return cellNumber;
+}
+
+- (void)resetLoadmore{
+    [super resetLoadmore];
+    _previousLoadMoreCellNumber = 0;
+}
+
+#pragma mark - Private
 
 - (float)_floatValueForColumnGap:(WXLength *)gap
 {
@@ -499,7 +557,7 @@ typedef enum : NSUInteger {
         WXComponent* component = components[i];
         
         if ([component isKindOfClass:[WXHeaderComponent class]]) {
-            if (i != 0) {
+            if (i != 0 && (currentSection.headerComponent || cellArray.count > 0)) {
                 currentSection.cellComponents = [cellArray copy];
                 [sectionArray addObject:currentSection];
                 currentSection = [WXSectionDataController new];
@@ -511,15 +569,39 @@ typedef enum : NSUInteger {
             [cellArray addObject:(WXCellComponent *)component];
         } else if ([component isKindOfClass:[WXFooterComponent class]]) {
             currentSection.footerComponent = component;
-        }
-        
-        if (i == components.count - 1 && cellArray.count > 0) {
-            currentSection.cellComponents = [cellArray copy];
-            [sectionArray addObject:currentSection];
+        } else {
+            continue;
         }
     }
     
+    if (cellArray.count > 0 || currentSection.headerComponent) {
+        currentSection.cellComponents = [cellArray copy];
+        [sectionArray addObject:currentSection];
+    }
+    
     return sectionArray;
+}
+
+- (void)fixFlicker
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // FIXME:(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero by calling _adjustContentOffsetIfNecessary after insert cells.
+        // So if you pull down list while list is rendering, the list will be flickering.
+        // Demo:
+        // Have to hook _adjustContentOffsetIfNecessary here.
+        // Any other more elegant way?
+        NSString *a = @"ntOffsetIfNe";
+        NSString *b = @"adjustConte";
+        
+        NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
+        [[self class] weex_swizzle:[WXCollectionView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
+    });
+}
+
+- (void)fixedFlickerSelector
+{
+    // DO NOT delete this method.
 }
 
 @end

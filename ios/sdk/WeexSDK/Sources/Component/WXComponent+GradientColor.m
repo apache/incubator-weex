@@ -14,6 +14,9 @@
 @implementation  WXComponent (GradientColor)
 
 - (void)setGradientLayer {
+    if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        return;
+    }
     //parse gradient-color, linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
     if ([_backgroundImage hasPrefix:@"linear-gradient"] && [_backgroundImage hasSuffix:@")"] ) {
         NSRange range = NSMakeRange(16, _backgroundImage.length - 17);

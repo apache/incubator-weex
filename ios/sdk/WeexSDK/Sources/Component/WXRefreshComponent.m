@@ -48,14 +48,19 @@
 - (void)viewDidLoad
 {
      _initFinished = YES;
+    
+    if (!_displayState) {
+        [_indicator.view setHidden:YES];
+    }
+}
+
+- (void)layoutDidFinish
+{
     [self.view setFrame: (CGRect) {
         .size = self.calculatedFrame.size,
         .origin.x = self.calculatedFrame.origin.x,
         .origin.y = self.view.frame.origin.y - CGRectGetHeight(self.calculatedFrame)
     }];
-    if (!_displayState) {
-        [_indicator.view setHidden:YES];
-    }
 }
 
 - (void)viewWillUnload
@@ -137,21 +142,16 @@
         offset.y = -self.calculatedFrame.size.height;
         [_indicator start];
     } else {
-        offset.y = 0;
+        offset.y += CGRectGetHeight(self.calculatedFrame);
         [_indicator stop];
     }
     [scrollerProtocol setContentOffset:offset animated:YES];
+  
 }
 
 - (BOOL)displayState
 {
     return _displayState;
-}
-
-- (void)setFrame:(CGRect)frame
-{
-    CGRect rect = frame;
-    rect.origin.y = 0 - frame.size.height;
 }
 
 @end

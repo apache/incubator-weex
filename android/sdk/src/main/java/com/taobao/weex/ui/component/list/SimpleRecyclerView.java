@@ -216,13 +216,12 @@ import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 import java.util.Stack;
 
 /**
+ * Simple list is used for specific occasion, NOT Support sticky,load more,bounce etc.
  * Created by sospartan on 13/12/2016.
  */
 
 class SimpleRecyclerView extends WXRecyclerView implements ListComponentView{
   private RecyclerViewBaseAdapter mAdapter = null;
-  private Stack<View> headerViewStack = new Stack<>();
-  private Stack<WXCell> headComponentStack = new Stack<>();
 
   public SimpleRecyclerView(Context context) {
     super(context);
@@ -243,83 +242,19 @@ class SimpleRecyclerView extends WXRecyclerView implements ListComponentView{
    * @param component
    */
   public void notifyStickyShow(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty()) {
-      WXCell oldCom = headComponentStack.pop();
-      if (!oldCom.getRef().equals(component.getRef())) {
-        headComponentStack.push(oldCom);
-        headComponentStack.push(component);
-        showSticky();
-      } else {
-        headComponentStack.push(oldCom);
-        return;
-      }
-    } else {
-      headComponentStack.push(component);
-      showSticky();
-    }
+    //Simple list is used for specific occasion, NOT Support sticky,load more,bounce etc.
   }
 
   /**
    * @param component
    */
   public void notifyStickyRemove(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty() && !headerViewStack.isEmpty()) {
-      removeSticky(component);
-    }
+    //Simple list is used for specific occasion, NOT Support sticky,load more,bounce etc.
   }
 
-  /**
-   * Pop stickyView to stack
-   */
-  private void showSticky() {
-    WXCell headComponent = headComponentStack.pop();
-    headComponentStack.push(headComponent);
-    final View headerView = headComponent.getRealView();
-    if (headerView == null)
-      return;
-    headerViewStack.push(headerView);
-    headComponent.removeSticky();
-    final ViewGroup parent = (ViewGroup) getParent();
-    if(parent != null){
-      parent.post(WXThread.secure(new Runnable() {
-        @Override
-        public void run() {
-          ViewGroup existedParent;
-          if((existedParent = (ViewGroup)headerView.getParent())!= null){
-            existedParent.removeView(headerView);
-          }
-          parent.addView(headerView);
-        }
-      }));
-    }
-  }
-
-  /**
-   * remove top stickyView
-   * @param component
-   */
-  private void removeSticky(WXComponent component) {
-    final WXCell headComponent = headComponentStack.pop();
-    if (!component.getRef().equals(headComponent.getRef())) {
-      headComponentStack.push(headComponent);
-      return;
-    }
-    final View headerView = headerViewStack.pop();
-    final ViewGroup parent = (ViewGroup) getParent();
-    if(parent != null){
-      parent.post(WXThread.secure(new Runnable() {
-        @Override
-        public void run() {
-          parent.removeView(headerView);
-          headComponent.recoverySticky();
-        }
-      }));
-    }
-
+  @Override
+  public void updateStickyView(int currentStickyPos) {
+    //Simple list is used for specific occasion, NOT Support sticky,load more,bounce etc.
   }
 
   @Override

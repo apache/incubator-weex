@@ -82,9 +82,12 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
     id<WXResourceRequestDelegate> delegate = [_delegates objectForKey:task];
-    [delegate requestDidFinishLoading:(WXResourceRequest *)task.originalRequest];
+    if (error) {
+        [delegate request:(WXResourceRequest *)task.originalRequest didFailWithError:error];
+    }else {
+        [delegate requestDidFinishLoading:(WXResourceRequest *)task.originalRequest];
+    }
     [_delegates removeObjectForKey:task];
 }
-
 
 @end

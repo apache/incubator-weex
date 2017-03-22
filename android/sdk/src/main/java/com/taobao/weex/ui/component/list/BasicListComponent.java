@@ -230,7 +230,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.OnWXScrollListener;
-import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.AppearanceHelper;
@@ -271,7 +270,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   public static final String LOADMOREOFFSET = "loadmoreoffset";
   private String TAG = "BasicListComponent";
   private int mListCellCount = 0;
-  private String mLoadMoreRetry = "";
+  private boolean mForceLoadmoreNextTime = false;
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
@@ -537,7 +536,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
   public void setOffsetAccuracy(int accuracy) {
-    float real = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getViewPortWidth());
+    float real = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getInstanceViewPortWidth());
     this.mOffsetAccuracy = (int) real;
   }
 
@@ -594,7 +593,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
       if (offsetStr != null) {
         try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getViewPortWidth());
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offsetStr), getInstance().getInstanceViewPortWidth());
         }catch (Exception e ){
           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
         }
@@ -665,6 +664,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     Iterator<Map.Entry<String, WXComponent>> iterator = stickyMap.entrySet().iterator();
     Map.Entry<String, WXComponent> entry;
     WXComponent stickyComponent;
+    int currentStickyPos = -1;
     while (iterator.hasNext()) {
       entry = iterator.next();
       stickyComponent = entry.getValue();
@@ -677,21 +677,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           return;
         }
 
-        if (stickyComponent != null && stickyComponent.getDomObject() != null
-            && stickyComponent instanceof WXCell) {
-          if (stickyComponent.getHostView() == null) {
-            return;
-          }
-
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
           layoutManager = getHostView().getInnerView().getLayoutManager();
           if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
             int pos = mChildren.indexOf(cell);
+            cell.setScrollPositon(pos);
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+              if(pos > currentStickyPos) {
+                currentStickyPos = pos;
+              }
             }
           } else if(layoutManager instanceof StaggeredGridLayoutManager){
             int [] firstItems= new int[3];
@@ -719,7 +717,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           }
           cell.setLocationFromStart(top);
         }
-      }
+    }
+
+    if(currentStickyPos>=0){
+      bounceRecyclerView.updateStickyView(currentStickyPos);
     }
   }
 
@@ -778,8 +779,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       } else {
         view.getInnerView().setItemAnimator(null);
       }
-      boolean isKeepScrollPosition = isKeepScrollPosition(child);
+      boolean isKeepScrollPosition = isKeepScrollPosition(child,index);
       if (isKeepScrollPosition) {
+        int last=((LinearLayoutManager)view.getInnerView().getLayoutManager()).findLastVisibleItemPosition();
+        view.getInnerView().getLayoutManager().scrollToPosition(last);
         view.getRecyclerViewBaseAdapter().notifyItemInserted(adapterPosition);
       } else {
         view.getRecyclerViewBaseAdapter().notifyItemChanged(adapterPosition);
@@ -809,11 +812,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * @param child Need to insert the component
    * @return fixed=true
    */
-  private boolean isKeepScrollPosition(WXComponent child) {
+  private boolean isKeepScrollPosition(WXComponent child,int index) {
     ImmutableDomObject domObject = child.getDomObject();
     if (domObject != null) {
       Object attr = domObject.getAttrs().get(Constants.Name.KEEP_SCROLL_POSITION);
-      if (WXUtils.getBoolean(attr, false)) {
+      if (WXUtils.getBoolean(attr, false) && index <= getChildCount() && index>-1) {
         return true;
       }
     }
@@ -910,9 +913,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void onViewRecycled(ListBaseViewHolder holder) {
     long begin = System.currentTimeMillis();
-    holder.setComponentUsing(false);
+
     if(holder.canRecycled()) {
       recycleViewList.add(holder);
+      holder.setComponentUsing(false);
     } else {
       WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
     }
@@ -1149,19 +1153,15 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       if (TextUtils.isEmpty(offset)) {
         offset = "0";
       }
-      float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),WXSDKInstance.getViewPortWidth());
+      float offsetParsed = WXViewUtils.getRealPxByWidth(Integer.parseInt(offset),getInstance().getInstanceViewPortWidth());
 
       if (offScreenY < offsetParsed) {
-        String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
-        if (loadMoreRetry == null) {
-          loadMoreRetry = mLoadMoreRetry;
-        }
 
         if (mListCellCount != mChildren.size()
-            || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
+            || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mListCellCount = mChildren.size();
-          mLoadMoreRetry = loadMoreRetry;
+          mForceLoadmoreNextTime = false;
         }
       }
     } catch (Exception e) {
@@ -1226,7 +1226,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @JSMethod
   public void resetLoadmore() {
-    mLoadMoreRetry = "";
+    mForceLoadmoreNextTime = true;
     mListCellCount = 0;
   }
 
@@ -1249,11 +1249,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             Map<String, Object> contentSize = new HashMap<>(2);
             Map<String, Object> contentOffset = new HashMap<>(2);
 
-            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getViewPortWidth()));
-            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getViewPortWidth()));
+            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
+            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
 
-            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getViewPortWidth()));
-            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getViewPortWidth()));
+            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getInstanceViewPortWidth()));
+            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
             event.put(Constants.Name.CONTENT_SIZE, contentSize);
             event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
 

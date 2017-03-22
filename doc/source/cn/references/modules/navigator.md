@@ -87,4 +87,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/navigator.html)
+[try it](http://dotwe.org/vue/5c670b07735ee6d08de5c8eb93f91f11)

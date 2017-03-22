@@ -74,12 +74,11 @@ menu:
   blog: 博客
   showcase: 示例
   download: 下载
-  resources: 下载
+  resources: 资源
   tools: 工具和服务
   advanced: 高阶知识
-  baichuan: 阿里百川
   github: GitHub
-  legacy: 旧文档
+  legacy: 旧语法文档
 playground:
   content: Weex Native 运行时实例 & Weex 文件预览工具。
 categories: Categories

@@ -1,9 +1,9 @@
 <template>
-  <waterfall class="page"
+  <waterfall class="page" ref="waterfall"
   v-bind:style="{padding:padding}"
   :column-width="columnWidth" :column-count="columnCount" :column-gap="columnGap"
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
-  @scroll="recylerScroll"
+  @scroll="recylerScroll" @loadmore="loadmore" loadmoreoffset=3000
   >
     <refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
       <loading-indicator class="indicator"></loading-indicator>
@@ -49,6 +49,9 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
+    <header class="footer">
+      <text class="stickyText">Footer</text>
+    </header>
     <div class="fixedItem" @click="scrollToTop">
       <text class="fixedText">Top</text>
     </div>
@@ -201,6 +204,12 @@
     margin-right: 24;
     margin-bottom: 30;
   }
+  .footer {
+    height: 94;
+    justify-content: center;
+    align-items: center;
+    background-color: #00cc99;
+  }
 
   .fixedItem {
     position: fixed;
@@ -325,6 +334,10 @@
     methods: {
       recylerScroll: function(e) {
         this.contentOffset = e.contentOffset.y
+      },
+      loadmore: function(e) {
+        console.log('receive loadmore event')
+        // this.$refs.waterfall.resetLoadmore()
       },
       showOrRemoveHeader: function() {
         this.showHeader = !this.showHeader

@@ -1,7 +1,7 @@
 ---
 title: 如何将原有 Weex 项目改造成 Vue 版本
 type: references
-order: 11.1
+order: 12.1
 version: 2.1
 ---
 
