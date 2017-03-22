@@ -27,10 +27,7 @@ export function createInstance (id, code, options, data, info) {
     result = initApp(instance,
                      code,
                      data,
-                     services,
-                     options.bundleUrl,
-                     options.bundleDigest,
-                     options.codeCachePath)
+                     services)
   }
   else {
     result = new Error(`invalid instance id "${id}"`)

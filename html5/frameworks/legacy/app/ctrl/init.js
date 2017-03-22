@@ -21,11 +21,8 @@ import { updateActions } from './misc'
  * @param  {object} app
  * @param  {string} code
  * @param  {object} data
- * @param  {string} bundleUrl
- * @param  {string} bundleDigest
- * @param  {string} codeCachePath
  */
-export function init (app, code, data, services, bundleUrl, bundleDigest, codeCachePath) {
+export function init (app, code, data, services) {
   console.debug('[JS Framework] Intialize an instance with:\n', data)
   let result
 
@@ -121,11 +118,7 @@ export function init (app, code, data, services, bundleUrl, bundleDigest, codeCa
     __weex_viewmodel__: bundleVm,
     weex: weexGlobalObject
   }, timerAPIs, services)
-  if (!callFunctionNative(globalObjects,
-                          functionBody,
-                          bundleUrl,
-                          bundleDigest,
-                          codeCachePath)) {
+  if (!callFunctionNative(globalObjects, functionBody)) {
     // If failed to compile functionBody on native side,
     // fallback to callFunction.
     callFunction(globalObjects, functionBody)
@@ -156,13 +149,10 @@ function callFunction (globalObjects, body) {
 /**
  * Call a new function generated on the V8 native side.
  * @param  {object} globalObjects
- * @param  {string} code
- * @param  {string} url
- * @param  {string} digest
- * @param  {string} path
+ * @param  {string} body
  * @return {boolean} return true if no error occurred.
  */
-function callFunctionNative (globalObjects, body, url, digest, path) {
+function callFunctionNative (globalObjects, body) {
   if (typeof compileAndRunBundle !== 'function') {
     return false
   }
@@ -186,7 +176,12 @@ function callFunctionNative (globalObjects, body, url, digest, path) {
   script += '} )'
 
   try {
-    fn = compileAndRunBundle(script, url, digest, path)
+    const weex = globalObjects.weex || {}
+    const config = weex.config || {}
+    fn = compileAndRunBundle(script,
+                             config.bundleUrl,
+                             config.bundleDigest,
+                             config.codeCachePath)
     if (fn && typeof fn === 'function') {
       fn(...globalValues)
       isNativeCompileOk = true
