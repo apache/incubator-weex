@@ -328,7 +328,8 @@ class AnimationAction implements DOMAction, RenderAction {
               .getInstanceViewPortWidth());
           if (animator != null) {
             Animator.AnimatorListener animatorCallback = createAnimatorListener(instance, callback);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 && component
+                .enableLayerType() ) {
               component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
             }
             Interpolator interpolator = createTimeInterpolator();
