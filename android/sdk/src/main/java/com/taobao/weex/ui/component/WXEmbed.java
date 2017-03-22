@@ -204,164 +204,43 @@
  */
 package com.taobao.weex.ui.component;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
-import com.taobao.weappplus_sdk.R;
 import com.taobao.weex.IWXRenderListener;
-import com.taobao.weex.WXRenderErrorCode;
+import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
-import com.taobao.weex.utils.WXViewUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 @Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+public class WXEmbed extends WXVContainer<RenderContainer> implements WXSDKInstance.OnInstanceVisibleListener, IWXRenderListener {
 
   public static final String ITEM_ID = "itemId";
 
-  private String src;
   private WXSDKInstance mNestedInstance;
-  private static int ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,750);
-  private static int ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,750);
-
   private boolean mIsVisible = true;
-  private EmbedRenderListener mListener;
-
-  public interface EmbedManager {
-    WXEmbed getEmbed(String itemId);
-    void putEmbed(String itemId,WXEmbed comp);
-  }
-
-  public static class FailToH5Listener extends ClickToReloadListener {
-    @SuppressLint("SetJavaScriptEnabled")
-    @Override
-    public void onException(NestedContainer comp, String errCode, String msg) {
-      //downgrade embed
-      if( errCode != null && comp instanceof WXEmbed && errCode.startsWith("1|")) {
-        ViewGroup container = comp.getViewContainer();
-        WebView webView = new WebView(container.getContext());
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        webView.setLayoutParams(params);
-        webView.getSettings().setJavaScriptEnabled(true);
-
-        //WebView Remote Code Execution Vulnerability
-        webView.removeJavascriptInterface("searchBoxJavaBridge_");
-        webView.removeJavascriptInterface("accessibility");
-        webView.removeJavascriptInterface("accessibilityTraversal");
-        webView.getSettings().setSavePassword(false);
-
-        container.removeAllViews();
-        container.addView(webView);
-        webView.loadUrl(((WXEmbed) comp).src);
-      }else{
-        super.onException(comp,errCode,msg);
-      }
-    }
-  }
-
-  /**
-   * Default event listener.
-   */
-  public static class ClickToReloadListener implements OnNestedInstanceEventListener {
-    @Override
-    public void onException(NestedContainer container, String errCode, String msg) {
-      if (TextUtils.equals(errCode, WXRenderErrorCode.WX_NETWORK_ERROR) && container instanceof WXEmbed) {
-        final WXEmbed comp = ((WXEmbed)container);
-        final ImageView imageView = new ImageView(comp.getContext());
-        imageView.setImageResource(R.drawable.error);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ERROR_IMG_WIDTH, ERROR_IMG_HEIGHT);
-        layoutParams.gravity = Gravity.CENTER;
-        imageView.setLayoutParams(layoutParams);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setAdjustViewBounds(true);
-        imageView.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            imageView.setOnClickListener(null);
-            imageView.setEnabled(false);
-            comp.loadContent();
-          }
-        });
-        FrameLayout hostView = comp.getHostView();
-        hostView.removeAllViews();
-        hostView.addView(imageView);
-        WXLogUtils.e("WXEmbed", "NetWork failure :" + errCode + ",\n error message :" + msg);
-      }
-    }
-
-    @Override
-    public boolean onPreCreate(NestedContainer comp, String src) {
-      return true;
-    }
-
-    @Override
-    public String transformUrl(String origin) {
-      return origin;
-    }
-
-    @Override
-    public void onCreated(NestedContainer comp, WXSDKInstance nestedInstance) {
-
-    }
-  }
-
-  static class EmbedRenderListener implements IWXRenderListener {
-    WXEmbed mComponent;
-    OnNestedInstanceEventListener mEventListener;
-
-    EmbedRenderListener(WXEmbed comp) {
-      mComponent = comp;
-      mEventListener = new ClickToReloadListener();
-    }
-
-    @Override
-    public void onViewCreated(WXSDKInstance instance, View view) {
-      FrameLayout hostView = mComponent.getHostView();
-      hostView.removeAllViews();
-      hostView.addView(view);
-    }
-
-    @Override
-    public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
-
-    }
-
-    @Override
-    public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
-
-    }
-
-    @Override
-    public void onException(WXSDKInstance instance, String errCode, String msg) {
-      if (mEventListener != null) {
-        mEventListener.onException(mComponent, errCode, msg);
-      }
-    }
-  }
+  private String src;
 
   @Deprecated
   public WXEmbed(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance,dom,parent);
+    this(instance, dom, parent);
   }
 
   public WXEmbed(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
     super(instance, node, parent);
-    mListener = new EmbedRenderListener(this);
-
-    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
-    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
-    if(instance instanceof EmbedManager) {
+    instance.addOnInstanceVisibleListener(this);
+    if (instance instanceof EmbedManager) {
       Object itemId = node.getAttrs().get(ITEM_ID);
       if (itemId != null) {
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
@@ -370,56 +249,37 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   }
 
   @Override
-  public void setOnNestEventListener(OnNestedInstanceEventListener listener){
-    mListener.mEventListener = listener;
-  }
-
-  @Override
-  public ViewGroup getViewContainer() {
-    return getHostView();
+  protected RenderContainer initComponentHostView(@NonNull Context context) {
+    RenderContainer container = new RenderContainer(context);
+    container.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    return container;
   }
 
   @Override
   protected boolean setProperty(String key, Object param) {
     switch (key) {
       case Constants.Name.SRC:
-        String src = WXUtils.getString(param,null);
-        if (src != null)
+        String src = WXUtils.getString(param, null);
+        if (src != null) {
           setSrc(src);
+        }
         return true;
     }
     return super.setProperty(key, param);
   }
 
-  @Override
-  public void renderNewURL(String url) {
-    src = url;
-    loadContent();
-  }
-
-
-  public String getOriginUrl() {
-    return originUrl;
-  }
-
-  public void setOriginUrl(String originUrl) {
-    this.originUrl = originUrl;
-  }
-
-  private String originUrl;
-
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
-    originUrl=src;
     this.src = src;
     if (mNestedInstance != null) {
       mNestedInstance.destroy();
       mNestedInstance = null;
     }
     if (mIsVisible) {
-      loadContent();
+      mNestedInstance = createInstance();
     }
   }
+
   public String getSrc() {
     return src;
   }
@@ -427,42 +287,39 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   /**
    * Load embed content, default behavior is create a nested instance.
    */
-  protected void loadContent(){
-    mNestedInstance = createInstance();
-    if(mListener != null && mListener.mEventListener != null){
-      if(!mListener.mEventListener.onPreCreate(this,src)){
-        //cancel render
-        mListener.mEventListener.onCreated(this, mNestedInstance);
-      }
-    }
+
+  public WXSDKInstance createInstance() {
+    WXSDKInstance instance = new WXSDKInstance(getContext());
+    instance.setRenderContainer(getHostView());
+    instance.registerRenderListener(this);
+    instance.renderByUrl(WXPerformance.DEFAULT, src, assembleOptions(src), null, WXRenderStrategy.APPEND_ASYNC);
+    return instance;
   }
 
-  private WXSDKInstance createInstance() {
-    WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
-    getInstance().addOnInstanceVisibleListener(this);
-    sdkInstance.registerRenderListener(mListener);
+  public Map<String, Object> assembleOptions(String src) {
+    Map<String, Object> options = new HashMap<>();
+    options.put(WXSDKInstance.BUNDLE_URL, src);
+    return options;
+  }
 
-    String url=src;
-    if(mListener != null && mListener.mEventListener != null){
-      url=mListener.mEventListener.transformUrl(src);
-      if(!mListener.mEventListener.onPreCreate(this,src)){
-        //cancel render
-        return null;
-      }
-    }
+  @Override
+  public void onViewCreated(WXSDKInstance instance, View view) {
 
-    if(TextUtils.isEmpty(url)){
-      mListener.mEventListener.onException(this,WXRenderErrorCode.WX_USER_INTERCEPT_ERROR,"degradeToH5");
-      return sdkInstance;
-    }
+  }
 
-    ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
-    sdkInstance.renderByUrl(WXPerformance.DEFAULT,
-                            url,
-                            null, null, layoutParams.width,
-                            layoutParams.height,
-                            WXRenderStrategy.APPEND_ASYNC);
-    return sdkInstance;
+  @Override
+  public void onRenderSuccess(WXSDKInstance instance, int width, int height) {
+
+  }
+
+  @Override
+  public void onRefreshSuccess(WXSDKInstance instance, int width, int height) {
+
+  }
+
+  @Override
+  public void onException(WXSDKInstance instance, String errCode, String msg) {
+
   }
 
   @Override
@@ -471,7 +328,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     boolean visible = TextUtils.equals(visibility, Constants.Value.VISIBLE);
     if (!TextUtils.isEmpty(src) && visible) {
       if (mNestedInstance == null) {
-        loadContent();
+        mNestedInstance = createInstance();
       } else {
         mNestedInstance.onViewAppear();
       }
@@ -501,20 +358,29 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
   @Override
   public void onAppear() {
     //appear event from root instance will not trigger visibility change
-    if(mIsVisible && mNestedInstance != null){
+    if (mIsVisible && mNestedInstance != null) {
       WXComponent comp = mNestedInstance.getRootComponent();
-      if(comp != null)
+      if (comp != null) {
         comp.fireEvent(Constants.Event.VIEWAPPEAR);
+      }
     }
   }
 
   @Override
   public void onDisappear() {
     //appear event from root instance will not trigger visibility change
-    if(mIsVisible && mNestedInstance != null){
+    if (mIsVisible && mNestedInstance != null) {
       WXComponent comp = mNestedInstance.getRootComponent();
-      if(comp != null)
+      if (comp != null) {
         comp.fireEvent(Constants.Event.VIEWDISAPPEAR);
+      }
     }
+  }
+
+  public interface EmbedManager {
+
+    WXEmbed getEmbed(String itemId);
+
+    void putEmbed(String itemId, WXEmbed comp);
   }
 }
