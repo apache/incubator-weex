@@ -237,4 +237,9 @@ public class WXHeader extends WXCell {
   public boolean isSticky() {
     return true;
   }
+
+  @Override
+  public boolean canRecycled() {
+    return false;
+  }
 }
