@@ -212,8 +212,6 @@ import android.view.View;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.bridge.SimpleJSCallback;
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.ui.component.WXComponent;
@@ -225,7 +223,7 @@ import java.util.Map;
 /**
  * Created by sospartan on 02/03/2017.
  */
-class GetComponentRectAction implements DOMAction, RenderAction {
+class GetComponentRectAction implements RenderAction {
   private final String mRef;
   private final String mCallback;
 
@@ -234,25 +232,12 @@ class GetComponentRectAction implements DOMAction, RenderAction {
     this.mRef = ref;
     this.mCallback = callback;
   }
-
-  @Override
-  public void executeDom(DOMActionContext context) {
-    JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
-    if (context.isDestory()) {
-      Map<String, Object> options = new HashMap<>();
-      options.put("result", false);
-      options.put("errMsg", "Component does not exist");
-      jsCallback.invoke(options);
-    } else {
-      context.postRenderTask(this);
-    }
-
-  }
-
   @Override
   public void executeRender(RenderActionContext context) {
     JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
-    if (TextUtils.isEmpty(mRef)) {
+    if (context.getInstance().isDestroy()) {
+      //do nothing
+    }else if (TextUtils.isEmpty(mRef)) {
       Map<String, Object> options = new HashMap<>();
       options.put("result", false);
       options.put("errMsg", "Illegal parameter");
@@ -263,7 +248,7 @@ class GetComponentRectAction implements DOMAction, RenderAction {
       WXComponent component = context.getComponent(mRef);
       Map<String, Object> options = new HashMap<>();
       if (component != null) {
-        Map<String, String> size = new HashMap<>();
+        Map<String, Float> size = new HashMap<>();
         Rect sizes = component.getComponentSize();
         size.put("width", getWebPxValue(sizes.width()));
         size.put("height", getWebPxValue(sizes.height()));
@@ -285,11 +270,11 @@ class GetComponentRectAction implements DOMAction, RenderAction {
     View container;
     if ((container = instance.getContainerView()) != null) {
       Map<String, Object> options = new HashMap<>();
-      Map<String, String> sizes = new HashMap<>();
+      Map<String, Float> sizes = new HashMap<>();
       int[] location = new int[2];
       instance.getContainerView().getLocationOnScreen(location);
-      sizes.put("left", "0");
-      sizes.put("top", "0");
+      sizes.put("left", 0f);
+      sizes.put("top", 0f);
       sizes.put("right", getWebPxValue(container.getWidth()));
       sizes.put("bottom", getWebPxValue(container.getHeight()));
       sizes.put("width", getWebPxValue(container.getWidth()));
@@ -306,8 +291,8 @@ class GetComponentRectAction implements DOMAction, RenderAction {
   }
 
   @NonNull
-  private String getWebPxValue(int value) {
-    return String.valueOf(WXViewUtils.getWebPxByWidth(value, WXSDKInstance.getViewPortWidth()));
+  private float getWebPxValue(int value) {
+    return WXViewUtils.getWebPxByWidth(value, WXSDKInstance.getViewPortWidth());
   }
 
 

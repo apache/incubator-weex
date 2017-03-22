@@ -230,6 +230,9 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
     private View mHeadView;
     private boolean mLazy = true;
 
+    /** used in list sticky detect **/
+    private int mScrollPositon = -1;
+
 
     @Deprecated
     public WXCell(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -272,6 +275,14 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
 
     public void setLocationFromStart(int l){
         mLastLocationY = l;
+    }
+
+    void setScrollPositon(int pos){
+        mScrollPositon = pos;
+    }
+
+    public int getScrollPositon() {
+        return mScrollPositon;
     }
 
     @Override

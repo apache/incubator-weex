@@ -212,11 +212,10 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXLogUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -281,12 +280,15 @@ public final class WXDomModule extends WXModule {
     }
     //TODO：add pooling
     try {
-      DOMAction action = Actions.get(method,args);
+      Action action = Actions.get(method,args);
       if(action == null){
         WXLogUtils.e("Unknown dom action.");
       }
-
-      postAction(action,CREATE_BODY.equals(method));
+      if(action instanceof DOMAction){
+        postAction((DOMAction)action, CREATE_BODY.equals(method));
+      }else {
+        postAction((RenderAction)action);
+      }
     } catch (IndexOutOfBoundsException e) {
       // no enougn args
       e.printStackTrace();
@@ -309,6 +311,10 @@ public final class WXDomModule extends WXModule {
     }
 
     postAction(Actions.getInvokeMethod(ref,method,args),false);
+  }
+
+  public void postAction(RenderAction action){
+    WXSDKManager.getInstance().getWXRenderManager().runOnThread(mWXSDKInstance.getInstanceId(),action);
   }
 
   /**

@@ -436,14 +436,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _lastContentOffset = scrollView.contentOffset;
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    if ([_refreshComponent displayState] && scrollView.dragging) {
-        [_refreshComponent pullingdown:@{
+    [_refreshComponent pullingdown:@{
              REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
              REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
              REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
              @"type":@"pullingdown"
-         }];
-    }
+    }];
 
     // check sticky
     [self adjustSticky];

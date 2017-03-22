@@ -342,19 +342,22 @@ static BOOL WXNotStat;
         if ([self isFileExist:fpath]) {
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
-            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
             if (fontURL) {
+                CFErrorRef error = nil;
+                CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                if (error) {
+                    CFRelease(error);
+                    error = nil;
+                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                }
+                NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+                // length of descriptors here will be only one.
+                for (UIFontDescriptor *desc in descriptors) {
+                    font = [UIFont fontWithDescriptor:desc size:fontSize];
+                }
                 CFRelease(fontURL);
             }
-            CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
-            if (fontDataProvider) {
-                CGDataProviderRelease(fontDataProvider);
-            }
-            CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
-            if (graphicFont) {
-                CFRelease(graphicFont);
-            }
-            font = (__bridge_transfer UIFont*)smallFont;
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -362,19 +365,27 @@ static BOOL WXNotStat;
     if (!font) {
         if (fontFamily) {
             font = [UIFont fontWithName:fontFamily size:fontSize];
-            if (!font) {
+        }
+        if (!font) {
+            if (fontFamily) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
+            }
+            if(WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+                font = [UIFont systemFontOfSize:fontSize];
+            } else {
                 font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
-        } else {
-            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
+    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }else {
+        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];

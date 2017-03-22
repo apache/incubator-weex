@@ -21,8 +21,6 @@ There are no child components for the switch component.
 * checked &lt;boolean&gt; true|false, default value is false, indicating whether the button is on or not.
 * disabled &lt;boolean&gt; true|false, default value is false, indicating whether the button is enable or not.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 Notes: There are several style properties that you mustn't use on this component. And here are all the invalid properties:
 
@@ -114,4 +112,4 @@ common styles: check out [common styles for components](../common-style.html)
 </style>
 ```
 
-[try it](../../examples/switch.html)
+[try it](http://dotwe.org/vue/06b1d740fb69d04f9ebe9eaf730974d1)

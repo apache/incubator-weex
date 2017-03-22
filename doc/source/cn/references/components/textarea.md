@@ -159,4 +159,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/textarea.html)
+[try it](http://dotwe.org/vue/a1877866e8b91ffa1e6ea9bc66c200fa)

@@ -204,15 +204,13 @@
  */
 package com.taobao.weex.dom;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
@@ -460,21 +458,11 @@ class DOMActionContextImpl implements DOMActionContext {
   }
 
   private void parseAnimation() {
-    for(final Pair<String, Map<String, Object>> pair:animations) {
+    for (final Pair<String, Map<String, Object>> pair : animations) {
       if (!TextUtils.isEmpty(pair.first)) {
         final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
         if (animationBean != null) {
-          mNormalTasks.add(new IWXRenderTask() {
-            @Override
-            public void execute() {
-              mWXRenderManager.startAnimation(mInstanceId, pair.first, animationBean, null);
-            }
-
-            @Override
-            public String toString() {
-              return "startAnimationByStyle";
-            }
-          });
+          postRenderTask(Actions.getAnimationAction(pair.first, animationBean));
         }
       }
     }
@@ -521,32 +509,6 @@ class DOMActionContextImpl implements DOMActionContext {
     }
   }
 
-  void startAnimation(@NonNull final String ref, @NonNull String animation,
-                      @Nullable final String callBack){
-    if (mDestroy) {
-      return;
-    }
-    WXDomObject domObject = mRegistry.get(ref);
-    if (domObject == null) {
-      return;
-    }
-    final WXAnimationBean animationBean=createAnimationBean(ref, animation);
-    if(animationBean!=null) {
-      mNormalTasks.add(new IWXRenderTask() {
-        @Override
-        public void execute() {
-          mWXRenderManager.startAnimation(mInstanceId, ref, animationBean, callBack);
-        }
-
-        @Override
-        public String toString() {
-          return "startAnimationByCall";
-        }
-      });
-      mDirty=true;
-    }
-  }
-
   @Override
   public void addAnimationForElement(String ref, Map<String, Object> animMap) {
     animations.add(new Pair<>(ref,animMap));
@@ -554,8 +516,8 @@ class DOMActionContextImpl implements DOMActionContext {
   }
 
   @Override
-  public void postRenderTask(RenderAction statement) {
-    mNormalTasks.add(new RenderActionTask(statement, mWXRenderManager.getWXRenderStatement(mInstanceId)));
+  public void postRenderTask(RenderAction action) {
+    mNormalTasks.add(new RenderActionTask(action, mWXRenderManager.getRenderContext(mInstanceId)));
     mDirty = true;
   }
 
@@ -592,24 +554,6 @@ class DOMActionContextImpl implements DOMActionContext {
   @Override
   public WXDomObject getDomByRef(String ref) {
     return mRegistry.get(ref);
-  }
-
-  private WXAnimationBean createAnimationBean(String ref, String animation){
-    try {
-      WXAnimationBean animationBean =
-          JSONObject.parseObject(animation, WXAnimationBean.class);
-      if (animationBean != null && animationBean.styles != null) {
-        WXDomObject domObject=mRegistry.get(ref);
-        int width=(int)domObject.getLayoutWidth();
-        int height=(int)domObject.getLayoutHeight();
-        animationBean.styles.init(animationBean.styles.transformOrigin,
-                                  animationBean.styles.transform,width,height,WXSDKManager.getInstance().getSDKInstance(mInstanceId).getInstanceViewPortWidth());
-      }
-      return animationBean;
-    } catch (RuntimeException e) {
-      WXLogUtils.e("", e);
-      return null;
-    }
   }
 
   private WXAnimationBean createAnimationBean(String ref,Map<String, Object> style){

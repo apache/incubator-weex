@@ -13,11 +13,14 @@ version: 2.1
 
 支持所有 Weex 的组件作为它的子组件。
 
+## 属性
+*  `keep-scroll-position {boolean}`: <span class="api-version">v0.11+</span> List 插入数据后是否保持上次滚动的位置
+
 ## 样式
 
 **注意：**
 
-你不能给 `<cell>` 设定`flex`值。 `<cell>`的宽度等于父组件 `<list>` 的宽度，并且 `<cell>` 高度自适应。
+由于 `<cell>` 本身是一个容器，其布局由 `<list>` 进行管理，你不能给 `<cell>` 设定`flex`值。 `<cell>`的宽度等于父组件 `<list>` 的宽度，并且 `<cell>` 高度自适应，指定 `margin` 样式也不起作用。
 
 - 通用样式：支持所有通用样式
 
@@ -102,4 +105,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/list.html)
+[try it](http://dotwe.org/vue/d31c85e7cd2dc54fa098e920a5376c38)
