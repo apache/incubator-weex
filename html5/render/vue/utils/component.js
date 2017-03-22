@@ -94,10 +94,10 @@ export function watchAppear (context) {
               listener = listener.fn
             }
             const scrollTop = container.scrollTop || window.pageYOffset
-            lastScrollTop = scrollTop
             listener && listener(createEvent(context.$el, type, {
               direction: scrollTop > lastScrollTop ? 'down' : 'up'
             }))
+            lastScrollTop = scrollTop
           }
         }, 25, true)
 
