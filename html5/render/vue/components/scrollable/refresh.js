@@ -83,8 +83,7 @@ export default {
     return createElement('aside', {
       ref: 'refresh',
       attrs: { 'weex-type': 'refresh' },
-      staticClass: 'weex-refresh weex-ct',
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
+      staticClass: 'weex-refresh weex-ct'
     }, this.getChildren())
   }
 }

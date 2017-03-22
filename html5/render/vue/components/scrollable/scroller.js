@@ -76,7 +76,6 @@ export default {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data),
       on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,

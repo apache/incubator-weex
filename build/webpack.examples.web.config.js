@@ -62,6 +62,18 @@ module.exports = {
     ]
   },
   vue: {
+    compilerModules: [
+      {
+        postTransformNode: el => {
+          if (el.staticStyle) {
+            el.staticStyle = `$processStyle(${el.staticStyle})`
+          }
+          if (el.styleBinding) {
+            el.styleBinding = `$processStyle(${el.styleBinding})`
+          }
+        }
+      }
+    ],
     autoprefixer: {
       browsers: ['last 7 versions']
     }
