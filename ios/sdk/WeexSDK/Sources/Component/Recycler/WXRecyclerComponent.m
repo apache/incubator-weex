@@ -105,6 +105,7 @@ typedef enum : NSUInteger {
         _dataController = [WXRecyclerDataController new];
         _updateController = [WXRecyclerUpdateController new];
         _updateController.delegate = self;
+        [self fixFlicker];
     }
     
     return self;
@@ -579,6 +580,28 @@ typedef enum : NSUInteger {
     }
     
     return sectionArray;
+}
+
+- (void)fixFlicker
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // FIXME:(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero by calling _adjustContentOffsetIfNecessary after insert cells.
+        // So if you pull down list while list is rendering, the list will be flickering.
+        // Demo:
+        // Have to hook _adjustContentOffsetIfNecessary here.
+        // Any other more elegant way?
+        NSString *a = @"ntOffsetIfNe";
+        NSString *b = @"adjustConte";
+        
+        NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
+        [[self class] weex_swizzle:[WXCollectionView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
+    });
+}
+
+- (void)fixedFlickerSelector
+{
+    // DO NOT delete this method.
 }
 
 @end

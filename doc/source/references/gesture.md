@@ -27,7 +27,7 @@ For now, there are four types of gestures:
   * `horizontalpan`
   * `verticalpan`
 * **Swipe**. Swipe is fired when user swipe a touch point on the screen. A serial of motion will only trigger one Swipe gesture.
-* **LongPress**. Swipe is fired when a touch point is held for 500 ms or more.
+* **LongPress**. LongPress is fired when a touch point is held for 500 ms or more.
 
 The Touch gesture and Pan is very close to each other, with following features hold:
 

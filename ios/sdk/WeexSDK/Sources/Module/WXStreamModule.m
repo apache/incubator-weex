@@ -119,7 +119,9 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     
     //parse responseType
     NSString *responseType = [options objectForKey:@"type"];
-    [callbackRsp setObject:responseType?:@"JSON" forKey:@"responseType"];
+    if ([responseType isKindOfClass:[NSString class]]) {
+        [callbackRsp setObject:responseType? responseType.lowercaseString:@"" forKey:@"responseType"];
+    }
     
     //parse timeout
     if ([options valueForKey:@"timeout"]){
@@ -195,8 +197,8 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     NSString *responseData = [self _stringfromData:data encode:((NSHTTPURLResponse*)response).textEncodingName];
     NSString * responseType = [callbackRsp objectForKey:@"responseType"];
     [callbackRsp removeObjectForKey:@"responseType"];
-    if (responseType) {
-        
+    if ([responseType isEqualToString:@"json"] || [responseType isEqualToString:@"jsonp"]) {
+        //handle json format
         if ([responseType isEqualToString:@"jsonp"]) {
             //TODO: to be more elegant
             NSUInteger start = [responseData rangeOfString:@"("].location + 1 ;
@@ -211,6 +213,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
         }
         
     } else {
+        // return original Data
         if (responseData) {
             [callbackRsp setObject:responseData forKey:@"data"];
         }

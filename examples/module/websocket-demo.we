@@ -99,7 +99,7 @@
         }
         websocket.onerror = function(e)
         {
-          self.onerrorinfo = e.data;
+          self.onerrorinfo = e.data;    
         }
         websocket.onclose = function(e)
         {

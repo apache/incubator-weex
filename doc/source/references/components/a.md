@@ -68,4 +68,4 @@ We can't guarantee the order of execution between onclick function and href. we 
 </style>
 ```
 
-[try it](../../examples/a.html)
+[try it](http://dotwe.org/vue/025db54e37123ab5336a4b848397660f)

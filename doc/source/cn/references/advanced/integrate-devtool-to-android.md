@@ -1,7 +1,7 @@
 ---
 title:  集成 Devtools 到 Android
 type: references
-order: 10.6
+order: 11.6
 version: 2.1
 ---
 
@@ -91,7 +91,7 @@ Weex Devtools 能够方便调试 Weex 页面，但此功能离不开 Native 的�
 
 控制调试模式的打开和关闭的关键点可以概括为三条规则。
 
-**规则一：通过 `sRemoteDebugMode` 和 `sRemoteDebugProxyUrl` 和来设置开关和 Debugger Server 地址。**
+**规则一：通过 `sRemoteDebugMode` 和 `sRemoteDebugProxyUrl` 来设置开关和 Debugger Server 地址。**
 
 Weex SDK 的 `WXEnvironment` 类里有一对静态变量标记了 Weex 当前的调试模式是否开启分别是：
 
@@ -169,7 +169,7 @@ public class RefreshBroadcastReceiver extends BroadcastReceiver {
 
 ## 接入示例
 
-最简单方式就是复用 Playground 的相关代码，比如扫码和刷新等模块，但是扫码不是必须的，它只是与 App 通信的一种形式，二维码里的包含DebugServer IP 及 bundle 地址等信息，用于建立 App 和 Debugger Server 之间的连接及动态加载 bundle。在 Playground 中给出了两种开启 debug 模式的范例。
+最简单方式就是复用 Playground 的相关代码，比如扫码和刷新等模块，但是扫码不是必须的，它只是与 App 通信的一种形式，二维码里的包含 DebugServer IP 及 bundle 地址等信息，用于建立 App 和 Debugger Server 之间的连接及动态加载 bundle。在 Playground 中给出了两种开启 debug 模式的范例。
 
 * 范例1：通过在 `XXXApplication` 中设置开关打开调试模式
 

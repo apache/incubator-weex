@@ -12,7 +12,7 @@ version: 2.1
 
 `globalEvent` are used to listen for persistent events, such as changes in positioning information, gyroscopes, and so on. A global event is a secondary API that requires additional APIs to work with.
 
-You can register events via `addEventListener`, which can be removed by `removingEventListener` when you do not need to listen for `globalEvent`.
+You can register events via `addEventListener`, which can be removed by `removeEventListener` when you do not need to listen for `globalEvent`. `globalEvent` is not supported in Vue version.
 
 *AUCTION* 
 - Only instance level is not application level . 
@@ -44,7 +44,7 @@ document.dispatchEvent(evt)
 ```java
 Map<String,Object> params=new HashMap<>();
 params.put("key","value");
-mWXSDKInstance.fireGlobalEventCallback("geolocation",params);
+mWXSDKInstance.fireGlobalEventCallback("geolocation", params);
 ```
 #### iOS
 
@@ -69,7 +69,7 @@ register global event.
 var globalEvent = require('@weex-module/globalEvent');
 globalEvent.addEventListener("geolocation", function (e) {
 	console.log("get geolocation")
-	});
+});
 ```
 
 ### removeEventListener(String eventName)

@@ -1,7 +1,7 @@
 ---
 title: 集成 Devtools 到 iOS
 type: references
-order: 10.7
+order: 11.7
 version: 2.1
 ---
 
@@ -47,7 +47,7 @@ pod  'WXDevtool',   '0.7.0', :configurations => ['Debug']，
   ![_](//img.alicdn.com/tps/TB1A518NXXXXXbZXFXXXXXXXXXX-642-154.png)
 
 
-  在相对较大的互联网App研发中, framework 静态库被广泛应用，所以推荐使用方法一接入。
+  在相对较大的互联网 App 研发中, framework 静态库被广泛应用，所以推荐使用方法一接入。
 
 ### 集成功能
 
@@ -114,13 +114,13 @@ pod  'WXDevtool',   '0.7.0', :configurations => ['Debug']，
 
 - 为什么需要页面刷新功能？
 
-  如下图所示，当点击 debug 按钮时，js 的运行环境会从手机端（JavaScriptCore）切换到 Chrome（V8），这时需要重新初始化 Weex 环境，重新渲染页面。页面渲染是需要接入方在自己的页面添加。
+  如下图所示，当点击 debugger 按钮时，js 的运行环境会从手机端（JavaScriptCore）切换到 Chrome（V8），这时需要重新初始化 Weex 环境，重新渲染页面。页面渲染是需要接入方在自己的页面添加。
          
   ![_debug](//img.alicdn.com/tps/TB1xRHhNXXXXXakXpXXXXXXXXXX-1498-668.png)
 
 - 什么场景下需要添加页面刷新功能? 
 
-  - 点击 debug 按钮调试
+  - 点击 debugger 按钮调试
   - 切换 RemoteDebug 开关
   - 刷新 Chrome 页面（command+R）
        
