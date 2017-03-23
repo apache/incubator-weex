@@ -205,6 +205,10 @@
         [self.ancestorScroller adjustSticky];
     }
     
+    if (0 == [[self.view subviews] count]) {
+        self.view.isAccessibilityElement = YES;
+        self.view.accessibilityFrame = [[self.view superview] convertRect:self.calculatedFrame toView:nil];
+    }
     [self layoutDidFinish];
 }
 

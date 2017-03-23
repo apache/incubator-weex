@@ -1,0 +1,76 @@
+<template>
+  <scoller style='top:30;left:30'>
+      <div class='direction'>
+        <text>role:button  text btn </text>
+        <text class='txt' role='button' aria-label='I am a button with text' >text button</text>
+      </div>
+      <div class='direction'>
+        <text>role:button  div btn </text>
+        <div class='txt' role='button' aria-label='I am a button with div' >
+        </div>
+      </div>
+
+      <div class='direction'>
+        <text>role:input </text>
+        <input class='input' aria-label='I am a input' placeholder='please input'></input>
+      </div>
+      <div class='direction'>
+        <text>role:search </text>
+        <input class='input' role='search' aria-label='I am a search item' placeholder='please input something to search'></input>
+      </div>
+
+      <div class='direction'>
+        <text>role:link </text>
+        <a class='a' role='link' href='http://g.tbcdn.cn/ali-wireless-h5/res/0.0.16/hello.js' aria-label='I am a link'></a>
+      </div>
+
+      <div class='direction'>
+        <text>role:img </text>
+        <image class='img' role='img' src="https://imgsa.baidu.com/baike/c0%3Dbaike92%2C5%2C5%2C92%2C30/sign=5f234c7e0d7b020818c437b303b099b6/d4628535e5dde711a1ca272da0efce1b9c1661d4.jpg"
+         aria-label='I am a image,a little dog with brown hair'></image>
+      </div>
+
+      <div class='direction'>
+        <text aria-hidden='true'>hidden from voice-over/talkback </text>
+        <image class='img' aria-hidden='true' role='img' src="https://imgsa.baidu.com/baike/c0%3Dbaike92%2C5%2C5%2C92%2C30/sign=5f234c7e0d7b020818c437b303b099b6/d4628535e5dde711a1ca272da0efce1b9c1661d4.jpg" aria-label='I am a image'></image>
+      </div>
+      
+   </scroller>
+</template>
+
+<style>
+.direction {
+  flex-direction:row;
+  margin-top:50;
+}
+.txt {
+  border-width:2;
+  border-color:red;
+  border-radius:20;
+  width:200;
+  margin-left:20;
+  padding-left:65;
+  margin-top:-20;
+}
+
+.input {
+  border-width:2;
+  width:300;
+  height:60;
+  margin-top:-10;
+  margin-left:20;
+  border-radius:20;
+}
+.a {
+  border-width:2;
+  width:100;
+  margin-left:20;
+  background-color:green
+}
+.img {
+  width:100;
+  height:100;
+  margin-left:20;
+  margin-top:-20;
+}
+</style>
