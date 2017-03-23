@@ -55,6 +55,7 @@ const debouncedTagImg = debounce(function () {
     })
     i++
   }
+  end > 0 && (end = end - IMG_REC_INDENT)
   perf.latestRenderFinishes.push(end)
   const start = Math.max(earliestBeforeCreateTime, earliestBeforeUpdateTime)
   perf.renderTime.push({
