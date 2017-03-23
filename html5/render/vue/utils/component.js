@@ -74,7 +74,7 @@ export function watchAppear (context) {
           if (on.appear.fn) {
             on.appear = on.appear.fn
           }
-          on.appear(createEvent(context.$el, 'appear', { direction: 'down' }))
+          on.appear(createEvent(context.$el, 'appear', { direction: null }))
         }
         const handler = throttle(event => {
           const visible = isElementVisible(context.$el, isWindow ? document.body : container)
@@ -95,7 +95,8 @@ export function watchAppear (context) {
             }
             const scrollTop = container.scrollTop || window.pageYOffset
             listener && listener(createEvent(context.$el, type, {
-              direction: scrollTop > lastScrollTop ? 'down' : 'up'
+              direction: scrollTop < lastScrollTop ? 'down'
+                : scrollTop > lastScrollTop ? 'up' : null
             }))
             lastScrollTop = scrollTop
           }
