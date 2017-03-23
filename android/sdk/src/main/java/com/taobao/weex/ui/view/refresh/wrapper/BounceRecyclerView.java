@@ -207,29 +207,27 @@ package com.taobao.weex.ui.view.refresh.wrapper;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.list.ListComponentView;
+import com.taobao.weex.ui.component.list.StickyHeaderHelper;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
-import java.util.Stack;
-
 public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implements ListComponentView,WXGestureObservable {
 
+  public static final int DEFAULT_COLUMN_COUNT = 1;
+  public static final int DEFAULT_COLUMN_GAP = 1;
   private RecyclerViewBaseAdapter adapter = null;
-  private Stack<View> headerViewStack = new Stack<>();
-  private Stack<WXCell> headComponentStack = new Stack<>();
   private WXGesture mGesture;
   private int mLayoutType = WXRecyclerView.TYPE_LINEAR_LAYOUT;
-  private int mColumnCount = 1;
-  private float mColumnGap = 1;
+  private int mColumnCount = DEFAULT_COLUMN_COUNT;
+  private float mColumnGap = DEFAULT_COLUMN_GAP;
+  private StickyHeaderHelper mStickyHeaderHelper;
+
 
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
@@ -242,11 +240,11 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
     mColumnCount = columnCount;
     mColumnGap = columnGap;
     init(context);
+    mStickyHeaderHelper = new StickyHeaderHelper(this);
   }
+
   public BounceRecyclerView(Context context,int type,int orientation) {
-    super(context, orientation);
-    mLayoutType = type;
-    init(context);
+    this(context,type, DEFAULT_COLUMN_COUNT, DEFAULT_COLUMN_GAP,orientation);
   }
 
   public void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter) {
@@ -294,104 +292,24 @@ public class BounceRecyclerView extends BaseBounceView<WXRecyclerView> implement
    * @param component
    */
   public void notifyStickyShow(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty()) {
-      WXCell oldCom = headComponentStack.pop();
-      if (!oldCom.getRef().equals(component.getRef())) {
-        headComponentStack.push(oldCom);
-        headComponentStack.push(component);
-        showSticky();
-      } else {
-        headComponentStack.push(oldCom);
-        return;
-      }
-    } else {
-      headComponentStack.push(component);
-      showSticky();
-    }
+    mStickyHeaderHelper.notifyStickyShow(component);
   }
 
   @Override
-  public void updateStickyView() {
-    if (!headComponentStack.isEmpty()) {
-      WXCell header = headComponentStack.peek();
-      header.getRealView().bringToFront();
-    }
+  public void updateStickyView(int currentStickyPos) {
+    mStickyHeaderHelper.updateStickyView(currentStickyPos);
   }
 
   /**
-   * @param component
+   *
+   * @param compToRemove
    */
-  public void notifyStickyRemove(WXCell component) {
-    if (component == null)
-      return;
-    if (!headComponentStack.isEmpty() && !headerViewStack.isEmpty()) {
-      removeSticky(component);
-    }
+  @Override
+  public void notifyStickyRemove(WXCell compToRemove) {
+    mStickyHeaderHelper.notifyStickyRemove(compToRemove);
   }
 
-  /**
-   * Pop stickyView to stack
-   */
-  private void showSticky() {
-    WXCell headComponent = headComponentStack.pop();
-    headComponentStack.push(headComponent);
-    final View headerView = headComponent.getRealView();
-    if (headerView == null)
-      return;
-    headerViewStack.push(headerView);
-    //record translation, it should not change after transformation
-    final float translationX = headerView.getTranslationX();
-    final float translationY = headerView.getTranslationY();
-    headComponent.removeSticky();
-    post(WXThread.secure(new Runnable() {
-      @Override
-      public void run() {
-        ViewGroup existedParent;
-        if((existedParent = (ViewGroup)headerView.getParent())!= null){
-          existedParent.removeView(headerView);
-        }
-        addView(headerView,getChildCount()-1);
-        //recover translation, sometimes it will be changed on fling
-        headerView.setTranslationX(translationX);
-        headerView.setTranslationY(translationY);
-      }
-    }));
-  }
 
-  /**
-   * remove top stickyView
-   * @param component
-   */
-  private void removeSticky(WXComponent component) {
-    final WXCell headComponent = headComponentStack.pop();
-    if (!component.getRef().equals(headComponent.getRef())) {
-      headComponentStack.push(headComponent);
-      return;
-    }
-    final View headerView = headerViewStack.pop();
-    post(WXThread.secure(new Runnable() {
-      @Override
-      public void run() {
-        removeView(headerView);
-        headComponent.recoverySticky();
-      }
-    }));
-  }
-
-  /**
-   * Clear All Sticky of stack
-   */
-  public void clearSticky() {
-    int size = headComponentStack.size();
-    while (size > 0 && headerViewStack.size() == size) {
-      WXCell headComponent = headComponentStack.pop();
-      View headerView = headerViewStack.pop();
-      ((ViewGroup) getParent()).removeView(headerView);
-      headComponent.recoverySticky();
-    }
-  }
 
   @Override
   public void registerGestureListener(@Nullable WXGesture wxGesture) {

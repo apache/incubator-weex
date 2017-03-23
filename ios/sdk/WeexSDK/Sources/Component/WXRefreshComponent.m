@@ -154,10 +154,4 @@
     return _displayState;
 }
 
-- (void)setFrame:(CGRect)frame
-{
-    CGRect rect = frame;
-    rect.origin.y = 0 - frame.size.height;
-}
-
 @end
