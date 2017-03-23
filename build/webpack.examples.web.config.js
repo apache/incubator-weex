@@ -75,12 +75,8 @@ module.exports = {
     compilerModules: [
       {
         postTransformNode: el => {
-          if (el.staticStyle) {
-            el.staticStyle = `$processStyle(${el.staticStyle})`
-          }
-          if (el.styleBinding) {
-            el.styleBinding = `$processStyle(${el.styleBinding})`
-          }
+          el.staticStyle = `$processStyle(${el.staticStyle})`
+          el.styleBinding = `$processStyle(${el.styleBinding})`
         }
       }
     ],

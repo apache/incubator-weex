@@ -71,8 +71,11 @@ export default {
   },
 
   methods: {
-    $processStyle (style, hyphenated) {
+    $processStyle (style) {
       window._style_processing_added = true
+      if (!style) {
+        return
+      }
       if (window._process_style) {
         return window._process_style(style)
       }

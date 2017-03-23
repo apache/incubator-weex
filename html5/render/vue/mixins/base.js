@@ -24,7 +24,7 @@ function watchLazyload () {
 }
 
 let warned = false
-const notePage = 'https://github.com/MrRaindrop/weex/blob/html5-feature-vue-render-process-style/build/webpack.examples.web.config.js#L70-L89'
+const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js-L2-L16'
 function warnProcessStyle () {
   if (!warned) {
     warned = true
