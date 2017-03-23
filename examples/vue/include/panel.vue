@@ -115,10 +115,10 @@
   }
 
   .panel-body {
-    /*padding-left: 12px;*/
-    /*padding-right: 12px;*/
-    /*padding-top: 20px;*/
-    /*padding-bottom: 20px;*/
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 
   .panel-body-default {
