@@ -13,13 +13,10 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('div', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    // const ms = this._getComponentStyle(this.$vnode.data)
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
       on: this._createEventMap(),
-      staticClass: 'weex-div weex-ct',
-      // staticStyle: ms
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
+      staticClass: 'weex-div weex-ct'
     }, trimTextNode(this.$slots.default))
   }
 }

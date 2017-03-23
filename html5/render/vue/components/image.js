@@ -1,5 +1,3 @@
-import { extend } from '../utils'
-
 /**
  * get resize (stetch|cover|contain) related styles.
  */
@@ -7,6 +5,7 @@ function getResizeStyle (context) {
   const stretch = '100% 100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
+  // compatibility: http://caniuse.com/#search=background-size
   return { 'background-size': bgSize }
 }
 
@@ -49,15 +48,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-
-    // let cssText = `background-image:url("${this.src}");`
-
-    // // compatibility: http://caniuse.com/#search=background-size
-    // cssText += (this.resize && this.resize !== 'stretch')
-    //   ? `background-size: ${this.resize};`
-    //   : `background-size: 100% 100%;`
-    const style = this._normalizeInlineStyles(this.$vnode.data)
-    // const ms = this._getComponentStyle(this.$vnode.data)
+    // const style = this._normalizeInlineStyles(this.$vnode.data)
     const wh = this._getSize(this.$vnode.data)
     return createElement('figure', {
       attrs: {
@@ -67,8 +58,7 @@ export default {
       },
       on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image weex-el',
-      staticStyle: extend(style, getResizeStyle(this))
-      // staticStyle: extend(ms, getResizeStyle(this))
+      staticStyle: getResizeStyle(this)
     })
   }
 }

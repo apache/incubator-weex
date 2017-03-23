@@ -4,6 +4,12 @@
   border-style: solid;
 }
 
+.weex-flex-ct {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+
 .weex-ct {
   box-sizing: border-box;
   display: -webkit-box;

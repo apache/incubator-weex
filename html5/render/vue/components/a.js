@@ -15,8 +15,7 @@ export default {
         href: this.href
       },
       on: this._createEventMap(),
-      staticClass: 'weex-a weex-ct',
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
+      staticClass: 'weex-a weex-ct'
     }, this.$slots.default)
   }
 }
