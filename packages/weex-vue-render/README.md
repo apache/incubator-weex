@@ -12,15 +12,15 @@ you should add config for `vue-loader` as below (`vue-loader` version should be 
 
 ```javascript
 vue: {
+  /**
+   * important! should use postTransformNode to add $processStyle for
+   * inline style prefixing.
+   */
   compilerModules: [
     {
       postTransformNode: el => {
-        if (el.staticStyle) {
-          el.staticStyle = `$processStyle(${el.staticStyle})`
-        }
-        if (el.styleBinding) {
-          el.styleBinding = `$processStyle(${el.styleBinding})`
-        }
+        el.staticStyle = `$processStyle(${el.staticStyle})`
+        el.styleBinding = `$processStyle(${el.styleBinding})`
       }
     }
   ],
