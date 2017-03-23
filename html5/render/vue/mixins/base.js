@@ -23,6 +23,16 @@ function watchLazyload () {
   })
 }
 
+let warned = false
+const notePage = 'https://github.com/MrRaindrop/weex/blob/html5-feature-vue-render-process-style/build/webpack.examples.web.config.js#L70-L89'
+function warnProcessStyle () {
+  if (!warned) {
+    warned = true
+    console.error(`[vue-render] warn: should add loader config using $processStyle to enable`
+      + ` inline styles's auto-prefixing. see ${notePage}`)
+  }
+}
+
 export default {
   beforeCreate () {
     if (!lazyloadWatched) {
@@ -37,6 +47,9 @@ export default {
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
+    }
+    if (!warned && !window._style_processing_added) {
+      warnProcessStyle()
     }
     watchAppear(this)
     if (process.env.NODE_ENV === 'development') {
