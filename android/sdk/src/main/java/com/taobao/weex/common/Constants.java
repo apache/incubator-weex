@@ -358,6 +358,7 @@ public class Constants {
     String DELETE_CELL_ANIMATION = "deleteAnimation";
     String AUTO = "auto";
     String NORMAL = "normal";
+    String ARIA_LABEL = "aria-label";
   }
 
   public interface Value {

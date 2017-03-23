@@ -763,6 +763,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         String fixedSize = WXUtils.getString(param, PROP_FS_MATCH_PARENT);
         setFixedSize(fixedSize);
         return true;
+      case Constants.Name.ARIA_LABEL:
+        String label = WXUtils.getString(param,"");
+        setAriaLabel(label);
+        return true;
       case Constants.Name.WIDTH:
       case Constants.Name.MIN_WIDTH:
       case Constants.Name.MAX_WIDTH:
@@ -792,6 +796,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         return true;
       default:
         return false;
+    }
+  }
+
+  private void setAriaLabel(String label) {
+    View host = getHostView();
+    if(host != null){
+      host.setContentDescription(label);
     }
   }
 
