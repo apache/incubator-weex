@@ -127,6 +127,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -135,6 +136,7 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
@@ -767,6 +769,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         String label = WXUtils.getString(param,"");
         setAriaLabel(label);
         return true;
+      case Constants.Name.ARIA_HIDDEN:
+        boolean isHidden = WXUtils.getBoolean(param,false);
+        setAriaHidden(isHidden);
+        return true;
       case Constants.Name.WIDTH:
       case Constants.Name.MIN_WIDTH:
       case Constants.Name.MAX_WIDTH:
@@ -799,7 +805,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
-  private void setAriaLabel(String label) {
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+  protected void setAriaHidden(boolean isHidden) {
+    View host = getHostView();
+    if(host != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+      host.setImportantForAccessibility(isHidden?View.IMPORTANT_FOR_ACCESSIBILITY_NO:View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+    }
+  }
+
+  protected void setAriaLabel(String label) {
     View host = getHostView();
     if(host != null){
       host.setContentDescription(label);
