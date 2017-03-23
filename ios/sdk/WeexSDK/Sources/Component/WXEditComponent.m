@@ -348,6 +348,9 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     if (attributes[@"value"]) {
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
+        if (_maxLength && [_value length] > [_maxLength integerValue]&& [_maxLength integerValue]> 0) {
+            _value = [_value substringToIndex:([_maxLength integerValue])];
+        }
         [self setText:_value];
     }
     if (attributes[@"returnKeyType"]) {
