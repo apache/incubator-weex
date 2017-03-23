@@ -233,7 +233,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
 
-  private Runnable scrollAction = new ScrollAction(this, intervalTime);
+  private Runnable scrollAction = new ScrollAction(this);
 
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context) {
@@ -487,10 +487,8 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
 
   private static final class ScrollAction implements Runnable {
     private WeakReference<WXCircleViewPager> targetRef;
-    private long intervalTime;
-    private ScrollAction(WXCircleViewPager target, long intervalTime) {
+    private ScrollAction(WXCircleViewPager target) {
       this.targetRef = new WeakReference<>(target);
-      this.intervalTime = intervalTime;
     }
 
     @Override
@@ -500,7 +498,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       if ((target = targetRef.get()) != null) {
         target.showNextItem();
         target.removeCallbacks(this);
-        target.postDelayed(this, intervalTime);
+        target.postDelayed(this, target.getIntervalTime());
       }
     }
   }
