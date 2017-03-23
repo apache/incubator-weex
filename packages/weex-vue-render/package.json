@@ -23,6 +23,7 @@
     "core-js": "^2.4.1",
     "envd": "^0.1.1",
     "httpurl": "^0.1.1",
-    "query-string": "^4.3.2"
+    "query-string": "^4.3.2",
+    "inline-style-prefixer": "^3.0.2"
   }
 }

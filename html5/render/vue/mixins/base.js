@@ -24,7 +24,7 @@ function watchLazyload () {
 }
 
 let warned = false
-const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js-L2-L16'
+const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js'
 function warnProcessStyle () {
   if (!warned) {
     warned = true
