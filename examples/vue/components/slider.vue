@@ -1,5 +1,10 @@
 <template>
   <scroller class="body">
+  <slider class="slider" interval="3000" auto-play="false" infinite="true">
+      <div class="frame" v-for="img in imageList">
+        <image class="image" resize="cover" :src="img.src"></image>
+      </div>
+    </slider>
     <panel title="auto-play" type="primary">
       <panel title="auto-play = false" padding-body="0">
         <slider class="slider" append="tree"

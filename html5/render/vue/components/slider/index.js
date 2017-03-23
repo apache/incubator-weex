@@ -13,7 +13,12 @@ export default {
     interval: {
       type: [String, Number],
       default: 3000
+    },
+    infinite: {
+      type: [String, Boolean],
+      default: false
     }
+
   },
 
   data () {
@@ -104,7 +109,7 @@ export default {
 
       this._autoPlayTimer = setTimeout(autoPlayFn, interval)
     }
-
+    // this.order()
     this.reorder()
     fireLazyload(this.$el, true)
   },

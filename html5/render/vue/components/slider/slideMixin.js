@@ -14,6 +14,13 @@ export default {
     },
 
     slideTo (index) {
+      if (this.infinite && this.infinite !== 'false') {
+        if (index === -1 || index > (this._cells.length - 1)) {
+          this.slideTo(this.currentIndex)
+          return
+        }
+      }
+
       const newIndex = this.normalizeIndex(index)
       const inner = this.$refs.inner
       const step = this._cells.length <= 1 ? 0 : this.currentIndex - index
@@ -44,7 +51,18 @@ export default {
         setTimeout(() => { this.reorder() }, TRANSITION_TIME)
       }
     },
-
+    order () {
+      this.$nextTick(() => {
+        for (let i = 1, l = this._cells.length; i < l; i++) {
+          const nextElm = this._cells[i].elm
+          const nextOffset = this.wrapperWidth * i
+          // console.log(this.wrapperWidth + ' - ' + this.innerOffset)
+          nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
+          nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
+        }
+        // this.reorder()
+      })
+    },
     reorder () {
       const removeClone = (clone, prevElm) => {
         // switch current page.
@@ -56,10 +74,14 @@ export default {
       }
 
       this.$nextTick(() => {
+        console.log(this.infinite)
         if (this._cells.length <= 1) {
           return
         }
-
+        if (this.infinite && this.infinite !== 'false') {
+          this.order()
+          return
+        }
         const lastPrev = this._prevElm
         const prevIndex = this.normalizeIndex(this.currentIndex - 1)
         const nextIndex = this.normalizeIndex(this.currentIndex + 1)
@@ -67,6 +89,7 @@ export default {
         const nextElm = this._cells[nextIndex].elm
         const currentElm = this._cells[this.currentIndex].elm
 
+        currentElm.style.zIndex = 1
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
           this._clonePrev && removeClone(this._clonePrev, lastPrev)
