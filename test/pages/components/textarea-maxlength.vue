@@ -1,14 +1,20 @@
 <template>
   <div class="wrapper">
-    <text style="font-size:30">test textarea maxlenght</text>
+    <text style="font-size:30">{{value}}</text>
     <textarea id="textarea" class="textarea" value="" autofocus="true" maxlength=4 @input="oninput" @change="onchange" ></textarea>
   </div>
 </template>
 <script>
   const modal = weex.requireModule('modal')
   export default {
+    data () {
+      return {
+        value:'1'
+      }
+    },
     methods: {
       oninput (event) {
+        this.value = event.value
         console.log('oninput:', event.value)
         modal.toast({
           message: `oninput: ${event.value}`,

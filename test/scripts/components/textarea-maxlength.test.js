@@ -25,7 +25,8 @@ describe('textarea maxlength vue test2 ', function () {
     return driver
       .waitForElementByXPath('//div/textarea')
       .sendKeys('12345678')
-      .elementByXPath('//div/textarea')
+      .sleep(2000)
+      .elementByXPath('//div/text[1]')
       .text()
       .then((text)=>{
       assert.equal(text,'1234')
