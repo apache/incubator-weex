@@ -142,7 +142,7 @@
         offset.y = -self.calculatedFrame.size.height;
         [_indicator start];
     } else {
-        offset.y += CGRectGetHeight(self.calculatedFrame);
+        offset.y = 0;
         [_indicator stop];
     }
     [scrollerProtocol setContentOffset:offset animated:YES];
