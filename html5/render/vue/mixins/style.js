@@ -1,5 +1,6 @@
 import {
   camelizeKeys,
+  hyphenateKeys,
   extend,
   trimComment
 } from '../utils'
@@ -86,7 +87,7 @@ export default {
           }
         })
       }
-      return addPrefix(camelizeKeys(style))
+      return hyphenateKeys(addPrefix(camelizeKeys(style)))
     },
 
     _getScopeStyle (classNames) {
