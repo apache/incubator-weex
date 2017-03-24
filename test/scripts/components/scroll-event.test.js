@@ -13,7 +13,7 @@ describe('list scroll event', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/list-scroll.js')
+      .get(util.getPage('/list-scroll.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
@@ -55,7 +55,7 @@ describe('scroller scroll event', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/scroller-scroll.js')
+      .get(util.getPage('/scroller-scroll.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 

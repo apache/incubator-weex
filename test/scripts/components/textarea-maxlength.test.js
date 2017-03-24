@@ -13,7 +13,7 @@ describe('textarea maxlength vue test2 ', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/components/textarea-maxlength.js')
+      .get(util.getPage('/components/textarea-maxlength.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
