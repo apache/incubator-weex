@@ -326,6 +326,7 @@ body > .weex-scroller {
 
 .weex-indicator {
   position: absolute;
+  z-index: 10;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
