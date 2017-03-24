@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <text style="font-size:30">test textarea maxlenght</text>
-    <textarea id="textarea" class="textarea" value="" maxlength=4 @input="oninput" @change="onchange" ></textarea>
+    <textarea id="textarea" class="textarea" value="" autofocus="true" maxlength=4 @input="oninput" @change="onchange" ></textarea>
   </div>
 </template>
 <script>
