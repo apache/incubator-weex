@@ -35,15 +35,6 @@ export default {
     returnKeyType: String
   },
 
-  methods: {
-    focus () {
-      this.$el && this.$el.focus()
-    },
-    blur () {
-      this.$el && this.$el.blur()
-    }
-  },
-
   render (createElement) {
     /* istanbul ignore next */
     // if (process.env.NODE_ENV === 'development') {

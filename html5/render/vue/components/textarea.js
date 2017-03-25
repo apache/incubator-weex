@@ -43,6 +43,6 @@ export default {
       },
       on: this.createKeyboardEvent(events),
       staticClass: 'weex-textarea weex-el'
-    }, this.value)
+    })
   }
 }

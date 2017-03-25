@@ -11,6 +11,12 @@ const findEnterKeyType = function (key) {
 
 export default {
   methods: {
+    focus () {
+      this.$el && this.$el.focus()
+    },
+    blur () {
+      this.$el && this.$el.blur()
+    },
     // support enter key envent
     createKeyboardEvent (events) {
       const customKeyType = this.returnKeyType
