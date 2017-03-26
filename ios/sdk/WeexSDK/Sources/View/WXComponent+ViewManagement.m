@@ -114,7 +114,7 @@
     if (styles[@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
         _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
-        [self configBoxShadow:_boxShadow];
+        [self configBoxShadow:_boxShadow view:self.view];
         [self setNeedsDisplay];
     }
     
