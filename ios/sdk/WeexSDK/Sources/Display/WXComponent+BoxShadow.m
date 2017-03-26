@@ -81,13 +81,20 @@
             }
         }
     } else {
-        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
-        view.layer.masksToBounds = NO;
-        view.layer.shadowColor = boxShadow.shadowColor;
-        view.layer.shadowOffset = boxShadow.shadowOffset;
-        view.layer.shadowRadius = boxShadow.shadowRadius;
-        view.layer.shadowOpacity = boxShadow.shadowOpacity;
-        view.layer.shadowPath = shadowPath.CGPath;
+        @try {
+            UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:view.bounds];
+            view.layer.masksToBounds = NO;
+            view.layer.shadowColor = boxShadow.shadowColor;
+            view.layer.shadowOffset = boxShadow.shadowOffset;
+            view.layer.shadowRadius = boxShadow.shadowRadius;
+            view.layer.shadowOpacity = boxShadow.shadowOpacity;
+            view.layer.shadowPath = shadowPath.CGPath;
+        }
+        @catch (NSException *exception) {
+            WXLogError(@"WXBoxShadow exception:%@", [exception reason]);
+        }
+        
+        
     }
 }
 
