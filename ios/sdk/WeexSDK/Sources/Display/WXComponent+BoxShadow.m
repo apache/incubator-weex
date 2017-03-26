@@ -93,8 +93,6 @@
         @catch (NSException *exception) {
             WXLogError(@"WXBoxShadow exception:%@", [exception reason]);
         }
-        
-        
     }
 }
 
