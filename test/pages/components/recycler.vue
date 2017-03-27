@@ -49,11 +49,11 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
-    <header class="footer">
+    <header class="footer" ref="footer">
       <text class="stickyText">Footer</text>
     </header>
-    <div ref="fixed" class="fixedItem" @click="scrollToTop">
-      <text class="fixedText">Top</text>
+    <div ref="fixed" class="fixedItem" @click="scrollToNext">
+      <text class="fixedText">bot</text>
     </div>
   </waterfall>
 </template>
@@ -78,8 +78,6 @@
     height: 40;
     width: 40;
     margin-right: 30;
-  }
-  .header {
   }
   .banner {
     height: 377;
@@ -223,9 +221,9 @@
     justify-content: center;
   }
   .fixedText {
-    font-size: 36;
+    font-size: 32;
     color: white;
-    line-height: 36;
+    line-height: 32;
   }
 
 </style>
@@ -238,8 +236,8 @@
           src:'https://gw.alicdn.com/tps/TB1Jl1CPFXXXXcJXXXXXXXXXXXX-370-370.jpg',
           name: 'Thomas Carlyle',
           desc:'Genius only means hard-working all one\'s life',
-          behaviourName: 'Change count',
-          behaviour: 'changeColumnCount'
+          behaviourName: 'Change width',
+          behaviour: 'changeColumnWidth',
         },
         {
           src:'https://gw.alicdn.com/tps/TB1Hv1JPFXXXXa3XXXXXXXXXXXX-370-370.jpg',
@@ -250,15 +248,15 @@
         {
           src:'https://gw.alicdn.com/tps/TB1eNKuPFXXXXc_XpXXXXXXXXXX-370-370.jpg',
           desc:'There is no such thing as a great talent without great will - power',
-          behaviourName: 'Show scrollbar',
-          behaviour: 'showScrollbar',
+          behaviourName: 'Change count',
+          behaviour: 'changeColumnCount'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1DCh8PFXXXXX7aXXXXXXXXXXX-370-370.jpg',
           name:'Addison',
           desc:'Cease to struggle and you cease to live',
-          behaviourName: 'Change width',
-          behaviour: 'changeColumnWidth',
+          behaviourName: 'Show scrollbar',
+          behaviour: 'showScrollbar',
         },
         {
           src:'https://gw.alicdn.com/tps/TB1ACygPFXXXXXwXVXXXXXXXXXX-370-370.jpg',
@@ -440,8 +438,8 @@
         this.stickyHeaderType = (this.stickyHeaderType === 'scroll' ? 'none' : 'scroll')
       },
 
-      scrollToTop: function() {
-        weex.requireModule('dom').scrollToElement(this.$refs.header)
+      scrollToNext: function() {
+        weex.requireModule('dom').scrollToElement(this.$refs.footer)
       },
 
       setRecyclerPadding: function() {
