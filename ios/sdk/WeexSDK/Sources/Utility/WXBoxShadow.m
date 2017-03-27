@@ -47,7 +47,7 @@
         if (begin.location < end.location && end.location < [string length]) {
             NSRange range = NSMakeRange(begin.location, end.location-begin.location + 1);
             NSString *str = [string substringWithRange:range];
-            UIColor * color = [WXConvert UIColor:str];
+            UIColor *color = [WXConvert UIColor:str];
             if (color && [color isKindOfClass:[UIColor class]]) {
                 boxShadow.shadowColor = color.CGColor;
             }
@@ -56,7 +56,7 @@
     } else {
         NSArray *boxShadowElements = [self getBoxShadowElementsByBlank:string];
         NSString *str = [boxShadowElements lastObject];
-        UIColor * color = [WXConvert UIColor:str];
+        UIColor *color = [WXConvert UIColor:str];
         if (color && [color isKindOfClass:[UIColor class]]) {
             boxShadow.shadowColor = color.CGColor;
         }
