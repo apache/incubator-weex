@@ -214,6 +214,8 @@ import com.alibaba.weex.commons.adapter.JSExceptionAdapter;
 import com.alibaba.weex.extend.PlayDebugAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
+import com.alibaba.weex.extend.component.WXMask;
+import com.alibaba.weex.extend.component.dom.WXMaskDomObject;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
@@ -262,6 +264,9 @@ public class WXApplication extends Application {
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
+
+      WXSDKEngine.registerComponent("mask",WXMask.class);
+      WXSDKEngine.registerDomObject("mask", WXMaskDomObject.class);
 
       WXSDKEngine.registerModule("myModule", MyModule.class);
       WXSDKEngine.registerModule("geolocation", GeolocationModule.class);
