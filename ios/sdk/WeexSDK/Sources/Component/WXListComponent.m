@@ -407,6 +407,10 @@
     WXAssert(section, @"no section found for section number:%ld", sectionNum);
     NSMutableArray *completedSections;
     BOOL isReload = [section.rows containsObject:cell];
+    if (!isReload && row > [section.rows count]) {
+        // protect crash when row out of bounds
+        return ;
+    }
     if (!isReload) {
         [section.rows insertObject:cell atIndex:row];
         // deep copy
