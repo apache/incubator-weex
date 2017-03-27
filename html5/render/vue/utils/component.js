@@ -1,5 +1,5 @@
-import { throttle } from './func'
-import { createEvent } from '../utils'
+import { throttle, extend } from './func'
+import { createEvent } from './event'
 
 export function getParentScroller (vnode) {
   if (!vnode) return null
@@ -55,8 +55,9 @@ export function watchAppear (context) {
   if (!context) return null
 
   context.$nextTick(() => {
-    if (context.$options && context.$options._parentListeners) {
-      const on = context.$options._parentListeners
+    if ((context.$options && context.$options._parentListeners)
+      || (context.$vnode && context.$vnode.data && context.$vnode.data.on)) {
+      const on = extend({}, context.$options._parentListeners, context.$vnode.data.on)
       if (on.appear || on.disappear) {
         const scroller = getParentScroller(context)
         let isWindow = false
