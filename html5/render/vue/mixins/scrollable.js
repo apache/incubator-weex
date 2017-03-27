@@ -19,7 +19,19 @@ function getThrottledScroll (context) {
         evt.contentSize = { width: rect.width, height: rect.height }
         evt.contentOffset = {
           x: wrapper.scrollLeft,
-          y: wrapper.scrollTop
+          /**
+           * positive direciton for y-axis is down.
+           * so should use negative operation on scrollTop.
+           *
+           *  (0,0)---------------> x
+           *       |
+           *       |
+           *       |
+           *       |
+           *       v y
+           *
+           */
+          y: -wrapper.scrollTop
         }
         context.$emit('scroll', evt)
       }
