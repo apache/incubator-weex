@@ -208,6 +208,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -424,18 +425,18 @@ public class WXResourceUtils {
     color = color.trim(); //remove non visible codes
 
     int resultColor = defaultColor;
-    try {
-      ColorConvertHandler[] handlers = ColorConvertHandler.values();
-      for (ColorConvertHandler handler : handlers) {
-        try {
-          resultColor = handler.handle(color);
+    Pair<Boolean, Integer> result;
+    ColorConvertHandler[] handlers = ColorConvertHandler.values();
+    for (ColorConvertHandler handler : handlers) {
+      try {
+        result = handler.handle(color);
+        if (result.first) {
+          resultColor = result.second;
           break;
-        } catch (IllegalArgumentException e) {
-          WXLogUtils.v("Color", "Color convert fails");
         }
+      } catch (RuntimeException e) {
+        WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
       }
-    } catch (Exception e) {
-      WXLogUtils.e("WXResourceUtils getColor failed: " + color);
     }
     return resultColor;
   }
@@ -548,70 +549,58 @@ public class WXResourceUtils {
   enum ColorConvertHandler {
     NAMED_COLOR_HANDLER {
       @Override
-      int handle(String rawColor) {
-        try {
-          return colorMap.get(rawColor);
-        } catch (RuntimeException e) {
-          throw new IllegalArgumentException(e);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        if (colorMap.containsKey(rawColor)) {
+          return new Pair<>(Boolean.TRUE, colorMap.get(rawColor));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }
       }
     },
     RGB_HANDLER {
       @Override
-      int handle(String rawColor) {
-        try {
-          if (rawColor.length() == 4) {
-            //#eee, #333
-            int r, g, b;
-            r = Integer.parseInt(rawColor.substring(1, 2), HEX);
-            g = Integer.parseInt(rawColor.substring(2, 3), HEX);
-            b = Integer.parseInt(rawColor.substring(3, 4), HEX);
-            return Color.rgb(r + (r << 4), g + (g << 4), b + (b << 4));
-          } else if (rawColor.length() == 7 || rawColor.length() == 9) {
-            //#eeeeee, #333333
-            return Color.parseColor(rawColor);
-          } else {
-            throw new IllegalArgumentException("ColorConvertHandler invalid color: " + rawColor);
-          }
-        } catch (RuntimeException e) {
-          throw new IllegalArgumentException(e);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        if (rawColor.length() == 4) {
+          //#eee, #333
+          int r, g, b;
+          r = Integer.parseInt(rawColor.substring(1, 2), HEX);
+          g = Integer.parseInt(rawColor.substring(2, 3), HEX);
+          b = Integer.parseInt(rawColor.substring(3, 4), HEX);
+          return new Pair<>(Boolean.TRUE, Color.rgb(r + (r << 4), g + (g << 4), b + (b << 4)));
+        } else if (rawColor.length() == 7 || rawColor.length() == 9) {
+          //#eeeeee, #333333
+          return new Pair<>(Boolean.TRUE, Color.parseColor(rawColor));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }
       }
     },
     FUNCTIONAL_RGB_HANDLER {
       @Override
-      int handle(String rawColor) {
-        try {
-          SingleFunctionParser<Integer> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGB_MAPPER);
-          List<Integer> rgb = functionParser.parse(RGB);
-          if (rgb.size() == RGB_SIZE) {
-            return Color.rgb(rgb.get(0), rgb.get(1), rgb.get(2));
-          } else {
-            throw new IllegalArgumentException("Conversion of functional RGB fails");
-          }
-        } catch (RuntimeException e) {
-          throw new IllegalArgumentException(e);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        SingleFunctionParser<Integer> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGB_MAPPER);
+        List<Integer> rgb = functionParser.parse(RGB);
+        if (rgb.size() == RGB_SIZE) {
+          return new Pair<>(Boolean.TRUE, Color.rgb(rgb.get(0), rgb.get(1), rgb.get(2)));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }
       }
     },
 
     FUNCTIONAL_RGBA_HANDLER {
       @Override
-      int handle(String rawColor) {
-        try {
-          SingleFunctionParser<Number> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGBA_MAPPER);
-          List<Number> rgba = functionParser.parse(RGBA);
-          if (rgba.size() == RGBA_SIZE) {
-            return Color.argb(
-                parseAlpha(rgba.get(3).floatValue()),
-                rgba.get(0).intValue(),
-                rgba.get(1).intValue(),
-                rgba.get(2).intValue());
-          } else {
-            throw new IllegalArgumentException("Conversion of functional RGBA fails");
-          }
-        } catch (RuntimeException e) {
-          throw new IllegalArgumentException(e);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        SingleFunctionParser<Number> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGBA_MAPPER);
+        List<Number> rgba = functionParser.parse(RGBA);
+        if (rgba.size() == RGBA_SIZE) {
+          return new Pair<>(Boolean.TRUE, Color.argb(
+              parseAlpha(rgba.get(3).floatValue()),
+              rgba.get(0).intValue(),
+              rgba.get(1).intValue(),
+              rgba.get(2).intValue()));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }
       }
     };
@@ -622,7 +611,7 @@ public class WXResourceUtils {
      * @param rawColor color, maybe functional RGB(RGBA), #RGB, keywords color or transparent
      * @return #RRGGBB or #AARRGGBB
      */
-    abstract int handle(String rawColor) throws IllegalArgumentException;
+    @NonNull abstract Pair<Boolean, Integer> handle(String rawColor);
 
     /**
      * Parse alpha gradient of color from range 0-1 to range 0-255

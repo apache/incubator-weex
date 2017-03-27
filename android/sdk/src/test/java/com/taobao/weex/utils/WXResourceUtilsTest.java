@@ -206,12 +206,9 @@ package com.taobao.weex.utils;
 
 import android.graphics.Shader;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
@@ -221,13 +218,9 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by caolijie on 16/8/4.
  */
-@RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class,sdk = 19)
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 public class WXResourceUtilsTest {
-
-  @Before
-  public void setUp() throws Exception {
-  }
 
   @Test
   public void testColor1() throws Exception {
