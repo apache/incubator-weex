@@ -12,12 +12,16 @@
 
 @implementation WXBoxShadow
 
+- (void) dealloc
+{
+    CGColorRelease(_shadowColor);
+}
+
 - (instancetype)init
 {
     self = [super init];
     
     if (self) {
-        self.shadowColor = [UIColor whiteColor].CGColor;
         self.shadowRadius = 0.0f;
         self.isInset = NO;
         self.shadowOffset = CGSizeZero;
@@ -26,6 +30,18 @@
     
     return self;
 }
+
+
+- (void)setShadowColor: (CGColorRef)shadowColor
+{
+    if (shadowColor == _shadowColor)
+    return;
+    
+    CGColorRetain(shadowColor);
+    CGColorRelease(_shadowColor);
+    _shadowColor = shadowColor;
+}
+
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
 {
