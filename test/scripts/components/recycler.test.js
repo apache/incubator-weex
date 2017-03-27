@@ -25,7 +25,7 @@ const cell30Path = isAndroid ? '//recycler[1]/div[32]/' : '//recycler[1]/cell[30
 const footerPath = '//recycler[1]/div[1]'
 
 const isApproximate = (x, y) =>  {
-  return Math.abs(x - y) <= 1
+  return Math.abs(x - y) <= isAndroid ? 1 : 0.5
 }
 
 if (isAndroid) {
@@ -179,24 +179,24 @@ describe('recycler', function () {
       cell1Height = rect.height
       assert.isOk(isApproximate(rect.x, 0))
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
-      assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
+      assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
     .elementByXPath(cell2Path)
     .getRect()
     .then((rect)=>{
       console.log(`cell 2 rect after changing column gap to normal:${JSON.stringify(rect)}`)
       cell2Height = rect.height
-      assert.isOk(isApproximate(rect.x, 393 * scaleFactor))
+      assert.isOk(isApproximate(rect.x, 391 * scaleFactor))
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
-      assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
+      assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
     .elementByXPath(cell3Path)
     .getRect()
     .then((rect)=>{
       console.log(`cell 3 rect after changing column gap to normal:${JSON.stringify(rect)}`)
-      assert.isOk(isApproximate(rect.x, 393 * scaleFactor))
+      assert.isOk(isApproximate(rect.x, 391 * scaleFactor))
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell2Height))
-      assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
+      assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
     .elementByXPath(cell4Path)
     .getRect()
@@ -204,7 +204,7 @@ describe('recycler', function () {
       console.log(`cell 4 rect after changing column gap to normal:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 0))
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell1Height))
-      assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
+      assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
     .elementByXPath(cell2Path)
     .click()
