@@ -206,8 +206,7 @@ package com.taobao.weex.ui.animation;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
-import com.taobao.weex.dom.TestDomObject;
-import com.taobao.weex.ui.component.TestComponent;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -239,21 +238,6 @@ public class WXAnimationModuleTest {
   public void testTransition() throws Exception {
     module.transition("","","");
     module.transition("test","test","");
-  }
-
-  @Test
-  public void testStartAnimation() throws Exception {
-    module.startAnimation(module.mWXSDKInstance,null,null,null);
-
-    TestComponent comp = new TestComponent(module.mWXSDKInstance,new TestDomObject(),null);
-    module.startAnimation(module.mWXSDKInstance,comp,null,null);
-
-    WXAnimationBean animation = new WXAnimationBean();
-    module.startAnimation(module.mWXSDKInstance,comp,animation,null);
-
-    animation.styles = new WXAnimationBean.Style();
-    module.startAnimation(module.mWXSDKInstance,comp,animation,null);
-
   }
 
   @Test

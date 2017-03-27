@@ -1,9 +1,9 @@
 <template>
-  <scroller id="container" class="container" onscroll="onscroll">
+  <scroller ref="container" class="container" @scroll="onscroll">
       <div><text>{{vp}}|{{p1}}|{{p2}}</text></div>
-    <div repeat="{{items}}" style="background-color:yellow;height:500"><text>row</text></div>
-    <div id="panel" class="fixed-panel"></div>
-    <div id="panel2" class="fixed-panel2"></div>
+    <div v-for="item in items" style="background-color:yellow;height:300"><text >row</text></div>
+    <div ref="panel" class="fixed-panel"></div>
+    <div ref="panel2" class="fixed-panel2"></div>
   </scroller>
 </template>
 <style>
@@ -28,31 +28,33 @@
   }
 </style>
 <script>
-    var dom = require("@weex-module/dom")
+    const dom = weex.requireModule('dom')
     module.exports = {
-        data:{
+        data:function(){
+            return {
             items:[1,1,1,1,1,1,1,1],
             height:100,
             vp:-1,
             p1:-1,
             p2:-1
+            }
         },
-        ready:function(){
+        mounted:function(){
             var self = this;
-            dom.getComponentRect(this.$el('container'),function(data){
+            dom.getComponentRect(this.$refs.container,function(data){
                 self.vp = data.size.height;
             })
         },
         methods:{
             onscroll:function(e){
                 var self = this;
-                dom.getComponentRect(this.$el('container'),function(data){
+                dom.getComponentRect(this.$refs.container,function(data){
                     self.vp = Math.round(data.size.height);
                 });
-                dom.getComponentRect(this.$el('panel'),function(data){
+                dom.getComponentRect(this.$refs.panel,function(data){
                     self.p1 = Math.round(data.size.top+data.size.height);
                 });
-                dom.getComponentRect(this.$el('panel2'),function(data){
+                dom.getComponentRect(this.$refs.panel2,function(data){
                     self.p2 = data.size.top;
                 });
                 //should vp != 0 && p1 == vp && p2 ==0

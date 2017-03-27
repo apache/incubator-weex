@@ -206,9 +206,9 @@ package com.taobao.weex.adapter;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.common.Constants;
 
 import java.util.List;
 
@@ -223,6 +223,10 @@ public class DefaultUriAdapter implements URIAdapter {
   @NonNull
   @Override
   public Uri rewrite(WXSDKInstance instance, String type, Uri uri) {
+    if (TextUtils.isEmpty(instance.getBundleUrl())) {
+      return uri;
+    }
+
     Uri base = Uri.parse(instance.getBundleUrl());
     Uri.Builder resultBuilder = uri.buildUpon();
 
@@ -231,8 +235,6 @@ public class DefaultUriAdapter implements URIAdapter {
       return resultBuilder.build();
     }
     return uri;
-
-
   }
 
   private Uri.Builder buildRelativeURI(Uri.Builder resultBuilder, Uri base, Uri uri) {

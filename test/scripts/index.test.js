@@ -13,7 +13,7 @@ describe('weex mobile index', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/index.js')
+      .get(util.getPage('/index.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000);
   });
 
