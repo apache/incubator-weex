@@ -7,33 +7,30 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('image onload', function () {
+describe('textarea maxlength vue test2 ', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
   before(function () {
     return util.init(driver)
-      .get(util.getPage('/image-onload.js'))
+      .get(util.getPage('/components/textarea-maxlength.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
-      return util.quit(driver);
+      return util.quit(driver)
   })
 
-
-  it('#1 download image', () => {
+  it('#1 textarea maxlenght', () => {
     return driver
-    .sleep(5000)
-    .elementByXPath('//div/text')
-    .text()
-    .then((text)=>{
-        if(text == '-1,-1') {
-            return;
-        }
-        assert.equal(text, '360,388')
-    })
+      .waitForElementByXPath('//div/textarea')
+      .sendKeys('12345678')
+      .sleep(2000)
+      .elementByXPath('//div/text[1]')
+      .text()
+      .then((text)=>{
+      assert.equal(text,'1234')
+     })
   })
+
 });
-
-

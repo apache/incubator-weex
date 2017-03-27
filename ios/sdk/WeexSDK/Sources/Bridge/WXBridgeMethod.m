@@ -21,7 +21,7 @@
 {
     if (self = [super init]) {
         _methodName = methodName;
-        _arguments = arguments;
+        _arguments = [NSMutableArray arrayWithArray:arguments];
         _instance = instance;
     }
     

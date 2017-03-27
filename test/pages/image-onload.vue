@@ -1,13 +1,15 @@
 <template>
   <div>
-    <img style="width: 500;height: 500;" src="https://gw.alicdn.com/tps/TB1bEMYKXXXXXaLaXXXXXXXXXXX-360-388.png" onload="onload"></img>
+    <img style="width: 500;height: 500;" src="https://gw.alicdn.com/tps/TB1bEMYKXXXXXaLaXXXXXXXXXXX-360-388.png" @load="onload"></img>
     <text style="font-size:30">{{size}}</text>
   </div>
 </template>
 <script>
   module.exports = {
-    data : {
+    data : function(){
+      return {
       size:"-1,-1"
+      }
     },
     methods : {
       onload : function(e) {
