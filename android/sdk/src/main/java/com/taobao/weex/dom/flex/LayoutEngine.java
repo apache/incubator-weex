@@ -104,8 +104,10 @@ public class LayoutEngine {
       return;
     }
     // We only run if there's a width or height defined
+    // modify by moxun.ljf on 17/03/27
+    // 0.0 should be a legal value, it is usually used to hide an element on the page
     if (Float.isNaN(node.cssstyle.dimensions[dim[axis]]) ||
-        node.cssstyle.dimensions[dim[axis]] <= 0.0) {
+        node.cssstyle.dimensions[dim[axis]] < 0.0) {
       return;
     }
 
