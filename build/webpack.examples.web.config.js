@@ -80,9 +80,7 @@ module.exports = {
         }
       }
     ],
-    autoprefixer: {
-      browsers: ['last 7 versions']
-    }
+    postcss: [require('autoprefixer')()]
   },
   plugins: [bannerPlugin]
 }
