@@ -29,6 +29,8 @@
 
 - (BOOL)isStickyForHeaderAtIndexPath:(NSIndexPath *)indexPath;
 
+- (BOOL)hasHeaderInSection:(NSInteger)section;
+
 - (NSIndexPath *)indexPathForCell:(WXCellComponent *)cell;
 
 - (NSUInteger)indexForHeader:(WXHeaderComponent *)header;

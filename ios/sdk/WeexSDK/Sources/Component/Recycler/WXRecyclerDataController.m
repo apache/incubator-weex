@@ -92,6 +92,12 @@
     return [sectionController sizeForHeaderAtIndex:indexPath.item];
 }
 
+- (BOOL)hasHeaderInSection:(NSInteger)section
+{
+    WXSectionDataController *sectionController = [self dataControllerForSection:section];
+    return sectionController.headerComponent != nil;
+}
+
 - (BOOL)isStickyForHeaderAtIndexPath:(NSIndexPath *)indexPath
 {
     WXSectionDataController *sectionController = [self dataControllerForSection:indexPath.section];

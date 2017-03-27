@@ -406,6 +406,11 @@ typedef enum : NSUInteger {
     return headerSize.height;
 }
 
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout hasHeaderInSection:(NSInteger)section
+{
+    return [self.dataController hasHeaderInSection:section];
+}
+
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout isNeedStickyForHeaderInSection:(NSInteger)section
 {
     return [self.dataController isStickyForHeaderAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
