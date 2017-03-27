@@ -31,7 +31,6 @@
     return self;
 }
 
-
 - (void)setShadowColor: (CGColorRef)shadowColor
 {
     if (shadowColor == _shadowColor)
@@ -41,7 +40,6 @@
     CGColorRelease(_shadowColor);
     _shadowColor = shadowColor;
 }
-
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
 {
