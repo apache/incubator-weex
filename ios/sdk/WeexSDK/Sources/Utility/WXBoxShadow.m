@@ -12,6 +12,21 @@
 
 @implementation WXBoxShadow
 
+- (instancetype)init
+{
+    self = [super init];
+    
+    if (self) {
+        self.shadowColor = [UIColor whiteColor].CGColor;
+        self.shadowRadius = 0.0f;
+        self.isInset = NO;
+        self.shadowOffset = CGSizeZero;
+        self.shadowOpacity = 1.0f;
+    }
+    
+    return self;
+}
+
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
 {
     string = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -34,11 +49,6 @@
         return nil;
     }
     WXBoxShadow *boxShadow = [WXBoxShadow new];
-    boxShadow.shadowColor = [UIColor whiteColor].CGColor;
-    boxShadow.shadowRadius = 0.0f;
-    boxShadow.isInset = NO;
-    boxShadow.shadowOffset = CGSizeZero;
-    boxShadow.shadowOpacity = 1.0f;
     
     //parse color
     if ([string rangeOfString:@"rgb"].location != NSNotFound) {

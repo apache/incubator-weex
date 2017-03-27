@@ -18,10 +18,6 @@
 - (WXBoxShadow *_Nullable)getViewBoxShadow:(UIView *_Nullable)view
 {
     WXBoxShadow *boxShadow = [WXBoxShadow new];
-    boxShadow.shadowColor = [UIColor whiteColor].CGColor;
-    boxShadow.shadowRadius = 0.0f;
-    boxShadow.isInset = NO;
-    boxShadow.shadowOffset = CGSizeZero;
     boxShadow.shadowColor = view.layer.shadowColor;
     boxShadow.shadowOffset = view.layer.shadowOffset;
     boxShadow.shadowRadius = view.layer.shadowRadius;
