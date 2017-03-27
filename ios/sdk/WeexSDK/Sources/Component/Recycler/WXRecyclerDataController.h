@@ -31,4 +31,6 @@
 
 - (NSIndexPath *)indexPathForCell:(WXCellComponent *)cell;
 
+- (NSUInteger)indexForHeader:(WXHeaderComponent *)header;
+
 @end
