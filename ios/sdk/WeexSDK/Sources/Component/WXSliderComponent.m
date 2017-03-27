@@ -73,7 +73,7 @@
     if (_scrollView) {
         _scrollView.delegate = nil;
     }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void)setIndicator:(WXIndicatorView *)indicator
@@ -297,9 +297,9 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
     //ensure that the end of scroll is fired.
-    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
+    //[self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
