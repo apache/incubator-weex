@@ -912,8 +912,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   @Override
-  public void onActivityDestroy() {
-    super.onActivityDestroy();
+  public void destroy() {
+    super.destroy();
+    WXLogUtils.e("destroy unregister");
     if (mUnregister != null) {
       try {
         mUnregister.execute();
