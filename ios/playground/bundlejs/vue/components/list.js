@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(409)
+	__vue_styles__.push(__webpack_require__(427)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(410)
+	__vue_exports__ = __webpack_require__(428)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(411)
+	var __vue_template__ = __webpack_require__(429)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/list.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/list.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-b4a37b42"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 409:
+/***/ 427:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -111,17 +115,21 @@
 	    "borderBottomWidth": 2,
 	    "borderBottomColor": "#c0c0c0",
 	    "height": 100,
-	    "padding": 20
+	    "padding": 20,
+	    "backgroundColor:active": "#00BDFF"
 	  }
 	}
 
 /***/ },
 
-/***/ 410:
+/***/ 428:
 /***/ function(module, exports) {
 
 	'use strict';
 
+	//
+	//
+	//
 	//
 	//
 	//
@@ -209,14 +217,14 @@
 
 /***/ },
 
-/***/ 411:
+/***/ 429:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('list', {
+	  return _c('div', [_c('list', {
 	    staticClass: ["list"]
-	  }, [_vm._l((_vm.rows), function(v, i) {
-	    return _h('cell', {
+	  }, _vm._l((_vm.rows), function(v, i) {
+	    return _c('cell', {
 	      staticClass: ["row"],
 	      appendAsTree: true,
 	      attrs: {
@@ -227,12 +235,12 @@
 	        "appear": _vm.onappear,
 	        "disappear": _vm.ondisappear
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticClass: ["item"]
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["item-title"]
-	    }, ["row " + _vm._s(v.id)])])])
-	  })]), _h('text', {
+	    }, [_vm._v("row " + _vm._s(v.id))])])])
+	  })), _c('text', {
 	    staticClass: ["count"],
 	    attrs: {
 	      "value": 'Appear items: ' + _vm.appearMin + ' ~ ' + _vm.appearMax

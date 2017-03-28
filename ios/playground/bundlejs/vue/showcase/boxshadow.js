@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(628)
+	__vue_styles__.push(__webpack_require__(510)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(629)
+	__vue_exports__ = __webpack_require__(511)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(630)
+	var __vue_template__ = __webpack_require__(512)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,10 +70,10 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/template-if.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/showcase/boxshadow.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-	__vue_options__._scopeId = "data-v-1437c26c"
+	__vue_options__._scopeId = "data-v-ddb560de"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
 	  for (var name in module) {
@@ -91,26 +91,22 @@
 
 /***/ },
 
-/***/ 628:
+/***/ 510:
 /***/ function(module, exports) {
 
 	module.exports = {
+	  "wrapper": {
+	    "alignItems": "center",
+	    "marginTop": 120
+	  },
 	  "title": {
 	    "fontSize": 48
-	  },
-	  "btn": {
-	    "fontSize": 36,
-	    "textAlign": "center",
-	    "color": "#FFFFFF",
-	    "backgroundColor": "#808080",
-	    "padding": 20,
-	    "borderRadius": 5
 	  }
 	}
 
 /***/ },
 
-/***/ 629:
+/***/ 511:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -132,35 +128,114 @@
 	//
 	//
 	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
 
 	module.exports = {
-	  data: {
-	    flag: true
-	  },
-	  methods: {
-	    toggle: function toggle(e) {
-	      this.flag = !this.flag;
-	      console.log('this.flag:', this.flag);
+	    data: function data() {
+	        return {
+	            logoUrl: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png',
+	            target: 'World'
+	        };
 	    }
-	  }
 	};
 
 /***/ },
 
-/***/ 630:
+/***/ 512:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('div', [_c('text', {
-	    staticClass: ["btn"],
-	    on: {
-	      "click": _vm.toggle
+	  return _c('div', {
+	    staticClass: ["wrapper"]
+	  }, [_c('div', {
+	    staticStyle: {
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "20px  10px rgb(255, 69, 0)"
 	    }
-	  }, [_vm._v("Toggle")]), (_vm.flag) ? _c('text', {
-	    staticClass: ["title"]
-	  }, [_vm._v("I'm ON")]) : _vm._e(), (!_vm.flag) ? _c('text', {
-	    staticClass: ["title"]
-	  }, [_vm._v("I'm Off")]) : _vm._e()])
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])]), _c('div', {
+	    staticStyle: {
+	      marginTop: "80px",
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "20px  10px 5px rgba(255, 69, 0, 0.8)"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])]), _c('div', {
+	    staticStyle: {
+	      marginTop: "80px",
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "inset 20px  10px 5px rgba(255, 69, 0, 0.8)"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])]), _c('div', {
+	    staticStyle: {
+	      marginTop: "80px",
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "inset 20px  10px 5px rgb(255, 69, 0)"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])]), _c('div', {
+	    staticStyle: {
+	      marginTop: "80px",
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "20px  10px 5px black"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])]), _c('div', {
+	    staticStyle: {
+	      marginTop: "80px",
+	      width: "400px",
+	      height: "60px",
+	      backgroundColor: "#FFE4C4",
+	      boxShadow: "20px  10px 5px #008B00"
+	    }
+	  }, [_c('text', {
+	    staticClass: ["title"],
+	    staticStyle: {
+	      textAlign: "center"
+	    }
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
