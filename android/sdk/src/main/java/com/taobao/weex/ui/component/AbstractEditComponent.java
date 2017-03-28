@@ -257,6 +257,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private int mEditorAction = EditorInfo.IME_ACTION_DONE;
   private String mReturnKeyType = null;
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
+  private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
@@ -283,6 +284,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         setPseudoClassStatus(Constants.PSEUDO.FOCUS,hasFocus);
       }
     });
+
+    addKeyboardListener(host);
   }
 
   @Override
@@ -437,17 +440,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     }
 
     if (Constants.Event.KEYBOARD_EVENT.equals(type)) {
-      Context context = text.getContext();
-      if (context != null && context instanceof Activity) {
-        SoftKeyboardDetector.registerKeyboardEventListener((Activity) context, new SoftKeyboardDetector.OnKeyboardEventListener() {
-          @Override
-          public void onKeyboardEvent(boolean isShown) {
-            Map<String, Object> event = new HashMap<>(1);
-            event.put("isShow", isShown);
-            fireEvent(Constants.Event.KEYBOARD_EVENT, event);
-          }
-        });
-      }
+      mListeningKeyboard = true;
     }
   }
 
@@ -893,6 +886,28 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         });
       }
       mEditorActionListeners.add(listener);
+    }
+  }
+
+  private void addKeyboardListener(final WXEditText host) {
+    if (host == null) {
+      return;
+    }
+    Context context = host.getContext();
+    if (context != null && context instanceof Activity) {
+      SoftKeyboardDetector.registerKeyboardEventListener((Activity) context, new SoftKeyboardDetector.OnKeyboardEventListener() {
+        @Override
+        public void onKeyboardEvent(boolean isShown) {
+          if (mListeningKeyboard) {
+            Map<String, Object> event = new HashMap<>(1);
+            event.put("isShow", isShown);
+            fireEvent(Constants.Event.KEYBOARD_EVENT, event);
+          }
+          if (!isShown) {
+            blur();
+          }
+        }
+      });
     }
   }
 
