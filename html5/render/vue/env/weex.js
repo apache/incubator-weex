@@ -2,7 +2,6 @@
 
 import './wx-env'
 import * as utils from '../utils'
-import { requireWeexModule } from '../modules'
 
 const weexModules = {}
 
@@ -16,10 +15,6 @@ const weex = {
   },
 
   requireModule (moduleName) {
-    const module = requireWeexModule(moduleName)
-    if (module) {
-      return module
-    }
     return weexModules[moduleName]
   },
 
