@@ -37,9 +37,8 @@ describe('recycler', function () {
   const driver = util.createDriver(wd)
 
   before(function () {
-    console.log('wxpage://' + util.getDeviceHost() +'/components/recycler.js')
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/components/recycler.js')
+      .get(util.getPage('/components/recycler.js'))
       .waitForElementByXPath('//recycler[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
