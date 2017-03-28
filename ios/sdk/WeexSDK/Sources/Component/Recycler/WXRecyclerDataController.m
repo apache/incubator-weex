@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong, readwrite) NSArray<WXSectionDataController *> *sections;
 @property (nonatomic, strong, readonly) NSMapTable<WXCellComponent *, NSIndexPath*> *cellToIndexPathTable;
+@property (nonatomic, strong, readonly) NSMapTable<WXCellComponent *, NSIndexPath*> *headerToIndexTable;
 
 @end
 
@@ -25,6 +26,7 @@
     if (self = [super init]) {
         _sections = [NSArray new];
         _cellToIndexPathTable = [NSMapTable weakToStrongObjectsMapTable];
+        _headerToIndexTable = [NSMapTable weakToStrongObjectsMapTable];
     }
     
     return self;
@@ -44,6 +46,9 @@
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx2 inSection:idx];
             [_cellToIndexPathTable setObject:indexPath forKey:obj];
         }];
+        if (controller.headerComponent) {
+            [_headerToIndexTable setObject:@(idx) forKey:controller.headerComponent];
+        }
     }];
 }
 
@@ -87,6 +92,12 @@
     return [sectionController sizeForHeaderAtIndex:indexPath.item];
 }
 
+- (BOOL)hasHeaderInSection:(NSInteger)section
+{
+    WXSectionDataController *sectionController = [self dataControllerForSection:section];
+    return sectionController.headerComponent != nil;
+}
+
 - (BOOL)isStickyForHeaderAtIndexPath:(NSIndexPath *)indexPath
 {
     WXSectionDataController *sectionController = [self dataControllerForSection:indexPath.section];
@@ -96,6 +107,12 @@
 - (NSIndexPath *)indexPathForCell:(WXCellComponent *)cell
 {
     return [_cellToIndexPathTable objectForKey:cell];
+}
+
+- (NSUInteger)indexForHeader:(WXHeaderComponent *)header
+{
+    NSNumber *index = [_headerToIndexTable objectForKey:header];
+    return [index unsignedIntegerValue];
 }
 
 #pragma mark - Private
@@ -109,6 +126,7 @@
 - (void)cleanup
 {
     [_cellToIndexPathTable removeAllObjects];
+    [_headerToIndexTable removeAllObjects];
 }
 
 @end

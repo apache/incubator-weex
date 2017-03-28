@@ -96,7 +96,7 @@ typedef enum : NSUInteger {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeAuto];
             layout.columnCount = [WXConvert WXLength:attributes[@"columnCount"] isFloat:NO scaleFactor:1.0] ? : [WXLength lengthWithInt:1 type:WXLengthTypeFixed];
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
-            
+
             layout.delegate = self;
         } else {
             _collectionViewlayout = [UICollectionViewLayout new];
@@ -211,7 +211,43 @@ typedef enum : NSUInteger {
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
-    [super scrollToComponent:component withOffset:offset animated:animated];
+    if (_collectionView.contentSize.height <= _collectionView.frame.size.height) {
+        // can not scroll
+        return;
+    }
+    
+    CGPoint contentOffset = _collectionView.contentOffset;
+    CGFloat contentOffsetY = 0;
+    
+    CGRect rect;
+    while (component) {
+        if ([component isKindOfClass:[WXCellComponent class]]) {
+            NSIndexPath *toIndexPath = [self.dataController indexPathForCell:component];
+            UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForItemAtIndexPath:toIndexPath];
+            rect = attributes.frame;
+            break;
+        }
+        if ([component isKindOfClass:[WXHeaderComponent class]]) {
+            NSUInteger toIndex = [self.dataController indexForHeader:component];
+            UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForSupplementaryElementOfKind:kCollectionSupplementaryViewKindHeader atIndexPath:[NSIndexPath indexPathWithIndex:toIndex]];
+            rect = attributes.frame;
+            break;
+        }
+        contentOffsetY += component.calculatedFrame.origin.y;
+        component = component.supercomponent;
+    }
+    
+    contentOffsetY += rect.origin.y;
+    contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
+    
+    if (contentOffsetY > _collectionView.contentSize.height - _collectionView.frame.size.height) {
+        contentOffset.y = _collectionView.contentSize.height - _collectionView.frame.size.height;
+    } else {
+        contentOffset.y = contentOffsetY;
+    }
+    
+    [_collectionView setContentOffset:contentOffset animated:animated];
+
 }
 
 - (void)performUpdatesWithCompletion:(void (^)(BOOL finished))completion
@@ -368,6 +404,11 @@ typedef enum : NSUInteger {
 {
     CGSize headerSize = [self.dataController sizeForHeaderAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
     return headerSize.height;
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout hasHeaderInSection:(NSInteger)section
+{
+    return [self.dataController hasHeaderInSection:section];
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout isNeedStickyForHeaderInSection:(NSInteger)section
