@@ -24,12 +24,12 @@ function watchLazyload () {
 }
 
 let warned = false
-const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js'
+const notePage = 'https://github.com/MrRaindrop/weex/issues/14'
 function warnProcessStyle () {
   if (!warned) {
     warned = true
-    console.error(`[vue-render] warn: should add loader config using $processStyle to enable`
-      + ` inline styles's auto-prefixing. see ${notePage}`)
+    console.warn(`[vue-render] warn: should add loader config using $processStyle to enable`
+      + ` inline styles's auto-prefixing. see ${notePage}. If already did it, please ignore this.`)
   }
 }
 
