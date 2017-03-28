@@ -1,28 +1,31 @@
 <template>
     <div>
-        <list style="background-color: beige; width: 750px; height: 900px" offset-accuracy="10" onscroll="onscroll">
-            <cell repeat="{{row in rows}}" style="padding: 10px;">
+        <list style="background-color: beige; width: 750px; height: 900px" offset-accuracy="10" @scroll="onscroll">
+            <cell v-for="(index, row) in rows" :key="index" style="padding: 10px;">
                 <text style="width: 750px; height: 150px; background-color: aqua">
                     {{row.id}}
                 </text>
             </cell>
         </list>
-        <text id="status" style="font-size: 40px;">{{status}}</text>
+        <text ref="status" style="font-size: 40px;">{{status}}</text>
     </div>
 </template>
 
 <script>
     module.exports = {
-        data: {
-            rows: [],
-            status: '-'
+        data: function(){
+            return {
+                rows: [],
+                status: '-'
+            }
         },
-        methods: {
-            ready: function () {
+        created: function () {
                 for (var i = 0; i < 20; i++) {
                     this.rows.push({"id": "Cell " + i});
                 }
             },
+        methods: {
+            
             onscroll: function (e) {
                 this.status = e.contentOffset.y;
             }

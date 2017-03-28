@@ -45,6 +45,7 @@
 @property (nonatomic) BOOL blurEvent;
 @property (nonatomic) BOOL changeEvent;
 @property (nonatomic) BOOL returnEvent;
+@property (nonatomic) BOOL keyboardEvent;
 @property (nonatomic, strong) NSString *changeEventString;
 @property (nonatomic, assign) CGSize keyboardSize;
 
@@ -71,6 +72,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         _changeEvent = NO;
         _returnEvent = NO;
         _clickEvent = NO;
+        _keyboardEvent = NO;
         // handle attributes
         _autofocus = [attributes[@"autofocus"] boolValue];
         _disabled = [attributes[@"disabled"] boolValue];
@@ -297,6 +299,9 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = YES;
     }
+    if ([eventName isEqualToString:@"keyboardevent"]) {
+        _keyboardEvent = YES;
+    }
 }
 
 #pragma Remove Event
@@ -320,6 +325,9 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = NO;
+    }
+    if ([eventName isEqualToString:@"keyboardevent"]) {
+        _keyboardEvent = NO;
     }
 }
 
@@ -348,6 +356,9 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     if (attributes[@"value"]) {
         _value = [WXConvert NSString:attributes[@"value"]]?:@"";
+        if (_maxLength && [_value length] > [_maxLength integerValue]&& [_maxLength integerValue] >= 0) {
+            _value = [_value substringToIndex:([_maxLength integerValue])];
+        }
         [self setText:_value];
     }
     if (attributes[@"returnKeyType"]) {
@@ -607,6 +618,15 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
             [self fireEvent:@"return" params:@{@"value":[textView text],@"returnKeyType":typeStr} domChanges:@{@"attrs":@{@"value":[textView text]}}];
         }
     }
+    
+    if (_maxLength) {
+        NSUInteger oldLength = [textView.text length];
+        NSUInteger replacementLength = [text length];
+        NSUInteger rangeLength = range.length;
+        NSUInteger newLength = oldLength - rangeLength + replacementLength;
+        return newLength <= [_maxLength integerValue] ;
+    }
+    
     return YES;
 }
 
@@ -658,7 +678,6 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 {
     [self setKeyboardType:UIKeyboardTypeDefault];
     [self setSecureTextEntry:NO];
-    
     if ([_inputType isEqualToString:@"text"]) {
         [self setKeyboardType:UIKeyboardTypeDefault];
     }else if ([_inputType isEqualToString:@"password"]) {
@@ -669,6 +688,8 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         [self setKeyboardType:UIKeyboardTypeEmailAddress];
     }else if ([_inputType isEqualToString:@"url"]) {
         [self setKeyboardType:UIKeyboardTypeURL];
+    }else if ([_inputType isEqualToString:@"number"]) {
+        [self setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
     }else if ([self isDateType]) {
         if (!_datePickerManager) {
             _datePickerManager = [[WXDatePickerManager alloc] init];
@@ -746,6 +767,10 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         [self setViewMovedUp:YES];
         self.weexInstance.isRootViewFrozen = YES;
     }
+    
+    if (_keyboardEvent) {
+        [self fireEvent:@"keyboardevent" params:@{ @"isShow": @YES }];
+    }
 }
 
 - (void)keyboardWillHide:(NSNotification*)notification
@@ -757,6 +782,9 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if (!CGRectEqualToRect(self.weexInstance.frame, rootView.frame)) {
         [self setViewMovedUp:NO];
         self.weexInstance.isRootViewFrozen = NO;
+    }
+    if (_keyboardEvent) {
+        [self fireEvent:@"keyboardevent" params:@{ @"isShow": @NO }];
     }
 }
 

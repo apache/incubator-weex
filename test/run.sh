@@ -43,8 +43,13 @@ function runiOS {
     platform=ios macaca run -d $1
 }
 
+function runWeb {
+    echo 'run web'
+    browser=chrome macaca run -d $1
+}
+
 platform_android='android'
- platform=${1:-$platform_android}
+platform=${1:-$platform_android}
  
  #get test folder
  
@@ -53,6 +58,9 @@ platform_android='android'
  #run tests
  if [ $platform = $platform_android ]; then
      runAndroid ./test/scripts/
+ elif [ $platform = 'web' ]; 
+ then
+    runWeb ./test/scripts/
  else
      runiOS ./test/scripts/
  fi
