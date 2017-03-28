@@ -240,7 +240,6 @@
         }
 
         [self _handleFirstScreenTime];
-        [self _configWXComponentA11yWithAttributes:nil];
         
         return _view;
     }
@@ -465,6 +464,10 @@
     if (attributes[@"ariaLabel"]) {
         _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
+    }
+    
+    if (attributes[@"id"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"id"]]];
     }
     
     // set accessibilityFrame for view which has no subview
