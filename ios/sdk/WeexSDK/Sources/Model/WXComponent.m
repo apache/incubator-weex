@@ -466,8 +466,8 @@
         self.view.accessibilityValue = _ariaLabel;
     }
     
-    if (attributes[@"id"]) {
-        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"id"]]];
+    if (attributes[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
     }
     
     // set accessibilityFrame for view which has no subview
