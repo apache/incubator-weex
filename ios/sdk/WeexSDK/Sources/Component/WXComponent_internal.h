@@ -194,4 +194,6 @@
 - (void)_updatePseudoClassStyles:(NSString *)key;
 
 - (void)_restoreViewStyles;
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
 @end

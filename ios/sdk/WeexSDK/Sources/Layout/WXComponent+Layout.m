@@ -137,6 +137,7 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
+            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }
@@ -203,11 +204,6 @@
     
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
-    }
-    
-    if (0 == [[self.view subviews] count]) {
-        self.view.isAccessibilityElement = YES;
-        self.view.accessibilityFrame = [[self.view superview] convertRect:self.calculatedFrame toView:nil];
     }
     [self layoutDidFinish];
 }
