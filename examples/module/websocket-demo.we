@@ -18,6 +18,7 @@
         <text class="button" onclick="{{connect}}">connect</text>
         <text class="button" onclick="{{send}}">send</text>
         <text class="button" onclick="{{close}}">close</text>
+        <text class="button" onclick="{{go}}">chatroom</text>
       </div>
       <div style="background-color: #D3D3D3;margin-top: 20">
         <text class="title" style="height: 80 ;padding: 20;color: #000000">method = send</text>
@@ -54,7 +55,7 @@
     width: 600;
   }
   .button {
-    font-size: 36;
+    font-size: 30;
     width: 150;
     color: #41B883;
     text-align: center;
@@ -69,6 +70,7 @@
 </style>
 <script>
   var websocket = require('@weex-module/webSocket');
+  var navigator = require('@weex-module/navigator');
   module.exports = {
     data: {
       connectinfo: '',
@@ -84,7 +86,41 @@
       dir: 'examples',
       baseURL: '',
     },
+    created: function() {
+      var bundleUrl = this.$getConfig().bundleUrl;
+      bundleUrl = new String(bundleUrl);
+      console.log('hit', bundleUrl);
+      var nativeBase;
+      var isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
+
+      var isiOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
+      if (isAndroidAssets) {
+        nativeBase = 'file://assets/';
+      }
+      else if (isiOSAssets) {
+        // file:///var/mobile/Containers/Bundle/Application/{id}/WeexDemo.app/
+        // file:///Users/{user}/Library/Developer/CoreSimulator/Devices/{id}/data/Containers/Bundle/Application/{id}/WeexDemo.app/
+        nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/') + 1);
+      }
+      else {
+        var host = 'localhost:12580';
+        var matches = /\/\/([^\/]+?)\//.exec(this.$getConfig().bundleUrl);
+        if (matches && matches.length >= 2) {
+          host = matches[1];
+        }
+        nativeBase = 'http://' + host + '/' + this.dir + '/build/';
+      }
+      var h5Base = bundleUrl;
+      // in Native
+      var base = nativeBase;
+      if (typeof window == 'object') {
+        // in Browser or WebView
+        base = h5Base;
+      }
+      this.baseURL = base;
+    },
     methods: {
+
       connect:function() {
         websocket.WebSocket('ws://echo.websocket.org','');
         var self = this;
@@ -118,6 +154,18 @@
       },
       close:function(e) {
         websocket.close();
+      },
+      go:function(e) {
+        var vm = this;
+        if (typeof window !== 'object') {
+          this.baseURL = this.baseURL + 'module/chatroom-demo.js?test=1';
+        }
+        var params = {
+          'url':  this.baseURL,
+          'animated' : 'true',
+        }
+        navigator.push(params,function(){
+        });
       },
     }
   };
