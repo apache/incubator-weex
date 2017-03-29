@@ -1,8 +1,5 @@
 <template>
   <scroller class="list" append="tree">
-    <refresh class="loading-view" :display="refresh_display" @refresh="refresh" @pullingdown="pullingdown">
-      <image ref='roate' src="http://gw.alicdn.com/bao/uploaded/TB1xDrVNFXXXXbEXFXXXXXXXXXX-48-48.png" style="width:50;height:50"></image>
-    </refresh>
     <div v-for="sec in sections" class="section">
       <div class="header">
         <text class="header-title">{{sec.title}}</text>
@@ -11,8 +8,8 @@
         <text class="item-title">row {{item.id}}</text>
       </div>
     </div>
-    <loading class="loading-view" :display="loading_display" @loading="loading">
-      <loading-indicator style="height: 60; width: 60;color:blue"></loading-indicator>
+    <loading class="loading-view" :display="loading_display" onloading="onloading">
+      <loading-indicator style="height: 60; width: 60"></loading-indicator>
     </loading>
   </scroller>
 </template>
@@ -75,27 +72,19 @@
 <script>
   module.exports = {
     methods: {
-      refresh: function(e) {
+      onrefresh: function(e) {
         var self = this;
         self.refresh_display = 'show';
         setTimeout(function () {
           self.refresh_display = 'hide';
         }, 1000)
       },
-      loading: function(e) {
+      onloading: function(e) {
         var self = this;
         self.loading_display = 'show';
         setTimeout(function () {
           self.loading_display = 'hide';
         }, 1000)
-      },
-      pullingdown:function(e) {
-        weex.requireModule('modal').toast({
-          message:JSON.stringify(e),
-          duration:1
-        });
-        var maxHeight= e.viewHeight;
-        console.log(JSON.stringify(e));
       }
     },
     data: function () {
