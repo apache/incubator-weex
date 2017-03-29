@@ -47,7 +47,37 @@ For example: If you want to implement an address jumping function, you can achie
 @end
 ```
 
-In addition, `0.10.0` begins to support synchronous module API call, you can use macro `WX_EXPORT_METHOD_SYNC` to export module methods which could make JavaScript receive return values from native,  it **can only be called on JS thread**.
+#### export synchronous methods <span class="api-version">v0.10+</span> 
+
+If you want to export synchronous methods which could make Javascript receive return values from natvie, you can use `WX_EXPORT_METHOD_SYNC`  macro. 
+
+native code:
+
+```objective-c
+@implementation WXEventModule
+
+WX_EXPORT_METHOD_SYNC(@selector(getString))
+  
+- (NSString *)getString
+{
+    return @"testString";
+}
+
+@end
+```
+
+js code:
+
+```javascript
+const eventModule = weex.requireModule('event')
+const returnString = syncTest.getString()  // return "testString"
+```
+
+You can alse return number/array/dictionary except string.
+
+`notice:`  the exported synchronous native method **can only be called on JS thread**.
+
+`notice:`  Vue 2.0 has not supported this feature yet. 
 
 #### Register the module
 
@@ -194,19 +224,19 @@ A Native Component has a life cycle managed by Weex. Weex creates it, layout it,
 
 Weex offers component life cycle hooks that give you visibility into these key moments and the ability to act when they occur.
 
-method| description
-:----:|------
-initWithRef:type:...| Initializes a new component using the specified  properties.
-layoutDidFinish | Called when the component has just laid out.
-loadView   | Creates the view that the component manages.
-viewWillLoad | Called before the load of component's view .
-viewDidLoad | Called after the component's view is loaded and set.
-viewWillUnload | Called just before releasing the component's view.
-viewDidUnload | Called when the component's view is released.
-updateStyles:| Called when component's style are updated.
-updateAttributes:| Called when component's attributes are updated.
-addEvent:| Called when adding an event to the component.
-removeEvent:| Called when removing an event frome the component.
+|        method        | description                              |
+| :------------------: | ---------------------------------------- |
+| initWithRef:type:... | Initializes a new component using the specified  properties. |
+|   layoutDidFinish    | Called when the component has just laid out. |
+|       loadView       | Creates the view that the component manages. |
+|     viewWillLoad     | Called before the load of component's view . |
+|     viewDidLoad      | Called after the component's view is loaded and set. |
+|    viewWillUnload    | Called just before releasing the component's view. |
+|    viewDidUnload     | Called when the component's view is released. |
+|    updateStyles:     | Called when component's style are updated. |
+|  updateAttributes:   | Called when component's attributes are updated. |
+|      addEvent:       | Called when adding an event to the component. |
+|     removeEvent:     | Called when removing an event frome the component. |
 
 
 As in the image component example, if we need to use our own image view, we can override the `loadView` method.
@@ -287,9 +317,9 @@ for example:
    }
 @end
 ```
-   
+
 after your registration for your own custom component, now you can call it in your js file.
- 
+
 ```html
 <template>
   <mycomponent id='mycomponent'></mycomponent>
@@ -301,4 +331,4 @@ after your registration for your own custom component, now you can call it in yo
     }
   }
 </script>
-``` 
+```
