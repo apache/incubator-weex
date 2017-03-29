@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(604)
+	__vue_styles__.push(__webpack_require__(628)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(605)
+	__vue_exports__ = __webpack_require__(629)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(606)
+	var __vue_template__ = __webpack_require__(630)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/syntax/template-if.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/template-if.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-1437c26c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 604:
+/***/ 628:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -106,7 +110,7 @@
 
 /***/ },
 
-/***/ 605:
+/***/ 629:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -143,20 +147,20 @@
 
 /***/ },
 
-/***/ 606:
+/***/ 630:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('text', {
+	  return _c('div', [_c('text', {
 	    staticClass: ["btn"],
 	    on: {
 	      "click": _vm.toggle
 	    }
-	  }, ["Toggle"]), (_vm.flag) ? _h('text', {
+	  }, [_vm._v("Toggle")]), (_vm.flag) ? _c('text', {
 	    staticClass: ["title"]
-	  }, ["I'm ON"]) : _vm._e(), (!_vm.flag) ? _h('text', {
+	  }, [_vm._v("I'm ON")]) : _vm._e(), (!_vm.flag) ? _c('text', {
 	    staticClass: ["title"]
-	  }, ["I'm Off"]) : _vm._e()])
+	  }, [_vm._v("I'm Off")]) : _vm._e()])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

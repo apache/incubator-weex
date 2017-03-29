@@ -219,6 +219,8 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
+        [self _configWXComponentA11yWithAttributes:_attributes];
+        
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
         
@@ -428,6 +430,7 @@
     [self _updateNavBarAttributes:attributes];
     
     [self updateAttributes:attributes];
+    [self _configWXComponentA11yWithAttributes:attributes];
 }
 
 - (void)updateStyles:(NSDictionary *)styles
@@ -445,6 +448,32 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     WXAssertMainThread();
+    
+}
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
+{
+    if (attributes[@"role"]){
+        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        self.view.accessibilityTraits = _role;
+    }
+    if (attributes[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        self.view.accessibilityElementsHidden = _ariaHidden;
+    }
+    if (attributes[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        self.view.accessibilityValue = _ariaLabel;
+    }
+    
+    if (attributes[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
+    }
+    
+    // set accessibilityFrame for view which has no subview
+    if (0 == [self.subcomponents count]) {
+        self.view.isAccessibilityElement = YES;
+    }
 }
 
 #pragma mark Reset

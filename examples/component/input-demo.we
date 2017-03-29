@@ -3,126 +3,179 @@
         <div>
             <text style="font-size: 40px">oninput: {{txtInput}}</text>
             <text style="font-size: 40px">onchange: {{txtChange}}</text>
+            <text style="font-size: 40px">onreturntype: {{txtReturnType}}</text>
+            <text style="font-size: 40px">onrange: {{txtRange}}</text>
         </div>
         <scroller>
-            <wxc-panel title="input type = text" type="primary">
-                <input
-                        type="text"
-                        placeholder="Input Text"
-                        class="input"
-                        autofocus="{{autofocus}}"
-                        value=""
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = text</text>
+                </div>
+                <input type="text" placeholder="Input Text" class="input" :autofocus="autofocus" value="" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = password" type="primary">
-                <input
-                        type="password"
-                        placeholder="Input Password"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = password</text>
+                </div>
+                <input type="password" placeholder="Input Password" class="input" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = url" type="primary">
-                <input
-                        type="url"
-                        placeholder="Input URL"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = url</text>
+                </div>
+                <input type="url" placeholder="Input URL" class="input" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = email" type="primary">
-                <input
-                        type="email"
-                        placeholder="Input Email"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = email</text>
+                </div>
+                <input type="email" placeholder="Input Email" class="input" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = tel" type="primary">
-                <input
-                        type="tel"
-                        placeholder="Input Tel"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = tel</text>
+                </div>
+                <input type="tel" placeholder="Input Tel" class="input" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = time" type="primary">
-                <input
-                        type="time"
-                        placeholder="Input Time"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = time</text>
+                </div>
+                <input type="time" placeholder="Input Time" class="input" onchange="onchange" oninput="oninput"/>
+            </div>
 
-            <wxc-panel title="input type = date" type="primary">
-                <input
-                        type="date"
-                        placeholder="Input Date"
-                        class="input"
-                        onchange="onchange"
-                        oninput="oninput"
-                        max="2017-12-12"
-                        min="2015-01-01"
-                />
-            </wxc-panel>
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = date</text>
+                </div>
+                <input type="date" placeholder="Input Date" class="input" onchange="onchange" oninput="oninput" max="2017-12-12" min="2015-01-01"/>
+            </div>
 
-            <wxc-panel title="function focus() & blur()" type="primary">
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = default</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="default" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = go</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="go" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = next</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="next" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = search</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="search" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = send</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="send" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = done</text>
+                </div>
+                <input type="text" placeholder="please input" return-key-type="done" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
+            </div>
+
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">function focus() & blur()</text>
+                </div>
                 <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
-                    <wxc-button value="Focus" type="primary" onclick="{{focus}}"></wxc-button>
-                    <wxc-button value="Blur" type="primary" onclick="{{blur}}"></wxc-button>
+                    <text class="button" value="Focus" type="primary" onclick="focus"></text>
+                    <text class="button" value="Blur" type="primary" onclick="blur"></text>
                 </div>
 
-                <input
-                        type="text"
-                        placeholder="Input1"
-                        class="input"
-                        value=""
-                        id="input1"
-                />
-            </wxc-panel>
+                <input type="text" placeholder="Input1" class="input" value="" id="input1"/>
+            </div>
+
+
+            <div>
+                <div style="background-color: #286090">
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input selection</text>
+                </div>
+                <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
+                    <text class="button" value="setRange" type="primary" onclick="setRange"></text>
+                    <text class="button" value="getRange" type="primary" onclick="getRange"></text>
+                </div>
+                <input type="text"  id="inputselection" placeholder="please input" value="123456789"  class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput"/>
+            </div>
+
+
+
         </scroller>
     </div>
 </template>
 
-<style>
+<style scoped>
     .input {
         font-size: 60px;
         height: 80px;
         width: 750px;
     }
+    .button {
+        font-size: 36;
+        width: 200;
+        color: #41B883;
+        text-align: center;
+        padding-top: 10;
+        padding-bottom: 10;
+        border-width: 2;
+        border-style: solid;
+        margin-right: 20;
+        border-color: rgb(162, 217, 192);
+        background-color: rgba(162, 217, 192, 0.2);
+    }
 </style>
 
 <script>
-    require('weex-components');
     module.exports = {
-        data: {
-            txtInput: '',
-            txtChange: '',
-            autofocus: false,
+        data: function () {
+            return {
+                txtInput: '',
+                txtChange: '',
+                txtReturnType: '',
+                txtSelection:'',
+                autofocus: false,
+                txtRange:''
+            };
         },
         methods: {
-            ready : function () {
+            ready: function () {
                 var self = this;
                 setTimeout(function () {
                     self.autofocus = true;
-                },1000);
+                }, 1000);
             },
             onchange: function (event) {
                 this.txtChange = event.value;
                 console.log('onchange', event.value);
+            },
+            onreturn: function (event) {
+                this.txtReturnType = event.returnKeyType;
+                console.log('onreturn', event.type);
             },
             oninput: function (event) {
                 this.txtInput = event.value;
@@ -133,6 +186,16 @@
             },
             blur: function () {
                 this.$el('input1').blur();
+            },
+            setRange: function() {
+                console.log(this.$el["inputselection"]);
+                this.$el("inputselection").setSelectionRange(2, 6);
+            },
+            getRange: function() {
+                var self = this;
+                this.$el("inputselection").getSelectionRange(function(e) {
+                    self.txtRange =  e.selectionStart + '-'+e.selectionEnd;
+                });
             }
         }
     };

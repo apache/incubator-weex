@@ -771,6 +771,28 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return nil;
 }
 
++ (UIAccessibilityTraits)WXUIAccessibilityTraits:(id)value
+{
+    UIAccessibilityTraits accessibilityTrait = UIAccessibilityTraitNone;
+    if (![value isKindOfClass:[NSString class]]) {
+        return accessibilityTrait;
+    }
+    NSString * role = [value lowercaseString];
+    if ([role isEqualToString:@"button"]) {
+        accessibilityTrait = UIAccessibilityTraitButton;
+    } else if ([role isEqualToString:@"link"]) {
+        accessibilityTrait = UIAccessibilityTraitLink;
+    } else if ([role isEqualToString:@"img"]) {
+        accessibilityTrait = UIAccessibilityTraitImage;
+    } else if ([role isEqualToString:@"search"]) {
+        accessibilityTrait = UIAccessibilityTraitSearchField;
+    } else if ([role isEqualToString:@"tab"]) {
+        accessibilityTrait = UIAccessibilityTraitTabBar;
+    }
+    
+    return accessibilityTrait;
+}
+
 @end
 
 @implementation WXConvert (Deprecated)

@@ -45,6 +45,11 @@ typedef enum : NSUInteger {
     [self.wx_component layoutDidFinish];
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+    [super setContentOffset:contentOffset];
+}
+
 @end
 
 @interface WXCollectionViewCell : UICollectionViewCell
@@ -211,24 +216,19 @@ typedef enum : NSUInteger {
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
-    if (_collectionView.contentSize.height <= _collectionView.frame.size.height) {
-        // can not scroll
-        return;
-    }
-    
     CGPoint contentOffset = _collectionView.contentOffset;
     CGFloat contentOffsetY = 0;
     
     CGRect rect;
     while (component) {
         if ([component isKindOfClass:[WXCellComponent class]]) {
-            NSIndexPath *toIndexPath = [self.dataController indexPathForCell:component];
+            NSIndexPath *toIndexPath = [self.dataController indexPathForCell:(WXCellComponent *)component];
             UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForItemAtIndexPath:toIndexPath];
             rect = attributes.frame;
             break;
         }
         if ([component isKindOfClass:[WXHeaderComponent class]]) {
-            NSUInteger toIndex = [self.dataController indexForHeader:component];
+            NSUInteger toIndex = [self.dataController indexForHeader:(WXHeaderComponent *)component];
             UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForSupplementaryElementOfKind:kCollectionSupplementaryViewKindHeader atIndexPath:[NSIndexPath indexPathWithIndex:toIndex]];
             rect = attributes.frame;
             break;
@@ -240,7 +240,7 @@ typedef enum : NSUInteger {
     contentOffsetY += rect.origin.y;
     contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
     
-    if (contentOffsetY > _collectionView.contentSize.height - _collectionView.frame.size.height) {
+    if (_collectionView.contentSize.height >= _collectionView.frame.size.height && contentOffsetY > _collectionView.contentSize.height - _collectionView.frame.size.height) {
         contentOffset.y = _collectionView.contentSize.height - _collectionView.frame.size.height;
     } else {
         contentOffset.y = contentOffsetY;
@@ -404,6 +404,11 @@ typedef enum : NSUInteger {
 {
     CGSize headerSize = [self.dataController sizeForHeaderAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
     return headerSize.height;
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout hasHeaderInSection:(NSInteger)section
+{
+    return [self.dataController hasHeaderInSection:section];
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout isNeedStickyForHeaderInSection:(NSInteger)section
