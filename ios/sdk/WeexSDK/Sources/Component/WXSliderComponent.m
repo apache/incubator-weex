@@ -284,6 +284,16 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    __weak typeof(self) weakSelf = self;
+    if (!weakSelf)
+    {
+        //NSLog(@"self被销毁");
+        return;
+    }
+    //ensure that the end of scroll is fired.
+    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
+    
     UIView *itemView = nil;
     for (itemView in self.itemViews) {
         if ([self _isItemViewVisiable:itemView]) {
@@ -296,9 +306,6 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    //ensure that the end of scroll is fired.
-    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
