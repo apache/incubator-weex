@@ -42,6 +42,7 @@ version: 2.1
 ## 特性
 
 - `loadmoreoffset {number}`：默认值为 0，触发 `loadmore` 事件所需要的垂直偏移距离（设备屏幕底部与 `<list>` 底部之间的距离）。当 `<list>` 的滚动条滚动到足够接近 `<list>` 底部时将会触发 `loadmore` 这个事件。
+- `offset-accuracy {number}` <sup class="wx-v">0.11+</sup>：控制`onscroll`事件触发的频率，默认值为10，表示两次`onscroll`事件之间列表至少滚动了10px。注意，将该值设置为较小的数值会提高滚动事件采样的精度，但同时也会降低页面的性能。
 
 ## 样式
 
@@ -59,6 +60,15 @@ version: 2.1
 
 - `loadmore` <sup class="wx-v">0.5+</sup>：如果列表滚动到底部将会立即触发这个事件，你可以在这个事件的处理函数中加载下一页的列表项。
 - `onscroll` <sup class="wx-v">0.11+</sup>: 列表发生滚动时将会触发该事件，事件的默认抽样率为10px，即列表每滚动10px触发一次，可通过属性`offset-accuracy`设置抽样率。    
+  
+  事件中 event 对象属性：
+  - `contentSize {Object}`：列表的内容尺寸
+    - `width {number}`: 列表内容宽度
+    - `height {number}`: 列表内容高度
+  - `contentOffset {Object}`: 列表的偏移尺寸
+    - `x {number}`: x轴上的偏移量
+    - `y {number}`: y轴上的偏移量
+
 - 通用事件
 
   支持所有通用事件：
@@ -75,6 +85,9 @@ version: 2.1
 ### scrollToElement(node, options)
 
 滚动到列表某个指定项是常见需求，`<list>` 拓展了该功能支持滚动到指定 `<cell>`。通过 `dom` module 访问，更多信息可参考 [dom module](../modules/dom.html) 。
+
+### resetLoadmore() <sup class="wx-v">0.9+</sup>
+在默认情况下，触发`loadmore`事件后，如果列表中内容没有发生变更，则下一次滚动到列表末尾时将不会再次触发`loadmore`事件，你可以通过调用`resetLoadmore()`方法来打破这一限制，调用该方法后，下一次滚动到列表末尾时将强制触发`loadmore`。
 
 #### 参数
 
