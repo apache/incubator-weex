@@ -75,9 +75,9 @@ const returnString = syncTest.getString()  // return "testString"
 
 You can alse return number/array/dictionary except string.
 
-`notice:`  the exported synchronous native method **can only be called on JS thread**.
+`notice:`  the exported synchronous native method **can only be called on JS thread**. **Do not** do heavy work which will block js execution.
 
-`notice:`  Vue 2.0 has not supported this feature yet. 
+`notice:`  Vue 2.0 has not supported this feature yet.  It will be supported in version 0.12 at the soonest.
 
 #### Register the module
 
