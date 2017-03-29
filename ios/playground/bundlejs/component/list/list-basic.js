@@ -45,9 +45,9 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(97)
-	var __weex_style__ = __webpack_require__(98)
-	var __weex_script__ = __webpack_require__(99)
+	var __weex_template__ = __webpack_require__(102)
+	var __weex_style__ = __webpack_require__(103)
+	var __weex_script__ = __webpack_require__(104)
 
 	__weex_define__('@weex-component/e4cde146096cc51ec5ab930a518ea157', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -66,17 +66,97 @@
 
 /***/ },
 
-/***/ 97:
+/***/ 34:
+/***/ function(module, exports) {
+
+	var core = module.exports = {version: '2.4.0'};
+	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+
+/***/ },
+
+/***/ 100:
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(101), __esModule: true };
+
+/***/ },
+
+/***/ 101:
+/***/ function(module, exports, __webpack_require__) {
+
+	var core  = __webpack_require__(34)
+	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
+
+/***/ },
+
+/***/ 102:
 /***/ function(module, exports) {
 
 	module.exports = {
 	  "type": "div",
 	  "children": [
 	    {
+	      "type": "div",
+	      "style": {
+	        "backgroundColor": "#eeeeee"
+	      },
+	      "children": [
+	        {
+	          "type": "text",
+	          "classList": [
+	            "count"
+	          ],
+	          "attr": {
+	            "value": function () {return 'Appear items:' + (this.appearMin) + ' - ' + (this.appearMax)}
+	          }
+	        },
+	        {
+	          "type": "div",
+	          "style": {
+	            "height": 20,
+	            "width": 750,
+	            "borderColor": "#000000",
+	            "borderWidth": 2,
+	            "justifyContent": "center"
+	          },
+	          "children": [
+	            {
+	              "type": "div",
+	              "style": {
+	                "height": 14,
+	                "width": function () {return this.progress_width},
+	                "marginLeft": function () {return this.progress},
+	                "backgroundColor": "#808080"
+	              }
+	            }
+	          ]
+	        },
+	        {
+	          "type": "text",
+	          "style": {
+	            "width": 750
+	          },
+	          "attr": {
+	            "value": function () {return this.event}
+	          }
+	        }
+	      ]
+	    },
+	    {
 	      "type": "list",
+	      "id": "list",
 	      "classList": [
 	        "list"
 	      ],
+	      "events": {
+	        "scroll": "onScroll"
+	      },
+	      "attr": {
+	        "offsetAccuracy": "5"
+	      },
 	      "children": [
 	        {
 	          "type": "refresh",
@@ -167,22 +247,13 @@
 	          ]
 	        }
 	      ]
-	    },
-	    {
-	      "type": "text",
-	      "classList": [
-	        "count"
-	      ],
-	      "attr": {
-	        "value": function () {return 'Appear items:' + (this.appearMin) + ' - ' + (this.appearMax)}
-	      }
 	    }
 	  ]
 	}
 
 /***/ },
 
-/***/ 98:
+/***/ 103:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -210,7 +281,8 @@
 	    "borderBottomWidth": 2,
 	    "borderBottomColor": "#c0c0c0",
 	    "height": 100,
-	    "padding": 20
+	    "padding": 20,
+	    "backgroundColor:active": "#00BFFF"
 	  },
 	  "refresh-view": {
 	    "width": 750,
@@ -234,11 +306,19 @@
 
 /***/ },
 
-/***/ 99:
-/***/ function(module, exports) {
+/***/ 104:
+/***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
+	var _stringify = __webpack_require__(100);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var dom = weex.requireModule('dom');
+	var isFirst = true;
 	module.exports = {
 	  methods: {
 	    onappear: function onappear(e) {
@@ -291,9 +371,27 @@
 	        }
 	        self.loading_display = 'hide';
 	      }, 3000);
+	    },
+
+	    onScroll: function onScroll(e) {
+	      var self = this;
+	      this.event = 'contentOffset: ' + (0, _stringify2.default)(e.contentOffset) + '\ncontentSize: ' + (0, _stringify2.default)(e.contentSize);
+	      dom.getComponentRect(this.$el('list'), function (ret) {
+	        if (e.contentOffset.x == 0 && e.contentOffset.y == 0 && isFirst) {
+	          isFirst = false;
+	          return;
+	        }
+	        var listHeight = ret.size.height;
+	        self.progress_width = listHeight / e.contentSize.height * 750;
+	        var offsetY = e.contentOffset.y > 0 ? 0 : Math.abs(e.contentOffset.y);
+	        self.progress = offsetY / (e.contentSize.height - listHeight) * (750 - self.progress_width);
+	      });
 	    }
 	  },
 	  data: function () {return {
+	    progress_width: 0,
+	    progress: 0,
+	    event: '-',
 	    refresh_display: 'hide',
 	    loading_display: 'hide',
 	    appearMin: 1,

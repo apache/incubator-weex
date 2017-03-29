@@ -45,7 +45,7 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(317)
+	var __weex_template__ = __webpack_require__(335)
 
 	__weex_define__('@weex-component/25608f094c039b891a20c8161b9c650b', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -57,7 +57,7 @@
 
 /***/ },
 
-/***/ 317:
+/***/ 335:
 /***/ function(module, exports) {
 
 	module.exports = {

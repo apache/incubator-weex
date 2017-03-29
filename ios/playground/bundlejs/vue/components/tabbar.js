@@ -51,10 +51,10 @@
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(443)
+	__vue_exports__ = __webpack_require__(461)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(452)
+	var __vue_template__ = __webpack_require__(470)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,15 +66,18 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/tabbar.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -83,7 +86,7 @@
 
 /***/ },
 
-/***/ 419:
+/***/ 437:
 /***/ function(module, exports) {
 
 	exports.getBaseURL = function (vm) {
@@ -107,7 +110,7 @@
 	    }
 	    nativeBase = 'http://' + host + '/' + vm.dir + '/build/';
 	  }
-	  var h5Base = './index.html?page=./' + vm.dir + '/build/';
+	  var h5Base = './vue.html?page=./' + vm.dir + '/build/';
 	  // in Native
 	  var base = nativeBase;
 	  if (typeof window === 'object') {
@@ -120,7 +123,7 @@
 
 /***/ },
 
-/***/ 443:
+/***/ 461:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -132,7 +135,7 @@
 	//
 	//
 
-	var getBaseURL = __webpack_require__(419).getBaseURL;
+	var getBaseURL = __webpack_require__(437).getBaseURL;
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -168,7 +171,7 @@
 	    };
 	  },
 	  components: {
-	    tabbar: __webpack_require__(444)
+	    tabbar: __webpack_require__(462)
 	  },
 	  created: function created() {
 	    var baseURL = getBaseURL(this);
@@ -186,21 +189,21 @@
 
 /***/ },
 
-/***/ 444:
+/***/ 462:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(445)
+	__vue_styles__.push(__webpack_require__(463)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(446)
+	__vue_exports__ = __webpack_require__(464)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(451)
+	var __vue_template__ = __webpack_require__(469)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -212,22 +215,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/tabbar.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/tabbar.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-72e74326"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 445:
+/***/ 463:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -260,7 +267,7 @@
 
 /***/ },
 
-/***/ 446:
+/***/ 464:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -328,7 +335,7 @@
 	    };
 	  },
 	  components: {
-	    tabitem: __webpack_require__(447)
+	    tabitem: __webpack_require__(465)
 	  },
 	  created: function created() {
 	    this.select(this.selectedIndex);
@@ -358,21 +365,21 @@
 
 /***/ },
 
-/***/ 447:
+/***/ 465:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(448)
+	__vue_styles__.push(__webpack_require__(466)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(449)
+	__vue_exports__ = __webpack_require__(467)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(450)
+	var __vue_template__ = __webpack_require__(468)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -384,22 +391,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/tabitem.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/tabitem.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-8733b9ae"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 448:
+/***/ 466:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -431,7 +442,7 @@
 
 /***/ },
 
-/***/ 449:
+/***/ 467:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -501,11 +512,11 @@
 
 /***/ },
 
-/***/ 450:
+/***/ 468:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["container"],
 	    style: {
 	      backgroundColor: _vm.backgroundColor
@@ -513,84 +524,50 @@
 	    on: {
 	      "click": _vm.onclickitem
 	    }
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["top-line"],
 	    attrs: {
 	      "src": "http://gtms03.alicdn.com/tps/i3/TB1mdsiMpXXXXXpXXXXNw4JIXXX-640-4.png"
 	    }
-	  }), _h('image', {
+	  }), _c('image', {
 	    staticClass: ["tab-icon"],
 	    attrs: {
 	      "src": _vm.icon
 	    }
-	  }), _h('text', {
+	  }), _c('text', {
 	    staticClass: ["tab-text"],
 	    style: {
 	      color: _vm.titleColor
 	    }
-	  }, [_vm._s(_vm.title)])])
+	  }, [_vm._v(_vm._s(_vm.title))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 451:
+/***/ 469:
 /***/ function(module, exports) {
 
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
-	    staticClass: ["wrapper"]
-	  }, [_vm._l((_vm.tabItems), function(item) {
-	    return _h('embed', {
-	      staticClass: ["content"],
-	      style: {
-	        visibility: item.visibility
-	      },
-	      attrs: {
-	        "src": item.src,
-	        "type": "weex"
-	      }
-	    })
-	  }), _h('div', {
-	    staticClass: ["tabbar"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree"
-	    }
-	  }, [_vm._l((_vm.tabItems), function(item) {
-	    return _h('tabitem', {
-	      attrs: {
-	        "index": item.index,
-	        "icon": item.icon,
-	        "title": item.title,
-	        "titleColor": item.titleColor
-	      },
-	      on: {
-	        "tabItemOnClick": _vm.tabItemOnClick
-	      }
-	    })
-	  })])])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
+	module.exports={render:function(){},staticRenderFns:[]}
 
 /***/ },
 
-/***/ 452:
+/***/ 470:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticStyle: {
 	      flexDirection: "column"
 	    }
-	  }, [_h('tabbar', {
+	  }, [_c('tabbar', {
 	    attrs: {
 	      "tabItems": _vm.tabItems
 	    },
 	    on: {
 	      "tabBarOnClick": _vm.tabBarOnClick
 	    }
-	  })])
+	  })], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
