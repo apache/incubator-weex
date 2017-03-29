@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(584)
+	__vue_styles__.push(__webpack_require__(608)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(585)
+	__vue_exports__ = __webpack_require__(609)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(586)
+	var __vue_template__ = __webpack_require__(610)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/syntax/script-lifecycle.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/script-lifecycle.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-4a5eb17c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 584:
+/***/ 608:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -98,7 +102,7 @@
 
 /***/ },
 
-/***/ 585:
+/***/ 609:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -138,15 +142,15 @@
 
 /***/ },
 
-/***/ 586:
+/***/ 610:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_vm._l((_vm.list), function(value) {
-	    return _h('text', {
+	  return _c('div', _vm._l((_vm.list), function(value) {
+	    return _c('text', {
 	      staticClass: ["title"]
-	    }, [_vm._s(value)])
-	  })])
+	    }, [_vm._v(_vm._s(value))])
+	  }))
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

@@ -230,7 +230,7 @@ public class WXRecyclerDomObject extends WXDomObject{
     }
 
     public float getColumnGap() {
-        return mColumnGap;
+        return WXViewUtils.getRealPxByWidth(mColumnGap,getViewPortWidth());
     }
 
     public int getColumnCount() {
@@ -238,7 +238,7 @@ public class WXRecyclerDomObject extends WXDomObject{
     }
 
     public float getColumnWidth() {
-        return mColumnWidth;
+        return WXViewUtils.getRealPxByWidth(mColumnWidth,getViewPortWidth());
     }
     @Override
     public void add(WXDomObject child, int index) {

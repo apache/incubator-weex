@@ -40,6 +40,9 @@
     height: 100px;
     padding:20px;
   }
+  .item:active {
+     background-color: #00BDFF;
+   }
   .item-title {
   }
 </style>

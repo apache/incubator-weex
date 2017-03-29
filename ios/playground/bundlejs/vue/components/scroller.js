@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(429)
+	__vue_styles__.push(__webpack_require__(447)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(430)
+	__vue_exports__ = __webpack_require__(448)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(431)
+	var __vue_template__ = __webpack_require__(449)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/scroller.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/scroller.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-bc3ac90a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 429:
+/***/ 447:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -136,7 +140,7 @@
 
 /***/ },
 
-/***/ 430:
+/***/ 448:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -260,42 +264,42 @@
 
 /***/ },
 
-/***/ 431:
+/***/ 449:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', {
+	  return _c('scroller', {
 	    staticClass: ["list"],
 	    appendAsTree: true,
 	    attrs: {
 	      "append": "tree"
 	    }
 	  }, [_vm._l((_vm.sections), function(sec) {
-	    return _h('div', {
+	    return _c('div', {
 	      staticClass: ["section"]
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticClass: ["header"]
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["header-title"]
-	    }, [_vm._s(sec.title)])]), _vm._l((sec.items), function(item) {
-	      return _h('div', {
+	    }, [_vm._v(_vm._s(sec.title))])]), _vm._l((sec.items), function(item) {
+	      return _c('div', {
 	        staticClass: ["item"]
-	      }, [_h('text', {
+	      }, [_c('text', {
 	        staticClass: ["item-title"]
-	      }, ["row " + _vm._s(item.id)])])
-	    })])
-	  }), _h('loading', {
+	      }, [_vm._v("row " + _vm._s(item.id))])])
+	    })], 2)
+	  }), _c('loading', {
 	    staticClass: ["loading-view"],
 	    attrs: {
 	      "display": _vm.loading_display,
 	      "onloading": "onloading"
 	    }
-	  }, [_h('loading-indicator', {
+	  }, [_c('loading-indicator', {
 	    staticStyle: {
 	      height: "60",
 	      width: "60"
 	    }
-	  })])])
+	  })], 1)], 2)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

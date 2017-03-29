@@ -7,35 +7,46 @@ export function freezePrototype () {
   Object.freeze(Array)
 
   // Object.freeze(Object.prototype)
-  freezeObjProto()
+  freezeObjectProto()
   Object.freeze(Array.prototype)
   Object.freeze(String.prototype)
   Object.freeze(Number.prototype)
   Object.freeze(Boolean.prototype)
 
-  Object.freeze(Error.prototype)
+  // Object.freeze(Error.prototype)
+  freezeErrorProto()
   Object.freeze(Date.prototype)
   Object.freeze(RegExp.prototype)
 }
 
-function freezeObjProto () {
-  freezeObjProtoProperty('__defineGetter__')
-  freezeObjProtoProperty('__defineSetter__')
-  freezeObjProtoProperty('__lookupGetter__')
-  freezeObjProtoProperty('__lookupSetter__')
-  freezeObjProtoProperty('constructor')
-  freezeObjProtoProperty('hasOwnProperty')
-  freezeObjProtoProperty('isPrototypeOf')
-  freezeObjProtoProperty('propertyIsEnumerable')
-  freezeObjProtoProperty('toLocaleString')
-  freezeObjProtoProperty('toString')
-  freezeObjProtoProperty('valueOf')
-  Object.seal(Object.prototype)
+function freezeObjectProto () {
+  const proto = Object.prototype
+  const protoName = 'Object.prototype'
+  freezeProtoProperty(proto, '__defineGetter__', protoName)
+  freezeProtoProperty(proto, '__defineSetter__', protoName)
+  freezeProtoProperty(proto, '__lookupGetter__', protoName)
+  freezeProtoProperty(proto, '__lookupSetter__', protoName)
+  freezeProtoProperty(proto, 'constructor', protoName)
+  freezeProtoProperty(proto, 'hasOwnProperty', protoName)
+  freezeProtoProperty(proto, 'isPrototypeOf', protoName)
+  freezeProtoProperty(proto, 'propertyIsEnumerable', protoName)
+  freezeProtoProperty(proto, 'toLocaleString', protoName)
+  freezeProtoProperty(proto, 'toString', protoName)
+  freezeProtoProperty(proto, 'valueOf', protoName)
+  Object.seal(proto)
 }
 
-function freezeObjProtoProperty (propertyName) {
-  const proto = Object.prototype
+function freezeErrorProto () {
+  const proto = Error.prototype
+  const protoName = 'Error.prototype'
+  freezeProtoProperty(proto, 'name', protoName)
+  freezeProtoProperty(proto, 'message', protoName)
+  freezeProtoProperty(proto, 'toString', protoName)
+  freezeProtoProperty(proto, 'constructor', protoName)
+  Object.seal(proto)
+}
 
+function freezeProtoProperty (proto, propertyName, protoName) {
   if (!proto.hasOwnProperty(propertyName)) {
     return
   }
@@ -47,7 +58,7 @@ function freezeObjProtoProperty (propertyName) {
     },
     set: function (value) {
       if (this === proto) {
-        throw Error(`Cannot assign to read only property ${propertyName} of Object.prototype`)
+        throw Error(`Cannot assign to read only property ${propertyName} of ${protoName}`)
       }
 
       Object.defineProperty(this, propertyName, {
