@@ -18,7 +18,7 @@ It can provide excellent experience and performance while still maintaining smoo
 ```html
 <template>
   <list>
-    <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{staffs}}" index="{{$index}}">
+    <cell onappear="onappear($event, $index)" ondisappear="ondisappear($event, $index)" class="row" repeat="{{staffs}}" index="{{$index}}">
       <div class="item">
         <text>{{name}}</text>
       </div>
@@ -45,13 +45,12 @@ It can provide excellent experience and performance while still maintaining smoo
       staffs:[{name:'inns'},{name:'connon'},{name:'baos'},{name:'anna'},{name:'dolley'},{name:'lucy'},{name:'john'}, {name:'lily'},{name:'locke'},{name:'jack'},{name:'danny'},{name:'rose'},{name:'harris'},{name:'lotus'},{name:'louis'}]
     },
     methods:{
-      onappear: function (e) {
-        var index = e.target.attr.index
-        nativeLog('+++++', index);
+      onappear: function (e, index) {
+        console.log('+++++', index)
         console.log(this.staffs[index].name + ' is appearing...');
       },
-      ondisappear:function (e) {
-        nativeLog('+++++', e.target.attr.index);
+      ondisappear:function (e, index) {
+        console.log('+++++', index)
       }
     }
   }
