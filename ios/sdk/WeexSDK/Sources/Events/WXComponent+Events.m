@@ -159,6 +159,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(touchend, addTouchEndEvent)
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
     
+    if(_isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = YES;
+    }
+    
     [self addEvent:addEventName];
 }
 
@@ -264,9 +268,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     NSMutableDictionary *position = [[NSMutableDictionary alloc] initWithCapacity:4];
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    
-    if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-        CGRect frame = [self.view.superview convertRect:self.calculatedFrame toView:self.view.window];
+    if (![self isViewLoaded]) {
+        return;
+    }
+    if (!CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        CGRect frame = [self.view.superview convertRect:self.view.frame toView:self.view.window];
         position[@"x"] = @(frame.origin.x/scaleFactor);
         position[@"y"] = @(frame.origin.y/scaleFactor);
         position[@"width"] = @(frame.size.width/scaleFactor);

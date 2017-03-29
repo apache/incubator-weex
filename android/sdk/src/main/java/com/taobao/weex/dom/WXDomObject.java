@@ -212,6 +212,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -222,7 +224,6 @@ import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -241,6 +242,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static final String ROOT = "_root";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
+  static final WXDomObject DESTROYED = new WXDomObject();
+  static{
+    DESTROYED.mRef = "_destroyed";
+  }
   private AtomicBoolean sDestroy = new AtomicBoolean();
 
   private int mViewPortWidth =750;
@@ -458,6 +463,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   public boolean isFixed() {
     return mStyles == null ? false : mStyles.isFixed();
+  }
+
+  public boolean canRecycled() {
+    return mAttributes == null ? false : mAttributes.canRecycled();
   }
 
   public Object getExtra() {
@@ -809,9 +818,28 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       }
 
       String type = (String) json.get(TYPE);
+
+      if (wxsdkInstance.isNeedValidate()) {
+        WXValidateProcessor processor = WXSDKManager.getInstance()
+                .getValidateProcessor();
+        if (processor != null) {
+          WXValidateProcessor.WXComponentValidateResult result = processor
+                  .onComponentValidate(wxsdkInstance, type);
+          if (result != null && !result.isSuccess) {
+            type = TextUtils.isEmpty(result.replacedComponent) ? WXBasicComponentType.DIV
+                    : result.replacedComponent;
+            json.put(TYPE, type);
+            if(WXEnvironment.isApkDebugable()&&result.validateInfo!=null){
+              String tag = "[WXDomObject]onComponentValidate failure. >>> "+result.validateInfo.toJSONString();
+              WXLogUtils.e(tag);
+            }
+          }
+        }
+      }
+
       WXDomObject domObject = WXDomObjectFactory.newInstance(type);
 
-      domObject.setViewPortWidth(wxsdkInstance.getViewPortWidth());
+      domObject.setViewPortWidth(wxsdkInstance.getInstanceViewPortWidth());
 
       if(domObject == null){
         return null;

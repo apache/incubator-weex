@@ -204,15 +204,17 @@
  */
 package com.taobao.weex.ui.view.listview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MotionEvent;
 
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
@@ -223,7 +225,6 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   public static final int TYPE_GRID_LAYOUT = 2;
   public static final int TYPE_STAGGERED_GRID_LAYOUT = 3;
   private WXGesture mGesture;
-
   private boolean scrollable = true;
 
   public WXRecyclerView(Context context) {
@@ -242,6 +243,10 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
   public boolean postDelayed(Runnable action, long delayMillis) {
     return super.postDelayed(WXThread.secure(action), delayMillis);
   }
+  public void initView(Context context, int type,int orientation) {
+    initView(context,type, Constants.Value.COLUMN_COUNT_NORMAL,Constants.Value.COLUMN_GAP_NORMAL,orientation);
+  }
+
 
   /**
    *
@@ -249,39 +254,14 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
    * @param type
    * @param orientation should be {@link OrientationHelper#HORIZONTAL} or {@link OrientationHelper#VERTICAL}
    */
-  public void initView(Context context, int type,int orientation) {
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+  public void initView(Context context, int type, int columnCount, float columnGap, int orientation) {
     if (type == TYPE_GRID_LAYOUT) {
-      setLayoutManager(new GridLayoutManager(context, 2,orientation,false));
+      setLayoutManager(new GridLayoutManager(context, columnCount,orientation,false));
     } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new StaggeredGridLayoutManager(2, orientation));
+      setLayoutManager(new StaggeredGridLayoutManager(columnCount, orientation));
     } else if (type == TYPE_LINEAR_LAYOUT) {
-      setLayoutManager(new LinearLayoutManager(context,orientation,false){
-
-        @Override
-        public boolean supportsPredictiveItemAnimations() {
-          return false;
-        }
-
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-          try {
-            super.onLayoutChildren(recycler, state);
-          } catch (IndexOutOfBoundsException e) {
-             e.printStackTrace();
-
-          }
-        }
-
-        @Override
-        public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
-          try {
-            return super.scrollVerticallyBy(dy, recycler, state);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          return 0;
-        }
-
-      });
+      setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false));
     }
   }
 

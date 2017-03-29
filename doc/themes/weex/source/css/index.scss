@@ -13,12 +13,12 @@
   height: 100%;
   height: calc(100% - 72px);
 
-  &:nth-child(odd) {
+  &:nth-child(even) {
     background: $bg-gray;
     color: $text-blue;
   }
 
-  &:nth-child(even) {
+  &:nth-child(odd) {
     background: $bg-blue; 
     color: $text-white;
   }

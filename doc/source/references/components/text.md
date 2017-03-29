@@ -95,4 +95,4 @@ check out [common events](../common-event.html)
 </style>
 ```
 
-[try it](../../examples/text.html)
+[try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)

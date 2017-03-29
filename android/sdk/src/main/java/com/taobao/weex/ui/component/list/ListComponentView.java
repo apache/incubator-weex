@@ -204,9 +204,6 @@
  */
 package com.taobao.weex.ui.component.list;
 
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.RecyclerViewBaseAdapter;
 
@@ -219,5 +216,6 @@ public interface ListComponentView {
   void setRecyclerViewBaseAdapter(RecyclerViewBaseAdapter adapter);
   void notifyStickyShow(WXCell component);
   void notifyStickyRemove(WXCell component);
+  void updateStickyView(int currentStickyPos);
   RecyclerViewBaseAdapter getRecyclerViewBaseAdapter();
 }

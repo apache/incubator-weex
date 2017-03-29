@@ -247,7 +247,7 @@ public class WXAnimationModule extends WXModule {
 
   @JSMethod
   public void transition(@Nullable String ref, @Nullable String animation, @Nullable String callBack) {
-    if(!TextUtils.isEmpty(ref)&&!TextUtils.isEmpty(animation)) {
+    if(!TextUtils.isEmpty(ref)&&!TextUtils.isEmpty(animation) && mWXSDKInstance!=null) {
       Message msg = Message.obtain();
       WXDomTask task = new WXDomTask();
       task.instanceId = mWXSDKInstance.getInstanceId();
@@ -257,11 +257,13 @@ public class WXAnimationModule extends WXModule {
       task.args.add(callBack);
       msg.what = WXDomHandler.MsgType.WX_ANIMATION;
       msg.obj = task;
-      WXSDKManager.getInstance().getWXDomManager().sendMessage(msg);
+      //Due to animation module rely on the result of the css-layout and the batch mechanism of
+      //css-layout, the animation.transition must be delayed the batch time.
+      WXSDKManager.getInstance().getWXDomManager().sendMessageDelayed(msg, WXDomHandler.DELAY_TIME);
     }
   }
 
-  public static void startAnimation(WXSDKInstance mWXSDKInstance, WXComponent component,
+  public static void startAnimation(WXSDKInstance instance, WXComponent component,
                                     @NonNull WXAnimationBean animationBean, @Nullable String callback) {
     if(component == null){
       return;
@@ -272,9 +274,9 @@ public class WXAnimationModule extends WXModule {
       return;
     }
     try {
-      Animator animator = createAnimator(animationBean, component.getHostView(),mWXSDKInstance.getViewPortWidth());
+      Animator animator = createAnimator(animationBean, component.getHostView(),instance.getInstanceViewPortWidth());
       if (animator != null) {
-        Animator.AnimatorListener animatorCallback = createAnimatorListener(mWXSDKInstance, callback);
+        Animator.AnimatorListener animatorCallback = createAnimatorListener(instance, callback);
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.JELLY_BEAN_MR2) {
           component.getHostView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
         }
@@ -307,12 +309,12 @@ public class WXAnimationModule extends WXModule {
         BorderDrawable borderDrawable;
         if ((borderDrawable=WXViewUtils.getBorderDrawable(target))!=null) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               borderDrawable.getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         } else if (target.getBackground() instanceof ColorDrawable) {
           holders.add(PropertyValuesHolder.ofObject(
-              WXAnimationBean.Style.BACKGROUND_COLOR, new ArgbEvaluator(),
+              new BackgroundColorProperty(), new ArgbEvaluator(),
               ((ColorDrawable) target.getBackground()).getColor(),
               WXResourceUtils.getColor(style.backgroundColor)));
         }
@@ -347,15 +349,15 @@ public class WXAnimationModule extends WXModule {
 
   public static
   @Nullable
-  Animator.AnimatorListener createAnimatorListener(final WXSDKInstance mWXSDKInstance, @Nullable final String callBack) {
+  Animator.AnimatorListener createAnimatorListener(final WXSDKInstance instance, @Nullable final String callBack) {
     if (!TextUtils.isEmpty(callBack)) {
       return new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animation) {
-          if (mWXSDKInstance == null) {
-            WXLogUtils.e("WXRenderStatement-onAnimationEnd mWXSDKInstance == null NPE");
+          if (instance == null) {
+            WXLogUtils.e("WXRenderStatement-onAnimationEnd WXSDKInstance == null NPE");
           } else {
-            WXSDKManager.getInstance().callback(mWXSDKInstance.getInstanceId(),
+            WXSDKManager.getInstance().callback(instance.getInstanceId(),
                                                 callBack,
                                                 new HashMap<String, Object>());
           }

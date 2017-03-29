@@ -27,9 +27,14 @@ This component supports no child components.
 - `autofocus`: &lt;boolean&gt; a boolean attribute lets you specify that a form control should have input focus when the page loads.
 - `rows:`&lt;number&gt; a number which can specify the height of textarea, default is `2`.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ### Styles
+
+**Pseudo-class**<span class="api-version">v0.9.5+</span>: `textarea` component support the following pseudo-classes:
+
+* `active`
+* `focus`
+* `disabled`
+* `enabled`
 
 **text styles**: checkout [text styles](../text-style.html)
 
@@ -132,4 +137,4 @@ Other attributes please check out the [common attributes](../common-attrs.html).
 </style>
 ```
 
-[try it](../../examples/textarea.html)
+[try it](http://dotwe.org/vue/a1877866e8b91ffa1e6ea9bc66c200fa)

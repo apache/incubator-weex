@@ -8,6 +8,9 @@
 
 #import "WXConvert.h"
 #import "WXUtility.h"
+#import "WXBoxShadow.h"
+#import "WXLength.h"
+#import "WXAssert.h"
 
 @implementation WXConvert
 
@@ -48,7 +51,7 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     if ([value isKindOfClass:[NSString class]]) {
         NSString *valueString = (NSString *)value;
-        if ([valueString hasSuffix:@"px"]) {
+        if ([valueString hasSuffix:@"px"] || [valueString hasSuffix:@"wx"]) {
             valueString = [valueString substringToIndex:(valueString.length - 2)];
         }
         return [valueString doubleValue];
@@ -74,6 +77,9 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 {
     CGFloat pixel = [self CGFloat:value];
     
+    if ([value isKindOfClass:[NSString class]] && [value hasSuffix:@"wx"]) {
+        return pixel;
+    }
     return pixel * scaleFactor;
 }
 
@@ -466,6 +472,26 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     return NSTextAlignmentNatural;
 }
 
++ (UIReturnKeyType)UIReturnKeyType:(id)value
+{
+    if([value isKindOfClass:[NSString class]]){
+        NSString *string = (NSString *)value;
+        if ([string isEqualToString:@"defalut"])
+            return UIReturnKeyDefault;
+        else if ([string isEqualToString:@"go"])
+            return UIReturnKeyGo;
+        else if ([string isEqualToString:@"next"])
+            return UIReturnKeyNext;
+        else if ([string isEqualToString:@"search"])
+            return UIReturnKeySearch;
+        else if ([string isEqualToString:@"send"])
+            return UIReturnKeySend;
+        else if ([string isEqualToString:@"done"])
+            return UIReturnKeyDone;
+    }
+    return UIReturnKeyDefault;
+}
+
 + (WXTextStyle)WXTextStyle:(id)value
 {
     if([value isKindOfClass:[NSString class]]){
@@ -480,32 +506,32 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
 
 + (CGFloat)WXTextWeight:(id)value
 {
-    if([value isKindOfClass:[NSString class]]){
-        NSString *string = (NSString *)value;
-        if ([string isEqualToString:@"normal"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
-        else if ([string isEqualToString:@"bold"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
-        else if ([string isEqualToString:@"100"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.8:UIFontWeightUltraLight;
-        else if ([string isEqualToString:@"200"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.6:UIFontWeightThin;
-        else if ([string isEqualToString:@"300"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.4:UIFontWeightLight;
-        else if ([string isEqualToString:@"400"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
-        else if ([string isEqualToString:@"500"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.23:UIFontWeightMedium;
-        else if ([string isEqualToString:@"600"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.3:UIFontWeightSemibold;
-        else if ([string isEqualToString:@"700"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
-        else if ([string isEqualToString:@"800"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.56:UIFontWeightHeavy;
-        else if ([string isEqualToString:@"900"])
-            return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.62:UIFontWeightBlack;
-
-    }
+    NSString *string = [WXConvert NSString:value];
+    if (!string)
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
+    else if ([string isEqualToString:@"normal"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
+    else if ([string isEqualToString:@"bold"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
+    else if ([string isEqualToString:@"100"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.8:UIFontWeightUltraLight;
+    else if ([string isEqualToString:@"200"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.6:UIFontWeightThin;
+    else if ([string isEqualToString:@"300"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?-0.4:UIFontWeightLight;
+    else if ([string isEqualToString:@"400"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
+    else if ([string isEqualToString:@"500"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.23:UIFontWeightMedium;
+    else if ([string isEqualToString:@"600"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.3:UIFontWeightSemibold;
+    else if ([string isEqualToString:@"700"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold;
+    else if ([string isEqualToString:@"800"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.56:UIFontWeightHeavy;
+    else if ([string isEqualToString:@"900"])
+        return WX_SYS_VERSION_LESS_THAN(@"8.2")?0.62:UIFontWeightBlack;
+        
     return WX_SYS_VERSION_LESS_THAN(@"8.2")?0:UIFontWeightRegular;
 }
 
@@ -698,6 +724,51 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
         }
     }
     return type;
+}
+
+#pragma mark - Length
+
++ (WXLength *)WXLength:(id)value isFloat:(BOOL)isFloat scaleFactor:(CGFloat)scaleFactor
+{
+    if (!value) {
+        return nil;
+    }
+    
+    WXLengthType type = WXLengthTypeFixed;
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"auto"]) {
+            type = WXLengthTypeAuto;
+        } else if ([value isEqualToString:@"normal"]){
+            type = WXLengthTypeNormal;
+        } else if ([value hasSuffix:@"%"]) {
+            type = WXLengthTypePercent;
+        }
+    } else if (![value isKindOfClass:[NSNumber class]]) {
+        WXAssert(NO, @"Unsupported type:%@ for WXLength", NSStringFromClass([value class]));
+    }
+    
+    if (isFloat) {
+        return [WXLength lengthWithFloat:([value floatValue] * scaleFactor) type:type];
+    } else {
+        return [WXLength lengthWithInt:([value intValue] * scaleFactor) type:type];
+    }
+}
+
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor
+{
+    NSString *boxShadow = @"";
+    if([value isKindOfClass:[NSString class]]){
+        boxShadow = value;
+    } else if([value isKindOfClass:[NSNumber class]]){
+        boxShadow =  [((NSNumber *)value) stringValue];
+    } else if (value != nil) {
+        boxShadow = nil;
+        WXLogError(@"Convert Error:%@ can not be converted to boxshadow type", value);
+    }
+    if (boxShadow) {
+        return [WXBoxShadow getBoxShadowFromString:boxShadow scaleFactor:scaleFactor];
+    }
+    return nil;
 }
 
 @end

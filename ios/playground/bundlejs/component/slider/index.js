@@ -44,10 +44,10 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(160)
-	var __weex_template__ = __webpack_require__(168)
-	var __weex_style__ = __webpack_require__(169)
-	var __weex_script__ = __webpack_require__(170)
+	__webpack_require__(172)
+	var __weex_template__ = __webpack_require__(180)
+	var __weex_style__ = __webpack_require__(181)
+	var __weex_script__ = __webpack_require__(182)
 
 	__weex_define__('@weex-component/0f29733e34d42a0cdfe7b98eb53bff4c', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -524,8 +524,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2103,13 +2102,25 @@
 /* 157 */,
 /* 158 */,
 /* 159 */,
-/* 160 */
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(161)
-	var __weex_template__ = __webpack_require__(165)
-	var __weex_style__ = __webpack_require__(166)
-	var __weex_script__ = __webpack_require__(167)
+	__webpack_require__(173)
+	var __weex_template__ = __webpack_require__(177)
+	var __weex_style__ = __webpack_require__(178)
+	var __weex_script__ = __webpack_require__(179)
 
 	__weex_define__('@weex-component/slider-page', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -2126,12 +2137,12 @@
 
 
 /***/ },
-/* 161 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(162)
-	var __weex_style__ = __webpack_require__(163)
-	var __weex_script__ = __webpack_require__(164)
+	var __weex_template__ = __webpack_require__(174)
+	var __weex_style__ = __webpack_require__(175)
+	var __weex_script__ = __webpack_require__(176)
 
 	__weex_define__('@weex-component/slider-item', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -2148,7 +2159,7 @@
 
 
 /***/ },
-/* 162 */
+/* 174 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2162,7 +2173,7 @@
 	}
 
 /***/ },
-/* 163 */
+/* 175 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2173,7 +2184,7 @@
 	}
 
 /***/ },
-/* 164 */
+/* 176 */
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -2194,7 +2205,7 @@
 
 
 /***/ },
-/* 165 */
+/* 177 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2211,7 +2222,7 @@
 	}
 
 /***/ },
-/* 166 */
+/* 178 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2224,7 +2235,7 @@
 	}
 
 /***/ },
-/* 167 */
+/* 179 */
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){"use strict";
@@ -2249,7 +2260,7 @@
 
 
 /***/ },
-/* 168 */
+/* 180 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2313,6 +2324,39 @@
 	              "attr": {
 	                "interval": function () {return this.sliders[0].interval},
 	                "autoPlay": function () {return this.sliders[0].autoPlay}
+	              },
+	              "children": [
+	                {
+	                  "type": "indicator",
+	                  "classList": [
+	                    "indicator"
+	                  ]
+	                },
+	                {
+	                  "type": "slider-page",
+	                  "repeat": function () {return this.sliders[0].sliderPages}
+	                }
+	              ]
+	            }
+	          ]
+	        },
+	        {
+	          "type": "wxc-panel",
+	          "attr": {
+	            "title": "auto-play = true & scrollable = false",
+	            "paddingBody": "0"
+	          },
+	          "children": [
+	            {
+	              "type": "slider",
+	              "classList": [
+	                "slider"
+	              ],
+	              "append": "tree",
+	              "attr": {
+	                "interval": function () {return this.sliders[0].interval},
+	                "autoPlay": function () {return this.sliders[0].autoPlay},
+	                "scrollable": "false"
 	              },
 	              "children": [
 	                {
@@ -2556,7 +2600,7 @@
 	}
 
 /***/ },
-/* 169 */
+/* 181 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2580,7 +2624,7 @@
 	}
 
 /***/ },
-/* 170 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

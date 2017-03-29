@@ -44,9 +44,9 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(145)
-	var __weex_style__ = __webpack_require__(146)
-	var __weex_script__ = __webpack_require__(147)
+	var __weex_template__ = __webpack_require__(150)
+	var __weex_style__ = __webpack_require__(151)
+	var __weex_script__ = __webpack_require__(152)
 
 	__weex_define__('@weex-component/0a82ae39306363e81eeac009d30abc0a', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -523,8 +523,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2087,7 +2086,12 @@
 /* 142 */,
 /* 143 */,
 /* 144 */,
-/* 145 */
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2125,13 +2129,13 @@
 	}
 
 /***/ },
-/* 146 */
+/* 151 */
 /***/ function(module, exports) {
 
 	module.exports = {}
 
 /***/ },
-/* 147 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

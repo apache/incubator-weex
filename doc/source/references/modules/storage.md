@@ -46,7 +46,7 @@ When passed a key name, will remove that key from the storage.
 ##### Example
 
 ```javascript
-var storage = require('@weex-module/storage');
+var storage = weex.requireModule('storage');
 storage.removeItem('foo', function(e) {
   // callback. 'e' is an object that contains 'result' and 'data'.
   // e.result will return 'success' or 'failed' according to the executing result.
@@ -169,4 +169,4 @@ Returns an array that contains all keys stored in Storage object.
 </style>
 ```
 
-[try it](../../examples/storage.html)
+[try it](http://dotwe.org/vue/3fdd3e2d1646ca41199d80c7be799858)

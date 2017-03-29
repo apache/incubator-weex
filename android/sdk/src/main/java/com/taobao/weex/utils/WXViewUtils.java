@@ -216,11 +216,13 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
@@ -306,11 +308,22 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
+  public static float getScreenDensity(Context ctx){
+    if(ctx != null){
+      try{
+        Resources res = ctx.getResources();
+        return res.getDisplayMetrics().density;
+      }catch (Exception e){
+        WXLogUtils.e("getScreenDensityDpi exception:"+e.getMessage());
+      }
+    }
+    return Constants.Value.DENSITY;
+  }
+
   public static int getScreenWidth(Context ctx) {
     if(ctx!=null){
       Resources res = ctx.getResources();
       mScreenWidth = res.getDisplayMetrics().widthPixels;
-
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
         mScreenHeight = res
                 .getDisplayMetrics()
@@ -535,18 +548,66 @@ public class WXViewUtils {
 
   public static void clipCanvasWithinBorderBox(View targetView, Canvas canvas) {
     Drawable drawable;
-    /* According to https://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
-      API 18 or higher supports clipPath to canvas based on hardware acceleration.
-     */
-    if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ||
-         !canvas.isHardwareAccelerated()) &&
+    if (clipCanvasDueToAndroidVersion(canvas) &&
+        clipCanvasIfAnimationExist() &&
         ((drawable = targetView.getBackground()) instanceof BorderDrawable)) {
       BorderDrawable borderDrawable = (BorderDrawable) drawable;
-      if(borderDrawable.isRounded()) {
-        Path path = borderDrawable.getContentPath(
-            new RectF(0, 0, targetView.getWidth(), targetView.getHeight()));
-        canvas.clipPath(path);
+      if (borderDrawable.isRounded()) {
+        if (clipCanvasIfBackgroundImageExist(targetView, borderDrawable)) {
+          Path path = borderDrawable.getContentPath(
+              new RectF(0, 0, targetView.getWidth(), targetView.getHeight()));
+          canvas.clipPath(path);
+        }
       }
     }
+  }
+
+  /**
+   * According to https://developer.android.com/guide/topics/graphics/hardware-accel.html#unsupported
+   API 18 or higher supports clipPath to canvas based on hardware acceleration.
+   * @param canvas
+   * @return
+   */
+  private static boolean clipCanvasDueToAndroidVersion(Canvas canvas) {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ||
+           !canvas.isHardwareAccelerated();
+  }
+
+  /**
+   * According to https://code.google.com/p/android/issues/detail?id=225556&sort=-id&colspec=ID
+   * clipPath doesn't work with rotation nor scale when API level is 24.
+   * As animation will not cause redraw if hardware-acceleration enabled, clipCanvas feature has
+   * to be disabled when API level is 24 without considering the animation property.
+   * As the compile version of weex_sdk is 23, so API level 24 has to be hard-code.
+   */
+  private static boolean clipCanvasIfAnimationExist() {
+    return Build.VERSION.SDK_INT != 24;
+  }
+
+  /**
+   * Due limitation in Android platform, the linear gradient in the following page will not be
+   * rounded if {@link Canvas#clipPath(Path)} of the parent view invoked when API level is lower
+   * than 21.
+   * http://dotwe.org/weex/963c9ade129f86757cecdd85651cd30e
+   * @param targetView
+   * @param borderDrawable
+   * @return
+   */
+  private static boolean clipCanvasIfBackgroundImageExist(@NonNull View targetView,
+                                                          @NonNull BorderDrawable borderDrawable) {
+    if (targetView instanceof ViewGroup) {
+      View child;
+      ViewGroup parent = ((ViewGroup) targetView);
+      int count = parent.getChildCount();
+      for (int i = 0; i < count; i++) {
+        child = parent.getChildAt(i);
+        if (child.getBackground() instanceof BorderDrawable &&
+            ((BorderDrawable) child.getBackground()).hasImage() &&
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }

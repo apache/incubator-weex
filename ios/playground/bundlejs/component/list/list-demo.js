@@ -45,9 +45,9 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(100)
-	var __weex_style__ = __webpack_require__(101)
-	var __weex_script__ = __webpack_require__(102)
+	var __weex_template__ = __webpack_require__(105)
+	var __weex_style__ = __webpack_require__(106)
+	var __weex_script__ = __webpack_require__(107)
 
 	__weex_define__('@weex-component/3226d5b3a8f5b1ae43875db22de0785e', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -66,7 +66,7 @@
 
 /***/ },
 
-/***/ 100:
+/***/ 105:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -106,7 +106,8 @@
 	                "shopHeader"
 	              ],
 	              "style": {
-	                "flexDirection": "row"
+	                "flexDirection": "row",
+	                "overflow": "hidden"
 	              },
 	              "children": [
 	                {
@@ -809,7 +810,7 @@
 
 /***/ },
 
-/***/ 101:
+/***/ 106:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -887,7 +888,7 @@
 
 /***/ },
 
-/***/ 102:
+/***/ 107:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

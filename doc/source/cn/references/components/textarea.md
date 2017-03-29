@@ -27,6 +27,13 @@ version: 2.1
 
 ## 样式
 
+- 伪类<span class="api-version">v0.9.5+</span>: `textarea` 支持以下伪类：
+
+  * `active`
+  * `focus`
+  * `disabled`
+  * `enabled`
+
 - text styles
   - 支持 `color`
   - 支持 `font-size`
@@ -152,4 +159,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/textarea.html)
+[try it](http://dotwe.org/vue/a1877866e8b91ffa1e6ea9bc66c200fa)

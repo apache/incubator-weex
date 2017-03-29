@@ -28,7 +28,16 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 
 ## 样式
 
-- `placeholder-color {color}`：placeholder 字符颜色。默认值是 `#999999`。
+- `placeholder-color {color}`：placeholder 字符颜色。默认值是 `#999999`
+
+
+- 伪类<span class="api-version">v0.9.5+</span>: `input` 支持以下伪类：
+
+  * `active`
+  * `focus`
+  * `disabled`
+  * `enabled`
+
 - text styles
   - 支持 `color`
   - 支持 `font-size`
@@ -169,4 +178,4 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 </style>
 ```
 
-[try it](../../../examples/input.html)
+[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)

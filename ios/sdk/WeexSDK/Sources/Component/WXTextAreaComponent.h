@@ -6,8 +6,9 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-#import "WXComponent.h"
+#import <Foundation/Foundation.h>
+#import "WXEditComponent.h"
 
-@interface WXTextAreaComponent : WXComponent<UITextViewDelegate>
+@interface WXTextAreaComponent : WXEditComponent
 
 @end

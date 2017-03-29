@@ -16,6 +16,7 @@
         {name: 'hello', title: 'Hello World'},
         {name: 'style/index', title: 'Common Style'},
         {name: 'animation', title: 'Animation'},
+        {name: 'linear-gradient', title: 'Gradient Color'},
 
         // component
         {name: 'component/text-demo', title: 'Text'},
@@ -26,6 +27,7 @@
         {name: 'component/list/list-demo', title: 'List (Advanced)'},
         {name: 'component/slider/index', title: 'Slider'},
         {name: 'component/slider-neighbor/index', title: 'Slider Neighbor'},
+        {name: 'component/slider-tab', title: 'Slider Tab'},
         {name: 'component/a-demo', title: 'A'},
         {name: 'component/video-demo', title: 'Video'},
         {name: 'component/countdown-demo', title: 'Countdown'},
@@ -50,7 +52,9 @@
         {name: 'showcase/calculator', title: 'Calculator'},
         {name: 'showcase/minesweeper', title: 'Minesweeper'},
         {name: 'showcase/ui', title: 'UI Gallery'},
-        {name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown'}
+        {name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown'},
+        {name: 'showcase/pseudo-class', title: 'PseudoClass'},
+        {name: 'showcase/boxshadow', title: 'boxshadow'}
       ]
     }
   }

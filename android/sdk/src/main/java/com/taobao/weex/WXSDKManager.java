@@ -138,6 +138,7 @@ import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
+import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -147,6 +148,7 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -178,9 +180,15 @@ public class WXSDKManager {
   private IWXDebugAdapter mIWXDebugAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
 
+
+
+  private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
+
   private IWXStorageAdapter mIWXStorageAdapter;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
+
+  private WXValidateProcessor mWXValidateProcessor;
 
   private WXSDKManager() {
     mWXRenderManager = new WXRenderManager();
@@ -200,7 +208,7 @@ public class WXSDKManager {
   }
 
   public static int getInstanceViewPortWidth(String instanceId){
-    return getInstance().getSDKInstance(instanceId).getViewPortWidth();
+    return getInstance().getSDKInstance(instanceId).getInstanceViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -333,6 +341,14 @@ public class WXSDKManager {
     return mDrawableLoader;
   }
 
+  public IWXJSExceptionAdapter getIWXJSExceptionAdapter() {
+    return mIWXJSExceptionAdapter;
+  }
+
+   void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+    mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
+  }
+
   public @NonNull IWXHttpAdapter getIWXHttpAdapter() {
     if (mIWXHttpAdapter == null) {
       mIWXHttpAdapter = new DefaultWXHttpAdapter();
@@ -356,6 +372,7 @@ public class WXSDKManager {
     this.mIWXUserTrackAdapter = config.getUtAdapter();
     this.mURIAdapter = config.getURIAdapter();
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
+    this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
   }
 
   public IWXDebugAdapter getIWXDebugAdapter() {
@@ -396,6 +413,14 @@ public class WXSDKManager {
       return mIWebSocketAdapterFactory.createWebSocketAdapter();
     }
     return null;
+  }
+
+  public void registerValidateProcessor(WXValidateProcessor processor){
+    this.mWXValidateProcessor = processor;
+  }
+
+  public WXValidateProcessor getValidateProcessor(){
+    return mWXValidateProcessor;
   }
 
 }

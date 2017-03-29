@@ -88,14 +88,14 @@ export function init (app, code, data, services) {
           args[0](...args.slice(2))
         }
         timer.setTimeout(handler, args[1])
-        return app.uid.toString()
+        return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
       },
       setInterval: (...args) => {
         const handler = function () {
           args[0](...args.slice(2))
         }
         timer.setInterval(handler, args[1])
-        return app.uid.toString()
+        return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
       },
       clearTimeout: (n) => {
         timer.clearTimeout(n)

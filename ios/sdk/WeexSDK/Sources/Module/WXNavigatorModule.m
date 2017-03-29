@@ -1,4 +1,4 @@
-/**
+ /**
  * Created by Weex.
  * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
  *
@@ -45,14 +45,18 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
 {
     id<WXNavigationProtocol> navigator = [self navigator];
     UIViewController *container = self.weexInstance.viewController;
-    [navigator open:param success:success failure:failure withContainer:container];
+    if (navigator && [navigator respondsToSelector:@selector(open:success:failure:withContainer:)]) {
+        [navigator open:param success:success failure:failure withContainer:container];
+    }
 }
     
 - (void)close:(NSDictionary *)param success:(WXModuleCallback)success failure:(WXModuleCallback)failure
 {
     id<WXNavigationProtocol> navigator = [self navigator];
     UIViewController *container = self.weexInstance.viewController;
-    [navigator close:param success:success failure:failure withContainer:container];
+    if (navigator && [navigator respondsToSelector:@selector(close:success:failure:withContainer:)]) {
+        [navigator close:param success:success failure:failure withContainer:container];
+    }
 }
     
 - (void)push:(NSDictionary *)param callback:(WXModuleCallback)callback
@@ -85,7 +89,9 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
         [navigator setNavigationBarHidden:[param[@"hidden"] boolValue] animated:[param[@"animated"] boolValue] withContainer:self.weexInstance.viewController];
         result = MSG_SUCCESS;
     }
-    callback(result);
+    if (callback) {
+        callback(result);
+    }
 }
 
 #pragma mark Navigation Setup
@@ -94,13 +100,17 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
 {
     NSString *backgroundColor = param[@"backgroundColor"];
     if (!backgroundColor) {
-        callback(MSG_PARAM_ERR);
+        if (callback) {
+            callback(MSG_PARAM_ERR);
+        }
     }
     
     id<WXNavigationProtocol> navigator = [self navigator];
     UIViewController *container = self.weexInstance.viewController;
     [navigator setNavigationBackgroundColor:[WXConvert UIColor:backgroundColor] withContainer:container];
-    callback(MSG_SUCCESS);
+    if (callback) {
+        callback(MSG_SUCCESS);
+    }
 }
 
 - (void)setNavBarRightItem:(NSDictionary *)param callback:(WXModuleCallback)callback
@@ -149,7 +159,10 @@ WX_EXPORT_METHOD(@selector(setNavBarHidden:callback:))
     UIViewController *container = self.weexInstance.viewController;
     
     NSMutableDictionary *mutableParam = [param mutableCopy];
-    [mutableParam setObject:self.weexInstance.instanceId forKey:@"instanceId"];
+    
+    if (self.weexInstance.instanceId) {
+        [mutableParam setObject:self.weexInstance.instanceId forKey:@"instanceId"];
+    }
     
     [navigator setNavigationItemWithParam:mutableParam position:position completion:^(NSString *code, NSDictionary *responseData) {
         if (callback && code) {

@@ -206,6 +206,8 @@ package com.taobao.weex.ui.component;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -258,7 +260,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   protected int mOrientation = Constants.Orientation.VERTICAL;
   private List<WXComponent> mRefreshs=new ArrayList<>();
   private int mChildrenLayoutOffset = 0;//Use for offset children layout
-  private String mLoadMoreRetry = "";
+  private boolean mForceLoadmoreNextTime = false;
+  private int mOffsetAccuracy = 10;
+  private Point mLastReport = new Point(-1, -1);
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -273,13 +277,15 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   /**
    * Map for storing component that is sticky.
    **/
-  private Map<String, HashMap<String, WXComponent>> mStickyMap = new HashMap<>();
+  private Map<String, Map<String, WXComponent>> mStickyMap = new HashMap<>();
   private FrameLayout mRealView;
 
   private int mContentHeight = 0;
 
   private WXStickyHelper stickyHelper;
   private Handler handler=new Handler();
+
+  private boolean isScrollable = true;
 
   @Deprecated
   public WXScroller(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -322,6 +328,75 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     } else {
       return getHostView();
     }
+  }
+
+  @Override
+  public void addEvent(String type) {
+    super.addEvent(type);
+    if (Constants.Event.SCROLL.equals(type) && getInnerView() != null && getInnerView() instanceof WXScrollView) {
+      ((WXScrollView) getInnerView()).addScrollViewListener(new WXScrollViewListener() {
+        @Override
+        public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
+          if (shouldReport(x, y)) {
+            Rect frame = scrollView.getContentFrame();
+
+            Map<String, Object> event = new HashMap<>(2);
+            Map<String, Object> contentSize = new HashMap<>(2);
+            Map<String, Object> contentOffset = new HashMap<>(2);
+
+            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(frame.width(), getInstance().getViewPortWidth()));
+            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(frame.height(), getInstance().getViewPortWidth()));
+
+            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(x, getInstance().getViewPortWidth()));
+            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(y, getInstance().getViewPortWidth()));
+
+            event.put(Constants.Name.CONTENT_SIZE, contentSize);
+            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+            fireEvent(Constants.Event.SCROLL, event);
+          }
+        }
+
+        @Override
+        public void onScrollToBottom(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+
+        @Override
+        public void onScrollStopped(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+
+        @Override
+        public void onScroll(WXScrollView scrollView, int x, int y) {
+          //ignore
+        }
+      });
+    }
+  }
+
+  private boolean shouldReport(int x, int y) {
+    if (mLastReport.x == -1 && mLastReport.y == -1) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    if (mOrientation == Constants.Orientation.HORIZONTAL
+            && Math.abs(x - mLastReport.x) >= mOffsetAccuracy) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    if (mOrientation == Constants.Orientation.VERTICAL
+            && Math.abs(y - mLastReport.y) >= mOffsetAccuracy) {
+      mLastReport.x = x;
+      mLastReport.y = y;
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -544,7 +619,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return getInnerView() == null ? 0 : getInnerView().getScrollX();
   }
 
-  public Map<String, HashMap<String, WXComponent>> getStickMap() {
+  @Override
+  public int getOrientation() {
+    return mOrientation;
+  }
+
+  public Map<String, Map<String, WXComponent>> getStickMap() {
     return mStickyMap;
   }
 
@@ -559,6 +639,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       case Constants.Name.SCROLLABLE:
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
+        return true;
+      case Constants.Name.OFFSET_ACCURACY:
+        int accuracy = WXUtils.getInteger(param, 10);
+        setOffsetAccuracy(accuracy);
         return true;
     }
     return super.setProperty(key, param);
@@ -578,6 +662,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @WXComponentProp(name = Constants.Name.SCROLLABLE)
   public void setScrollable(boolean scrollable) {
+    this.isScrollable = scrollable;
     View hostView = getInnerView();
     if(hostView instanceof WXHorizontalScrollView) {
       ((WXHorizontalScrollView)hostView).setScrollable(scrollable);
@@ -585,6 +670,18 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       ((WXScrollView)hostView).setScrollable(scrollable);
     }
   }
+
+  @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
+  public void setOffsetAccuracy(int accuracy) {
+    float realPx = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getViewPortWidth());
+    this.mOffsetAccuracy = (int) realPx;
+  }
+
+  @Override
+  public boolean isScrollable() {
+    return isScrollable;
+  }
+
 
   // TODO Need constrain, each container can only have one sticky child
   @Override
@@ -642,11 +739,26 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   }
 
   @Override
-  public void scrollTo(WXComponent component,int offset) {
+  public void scrollTo(WXComponent component, Map<String, Object> options) {
+    float offsetFloat = 0;
+    boolean smooth = true;
+
+    if (options != null) {
+      String offset = options.get(Constants.Name.OFFSET) == null ? "0" : options.get(Constants.Name.OFFSET).toString();
+      smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
+      if (offset != null) {
+        try {
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getViewPortWidth());
+        }catch (Exception e ){
+          WXLogUtils.e("Float parseFloat error :"+e.getMessage());
+        }
+      }
+    }
+
     int viewYInScroller=component.getAbsoluteY() - getAbsoluteY();
     int viewXInScroller=component.getAbsoluteX() - getAbsoluteX();
 
-    scrollBy(viewXInScroller - getScrollX() + offset,viewYInScroller - getScrollY() + offset);
+    scrollBy(viewXInScroller - getScrollX() + (int) offsetFloat, viewYInScroller - getScrollY() + (int) offsetFloat, smooth);
   }
 
   /**
@@ -655,21 +767,29 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * @param y vertical distance. Negative for scroll to top
    */
   public void scrollBy(final int x, final int y) {
+    scrollBy(x, y, false);
+  }
+
+  public void scrollBy(final int x, final int y, final boolean smooth) {
     if (getInnerView() == null) {
       return;
     }
 
     getInnerView().postDelayed(new Runnable() {
-
       @Override
       public void run() {
-        if(getInnerView()==null){
-          return;
-        }
-        if(mOrientation== Constants.Orientation.VERTICAL){
-          ((WXScrollView) getInnerView()).smoothScrollBy(0, y);
-        }else{
-          ((WXHorizontalScrollView)getInnerView()).smoothScrollBy(x,0);
+        if (mOrientation == Constants.Orientation.VERTICAL) {
+          if (smooth) {
+            ((WXScrollView) getInnerView()).smoothScrollBy(0, y);
+          } else {
+            ((WXScrollView) getInnerView()).scrollBy(0, y);
+          }
+        } else {
+          if (smooth) {
+            ((WXHorizontalScrollView) getInnerView()).smoothScrollBy(x, 0);
+          } else {
+            ((WXHorizontalScrollView) getInnerView()).scrollBy(x, 0);
+          }
         }
         getInnerView().invalidate();
       }
@@ -735,26 +855,22 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   protected void onLoadMore(WXScrollView scrollView, int x, int y) {
     try {
       String offset = getDomObject().getAttrs().getLoadMoreOffset();
-
       if (TextUtils.isEmpty(offset)) {
         return;
       }
+      int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), WXSDKInstance.getViewPortWidth());
 
       int contentH = scrollView.getChildAt(0).getHeight();
       int scrollerH = scrollView.getHeight();
       int offScreenY = contentH - y - scrollerH;
-      if (offScreenY < Integer.parseInt(offset)) {
+      if (offScreenY < offsetInt) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
         }
-        String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
-        if (loadMoreRetry == null) {
-          loadMoreRetry = mLoadMoreRetry;
-        }
-        if (mContentHeight != contentH || !mLoadMoreRetry.equals(loadMoreRetry)) {
+        if (mContentHeight != contentH || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mContentHeight = contentH;
-          mLoadMoreRetry = loadMoreRetry;
+          mForceLoadmoreNextTime = false;
         }
       }
     } catch (Exception e) {
@@ -765,6 +881,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @JSMethod
   public void resetLoadmore() {
-    mLoadMoreRetry = "";
+    mForceLoadmoreNextTime = true;
   }
 }

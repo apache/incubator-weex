@@ -55,14 +55,14 @@ void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
     [WXUtility performBlock:block onThread:thread];
 }
 
-void WXSwizzleInstanceMethod(Class class, SEL original, SEL replaced)
+void WXSwizzleInstanceMethod(Class className, SEL original, SEL replaced)
 {
-    Method originalMethod = class_getInstanceMethod(class, original);
-    Method newMethod = class_getInstanceMethod(class, replaced);
+    Method originalMethod = class_getInstanceMethod(className, original);
+    Method newMethod = class_getInstanceMethod(className, replaced);
     
-    BOOL didAddMethod = class_addMethod(class, original, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+    BOOL didAddMethod = class_addMethod(className, original, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
     if (didAddMethod) {
-        class_replaceMethod(class, replaced, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+        class_replaceMethod(className, replaced, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
     } else {
         method_exchangeImplementations(originalMethod, newMethod);
     }
@@ -342,13 +342,22 @@ static BOOL WXNotStat;
         if ([self isFileExist:fpath]) {
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
-            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
-            CFRelease(fontURL);
-            CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
-            CGDataProviderRelease(fontDataProvider);
-            CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
-            CFRelease(graphicFont);
-            font = (__bridge UIFont*)smallFont;
+            if (fontURL) {
+                CFErrorRef error = nil;
+                CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                if (error) {
+                    CFRelease(error);
+                    error = nil;
+                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                }
+                NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+                // length of descriptors here will be only one.
+                for (UIFontDescriptor *desc in descriptors) {
+                    font = [UIFont fontWithDescriptor:desc size:fontSize];
+                }
+                CFRelease(fontURL);
+            }
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -356,19 +365,27 @@ static BOOL WXNotStat;
     if (!font) {
         if (fontFamily) {
             font = [UIFont fontWithName:fontFamily size:fontSize];
-            if (!font) {
+        }
+        if (!font) {
+            if (fontFamily) {
                 WXLogWarning(@"Unknown fontFamily:%@", fontFamily);
+            }
+            if(WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+                font = [UIFont systemFontOfSize:fontSize];
+            } else {
                 font = [UIFont systemFontOfSize:fontSize weight:textWeight];
             }
-        } else {
-            font = [UIFont systemFontOfSize:fontSize weight:textWeight];
         }
     }
     UIFontDescriptor *fontD = font.fontDescriptor;
     UIFontDescriptorSymbolicTraits traits = 0;
     
     traits = (textStyle == WXTextStyleItalic) ? (traits | UIFontDescriptorTraitItalic) : traits;
-    traits = (fabs(textWeight-(WX_SYS_VERSION_LESS_THAN(@"8.2")?0.4:UIFontWeightBold)) <= 1e-6) ? (traits | UIFontDescriptorTraitBold) : traits;
+    if (WX_SYS_VERSION_LESS_THAN(@"8.2")) {
+        traits = ((textWeight-0.4) >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }else {
+        traits = (textWeight-UIFontWeightBold >= 0.0) ? (traits | UIFontDescriptorTraitBold) : traits;
+    }
     if (traits != 0) {
         fontD = [fontD fontDescriptorWithSymbolicTraits:traits];
         UIFont *tempFont = [UIFont fontWithDescriptor:fontD size:0];
@@ -382,48 +399,48 @@ static BOOL WXNotStat;
 
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock
 {
-    if ([url isFileURL]) {
-        // local file url
-        NSError * error = nil;
-        if (![WXUtility isFileExist:url.absoluteString]) {
-            error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        if ([url isFileURL]) {
+            // local file url
+            NSError * error = nil;
+            if (![WXUtility isFileExist:url.path]) {
+                error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
+            }
+            completionBlock(url, error);
+            return;
         }
-        completionBlock(url, error);
-        return;
-    }
-    
-    // remote font url
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        NSURL * downloadPath = nil;
-        NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse*)response;
-        if (200 == httpResponse.statusCode && !error && location) {
-            NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url absoluteString]]];
-            downloadPath = [NSURL fileURLWithPath:file];
-            NSFileManager *mgr = [NSFileManager defaultManager];
-            NSError * error ;
-            if (![mgr fileExistsAtPath:[file stringByDeletingLastPathComponent]]) {
-                // create font cache directory and its parent if not exist
-                [mgr createDirectoryAtPath:[file stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
+        // remote font url
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLSessionDownloadTask *task = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+            NSURL * downloadPath = nil;
+            NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse*)response;
+            if (200 == httpResponse.statusCode && !error && location) {
+                NSString *file = [NSString stringWithFormat:@"%@/%@",WX_FONT_DOWNLOAD_DIR,[WXUtility md5:[url absoluteString]]];
+                downloadPath = [NSURL fileURLWithPath:file];
+                NSFileManager *mgr = [NSFileManager defaultManager];
+                NSError * error ;
+                if (![mgr fileExistsAtPath:[file stringByDeletingLastPathComponent]]) {
+                    // create font cache directory and its parent if not exist
+                    [mgr createDirectoryAtPath:[file stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
+                }
+                BOOL result = [mgr moveItemAtURL:location toURL:downloadPath error:&error];
+                if (!result) {
+                    downloadPath = nil;
+                }
+            } else {
+                if (200 != httpResponse.statusCode) {
+                    error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"ErrorMsg": [NSString stringWithFormat:@"can not load the font url %@ ", url.absoluteString]}];
+                }
             }
-            BOOL result = [mgr moveItemAtURL:location toURL:downloadPath error:&error];
-            if (!result) {
-                downloadPath = nil;
-            }
-        } else {
-            if (200 != httpResponse.statusCode) {
-                error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"ErrorMsg": [NSString stringWithFormat:@"can not load the font url %@ ", url.absoluteString]}];
-            }
-        }
-        completionBlock(downloadPath, error);
-    }];
-    
-    [task resume];
+            completionBlock(downloadPath, error);
+        }];
+        
+        [task resume];
+    });
 }
 
 + (BOOL)isFileExist:(NSString *)filePath
 {
-    
     return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 
@@ -671,6 +688,55 @@ static BOOL WXNotStat;
     
 }
 
+BOOL WXFloatEqual(CGFloat a, CGFloat b) {
+    return WXFloatEqualWithPrecision(a, b,FLT_EPSILON);
+}
+BOOL WXFloatEqualWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return fabs(a - b) <= precision;
+}
+BOOL WXFloatLessThan(CGFloat a, CGFloat b) {
+    return WXFloatLessThanWithPrecision(a, b, FLT_EPSILON);
+}
+BOOL WXFloatLessThanWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return a-b < - precision;
+}
+
+BOOL WXFloatGreaterThan(CGFloat a, CGFloat b) {
+    return WXFloatGreaterThanWithPrecision(a, b, FLT_EPSILON);
+}
+BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
+    return a-b > precision;
+}
+
++ (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type
+{
+    NSString *typeStr = @"defalut";
+    switch (type) {
+        case UIReturnKeyDefault:
+            typeStr = @"defalut";
+            break;
+        case UIReturnKeyGo:
+            typeStr = @"go";
+            break;
+        case UIReturnKeyNext:
+            typeStr = @"next";
+            break;
+        case UIReturnKeySearch:
+            typeStr = @"search";
+            break;
+        case UIReturnKeySend:
+            typeStr = @"send";
+            break;
+        case UIReturnKeyDone:
+            typeStr = @"done";
+            break;
+            
+        default:
+            break;
+    }
+    return typeStr;
+}
+
 @end
 
 
@@ -700,4 +766,5 @@ CGPoint WXPixelPointResize(CGPoint value)
                               value.y * WXScreenResizeRadio());
     return new;
 }
+
 

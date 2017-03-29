@@ -7,7 +7,7 @@ version: 2.1
 
 # &lt;image&gt;
 
-`<image>` 组件用于渲染图片，并且它不能包含任何子组件。可以用 `<img>` 作简写。
+`<image>` 组件用于渲染图片，并且它不能包含任何子组件。新版 Vue 2.0 中**不支持**用 `<img>` 作简写。
 
 需要注意的是，需要明确指定 `width` 和 `height`，否则图片无法显示。
 
@@ -16,12 +16,12 @@ version: 2.1
 ```html
 <template>
   <div>
-    <img style="width: 560;height: 560;" src="https://img.alicdn.com/tps/TB1z.55OFXXXXcLXXXXXXXXXXXX-560-560.jpg"></img>
+    <image style="width: 560px;height: 560px;" src="https://img.alicdn.com/tps/TB1z.55OFXXXXcLXXXXXXXXXXXX-560-560.jpg"></image>
   </div>
 </template>
 ```
 
-[体验一下](http://dotwe.org/23b6cf951e6059d2cf7b9a74a9915ace)
+[体验一下](http://dotwe.org/vue/1d6145d98cbdb8c66c69b4d4dcd2744d)
 
 ## 子组件
 
@@ -30,9 +30,9 @@ version: 2.1
 ```html
 <template>
   <div>
-    <img style="width:750; height:750;" src="https://img.alicdn.com/tps/TB1z.55OFXXXXcLXXXXXXXXXXXX-560-560.jpg"></img>
+    <image style="width:750px; height:750px;" src="https://img.alicdn.com/tps/TB1z.55OFXXXXcLXXXXXXXXXXXX-560-560.jpg"></image>
     <div class="title">
-      <text style="font-size:50; color: #ff0000">你好，image</text>
+      <text style="font-size:50px; color: #ff0000">你好，image</text>
     </div>
   </div>
 </template>
@@ -45,7 +45,7 @@ version: 2.1
 </style>
 ```
 
-[体验一下](http://dotwe.org/08dd49aaca8bf289c5fc08f808b9c08c)
+[体验一下](http://dotwe.org/vue/0a81d27b5dbc68ea3bf5f9fd56c882e8)
 
 ## 特性
 
@@ -64,7 +64,9 @@ version: 2.1
 
   ![mobile_preview](../images/image_1.jpg)
 
-  [体验一下](http://dotwe.org/049213ab3364a86637e211c0329cdc50)
+- `placeholder`: <span class="api-version">v0.9+</span> &lt;string&gt; 当源图片下载中时显示一张占位图。
+
+  [体验一下](http://dotwe.org/vue/18e71ab3484bb6751ad77ff7d5195404)
 
 ## 样式
 
@@ -80,7 +82,7 @@ version: 2.1
 
 ## 事件
 
-- `load` <sup class="wx-v">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/25bd347da6a59603dd31ec057d2691da)
+- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/vue/98ee340348d7cc3e6fbfe68dbaef1eed)
 
   - 事件对象
     - `success`: 当图片成功加载时为`true`，否则为`false`
@@ -156,4 +158,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/image.html)
+[try it](http://dotwe.org/vue/e2122bc245beafb0348d79bfd1274904)

@@ -121,4 +121,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/stream.html)
+[try it](http://dotwe.org/vue/29bbf2d49fc8a204f98240044bbe211a)

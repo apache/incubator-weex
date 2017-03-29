@@ -20,7 +20,6 @@
 @property (nonatomic, strong) NSMutableDictionary *asyncMethods;
 @property (nonatomic, strong) NSMutableDictionary *syncMethods;
 
-+ (instancetype)sharedInstance;
 - (instancetype)initWithName:(NSString *)name class:(NSString *)clazz;
 - (void)registerMethods;
 

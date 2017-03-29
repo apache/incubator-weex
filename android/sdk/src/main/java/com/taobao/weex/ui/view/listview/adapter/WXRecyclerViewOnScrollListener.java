@@ -209,6 +209,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
+import com.taobao.weex.utils.WXLogUtils;
+
 import java.lang.ref.WeakReference;
 
 
@@ -225,17 +227,27 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   /**
    * The last position
    */
-  private int[] lastPositions;
+  private int[] mLastPositions;
+  /**
+   * The first position
+   */
+  private int[] mFirstPositions;
+
 
   /**
    * The location of last visible item
    */
-  private int lastVisibleItemPosition;
+  private int mLastVisibleItemPosition;
+
+  /**
+   * The location of last visible item
+   */
+  private int mFirstVisibleItemPosition;
 
   /**
    * The state of scroll status
    */
-  private int currentScrollState = 0;
+  private int mCurrentScrollState = 0;
 
   private WeakReference<IOnLoadMoreListener> listener;
 
@@ -246,14 +258,14 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   @Override
   public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
     super.onScrollStateChanged(recyclerView, newState);
-    currentScrollState = newState;
+    mCurrentScrollState = newState;
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
     int visibleItemCount = layoutManager.getChildCount();
     int totalItemCount = layoutManager.getItemCount();
 
     if (visibleItemCount != 0) {
-      int bottomOffset = (totalItemCount - lastVisibleItemPosition - 1) * (recyclerView.getHeight()) / visibleItemCount;
-      if (visibleItemCount > 0 && currentScrollState == RecyclerView.SCROLL_STATE_IDLE) {
+      int bottomOffset = (totalItemCount - mLastVisibleItemPosition - 1) * (recyclerView.getHeight()) / visibleItemCount;
+      if (visibleItemCount > 0 && mCurrentScrollState == RecyclerView.SCROLL_STATE_IDLE) {
         if (listener != null && listener.get() != null) {
           listener.get().onLoadMore(bottomOffset);
         }
@@ -265,43 +277,64 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
   public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
     super.onScrolled(recyclerView, dx, dy);
     RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-    listener.get().onBeforeScroll(dx,dy);
-    //  int lastVisibleItemPosition = -1;
-    if (layoutManagerType == null) {
+    if(listener == null){
+      return;
+    }
+    IOnLoadMoreListener iOnLoadMoreListener = listener.get();
+
+    if(iOnLoadMoreListener!=null) {
+
+      iOnLoadMoreListener.onBeforeScroll(dx, dy);
+
       if (layoutManager instanceof LinearLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.LINEAR;
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) layoutManager;
+        mLastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+        int firstVisible = linearLayoutManager.findFirstVisibleItemPosition();
+        iOnLoadMoreListener.notifyAppearStateChange(firstVisible
+            , mLastVisibleItemPosition
+            , dx
+            , dy);
       } else if (layoutManager instanceof GridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.GRID;
+        GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
+        mLastVisibleItemPosition = gridLayoutManager.findLastVisibleItemPosition();
+        iOnLoadMoreListener.notifyAppearStateChange(gridLayoutManager.findFirstVisibleItemPosition()
+            , mLastVisibleItemPosition
+            , dx
+            , dy);
+
       } else if (layoutManager instanceof StaggeredGridLayoutManager) {
         layoutManagerType = LAYOUT_MANAGER_TYPE.STAGGERED_GRID;
+        StaggeredGridLayoutManager staggeredGridLayoutManager = (StaggeredGridLayoutManager) layoutManager;
+        int newSpanCount = staggeredGridLayoutManager.getSpanCount();
+        if (mLastPositions == null || newSpanCount != mLastPositions.length) {
+          mLastPositions = new int[newSpanCount];
+        }
+        if (mFirstPositions == null || newSpanCount != mFirstPositions.length) {
+          mFirstPositions = new int[newSpanCount];
+        }
+        //avoid crash of support-v7 original bug
+        try{
+          staggeredGridLayoutManager.findFirstVisibleItemPositions(mFirstPositions);
+          mFirstVisibleItemPosition = findMin(mFirstPositions);
+          staggeredGridLayoutManager.findLastVisibleItemPositions(mLastPositions);
+          mLastVisibleItemPosition = findMax(mLastPositions);
+          iOnLoadMoreListener.notifyAppearStateChange(
+              mFirstVisibleItemPosition
+              , mLastVisibleItemPosition
+              , dx
+              , dy);
+
+        }catch(Exception e){
+          e.printStackTrace();
+          WXLogUtils.e(e.toString());
+        }
+
       } else {
         throw new RuntimeException(
             "Unsupported LayoutManager used. Valid ones are LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager");
       }
-    }
-
-    switch (layoutManagerType) {
-      case LINEAR:
-        lastVisibleItemPosition = ((LinearLayoutManager) layoutManager)
-            .findLastVisibleItemPosition();
-        listener.get().notifyAppearStateChange(((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition()
-            ,lastVisibleItemPosition
-            ,dx
-            ,dy);
-        break;
-      case GRID:
-        lastVisibleItemPosition = ((GridLayoutManager) layoutManager)
-            .findLastVisibleItemPosition();
-        break;
-      case STAGGERED_GRID:
-        StaggeredGridLayoutManager staggeredGridLayoutManager
-            = (StaggeredGridLayoutManager) layoutManager;
-        if (lastPositions == null) {
-          lastPositions = new int[staggeredGridLayoutManager.getSpanCount()];
-        }
-        staggeredGridLayoutManager.findLastVisibleItemPositions(lastPositions);
-        lastVisibleItemPosition = findMax(lastPositions);
-        break;
     }
   }
 
@@ -313,6 +346,16 @@ public class WXRecyclerViewOnScrollListener extends RecyclerView.OnScrollListene
       }
     }
     return max;
+  }
+
+  private int findMin(int[] firstPositions) {
+    int min = firstPositions[0];
+    for (int value : firstPositions) {
+      if (value < min) {
+        min = value;
+      }
+    }
+    return min;
   }
 
   public enum LAYOUT_MANAGER_TYPE {
