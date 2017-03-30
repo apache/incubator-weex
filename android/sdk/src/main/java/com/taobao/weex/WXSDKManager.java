@@ -218,7 +218,11 @@ public class WXSDKManager {
   }
 
   public static int getInstanceViewPortWidth(String instanceId){
-    return getInstance().getSDKInstance(instanceId).getInstanceViewPortWidth();
+    WXSDKInstance instance = getInstance().getSDKInstance(instanceId);
+    if (instance == null) {
+      return 750;
+    }
+    return instance.getInstanceViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -249,7 +253,7 @@ public class WXSDKManager {
     return mWXRenderManager;
   }
 
-  public WXSDKInstance getSDKInstance(String instanceId) {
+  public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
     return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
   }
 

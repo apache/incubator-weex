@@ -209,13 +209,17 @@ import android.net.Uri;
 import android.view.View;
 
 import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.URIAdapter;
 
 public class ATagUtil {
   public static void onClick(View widget, String instanceId, String url) {
-    String href = WXSDKManager.getInstance().getSDKInstance(instanceId).
-        rewriteUri(Uri.parse(url), URIAdapter.LINK).toString();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance == null) {
+      return;
+    }
+    String href = instance.rewriteUri(Uri.parse(url), URIAdapter.LINK).toString();
     JSONArray array = new JSONArray();
     array.add(href);
     WXSDKManager.getInstance().getWXBridgeManager().

@@ -567,7 +567,7 @@ class DOMActionContextImpl implements DOMActionContext {
           int width = (int) domObject.getLayoutWidth();
           int height = (int) domObject.getLayoutHeight();
           animationBean.styles = new WXAnimationBean.Style();
-          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstance().getSDKInstance(mInstanceId).getInstanceViewPortWidth());
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstanceViewPortWidth(mInstanceId));
           return animationBean;
         }
       }catch (RuntimeException e){
