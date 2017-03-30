@@ -8,6 +8,7 @@
 .*/ios/.*
 .*/bin/.*
 .*/dist/.*
+.*/flow-typed/.*
 
 [include]
 
