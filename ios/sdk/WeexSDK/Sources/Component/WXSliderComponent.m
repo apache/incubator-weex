@@ -288,7 +288,6 @@
     __weak typeof(self) weakSelf = self;
     if (!weakSelf)
     {
-        //NSLog(@"self被销毁");
         return;
     }
     //ensure that the end of scroll is fired.
