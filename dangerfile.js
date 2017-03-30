@@ -27,11 +27,15 @@ const flowIgnorePaths = [
 
 // new js files should have `@flow` at the top
 const unFlowedFiles = jsFiles.filter(filepath => {
-  for (const p in flowIgnorePaths) {
-    if (p.indexOf(filepath) >= -1) {
+  let i = 0
+  const len = flowIgnorePaths.length
+  while (i < len) {
+    const p = flowIgnorePaths[i]
+    if (p.indexOf(filepath) > -1) {
       // ignore this file because it's in the flow-ignore-paths.
-      return;
+      return false;
     }
+    i++
   }
   const content = fs.readFileSync(filepath);
   return !content.includes("@flow");
