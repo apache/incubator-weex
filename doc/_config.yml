@@ -322,3 +322,5 @@ alias:
   cn/doc/references/events/blur.html: cn/references/index.html
   cn/doc/references/events/input.html: cn/references/index.html
   cn/doc/references/events/focus.html: cn/references/index.html
+  cn/guide/tools/devtools.html: cn/guide/tools/toolkit.html
+  cn/guide/tools/weexpack.html: cn/guide/tools/toolkit.html
