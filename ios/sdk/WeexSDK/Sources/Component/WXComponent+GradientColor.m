@@ -6,14 +6,14 @@
  * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
  */
 
-
 #import "WXComponent+GradientColor.h"
 #import "WXComponent_internal.h"
 #import "WXConvert.h"
 
 @implementation  WXComponent (GradientColor)
 
-- (void)setGradientLayer {
+- (void)setGradientLayer
+{
     if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
         return;
     }
@@ -59,62 +59,66 @@
     
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            UIImage *bgImg = [weakSelf gradientColorImageFromColors:@[startColor, endColor] gradientType:gradientType imgSize:weakSelf.view.frame.size];
+            CAGradientLayer * gradientLayer = [weakSelf gradientLayerFromColors:@[startColor, endColor] gradientType:gradientType];
             dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.view.backgroundColor = [UIColor colorWithPatternImage:bgImg];
+                __strong typeof(self) strongSelf = weakSelf;
+                /*
+                 must insert the gradientLayer at index 0, and then set masksToBounds to match the view bounds
+                 or the subview will be invisible
+                 */
+                if(strongSelf) {
+                    [strongSelf.view.layer insertSublayer:gradientLayer atIndex:0];
+                    strongSelf.view.layer.masksToBounds = YES;
+                }
             });
         });
     }
 }
 
-- (UIImage *)gradientColorImageFromColors:(NSArray*)colors gradientType:(WXGradientType)gradientType imgSize:(CGSize)imgSize;{
-    NSMutableArray *array = [NSMutableArray array];
+- (CAGradientLayer*)gradientLayerFromColors:(NSArray*)colors gradientType:(WXGradientType)gradientType
+{
+    CAGradientLayer * gradientLayer = [CAGradientLayer layer];
+    NSMutableArray *newColors = [NSMutableArray array];
     for(UIColor *color in colors) {
-        [array addObject:(id)color.CGColor];
+        [newColors addObject:(id)color.CGColor];
     }
-    
-    UIGraphicsBeginImageContextWithOptions(imgSize, YES, 1);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSaveGState(context);
-    CGColorSpaceRef colorSpace = CGColorGetColorSpace([[colors lastObject] CGColor]);
-    CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (CFArrayRef)array, NULL);
+    gradientLayer.colors = newColors;
     CGPoint start;
     CGPoint end;
     switch (gradientType) {
         case WXGradientTypeToTop:
-            start = CGPointMake(0.0, imgSize.height);
+            start = CGPointMake(0.0, 1.0);
             end = CGPointMake(0.0, 0.0);
             break;
         case WXGradientTypeToBottom:
             start = CGPointMake(0.0, 0.0);
-            end = CGPointMake(0.0, imgSize.height);
+            end = CGPointMake(0.0, 1.0);
             break;
         case WXGradientTypeToLeft:
-            start = CGPointMake(imgSize.width, 0.0);
+            start = CGPointMake(1.0, 0.0);
             end = CGPointMake(0.0, 0.0);
             break;
         case WXGradientTypeToRight:
             start = CGPointMake(0.0, 0.0);
-            end = CGPointMake(imgSize.width, 0.0);
+            end = CGPointMake(1.0, 0.0);
             break;
         case WXGradientTypeToTopleft:
-            start = CGPointMake(imgSize.width, imgSize.height);
+            start = CGPointMake(1.0, 1.0);
             end = CGPointMake(0.0, 0.0f);
             break;
         case WXGradientTypeToBottomright:
             start = CGPointMake(0.0, 0.0);
-            end = CGPointMake(imgSize.width, imgSize.height);
+            end = CGPointMake(1.0, 1.0);
             break;
         default:
             break;
     }
-    CGContextDrawLinearGradient(context, gradient, start, end, kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    CGGradientRelease(gradient);
-    CGContextRestoreGState(context);
-    CGColorSpaceRelease(colorSpace);
-    UIGraphicsEndImageContext();
-    return image;
+    
+    gradientLayer.startPoint = start;
+    gradientLayer.endPoint = end;
+    gradientLayer.frame = self.view.bounds;
+    
+    return gradientLayer;
 }
 
 @end

@@ -207,6 +207,7 @@ package com.taobao.weex.ui.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.text.Layout;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -225,6 +226,8 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   private WeakReference<WXText> mWeakReference;
   private WXGesture wxGesture;
   private Layout textLayout;
+  private boolean mIsLabelSet = false;
+
   public WXTextView(Context context) {
     super(context);
   }
@@ -266,7 +269,7 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
 
   public void setTextLayout(Layout layout) {
     this.textLayout = layout;
-    if(layout!=null){
+    if(layout!=null && !mIsLabelSet){
       setContentDescription(layout.getText());
     }
     if (mWeakReference != null) {
@@ -275,6 +278,19 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
         wxText.readyToRender();
       }
     }
+  }
+
+  public void setAriaLabel(String label){
+    if(!TextUtils.isEmpty(label)){
+      mIsLabelSet = true;
+      setContentDescription(label);
+    }else{
+      mIsLabelSet = false;
+      if(textLayout != null){
+        setContentDescription(textLayout.getText());
+      }
+    }
+
   }
 
   @Override

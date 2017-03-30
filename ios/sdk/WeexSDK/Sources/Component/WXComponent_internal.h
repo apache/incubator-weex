@@ -45,6 +45,13 @@
     WXBoxShadow *_boxShadow;
     
     /**
+     * accessibility support
+     */
+    UIAccessibilityTraits _role; //accessibility
+    NSString * _ariaLabel; //accessibilityLabel
+    BOOL _ariaHidden; // accessibilityElementsHidden
+    
+    /**
      *  PseudoClass
      */
     NSMutableDictionary *_pseudoClassStyles;
@@ -187,4 +194,6 @@
 - (void)_updatePseudoClassStyles:(NSString *)key;
 
 - (void)_restoreViewStyles;
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
 @end

@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(547)
+	__vue_styles__.push(__webpack_require__(571)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(548)
+	__vue_exports__ = __webpack_require__(572)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(549)
+	var __vue_template__ = __webpack_require__(573)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/style/style-item.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/style/style-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-768350d6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 547:
+/***/ 571:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -107,7 +111,7 @@
 
 /***/ },
 
-/***/ 548:
+/***/ 572:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -134,11 +138,11 @@
 
 /***/ },
 
-/***/ 549:
+/***/ 573:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('text', {
+	  return _c('text', {
 	    staticClass: ["item", "txt"],
 	    style: {
 	      backgroundColor: _vm.bgColor

@@ -37,6 +37,7 @@
           // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
 
           // showcase
+          {name: root + '/showcase/boxshadow', title: 'boxshadow'},
           {name: root + '/showcase/progress', title: 'Progress Bar'},
           {name: root + '/showcase/itemlist', title: 'List (Advanced)'},
           {name: root + '/showcase/calculator', title: 'Calculator'},

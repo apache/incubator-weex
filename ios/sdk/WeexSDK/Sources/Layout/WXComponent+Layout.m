@@ -137,6 +137,7 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
+            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }
@@ -204,7 +205,6 @@
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
-    
     [self layoutDidFinish];
 }
 
