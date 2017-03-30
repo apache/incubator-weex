@@ -31,7 +31,6 @@ const unFlowedFiles = jsFiles.filter(filepath => {
   const len = flowIgnorePaths.length
   while (i < len) {
     const p = flowIgnorePaths[i]
-    console.log(filepath, p, filepath.indexOf(p))
     if (filepath.indexOf(p) > -1) {
       // ignore this file because it's in the flow-ignore-paths.
       return false;
