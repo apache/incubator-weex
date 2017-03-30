@@ -8,6 +8,7 @@
 
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXScannerVC.h"
+#import "WXScannerHistoryVC.h"
 #import "WXDefine.h"
 #import <objc/runtime.h>
 
@@ -34,17 +35,29 @@
     [self.navigationController.navigationBar setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
                                                                       [UIColor whiteColor], NSForegroundColorAttributeName, nil]];
     self.navigationItem.title = @"Weex Playground";
-    
-    if (self.navigationItem.leftBarButtonItem) return;
-    
-    UIBarButtonItem *leftItem;
-    if(![[self.navigationController.viewControllers objectAtIndex:0] isEqual:self]) {
-        leftItem = [self backButtonItem];
-    } else {
-        leftItem = [self leftBarButtonItem];
+    if (!self.navigationItem.leftBarButtonItem) {
+        UIBarButtonItem *leftItem;
+        if(![[self.navigationController.viewControllers objectAtIndex:0] isEqual:self]) {
+            leftItem = [self backButtonItem];
+        } else {
+            leftItem = [self leftBarButtonItem];
+        }
+        self.navigationItem.leftBarButtonItems = @[leftItem];
     }
-    
-    self.navigationItem.leftBarButtonItems = @[leftItem];
+    if ([self isKindOfClass:[WXScannerVC class]]) {
+        UIBarButtonItem *historyItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"scan_history"]
+                                                          style:UIBarButtonItemStyleBordered
+                                                         target:self
+                                                         action:@selector(historyButtonClicked:)];
+        self.navigationItem.rightBarButtonItems = @[historyItem];
+    }
+    if([self isKindOfClass:[WXScannerHistoryVC class]]) {
+        UIBarButtonItem *historyItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"delete"]
+                                                                        style:UIBarButtonItemStyleBordered
+                                                                       target:self
+                                                                       action:@selector(clearScannerHistory:)];
+        self.navigationItem.rightBarButtonItems = @[historyItem];
+    }
 }
 
 - (void)edgePanGesture:(UIScreenEdgePanGestureRecognizer*)edgePanGestureRecognizer
@@ -97,15 +110,24 @@
 #pragma mark -
 #pragma mark - UIBarButtonItem actions
 
-- (void)scanQR:(id)sender
-{
+- (void)scanQR:(id)sender {
+    
     WXScannerVC * scanViewController = [[WXScannerVC alloc] init];
     [self.navigationController pushViewController:scanViewController animated:YES];
 }
 
-- (void)backButtonClicked:(id)sender
-{
+- (void)backButtonClicked:(id)sender {
+    
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)historyButtonClicked:(id)sender {
+    
+    [self.navigationController pushViewController:[WXScannerHistoryVC new] animated:YES];
+}
+
+- (void)clearScannerHistory:(id)sender {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:WX_SCANNER_HISTORY];
 }
 
 @end

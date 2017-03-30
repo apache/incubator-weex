@@ -76,7 +76,8 @@
     [_session stopRunning];
     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     if (metadataObjects.count > 0) {
-        AVMetadataMachineReadableCodeObject * metadataObject = [metadataObjects objectAtIndex : 0 ];
+        AVMetadataMachineReadableCodeObject * metadataObject = [metadataObjects objectAtIndex: 0];
+        [self recordScannerHistory:metadataObject.stringValue];
         [self openURL:metadataObject.stringValue];
     }
 }
@@ -211,5 +212,20 @@
 }
 #pragma clang diagnostic pop
 
+- (void)recordScannerHistory:(NSString*)urlStr {
+    
+    NSMutableArray * scanner_history = [[[NSUserDefaults standardUserDefaults] objectForKey:WX_SCANNER_HISTORY] mutableCopy];
+    if (!scanner_history) {
+        scanner_history = [NSMutableArray new];
+    }
+    if ([scanner_history containsObject:urlStr]) {
+        [scanner_history removeObject:urlStr];
+    }
+    if ([scanner_history count] >= 7) {
+        [scanner_history removeLastObject];
+    }
+    [scanner_history insertObject:urlStr atIndex:0];
+    [[NSUserDefaults standardUserDefaults] setObject:scanner_history forKey:WX_SCANNER_HISTORY];
+}
 
 @end

@@ -26,3 +26,4 @@
 
 #define QRSCAN  @"com.taobao.WeexDemo.scan"
 #define WEEX_COLOR [UIColor colorWithRed:0.27 green:0.71 blue:0.94 alpha:1]
+#define WX_SCANNER_HISTORY @"wx_scanner_history"
