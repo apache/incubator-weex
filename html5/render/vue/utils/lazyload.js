@@ -3,19 +3,18 @@
 import { isElementVisible } from './component'
 import { createEvent, dispatchEvent } from './event'
 import { throttle } from './func'
-import { isArray } from './type'
 import { tagImg } from './perf'
 
 const SCREEN_REC_LIMIT = 3  // just record the first 3 times for screen-render finishing.
 let doRecord = true
 
 function preLoadImg (src: string,
-  loadCallback: ?(Event) => void,
-  errorCallback: ?(Event) => void): void {
-    const img = new Image()
-    img.onload = loadCallback ? loadCallback.bind(img) : null
-    img.onerror = errorCallback ? errorCallback.bind(img) : null
-    img.src = src
+    loadCallback: ?(Event) => void,
+    errorCallback: ?(Event) => void): void {
+  const img = new Image()
+  img.onload = loadCallback ? loadCallback.bind(img) : null
+  img.onerror = errorCallback ? errorCallback.bind(img) : null
+  img.src = src
 }
 
 export function applySrc (item: HTMLElement, src: ?string, placeholderSrc: ?string): void {
