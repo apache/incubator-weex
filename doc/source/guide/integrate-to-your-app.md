@@ -1,7 +1,7 @@
 ---
 title: Integrate to Your App  
 type: guide
-order: 3
+order: 1.2
 has_chapter_content: false
 chapter_title: Intro
 version: 2.1
@@ -12,7 +12,7 @@ version: 2.1
 ## Integrate to Android
 Tip：The following documents assume that you already have a certain Android development experience.    
 
-### Android has tow ways to integrate weex
+### Android has two ways to integrate weex
 1.using source code: Can quickly use the latest features of WEEX, according to your own characteristics of the project. So, you can do some related improvements.
 
 2.using SDK: WEEX will regularly release a stable version at jcenter.[jcenter](https://bintray.com/alibabaweex/maven/weex_sdk/view)       

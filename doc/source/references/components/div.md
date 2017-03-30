@@ -60,5 +60,5 @@ There is no specific attribute for this component.
 </style>
 ```
 
-[try it](../../examples/div.html)
+[try it](http://dotwe.org/vue/edfbd1806508cb86254b03dc0b8e28ac)
 

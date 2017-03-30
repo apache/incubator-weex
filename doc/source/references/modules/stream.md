@@ -128,4 +128,4 @@ Start a network request, use two callbacks to receive server's response data.
 </style>
 ```
 
-[try it](../../examples/stream.html)
+[try it](http://dotwe.org/vue/29bbf2d49fc8a204f98240044bbe211a)

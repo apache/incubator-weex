@@ -169,4 +169,4 @@ Returns an array that contains all keys stored in Storage object.
 </style>
 ```
 
-[try it](../../examples/storage.html)
+[try it](http://dotwe.org/vue/3fdd3e2d1646ca41199d80c7be799858)

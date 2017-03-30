@@ -211,4 +211,4 @@ common styles: check out [common styles for components](../common-style.html)
 </style>
 ```
 
-[try it](../../examples/refresh.html)
+[try it](http://dotwe.org/vue/d3db5f344220a6339de044a5e33c502b)

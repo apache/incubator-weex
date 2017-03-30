@@ -84,4 +84,4 @@ common styles: check out [common styles for components](../common-style.html)
 </script>
 ```
 
-[try it](../../examples/video.html)
+[try it](http://dotwe.org/vue/01d3d27073a471bb234b1a76e130d197)

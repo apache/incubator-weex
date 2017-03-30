@@ -98,4 +98,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/text.html)
+[try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)

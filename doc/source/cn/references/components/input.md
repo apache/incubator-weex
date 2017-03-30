@@ -190,4 +190,4 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 </style>
 ```
 
-[try it](../../../examples/input.html)
+[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)
