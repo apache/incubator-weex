@@ -25,7 +25,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 - `disabled {boolean}`：布尔类型的数据，表示是否支持输入。通常 `click` 事件在 `disabled` 控件上是失效的。
 - `autofocus {boolean}`：布尔类型的数据，表示是否在页面加载时控件自动获得输入焦点。
 - `maxlength {nubmer}`：<sup class="wx-v">v0.7</sup>一个数值类型的值，表示输入的最大长度。
-- `return-key-type {string}`：<sup class="wx-v">v0.11</sup>键盘enter键的类型。
+- `return-key-type {string}`：<sup class="wx-v">v0.11</sup>键盘返回键的类型。
 
 ## 样式
 
@@ -85,11 +85,11 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
   事件中 event 对象属性：
 
   - `timestamp`: 事件发生时的时间戳。
-- `return`: 键盘点击确认按钮。
+- `return`: 键盘点击返回键。
 
     事件中 event 对象属性：
 
-    - `returnKeyType`: 事件发生时的enter按钮内类型。
+    - `returnKeyType`: 事件发生时的返回键类型。
     - `value`: 触发事件的组件的文本；
 
 - 通用事件

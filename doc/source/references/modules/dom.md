@@ -24,6 +24,7 @@ Scroll the page to the specified node. This API should only be used on the eleme
 * `node`*(Node)*: an element that scrolled into the view.
 * `options`*(object)*: some options.
   * `offset`*(number)*: An offset to the visible position, default is `0`.
+  * `animated` *(bool)* :set element animation, default true
 
 #### Example
 
