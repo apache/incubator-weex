@@ -229,29 +229,23 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSONObject;
-
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
-import com.alibaba.weex.extend.WXInstanceStatisticsListener;
 import com.alibaba.weex.https.HotRefreshManager;
 import com.alibaba.weex.https.WXHttpManager;
 import com.alibaba.weex.https.WXHttpTask;
 import com.alibaba.weex.https.WXRequestListener;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.RenderContainer;
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.ui.component.NestedContainer;
-import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -354,47 +348,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mInstance = new WXSDKInstance(this);
       mInstance.setRenderContainer(renderContainer);
       mInstance.registerRenderListener(this);
-      mInstance.registerStatisticsListener(new WXInstanceStatisticsListener());
       mInstance.setNestedInstanceInterceptor(this);
       mInstance.setTrackComponent(true);
     }
     mContainer.post(new Runnable() {
       @Override
       public void run() {
-        Trace.beginSection(mUri.toString());
-
         Activity ctx = WXPageActivity.this;
         Rect outRect = new Rect();
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
-        mConfigMap.put(com.taobao.weex.common.Constants.CodeCache.URL,
-                       mUri.toString());
-        String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
-        String content = WXFileUtils.loadAsset(path, WXPageActivity.this);
-        // Set options.bundleDigest
-        try {
-          String banner = WXUtils.getBundleBanner(content);
-          JSONObject jsonObj = JSONObject.parseObject(banner);
-          String digest = null;
-          if (jsonObj != null) {
-            digest = jsonObj.getString(com.taobao.weex.common.Constants.CodeCache.BANNER_DIGEST);
-          }
-          if (digest != null) {
-            mConfigMap.put(com.taobao.weex.common.Constants.CodeCache.DIGEST,
-                           digest);
-          }
-        } catch (Throwable t) {}
-
-        // Set options.codeCachePath
-        path = WXEnvironment.getFilesDir(getApplicationContext());
-        path += File.separator;
-        path += com.taobao.weex.common.Constants.CodeCache.SAVE_PATH;
-        path += File.separator;
-        mConfigMap.put(com.taobao.weex.common.Constants.CodeCache.PATH,
-                       path);
-        mInstance.render(TAG, content,
+        mConfigMap.put("bundleUrl", mUri.toString());
+        String path = "file".equals(mUri.getScheme()) ? assembleFilePath(mUri) : mUri.toString();
+        mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
             mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
-        Trace.endSection();
       }
     });
   }

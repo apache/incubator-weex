@@ -318,6 +318,13 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
+    
+    if ((_scrollDirection == WXScrollDirectionHorizontal && scrollView.contentSize.width <= scrollView.frame.size.width)
+        || (_scrollDirection == WXScrollDirectionVertical && scrollView.contentSize.height <= scrollView.frame.size.height)) {
+        // can not scroll
+        return;
+    }
+
     CGPoint contentOffset = scrollView.contentOffset;
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     
@@ -429,14 +436,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _lastContentOffset = scrollView.contentOffset;
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    if ([_refreshComponent displayState] && scrollView.dragging) {
-        [_refreshComponent pullingdown:@{
+    [_refreshComponent pullingdown:@{
              REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
              REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
              REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
              @"type":@"pullingdown"
-         }];
-    }
+    }];
 
     // check sticky
     [self adjustSticky];
@@ -465,12 +470,15 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
     UIEdgeInsets inset = [scrollView contentInset];
-    if ([_refreshComponent displayState]) {
-        inset.top = _refreshComponent.view.frame.size.height;
-    }
-    else {
-        inset.top = 0;
-    }
+    
+//  currently only set contentInset when loading
+//    if ([_refreshComponent displayState]) {
+//        inset.top = _refreshComponent.view.frame.size.height;
+//    }
+//    else {
+//        inset.top = 0;
+//    }
+    
     if ([_loadingComponent displayState]) {
         inset.bottom = _loadingComponent.view.frame.size.height;
     } else {

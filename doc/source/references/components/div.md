@@ -19,11 +19,11 @@ This type of component supports all kinds of weex component as its child compone
 
 ### Attributes
 
-There is no specific attribute for this component other than the [common attributes](../common-attrs.html).
+There is no specific attribute for this component.
 
 ### Styles
 
-**common styles**: check out the [common styles](../common-attrs.html)
+**common styles**: check out the [common styles](../common-style.html)
 
 - support flexbox related styles
 - support box model related styles
@@ -60,5 +60,5 @@ There is no specific attribute for this component other than the [common attribu
 </style>
 ```
 
-[try it](../../examples/div.html)
+[try it](http://dotwe.org/vue/edfbd1806508cb86254b03dc0b8e28ac)
 

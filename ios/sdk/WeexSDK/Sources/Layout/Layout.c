@@ -700,6 +700,9 @@ static void layoutNodeImpl(css_node_t *node, float parentMaxWidth, float parentM
     float maxHeight = CSS_UNDEFINED;
     for (i = startLine; i < childCount; ++i) {
       child = node->get_child(node->context, i);
+        if (child == NULL) {
+            return;
+        }
       child->line_index = linesCount;
 
       child->next_absolute_child = NULL;

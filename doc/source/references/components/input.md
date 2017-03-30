@@ -29,8 +29,6 @@ This component supports no child components.
 
 * `maxlength`: <span class="api-version">v0.7+</span> a number value to specify maxlength of input.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ## Styles
 
 * placeholder-color: the color of placeholder. Default value is '#999999'.
@@ -153,4 +151,4 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 </style>
 ```
 
-[try it](../../examples/input.html)
+[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)

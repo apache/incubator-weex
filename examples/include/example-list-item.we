@@ -1,13 +1,36 @@
 <template>
-  <wxc-list-item onclick="{{redirect}}">
+    <div class="item" style="background-color:{{bgColor}};" onclick="{{redirect}}">
     <text class="item-txt">{{ title }}</text>
-  </wxc-list-item>
+    </div>
 </template>
 
 <style>
   .item-txt {
     font-size: 48px;
     color: #555;
+  }
+  .item {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-left: 35px;
+    padding-right: 35px;
+    height: 160px;
+    justify-content: center;
+    /*margin-bottom: 1px; FUTURE */
+    border-bottom-width: 1px;
+    border-color: #dddddd;
+  }
+  .item:active {
+      padding-top: 25px;
+      padding-bottom: 25px;
+      padding-left: 35px;
+      padding-right: 35px;
+      height: 160px;
+      justify-content: center;
+      /*margin-bottom: 1px; FUTURE */
+      background-color: #00BDFF;
+      border-bottom-width: 1px;
+      border-color: #dddddd;
   }
 </style>
 
@@ -16,7 +39,8 @@
   module.exports = {
     data: {
       title: '',
-      url: ''
+      url: '',
+      bgColor: '#ffffff'
     },
     methods: {
       redirect: function() {

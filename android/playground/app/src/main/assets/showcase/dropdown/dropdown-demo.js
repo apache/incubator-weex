@@ -1,11 +1,3 @@
-/*!197
- * {
- *   version: "0.4.0.20170207",
- *   create: "20170207145011",
- *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
- *   digest: "6be6cc3a029b05aa9f9b751cded492be"
- * }
- !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -53,10 +45,10 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(232)
-	var __weex_template__ = __webpack_require__(236)
-	var __weex_style__ = __webpack_require__(237)
-	var __weex_script__ = __webpack_require__(238)
+	__webpack_require__(234)
+	var __weex_template__ = __webpack_require__(238)
+	var __weex_style__ = __webpack_require__(239)
+	var __weex_script__ = __webpack_require__(240)
 
 	__weex_define__('@weex-component/f7fd132bdb4ce0ff6745c3887b3163e2', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -101,12 +93,12 @@
 
 /***/ },
 
-/***/ 232:
+/***/ 234:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(233)
-	var __weex_style__ = __webpack_require__(234)
-	var __weex_script__ = __webpack_require__(235)
+	var __weex_template__ = __webpack_require__(235)
+	var __weex_style__ = __webpack_require__(236)
+	var __weex_script__ = __webpack_require__(237)
 
 	__weex_define__('@weex-component/we-dropdown', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -124,7 +116,7 @@
 
 /***/ },
 
-/***/ 233:
+/***/ 235:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -230,7 +222,7 @@
 
 /***/ },
 
-/***/ 234:
+/***/ 236:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -314,7 +306,7 @@
 
 /***/ },
 
-/***/ 235:
+/***/ 237:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -412,7 +404,7 @@
 
 /***/ },
 
-/***/ 236:
+/***/ 238:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -510,7 +502,7 @@
 
 /***/ },
 
-/***/ 237:
+/***/ 239:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -583,7 +575,7 @@
 
 /***/ },
 
-/***/ 238:
+/***/ 240:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
@@ -594,7 +586,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(232);
+	__webpack_require__(234);
 
 	var initData = '[{\"addTime\":\"2016-07-14\",\"questionStatus\":\"2\",\"questionStatusValue\":\"Closed\",\"title\":\"This is a demo\",\"vid\":\"AW5PMSC\"},{\"addTime\":\"2016-07-14\",\"questionStatus\":\"1\",\"questionStatusValue\":\"Waiting\",\"title\":\"This is a demo\",\"vid\":\"AW5PMSM\"},{\"addTime\":\"2016-07-14\",\"questionStatus\":\"2\",\"questionStatusValue\":\"Confirmed\",\"title\":\"This is a demo\",\"vid\":\"AW5PMSA\"}]';
 

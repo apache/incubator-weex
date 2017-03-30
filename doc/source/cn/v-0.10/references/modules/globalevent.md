@@ -8,7 +8,7 @@ version: 0.10
 # 全局事件
 <span class="weex-version">0.8 (开发中)</span>
 
-`globalEvent` 用于监听持久性事件，例如定位信息，陀螺仪等的变化。全局事件是需要额外 APIs 处理的次要 API。你能通过 `addEventListener` 注册事件监听，当你不再需要的时候，也可以通过 `removingEventListener` 取消事件监听。
+`globalEvent` 用于监听持久性事件，例如定位信息，陀螺仪等的变化。全局事件是需要额外 APIs 处理的次要 API。你能通过 `addEventListener` 注册事件监听，当你不再需要的时候，也可以通过 `removeEventListener` 取消事件监听。
 
 *提醒*
 

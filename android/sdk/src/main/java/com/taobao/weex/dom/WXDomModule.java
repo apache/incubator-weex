@@ -697,6 +697,6 @@ public final class WXDomModule extends WXModule {
 
   @NonNull
   private float getWebPxValue(int value) {
-    return WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getViewPortWidth());
+    return WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getInstanceViewPortWidth());
   }
 }

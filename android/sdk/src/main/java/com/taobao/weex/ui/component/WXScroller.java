@@ -260,7 +260,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   protected int mOrientation = Constants.Orientation.VERTICAL;
   private List<WXComponent> mRefreshs=new ArrayList<>();
   private int mChildrenLayoutOffset = 0;//Use for offset children layout
-  private String mLoadMoreRetry = "";
+  private boolean mForceLoadmoreNextTime = false;
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
 
@@ -855,26 +855,22 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   protected void onLoadMore(WXScrollView scrollView, int x, int y) {
     try {
       String offset = getDomObject().getAttrs().getLoadMoreOffset();
-
       if (TextUtils.isEmpty(offset)) {
         return;
       }
+      int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), WXSDKInstance.getViewPortWidth());
 
       int contentH = scrollView.getChildAt(0).getHeight();
       int scrollerH = scrollView.getHeight();
       int offScreenY = contentH - y - scrollerH;
-      if (offScreenY < Integer.parseInt(offset)) {
+      if (offScreenY < offsetInt) {
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
         }
-        String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
-        if (loadMoreRetry == null) {
-          loadMoreRetry = mLoadMoreRetry;
-        }
-        if (mContentHeight != contentH || !mLoadMoreRetry.equals(loadMoreRetry)) {
+        if (mContentHeight != contentH || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mContentHeight = contentH;
-          mLoadMoreRetry = loadMoreRetry;
+          mForceLoadmoreNextTime = false;
         }
       }
     } catch (Exception e) {
@@ -885,6 +881,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @JSMethod
   public void resetLoadmore() {
-    mLoadMoreRetry = "";
+    mForceLoadmoreNextTime = true;
   }
 }

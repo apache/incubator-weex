@@ -214,22 +214,17 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXThread;
-import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Known Issus: In auto play mode, neighbor view not scaled or aplhaed rarely.
@@ -528,7 +523,7 @@ public class WXSliderNeighbor extends WXSlider {
         }
         View realView = ((ViewGroup)hostPage).getChildAt(0);
         float translation = (hostPage.getMeasuredWidth()-realView.getMeasuredWidth()*mNeighborScale)/4;
-        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth() * mCurrentItemScale)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace, getInstance().getViewPortWidth()))/2 ;
+        translation += ((hostPage.getMeasuredWidth()-realView.getMeasuredWidth() * mCurrentItemScale)/2 - WXViewUtils.getRealPxByWidth(mNeighborSpace, getInstance().getInstanceViewPortWidth()))/2 ;
         return translation;
     }
 

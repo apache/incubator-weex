@@ -1,11 +1,3 @@
-/*!197
- * {
- *   version: "0.4.0.20170207",
- *   create: "20170207145011",
- *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
- *   digest: "5169a82b5e387ecef6a07f653ab3f5dd"
- * }
- !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -52,9 +44,9 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(292)
-	var __weex_style__ = __webpack_require__(293)
-	var __weex_script__ = __webpack_require__(294)
+	var __weex_template__ = __webpack_require__(297)
+	var __weex_style__ = __webpack_require__(298)
+	var __weex_script__ = __webpack_require__(299)
 
 	__weex_define__('@weex-component/045f40e22d4b6e9c9f36354367812ecd', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -531,7 +523,8 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  }
+	  },
+	  "panel-body": {}
 	}
 
 /***/ },
@@ -2241,7 +2234,12 @@
 /* 289 */,
 /* 290 */,
 /* 291 */,
-/* 292 */
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2404,7 +2402,7 @@
 	}
 
 /***/ },
-/* 293 */
+/* 298 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2415,7 +2413,7 @@
 	}
 
 /***/ },
-/* 294 */
+/* 299 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

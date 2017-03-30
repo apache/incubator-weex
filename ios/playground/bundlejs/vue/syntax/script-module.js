@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(587)
+	__vue_styles__.push(__webpack_require__(611)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(588)
+	__vue_exports__ = __webpack_require__(612)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(589)
+	var __vue_template__ = __webpack_require__(613)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/syntax/script-module.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/script-module.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-85636e6c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 587:
+/***/ 611:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -103,7 +107,7 @@
 
 /***/ },
 
-/***/ 588:
+/***/ 612:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -124,7 +128,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  methods: {
 	    test: function test() {
@@ -138,16 +142,16 @@
 
 /***/ },
 
-/***/ 589:
+/***/ 613:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('text', {
+	  return _c('div', [_c('text', {
 	    staticClass: ["btn"],
 	    on: {
 	      "click": _vm.test
 	    }
-	  }, ["Toast!"])])
+	  }, [_vm._v("Toast!")])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

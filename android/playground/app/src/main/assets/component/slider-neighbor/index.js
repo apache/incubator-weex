@@ -1,11 +1,3 @@
-/*!197
- * {
- *   version: "0.4.0.20170207",
- *   create: "20170207145011",
- *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
- *   digest: "4f269d5a6fa85e338c056a0254fa0da0"
- * }
- !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -75,7 +67,7 @@
 /***/ function(module, exports) {
 
 	module.exports = {
-	  "type": "scroller",
+	  "type": "div",
 	  "style": {
 	    "flexDirection": "column",
 	    "backgroundColor": "#ffffff",
@@ -87,11 +79,12 @@
 	    {
 	      "type": "div",
 	      "style": {
-	        "height": 410,
-	        "borderWidth": 3,
+	        "width": 700,
+	        "height": 400,
+	        "borderWidth": 1,
 	        "borderStyle": "solid",
 	        "borderColor": "#000000",
-	        "margin": 10
+	        "margin": 0
 	      },
 	      "children": [
 	        {
@@ -103,75 +96,55 @@
 	          "attr": {
 	            "neighborScale": "0.8",
 	            "neighborSpace": "30",
-	            "currentItemScale": "0.95",
+	            "currentItemScale": "0.90",
 	            "interval": "3000",
 	            "neighborAlpha": "0.8",
 	            "autoPlay": function () {return this.attr_auto_play}
 	          },
 	          "children": [
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1dzanMVXXXXXQXVXXXXXXXXXX-573-412.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1dzanMVXXXXXQXVXXXXXXXXXX-573-412.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1p9CCMVXXXXa_XFXXXXXXXXXX-450-340.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1p9CCMVXXXXa_XFXXXXXXXXXX-450-340.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1zpSiMVXXXXchXFXXXXXXXXXX-448-338.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1zpSiMVXXXXchXFXXXXXXXXXX-448-338.png"
+	              }
 	            },
 	            {
-	              "type": "container",
-	              "children": [
-	                {
-	                  "type": "image",
-	                  "style": {
-	                    "width": 650,
-	                    "backgroundColor": "#FFFFDF",
-	                    "height": 400
-	                  },
-	                  "attr": {
-	                    "src": "https://gw.alicdn.com/tps/TB1EuGIMVXXXXcoXpXXXXXXXXXX-452-337.png"
-	                  }
-	                }
-	              ]
+	              "type": "image",
+	              "style": {
+	                "width": 600,
+	                "backgroundColor": "#FFFFDF",
+	                "height": 400
+	              },
+	              "attr": {
+	                "src": "https://gw.alicdn.com/tps/TB1EuGIMVXXXXcoXpXXXXXXXXXX-452-337.png"
+	              }
 	            },
 	            {
 	              "type": "indicator",
@@ -191,7 +164,7 @@
 	      ]
 	    },
 	    {
-	      "type": "scroller",
+	      "type": "div",
 	      "style": {
 	        "height": 100,
 	        "borderWidth": 0,

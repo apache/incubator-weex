@@ -222,6 +222,7 @@ import android.view.ViewGroup.LayoutParams;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 
@@ -307,11 +308,22 @@ public class WXViewUtils {
     return getScreenWidth(WXEnvironment.sApplication);
   }
 
+  public static float getScreenDensity(Context ctx){
+    if(ctx != null){
+      try{
+        Resources res = ctx.getResources();
+        return res.getDisplayMetrics().density;
+      }catch (Exception e){
+        WXLogUtils.e("getScreenDensityDpi exception:"+e.getMessage());
+      }
+    }
+    return Constants.Value.DENSITY;
+  }
+
   public static int getScreenWidth(Context ctx) {
     if(ctx!=null){
       Resources res = ctx.getResources();
       mScreenWidth = res.getDisplayMetrics().widthPixels;
-
       if(WXEnvironment.SETTING_FORCE_VERTICAL_SCREEN){
         mScreenHeight = res
                 .getDisplayMetrics()

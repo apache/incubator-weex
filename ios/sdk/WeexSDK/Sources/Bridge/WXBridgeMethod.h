@@ -12,7 +12,7 @@
 @interface WXBridgeMethod : NSObject
 
 @property (nonatomic, strong, readonly) NSString *methodName;
-@property (nonatomic, copy, readonly) NSArray *arguments;
+@property (nonatomic, copy, readonly) NSMutableArray *arguments;
 @property (nonatomic, weak, readonly) WXSDKInstance *instance;
 
 - (instancetype)initWithMethodName:(NSString *)methodName

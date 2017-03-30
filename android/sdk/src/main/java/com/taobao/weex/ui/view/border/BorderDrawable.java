@@ -450,8 +450,8 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
-  public void setImage(Shader shader){
-    mShader=shader;
+  public void setImage(Shader shader) {
+    mShader = shader;
     invalidateSelf();
   }
 
