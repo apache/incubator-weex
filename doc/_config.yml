@@ -324,3 +324,5 @@ alias:
   cn/doc/references/events/focus.html: cn/references/index.html
   cn/guide/tools/devtools.html: cn/guide/tools/toolkit.html
   cn/guide/tools/weexpack.html: cn/guide/tools/toolkit.html
+  guide/tools/devtools.html: guide/tools/toolkit.html
+  guide/tools/weexpack.html: guide/tools/toolkit.html
