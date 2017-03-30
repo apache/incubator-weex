@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(492)
+	__vue_styles__.push(__webpack_require__(516)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(493)
+	__vue_exports__ = __webpack_require__(517)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(494)
+	var __vue_template__ = __webpack_require__(518)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/showcase/itemlist.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/showcase/itemlist.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-b34e9a8a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 492:
+/***/ 516:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -156,7 +160,7 @@
 
 /***/ },
 
-/***/ 493:
+/***/ 517:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -380,7 +384,7 @@
 	//
 	//
 
-	var modal = __weex_require_module__('modal');
+	var modal = weex.requireModule('modal');
 	module.exports = {
 	  data: function data() {
 	    return {
@@ -695,11 +699,11 @@
 
 /***/ },
 
-/***/ 494:
+/***/ 518:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('list', {
+	  return _c('list', {
 	    staticClass: ["list"],
 	    attrs: {
 	      "loadmoreoffset": "2000"
@@ -707,30 +711,32 @@
 	    on: {
 	      "loadmore": _vm.loadmore
 	    }
-	  }, [_vm._l((_vm.shopList), function(item) {
-	    return _h('cell', {
+	  }, _vm._l((_vm.shopList), function(item) {
+	    return _c('cell', {
 	      staticClass: ["cell"],
+	      appendAsTree: true,
 	      attrs: {
-	        "scope": item.scopeValue
+	        "scope": item.scopeValue,
+	        "append": "tree"
 	      },
 	      on: {
 	        "click": function($event) {
 	          _vm.oncellclick(item.id)
 	        }
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticClass: ["shopDiv"]
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticClass: ["shopHeader"],
 	      staticStyle: {
 	        flexDirection: "row"
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticStyle: {
 	        flex: "2",
 	        flexDirection: "row"
 	      }
-	    }, [_h('div', [_h('image', {
+	    }, [_c('div', [_c('image', {
 	      staticStyle: {
 	        width: "60",
 	        height: "60"
@@ -738,57 +744,57 @@
 	      attrs: {
 	        "src": item.PersonPhoto
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticStyle: {
 	        flexDirection: "column",
 	        marginLeft: "5"
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticStyle: {
 	        marginTop: "5"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticStyle: {
 	        fontSize: "20"
 	      }
-	    }, [_vm._s(item.PersonName)])]), _h('div', {
+	    }, [_vm._v(_vm._s(item.PersonName))])]), _c('div', {
 	      staticStyle: {
 	        marginTop: "5"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticStyle: {
 	        fontSize: "20",
 	        color: "#cccccc"
 	      }
-	    }, [_vm._s(item.PersonVisitTime)])])])]), _vm._m(0, true)]), _h('div', {
+	    }, [_vm._v(_vm._s(item.PersonVisitTime))])])])]), _vm._m(0, true)]), _c('div', {
 	      staticClass: ["shopBody"],
 	      staticStyle: {
 	        flexDirection: "column"
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticClass: ["descDiv"],
 	      staticStyle: {
 	        marginTop: "10",
 	        marginLeft: "10"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["shopDesc"],
 	      staticStyle: {
 	        fontSize: "25"
 	      }
-	    }, [_vm._s(item.shopDesc)])]), _h('div', {
+	    }, [_vm._v(_vm._s(item.shopDesc))])]), _c('div', {
 	      staticStyle: {
 	        flexDirection: "row"
 	      }
-	    }, [_vm._l((item.shopImgList), function(img) {
-	      return _h('div', {
+	    }, _vm._l((item.shopImgList), function(img) {
+	      return _c('div', {
 	        staticClass: ["imgDiv"],
 	        staticStyle: {
 	          flex: "1",
 	          flexDirection: "column",
 	          margin: "10"
 	        }
-	      }, [_h('div', [_h('image', {
+	      }, [_c('div', [_c('image', {
 	        staticClass: ["shopImg"],
 	        style: {
 	          width: img.shopImgWidth,
@@ -798,7 +804,7 @@
 	          "src": img.shopImg
 	        }
 	      })]), _vm._m(1, true)])
-	    })])]), _h('div', {
+	    }))]), _c('div', {
 	      staticClass: ["shopFooter"],
 	      staticStyle: {
 	        flexDirection: "row",
@@ -806,93 +812,93 @@
 	        marginLeft: "10",
 	        justifyContent: "flex-end"
 	      }
-	    }, [_h('div', {
+	    }, [_c('div', {
 	      staticStyle: {
 	        marginRight: "5"
 	      }
-	    }, [_h('image', {
+	    }, [_c('image', {
 	      staticClass: ["shopLikeImg", "smallImg"],
 	      attrs: {
 	        "src": item.shopLikeImg
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticStyle: {
 	        marginRight: "15"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["shopLikeText"],
 	      staticStyle: {
 	        fontSize: "20"
 	      }
-	    }, [_vm._s(item.shopLikeText)])]), _h('div', {
+	    }, [_vm._v(_vm._s(item.shopLikeText))])]), _c('div', {
 	      staticStyle: {
 	        marginRight: "5"
 	      }
-	    }, [_h('image', {
+	    }, [_c('image', {
 	      staticClass: ["shopCommentImg", "smallImg"],
 	      attrs: {
 	        "src": item.shopCommentImg
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticStyle: {
 	        marginRight: "15"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["shopCommentText"],
 	      staticStyle: {
 	        fontSize: "20"
 	      }
-	    }, [_vm._s(item.shopCommentText)])]), _h('div', {
+	    }, [_vm._v(_vm._s(item.shopCommentText))])]), _c('div', {
 	      staticStyle: {
 	        marginRight: "5"
 	      }
-	    }, [_h('image', {
+	    }, [_c('image', {
 	      staticClass: ["shopLookImg", "smallImg"],
 	      attrs: {
 	        "src": item.shopLookImg
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticStyle: {
 	        marginRight: "15"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["shopLookText"],
 	      staticStyle: {
 	        fontSize: "20"
 	      }
-	    }, [_vm._s(item.shopLookText)])]), _h('div', {
+	    }, [_vm._v(_vm._s(item.shopLookText))])]), _c('div', {
 	      staticStyle: {
 	        marginRight: "5"
 	      }
-	    }, [_h('image', {
+	    }, [_c('image', {
 	      staticClass: ["shareImg", "smallImg"],
 	      attrs: {
 	        "src": item.shareImg
 	      }
-	    })]), _h('div', {
+	    })]), _c('div', {
 	      staticStyle: {
 	        marginRight: "20"
 	      }
-	    }, [_h('text', {
+	    }, [_c('text', {
 	      staticClass: ["shareText"],
 	      staticStyle: {
 	        fontSize: "20"
 	      }
-	    }, [_vm._s(item.shareText)])])])])])
-	  })])
+	    }, [_vm._v(_vm._s(item.shareText))])])])])])
+	  }))
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticStyle: {
 	      flex: "5",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticStyle: {
 	      flexDirection: "row",
 	      marginLeft: "10",
 	      marginTop: "10"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -900,18 +906,18 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i4/TB1zkDeIFXXXXXrXVXX07tlTXXX-200-200.png_88x88xz.jpg"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["Hope"])])]), _h('div', {
+	  }, [_vm._v("Hope")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
 	      left: "90",
 	      top: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -919,18 +925,18 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1hRb1IXXXXXX3XVXXXQaP.pXX-87-87.jpeg"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["Mem"])])]), _h('div', {
+	  }, [_vm._v("Mem")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
 	      left: "170",
 	      top: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -938,18 +944,18 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i3/TB1DGkJJFXXXXaZXFXX07tlTXXX-200-200.png"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["auth"])])]), _h('div', {
+	  }, [_vm._v("auth")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
 	      left: "250",
 	      top: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -957,18 +963,18 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i1/TB1nFvPIXXXXXbUXXXXUAkPJpXX-87-87.png"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["Friend"])])]), _h('div', {
+	  }, [_vm._v("Friend")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
 	      left: "330",
 	      top: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -976,18 +982,18 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1CpD7IXXXXXbSXXXXUAkPJpXX-87-87.png"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["issue"])])]), _h('div', {
+	  }, [_vm._v("issue")])])]), _c('div', {
 	    staticStyle: {
 	      position: "absolute",
 	      left: "410",
 	      top: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -995,25 +1001,25 @@
 	    attrs: {
 	      "src": "https://gtms02.alicdn.com/tps/i2/TB11ZZfIVXXXXbMXFXXEDhGGXXX-32-32.png"
 	    }
-	  })]), _h('div', [_h('text', {
+	  })]), _c('div', [_c('text', {
 	    staticStyle: {
 	      fontSize: "20"
 	    }
-	  }, ["super"])])])])
+	  }, [_vm._v("super")])])])])
 	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticStyle: {
 	      flex: "1",
 	      marginTop: "10",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticStyle: {
 	      flex: "1",
 	      justifyContent: "center",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -1021,22 +1027,22 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i1/TB1nFvPIXXXXXbUXXXXUAkPJpXX-87-87.png"
 	    }
-	  })]), _h('div', {
+	  })]), _c('div', {
 	    staticStyle: {
 	      marginLeft: "5"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      fontSize: "20",
 	      textAlign: "center"
 	    }
-	  }, ["Up"])])]), _h('div', {
+	  }, [_vm._v("Up")])])]), _c('div', {
 	    staticStyle: {
 	      flex: "1",
 	      justifyContent: "center",
 	      flexDirection: "row"
 	    }
-	  }, [_h('div', [_h('image', {
+	  }, [_c('div', [_c('image', {
 	    staticStyle: {
 	      width: "20",
 	      height: "20"
@@ -1044,16 +1050,16 @@
 	    attrs: {
 	      "src": "https://img.alicdn.com/tps/i2/TB1CpD7IXXXXXbSXXXXUAkPJpXX-87-87.png"
 	    }
-	  })]), _h('div', {
+	  })]), _c('div', {
 	    staticStyle: {
 	      marginLeft: "5"
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    staticStyle: {
 	      fontSize: "20",
 	      textAlign: "center"
 	    }
-	  }, ["down"])])])])
+	  }, [_vm._v("down")])])])])
 	}]}
 	module.exports.render._withStripped = true
 

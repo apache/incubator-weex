@@ -141,4 +141,4 @@ When a prompt box pops up, the user will have to click either confirm or cancel 
 </style>
 ```
 
-[try it](../../examples/modal.html)
+[try it](http://dotwe.org/vue/a7dddfb24edb72be947fc4eec3803f1d)

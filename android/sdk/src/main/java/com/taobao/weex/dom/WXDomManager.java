@@ -206,8 +206,6 @@ package com.taobao.weex.dom;
 
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
@@ -327,20 +325,6 @@ public final class WXDomManager {
     }
   }
 
-  void startAnimation(@NonNull String instanceId,
-                      @NonNull String ref,
-                      @NonNull String animation,
-                      @Nullable String callBack){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("RefreshFinish operation must be done in dom thread");
-    }
-    DOMActionContextImpl statement = mDomRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.startAnimation(ref,animation,callBack);
-  }
-
   public void executeAction(String instanceId, DOMAction action, boolean createContext) {
     DOMActionContext context = mDomRegistries.get(instanceId);
     if(context == null){
@@ -357,12 +341,20 @@ public final class WXDomManager {
 
   }
 
-
   /**
    *  @param action
    * @param createContext only true when create body
    */
   public void postAction(String instanceId,DOMAction action, boolean createContext){
+    postActionDelay(instanceId, action, createContext, 0);
+  }
+
+  /**
+   *  @param action
+   * @param createContext only true when create body
+   */
+  public void postActionDelay(String instanceId,DOMAction action,
+                              boolean createContext, long delay){
     if(action == null){
       return;
     }
@@ -374,6 +366,6 @@ public final class WXDomManager {
     task.args.add(action);
     task.args.add(createContext);
     msg.obj = task;
-    sendMessage(msg);
+    sendMessageDelayed(msg, delay);
   }
 }

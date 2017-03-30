@@ -204,15 +204,15 @@
  */
 package com.taobao.weex.ui;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
@@ -235,7 +235,7 @@ public class WXRenderManager {
     mWXRenderHandler = new WXRenderHandler();
   }
 
-  public RenderActionContextImpl getWXRenderStatement(String instanceId) {
+  public RenderActionContext getRenderContext(String instanceId) {
     return mRegistries.get(instanceId);
   }
 
@@ -243,7 +243,7 @@ public class WXRenderManager {
     if(instanceId == null || TextUtils.isEmpty(ref)){
       return null;
     }
-    RenderActionContextImpl stmt = getWXRenderStatement(instanceId);
+    RenderActionContext stmt = getRenderContext(instanceId);
     return stmt == null?null:stmt.getComponent(ref);
   }
 
@@ -287,6 +287,19 @@ public class WXRenderManager {
     }));
   }
 
+  public void runOnThread(final String instanceId, final RenderAction action) {
+    mWXRenderHandler.post(WXThread.secure(new Runnable() {
+
+      @Override
+      public void run() {
+        if (mRegistries.get(instanceId) == null) {
+          return;
+        }
+        action.executeRender(getRenderContext(instanceId));
+      }
+    }));
+  }
+
   public void registerInstance(WXSDKInstance instance) {
     mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
   }
@@ -308,16 +321,6 @@ public class WXRenderManager {
       return;
     }
     statement.setExtra(ref, extra);
-  }
-
-  public void startAnimation(String instanceId, @NonNull String ref,
-                             @NonNull WXAnimationBean animationBean, @Nullable String
-      callBack) {
-    RenderActionContextImpl statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.startAnimation(ref, animationBean, callBack);
   }
 
   public List<WXSDKInstance> getAllInstances() {

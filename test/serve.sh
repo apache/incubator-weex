@@ -1,4 +1,4 @@
-# /bin/bash -eu
-
-npm run build:ui-test
+#!/bin/bash -eu
+npm run build:vue
+npm run build:ci
 npm run serve:ui-test 

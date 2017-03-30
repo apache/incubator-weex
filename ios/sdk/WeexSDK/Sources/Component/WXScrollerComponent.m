@@ -318,12 +318,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
     UIScrollView *scrollView = (UIScrollView *)self.view;
-    
-    if ((_scrollDirection == WXScrollDirectionHorizontal && scrollView.contentSize.width <= scrollView.frame.size.width)
-        || (_scrollDirection == WXScrollDirectionVertical && scrollView.contentSize.height <= scrollView.frame.size.height)) {
-        // can not scroll
-        return;
-    }
 
     CGPoint contentOffset = scrollView.contentOffset;
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
@@ -332,7 +326,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         CGFloat contentOffetX = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].x;
         contentOffetX += offset * scaleFactor;
         
-        if (contentOffetX > scrollView.contentSize.width - scrollView.frame.size.width) {
+        if (scrollView.contentSize.width >= scrollView.frame.size.width && contentOffetX > scrollView.contentSize.width - scrollView.frame.size.width) {
             contentOffset.x = scrollView.contentSize.width - scrollView.frame.size.width;
         } else {
             contentOffset.x = contentOffetX;
@@ -341,7 +335,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         CGFloat contentOffetY = [component.supercomponent.view convertPoint:component.view.frame.origin toView:self.view].y;
         contentOffetY += offset * scaleFactor;
         
-        if (contentOffetY > scrollView.contentSize.height - scrollView.frame.size.height) {
+        if (scrollView.contentSize.height >= scrollView.frame.size.height && contentOffetY > scrollView.contentSize.height - scrollView.frame.size.height) {
             contentOffset.y = scrollView.contentSize.height - scrollView.frame.size.height;
         } else {
             contentOffset.y = contentOffetY;
@@ -436,14 +430,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _lastContentOffset = scrollView.contentOffset;
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    if ([_refreshComponent displayState] && scrollView.dragging) {
-        [_refreshComponent pullingdown:@{
+    [_refreshComponent pullingdown:@{
              REFRESH_DISTANCE_Y: @(fabs((scrollView.contentOffset.y - _lastContentOffset.y)/scaleFactor)),
              REFRESH_VIEWHEIGHT: @(_refreshComponent.view.frame.size.height/scaleFactor),
              REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
              @"type":@"pullingdown"
-         }];
-    }
+    }];
 
     // check sticky
     [self adjustSticky];

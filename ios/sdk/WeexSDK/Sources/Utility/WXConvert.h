@@ -38,6 +38,7 @@ typedef CGFloat WXPixelType;
 + (UIViewContentMode)UIViewContentMode:(id)value;
 + (WXImageQuality)WXImageQuality:(id)value;
 + (WXImageSharp)WXImageSharp:(id)value;
++ (UIAccessibilityTraits)WXUIAccessibilityTraits:(id)value;
 
 + (UIColor *)UIColor:(id)value;
 + (CGColorRef)CGColor:(id)value;

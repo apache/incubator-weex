@@ -45,6 +45,11 @@ typedef enum : NSUInteger {
     [self.wx_component layoutDidFinish];
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+    [super setContentOffset:contentOffset];
+}
+
 @end
 
 @interface WXCollectionViewCell : UICollectionViewCell
@@ -96,7 +101,7 @@ typedef enum : NSUInteger {
             layout.columnWidth = [WXConvert WXLength:attributes[@"columnWidth"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeAuto];
             layout.columnCount = [WXConvert WXLength:attributes[@"columnCount"] isFloat:NO scaleFactor:1.0] ? : [WXLength lengthWithInt:1 type:WXLengthTypeFixed];
             layout.columnGap = [self _floatValueForColumnGap:([WXConvert WXLength:attributes[@"columnGap"] isFloat:YES scaleFactor:scaleFactor] ? : [WXLength lengthWithFloat:0.0 type:WXLengthTypeNormal])];
-            
+
             layout.delegate = self;
         } else {
             _collectionViewlayout = [UICollectionViewLayout new];
@@ -105,6 +110,7 @@ typedef enum : NSUInteger {
         _dataController = [WXRecyclerDataController new];
         _updateController = [WXRecyclerUpdateController new];
         _updateController.delegate = self;
+        [self fixFlicker];
     }
     
     return self;
@@ -210,7 +216,38 @@ typedef enum : NSUInteger {
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
-    [super scrollToComponent:component withOffset:offset animated:animated];
+    CGPoint contentOffset = _collectionView.contentOffset;
+    CGFloat contentOffsetY = 0;
+    
+    CGRect rect;
+    while (component) {
+        if ([component isKindOfClass:[WXCellComponent class]]) {
+            NSIndexPath *toIndexPath = [self.dataController indexPathForCell:(WXCellComponent *)component];
+            UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForItemAtIndexPath:toIndexPath];
+            rect = attributes.frame;
+            break;
+        }
+        if ([component isKindOfClass:[WXHeaderComponent class]]) {
+            NSUInteger toIndex = [self.dataController indexForHeader:(WXHeaderComponent *)component];
+            UICollectionViewLayoutAttributes *attributes = [_collectionView layoutAttributesForSupplementaryElementOfKind:kCollectionSupplementaryViewKindHeader atIndexPath:[NSIndexPath indexPathWithIndex:toIndex]];
+            rect = attributes.frame;
+            break;
+        }
+        contentOffsetY += component.calculatedFrame.origin.y;
+        component = component.supercomponent;
+    }
+    
+    contentOffsetY += rect.origin.y;
+    contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
+    
+    if (_collectionView.contentSize.height >= _collectionView.frame.size.height && contentOffsetY > _collectionView.contentSize.height - _collectionView.frame.size.height) {
+        contentOffset.y = _collectionView.contentSize.height - _collectionView.frame.size.height;
+    } else {
+        contentOffset.y = contentOffsetY;
+    }
+    
+    [_collectionView setContentOffset:contentOffset animated:animated];
+
 }
 
 - (void)performUpdatesWithCompletion:(void (^)(BOOL finished))completion
@@ -369,6 +406,11 @@ typedef enum : NSUInteger {
     return headerSize.height;
 }
 
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout hasHeaderInSection:(NSInteger)section
+{
+    return [self.dataController hasHeaderInSection:section];
+}
+
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout isNeedStickyForHeaderInSection:(NSInteger)section
 {
     return [self.dataController isStickyForHeaderAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
@@ -506,7 +548,7 @@ typedef enum : NSUInteger {
     _previousLoadMoreCellNumber = 0;
 }
 
-#pragma makrk - private
+#pragma mark - Private
 
 - (float)_floatValueForColumnGap:(WXLength *)gap
 {
@@ -573,12 +615,34 @@ typedef enum : NSUInteger {
         }
     }
     
-    if (cellArray.count > 0) {
+    if (cellArray.count > 0 || currentSection.headerComponent) {
         currentSection.cellComponents = [cellArray copy];
         [sectionArray addObject:currentSection];
     }
     
     return sectionArray;
+}
+
+- (void)fixFlicker
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // FIXME:(ง •̀_•́)ง┻━┻ Stupid scoll view, always reset content offset to zero by calling _adjustContentOffsetIfNecessary after insert cells.
+        // So if you pull down list while list is rendering, the list will be flickering.
+        // Demo:
+        // Have to hook _adjustContentOffsetIfNecessary here.
+        // Any other more elegant way?
+        NSString *a = @"ntOffsetIfNe";
+        NSString *b = @"adjustConte";
+        
+        NSString *originSelector = [NSString stringWithFormat:@"_%@%@cessary", b, a];
+        [[self class] weex_swizzle:[WXCollectionView class] Method:NSSelectorFromString(originSelector) withMethod:@selector(fixedFlickerSelector)];
+    });
+}
+
+- (void)fixedFlickerSelector
+{
+    // DO NOT delete this method.
 }
 
 @end

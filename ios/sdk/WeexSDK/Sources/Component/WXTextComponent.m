@@ -91,6 +91,11 @@
 
 - (NSString *)accessibilityValue
 {
+    if (self.wx_component) {
+        if (self.wx_component->_ariaLabel) {
+            return self.wx_component->_ariaLabel;
+        }
+    }
     return _textStorage.string;
 }
 

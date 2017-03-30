@@ -17,7 +17,7 @@ This component supports no child components.
 
 ### Attributes
 
-There is no specific attribute for this component other than the [common attributes](../common-attrs.html).
+There is no specific attribute for this component.
 
 ### Styles
 
@@ -25,7 +25,7 @@ There is no specific attribute for this component other than the [common attribu
 - `item-selectedColor`: &lt;colors&gt; This style attribute sets the selected item color using either a named color or a color specified in the hexadecimal #RRGGBB format.
 - `item-size`: &lt;length&gt; The size of the indicator elements, which is an float attribute.
 
-**common styles**: check out the [common styles](../common-attrs.html)
+**common styles**: check out the [common styles](../common-style.html)
 
 - support flexbox related styles
 - support box model related styles
@@ -118,4 +118,4 @@ There is no specific attribute for this component other than the [common attribu
 </script>
 ```
 
-[try it](../../examples/indicator.html)
+[try it](http://dotwe.org/vue/d2a654c4b75f1b4d80336c8a5fe133b9)

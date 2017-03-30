@@ -173,11 +173,6 @@
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
-    if (_tableView.contentSize.height <= _tableView.frame.size.height) {
-        // can not scroll
-        return;
-    }
-    
     CGPoint contentOffset = _tableView.contentOffset;
     CGFloat contentOffsetY = 0;
     
@@ -201,7 +196,7 @@
     contentOffsetY += cellRect.origin.y;
     contentOffsetY += offset * self.weexInstance.pixelScaleFactor;
     
-    if (contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
+    if (_tableView.contentSize.height >= _tableView.frame.size.height && contentOffsetY > _tableView.contentSize.height - _tableView.frame.size.height) {
         contentOffset.y = _tableView.contentSize.height - _tableView.frame.size.height;
     } else {
         contentOffset.y = contentOffsetY;
@@ -407,6 +402,10 @@
     WXAssert(section, @"no section found for section number:%ld", sectionNum);
     NSMutableArray *completedSections;
     BOOL isReload = [section.rows containsObject:cell];
+    if (!isReload && row > [section.rows count]) {
+        // protect crash when row out of bounds
+        return ;
+    }
     if (!isReload) {
         [section.rows insertObject:cell atIndex:row];
         // deep copy

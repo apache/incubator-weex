@@ -289,10 +289,6 @@ class RenderActionContextImpl implements RenderActionContext {
     return mRegistry.get(ref);
   }
 
-  void startAnimation(@NonNull String ref, @NonNull WXAnimationBean animationBean, @Nullable String callBack) {
-    WXAnimationModule.startAnimation(mWXSDKInstance, mRegistry.get(ref), animationBean, callBack);
-  }
-
   public void registerComponent(String ref, WXComponent comp) {
     mRegistry.put(ref,comp);
   }

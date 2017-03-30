@@ -664,6 +664,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     Iterator<Map.Entry<String, WXComponent>> iterator = stickyMap.entrySet().iterator();
     Map.Entry<String, WXComponent> entry;
     WXComponent stickyComponent;
+    int currentStickyPos = -1;
     while (iterator.hasNext()) {
       entry = iterator.next();
       stickyComponent = entry.getValue();
@@ -676,21 +677,19 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           return;
         }
 
-        if (stickyComponent != null && stickyComponent.getDomObject() != null
-            && stickyComponent instanceof WXCell) {
-          if (stickyComponent.getHostView() == null) {
-            return;
-          }
-
           RecyclerView.LayoutManager layoutManager;
           boolean beforeFirstVisibleItem = false;
           layoutManager = getHostView().getInnerView().getLayoutManager();
           if (layoutManager instanceof LinearLayoutManager || layoutManager instanceof GridLayoutManager) {
             int fVisible = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
             int pos = mChildren.indexOf(cell);
+            cell.setScrollPositon(pos);
 
             if (pos <= fVisible) {
               beforeFirstVisibleItem = true;
+              if(pos > currentStickyPos) {
+                currentStickyPos = pos;
+              }
             }
           } else if(layoutManager instanceof StaggeredGridLayoutManager){
             int [] firstItems= new int[3];
@@ -715,12 +714,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             bounceRecyclerView.notifyStickyShow(cell);
           } else if (removeSticky) {
             bounceRecyclerView.notifyStickyRemove(cell);
-          }else{
-            bounceRecyclerView.updateStickyView();
           }
           cell.setLocationFromStart(top);
         }
-      }
+    }
+
+    if(currentStickyPos>=0){
+      bounceRecyclerView.updateStickyView(currentStickyPos);
     }
   }
 
@@ -913,17 +913,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   @Override
   public void onViewRecycled(ListBaseViewHolder holder) {
     long begin = System.currentTimeMillis();
-     WXComponent component = holder.getComponent();
-    if (component == null
-        || (component instanceof WXRefresh)
-        || (component instanceof WXLoading)
-        || (component.getDomObject() != null && component.getDomObject().isFixed())
-        ) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d(TAG, "Bind WXRefresh & WXLoading " + holder);
-      }
-      return;
-    }
 
     holder.setComponentUsing(false);
     if(holder.canRecycled()) {

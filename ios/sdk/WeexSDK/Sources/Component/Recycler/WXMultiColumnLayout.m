@@ -156,9 +156,10 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
     }
     
     for (NSInteger section = 0; section < numberOfSections; section++) {
-        CGFloat headerHeight = [self.delegate collectionView:self.collectionView layout:self heightForHeaderInSection:section];
+        BOOL hasHeader = [self.delegate collectionView:self.collectionView layout:self hasHeaderInSection:section];
         // header
-        if (headerHeight > 0) {
+        if (hasHeader) {
+            CGFloat headerHeight = [self.delegate collectionView:self.collectionView layout:self heightForHeaderInSection:section];
             WXMultiColumnLayoutHeaderAttributes *headerAttributes = [WXMultiColumnLayoutHeaderAttributes layoutAttributesForSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
             headerAttributes.frame = CGRectMake(insets.left, currentHeight, self.contentWidth - (insets.left + insets.right), headerHeight);
             headerAttributes.isSticky = [self.delegate collectionView:self.collectionView layout:self isNeedStickyForHeaderInSection:section];
@@ -182,9 +183,12 @@ NSString * const kMultiColumnLayoutCell = @"WXMultiColumnLayoutCell";
             
             self.columnsMaxHeights[column] = @(CGRectGetMaxY(itemAttributes.frame));
         }
+        
+        currentHeight = [self _maxHeightForAllColumns];
+        [self _columnsReachToHeight:currentHeight];
     }
     
-    currentHeight = [self _maxHeightForAllColumns] + insets.bottom;
+    currentHeight = currentHeight + insets.bottom;
     [self _columnsReachToHeight:currentHeight];
     
     self.layoutAttributes[kMultiColumnLayoutHeader] = headersAttributes;

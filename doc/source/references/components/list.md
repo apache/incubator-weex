@@ -77,8 +77,6 @@ Notes: The list now supports the following child components: cell, header, refre
 
 Please checkout [Scroller Component Attributes](./scroller.html) to have a look at the inherited attributes from direct parent.
 
-Other attributes please check out the [common attributes](../common-attrs.html).
-
 ### Styles
 
 common styles: check out [common styles for components](../common-style.html)
@@ -172,4 +170,4 @@ For example, a vertical list nested in a vertical list or scroller is not allowe
 </style>
 ```
 
-[try it](../../examples/list.html)
+[try it](http://dotwe.org/vue/d31c85e7cd2dc54fa098e920a5376c38)

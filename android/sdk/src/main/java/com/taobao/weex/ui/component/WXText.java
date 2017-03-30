@@ -264,6 +264,14 @@ public class WXText extends WXComponent<WXTextView> {
   }
 
   @Override
+  protected void setAriaLabel(String label) {
+    WXTextView text = getHostView();
+    if(text != null){
+      text.setAriaLabel(label);
+    }
+  }
+
+  @Override
   public void refreshData(WXComponent component) {
     super.refreshData(component);
     if (component instanceof WXText) {

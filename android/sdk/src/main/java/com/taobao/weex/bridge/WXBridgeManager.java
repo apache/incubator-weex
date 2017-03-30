@@ -410,14 +410,20 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               .getSDKInstance(instanceId);
       if (wxsdkInstance.isNeedValidate()
               && WXSDKManager.getInstance().getValidateProcessor() != null) {
-        boolean result = WXSDKManager.getInstance().getValidateProcessor()
-                .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args);
-        if (result) {
-          return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
-                  args);
-        } else {
-          return null;
-        }
+          WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager
+                  .getInstance().getValidateProcessor()
+                  .onModuleValidate(wxsdkInstance, moduleStr, methodStr, args);
+          if (validateResult == null) {
+              return null;
+          }
+          if (validateResult.isSuccess) {
+              return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr,
+                      args);
+          } else {
+              JSONObject validateInfo = validateResult.validateInfo;
+              WXLogUtils.e("[WXBridgeManager] module validate fail. >>> " + validateInfo.toJSONString());
+              return validateInfo;
+          }
       }
       return WXModuleManager.callModuleMethod(instanceId, moduleStr, methodStr, args);
   }
@@ -1353,16 +1359,10 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     registerModules(domMap);
   }
 
+  //This method is deprecated because of performance issue.
+  @Deprecated
   public void notifyTrimMemory() {
-    post(new Runnable() {
-      @Override
-      public void run() {
-        if (!isJSFrameworkInit())
-          return;
 
-        invokeExecJS("", null, METHOD_NOTIFY_TRIM_MEMORY, new WXJSObject[0]);
-      }
-    });
   }
 
   public

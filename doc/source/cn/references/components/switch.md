@@ -130,4 +130,4 @@ version: 2.1
 </style>
 ```
 
-[try it](../../../examples/switch.html)
+[try it](http://dotwe.org/vue/06b1d740fb69d04f9ebe9eaf730974d1)

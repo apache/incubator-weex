@@ -205,10 +205,12 @@
 package com.taobao.weex.dom;
 
 
+import com.taobao.weex.dom.action.Action;
+
 /**
  * Created by sospartan on 23/02/2017.
  */
 
-public interface DOMAction {
+public interface DOMAction extends Action{
   void executeDom(DOMActionContext context);
 }
