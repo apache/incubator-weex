@@ -202,170 +202,98 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.ui;
 
-import android.os.Handler;
-import android.os.Message;
+import android.graphics.Rect;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.ui.animation.WXAnimationBean;
+import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.component.Scrollable;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentFactory;
+import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * Class for rendering view. Method in this class should be run in main thread.
+ * This class is also <strong>not</storng> thread safe.
+ * This class is very similar to {@link com.taobao.weex.dom.WXDomStatement}
+ * @see com.taobao.weex.dom.WXDomStatement
  */
-public final class WXDomManager {
+class RenderActionContextImpl implements RenderActionContext {
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
-
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
-  }
-
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
+  private Map<String, WXComponent> mRegistry;
+  private WXSDKInstance mWXSDKInstance;
   /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
+   * The container for weex root view.
    */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
 
-        @Override
-        public void run() {
-          statement.destroy();
-        }
-      });
-    }
-  }
-
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
+  public RenderActionContextImpl(WXSDKInstance instance) {
+    mWXSDKInstance = instance;
+    mRegistry = new HashMap<>();
   }
 
   /**
-   * Destroy current instance
+   * @see com.taobao.weex.dom.WXDomStatement#destroy()
    */
   public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
+    mWXSDKInstance = null;
+    mRegistry.clear();
   }
 
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
+  public WXSDKInstance getWXSDKInstance() {
+    return mWXSDKInstance;
   }
 
   /**
-   * Batch the execution of {@link DOMActionContextImpl}
+   * set layout information of View
    */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
-    }
-  }
-
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
-  }
-
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
-      }
-    }
-    action.executeDom(context);
-
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
+  void setLayout(String ref, WXDomObject domObject) {
+    WXComponent component = mRegistry.get(ref);
+    if (component == null) {
       return;
     }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
+    component.setLayout(domObject);
+  }
+
+  /**
+   * set extra information of View
+   */
+  void setExtra(String ref, Object extra) {
+    WXComponent component = mRegistry.get(ref);
+    if (component == null) {
+      return;
+    }
+    component.updateExtra(extra);
+  }
+
+  @Override
+  public WXSDKInstance getInstance() {
+    return mWXSDKInstance;
+  }
+
+  @Override
+  public WXComponent getComponent(String ref) {
+    return mRegistry.get(ref);
+  }
+
+  public void registerComponent(String ref, WXComponent comp) {
+    mRegistry.put(ref,comp);
+  }
+
+  public WXComponent unregisterComponent(String ref) {
+    return mRegistry.remove(ref);
   }
 }

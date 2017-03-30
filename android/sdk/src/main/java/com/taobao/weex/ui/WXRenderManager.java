@@ -204,33 +204,30 @@
  */
 package com.taobao.weex.ui;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.Spacing;
-import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Manager class for render operation, mainly for managing {@link WXRenderStatement}.
+ * Manager class for render operation, mainly for managing {@link RenderActionContextImpl}.
  * This is <strong>not</strong> a thread-safe class
  */
 public class WXRenderManager {
 
-  private ConcurrentHashMap<String, WXRenderStatement> mRegistries;
+  private ConcurrentHashMap<String, RenderActionContextImpl> mRegistries;
   private WXRenderHandler mWXRenderHandler;
 
   public WXRenderManager() {
@@ -238,7 +235,7 @@ public class WXRenderManager {
     mWXRenderHandler = new WXRenderHandler();
   }
 
-  public WXRenderStatement getWXRenderStatement(String instanceId) {
+  public RenderActionContext getRenderContext(String instanceId) {
     return mRegistries.get(instanceId);
   }
 
@@ -246,12 +243,12 @@ public class WXRenderManager {
     if(instanceId == null || TextUtils.isEmpty(ref)){
       return null;
     }
-    WXRenderStatement stmt = getWXRenderStatement(instanceId);
+    RenderActionContext stmt = getRenderContext(instanceId);
     return stmt == null?null:stmt.getComponent(ref);
   }
 
   public WXSDKInstance getWXSDKInstance(String instanceId) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
+    RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement == null) {
       return null;
     }
@@ -270,7 +267,7 @@ public class WXRenderManager {
     if (!WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXRenderManager] removeRenderStatement can only be called in main thread");
     }
-    WXRenderStatement statement = mRegistries.remove(instanceId);
+    RenderActionContextImpl statement = mRegistries.remove(instanceId);
     if (statement != null) {
       statement.destroy();
     }
@@ -290,28 +287,25 @@ public class WXRenderManager {
     }));
   }
 
+  public void runOnThread(final String instanceId, final RenderAction action) {
+    mWXRenderHandler.post(WXThread.secure(new Runnable() {
+
+      @Override
+      public void run() {
+        if (mRegistries.get(instanceId) == null) {
+          return;
+        }
+        action.executeRender(getRenderContext(instanceId));
+      }
+    }));
+  }
+
   public void registerInstance(WXSDKInstance instance) {
-    mRegistries.put(instance.getInstanceId(), new WXRenderStatement(instance));
-  }
-
-  public void createBody(String instanceId, WXComponent component) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.createBody(component);
-  }
-
-  public WXComponent createBodyOnDomThread(String instanceId, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
-    }
-    return statement.createBodyOnDomThread(domObject);
+    mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
   }
 
   public void setLayout(String instanceId, String ref, WXDomObject domObject) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
+    RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
@@ -322,142 +316,19 @@ public class WXRenderManager {
    * Set extra info, other than attribute and style
    */
   public void setExtra(String instanceId, String ref, Object extra) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
+    RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement == null) {
       return;
     }
     statement.setExtra(ref, extra);
   }
 
-  public void setPadding(String instanceId, String ref, Spacing padding, Spacing border) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.setPadding(ref, padding, border);
-  }
-
-  public void addComponent(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.addComponent(dom, parentRef, index);
-  }
-
-  public @Nullable WXComponent createComponentOnDomThread(String instanceId, WXDomObject dom, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return null;
-    }
-    return statement.createComponentOnDomThread(dom, parentRef, index);
-  }
-
-  public void addComponent(String instanceId, WXComponent component, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.addComponent(component, parentRef, index);
-  }
-
-  public void removeComponent(String instanceId, String ref) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.removeComponent(ref);
-  }
-
-  public void moveComponent(String instanceId, String ref, String parentRef, int index) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.move(ref, parentRef, index);
-  }
-
-  public void updateAttrs(String instanceId, String ref, Map<String, Object> attrs) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateAttrs(ref, attrs);
-  }
-
-  public void updateStyle(String instanceId, String ref, Map<String, Object> style) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateStyle(ref, style);
-  }
-
-  public void addEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return ;
-    }
-    statement.addEvent(ref, type);
-  }
-
-  public void removeEvent(String instanceId, String ref, String type) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return ;
-    }
-    statement.removeEvent(ref, type);
-  }
-
-  public void scrollToComponent(String instanceId, String ref, Map<String, Object> options) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.scrollTo(ref, options);
-  }
-
-  public void createFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.createFinish(width, height);
-  }
-
-  public void refreshFinish(String instanceId, int width, int height) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.refreshFinish(width, height);
-  }
-
-  public void updateFinish(String instanceId) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.updateFinish();
-  }
-
-
-  public void startAnimation(String instanceId, @NonNull String ref,
-                             @NonNull WXAnimationBean animationBean, @Nullable String
-      callBack) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      return;
-    }
-    statement.startAnimation(ref, animationBean, callBack);
-  }
-
   public List<WXSDKInstance> getAllInstances() {
     ArrayList<WXSDKInstance> instances = null;
     if (mRegistries != null && !mRegistries.isEmpty()) {
       instances = new ArrayList<WXSDKInstance>();
-      for (Map.Entry<String, WXRenderStatement> entry : mRegistries.entrySet()) {
-        WXRenderStatement renderStatement = entry.getValue();
+      for (Map.Entry<String, RenderActionContextImpl> entry : mRegistries.entrySet()) {
+        RenderActionContextImpl renderStatement = entry.getValue();
         if (renderStatement != null) {
           instances.add(renderStatement.getWXSDKInstance());
         }
@@ -466,15 +337,11 @@ public class WXRenderManager {
     return instances;
   }
 
-  public void getComponentSize(String instanceId, String ref, JSCallback callback) {
-    WXRenderStatement statement = mRegistries.get(instanceId);
-    if (statement == null) {
-      Map<String, Object> options = new HashMap<>();
-      options.put("result", false);
-      options.put("errMsg", "Component does not exist");
-      callback.invoke(options);
-      return;
+  public void registerComponent(String instanceId, String ref, WXComponent comp) {
+    RenderActionContextImpl statement = mRegistries.get(instanceId);
+    if (statement != null) {
+      statement.registerComponent(ref,comp);
     }
-    statement.getComponentSize(ref, callback);
   }
+
 }

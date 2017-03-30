@@ -202,170 +202,149 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.dom.action;
 
-import android.os.Handler;
-import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.ui.animation.WXAnimationBean;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import static com.taobao.weex.dom.WXDomModule.ADD_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.ADD_EVENT;
+import static com.taobao.weex.dom.WXDomModule.ADD_RULE;
+import static com.taobao.weex.dom.WXDomModule.CREATE_BODY;
+import static com.taobao.weex.dom.WXDomModule.CREATE_FINISH;
+import static com.taobao.weex.dom.WXDomModule.GET_COMPONENT_RECT;
+import static com.taobao.weex.dom.WXDomModule.INVOKE_METHOD;
+import static com.taobao.weex.dom.WXDomModule.MOVE_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.REFRESH_FINISH;
+import static com.taobao.weex.dom.WXDomModule.REMOVE_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.REMOVE_EVENT;
+import static com.taobao.weex.dom.WXDomModule.SCROLL_TO_ELEMENT;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_ATTRS;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_FINISH;
+import static com.taobao.weex.dom.WXDomModule.UPDATE_STYLE;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * Created by sospartan on 01/03/2017.
  */
-public final class WXDomManager {
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
+public class Actions {
 
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
-  }
-
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
-  /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
+  public static Action get(String actionName,JSONArray args){
+    switch (actionName) {
+      case CREATE_BODY:
+        if (args == null) {
+          return null;
         }
-      });
+        return new CreateBodyAction(args.getJSONObject(0));
+      case UPDATE_ATTRS:
+        if (args == null) {
+          return null;
+        }
+        return new UpdateAttributeAction(args.getString(0),args.getJSONObject(1));
+      case UPDATE_STYLE:
+        if (args == null) {
+          return null;
+        }
+        return new UpdateStyleAction(args.getString(0),args.getJSONObject(1));
+      case REMOVE_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new RemoveElementAction(args.getString(0));
+      case ADD_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new AddElementAction(args.getJSONObject(1),args.getString(0),args.getInteger(2));
+      case MOVE_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new MoveElementAction(args.getString(0),args.getString(1),args.getInteger(2));
+      case ADD_EVENT:
+        if (args == null) {
+          return null;
+        }
+        return new AddEventAction(args.getString(0),args.getString(1));
+      case REMOVE_EVENT:
+        if (args == null) {
+          return null;
+        }
+        return new RemoveEventAction(args.getString(0),args.getString(1));
+      case CREATE_FINISH:
+        return new CreateFinishAction();
+      case REFRESH_FINISH:
+        return new RefreshFinishAction();
+      case UPDATE_FINISH:
+        return new UpdateFinishAction();
+      case SCROLL_TO_ELEMENT:
+        if (args == null) {
+          return null;
+        }
+        return new ScrollToElementAction(args.getString(0),args.getJSONObject(1));
+      case ADD_RULE:
+        if (args == null) {
+          return null;
+        }
+        return new AddRuleAction(args.getString(0),args.getJSONObject(1));
+      case GET_COMPONENT_RECT:
+        if(args == null){
+          return null;
+        }
+        return new GetComponentRectAction(args.getString(0),args.getString(1));
+      case INVOKE_METHOD:
+        if(args == null){
+          return null;
+        }
+        return new InvokeMethodAction(args.getString(0),args.getString(1),args.getJSONArray(2));
     }
+
+    return null;
   }
 
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
+
+  public static DOMAction getInvokeMethod(String ref,String method,JSONArray args){
+    return new InvokeMethodAction(ref,method,args);
   }
 
   /**
-   * Destroy current instance
+   * Bridge will get this action directly.
+   * @param data
+   * @param parentRef
+   * @param index
+   * @return
    */
-  public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
+  public static DOMAction getAddElement(JSONObject data, String parentRef, int index){
+    return new AddElementAction(data,parentRef,index);
   }
 
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
+  public static DOMAction getUpdateStyle(String ref, JSONObject data, boolean byPesudo){
+    return new UpdateStyleAction(ref,data,byPesudo);
   }
 
-  /**
-   * Batch the execution of {@link DOMActionContextImpl}
-   */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
-    }
+  public static DOMAction getAddEvent(String ref, String type) {
+    return new AddEventAction(ref,type);
   }
 
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
+  public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull String animation,
+                                             @Nullable final String callBack){
+    return new AnimationAction(ref, animation, callBack);
   }
 
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
-      }
-    }
-    action.executeDom(context);
-
+  public static RenderAction getAnimationAction(@NonNull String ref,
+                                                @NonNull final WXAnimationBean animationBean){
+    return new AnimationAction(ref, animationBean);
   }
 
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
-      return;
-    }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
+  public static RenderAction getAnimationAction(@NonNull String ref,
+                                                @NonNull final WXAnimationBean animationBean,
+                                                @Nullable String callback){
+    return new AnimationAction(ref, animationBean, callback);
   }
 }

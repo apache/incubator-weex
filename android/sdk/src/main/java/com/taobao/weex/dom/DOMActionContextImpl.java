@@ -204,168 +204,417 @@
  */
 package com.taobao.weex.dom;
 
-import android.os.Handler;
-import android.os.Message;
+import android.text.TextUtils;
+import android.util.Pair;
 
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.flex.CSSLayoutContext;
+import com.taobao.weex.ui.IWXRenderTask;
 import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.ui.animation.WXAnimationBean;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * <p>
+ * This class is responsible for creating command object of DOM operation and
+ * invoking command of corresponding object.
+ * </p>
+ * <p>
+ * In the command design pattern,
+ * this class acts as the <strong>invoker </strong>in the command pattern
+ * despite that it is also responsible for creating <strong>Command</strong> object.
+ * And,{@link IWXRenderTask} works as the <strong>Command</strong>
+ * {@link WXDomManager} works as the <strong>Client</strong>
+ * {@link WXRenderManager} works as the <strong>Receiver</strong>.
+ * </p>
+ * <p>
+ * There exists one to one correspondence between DOMActionContextImpl and WXInstance,
+ * and {@link WXDomManager} is responsible for manage the relation of correspondence.
+ * </p>
  */
-public final class WXDomManager {
-
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
+class DOMActionContextImpl implements DOMActionContext {
+  /** package **/ final ConcurrentHashMap<String, WXDomObject> mRegistry;
+  private WXDomObject.Consumer mAddDOMConsumer;
+  private WXDomObject.Consumer mUnregisterDomConsumer;
+  private String mInstanceId;
   private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
-
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
-  }
-
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
+  private ArrayList<IWXRenderTask> mNormalTasks;
+  private Set <Pair<String, Map<String, Object>>> animations;
+  private CSSLayoutContext mLayoutContext;
+  private volatile boolean mDirty;
+  private boolean mDestroy;
+  private Map<String, AddDomInfo> mAddDom = new HashMap<>();
 
   /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
+   * Create an instance of {@link DOMActionContextImpl},
+   * One {@link WXSDKInstance} corresponding to one and only one {@link DOMActionContextImpl}.
+   * And all the instance of {@link WXDomManager} share the same {@link WXRenderManager}.
+   * @param instanceId the id of the {@link WXSDKInstance}.
+   *                   One {@link WXSDKInstance} corresponding to one {@link DOMActionContextImpl},
+   *                   and vice versa.
+   * @param renderManager This acts as the Receiver of the command pattern
    */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
-        }
-      });
-    }
+  public DOMActionContextImpl(String instanceId, WXRenderManager renderManager) {
+    mDestroy = false;
+    mInstanceId = instanceId;
+    mLayoutContext = new CSSLayoutContext();
+    mRegistry = new ConcurrentHashMap<>();
+    mNormalTasks = new ArrayList<>();
+    animations = new LinkedHashSet<>();
+    mWXRenderManager = renderManager;
+    mAddDOMConsumer = new AddDOMConsumer(mRegistry);
+    mUnregisterDomConsumer = new RemoveElementConsumer(mRegistry);
   }
 
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
+  @Override
+  public String getInstanceId() {
+    return mInstanceId;
+  }
+
+  @Override
+  public WXDomObject.Consumer getAddDOMConsumer(){
+    return mAddDOMConsumer;
+  }
+
+  @Override
+  public WXDomObject.Consumer getRemoveElementConsumer() {
+    return mUnregisterDomConsumer;
+  }
+
+  @Override
+  public WXDomObject.Consumer getApplyStyleConsumer() {
+    return ApplyStyleConsumer.getInstance();
+  }
+
+  @Override
+  public void addDomInfo(String ref, WXComponent component) {
+    AddDomInfo addDomInfo = new AddDomInfo();
+    addDomInfo.component = component;
+    mAddDom.put(ref, addDomInfo);
   }
 
   /**
-   * Destroy current instance
+   * Destroy current instance, which occurred when {@link WXSDKInstance#destroy()} is called.
    */
   public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
-  }
-
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
+    mDestroy = true;
+    mRegistry.clear();
+    mAddDOMConsumer = null;
+    mNormalTasks.clear();
+    mAddDom.clear();
+    mLayoutContext = null;
+    mWXRenderManager = null;
+    animations.clear();
   }
 
   /**
-   * Batch the execution of {@link DOMActionContextImpl}
+   * Rebuild the component tree.
+   * The purpose of this method is moving fixed components to the root component.
+   * This method will be called when {@link #batch()} is executed.
+   * @param root root dom
    */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
-    }
-  }
-
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
-  }
-
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
+  void rebuildingFixedDomTree(WXDomObject root) {
+    if (root != null && root.getFixedStyleRefs() != null) {
+      int size = root.getFixedStyleRefs().size();
+      for (int i = 0; i < size; i++) {
+        String fixedRef = root.getFixedStyleRefs().get(i);
+        WXDomObject wxDomObject = mRegistry.get(fixedRef);
+        if (wxDomObject!=null && wxDomObject.parent != null) {
+          wxDomObject.parent.remove(wxDomObject);
+          root.add(wxDomObject, -1);
+        }
       }
     }
-    action.executeDom(context);
 
   }
 
   /**
-   *  @param action
-   * @param createContext only true when create body
+   * Batch the execution of command objects and execute all the command objects created other
+   * places, e.g. call {@link IWXRenderTask#execute()}.
+   * First, it will rebuild the dom tree and do pre layout staff.
+   * Then call {@link com.taobao.weex.dom.flex.CSSNode#calculateLayout(CSSLayoutContext)} to
+   * start calculate layout.
+   * Next, call {@link ApplyUpdateConsumer} to get changed dom and creating
+   * corresponding command object.
+   * Finally, walk through the queue, e.g. call {@link IWXRenderTask#execute()} for every task
+   * in the queue.
    */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
+  void batch() {
 
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
+    if (!mDirty || mDestroy) {
       return;
     }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
+
+    WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
+    layout(rootDom);
+  }
+
+  void layout(WXDomObject rootDom) {
+    if (rootDom == null) {
+      return;
+    }
+    long start0 = System.currentTimeMillis();
+
+    rebuildingFixedDomTree(rootDom);
+
+    rootDom.traverseTree( new WXDomObject.Consumer() {
+      @Override
+      public void accept(WXDomObject dom) {
+        if (!dom.hasUpdate() || mDestroy) {
+          return;
+        }
+        dom.layoutBefore();
+      }
+    });
+    long start = System.currentTimeMillis();
+
+
+    rootDom.calculateLayout(mLayoutContext);
+
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+    if (instance != null) {
+      instance.cssLayoutTime(System.currentTimeMillis() - start);
+    }
+
+    rootDom.traverseTree( new WXDomObject.Consumer() {
+      @Override
+      public void accept(WXDomObject dom) {
+        if (!dom.hasUpdate() || mDestroy) {
+          return;
+        }
+        dom.layoutAfter();
+      }
+    });
+
+    start = System.currentTimeMillis();
+    rootDom.traverseTree(new ApplyUpdateConsumer());
+
+    if (instance != null) {
+      instance.applyUpdateTime(System.currentTimeMillis() - start);
+    }
+
+    start = System.currentTimeMillis();
+    updateDomObj();
+    if (instance != null) {
+      instance.updateDomObjTime(System.currentTimeMillis() - start);
+    }
+    parseAnimation();
+
+    int count = mNormalTasks.size();
+    for (int i = 0; i < count && !mDestroy; ++i) {
+      mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
+    }
+    mNormalTasks.clear();
+    mAddDom.clear();
+    animations.clear();
+    mDirty = false;
+    if (instance != null) {
+      instance.batchTime(System.currentTimeMillis() - start0);
+    }
+  }
+
+  private class ApplyUpdateConsumer implements WXDomObject.Consumer{
+
+    @Override
+    public void accept(WXDomObject dom) {
+      if (dom.hasUpdate()) {
+        dom.markUpdateSeen();
+        if (!dom.isYoung()) {
+          final WXDomObject copy = dom.clone();
+          if (copy == null) {
+            return;
+          }
+          mNormalTasks.add(new IWXRenderTask() {
+
+            @Override
+            public void execute() {
+              mWXRenderManager.setLayout(mInstanceId, copy.getRef(), copy);
+              if(copy.getExtra() != null) {
+                mWXRenderManager.setExtra(mInstanceId, copy.getRef(), copy.getExtra());
+              }
+            }
+
+            @Override
+            public String toString() {
+              return "setLayout & setExtra";
+            }
+          });
+        }
+      }
+    }
+  }
+
+  private void parseAnimation() {
+    for (final Pair<String, Map<String, Object>> pair : animations) {
+      if (!TextUtils.isEmpty(pair.first)) {
+        final WXAnimationBean animationBean = createAnimationBean(pair.first, pair.second);
+        if (animationBean != null) {
+          postRenderTask(Actions.getAnimationAction(pair.first, animationBean));
+        }
+      }
+    }
+  }
+
+  /**
+   * Update all components' dom info stored in {@link #mAddDom}
+   */
+  private void updateDomObj() {
+    long start = System.currentTimeMillis();
+    Iterator<Map.Entry<String, AddDomInfo>> iterator = mAddDom.entrySet().iterator();
+    Map.Entry<String, AddDomInfo> entry;
+    AddDomInfo value;
+    while (iterator.hasNext()) {
+      entry = iterator.next();
+      value = entry.getValue();
+      updateDomObj(value.component);
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("updateDomObj", "time:" + (System.currentTimeMillis() - start));
+    }
+  }
+
+  /**
+   * Update the specified component's dom and mark it as old.
+   * @param component the component to be updated
+   */
+  private void updateDomObj(WXComponent component) {
+    if (component == null) {
+      return;
+    }
+    WXDomObject domObject = mRegistry.get(component.getRef());
+    if (domObject == null) {
+      return;
+    }
+    domObject.old();
+    component.updateDom(domObject);
+    if (component instanceof WXVContainer) {
+      WXVContainer container = (WXVContainer) component;
+      int count = container.childCount();
+      for (int i = 0; i < count; ++i) {
+        updateDomObj(container.getChild(i));
+      }
+    }
+  }
+
+  @Override
+  public void addAnimationForElement(String ref, Map<String, Object> animMap) {
+    animations.add(new Pair<>(ref,animMap));
+    mDirty = true;
+  }
+
+  @Override
+  public void postRenderTask(RenderAction action) {
+    mNormalTasks.add(new RenderActionTask(action, mWXRenderManager.getRenderContext(mInstanceId)));
+    mDirty = true;
+  }
+
+  @Override
+  public void registerDOMObject(String ref, WXDomObject obj) {
+    mRegistry.put(ref,obj);
+  }
+
+  @Override
+  public void unregisterDOMObject(String ref) {
+    mRegistry.remove(ref);
+  }
+
+  @Override
+  public void registerComponent(String ref, WXComponent comp) {
+    mWXRenderManager.registerComponent(mInstanceId,ref,comp);
+  }
+
+  @Override
+  public WXComponent getCompByRef(String ref) {
+    return mWXRenderManager.getWXComponent(mInstanceId,ref);
+  }
+
+  @Override
+  public boolean isDestory() {
+    return false;
+  }
+
+  @Override
+  public WXSDKInstance getInstance() {
+    return mWXRenderManager.getWXSDKInstance(mInstanceId);
+  }
+
+  @Override
+  public WXDomObject getDomByRef(String ref) {
+    return mRegistry.get(ref);
+  }
+
+  private WXAnimationBean createAnimationBean(String ref,Map<String, Object> style){
+    if (style != null) {
+      try {
+        Object transform = style.get(WXDomObject.TRANSFORM);
+        if (transform instanceof String && !TextUtils.isEmpty((String) transform)) {
+          String transformOrigin = (String) style.get(WXDomObject.TRANSFORM_ORIGIN);
+          WXAnimationBean animationBean = new WXAnimationBean();
+          WXDomObject domObject = mRegistry.get(ref);
+          int width = (int) domObject.getLayoutWidth();
+          int height = (int) domObject.getLayoutHeight();
+          animationBean.styles = new WXAnimationBean.Style();
+          animationBean.styles.init(transformOrigin, (String) transform, width, height,WXSDKManager.getInstance().getSDKInstance(mInstanceId).getInstanceViewPortWidth());
+          return animationBean;
+        }
+      }catch (RuntimeException e){
+        WXLogUtils.e("", e);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private static class RemoveElementConsumer implements WXDomObject.Consumer {
+    final ConcurrentHashMap<String, WXDomObject> mRegistry;
+
+    RemoveElementConsumer(ConcurrentHashMap<String, WXDomObject> r) {
+      mRegistry = r;
+    }
+
+
+    @Override
+    public void accept(WXDomObject dom) {
+      mRegistry.remove(dom.getRef());
+    }
+  }
+
+
+  private static class AddDOMConsumer implements WXDomObject.Consumer {
+    final ConcurrentHashMap<String, WXDomObject> mRegistry;
+    AddDOMConsumer(ConcurrentHashMap<String, WXDomObject> r){
+      mRegistry = r;
+    }
+
+    @Override
+    public void accept(WXDomObject dom) {
+      //register dom
+      dom.young();
+      mRegistry.put(dom.getRef(), dom);
+
+      //find fixed node
+      WXDomObject rootDom = mRegistry.get(WXDomObject.ROOT);
+      if (rootDom != null && dom.isFixed()) {
+        rootDom.add2FixedDomList(dom.getRef());
+      }
+    }
+  }
+
+  static class AddDomInfo {
+
+    public WXComponent component;
   }
 }

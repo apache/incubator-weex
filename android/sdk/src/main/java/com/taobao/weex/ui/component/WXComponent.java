@@ -159,9 +159,11 @@ import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
+import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
@@ -821,15 +823,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param type
    */
   protected void appendEventToDOM(String type){
-    Message message = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(getRef());
-    task.args.add(type);
-    message.obj = task;
-    message.what = WXDomHandler.MsgType.WX_DOM_ADD_EVENT;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+    WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(),type),false);
   }
 
   /**

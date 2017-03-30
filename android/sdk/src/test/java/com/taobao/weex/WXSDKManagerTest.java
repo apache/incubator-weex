@@ -216,7 +216,7 @@ import static org.junit.Assert.*;
 public class WXSDKManagerTest {
 
   public static void setRenderManager(WXRenderManager rm){
-    WXSDKManager.getInstance().mWXRenderManager = rm;
+    WXSDKManager.initInstance(rm);
   }
 
   public static void setInstance(WXSDKManager m){

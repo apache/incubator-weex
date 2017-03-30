@@ -217,6 +217,8 @@ public interface NestedContainer {
 
   void renderNewURL(String url);
 
+  void reload();
+
   interface OnNestedInstanceEventListener {
     void onException(NestedContainer comp, String errCode, String msg);
 

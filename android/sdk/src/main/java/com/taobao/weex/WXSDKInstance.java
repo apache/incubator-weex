@@ -1303,7 +1303,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return isDestroy;
   }
 
-  public String getBundleUrl() {
+  /**
+   * @return If you use render () the return value may be empty
+   */
+  public @Nullable String getBundleUrl() {
     return mBundleUrl;
   }
 
@@ -1315,6 +1318,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mRenderContainer;
   }
 
+  @Deprecated
   public void setBundleUrl(String url){
     mBundleUrl = url;
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {

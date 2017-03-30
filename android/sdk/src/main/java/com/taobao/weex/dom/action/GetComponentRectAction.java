@@ -202,170 +202,98 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.dom.action;
 
-import android.os.Handler;
-import android.os.Message;
+import android.graphics.Rect;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.view.View;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.bridge.SimpleJSCallback;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * Created by sospartan on 02/03/2017.
  */
-public final class WXDomManager {
+class GetComponentRectAction implements RenderAction {
+  private final String mRef;
+  private final String mCallback;
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
 
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
+  GetComponentRectAction(String ref, String callback) {
+    this.mRef = ref;
+    this.mCallback = callback;
   }
-
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
-  /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
-        }
-      });
-    }
-  }
-
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
-      return;
-    }
-    mDomHandler.post(WXThread.secure(task));
-  }
-
-  /**
-   * Destroy current instance
-   */
-  public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
-  }
-
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
-  }
-
-  /**
-   * Batch the execution of {@link DOMActionContextImpl}
-   */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
-    }
-  }
-
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
-    }
-  }
-
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
+  @Override
+  public void executeRender(RenderActionContext context) {
+    JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
+    if (context.getInstance().isDestroy()) {
+      //do nothing
+    }else if (TextUtils.isEmpty(mRef)) {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Illegal parameter");
+      jsCallback.invoke(options);
+    } else if ("viewport".equalsIgnoreCase(mRef)) {
+      callbackViewport(context, jsCallback);
+    } else {
+      WXComponent component = context.getComponent(mRef);
+      Map<String, Object> options = new HashMap<>();
+      if (component != null) {
+        Map<String, Float> size = new HashMap<>();
+        Rect sizes = component.getComponentSize();
+        size.put("width", getWebPxValue(sizes.width()));
+        size.put("height", getWebPxValue(sizes.height()));
+        size.put("bottom", getWebPxValue(sizes.bottom));
+        size.put("left", getWebPxValue(sizes.left));
+        size.put("right", getWebPxValue(sizes.right));
+        size.put("top", getWebPxValue(sizes.top));
+        options.put("size", size);
+        options.put("result", true);
+      } else {
+        options.put("errMsg", "Component does not exist");
       }
+      jsCallback.invoke(options);
     }
-    action.executeDom(context);
-
   }
 
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
-      return;
+  private void callbackViewport(RenderActionContext context, JSCallback jsCallback) {
+    WXSDKInstance instance = context.getInstance();
+    View container;
+    if ((container = instance.getContainerView()) != null) {
+      Map<String, Object> options = new HashMap<>();
+      Map<String, Float> sizes = new HashMap<>();
+      int[] location = new int[2];
+      instance.getContainerView().getLocationOnScreen(location);
+      sizes.put("left", 0f);
+      sizes.put("top", 0f);
+      sizes.put("right", getWebPxValue(container.getWidth()));
+      sizes.put("bottom", getWebPxValue(container.getHeight()));
+      sizes.put("width", getWebPxValue(container.getWidth()));
+      sizes.put("height", getWebPxValue(container.getHeight()));
+      options.put("size", sizes);
+      options.put("result", true);
+      jsCallback.invoke(options);
+    } else {
+      Map<String, Object> options = new HashMap<>();
+      options.put("result", false);
+      options.put("errMsg", "Component does not exist");
+      jsCallback.invoke(options);
     }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
   }
+
+  @NonNull
+  private float getWebPxValue(int value) {
+    return WXViewUtils.getWebPxByWidth(value, WXSDKInstance.getViewPortWidth());
+  }
+
+
 }

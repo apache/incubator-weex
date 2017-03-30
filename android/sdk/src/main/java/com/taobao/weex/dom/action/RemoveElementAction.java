@@ -202,170 +202,85 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.dom;
+package com.taobao.weex.dom.action;
 
-import android.os.Handler;
-import android.os.Message;
-
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.WXRuntimeException;
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.utils.WXUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.dom.DOMAction;
+import com.taobao.weex.dom.DOMActionContext;
+import com.taobao.weex.dom.RenderAction;
+import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 
 /**
- * Class for managing dom operation. This class works as the client in the command pattern, it
- * will call {@link DOMActionContextImpl} for creating command object and invoking corresponding
- * operation.
- * Methods in this class normally need to be invoked in dom thread, otherwise, {@link
- * WXRuntimeException} may be thrown.
+ * Created by sospartan on 27/02/2017.
  */
-public final class WXDomManager {
+final class RemoveElementAction implements DOMAction, RenderAction {
+  private final String mRef;
 
-  private WXThread mDomThread;
-  /** package **/
-  Handler mDomHandler;
-  private WXRenderManager mWXRenderManager;
-  private ConcurrentHashMap<String, DOMActionContextImpl> mDomRegistries;
-
-  public WXDomManager(WXRenderManager renderManager) {
-    mWXRenderManager = renderManager;
-    mDomRegistries = new ConcurrentHashMap<>();
-    mDomThread = new WXThread("WeeXDomThread", new WXDomHandler(this));
-    mDomHandler = mDomThread.getHandler();
+  RemoveElementAction(String ref) {
+    mRef = ref;
   }
 
-  public void sendEmptyMessageDelayed(int what, long delayMillis) {
-    if (mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
+  @Override
+  public void executeDom(DOMActionContext context) {
+    if (context.isDestory()) {
       return;
     }
-    mDomHandler.sendEmptyMessageDelayed(what, delayMillis);
-  }
-
-  public void sendMessage(Message msg) {
-    sendMessageDelayed(msg, 0);
-  }
-
-  public void sendMessageDelayed(Message msg, long delay) {
-    if (msg == null || mDomHandler == null || mDomThread == null
-        || !mDomThread.isWXThreadAlive() || mDomThread.getLooper() == null) {
+    WXSDKInstance instance = context.getInstance();
+    WXDomObject domObject = context.getDomByRef(mRef);
+    if (domObject == null) {
+      if (instance != null) {
+        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+      }
       return;
     }
-    mDomHandler.sendMessageDelayed(msg,delay);
-  }
-
-  /**
-   * Remove the specified dom statement. This is called when {@link WXSDKManager} destroy
-   * instances.
-   * @param instanceId {@link com.taobao.weex.WXSDKInstance#mInstanceId} for the instance
-   */
-  public void removeDomStatement(String instanceId) {
-    if (!WXUtils.isUiThread()) {
-      throw new WXRuntimeException("[WXDomManager] removeDomStatement");
-    }
-    final DOMActionContextImpl statement = mDomRegistries.remove(instanceId);
-    if (statement != null) {
-      post(new Runnable() {
-
-        @Override
-        public void run() {
-          statement.destroy();
-        }
-      });
-    }
-  }
-
-  public void post(Runnable task) {
-    if (mDomHandler == null || task == null || mDomThread == null || !mDomThread.isWXThreadAlive()
-        || mDomThread.getLooper() == null) {
+    WXDomObject parent = domObject.parent;
+    if (parent == null) {
+      if (instance != null) {
+        instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT);
+      }
       return;
     }
-    mDomHandler.post(WXThread.secure(task));
-  }
+    domObject.traverseTree(context.getRemoveElementConsumer());
+    parent.remove(domObject);
+    context.unregisterDOMObject(mRef);
 
-  /**
-   * Destroy current instance
-   */
-  public void destroy() {
-    if (mDomThread != null && mDomThread.isWXThreadAlive()) {
-      mDomThread.quit();
-    }
-    if (mDomRegistries != null) {
-      mDomRegistries.clear();
-    }
-    mDomHandler = null;
-    mDomThread = null;
-  }
+    context.postRenderTask(this);
 
-  private boolean isDomThread() {
-    return !WXEnvironment.isApkDebugable() || Thread.currentThread().getId() == mDomThread.getId();
-  }
-
-  /**
-   * Batch the execution of {@link DOMActionContextImpl}
-   */
-  void batch() {
-    throwIfNotDomThread();
-    Iterator<Entry<String, DOMActionContextImpl>> iterator = mDomRegistries.entrySet().iterator();
-    while (iterator.hasNext()) {
-      iterator.next().getValue().batch();
+    if (instance != null) {
+      instance.commitUTStab(IWXUserTrackAdapter.DOM_MODULE, WXErrorCode.WX_SUCCESS);
     }
   }
 
-  private void throwIfNotDomThread(){
-    if (!isDomThread()) {
-      throw new WXRuntimeException("dom operation must be done in dom thread");
+  @Override
+  public void executeRender(RenderActionContext context) {
+    WXComponent component = context.getComponent(mRef);
+    if (component == null || component.getParent() == null) {
+      return;
     }
+    WXVContainer parent = component.getParent();
+    clearRegistryForComponent(context, component);
+    parent.remove(component, true);
+    context.unregisterComponent(mRef);
   }
 
-  public void executeAction(String instanceId, DOMAction action, boolean createContext) {
-    DOMActionContext context = mDomRegistries.get(instanceId);
-    if(context == null){
-      if(createContext){
-        DOMActionContextImpl oldStatement = new DOMActionContextImpl(instanceId, mWXRenderManager);
-        mDomRegistries.put(instanceId, oldStatement);
-        context = oldStatement;
-      }else{
-        //Instance not existed.
-        return;
+  private void clearRegistryForComponent(RenderActionContext context, WXComponent component) {
+    WXComponent removedComponent = context.unregisterComponent(component.getDomObject().getRef());
+    if (removedComponent != null) {
+      removedComponent.removeAllEvent();
+      removedComponent.removeStickyStyle();
+    }
+    if (component instanceof WXVContainer) {
+      WXVContainer container = (WXVContainer) component;
+      int count = container.childCount();
+      for (int i = count - 1; i >= 0; --i) {
+        clearRegistryForComponent(context, container.getChild(i));
       }
     }
-    action.executeDom(context);
 
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postAction(String instanceId,DOMAction action, boolean createContext){
-    postActionDelay(instanceId, action, createContext, 0);
-  }
-
-  /**
-   *  @param action
-   * @param createContext only true when create body
-   */
-  public void postActionDelay(String instanceId,DOMAction action,
-                              boolean createContext, long delay){
-    if(action == null){
-      return;
-    }
-    Message msg = Message.obtain();
-    msg.what = WXDomHandler.MsgType.WX_EXECUTE_ACTION;
-    WXDomTask task = new WXDomTask();
-    task.instanceId = instanceId;
-    task.args = new ArrayList<>();
-    task.args.add(action);
-    task.args.add(createContext);
-    msg.obj = task;
-    sendMessageDelayed(msg, delay);
   }
 }

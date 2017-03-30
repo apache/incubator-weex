@@ -228,7 +228,7 @@ import org.robolectric.annotation.Config;
 @PrepareForTest({WXSoInstallMgrSdk.class, TextUtils.class,WXComponentFactory.class})
 public class WXRenderStatementTest {
 
-    WXRenderStatement mWXRenderStatement;
+    RenderActionContextImpl mWXRenderStatement;
 
     @Before
     public void setUp() throws Exception {
@@ -238,7 +238,7 @@ public class WXRenderStatementTest {
         PowerMockito.when(TextUtils.isEmpty("124")).thenReturn(true);
         PowerMockito.when(WXSoInstallMgrSdk.initSo(null, 1, null)).thenReturn(true);
         WXSDKInstance instance = Mockito.mock(WXSDKInstance.class);
-        mWXRenderStatement = new WXRenderStatement(instance);
+        mWXRenderStatement = new RenderActionContextImpl(instance);
     }
 
     public void testCreateBody() throws Exception {
