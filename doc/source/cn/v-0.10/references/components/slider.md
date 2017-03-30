@@ -22,6 +22,7 @@ version: 0.10
   该值决定是否自动播放轮播。重置 `loadmore` 相关的 UI，值不一样就会重置。
 
 - `interval {number}`：值为毫秒数，此值设定 slider 切换时间间隔。当 `auto-play` 值为 `true` 时生效。
+- `scrollable {boolean}`：可选值为 `true`/ `false`，默认值为 `true`。控制是否允许滚动。
 
 ## 样式
 

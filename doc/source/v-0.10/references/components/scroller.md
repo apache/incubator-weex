@@ -65,6 +65,7 @@ And there are two special components that can only be used inside scroller compo
 * scroll-direction: <string> define scroll direction of component, horizontal or vertical
 * loadmoreoffset : <number> default value is 0. The loadmore event will be triggered when the list is loadmoreoffset left to reach the bottom of the list view. e.g. a list has total content length of 1000, and the loadmoreoffset is set to 400, the loadmore event will be triggered when 600 has beed scrolled and there is less than 400 left.
 * loadmoreretry : <number> default value 0，whether to reset loadmore related UI when loadmore failed, will be deprecated in further release.
+* scrollable: true/false whether the scroller can scroll or not, default value is true
 
 **example**
 

@@ -42,6 +42,7 @@ version: 2.1
   ![mobile_preview](../images/scroller_1.jpg)
 
 - `loadmoreretry {number}`：默认值为 0，当 `loadmore` 失败时是否重置 `loadmore` 相关的 UI，值不一样就会重置。
+- `scrollable {boolean}`：可选值为 `true`/ `false`，默认值为 `true`。控制是否允许滚动。
 
 ## 样式
 

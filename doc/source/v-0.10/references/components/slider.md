@@ -20,6 +20,7 @@ It supports all kinds of weex components as its slides, especially the `indicato
 - `auto-play`: &lt;boolean&gt; `true` | `false`. This value determines whether the slides plays automatically after the page rendering finished. The default value is `false`.
 - `interval`: &lt;number&gt; millisecond. This value determines time interval for each page displayed in slider.
 - `index`: &lt;number&gt; . This value determines the  index of current shown slide. The default value is `0`.
+- `scrollable `: &lt;boolean&gt; `true` | `false`. This value determines whether the slider can scroll or not. The default value is `true`.
 
 Other attributes please check out the [common attributes](../references/common-attrs.html).
 
