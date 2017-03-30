@@ -1,4 +1,15 @@
-import { extend } from './func'
+// import { extend } from './func'
+
+function extend (to, ...args) {
+  if (!args || args.length <= 0) { return to }
+  args.forEach(from => {
+    if (typeof from !== 'object') { return }
+    for (const key in from) {
+      to[key] = from[key]
+    }
+  })
+  return to
+}
 
 /**
  * Create Event.
@@ -64,4 +75,8 @@ export function mapFormEvents (context) {
     }
   })
   return eventMap
+}
+
+export default {
+  mapFormEvents
 }

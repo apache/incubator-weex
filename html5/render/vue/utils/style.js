@@ -1,13 +1,15 @@
+// @flow
+
 /**
  * remove comments from a cssText.
  */
-export function trimComment (cssText) {
+export function trimComment (cssText: string): string {
   return cssText.replace(/(?:\/\*)[^*]*\*\//g, '')
 }
 
-let support = null
+let support: boolean | null = null
 
-export function supportSticky () {
+export function supportSticky (): boolean {
   if (support !== null) {
     return support
   }

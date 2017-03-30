@@ -1,7 +1,9 @@
+// @flow
+
 // input and textare has some common api and event
 import { extend } from '../utils'
 
-const findEnterKeyType = function (key) {
+const findEnterKeyType = function (key: string) : string {
   const keys = ['default', 'go', 'next', 'search', 'send']
   if (keys.indexOf(key) > -1) {
     return key
@@ -17,8 +19,8 @@ export default {
     blur () {
       this.$el && this.$el.blur()
     },
-    // support enter key envent
-    createKeyboardEvent (events) {
+    // support enter key event
+    createKeyboardEvent (events: {}) {
       const customKeyType = this.returnKeyType
       const self = this
       if (this._events['return']) {
