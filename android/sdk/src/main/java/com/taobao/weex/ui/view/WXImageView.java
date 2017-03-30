@@ -306,6 +306,12 @@ public class WXImageView extends ImageView implements WXGestureObservable,
     mWeakReference = new WeakReference<>(component);
   }
 
+  @Nullable
+  @Override
+  public WXImage getComponent() {
+    return mWeakReference.get();
+  }
+
   @Override
   public int getNaturalWidth() {
     Drawable drawable = getDrawable();
