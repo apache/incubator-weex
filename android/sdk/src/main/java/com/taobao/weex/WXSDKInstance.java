@@ -251,6 +251,7 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
+import com.taobao.weex.utils.Trace;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -279,6 +280,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public static final String BUNDLE_URL = "bundleUrl";
   private IWXUserTrackAdapter mUserTrackAdapter;
   private IWXRenderListener mRenderListener;
+  private IWXStatisticsListener mStatisticsListener;
   /** package **/ Context mContext;
   private final String mInstanceId;
   private RenderContainer mRenderContainer;
@@ -600,7 +602,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       wxRequest.paramMap = new HashMap<String, String>();
     }
     wxRequest.paramMap.put(KEY_USER_AGENT, WXHttpUtil.assembleUserAgent(mContext,WXEnvironment.getConfig()));
-    adapter.sendRequest(wxRequest, new WXHttpListener(pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis()));
+    WXHttpListener httpListener =
+        new WXHttpListener(pageName, renderOptions, jsonInitData, flag, System.currentTimeMillis());
+    httpListener.setSDKInstance(this);
+    adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) httpListener);
   }
 
   /**
@@ -760,6 +765,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return WXSDKManager.getInstance().getIWXHttpAdapter();
   }
 
+  public IWXStatisticsListener getWXStatisticsListener() {
+    return mStatisticsListener;
+  }
+
   public @Nullable
   IWebSocketAdapter getWXWebSocketAdapter() {
     return WXSDKManager.getInstance().getIWXWebSocketAdapter();
@@ -782,6 +791,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   @Deprecated
   public void registerActivityStateListener(IWXActivityStateListener listener) {
 
+  }
+
+  public void registerStatisticsListener(IWXStatisticsListener listener) {
+    mStatisticsListener = listener;
   }
 
   /********************************
@@ -1002,6 +1015,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
             if(mRenderListener != null) {
               mRenderListener.onViewCreated(WXSDKInstance.this, wxView);
             }
+            if (mStatisticsListener != null) {
+              mStatisticsListener.onFirstView();
+            }
           }
         }
       });
@@ -1152,6 +1168,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
        return;
 
     mEnd = true;
+
+    if (mStatisticsListener != null && mContext != null) {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          if (mStatisticsListener != null && mContext != null) {
+            Trace.beginSection("onFirstScreen");
+            mStatisticsListener.onFirstScreen();
+            Trace.endSection();
+          }
+        }
+      });
+    }
+
     mWXPerformance.screenRenderTime = System.currentTimeMillis() - mRenderStartTime;
     WXLogUtils.renderPerformanceLog("firstScreenRenderFinished", mWXPerformance.screenRenderTime);
     WXLogUtils.renderPerformanceLog("   firstScreenJSFExecuteTime", mWXPerformance.firstScreenJSFExecuteTime);
@@ -1189,12 +1219,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * UserTrack Log
    */
   public void commitUTStab(final String type, final WXErrorCode errorCode) {
-    if (mUserTrackAdapter == null || TextUtils.isEmpty(type) || errorCode==null) {
+    if (TextUtils.isEmpty(type) || errorCode == null) {
       return;
     }
+
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
+        // Record exception if a render error happened.
+        if (mStatisticsListener != null && errorCode != WXErrorCode.WX_SUCCESS) {
+          mStatisticsListener.onException(mInstanceId,
+                                          errorCode.getErrorCode(),
+                                          errorCode.getErrorMsg());
+        }
+
         WXPerformance performance = new WXPerformance();
         performance.errCode = errorCode.getErrorCode();
         performance.args = errorCode.getArgs();
@@ -1257,7 +1295,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mScrollView = null;
     mContext = null;
     mRenderListener = null;
-    isDestroy=true;
+    isDestroy = true;
+    mStatisticsListener = null;
   }
 
   public boolean isDestroy(){
@@ -1511,6 +1550,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     private Map<String, Object> options;
     private String jsonInitData;
     private WXRenderStrategy flag;
+    private WXSDKInstance instance;
     private long startRequestTime;
 
     private WXHttpListener(String pageName, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag, long startRequestTime) {
@@ -1520,16 +1560,25 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       this.flag = flag;
       this.startRequestTime = startRequestTime;
     }
-
+    
+    public void setSDKInstance(WXSDKInstance instance) {
+      this.instance = instance;
+    }
 
     @Override
     public void onHttpStart() {
-
+      if (this.instance != null
+          && this.instance.getWXStatisticsListener() != null) {
+        this.instance.getWXStatisticsListener().onHttpStart();
+      }
     }
 
     @Override
     public void onHeadersReceived(int statusCode,Map<String,List<String>> headers) {
-
+      if (this.instance != null
+          && this.instance.getWXStatisticsListener() != null) {
+        this.instance.getWXStatisticsListener().onHeadersReceived();
+      }
     }
 
     @Override
@@ -1544,6 +1593,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     @Override
     public void onHttpFinish(WXResponse response) {
+      if (this.instance != null
+          && this.instance.getWXStatisticsListener() != null) {
+        this.instance.getWXStatisticsListener().onHttpFinish();
+      }
 
       mWXPerformance.networkTime = System.currentTimeMillis() - startRequestTime;
       if(response.extendParams!=null){

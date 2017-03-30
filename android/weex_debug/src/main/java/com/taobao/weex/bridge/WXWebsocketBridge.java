@@ -302,6 +302,9 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public void takeHeapSnapshot(String filename) {}
+
+    @Override
     public void reportJSException(String instanceId, String func, String exception) {
         if (mJsManager != null) {
             mJsManager.reportJSException(instanceId, func, exception);

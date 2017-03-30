@@ -451,4 +451,12 @@ public class Constants {
     String HTTP = "http";
     String LOCAL = "local";
   }
+
+  public interface CodeCache {
+    String URL = "bundleUrl";
+    String DIGEST = "bundleDigest";
+    String PATH = "codeCachePath";
+    String BANNER_DIGEST = "digest";
+    String SAVE_PATH = "v8";
+  }
 }
