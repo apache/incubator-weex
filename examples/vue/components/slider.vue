@@ -6,7 +6,7 @@
           :interval="sliders[1].interval"
           autoPlay="false">
           <indicator class="indicator"></indicator>
-          <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
+          <slider-page v-for="v in sliders[1].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
       <panel title="auto-play = true" padding-body="0">
@@ -14,7 +14,7 @@
           :interval="sliders[0].interval"
           :autoPlay="sliders[0].autoPlay">
           <indicator class="indicator"></indicator>
-          <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
+          <slider-page v-for="v in sliders[0].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
     </panel>
@@ -24,7 +24,7 @@
         :autoPlay="sliders[0].autoPlay"
         @change="handleSliderChange">
         <indicator class="indicator"></indicator>
-        <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
+        <slider-page v-for="v in sliders[0].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
       </slider>
     </panel>
     <panel title="Indicator" type="primary">
@@ -34,23 +34,23 @@
           :autoPlay="sliders[0].autoPlay"
           @change="handleSliderChange">
           <indicator class="indicator"></indicator>
-          <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
+          <slider-page v-for="v in sliders[0].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
       <panel title="width & height" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[0].interval"
           :autoPlay="sliders[0].autoPlay">
-          <indicator style="itemColor: #dddddd;width:714px;height:460px;"></indicator>
-          <slider-page v-for="v in sliders[0].sliderPages" :items="v.items"></slider-page>
+          <indicator style="itemColor: #dddddd;width:714;height:460;"></indicator>
+          <slider-page v-for="v in sliders[0].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
       <panel title="left & top" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
           :autoPlay="sliders[1].autoPlay">
-          <indicator class="indicator" style="top:-140px;left:-240px"></indicator>
-          <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
+          <indicator class="indicator" style="top:-140;left:-240"></indicator>
+          <slider-page v-for="v in sliders[1].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
       <panel title="itemColor & itemSelectedColor" padding-body="0">
@@ -58,15 +58,15 @@
           :interval="sliders[2].interval"
           :autoPlay="sliders[2].autoPlay">
           <indicator class="indicator" style="itemSelectedColor:rgb(217, 83, 79);"></indicator>
-          <slider-page v-for="v in sliders[2].sliderPages" :items="v.items"></slider-page>
+          <slider-page v-for="v in sliders[2].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
       <panel title="itemSize" padding-body="0">
         <slider class="slider" append="tree"
           :interval="sliders[1].interval"
           :autoPlay="sliders[1].autoPlay">
-          <indicator style="itemColor: #dddddd;itemSize:40px;top:140px;left:180px;width:700px;height:380px;"></indicator>
-          <slider-page v-for="v in sliders[1].sliderPages" :items="v.items"></slider-page>
+          <indicator style="itemColor: #dddddd;itemSize:40;top:140;left:180;width:700;height:380;"></indicator>
+          <slider-page v-for="v in sliders[1].sliderPages" :key="Math.random()" :items="v.items"></slider-page>
         </slider>
       </panel>
     </panel>
