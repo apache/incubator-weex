@@ -36,8 +36,6 @@ for (var i = 0, l = plugins.length; i < l; i++) {
  */
 rollupConfig.plugins.splice(-2, 1, flow())
 
-console.log('rollupConfig', rollupConfig)
-
 rollupConfig.format = 'iife'
 rollupConfig.sourceMap = 'inline'
 
