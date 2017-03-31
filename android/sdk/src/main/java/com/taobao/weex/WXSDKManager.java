@@ -196,9 +196,20 @@ public class WXSDKManager {
   private boolean mNeedInitV8 = true;
 
   private WXSDKManager() {
-    mWXRenderManager = new WXRenderManager();
+    this(new WXRenderManager());
+  }
+
+  private WXSDKManager(WXRenderManager renderManager) {
+    mWXRenderManager = renderManager;
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  /**
+   * Used in junit test
+   */
+  static void initInstance(WXRenderManager renderManager){
+    sManager = new WXSDKManager(renderManager);
   }
 
   public void registerStatisticsListener(IWXStatisticsListener listener) {
