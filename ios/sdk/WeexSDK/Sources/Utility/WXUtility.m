@@ -333,7 +333,7 @@ static BOOL WXNotStat;
         NSRange range = NSMakeRange(16, backgroundImage.length - 17);
         NSString *str = [backgroundImage substringWithRange:range];
         NSArray *array = [str componentsSeparatedByString:@","];
-        WXGradientType gradientType;
+        WXGradientType gradientType = WXGradientTypeToTop;
         UIColor *startColor, *endColor;
         if ([array count] < 3) {
             return linearGradient;
