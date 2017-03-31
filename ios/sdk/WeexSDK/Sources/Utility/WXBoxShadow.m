@@ -11,10 +11,11 @@
 #import "WXUtility.h"
 
 @implementation WXBoxShadow
+@synthesize shadowColor = _shadowColor;
 
 - (void) dealloc
 {
-    CGColorRelease(self.shadowColor);
+    CGColorRelease(_shadowColor);
 }
 
 - (instancetype)init
@@ -32,17 +33,17 @@
 }
 
 - (CGColorRef)shadowColor {
-    return self.shadowColor;
+    return _shadowColor;
 }
 
 - (void)setShadowColor: (CGColorRef)shadowColor
 {
-    if (shadowColor == self.shadowColor)
+    if (shadowColor == _shadowColor)
     return;
     
     CGColorRetain(shadowColor);
-    CGColorRelease(self.shadowColor);
-    self.shadowColor = shadowColor;
+    CGColorRelease(_shadowColor);
+    _shadowColor = shadowColor;
 }
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
