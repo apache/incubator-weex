@@ -1,12 +1,13 @@
 var rollupConfig = require('./config')('weex-vue-render', true)
 var path = require('path')
+var flow = require('rollup-plugin-flow')
 
 function absolute (pa) {
   return path.resolve(__dirname, pa)
 }
 
 var removeConfigs = ['entry', 'dest', 'banner']
-var removePlugins = ['eslint', 'uglify']
+var removePlugins = ['eslint', 'uglify', 'flow-remove-type']
 
 removeConfigs.forEach(cfg => {
   delete rollupConfig[cfg]
@@ -29,6 +30,14 @@ for (var i = 0, l = plugins.length; i < l; i++) {
   if (!isRemove) { rollupConfig.plugins.push(plg) }
 }
 
+/**
+ * rollup-plugin-flow-no-whiitespace cause fatial error.
+ * use rollup-plugin-flow instead, since no soucemap needed, it's acceptable for extra whitespaces.
+ */
+rollupConfig.plugins.splice(-2, 1, flow())
+
+console.log('rollupConfig', rollupConfig)
+
 rollupConfig.format = 'iife'
 rollupConfig.sourceMap = 'inline'
 
@@ -38,13 +47,11 @@ module.exports = function (config) {
     browsers: ['PhantomJS'],
     files: [
       '../html5/test/render/vue/**/*.js'
-      // '../html5/test/render/vue/components/*.js'
     ],
 
     exclude: [
       '../html5/test/render/vue/helper.js',
       '../html5/test/render/vue/vender/**/*.js'
-      // '../html5/test/render/vue/examples/**/*.js'
     ],
 
     // singleRun: false,
@@ -59,8 +66,8 @@ module.exports = function (config) {
     },
 
     preprocessors: {
-      '../html5/test/**/*.js': ['rollup', 'coverage'],
-      // '../html5/test/**/!(components|examples)/*.js': ['rollup', 'coverage']
+      '../html5/test/**/*.js': ['rollup'],
+      '../html5/test/**/!(components|examples)/*.js': ['rollup', 'coverage']
     },
     rollupPreprocessor: rollupConfig,
 
