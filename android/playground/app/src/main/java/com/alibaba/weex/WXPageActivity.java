@@ -485,6 +485,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
    * @param map <weexid,viewId>
    */
   private static void collectId(WXComponent comp, Map<String,String> map){
+    if(comp == null){
+      return;
+    }
     ImmutableDomObject dom;
     String id;
     View view;
