@@ -15,6 +15,7 @@
 #import "WXImgLoaderDefaultImpl.h"
 #import "DemoDefine.h"
 #import "WXScannerVC.h"
+#import "WXScannerHistoryVC.h"
 #import "WXSyncTestModule.h"
 #import "UIView+UIThreadCheck.h"
 #import <WeexSDK/WeexSDK.h>
@@ -54,6 +55,10 @@
     if ([shortcutItem.type isEqualToString:QRSCAN]) {
         WXScannerVC * scanViewController = [[WXScannerVC alloc] init];
         [(WXRootViewController*)self.window.rootViewController pushViewController:scanViewController animated:YES];
+    }
+    if ([shortcutItem.type isEqualToString:QRSCAN_HISTORY]) {
+        WXScannerHistoryVC *scannerHistoryVC = [WXScannerHistoryVC new];
+        [(WXRootViewController*)self.window.rootViewController pushViewController:scannerHistoryVC animated:YES];
     }
 }
 
