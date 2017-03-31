@@ -232,6 +232,13 @@ public interface IWXBridge extends IWXObject {
   int execJSService(String javascript);
 
   /**
+   * take the heap snapshot and serialize the heap to a local file.
+   *
+   * @param filename
+   */
+  void takeHeapSnapshot(String filename);
+
+  /**
    * js call native
 
    */

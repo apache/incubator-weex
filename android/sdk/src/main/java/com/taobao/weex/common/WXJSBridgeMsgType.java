@@ -218,4 +218,5 @@ public class WXJSBridgeMsgType {
   public static final int REFRESH_INSTANCE = 0x0a;
   public static final int MODULE_TIMEOUT = 0x0b;
   public static final int MODULE_INTERVAL = 0x0c;
+  public static final int TAKE_HEAP_SNAPSHOT = 0x0d;
 }
