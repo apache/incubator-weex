@@ -19,7 +19,10 @@
     "callNative": false,
     "callNativeModule": false,
     "callAddElement":false,
-    "callJS": false
+    "callJS": false,
+    "notifyTrimMemory": false,
+    "markupState": false,
+    "compileAndRunBundle": false
   },
 
   "rules": {

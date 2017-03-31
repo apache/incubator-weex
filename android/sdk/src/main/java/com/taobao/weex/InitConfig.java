@@ -209,6 +209,7 @@ import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
@@ -224,6 +225,7 @@ public class InitConfig {
   private IWXUserTrackAdapter utAdapter;
   private IWXDebugAdapter debugAdapter;
   private IWXStorageAdapter storageAdapter;
+  private IWXSoLoaderAdapter soLoader;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
@@ -248,6 +250,11 @@ public class InitConfig {
   public IWXDebugAdapter getDebugAdapter(){
     return debugAdapter;
   }
+
+  public IWXSoLoaderAdapter getIWXSoLoaderAdapter() {
+    return soLoader;
+  }
+
   public String getFramework() {
     return framework;
   }
@@ -278,6 +285,7 @@ public class InitConfig {
     IWXUserTrackAdapter utAdapter;
     IWXDebugAdapter debugAdapter;
     IWXStorageAdapter storageAdapter;
+    IWXSoLoaderAdapter soLoader;
     URIAdapter mURIAdapter;
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
@@ -326,6 +334,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setSoLoader(IWXSoLoaderAdapter loader) {
+      this.soLoader = loader;
+      return this;
+    }
+
     public Builder setFramework(String framework){
       this.framework=framework;
       return this;
@@ -344,6 +357,7 @@ public class InitConfig {
       config.utAdapter = this.utAdapter;
       config.debugAdapter=this.debugAdapter;
       config.storageAdapter = this.storageAdapter;
+      config.soLoader=this.soLoader;
       config.framework=this.framework;
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
