@@ -15,7 +15,4 @@
 @interface WXComponent (GradientColor)
 
 - (void)setGradientLayer;
-
-- (UIImage *)gradientColorImageFromColors:(NSArray*)colors gradientType:(WXGradientType)gradientType imgSize:(CGSize)imgSize;
-
 @end

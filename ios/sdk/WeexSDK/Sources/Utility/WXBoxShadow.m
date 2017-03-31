@@ -14,7 +14,7 @@
 
 - (void) dealloc
 {
-    CGColorRelease(_shadowColor);
+    CGColorRelease(self.shadowColor);
 }
 
 - (instancetype)init
@@ -31,14 +31,18 @@
     return self;
 }
 
+- (CGColorRef)shadowColor {
+    return self.shadowColor;
+}
+
 - (void)setShadowColor: (CGColorRef)shadowColor
 {
-    if (shadowColor == _shadowColor)
+    if (shadowColor == self.shadowColor)
     return;
     
     CGColorRetain(shadowColor);
-    CGColorRelease(_shadowColor);
-    _shadowColor = shadowColor;
+    CGColorRelease(self.shadowColor);
+    self.shadowColor = shadowColor;
 }
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
