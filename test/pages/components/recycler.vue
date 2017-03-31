@@ -5,13 +5,14 @@
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
   @scroll="recylerScroll" @loadmore="loadmore" loadmoreoffset=3000
   >
-    <refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
+  <!--<refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
       <loading-indicator class="indicator"></loading-indicator>
       <text class="refreshText">{{refreshText}}</text>
-    </refresh>
+  </refresh>-->
     <header class="header" ref="header" v-if="showHeader">
-      <image class="banner" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover">
-        <div class="bannerInfo">
+      <div class="banner">
+       <image class="absolute" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover"></image>
+       <div class="bannerInfo">
           <image class="avatar" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg" resize="cover"></image>
           <text class="name">Adam Cat</text>
           <div class="titleWrap">
@@ -21,9 +22,9 @@
         <div class="bannerPhotoWrap">
           <image class="bannerPhoto" v-for="photo in banner.photos" :src="photo.src"></image>
         </div>
-      </image>
+      </div>
     </header>
-    <header class="stickyHeader" @click="showOrRemoveHeader">
+    <header class="stickyHeader" >
       <div v-if="stickyHeaderType === 'none'" class="stickyWrapper">
         <text class="stickyText">Sticky Header</text>
       </div>
@@ -79,6 +80,12 @@
     width: 40;
     margin-right: 30;
   }
+  .absolute {
+  position: absolute;
+  top: 0px;
+  width: 750;
+  height: 377;
+}
   .banner {
     height: 377;
     flex-direction: row;
