@@ -33,7 +33,7 @@ function waitForEmulator {
 }
 
 function setup_cpt {
-    set -eu
+    
     target_android='android'
     target_ios='ios'
     target_danger='danger'
@@ -43,6 +43,7 @@ function setup_cpt {
     
     setupBasic
 
+    set -eu
     if [ $target = $target_android ]; then
         # setupBasic
         # installAndroidSDK
