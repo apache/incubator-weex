@@ -13,6 +13,7 @@
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXRuleManager.h"
 #import "WXSDKEngine.h"
+#import "WXConvert.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <sys/utsname.h>
@@ -323,6 +324,106 @@ static BOOL WXNotStat;
 {
     message = message ? : @"";
     return [NSError errorWithDomain:@"WeexErrorDomain" code:code userInfo:@{@"errMsg":message}];
+}
+
++ (NSDictionary *)linearGradientWithBackgroundImage:(NSString *)backgroundImage
+{
+    NSMutableDictionary * linearGradient = nil;
+    if ([backgroundImage hasPrefix:@"linear-gradient"] && [backgroundImage hasSuffix:@")"] ) {
+        NSRange range = NSMakeRange(16, backgroundImage.length - 17);
+        NSString *str = [backgroundImage substringWithRange:range];
+        NSArray *array = [str componentsSeparatedByString:@","];
+        WXGradientType gradientType;
+        UIColor *startColor, *endColor;
+        if ([array count] < 3) {
+            return linearGradient;
+        }
+        if ([array count] == 3) {
+            gradientType = [WXConvert gradientType:array[0]];
+            startColor = [WXConvert UIColor:array[1]];
+            endColor = [WXConvert UIColor:array[2]];
+        } else if ([array count] > 3) {
+            NSString *gradientTypeStr = array[0];
+            NSString *subStr = [str substringFromIndex:gradientTypeStr.length + 1];
+            if ([subStr hasPrefix:@"rgb"]) {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                range = [subStr rangeOfString:@")"];
+                NSString *startColorStr = [subStr substringToIndex:range.location + 1];
+                NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
+                startColor = [WXConvert UIColor:startColorStr];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+            else {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                startColor = [WXConvert UIColor:array[1]];
+                
+                NSString *startColorStr = array[1];
+                NSString *endColorStr = [subStr substringFromIndex:startColorStr.length + 1];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+        }
+        
+        if (endColor || startColor) {
+            linearGradient = [NSMutableDictionary new];
+            [linearGradient setValue:startColor forKey:@"startColor"];
+            [linearGradient setValue:endColor forKey:@"endColor"];
+            [linearGradient setValue:@(gradientType) forKey:@"gradientType"];
+        }
+    }
+    return linearGradient;
+}
+
++ (CAGradientLayer *)gradientLayerFromColors:(NSArray*)colors locations:(NSArray*)locations frame:(CGRect)frame gradientType:(WXGradientType)gradientType
+{
+    CAGradientLayer * gradientLayer = [CAGradientLayer layer];
+    NSMutableArray *newColors = [NSMutableArray new];
+    for(UIColor *color in colors) {
+        [newColors addObject:(id)color.CGColor];
+    }
+    if (colors) {
+        gradientLayer.colors = newColors;
+    }
+    if (locations) {
+        gradientLayer.locations = locations;
+    }
+    CGPoint start = CGPointZero;
+    CGPoint end = CGPointZero;
+    switch (gradientType) {
+        case WXGradientTypeToTop:
+            start = CGPointMake(0.0, 1.0);
+            end = CGPointMake(0.0, 0.0);
+            break;
+        case WXGradientTypeToBottom:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(0.0, 1.0);
+            break;
+        case WXGradientTypeToLeft:
+            start = CGPointMake(1.0, 0.0);
+            end = CGPointMake(0.0, 0.0);
+            break;
+        case WXGradientTypeToRight:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(1.0, 0.0);
+            break;
+        case WXGradientTypeToTopleft:
+            start = CGPointMake(1.0, 1.0);
+            end = CGPointMake(0.0, 0.0f);
+            break;
+        case WXGradientTypeToBottomright:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(1.0, 1.0);
+            break;
+        default:
+            break;
+    }
+    
+    gradientLayer.startPoint = start;
+    gradientLayer.endPoint = end;
+    gradientLayer.frame = frame;
+    
+    return gradientLayer;
 }
 
 + (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
