@@ -26,7 +26,7 @@ matrix:
     include:
       - os: osx
         env: TEST_SUITE=ios
-        osx_image: xcode8.2
+        osx_image: xcode8.3
         language: objective-c
         Simulators: iOS 7.0
       - os: linux
