@@ -61,7 +61,7 @@
     UILongPressGestureRecognizer * longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     longPressGesture.minimumPressDuration = 1.0;
     [cell addGestureRecognizer:longPressGesture];
-    NSMutableAttributedString * attributeString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d %@",indexPath.row+1,[_scanner_history objectAtIndex:indexPath.row]]];
+    NSMutableAttributedString * attributeString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ld %@",(long)indexPath.row+1,[_scanner_history objectAtIndex:indexPath.row]]];
     [attributeString addAttribute:(NSString*)NSForegroundColorAttributeName value:(id)[UIColor redColor].CGColor range:NSMakeRange(0, 1)];
     NSDictionary<NSString*, id> *attributes = @{
                                                NSForegroundColorAttributeName:[UIColor redColor],
