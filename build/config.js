@@ -6,7 +6,8 @@ const postcss = require('rollup-plugin-postcss')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('rollup-plugin-uglify')
 const commonjs = require('rollup-plugin-commonjs')
-const flow = require('rollup-plugin-flow')
+// const flow = require('rollup-plugin-flow')
+const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const subversion = require('../package.json').subversion
 
@@ -98,7 +99,7 @@ function getConfig (name, minify) {
         'process.env.NODE_DEBUG': false
       }),
       commonjs(),
-      flow(),
+      flow(/*{ pretty: true }*/),
       buble()
     ])
   }
