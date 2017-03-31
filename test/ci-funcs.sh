@@ -1,3 +1,5 @@
+#!/bin/sh -eu
+
 function installAndroidSDK {
     # brew install android-sdk
     # export ANDROID_HOME=/usr/local/opt/android-sdk
@@ -31,6 +33,7 @@ function waitForEmulator {
 }
 
 function setup_cpt {
+    set -eu
     target_android='android'
     target_ios='ios'
     target_danger='danger'
@@ -84,6 +87,7 @@ function printEnvInfo {
 }
 
 function test_cpt {
+    set -eu
     echo 'cilog:start test ......'
 
     target_android='android'
