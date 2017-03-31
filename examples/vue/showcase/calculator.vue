@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .row {
     flex-direction: row;
   }

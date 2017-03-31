@@ -15,7 +15,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .btn {
     margin-bottom: 0;
     align-items: center;
