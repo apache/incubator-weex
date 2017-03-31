@@ -28,6 +28,7 @@ matrix:
         env: TEST_SUITE=ios
         osx_image: xcode8.2
         language: objective-c
+        Simulators: iOS 7.0
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8
