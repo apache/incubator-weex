@@ -1,6 +1,3 @@
-var flow = require('rollup-plugin-flow')
-var buble = require('rollup-plugin-buble')
-var replace = require('rollup-plugin-replace')
 var rollupConfig = require('./config')('weex-vue-render', true)
 var path = require('path')
 
