@@ -213,3 +213,12 @@ export function kebabToCamel (name) {
     return `${g1.toUpperCase()}`
   })
 }
+
+export function findEnterKeyType (key) {
+  const keys = ['default', 'go', 'next', 'search', 'send']
+  if (keys.indexOf(key) > -1) {
+    return key
+  }
+  return 'done'
+}
+

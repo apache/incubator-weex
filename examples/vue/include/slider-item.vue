@@ -11,7 +11,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   .slider-item {
     width: 348px;
     height: 400px;

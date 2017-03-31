@@ -11,7 +11,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .video {
     width: 750px;
     height: 460px;

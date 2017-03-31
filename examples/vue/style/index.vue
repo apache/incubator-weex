@@ -22,7 +22,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .bg-item {
     width: 690px;
     margin-bottom: 10px;

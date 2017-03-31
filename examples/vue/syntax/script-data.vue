@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
 </style>
 
