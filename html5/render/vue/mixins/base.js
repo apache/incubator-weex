@@ -116,6 +116,13 @@ export default {
       if (process.env.NODE_ENV === 'development') {
         tagEnd('base._fireLazyload')
       }
+    },
+
+    _trimTextNodeChildren (children) {
+      if (Array.isArray(children)) {
+        return children.filter(vnode => !!vnode.tag)
+      }
+      return children
     }
   }
 }
