@@ -1,6 +1,7 @@
 // import { validateStyles } from '../validator'
 
 export default {
+  name: 'weex-a',
   props: {
     href: String
   },
@@ -16,6 +17,6 @@ export default {
       },
       on: this._createEventMap(),
       staticClass: 'weex-a weex-ct'
-    }, this.$slots.default)
+    }, this._trimTextNodeChildren(this.$slots.default))
   }
 }
