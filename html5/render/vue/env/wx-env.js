@@ -1,21 +1,30 @@
 import 'envd'
 
+import { setViewport } from './viewport'
+import { extend } from '../utils'
+
+const scaleInfo = setViewport()
+
 const lib = window.lib
 const env = {
   platform: 'Web',
-  weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
+  // weexVersion: '0.10.0', // TODO: get version from package.json (not sure)
+  weexVersion: 'process.env.WEEX_VERSION',
   userAgent: navigator.userAgent,
   appName: lib.env.aliapp ? lib.env.aliapp.appname : navigator.appName,
   appVersion: lib.env.aliapp ? lib.env.aliapp.version.val : null,
   osName: lib.env.browser ? lib.env.browser.name : null,
   osVersion: lib.env.browser ? lib.env.browser.version.val : null,
-  deviceModel: lib.env.os.name || null,
-  deviceWidth: window.innerWidth,
-  deviceHeight: window.innerHeight
+  deviceModel: lib.env.os.name || null
 }
 
+/**
+ * scaleInfo: scale, deviceWidth, deviceHeight.
+ */
+extend(env, scaleInfo)
+
 // 750 by default currently
-const scale = 2
+const scale = env.scale
 
 const units = {
   REM: 12 * scale,
@@ -33,7 +42,7 @@ const units = {
 }
 
 Object.freeze(units)
-Object.freeze(env)
+// Object.freeze(env)
 
 window.CSS_UNIT = units
 window.WXEnvironment = env

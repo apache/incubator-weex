@@ -1,7 +1,7 @@
 <!--
   * <template>: html-like syntax
   * CSS-like inline style
-  * <style>: only support single-class selector
+  * <style scoped>: only support single-class selector
 -->
 
 <template>
@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .wrapper {align-items: center; margin-top: 120px;}
   .title {font-size: 48px;}
   .logo {width: 360px; height: 82px;}

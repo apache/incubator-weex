@@ -2,7 +2,7 @@
   <text class="h2">{{value}}</text>
 </template>
 
-<style>
+<style scoped>
   .h2 {font-size: 48px; font-weight: bold;
     padding: 20px; margin-top: 20px; margin-bottom: 20px;
     background-color: #eee;}
