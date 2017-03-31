@@ -13,7 +13,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .h1 {
     height: 110px;
     padding-top: 20px;

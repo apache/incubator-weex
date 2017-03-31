@@ -1,10 +1,10 @@
 // modules from render/browesr
-import Event from '../../browser/extend/api/event'
-import Geolocation from '../../browser/extend/api/geolocation'
-import PageInfo from '../../browser/extend/api/pageInfo'
-import Storage from '../../browser/extend/api/storage'
-import Stream from '../../browser/extend/api/stream'
-import Clipboard from '../../browser/extend/api/clipboard'
+import event from '../../browser/extend/api/event'
+import geolocation from '../../browser/extend/api/geolocation'
+import pageInfo from '../../browser/extend/api/pageInfo'
+import storage from '../../browser/extend/api/storage'
+import stream from '../../browser/extend/api/stream'
+import clipboard from '../../browser/extend/api/clipboard'
 
 // custom modules
 import animation from './animation'
@@ -12,6 +12,15 @@ import dom from './dom'
 import modal from './modal'
 import navigator from './navigator'
 import webview from './webview'
+
+const legacyModules = {
+  event,
+  geolocation,
+  pageInfo,
+  storage,
+  stream,
+  clipboard
+}
 
 const modules = {
   animation,
@@ -21,18 +30,13 @@ const modules = {
   webview
 }
 
-export function requireWeexModule (name) {
-  if (modules[name]) {
-    return modules[name]
+export default {
+  init (weex) {
+    for (const k in legacyModules) {
+      weex.install(legacyModules[k])
+    }
+    for (const k in modules) {
+      weex.registerModule(k, modules[k])
+    }
   }
-  return null
-}
-
-export function init (weex) {
-  weex.install(Event)
-  weex.install(Geolocation)
-  weex.install(PageInfo)
-  weex.install(Storage)
-  weex.install(Stream)
-  weex.install(Clipboard)
 }

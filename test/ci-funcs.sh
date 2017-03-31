@@ -33,6 +33,7 @@ function waitForEmulator {
 }
 
 function setup_cpt {
+    set -eu
     target_android='android'
     target_ios='ios'
     target_danger='danger'
@@ -86,6 +87,7 @@ function printEnvInfo {
 }
 
 function test_cpt {
+    set -eu
     echo 'cilog:start test ......'
 
     target_android='android'
