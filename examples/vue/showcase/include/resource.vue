@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {
     width: 750;
     height: 100;
