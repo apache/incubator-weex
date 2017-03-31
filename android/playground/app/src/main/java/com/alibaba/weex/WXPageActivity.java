@@ -217,10 +217,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -229,6 +231,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.weex.commons.WXAnalyzerDelegate;
 import com.alibaba.weex.commons.util.ScreenUtil;
 import com.alibaba.weex.constants.Constants;
@@ -240,10 +244,18 @@ import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.NestedContainer;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -252,6 +264,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class WXPageActivity extends WXBaseActivity implements IWXRenderListener, Handler.Callback, WXSDKInstance.NestedInstanceInterceptor {
@@ -279,6 +292,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_wxpage);
     setCurrentWxPageActivity(this);
+
+
     WXSDKEngine.setActivityNavBarSetter(new NavigatorAdapter());
     getWindow().setFormat(PixelFormat.TRANSLUCENT);
     mUri = getIntent().getData();
@@ -313,6 +328,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mUri = mUri.buildUpon().scheme("http").build();
       loadWXfromService(mUri.toString());
       startHotRefresh();
+      mWXHandler.removeCallbacks(mCollectIDMap);
+      mWXHandler.postDelayed(mCollectIDMap,2000);
     }else if (TextUtils.equals("http", mUri.getScheme()) || TextUtils.equals("https", mUri.getScheme())) {
       // if url has key "_wx_tpl" then get weex bundle js
       String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
@@ -447,6 +464,44 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   private void addOnListener() {
 
+  }
+
+  private Map<String,String> mIDMap = new ArrayMap<>();
+  private final Runnable mCollectIDMap = new Runnable() {
+    @Override
+    public void run() {
+      View container = findViewById(R.id.container);
+
+      collectId(mInstance.getRootComponent(),mIDMap);
+      container.setContentDescription(JSON.toJSONString(mIDMap));
+
+      mWXHandler.removeCallbacks(this);
+      mWXHandler.postDelayed(this,2000);
+    }
+  };
+
+  /**
+   *
+   * @param map <weexid,viewId>
+   */
+  private static void collectId(WXComponent comp, Map<String,String> map){
+    ImmutableDomObject dom;
+    String id;
+    View view;
+    if((view = comp.getHostView())!=null &&
+        (dom = comp.getDomObject()) != null &&
+        (id = (String) dom.getAttrs().get("testId"))!=null &&
+        !map.containsKey(id)){
+      Pair<String,Integer> pair = Utility.nextID();
+      view.setId(pair.second);
+      map.put(id,pair.first);
+    }
+    if(comp instanceof WXVContainer){
+      WXVContainer container = (WXVContainer) comp;
+      for(int i = container.getChildCount()-1;i>=0;i--){
+        collectId(container.getChild(i),map);
+      }
+    }
   }
 
   @Override
