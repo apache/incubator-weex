@@ -145,7 +145,7 @@
     "weex-components": "^0.2.0",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
-    "weex-wd": "^1.0.19",
+    "weex-wd": "^1.0.20",
     "wwp": "^0.3.5",
     "xml2map": "^1.0.2"
   }
