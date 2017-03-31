@@ -94,7 +94,11 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
         commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
     }
     if (instance.userInfo[WXCUSTOMMONITORINFO]) {
-        commitDict[WXCUSTOMMONITORINFO] = instance.userInfo[WXCUSTOMMONITORINFO];
+        if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSDictionary class]]) {
+            commitDict[WXCUSTOMMONITORINFO] = [WXUtility JSONString:instance.userInfo[WXCUSTOMMONITORINFO]];
+        }else if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSString class]]) {
+            commitDict[WXCUSTOMMONITORINFO] = instance.userInfo[WXCUSTOMMONITORINFO];
+        }
     }
     WXPerformBlockOnComponentThread(^{
         commitDict[@"componentCount"] = @([instance numberOfComponents]);
