@@ -104,7 +104,10 @@ static WXRuleManager *_sharedInstance = nil;
                     // load success
                     NSMutableDictionary * dictForFontFamily = [weakSelf.fontStorage objectForKey:rule[@"fontFamily"]];
                     NSString *fontSrc = [dictForFontFamily objectForKey:@"tempSrc"];
-                    [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    if (fontSrc) {
+                        // only remote font will be mark as tempSrc
+                        [dictForFontFamily setObject:fontSrc forKey:@"src"];
+                    }
                     [dictForFontFamily setObject:url forKey:@"localSrc"];
                     
                     [[NSNotificationCenter defaultCenter] postNotificationName:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil userInfo:@{@"fontFamily":rule[@"fontFamily"]}];

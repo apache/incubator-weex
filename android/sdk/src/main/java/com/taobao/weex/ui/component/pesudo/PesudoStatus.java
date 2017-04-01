@@ -297,7 +297,7 @@ public class PesudoStatus {
      * NEW INSTANCE, DO NOT USE MAP OBJECT FROM pesudoStyles
      */
     Map<String,Object> resultStyles = new ArrayMap<>();
-    if(prevStatusesStr != null){
+    if(prevUpdateStyles != null){
       resultStyles.putAll(prevUpdateStyles);
     }
 

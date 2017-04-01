@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(459)
+	__vue_styles__.push(__webpack_require__(480)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(460)
+	__vue_exports__ = __webpack_require__(481)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(461)
+	var __vue_template__ = __webpack_require__(482)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/web.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/web.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-74e76ca3"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,21 +91,21 @@
 
 /***/ },
 
-/***/ 385:
+/***/ 403:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(386)
+	__vue_styles__.push(__webpack_require__(404)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(387)
+	__vue_exports__ = __webpack_require__(405)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(388)
+	var __vue_template__ = __webpack_require__(406)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,22 +117,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/button.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/button.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-4c6be341"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 386:
+/***/ 404:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -228,7 +236,7 @@
 
 /***/ },
 
-/***/ 387:
+/***/ 405:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -251,21 +259,21 @@
 
 /***/ },
 
-/***/ 388:
+/***/ 406:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['btn', 'btn-' + _vm.type, 'btn-sz-' + _vm.size]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['btn-txt', 'btn-txt-' + _vm.type, 'btn-txt-sz-' + _vm.size]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 459:
+/***/ 480:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -298,7 +306,7 @@
 
 /***/ },
 
-/***/ 460:
+/***/ 481:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -350,10 +358,10 @@
 	//
 	//
 
-	var webview = __weex_require_module__('webview');
+	var webview = weex.requireModule('webview');
 	module.exports = {
 	  components: {
-	    button: __webpack_require__(385)
+	    button: __webpack_require__(403)
 	  },
 	  methods: {
 	    goback: function goback() {
@@ -376,19 +384,19 @@
 
 /***/ },
 
-/***/ 461:
+/***/ 482:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["wrapper"]
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["toolbar"],
 	    appendAsTree: true,
 	    attrs: {
 	      "append": "tree"
 	    }
-	  }, [_h('button', {
+	  }, [_c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -405,7 +413,7 @@
 	        _vm.goback($event)
 	      }
 	    }
-	  }), _h('button', {
+	  }), _c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -422,7 +430,7 @@
 	        _vm.goforward($event)
 	      }
 	    }
-	  }), _h('button', {
+	  }), _c('button', {
 	    staticStyle: {
 	      marginLeft: "30px",
 	      width: "210px",
@@ -439,7 +447,7 @@
 	        _vm.refresh($event)
 	      }
 	    }
-	  })]), _h('web', {
+	  })], 1), _c('web', {
 	    ref: "webview",
 	    staticClass: ["content"],
 	    attrs: {
@@ -450,7 +458,7 @@
 	      "pagefinish": _vm.finishload,
 	      "error": _vm.failload
 	    }
-	  })])
+	  })], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

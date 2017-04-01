@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .box {
     background-color: #f5f5f5;
     width: 260px;
