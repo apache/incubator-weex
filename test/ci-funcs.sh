@@ -33,7 +33,6 @@ function waitForEmulator {
 }
 
 function setup_cpt {
-    
     target_android='android'
     target_ios='ios'
     target_danger='danger'

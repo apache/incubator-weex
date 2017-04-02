@@ -18,7 +18,7 @@
 - (WXBoxShadow *_Nullable)getViewBoxShadow:(UIView *_Nullable)view
 {
     WXBoxShadow *boxShadow = [WXBoxShadow new];
-    boxShadow.shadowColor = view.layer.shadowColor;
+    boxShadow.shadowColor = [UIColor colorWithCGColor:view.layer.shadowColor];
     boxShadow.shadowOffset = view.layer.shadowOffset;
     boxShadow.shadowRadius = view.layer.shadowRadius;
     boxShadow.shadowOpacity =  view.layer.shadowOpacity;
@@ -29,7 +29,7 @@
 {
     UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds];
     self.view.layer.masksToBounds = NO;
-    self.view.layer.shadowColor = _originalBoxShadow.shadowColor;
+    self.view.layer.shadowColor = _originalBoxShadow.shadowColor.CGColor;
     self.view.layer.shadowOffset = _originalBoxShadow.shadowOffset;
     self.view.layer.shadowRadius = _originalBoxShadow.shadowRadius;
     self.view.layer.shadowOpacity = _originalBoxShadow.shadowOpacity;
@@ -44,11 +44,11 @@
 }
 
 // if not equal return NO, if equal return YES
-- (BOOL)EqualBoxShadow:(WXBoxShadow *_Nullable)boxShadow withBoxShadow:(WXBoxShadow *_Nullable)compareBoxShadow
+- (BOOL)equalBoxShadow:(WXBoxShadow *_Nullable)boxShadow withBoxShadow:(WXBoxShadow *_Nullable)compareBoxShadow
 {
     if(!compareBoxShadow && !boxShadow) {
         return YES;
-    } else if (CGColorEqualToColor(boxShadow.shadowColor,compareBoxShadow.shadowColor) &&
+    } else if (CGColorEqualToColor(boxShadow.shadowColor.CGColor,compareBoxShadow.shadowColor.CGColor) &&
                CGSizeEqualToSize(boxShadow.shadowOffset,compareBoxShadow.shadowOffset) &&
                WXFloatEqual(boxShadow.shadowRadius,compareBoxShadow.shadowRadius)&& (boxShadow.isInset == compareBoxShadow.isInset))
     {
@@ -80,7 +80,7 @@
     } else {
         UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds];
         self.view.layer.masksToBounds = NO;
-        self.view.layer.shadowColor = boxShadow.shadowColor;
+        self.view.layer.shadowColor = boxShadow.shadowColor.CGColor;
         self.view.layer.shadowOffset = boxShadow.shadowOffset;
         self.view.layer.shadowRadius = boxShadow.shadowRadius;
         self.view.layer.shadowOpacity = boxShadow.shadowOpacity;

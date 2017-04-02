@@ -1,8 +1,8 @@
-import { expect } from 'chai'
-import { multiDescribe } from '../helper'
+import { init } from '../helper'
 import web from '../../../../render/vue/components/web'
 
-multiDescribe('<web> component', (Vue, helper) => {
+init('<web> component', (Vue, helper) => {
+  const { utils, compile } = helper
   before(() => {
     helper.register('web', web)
   })
@@ -12,18 +12,18 @@ multiDescribe('<web> component', (Vue, helper) => {
   })
 
   it('simple <web> component', () => {
-    const vm = helper.compile(`<web></web>`)
+    const vm = compile(`<web></web>`)
 
     // console.log(vm.$el)
     expect(vm.$el.tagName).to.be.equal('IFRAME')
-    expect(vm.$el.className).to.be.equal('weex-web')
+    expect(utils.toArray(vm.$el.classList)).to.include.members(['weex-web', 'weex-el'])
   })
 
   it('use src attribute', () => {
-    const vm = helper.compile(`<web src="https://x.cn"></web>`)
+    const vm = compile(`<web src="https://x.cn"></web>`)
 
     expect(vm.$el.tagName).to.be.equal('IFRAME')
     expect(vm.$el.getAttribute('src')).to.be.equal('https://x.cn')
-    expect(vm.$el.className).to.be.equal('weex-web')
+    expect(utils.toArray(vm.$el.classList)).to.include.members(['weex-web', 'weex-el'])
   })
 })

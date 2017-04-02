@@ -23,7 +23,9 @@ const flowIgnorePaths = [
   'bin',
   'dist',
   'flow-typed'
-].map(absolute);
+].map(function (rel) {
+  return absolute('html5/' + rel)
+});
 
 // new js files should have `@flow` at the top
 const unFlowedFiles = jsFiles.filter(filepath => {
@@ -31,7 +33,7 @@ const unFlowedFiles = jsFiles.filter(filepath => {
   const len = flowIgnorePaths.length
   while (i < len) {
     const p = flowIgnorePaths[i]
-    if (filepath.indexOf(p) > -1) {
+    if (absolute(filepath).indexOf(p) > -1) {
       // ignore this file because it's in the flow-ignore-paths.
       return false;
     }

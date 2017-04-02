@@ -11,7 +11,7 @@
 
 @interface WXBoxShadow : NSObject
 
-@property(nullable) CGColorRef shadowColor;
+@property(nonatomic,strong,nullable) UIColor *shadowColor;
 @property CGSize shadowOffset;
 @property CGFloat shadowRadius;
 @property BOOL isInset;
