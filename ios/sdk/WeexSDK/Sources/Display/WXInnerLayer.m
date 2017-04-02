@@ -50,9 +50,9 @@
     CGPathAddRect(outer, NULL, CGRectInset(rect, -1*rect.size.width, -1*rect.size.height));
     CGPathAddPath(outer, NULL, bezierPath.CGPath);
     CGPathCloseSubpath(outer);
-    CGFloat *oldComponents = (CGFloat *)CGColorGetComponents(self.boxShadowColor);
+    CGFloat *oldComponents = (CGFloat *)CGColorGetComponents(self.boxShadowColor.CGColor);
     CGFloat newComponents[4];
-    NSInteger numberOfComponents = CGColorGetNumberOfComponents(self.boxShadowColor);
+    NSInteger numberOfComponents = CGColorGetNumberOfComponents(self.boxShadowColor.CGColor);
     switch (numberOfComponents)
     {
         case 2:

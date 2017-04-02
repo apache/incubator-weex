@@ -12,12 +12,6 @@
 
 @implementation WXBoxShadow
 @synthesize shadowColor = _shadowColor;
-
-- (void) dealloc
-{
-    CGColorRelease(_shadowColor);
-}
-
 - (instancetype)init
 {
     self = [super init];
@@ -30,20 +24,6 @@
     }
     
     return self;
-}
-
-- (CGColorRef)shadowColor {
-    return _shadowColor;
-}
-
-- (void)setShadowColor: (CGColorRef)shadowColor
-{
-    if (shadowColor == _shadowColor)
-    return;
-    
-    CGColorRetain(shadowColor);
-    CGColorRelease(_shadowColor);
-    _shadowColor = shadowColor;
 }
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
@@ -78,7 +58,7 @@
             NSString *str = [string substringWithRange:range];
             UIColor *color = [WXConvert UIColor:str];
             if (color && [color isKindOfClass:[UIColor class]]) {
-                boxShadow.shadowColor = color.CGColor;
+                boxShadow.shadowColor = color;
             }
             string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
         }
@@ -87,7 +67,7 @@
         NSString *str = [boxShadowElements lastObject];
         UIColor *color = [WXConvert UIColor:str];
         if (color && [color isKindOfClass:[UIColor class]]) {
-            boxShadow.shadowColor = color.CGColor;
+            boxShadow.shadowColor = color;
         }
         string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
     }
