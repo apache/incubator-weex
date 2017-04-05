@@ -83,7 +83,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     [self resetItemViewsFrame];
 }
 
-#pragma mark --private methods--
+#pragma mark Private Methods
 - (CGFloat)height {
     return self.scrollView.frame.size.height;
 }
@@ -104,14 +104,14 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)setCurrentIndex:(NSInteger)currentIndex
 {
     _currentIndex = currentIndex;
-    if (_direction == DirectionRight) { // 如果是向右滚动
+    if (_direction == DirectionRight) {
         self.nextItemFrame = CGRectMake(0, 0, self.width, self.height);
         self.nextIndex = self.currentIndex - 1;
         if (self.nextIndex < 0)
         {
             self.nextIndex = _itemViews.count - 1;
         }
-    }else if (_direction == DirectionLeft){ // 如果是向左边滚动
+    }else if (_direction == DirectionLeft) {
         self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
         self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
     }
@@ -123,7 +123,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
-#pragma mark - 设置滚动方向
+#pragma mark  Scroll & Frames
 - (void)setDirection:(Direction)direction {
     //变换方向时设置一次各view frame
     if (_direction == direction) return;
@@ -285,15 +285,15 @@ typedef NS_ENUM(NSInteger, Direction) {
         _lastOffsetXRatio = 0;
         
         if (attributes[@"autoPlay"]) {
-            _autoPlay = [attributes[@"autoPlay"] boolValue];
+            _autoPlay = [WXConvert BOOL:attributes[@"autoPlay"]];
         }
         
         if (attributes[@"interval"]) {
-            _interval = [attributes[@"interval"] integerValue];
+            _interval = [WXConvert NSInteger:attributes[@"interval"]];
         }
         
         if (attributes[@"index"]) {
-            _index = [attributes[@"index"] integerValue];
+            _index = [WXConvert NSInteger:attributes[@"index"]];
         }
         
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
@@ -402,7 +402,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     if (attributes[@"autoPlay"]) {
-        _autoPlay = [attributes[@"autoPlay"] boolValue];
+        _autoPlay = [WXConvert BOOL:attributes[@"autoPlay"]];
         if (_autoPlay) {
             [self _startAutoPlayTimer];
         } else {
@@ -411,8 +411,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
     
     if (attributes[@"interval"]) {
-        _interval = [attributes[@"interval"] integerValue];
-        
+        _interval = [WXConvert NSInteger:attributes[@"interval"]];
         [self _stopAutoPlayTimer];
         
         if (_autoPlay) {
@@ -421,7 +420,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
     
     if (attributes[@"index"]) {
-        _index = [attributes[@"index"] integerValue];
+        _index = [WXConvert NSInteger:attributes[@"index"]];
         self.currentIndex = _index;
         self.recycleSliderView.currentIndex = _index;
     }
