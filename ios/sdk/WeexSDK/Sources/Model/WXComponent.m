@@ -8,7 +8,6 @@
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
-#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -449,6 +448,34 @@
 {
     WXAssertMainThread();
     
+}
+
+- (void)setGradientLayer
+{
+    if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        return;
+    }
+    NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:_backgroundImage];
+    if (!linearGradient) {
+        return ;
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        /*
+         must insert the gradientLayer at index 0, and then set masksToBounds to match the view bounds
+         or the subview will be invisible
+         */
+        
+        if(strongSelf) {
+            UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
+            UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
+            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            [strongSelf.view.layer insertSublayer:gradientLayer atIndex:0];
+            strongSelf.view.layer.masksToBounds = YES;
+        }
+    });
 }
 
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
