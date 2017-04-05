@@ -58,7 +58,7 @@
     return YES;
 }
 
-- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context
+- (UIImage *)drawRect:(CGRect)rect
 {
     CGSize size = rect.size;
     if (size.width <= 0 || size.height <= 0) {
@@ -66,6 +66,7 @@
         return nil;
     }
     
+    CGContextRef context = UIGraphicsGetCurrentContext();
     [self _drawBorderWithContext:context size:size];
 
     return nil;
@@ -79,8 +80,7 @@
         }
 
         UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size] , 0.0);
-        CGContextRef context = UIGraphicsGetCurrentContext();
-        UIImage *image = [self drawRect:bounds withContext:context];
+        UIImage *image = [self drawRect:bounds];
         if (!image) {
             image = UIGraphicsGetImageFromCurrentImageContext();
         }
@@ -228,6 +228,8 @@
         
         [self _collectCompositingDisplayBlocks:displayBlocks context:context isCancelled:isCancelled];
         
+        UIGraphicsPushContext(context);
+        
         for (dispatch_block_t block in displayBlocks) {
             if (isCancelled()) {
                 UIGraphicsEndImageContext();
@@ -235,6 +237,8 @@
             }
             block();
         }
+        
+        UIGraphicsPopContext();
         
         UIImage *image = [self endDrawContext:context];
         return image;
@@ -273,10 +277,9 @@
                 [[UIBezierPath bezierPathWithRect:bounds] addClip];
             }
             
-            UIImage *image = [self drawRect:bounds withContext:context];
+            UIImage *image = [self drawRect:bounds];
             if (image) {
-                CGContextDrawImage(context, bounds, image.CGImage);
-//                [image drawInRect:bounds];
+                [image drawInRect:bounds];
             }
         };
         [displayBlocks addObject:[displayBlockToPush copy]];

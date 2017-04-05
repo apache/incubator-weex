@@ -350,7 +350,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If you already have an image that represents the content of the component, then you should just return the image and do no drawing, otherwise you should draw your content in the current context and return nil.
  * You should never call this method directly yourself. To invalidate part of your component's content, and thus cause that portion to be redrawn, call the `setNeedsDisplay` method instead.
  */
-- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context;
+- (UIImage *)drawRect:(CGRect)rect;
 
 /**
  * @abstract Called when a component finishes rendering its content.

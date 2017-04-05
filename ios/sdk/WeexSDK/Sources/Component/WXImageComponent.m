@@ -167,7 +167,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     }
 }
 
-- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context;
+- (UIImage *)drawRect:(CGRect)rect;
 {
     if (!self.image) {
         [self updateImage];

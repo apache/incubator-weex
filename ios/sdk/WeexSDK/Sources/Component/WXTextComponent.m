@@ -201,8 +201,9 @@ do {\
     return YES;
 }
 
-- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context;
+- (UIImage *)drawRect:(CGRect)rect;
 {
+    CGContextRef context = UIGraphicsGetCurrentContext();
     if (_isCompositingChild) {
         [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
     } else {
