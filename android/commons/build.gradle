@@ -49,6 +49,7 @@ dependencies {
     provided 'com.taobao.android:weex_analyzer:0.1.0.5'
     provided 'com.squareup.okhttp:okhttp:2.3.0'
     provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    provided 'com.alibaba:fastjson:1.1.46.android'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-core:1.3'

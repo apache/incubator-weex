@@ -214,12 +214,17 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.weex.commons.util.AssertUtil;
 import com.alibaba.weex.commons.util.ScreenUtil;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.utils.WXUtils;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -279,6 +284,25 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     AssertUtil.throwIfNull(mContainer,new RuntimeException("Can't render page, container is null"));
     Map<String, Object> options = new HashMap<>();
     options.put(WXSDKInstance.BUNDLE_URL, source);
+    // Set options.bundleDigest
+    try {
+      String banner = WXUtils.getBundleBanner(template);
+      JSONObject jsonObj = JSONObject.parseObject(banner);
+      String digest = null;
+      if (jsonObj != null) {
+        digest = jsonObj.getString(Constants.CodeCache.BANNER_DIGEST);
+      }
+      if (digest != null) {
+        options.put(Constants.CodeCache.DIGEST, digest);
+      }
+    } catch (Throwable t) {}
+    //Set options.codeCachePath
+    String path = WXEnvironment.getFilesDir(getApplicationContext());
+    path += File.separator;
+    path += Constants.CodeCache.SAVE_PATH;
+    path += File.separator;
+    options.put(Constants.CodeCache.PATH, path);
+
     mInstance.setTrackComponent(true);
     mInstance.render(
       getPageName(),

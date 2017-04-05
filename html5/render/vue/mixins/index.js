@@ -1,9 +1,11 @@
 import base from './base'
-import event from './event'
+import style from './style'
 import scrollable from './scrollable'
+import inputCommon from './input-common'
 
 export {
   base,
-  event,
-  scrollable
+  scrollable,
+  style,
+  inputCommon
 }

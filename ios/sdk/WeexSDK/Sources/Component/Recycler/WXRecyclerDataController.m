@@ -15,7 +15,7 @@
 
 @property (nonatomic, strong, readwrite) NSArray<WXSectionDataController *> *sections;
 @property (nonatomic, strong, readonly) NSMapTable<WXCellComponent *, NSIndexPath*> *cellToIndexPathTable;
-@property (nonatomic, strong, readonly) NSMapTable<WXCellComponent *, NSIndexPath*> *headerToIndexTable;
+@property (nonatomic, strong, readonly) NSMapTable<WXHeaderComponent *, NSNumber*> *headerToIndexTable;
 
 @end
 

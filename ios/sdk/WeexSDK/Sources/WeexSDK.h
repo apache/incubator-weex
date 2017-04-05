@@ -8,6 +8,7 @@
 
 #ifdef __OBJC__
 
+#import "WXValidateProtocol.h"
 #import "WXUtility.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXType.h"
