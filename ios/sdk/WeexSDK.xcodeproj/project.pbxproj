@@ -37,6 +37,8 @@
 		2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AFEB1791C747139000507FA /* WXInstanceWrap.h */; };
 		2AFEB17C1C747139000507FA /* WXInstanceWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFEB17A1C747139000507FA /* WXInstanceWrap.m */; };
+		37D940681E9492C600A5C45F /* WXRecycleSliderComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 37D940661E9492C600A5C45F /* WXRecycleSliderComponent.m */; };
+		37D940691E9492C600A5C45F /* WXRecycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37D940671E9492C600A5C45F /* WXRecycleSliderComponent.h */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
 		591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 591DD32F1D23AD5800BE8709 /* WXErrorView.m */; };
 		591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 591DD3301D23AD5800BE8709 /* WXErrorView.h */; };
@@ -347,6 +349,8 @@
 		2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEventModuleProtocol.h; sourceTree = "<group>"; };
 		2AFEB1791C747139000507FA /* WXInstanceWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInstanceWrap.h; sourceTree = "<group>"; };
 		2AFEB17A1C747139000507FA /* WXInstanceWrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceWrap.m; sourceTree = "<group>"; };
+		37D940661E9492C600A5C45F /* WXRecycleSliderComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXRecycleSliderComponent.m; sourceTree = "<group>"; };
+		37D940671E9492C600A5C45F /* WXRecycleSliderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXRecycleSliderComponent.h; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
 		591DD32F1D23AD5800BE8709 /* WXErrorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXErrorView.m; sourceTree = "<group>"; };
 		591DD3301D23AD5800BE8709 /* WXErrorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXErrorView.h; sourceTree = "<group>"; };
@@ -1116,6 +1120,8 @@
 				77E65A181C155F25008B8775 /* WXScrollerComponent.m */,
 				2A44AB0F1C1AD5B00067A7EA /* WXSliderComponent.h */,
 				59D3CA461CFC3CC0008835DC /* WXSliderComponent.m */,
+				37D940661E9492C600A5C45F /* WXRecycleSliderComponent.m */,
+				37D940671E9492C600A5C45F /* WXRecycleSliderComponent.h */,
 				74CC7A1B1C2BC5F800829368 /* WXCellComponent.m */,
 				74CC7A1E1C2BF9DC00829368 /* WXListComponent.h */,
 				74CC7A1F1C2BF9DC00829368 /* WXListComponent.m */,
@@ -1235,6 +1241,7 @@
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
 				77D161281C02DE1A0010B15B /* WXSDKManager.h in Headers */,
 				59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */,
+				37D940691E9492C600A5C45F /* WXRecycleSliderComponent.h in Headers */,
 				74BB5FB91DFEE81A004FC3DF /* WXMetaModule.h in Headers */,
 				DCA0EF641D6EED6F00CB18B9 /* WXGlobalEventModule.h in Headers */,
 				2A837AB21CD9DE9200AEDF03 /* WXLoadingComponent.h in Headers */,
@@ -1624,6 +1631,7 @@
 				74D205211E091B8000128F44 /* WXCallJSMethod.m in Sources */,
 				59D3CA471CFC3CC0008835DC /* WXSliderComponent.m in Sources */,
 				77D1613D1C02DEA60010B15B /* WXJSCoreBridge.m in Sources */,
+				37D940681E9492C600A5C45F /* WXRecycleSliderComponent.m in Sources */,
 				C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */,
 				77D1614C1C02E3790010B15B /* WXConvert.m in Sources */,
 				749DC27C1D40827B009E1C91 /* WXMonitor.m in Sources */,
