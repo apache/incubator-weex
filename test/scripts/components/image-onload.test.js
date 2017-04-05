@@ -14,7 +14,7 @@ describe('image onload', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/image-onload.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),10000)
   });
 
   after(function () {
