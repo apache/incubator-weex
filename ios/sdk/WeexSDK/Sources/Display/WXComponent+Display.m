@@ -58,7 +58,7 @@
     return YES;
 }
 
-- (UIImage *)drawRect:(CGRect)rect
+- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context
 {
     CGSize size = rect.size;
     if (size.width <= 0 || size.height <= 0) {
@@ -66,7 +66,6 @@
         return nil;
     }
     
-    CGContextRef context = UIGraphicsGetCurrentContext();
     [self _drawBorderWithContext:context size:size];
 
     return nil;
@@ -80,7 +79,8 @@
         }
 
         UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size] , 0.0);
-        UIImage *image = [self drawRect:bounds];
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        UIImage *image = [self drawRect:bounds withContext:context];
         if (!image) {
             image = UIGraphicsGetImageFromCurrentImageContext();
         }
@@ -176,16 +176,32 @@
 
 - (CGContextRef)beginDrawContext:(CGRect)bounds
 {
-    UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
+//    UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);
+//    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    float scaleFactor = [[UIScreen mainScreen] scale];
+    CGColorSpaceRef	colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, 8, 4 * bounds.size.width * scaleFactor, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    CGContextScaleCTM(context, scaleFactor, scaleFactor);
+
+    // Adjusts position and invert the image.
+    // The OpenGL uses the image data upside-down compared commom image files.
+    CGContextTranslateCTM(context, 0, bounds.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    
+    CGColorSpaceRelease(colorSpace);
     
     return context;
 }
 
-- (UIImage *)endDrawContext
+- (UIImage *)endDrawContext:(CGContextRef)context
 {
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+//    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+//    UIGraphicsEndImageContext();
+    
+    CGImageRef imageRef= CGBitmapContextCreateImage(context);
+    UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
+    CGContextRelease(context);
     
     return image;
 }
@@ -220,13 +236,7 @@
             block();
         }
         
-//        CGImageRef imageRef= CGBitmapContextCreateImage(context);
-//        UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
-        
-//        CGColorSpaceRelease(colorSpace);
-//        CGContextRelease(context);
-       
-        UIImage *image = [self endDrawContext];
+        UIImage *image = [self endDrawContext:context];
         return image;
     };
 }
@@ -249,7 +259,9 @@
     
     if (shouldDisplay) {
         dispatch_block_t displayBlockToPush = ^{
-            CGContextRef context = UIGraphicsGetCurrentContext();
+            if (!context) {
+                
+            }
             CGContextSaveGState(context);
             CGContextTranslateCTM(context, frame.origin.x, frame.origin.y);
             
@@ -261,9 +273,10 @@
                 [[UIBezierPath bezierPathWithRect:bounds] addClip];
             }
             
-            UIImage *image = [self drawRect:bounds];
+            UIImage *image = [self drawRect:bounds withContext:context];
             if (image) {
-                [image drawInRect:bounds];
+                CGContextDrawImage(context, bounds, image.CGImage);
+//                [image drawInRect:bounds];
             }
         };
         [displayBlocks addObject:[displayBlockToPush copy]];

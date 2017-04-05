@@ -201,13 +201,13 @@ do {\
     return YES;
 }
 
-- (UIImage *)drawRect:(CGRect)rect
+- (UIImage *)drawRect:(CGRect)rect withContext:(CGContextRef)context;
 {
     if (_isCompositingChild) {
-        [self drawTextWithBounds:rect padding:_padding view:nil];
+        [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
     } else {
         WXText *textView = ((WXText *)self.view);
-        [self drawTextWithBounds:rect padding:_padding view:textView];
+        [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
     }
     
     return nil;
@@ -413,13 +413,11 @@ do {\
     [self syncTextStorageForView];
 }
 
-- (void)drawTextWithBounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
 {
     if (bounds.size.width <=0 || bounds.size.height <= 0) {
         return;
     }
-    
-    CGContextRef context = UIGraphicsGetCurrentContext();
     
     if ([self _needsDrawBorder]) {
         [self _drawBorderWithContext:context size:bounds.size];
