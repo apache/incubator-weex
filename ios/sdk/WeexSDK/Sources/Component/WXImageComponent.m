@@ -158,38 +158,21 @@ static dispatch_queue_t WXImageUpdateQueue;
     
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
 {
-    if ([self isViewLoaded]) {
-        // if has a image view, image is setted by image view, displayBlock is not needed
-        return nil;
+    if (_isCompositingChild) {
+        return YES;
+    } else {
+        return NO;
     }
-    
-    __weak typeof(self) weakSelf = self;
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        
-        if (!weakSelf.image) {
-            [weakSelf updateImage];
-            return nil;
-        }
-        
-        if (isCancelled && isCancelled()) {
-            return nil;
-        }
-        
-        UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, 1.0);
-        
-        [weakSelf.image drawInRect:bounds];
-        
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        
-        UIGraphicsEndImageContext();
-        
-        return image;
-    };
+}
+
+- (UIImage *)drawRect:(CGRect)rect
+{
+    if (!self.image) {
+        [self updateImage];
+    }
+    return self.image;
 }
 
 - (void)viewWillUnload
@@ -262,6 +245,9 @@ static dispatch_queue_t WXImageUpdateQueue;
                     ((UIImageView *)strongSelf.view).image = image;
                     weakSelf.imageDownloadFinish = YES;
                     [self readyToRender];
+                } else if (strongSelf->_isCompositingChild) {
+                    strongSelf->_image = image;
+                    weakSelf.imageDownloadFinish = YES;
                 }
             });
         }];
@@ -302,6 +288,10 @@ static dispatch_queue_t WXImageUpdateQueue;
                         strongSelf.imageDownloadFinish = YES;
                         ((UIImageView *)strongSelf.view).image = image;
                         [strongSelf readyToRender];
+                    } else if (strongSelf->_isCompositingChild) {
+                        strongSelf.imageDownloadFinish = YES;
+                        strongSelf->_image = image;
+                        [strongSelf setNeedsDisplay];
                     }
                 });
             }];

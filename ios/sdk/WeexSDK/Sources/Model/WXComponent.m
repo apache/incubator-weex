@@ -95,6 +95,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -180,7 +181,7 @@
         WXAssertMainThread();
         
         // compositing child will be drew by its composited ancestor
-        if (_compositingChild) {
+        if (_isCompositingChild) {
             return nil;
         }
         
@@ -330,6 +331,10 @@
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
         subcomponent->_isNeedJoinLayoutSystem = NO;
+    }
+    
+    if (_useCompositing || _isCompositingChild) {
+        subcomponent->_isCompositingChild = YES;
     }
     
     [self _recomputeCSSNodeChildren];

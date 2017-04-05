@@ -42,37 +42,6 @@
     return [WXLayer class];
 }
 
-- (UIImage *)drawTextWithBounds:(CGRect)bounds padding:(UIEdgeInsets)padding
-{
-    if (bounds.size.width <=0 || bounds.size.height <= 0) {
-        return nil;
-    }
-    UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, WXScreenScale());
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    if ([self.wx_component _needsDrawBorder]) {
-        [self.wx_component _drawBorderWithContext:context size:bounds.size];
-    } else {
-        WXPerformBlockOnMainThread(^{
-            [self.wx_component _resetNativeBorderRadius];
-        });
-    }
-    NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
-    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
-    
-    CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
-    NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
-    
-    [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
-    [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return image;
-}
-
 - (void)setTextStorage:(NSTextStorage *)textStorage
 {
     if (_textStorage != textStorage) {
@@ -227,25 +196,21 @@ do {\
     return [[WXText alloc] init];
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
 {
-    WXText *textView = ((WXText *)self.view);
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_lock(&_textStorageMutex);
-        }
-        
-        UIImage *image = [textView drawTextWithBounds:bounds padding:_padding];
-        
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_unlock(&_textStorageMutex);
-        }
-        
-        return image;
-    };
+    return YES;
+}
+
+- (UIImage *)drawRect:(CGRect)rect
+{
+    if (_isCompositingChild) {
+        [self drawTextWithBounds:rect padding:_padding view:nil];
+    } else {
+        WXText *textView = ((WXText *)self.view);
+        [self drawTextWithBounds:rect padding:_padding view:textView];
+    }
+    
+    return nil;
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -287,6 +252,7 @@ do {\
 }
 
 #pragma mark Text Building
+
 - (NSString *)text
 {
     return _text;
@@ -445,6 +411,31 @@ do {\
     [self fillAttributes:attributes];
     
     [self syncTextStorageForView];
+}
+
+- (void)drawTextWithBounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+{
+    if (bounds.size.width <=0 || bounds.size.height <= 0) {
+        return;
+    }
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    if ([self _needsDrawBorder]) {
+        [self _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self _resetNativeBorderRadius];
+        });
+    }
+    NSLayoutManager *layoutManager = (view ? view.textStorage : _textStorage).layoutManagers.firstObject;
+    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+    
+    CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+    NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+    
+    [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
+    [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
 }
 
 #ifdef UITEST

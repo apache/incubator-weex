@@ -17,6 +17,8 @@
 @property (nonatomic, assign) CGFloat bottomLeft;
 @property (nonatomic, assign) CGFloat bottomRight;
 
+- (BOOL)hasBorderRadius;
+
 @end
 
 @interface WXRoundedRect : NSObject
