@@ -32,7 +32,8 @@
     "callJS": false,
     "notifyTrimMemory": false,
     "markupState": false,
-    "compileAndRunBundle": false
+    "compileAndRunBundle": false,
+    "expect": false
   },
 
   "rules": {

@@ -196,4 +196,7 @@
 - (void)_restoreViewStyles;
 
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
+
+- (void)setGradientLayer;
+
 @end

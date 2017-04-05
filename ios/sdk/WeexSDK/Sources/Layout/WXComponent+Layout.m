@@ -13,7 +13,6 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXComponent+GradientColor.h"
 
 @implementation WXComponent (Layout)
 
@@ -122,7 +121,7 @@
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 [strongSelf configBoxShadow:_boxShadow];
             } else {
-                if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
                     [strongSelf configBoxShadow:_boxShadow];
                 }
             }
