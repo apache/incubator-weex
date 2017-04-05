@@ -136,6 +136,7 @@
     "rollup-plugin-commonjs": "^5.0.4",
     "rollup-plugin-eslint": "^3.0.0",
     "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-flow-no-whitespace": "^1.0.0",
     "rollup-plugin-json": "^2.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-postcss": "^0.2.0",
