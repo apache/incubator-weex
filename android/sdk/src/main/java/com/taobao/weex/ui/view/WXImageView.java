@@ -223,7 +223,8 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public class WXImageView extends ImageView implements WXGestureObservable,
-                                                      IRenderStatus<WXImage>, WXImage.Measurable {
+                                                      IRenderStatus<WXImage>,
+                                                      IRenderResult<WXImage>, WXImage.Measurable {
 
   private WeakReference<WXImage> mWeakReference;
   private WXGesture wxGesture;

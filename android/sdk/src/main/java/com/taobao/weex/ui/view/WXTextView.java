@@ -222,7 +222,7 @@ import java.lang.ref.WeakReference;
  * TextView wrapper
  */
 public class WXTextView extends View implements WXGestureObservable, IWXTextView,
-                                                IRenderStatus<WXText> {
+                                                IRenderStatus<WXText>, IRenderResult<WXText> {
 
   private WeakReference<WXText> mWeakReference;
   private WXGesture wxGesture;

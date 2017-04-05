@@ -212,5 +212,4 @@ public interface IRenderStatus<T extends WXComponent> {
 
   public void holdComponent(T component);
 
-  public T getComponent();
 }

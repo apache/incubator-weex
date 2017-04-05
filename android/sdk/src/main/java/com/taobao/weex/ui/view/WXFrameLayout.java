@@ -221,7 +221,7 @@ import java.lang.ref.WeakReference;
  * FrameLayout wrapper
  *
  */
-public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv> {
+public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv> {
 
   private WXGesture wxGesture;
 
