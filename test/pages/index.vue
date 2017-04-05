@@ -1,10 +1,10 @@
 <template>
     <div>
-        <text>hello world.</text>
-        <input ref="input" value="input" @blur="onblur"></input>
-        <text style="color:red">{{status}}</text>
-        <text @click="onclick">button</text>
-        <text @click="toggleblur">blur input</text>
+        <text test-id="title">hello world.</text>
+        <input ref="input" test-id="input" value="input" @blur="onblur"></input>
+        <text style="color:red" test-id="status">{{status}}</text>
+        <text @click="onclick" test-id="button">button</text>
+        <text @click="toggleblur" test-id="button2">blur input</text>
     </div>
 </template>
 <script>

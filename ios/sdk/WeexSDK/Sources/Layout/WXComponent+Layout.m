@@ -122,7 +122,7 @@
                 strongSelf.view.frame = strongSelf.calculatedFrame;
                 [strongSelf configBoxShadow:_boxShadow];
             } else {
-                if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
+                if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
                     [strongSelf configBoxShadow:_boxShadow];
                 }
             }

@@ -249,6 +249,12 @@ class WXBridge implements IWXBridge {
   public native int execJSService(String javascript);
 
   /**
+   * Take v8's heap snapshot
+   * @param filename the name of the file to be written.
+   */
+  public native void takeHeapSnapshot(String filename);
+
+  /**
    * JavaScript uses this methods to call Android code
    *
    * @param instanceId
