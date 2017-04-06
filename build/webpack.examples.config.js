@@ -1,7 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
-var bannerWebpackPlugin = require('./examples-banner-plugin')
+// var bannerWebpackPlugin = require('./examples-banner-plugin')
 
 var entry = {};
 var bannerExcludeFiles = [];
@@ -50,5 +50,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [bannerPlugin, new bannerWebpackPlugin()]
+  plugins: [bannerPlugin]
 }

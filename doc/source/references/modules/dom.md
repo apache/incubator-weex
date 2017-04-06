@@ -9,7 +9,7 @@ version: 2.1
 
 ## Summary
 
-A series of dom apis that sending virtual-dom's messages to the native renderer to update the dom tree. The only API for developers to use in a `.we` file is `scrollToElement` <del>which you can use by calling the `$scrollTo` method</del>. Other APIs mentioned on this page should only be used through the native renderer in the `callNative` process.
+A series of dom apis that sending virtual-dom's messages to the native renderer to update the dom tree. The only API for developers to use in a `.vue` file is `scrollToElement` <del>which you can use by calling the `$scrollTo` method</del>. Other APIs mentioned on this page should only be used through the native renderer in the `callNative` process.
 
 ## API
 
@@ -24,6 +24,7 @@ Scroll the page to the specified node. This API should only be used on the eleme
 * `node`*(Node)*: an element that scrolled into the view.
 * `options`*(object)*: some options.
   * `offset`*(number)*: An offset to the visible position, default is `0`.
+  * `animated`*(boolean)*: Whether there is an animation effect, default is `true`.
 
 #### Example
 
