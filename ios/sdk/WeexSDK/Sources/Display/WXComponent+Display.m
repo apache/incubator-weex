@@ -477,6 +477,7 @@ do {\
     WX_CHECK_BORDER_PROP_PIXEL(Radius, TopLeft, TopRight, BottomLeft, BottomRight)
 
     if (updating) {
+        WX_CHECK_COMPONENT_TYPE(self.componentType)
         BOOL nowNeedsDrawBorder = [self _needsDrawBorder];
         if (nowNeedsDrawBorder && !previousNeedsDrawBorder) {
             _layer.cornerRadius = 0;
