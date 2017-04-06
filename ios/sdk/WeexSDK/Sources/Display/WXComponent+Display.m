@@ -191,6 +191,11 @@
     }
 }
 
+- (void)triggerDisplay
+{
+    [self _willDisplayLayer:_layer];
+}
+
 - (CGContextRef)beginDrawContext:(CGRect)bounds
 {
     UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);

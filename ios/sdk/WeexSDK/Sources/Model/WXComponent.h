@@ -361,6 +361,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readyToRender;
 
 /**
+ * @abstract trigger display if you do not have a WXLayer
+ */
+- (void)triggerDisplay;
+
+/**
  * @abstract Creates a  graphics context with the specified bounds, the context will be used for `drawRect:` in compositing environment
  * @discussion You can override this method to use your own graphics context.
  */
