@@ -7,10 +7,6 @@ init('<web> component', (Vue, helper) => {
     helper.register('web', web)
   })
 
-  after(() => {
-    helper.reset()
-  })
-
   it('simple <web> component', () => {
     const vm = compile(`<web></web>`)
 
