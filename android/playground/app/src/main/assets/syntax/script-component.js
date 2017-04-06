@@ -45,8 +45,8 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(318)
-	var __weex_script__ = __webpack_require__(319)
+	var __weex_template__ = __webpack_require__(330)
+	var __weex_script__ = __webpack_require__(331)
 
 	__weex_define__('@weex-component/2a5ba7e55afcba45accf15b3179f0016', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -63,7 +63,7 @@
 
 /***/ },
 
-/***/ 318:
+/***/ 330:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -96,12 +96,12 @@
 
 /***/ },
 
-/***/ 319:
+/***/ 331:
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';
 
-	__webpack_require__(320);
+	__webpack_require__(332);
 	module.exports = {
 	  data: function () {return {
 	    items: [{ title: 'A', url: 'a' }, { title: 'B', url: 'b' }, { title: 'C', url: 'c' }]
@@ -112,12 +112,12 @@
 
 /***/ },
 
-/***/ 320:
+/***/ 332:
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(321)
-	var __weex_style__ = __webpack_require__(322)
-	var __weex_script__ = __webpack_require__(323)
+	var __weex_template__ = __webpack_require__(333)
+	var __weex_style__ = __webpack_require__(334)
+	var __weex_script__ = __webpack_require__(335)
 
 	__weex_define__('@weex-component/sub', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -135,7 +135,7 @@
 
 /***/ },
 
-/***/ 321:
+/***/ 333:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -150,7 +150,7 @@
 
 /***/ },
 
-/***/ 322:
+/***/ 334:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -162,7 +162,7 @@
 
 /***/ },
 
-/***/ 323:
+/***/ 335:
 /***/ function(module, exports) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

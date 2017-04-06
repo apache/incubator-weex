@@ -6,6 +6,7 @@ const postcss = require('rollup-plugin-postcss')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('rollup-plugin-uglify')
 const commonjs = require('rollup-plugin-commonjs')
+const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const subversion = require('../package.json').subversion
 
@@ -63,8 +64,8 @@ const configs = {
   'weex-vue-render': {
     moduleName: 'WeexVueRender',
     entry: absolute('html5/render/vue/index.js'),
-    dest: absolute('packages/weex-vue-render/index.js'),
-    banner: `/* 'WEEX VUE RENDER ${subversion.vueRender}, Build ${now()}. */\n\n`,
+    dest: absolute('packages/weex-vue-render/dist/index.js'),
+    banner: `console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
     format: 'umd',
     plugins: [
       postcss(),
@@ -72,6 +73,9 @@ const configs = {
         jsnext: true,
         main: true,
         browser: true
+      }),
+      replace({
+        'process.env.WEEX_VERSION': subversion['vue-render']
       })
     ]
   }
@@ -94,6 +98,7 @@ function getConfig (name, minify) {
         'process.env.NODE_DEBUG': false
       }),
       commonjs(),
+      flow(/*{ pretty: true }*/),
       buble()
     ])
   }
@@ -102,6 +107,10 @@ function getConfig (name, minify) {
     config.plugins.push(uglify())
   }
   else {
+    /**
+     * rollup-plugin-flow will cause soucemap problem.
+     * use rollup-plugin-flow-no-whitespace can fixe this.
+     */
     config.sourceMap = 'inline'
     config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }

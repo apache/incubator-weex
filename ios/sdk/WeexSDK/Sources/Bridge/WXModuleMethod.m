@@ -13,6 +13,8 @@
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
+#import "WXHandlerFactory.h"
+#import "WXValidateProtocol.h"
 
 @implementation WXModuleMethod
 
@@ -30,6 +32,26 @@
 
 - (NSInvocation *)invoke
 {
+    
+    if (self.instance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            WXModuleValidateResult* result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
+            if (result && !result.isSuccess) {
+                NSString *errorMessage = [result.error.userInfo  objectForKey:@"errorMsg"];
+                WXLogError(@"%@", errorMessage);
+                WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
+                if ([result.error respondsToSelector:@selector(userInfo)]) {
+                    NSInvocation *invocation = [self invocationWithTarget:result.error selector:@selector(userInfo)];
+                    [invocation invoke];
+                    return invocation;
+                }else{
+                    return nil;
+                }
+            }
+        }
+    }
+    
     Class moduleClass =  [WXModuleFactory classWithModuleName:_moduleName];
     if (!moduleClass) {
         NSString *errorMessage = [NSString stringWithFormat:@"Module：%@ doesn't exist, maybe it has not been registered", _moduleName];

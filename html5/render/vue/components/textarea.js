@@ -1,9 +1,9 @@
-import { base } from '../mixins'
+import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
+  mixins: [inputCommon],
   props: {
     value: String,
     placeholder: String,
@@ -18,15 +18,16 @@ export default {
     rows: {
       type: [String, Number],
       default: 2
-    }
+    },
+    returnKeyType: String
   },
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
+    const events = extend(this._createEventMap(), mapFormEvents(this))
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',
@@ -34,10 +35,14 @@ export default {
         disabled: (this.disabled !== 'false' && this.disabled !== false),
         autofocus: (this.autofocus !== 'false' && this.autofocus !== false),
         placeholder: this.placeholder,
-        rows: this.rows
+        rows: this.rows,
+        'return-key-type': this.returnKeyType
       },
-      on: extend(this.createEventMap(), mapFormEvents(this)),
-      staticClass: 'weex-textarea'
-    }, this.value)
+      domProps: {
+        value: this.value
+      },
+      on: this.createKeyboardEvent(events),
+      staticClass: 'weex-textarea weex-el'
+    })
   }
 }

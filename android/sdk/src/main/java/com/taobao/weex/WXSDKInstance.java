@@ -206,8 +206,8 @@ package com.taobao.weex;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -249,7 +249,6 @@ import com.taobao.weex.ui.component.NestedContainer;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
-import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.ui.view.WXScrollView.WXScrollViewListener;
 import com.taobao.weex.utils.WXFileUtils;
@@ -294,18 +293,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
   private boolean trackComponent;
-  /*
-   *  store custom ViewPort Width
-   */
-  public void setViewPortWidth(int mViewPortWidth) {
-    this.mViewPortWidth = mViewPortWidth;
-  }
-
-  public static int getViewPortWidth() {
-    return mViewPortWidth;
-  }
-
+  private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
+  private int mInstanceViewPortWidth = 750;
 
   /**
    * Render strategy.
@@ -348,6 +338,31 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setTrackComponent(boolean trackComponent) {
     this.trackComponent = trackComponent;
+  }
+
+  public boolean isNeedValidate() {
+    return mNeedValidate;
+  }
+
+  /*
+  *  store custom ViewPort Width
+  */
+  @Deprecated
+  public void setViewPortWidth(int viewPortWidth) {
+    mViewPortWidth = viewPortWidth;
+  }
+
+  @Deprecated
+  public static int getViewPortWidth() {
+    return mViewPortWidth;
+  }
+
+  public void setInstanceViewPortWidth(int instanceViewPortWidth) {
+    this.mInstanceViewPortWidth = instanceViewPortWidth;
+  }
+
+  public int getInstanceViewPortWidth(){
+    return mInstanceViewPortWidth;
   }
 
   public interface OnInstanceVisibleListener{
@@ -559,6 +574,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     ensureRenderArchor();
     pageName = wrapPageName(pageName, url);
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
 
     Map<String, Object> renderOptions = options;
     if (renderOptions == null) {
@@ -570,7 +588,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
     Uri uri = Uri.parse(url);
     if (uri != null && TextUtils.equals(uri.getScheme(), "file")) {
-      render(pageName, WXFileUtils.loadAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
+      render(pageName, WXFileUtils.loadFileOrAsset(assembleFilePath(uri), mContext), renderOptions, jsonInitData, flag);
       return;
     }
 
@@ -862,6 +880,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mContext.sendBroadcast(intent);
 
     onViewAppear();
+
+    setViewPortWidth(mInstanceViewPortWidth);
   }
 
   @Override
@@ -1258,22 +1278,34 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setBundleUrl(String url){
     mBundleUrl = url;
+    if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
+      mNeedValidate = WXSDKManager.getInstance().getValidateProcessor().needValidate(mBundleUrl);
+    }
   }
 
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
     mRenderContainer.addView(root.getHostView());
+    setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
 
-  public void addFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().addView(fixedChild);
+  /**
+   * Move fixed view to container ,except it's already moved.
+   * @param fixedChild
+   */
+  public void moveFixedView(View fixedChild){
+    if(mRenderContainer != null) {
+      if (fixedChild.getParent() != mRenderContainer) {
+        ViewGroup viewGroup = (ViewGroup) fixedChild.getParent();
+        viewGroup.removeView(fixedChild);
+        mRenderContainer.addView(fixedChild);
+      }
     }
   }
 
   public void removeFixedView(View fixedChild){
-    if(mRootComp instanceof WXVContainer){
-      ((WXVContainer)mRootComp).getRealView().removeView(fixedChild);
+    if(mRenderContainer != null) {
+      mRenderContainer.removeView(fixedChild);
     }
   }
 
@@ -1306,8 +1338,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     if (width < 0 || height < 0 || isDestroy || !mRendered) {
       return;
     }
-    float realWidth = WXViewUtils.getWebPxByWidth(width,getViewPortWidth());
-    float realHeight = WXViewUtils.getWebPxByWidth(height,getViewPortWidth());
+    float realWidth = WXViewUtils.getWebPxByWidth(width,getInstanceViewPortWidth());
+    float realHeight = WXViewUtils.getWebPxByWidth(height,getInstanceViewPortWidth());
 
     View godView = mRenderContainer;
     if (godView != null) {

@@ -1,8 +1,6 @@
-import { base } from '../mixins'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
   props: {
     src: String,
     playStatus: {
@@ -34,9 +32,9 @@ export default {
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('video', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('video', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     // TODO: support playStatus
     return createElement('html:video', {
@@ -47,8 +45,8 @@ export default {
         controls: this.controls,
         src: this.src
       },
-      on: this.createEventMap(['start', 'pause', 'finish', 'fail']),
-      staticClass: 'weex-video'
+      on: this._createEventMap(['start', 'pause', 'finish', 'fail']),
+      staticClass: 'weex-video weex-el'
     })
   }
 }
