@@ -318,6 +318,10 @@ public class WXApplication extends Application {
           // We assume that the application is on an idle time.
           WXSDKManager.getInstance().notifyTrimMemory();
         }
+        // The demo code of calling 'notifySerializeCodeCache()'
+        if (false) {
+          WXSDKManager.getInstance().notifySerializeCodeCache();
+        }
       }
     });
 

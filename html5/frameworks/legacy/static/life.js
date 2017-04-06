@@ -42,6 +42,11 @@ export function refreshInstance (id, data) {
  * @param  {string} id
  */
 export function destroyInstance (id) {
+  // Markup some global state in native side
+  if (typeof markupState === 'function') {
+    markupState()
+  }
+
   resetTarget()
   const instance = instanceMap[id]
   /* istanbul ignore else */
@@ -50,5 +55,19 @@ export function destroyInstance (id) {
   }
   destroy(instance)
   delete instanceMap[id]
+  // notifyContextDisposed is used to tell v8 to do a full GC,
+  // but this would have a negative performance impact on weex,
+  // because all the inline cache in v8 would get cleared
+  // during a full GC.
+  // To take care of both memory and performance, just tell v8
+  // to do a full GC every eighteen times.
+  const idNum = Math.round(id)
+  const round = 18
+  if (idNum > 0) {
+    const remainder = idNum % round
+    if (!remainder && typeof notifyTrimMemory === 'function') {
+      notifyTrimMemory()
+    }
+  }
   return instanceMap
 }

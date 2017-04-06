@@ -19,7 +19,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .item {
     margin-right: 10px;
     /*margin-bottom: 10px;*/

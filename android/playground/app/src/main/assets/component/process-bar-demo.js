@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "3771bf113fd85c270d38518ea7af1a5f"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -523,8 +531,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },

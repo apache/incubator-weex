@@ -1,5 +1,6 @@
 import { danger, fail, warn } from "danger";
 import fs from "fs";
+import path from 'path';
 
 // Make sure there are changelog entries
 // const hasChangelog = danger.git.modified_files.includes("changelog.md")
@@ -7,8 +8,37 @@ import fs from "fs";
 
 const jsFiles = danger.git.created_files.filter(path => path.endsWith("js"));
 
+function absolute (relPath) {
+  return path.resolve(__dirname, relPath)
+}
+
+const flowIgnorePaths = [
+  'node_modules',
+  'test',
+  'build',
+  'examples',
+  'doc',
+  'android',
+  'ios',
+  'bin',
+  'dist',
+  'flow-typed'
+].map(function (rel) {
+  return absolute('html5/' + rel)
+});
+
 // new js files should have `@flow` at the top
 const unFlowedFiles = jsFiles.filter(filepath => {
+  let i = 0
+  const len = flowIgnorePaths.length
+  while (i < len) {
+    const p = flowIgnorePaths[i]
+    if (absolute(filepath).indexOf(p) > -1) {
+      // ignore this file because it's in the flow-ignore-paths.
+      return false;
+    }
+    i++
+  }
   const content = fs.readFileSync(filepath);
   return !content.includes("@flow");
 });

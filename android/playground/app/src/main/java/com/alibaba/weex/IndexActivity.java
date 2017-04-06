@@ -363,6 +363,12 @@ public class IndexActivity extends AbstractWeexActivity {
     LocalBroadcastManager.getInstance(this).unregisterReceiver(mReloadReceiver);
   }
 
+  @Override
+  public void onPause() {
+    super.onPause();
+//    WXSDKManager.getInstance().takeJSHeapSnapshot("/sdcard/weex/");
+  }
+
   private static String getIndexUrl() {
     return "http://" + sCurrentIp + ":12580/examples/build/index.js";
   }

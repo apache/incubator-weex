@@ -21,7 +21,7 @@
  *
  *  @return if not equal return NO, if equal return YES
  */
-- (BOOL)EqualBoxShadow:(WXBoxShadow *_Nullable)boxShadow withBoxShadow:(WXBoxShadow *_Nullable)compareBoxShadow;
+- (BOOL)equalBoxShadow:(WXBoxShadow *_Nullable)boxShadow withBoxShadow:(WXBoxShadow *_Nullable)compareBoxShadow;
 
 /**
  *  @abstract config view Layer with boxshadow, lastboxshadow and originalBoxShadow

@@ -527,4 +527,86 @@ public class WXUtils {
     return (int)(Float.parseFloat(raw) / HUNDRED * unit);
   }
 
+  /**
+   * Get a banner data in JSON format from a bundle content.
+   * A bundle banner looks like below:
+   * \/*!count
+   *  * {
+   *  *   version: "0.2.1.20170104-release",
+   *  *   create: "20170207171112",
+   *  *   git: "banner--772c915",
+   *  *   digest: "c709b7f91867e371b24f54d6aeea232a"
+   *  * }
+   *  !*\/
+   *
+   * @param content a bundle content
+   * @return
+   */
+  public static String getBundleBanner(String content) {
+    final String commentBegin = "/*!";
+    final String commentEnd = "!*/";
+    final String asteriskRegex = "\\*";
+    final String replacement = "";
+
+    int offsetCountBegin = content.indexOf(commentBegin);
+    if (offsetCountBegin == -1) {
+        return null;
+    }
+    offsetCountBegin += commentBegin.length();
+    int offsetCountEnd = indexLineBreak(content, offsetCountBegin);
+    if (offsetCountEnd == -1) {
+        return null;
+    }
+    String countStr = content.substring(offsetCountBegin, offsetCountEnd);
+    int count = Integer.parseInt(countStr);
+
+    String commentBody = content.substring(offsetCountEnd + 1, offsetCountEnd + 1 + count);
+    int offsetBodyEnd = commentBody.lastIndexOf(commentEnd);
+    if (offsetBodyEnd == -1) {
+        return null;
+    }
+    commentBody = commentBody.substring(0, offsetBodyEnd);
+
+    StringBuilder commentBodyBuilder = new StringBuilder();
+    String[] items = splitLineBreak(commentBody);
+
+    for (String item : items) {
+        commentBodyBuilder.append(item.replaceFirst(asteriskRegex, replacement));
+    }
+
+    return commentBodyBuilder.toString();
+}
+
+private static int indexLineBreak(String str, int fromIndex) {
+    final String lineBreakIos = "\r";
+    final String lineBreakUnix = "\n";
+    final String linebreakWin = "\r\n";
+
+    int index = str.indexOf(lineBreakIos, fromIndex);
+    if (index == -1) {
+        index = str.indexOf(lineBreakUnix, fromIndex);
+    }
+    if (index == -1) {
+        index = str.indexOf(linebreakWin, fromIndex);
+    }
+
+    return index;
+}
+
+private static String[] splitLineBreak(String str) {
+    final String lineBreakIos = "\r";
+    final String lineBreakUnix = "\n";
+    final String linebreakWin = "\r\n";
+    String[] items = str.split(lineBreakIos);
+
+    if (items.length == 1) {
+        items = str.split(lineBreakUnix);
+    }
+    if (items.length == 1) {
+        items = str.split(linebreakWin);
+    }
+
+    return items;
+}
+
 }

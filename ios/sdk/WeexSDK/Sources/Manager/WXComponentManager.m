@@ -132,10 +132,10 @@ static NSThread *WXComponentThread;
     if (_rootCSSNode) {
         [self _applyRootFrame:frame toRootCSSNode:_rootCSSNode];
         if (!_rootComponent.styles[@"width"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_WIDTH] = frame.size.width;
+            _rootComponent.cssNode->style.dimensions[CSS_WIDTH] = frame.size.width ?: CSS_UNDEFINED;
         }
         if (!_rootComponent.styles[@"height"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_HEIGHT] = frame.size.height;
+            _rootComponent.cssNode->style.dimensions[CSS_HEIGHT] = frame.size.height ?: CSS_UNDEFINED;
         }
         [_rootComponent setNeedsLayout];
         [self startComponentTasks];
