@@ -68,6 +68,13 @@ export function getHeadStyleMap () {
             return styleObj
           }, {})
       })
+      /**
+       * remove this styleSheet node since it's in the styleMap already. And this style
+       * should only be fetched and used from styleMap to generate the final combined
+       * component style, not from the stylesheet itself.
+       */
+      const node = styleSheet.ownerNode
+      node.parentNode.removeChild(node)
       return pre
     }, {})
   if (process.env.NODE_ENV === 'development') {
