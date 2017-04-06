@@ -331,10 +331,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setNeedsDisplay;
 
-- (CGContextRef)beginDrawContext:(CGRect)bounds;
-
-- (UIImage *)endDrawContext:(CGContextRef)context;
-
 /**
  * @abstract Returns a Boolean indicating whether the component needs to be drawn by `drawRect:`
  */
@@ -353,16 +349,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIImage *)drawRect:(CGRect)rect;
 
 /**
- * @abstract Called when a component finishes rendering its content.
+ * @abstract Called when a component finishes drawing its content.
  * @discussion Do not call this method directly. Weex calls this method at appropriate times to finish updating the component's content.
  * Subclasses can override this method to perform additional work on components that were rendered.
  */
-- (void)displayDidFinished:(BOOL)success;
+- (void)didFinishDrawingLayer:(BOOL)success;
 
 /**
  * readyToRender, do not use it, will be deprecated soon
  */
 - (void)readyToRender;
+
+/**
+ * @abstract Creates a  graphics context with the specified bounds, the context will be used for `drawRect:` in compositing environment
+ * @discussion You can override this method to use your own graphics context.
+ */
+- (CGContextRef)beginDrawContext:(CGRect)bounds;
+
+/**
+ * @abstract Removes the current graphics context and returns an image based on the contents of the current graphics context.
+ * @discussion You can override this method to use your own graphics context. The image will be set to layer,  if your drawing system do not have layer and do not need image, returning nil is fine.
+ */
+- (UIImage *)endDrawContext:(CGContextRef)context;
 
 @end
 
@@ -377,7 +385,7 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on any thread.
  *
  */
-- (WXDisplayBlock)displayBlock DEPRECATED_MSG_ATTRIBUTE("use drawRect method instead.");
+- (WXDisplayBlock)displayBlock DEPRECATED_MSG_ATTRIBUTE("use drawRect: method instead.");
 
 /**
  * @abstract Return a block to be called while drawing is finished.
@@ -385,7 +393,7 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on main thread.
  *
  */
-- (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use displayDidFinished method instead.");
+- (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
 
 
 @end

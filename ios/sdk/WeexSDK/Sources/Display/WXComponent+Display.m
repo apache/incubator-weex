@@ -46,6 +46,10 @@
 
 - (BOOL)needsDrawRect
 {
+    if (_useCompositing || _isCompositingChild) {
+        return YES;
+    }
+    
     if (![self _needsDrawBorder]) {
         WXLogDebug(@"No need to draw border for %@", self.ref);
         WXPerformBlockOnMainThread(^{
@@ -72,13 +76,20 @@
     return nil;
 }
 
+- (void)didFinishDrawingLayer:(BOOL)success
+{
+    WXAssertMainThread();
+}
+
+#pragma mark Private
+
 - (WXDisplayBlock)_displayBlock
 {
     WXDisplayBlock displayBlock = ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
         if (isCancelled()) {
             return nil;
         }
-
+        
         UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size] , 0.0);
         UIImage *image = [self drawRect:bounds];
         if (!image) {
@@ -92,7 +103,13 @@
     return displayBlock;
 }
 
-#pragma mark Private
+- (WXDisplayCompletionBlock)_displayCompletionBlock
+{
+    __weak typeof(self) weakSelf = self;
+    return ^(CALayer *layer, BOOL finished) {
+        [weakSelf didFinishDrawingLayer:finished];
+    };
+}
 
 - (void)_initCompositingAttribute:(NSDictionary *)attributes
 {
@@ -117,7 +134,7 @@
     } else {
         displayBlock = [self _displayBlock];
     }
-    WXDisplayCompletionBlock completionBlock = [self displayCompletionBlock];
+    WXDisplayCompletionBlock completionBlock = [self _displayCompletionBlock];
     
     if (!displayBlock || !needsDrawRect) {
         if (completionBlock) {
@@ -176,32 +193,32 @@
 
 - (CGContextRef)beginDrawContext:(CGRect)bounds
 {
-//    UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);
-//    CGContextRef context = UIGraphicsGetCurrentContext();
+    UIGraphicsBeginImageContextWithOptions(bounds.size, [self _bitmapOpaqueWithSize:bounds.size], 0.0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
     
-    float scaleFactor = [[UIScreen mainScreen] scale];
-    CGColorSpaceRef	colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(NULL, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, 8, 4 * bounds.size.width * scaleFactor, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    CGContextScaleCTM(context, scaleFactor, scaleFactor);
-
-    // Adjusts position and invert the image.
-    // The OpenGL uses the image data upside-down compared commom image files.
-    CGContextTranslateCTM(context, 0, bounds.size.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
-    
-    CGColorSpaceRelease(colorSpace);
+//    float scaleFactor = [[UIScreen mainScreen] scale];
+//    CGColorSpaceRef	colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGContextRef context = CGBitmapContextCreate(NULL, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, 8, 4 * bounds.size.width * scaleFactor, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+//    CGContextScaleCTM(context, scaleFactor, scaleFactor);
+//
+//    // Adjusts position and invert the image.
+//    // The OpenGL uses the image data upside-down compared commom image files.
+//    CGContextTranslateCTM(context, 0, bounds.size.height);
+//    CGContextScaleCTM(context, 1.0, -1.0);
+//    
+//    CGColorSpaceRelease(colorSpace);
     
     return context;
 }
 
 - (UIImage *)endDrawContext:(CGContextRef)context
 {
-//    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-//    UIGraphicsEndImageContext();
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
     
-    CGImageRef imageRef= CGBitmapContextCreateImage(context);
-    UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
-    CGContextRelease(context);
+//    CGImageRef imageRef= CGBitmapContextCreateImage(context);
+//    UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
+//    CGContextRelease(context);
     
     return image;
 }
@@ -216,19 +233,9 @@
         
         CGContextRef context = [self beginDrawContext:bounds];
         
-//        float scaleFactor = [[UIScreen mainScreen] scale];
-//        CGColorSpaceRef	colorSpace = CGColorSpaceCreateDeviceRGB();
-//        CGContextRef context = CGBitmapContextCreate(NULL, bounds.size.width * scaleFactor, bounds.size.height * scaleFactor, 8, 4 * bounds.size.width * scaleFactor, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-//        CGContextScaleCTM(context, scaleFactor, scaleFactor);
-//        
-//        // Adjusts position and invert the image.
-//        // The OpenGL uses the image data upside-down compared commom image files.
-//        CGContextTranslateCTM(context, 0, bounds.size.height);
-//        CGContextScaleCTM(context, 1.0, -1.0);
+        UIGraphicsPushContext(context);
         
         [self _collectCompositingDisplayBlocks:displayBlocks context:context isCancelled:isCancelled];
-        
-        UIGraphicsPushContext(context);
         
         for (dispatch_block_t block in displayBlocks) {
             if (isCancelled()) {
@@ -553,7 +560,7 @@ do {\
 
 - (WXDisplayCompletionBlock)displayCompletionBlock
 {
-    return nil;
+    return [self _displayCompletionBlock];
 }
 
 @end
