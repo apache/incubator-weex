@@ -16,6 +16,7 @@ export function getHeadStyleMap () {
   if (process.env.NODE_ENV === 'development') {
     tagBegin('getHeadStyleMap')
   }
+  const needToRemoveStyleSheetNodes = []
   const res = Array.from(document.styleSheets || [])
     .reduce((pre, styleSheet) => {
       // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
@@ -73,10 +74,12 @@ export function getHeadStyleMap () {
        * should only be fetched and used from styleMap to generate the final combined
        * component style, not from the stylesheet itself.
        */
-      const node = styleSheet.ownerNode
-      node.parentNode.removeChild(node)
+      needToRemoveStyleSheetNodes.push(styleSheet.ownerNode)
       return pre
     }, {})
+  needToRemoveStyleSheetNodes.forEach(function (node) {
+    node.parentNode.removeChild(node)
+  })
   if (process.env.NODE_ENV === 'development') {
     tagEnd('getHeadStyleMap')
   }
