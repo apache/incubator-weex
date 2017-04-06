@@ -2,7 +2,7 @@
  * get resize (stetch|cover|contain) related styles.
  */
 function getResizeStyle (context) {
-  const stretch = '100% 100%'
+  const stretch = '100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
   // compatibility: http://caniuse.com/#search=background-size

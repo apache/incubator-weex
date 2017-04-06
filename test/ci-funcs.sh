@@ -33,7 +33,6 @@ function waitForEmulator {
 }
 
 function setup_cpt {
-    set -eu
     target_android='android'
     target_ios='ios'
     target_danger='danger'
@@ -87,7 +86,6 @@ function printEnvInfo {
 }
 
 function test_cpt {
-    set -eu
     echo 'cilog:start test ......'
 
     target_android='android'
@@ -106,6 +104,7 @@ function test_cpt {
         run_in_ci=true ./test/run.sh
     elif [ $target = $target_ios ]
     then
+        set -eu
         ./test/serve.sh 2&>1 > /dev/null &
         xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
         run_in_ci=true ./test/run.sh ios

@@ -1,13 +1,7 @@
 // import { validateStyles } from '../validator'
 
-function trimTextNode (children) {
-  if (Array.isArray(children)) {
-    return children.filter(vnode => !!vnode.tag)
-  }
-  return children
-}
-
 export default {
+  name: 'weex-div',
   render (createElement) {
     /* istanbul ignore next */
     // if (process.env.NODE_ENV === 'development') {
@@ -17,6 +11,6 @@ export default {
       attrs: { 'weex-type': 'div' },
       on: this._createEventMap(),
       staticClass: 'weex-div weex-ct'
-    }, trimTextNode(this.$slots.default))
+    }, this._trimTextNodeChildren(this.$slots.default))
   }
 }

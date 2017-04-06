@@ -374,6 +374,12 @@ public class WXImage extends WXComponent<ImageView> {
     if (src == null) {
       return;
     }
+
+    if("".equals(src)){
+      getHostView().setImageDrawable(null);
+      return;
+    }
+
     this.mSrc = src;
     WXSDKInstance instance = getInstance();
     Uri rewrited = instance.rewriteUri(Uri.parse(src), URIAdapter.IMAGE);
