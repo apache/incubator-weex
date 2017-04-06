@@ -193,7 +193,9 @@
 
 - (void)triggerDisplay
 {
-    [self _willDisplayLayer:_layer];
+    WXPerformBlockOnMainThread(^{
+        [self _willDisplayLayer:_layer];
+    });
 }
 
 - (CGContextRef)beginDrawContext:(CGRect)bounds
