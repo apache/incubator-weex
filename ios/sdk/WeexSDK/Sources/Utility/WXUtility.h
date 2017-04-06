@@ -357,6 +357,33 @@ CGRect WXPixelFrameResize(CGRect value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelSca
 CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
 + (UIFont  * _Nullable )fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString * _Nullable)fontFamily DEPRECATED_MSG_ATTRIBUTE("Use +[WXUtility fontWithSize:textWeight:textStyle:fontFamily:scaleFactor:]");
 
+
+/**
+ @discusstion construct a gradientLayer from the colors locations, gradientType
+ @param colors The array of UIColor objects defining the color of each gradient
+ stop. Defaults to nil
+ @param locations An optional array of NSNumber objects defining the location of each
+  gradient stop as a value in the range [0,1].
+ @param frame the layer frame
+ @param gradientType WXGradientType value specify the gradient location
+ @return gradient layer
+ */
++ (CAGradientLayer *_Nullable)gradientLayerFromColors:(NSArray*_Nullable)colors
+                                           locations:(NSArray*_Nullable)locations
+                                               frame:(CGRect)frame
+                                        gradientType:(WXGradientType)gradientType;
+
+/**
+ @discusstion parse gradient-color string to a dictionary, then you can get gradientLayer from @see gradientLayerFromColors:colors:locations:frame:locations
+ @param a linear-gradient string like linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
+ @return A dictionary with endColor, startColor and gradientType value
+ @code
+    NSDictionary * linearGradient = [self linearGradientWithBackgroundImage:@"linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))"];
+    CAGradientLayer * gradientLayer = [self gradientLayerFromColors:@[linearGradient[@"startColor"], linearGradient[@"endColor"]],nil,bounds,[linearGradient[@"gradientType"] integerValue]];
+ @endcode
+ */
++ (NSDictionary *_Nullable)linearGradientWithBackgroundImage:(NSString *_Nullable)backgroundImage;
+
 /**
  *  @abstract compare float a and b, if a equal b, return true,or reture false.
  *

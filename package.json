@@ -4,7 +4,7 @@
   "subversion": {
     "browser": "0.5.0",
     "vue-render": "0.11.2",
-    "framework": "0.19.16",
+    "framework": "0.19.17",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -93,8 +93,8 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.1.0",
-    "weex-vue-framework": "2.2.1-weex.1",
+    "weex-rax-framework": "0.2.11",
+    "weex-vue-framework": "2.2.2-weex.1",
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
@@ -136,6 +136,7 @@
     "rollup-plugin-commonjs": "^5.0.4",
     "rollup-plugin-eslint": "^3.0.0",
     "rollup-plugin-flow": "^1.1.1",
+    "rollup-plugin-flow-no-whitespace": "^1.0.0",
     "rollup-plugin-json": "^2.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-postcss": "^0.2.0",
