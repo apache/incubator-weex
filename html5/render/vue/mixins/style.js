@@ -3,6 +3,7 @@ import {
   hyphenateKeys,
   extend,
   trimComment
+  // normalizeStyle
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 import addPrefix from 'inline-style-prefixer/static'
@@ -88,6 +89,19 @@ export default {
         })
       }
       return hyphenateKeys(addPrefix(camelizeKeys(style)))
+    },
+
+    _mergeStyle (data) {
+      const res = {}
+      const style = data.style
+      const staticStyle = data.staticStyle
+      const classes = typeof data.class === 'string' ? data.class.split(' ') : (data.class || [])
+      const staticClass = typeof data.staticClass === 'string' ? data.staticClass.split(' ') : (data.class || [])
+      const clsNms = staticClass.concat(classes)
+      extend(res, this._getScopeStyle(clsNms))
+      extend(res, staticStyle)
+      extend(res, style)
+      return hyphenateKeys(addPrefix(camelizeKeys(res)))
     },
 
     _getScopeStyle (classNames) {

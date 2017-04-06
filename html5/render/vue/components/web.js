@@ -1,3 +1,4 @@
+import { extractComponentStyle } from '../core'
 import { createEvent } from '../utils'
 // import { validateStyles } from '../validator'
 
@@ -45,7 +46,8 @@ export default {
         src: this.src
       },
       on: this._createEventMap(['error']),
-      staticClass: 'weex-web weex-el'
+      staticClass: 'weex-web weex-el',
+      staticStyle: extractComponentStyle(this)
     })
   }
 }

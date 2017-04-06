@@ -1,4 +1,5 @@
 // import { validateStyles } from '../../validator'
+import { extractComponentStyle } from '../../core'
 import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
@@ -127,7 +128,8 @@ export default {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd
-        })
+        }),
+        staticStyle: extractComponentStyle(this)
       },
       [
         createElement('ul', {

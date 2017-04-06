@@ -1,3 +1,4 @@
+import { extractComponentStyle } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
@@ -42,7 +43,8 @@ export default {
         value: this.value
       },
       on: this.createKeyboardEvent(events),
-      staticClass: 'weex-textarea weex-el'
+      staticClass: 'weex-textarea weex-el',
+      staticStyle: extractComponentStyle(this)
     })
   }
 }

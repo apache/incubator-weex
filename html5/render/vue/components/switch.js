@@ -1,4 +1,5 @@
 // import { validateStyles } from '../validator'
+import { extractComponentStyle } from '../core'
 
 export default {
   props: {
@@ -42,13 +43,14 @@ export default {
     // }
     return createElement('span', {
       attrs: { 'weex-type': 'switch' },
-      staticClass: this.wrapperClass,
       on: {
         click: event => {
           this.$emit('click', event)
           this.toggle()
         }
-      }
+      },
+      staticClass: this.wrapperClass,
+      staticStyle: extractComponentStyle(this)
     }, [createElement('small', { staticClass: 'weex-switch-inner' })])
   }
 }

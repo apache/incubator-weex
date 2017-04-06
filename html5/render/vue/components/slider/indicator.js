@@ -1,21 +1,23 @@
+import { extractComponentStyle } from '../../core'
 import { extend, extendKeys } from '../../utils'
 
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
-  style['background-color'] = spec[isActive ? 'item-selected-color' : 'item-color']
-  style['width'] = style['height'] = spec['item-size']
+  style['background-color'] = spec[isActive ? 'itemSelectedColor' : 'itemColor']
+  style['width'] = style['height'] = spec['itemSize']
   return style
 }
 
 function _render (context, h) {
   const children = []
-  const mergedStyle = context._getComponentStyle(context.$vnode.data)
-  context.$vnode.data.cached = {}
-  extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
+  const mergedStyle = extractComponentStyle(context)
+  // const mergedStyle = context._getComponentStyle(context.$vnode.data)
+  // context.$vnode.data.cached = {}
+  // extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
   const indicatorSpecStyle = extendKeys(
       {},
       mergedStyle,
-      ['item-color', 'item-selected-color', 'item-size']
+      ['itemColor', 'itemSelectedColor', 'itemSize']
     )
   for (let i = 0; i < Number(context.count); ++i) {
     const classNames = ['weex-indicator-item weex-el']
@@ -29,11 +31,9 @@ function _render (context, h) {
       staticStyle: getIndicatorItemStyle(indicatorSpecStyle, isActive)
     }))
   }
-  if (!context.$vnode.context._isMounted) {
-    context.$nextTick(function () {
-      _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
-    })
-  }
+  context.$nextTick(function () {
+    _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
+  })
   return h('nav', {
     attrs: { 'weex-type': 'indicator' },
     staticClass: 'weex-indicator weex-ct',
@@ -116,10 +116,6 @@ export default {
   props: {
     count: [Number, String],
     active: [Number, String]
-  },
-  updated () {
-    const mergedStyle = this._getComponentStyle(this.$vnode.data)
-    _reLayout(this, _getVirtualRect(this, mergedStyle), _getLtbr(this, mergedStyle))
   },
   render (createElement) {
     return _render(this, createElement)

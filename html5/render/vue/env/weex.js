@@ -8,7 +8,7 @@ const weexModules = {}
 const weex = {
   __vue__: null,
   utils,
-  units: window.CSS_UNIT,
+  // units: window.CSS_UNIT,
   config: {
     env: window.WXEnvironment,
     bundleUrl: location.href

@@ -1,3 +1,4 @@
+import { extractComponentStyle } from '../../core'
 import { scrollable } from '../../mixins'
 // import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
@@ -75,13 +76,14 @@ export default {
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
-      staticClass: this.wrapperClass,
       on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
         touchend: this.handleTouchEnd
-      })
+      }),
+      staticClass: this.wrapperClass,
+      staticStyle: extractComponentStyle(this)
     }, this.createChildren(createElement))
   }
 }

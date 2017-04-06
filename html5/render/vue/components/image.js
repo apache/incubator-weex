@@ -1,8 +1,10 @@
+import { extractComponentStyle } from '../core/style'
+import { extend } from '../utils'
 /**
  * get resize (stetch|cover|contain) related styles.
  */
 function getResizeStyle (context) {
-  const stretch = '100%'
+  const stretch = '100% 100%'
   const resize = context.resize || stretch
   const bgSize = ['cover', 'contain', stretch].indexOf(resize) > -1 ? resize : stretch
   // compatibility: http://caniuse.com/#search=background-size
@@ -49,16 +51,17 @@ export default {
     //   validateStyles('image', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
     // const style = this._normalizeInlineStyles(this.$vnode.data)
-    const wh = this._getSize(this.$vnode.data)
+    const resizeStyle = getResizeStyle(this)
+    const style = extractComponentStyle(this)
     return createElement('figure', {
       attrs: {
         'weex-type': 'image',
-        'img-src': preProcessSrc(this, this.src, wh),
-        'img-placeholder': preProcessSrc(this, this.placeholder, wh)
+        'img-src': preProcessSrc(this, this.src, style),
+        'img-placeholder': preProcessSrc(this, this.placeholder, style)
       },
       on: this._createEventMap(['load', 'error']),
       staticClass: 'weex-image weex-el',
-      staticStyle: getResizeStyle(this)
+      staticStyle: extend(style, resizeStyle)
     })
   }
 }

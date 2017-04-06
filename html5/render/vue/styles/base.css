@@ -64,9 +64,7 @@
   min-width: 0;
 }
 
-.weex-a {
-  text-decoration: none;
-}
+
 
 body > .weex-div {
   min-height: 100%;
@@ -254,11 +252,13 @@ body > .weex-scroller {
 }
 
 .weex-scroller-wrapper.weex-scroller-vertical {
+  overflow-x: hidden;
   overflow-y: scroll;
 }
 
 .weex-scroller-wrapper.weex-scroller-horizontal {
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .weex-scroller-horizontal .weex-scroller-inner {

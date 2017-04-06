@@ -1,4 +1,5 @@
 // import { validateStyles } from '../../../validator'
+import { extractComponentStyle } from '../../../core'
 
 export default {
   render (createElement) {
@@ -9,7 +10,8 @@ export default {
     return createElement('section', {
       attrs: { 'weex-type': 'cell' },
       on: this._createEventMap(),
-      staticClass: 'weex-cell weex-ct'
+      staticClass: 'weex-cell weex-ct',
+      staticStyle: extractComponentStyle(this)
     }, this.$slots.default)
   }
 }

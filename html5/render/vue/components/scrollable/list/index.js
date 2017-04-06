@@ -1,3 +1,4 @@
+import { extractComponentStyle } from '../../../core'
 import { scrollable } from '../../../mixins'
 // import { validateStyles } from '../../../validator'
 import { extend } from '../../../utils'
@@ -61,7 +62,8 @@ export default {
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
         touchend: this.handleTouchEnd
-      })
+      }),
+      staticStyle: extractComponentStyle(this)
     }, this.createChildren(createElement))
   }
 }

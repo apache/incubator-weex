@@ -44,16 +44,19 @@ module.exports = function (config) {
     frameworks: ['mocha', 'sinon-chai'],
     browsers: ['PhantomJS'],
     files: [
+      // '../html5/test/render/vue/components/*.js'
       '../html5/test/render/vue/**/*.js'
     ],
 
     exclude: [
       '../html5/test/render/vue/helper.js',
-      '../html5/test/render/vue/vender/**/*.js'
+      '../html5/test/render/vue/helper/*.js',
+      '../html5/test/render/vue/vender/**/*.js',
+      '../html5/test/render/vue/data/**/*.js'
     ],
 
-    // singleRun: false,
-    singleRun: true,
+    singleRun: false,
+    // singleRun: true,
 
     reporters: ['mocha', 'coverage'],
     coverageReporter: {
@@ -65,7 +68,7 @@ module.exports = function (config) {
 
     preprocessors: {
       '../html5/test/**/*.js': ['rollup'],
-      '../html5/test/**/!(components|examples)/*.js': ['rollup', 'coverage']
+      '../html5/test/**/!(components|examples|core)/*.js': ['rollup', 'coverage']
     },
     rollupPreprocessor: rollupConfig,
 

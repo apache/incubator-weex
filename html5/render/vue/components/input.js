@@ -2,6 +2,7 @@
  * @fileOverview Input component.
  * Support v-model only if vue version is large than 2.2.0
  */
+import { extractComponentStyle } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
@@ -56,7 +57,8 @@ export default {
         value: this.value
       },
       on: this.createKeyboardEvent(events),
-      staticClass: 'weex-input weex-el'
+      staticClass: 'weex-input weex-el',
+      staticStyle: extractComponentStyle(this)
     })
   }
 }
