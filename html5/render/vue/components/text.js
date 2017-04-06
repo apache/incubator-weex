@@ -9,6 +9,18 @@
 import { extractComponentStyle } from '../core'
 import { extend } from '../utils'
 
+const _css = `
+.weex-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  position: relative;
+  white-space: pre-wrap;  /* not using 'pre': support auto line feed. */
+  font-size: 0.426667rem;
+  word-wrap: break-word;
+  overflow: hidden; /* it'll be clipped if the height is not high enough. */
+}
+`
+
 /**
  * Get text special styles (lines and text-overflow).
  */
@@ -43,5 +55,6 @@ export default {
       staticClass: 'weex-text weex-el',
       staticStyle: extend(style, textSpecStyle)
     }, this.$slots.default || [this.value])
-  }
+  },
+  _css
 }

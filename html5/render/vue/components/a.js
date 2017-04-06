@@ -1,7 +1,7 @@
 import { extractComponentStyle } from '../core'
 // import { validateStyles } from '../validator'
 
-const defaultStyle = `
+const _css = `
 .weex-a {
   text-decoration: none;
 }
@@ -27,5 +27,5 @@ export default {
       staticStyle: extractComponentStyle(this)
     }, this._trimTextNodeChildren(this.$slots.default))
   },
-  _d_style: defaultStyle
+  _css
 }

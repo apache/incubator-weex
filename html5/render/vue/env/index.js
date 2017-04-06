@@ -1,4 +1,4 @@
-import css from '../styles/reset.css'
+import '../styles/reset.css'
 import '../styles/base.css'
 
 // import 'lazyimg'

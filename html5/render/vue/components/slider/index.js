@@ -4,6 +4,32 @@ import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
+const _css = `
+.weex-slider-wrapper {
+  overflow: hidden;
+}
+
+.weex-slider-inner {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.weex-slider-cell {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+`
+
 export default {
   mixins: [slideMixin],
   props: {
@@ -139,5 +165,7 @@ export default {
         this._indicator
       ]
     )
-  }
+  },
+  // export default css styles for this component.
+  _css
 }

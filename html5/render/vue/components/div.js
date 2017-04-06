@@ -1,6 +1,12 @@
 // import { validateStyles } from '../validator'
 import { extractComponentStyle } from '../core'
 
+const _css = `
+body > .weex-div {
+  min-height: 100%;
+}
+`
+
 export default {
   name: 'weex-div',
   render (createElement) {
@@ -14,5 +20,6 @@ export default {
       staticClass: 'weex-div weex-ct',
       staticStyle: extractComponentStyle(this)
     }, this._trimTextNodeChildren(this.$slots.default))
-  }
+  },
+  _css
 }

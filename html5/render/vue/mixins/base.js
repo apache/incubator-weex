@@ -57,16 +57,6 @@ export default {
   },
 
   methods: {
-    _getTopContext () {
-      let ctx = this
-      let vnode = ctx.$options._parentVnode
-      while (vnode) {
-        ctx = vnode.context
-        vnode = ctx.$options._parentVnode
-      }
-      return ctx
-    },
-
     _getScopeIds () {
       const arr = []
       let ctx = this

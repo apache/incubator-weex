@@ -45,6 +45,13 @@ const weex = {
     if (!this.__vue__) {
       return console.log('[Vue Render] Vue is not found. Please import Vue.js before register a component.')
     }
+    if (component._css) {
+      const css = component._css.replace(/\b[+-]?[\d.]+rem;?\b/g, function (m) {
+        return parseFloat(m) * 75 * weex.config.env.scale + 'px'
+      })
+      utils.appendCss(css, `weex-cmp-${name}`)
+      delete component._css
+    }
     this.__vue__.component(name, component)
   },
 

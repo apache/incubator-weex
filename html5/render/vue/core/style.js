@@ -38,7 +38,7 @@ export function getHeadStyleMap () {
          * .a { color: red; }
          * etc.
          */
-        const match = str.match(/((?:,?\s*\.[\w-]+\[data-v-\w+\])+)\s*({[^}]+)/)
+        const match = str.match(/((?:,?\s*\.[\w-]+\[data-v-\w+\](?::\w+)?)+)\s*({[^}]+)/)
         if (!match) {
           // not the vue static class styles map. so acquire no rules for this styleSheet.
           // just jump through this styleSheet and go to analyzing next.
@@ -86,10 +86,6 @@ export function getScopeIds (context) {
     ctx = ctx.$options.parent
   }
   return arr
-}
-
-export function setDefaultStyle () {
-  
 }
 
 /**

@@ -1,5 +1,12 @@
 import { extractComponentStyle } from '../core/style'
 import { extend } from '../utils'
+
+const _css = `
+.weex-image, .weex-img {
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+`
 /**
  * get resize (stetch|cover|contain) related styles.
  */
@@ -63,5 +70,6 @@ export default {
       staticClass: 'weex-image weex-el',
       staticStyle: extend(style, resizeStyle)
     })
-  }
+  },
+  _css
 }

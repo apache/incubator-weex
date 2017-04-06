@@ -7,6 +7,15 @@ import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
 
+const _css = `
+.weex-input, .weex-textarea {
+  font-size: 0.426667rem;
+}
+.weex-input:focus, .weex-textarea:focus {
+  outline: none;
+}
+`
+
 export default {
   mixins: [inputCommon],
   props: {
@@ -60,5 +69,6 @@ export default {
       staticClass: 'weex-input weex-el',
       staticStyle: extractComponentStyle(this)
     })
-  }
+  },
+  _css
 }

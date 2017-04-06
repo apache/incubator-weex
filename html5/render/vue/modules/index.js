@@ -25,7 +25,6 @@ const legacyModules = {
 const modules = {
   animation,
   dom,
-  modal,
   navigator,
   webview
 }
@@ -35,6 +34,7 @@ export default {
     for (const k in legacyModules) {
       weex.install(legacyModules[k])
     }
+    weex.install(modal)
     for (const k in modules) {
       weex.registerModule(k, modules[k])
     }

@@ -1,6 +1,35 @@
 import { extractComponentStyle } from '../../core'
 import { extend, extendKeys } from '../../utils'
 
+const _css = `
+.weex-indicator {
+  position: absolute;
+  z-index: 10;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-orient: horizontal;
+  margin: 0;
+  padding: 0;
+}
+
+.weex-indicator-item {
+  display: inline-block;
+  position: relative;
+  border-radius: 50%;
+  width: 0.266667rem;
+  height: 0.266667rem;
+  background-color: #BBBBBB;
+}
+.weex-indicator-item + .weex-indicator-item {
+  margin-left: 0.133333rem;
+}
+
+.weex-indicator-item-active {
+  background-color: blue;
+}
+`
+
 function getIndicatorItemStyle (spec, isActive) {
   const style = {}
   style['background-color'] = spec[isActive ? 'itemSelectedColor' : 'itemColor']
@@ -119,5 +148,6 @@ export default {
   },
   render (createElement) {
     return _render(this, createElement)
-  }
+  },
+  _css
 }
