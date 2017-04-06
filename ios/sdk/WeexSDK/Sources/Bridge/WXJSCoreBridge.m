@@ -22,6 +22,7 @@
 #import "WXPolyfillSet.h"
 #import "JSValue+Weex.h"
 #import "WXJSExceptionProtocol.h"
+#import "WXSDKManager.h"
 
 #import <dlfcn.h>
 
@@ -31,6 +32,7 @@
 @interface WXJSCoreBridge ()
 
 @property (nonatomic, strong)  JSContext *jsContext;
+@property (nonatomic, strong)  NSMutableArray *timers;
 
 @end
 
@@ -45,6 +47,7 @@
         if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             _jsContext.name = @"Weex Context";
         }
+        _timers = [NSMutableArray new];
         
         __weak typeof(self) weakSelf = self;
         
@@ -56,6 +59,15 @@
             [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
                 [function callWithArguments:@[]];
             } afterDelay:[timeout toDouble] / 1000];
+        };
+        
+        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg ) {
+            [weakSelf triggerTimeout:[appid toString] ret:[ret toString] arg:[arg toString]];
+        };
+        
+        _jsContext[@"setIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
+            [weakSelf triggerInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+            
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -229,11 +241,76 @@ typedef void (*WXJSCGarbageCollect)(JSContextRef);
 //    }
 }
 
+#pragma mark - Public
+-(void)removeTimers:(NSString *)instance
+{
+    if(instance && [_timers containsObject:instance])
+    {
+        [_timers removeObject:instance];
+    }
+}
+
 #pragma mark - Private
 
 - (void)triggerTimeout:(void(^)())block
 {
     block();
+}
+
+- (void)callBack:(NSDictionary *)dic
+{
+    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
+    }
+}
+
+
+- (void)callBackInterval:(NSDictionary *)dic
+{
+    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:nil keepAlive:YES];
+        [self triggerInterval:[dic objectForKey:@"appid"] ret:[dic objectForKey:@"ret"] arg:[dic objectForKey:@"arg"]];
+    }
+    
+}
+
+- (void)triggerTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    
+    double interval = [arg doubleValue]/1000.0f;
+    if(WXFloatEqual(interval,0)) {
+        return;
+    }
+    if(![_timers containsObject:appid]){
+        [_timers addObject:appid];
+    }
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
+    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableDictionary *dic = [NSMutableDictionary new];
+        [dic setObject:appid forKey:@"appid"];
+        [dic setObject:ret forKey:@"ret"];
+        [dic setObject:arg forKey:@"arg"];
+        [self performSelector:@selector(callBack:) withObject:dic ];
+    });
+}
+
+- (void)triggerInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    double interval = [arg doubleValue]/1000.0f;
+    if(WXFloatEqual(interval,0)) {
+        return;
+    }
+    if(![_timers containsObject:appid]){
+        [_timers addObject:appid];
+    }
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
+    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableDictionary *dic = [NSMutableDictionary new];
+        [dic setObject:appid forKey:@"appid"];
+        [dic setObject:ret forKey:@"ret"];
+        [dic setObject:arg forKey:@"arg"];
+        [self performSelector:@selector(callBackInterval:) withObject:dic ];
+    });
 }
 
 @end
