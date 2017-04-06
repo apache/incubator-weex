@@ -1,5 +1,16 @@
+import { extractComponentStyle } from '../core'
 import { createEvent } from '../utils'
 // import { validateStyles } from '../validator'
+
+const _css = `
+.weex-web {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: none;
+  box-sizing: border-box;
+}
+`
 
 export default {
   props: {
@@ -45,7 +56,9 @@ export default {
         src: this.src
       },
       on: this._createEventMap(['error']),
-      staticClass: 'weex-web weex-el'
+      staticClass: 'weex-web weex-el',
+      staticStyle: extractComponentStyle(this)
     })
-  }
+  },
+  _css
 }

@@ -48,7 +48,6 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
   exclude: bannerExcludeFiles
 })
 
-
 module.exports = {
   entry: entry,
   output: {
@@ -67,20 +66,20 @@ module.exports = {
       }
     ]
   },
-  vue: {
-    /**
-     * important! should use postTransformNode to add $processStyle for
-     * inline style prefixing.
-     */
-    compilerModules: [
-      {
-        postTransformNode: el => {
-          el.staticStyle = `$processStyle(${el.staticStyle})`
-          el.styleBinding = `$processStyle(${el.styleBinding})`
-        }
-      }
-    ],
-    postcss: [require('autoprefixer')()]
-  },
+  // vue: {
+  //   /**
+  //    * important! should use postTransformNode to add $processStyle for
+  //    * inline style prefixing.
+  //    */
+  //   compilerModules: [
+  //     {
+  //       postTransformNode: el => {
+  //         el.staticStyle = `$processStyle(${el.staticStyle})`
+  //         el.styleBinding = `$processStyle(${el.styleBinding})`
+  //       }
+  //     }
+  //   ],
+  //   postcss: [require('autoprefixer')()]
+  // },
   plugins: [bannerPlugin]
 }

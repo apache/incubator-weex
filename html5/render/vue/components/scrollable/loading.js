@@ -1,3 +1,4 @@
+import { extractComponentStyle } from '../../core'
 import LoadingIndicator from './loading-indicator'
 
 export default {
@@ -30,7 +31,7 @@ export default {
   },
   watch: {
     height (val) {
-      this.$el.style.height = val + 'px'
+      this.$el.style.height = val * weex.config.env.scale + 'px'
     },
     display (val) {
       if (val === 'hide') {
@@ -75,7 +76,8 @@ export default {
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },
-      staticClass: 'weex-loading weex-ct'
+      staticClass: 'weex-loading weex-ct',
+      staticStyle: extractComponentStyle(this)
     }, this.getChildren())
   }
 }

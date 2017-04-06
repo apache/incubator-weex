@@ -1,6 +1,17 @@
+import { extractComponentStyle } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
+
 // import { validateStyles } from '../validator'
+
+const _css = `
+.weex-textarea {
+  font-size: 0.426667rem
+}
+.weex-textarea:focus {
+  outline: none;
+}
+`
 
 export default {
   mixins: [inputCommon],
@@ -42,7 +53,9 @@ export default {
         value: this.value
       },
       on: this.createKeyboardEvent(events),
-      staticClass: 'weex-textarea weex-el'
+      staticClass: 'weex-textarea weex-el',
+      staticStyle: extractComponentStyle(this)
     })
-  }
+  },
+  _css
 }

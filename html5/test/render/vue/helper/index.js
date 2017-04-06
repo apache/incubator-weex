@@ -1,39 +1,12 @@
-import '../../../render/vue/styles/reset.css'
-import '../../../render/vue/styles/components.css'
-
-import '../../../render/browser/render/gesture'
-
-/* istanbul ignore next */
-import '../../../shared/arrayFrom'
-/* istanbul ignore next */
-import '../../../shared/objectAssign'
-/* istanbul ignore next */
-import '../../../shared/objectSetPrototypeOf'
-
-/* istanbul ignore next */
-import 'core-js/modules/es6.object.to-string'
-/* istanbul ignore next */
-import 'core-js/modules/es6.string.iterator'
-/* istanbul ignore next */
-import 'core-js/modules/web.dom.iterable'
-/* istanbul ignore next */
-import 'core-js/modules/es6.promise'
+import './env'
 
 /* istanbul ignore next */
 import Vue from 'vue/dist/vue.esm.js'
 // import { base, scrollable, style, inputCommon } from '../../../render/vue/mixins'
-import { base, style } from '../../../render/vue/mixins'
-import weex from '../../../render/vue/env/weex'
+import { base, style } from '../../../../render/vue/mixins'
+import weex from '../../../../render/vue/env/weex'
 
-/**
- * functional tools exported by helper.utils.
- */
-const utils = {
-  toArray (list) {
-    if (!list) return []
-    return Array.prototype.slice.call(list)
-  }
-}
+import * as utils from './utils'
 
 /**
  * Describe tests for current versions of Vue.

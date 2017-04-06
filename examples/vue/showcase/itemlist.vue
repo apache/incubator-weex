@@ -1,11 +1,11 @@
 <template>
   <list class="list" @loadmore="loadmore" loadmoreoffset=2000>
-    <cell class="cell" v-for="(item,i) in shopList" :key="i" :scope="item.scopeValue" @click="oncellclick(item.id)">
+    <cell class="cell" v-for="item in shopList" :scope="item.scopeValue" @click="oncellclick(item.id)">
       <div class="shopDiv">
         <div class="shopHeader" style="flex-direction:row;">
           <div style="flex:2;flex-direction:row;">
             <div>
-              <image style="width:60px;height:60px;" :src="item.PersonPhoto"></image>
+              <image class="test" :src="item.PersonPhoto"></image>
             </div>
             <div style="flex-direction:column;margin-left:5px;">
               <div style="margin-top:5px;">
@@ -78,7 +78,7 @@
             <text class="shopDesc" style="font-size:25px;">{{item.shopDesc}}</text>
           </div>
           <div style="flex-direction:row;">
-            <div class="imgDiv" style="flex:1;flex-direction:column;margin:10px;" v-for="img in item.shopImgList">
+            <div class="imgDiv" style="flex:1;height:300px;flex-direction:column;margin:10px;" v-for="img in item.shopImgList">
               <div>
                 <image class="shopImg" :style="{ width: img.shopImgWidth, height: img.shopImgHeight }" :src="img.shopImg"></image>
               </div>
@@ -178,6 +178,11 @@
     background-color: #dddddd;
     flex-direction: column;
     width: 750px;
+  }
+
+  .test {
+    width:60px;
+    height:60px;
   }
 
   .shopDiv {

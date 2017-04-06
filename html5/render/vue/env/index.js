@@ -1,5 +1,5 @@
 import '../styles/reset.css'
-import '../styles/components.css'
+import '../styles/base.css'
 
 // import 'lazyimg'
 import '../../browser/render/gesture'

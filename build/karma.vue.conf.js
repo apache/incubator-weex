@@ -36,8 +36,6 @@ for (var i = 0, l = plugins.length; i < l; i++) {
  */
 rollupConfig.plugins.splice(-2, 1, flow())
 
-console.log('rollupConfig', rollupConfig)
-
 rollupConfig.format = 'iife'
 rollupConfig.sourceMap = 'inline'
 
@@ -46,12 +44,15 @@ module.exports = function (config) {
     frameworks: ['mocha', 'sinon-chai'],
     browsers: ['PhantomJS'],
     files: [
+      // '../html5/test/render/vue/components/*.js'
       '../html5/test/render/vue/**/*.js'
     ],
 
     exclude: [
       '../html5/test/render/vue/helper.js',
-      '../html5/test/render/vue/vender/**/*.js'
+      '../html5/test/render/vue/helper/*.js',
+      '../html5/test/render/vue/vender/**/*.js',
+      '../html5/test/render/vue/data/**/*.js'
     ],
 
     // singleRun: false,
@@ -67,7 +68,7 @@ module.exports = function (config) {
 
     preprocessors: {
       '../html5/test/**/*.js': ['rollup'],
-      '../html5/test/**/!(components|examples)/*.js': ['rollup', 'coverage']
+      '../html5/test/**/!(components|examples|core)/*.js': ['rollup', 'coverage']
     },
     rollupPreprocessor: rollupConfig,
 

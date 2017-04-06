@@ -23,16 +23,6 @@ function watchLazyload () {
   })
 }
 
-let warned = false
-const notePage = 'https://github.com/MrRaindrop/weex/issues/14'
-function warnProcessStyle () {
-  if (!warned) {
-    warned = true
-    console.warn(`[vue-render] warn: should add loader config using $processStyle to enable`
-      + ` inline styles's auto-prefixing. see ${notePage}. If already did it, please ignore this.`)
-  }
-}
-
 export default {
   beforeCreate () {
     if (!lazyloadWatched) {
@@ -47,9 +37,6 @@ export default {
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
-    }
-    if (!warned && !window._style_processing_added) {
-      warnProcessStyle()
     }
     watchAppear(this)
     if (process.env.NODE_ENV === 'development') {
@@ -70,16 +57,6 @@ export default {
   },
 
   methods: {
-    _getTopContext () {
-      let ctx = this
-      let vnode = ctx.$options._parentVnode
-      while (vnode) {
-        ctx = vnode.context
-        vnode = ctx.$options._parentVnode
-      }
-      return ctx
-    },
-
     _getScopeIds () {
       const arr = []
       let ctx = this

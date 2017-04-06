@@ -1,5 +1,6 @@
 // import { validateStyles } from '../../validator'
 import { supportSticky } from '../../utils/style'
+import { extractComponentStyle } from '../../core'
 
 export default {
   data () {
@@ -51,7 +52,8 @@ export default {
       on: this._createEventMap(),
       ref: 'header',
       staticClass: 'weex-header weex-ct',
-      class: { sticky: this.sticky, iossticky: this.supportSticky }
+      class: { sticky: this.sticky, iossticky: this.supportSticky },
+      staticStyle: extractComponentStyle(this)
     }, this.$slots.default)
   }
 }
