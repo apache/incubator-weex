@@ -1,6 +1,59 @@
-import { getThrottleLazyload } from '../utils'
+import { getThrottleLazyload, throttle } from '../utils'
+
+let throttleScroll
+function getThrottledScroll (context) {
+  if (!throttleScroll) {
+    const wrapper = context.$refs.wrapper
+    const inner = context.$refs.inner
+    let preOffset = (context.scrollDirection === 'horizontal'
+        ? wrapper.scrollLeft
+        : wrapper.scrollTop)
+      || 0
+    throttleScroll = throttle(function (evt) {
+      const offset = context.scrollDirection === 'horizontal'
+        ? wrapper.scrollLeft
+        : wrapper.scrollTop
+      const indent = parseInt(context.offsetAccuracy)
+      function triggerScroll () {
+        const rect = inner.getBoundingClientRect()
+        evt.contentSize = { width: rect.width, height: rect.height }
+        evt.contentOffset = {
+          x: wrapper.scrollLeft,
+          /**
+           * positive direciton for y-axis is down.
+           * so should use negative operation on scrollTop.
+           *
+           *  (0,0)---------------> x
+           *       |
+           *       |
+           *       |
+           *       |
+           *       v y
+           *
+           */
+          y: -wrapper.scrollTop
+        }
+        context.$emit('scroll', evt)
+      }
+      if (indent
+        && !isNaN(indent)
+        && indent > 0
+        && Math.abs(offset - preOffset) >= indent) {
+        triggerScroll()
+        preOffset = offset
+      }
+      else if (!indent || isNaN(indent) || indent <= 0) {
+        triggerScroll()
+      }
+    }, 16, true)
+  }
+  return throttleScroll
+}
 
 export default {
+  props: {
+    offsetAccuracy: [Number, String]
+  },
   methods: {
     updateLayout () {
       const wrapper = this.$refs.wrapper
@@ -13,6 +66,7 @@ export default {
 
     handleScroll (event) {
       getThrottleLazyload(25, this.$el, 'scroll')()
+      getThrottledScroll(this)(event)
       if (this.reachBottom()) {
         this.$emit('loadmore', event)
       }

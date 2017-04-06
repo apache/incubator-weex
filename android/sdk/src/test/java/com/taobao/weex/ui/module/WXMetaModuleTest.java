@@ -241,23 +241,23 @@ public class WXMetaModuleTest {
         JSONObject jsonObject  = new JSONObject();
         jsonObject.put(WXMetaModule.WIDTH,640);
         mMeta.setViewport(jsonObject.toString());
-        assertTrue(mMeta.mWXSDKInstance.getViewPortWidth() == 640);
+        assertTrue(mMeta.mWXSDKInstance.getInstanceViewPortWidth() == 640);
 
         jsonObject.put(WXMetaModule.WIDTH,320.5);
         mMeta.setViewport(jsonObject.toString());
-        assertTrue(mMeta.mWXSDKInstance.getViewPortWidth() == 320);
+        assertTrue(mMeta.mWXSDKInstance.getInstanceViewPortWidth() == 320);
 
         jsonObject.put(WXMetaModule.WIDTH,"-200");
         mMeta.setViewport(jsonObject.toString());
-        assertTrue(mMeta.mWXSDKInstance.getViewPortWidth() == 320);
+        assertTrue(mMeta.mWXSDKInstance.getInstanceViewPortWidth() == 320);
 
         jsonObject.put(WXMetaModule.WIDTH,"error");
         mMeta.setViewport(jsonObject.toString());
-        assertTrue(mMeta.mWXSDKInstance.getViewPortWidth() == 320);
+        assertTrue(mMeta.mWXSDKInstance.getInstanceViewPortWidth() == 320);
 
 
         mMeta.setViewport("ads");
-        assertTrue(mMeta.mWXSDKInstance.getViewPortWidth() == 320);
+        assertTrue(mMeta.mWXSDKInstance.getInstanceViewPortWidth() == 320);
     }
 
 }

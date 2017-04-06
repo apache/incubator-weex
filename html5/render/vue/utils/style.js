@@ -1,22 +1,15 @@
-import { normalize } from './flex'
+// @flow
 
 /**
  * remove comments from a cssText.
  */
-export function trimComment (cssText) {
+export function trimComment (cssText: string): string {
   return cssText.replace(/(?:\/\*)[^*]*\*\//g, '')
 }
 
-/**
- * add flex prefixes for compatibility conisderation.
- */
-export function normalizeStyles (style) {
-  return normalize(style)
-}
+let support: boolean | null = null
 
-let support = null
-
-export function supportSticky () {
+export function supportSticky (): boolean {
   if (support !== null) {
     return support
   }

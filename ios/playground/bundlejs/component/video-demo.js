@@ -44,9 +44,9 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __weex_template__ = __webpack_require__(179)
-	var __weex_style__ = __webpack_require__(180)
-	var __weex_script__ = __webpack_require__(181)
+	var __weex_template__ = __webpack_require__(191)
+	var __weex_style__ = __webpack_require__(192)
+	var __weex_script__ = __webpack_require__(193)
 
 	__weex_define__('@weex-component/a6ac855fc70c0bffbf2b317f9487878f', [], function(__weex_require__, __weex_exports__, __weex_module__) {
 
@@ -523,8 +523,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2121,7 +2120,19 @@
 /* 176 */,
 /* 177 */,
 /* 178 */,
-/* 179 */
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2179,7 +2190,7 @@
 	}
 
 /***/ },
-/* 180 */
+/* 192 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -2191,7 +2202,7 @@
 	}
 
 /***/ },
-/* 181 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module, exports, __weex_require__){'use strict';

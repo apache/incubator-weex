@@ -1,3 +1,30 @@
+<script>
+  ;(function(){
+    var currentOrigin = location.origin || 'https://weex-project.io',
+        currentPathname = location.pathname,
+        currentLang = navigator.language || navigator.browserLanguage || 'en',
+        selectedLang = '';
+
+    if (window.localStorage) {
+      selectedLang = window.localStorage.getItem('lang')
+      currentLang = selectedLang ? selectedLang : currentLang
+    }
+
+    if (/zh|cn/i.test(currentLang)) { // Chinese
+      if (currentPathname.indexOf('/cn/') != 0) {
+        location.href = currentOrigin + '/cn/'
+      }
+    } else if (/en/i.test(currentLang)) { // English
+      if (!/^\/$|^\/index/.test(currentPathname)) {
+        location.href = currentOrigin
+      }
+    } else { // Other
+      if (!/^\/$|^\/index/.test(currentPathname)) {
+        location.href = currentOrigin
+      }
+    }
+  })();
+</script>
 <div class="scene header" style="background: #00BDFF;">
   <div class="scene-container">
     <div class="galaxy left">
@@ -206,6 +233,6 @@ var swiper = new Swiper('.swiper-container', {
   loop: false,
   autoplay: false,
   autoplayDisableOnInteraction: false
-})
+});
 </script>
     

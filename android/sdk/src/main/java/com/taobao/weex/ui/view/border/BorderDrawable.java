@@ -218,6 +218,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
@@ -357,7 +358,7 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  public void setBorderWidth(int position, float width) {
+  public void setBorderWidth(@BorderWidthStyleColorType int position, float width) {
     if (mBorderWidth == null) {
       mBorderWidth = new SparseArray<>(5);
       mBorderWidth.put(Spacing.ALL, DEFAULT_BORDER_WIDTH);
@@ -370,11 +371,11 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  float getBorderWidth(int position) {
+  float getBorderWidth(@BorderWidthStyleColorType int position) {
     return BorderUtil.fetchFromSparseArray(mBorderWidth, position, DEFAULT_BORDER_WIDTH);
   }
 
-  public void setBorderRadius(int position, float radius) {
+  public void setBorderRadius(@BorderRadiusType int position, float radius) {
     if (mBorderRadius == null) {
       mBorderRadius = new SparseArray<>(5);
       mBorderRadius.put(Spacing.ALL, DEFAULT_BORDER_RADIUS);
@@ -386,17 +387,10 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  /**
-   * This method is only used for Unit test, do not call this method, use
-   * {@link #getBorderRadius(SparseArray, int)} instead.
-   * @param position the index of the edge
-   * @return the radius considering border-overlapping of the corner.
-   */
-  @Deprecated
-  float getBorderRadius(int position) {
+  @VisibleForTesting
+  float getBorderRadius(@BorderRadiusType int position) {
     return getBorderRadius(mOverlappingBorderRadius, position);
   }
-
 
   public
   @NonNull
@@ -412,7 +406,7 @@ public class BorderDrawable extends Drawable {
         bottomLeftRadius,bottomLeftRadius};
   }
 
-  public void setBorderColor(int position, int color) {
+  public void setBorderColor(@BorderWidthStyleColorType int position, int color) {
     if (mBorderColor == null) {
       mBorderColor = new SparseIntArray(5);
       mBorderColor.put(Spacing.ALL, DEFAULT_BORDER_COLOR);
@@ -423,11 +417,11 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  int getBorderColor(int position) {
+  int getBorderColor(@BorderWidthStyleColorType int position) {
     return BorderUtil.fetchFromSparseArray(mBorderColor, position, DEFAULT_BORDER_COLOR);
   }
 
-  public void setBorderStyle(int position, @NonNull String style) {
+  public void setBorderStyle(@BorderWidthStyleColorType int position, @NonNull String style) {
     if (mBorderStyle == null) {
       mBorderStyle = new SparseIntArray(5);
       mBorderStyle.put(Spacing.ALL, DEFAULT_BORDER_STYLE.ordinal());
@@ -443,7 +437,7 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  int getBorderStyle(int position) {
+  int getBorderStyle(@BorderWidthStyleColorType int position) {
     return BorderUtil.fetchFromSparseArray(mBorderStyle, position, BorderStyle.SOLID.ordinal());
   }
 
@@ -456,9 +450,13 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
-  public void setImage(Shader shader){
-    mShader=shader;
+  public void setImage(Shader shader) {
+    mShader = shader;
     invalidateSelf();
+  }
+
+  public boolean hasImage(){
+    return mShader!=null;
   }
 
   public boolean isRounded() {
@@ -477,7 +475,7 @@ public class BorderDrawable extends Drawable {
     return contentClip;
   }
 
-  private float getBorderRadius(@Nullable SparseArray<Float> borderRadius, int position) {
+  private float getBorderRadius(@Nullable SparseArray<Float> borderRadius, @BorderRadiusType int position) {
     return BorderUtil.fetchFromSparseArray(borderRadius, position, DEFAULT_BORDER_RADIUS);
   }
 
@@ -628,14 +626,13 @@ public class BorderDrawable extends Drawable {
     }
   }
 
-  private void preparePaint(int side) {
+  private void preparePaint(@BorderWidthStyleColorType int side) {
     float borderWidth = getBorderWidth(side);
     int color = WXViewUtils.multiplyColorAlpha(getBorderColor(side), mAlpha);
     BorderStyle borderStyle = BorderStyle.values()[getBorderStyle(side)];
     Shader shader = borderStyle.getLineShader(borderWidth, color, side);
     mPaint.setShader(shader);
     mPaint.setColor(color);
-    mPaint.setStrokeWidth(borderWidth);
     mPaint.setStrokeCap(Paint.Cap.ROUND);
   }
 }

@@ -1,5 +1,5 @@
-import { throttle } from './func'
-import { createEvent } from '../utils'
+import { throttle, extend } from './func'
+import { createEvent } from './event'
 
 export function getParentScroller (vnode) {
   if (!vnode) return null
@@ -55,8 +55,9 @@ export function watchAppear (context) {
   if (!context) return null
 
   context.$nextTick(() => {
-    if (context.$options && context.$options._parentListeners) {
-      const on = context.$options._parentListeners
+    if ((context.$options && context.$options._parentListeners)
+      || (context.$vnode && context.$vnode.data && context.$vnode.data.on)) {
+      const on = extend({}, context.$options._parentListeners, context.$vnode.data.on)
       if (on.appear || on.disappear) {
         const scroller = getParentScroller(context)
         let isWindow = false
@@ -74,7 +75,7 @@ export function watchAppear (context) {
           if (on.appear.fn) {
             on.appear = on.appear.fn
           }
-          on.appear(createEvent(context.$el, 'appear', { direction: 'down' }))
+          on.appear(createEvent(context.$el, 'appear', { direction: null }))
         }
         const handler = throttle(event => {
           const visible = isElementVisible(context.$el, isWindow ? document.body : container)
@@ -94,10 +95,11 @@ export function watchAppear (context) {
               listener = listener.fn
             }
             const scrollTop = container.scrollTop || window.pageYOffset
-            lastScrollTop = scrollTop
             listener && listener(createEvent(context.$el, type, {
-              direction: scrollTop > lastScrollTop ? 'down' : 'up'
+              direction: scrollTop < lastScrollTop ? 'down'
+                : scrollTop > lastScrollTop ? 'up' : null
             }))
+            lastScrollTop = scrollTop
           }
         }, 25, true)
 

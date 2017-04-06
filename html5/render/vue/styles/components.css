@@ -4,6 +4,12 @@
   border-style: solid;
 }
 
+.weex-flex-ct {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+
 .weex-ct {
   box-sizing: border-box;
   display: -webkit-box;
@@ -320,6 +326,7 @@ body > .weex-scroller {
 
 .weex-indicator {
   position: absolute;
+  z-index: 10;
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;

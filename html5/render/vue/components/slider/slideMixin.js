@@ -89,7 +89,9 @@ export default {
         const nextElm = this._cells[nextIndex].elm
         const currentElm = this._cells[this.currentIndex].elm
 
+        // put current slide on the top.
         currentElm.style.zIndex = 1
+
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
           this._clonePrev && removeClone(this._clonePrev, lastPrev)

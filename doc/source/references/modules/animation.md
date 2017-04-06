@@ -103,4 +103,4 @@ properties of `transform`:
 </style>
 ```
 
-[try it](../../examples/animation.html)
+[try it](http://dotwe.org/vue/2d1b61bef061448c1a5a13eac9624410)

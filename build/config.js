@@ -6,6 +6,7 @@ const postcss = require('rollup-plugin-postcss')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const uglify = require('rollup-plugin-uglify')
 const commonjs = require('rollup-plugin-commonjs')
+const flow = require('rollup-plugin-flow-no-whitespace')
 const buble = require('rollup-plugin-buble')
 const subversion = require('../package.json').subversion
 
@@ -97,6 +98,7 @@ function getConfig (name, minify) {
         'process.env.NODE_DEBUG': false
       }),
       commonjs(),
+      flow(/*{ pretty: true }*/),
       buble()
     ])
   }
@@ -105,6 +107,10 @@ function getConfig (name, minify) {
     config.plugins.push(uglify())
   }
   else {
+    /**
+     * rollup-plugin-flow will cause soucemap problem.
+     * use rollup-plugin-flow-no-whitespace can fixe this.
+     */
     config.sourceMap = 'inline'
     config.plugins.unshift(eslint({ exclude: ['**/*.json', '**/*.css'] }))
   }

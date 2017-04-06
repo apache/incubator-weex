@@ -208,6 +208,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXHeader;
 
 import java.lang.ref.WeakReference;
 
@@ -219,6 +220,7 @@ import java.lang.ref.WeakReference;
  */
 public class ListBaseViewHolder extends RecyclerView.ViewHolder {
   private int mViewType;
+  private boolean isRecycled = true;
   private WeakReference<WXComponent> mComponent;
 
   public ListBaseViewHolder(WXComponent component, int viewType) {
@@ -226,9 +228,40 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
     mViewType = viewType;
     mComponent = new WeakReference(component);
   }
+
   public ListBaseViewHolder(View view, int viewType) {
     super(view);
     mViewType = viewType;
+  }
+
+  public boolean isRecycled() {
+    return isRecycled;
+  }
+
+  public void recycled() {
+    if (mComponent != null && mComponent.get() != null) {
+      mComponent.get().recycled();
+      isRecycled = true;
+
+    }
+  }
+
+  public void bindData(WXComponent component) {
+    if (mComponent != null && mComponent.get() != null) {
+      mComponent.get().bindData(component);
+      isRecycled = false;
+    }
+  }
+    
+  public boolean isFullSpan() {
+    return mComponent != null && mComponent.get() instanceof WXHeader;
+  }
+
+  public boolean canRecycled() {
+    if (mComponent != null && mComponent.get() != null) {
+      return mComponent.get().canRecycled();
+    }
+    return true;
   }
 
   public View getView() {
@@ -238,12 +271,13 @@ public class ListBaseViewHolder extends RecyclerView.ViewHolder {
   public int getViewType() {
     return mViewType;
   }
-  public void setComponentUsing(boolean using){
-    if(mComponent!=null)
-      if (mComponent.get() != null)
-        mComponent.get().setUsing(using);
+
+  public void setComponentUsing(boolean using) {
+    if (mComponent != null && mComponent.get() != null)
+      mComponent.get().setUsing(using);
   }
-  public WXComponent getComponent(){
+
+  public WXComponent getComponent() {
     return mComponent != null ? mComponent.get() : null;
   }
 }

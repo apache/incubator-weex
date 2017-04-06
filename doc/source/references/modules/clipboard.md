@@ -95,4 +95,4 @@ sets the text to clipboard, having the same effect as copying manually.
 </style>
 ```
 
-[try it](../../examples/clipboard.html)
+[try it](http://dotwe.org/vue/126d3cfc5533393e28943978b07aa5c1)

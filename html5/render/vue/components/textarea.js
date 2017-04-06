@@ -42,8 +42,7 @@ export default {
         value: this.value
       },
       on: this.createKeyboardEvent(events),
-      staticClass: 'weex-textarea weex-el',
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
-    }, this.value)
+      staticClass: 'weex-textarea weex-el'
+    })
   }
 }

@@ -1,15 +1,11 @@
-import { extend, trimComment, normalizeStyles } from '../utils'
+import {
+  camelizeKeys,
+  hyphenateKeys,
+  extend,
+  trimComment
+} from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
-// import { validateStyles } from '../validator'
-
-// let warned = false
-
-// function hyphenateExtend (to, from) {
-//   if (!from) { return }
-//   for (const k in from) {
-//     to[hyphenate(k)] = from[k]
-//   }
-// }
+import addPrefix from 'inline-style-prefixer/static'
 
 function getHeadStyleMap () {
   if (process.env.NODE_ENV === 'development') {
@@ -76,11 +72,22 @@ export default {
   },
 
   methods: {
-
-    _normalizeInlineStyles (data) {
-      const style = extend({}, data.staticStyle, data.style)
-      const res = normalizeStyles(style)
-      return res
+    $processStyle (style) {
+      window._style_processing_added = true
+      if (!style) {
+        return
+      }
+      if (window._process_style) {
+        return window._process_style(style)
+      }
+      if (style.display === 'flex') {
+        this.$nextTick(() => {
+          if (this.$el) {
+            this.$el.classList.add('weex-flex-ct')
+          }
+        })
+      }
+      return hyphenateKeys(addPrefix(camelizeKeys(style)))
     },
 
     _getScopeStyle (classNames) {
@@ -134,40 +141,26 @@ export default {
       return wh
     },
 
-    // get style from class, staticClass, style and staticStyle.
+    /**
+     * get style from class, staticClass, style and staticStyle.
+     * merge styles priority: high -> low
+     *  1. data.style (bound style).
+     *  2. data.staticStyle (inline styles).
+     *  3. data.class style (bound class names).
+     *  4. data.staticClass style (scoped styles or static classes).
+     */
     _getComponentStyle (data) {
       const staticClassNames = (typeof data.staticClass === 'string') ? data.staticClass.split(' ') : (data.staticClass || [])
       const classNames = (typeof data.class === 'string') ? data.class.split(' ') : (data.class || [])
-      /**
-       * merge styles. priority: high -> low
-       *  1. data.style (bound style).
-       *  2. data.staticStyle (inline styles).
-       *  3. data.class style (bound class names).
-       *  4. data.staticClass style (scoped styles or static classes).
-       */
       const clsNms = staticClassNames.concat(classNames)
       const style = this._getScopeStyle(clsNms)
-      const res = normalizeStyles(extend(style, data.staticStyle, data.style))
+      const res = extend(style, data.staticStyle, data.style)
       return res
-    },
-
-    // merge static styles and static class styles into $vnode.data.mergedStyles.
-    _mergeStyles () {
-      const vnode = this.$options._parentVnode || {}
-      const data = vnode.data
-      if (!data) { return }
-      this.$options._parentVnode.data.staticStyle = this._getComponentStyle(data)
     },
 
     _getParentRect () {
       const parentElm = this.$options._parentElm
       return parentElm && parentElm.getBoundingClientRect()
-    },
-
-    _getParentRectAsync (cb) {
-      this.$nextTick(function () {
-        return cb && cb.call(this, this.getParentRectSync())
-      })
     }
   }
 }

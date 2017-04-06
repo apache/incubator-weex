@@ -473,23 +473,11 @@ class WXRenderStatement {
       return;
     }
 
-    float offsetFloat = 0;
-    if (options != null) {
-      String offset = options.get("offset") == null ? "0" : options.get("offset").toString();
-      if (offset != null) {
-        try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset),mWXSDKInstance.getViewPortWidth());
-        }catch (Exception e ){
-           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
-        }
-      }
-    }
-
     Scrollable scroller = component.getParentScroller();
     if (scroller == null) {
       return;
     }
-    scroller.scrollTo(component,(int)offsetFloat);
+    scroller.scrollTo(component,options);
   }
 
   /**
@@ -550,14 +538,14 @@ class WXRenderStatement {
     WXComponent component = mRegistry.get(ref);
     Map<String, Object> options = new HashMap<>();
     if (component != null) {
-      Map<String, String> size = new HashMap<>();
+      Map<String, Float> size = new HashMap<>();
       Rect sizes = component.getComponentSize();
-      size.put("width", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.width(),mWXSDKInstance.getViewPortWidth())));
-      size.put("height", String.valueOf(WXViewUtils.getWebPxByWidth(sizes.height(),mWXSDKInstance.getViewPortWidth())));
-      size.put("bottom",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.bottom,mWXSDKInstance.getViewPortWidth())));
-      size.put("left",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.left,mWXSDKInstance.getViewPortWidth())));
-      size.put("right",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.right,mWXSDKInstance.getViewPortWidth())));
-      size.put("top",String.valueOf(WXViewUtils.getWebPxByWidth(sizes.top,mWXSDKInstance.getViewPortWidth())));
+      size.put("width", WXViewUtils.getWebPxByWidth(sizes.width(),mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("height", WXViewUtils.getWebPxByWidth(sizes.height(),mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("bottom",WXViewUtils.getWebPxByWidth(sizes.bottom,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("left",WXViewUtils.getWebPxByWidth(sizes.left,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("right",WXViewUtils.getWebPxByWidth(sizes.right,mWXSDKInstance.getInstanceViewPortWidth()));
+      size.put("top",WXViewUtils.getWebPxByWidth(sizes.top,mWXSDKInstance.getInstanceViewPortWidth()));
       options.put("size", size);
       options.put("result", true);
     } else {

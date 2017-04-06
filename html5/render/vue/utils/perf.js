@@ -1,3 +1,4 @@
+// @flow
 /**
  * @fileOverview: perf data recorder.
  */
@@ -5,37 +6,50 @@
 import { debounce, depress } from './func'
 
 // performance tracker for weex.
-const perf = window._weex_perf = {
+const perf: {
+  earliestBeforeCreates: Array<number>,
+  latestMounts: Array<number>,
+  earliestBeforeUpdates: Array<number>,
+  latestUpdates: Array<number>,
+  latestRenderFinishes: Array<number>,
+  // createTime: earliest beforeCreate -> latest mounted.
+  createTime: Array<{ start: number, end: number, duration: number }>,
+  // updateTime: earliest beforeUpdate -> latest updated.
+  updateTime: Array<{ start: number, end: number, duration: number }>,
+  // renderTime: earliest beforeCreate/beforeUpdate -> latest img loaded.
+  renderTime: Array<{ start: number, end: number, duration: number }>,
+  entries: Array<{ requestStart: number, responseEnd: number }>,
+  time: {},
+  firstAllMountedTime: ?number
+} = window._weex_perf = {
   earliestBeforeCreates: [],
   latestMounts: [],
   earliestBeforeUpdates: [],
   latestUpdates: [],
   latestRenderFinishes: [],
-  // createTime: earliest beforeCreate -> latest mounted.
   createTime: [],
-  // updateTime: earliest beforeUpdate -> latest updated.
   updateTime: [],
-  // renderTime: earliest beforeCreate/beforeUpdate -> latest img loaded.
   renderTime: [],
   entries: [],
-  time: {}
+  time: {},
+  firstAllMountedTime: null
 }
 
 const tmp = {}
 
-const IMG_REC_INDENT = 500  // record loading events after 500ms towards last recording.
+const IMG_REC_INDENT: number = 500  // record loading events after 500ms towards last recording.
 
-let earliestBeforeUpdateTime = 0
-let earliestBeforeCreateTime = 0
+let earliestBeforeUpdateTime: number = 0
+let earliestBeforeCreateTime: number = 0
 
-function getNow () {
+function getNow (): number {
   return performance.now ? performance.now() : new Date().getTime()
 }
 
-function getEntries () {
+function getEntries (): Array<any> {
   return performance.getEntries
     ? performance.getEntries()
-    : [{ responseEnd: getNow() }]
+    : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }
 
 /**
@@ -65,14 +79,14 @@ const debouncedTagImg = debounce(function () {
 
   const num = perf.renderTime.length
   perf[`screenTime${num}`] = end
-  weex.emit('renderfinish', end)
+  window.weex.emit('renderfinish', end)
   if (process.env.NODE_ENV === 'development') {
     console.log(`screenTime[${num}]: ${end} ms.`)
     console.log('_weex_perf:', window._weex_perf)
   }
 }, IMG_REC_INDENT)
 
-export function tagImg () {
+export function tagImg (): void {
   debouncedTagImg()
 }
 
@@ -85,7 +99,7 @@ const depressedTagBeforeCreate = depress(function () {
   perf.earliestBeforeCreates.push(now)
 }, 25)
 
-export function tagBeforeCreate () {
+export function tagBeforeCreate (): void {
   depressedTagBeforeCreate()
 }
 
@@ -109,7 +123,7 @@ const debouncedTagMounted = debounce(function () {
   }
 }, 25)
 
-export function tagMounted () {
+export function tagMounted (): void {
   debouncedTagMounted()
 }
 
@@ -122,7 +136,7 @@ const depressedTagBeforeUpdate = depress(function () {
   perf.earliestBeforeUpdates.push(now)
 }, 25)
 
-export function tagBeforeUpdate () {
+export function tagBeforeUpdate (): void {
   depressedTagBeforeUpdate()
 }
 
@@ -139,15 +153,15 @@ const debouncedTagUpdated = debounce(function () {
   })
 }, 25)
 
-export function tagUpdated () {
+export function tagUpdated (): void {
   debouncedTagUpdated()
 }
 
-export function tagBegin (name) {
+export function tagBegin (name: string): void {
   tmp[name] = getNow()
 }
 
-export function tagEnd (name) {
+export function tagEnd (name: string): void {
   let pre = perf.time[name]
   if (!pre) {
     pre = 0

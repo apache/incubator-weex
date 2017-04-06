@@ -7,6 +7,7 @@
  */
 
 #import "WXSDKEngine.h"
+#import "WXDebugTool.h"
 #import "WXModuleFactory.h"
 #import "WXHandlerFactory.h"
 #import "WXComponentFactory.h"
@@ -71,6 +72,8 @@
     [self registerComponent:@"image" withClass:NSClassFromString(@"WXImageComponent") withProperties:nil];
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
+    [self registerComponent:@"recycler" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
+    [self registerComponent:@"waterfall" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
     
     [self registerComponent:@"header" withClass:NSClassFromString(@"WXHeaderComponent")];
     [self registerComponent:@"cell" withClass:NSClassFromString(@"WXCellComponent")];
@@ -166,14 +169,10 @@
 
 + (void)initSDKEnvironment
 {
-    WX_MONITOR_PERF_START(WXPTInitalize)
-    WX_MONITOR_PERF_START(WXPTInitalizeSync)
     
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
-    
-    WX_MONITOR_PERF_END(WXPTInitalizeSync)
     
 #if TARGET_OS_SIMULATOR
     static dispatch_once_t onceToken;
@@ -203,14 +202,22 @@
 
 + (void)initSDKEnvironment:(NSString *)script
 {
+    
+    WX_MONITOR_PERF_START(WXPTInitalize)
+    WX_MONITOR_PERF_START(WXPTInitalizeSync)
+    
     if (!script || script.length <= 0) {
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
     }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self registerDefaults];
+        [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    });
     
-    [self registerDefaults];
+    WX_MONITOR_PERF_END(WXPTInitalizeSync)
     
-    [[WXSDKManager bridgeMgr] executeJsFramework:script];
 }
 
 + (void)registerDefaults
@@ -255,19 +262,33 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+    [self restartWithScript:script];
+}
+
++ (void)restartWithScript:(NSString*)script
+{
     NSDictionary *components = [WXComponentFactory componentConfigs];
     NSDictionary *modules = [WXModuleFactory moduleConfigs];
     NSDictionary *handlers = [WXHandlerFactory handlerConfigs];
     [WXSDKManager unload];
     [WXComponentFactory unregisterAllComponents];
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
-    NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     
     [self _originalRegisterComponents:components];
     [self _originalRegisterModules:modules];
     [self _originalRegisterHandlers:handlers];
     
     [[WXSDKManager bridgeMgr] executeJsFramework:script];
+    
+    NSDictionary *jsSerices = [WXDebugTool jsServiceCache];
+    for(NSString *serviceName in jsSerices) {
+        NSDictionary *service = [jsSerices objectForKey:serviceName];
+        NSString *serviceName = [service objectForKey:@"name"];
+        NSString *serviceScript = [service objectForKey:@"script"];
+        NSDictionary *serviceOptions = [service objectForKey:@"options"];
+        [WXSDKEngine registerService:serviceName withScript:serviceScript withOptions:serviceOptions];
+    }
 }
 
 + (void)connectDebugServer:(NSString*)URL

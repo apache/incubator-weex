@@ -1,20 +1,23 @@
+// @flow
+
 import { isElementVisible } from './component'
 import { createEvent, dispatchEvent } from './event'
 import { throttle } from './func'
-import { isArray } from './type'
 import { tagImg } from './perf'
 
 const SCREEN_REC_LIMIT = 3  // just record the first 3 times for screen-render finishing.
 let doRecord = true
 
-function preLoadImg (src, loadCallback, errorCallback) {
+function preLoadImg (src: string,
+    loadCallback: ?(Event) => void,
+    errorCallback: ?(Event) => void): void {
   const img = new Image()
   img.onload = loadCallback ? loadCallback.bind(img) : null
   img.onerror = errorCallback ? errorCallback.bind(img) : null
   img.src = src
 }
 
-export function applySrc (item, src, placeholderSrc) {
+export function applySrc (item: HTMLElement, src: ?string, placeholderSrc: ?string): void {
   if (!src) { return }
   function finallCb () {
     item.removeAttribute('img-src')
@@ -27,28 +30,30 @@ export function applySrc (item, src, placeholderSrc) {
       }
     }
   }
-  preLoadImg(src, function () {
-    item.style.backgroundImage = `url(${src})`
+  preLoadImg(src, function (evt) {
+    item.style.backgroundImage = `url(${src || ''})`
     const { width: naturalWidth, height: naturalHeight } = this
     dispatchEvent(item, createEvent(item, 'load', { naturalWidth, naturalHeight }))
     finallCb()
-  }, function () {
+  }, function (evt) {
     dispatchEvent(item, createEvent(item, 'error'))
     if (placeholderSrc) {
       preLoadImg(placeholderSrc, function () {
-        item.style.backgroundImage = `url(${placeholderSrc})`
+        item.style.backgroundImage = `url(${placeholderSrc || ''})`
       })
     }
     finallCb()
   })
 }
 
-export function fireLazyload (el, ignoreVisibility) {
-  if (isArray(el)) {
+export function fireLazyload (el: Array<HTMLElement> | HTMLElement | null, ignoreVisibility: ?boolean): void {
+  if (Array.isArray(el)) {
     return el.forEach(ct => fireLazyload(ct))
   }
-  const imgs = (el || document.body).querySelectorAll('[img-src]')
-  for (let i = 0; i < imgs.length; i++) {
+  el = el || document.body
+  if (!el) { return }
+  const imgs: NodeList = (el || document.body).querySelectorAll('[img-src]')
+  for (let i: number = 0; i < imgs.length; i++) {
     const img = imgs[i]
     if (typeof ignoreVisibility === 'boolean' && ignoreVisibility) {
       applySrc(img, img.getAttribute('img-src'), img.getAttribute('img-placeholder'))
@@ -76,12 +81,12 @@ export function fireLazyload (el, ignoreVisibility) {
  *      }
  */
 const cache = {}
-let _uid = 0
-export function getThrottleLazyload (wait = 16, el = document.body) {
-  let id = el.dataset.throttleId
-  if (!id) {
+let _uid: number = 1
+export function getThrottleLazyload (wait: number = 16, el: HTMLElement | null = document.body) {
+  let id: number = +(el && el.dataset.throttleId)
+  if (isNaN(id) || id <= 0) {
     id = _uid++
-    el.setAttribute('data-throttle-id', id)
+    el && el.setAttribute('data-throttle-id', id + '')
   }
 
   !cache[id] && (cache[id] = {})

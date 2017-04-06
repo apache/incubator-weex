@@ -1,8 +1,15 @@
 <template>
   <div>
-    <list class="list">
-      <refresh  class = "refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
-        <text if="{{(refresh_display==='hide')}}"> ↓ pull to refresh </text>
+    <div style="background-color: #eeeeee">
+      <text class="count">Appear items:{{appearMin}} - {{appearMax}}</text>
+      <div style="height: 20px;width: 750px;border-color: black;border-width: 2px;justify-content: center">
+        <div style="height: 14px;width: {{progress_width}};margin-left:{{progress}};background-color: gray"></div>
+      </div>
+      <text style="width: 750px">{{event}}</text>
+    </div>
+    <list id="list" class="list" onscroll="{{onScroll}}" offset-accuracy="5">
+      <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
+        <text if="{{(refresh_display==='hide')}}"> ↓ pull to refresh</text>
         <loading-indicator class="indicator"></loading-indicator>
       </refresh>
       <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{rows}}" index="{{$index}}">
@@ -11,26 +18,27 @@
         </div>
       </cell>
       <loading class="loading-view" display="{{loading_display}}" onloading="onloading">
-        <text if="{{(loading_display==='hide')}}">↑ Loadmore </text>
+        <text if="{{(loading_display==='hide')}}">↑ Loadmore</text>
         <loading-indicator class="indicator"></loading-indicator>
       </loading>
     </list>
-    <text class="count">Appear items:{{appearMin}} - {{appearMax}}</text>
   </div>
 </template>
 
 <style>
   .list {
-    height:850
+    height:850;
   }
+
   .count {
     font-size: 48;
-    margin:10;
+    margin: 10;
   }
+
   .indicator {
     height: 40;
     width: 40;
-    color:#45b5f0;
+    color: #45b5f0;
   }
 
   .refresh-arrow {
@@ -41,16 +49,22 @@
   .row {
     width: 750;
   }
-  
+
   .item {
     justify-content: center;
     border-bottom-width: 2;
     border-bottom-color: #c0c0c0;
     height: 100;
-    padding:20;
+    padding: 20;
   }
+
+  .item:active {
+    background-color: #00BFFF;
+  }
+
   .item-title {
   }
+
   .refresh-view {
     width: 750;
     height: 100;
@@ -62,6 +76,7 @@
     -webkit-box-align: center;
     align-items: center;
   }
+
   .loading-view {
     width: 750;
     height: 100;
@@ -73,6 +88,7 @@
     -webkit-box-align: center;
     align-items: center;
   }
+
   .indicator {
     height: 60;
     width: 60;
@@ -81,7 +97,8 @@
 </style>
 
 <script>
-
+  var dom = weex.requireModule('dom');
+  var isFirst = true;
   module.exports = {
     methods: {
       onappear: function (e) {
@@ -91,7 +108,7 @@
         appearIds.push(appearId);
         this.getMinAndMaxIds(appearIds);
       },
-      ondisappear:function (e) {
+      ondisappear: function (e) {
         var disAppearId = this.rows[e.target.attr.index].id;
         nativeLog('+++++', disAppearId);
         var appearIds = this.appearIds;
@@ -101,15 +118,15 @@
         }
         this.getMinAndMaxIds(appearIds);
       },
-      getMinAndMaxIds:function (appearIds) {
-        appearIds.sort(function(a, b) {
+      getMinAndMaxIds: function (appearIds) {
+        appearIds.sort(function (a, b) {
           return a - b;
         });
         this.appearIds = appearIds;
         this.appearMax = appearIds[appearIds.length - 1];
         this.appearMin = appearIds[0];
       },
-      onrefresh: function(e) {
+      onrefresh: function (e) {
         var self = this;
         self.refresh_display = 'show';
         self.$call('modal', 'toast', {
@@ -121,7 +138,7 @@
         }, 3000);
       },
 
-      onloading: function() {
+      onloading: function () {
         var self = this;
         self.loading_display = 'show';
         self.$call('modal', 'toast', {
@@ -130,19 +147,37 @@
 
         this.$call('timer', 'setTimeout', function () {
           if (self.rows.length <= 33) {
-              self.rows.push(self.moreRows[self.rows.length - 29]);
-            }
+            self.rows.push(self.moreRows[self.rows.length - 29]);
+          }
           self.loading_display = 'hide';
         }, 3000);
       },
+
+      onScroll: function (e) {
+        var self = this;
+        this.event = 'contentOffset: ' + JSON.stringify(e.contentOffset) + '\ncontentSize: ' + JSON.stringify(e.contentSize);
+        dom.getComponentRect(this.$el('list'), function (ret) {
+          if (e.contentOffset.x == 0 && e.contentOffset.y == 0 && isFirst) {
+            isFirst = false;
+            return;
+          }
+          var listHeight = ret.size.height;
+          self.progress_width = (listHeight / e.contentSize.height) * 750;
+          var offsetY = e.contentOffset.y > 0 ? 0 : Math.abs(e.contentOffset.y);
+          self.progress = (offsetY / (e.contentSize.height - listHeight)) * (750 - self.progress_width);
+        });
+      }
     },
     data: {
+      progress_width: 0,
+      progress:0,
+      event:'-',
       refresh_display: 'hide',
       loading_display: 'hide',
-      appearMin:1,
-      appearMax:1,
-      appearIds:[],
-      rows:[
+      appearMin: 1,
+      appearMax: 1,
+      appearIds: [],
+      rows: [
         {id: 1},
         {id: 2},
         {id: 3},

@@ -9,7 +9,7 @@
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.9.5"
+#define WX_SDK_VERSION @"0.11.0"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
@@ -80,6 +80,7 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 }
 
 #define WX_MODULE_EVENT_FIRE_NOTIFICATION  @"WX_MODULE_EVENT_FIRE_NOTIFICATION"
+#define WX_ICONFONT_DOWNLOAD_NOTIFICATION  @"WX_ICONFONT_DOWNLOAD_FINISH_NOTIFICATION"
 
 /**
  *  @abstract export public method

@@ -24,6 +24,14 @@ export const camelize = cached(str => {
   return str.replace(camelizeRE, (_, c) => c.toUpperCase())
 })
 
+export function camelizeKeys (obj) {
+  const res = {}
+  for (const key in obj) {
+    res[camelize(key)] = obj[key]
+  }
+  return res
+}
+
 /**
  * Capitalize a string.
  */
@@ -41,6 +49,26 @@ export const hyphenate = cached(str => {
     .replace(hyphenateRE, '$1-$2')
     .toLowerCase()
 })
+
+export function hyphenateKeys (obj) {
+  const res = {}
+  for (const key in obj) {
+    res[hyphenate(key)] = obj[key]
+  }
+  return res
+}
+
+// const vendorsReg = /webkit-|moz-|o-|ms-/
+// export function hyphenateStyleKeys (obj) {
+//   const res = {}
+//   for (const key in obj) {
+//     const hk = hyphenate(key).replace(vendorsReg, function ($0) {
+//       return '-' + $0
+//     })
+//     res[hk] = obj[key]
+//   }
+//   return res
+// }
 
 export function camelToKebab (name) {
   if (!name) { return '' }

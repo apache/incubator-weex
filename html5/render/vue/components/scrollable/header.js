@@ -51,8 +51,7 @@ export default {
       on: this._createEventMap(),
       ref: 'header',
       staticClass: 'weex-header weex-ct',
-      class: { sticky: this.sticky, iossticky: this.supportSticky },
-      staticStyle: this._normalizeInlineStyles(this.$vnode.data)
+      class: { sticky: this.sticky, iossticky: this.supportSticky }
     }, this.$slots.default)
   }
 }
