@@ -35,6 +35,7 @@
 {
     WXAssertMainThread();
     
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.rootView addSubview:subcomponent.view];
         return;
@@ -66,6 +67,7 @@
 
 - (void)moveToSuperview:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     [self removeFromSuperview];
     [newSupercomponent insertSubview:self atIndex:index];
 }
@@ -111,6 +113,7 @@
 
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (styles[@"boxShadow"]) {
         _lastBoxShadow = _boxShadow;
         _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;

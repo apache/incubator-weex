@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, WXComponentType) {
+    WXComponentTypeCommon = 0,
+    WXComponentTypeVirtual
+};
+
 typedef NS_ENUM(NSUInteger, WXScrollDirection) {
     WXScrollDirectionVertical,
     WXScrollDirectionHorizontal,
