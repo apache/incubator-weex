@@ -15,10 +15,12 @@
 #import "WXRuleManager.h"
 #import "WXDefine.h"
 #import <pthread/pthread.h>
+#import <CoreText/CoreText.h>
 
 @interface WXText : UIView
 
 @property (nonatomic, strong) NSTextStorage *textStorage;
+@property (nonatomic, strong) NSMutableAttributedString * attributedString;
 
 @end
 
@@ -57,26 +59,59 @@
             [self.wx_component _resetNativeBorderRadius];
         });
     }
-    NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
-    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
-    
-    CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
-    NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
-    
-    [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
-    [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return image;
+    if (![[self.wx_component valueForKey:@"coretext"] boolValue]) {
+        NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
+        NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+        
+        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+        NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+        
+        [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
+        [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return image;
+    }else {
+        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+        // sufficient height for text to draw, or frame lines will be empty
+        textFrame.size.height = bounds.size.height*2;
+        
+        //flip the coordinate system
+        CGContextRetain(context);
+        CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+        CGContextTranslateCTM(context, 0, textFrame.size.height);
+        CGContextScaleCTM(context, 1.0, -1.0);
+        
+        //add path
+        CGMutablePathRef path = CGPathCreateMutable();
+        CGPathAddRect(path, NULL, textFrame);
+        NSMutableAttributedString * attributedStringCopy = [_attributedString mutableCopy];
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+        CTFrameDraw(frame, context);
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        CFRelease(frame);
+        CFRelease(framesetter);
+        CGPathRelease(path);
+        CGContextRelease(context);
+        
+        return image;
+    }
 }
 
 - (void)setTextStorage:(NSTextStorage *)textStorage
 {
     if (_textStorage != textStorage) {
         _textStorage = textStorage;
+        [self.wx_component setNeedsDisplay];
+    }
+}
+
+- (void)setAttributedString:(NSMutableAttributedString *)attributedString {
+    if (_attributedString != attributedString) {
+        _attributedString = attributedString;
         [self.wx_component setNeedsDisplay];
     }
 }
@@ -101,6 +136,10 @@
 
 @end
 
+@interface WXTextComponent()
+@property (nonatomic, assign)BOOL coretext;
+@end
+
 @implementation WXTextComponent
 {
     UIEdgeInsets _border;
@@ -119,7 +158,6 @@
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
-    
    
     pthread_mutex_t _textStorageMutex;
     pthread_mutexattr_t _textStorageMutexAttr;
@@ -145,7 +183,11 @@ static BOOL _isUsingTextStorageLock = NO;
             pthread_mutexattr_settype(&_textStorageMutexAttr, PTHREAD_MUTEX_RECURSIVE);
             pthread_mutex_init(&_textStorageMutex, &_textStorageMutexAttr);
         }
-        
+        if (attributes[@"coretext"]) {
+            _coretext = [WXConvert BOOL:attributes[@"coretext"]];
+        } else {
+            _coretext = YES;
+        }
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
     }
@@ -248,6 +290,7 @@ do {\
         pthread_mutex_lock(&_textStorageMutex);
     }
     ((WXText *)self.view).textStorage = _textStorage;
+    ((WXText *)self.view).attributedString = [self buildCTAttributeString];
     if (_isUsingTextStorageLock) {
         pthread_mutex_unlock(&_textStorageMutex);
     }
@@ -337,6 +380,71 @@ do {\
             [self setNeedsDisplay];
         });
     });
+}
+
+- (NSMutableAttributedString *)buildCTAttributeString {
+    
+    NSString *string = [self text] ?: @"";
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    
+    if (_color) {
+        [attributedString addAttribute:(id)kCTForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
+    }
+    
+    if (_fontFamily) {
+        NSString * keyPath = [NSString stringWithFormat:@"%@.tempSrc", _fontFamily];
+        NSString * fontSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        keyPath = [NSString stringWithFormat:@"%@.localSrc", _fontFamily];
+        NSString * fontLocalSrc = [[[WXRuleManager sharedInstance] getRule:@"fontFace"] valueForKeyPath:keyPath];
+        //custom localSrc is cached
+        if (!fontLocalSrc && fontSrc) {
+            // if use custom font, when the custom font download finish, refresh text.
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+        }
+    }
+    
+    // set font
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
+    CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName,
+                                           font.pointSize,
+                                           NULL);
+    if (ctFont) {
+        [attributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)(ctFont) range:NSMakeRange(0, string.length)];
+    }
+    
+    if(_textDecoration == WXTextDecorationUnderline){
+        [attributedString addAttribute:(id)kCTUnderlineStyleAttributeName value:@(kCTUnderlinePatternSolid | kCTUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
+    } else if(_textDecoration == WXTextDecorationLineThrough){
+        [attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlinePatternSolid | NSUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
+    }
+    
+    NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+    
+    if (_textAlign) {
+        paragraphStyle.alignment = _textAlign;
+    }
+    
+    if (_lineHeight) {
+        paragraphStyle.maximumLineHeight = _lineHeight;
+        paragraphStyle.minimumLineHeight = _lineHeight;
+    }
+    if (_lineHeight || _textAlign) {
+        [attributedString addAttribute:(id)kCTParagraphStyleAttributeName
+                                 value:paragraphStyle
+                                 range:(NSRange){0, attributedString.length}];
+    }
+    
+    if ([self adjustLineHeight]) {
+        if (_lineHeight > font.lineHeight) {
+            [attributedString addAttribute:(id)kCTBaselineReferenceFont
+                                     value:@((_lineHeight - font.lineHeight)/ 2)
+                                     range:(NSRange){0, attributedString.length}];
+        }
+    }
+    
+    
+    return attributedString;
 }
 
 - (NSAttributedString *)buildAttributeString
@@ -451,6 +559,7 @@ do {\
 {
     CGFloat width = self.calculatedFrame.size.width - (_padding.left + _padding.right);
     NSTextStorage *textStorage = [self textStorageWithWidth:width];
+    NSMutableAttributedString * attributedString = [self buildCTAttributeString];
     
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
@@ -458,6 +567,7 @@ do {\
                 pthread_mutex_lock(&_textStorageMutex);
             }
             ((WXText *)self.view).textStorage = textStorage;
+            ((WXText *)self.view).attributedString = attributedString;
             if (_isUsingTextStorageLock) {
                 pthread_mutex_unlock(&_textStorageMutex);
             }
