@@ -55,8 +55,8 @@ module.exports = function (config) {
       '../html5/test/render/vue/data/**/*.js'
     ],
 
-    singleRun: false,
-    // singleRun: true,
+    // singleRun: false,
+    singleRun: true,
 
     reporters: ['mocha', 'coverage'],
     coverageReporter: {
