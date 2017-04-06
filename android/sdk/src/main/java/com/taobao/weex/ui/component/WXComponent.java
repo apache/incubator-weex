@@ -161,7 +161,6 @@ import com.taobao.weex.common.IWXObject;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomHandler;
-import com.taobao.weex.dom.WXDomManager;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
@@ -567,17 +566,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
-    if (host.getParent() instanceof ViewGroup) {
-      ViewGroup viewGroup = (ViewGroup) host.getParent();
-      viewGroup.removeView(host);
-    }
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
     params.width = width;
     params.height = height;
     params.setMargins(left, top, right, bottom);
     host.setLayoutParams(params);
-    mInstance.addFixedView(host);
+    mInstance.moveFixedView(host);
 
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);

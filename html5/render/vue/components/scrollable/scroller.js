@@ -1,11 +1,10 @@
-import { base, scrollable } from '../../mixins'
-import { validateStyles } from '../../validator'
+import { scrollable } from '../../mixins'
+// import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
-import * as shared from './shared'
 import listMixin from './list/listMixin'
 
 export default {
-  mixins: [base, scrollable, listMixin],
+  mixins: [scrollable, listMixin],
   props: {
     scrollDirection: {
       type: [String],
@@ -27,9 +26,12 @@ export default {
 
   computed: {
     wrapperClass () {
-      const classArray = ['weex-scroller', 'weex-scroller-wrapper']
+      const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
       if (this.scrollDirection === 'horizontal') {
         classArray.push('weex-scroller-horizontal')
+      }
+      else {
+        classArray.push('weex-scroller-vertical')
       }
       return classArray.join(' ')
     }
@@ -40,19 +42,13 @@ export default {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {
         if (!vnode.tag || !vnode.componentOptions) return false
-        switch (vnode.componentOptions.tag) {
-          case 'loading': this._loading = shared.createLoading(this, h, vnode); return false
-          case 'refresh': this._refresh = shared.createRefresh(this, h, vnode); return false
-        }
         return true
       })
       return [
-        this._refresh,
         h('html:div', {
           ref: 'inner',
-          staticClass: 'weex-scroller-inner'
-        }, this._cells),
-        this._loading
+          staticClass: 'weex-scroller-inner weex-ct'
+        }, this._cells)
       ]
     },
     scrollTo (vnode) {
@@ -67,9 +63,9 @@ export default {
     this.weexType = 'scroller'
 
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.$slots.default || []
     this.$nextTick(() => {
@@ -80,7 +76,7 @@ export default {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      on: extend(this.createEventMap(), {
+      on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
