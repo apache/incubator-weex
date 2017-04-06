@@ -211,5 +211,4 @@ import com.taobao.weex.ui.component.WXComponent;
 public interface IRenderStatus<T extends WXComponent> {
 
   public void holdComponent(T component);
-
 }
