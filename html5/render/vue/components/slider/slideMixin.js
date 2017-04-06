@@ -56,7 +56,6 @@ export default {
         for (let i = 1, l = this._cells.length; i < l; i++) {
           const nextElm = this._cells[i].elm
           const nextOffset = this.wrapperWidth * i
-          // console.log(this.wrapperWidth + ' - ' + this.innerOffset)
           nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
           nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
         }
@@ -74,7 +73,6 @@ export default {
       }
 
       this.$nextTick(() => {
-        console.log(this.infinite)
         if (this._cells.length <= 1) {
           return
         }

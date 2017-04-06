@@ -109,7 +109,6 @@ export default {
 
       this._autoPlayTimer = setTimeout(autoPlayFn, interval)
     }
-    // this.order()
     this.reorder()
     fireLazyload(this.$el, true)
   },
