@@ -397,6 +397,12 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     loadContent();
   }
 
+  @Override
+  public void reload() {
+    if (!TextUtils.isEmpty(src)) {
+      loadContent();
+    }
+  }
 
   public String getOriginUrl() {
     return originUrl;

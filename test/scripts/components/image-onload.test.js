@@ -13,7 +13,7 @@ describe('image onload', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/image-onload.js')
+      .get(util.getPage('/image-onload.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 

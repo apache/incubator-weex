@@ -132,7 +132,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
@@ -160,7 +159,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,9 +196,20 @@ public class WXSDKManager {
   private boolean mNeedInitV8 = true;
 
   private WXSDKManager() {
-    mWXRenderManager = new WXRenderManager();
+    this(new WXRenderManager());
+  }
+
+  private WXSDKManager(WXRenderManager renderManager) {
+    mWXRenderManager = renderManager;
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  /**
+   * Used in junit test
+   */
+  static void initInstance(WXRenderManager renderManager){
+    sManager = new WXSDKManager(renderManager);
   }
 
   public void registerStatisticsListener(IWXStatisticsListener listener) {
@@ -394,7 +403,7 @@ public class WXSDKManager {
     return mIWXJSExceptionAdapter;
   }
 
-   void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+  void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
     mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
   }
 

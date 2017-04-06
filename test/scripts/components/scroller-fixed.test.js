@@ -13,7 +13,7 @@ describe('scroller fixed position item ', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/components/scroller-fixed.js')
+      .get(util.getPage('/components/scroller-fixed.js'))
       .waitForElementByXPath('//scroller[1]/div[1]',util.getGETActionWaitTimeMills(),1000)
   });
 

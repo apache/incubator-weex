@@ -1,8 +1,7 @@
-import { base, event } from '../mixins'
-import { validateStyles } from '../validator'
+import { createEvent } from '../utils'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base, event],
   props: {
     src: String
   },
@@ -27,26 +26,26 @@ export default {
 
   mounted () {
     if (this.$el) {
-      this.$emit('pagefinish', this.createCustomEvent(this, 'pagestart', { url: this.src }))
+      this.$emit('pagestart', createEvent(this.$el, 'pagestart', { url: this.src }))
       this.$el.addEventListener('load', event => {
-        this.$emit('pagefinish', this.createCustomEvent(this, 'pagefinish', { url: this.src }))
+        this.$emit('pagefinish', createEvent(this.$el, 'pagefinish', { url: this.src }))
       })
     }
   },
 
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('web', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('web', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     return createElement('iframe', {
       attrs: {
         'weex-type': 'web',
         src: this.src
       },
-      on: this.createEventMap(['error']),
-      staticClass: 'weex-web'
+      on: this._createEventMap(['error']),
+      staticClass: 'weex-web weex-el'
     })
   }
 }

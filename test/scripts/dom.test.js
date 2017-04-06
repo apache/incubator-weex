@@ -13,7 +13,7 @@ describe('weex mobile index', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/dom-operation.js')
+      .get(util.getPage('/dom-operation.js'))
       .waitForElementByXPath('//div/text[2]',util.getGETActionWaitTimeMills(),1000);
   });
 
@@ -61,6 +61,15 @@ describe('weex mobile index', function () {
     .then((noexist)=>{
         assert.equal(noexist,undefined)
     })
+  })
+
+  it('#3 Update DOM attr', ()=>{
+      return driver
+      .elementByXPath("//div/text[3]")
+      .text()
+      .then((text)=>{
+          assert.equal("finished",text);
+      })
   })
 
   

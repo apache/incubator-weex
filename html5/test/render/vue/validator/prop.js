@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as prop from '../../../../render/vue/validator/prop'
 
 describe('check property value', () => {

@@ -1,4 +1,5 @@
 'use strict'
+import { findEnterKeyType } from '../../utils/index'
 
 let appendStyle
 
@@ -34,7 +35,25 @@ const proto = {
     node.classList.add(this.className)
     node.classList.add('weex-element')
     this.placeholder && (node.placeholder = this.placeholder)
+    this.createKeybordEvent(node)
     return node
+  },
+
+  // support enter key envent
+  createKeybordEvent (node) {
+    if (Array.isArray(this.data.event) && this.data.event.indexOf('return') > -1) {
+      node.addEventListener('keyup', (ev) => {
+        const code = ev.keyCode
+        let key = ev.key
+        if (code === 13) {
+          if (key.toLowerCase() === 'tab') {
+            key = 'next'
+          }
+          const rightKeyType = findEnterKeyType(this.data.attr['returnKeyType'])
+          this.dispatchEvent('return', { returnKeyType: rightKeyType })
+        }
+      }, false)
+    }
   },
 
   focus () {
@@ -68,6 +87,10 @@ const attr = {
     this.node.type = availableTypes.indexOf(val) !== -1
       ? val
       : DEFAULT_TYPE
+  },
+
+  returnKeyType (val) {
+    this.node.returnKeyType = val || ''
   }
 }
 
@@ -108,6 +131,16 @@ const event = {
       return {
         value: this.node.value,
         timestamp: Date.now()
+      }
+    }
+  },
+
+  return: {
+    updator: function (obj) {
+      return {
+        attrs: {
+          value: this.node.value
+        }
       }
     }
   }

@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as validator from '../../../../render/vue/validator'
 
 describe('validator', function () {

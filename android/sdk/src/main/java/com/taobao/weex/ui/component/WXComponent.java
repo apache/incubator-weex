@@ -127,6 +127,7 @@
  */
 package com.taobao.weex.ui.component;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -135,6 +136,7 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
@@ -162,6 +164,7 @@ import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomTask;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.animation.WXAnimationModule;
@@ -563,17 +566,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   private void setFixedHostLayoutParams(T host, int width, int height, int left, int right, int top, int bottom){
-    if (host.getParent() instanceof ViewGroup) {
-      ViewGroup viewGroup = (ViewGroup) host.getParent();
-      viewGroup.removeView(host);
-    }
     FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
     params.width = width;
     params.height = height;
     params.setMargins(left, top, right, bottom);
     host.setLayoutParams(params);
-    mInstance.addFixedView(host);
+    mInstance.moveFixedView(host);
 
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("Weex_Fixed_Style", "WXComponent:setLayout :" + left + " " + top + " " + width + " " + height);
@@ -761,6 +760,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         String fixedSize = WXUtils.getString(param, PROP_FS_MATCH_PARENT);
         setFixedSize(fixedSize);
         return true;
+      case Constants.Name.ARIA_LABEL:
+        String label = WXUtils.getString(param,"");
+        setAriaLabel(label);
+        return true;
+      case Constants.Name.ARIA_HIDDEN:
+        boolean isHidden = WXUtils.getBoolean(param,false);
+        setAriaHidden(isHidden);
+        return true;
       case Constants.Name.WIDTH:
       case Constants.Name.MIN_WIDTH:
       case Constants.Name.MAX_WIDTH:
@@ -793,6 +800,21 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+  protected void setAriaHidden(boolean isHidden) {
+    View host = getHostView();
+    if(host != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+      host.setImportantForAccessibility(isHidden?View.IMPORTANT_FOR_ACCESSIBILITY_NO:View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+    }
+  }
+
+  protected void setAriaLabel(String label) {
+    View host = getHostView();
+    if(host != null){
+      host.setContentDescription(label);
+    }
+  }
+
   /**
    * Avoid large size view fail in GPU-Animation.
    * @param fixedSize
@@ -821,15 +843,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param type
    */
   protected void appendEventToDOM(String type){
-    Message message = Message.obtain();
-    WXDomTask task = new WXDomTask();
-    task.instanceId = getInstanceId();
-    task.args = new ArrayList<>();
-    task.args.add(getRef());
-    task.args.add(type);
-    message.obj = task;
-    message.what = WXDomHandler.MsgType.WX_DOM_ADD_EVENT;
-    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
+    WXSDKManager.getInstance().getWXDomManager().postAction(getInstanceId(), Actions.getAddEvent(getRef(),type),false);
   }
 
   /**

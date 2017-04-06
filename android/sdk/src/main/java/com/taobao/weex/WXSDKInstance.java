@@ -1303,7 +1303,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return isDestroy;
   }
 
-  public String getBundleUrl() {
+  /**
+   * @return If you use render () the return value may be empty
+   */
+  public @Nullable String getBundleUrl() {
     return mBundleUrl;
   }
 
@@ -1315,6 +1318,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mRenderContainer;
   }
 
+  @Deprecated
   public void setBundleUrl(String url){
     mBundleUrl = url;
     if(WXSDKManager.getInstance().getValidateProcessor()!=null) {
@@ -1325,15 +1329,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
     mRenderContainer.addView(root.getHostView());
-    if(root.getDomObject().getStyles().getDefaultHeight() == 0
-        || root.getDomObject().getStyles().getDefaultWidth() ==0){
-      setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
-    }
+    setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
 
-  public void addFixedView(View fixedChild){
+  /**
+   * Move fixed view to container ,except it's already moved.
+   * @param fixedChild
+   */
+  public void moveFixedView(View fixedChild){
     if(mRenderContainer != null) {
-      mRenderContainer.addView(fixedChild);
+      if (fixedChild.getParent() != mRenderContainer) {
+        ViewGroup viewGroup = (ViewGroup) fixedChild.getParent();
+        viewGroup.removeView(fixedChild);
+        mRenderContainer.addView(fixedChild);
+      }
     }
   }
 

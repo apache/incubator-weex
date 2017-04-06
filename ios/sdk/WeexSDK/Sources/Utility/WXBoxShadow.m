@@ -11,6 +11,20 @@
 #import "WXUtility.h"
 
 @implementation WXBoxShadow
+@synthesize shadowColor = _shadowColor;
+- (instancetype)init
+{
+    self = [super init];
+    
+    if (self) {
+        self.shadowRadius = 0.0f;
+        self.isInset = NO;
+        self.shadowOffset = CGSizeZero;
+        self.shadowOpacity = 1.0f;
+    }
+    
+    return self;
+}
 
 + (NSArray *)getBoxShadowElementsByBlank:(NSString *)string
 {
@@ -34,7 +48,6 @@
         return nil;
     }
     WXBoxShadow *boxShadow = [WXBoxShadow new];
-    boxShadow.shadowOpacity = 1.0f;
     
     //parse color
     if ([string rangeOfString:@"rgb"].location != NSNotFound) {
@@ -43,13 +56,19 @@
         if (begin.location < end.location && end.location < [string length]) {
             NSRange range = NSMakeRange(begin.location, end.location-begin.location + 1);
             NSString *str = [string substringWithRange:range];
-            boxShadow.shadowColor = [WXConvert UIColor:str].CGColor;
+            UIColor *color = [WXConvert UIColor:str];
+            if (color && [color isKindOfClass:[UIColor class]]) {
+                boxShadow.shadowColor = color;
+            }
             string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
         }
     } else {
         NSArray *boxShadowElements = [self getBoxShadowElementsByBlank:string];
         NSString *str = [boxShadowElements lastObject];
-        boxShadow.shadowColor = [WXConvert UIColor:str].CGColor;
+        UIColor *color = [WXConvert UIColor:str];
+        if (color && [color isKindOfClass:[UIColor class]]) {
+            boxShadow.shadowColor = color;
+        }
         string = [string stringByReplacingOccurrencesOfString:str withString:@""];// remove color string
     }
 
