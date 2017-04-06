@@ -1,5 +1,5 @@
 <template>
-  <waterfall class="page" ref="waterfall"
+  <waterfall class="page" ref="waterfall" test-id="waterfall"
   v-bind:style="{padding:padding}"
   :column-width="columnWidth" :column-count="columnCount" :column-gap="columnGap"
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
@@ -9,7 +9,7 @@
       <loading-indicator class="indicator"></loading-indicator>
       <text class="refreshText">{{refreshText}}</text>
   </refresh>-->
-    <header class="header" ref="header" v-if="showHeader">
+    <header class="header" ref="header" test-id="header1" v-if="showHeader">
       <div class="banner">
        <image class="absolute" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover"></image>
        <div class="bannerInfo">
@@ -24,9 +24,9 @@
         </div>
       </div>
     </header>
-    <header class="stickyHeader" >
+    <header class="stickyHeader" test-id="header2">
       <div v-if="stickyHeaderType === 'none'" class="stickyWrapper">
-        <text class="stickyText">Sticky Header</text>
+        <text class="stickyText" test-id="stickyText1">Sticky Header</text>
       </div>
       <div v-if="stickyHeaderType === 'appear'" class="stickyWrapper">
         <div class="stickyTextImageWrapper">
@@ -42,7 +42,7 @@
         <text class="stickyText">Content Offset:{{contentOffset}}</text>
       </div>
     </header>
-    <cell v-for="(item, index) in items" :key="item.src" class="cell" ref="index">
+    <cell v-for="(item, index) in items" :key="item.src" class="cell" :test-id="item.testid" ref="index">
       <div class="item" @click="onItemclick(item.behaviour, index)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
         <text v-if="item.name" class="itemName">{{item.name}}</text>
         <image class="itemPhoto" :src="item.src"></image>
@@ -50,10 +50,10 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
-    <header class="footer" ref="footer">
+    <header class="footer" ref="footer" test-id="footer1" >
       <text class="stickyText">Footer</text>
     </header>
-    <div ref="fixed" class="fixedItem" @click="scrollToNext">
+    <div ref="fixed" class="fixedItem" test-id="fixed1" @click="scrollToNext">
       <text class="fixedText">bot</text>
     </div>
   </waterfall>
@@ -244,7 +244,7 @@
           name: 'Thomas Carlyle',
           desc:'Genius only means hard-working all one\'s life',
           behaviourName: 'Change width',
-          behaviour: 'changeColumnWidth',
+          behaviour: 'changeColumnWidth'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1Hv1JPFXXXXa3XXXXXXXXXXXX-370-370.jpg',
@@ -263,13 +263,13 @@
           name:'Addison',
           desc:'Cease to struggle and you cease to live',
           behaviourName: 'Show scrollbar',
-          behaviour: 'showScrollbar',
+          behaviour: 'showScrollbar'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1ACygPFXXXXXwXVXXXXXXXXXX-370-370.jpg',
           desc:'A strong man will struggle with the storms of fate',
           behaviourName: 'Listen appear',
-          behaviour: 'listenAppear',
+          behaviour: 'listenAppear'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1IGShPFXXXXaqXVXXXXXXXXXX-370-370.jpg',
@@ -281,32 +281,37 @@
         {
           src:'https://gw.alicdn.com/tps/TB1xU93PFXXXXXHaXXXXXXXXXXX-240-240.jpg',
           behaviourName: 'waterfall padding',
-          behaviour: 'setPadding',
+          behaviour: 'setPadding'
         },
         {
           src:'https://gw.alicdn.com/tps/TB19hu0PFXXXXaXaXXXXXXXXXXX-240-240.jpg',
           name:'Balzac',
           desc:'There is no such thing as a great talent without great will - power',
           behaviourName: 'listen scroll',
-          behaviour: 'listenScroll',
+          behaviour: 'listenScroll'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1ux2vPFXXXXbkXXXXXXXXXXXX-240-240.jpg',
           behaviourName: 'Remove cell',
-          behaviour: 'removeCell',
+          behaviour: 'removeCell'
         },
         {
           src:'https://gw.alicdn.com/tps/TB1tCCWPFXXXXa7aXXXXXXXXXXX-240-240.jpg',
           behaviourName: 'Move cell',
-          behaviour: 'moveCell',
+          behaviour: 'moveCell'
+       
         }
       ]
 
       let repeatItems = [];
-      for (let i = 0; i < 3; i++) {
+      // for (let i = 0; i < 3; i++) {
         repeatItems.push(...items)
-      }
-
+      // }
+      
+       for(let i =0;i< repeatItems.length;i++ ){
+           repeatItems[i].testid = 'cell'+i;
+           console.log(repeatItems[i].testid)
+        }
       return {
         padding: 0,
         refreshing: false,
