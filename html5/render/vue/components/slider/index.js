@@ -16,7 +16,7 @@ export default {
     },
     infinite: {
       type: [String, Boolean],
-      default: false
+      default: true
     }
 
   },

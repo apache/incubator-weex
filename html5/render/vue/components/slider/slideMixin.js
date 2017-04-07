@@ -14,7 +14,7 @@ export default {
     },
 
     slideTo (index) {
-      if (this.infinite && this.infinite !== 'false') {
+      if (!this.infinite || this.infinite === 'false') {
         if (index === -1 || index > (this._cells.length - 1)) {
           this.slideTo(this.currentIndex)
           return
@@ -76,7 +76,7 @@ export default {
         if (this._cells.length <= 1) {
           return
         }
-        if (this.infinite && this.infinite !== 'false') {
+        if (!this.infinite || this.infinite === 'false') {
           this.order()
           return
         }
