@@ -206,6 +206,7 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -221,7 +222,7 @@ import java.lang.ref.WeakReference;
  * TextView wrapper
  */
 public class WXTextView extends View implements WXGestureObservable, IWXTextView,
-                                                IRenderStatus<WXText> {
+                                                IRenderStatus<WXText>, IRenderResult<WXText> {
 
   private WeakReference<WXText> mWeakReference;
   private WXGesture wxGesture;
@@ -296,5 +297,11 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   @Override
   public void holdComponent(WXText component) {
     mWeakReference = new WeakReference<>(component);
+  }
+
+  @Nullable
+  @Override
+  public WXText getComponent() {
+    return mWeakReference.get();
   }
 }

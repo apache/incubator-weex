@@ -206,20 +206,26 @@ package com.taobao.weex.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.WXViewUtils;
+
+import java.lang.ref.WeakReference;
 
 /**
  * FrameLayout wrapper
  *
  */
-public class WXFrameLayout extends FrameLayout implements WXGestureObservable {
+public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IRenderStatus<WXDiv>,IRenderResult<WXDiv> {
 
   private WXGesture wxGesture;
+
+  private WeakReference<WXDiv> mWeakReference;
 
   public WXFrameLayout(Context context) {
     super(context);
@@ -243,5 +249,16 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable {
   protected void onDraw(Canvas canvas) {
     WXViewUtils.clipCanvasWithinBorderBox(this, canvas);
     super.onDraw(canvas);
+  }
+
+  @Override
+  public void holdComponent(WXDiv component) {
+    mWeakReference = new WeakReference<WXDiv>(component);
+  }
+
+  @Nullable
+  @Override
+  public WXDiv getComponent() {
+    return mWeakReference.get();
   }
 }
