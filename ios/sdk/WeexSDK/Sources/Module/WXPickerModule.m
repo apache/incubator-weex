@@ -31,7 +31,7 @@
 @property(nonatomic,strong)UIColor *cancelTitleColor;
 @property(nonatomic,strong)UIColor *confirmTitleColor;
 @property(nonatomic,strong)UIColor *titleBackgroundColor;
-@property(nonatomic)NSInteger height;
+@property(nonatomic)CGFloat height;
 @property(nonatomic,strong)UIColor *textColor;
 @property(nonatomic,strong)UIColor *selectionColor;
 //data
