@@ -204,13 +204,28 @@
  */
 package com.taobao.weex.appfram.pickers;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Checkable;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.utils.WXResourceUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -238,13 +253,16 @@ public class WXPickersModule extends WXModule {
     private static final String KEY_ITEMS = "items";
 
     private int selected;
+    private View selectedView;
 
     @JSMethod
     public void pick(Map<String, Object> options, JSCallback callback) {
         List<String> items = safeConvert(getOption(options, KEY_ITEMS, new ArrayList<String>()));
-        int index = getOption(options, KEY_INDEX, 0);
-        String title = getOption(options, KEY_TITLE, null);
-        performSinglePick(items, index, title, callback);
+        try {
+            performSinglePick(items, options, callback);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     @JSMethod
@@ -277,6 +295,14 @@ public class WXPickersModule extends WXModule {
                 return defValue;
             }
         }
+    }
+
+    private int getColor(Map<String, Object> options, String key, int defValue) {
+        Object value = getOption(options, key, null);
+        if (value == null) {
+            return defValue;
+        }
+        return WXResourceUtils.getColor(value.toString(), defValue);
     }
 
     private void performPickTime(Map<String, Object> options, final JSCallback callback) {
@@ -331,16 +357,31 @@ public class WXPickersModule extends WXModule {
 
     }
 
-    private void performSinglePick(List<String> items, int checked, String title, final JSCallback callback) {
-        selected = checked;
-        new AlertDialog.Builder(mWXSDKInstance.getContext())
-                .setTitle(title)
-                .setSingleChoiceItems(items.toArray(new String[items.size()]), checked, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selected = which;
-                    }
-                })
+    private void performSinglePick(List<String> items, final Map<String, Object> options, final JSCallback callback) {
+        selected = getOption(options, KEY_INDEX, 0);
+        final int textColor = getColor(options, "textColor", Color.TRANSPARENT);
+
+        final AlertDialog dialog =  new AlertDialog.Builder(mWXSDKInstance.getContext())
+                .setAdapter(
+                        new ArrayAdapter<String>(
+                                mWXSDKInstance.getContext(),
+                                android.R.layout.simple_list_item_single_choice,
+                                items) {
+                            @NonNull
+                            @Override
+                            public View getView(int position, View convertView, @Nullable ViewGroup parent) {
+                                View itemView =  super.getView(position, convertView, parent);
+                                if (position == selected) {
+                                    selectedView = itemView;
+                                }
+
+                                if (itemView instanceof TextView && textColor != Color.TRANSPARENT) {
+                                    ((TextView) itemView).setTextColor(textColor);
+                                }
+
+                                return itemView;
+                            }
+                        } , null)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -361,6 +402,98 @@ public class WXPickersModule extends WXModule {
                         callback.invoke(ret);
                     }
                 })
-                .show();
+                .setCustomTitle(makeTitleView(mWXSDKInstance.getContext(), options))
+                .create();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            dialog.create();
+        }
+
+        final ListView listView = dialog.getListView();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            private View previousView;
+            private int selectionColor = getColor(options, "selectionColor", Color.TRANSPARENT);
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selected = position;
+                if (previousView == view) {
+                    return;
+                }
+                if (previousView != null) {
+                    previousView.setBackgroundColor(Color.TRANSPARENT);
+                    if (previousView instanceof Checkable) {
+                        ((Checkable) previousView).toggle();
+                    }
+                }
+                if (view instanceof Checkable) {
+                    ((Checkable) view).toggle();
+                }
+                view.setBackgroundColor(selectionColor);
+                previousView = view;
+            }
+        });
+
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (selectedView != null) {
+                    listView.performItemClick(selectedView, selected, selectedView.getId());
+                }
+            }
+        });
+
+        dialog.getWindow().getDecorView().post(new Runnable() {
+            @Override
+            public void run() {
+                Button confirm = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                Button cancel = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+                if (confirm != null) {
+                    String confirmTitle = getOption(options, "confirmTitle", null);
+                    int confirmColor = getColor(options, "confirmTitleColor", Color.TRANSPARENT);
+
+                    if (confirmTitle != null) {
+                        confirm.setText(confirmTitle);
+                    }
+
+                    if (confirmColor != Color.TRANSPARENT) {
+                        confirm.setTextColor(confirmColor);
+                    }
+                }
+
+                if (cancel != null) {
+                    String cancelTitle = getOption(options, "cancelTitle", null);
+                    int cancelColor = getColor(options, "cancelTitleColor", Color.TRANSPARENT);
+
+                    if (cancelTitle != null) {
+                        cancel.setText(cancelTitle);
+                    }
+
+                    if (cancelColor != Color.TRANSPARENT) {
+                        cancel.setTextColor(cancelColor);
+                    }
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    private TextView makeTitleView(Context context, Map<String, Object> options) {
+        String text = getOption(options, "title", null);
+        if (text == null) {
+            return null;
+        }
+        TextView textView = new TextView(context);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        int padding = WXViewUtils.dip2px(12);
+        textView.setPadding(padding, padding, padding, padding);
+        textView.getPaint().setFakeBoldText(true);
+        textView.setBackgroundColor(getColor(options, "titleBackgroundColor", Color.TRANSPARENT));
+        textView.setTextColor(getColor(options, "titleColor", Color.BLACK));
+        textView.setText(text);
+        return textView;
     }
 }
