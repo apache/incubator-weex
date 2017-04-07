@@ -171,9 +171,6 @@
         WXSliderNeighborComponent *parentSlider = (WXSliderNeighborComponent *)parent;
         [parentSlider setIndicatorView:_indicatorView];
     }
-    else {
-         NSAssert(NO, @"");
-    }
 }
 
 - (void)updateStyles:(NSDictionary *)styles

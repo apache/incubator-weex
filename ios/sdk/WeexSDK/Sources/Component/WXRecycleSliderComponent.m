@@ -95,6 +95,9 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)setCurrentIndex:(NSInteger)currentIndex
 {
+    if (currentIndex >= _itemViews.count || currentIndex < 0) {
+        currentIndex = 0;
+    }
     _currentIndex = currentIndex;
     if (_infinite) {
         if (_direction == DirectionRight) {
@@ -104,15 +107,11 @@ typedef NS_ENUM(NSInteger, Direction) {
             {
                 self.nextIndex = _itemViews.count - 1;
             }
-            NSLog(@"setCurrentIndex DirectionRight");
-
         }else if (_direction == DirectionLeft) {
-            NSLog(@"setCurrentIndex DirectionLeft");
-
             self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
             self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
-            NSLog(@"setCurrentIndex DirectionLeft nextIndex:%ld",_nextIndex);
-
+        }else {
+            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
         }
         [self resetAllViewsFrame];
     } else {
@@ -142,36 +141,23 @@ typedef NS_ENUM(NSInteger, Direction) {
         {
             self.nextIndex = _itemViews.count - 1;
         }
-        NSLog(@"DirectionRight");
-        NSLog(@"DirectionRight nextIndex:%ld",_nextIndex);
-//        [self getItemAtIndex:_nextIndex].frame = _nextItemFrame;
         UIView *view = [self getItemAtIndex:_nextIndex];
         if (view) {
             view.frame = _nextItemFrame;
         }
-
-
     }else if (_direction == DirectionLeft){
-        NSLog(@"DirectionLeft");
         self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
         self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
-        NSLog(@"DirectionLeft nextIndex:%ld",_nextIndex);
         UIView *view = [self getItemAtIndex:_nextIndex];
         if (view) {
             view.frame = _nextItemFrame;
-        }
-        
-        NSLog(@"frame %@",NSStringFromCGRect(view.frame));
-        if (view) {
-            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
-            NSLog(@"DirectionLeft nextIndex:%ld",_nextIndex);
         }
     }
 }
 
 - (void)resetAllViewsFrame
 {
-    if (_infinite) {
+    if (_infinite && _itemViews.count > 1) {
         self.scrollView.frame = CGRectMake(0, 0, self.width, self.height);
         self.scrollView.contentOffset = CGPointMake(self.width, 0);
         if (self.itemViews.count > 1) {
@@ -180,7 +166,6 @@ typedef NS_ENUM(NSInteger, Direction) {
             self.scrollView.contentSize = CGSizeZero;
         }
         _currentItemFrame = CGRectMake(self.width, 0, self.width, self.height);
-        _nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
         for (int i = 0; i < self.itemViews.count; i++) {
             UIView *view = [self.itemViews objectAtIndex:i];
             if (i != self.currentIndex && i != self.nextIndex) {
@@ -188,9 +173,10 @@ typedef NS_ENUM(NSInteger, Direction) {
             }
         }
         [self getItemAtIndex:_currentIndex].frame = _currentItemFrame;
-        [self getItemAtIndex:_nextIndex].frame = _nextItemFrame;
-        NSLog(@"resetAllViewsFrame _currentIndex:%ld nextIndex:%ld",_currentIndex,_nextIndex);
-
+        if (_itemViews.count == 2) {
+            _nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
+            [self getItemAtIndex:_nextIndex].frame = _nextItemFrame;
+        }
     } else {
         self.scrollView.frame = self.bounds;
         self.scrollView.contentSize = CGSizeMake(self.width * _itemViews.count, self.height);
@@ -205,12 +191,14 @@ typedef NS_ENUM(NSInteger, Direction) {
 }
 
 - (void)nextPage {
-    if (_infinite) {
-        [self.scrollView setContentOffset:CGPointMake(self.width * 2, 0) animated:YES];
-    } else {
-        _currentIndex += 1;
-        if (_currentIndex - 1 < _itemViews.count) {
-            [self.scrollView setContentOffset:CGPointMake(_currentIndex * self.width, 0) animated:YES];
+    if (_itemViews.count > 1) {
+        if (_infinite) {
+            [self.scrollView setContentOffset:CGPointMake(self.width * 2, 0) animated:YES];
+        } else {
+            _currentIndex += 1;
+            if (_currentIndex - 1 < _itemViews.count) {
+                [self.scrollView setContentOffset:CGPointMake(_currentIndex * self.width, 0) animated:YES];
+            }
         }
     }
 }
@@ -568,7 +556,12 @@ typedef NS_ENUM(NSInteger, Direction) {
 {
     if (_sliderScrollEvent) {
         CGFloat width = scrollView.frame.size.width;
-        CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
+        CGFloat XDeviation = 0;
+        if (_infinite) {
+            XDeviation = - (scrollView.contentOffset.x - width);
+        } else {
+            XDeviation = - (scrollView.contentOffset.x - width * _currentIndex);
+        }
         CGFloat offsetXRatio = (XDeviation / width);
         if (fabs(offsetXRatio - _lastOffsetXRatio) >= _offsetXAccuracy) {
             _lastOffsetXRatio = offsetXRatio;
