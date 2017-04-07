@@ -13,7 +13,6 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXComponent+GradientColor.h"
 
 @implementation WXComponent (Layout)
 
