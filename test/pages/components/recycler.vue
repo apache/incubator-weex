@@ -42,7 +42,7 @@
         <text class="stickyText">Content Offset:{{contentOffset}}</text>
       </div>
     </header>
-    <cell v-for="(item, index) in items" :key="item.src" class="cell" :test-id="item.testid" ref="index">
+    <cell v-for="(item, index) in items" :key="item.src" class="cell" :test-id="'cell' + index" ref="index">
       <div class="item" @click="onItemclick(item.behaviour, index)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
         <text v-if="item.name" class="itemName">{{item.name}}</text>
         <image class="itemPhoto" :src="item.src"></image>
@@ -304,14 +304,10 @@
       ]
 
       let repeatItems = [];
-      // for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 3; i++) {
         repeatItems.push(...items)
-      // }
-      
-       for(let i =0;i< repeatItems.length;i++ ){
-           repeatItems[i].testid = 'cell'+i;
-           console.log(repeatItems[i].testid)
-        }
+      }
+
       return {
         padding: 0,
         refreshing: false,

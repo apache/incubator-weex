@@ -25,7 +25,7 @@ const isAndroid = platform === 'android';
 // const footerPath = '//recycler[1]/div[1]'
 
 const isApproximate = (x, y) =>  {
-  return Math.abs(x - y) <= isAndroid ? 1 : 0.5
+  return Math.abs(x - y) <= (isAndroid ? 1 : 1.5)
 }
 
 // if (isAndroid) {
@@ -130,7 +130,7 @@ describe('recycler', function () {
 
   it('#2 test column count', () => {
     return driver
-   .elementById('cell3')
+   .elementById('cell2')
     .click()
     .elementById('cell0')
     .getRect()
@@ -307,14 +307,14 @@ describe('recycler', function () {
 
   it('#9 test moving cell', () => {
     return driver
-    .elementById('cell28')
+    .elementById('cell29')
     .click()
     .elementById('fixed1')
     .click()
-    .elementById('cell28')
+    .elementById('cell27')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 28 rect after moving cell 29 to 1:${JSON.stringify(rect)}`)
+      console.log(`cell 28 rect after moving cell 30 to 1:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
       assert.isOk(isApproximate(rect.y, screenHeight - 94 * scaleFactor - rect.height))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
@@ -323,7 +323,7 @@ describe('recycler', function () {
 
   it('#10 test recycler padding', () => {
     return driver
-    .elementById('cell27')
+    .elementById('cell26')
     .click()
     .elementById('fixed1')
     .click()
@@ -348,14 +348,14 @@ describe('recycler', function () {
     .elementById('cell27')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 28 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 27 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
     .elementById('cell28')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 29 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 28 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
@@ -366,10 +366,15 @@ describe('recycler', function () {
   it('#11 test onscroll', () => {
     let originContentOffset = 0
     return driver
-     .elementById('cell28')
+    .elementById('cell28')
+    .getRect()
+    .then((rect)=>{
+      console.log(`cell 29 rect:${JSON.stringify(rect)}`)
+    })
+    .elementById('cell28')
     .click()
     .elementById('stickyText1')
-    .text()
+    .text() 
     .then(text => {
       console.log(text)
       originContentOffset = Number.parseInt(text.replace('Content Offset:-',''))
