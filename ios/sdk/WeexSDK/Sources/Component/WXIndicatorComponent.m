@@ -8,7 +8,7 @@
 
 #import "WXIndicatorComponent.h"
 #import "WXSliderComponent.h"
-#import "WXRecycleSliderComponent.h"
+#import "WXCycleSliderComponent.h"
 #import "WXConvert.h"
 #import "WXSliderNeighborComponent.h"
 #import "WXSDKInstance.h"
@@ -164,8 +164,8 @@
         WXSliderComponent *parentSlider = (WXSliderComponent *)parent;
         [parentSlider setIndicatorView:_indicatorView];
     }
-    if([parent isKindOfClass:[WXRecycleSliderComponent class]]) {
-        WXRecycleSliderComponent *parentSlider = (WXRecycleSliderComponent *)parent;
+    if([parent isKindOfClass:[WXCycleSliderComponent class]]) {
+        WXCycleSliderComponent *parentSlider = (WXCycleSliderComponent *)parent;
         [parentSlider setIndicatorView:_indicatorView];
     }else if ([parent isKindOfClass:[WXSliderNeighborComponent class]]) {
         WXSliderNeighborComponent *parentSlider = (WXSliderNeighborComponent *)parent;
