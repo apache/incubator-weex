@@ -53,8 +53,6 @@
 		598805AD1D52D8C800EDED2C /* WXStorageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 598805AC1D52D8C800EDED2C /* WXStorageTests.m */; };
 		5996BD701D49EC0600C0FEA6 /* WXInstanceWrapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD6F1D49EC0600C0FEA6 /* WXInstanceWrapTests.m */; };
 		5996BD751D4D8A0E00C0FEA6 /* WXSDKEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */; };
-		59970D2E1E0D228D0049F535 /* WXComponent+GradientColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 59970D2C1E0D228D0049F535 /* WXComponent+GradientColor.h */; };
-		59970D2F1E0D228D0049F535 /* WXComponent+GradientColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 59970D2D1E0D228D0049F535 /* WXComponent+GradientColor.m */; };
 		59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */; };
 		59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */; };
@@ -366,8 +364,6 @@
 		598805AC1D52D8C800EDED2C /* WXStorageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStorageTests.m; sourceTree = "<group>"; };
 		5996BD6F1D49EC0600C0FEA6 /* WXInstanceWrapTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceWrapTests.m; sourceTree = "<group>"; };
 		5996BD741D4D8A0E00C0FEA6 /* WXSDKEngineTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSDKEngineTests.m; sourceTree = "<group>"; };
-		59970D2C1E0D228D0049F535 /* WXComponent+GradientColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+GradientColor.h"; sourceTree = "<group>"; };
-		59970D2D1E0D228D0049F535 /* WXComponent+GradientColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+GradientColor.m"; sourceTree = "<group>"; };
 		59A582D31CF481110081FD3E /* WXAppMonitorProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAppMonitorProtocol.h; sourceTree = "<group>"; };
 		59A582FA1CF5B17B0081FD3E /* WXBridgeContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXBridgeContext.h; sourceTree = "<group>"; };
 		59A582FB1CF5B17B0081FD3E /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
@@ -1143,8 +1139,6 @@
 				741081251CEDB4EC001BC6E5 /* WXComponent_internal.h */,
 				D33451061D3E19480083598A /* WXCanvasComponent.h */,
 				D33451071D3E19480083598A /* WXCanvasComponent.m */,
-				59970D2C1E0D228D0049F535 /* WXComponent+GradientColor.h */,
-				59970D2D1E0D228D0049F535 /* WXComponent+GradientColor.m */,
 				744D610A1E49978200B624B3 /* WXHeaderComponent.h */,
 				744D610B1E49978200B624B3 /* WXHeaderComponent.m */,
 				744D610E1E49979000B624B3 /* WXFooterComponent.h */,
@@ -1328,7 +1322,6 @@
 				D317338C1C57257000BB7539 /* WXTransform.h in Headers */,
 				77D161301C02DE4E0010B15B /* WXComponent.h in Headers */,
 				2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */,
-				59970D2E1E0D228D0049F535 /* WXComponent+GradientColor.h in Headers */,
 				744BEA551D05178F00452B5D /* WXComponent+Display.h in Headers */,
 				741081231CED6756001BC6E5 /* WXComponentFactory.h in Headers */,
 				59D3CA4A1CFC3CE1008835DC /* NSTimer+Weex.h in Headers */,
@@ -1637,7 +1630,6 @@
 				749DC27C1D40827B009E1C91 /* WXMonitor.m in Sources */,
 				C4B834271DE69B09007AD27E /* WXPickerModule.m in Sources */,
 				C4F0127A1E1502A6003378D0 /* SRWebSocket+Weex.m in Sources */,
-				59970D2F1E0D228D0049F535 /* WXComponent+GradientColor.m in Sources */,
 				745B2D691E5A8E1E0092D38A /* WXMultiColumnLayout.m in Sources */,
 				77D161391C02DE940010B15B /* WXBridgeManager.m in Sources */,
 			);

@@ -8,7 +8,6 @@
 
 #import "WXComponent+ViewManagement.h"
 #import "WXComponent_internal.h"
-#import "WXComponent+GradientColor.h"
 #import "WXComponent+BoxShadow.h"
 #import "WXAssert.h"
 #import "WXView.h"

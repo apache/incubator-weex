@@ -1329,10 +1329,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
     mRenderContainer.addView(root.getHostView());
-    if(root.getDomObject().getStyles().getDefaultHeight() == 0
-        || root.getDomObject().getStyles().getDefaultWidth() ==0){
-      setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
-    }
+    setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
 
   /**
@@ -1341,9 +1338,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    */
   public void moveFixedView(View fixedChild){
     if(mRenderContainer != null) {
-      if (fixedChild.getParent() != mRenderContainer) {
-        ViewGroup viewGroup = (ViewGroup) fixedChild.getParent();
-        viewGroup.removeView(fixedChild);
+      ViewGroup parent;
+      if((parent = (ViewGroup) fixedChild.getParent()) != null){
+        if (parent != mRenderContainer) {
+          parent.removeView(fixedChild);
+          mRenderContainer.addView(fixedChild);
+        }
+      }else{
         mRenderContainer.addView(fixedChild);
       }
     }
