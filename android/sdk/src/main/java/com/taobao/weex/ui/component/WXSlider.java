@@ -209,6 +209,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -230,6 +232,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -239,6 +242,9 @@ import java.util.Map;
 public class WXSlider extends WXVContainer<FrameLayout> {
 
   public static final String INDEX = "index";
+  public static final String INFINITE = "infinite";
+
+  private boolean isInfinite = true;
 
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
@@ -283,13 +289,18 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
     // init view pager
+    if (getDomObject() != null && getDomObject().getAttrs() != null) {
+      Object obj = getDomObject().getAttrs().get(INFINITE);
+      isInfinite = WXUtils.getBoolean(obj, true);
+    }
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
         LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     mViewPager = new WXCircleViewPager(context);
+    mViewPager.setCircle(isInfinite);
     mViewPager.setLayoutParams(pagerParams);
 
     // init adapter
-    mAdapter = new WXCirclePageAdapter();
+    mAdapter = new WXCirclePageAdapter(isInfinite);
     mViewPager.setAdapter(mAdapter);
     // add to parent
     view.addView(mViewPager);
@@ -328,9 +339,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (getRealView() != null) {
-      getRealView().setOnTouchListener(null);
-    }
     if (Constants.Event.SCROLL.equals(type)) {
       if (mViewPager == null) {
         return;
@@ -360,6 +368,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       return;
     }
     mAdapter.addPageView(view);
+    hackTwoItemsInfiniteScroll();
+
     mViewPager.setCurrentItem(0);
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
@@ -374,7 +384,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
 
     mAdapter.removePageView(child.getHostView());
-    mAdapter.notifyDataSetChanged();
+    hackTwoItemsInfiniteScroll();
     super.remove(child,destroy);
   }
 
@@ -663,6 +673,67 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           break;
 
       }
+    }
+  }
+
+  private void hackTwoItemsInfiniteScroll() {
+    if (mViewPager == null || mAdapter == null) {
+      return;
+    }
+    if (isInfinite) {
+      if (mAdapter.getRealCount() == 2) {
+        final GestureDetector gestureDetector = new GestureDetector(getContext(), new FlingGestureListener(mViewPager));
+        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+          }
+        });
+      } else {
+        mViewPager.setOnTouchListener(null);
+      }
+    }
+  }
+
+  private static class FlingGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private static final int SWIPE_MIN_DISTANCE = WXViewUtils.dip2px(50);
+    private static final int SWIPE_MAX_OFF_PATH = WXViewUtils.dip2px(250);
+    private static final int SWIPE_THRESHOLD_VELOCITY = WXViewUtils.dip2px(200);
+    private WeakReference<WXCircleViewPager> pagerRef;
+
+    FlingGestureListener(WXCircleViewPager pager) {
+      this.pagerRef = new WeakReference<>(pager);
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+      WXCircleViewPager mViewPager = pagerRef.get();
+      if (mViewPager == null) {
+        return false;
+      }
+
+      try {
+        if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH) {
+          return false;
+        }
+
+        if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                && mViewPager.superGetCurrentItem() == 1) {
+          // right to left swipe
+          mViewPager.setCurrentItem(0, false);
+          return true;
+        } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                && mViewPager.superGetCurrentItem() == 0) {
+          // left to right swipe
+          mViewPager.setCurrentItem(1, false);
+          return true;
+        }
+      } catch (Exception e) {
+        // ignore
+      }
+      return false;
     }
   }
 }
