@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "WXLayoutDefine.h"
+#import "WXType.h"
 
 @class WXSDKInstance;
 
@@ -59,6 +60,11 @@ NS_ASSUME_NONNULL_BEGIN
  *  @abstract The component's type string.
  */
 @property (nonatomic, readonly, copy) NSString *type;
+
+/**
+ *  @abstract The component's type.
+ */
+@property (nonatomic, assign) WXComponentType componentType;
 
 /**
  *  @abstract The component's styles.

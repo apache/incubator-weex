@@ -145,6 +145,17 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
  */
 #define WX_SYS_LESS_THAN_OR_EQUAL_TO(v)             ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
+/**
+ *  @abstract Estimate component's type. If the type isn't equal to WXComponentTypeCommon, then return.
+ */
+#define WX_CHECK_COMPONENT_TYPE(type)\
+do {\
+if (type != WXComponentTypeCommon) {\
+return;\
+}\
+} while (0);
+
+
 
 #if __has_attribute(objc_requires_super)
     #define WX_REQUIRES_SUPER __attribute__((objc_requires_super))
