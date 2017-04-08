@@ -13,7 +13,7 @@ describe('slider infinite scroll', function () {
 
   before(function () {
     return util.init(driver)
-      .get('wxpage://' + util.getDeviceHost() +'/slider-infinite.js')
+      .get(util.getPage('/slider-infinite.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
