@@ -24,10 +24,9 @@ export function init (title, fn) {
       Vue.mixin(base)
       Vue.mixin(style)
 
-      setVue(Vue)
-
       window.global = window
       global.weex = weex
+      setVue(Vue)
 
       window._no_remove_style_sheets = true
     })

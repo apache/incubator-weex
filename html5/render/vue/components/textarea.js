@@ -1,4 +1,4 @@
-import { extractComponentStyle } from '../core'
+import { extractComponentStyle, createEventMap } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 
@@ -38,7 +38,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const events = extend(this._createEventMap(), mapFormEvents(this))
+    const events = extend(createEventMap(this), mapFormEvents(this))
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',

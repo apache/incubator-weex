@@ -1,4 +1,4 @@
-import { extractComponentStyle } from '../core'
+import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
 // import { validateStyles } from '../validator'
 
 const _css = `
@@ -22,10 +22,10 @@ export default {
         'weex-type': 'a',
         href: this.href
       },
-      on: this._createEventMap(),
+      on: createEventMap(this),
       staticClass: 'weex-a weex-ct',
       staticStyle: extractComponentStyle(this)
-    }, this._trimTextNodeChildren(this.$slots.default))
+    }, trimTextVNodes(this.$slots.default))
   },
   _css
 }

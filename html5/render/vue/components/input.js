@@ -2,7 +2,7 @@
  * @fileOverview Input component.
  * Support v-model only if vue version is large than 2.2.0
  */
-import { extractComponentStyle } from '../core'
+import { extractComponentStyle, createEventMap } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
 // import { validateStyles } from '../validator'
@@ -50,7 +50,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const events = extend(this._createEventMap(), mapFormEvents(this))
+    const events = extend(createEventMap(this), mapFormEvents(this))
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',

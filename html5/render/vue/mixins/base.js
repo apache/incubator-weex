@@ -1,11 +1,6 @@
 import { getThrottleLazyload, watchAppear } from '../utils'
 import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated, tagBegin, tagEnd } from '../utils/perf'
 
-const supportedEvents = [
-  'click', 'longpress', 'appear', 'disappear'
-  // 'touchstart', 'touchmove', 'touchend'
-]
-
 const scrollableTypes = ['scroller', 'list']
 
 let lazyloadWatched = false
@@ -77,14 +72,6 @@ export default {
       return parent
     },
 
-    _createEventMap (extras = []) {
-      const eventMap = {}
-      supportedEvents.concat(extras).forEach(name => {
-        eventMap[name] = event => this.$emit(name, event)
-      })
-      return eventMap
-    },
-
     _fireLazyload (el) {
       if (process.env.NODE_ENV === 'development') {
         tagBegin('base._fireLazyload')
@@ -93,13 +80,6 @@ export default {
       if (process.env.NODE_ENV === 'development') {
         tagEnd('base._fireLazyload')
       }
-    },
-
-    _trimTextNodeChildren (children) {
-      if (Array.isArray(children)) {
-        return children.filter(vnode => !!vnode.tag)
-      }
-      return children
     }
   }
 }

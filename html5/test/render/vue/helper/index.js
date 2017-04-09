@@ -24,10 +24,9 @@ export function init (title, fn) {
       Vue.mixin(base)
       Vue.mixin(style)
 
-      setVue(Vue)
-
       window.global = window
       global.weex = weex
+      setVue(Vue)
 
       window._no_remove_style_sheets = true
     })
@@ -42,7 +41,6 @@ export function init (title, fn) {
        */
       register (name, component) {
         global.weex.registerComponent(name, component)
-        // components[name] = component
       },
 
       /**

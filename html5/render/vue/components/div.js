@@ -1,5 +1,5 @@
 // import { validateStyles } from '../validator'
-import { extractComponentStyle } from '../core'
+import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
 
 const _css = `
 body > .weex-div {
@@ -16,10 +16,10 @@ export default {
     // }
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
-      on: this._createEventMap(),
+      on: createEventMap(this),
       staticClass: 'weex-div weex-ct',
       staticStyle: extractComponentStyle(this)
-    }, this._trimTextNodeChildren(this.$slots.default))
+    }, trimTextVNodes(this.$slots.default))
   },
   _css
 }
