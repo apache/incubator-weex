@@ -19,6 +19,8 @@
 
 - (BOOL)hasBorderRadius;
 
+- (BOOL)radiusesAreEqual;
+
 @end
 
 @interface WXRoundedRect : NSObject
