@@ -42,8 +42,10 @@ export function refreshInstance (id, data) {
  * @param  {string} id
  */
 export function destroyInstance (id) {
-  // Markup some global state in natie side
-  markupState()
+  // Markup some global state in native side
+  if (typeof markupState === 'function') {
+    markupState()
+  }
 
   resetTarget()
   const instance = instanceMap[id]
@@ -63,7 +65,7 @@ export function destroyInstance (id) {
   const round = 18
   if (idNum > 0) {
     const remainder = idNum % round
-    if (!remainder) {
+    if (!remainder && typeof notifyTrimMemory === 'function') {
       notifyTrimMemory()
     }
   }
