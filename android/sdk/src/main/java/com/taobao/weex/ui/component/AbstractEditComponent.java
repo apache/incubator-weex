@@ -230,8 +230,10 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.ui.component.helper.SoftKeyboardDetector;
 import com.taobao.weex.ui.component.helper.WXTimeInputHelper;
 import com.taobao.weex.ui.view.WXEditText;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 
@@ -255,6 +257,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private int mEditorAction = EditorInfo.IME_ACTION_DONE;
   private String mReturnKeyType = null;
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
+  private boolean mListeningKeyboard = false;
+  private SoftKeyboardDetector.Unregister mUnregister;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -280,6 +284,8 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         setPseudoClassStatus(Constants.PSEUDO.FOCUS,hasFocus);
       }
     });
+
+    addKeyboardListener(host);
   }
 
   @Override
@@ -431,6 +437,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           return false;
         }
       });
+    }
+
+    if (Constants.Event.KEYBOARD.equals(type)) {
+      mListeningKeyboard = true;
     }
   }
 
@@ -713,6 +723,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       case Constants.Value.URL:
         inputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
         break;
+      case Constants.Value.NUMBER:
+        inputType = InputType.TYPE_CLASS_NUMBER;
+        break;
       default:
         inputType = InputType.TYPE_CLASS_TEXT;
     }
@@ -873,6 +886,41 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         });
       }
       mEditorActionListeners.add(listener);
+    }
+  }
+
+  private void addKeyboardListener(final WXEditText host) {
+    if (host == null) {
+      return;
+    }
+    Context context = host.getContext();
+    if (context != null && context instanceof Activity) {
+      SoftKeyboardDetector.registerKeyboardEventListener((Activity) context, new SoftKeyboardDetector.OnKeyboardEventListener() {
+        @Override
+        public void onKeyboardEvent(boolean isShown) {
+          if (mListeningKeyboard) {
+            Map<String, Object> event = new HashMap<>(1);
+            event.put("isShow", isShown);
+            fireEvent(Constants.Event.KEYBOARD, event);
+          }
+          if (!isShown) {
+            blur();
+          }
+        }
+      });
+    }
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    if (mUnregister != null) {
+      try {
+        mUnregister.execute();
+        mUnregister = null;
+      } catch (Throwable throwable) {
+        WXLogUtils.w("Unregister throw ", throwable);
+      }
     }
   }
 
