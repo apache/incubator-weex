@@ -299,7 +299,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = YES;
     }
-    if ([eventName isEqualToString:@"keyboardevent"]) {
+    if ([eventName isEqualToString:@"keyboard"]) {
         _keyboardEvent = YES;
     }
 }
@@ -326,7 +326,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     if ([eventName isEqualToString:@"click"]) {
         _clickEvent = NO;
     }
-    if ([eventName isEqualToString:@"keyboardevent"]) {
+    if ([eventName isEqualToString:@"keyboard"]) {
         _keyboardEvent = NO;
     }
 }
@@ -769,7 +769,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }
     
     if (_keyboardEvent) {
-        [self fireEvent:@"keyboardevent" params:@{ @"isShow": @YES }];
+        [self fireEvent:@"keyboard" params:@{ @"isShow": @YES }];
     }
 }
 
@@ -784,7 +784,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         self.weexInstance.isRootViewFrozen = NO;
     }
     if (_keyboardEvent) {
-        [self fireEvent:@"keyboardevent" params:@{ @"isShow": @NO }];
+        [self fireEvent:@"keyboard" params:@{ @"isShow": @NO }];
     }
 }
 
