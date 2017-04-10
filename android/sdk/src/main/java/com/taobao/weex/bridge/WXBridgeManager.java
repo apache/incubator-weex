@@ -410,6 +410,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     public Object callModuleMethod(String instanceId, String moduleStr, String methodStr, JSONArray args) {
       WXSDKInstance wxsdkInstance = WXSDKManager.getInstance()
               .getSDKInstance(instanceId);
+      if (wxsdkInstance == null) {
+        return null;
+      }
       if (wxsdkInstance.isNeedValidate()
               && WXSDKManager.getInstance().getValidateProcessor() != null) {
           WXValidateProcessor.WXModuleValidateResult validateResult = WXSDKManager

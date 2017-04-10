@@ -195,6 +195,8 @@ public class WXSDKManager {
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
 
+  private static final int DEFAULT_VIEWPORT_WIDTH = 750;
+
   private WXSDKManager() {
     this(new WXRenderManager());
   }
@@ -266,7 +268,11 @@ public class WXSDKManager {
   }
 
   public static int getInstanceViewPortWidth(String instanceId){
-    return getInstance().getSDKInstance(instanceId).getInstanceViewPortWidth();
+    WXSDKInstance instance = getInstance().getSDKInstance(instanceId);
+    if (instance == null) {
+      return DEFAULT_VIEWPORT_WIDTH;
+    }
+    return instance.getInstanceViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -297,7 +303,7 @@ public class WXSDKManager {
     return mWXRenderManager;
   }
 
-  public WXSDKInstance getSDKInstance(String instanceId) {
+  public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
     return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
   }
 
