@@ -1,7 +1,7 @@
 <template>
   <div>
     <image style="width: 500;height: 500;" src="https://gw.alicdn.com/tps/TB1bEMYKXXXXXaLaXXXXXXXXXXX-360-388.png" @load="onload"></image>
-    <text style="font-size:30">{{size}}</text>
+    <text test-id='imgSize' style="font-size:30">{{size}}</text>
   </div>
 </template>
 <script>
