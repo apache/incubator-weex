@@ -1,15 +1,15 @@
 import {
   autoPrefix,
-  normalizeStyle,
+  // normalizeStyle,
   normalizeString,
   normalizeNumber,
   normalizeUnitsNum
 } from '../../../../render/vue/utils/style'
-import { init, resetViewport } from '../../../../render/vue/env/viewport'
+import { init } from '../../../../render/vue/env/viewport'
 
 describe('style', function () {
-  const rect = document.documentElement.getBoundingClientRect()
-  const info = {}
+  // const rect = document.documentElement.getBoundingClientRect()
+  // const info = {}
   const { scale, dpr } = init()
 
   it('should normalize units numbers', function () {

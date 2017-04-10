@@ -14,7 +14,7 @@ import * as utils from './utils'
  */
 export function init (title, fn) {
   return describe(title, () => {
-    let components = {}
+    // let components = {}
 
     before(function () {
       const htmlRegex = /^html:/i
@@ -71,36 +71,3 @@ export function init (title, fn) {
     })
   })
 }
-
-// import vue200 from './vender/vue-2.0.0.js'
-// import vue210 from './vender/vue-2.1.0.js'
-// const Vues = [
-//   vue200,
-//   vue210
-// ]
-/**
- * Describe tests for multiple versions of Vue.
- */
-// export function multiDescribe (title, fn) {
-//   return describe(title, () => {
-//     Vues.forEach(Vue => {
-//       let components = {}
-//       Vue.config.isReservedTag = function () { return false }
-//       describe(`Vue ${Vue.version}`, () => fn(Vue, {
-//         register (name, component) {
-//           components[name] = component
-//         },
-//         reset () {
-//           components = {}
-//         },
-//         createVm (options = {}) {
-//           options.components = components
-//           return new Vue(options).$mount()
-//         },
-//         compile (template) {
-//           return this.createVm({ template })
-//         }
-//       }))
-//     })
-//   })
-// }

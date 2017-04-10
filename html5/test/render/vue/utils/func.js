@@ -46,5 +46,4 @@ describe('utils', function () {
       expect(abc).to.deep.equal({ name: 'x' })
     })
   })
-
 })
