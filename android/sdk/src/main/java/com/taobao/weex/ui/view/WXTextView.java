@@ -302,6 +302,6 @@ public class WXTextView extends View implements WXGestureObservable, IWXTextView
   @Nullable
   @Override
   public WXText getComponent() {
-    return mWeakReference.get();
+     return null != mWeakReference ? mWeakReference.get() : null;
   }
 }

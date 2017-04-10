@@ -259,6 +259,6 @@ public class WXFrameLayout extends FrameLayout implements WXGestureObservable,IR
   @Nullable
   @Override
   public WXDiv getComponent() {
-    return mWeakReference.get();
+    return null != mWeakReference ? mWeakReference.get() : null;
   }
 }

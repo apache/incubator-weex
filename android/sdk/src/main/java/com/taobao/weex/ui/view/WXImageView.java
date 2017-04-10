@@ -310,7 +310,7 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Nullable
   @Override
   public WXImage getComponent() {
-    return mWeakReference.get();
+    return null != mWeakReference ? mWeakReference.get() : null;
   }
 
   @Override
