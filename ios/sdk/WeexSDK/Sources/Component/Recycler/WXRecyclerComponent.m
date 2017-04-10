@@ -348,6 +348,7 @@ typedef enum : NSUInteger {
     }
     
     [cellView.contentView addSubview:contentView];
+    [cellView setAccessibilityIdentifier:contentView.accessibilityIdentifier];
     
     return cellView;
 }
