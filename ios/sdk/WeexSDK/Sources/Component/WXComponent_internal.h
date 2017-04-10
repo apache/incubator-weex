@@ -81,8 +81,8 @@
      *  Display
      */
     CALayer *_layer;
-    BOOL _composite;
-    BOOL _compositingChild;
+    BOOL _useCompositing;
+    BOOL _isCompositingChild;
     WXThreadSafeCounter *_displayCounter;
     
     UIColor *_borderTopColor;
@@ -184,6 +184,10 @@
 - (void)_removeAllEvents;
 
 - (void)_setupNavBarWithStyles:(NSMutableDictionary *)styles attributes:(NSMutableDictionary *)attributes;
+
+- (void)_initCompositingAttribute:(NSDictionary *)attributes;
+
+- (BOOL)_bitmapOpaqueWithSize:(CGSize)size;
 
 - (void)_updateNavBarAttributes:(NSDictionary *)attributes;
 

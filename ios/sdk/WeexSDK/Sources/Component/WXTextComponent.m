@@ -42,37 +42,6 @@
     return [WXLayer class];
 }
 
-- (UIImage *)drawTextWithBounds:(CGRect)bounds padding:(UIEdgeInsets)padding
-{
-    if (bounds.size.width <=0 || bounds.size.height <= 0) {
-        return nil;
-    }
-    UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, WXScreenScale());
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    if ([self.wx_component _needsDrawBorder]) {
-        [self.wx_component _drawBorderWithContext:context size:bounds.size];
-    } else {
-        WXPerformBlockOnMainThread(^{
-            [self.wx_component _resetNativeBorderRadius];
-        });
-    }
-    NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
-    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
-    
-    CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
-    NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
-    
-    [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
-    [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return image;
-}
-
 - (void)setTextStorage:(NSTextStorage *)textStorage
 {
     if (_textStorage != textStorage) {
@@ -119,16 +88,6 @@
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
-    
-   
-    pthread_mutex_t _textStorageMutex;
-    pthread_mutexattr_t _textStorageMutexAttr;
-}
-
-static BOOL _isUsingTextStorageLock = NO;
-+ (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
-{
-    _isUsingTextStorageLock = isUsingTextStorageLock;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -140,12 +99,6 @@ static BOOL _isUsingTextStorageLock = NO;
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        if (_isUsingTextStorageLock) {
-            pthread_mutexattr_init(&_textStorageMutexAttr);
-            pthread_mutexattr_settype(&_textStorageMutexAttr, PTHREAD_MUTEX_RECURSIVE);
-            pthread_mutex_init(&_textStorageMutex, &_textStorageMutexAttr);
-        }
-        
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
     }
@@ -155,10 +108,6 @@ static BOOL _isUsingTextStorageLock = NO;
 
 - (void)dealloc
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_destroy(&_textStorageMutex);
-        pthread_mutexattr_destroy(&_textStorageMutexAttr);
-    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -226,13 +175,7 @@ do {\
 
 - (void)setNeedsRepaint
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     _textStorage = nil;
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
 }
 
 #pragma mark - Subclass
@@ -244,13 +187,7 @@ do {\
 
 - (void)viewDidLoad
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     ((WXText *)self.view).textStorage = _textStorage;
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
     [self setNeedsDisplay];
 }
 
@@ -259,25 +196,22 @@ do {\
     return [[WXText alloc] init];
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
 {
-    WXText *textView = ((WXText *)self.view);
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_lock(&_textStorageMutex);
-        }
-        
-        UIImage *image = [textView drawTextWithBounds:bounds padding:_padding];
-        
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_unlock(&_textStorageMutex);
-        }
-        
-        return image;
-    };
+    return YES;
+}
+
+- (UIImage *)drawRect:(CGRect)rect;
+{
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    if (_isCompositingChild) {
+        [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
+    } else {
+        WXText *textView = ((WXText *)self.view);
+        [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
+    }
+    
+    return nil;
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -319,6 +253,7 @@ do {\
 }
 
 #pragma mark Text Building
+
 - (NSString *)text
 {
     return _text;
@@ -435,14 +370,7 @@ do {\
     [layoutManager ensureLayoutForTextContainer:textContainer];
     
     _textStorageWidth = width;
-    
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     _textStorage = textStorage;
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
     
     return textStorage;
 }
@@ -454,13 +382,8 @@ do {\
     
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
-            if (_isUsingTextStorageLock) {
-                pthread_mutex_lock(&_textStorageMutex);
-            }
             ((WXText *)self.view).textStorage = textStorage;
-            if (_isUsingTextStorageLock) {
-                pthread_mutex_unlock(&_textStorageMutex);
-            }
+            
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
@@ -489,6 +412,29 @@ do {\
     [self fillAttributes:attributes];
     
     [self syncTextStorageForView];
+}
+
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+{
+    if (bounds.size.width <=0 || bounds.size.height <= 0) {
+        return;
+    }
+    
+    if ([self _needsDrawBorder]) {
+        [self _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self _resetNativeBorderRadius];
+        });
+    }
+    NSLayoutManager *layoutManager = (view ? view.textStorage : _textStorage).layoutManagers.firstObject;
+    NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+    
+    CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+    NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+    
+    [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
+    [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
 }
 
 #ifdef UITEST

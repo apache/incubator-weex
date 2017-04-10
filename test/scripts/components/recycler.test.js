@@ -37,8 +37,6 @@ describe('recycler', function () {
   const driver = util.createDriver(wd)
 
   before(function () {
-
-    console.log(util.getPage('/components/recycler.js'))
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
       .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
