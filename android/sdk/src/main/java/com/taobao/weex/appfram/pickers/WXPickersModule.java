@@ -252,6 +252,15 @@ public class WXPickersModule extends WXModule {
     private static final String KEY_MIN = "min";
     private static final String KEY_ITEMS = "items";
 
+    private static final String KEY_TITLE_COLOR = "titleColor";
+    private static final String KEY_CANCEL_TITLE_COLOR = "cancelTitleColor";
+    private static final String KEY_CONFIRM_TITLE = "confirmTitle";
+    private static final String KEY_CANCEL_TITLE = "cancelTitle";
+    private static final String KEY_CONFIRM_TITLE_COLOR = "confirmTitleColor";
+    private static final String KEY_TITLE_BACKGROUND_COLOR = "titleBackgroundColor";
+    private static final String KEY_TEXT_COLOR = "textColor";
+    private static final String KEY_SELECTION_COLOR = "selectionColor";
+
     private int selected;
     private View selectedView;
 
@@ -359,7 +368,7 @@ public class WXPickersModule extends WXModule {
 
     private void performSinglePick(List<String> items, final Map<String, Object> options, final JSCallback callback) {
         selected = getOption(options, KEY_INDEX, 0);
-        final int textColor = getColor(options, "textColor", Color.TRANSPARENT);
+        final int textColor = getColor(options, KEY_TEXT_COLOR, Color.TRANSPARENT);
 
         final AlertDialog dialog =  new AlertDialog.Builder(mWXSDKInstance.getContext())
                 .setAdapter(
@@ -406,13 +415,15 @@ public class WXPickersModule extends WXModule {
                 .create();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //pre create the content view on dialog.
+            //if not , the content view will not be created until dialog.show() called
             dialog.create();
         }
 
         final ListView listView = dialog.getListView();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             private View previousView;
-            private int selectionColor = getColor(options, "selectionColor", Color.TRANSPARENT);
+            private int selectionColor = getColor(options, KEY_SELECTION_COLOR, Color.TRANSPARENT);
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -450,8 +461,8 @@ public class WXPickersModule extends WXModule {
                 Button cancel = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
 
                 if (confirm != null) {
-                    String confirmTitle = getOption(options, "confirmTitle", null);
-                    int confirmColor = getColor(options, "confirmTitleColor", Color.TRANSPARENT);
+                    String confirmTitle = getOption(options, KEY_CONFIRM_TITLE, null);
+                    int confirmColor = getColor(options, KEY_CONFIRM_TITLE_COLOR, Color.TRANSPARENT);
 
                     if (confirmTitle != null) {
                         confirm.setText(confirmTitle);
@@ -463,8 +474,8 @@ public class WXPickersModule extends WXModule {
                 }
 
                 if (cancel != null) {
-                    String cancelTitle = getOption(options, "cancelTitle", null);
-                    int cancelColor = getColor(options, "cancelTitleColor", Color.TRANSPARENT);
+                    String cancelTitle = getOption(options, KEY_CANCEL_TITLE, null);
+                    int cancelColor = getColor(options, KEY_CANCEL_TITLE_COLOR, Color.TRANSPARENT);
 
                     if (cancelTitle != null) {
                         cancel.setText(cancelTitle);
@@ -481,7 +492,7 @@ public class WXPickersModule extends WXModule {
     }
 
     private TextView makeTitleView(Context context, Map<String, Object> options) {
-        String text = getOption(options, "title", null);
+        String text = getOption(options, KEY_TITLE, null);
         if (text == null) {
             return null;
         }
@@ -491,8 +502,8 @@ public class WXPickersModule extends WXModule {
         int padding = WXViewUtils.dip2px(12);
         textView.setPadding(padding, padding, padding, padding);
         textView.getPaint().setFakeBoldText(true);
-        textView.setBackgroundColor(getColor(options, "titleBackgroundColor", Color.TRANSPARENT));
-        textView.setTextColor(getColor(options, "titleColor", Color.BLACK));
+        textView.setBackgroundColor(getColor(options, KEY_TITLE_BACKGROUND_COLOR, Color.TRANSPARENT));
+        textView.setTextColor(getColor(options, KEY_TITLE_COLOR, Color.BLACK));
         textView.setText(text);
         return textView;
     }
