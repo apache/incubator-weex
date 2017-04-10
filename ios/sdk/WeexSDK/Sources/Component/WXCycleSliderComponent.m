@@ -303,7 +303,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 @end
 
-@interface WXCycleSliderComponent ()<WXRecycleSliderViewDelegate>
+@interface WXCycleSliderComponent () <WXRecycleSliderViewDelegate,WXIndicatorComponentDelegate>
 
 @property (nonatomic, strong) WXRecycleSliderView *recycleSliderView;
 @property (nonatomic, strong) NSTimer *autoTimer;
@@ -417,6 +417,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         
         WXRecycleSliderView *recycleSliderView = (WXRecycleSliderView *)self.view;
         if ([view isKindOfClass:[WXIndicatorView class]]) {
+            ((WXIndicatorComponent *)subcomponent).delegate = self;
             [recycleSliderView addSubview:view];
             return;
         }
@@ -512,7 +513,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
-#pragma mark Public Methods
+#pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
 {

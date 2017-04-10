@@ -28,6 +28,14 @@ typedef enum
 @end
 
 
+@protocol WXIndicatorComponentDelegate <NSObject>
+
+-(void)setIndicatorView:(WXIndicatorView *)indicatorView;
+
+@end
+
 @interface WXIndicatorComponent : WXComponent
+
+@property (nonatomic, weak) id<WXIndicatorComponentDelegate> delegate;
 
 @end
