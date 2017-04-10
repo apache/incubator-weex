@@ -26,6 +26,16 @@
     return self;
 }
 
+- (BOOL)hasBorderRadius
+{
+    return _topLeft > 0.001 || _topRight > 0.001 || _bottomLeft > 0.001 || _bottomRight > 0.001;
+}
+
+- (BOOL)radiusesAreEqual
+{
+    return _topLeft == _topRight && _topRight == _bottomRight && _bottomRight == _bottomLeft;
+}
+
 - (void)scale:(float)factor
 {
     if (factor == 1) {
