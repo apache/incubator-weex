@@ -223,8 +223,6 @@
         [self _registerDefaultModules];
         [self _registerDefaultHandlers];
     });
-    
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"taobao://"]];
 }
 
 + (NSString*)SDKEngineVersion
