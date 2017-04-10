@@ -422,6 +422,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         view.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
+            if(mGesture != null && mGesture.isTouchEventConsumed()){
+              //event is already consumed by gesture
+              return;
+            }
             for (OnClickListener listener : mHostClickListeners){
               if(listener != null) {
                 listener.onHostViewClick();

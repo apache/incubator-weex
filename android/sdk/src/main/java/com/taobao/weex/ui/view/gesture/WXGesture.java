@@ -256,6 +256,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
   private WXGestureType mPendingPan = null;//event type to notify when action_up or action_cancel
   private int mParentOrientation =-1;
   private boolean mIsPreventMoveEvent = false;
+  private boolean mIsTouchEventConsumed = false; //Reset to false when first touch event, set to true when gesture event fired.
 
   public WXGesture(WXComponent wxComponent, Context context) {
     this.component = wxComponent;
@@ -288,6 +289,15 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     mIsPreventMoveEvent = preventMoveEvent;
   }
 
+  /**
+   *
+   * @return true if current touch event is already consumed by gesture.
+   * Reset to false when next first touch event, set to true when gesture event fired.
+   */
+  public boolean isTouchEventConsumed(){
+    return mIsTouchEventConsumed;
+  }
+
   @Override
   public boolean onTouch(View v, MotionEvent event) {
     try {
@@ -295,6 +305,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
       switch (event.getActionMasked()) {
         case MotionEvent.ACTION_POINTER_DOWN:
         case MotionEvent.ACTION_DOWN:
+          mIsTouchEventConsumed = false;
           /**
            * If component has same scroll orientation with it's parent and it's parent not scrollable
            * , we should disallow parent in DOWN.
@@ -309,12 +320,14 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           break;
         case MotionEvent.ACTION_MOVE:
           result |= handleMotionEvent(LowLevelGesture.ACTION_MOVE, event);
+          mIsTouchEventConsumed = mIsTouchEventConsumed || result;
           break;
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_POINTER_UP:
           finishDisallowInterceptTouchEvent(v);
           result |= handleMotionEvent(LowLevelGesture.ACTION_UP, event);
           result |= handlePanMotionEvent(event);
+          mIsTouchEventConsumed = mIsTouchEventConsumed || result;
           break;
         case MotionEvent.ACTION_CANCEL:
           finishDisallowInterceptTouchEvent(v);
@@ -627,6 +640,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           component.getDomObject().getRef(),
           HighLevelGesture.LONG_PRESS.toString(),
           list.get(list.size() - 1));
+      mIsTouchEventConsumed = mIsTouchEventConsumed || true;
     }
   }
 
