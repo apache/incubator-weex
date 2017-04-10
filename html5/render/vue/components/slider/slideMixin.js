@@ -1,6 +1,9 @@
-import { createEvent/*, nextFrame*/, fireLazyload } from '../../utils'
+import { createEvent/*, nextFrame*/, fireLazyload, addTransform } from '../../utils'
 
 const TRANSITION_TIME = 200
+
+const MAIN_SLIDE_SCALE = 0.9
+const MAIN_SLIDE_OPACITY = 1
 
 // trigger scroll event frequency.
 // const scrollDam = 16
@@ -63,11 +66,49 @@ export default {
       })
     },
     reorder () {
+      // dir: 'current' | 'prev' | 'next'
+      const setPosition = (elm, dir) => {
+        const scale = window.weex.config.env.scale
+        let neighborScale = this.neighborScale
+        let opacity = this.neighborAlpha
+        let offsetX = -this.innerOffset
+        let offsetY = 0
+        if (dir === 'current') {
+          elm.style.zIndex = 1
+          neighborScale = MAIN_SLIDE_SCALE
+          opacity = MAIN_SLIDE_OPACITY
+        }
+
+        const origin = dir === 'prev' ? '100% 0' : '0 0'
+        elm.style.webkitTransformOrigin = origin
+        elm.style.transformOrigin = origin
+
+        const sign = dir === 'current' ? 0 : dir === 'prev' ? -1 : 1
+        offsetX = -this.innerOffset + sign * this.wrapperWidth
+        if (this.isNeighbor) {
+          offsetY = (1 - neighborScale) * this.wrapperHeight / 2
+          elm.style.opacity = opacity
+          if (dir === 'current') {
+            offsetX += this.wrapperWidth * (1 - neighborScale) / 2
+          }
+          else {
+            offsetX = offsetX - sign * this.neighborSpace * scale
+          }
+        }
+
+        elm.style.width = this.wrapperWidth + 'px'
+        addTransform(elm, {
+          translate: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
+          scale: this.isNeighbor && `scale(${neighborScale})`
+        })
+      }
+
       const removeClone = (clone, prevElm) => {
         // switch current page.
-        const curTransform = `translate3d(${-this.innerOffset}px, 0, 0)`
-        prevElm.style.transform = curTransform
-        prevElm.style.webkitTransform = curTransform
+        setPosition(prevElm, 'current')
+        // const curTransform = `translate3d(${-this.innerOffset}px, 0, 0)`
+        // prevElm.style.transform = curTransform
+        // prevElm.style.webkitTransform = curTransform
         // remove clone node.
         clone && clone.parentElement.removeChild(clone)
       }
@@ -88,7 +129,7 @@ export default {
         const currentElm = this._cells[this.currentIndex].elm
 
         // put current slide on the top.
-        currentElm.style.zIndex = 1
+        setPosition(currentElm, 'current')
 
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
@@ -103,12 +144,8 @@ export default {
           prevElm = this._clonePrev
         }
 
-        const prevOffset = -this.wrapperWidth - this.innerOffset
-        prevElm.style.webkitTransform = `translate3d(${prevOffset}px, 0, 0)`
-        prevElm.style.transform = `translate3d(${prevOffset}px, 0, 0)`
-        const nextOffset = this.wrapperWidth - this.innerOffset
-        nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
-        nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
+        setPosition(prevElm, 'prev')
+        setPosition(nextElm, 'next')
       })
     },
 
