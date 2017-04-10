@@ -327,7 +327,7 @@
 
 @end
 
-@interface WXSliderComponent ()<WXSliderViewDelegate>
+@interface WXSliderComponent () <WXSliderViewDelegate,WXIndicatorComponentDelegate>
 
 @property (nonatomic, strong) WXSliderView *sliderView;
 @property (nonatomic, strong) NSTimer *autoTimer;
@@ -442,6 +442,7 @@
         
         WXSliderView *sliderView = (WXSliderView *)self.view;
         if ([view isKindOfClass:[WXIndicatorView class]]) {
+            ((WXIndicatorComponent *)subcomponent).delegate = self;
             [sliderView addSubview:view];
             return;
         }
@@ -550,7 +551,7 @@
     }
 }
 
-#pragma mark Public Methods
+#pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
