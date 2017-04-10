@@ -29,7 +29,7 @@ This component supports no child components.
 
 * `maxlength`: <span class="api-version">v0.7+</span> a number value to specify maxlength of input.
 
-* `return-key-type {string}`：<sup class="wx-v">v0.11</sup>the keybord returen key type.
+* `return-key-type {string}`：<sup class="wx-v">v0.11</sup>the keybord returen key type support defalut;go;next;search;send,done.
 
 ## Styles
 
