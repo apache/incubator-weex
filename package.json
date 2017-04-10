@@ -96,6 +96,7 @@
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
+    "autoprefixer": "^6.7.7",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
