@@ -88,7 +88,44 @@
         NSMutableAttributedString * attributedStringCopy = [_attributedString mutableCopy];
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
         CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-        CTFrameDraw(frame, context);
+        
+        CFArrayRef lines = CTFrameGetLines(frame);
+        CFIndex lineCount = CFArrayGetCount(lines);
+        CGPoint lineOrigins[lineCount];
+        CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
+        
+        CGFloat frameY = 0;
+        for (CFIndex index = 0; index < lineCount; index ++) {
+            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
+            CGFloat lineAscent;
+            CGFloat lineDescent;
+            CGFloat lineLeading;
+            
+            CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);
+            CGPoint lineOrigin = lineOrigins[index];
+            
+            NSLog(@"lineAscent = %f",lineAscent);
+            NSLog(@"lineDescent = %f",lineDescent);
+            NSLog(@"lineLeading = %f",lineLeading);
+            
+            if (index > 0) {
+                frameY = frameY - lineAscent;
+            }else {
+                frameY = lineOrigin.y;
+            }
+            lineOrigin.x += padding.left;
+            lineOrigin.y -= padding.top;
+            NSLog(@"lines: %ld origin: %@",index, NSStringFromCGPoint(lineOrigin));
+            CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
+//            CTLineDraw(lineRef, context);
+            CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
+            for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
+                CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
+                CTRunDraw(run, context, CFRangeMake(0, 0));
+            }
+            frameY = frameY - lineDescent;
+        }
+        
         UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         
@@ -425,11 +462,18 @@ do {\
         paragraphStyle.alignment = _textAlign;
     }
     
+    // set default lineBreakMode
+    paragraphStyle.lineBreakMode = NSLineBreakByClipping;
+    if (_textOverflow && [_textOverflow length] > 0) {
+        if ([_textOverflow isEqualToString:@"ellipsis"])
+            paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+    }
+    
     if (_lineHeight) {
         paragraphStyle.maximumLineHeight = _lineHeight;
         paragraphStyle.minimumLineHeight = _lineHeight;
     }
-    if (_lineHeight || _textAlign) {
+    if (_lineHeight || _textAlign || [_textOverflow length] > 0) {
         [attributedString addAttribute:(id)kCTParagraphStyleAttributeName
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
@@ -511,7 +555,7 @@ do {\
 
 - (BOOL)adjustLineHeight
 {
-    return YES;
+    return !_coretext;
 }
 
 - (NSTextStorage *)textStorageWithWidth:(CGFloat)width
