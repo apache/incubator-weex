@@ -295,7 +295,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.index = row;
     if(self.selectionColor) {
         UILabel *labelSelected = (UILabel*)[pickerView viewForRow:row forComponent:component];
-        [labelSelected setBackgroundColor:self.selectionColor?self.selectionColor:[UIColor whiteColor]];
+        [labelSelected setBackgroundColor:self.selectionColor];
     }
 }
 
