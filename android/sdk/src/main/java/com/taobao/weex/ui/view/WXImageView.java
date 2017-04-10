@@ -223,7 +223,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 public class WXImageView extends ImageView implements WXGestureObservable,
-                                                      IRenderStatus<WXImage> {
+                                                      IRenderStatus<WXImage>, WXImage.Measurable {
 
   private WeakReference<WXImage> mWeakReference;
   private WXGesture wxGesture;
@@ -304,5 +304,23 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Override
   public void holdComponent(WXImage component) {
     mWeakReference = new WeakReference<>(component);
+  }
+
+  @Override
+  public int getNaturalWidth() {
+    Drawable drawable = getDrawable();
+    if (drawable != null && drawable instanceof ImageDrawable) {
+      return ((ImageDrawable) drawable).getBitmapWidth();
+    }
+    return -1;
+  }
+
+  @Override
+  public int getNaturalHeight() {
+    Drawable drawable = getDrawable();
+    if (drawable != null && drawable instanceof ImageDrawable) {
+      return ((ImageDrawable) drawable).getBitmapHeight();
+    }
+    return -1;
   }
 }

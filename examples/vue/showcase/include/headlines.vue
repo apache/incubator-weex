@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .banner {
     width: 750;
     height: 782;

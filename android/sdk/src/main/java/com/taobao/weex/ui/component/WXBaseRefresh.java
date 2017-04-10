@@ -236,16 +236,6 @@ public class WXBaseRefresh extends WXVContainer<WXFrameLayout> {
   }
 
   @Override
-  protected void setHostLayoutParams(WXFrameLayout host, int width, int height, int left, int right, int top, int bottom) {
-    if (getParent() instanceof Scrollable) {
-      //do nothing
-      return;
-    }else{
-      super.setHostLayoutParams(host, width, height, left, right, top, bottom);
-    }
-  }
-
-  @Override
   public void addChild(WXComponent child, int index) {
     super.addChild(child, index);
     this.checkLoadingIndicator(child);

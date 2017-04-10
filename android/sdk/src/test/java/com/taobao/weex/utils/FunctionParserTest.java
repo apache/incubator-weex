@@ -206,7 +206,7 @@ package com.taobao.weex.utils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.List;
 
 /**
  * Created by sospartan on 27/09/2016.
@@ -215,11 +215,12 @@ public class FunctionParserTest {
 
   @Test
   public void testParse() throws Exception {
-    new SingleFunctionParser<String>("transform(50 , 20)", new SingleFunctionParser.FlatMapper<String>() {
+    List<Integer> s = new SingleFunctionParser<>("blur(5px)", new SingleFunctionParser.FlatMapper<Integer>() {
       @Override
-      public String map(String raw) {
-        return null;
+      public Integer map(String raw) {
+        return WXUtils.getInteger(raw,0);
       }
-    }).parse("transform");
+    }).parse("blur");
+    System.out.println(s);
   }
 }

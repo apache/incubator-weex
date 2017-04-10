@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
+#import "WXJSExceptionInfo.h"
 @class WXResourceRequest;
 
 extern NSString *const bundleUrlOptionKey;
@@ -30,6 +31,11 @@ extern NSString *const bundleUrlOptionKey;
  * If Component want to freeze the rootview frame, set isRootViewFrozen YES, weex will not change the rootview frame when layout,or set NO.
  **/
 @property (nonatomic, assign) BOOL isRootViewFrozen;
+
+/**
+ * Which indicates current instance needs to be validated or not to load,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needValidate;
 
 /**
  * The scriptURL of weex bundle.

@@ -1,0 +1,16 @@
+[ignore]
+.*/node_modules/.*
+.*/test/.*
+.*/build/.*
+.*/examples/.*
+.*/doc/.*
+.*/android/.*
+.*/ios/.*
+.*/bin/.*
+.*/dist/.*
+.*/flow-typed/.*
+
+[include]
+
+[options]
+experimental.strict_type_args=false

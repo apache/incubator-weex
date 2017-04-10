@@ -1,24 +1,22 @@
-import { base } from '../mixins'
-import { validateStyles } from '../validator'
+// import { validateStyles } from '../validator'
 
 export default {
-  mixins: [base],
+  name: 'weex-a',
   props: {
     href: String
   },
   render (createElement) {
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
     return createElement('html:a', {
       attrs: {
         'weex-type': 'a',
         href: this.href
       },
-      on: this.createEventMap(),
-      staticClass: 'weex-a'
-    }, this.$slots.default)
+      on: this._createEventMap(),
+      staticClass: 'weex-a weex-ct'
+    }, this._trimTextNodeChildren(this.$slots.default))
   }
 }

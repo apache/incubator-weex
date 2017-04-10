@@ -359,8 +359,8 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
     super(instance, node, parent);
     mListener = new EmbedRenderListener(this);
 
-    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getViewPortWidth());
-    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getViewPortWidth());
+    ERROR_IMG_WIDTH = (int) WXViewUtils.getRealPxByWidth(270,instance.getInstanceViewPortWidth());
+    ERROR_IMG_HEIGHT = (int) WXViewUtils.getRealPxByWidth(260,instance.getInstanceViewPortWidth());
     if(instance instanceof EmbedManager) {
       Object itemId = node.getAttrs().get(ITEM_ID);
       if (itemId != null) {
@@ -493,6 +493,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance = null;
     }
     src = null;
+    if (getInstance() != null) {
+      getInstance().removeOnInstanceVisibleListener(this);
+    }
   }
 
   @Override
