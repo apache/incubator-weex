@@ -294,7 +294,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
    * @return true if current touch event is already consumed by gesture.
    * Reset to false when next first touch event, set to true when gesture event fired.
    */
-  public boolean isTouchEventConsumed(){
+  public boolean isTouchEventConsumedByAdvancedGesture(){
     return mIsTouchEventConsumed;
   }
 
@@ -320,14 +320,12 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           break;
         case MotionEvent.ACTION_MOVE:
           result |= handleMotionEvent(LowLevelGesture.ACTION_MOVE, event);
-          mIsTouchEventConsumed = mIsTouchEventConsumed || result;
           break;
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_POINTER_UP:
           finishDisallowInterceptTouchEvent(v);
           result |= handleMotionEvent(LowLevelGesture.ACTION_UP, event);
           result |= handlePanMotionEvent(event);
-          mIsTouchEventConsumed = mIsTouchEventConsumed || result;
           break;
         case MotionEvent.ACTION_CANCEL:
           finishDisallowInterceptTouchEvent(v);
@@ -640,7 +638,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
           component.getDomObject().getRef(),
           HighLevelGesture.LONG_PRESS.toString(),
           list.get(list.size() - 1));
-      mIsTouchEventConsumed = mIsTouchEventConsumed || true;
+      mIsTouchEventConsumed = true;
     }
   }
 
@@ -703,6 +701,7 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
         result = true;
       }
     }
+    mIsTouchEventConsumed = mIsTouchEventConsumed || result;
     return result;
   }
 
