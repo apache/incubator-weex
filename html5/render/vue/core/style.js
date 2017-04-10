@@ -16,11 +16,20 @@ export function getHeadStyleMap () {
   if (process.env.NODE_ENV === 'development') {
     tagBegin('getHeadStyleMap')
   }
+  const needToRemoveStyleSheetNodes = []
   const res = Array.from(document.styleSheets || [])
     .reduce((pre, styleSheet) => {
-      // why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
-      // because weex's components defined non-standard style attributes, which is
-      // auto ignored when access rule.cssText.
+      /**
+       * why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
+       * because weex's components defined non-standard style attributes, which is
+       * auto ignored when access rule.cssText.
+       */
+      if (!styleSheet.cssRules) {
+        /**
+         * no rules. just ignore this. probably a link stylesheet.
+         */
+        return pre
+      }
       const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/}/)
       const len = strArr.length
       const rules = []
@@ -68,8 +77,22 @@ export function getHeadStyleMap () {
             return styleObj
           }, {})
       })
+      /**
+       * remove this styleSheet node since it's in the styleMap already. And this style
+       * should only be fetched and used from styleMap to generate the final combined
+       * component style, not from the stylesheet itself.
+       */
+      needToRemoveStyleSheetNodes.push(styleSheet.ownerNode)
       return pre
     }, {})
+  if (!window._no_remove_style_sheets) {
+    needToRemoveStyleSheetNodes.forEach(function (node) {
+      node.parentNode.removeChild(node)
+    })
+  }
+  else if (process.env.NODE_ENV === 'development') {
+    console.warn(`[vue-render] you've defined '_no_remove_style_sheets' and the v-data-xx stylesheets will not be removed.`)
+  }
   if (process.env.NODE_ENV === 'development') {
     tagEnd('getHeadStyleMap')
   }

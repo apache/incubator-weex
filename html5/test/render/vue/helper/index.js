@@ -5,6 +5,7 @@ import Vue from 'vue/dist/vue.esm.js'
 // import { base, scrollable, style, inputCommon } from '../../../render/vue/mixins'
 import { base, style } from '../../../../render/vue/mixins'
 import weex from '../../../../render/vue/env/weex'
+import { setVue } from '../../../../render/vue/env'
 
 import * as utils from './utils'
 
@@ -25,6 +26,9 @@ export function init (title, fn) {
 
       window.global = window
       global.weex = weex
+      setVue(Vue)
+
+      window._no_remove_style_sheets = true
     })
 
     const helper = {
@@ -36,14 +40,7 @@ export function init (title, fn) {
        * @param  {object} component.
        */
       register (name, component) {
-        components[name] = component
-      },
-
-      /**
-       * reset registered components with empty object.
-       */
-      reset () {
-        components = {}
+        global.weex.registerComponent(name, component)
       },
 
       /**
@@ -52,7 +49,7 @@ export function init (title, fn) {
        * @return {Vue} vue instance.
        */
       createVm (options = {}) {
-        options.components = components
+        // options.components = components
         return new Vue(options).$mount()
       },
 
@@ -70,10 +67,6 @@ export function init (title, fn) {
      * describe a vue-render test for certain vue verson.
      */
     describe(`Vue ${Vue.version}`, () => {
-      after(function () {
-        helper.reset()
-      })
-
       fn(Vue, helper)
     })
   })

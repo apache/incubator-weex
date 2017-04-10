@@ -1,4 +1,4 @@
-import { extractComponentStyle } from '../core/style'
+import { extractComponentStyle, createEventMap } from '../core'
 import { extend } from '../utils'
 
 const _css = `
@@ -66,7 +66,7 @@ export default {
         'img-src': preProcessSrc(this, this.src, style),
         'img-placeholder': preProcessSrc(this, this.placeholder, style)
       },
-      on: this._createEventMap(['load', 'error']),
+      on: createEventMap(this, ['load', 'error']),
       staticClass: 'weex-image weex-el',
       staticStyle: extend(style, resizeStyle)
     })

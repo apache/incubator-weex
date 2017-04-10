@@ -1,5 +1,5 @@
 // import { validateStyles } from '../../validator'
-import { extractComponentStyle } from '../../core'
+import { extractComponentStyle, createEventMap } from '../../core'
 import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
@@ -40,7 +40,12 @@ export default {
     interval: {
       type: [String, Number],
       default: 3000
+    },
+    infinite: {
+      type: [String, Boolean],
+      default: true
     }
+
   },
 
   data () {
@@ -131,7 +136,6 @@ export default {
 
       this._autoPlayTimer = setTimeout(autoPlayFn, interval)
     }
-
     this.reorder()
     fireLazyload(this.$el, true)
   },
@@ -150,7 +154,7 @@ export default {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
         staticClass: 'weex-slider weex-slider-wrapper weex-ct',
-        on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
+        on: extend(createEventMap(this, ['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd

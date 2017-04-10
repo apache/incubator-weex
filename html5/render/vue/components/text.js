@@ -6,7 +6,7 @@
  * be clipped according to the 'lines'. Otherwise, it'll be the 'height'.
  */
 
-import { extractComponentStyle } from '../core'
+import { extractComponentStyle, createEventMap } from '../core'
 import { extend } from '../utils'
 
 const _css = `
@@ -51,7 +51,7 @@ export default {
     const textSpecStyle = getTextSpecStyle(style)
     return createElement('p', {
       attrs: { 'weex-type': 'text' },
-      on: this._createEventMap(),
+      on: createEventMap(this),
       staticClass: 'weex-text weex-el',
       staticStyle: extend(style, textSpecStyle)
     }, this.$slots.default || [this.value])
