@@ -434,7 +434,7 @@ public class Constants {
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
-    String KEYBOARD_EVENT = "keyboardevent";
+    String KEYBOARD = "keyboard";
   }
 
   public interface PSEUDO {

@@ -439,7 +439,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
       });
     }
 
-    if (Constants.Event.KEYBOARD_EVENT.equals(type)) {
+    if (Constants.Event.KEYBOARD.equals(type)) {
       mListeningKeyboard = true;
     }
   }
@@ -901,7 +901,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           if (mListeningKeyboard) {
             Map<String, Object> event = new HashMap<>(1);
             event.put("isShow", isShown);
-            fireEvent(Constants.Event.KEYBOARD_EVENT, event);
+            fireEvent(Constants.Event.KEYBOARD, event);
           }
           if (!isShown) {
             blur();
