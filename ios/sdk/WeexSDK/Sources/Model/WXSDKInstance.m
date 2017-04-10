@@ -292,7 +292,7 @@ typedef enum : NSUInteger {
     }
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
-    
+
     if (_componentManager) {
         [_componentManager invalidate];
     }

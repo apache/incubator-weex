@@ -68,6 +68,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
+        _componentType = WXComponentTypeCommon;
         _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
@@ -175,6 +176,9 @@
 
 - (UIView *)view
 {
+    if (_componentType != WXComponentTypeCommon) {
+        return nil;
+    }
     if ([self isViewLoaded]) {
         return _view;
     } else {
@@ -485,6 +489,7 @@
 
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;

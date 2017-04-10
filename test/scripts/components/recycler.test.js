@@ -11,26 +11,26 @@ var util = require("../util.js");
 const platform = process.env.platform.toLowerCase() || 'android';
 const isAndroid = platform === 'android';
 
-const fixedPath = '//div[1]'
-const header1Path = '//recycler[1]/div[1]/'
-const header2Path = '//recycler[1]/div[2]/'
-const cell1Path = isAndroid ? '//recycler[1]/div[3]/' : '//recycler[1]/cell[1]/'
-const cell2Path = isAndroid ? '//recycler[1]/div[4]/' : '//recycler[1]/cell[2]/'
-const cell3Path = isAndroid ? '//recycler[1]/div[5]/' : '//recycler[1]/cell[3]/'
-const cell4Path = isAndroid ? '//recycler[1]/div[6]/' : '//recycler[1]/cell[4]/'
-const cell27Path = isAndroid ? '//recycler[1]/div[29]/' : '//recycler[1]/cell[27]/'
-const cell28Path = isAndroid ? '//recycler[1]/div[30]/' : '//recycler[1]/cell[28]/'
-const cell29Path = isAndroid ? '//recycler[1]/div[31]/' : '//recycler[1]/cell[29]/'
-const cell30Path = isAndroid ? '//recycler[1]/div[32]/' : '//recycler[1]/cell[30]/'
-const footerPath = '//recycler[1]/div[1]'
+// const fixedPath = '//div[1]'
+// const header1Path = '//recycler[1]/div[1]/'
+// const header2Path = '//recycler[1]/div[2]/'
+// const cell1Path = isAndroid ? '//recycler[1]/div[3]/' : '//recycler[1]/cell[1]/'
+// const cell2Path = isAndroid ? '//recycler[1]/div[4]/' : '//recycler[1]/cell[2]/'
+// const cell3Path = isAndroid ? '//recycler[1]/div[5]/' : '//recycler[1]/cell[3]/'
+// const cell4Path = isAndroid ? '//recycler[1]/div[6]/' : '//recycler[1]/cell[4]/'
+// const cell27Path = isAndroid ? '//recycler[1]/div[29]/' : '//recycler[1]/cell[27]/'
+// const cell28Path = isAndroid ? '//recycler[1]/div[30]/' : '//recycler[1]/cell[28]/'
+// const cell29Path = isAndroid ? '//recycler[1]/div[31]/' : '//recycler[1]/cell[29]/'
+// const cell30Path = isAndroid ? '//recycler[1]/div[32]/' : '//recycler[1]/cell[30]/'
+// const footerPath = '//recycler[1]/div[1]'
 
 const isApproximate = (x, y) =>  {
-  return Math.abs(x - y) <= isAndroid ? 1 : 0.5
+  return Math.abs(x - y) <= (isAndroid ? 1 : 1.5)
 }
 
-if (isAndroid) {
-  return;
-}
+// if (isAndroid) {
+//   return;
+// }
 
 describe('recycler', function () {
   this.timeout(util.getTimeoutMills())
@@ -39,7 +39,7 @@ describe('recycler', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
-      .waitForElementByXPath('//recycler[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -63,7 +63,7 @@ describe('recycler', function () {
       console.log(`scale factor:${scaleFactor}`)
     })
     .sleep(2000)
-    .elementByXPath('//recycler[1]')
+    .elementById('waterfall')
     .getRect()
     .then((rect)=>{
       console.log(`recycler rect:${JSON.stringify(rect)}`)
@@ -72,7 +72,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth))
       assert.isOk(isApproximate(rect.height, screenHeight - navBarHeight))
     })
-    .elementByXPath(header1Path)
+    .elementById('header1')
     .getRect()
     .then((rect)=>{
       console.log(`header 1 rect:${JSON.stringify(rect)}`)
@@ -81,7 +81,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth))
       assert.isOk(isApproximate(rect.height, 377 * scaleFactor))
     })
-    .elementByXPath(header2Path)
+    .elementById('header2')
     .getRect()
     .then((rect)=>{
       console.log(`header 2 rect:${JSON.stringify(rect)}`)
@@ -90,7 +90,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
-    .elementByXPath(cell1Path)
+    .elementById('cell0')
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect:${JSON.stringify(rect)}`)
@@ -99,7 +99,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
     })
-    .elementByXPath(cell2Path)
+    .elementById('cell1')
     .getRect()
     .then((rect)=>{
       console.log(`cell 2 rect:${JSON.stringify(rect)}`)
@@ -108,7 +108,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
     })
-    .elementByXPath(cell3Path)
+    .elementById('cell2')
     .getRect()
     .then((rect)=>{
       console.log(`cell 3 rect:${JSON.stringify(rect)}`)
@@ -116,7 +116,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell2Height))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
     })
-    .elementByXPath(cell4Path)
+    .elementById('cell3')
     .getRect()
     .then((rect)=>{
       console.log(`cell 4 rect:${JSON.stringify(rect)}`)
@@ -128,9 +128,9 @@ describe('recycler', function () {
 
   it('#2 test column count', () => {
     return driver
-    .elementByXPath(cell3Path)
+   .elementById('cell2')
     .click()
-    .elementByXPath(cell1Path)
+    .elementById('cell0')
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect after changing column count to 3:${JSON.stringify(rect)}`)
@@ -138,7 +138,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 242 * scaleFactor))
     })
-    .elementByXPath(cell2Path)
+    .elementById('cell1')
     .getRect()
     .then((rect)=>{
       console.log(`cell 2 rect after changing column count to 3:${JSON.stringify(rect)}`)
@@ -147,7 +147,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 242 * scaleFactor))
     })
-    .elementByXPath(cell3Path)
+   .elementById('cell2')
     .getRect()
     .then((rect)=>{
       console.log(`cell 3 rect after changing column count to 3:${JSON.stringify(rect)}`)
@@ -155,7 +155,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 242 * scaleFactor))
     })
-    .elementByXPath(cell4Path)
+   .elementById('cell3')
     .getRect()
     .then((rect)=>{
       console.log(`cell 4 rect after changing column count to 3:${JSON.stringify(rect)}`)
@@ -163,15 +163,15 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell2Height))
       assert.isOk(isApproximate(rect.width, 242 * scaleFactor))
     })
-    .elementByXPath(cell3Path)
+    .elementById('cell2')
     .click()
   })
 
   it('#3 test column gap', () => {
     return driver
-    .elementByXPath(cell2Path)
+    .elementById('cell1')
     .click()
-    .elementByXPath(cell1Path)
+    .elementById('cell0')
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect after changing column gap to normal:${JSON.stringify(rect)}`)
@@ -180,7 +180,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
-    .elementByXPath(cell2Path)
+     .elementById('cell1')
     .getRect()
     .then((rect)=>{
       console.log(`cell 2 rect after changing column gap to normal:${JSON.stringify(rect)}`)
@@ -189,7 +189,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
-    .elementByXPath(cell3Path)
+    .elementById('cell2')
     .getRect()
     .then((rect)=>{
       console.log(`cell 3 rect after changing column gap to normal:${JSON.stringify(rect)}`)
@@ -197,7 +197,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell2Height))
       assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
-    .elementByXPath(cell4Path)
+     .elementById('cell3')
     .getRect()
     .then((rect)=>{
       console.log(`cell 4 rect after changing column gap to normal:${JSON.stringify(rect)}`)
@@ -205,15 +205,15 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell1Height))
       assert.isOk(isApproximate(rect.width, 359 * scaleFactor))
     })
-    .elementByXPath(cell2Path)
+    .elementById('cell1')
     .click()
   })
 
   it('#4 test column width', () => {
     return driver
-    .elementByXPath(cell1Path)
+     .elementById('cell0')
     .click()
-    .elementByXPath(cell1Path)
+    .elementById('cell0')
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect after changing column width to 600:${JSON.stringify(rect)}`)
@@ -222,7 +222,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
       assert.isOk(isApproximate(rect.width, recyclerWidth))
     })
-    .elementByXPath(cell2Path)
+    .elementById('cell1')
     .getRect()
     .then((rect)=>{
       console.log(`cell 2 rect after changing column width to 600:${JSON.stringify(rect)}`)
@@ -231,15 +231,15 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor + cell1Height))
       assert.isOk(isApproximate(rect.width, recyclerWidth))
     })
-    .elementByXPath(cell1Path)
+    .elementById('cell0')
     .click()
   })
 
   it('#5 test deleting header', () => {
     return driver
-    .elementByXPath(header2Path)
+    .elementById('header2')
     .click()
-    .elementByXPath(header1Path)
+     .elementById('header1')
     .getRect()
     .then((rect)=>{
       console.log(`header 2 rect after deleting header 1:${JSON.stringify(rect)}`)
@@ -247,16 +247,16 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.y, navBarHeight))
       assert.isOk(isApproximate(rect.width, recyclerWidth))
     })
-    .elementByXPath(header2Path)
+   .elementById('header2')
     .click()
   })
 
   it('#6 test footer', () => {
     return driver
-    .elementByXPath(fixedPath)
+   .elementById('fixed1')
     .click()
     .sleep(500)
-    .elementByXPath(footerPath)
+    .elementById('footer1')
     .getRect()
     .then((rect)=>{
       console.log(`footer rect:${JSON.stringify(rect)}`)
@@ -268,8 +268,8 @@ describe('recycler', function () {
   })
 
   it('#7 test sticky and fixed', () => {
-    return driver
-    .elementByXPath(fixedPath)
+    return driver  
+   .elementById('fixed1')
     .getRect()
     .then((rect)=>{
       console.log(`fixed rect:${JSON.stringify(rect)}`)
@@ -278,7 +278,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, 78 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 78 * scaleFactor))
     })
-    .elementByXPath(header2Path)
+    .elementById('header2')
     .getRect()
     .then((rect)=>{
       console.log(`sticky header rect:${JSON.stringify(rect)}`)
@@ -291,9 +291,9 @@ describe('recycler', function () {
 
   it('#8 test removing cell', () => {
     return driver
-    .elementByXPath(cell29Path)
+    .elementById('cell28')
     .click()
-    .elementByXPath(cell28Path)
+    .elementById('cell27')
     .getRect()
     .then((rect)=>{
       console.log(`cell 28 rect after removing cell 29:${JSON.stringify(rect)}`)
@@ -305,14 +305,14 @@ describe('recycler', function () {
 
   it('#9 test moving cell', () => {
     return driver
-    .elementByXPath(cell29Path)
+    .elementById('cell29')
     .click()
-    .elementByXPath(fixedPath)
+    .elementById('fixed1')
     .click()
-    .elementByXPath(cell29Path)
+    .elementById('cell27')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 28 rect after moving cell 29 to 1:${JSON.stringify(rect)}`)
+      console.log(`cell 28 rect after moving cell 30 to 1:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
       assert.isOk(isApproximate(rect.y, screenHeight - 94 * scaleFactor - rect.height))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
@@ -321,11 +321,11 @@ describe('recycler', function () {
 
   it('#10 test recycler padding', () => {
     return driver
-    .elementByXPath(cell28Path)
+    .elementById('cell26')
     .click()
-    .elementByXPath(fixedPath)
+    .elementById('fixed1')
     .click()
-    .elementByXPath(header2Path)
+    .elementById('header2')
     .getRect()
     .then((rect)=>{
       console.log(`sticking header rect after setting padding to 12:${JSON.stringify(rect)}`)
@@ -334,7 +334,7 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
-    .elementByXPath(footerPath)
+    .elementById('footer1')
     .getRect()
     .then((rect)=>{
       console.log(`footer rect after setting padding to 12:${JSON.stringify(rect)}`)
@@ -343,31 +343,36 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
-    .elementByXPath(cell28Path)
+    .elementById('cell27')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 28 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 27 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
-    .elementByXPath(cell29Path)
+    .elementById('cell28')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 29 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 28 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
-    .elementByXPath(cell28Path)
+     .elementById('cell27')
     .click()
   })
 
   it('#11 test onscroll', () => {
     let originContentOffset = 0
     return driver
-    .elementByXPath(cell29Path)
+    .elementById('cell28')
+    .getRect()
+    .then((rect)=>{
+      console.log(`cell 29 rect:${JSON.stringify(rect)}`)
+    })
+    .elementById('cell28')
     .click()
-    .elementByXPath(header2Path + '/div[1]/div[1]/text[1]')
-    .text()
+    .elementById('stickyText1')
+    .text() 
     .then(text => {
       console.log(text)
       originContentOffset = Number.parseInt(text.replace('Content Offset:-',''))
@@ -375,30 +380,30 @@ describe('recycler', function () {
     .touch('drag', {fromX:recyclerWidth / 2, fromY:screenHeight / 5, toX:recyclerWidth / 2, toY: screenHeight * 4 / 5})
     .sleep(1000)
     .touch('drag', {fromX:recyclerWidth / 2, fromY:screenHeight / 5, toX:recyclerWidth / 2, toY: screenHeight * 4 / 5})
-    .elementByXPath(header2Path + '/div[1]/div[1]/text[1]')
+    .elementById('stickyText1')
     .text()
     .then(text => {
       console.log(text)
       const contentOffset = Number.parseInt(text.replace('Content Offset:-',''))
       assert.isOk(originContentOffset - contentOffset > screenHeight / scaleFactor)
     })
-    .elementByXPath(fixedPath)
+    .elementById('fixed1')
     .click()
   })
 
   it('#12 test scrollable', () => {
     let originContentOffset = 0
     return driver
-    .elementByXPath(cell27Path)
+    .elementById('cell26')
     .click()
-    .elementByXPath(header2Path + '/div[1]/div[1]/text[1]')
+    .elementById('stickyText1')
     .text()
     .then(text => {
       console.log(text)
       originContentOffset = Number.parseInt(text.replace('Content Offset:-',''))
     })
     .touch('drag', {fromX:recyclerWidth / 2, fromY:screenHeight / 5, toX:recyclerWidth / 2, toY: screenHeight * 4 / 5})
-    .elementByXPath(header2Path + '/div[1]/div[1]/text[1]')
+    .elementById('stickyText1')
     .text()
     .then(text => {
       console.log(text)
