@@ -246,6 +246,10 @@ _Pragma("clang diagnostic pop") \
     if([self.insStack containsObject:instance]){
         [self.insStack removeObject:instance];
     }
+    
+    if(_jsBridge){
+        [_jsBridge removeTimers:instance];
+    }
 
     if(self.sendQueue[instance]){
         [self.sendQueue removeObjectForKey:instance];

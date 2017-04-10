@@ -59,15 +59,9 @@
     }
 }
 
-- (WXDisplayCompletionBlock)displayCompletionBlock
+- (void)didFinishDrawingLayer:(BOOL)success
 {
-    return ^(CALayer *layer, BOOL finished) {
-        if ([super displayCompletionBlock]) {
-            [super displayCompletionBlock](layer, finished);
-        }
-        
-        [self.delegate cellDidRendered:self];
-    };
+    [self.delegate cellDidRendered:self];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes

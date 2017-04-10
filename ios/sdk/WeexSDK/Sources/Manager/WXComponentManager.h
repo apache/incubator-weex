@@ -141,6 +141,10 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
  **/
 - (void)unload;
 
+/**
+ * @abstract invalidate component management, this can be called on main thread.
+ **/
+- (void)invalidate;
 
 ///--------------------------------------
 /// @name Fixed

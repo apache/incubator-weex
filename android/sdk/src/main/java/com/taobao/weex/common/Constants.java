@@ -400,6 +400,7 @@ public class Constants {
     String DIRECTION_RIGHT = "right";
     String DIRECTION_UP = "up";
     String DIRECTION_DOWN = "down";
+    String NUMBER = "number";
 
     String NONE = "none";
     String DEFAULT = "default";
@@ -435,6 +436,7 @@ public class Constants {
     String RESUME_EVENT = "WXApplicationDidBecomeActiveEvent";
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
+    String KEYBOARD = "keyboard";
   }
 
   public interface PSEUDO {

@@ -44,100 +44,6 @@
     return [WXLayer class];
 }
 
-- (UIImage *)drawTextWithBounds:(CGRect)bounds padding:(UIEdgeInsets)padding
-{
-    if (bounds.size.width <=0 || bounds.size.height <= 0) {
-        return nil;
-    }
-    UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, WXScreenScale());
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    if ([self.wx_component _needsDrawBorder]) {
-        [self.wx_component _drawBorderWithContext:context size:bounds.size];
-    } else {
-        WXPerformBlockOnMainThread(^{
-            [self.wx_component _resetNativeBorderRadius];
-        });
-    }
-    if (![[self.wx_component valueForKey:@"coretext"] boolValue]) {
-        NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
-        NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
-        
-        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
-        NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
-        
-        [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
-        [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        return image;
-    }else {
-        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
-        // sufficient height for text to draw, or frame lines will be empty
-        textFrame.size.height = bounds.size.height*2;
-        
-        //flip the coordinate system
-        CGContextRetain(context);
-        CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-        CGContextTranslateCTM(context, 0, textFrame.size.height);
-        CGContextScaleCTM(context, 1.0, -1.0);
-        
-        //add path
-        CGMutablePathRef path = CGPathCreateMutable();
-        CGPathAddRect(path, NULL, textFrame);
-        NSMutableAttributedString * attributedStringCopy = [_attributedString mutableCopy];
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-        
-        CFArrayRef lines = CTFrameGetLines(frame);
-        CFIndex lineCount = CFArrayGetCount(lines);
-        CGPoint lineOrigins[lineCount];
-        CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
-        
-        CGFloat frameY = 0;
-        for (CFIndex index = 0; index < lineCount; index ++) {
-            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
-            CGFloat lineAscent;
-            CGFloat lineDescent;
-            CGFloat lineLeading;
-            
-            CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);
-            CGPoint lineOrigin = lineOrigins[index];
-            
-            NSLog(@"lineAscent = %f",lineAscent);
-            NSLog(@"lineDescent = %f",lineDescent);
-            NSLog(@"lineLeading = %f",lineLeading);
-            
-            if (index > 0) {
-                frameY = frameY - lineAscent;
-            }else {
-                frameY = lineOrigin.y;
-            }
-            lineOrigin.x += padding.left;
-            lineOrigin.y -= padding.top;
-            NSLog(@"lines: %ld origin: %@",index, NSStringFromCGPoint(lineOrigin));
-            CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
-//            CTLineDraw(lineRef, context);
-            CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
-            for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
-                CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
-                CTRunDraw(run, context, CFRangeMake(0, 0));
-            }
-            frameY = frameY - lineDescent;
-        }
-        
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        
-        CFRelease(frame);
-        CFRelease(framesetter);
-        CGPathRelease(path);
-        CGContextRelease(context);
-        
-        return image;
-    }
-}
-
 - (void)setTextStorage:(NSTextStorage *)textStorage
 {
     if (_textStorage != textStorage) {
@@ -195,15 +101,6 @@
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
-   
-    pthread_mutex_t _textStorageMutex;
-    pthread_mutexattr_t _textStorageMutexAttr;
-}
-
-static BOOL _isUsingTextStorageLock = NO;
-+ (void)useTextStorageLock:(BOOL)isUsingTextStorageLock
-{
-    _isUsingTextStorageLock = isUsingTextStorageLock;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -215,11 +112,6 @@ static BOOL _isUsingTextStorageLock = NO;
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        if (_isUsingTextStorageLock) {
-            pthread_mutexattr_init(&_textStorageMutexAttr);
-            pthread_mutexattr_settype(&_textStorageMutexAttr, PTHREAD_MUTEX_RECURSIVE);
-            pthread_mutex_init(&_textStorageMutex, &_textStorageMutexAttr);
-        }
         if (attributes[@"coretext"]) {
             _coretext = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
@@ -234,10 +126,6 @@ static BOOL _isUsingTextStorageLock = NO;
 
 - (void)dealloc
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_destroy(&_textStorageMutex);
-        pthread_mutexattr_destroy(&_textStorageMutexAttr);
-    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -305,13 +193,7 @@ do {\
 
 - (void)setNeedsRepaint
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     _textStorage = nil;
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
 }
 
 #pragma mark - Subclass
@@ -323,14 +205,8 @@ do {\
 
 - (void)viewDidLoad
 {
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     ((WXText *)self.view).textStorage = _textStorage;
     ((WXText *)self.view).attributedString = [self buildCTAttributeString];
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
     [self setNeedsDisplay];
 }
 
@@ -339,25 +215,22 @@ do {\
     return [[WXText alloc] init];
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
 {
-    WXText *textView = ((WXText *)self.view);
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_lock(&_textStorageMutex);
-        }
-        
-        UIImage *image = [textView drawTextWithBounds:bounds padding:_padding];
-        
-        if (_isUsingTextStorageLock) {
-            pthread_mutex_unlock(&_textStorageMutex);
-        }
-        
-        return image;
-    };
+    return YES;
+}
+
+- (UIImage *)drawRect:(CGRect)rect;
+{
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    if (_isCompositingChild) {
+        [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
+    } else {
+        WXText *textView = ((WXText *)self.view);
+        [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
+    }
+    
+    return nil;
 }
 
 - (CGSize (^)(CGSize))measureBlock
@@ -399,6 +272,7 @@ do {\
 }
 
 #pragma mark Text Building
+
 - (NSString *)text
 {
     return _text;
@@ -587,14 +461,7 @@ do {\
     [layoutManager ensureLayoutForTextContainer:textContainer];
     
     _textStorageWidth = width;
-    
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_lock(&_textStorageMutex);
-    }
     _textStorage = textStorage;
-    if (_isUsingTextStorageLock) {
-        pthread_mutex_unlock(&_textStorageMutex);
-    }
     
     return textStorage;
 }
@@ -607,14 +474,8 @@ do {\
     
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
-            if (_isUsingTextStorageLock) {
-                pthread_mutex_lock(&_textStorageMutex);
-            }
             ((WXText *)self.view).textStorage = textStorage;
             ((WXText *)self.view).attributedString = attributedString;
-            if (_isUsingTextStorageLock) {
-                pthread_mutex_unlock(&_textStorageMutex);
-            }
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
@@ -643,6 +504,89 @@ do {\
     [self fillAttributes:attributes];
     
     [self syncTextStorageForView];
+}
+
+- (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
+{
+    if (bounds.size.width <=0 || bounds.size.height <= 0) {
+        return;
+    }
+    
+    if ([self _needsDrawBorder]) {
+        [self _drawBorderWithContext:context size:bounds.size];
+    } else {
+        WXPerformBlockOnMainThread(^{
+            [self _resetNativeBorderRadius];
+        });
+    }
+    if (!self.coretext) {
+        NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
+        NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+        
+        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+        NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+        
+        [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
+        [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
+    }else {
+        CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
+        // sufficient height for text to draw, or frame lines will be empty
+        textFrame.size.height = bounds.size.height*2;
+        
+        //flip the coordinate system
+        CGContextRetain(context);
+        CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+        CGContextTranslateCTM(context, 0, textFrame.size.height);
+        CGContextScaleCTM(context, 1.0, -1.0);
+        
+        //add path
+        CGMutablePathRef path = CGPathCreateMutable();
+        CGPathAddRect(path, NULL, textFrame);
+        NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+        
+        CFArrayRef lines = CTFrameGetLines(frame);
+        CFIndex lineCount = CFArrayGetCount(lines);
+        CGPoint lineOrigins[lineCount];
+        CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
+        
+        CGFloat frameY = 0;
+        for (CFIndex index = 0; index < lineCount; index ++) {
+            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
+            CGFloat lineAscent;
+            CGFloat lineDescent;
+            CGFloat lineLeading;
+            
+            CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);
+            CGPoint lineOrigin = lineOrigins[index];
+            
+            NSLog(@"lineAscent = %f",lineAscent);
+            NSLog(@"lineDescent = %f",lineDescent);
+            NSLog(@"lineLeading = %f",lineLeading);
+            
+            if (index > 0) {
+                frameY = frameY - lineAscent;
+            }else {
+                frameY = lineOrigin.y;
+            }
+            lineOrigin.x += padding.left;
+            lineOrigin.y -= padding.top;
+            NSLog(@"lines: %ld origin: %@",index, NSStringFromCGPoint(lineOrigin));
+            CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
+            //            CTLineDraw(lineRef, context);
+            CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
+            for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
+                CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
+                CTRunDraw(run, context, CFRangeMake(0, 0));
+            }
+            frameY = frameY - lineDescent;
+        }
+        
+        CFRelease(frame);
+        CFRelease(framesetter);
+        CGPathRelease(path);
+    }
 }
 
 #ifdef UITEST

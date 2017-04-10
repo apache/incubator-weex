@@ -14,6 +14,8 @@
 #import "WXType.h"
 #import "WXConvert.h"
 #import "WXURLRewriteProtocol.h"
+#import "WXRoundedRect.h"
+#import "UIBezierPath+Weex.h"
 
 @interface WXImageView : UIImageView
 
@@ -154,42 +156,37 @@ static dispatch_queue_t WXImageUpdateQueue;
     imageView.clipsToBounds = YES;
     imageView.exclusiveTouch = YES;
     
+    [self _clipsToBounds];
+    
     [self updateImage];
     
 }
 
-- (WXDisplayBlock)displayBlock
+- (BOOL)needsDrawRect
 {
-    if ([self isViewLoaded]) {
-        // if has a image view, image is setted by image view, displayBlock is not needed
+    if (_isCompositingChild) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+- (UIImage *)drawRect:(CGRect)rect;
+{
+    if (!self.image) {
+        [self updateImage];
         return nil;
     }
     
-    __weak typeof(self) weakSelf = self;
-    return ^UIImage *(CGRect bounds, BOOL(^isCancelled)(void)) {
-        if (isCancelled()) {
-            return nil;
-        }
-        
-        if (!weakSelf.image) {
-            [weakSelf updateImage];
-            return nil;
-        }
-        
-        if (isCancelled && isCancelled()) {
-            return nil;
-        }
-        
-        UIGraphicsBeginImageContextWithOptions(bounds.size, self.layer.opaque, 1.0);
-        
-        [weakSelf.image drawInRect:bounds];
-        
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        
-        UIGraphicsEndImageContext();
-        
-        return image;
-    };
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+
+    WXRadii *radii = borderRect.radii;    
+    if ([radii hasBorderRadius]) {
+        CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
+        UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:rect topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+        [bezierPath addClip];
+    }
+    return self.image;
 }
 
 - (void)viewWillUnload
@@ -197,6 +194,13 @@ static dispatch_queue_t WXImageUpdateQueue;
     [super viewWillUnload];
     [self cancelImage];
     _image = nil;
+}
+
+- (void)_frameDidCalculated:(BOOL)isChanged
+{
+    if ([self isViewLoaded] && isChanged) {
+        [self _clipsToBounds];
+    }
 }
 
 - (void)setImageSrc:(NSString*)src
@@ -262,6 +266,9 @@ static dispatch_queue_t WXImageUpdateQueue;
                     ((UIImageView *)strongSelf.view).image = image;
                     weakSelf.imageDownloadFinish = YES;
                     [self readyToRender];
+                } else if (strongSelf->_isCompositingChild) {
+                    strongSelf->_image = image;
+                    weakSelf.imageDownloadFinish = YES;
                 }
             });
         }];
@@ -302,6 +309,10 @@ static dispatch_queue_t WXImageUpdateQueue;
                         strongSelf.imageDownloadFinish = YES;
                         ((UIImageView *)strongSelf.view).image = image;
                         [strongSelf readyToRender];
+                    } else if (strongSelf->_isCompositingChild) {
+                        strongSelf.imageDownloadFinish = YES;
+                        strongSelf->_image = image;
+                        [strongSelf setNeedsDisplay];
                     }
                 });
             }];
@@ -335,9 +346,28 @@ static dispatch_queue_t WXImageUpdateQueue;
     return imageLoader;
 }
 
-- (BOOL)_needsDrawBorder
+- (void)_clipsToBounds
 {
-    return NO;
+    if (!_clipToBounds) {
+        return;
+    }
+    
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.view.bounds topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    // here is computed radii, do not use original style
+    WXRadii *radii = borderRect.radii;
+    
+    if ([radii radiusesAreEqual]) {
+        return;
+    }
+    
+    CGFloat topLeft = radii.topLeft, topRight = radii.topRight, bottomLeft = radii.bottomLeft, bottomRight = radii.bottomRight;
+    
+    // clip to border radius
+    UIBezierPath *bezierPath = [UIBezierPath wx_bezierPathWithRoundedRect:self.view.bounds topLeft:topLeft topRight:topRight bottomLeft:bottomLeft bottomRight:bottomRight];
+    
+    CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+    shapeLayer.path = bezierPath.CGPath;
+    self.layer.mask = shapeLayer;
 }
 
 #ifdef UITEST

@@ -1377,7 +1377,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
 
 @end
 
-@interface WXSliderNeighborComponent() {
+@interface WXSliderNeighborComponent () <WXIndicatorComponentDelegate>{
     WXPixelType neighborSpace;
     CGFloat neighborAlpha;
     CGFloat neighborScale;
@@ -1487,6 +1487,7 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         
         WXSliderNeighborView *sliderView = (WXSliderNeighborView *)self.view;
         if ([view isKindOfClass:[WXIndicatorView class]]) {
+            ((WXIndicatorComponent *)subcomponent).delegate = self;
             [sliderView addSubview:view];
             return;
         }
@@ -1585,6 +1586,8 @@ NSComparisonResult sliderNeighorCompareViewDepth(UIView *view1, UIView *view2, W
         _sliderChangeEvent = NO;
     }
 }
+
+#pragma mark WXIndicatorComponentDelegate Methods
 
 - (void)setIndicatorView:(WXIndicatorView *)indicatorView
 {

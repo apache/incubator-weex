@@ -45,6 +45,10 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
 - (void)resetEnvironment;
 
 @optional
+/**
+ * Remove instance's timer.
+ */
+-(void)removeTimers:(NSString *)instance;
 
 /**
  * Called when garbage collection is wanted by sdk.

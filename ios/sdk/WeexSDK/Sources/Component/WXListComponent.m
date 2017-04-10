@@ -610,6 +610,8 @@
     
     [cellView.contentView addSubview:cell.view];
     
+    [cellView setAccessibilityIdentifier:cell.view.accessibilityIdentifier];
+    
     WXLogDebug(@"Created cell:%@ view:%@ cellView:%@ at indexPath:%@", cell.ref, cell.view, cellView, indexPath);
     return cellView;
 }

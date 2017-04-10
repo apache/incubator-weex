@@ -68,6 +68,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
+        _componentType = WXComponentTypeCommon;
         _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
@@ -95,6 +96,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -174,13 +176,16 @@
 
 - (UIView *)view
 {
+    if (_componentType != WXComponentTypeCommon) {
+        return nil;
+    }
     if ([self isViewLoaded]) {
         return _view;
     } else {
         WXAssertMainThread();
         
         // compositing child will be drew by its composited ancestor
-        if (_compositingChild) {
+        if (_isCompositingChild) {
             return nil;
         }
         
@@ -332,6 +337,10 @@
         subcomponent->_isNeedJoinLayoutSystem = NO;
     }
     
+    if (_useCompositing || _isCompositingChild) {
+        subcomponent->_isCompositingChild = YES;
+    }
+    
     [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
 }
@@ -480,6 +489,7 @@
 
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;

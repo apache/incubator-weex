@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "WXLayoutDefine.h"
+#import "WXType.h"
 
 @class WXSDKInstance;
 
@@ -59,6 +60,11 @@ NS_ASSUME_NONNULL_BEGIN
  *  @abstract The component's type string.
  */
 @property (nonatomic, readonly, copy) NSString *type;
+
+/**
+ *  @abstract The component's type.
+ */
+@property (nonatomic, assign) WXComponentType componentType;
 
 /**
  *  @abstract The component's styles.
@@ -324,13 +330,65 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Display
 ///--------------------------------------
 
-typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
-typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
-
 /**
  * @abstract Marks the view as needing display. The method should be called on the main thread.
+ * @discussion You can use this method to notify the system that your component's contents need to be redrawn. This method makes a note of the request and returns immediately. The component is not actually redrawn until the next drawing cycle, at which point all invalidated components are updated.
+ *
  */
 - (void)setNeedsDisplay;
+
+/**
+ * @abstract Returns a Boolean indicating whether the component needs to be drawn by `drawRect:`
+ */
+- (BOOL)needsDrawRect;
+
+/**
+ * @abstract Draws the component’s image within the passed-in rectangle.
+ * @parameter rect The rectangle which is the entire visible bounds of your component. 
+ * @return A UIImage containing the contents of the current bitmap graphics context.
+ * @discussion 
+ * Subclasses that use technologies such as Core Graphics and UIKit to draw their own component’s content should override this method and implement their drawing code there. You do not need to override this method if your component sets its content in superclass's way.
+ * By the time this method is called, UIKit has configured the drawing environment appropriately for your view and you can simply call whatever drawing methods and functions you need to render your content. Specifically, Weex creates and configures a graphics context for drawing and adjusts the transform of that context so that its origin matches the origin of your components’s bounds rectangle. You can get a reference to the graphics context using the `UIGraphicsGetCurrentContext` function, but do not establish a strong reference to the graphics context because it can change between calls to the drawRect: method.
+ * If you already have an image that represents the content of the component, then you should just return the image and do no drawing, otherwise you should draw your content in the current context and return nil.
+ * You should never call this method directly yourself. To invalidate part of your component's content, and thus cause that portion to be redrawn, call the `setNeedsDisplay` method instead.
+ */
+- (UIImage *)drawRect:(CGRect)rect;
+
+/**
+ * @abstract Called when a component finishes drawing its content.
+ * @discussion Do not call this method directly. Weex calls this method at appropriate times to finish updating the component's content.
+ * Subclasses can override this method to perform additional work on components that were rendered.
+ */
+- (void)didFinishDrawingLayer:(BOOL)success;
+
+/**
+ * readyToRender, do not use it, will be deprecated soon
+ */
+- (void)readyToRender;
+
+/**
+ * @abstract trigger display if you do not have a WXLayer
+ */
+- (void)triggerDisplay;
+
+/**
+ * @abstract Creates a  graphics context with the specified bounds, the context will be used for `drawRect:` in compositing environment
+ * @discussion You can override this method to use your own graphics context.
+ */
+- (CGContextRef)beginDrawContext:(CGRect)bounds;
+
+/**
+ * @abstract Removes the current graphics context and returns an image based on the contents of the current graphics context.
+ * @discussion You can override this method to use your own graphics context. The image will be set to layer,  if your drawing system do not have layer and do not need image, returning nil is fine.
+ */
+- (UIImage *)endDrawContext:(CGContextRef)context;
+
+@end
+
+@interface WXComponent (Deprecated)
+
+typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
+typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
 
 /**
  * @abstract Return a block to be called to draw layer.
@@ -338,12 +396,7 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on any thread.
  *
  */
-- (WXDisplayBlock)displayBlock;
-
-/**
- * readyToRender
- */
-- (void)readyToRender;
+- (WXDisplayBlock)displayBlock DEPRECATED_MSG_ATTRIBUTE("use drawRect: method instead.");
 
 /**
  * @abstract Return a block to be called while drawing is finished.
@@ -351,7 +404,8 @@ typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on main thread.
  *
  */
-- (WXDisplayCompletionBlock)displayCompletionBlock;
+- (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
+
 
 @end
 

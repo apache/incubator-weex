@@ -230,6 +230,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private PesudoStatus mPesudoStatus = new PesudoStatus();
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
+  private int mType = TYPE_COMMON;
+
+  public static final int TYPE_COMMON = 0;
+  public static final int TYPE_VIRTUAL = 1;
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
@@ -318,9 +322,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent) {
+    this(instance, dom, parent, TYPE_COMMON);
+  }
+
+  public WXComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, int type) {
     mInstance = instance;
     mContext = mInstance.getContext();
     mParent = parent;
+    mType = type;
     mDomObj = dom.clone();
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
@@ -422,6 +431,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         view.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
+            if(mGesture != null && mGesture.isTouchEventConsumed()){
+              //event is already consumed by gesture
+              return;
+            }
             for (OnClickListener listener : mHostClickListeners){
               if(listener != null) {
                 listener.onHostViewClick();
@@ -635,7 +648,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
 
   @Deprecated
   public void updateProperties(Map<String, Object> props) {
-    if (props == null || mHost == null) {
+    if (props == null || (mHost == null && !isVirtualComponent())) {
       return;
     }
 
@@ -966,7 +979,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   protected void createViewImpl() {
     if (mContext != null) {
       mHost = initComponentHostView(mContext);
-      if (mHost == null) {
+      if (mHost == null && !isVirtualComponent()) {
         //compatible
         initView();
       }
@@ -1431,9 +1444,13 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @return false component add subview
    */
   public boolean isVirtualComponent(){
-    return false;
+    return mType == TYPE_VIRTUAL;
   }
   public void removeVirtualComponent() {
+  }
+
+  public void setType(int type) {
+    mType = type;
   }
 
   public boolean hasScrollParent(WXComponent component) {

@@ -202,309 +202,133 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.taobao.weex.appfram.pickers;
+package com.taobao.weex.ui.component.helper;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
+import android.app.Activity;
+import android.graphics.Rect;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Checkable;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 
-import com.taobao.weex.annotation.JSMethod;
-import com.taobao.weex.bridge.JSCallback;
-import com.taobao.weex.common.WXModule;
-import com.taobao.weex.utils.WXResourceUtils;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.ref.WeakReference;
 
 /**
- * Created by moxun on 16/10/27.
+ * Created by moxun on 17/3/24.
  */
 
-public class WXPickersModule extends WXModule {
+public class SoftKeyboardDetector {
 
-    private static final String SUCCESS = "success";
-    private static final String CANCEL = "cancel";
-    private static final String ERROR = "error";
+    private static final int KEYBOARD_VISIBLE_THRESHOLD_DIP = 100;
 
-    private static final String RESULT = "result";
-    private static final String DATA = "data";
-
-    private static final String KEY_VALUE = "value";
-    private static final String KEY_INDEX = "index";
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_MAX = "max";
-    private static final String KEY_MIN = "min";
-    private static final String KEY_ITEMS = "items";
-
-    private static final String KEY_TITLE_COLOR = "titleColor";
-    private static final String KEY_CANCEL_TITLE_COLOR = "cancelTitleColor";
-    private static final String KEY_CONFIRM_TITLE = "confirmTitle";
-    private static final String KEY_CANCEL_TITLE = "cancelTitle";
-    private static final String KEY_CONFIRM_TITLE_COLOR = "confirmTitleColor";
-    private static final String KEY_TITLE_BACKGROUND_COLOR = "titleBackgroundColor";
-    private static final String KEY_TEXT_COLOR = "textColor";
-    private static final String KEY_SELECTION_COLOR = "selectionColor";
-
-    private int selected;
-    private View selectedView;
-
-    @JSMethod
-    public void pick(Map<String, Object> options, JSCallback callback) {
-        List<String> items = safeConvert(getOption(options, KEY_ITEMS, new ArrayList<String>()));
-        try {
-            performSinglePick(items, options, callback);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-    }
-
-    @JSMethod
-    public void pickDate(Map<String, Object> options, JSCallback callback) {
-        performPickDate(options, callback);
-    }
-
-    @JSMethod
-    public void pickTime(Map<String, Object> options, JSCallback callback) {
-        performPickTime(options, callback);
-    }
-
-    private List<String> safeConvert(List src) {
-        List<String> result = new ArrayList<>(src.size());
-        for (Object obj : src) {
-            result.add(String.valueOf(obj));
-        }
-        return result;
-    }
-
-    private <T> T getOption(Map<String, Object> options, String key, T defValue) {
-        Object value = options.get(key);
-        if (value == null) {
-            return defValue;
-        } else {
-            try {
-                return (T) value;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return defValue;
-            }
-        }
-    }
-
-    private int getColor(Map<String, Object> options, String key, int defValue) {
-        Object value = getOption(options, key, null);
-        if (value == null) {
-            return defValue;
-        }
-        return WXResourceUtils.getColor(value.toString(), defValue);
-    }
-
-    private void performPickTime(Map<String, Object> options, final JSCallback callback) {
-        String value = getOption(options, KEY_VALUE, "");
-        DatePickerImpl.pickTime(
-                mWXSDKInstance.getContext(),
-                value,
-                new DatePickerImpl.OnPickListener() {
-                    @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            Map<String, Object> ret = new HashMap<>(2);
-                            ret.put(RESULT, SUCCESS);
-                            ret.put(DATA, result);
-                            callback.invoke(ret);
-                        } else {
-                            Map<String, Object> ret = new HashMap<>(2);
-                            ret.put(RESULT, CANCEL);
-                            ret.put(DATA, null);
-                            callback.invoke(ret);
-                        }
-                    }
-                }
-        );
-    }
-
-    private void performPickDate(Map<String, Object> options, final JSCallback callback) {
-        String value = getOption(options, KEY_VALUE, "");
-        String max = getOption(options, KEY_MAX, "");
-        String min = getOption(options, KEY_MIN, "");
-        DatePickerImpl.pickDate(
-                mWXSDKInstance.getContext(),
-                value,
-                max,
-                min,
-                new DatePickerImpl.OnPickListener() {
-                    @Override
-                    public void onPick(boolean set, @Nullable String result) {
-                        if (set) {
-                            Map<String, Object> ret = new HashMap<>(2);
-                            ret.put(RESULT, SUCCESS);
-                            ret.put(DATA, result);
-                            callback.invoke(ret);
-                        } else {
-                            Map<String, Object> ret = new HashMap<>(2);
-                            ret.put(RESULT, CANCEL);
-                            ret.put(DATA, null);
-                            callback.invoke(ret);
-                        }
-                    }
-                });
-
-    }
-
-    private void performSinglePick(List<String> items, final Map<String, Object> options, final JSCallback callback) {
-        selected = getOption(options, KEY_INDEX, 0);
-        final int textColor = getColor(options, KEY_TEXT_COLOR, Color.TRANSPARENT);
-
-        final AlertDialog dialog =  new AlertDialog.Builder(mWXSDKInstance.getContext())
-                .setAdapter(
-                        new ArrayAdapter<String>(
-                                mWXSDKInstance.getContext(),
-                                android.R.layout.simple_list_item_single_choice,
-                                items) {
-                            @NonNull
-                            @Override
-                            public View getView(int position, View convertView, @Nullable ViewGroup parent) {
-                                View itemView =  super.getView(position, convertView, parent);
-                                if (position == selected) {
-                                    selectedView = itemView;
-                                }
-
-                                if (itemView instanceof TextView && textColor != Color.TRANSPARENT) {
-                                    ((TextView) itemView).setTextColor(textColor);
-                                }
-
-                                return itemView;
-                            }
-                        } , null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //which == -1
-                        Map<String, Object> ret = new HashMap<>(2);
-                        ret.put(RESULT, SUCCESS);
-                        ret.put(DATA, selected);
-                        callback.invoke(ret);
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //which == -2
-                        Map<String, Object> ret = new HashMap<>(2);
-                        ret.put(RESULT, CANCEL);
-                        ret.put(DATA, -1);
-                        callback.invoke(ret);
-                    }
-                })
-                .setCustomTitle(makeTitleView(mWXSDKInstance.getContext(), options))
-                .create();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //pre create the content view on dialog.
-            //if not , the content view will not be created until dialog.show() called
-            dialog.create();
-        }
-
-        final ListView listView = dialog.getListView();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            private View previousView;
-            private int selectionColor = getColor(options, KEY_SELECTION_COLOR, Color.TRANSPARENT);
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selected = position;
-                if (previousView == view) {
-                    return;
-                }
-                if (previousView != null) {
-                    previousView.setBackgroundColor(Color.TRANSPARENT);
-                    if (previousView instanceof Checkable) {
-                        ((Checkable) previousView).toggle();
-                    }
-                }
-                if (view instanceof Checkable) {
-                    ((Checkable) view).toggle();
-                }
-                view.setBackgroundColor(selectionColor);
-                previousView = view;
-            }
-        });
-
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedView != null) {
-                    listView.performItemClick(selectedView, selected, selectedView.getId());
-                }
-            }
-        });
-
-        dialog.getWindow().getDecorView().post(new Runnable() {
-            @Override
-            public void run() {
-                Button confirm = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                Button cancel = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-
-                if (confirm != null) {
-                    String confirmTitle = getOption(options, KEY_CONFIRM_TITLE, null);
-                    int confirmColor = getColor(options, KEY_CONFIRM_TITLE_COLOR, Color.TRANSPARENT);
-
-                    if (confirmTitle != null) {
-                        confirm.setText(confirmTitle);
-                    }
-
-                    if (confirmColor != Color.TRANSPARENT) {
-                        confirm.setTextColor(confirmColor);
-                    }
-                }
-
-                if (cancel != null) {
-                    String cancelTitle = getOption(options, KEY_CANCEL_TITLE, null);
-                    int cancelColor = getColor(options, KEY_CANCEL_TITLE_COLOR, Color.TRANSPARENT);
-
-                    if (cancelTitle != null) {
-                        cancel.setText(cancelTitle);
-                    }
-
-                    if (cancelColor != Color.TRANSPARENT) {
-                        cancel.setTextColor(cancelColor);
-                    }
-                }
-            }
-        });
-
-        dialog.show();
-    }
-
-    private TextView makeTitleView(Context context, Map<String, Object> options) {
-        String text = getOption(options, KEY_TITLE, null);
-        if (text == null) {
+    public static Unregister registerKeyboardEventListener(Activity activity, final OnKeyboardEventListener listener) {
+        if (activity == null || listener == null) {
+            WXLogUtils.e("Activity or listener is null!");
             return null;
         }
-        TextView textView = new TextView(context);
-        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        int padding = WXViewUtils.dip2px(12);
-        textView.setPadding(padding, padding, padding, padding);
-        textView.getPaint().setFakeBoldText(true);
-        textView.setBackgroundColor(getColor(options, KEY_TITLE_BACKGROUND_COLOR, Color.TRANSPARENT));
-        textView.setTextColor(getColor(options, KEY_TITLE_COLOR, Color.BLACK));
-        textView.setText(text);
-        return textView;
+
+        if (activity.getWindow() != null) {
+            WindowManager.LayoutParams attributes = activity.getWindow().getAttributes();
+            if (attributes != null) {
+                int softInputMode = attributes.softInputMode;
+                if (softInputMode == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
+                        || softInputMode == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN) {
+                    WXLogUtils.e("SoftKeyboard detector can't work with softInputMode is SOFT_INPUT_ADJUST_NOTHING or SOFT_INPUT_ADJUST_PAN");
+                    return null;
+                }
+            }
+        }
+
+        final View activityRoot = getActivityRoot(activity);
+
+        if (activityRoot == null) {
+            WXLogUtils.e("Activity root is null!");
+            return null;
+        }
+
+        final ViewTreeObserver.OnGlobalLayoutListener layoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            private final Rect visibleFrame = new Rect();
+            private final int threshold = WXViewUtils.dip2px(KEYBOARD_VISIBLE_THRESHOLD_DIP);
+            private boolean wasKeyboardOpened = false;
+
+            @Override
+            public void onGlobalLayout() {
+                activityRoot.getWindowVisibleDisplayFrame(visibleFrame);
+                int heightDiff = activityRoot.getRootView().getHeight() - visibleFrame.height();
+                boolean isOpen = heightDiff > threshold;
+                if (isOpen == wasKeyboardOpened) {
+                    return;
+                }
+
+                wasKeyboardOpened = isOpen;
+                listener.onKeyboardEvent(isOpen);
+            }
+        };
+
+        activityRoot.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
+        return new DefaultUnRegister(activity, layoutListener);
+    }
+
+    public static boolean isKeyboardVisible(Activity activity) {
+        Rect windowFrame = new Rect();
+        View root = getActivityRoot(activity);
+
+        if (root != null) {
+            root.getWindowVisibleDisplayFrame(windowFrame);
+            int heightDiff = root.getRootView().getHeight() - windowFrame.height();
+            return heightDiff > WXViewUtils.dip2px(KEYBOARD_VISIBLE_THRESHOLD_DIP);
+        }
+        return false;
+    }
+
+    public static @Nullable View getActivityRoot(Activity activity) {
+        if (activity != null) {
+            return activity.findViewById(android.R.id.content);
+        }
+        return null;
+    }
+
+    public static final class DefaultUnRegister implements Unregister {
+
+        private WeakReference<Activity> activityRef;
+        private WeakReference<ViewTreeObserver.OnGlobalLayoutListener> listenerRef;
+
+        public DefaultUnRegister(Activity activity, ViewTreeObserver.OnGlobalLayoutListener listener) {
+            this.activityRef = new WeakReference<>(activity);
+            this.listenerRef = new WeakReference<>(listener);
+        }
+
+        @Override
+        public void execute() {
+            Activity activity = activityRef.get();
+            ViewTreeObserver.OnGlobalLayoutListener listener = listenerRef.get();
+
+            if (activity != null && listener != null) {
+                View root = SoftKeyboardDetector.getActivityRoot(activity);
+                if (root != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        root.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+                    } else {
+                        root.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+                    }
+                }
+            }
+
+            activityRef.clear();
+            listenerRef.clear();
+        }
+    }
+
+    public interface Unregister {
+        void execute();
+    }
+
+    public interface OnKeyboardEventListener {
+        void onKeyboardEvent(boolean isShown);
     }
 }

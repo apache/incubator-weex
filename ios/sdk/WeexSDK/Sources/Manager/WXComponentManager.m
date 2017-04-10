@@ -536,6 +536,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     _isValid = NO;
 }
 
+- (void)invalidate
+{
+    _isValid = NO;
+}
+
 - (BOOL)isValid
 {
     return _isValid;
