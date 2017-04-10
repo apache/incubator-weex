@@ -190,6 +190,8 @@ public class WXSDKManager {
 
   private WXValidateProcessor mWXValidateProcessor;
 
+  private static final int DEFAULT_VIEWPORT_WIDTH = 750;
+
   private WXSDKManager() {
     mWXRenderManager = new WXRenderManager();
     mWXDomManager = new WXDomManager(mWXRenderManager);
@@ -220,7 +222,7 @@ public class WXSDKManager {
   public static int getInstanceViewPortWidth(String instanceId){
     WXSDKInstance instance = getInstance().getSDKInstance(instanceId);
     if (instance == null) {
-      return 750;
+      return DEFAULT_VIEWPORT_WIDTH;
     }
     return instance.getInstanceViewPortWidth();
   }
