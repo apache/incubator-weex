@@ -1,0 +1,11 @@
+\.gitignore
+\.git/.*
+ios/playground 
+.rat-excludes
+build
+.*\.json
+Info\.plist
+.*\.xml
+.*\.pch
+main\.js
+\./ios/playground/Pods/.*
