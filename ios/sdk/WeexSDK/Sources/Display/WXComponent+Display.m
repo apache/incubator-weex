@@ -277,9 +277,6 @@
     
     if (shouldDisplay) {
         dispatch_block_t displayBlockToPush = ^{
-            if (!context) {
-                
-            }
             CGContextSaveGState(context);
             CGContextTranslateCTM(context, frame.origin.x, frame.origin.y);
             
