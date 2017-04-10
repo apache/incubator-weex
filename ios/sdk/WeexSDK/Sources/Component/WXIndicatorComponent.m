@@ -7,9 +7,7 @@
  */
 
 #import "WXIndicatorComponent.h"
-#import "WXSliderComponent.h"
 #import "WXConvert.h"
-#import "WXSliderNeighborComponent.h"
 #import "WXSDKInstance.h"
 
 @implementation WXIndicatorView
@@ -158,13 +156,13 @@
     _indicatorView.lightColor = _itemSelectedColor;
     _indicatorView.pointSize = _itemSize;
     
-    WXComponent *parent = self.supercomponent;
-    if([parent isKindOfClass:[WXSliderComponent class]] || [parent isKindOfClass:[WXSliderNeighborComponent class]]) {
-        WXSliderComponent *parentSlider = (WXSliderComponent *)parent;
-        [parentSlider setIndicatorView:_indicatorView];
-    }
-    else {
-         NSAssert(NO, @"");
+    
+}
+
+- (void)layoutDidFinish
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(setIndicatorView:)]) {
+        [self.delegate setIndicatorView:_indicatorView];
     }
 }
 

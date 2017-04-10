@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, WXSliderNeighborOption)
 };
 
 @class WXSliderNeighborView;
+@class WXIndicatorView;
 
 @protocol WXSliderNeighborDelegate <NSObject>
 @optional
@@ -63,6 +64,8 @@ typedef NS_ENUM(NSInteger, WXSliderNeighborOption)
 @end
 
 @interface WXSliderNeighborComponent : WXComponent<WXSliderNeighborDelegate, WXSliderNeighborDataSource>
+
+- (void)setIndicatorView:(WXIndicatorView *_Nonnull)indicatorView;
 
 @end
 
