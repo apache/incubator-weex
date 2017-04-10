@@ -233,7 +233,7 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
   private boolean scrollable = true;
   private int mState = ViewPager.SCROLL_STATE_IDLE;
 
-  private Runnable scrollAction = new ScrollAction(this, intervalTime);
+  private Runnable scrollAction = new ScrollAction(this);
 
   @SuppressLint("NewApi")
   public WXCircleViewPager(Context context) {
@@ -468,6 +468,17 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
     this.scrollable = scrollable;
   }
 
+  private void showNextItem() {
+    if (!needLoop && superGetCurrentItem() == getRealCount() - 1) {
+      return;
+    }
+    if (getRealCount() == 2 && superGetCurrentItem() == 1) {
+      superSetCurrentItem(0, true);
+    } else {
+      superSetCurrentItem(superGetCurrentItem() + 1, true);
+    }
+  }
+
   @Override
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
@@ -476,10 +487,8 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
 
   private static final class ScrollAction implements Runnable {
     private WeakReference<WXCircleViewPager> targetRef;
-    private long intervalTime;
-    private ScrollAction(WXCircleViewPager target, long intervalTime) {
+    private ScrollAction(WXCircleViewPager target) {
       this.targetRef = new WeakReference<>(target);
-      this.intervalTime = intervalTime;
     }
 
     @Override
@@ -487,9 +496,9 @@ public class WXCircleViewPager extends ViewPager implements WXGestureObservable 
       WXLogUtils.d("[CircleViewPager] trigger auto play action");
       WXCircleViewPager target;
       if ((target = targetRef.get()) != null) {
-        target.superSetCurrentItem(target.superGetCurrentItem() + 1, true);
+        target.showNextItem();
         target.removeCallbacks(this);
-        target.postDelayed(this, intervalTime);
+        target.postDelayed(this, target.getIntervalTime());
       }
     }
   }
