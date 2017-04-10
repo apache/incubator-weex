@@ -25,7 +25,6 @@ function getStyleSheetNodes () {
 }
 
 describe('style map', () => {
-
   let styleSheetNodes
 
   before(function () {
@@ -56,7 +55,6 @@ describe('style map', () => {
     for (const key in headMap) {
       const expected = headMap[key]
       const result = styleMap[key]
-      debugger;
       expect(expected).be.deep.equal(result)
     }
 

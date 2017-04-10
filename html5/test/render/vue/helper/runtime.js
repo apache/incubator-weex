@@ -14,7 +14,7 @@ import * as utils from './utils'
  */
 export function init (title, fn) {
   return describe(title, () => {
-    let components = {}
+    // let components = {}
 
     before(function () {
       const htmlRegex = /^html:/i
@@ -41,15 +41,8 @@ export function init (title, fn) {
        */
       register (name, component) {
         global.weex.registerComponent(name, component)
-        components[name] = component
+        // components[name] = component
       },
-
-      /**
-       * reset registered components with empty object.
-       */
-      // reset () {
-      //   components = {}
-      // },
 
       /**
        * create a vm instance of Vue.
