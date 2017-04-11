@@ -140,8 +140,6 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-
-
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
 do {\
     id value = styles[@#key];\
@@ -545,7 +543,6 @@ do {\
         textFrame.size.height = bounds.size.height*2;
         
         //flip the coordinate system
-        CGContextRetain(context);
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextTranslateCTM(context, 0, textFrame.size.height);
         CGContextScaleCTM(context, 1.0, -1.0);
@@ -554,6 +551,7 @@ do {\
         CGMutablePathRef path = CGPathCreateMutable();
         CGPathAddRect(path, NULL, textFrame);
         NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
+        
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
         CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
         
@@ -562,7 +560,6 @@ do {\
         CGPoint lineOrigins[lineCount];
         CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
         
-        CGFloat frameY = 0;
         for (CFIndex index = 0; index < lineCount; index ++) {
             CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
             CGFloat lineAscent;
@@ -571,19 +568,8 @@ do {\
             
             CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);
             CGPoint lineOrigin = lineOrigins[index];
-            
-            NSLog(@"lineAscent = %f",lineAscent);
-            NSLog(@"lineDescent = %f",lineDescent);
-            NSLog(@"lineLeading = %f",lineLeading);
-            
-            if (index > 0) {
-                frameY = frameY - lineAscent;
-            }else {
-                frameY = lineOrigin.y;
-            }
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
-            NSLog(@"lines: %ld origin: %@",index, NSStringFromCGPoint(lineOrigin));
             CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
             //            CTLineDraw(lineRef, context);
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
@@ -591,7 +577,6 @@ do {\
                 CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
                 CTRunDraw(run, context, CFRangeMake(0, 0));
             }
-            frameY = frameY - lineDescent;
         }
         
         CFRelease(frame);
