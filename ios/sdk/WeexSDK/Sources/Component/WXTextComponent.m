@@ -90,6 +90,8 @@
 
 @end
 
+static BOOL textRenderUsingCoreText;
+
 @interface WXTextComponent()
 @property (nonatomic, assign)BOOL coretext;
 @end
@@ -114,6 +116,16 @@
     CGFloat _lineHeight;
 }
 
++ (void)setRenderUsingCoreText:(BOOL)usingCoreText
+{
+    textRenderUsingCoreText = usingCoreText;
+}
+
++ (BOOL)textRenderUsingCoreText
+{
+    return textRenderUsingCoreText;
+}
+
 - (instancetype)initWithRef:(NSString *)ref
                        type:(NSString *)type
                      styles:(NSDictionary *)styles
@@ -123,11 +135,18 @@
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
+        // just for coretext and textkit render replacement
         if (attributes[@"coretext"]) {
             _coretext = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
             _coretext = YES;
         }
+        BOOL renderUsingCoreText = YES;
+        if (weexInstance.userInfo[@"renderUsingCoreText"]) {
+            renderUsingCoreText = [weexInstance.userInfo[@"renderUsingCoreText"] boolValue];
+        }
+        [WXTextComponent setRenderUsingCoreText:renderUsingCoreText];
+        
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
     }
@@ -333,6 +352,8 @@ do {\
         [attributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)(ctFont) range:NSMakeRange(0, string.length)];
     }
     
+    CFRelease(ctFont);
+    
     if(_textDecoration == WXTextDecorationUnderline){
         [attributedString addAttribute:(id)kCTUnderlineStyleAttributeName value:@(kCTUnderlinePatternSolid | kCTUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
     } else if(_textDecoration == WXTextDecorationLineThrough){
@@ -438,7 +459,7 @@ do {\
 
 - (BOOL)adjustLineHeight
 {
-    return !_coretext;
+    return !(_coretext && [WXTextComponent textRenderUsingCoreText]);
 }
 
 - (NSTextStorage *)textStorageWithWidth:(CGFloat)width
@@ -528,7 +549,7 @@ do {\
             [self _resetNativeBorderRadius];
         });
     }
-    if (!self.coretext) {
+    if (![WXTextComponent textRenderUsingCoreText] || !self.coretext) {
         NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
         NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
         
