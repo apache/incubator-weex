@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,6 +32,13 @@ export default {
     },
 
     slideTo (index) {
+      if (!this.infinite || this.infinite === 'false') {
+        if (index === -1 || index > (this._cells.length - 1)) {
+          this.slideTo(this.currentIndex)
+          return
+        }
+      }
+
       const newIndex = this.normalizeIndex(index)
       const inner = this.$refs.inner
       const step = this._cells.length <= 1 ? 0 : this.currentIndex - index
@@ -62,7 +69,17 @@ export default {
         setTimeout(() => { this.reorder() }, TRANSITION_TIME)
       }
     },
-
+    order () {
+      this.$nextTick(() => {
+        for (let i = 1, l = this._cells.length; i < l; i++) {
+          const nextElm = this._cells[i].elm
+          const nextOffset = this.wrapperWidth * i
+          nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
+          nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
+        }
+        // this.reorder()
+      })
+    },
     reorder () {
       const removeClone = (clone, prevElm) => {
         // switch current page.
@@ -77,7 +94,10 @@ export default {
         if (this._cells.length <= 1) {
           return
         }
-
+        if (!this.infinite || this.infinite === 'false') {
+          this.order()
+          return
+        }
         const lastPrev = this._prevElm
         const prevIndex = this.normalizeIndex(this.currentIndex - 1)
         const nextIndex = this.normalizeIndex(this.currentIndex + 1)

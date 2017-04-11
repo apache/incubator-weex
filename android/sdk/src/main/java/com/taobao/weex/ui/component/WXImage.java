@@ -189,8 +189,9 @@ public class WXImage extends WXComponent<ImageView> {
       return;
     }
 
-    if("".equals(src)){
-      getHostView().setImageDrawable(null);
+    ImageView image = getHostView();
+    if("".equals(src) && image != null){
+      image.setImageDrawable(null);
       return;
     }
 

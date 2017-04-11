@@ -337,4 +337,44 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         comp.fireEvent(Constants.Event.VIEWDISAPPEAR);
     }
   }
+
+  @Override
+  public void onActivityStart() {
+    super.onActivityStart();
+    if (mNestedInstance != null) {
+      mNestedInstance.onActivityStart();
+    }
+  }
+
+  @Override
+  public void onActivityResume() {
+    super.onActivityResume();
+    if (mNestedInstance != null) {
+      mNestedInstance.onActivityResume();
+    }
+  }
+
+  @Override
+  public void onActivityPause() {
+    super.onActivityPause();
+    if (mNestedInstance != null) {
+      mNestedInstance.onActivityPause();
+    }
+  }
+
+  @Override
+  public void onActivityStop() {
+    super.onActivityStop();
+    if (mNestedInstance != null) {
+      mNestedInstance.onActivityStop();
+    }
+  }
+
+  @Override
+  public void onActivityDestroy() {
+    super.onActivityDestroy();
+    if (mNestedInstance != null) {
+      mNestedInstance.onActivityDestroy();
+    }
+  }
 }
