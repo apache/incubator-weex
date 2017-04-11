@@ -1,0 +1,8 @@
+<project xmlns:rat="antlib:org.apache.rat.anttasks"
+    xmlns="antlib:org.apache.tools.ant">
+    <rat:report>
+        <fileset dir="../ios" includes="**/*.m,**/*.h,**/*.mm" excludes="**/WeexSDKTests/** **/WeexSDK/Sources/Layout/**,**/Pods/**,**/build/**,**/WeexUITestDemoUITests/**,**/WeexDemoTests/**"/>
+        <fileset dir="../android" includes="**/*.java" excludes="**/playground/app/src/androidTest/**,**/build/**,**/sdk/src/main/java/com/taobao/weex/dom/flex/**,**/playground/app/src/main/java_zxing/**"/>
+        <fileset dir="../html5" includes="**/*.js" excludes="**/test/**"/>
+    </rat:report>
+</project>
