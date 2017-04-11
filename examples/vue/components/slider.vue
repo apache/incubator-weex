@@ -18,7 +18,6 @@
         </slider>
       </panel>
     </panel>
-    <panel style="height:1000px;"></panel>
     <panel :title="'Event, ' + eventCnt + ' change'" type="primary">
       <slider class="slider" append="tree"
         :interval="sliders[0].interval"
