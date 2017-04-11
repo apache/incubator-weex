@@ -235,7 +235,7 @@ do {\
     if (_isCompositingChild) {
         [self drawTextWithContext:context bounds:rect padding:_padding view:nil];
     } else {
-        WXText *textView = ((WXText *)self.view);
+        WXText *textView = (WXText *)_view;
         [self drawTextWithContext:context bounds:rect padding:_padding view:textView];
     }
     
