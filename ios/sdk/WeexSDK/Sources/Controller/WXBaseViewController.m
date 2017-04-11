@@ -81,10 +81,10 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self _renderWithURL:_sourceURL];
-    
     if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
-        self.navigationController.navigationBarHidden = YES;
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
     }
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -97,6 +97,7 @@
     [super viewDidAppear:animated];
     [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
     [self _updateInstanceState:WeexInstanceAppear];
+    
 }
 
 - (void)viewDidDisappear:(BOOL)animated
