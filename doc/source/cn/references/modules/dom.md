@@ -30,6 +30,7 @@ version: 2.1
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
   - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
+  - `animated {bool}`：设置是否有滚动动画，默认是 true
 
 #### 示例
 

@@ -24,6 +24,7 @@ Scroll the page to the specified node. This API should only be used on the eleme
 * `node`*(Node)*: an element that scrolled into the view.
 * `options`*(object)*: some options.
   * `offset`*(number)*: An offset to the visible position, default is `0`.
+  * `animated` *(bool)* :set element animation, default true
 
 #### Example
 
@@ -252,4 +253,5 @@ Example Useage:
 </style>
 ```
 
-[try it](http://dotwe.org/vue/d069a9bf0f0781b914f12a9a7b9a1447)
+[try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
+
