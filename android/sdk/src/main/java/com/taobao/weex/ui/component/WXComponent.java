@@ -977,6 +977,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       return;
     }
     for (String event : mDomObj.getEvents()) {
+      if(event == null){
+        continue;
+      }
       removeEventFromView(event);
     }
     mAppendEvents.clear();//only clean append events, not dom's events.
