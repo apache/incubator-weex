@@ -5,6 +5,12 @@ order: 11.1
 version: 2.1
 ---
 
+## 注意
+
+**Weex 所有暴露给  JS 的内置 module 或 component API 都是安全和可控的， 它们不会去访问系统的私有 API ，也不会去做任何 runtime 上的 hack 更不会去改变应用原有的功能定位。**
+
+**如果需要扩展自定义的 module 或者 component ，一定注意不要将 OC 的 runtime 暴露给 JS ， 不要将一些诸如 `dlopen()`， `dlsym()`， `respondsToSelector:`，`performSelector:`，`method_exchangeImplementations()` 的动态和不可控的方法暴露给JS， 也不要将系统的私有API暴露给JS**
+
 ## Module 扩展
 
 [swift](https://github.com/weexteam/article/issues/55) 扩展 module 
