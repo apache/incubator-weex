@@ -1,5 +1,5 @@
 export default {
-  /*// 1 /////////////////////////////////////////////////*/
+  /*// head1.css /////////////////////////////////////////////////*/
   ".wrapper[data-v-67763bae]": {
     "width": "375px",
     "overflow": "hidden"
@@ -35,7 +35,7 @@ export default {
     "bottom": "0"
   },
 
-  /*// 2 /////////////////////////////////////////////////*/
+  /*// head2.css /////////////////////////////////////////////////*/
   ".wrapper[data-v-16194ed9]": {
     "color": "#353535"
   },
@@ -46,7 +46,7 @@ export default {
     "width": "375px"
   },
 
-  /*// 3 /////////////////////////////////////////////////*/
+  /*// head3.css /////////////////////////////////////////////////*/
   ".wrapper[data-v-6acf469e]": {
     "background-color": "transparent",
     "-webkit-box-pack": "center",
@@ -70,7 +70,7 @@ export default {
     "flex-direction": "row"
   },
 
-  /*// 4 /////////////////////////////////////////////////*/
+  /*// head4.css /////////////////////////////////////////////////*/
   ".item[data-v-553d6ea0]": {
     "width": "178px",
     "height": "118px",
@@ -126,7 +126,7 @@ export default {
     "top": "76px"
   },
 
-  /*// 5 /////////////////////////////////////////////////*/
+  /*// head5.css /////////////////////////////////////////////////*/
   ".wrapper[data-v-2c9fb3eb]": {
     "background-color": "transparent"
   },
@@ -243,5 +243,33 @@ export default {
     "color": "#E71A17",
     "font-size": "15px",
     "font-weight": "bold"
+  },
+
+  /*// head13.css /////////////////////////////////////////////////*/
+  ".row[data-v-0dad7305]": {
+    "flex-direction": "row"
+  },
+  ".result[data-v-0dad7305]": {
+    "text-align": "right",
+    "background-color": "#666",
+    "font-size": "40px",
+    "color": "white",
+    "height": "100px",
+    "padding": "30px",
+    "margin": "5px"
+  },
+  ".btn[data-v-0dad7305]": {
+    "flex": "1",
+    "text-align": "center",
+    "background-color": "#eee",
+    "font-size": "36px",
+    "height": "100px",
+    "padding": "30px",
+    "margin": "5px"
+  },
+  ".btn-operator[data-v-0dad7305]": {
+    "background-color": "#669",
+    "font-size": "40px",
+    "color": "white"
   }
 }

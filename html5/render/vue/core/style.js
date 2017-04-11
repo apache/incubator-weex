@@ -67,7 +67,7 @@ export function getHeadStyleMap () {
       }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
-        pre[selector] = trimComment(rule.cssText).split(';')
+        const styleObj = trimComment(rule.cssText).split(';')
           .reduce((styleObj, statement) => {
             statement = statement.trim()
             if (statement && statement.indexOf('/*') <= -1) {
@@ -76,6 +76,13 @@ export function getHeadStyleMap () {
             }
             return styleObj
           }, {})
+        const res = pre[selector]
+        if (!res) {
+          pre[selector] = styleObj
+        }
+        else {
+          extend(pre[selector], styleObj)
+        }
       })
       /**
        * remove this styleSheet node since it's in the styleMap already. And this style
