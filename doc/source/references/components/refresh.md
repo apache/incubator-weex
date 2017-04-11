@@ -132,8 +132,15 @@ Other attributes please check out the [common attributes](../common-attrs.html).
 common styles: check out [common styles for components](../common-style.html)
 
 ### Events
-* onrefresh triggered when the scroller has been pulled down
-* onpullingdown available on Android. triggered when the scroller has been pulled down. you can get dy, headerHeight, maxHeight from onpullingdowns event object.
+* `onrefresh`: triggered when the scroller has been pulled down
+* `onpullingdown`: triggered when the scroller has been pulled down. you can get `dy, pullingDistance, viewHeight, type` from onpullingdown event object.
+
+ ```
+  dy: the differencen between two scroll actions
+  pullingDistance: the distance of pulling
+  viewHeight: the height of refreshView 
+  type: "pullingdown" constant string type for this event
+ ```
 
 ### Restrictions
 
