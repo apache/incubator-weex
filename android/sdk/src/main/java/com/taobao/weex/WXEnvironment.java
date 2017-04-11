@@ -155,17 +155,29 @@ public class WXEnvironment {
   /**
    * Tell whether Weex can run on current hardware.
    * @return true if weex can run on current hardware, otherwise false.
+   * Weex has removed the restrictions on the tablet, please use {@link #isCPUSupport()}
    */
+  @Deprecated
   public static boolean isHardwareSupport() {
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("isTableDevice:" + WXUtils.isTabletDevice());
+    }
+    return isCPUSupport() && !WXUtils.isTabletDevice();
+  }
+
+  /**
+   * Determine whether Weex supports the current CPU architecture
+   * @return true when support
+   */
+  public static boolean isCPUSupport(){
     boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
     boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86() && excludeX86;
     boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + "isX86AndExclueded: "+ isX86AndExcluded
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
+                   + "isX86AndExclueded: "+ isX86AndExcluded);
     }
-    return isCPUSupport && !WXUtils.isTabletDevice();
+    return isCPUSupport;
   }
 
   public static boolean isApkDebugable() {
