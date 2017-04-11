@@ -345,15 +345,10 @@ public class WXEnvironment {
    */
   @Deprecated
   public static boolean isHardwareSupport() {
-    boolean excludeX86 = "true".equals(options.get(SETTING_EXCLUDE_X86SUPPORT));
-    boolean isX86AndExcluded = WXSoInstallMgrSdk.isX86() && excludeX86;
-    boolean isCPUSupport = WXSoInstallMgrSdk.isCPUSupport() && !isX86AndExcluded;
     if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("WXEnvironment.sSupport:" + isCPUSupport
-                   + "isX86AndExclueded: "+ isX86AndExcluded
-                   + " !WXUtils.isTabletDevice():" + !WXUtils.isTabletDevice());
+      WXLogUtils.d("isTableDevice:" + WXUtils.isTabletDevice());
     }
-    return isCPUSupport && !WXUtils.isTabletDevice();
+    return isCPUSupport() && !WXUtils.isTabletDevice();
   }
 
   /**
