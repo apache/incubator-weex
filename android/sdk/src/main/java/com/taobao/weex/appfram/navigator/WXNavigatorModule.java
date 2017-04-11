@@ -140,9 +140,7 @@ public class WXNavigatorModule extends WXModule {
                     callback.invoke(MSG_FAILED);
                 }
             }
-        }
-
-        if (callback != null) {
+        } else if (callback != null) {
             callback.invoke(MSG_FAILED);
         }
     }

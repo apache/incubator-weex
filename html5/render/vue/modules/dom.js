@@ -103,6 +103,10 @@ export default {
           + 'otherwise it may not works well on native.')
       }
 
+      if (options && options.animated === false) {
+        return scrollElement.call(scroller.$el, dSuffix, offset)
+      }
+
       step({
         scrollable: scroller.$el,
         startTime: now(),
