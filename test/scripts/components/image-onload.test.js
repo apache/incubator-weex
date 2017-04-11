@@ -14,7 +14,7 @@ describe('image onload', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/image-onload.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('imgSize',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -25,7 +25,7 @@ describe('image onload', function () {
   it('#1 download image', () => {
     return driver
     .sleep(5000)
-    .elementByXPath('//div/text')
+    .elementById('imgSize')
     .text()
     .then((text)=>{
         if(text == '-1,-1') {
