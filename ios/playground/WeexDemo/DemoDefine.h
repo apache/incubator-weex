@@ -36,4 +36,6 @@
 #define UITEST_HOME_URL @"http://test?_wx_tpl=http://localhost:12580/test/build/TC__Home.js"
 
 #define QRSCAN  @"com.taobao.WeexDemo.scan"
+#define QRSCAN_HISTORY  @"com.taobao.WeexDemo.scan.history"
 #define WEEX_COLOR [UIColor colorWithRed:0.27 green:0.71 blue:0.94 alpha:1]
+#define WX_SCANNER_HISTORY @"wx_scanner_history"
