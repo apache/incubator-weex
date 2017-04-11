@@ -198,6 +198,8 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
+    [super _frameDidCalculated:isChanged];
+    
     if ([self isViewLoaded] && isChanged) {
         [self _clipsToBounds];
     }
