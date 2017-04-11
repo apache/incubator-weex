@@ -1593,7 +1593,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           }else {
             performance.errCode=WXErrorCode.WX_SUCCESS.getErrorCode();
           }
-          mUserTrackAdapter.commit(getContext(),null,IWXUserTrackAdapter.JS_DOWNLOAD,performance,null);
+          if (mUserTrackAdapter != null) {
+            mUserTrackAdapter.commit(getContext(), null, IWXUserTrackAdapter.JS_DOWNLOAD, performance, null);
+          }
         }
       }
       WXLogUtils.renderPerformanceLog("networkTime", mWXPerformance.networkTime);
