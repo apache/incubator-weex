@@ -136,7 +136,7 @@ static BOOL textRenderUsingCoreText;
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         // just for coretext and textkit render replacement
-        if (attributes[@"coretext"]) {
+        if ([attributes objectForKey:@"coretext"]) {
             _coretext = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
             _coretext = YES;
@@ -265,11 +265,15 @@ do {\
 {
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
+        CGSize computedSize = CGSizeZero;
         NSTextStorage *textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
-        
-        NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
-        NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
-        CGSize computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
+        if (!(weakSelf.coretext && [WXTextComponent textRenderUsingCoreText]) ) {
+            NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
+            NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
+            computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
+        } else {
+            computedSize = [[weakSelf buildCTAttributeString] boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+        }
         
         //TODO:more elegant way to use max and min constrained size
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
@@ -562,7 +566,7 @@ do {\
         CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
         // sufficient height for text to draw, or frame lines will be empty
         textFrame.size.height = bounds.size.height*2;
-        
+        CGContextSaveGState(context);
         //flip the coordinate system
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextTranslateCTM(context, 0, textFrame.size.height);
@@ -580,7 +584,6 @@ do {\
         CFIndex lineCount = CFArrayGetCount(lines);
         CGPoint lineOrigins[lineCount];
         CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
-        
         for (CFIndex index = 0; index < lineCount; index ++) {
             CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
             CGFloat lineAscent;
@@ -592,17 +595,80 @@ do {\
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
             CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
-            //            CTLineDraw(lineRef, context);
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
+            CGFloat xHeight = 0, underLinePosition = 0, lineThickness = 0 ;
+            WXTextGetRunsMaxMetric(runs, &xHeight, &underLinePosition, &lineThickness);
+            CGPoint strikethroughStart;
+            strikethroughStart.x =  lineOrigin.x - underLinePosition;
+            strikethroughStart.y = lineOrigin.y + xHeight/2;
             for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
                 CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
                 CTRunDraw(run, context, CFRangeMake(0, 0));
+                CFDictionaryRef attr = CTRunGetAttributes(run);
+                NSUnderlineStyle strikethrough = (NSUnderlineStyle)CFDictionaryGetValue(attr, NSStrikethroughStyleAttributeName);
+                
+                if (strikethrough) {
+                    // currently draw strikethrough
+                    CGPoint runPosition = CGPointZero;
+                    CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
+                    strikethroughStart.x = lineOrigin.x + runPosition.x;
+                    CGContextSetLineWidth(context, 1.5);
+                    double length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
+                    CGContextMoveToPoint(context, strikethroughStart.x, strikethroughStart.y);
+                    CGContextAddLineToPoint(context, strikethroughStart.x + length, strikethroughStart.y);
+                    CGContextStrokePath(context);
+                }
+                
             }
         }
         
         CFRelease(frame);
         CFRelease(framesetter);
         CGPathRelease(path);
+        
+        CGContextRestoreGState(context);
+    }
+}
+
+static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness) {
+    CGFloat maxXHeight = 0;
+    CGFloat maxUnderlinePos = 0;
+    CGFloat maxLineThickness = 0;
+    for (NSUInteger index = 0, runsCount = CFArrayGetCount(runs); index < runsCount; index ++) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, index);
+        CFDictionaryRef attrs = CTRunGetAttributes(run);
+        if (attrs) {
+            CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+            if (font) {
+                
+                CGFloat xHeight = CTFontGetXHeight(font);
+                if (xHeight > maxXHeight) {
+                    maxXHeight = xHeight;
+                }
+                
+                CGFloat underlinePos = CTFontGetUnderlinePosition(font);
+                if (underlinePos < maxUnderlinePos) {
+                    maxUnderlinePos = underlinePos;
+                }
+                
+                CGFloat lineThickness = CTFontGetUnderlineThickness(font);
+                if (lineThickness > maxLineThickness) {
+                    maxLineThickness = lineThickness;
+                }
+            }
+        }
+    }
+    
+    if (xHeight) {
+        *xHeight = maxXHeight;
+    }
+    
+    if (underlinePosition) {
+        *underlinePosition = maxUnderlinePos;
+    }
+    
+    if (lineThickness) {
+        *lineThickness = maxLineThickness;
     }
 }
 
