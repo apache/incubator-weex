@@ -32,7 +32,7 @@ const isApproximate = (x, y) =>  {
 //   return;
 // }
 
-describe('recycler', function () {
+describe('recycler @ignore-android', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
 
