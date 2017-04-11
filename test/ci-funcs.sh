@@ -41,7 +41,6 @@ function setup_cpt {
     target=${1:-$target_android}
     
     setupBasic
-
     if [ $target = $target_android ]; then
         # setupBasic
         # installAndroidSDK
@@ -87,7 +86,6 @@ function printEnvInfo {
 
 function test_cpt {
     echo 'cilog:start test ......'
-
     target_android='android'
     target_ios='ios'
     target_danger='danger'
