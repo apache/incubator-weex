@@ -489,8 +489,8 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * DOM can be changed in js runtime.
    */
   protected void onFinishLayout() {
-    Object param=mDomObj.getStyles().get(Constants.Name.BACKGROUND_IMAGE);
-    if(param!=null){
+    Object param = mDomObj.getStyles() != null ? mDomObj.getStyles().get(Constants.Name.BACKGROUND_IMAGE) : null;
+    if (param != null) {
       setBackgroundImage(param.toString());
     }
   }
