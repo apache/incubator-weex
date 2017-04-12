@@ -26,9 +26,8 @@ import com.taobao.weex.dom.TestDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.dom.flex.Spacing;
-
 import com.taobao.weex.ui.SimpleComponentHolder;
-import org.apache.tools.ant.taskdefs.EchoXML;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -157,7 +156,7 @@ public class WXTextTest {
         prop.put(Constants.Name.OPACITY, 0.8f);
         mWXText.updateProperties(prop);
         assertTrue(mWXText.getHostView().isEnabled());
-        assertTrue(mWXText.getHostView().getAlpha()>=0.799 && mWXText.getHostView().getAlpha()<=0.811);
+        assertEquals(0.8f, mWXText.getHostView().getAlpha(), 0.001f);
 
         prop.put(Constants.Name.DISABLED, "true");
         mWXText.updateProperties(prop);
