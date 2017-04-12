@@ -24,7 +24,7 @@ const flowIgnorePaths = [
   'dist',
   'flow-typed'
 ].map(function (rel) {
-  return absolute('html5/' + rel)
+  return absolute(rel)
 });
 
 // new js files should have `@flow` at the top
