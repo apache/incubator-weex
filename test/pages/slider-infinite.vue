@@ -1,6 +1,6 @@
 <template>
     <div>
-        <text>{{d1}}</text>
+        <text test-id="txt1">{{d1}}</text>
         <slider auto-play="true" @change="change" style="width: 750px;height: 400px;background-color: blue" interval="500" infinite="false">
             <div style="flex: 1;background-color: beige;align-items: center;" v-for="item in items">
                 <text style="font-size: 60px;">
@@ -10,8 +10,8 @@
             <indicator style="height: 20px"></indicator>
         </slider>
         
-        <text style="margin-top:60">{{d2}}</text>
-        <slider auto-play="true" @change="change2" style="width: 750px;height: 400px;background-color: blue;" interval="500">
+        <text test-id="txt2" style="margin-top:60">{{d2}}</text>
+        <slider :auto-play="is_auto" @change="change2" style="width: 750px;height: 400px;background-color: blue;" interval="500">
             <div style="flex: 1;background-color: beige;align-items: center;" v-for="item in items">
                 <text style="font-size: 60px;">
                     {{item}}
@@ -30,12 +30,17 @@
                     d1:0,
                     d2:0,
                     items: [],
+                    is_auto: true
                 }
         },
         created: function () {
                 for (var index = 0; index < itemCount ; index++) {
                     this.items[index] = 'Page: ' + index;
                 }
+                let self = this
+                setTimeout(function(){
+                    self.is_auto = false
+                },5000);
         },
         methods: {
             change: function(e){

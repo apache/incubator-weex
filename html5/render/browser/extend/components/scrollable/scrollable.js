@@ -18,7 +18,6 @@
  */
 /* global lib */
 
-
 'use strict'
 
 import './scrollable.css'

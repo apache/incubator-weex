@@ -98,6 +98,7 @@ function test_cpt {
     
     if [ $target = $target_android ]; then
         ./test/serve.sh 2&>1 > /dev/null &
+        set -eu
         # export ANDROID_HOME=/usr/local/opt/android-sdk
         cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
         waitForEmulator
