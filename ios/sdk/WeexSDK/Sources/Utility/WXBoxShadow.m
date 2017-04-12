@@ -12,7 +12,6 @@
 
 @implementation WXBoxShadow
 
-
 - (instancetype)init
 {
     self = [super init];

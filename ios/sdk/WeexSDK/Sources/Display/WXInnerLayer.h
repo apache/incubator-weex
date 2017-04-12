@@ -12,7 +12,7 @@
 @interface WXInnerLayer : CAGradientLayer
 
 @property CGFloat boxShadowRadius;
-@property (nonatomic,strong,nullable) UIColor *boxShadowColor;
+@property(nonatomic,strong,nullable) UIColor *boxShadowColor;
 @property CGSize boxShadowOffset;
 @property CGFloat boxShadowOpacity;
 
