@@ -18,7 +18,6 @@
  */
 /* global WebSocket */
 
-
 'use strict'
 
 let instance

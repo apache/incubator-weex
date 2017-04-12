@@ -18,7 +18,6 @@
  */
 /* global lib: true */
 
-
 'use strict'
 
 /**
