@@ -1059,7 +1059,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void setOpacity(float opacity) {
-    if (opacity >= 0 && opacity <= 1 && mHost.getAlpha() != opacity && enableLayerType()) {
+    if (opacity >= 0 && opacity <= 1 && mHost.getAlpha() != opacity && isLayerTypeEnabled()) {
       mHost.setLayerType(View.LAYER_TYPE_HARDWARE, null);
       mHost.setAlpha(opacity);
     }
@@ -1247,7 +1247,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXComponent] destroy can only be called in main thread");
     }
-    if(mHost!= null && mHost.getLayerType()==View.LAYER_TYPE_HARDWARE && enableLayerType()) {
+    if(mHost!= null && mHost.getLayerType()==View.LAYER_TYPE_HARDWARE && isLayerTypeEnabled()) {
       mHost.setLayerType(View.LAYER_TYPE_NONE, null);
     }
     removeAllEvent();
