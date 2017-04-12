@@ -66,6 +66,11 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 
 #pragma mark -
 #pragma mark Single Picker
+-(void)dealloc
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
 -(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback
 {
     NSArray *items = @[];
@@ -117,6 +122,14 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
 }
 
+-(void)SetColorDelay:(NSNumber *)number
+{
+    if(self.selectionColor) {
+        UILabel *labelSelected = (UILabel*)[self.picker viewForRow:[number integerValue] forComponent:0.3];
+        [labelSelected setBackgroundColor:self.selectionColor];
+    }
+}
+
 -(void)createPicker:(NSArray *)items index:(NSInteger)index
 {
     [self configPickerView];
@@ -124,8 +137,12 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     self.index = index;
     if (items && index < [items count]) {
         [self.picker selectRow:index inComponent:0 animated:NO];
+        [self performSelector:@selector(SetColorDelay:) withObject:[NSNumber numberWithInteger:self.index] afterDelay:0.3];
+        
     } else if(items && [items count]>0) {
         [self.picker selectRow:0 inComponent:0 animated:NO];
+        [self performSelector:@selector(SetColorDelay:) withObject:[NSNumber numberWithInteger:0] afterDelay:0.3];
+
     }
     [self show];
 }
@@ -244,7 +261,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     titleLabel.center = toolBar.center;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     if(self.titleColor){
-        titleLabel.textColor = self.textColor;
+        titleLabel.textColor = self.titleColor;
     }
     if(self.title.length>0){
         titleLabel.text = self.title;
@@ -310,15 +327,6 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     }
 }
 
-- (NSAttributedString *)pickerView:(UIPickerView *)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component{
-    NSString * reStr = self.items[row];
-    NSMutableAttributedString * attriStr = [[NSMutableAttributedString alloc] initWithString:reStr];
-    UIColor *color = self.textColor?self.textColor:[UIColor blackColor];
-    [attriStr addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, reStr.length)];
-
-    return attriStr;
-}
-
 -(UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view
 {
     
@@ -329,7 +337,9 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
         
         label= [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, [pickerView rowSizeForComponent:component].width, [pickerView rowSizeForComponent:component].height)];
         label.textAlignment = NSTextAlignmentCenter;
-        label.text = self.items[row];
+        UIColor *color = self.textColor?self.textColor:[UIColor blackColor];
+        label.textColor = color;
+        label.text = [self convertItem:self.items[row]];
     }
     
     return label;
