@@ -42,7 +42,7 @@ function runiOS {
     killAll Simulator || echo 'killall failed'
     # ps -ef
     macaca server &
-    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail
+    #platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail
 }
 
 function runWeb {
