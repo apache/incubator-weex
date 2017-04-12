@@ -488,8 +488,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * After component's layout result is apply to view. May be invoke multiple times since
    * DOM can be changed in js runtime.
    */
-  protected void onFinishLayout(){
-
+  protected void onFinishLayout() {
+    Object param=mDomObj.getStyles().get(Constants.Name.BACKGROUND_IMAGE);
+    if(param!=null){
+      setBackgroundImage(param.toString());
+    }
   }
 
   public void setPadding(Spacing padding, Spacing border) {
@@ -604,10 +607,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           setBackgroundColor(bgColor);
         return true;
       case Constants.Name.BACKGROUND_IMAGE:
-        String bgImage = WXUtils.getString(param, null);
-        if (bgImage != null && mHost != null) {
-          setBackgroundImage(bgImage);
-        }
+        /**
+         * Since the gradient color needs to depend on the layout to be completed,
+         * the settings are moved to the {@link #onFinishLayout()} method
+         * **/
         return true;
       case Constants.Name.OPACITY:
         Float opacity = WXUtils.getFloat(param,null);
