@@ -1510,7 +1510,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * For now, this method respect the result of {@link WXSDKInstance#isLayerTypeEnabled()}
    * @return Refer {@link WXSDKInstance#isLayerTypeEnabled()}
    */
-  public boolean enableLayerType() {
+  public boolean isLayerTypeEnabled() {
     return getInstance().isLayerTypeEnabled();
   }
 }
