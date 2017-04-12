@@ -29,10 +29,7 @@
 #import <CoreText/CoreText.h>
 
 @interface WXText : UIView
-
 @property (nonatomic, strong) NSTextStorage *textStorage;
-@property (nonatomic, strong) NSMutableAttributedString * attributedString;
-
 @end
 
 @implementation WXText
@@ -59,13 +56,6 @@
 {
     if (_textStorage != textStorage) {
         _textStorage = textStorage;
-        [self.wx_component setNeedsDisplay];
-    }
-}
-
-- (void)setAttributedString:(NSMutableAttributedString *)attributedString {
-    if (_attributedString != attributedString) {
-        _attributedString = attributedString;
         [self.wx_component setNeedsDisplay];
     }
 }
@@ -114,6 +104,8 @@ static BOOL textRenderUsingCoreText;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
+    
+    CTFrameRef coretextFrameRef;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -154,9 +146,17 @@ static BOOL textRenderUsingCoreText;
     return self;
 }
 
+- (BOOL)useCoreText
+{
+    return (_coretext || [WXTextComponent textRenderUsingCoreText]);
+}
+
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (coretextFrameRef && CFGetRetainCount(coretextFrameRef)) {
+        CFRelease(coretextFrameRef);
+    }
 }
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
@@ -234,7 +234,6 @@ do {\
 - (void)viewDidLoad
 {
     ((WXText *)self.view).textStorage = _textStorage;
-    ((WXText *)self.view).attributedString = [self buildCTAttributeString];
     [self setNeedsDisplay];
 }
 
@@ -272,9 +271,9 @@ do {\
             NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
         } else {
-            computedSize = [[weakSelf buildCTAttributeString] boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+            computedSize = [weakSelf calculateTextHeightWithWidth:constrainedSize.width];
         }
-        
+    
         //TODO:more elegant way to use max and min constrained size
         if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
             computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
@@ -356,8 +355,6 @@ do {\
         [attributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)(ctFont) range:NSMakeRange(0, string.length)];
     }
     
-    CFRelease(ctFont);
-    
     if(_textDecoration == WXTextDecorationUnderline){
         [attributedString addAttribute:(id)kCTUnderlineStyleAttributeName value:@(kCTUnderlinePatternSolid | kCTUnderlineStyleSingle) range:NSMakeRange(0, string.length)];
     } else if(_textDecoration == WXTextDecorationLineThrough){
@@ -371,9 +368,10 @@ do {\
     }
     
     // set default lineBreakMode
-    paragraphStyle.lineBreakMode = NSLineBreakByClipping;
+    // TODO:default clip
+    paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
     if (_textOverflow && [_textOverflow length] > 0) {
-        if ([_textOverflow isEqualToString:@"ellipsis"])
+        if (_lines && [_textOverflow isEqualToString:@"ellipsis"])
             paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
     }
     
@@ -395,6 +393,7 @@ do {\
         }
     }
     
+    CFRelease(ctFont);
     
     return attributedString;
 }
@@ -463,7 +462,7 @@ do {\
 
 - (BOOL)adjustLineHeight
 {
-    return !(_coretext && [WXTextComponent textRenderUsingCoreText]);
+    return ![self useCoreText];
 }
 
 - (NSTextStorage *)textStorageWithWidth:(CGFloat)width
@@ -504,12 +503,9 @@ do {\
 {
     CGFloat width = self.calculatedFrame.size.width - (_padding.left + _padding.right);
     NSTextStorage *textStorage = [self textStorageWithWidth:width];
-    NSMutableAttributedString * attributedString = [self buildCTAttributeString];
-    
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
             ((WXText *)self.view).textStorage = textStorage;
-            ((WXText *)self.view).attributedString = attributedString;
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
@@ -572,26 +568,21 @@ do {\
         CGContextTranslateCTM(context, 0, textFrame.size.height);
         CGContextScaleCTM(context, 1.0, -1.0);
         
+        NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
         //add path
         CGMutablePathRef path = CGPathCreateMutable();
         CGPathAddRect(path, NULL, textFrame);
-        NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
-        
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+         coretextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
         
-        CFArrayRef lines = CTFrameGetLines(frame);
+        CFArrayRef lines = CTFrameGetLines(coretextFrameRef);
         CFIndex lineCount = CFArrayGetCount(lines);
         CGPoint lineOrigins[lineCount];
-        CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), lineOrigins);
-        for (CFIndex index = 0; index < lineCount; index ++) {
-            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, index);
-            CGFloat lineAscent;
-            CGFloat lineDescent;
-            CGFloat lineLeading;
+        CTFrameGetLineOrigins(coretextFrameRef, CFRangeMake(0, 0), lineOrigins);
+        for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
             
-            CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &lineLeading);
-            CGPoint lineOrigin = lineOrigins[index];
+            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
+            CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
             CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
@@ -621,13 +612,46 @@ do {\
                 
             }
         }
-        
-        CFRelease(frame);
         CFRelease(framesetter);
         CGPathRelease(path);
-        
         CGContextRestoreGState(context);
     }
+}
+
+- (CGSize)calculateTextHeightWithWidth:(CGFloat)aWidth
+{
+    if (isnan(aWidth)) {
+        aWidth = CGFLOAT_MAX;
+    }
+    NSAttributedString * attributedStringCpy = [self buildCTAttributeString];
+    CTFramesetterRef framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
+    
+    CGSize suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
+    
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathAddRect(path, NULL, CGRectMake(0, 0, aWidth, suggestSize.height*10));
+    
+    CTFrameRef frameRef = CTFramesetterCreateFrame(framesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
+    
+    CFArrayRef lines = CTFrameGetLines(frameRef);
+    CFIndex lineCount = CFArrayGetCount(lines);
+    CGFloat ascent = 0;
+    CGFloat descent = 0;
+    CGFloat leading = 0;
+    CGFloat totalHeight = 0;
+    // height = ascent + descent + lineCount*leading
+    // ignore linespaing
+    NSUInteger actualLineCount = 0;
+    for (CFIndex lineIndex = 0; (!_lines|| lineIndex < _lines) && lineIndex < lineCount; lineIndex ++)
+    {
+        CTLineRef lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
+        CTLineGetTypographicBounds(lineRef, &ascent, &descent, &leading);
+        totalHeight += ascent + descent;
+        actualLineCount ++;
+    }
+    
+    totalHeight = totalHeight + actualLineCount*leading;
+    return CGSizeMake(suggestSize.width, totalHeight);
 }
 
 static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness) {
