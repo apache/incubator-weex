@@ -52,7 +52,9 @@ public class WXDiv extends WXVContainer<WXFrameLayout> {
 
   @Override
   protected WXFrameLayout initComponentHostView(@NonNull Context context) {
-    return new WXFrameLayout(context);
+    WXFrameLayout frameLayout =new WXFrameLayout(context);
+    frameLayout.holdComponent(this);
+    return frameLayout;
   }
 
 }
