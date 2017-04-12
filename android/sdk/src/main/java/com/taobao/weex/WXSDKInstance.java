@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -109,6 +110,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean isCommit=false;
   private WXGlobalEventReceiver mGlobalEventReceiver=null;
   private boolean trackComponent;
+  private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
@@ -154,6 +156,29 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void setTrackComponent(boolean trackComponent) {
     this.trackComponent = trackComponent;
+  }
+
+  /**
+   * Tell whether it is enabled to change the layerType
+   * {@link android.view.View#setLayerType(int, Paint)}
+   * @return True for enable to change the layerType of component, false otherwise. The default
+   * is True
+   */
+  public boolean isLayerTypeEnabled() {
+    return enableLayerType;
+  }
+
+  /**
+   * Enable the ability of changing layerType. e.g. {@link android.view.View#setLayerType(int, Paint)}
+   * Disable the ability of changing layerType will have tremendous <strong>performance
+   * punishment</strong>.
+   *
+   * <strong>Do not</strong> set this to false unless you know exactly what you are doing.
+   * @param enable True for enable to change the layerType of component, false otherwise. The default
+   * is True
+   */
+  public void enableLayerType(boolean enable) {
+    enableLayerType = enable;
   }
 
   public boolean isNeedValidate() {

@@ -257,7 +257,7 @@
         
         for (dispatch_block_t block in displayBlocks) {
             if (isCancelled()) {
-                UIGraphicsEndImageContext();
+                [self endDrawContext:context];
                 return nil;
             }
             block();
