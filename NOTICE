@@ -12,5 +12,9 @@ by Denis Pushkarev , licensed under the MIT License.
 This product contains software vuejs(https://github.com/vuejs/vue) developed
 by Yuxi Evan You , licensed under the MIT License.
 
-This product contains software (https://github.com/component/scroll-to) developed
+This product contains software scroll-to (https://github.com/component/scroll-to) developed
 by TooTallNate , licensed under the MIT License.
+
+This product contains software inline-style-prefixer
+(https://github.com/rofrischmann/inline-style-prefixer) developed by
+rofrischmann , licensed under the MIT License.

@@ -1,5 +1,5 @@
 import '../styles/reset.css'
-import '../styles/components.css'
+import '../styles/base.css'
 
 // import 'lazyimg'
 import '../../browser/render/gesture'
@@ -14,20 +14,17 @@ import 'core-js/modules/web.dom.iterable'
 import 'core-js/modules/es6.promise'
 
 import modules from '../modules'
-import weex from './weex'
+import './global'
 
 // register built-in modules.
-weex.install(modules)
+global.weex.install(modules)
 
 export function setVue (vue) {
   if (!vue) {
     throw new Error('[Vue Render] Vue not found. Please make sure vue 2.x runtime is imported.')
   }
-  weex.__vue__ = vue
+  global.weex.__vue__ = vue
   console.log(`[Vue Render] install Vue ${vue.version}.`)
 }
-
-window.weex = weex
-window.global = window
 
 export default weex

@@ -1,4 +1,4 @@
-import { camelToKebab, appendStyle } from '../utils'
+import { camelToKebab, appendCss } from '../utils'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
@@ -79,6 +79,7 @@ export default {
 
       if (options) {
         offset += Number(options.offset) || 0
+        offset *= weex.config.env.scale /* adapt offset to different screen scales. */
       }
       else if (process.env.NODE_ENV === 'development') {
         console.warn('[Vue Render] The second parameter of "scrollToElement" is required, '
@@ -148,6 +149,6 @@ export default {
       }
     }
     const styleText = `@${key}{${stylesText}}`
-    appendStyle(styleText, 'dom-added-rules')
+    appendCss(styleText, 'dom-added-rules')
   }
 }

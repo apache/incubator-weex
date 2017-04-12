@@ -1,4 +1,11 @@
 // import { validateStyles } from '../validator'
+import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
+
+const _css = `
+body > .weex-div {
+  min-height: 100%;
+}
+`
 
 export default {
   name: 'weex-div',
@@ -9,8 +16,10 @@ export default {
     // }
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
-      on: this._createEventMap(),
-      staticClass: 'weex-div weex-ct'
-    }, this._trimTextNodeChildren(this.$slots.default))
-  }
+      on: createEventMap(this),
+      staticClass: 'weex-div weex-ct',
+      staticStyle: extractComponentStyle(this)
+    }, trimTextVNodes(this.$slots.default))
+  },
+  _css
 }

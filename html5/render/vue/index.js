@@ -26,19 +26,8 @@ function init (Vue/*, options = {}*/) {
 
   // register sdk components.
   for (const name in components) {
-    Vue.component(name, components[name])
+    weex.registerComponent(name, components[name])
   }
-
-  // // get user extended plugins.
-  // const { components: comps, modules } = options
-  // // register user extended components.
-  // for (const name in comps) {
-  //   Vue.components(name, comps[name])
-  // }
-  // // register user extended modules.
-  // for (const mod in modules) {
-  //   this.registerModule(mod, modules[mod])
-  // }
 
   /* istanbul ignore next */
   // if (process.env.NODE_ENV === 'development') {
