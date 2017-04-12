@@ -11,32 +11,17 @@ var util = require("../util.js");
 const platform = process.env.platform.toLowerCase() || 'android';
 const isAndroid = platform === 'android';
 
-// const fixedPath = '//div[1]'
-// const header1Path = '//recycler[1]/div[1]/'
-// const header2Path = '//recycler[1]/div[2]/'
-// const cell1Path = isAndroid ? '//recycler[1]/div[3]/' : '//recycler[1]/cell[1]/'
-// const cell2Path = isAndroid ? '//recycler[1]/div[4]/' : '//recycler[1]/cell[2]/'
-// const cell3Path = isAndroid ? '//recycler[1]/div[5]/' : '//recycler[1]/cell[3]/'
-// const cell4Path = isAndroid ? '//recycler[1]/div[6]/' : '//recycler[1]/cell[4]/'
-// const cell27Path = isAndroid ? '//recycler[1]/div[29]/' : '//recycler[1]/cell[27]/'
-// const cell28Path = isAndroid ? '//recycler[1]/div[30]/' : '//recycler[1]/cell[28]/'
-// const cell29Path = isAndroid ? '//recycler[1]/div[31]/' : '//recycler[1]/cell[29]/'
-// const cell30Path = isAndroid ? '//recycler[1]/div[32]/' : '//recycler[1]/cell[30]/'
-// const footerPath = '//recycler[1]/div[1]'
-
 const isApproximate = (x, y) =>  {
-  return Math.abs(x - y) <= (isAndroid ? 1 : 1.5)
+  return Math.abs(x - y) <= (isAndroid ? 2 : 1.5)
 }
-
-// if (isAndroid) {
-//   return;
-// }
 
 describe('recycler', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
 
   before(function () {
+
+    console.log(util.getPage('/components/recycler.js'))
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
       .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
@@ -58,9 +43,11 @@ describe('recycler', function () {
     .then(size=>{
       scaleFactor = size.width / 750
       screenHeight = size.height
-      recyclerWidth = isAndroid ? (size.width + 12) : 750 * scaleFactor
+      recyclerWidth = 750 * scaleFactor
       console.log(`screen size:${JSON.stringify(size)}`)
       console.log(`scale factor:${scaleFactor}`)
+      console.log(`recyclerWidth:${recyclerWidth}`)
+      console.log(`screenHeight:${screenHeight}`)
     })
     .sleep(2000)
     .elementById('waterfall')
@@ -128,7 +115,7 @@ describe('recycler', function () {
 
   it('#2 test column count', () => {
     return driver
-   .elementById('cell2')
+    .elementById('cell2')
     .click()
     .elementById('cell0')
     .getRect()
@@ -217,6 +204,10 @@ describe('recycler', function () {
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect after changing column width to 600:${JSON.stringify(rect)}`)
+      console.log(`navBarHeight:${navBarHeight}`)
+      console.log(`scaleFactor:${scaleFactor}`)
+      console.log(`recyclerWidth:${recyclerWidth}`)
+
       cell1Height = rect.height
       assert.isOk(isApproximate(rect.x, 0))
       assert.isOk(isApproximate(rect.y, navBarHeight + 471 * scaleFactor))
@@ -313,7 +304,6 @@ describe('recycler', function () {
     .getRect()
     .then((rect)=>{
       console.log(`cell 28 rect after moving cell 30 to 1:${JSON.stringify(rect)}`)
-      assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
       assert.isOk(isApproximate(rect.y, screenHeight - 94 * scaleFactor - rect.height))
       assert.isOk(isApproximate(rect.width, 369 * scaleFactor))
     })
@@ -329,8 +319,9 @@ describe('recycler', function () {
     .getRect()
     .then((rect)=>{
       console.log(`sticking header rect after setting padding to 12:${JSON.stringify(rect)}`)
+  
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
-      assert.isOk(isApproximate(rect.y, navBarHeight))
+      assert.isOk(isApproximate(rect.y, navBarHeight+12 * scaleFactor))
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
@@ -343,33 +334,24 @@ describe('recycler', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
-    .elementById('cell27')
+    .elementById('cell26')
     .getRect()
     .then((rect)=>{
-      console.log(`cell 27 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 26 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
-    .elementById('cell28')
-    .getRect()
-    .then((rect)=>{
-      console.log(`cell 28 rect after setting padding to 12:${JSON.stringify(rect)}`)
-      assert.isOk(isApproximate(rect.x, 381 * scaleFactor))
-      assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
-    })
-     .elementById('cell27')
-    .click()
   })
 
   it('#11 test onscroll', () => {
     let originContentOffset = 0
     return driver
-    .elementById('cell28')
+    .elementById('cell27')
     .getRect()
     .then((rect)=>{
       console.log(`cell 29 rect:${JSON.stringify(rect)}`)
     })
-    .elementById('cell28')
+    .elementById('cell27')
     .click()
     .elementById('stickyText1')
     .text() 
@@ -385,7 +367,7 @@ describe('recycler', function () {
     .then(text => {
       console.log(text)
       const contentOffset = Number.parseInt(text.replace('Content Offset:-',''))
-      assert.isOk(originContentOffset - contentOffset > screenHeight / scaleFactor)
+       assert.isOk(originContentOffset - contentOffset > screenHeight / scaleFactor)
     })
     .elementById('fixed1')
     .click()
@@ -394,7 +376,7 @@ describe('recycler', function () {
   it('#12 test scrollable', () => {
     let originContentOffset = 0
     return driver
-    .elementById('cell26')
+    .elementById('cell25')
     .click()
     .elementById('stickyText1')
     .text()

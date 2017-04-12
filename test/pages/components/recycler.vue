@@ -24,7 +24,8 @@
         </div>
       </div>
     </header>
-    <header class="stickyHeader" test-id="header2">
+    <header  class="stickyHeader" >
+      <div class="header2" test-id="header2">
       <div v-if="stickyHeaderType === 'none'" class="stickyWrapper">
         <text class="stickyText" test-id="stickyText1">Sticky Header</text>
       </div>
@@ -38,11 +39,13 @@
           <image class="stickyImage" :src="disappearImage"></image>
         </div>
       </div>
+     
       <div v-if="stickyHeaderType === 'scroll'" class="stickyWrapper">
         <text class="stickyText">Content Offset:{{contentOffset}}</text>
       </div>
+     </div>
     </header>
-    <cell v-for="(item, index) in items" :key="item.src" class="cell" :test-id="'cell' + index" ref="index">
+  <cell v-for="(item, index) in items" :key="item.src" class="cell" :test-id="'cell' + index" ref="index">
       <div class="item" @click="onItemclick(item.behaviour, index)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
         <text v-if="item.name" class="itemName">{{item.name}}</text>
         <image class="itemPhoto" :src="item.src"></image>
@@ -50,8 +53,10 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
-    <header class="footer" ref="footer" test-id="footer1" >
+    <header>
+      <div  class="footer" ref="footer" test-id="footer1">
       <text class="stickyText">Footer</text>
+      </div>
     </header>
     <div ref="fixed" class="fixedItem" test-id="fixed1" @click="scrollToNext">
       <text class="fixedText">bot</text>
@@ -141,6 +146,12 @@
     margin-bottom: 6;
   }
   .stickyHeader {
+    position: sticky;
+    /*height: 94;
+    flex-direction: row;
+    padding-bottom:6;*/
+  }
+  .header2 {
     position: sticky;
     height: 94;
     flex-direction: row;
@@ -447,7 +458,7 @@
       },
 
       scrollToNext: function() {
-        weex.requireModule('dom').scrollToElement(this.$refs.footer)
+        weex.requireModule('dom').scrollToElement(this.$refs.footer,{})
       },
 
       setRecyclerPadding: function() {

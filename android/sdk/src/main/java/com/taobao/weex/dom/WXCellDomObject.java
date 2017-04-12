@@ -204,109 +204,40 @@
  */
 package com.taobao.weex.dom;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.flex.CSSNode;
+import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXViewUtils;
-
-import java.util.Map;
 
 /**
- * Created by zhengshihan on 2017/2/21.
+ * Created by zhengshihan on 2017/4/11.
  */
 
-public class WXRecyclerDomObject extends WXDomObject{
+public class WXCellDomObject extends WXDomObject {
 
-
-    private int mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
-    private float mColumnWidth = Constants.Value.AUTO;
-    private float mColumnGap = Constants.Value.COLUMN_GAP_NORMAL;
-    private float mAvailableWidth = 0;
-    private boolean mIsPreCalculateCellWidth =false;
-
-    public float getAvailableWidth() {
-        return WXViewUtils.getRealPxByWidth(mAvailableWidth,getViewPortWidth());
-    }
-
-    public int getLayoutType(){
-        return getAttrs().getLayoutType();
-    }
-
-    public float getColumnGap() {
-        return WXViewUtils.getRealPxByWidth(mColumnGap,getViewPortWidth());
-    }
-
-    public int getColumnCount() {
-        return mColumnCount;
-    }
-
-    public float getColumnWidth() {
-        return WXViewUtils.getRealPxByWidth(mColumnWidth,getViewPortWidth());
-    }
+  /** package **/ static final CSSNode.MeasureFunction CELL_MEASURE_FUNCTION = new MeasureFunction() {
     @Override
-    public void add(WXDomObject child, int index) {
-        super.add(child, index);
-
-        if (WXBasicComponentType.CELL.equals(child.getType())) {
-            if (!mIsPreCalculateCellWidth) {
-                preCalculateCellWidth();
-            }
-            child.getStyles().put(Constants.Name.WIDTH, mColumnWidth);
+    public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
+      if (node != null) {
+        CSSNode parent = node.getParent();
+        if (parent != null && parent instanceof WXRecyclerDomObject) {
+          WXRecyclerDomObject parentDom = ((WXRecyclerDomObject) parent);
+          parentDom.preCalculateCellWidth();
+          WXDomObject domObject = (WXDomObject) node;
+          if (WXBasicComponentType.CELL.equals(domObject.getType())) {
+            float w = ((WXRecyclerDomObject) parent).getColumnWidth();
+            node.setLayoutWidth(w);
+          } else if (WXBasicComponentType.HEADER.equals(domObject.getType())){
+            float w = parentDom.getAvailableWidth();
+            WXLogUtils.d("getAvailableWidth:"+w);
+            node.setLayoutWidth(w);
+          }
         }
+      }
     }
+  };
 
-    public void preCalculateCellWidth(){
-
-        if (getAttrs() != null) {
-            mColumnCount = getAttrs().getColumnCount();
-            mColumnWidth = getAttrs().getColumnWidth();
-            mColumnGap =  getAttrs().getColumnGap();
-
-            mAvailableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
-            mAvailableWidth = WXViewUtils.getWebPxByWidth(mAvailableWidth,getViewPortWidth());
-
-            if (Constants.Value.AUTO == mColumnCount && Constants.Value.AUTO == mColumnWidth) {
-                mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
-            } else if (Constants.Value.AUTO == mColumnWidth && Constants.Value.AUTO != mColumnCount) {
-                mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
-                mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
-            } else if (Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO == mColumnCount) {
-                mColumnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
-                mColumnCount = mColumnCount > 0 ? mColumnCount :1;
-                mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
-            } else if(Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO != mColumnCount){
-                int columnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
-                mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
-                mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
-            }
-            mIsPreCalculateCellWidth = true;
-            if(WXEnvironment.isApkDebugable()) {
-                WXLogUtils.d("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
-            }
-        }
-    }
-
-    public void updateRecyclerAttr(){
-        preCalculateCellWidth();
-        int count = getChildCount();
-        for(int i=0;i<count; i++){
-            WXDomObject domObject = getChild(i);
-            if(WXBasicComponentType.CELL.equals(domObject.getType())) {
-                getChild(i).getStyles().put(Constants.Name.WIDTH, mColumnWidth);
-            }
-        }
-    }
-
-    @Override
-    public void updateAttr(Map<String, Object> attrs) {
-        super.updateAttr(attrs);
-        if(attrs.containsKey(Constants.Name.COLUMN_COUNT)
-                || attrs.containsKey(Constants.Name.COLUMN_GAP)
-                || attrs.containsKey(Constants.Name.COLUMN_WIDTH)){
-            updateRecyclerAttr();
-        }
-    }
-
+  public WXCellDomObject() {
+    setMeasureFunction(CELL_MEASURE_FUNCTION);
+  }
 }
