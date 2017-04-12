@@ -14,7 +14,7 @@ function installAndroidSDK {
 }
 
 function createAVD {
-    echo no | android create avd --force -n weexavd -t android-19 --abi default/armeabi-v7a
+    echo no | android create avd --force -n weexavd -t android-22 --abi default/armeabi-v7a
 }
 
 function startAVD {
