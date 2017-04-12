@@ -15,13 +15,11 @@ const isApproximate = (x, y) =>  {
   return Math.abs(x - y) <= (isAndroid ? 2 : 1.5)
 }
 
-describe('recycler', function () {
+describe('recycler @ignore_android', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
 
   before(function () {
-
-    console.log(util.getPage('/components/recycler.js'))
     return util.init(driver)
       .get(util.getPage('/components/recycler.js'))
       .waitForElementById('waterfall',util.getGETActionWaitTimeMills(),1000)
