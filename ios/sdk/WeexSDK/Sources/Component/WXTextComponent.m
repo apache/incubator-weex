@@ -80,7 +80,7 @@
 
 @end
 
-static BOOL textRenderUsingCoreText;
+static BOOL textRenderUsingCoreText = NO;
 
 @interface WXTextComponent()
 @property (nonatomic, assign)BOOL coretext;
@@ -104,8 +104,6 @@ static BOOL textRenderUsingCoreText;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
-    
-    CTFrameRef coretextFrameRef;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -133,11 +131,6 @@ static BOOL textRenderUsingCoreText;
         } else {
             _coretext = NO;
         }
-        BOOL renderUsingCoreText = YES;
-        if (weexInstance.userInfo[@"renderUsingCoreText"]) {
-            renderUsingCoreText = [weexInstance.userInfo[@"renderUsingCoreText"] boolValue];
-        }
-        [WXTextComponent setRenderUsingCoreText:renderUsingCoreText];
         
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
@@ -154,9 +147,6 @@ static BOOL textRenderUsingCoreText;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if (coretextFrameRef && CFGetRetainCount(coretextFrameRef)) {
-        CFRelease(coretextFrameRef);
-    }
 }
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
@@ -332,7 +322,7 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     if (_color) {
-        [attributedString addAttribute:(id)kCTForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
+        [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }
     
     if (_fontFamily) {
@@ -381,14 +371,14 @@ do {\
         paragraphStyle.minimumLineHeight = _lineHeight;
     }
     if (_lineHeight || _textAlign || [_textOverflow length] > 0) {
-        [attributedString addAttribute:(id)kCTParagraphStyleAttributeName
+        [attributedString addAttribute:NSParagraphStyleAttributeName
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
     }
     
     if ([self adjustLineHeight]) {
         if (_lineHeight > font.lineHeight) {
-            [attributedString addAttribute:(id)kCTBaselineReferenceFont
+            [attributedString addAttribute:NSBaselineOffsetAttributeName
                                      value:@((_lineHeight - font.lineHeight)/ 2)
                                      range:(NSRange){0, attributedString.length}];
         }
@@ -539,7 +529,7 @@ do {\
 
 - (void)drawTextWithContext:(CGContextRef)context bounds:(CGRect)bounds padding:(UIEdgeInsets)padding view:(WXText *)view
 {
-    if (bounds.size.width <=0 || bounds.size.height <= 0) {
+    if (bounds.size.width <= 0 || bounds.size.height <= 0) {
         return;
     }
     
@@ -571,18 +561,24 @@ do {\
         
         NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
         //add path
-        CGMutablePathRef path = CGPathCreateMutable();
-        CGPathAddRect(path, NULL, textFrame);
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge  CFAttributedStringRef)attributedStringCopy);
-         coretextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-        
-        CFArrayRef lines = CTFrameGetLines(coretextFrameRef);
+        CGPathRef path = NULL;
+        path = CGPathCreateWithRect(textFrame, NULL);
+        CTFramesetterRef framesetter = NULL;
+        framesetter = CTFramesetterCreateWithAttributedString((CFTypeRef)attributedStringCopy);
+        CTFrameRef coretextFrameRef = NULL;
+        coretextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+        CGPathRelease(path);
+        path = NULL;
+        CFRelease(framesetter);
+        framesetter = NULL;
+        CFArrayRef lines = NULL;
+        lines = CTFrameGetLines(coretextFrameRef);
         CFIndex lineCount = CFArrayGetCount(lines);
         CGPoint lineOrigins[lineCount];
         CTFrameGetLineOrigins(coretextFrameRef, CFRangeMake(0, 0), lineOrigins);
         for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
-            
-            CTLineRef lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
+            CTLineRef lineRef = NULL;
+            lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
             CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
@@ -594,9 +590,11 @@ do {\
             strikethroughStart.x =  lineOrigin.x - underLinePosition;
             strikethroughStart.y = lineOrigin.y + xHeight/2;
             for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
-                CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
+                CTRunRef run = NULL;
+                run = CFArrayGetValueAtIndex(runs, runIndex);
                 CTRunDraw(run, context, CFRangeMake(0, 0));
-                CFDictionaryRef attr = CTRunGetAttributes(run);
+                CFDictionaryRef attr = NULL;
+                attr = CTRunGetAttributes(run);
                 NSUnderlineStyle strikethrough = (NSUnderlineStyle)CFDictionaryGetValue(attr, NSStrikethroughStyleAttributeName);
                 
                 if (strikethrough) {
@@ -610,11 +608,9 @@ do {\
                     CGContextAddLineToPoint(context, strikethroughStart.x + length, strikethroughStart.y);
                     CGContextStrokePath(context);
                 }
-                
             }
         }
-        CFRelease(framesetter);
-        CGPathRelease(path);
+        CFRelease(coretextFrameRef);
         CGContextRestoreGState(context);
     }
 }
@@ -624,35 +620,49 @@ do {\
     if (isnan(aWidth)) {
         aWidth = CGFLOAT_MAX;
     }
+    
+    CGFloat totalHeight = 0;
+    CGSize suggestSize = CGSizeZero;
     NSAttributedString * attributedStringCpy = [self buildCTAttributeString];
-    CTFramesetterRef framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
-    
-    CGSize suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
-    
-    CGMutablePathRef path = CGPathCreateMutable();
-    // sufficient height to draw text
+    CTFramesetterRef framesetterRef = NULL;
+    framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
+        
+    suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
+        
+    CGMutablePathRef path = NULL;
+    path = CGPathCreateMutable();
+        // sufficient height to draw text
     CGPathAddRect(path, NULL, CGRectMake(0, 0, aWidth, suggestSize.height * 10));
+        
+    CTFrameRef frameRef = NULL;
+    frameRef = CTFramesetterCreateFrame(framesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
+        
+    CFRelease(framesetterRef);
+    CGPathRelease(path);
+    framesetterRef = NULL;
     
-    CTFrameRef frameRef = CTFramesetterCreateFrame(framesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
-    
-    CFArrayRef lines = CTFrameGetLines(frameRef);
+    CFArrayRef lines = NULL;
+    lines = CTFrameGetLines(frameRef);
     CFIndex lineCount = CFArrayGetCount(lines);
     CGFloat ascent = 0;
     CGFloat descent = 0;
     CGFloat leading = 0;
-    CGFloat totalHeight = 0;
+    
     // height = ascent + descent + lineCount*leading
     // ignore linespaing
     NSUInteger actualLineCount = 0;
     for (CFIndex lineIndex = 0; (!_lines|| lineIndex < _lines) && lineIndex < lineCount; lineIndex ++)
     {
-        CTLineRef lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
+        CTLineRef lineRef = NULL;
+        lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
         CTLineGetTypographicBounds(lineRef, &ascent, &descent, &leading);
         totalHeight += ascent + descent;
         actualLineCount ++;
     }
     
     totalHeight = totalHeight + actualLineCount*leading;
+    CFRelease(frameRef);
+    
     return CGSizeMake(suggestSize.width, totalHeight);
 }
 
