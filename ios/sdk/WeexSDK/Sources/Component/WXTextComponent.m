@@ -131,7 +131,7 @@ static BOOL textRenderUsingCoreText;
         if ([attributes objectForKey:@"coretext"]) {
             _coretext = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
-            _coretext = YES;
+            _coretext = NO;
         }
         BOOL renderUsingCoreText = YES;
         if (weexInstance.userInfo[@"renderUsingCoreText"]) {
@@ -265,8 +265,9 @@ do {\
     __weak typeof(self) weakSelf = self;
     return ^CGSize (CGSize constrainedSize) {
         CGSize computedSize = CGSizeZero;
-        NSTextStorage *textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
+        NSTextStorage *textStorage = nil;
         if (!(weakSelf.coretext && [WXTextComponent textRenderUsingCoreText]) ) {
+            textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
             NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
             computedSize = [layoutManager usedRectForTextContainer:textContainer].size;
@@ -290,7 +291,7 @@ do {\
         if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
             computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
         }
-        if ([WXUtility isBlankString:textStorage.string]) {
+        if (textStorage && [WXUtility isBlankString:textStorage.string]) {
             //  if the text value is empty or nil, then set the height is 0.
             computedSize.height = 0;
         }
@@ -549,7 +550,7 @@ do {\
             [self _resetNativeBorderRadius];
         });
     }
-    if (![WXTextComponent textRenderUsingCoreText] || !self.coretext) {
+    if (![self useCoreText]) {
         NSLayoutManager *layoutManager = _textStorage.layoutManagers.firstObject;
         NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
         
@@ -629,7 +630,8 @@ do {\
     CGSize suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
     
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddRect(path, NULL, CGRectMake(0, 0, aWidth, suggestSize.height*10));
+    // sufficient height to draw text
+    CGPathAddRect(path, NULL, CGRectMake(0, 0, aWidth, suggestSize.height * 10));
     
     CTFrameRef frameRef = CTFramesetterCreateFrame(framesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
     
