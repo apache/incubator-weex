@@ -68,14 +68,6 @@ class WXBridge implements IWXBridge {
    */
   public native void takeHeapSnapshot(String filename);
 
-
-  /**
-   * Called to clear all unhandled c++ timer when an instance is
-   * destroyed
-   * @param instanceId the destoyed instance's id.
-   */
-  public native void clearInstanceCallback(String instanceId);
-
   /**
    * JavaScript uses this methods to call Android code
    *
