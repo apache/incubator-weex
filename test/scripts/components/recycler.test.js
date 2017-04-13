@@ -7,7 +7,6 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-
 const platform = process.env.platform.toLowerCase() || 'android';
 const isAndroid = platform === 'android';
 
