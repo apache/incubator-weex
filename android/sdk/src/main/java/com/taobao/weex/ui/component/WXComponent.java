@@ -607,10 +607,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
           setBackgroundColor(bgColor);
         return true;
       case Constants.Name.BACKGROUND_IMAGE:
-        /**
-         * Since the gradient color needs to depend on the layout to be completed,
-         * the settings are moved to the {@link #onFinishLayout()} method
-         * **/
+        String bgImage = WXUtils.getString(param, null);
+        if (bgImage != null && mHost != null) {
+          setBackgroundImage(bgImage);
+        }
         return true;
       case Constants.Name.OPACITY:
         Float opacity = WXUtils.getFloat(param,null);
