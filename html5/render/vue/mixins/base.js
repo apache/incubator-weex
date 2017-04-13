@@ -67,6 +67,7 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
+    watchAppear(this)
   },
 
   methods: {

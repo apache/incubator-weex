@@ -26,7 +26,7 @@ function walk(dir) {
         // var entryFile = path.join(entryDirectory, path.basename(file, extname) + '.js');
         // fs.outputFileSync(entryFile, getEntryFileContent(entryFile, fullpath));
         var name = path.join('html5/test/render/vue/data', 'build', dir, path.basename(file, extname));
-        entry[name] = fullpath
+        entry[name] = [fullpath]
       } else if (stat.isDirectory() && file !== 'build' && file !== 'include') {
         var subdir = path.join(dir, file);
         walk(subdir);

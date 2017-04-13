@@ -9,6 +9,7 @@
 examples/build
 web-entry
 test/build
+data/build
 weex_tmp
 coverage
 dist
