@@ -19,7 +19,6 @@
 
 /* global Image */
 
-
 'use strict'
 
 // const WEAPP_STYLE_ID = 'weapp-style'

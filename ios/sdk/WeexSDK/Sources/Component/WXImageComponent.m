@@ -209,6 +209,8 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
+    [super _frameDidCalculated:isChanged];
+    
     if ([self isViewLoaded] && isChanged) {
         [self _clipsToBounds];
     }
@@ -359,10 +361,6 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)_clipsToBounds
 {
-    if (!_clipToBounds) {
-        return;
-    }
-    
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:self.view.bounds topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     // here is computed radii, do not use original style
     WXRadii *radii = borderRect.radii;

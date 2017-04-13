@@ -37,7 +37,12 @@ public class WXRecyclerDomObject extends WXDomObject{
     private int mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
     private float mColumnWidth = Constants.Value.AUTO;
     private float mColumnGap = Constants.Value.COLUMN_GAP_NORMAL;
+    private float mAvailableWidth = 0;
     private boolean mIsPreCalculateCellWidth =false;
+
+    public float getAvailableWidth() {
+        return WXViewUtils.getRealPxByWidth(mAvailableWidth,getViewPortWidth());
+    }
 
     public int getLayoutType(){
         return getAttrs().getLayoutType();
@@ -73,28 +78,27 @@ public class WXRecyclerDomObject extends WXDomObject{
             mColumnWidth = getAttrs().getColumnWidth();
             mColumnGap =  getAttrs().getColumnGap();
 
-            float availableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
-            availableWidth = WXViewUtils.getWebPxByWidth(availableWidth,getViewPortWidth());
+            mAvailableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
+            mAvailableWidth = WXViewUtils.getWebPxByWidth(mAvailableWidth,getViewPortWidth());
 
             if (Constants.Value.AUTO == mColumnCount && Constants.Value.AUTO == mColumnWidth) {
                 mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
             } else if (Constants.Value.AUTO == mColumnWidth && Constants.Value.AUTO != mColumnCount) {
-                mColumnWidth = (availableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
+                mColumnWidth = (mAvailableWidth - ((mColumnCount - 1) * mColumnGap)) / mColumnCount;
                 mColumnWidth = mColumnWidth > 0 ? mColumnWidth :0;
             } else if (Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO == mColumnCount) {
-                mColumnCount = Math.round((availableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
+                mColumnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = mColumnCount > 0 ? mColumnCount :1;
-                mColumnWidth =((availableWidth + mColumnGap) / mColumnCount) - mColumnGap;
+                mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             } else if(Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO != mColumnCount){
-                int columnCount = Math.round((availableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
+                int columnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
-                mColumnWidth= ((availableWidth + mColumnGap) / mColumnCount) - mColumnGap;
+                mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             }
             mIsPreCalculateCellWidth = true;
             if(WXEnvironment.isApkDebugable()) {
                 WXLogUtils.d("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
             }
-
         }
     }
 
@@ -119,13 +123,4 @@ public class WXRecyclerDomObject extends WXDomObject{
         }
     }
 
-    @Override
-    public void updateStyle(Map<String, Object> styles, boolean byPesudo) {
-        super.updateStyle(styles, byPesudo);
-        if(styles.containsKey(Constants.Name.PADDING)
-                ||styles.containsKey(Constants.Name.PADDING_LEFT)
-                || styles.containsKey(Constants.Name.PADDING_RIGHT)){
-            preCalculateCellWidth();
-        }
-    }
 }

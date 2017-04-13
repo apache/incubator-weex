@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// import { validateStyles } from '../validator'
+import { extractComponentStyle, createEventMap } from '../core'
 
 export default {
   props: {
@@ -62,8 +64,9 @@ export default {
         controls: this.controls,
         src: this.src
       },
-      on: this._createEventMap(['start', 'pause', 'finish', 'fail']),
-      staticClass: 'weex-video weex-el'
+      on: createEventMap(this, ['start', 'pause', 'finish', 'fail']),
+      staticClass: 'weex-video weex-el',
+      staticStyle: extractComponentStyle(this)
     })
   }
 }

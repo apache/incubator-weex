@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { extractComponentStyle } from '../../core'
 import LoadingIndicator from './loading-indicator'
 import { createEvent } from '../../utils'
 
@@ -50,7 +51,7 @@ export default {
   },
   watch: {
     height (val) {
-      this.$el.style.height = val + 'px'
+      this.$el.style.height = val * weex.config.env.scale + 'px'
     },
     display (val) {
       if (val === 'hide') {
@@ -101,7 +102,8 @@ export default {
     return createElement('aside', {
       ref: 'refresh',
       attrs: { 'weex-type': 'refresh' },
-      staticClass: 'weex-refresh weex-ct'
+      staticClass: 'weex-refresh weex-ct',
+      staticStyle: extractComponentStyle(this)
     }, this.getChildren())
   }
 }

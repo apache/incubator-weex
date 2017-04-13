@@ -16,8 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { extractComponentStyle, createEventMap } from '../core'
 import { createEvent } from '../utils'
 // import { validateStyles } from '../validator'
+
+const _css = `
+.weex-web {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: none;
+  box-sizing: border-box;
+}
+`
 
 export default {
   props: {
@@ -62,8 +73,10 @@ export default {
         'weex-type': 'web',
         src: this.src
       },
-      on: this._createEventMap(['error']),
-      staticClass: 'weex-web weex-el'
+      on: createEventMap(this, ['error']),
+      staticClass: 'weex-web weex-el',
+      staticStyle: extractComponentStyle(this)
     })
-  }
+  },
+  _css
 }

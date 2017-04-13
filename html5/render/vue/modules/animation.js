@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { nextFrame, toCSSText } from '../utils'
+import { nextFrame, toCSSText, autoPrefix, camelizeKeys, normalizeStyle } from '../utils'
 
 function transitionOnce (vnode, config, callback) {
   const duration = config.duration || 1000 // ms
@@ -42,7 +42,8 @@ function transitionOnce (vnode, config, callback) {
   dom.addEventListener('transitionend', transitionEndHandler)
 
   nextFrame(() => {
-    dom.style.cssText += toCSSText(config.styles || {})
+    dom.style.cssText
+      += toCSSText(autoPrefix(normalizeStyle(camelizeKeys(config.styles))) || {})
   })
 }
 
@@ -54,7 +55,7 @@ export default {
    * @param  {String} callback
    */
   transition (vnode, config, callback) {
-    // TODO: Make sure the transition is only run once
+    if (!config.styles) { return }
     return transitionOnce(vnode, config, () => {
       callback && callback()
     })

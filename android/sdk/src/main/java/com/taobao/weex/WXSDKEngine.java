@@ -48,6 +48,7 @@ import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.BasicEditTextDomObject;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
+import com.taobao.weex.dom.WXCellDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomRegistry;
 import com.taobao.weex.dom.WXListDomObject;
@@ -298,6 +299,8 @@ public class WXSDKEngine {
 
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
+      registerDomObject(WXBasicComponentType.HEADER, WXCellDomObject.class);
+      registerDomObject(WXBasicComponentType.CELL, WXCellDomObject.class);
       registerDomObject(WXBasicComponentType.INPUT, BasicEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.TEXTAREA, TextAreaEditTextDomObject.class);
       registerDomObject(WXBasicComponentType.SWITCH, WXSwitchDomObject.class);

@@ -18,7 +18,6 @@
  */
 /* global lib, HTMLElement */
 
-
 'use strict'
 
 import 'lazyimg'

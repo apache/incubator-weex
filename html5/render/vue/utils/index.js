@@ -76,17 +76,17 @@ export function hyphenateKeys (obj) {
   return res
 }
 
-// const vendorsReg = /webkit-|moz-|o-|ms-/
-// export function hyphenateStyleKeys (obj) {
-//   const res = {}
-//   for (const key in obj) {
-//     const hk = hyphenate(key).replace(vendorsReg, function ($0) {
-//       return '-' + $0
-//     })
-//     res[hk] = obj[key]
-//   }
-//   return res
-// }
+const vendorsReg = /webkit-|moz-|o-|ms-/
+export function hyphenateStyleKeys (obj) {
+  const res = {}
+  for (const key in obj) {
+    const hk = hyphenate(key).replace(vendorsReg, function ($0) {
+      return '-' + $0
+    })
+    res[hk] = obj[key]
+  }
+  return res
+}
 
 export function camelToKebab (name) {
   if (!name) { return '' }
@@ -95,8 +95,8 @@ export function camelToKebab (name) {
   })
 }
 
-export function appendStyle (css, styleId, replace) {
-  let style = document.getElementById(styleId)
+export function appendCss (css, cssId, replace) {
+  let style = document.getElementById(cssId)
   if (style && replace) {
     style.parentNode.removeChild(style)
     style = null
@@ -104,7 +104,7 @@ export function appendStyle (css, styleId, replace) {
   if (!style) {
     style = document.createElement('style')
     style.type = 'text/css'
-    styleId && (style.id = styleId)
+    cssId && (style.id = cssId)
     document.getElementsByTagName('head')[0].appendChild(style)
   }
   style.appendChild(document.createTextNode(css))
@@ -118,11 +118,11 @@ export function nextFrame (callback) {
 }
 
 export function toCSSText (object) {
+  if (!object) { return }
+  const obj = hyphenateStyleKeys(object)
   let cssText = ''
-  if (object) {
-    for (const key in object) {
-      cssText += `${hyphenate(key)}:${object[key]};`
-    }
+  for (const key in obj) {
+    cssText += `${key}:${obj[key]};`
   }
   return cssText
 }

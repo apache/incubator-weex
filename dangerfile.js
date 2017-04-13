@@ -24,7 +24,7 @@ const flowIgnorePaths = [
   'dist',
   'flow-typed'
 ].map(function (rel) {
-  return absolute('html5/' + rel)
+  return absolute(rel)
 });
 
 // new js files should have `@flow` at the top
@@ -144,8 +144,17 @@ const copyright_header_components = [
   'with the License\\.  You may obtain a copy of the License at'
 ];
 
+//path prefix
+const ignoreCopyrightVerifyPath = [
+  'test'
+]
 
 codefiles.forEach(filepath => {
+  for(var i=ignoreCopyrightVerifyPath.length-1;i>=0;i--){
+    if(filepath.startsWith(ignoreCopyrightVerifyPath[i])){
+      return
+    }
+  }
   const content = fs.readFileSync(filepath).toString();
   for (const line of copyright_header_components) {
     if (!content.match(new RegExp(line))) {

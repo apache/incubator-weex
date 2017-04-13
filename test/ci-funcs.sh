@@ -14,7 +14,7 @@ function installAndroidSDK {
 }
 
 function createAVD {
-    echo no | android create avd --force -n weexavd -t android-19 --abi default/armeabi-v7a
+    echo no | android create avd --force -n weexavd -t android-22 --abi default/armeabi-v7a
 }
 
 function startAVD {
@@ -98,6 +98,7 @@ function test_cpt {
     
     if [ $target = $target_android ]; then
         ./test/serve.sh 2&>1 > /dev/null &
+        set -eu
         # export ANDROID_HOME=/usr/local/opt/android-sdk
         cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
         waitForEmulator

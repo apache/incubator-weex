@@ -14,23 +14,26 @@ describe('slider infinite scroll', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/slider-infinite.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('txt1',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
-      return util.quit(driver);
+      // return util.quit(driver);
   })
 
 
   it('#1 waiting for auto play', () => {
     return driver
     .sleep(5000)
-    .elementByXPath('//div/text')
+    .elementById('txt1')
     .text()
     .then((text)=>{
-        var parts = text.split("-");
-        assert.equal(parts[0], 1);
-        assert.equal(parts[2] == 1, false);
+        assert.equal(text, 1);
+    })
+    .elementById('txt2')
+    .text()
+    .then((text)=>{
+        assert.equal(text>2, true);
     })
   })
 });

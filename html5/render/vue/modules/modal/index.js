@@ -20,9 +20,10 @@ import toast from './toast'
 import Alert from './alert'
 import Confirm from './confirm'
 import Prompt from './prompt'
+import _css from './style'
 
 // TODO: rewrite the modal styles
-export default {
+const modal = {
 
   // duration: default is 0.8 seconds.
   toast: function (config) {
@@ -62,5 +63,12 @@ export default {
       callback && callback(val)
     }
     new Prompt(config).show()
+  }
+}
+
+export default {
+  init: function (Weex) {
+    Weex.utils.appendCss(_css, 'weex-mud-modal')
+    Weex.registerModule('modal', modal)
   }
 }
