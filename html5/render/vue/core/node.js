@@ -11,8 +11,9 @@ export function trimTextVNodes (vnodes) {
 }
 
 const supportedEvents = [
-  'click', 'longpress', 'appear', 'disappear'
-  // 'touchstart', 'touchmove', 'touchend'
+  'click', 'longpress', 'appear', 'disappear',
+  'touchstart', 'touchmove', 'touchend',
+  'panstart', 'panmove', 'panend', 'swipe', 'longpress'
 ]
 /**
  * emit native events to enable v-on.
