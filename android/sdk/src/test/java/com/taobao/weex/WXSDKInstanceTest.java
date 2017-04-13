@@ -189,7 +189,6 @@ public class WXSDKInstanceTest {
     mInstance.onActivityResume();
     mInstance.onActivityPause();
     mInstance.onActivityStop();
-    mInstance.onActivityDestroy();
   }
 
   @Test
