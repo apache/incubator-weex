@@ -9,10 +9,6 @@ init('<text> component', (Vue, helper) => {
     helper.register('text', text)
   })
 
-  after(() => {
-    helper.reset()
-  })
-
   it('create simple text component', () => {
     const vm = compile(`<text>abc</text>`)
 

@@ -41,11 +41,11 @@ init('<image> component', (Vue, helper) => {
 
   it('<image> resize="stretch"', () => {
     const vm = compile(`<image resize="stretch"></image>`)
-    expect(vm.$el.style.backgroundSize).to.be.equal('100%')
+    expect(vm.$el.style.backgroundSize).to.contain('100%')
   })
 
   it('<image> unknown resize', () => {
     const vm = compile(`<image resize="unknown"></image>`)
-    expect(vm.$el.style.backgroundSize).to.be.equal('100%')
+    expect(vm.$el.style.backgroundSize).to.be.contain('100%')
   })
 })

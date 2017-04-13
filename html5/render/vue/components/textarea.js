@@ -16,9 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { extractComponentStyle, createEventMap } from '../core'
 import { inputCommon } from '../mixins'
 import { extend, mapFormEvents } from '../utils'
+
 // import { validateStyles } from '../validator'
+
+const _css = `
+.weex-textarea {
+  font-size: 0.426667rem
+}
+.weex-textarea:focus {
+  outline: none;
+}
+`
 
 export default {
   mixins: [inputCommon],
@@ -45,7 +56,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
-    const events = extend(this._createEventMap(), mapFormEvents(this))
+    const events = extend(createEventMap(this), mapFormEvents(this))
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',
@@ -60,7 +71,9 @@ export default {
         value: this.value
       },
       on: this.createKeyboardEvent(events),
-      staticClass: 'weex-textarea weex-el'
+      staticClass: 'weex-textarea weex-el',
+      staticStyle: extractComponentStyle(this)
     })
-  }
+  },
+  _css
 }
