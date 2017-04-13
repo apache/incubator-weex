@@ -761,6 +761,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityDestroy can not be call!");
     }
 
+    destroyUnhandledTimer();
     destroy();
   }
 
@@ -1107,6 +1108,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     } catch (Exception e) {
       WXLogUtils.e("WXSDKInstance destroyView Exception: ", e);
     }
+  }
+
+  /**
+   * destroy all unhandled c++ setTimeout/setInterval callback
+   */
+  public void destroyUnhandledTimer(){
+    WXBridgeManager.getInstance().clearInstanceCallback(mInstanceId);
   }
 
   public synchronized void destroy() {
