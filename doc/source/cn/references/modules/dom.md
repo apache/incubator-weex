@@ -11,7 +11,7 @@ version: 2.1
 
 这部分API是通过把 virtual-dom 的消息发送到 native 渲染器来做到的。
 
-开发者在日常开发中，唯一可在 `.we` 文件中使用的是 `scrollToElement`。
+开发者在日常开发中，唯一可在 `.vue` 文件中使用的是 `scrollToElement`。
 ~~你也可以调用 `$scrollTo` 方法来使用它~~
 
 这个页面提及的其他的 API，只在 `callNative` 进程中的 native 渲染器用。
@@ -30,8 +30,7 @@ version: 2.1
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
   - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
-  - `animated {bool}`：设置是否有滚动动画，默认是 true
-
+ - `animated {bool}`：设置是否有滚动动画，默认是 true
 #### 示例
 
 ```html

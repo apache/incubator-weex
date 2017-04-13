@@ -84,10 +84,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_TRACE", "false"
         }
 
         debug {
             testCoverageEnabled true
+            buildConfigField "boolean", "ENABLE_TRACE", "true"
         }
     }
 

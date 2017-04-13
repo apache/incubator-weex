@@ -13,7 +13,6 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXComponent+GradientColor.h"
 
 @implementation WXComponent (Layout)
 
@@ -137,6 +136,7 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
+            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }
@@ -204,7 +204,6 @@
     if (_positionType == WXPositionTypeSticky) {
         [self.ancestorScroller adjustSticky];
     }
-    
     [self layoutDidFinish];
 }
 

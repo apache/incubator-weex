@@ -54,10 +54,20 @@
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Scan history</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.taobao.WeexDemo.scan.history</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>history</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>scan_history</string>
+		</dict>
+		<dict>
 			<key>UIApplicationShortcutItemIconFile</key>
 			<string>scan</string>
 			<key>UIApplicationShortcutItemSubtitle</key>
-			<string>scan your QR code</string>
+			<string>scan QR code</string>
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Scan QR</string>
 			<key>UIApplicationShortcutItemType</key>

@@ -8,10 +8,6 @@ init('<switch> component', (Vue, helper) => {
     helper.register('switch', _switch)
   })
 
-  after(() => {
-    helper.reset()
-  })
-
   it('simple <switch> component', () => {
     const vm = compile(`<switch></switch>`)
 

@@ -1,34 +1,25 @@
 <template>
-  <div>
-    <div style="height: 20px;width: 750px;border-color: black;border-width: 2px;justify-content: center">
-      <div style="height: 14px;width: {{progress_width}};margin-left:{{progress}};background-color: gray"></div>
-    </div>
-    <text style="width: 750px">{{event}}</text>
+  <scroller class="list" append="tree">
 
-    <scroller id="scroller" onscroll="{{onScroll}}">
+    <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
+      <loading-indicator class="indicator" ></loading-indicator>
+      <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)" if="{{(refresh_display==='hide')}}">Pull To Refresh</text>
+    </refresh>
 
-      <refresh class="refresh-view" display="{{refresh_display}}" onrefresh="onrefresh">
-        <loading-indicator class="indicator"></loading-indicator>
-        <text class="refresh-arrow" style="text-align: center; color:rgb(238, 162, 54)"
-              if="{{(refresh_display==='hide')}}">Pull To Refresh
-        </text>
-      </refresh>
-
-      <div class="section" repeat="{{sections}}">
-        <div class="header">
-          <text class="header-title">{{title}}</text>
-        </div>
-        <div class="item" repeat="{{items}}">
-          <text class="item-title">row {{id}}</text>
-        </div>
+    <div class="section" repeat="{{sections}}">
+      <div class="header">
+        <text class="header-title">{{title}}</text>
       </div>
+      <div class="item" repeat="{{items}}">
+        <text class="item-title">row {{id}}</text>
+      </div>
+    </div>
 
-      <loading class="loading-view" display="{{loading_display}}" onloading="onloading">
-        <loading-indicator class="indicator"></loading-indicator>
-      </loading>
+    <loading class="loading-view" display="{{loading_display}}" onloading="onloading">
+      <loading-indicator class="indicator" ></loading-indicator>
+    </loading>
 
-    </scroller>
-  </div>
+  </scroller>
 </template>
 
 <style>
@@ -94,48 +85,33 @@
 
 <script>
   require('weex-components');
-  var dom = weex.requireModule('dom');
   module.exports = {
     methods: {
-      onrefresh: function (e) {
+      onrefresh: function(e) {
         var self = this;
         self.refresh_display = 'show';
         self.$call('modal', 'toast', {
           'message': 'onrefresh'
         });
-        this.$call('timer', 'setTimeout', function () {
+        this.$call('timer', 'setTimeout', function() {
           self.refresh_display = 'hide';
         }, 3000);
       },
-      onloading: function (e) {
+      onloading: function(e) {
         var self = this;
         self.loading_display = 'show';
         self.$call('modal', 'toast', {
           'message': 'onloading'
         });
-        this.$call('timer', 'setTimeout', function () {
+        this.$call('timer', 'setTimeout', function() {
           if (self.sections.length <= 6) {
             self.sections.push(self.moreSections[self.sections.length - 2]);
           }
           self.loading_display = 'hide';
         }, 3000);
-      },
-      onScroll: function (e) {
-        var self = this;
-        this.event = 'contentOffset: ' + JSON.stringify(e.contentOffset) + '\ncontentSize: ' + JSON.stringify(e.contentSize);
-        dom.getComponentRect(this.$el('scroller'), function (ret) {
-          console.log(ret.size.height);
-          var listHeight = ret.size.height;
-          self.progress_width = (listHeight / e.contentSize.height) * 750;
-          var offsetY = e.contentOffset.y > 0 ? 0 : Math.abs(e.contentOffset.y);
-          self.progress = (offsetY / (e.contentSize.height - listHeight)) * (750 - self.progress_width);
-        });
       }
     },
     data: {
-      event: '-',
-      progress_width: 0,
-      progress:0,
       refresh_display: 'hide',
       loading_display: 'hide',
       sections: [
