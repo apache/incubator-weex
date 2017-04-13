@@ -29,7 +29,7 @@ Make sure the following configuration is complete:
 ### Quick to use
 If you are the first time to try or have a higher demand for stability, you can use the way to dependence on the SDK.      
 The steps are as follows:       
- 
+
 1. Create an Android project. There is nothing to be specified, according to your habits to.
 2. Update build.gradle by adding the following dependencies:
 
@@ -258,7 +258,8 @@ Weex supports both full page rendering and partial rendering. What you need to d
     _instance.renderFinish = ^ (UIView *view) {
         //process renderFinish
     };
-    [_instance renderWithURL:self.url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"]
+    [_instance renderWithURL:url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
 }
 ```
 

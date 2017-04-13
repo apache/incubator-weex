@@ -32,7 +32,7 @@ has_chapter_content: true
 步骤如下：  
 1. 创建Android工程，没有什么要特别说明的，按照你的习惯来。
 2. 修改build.gradle 加入如下基础依赖  
-   
+
    ```gradle
    compile 'com.android.support:recyclerview-v7:23.1.1'
    compile 'com.android.support:support-v4:23.1.1'
@@ -40,7 +40,7 @@ has_chapter_content: true
    compile 'com.alibaba:fastjson:1.1.46.android'
    compile 'com.taobao.android:weex_sdk:0.5.1@aar'
    ```
-   
+
    注:版本可以高不可以低。  
 
 #### 代码实现
@@ -229,7 +229,7 @@ WXSample地址
       pod 'WeexSDK', '0.9.5'   ## 建议使用WeexSDK新版本 
   end
   ```
-    
+
 - 源码集成
 
   首先 拷贝 `ios/sdk` 目录到你已有项目目录 (此处以拷贝到你已有项目的根目录为例子)，然后在 `Podfile` 文件中添加
@@ -274,7 +274,7 @@ WXSample地址
 
 Weex 支持整体页面渲染和部分渲染两种模式，你需要做的事情是用指定的 URL 渲染 Weex 的 view，然后添加到它的父容器上，父容器一般都是 viewController。
 
-```
+```objective-c
 #import <WeexSDK/WXSDKInstance.h>
 - (void)viewDidLoad 
 {
@@ -297,7 +297,8 @@ Weex 支持整体页面渲染和部分渲染两种模式，你需要做的事情
     _instance.renderFinish = ^ (UIView *view) {
         //process renderFinish
     };
-    [_instance renderWithURL:self.url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"]
+    [_instance renderWithURL:url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
 }
 ```
 
