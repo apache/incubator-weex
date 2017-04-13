@@ -28,10 +28,6 @@ import { extend } from '../utils/func'
  * 3. process.env.VIEWPORT_WIDTH (buid time)
  *
  */
-<<<<<<< HEAD
-
-let viewportWidth = process.env.VIEWPORT_WIDTH
-=======
 let isInited = false
 const DEFAULT_VIEWPORT_WIDTH = 750
 
@@ -42,7 +38,6 @@ const envViewportWidth = parseInt(process.env.VIEWPORT_WIDTH)
 let width: number = !isNaN(envViewportWidth) && envViewportWidth > 0
   ? envViewportWidth
   : DEFAULT_VIEWPORT_WIDTH
->>>>>>> 0.11-dev
 
 let wxViewportMeta = document.querySelector('meta[name="weex-viewport"]')
 const metaWidth = wxViewportMeta && parseInt(wxViewportMeta.getAttribute('content'))

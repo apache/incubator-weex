@@ -53,7 +53,6 @@ const _css = `
 }
 `
 
->>>>>>> 0.11-dev
 export default {
   render (createElement) {
     this.weexType = 'loading-indicator'
