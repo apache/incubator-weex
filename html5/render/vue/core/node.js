@@ -23,7 +23,10 @@ const supportedEvents = [
 export function createEventMap (context, extras = []) {
   const eventMap = {}
   supportedEvents.concat(extras).forEach(name => {
-    eventMap[name] = event => context.$emit(name, event)
+    eventMap[name] = function (e) {
+      e.stopPropagation()
+      context.$emit(name, e)
+    }
   })
   return eventMap
 }
