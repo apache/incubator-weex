@@ -81,7 +81,10 @@
 @end
 
 static BOOL textRenderUsingCoreText = NO;
-static BOOL useCoreTextAttr = NO;
+
+@interface WXTextComponent()
+@property (nonatomic, assign)BOOL useCoreTextAttr;
+@end
 
 @implementation WXTextComponent
 {
@@ -124,7 +127,7 @@ static BOOL useCoreTextAttr = NO;
     if (self) {
         // just for coretext and textkit render replacement
         if ([attributes objectForKey:@"coretext"]) {
-            useCoreTextAttr = [WXConvert BOOL:attributes[@"coretext"]];
+            _useCoreTextAttr = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
             _useCoreTextAttr = NO;
         }
@@ -136,9 +139,9 @@ static BOOL useCoreTextAttr = NO;
     return self;
 }
 
-+ (BOOL)useCoreText
+- (BOOL)useCoreText
 {
-    if (useCoreTextAttr) {
+    if (_useCoreTextAttr) {
         return YES;
     }
     if ([WXTextComponent textRenderUsingCoreText]) {
@@ -339,7 +342,7 @@ do {\
     }
     
     // set font
-    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor];
+    UIFont *font = [WXUtility fontWithSize:_fontSize textWeight:_fontWeight textStyle:_fontStyle fontFamily:_fontFamily scaleFactor:self.weexInstance.pixelScaleFactor useCoreText:[self useCoreText]];
     CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName,
                                            font.pointSize,
                                            NULL);

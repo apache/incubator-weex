@@ -22,6 +22,4 @@
 @interface WXTextComponent : WXComponent
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText;
-+ (BOOL)useCoreText;
-
 @end
