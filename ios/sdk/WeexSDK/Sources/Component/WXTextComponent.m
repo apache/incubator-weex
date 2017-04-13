@@ -81,10 +81,7 @@
 @end
 
 static BOOL textRenderUsingCoreText = NO;
-
-@interface WXTextComponent()
-@property (nonatomic, assign)BOOL coretext;
-@end
+static BOOL useCoreTextAttr = NO;
 
 @implementation WXTextComponent
 {
@@ -127,9 +124,9 @@ static BOOL textRenderUsingCoreText = NO;
     if (self) {
         // just for coretext and textkit render replacement
         if ([attributes objectForKey:@"coretext"]) {
-            _coretext = [WXConvert BOOL:attributes[@"coretext"]];
+            useCoreTextAttr = [WXConvert BOOL:attributes[@"coretext"]];
         } else {
-            _coretext = NO;
+            _useCoreTextAttr = NO;
         }
         
         [self fillCSSStyles:styles];
@@ -139,9 +136,15 @@ static BOOL textRenderUsingCoreText = NO;
     return self;
 }
 
-- (BOOL)useCoreText
++ (BOOL)useCoreText
 {
-    return (_coretext || [WXTextComponent textRenderUsingCoreText]);
+    if (useCoreTextAttr) {
+        return YES;
+    }
+    if ([WXTextComponent textRenderUsingCoreText]) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void)dealloc
@@ -256,7 +259,7 @@ do {\
     return ^CGSize (CGSize constrainedSize) {
         CGSize computedSize = CGSizeZero;
         NSTextStorage *textStorage = nil;
-        if (!(weakSelf.coretext && [WXTextComponent textRenderUsingCoreText]) ) {
+        if (![self useCoreText]) {
             textStorage = [weakSelf textStorageWithWidth:constrainedSize.width];
             NSLayoutManager *layoutManager = textStorage.layoutManagers.firstObject;
             NSTextContainer *textContainer = layoutManager.textContainers.firstObject;
@@ -318,9 +321,7 @@ do {\
 - (NSMutableAttributedString *)buildCTAttributeString {
     
     NSString *string = [self text] ?: @"";
-    
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
-    
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
     }
@@ -552,7 +553,7 @@ do {\
     }else {
         CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
         // sufficient height for text to draw, or frame lines will be empty
-        textFrame.size.height = bounds.size.height*2;
+        textFrame.size.height = bounds.size.height * 2;
         CGContextSaveGState(context);
         //flip the coordinate system
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
@@ -676,7 +677,6 @@ static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *u
         if (attrs) {
             CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
             if (font) {
-                
                 CGFloat xHeight = CTFontGetXHeight(font);
                 if (xHeight > maxXHeight) {
                     maxXHeight = xHeight;
