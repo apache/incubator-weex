@@ -796,7 +796,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     WXModuleManager.onActivityResult(getInstanceId(),requestCode,resultCode,data);
 
     if(mRootComp != null) {
-      mRootComp.onActivityResult(requestCode,requestCode,data);
+      mRootComp.onActivityResult(requestCode,resultCode,data);
     }else{
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResult can not be call!");
     }
