@@ -148,3 +148,44 @@ export function normalizeStyle (style: {}) {
   }
   return res
 }
+
+/**
+ * add transform style to element.
+ * @param {HTMLElement} elm
+ * @param {object} style: transform object, format is like this:
+ *   {
+ *     translate: 'translate3d(2px, 2px, 2px)',
+ *     scale: 'scale(0.2)',
+ *     rotate: 'rotate(30deg)'
+ *   }
+ * @param {boolean} replace: whether to replace all transform properties.
+ */
+export function addTransform (elm: HTMLElement, style: {}, replace: boolean): void {
+  if (!style) { return }
+  const transformStr = elm.style.webkitTransform || elm.style.transform
+  let styleObj = {}
+  if (
+    transformStr
+    && !replace
+    && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
+    styleObj = transformStr.trim().split(' ').reduce(function (pre, str) {
+      ['translate', 'scale', 'rotate'].forEach(function (name) {
+        if (new RegExp(name, 'i').test(str)) {
+          pre[name] = str
+        }
+      })
+      return pre
+    }, {})
+  }
+  for (const key in style) {
+    const val = style[key]
+    if (val) {
+      styleObj[key] = val
+    }
+  }
+  const resStr = Object.keys(style).reduce(function (pre, key) {
+    return pre + style[key] + ' '
+  }, '')
+  elm.style.webkitTransform = resStr
+  elm.style.transform = resStr
+}

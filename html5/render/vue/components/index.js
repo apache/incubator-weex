@@ -28,6 +28,7 @@ import list from './scrollable/list'
 import cell from './scrollable/list/cell'
 import scroller from './scrollable/scroller'
 import slider from './slider'
+import neighbor from './slider/slider-neighbor'
 // import indicator from './warning'
 import indicator from './slider/indicator'
 // import refresh from './warning'
@@ -40,18 +41,19 @@ import textarea from './textarea'
 import video from './video'
 import web from './web'
 
-export {
+export default {
   a,
   div,
-  div as container,
+  container: div,
   image,
-  image as img,
+  img: image,
   input,
   header,
   list,
   cell,
   scroller,
   slider,
+  'slider-neighbor': neighbor,
   indicator,
   refresh,
   loading,
