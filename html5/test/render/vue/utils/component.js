@@ -13,13 +13,14 @@ init('utils component', (Vue, helper) => {
     spy && spy(evt)
   }
 
+  const id = 'test-first-screen-appear'
+
   before(() => {
     helper.register('div', div)
   })
 
   describe('watchAppear', function () {
     it('should work when mounted and updated.', function (done) {
-      const id = 'test-first-screen-appear'
       helper.createVm(firstScreenAppearBundle, id)
       helper.registerDone(id, () => {
         const { appear: appearSpy, disappear: disappearSpy } = spys
@@ -31,6 +32,7 @@ init('utils component', (Vue, helper) => {
         expect(appearSpy.args[0][0].direction).to.not.exist
         expect(appearSpy.args[1][0].direction).to.not.exist
         expect(disappearSpy.args[0][0].direction).to.not.exist
+        helper.unregisterDone(id)
         done()
       })
     })

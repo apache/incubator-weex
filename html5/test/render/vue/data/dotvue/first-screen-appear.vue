@@ -7,7 +7,7 @@
 <script>
   module.exports = {
     components: {
-      foo: require('./foo.vue')
+      foo: require('./first-screen-appear-foo.vue')
     },
     methods: {
       appear: function (evt) {

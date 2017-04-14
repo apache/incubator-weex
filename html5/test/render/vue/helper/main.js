@@ -62,6 +62,11 @@ const helper = {
     this._done[id] = cb
   },
 
+  unregisterDone(id) {
+    if (!id) { return }
+    delete this._done[id]
+  },
+
   done (id, ...args) {
     const done = this._done[id]
     done && done(...args)
