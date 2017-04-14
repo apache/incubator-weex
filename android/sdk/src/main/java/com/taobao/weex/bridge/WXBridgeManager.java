@@ -387,7 +387,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     if (WXEnvironment.isApkDebugable()) {
       mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
           .append(", tasks:").append(tasks).append(", callback:").append(callback);
-
+      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
 
@@ -886,7 +886,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
               .append("function:").append(function);
       if(logTaskDetail)
         mLodBuilder.append(" tasks:").append(WXJsonUtils.fromObjectToJSONString(args));
-
+      WXLogUtils.d(mLodBuilder.substring(0));
       mLodBuilder.setLength(0);
     }
     mWXBridge.execJS(instanceId, namespace, function, args);
@@ -1156,10 +1156,6 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents ", e);
       commitJSFrameworkAlarmMonitor(IWXUserTrackAdapter.JS_FRAMEWORK,WXErrorCode.WX_ERR_JS_EXECUTE,"invokeRegisterComponents");
     }
-  }
-
-  public void clearInstanceCallback(String instanceId){
-    mWXBridge.clearInstanceCallback(instanceId);
   }
 
   public void destroy() {
