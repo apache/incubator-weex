@@ -146,7 +146,12 @@ const copyright_header_components = [
 
 //path prefix
 const ignoreCopyrightVerifyPath = [
-  'test'
+  'test',
+  'android/playground/app/src/main/assets',
+  'android/sdk/assets',
+  'ios/playground/bundlejs',
+  'ios/sdk/WeexSDK/Resources',
+  'ios/sdk/WeexSDK/Sources/Layout'
 ]
 
 codefiles.forEach(filepath => {
