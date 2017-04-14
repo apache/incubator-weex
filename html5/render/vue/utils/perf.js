@@ -61,6 +61,8 @@ const IMG_REC_INDENT: number = 500  // record loading events after 500ms towards
 let earliestBeforeUpdateTime: number = 0
 let earliestBeforeCreateTime: number = 0
 
+let isFirstScreenDetected = false
+
 function getNow (): number {
   return performance.now ? performance.now() : new Date().getTime()
 }
@@ -99,6 +101,10 @@ const debouncedTagImg = debounce(function () {
   const num = perf.renderTime.length
   perf[`screenTime${num}`] = end
   window.weex.emit('renderfinish', end)
+  if (!isFirstScreenDetected) {
+    isFirstScreenDetected = true
+    window.weex.emit('firstscreenfinish', end)
+  }
   if (process.env.NODE_ENV === 'development') {
     console.log(`screenTime[${num}]: ${end} ms.`)
     console.log('_weex_perf:', window._weex_perf)
