@@ -62,7 +62,7 @@ const helper = {
     this._done[id] = cb
   },
 
-  unregisterDone(id) {
+  unregisterDone (id) {
     if (!id) { return }
     delete this._done[id]
   },

@@ -1,3 +1,5 @@
+/* global Event */
+
 import { init } from '../helper/runtime'
 import div from '../../../../render/vue/components/div'
 
@@ -9,21 +11,20 @@ init('core node', (Vue, helper) => {
   before(() => {
     helper.register('div', div)
   })
-  
+
   describe('stop event bubble', function () {
     let infoStr = ''
-    let i = 0
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
       expect(tracker).to.equal(shouldBe)
       infoStr = shouldBe
     }
-    
+
     it('should trigger the closest parent.', function (done) {
       const vm = helper.createVm(eventBubbleBundle, id)
       const el = vm.$el.querySelector('.event-bubble-outter')
       expect(vm.tracker).to.equal('')
-      
+
       /**
        * click outter div. should trigget event on the outter div.
        * and should execute handlers by the priority of:
@@ -40,8 +41,7 @@ init('core node', (Vue, helper) => {
       })
     })
 
-    it ('should not bubble if already triggered.', function (done) {
-
+    it('should not bubble if already triggered.', function (done) {
       const vm = helper.createVm(eventBubbleBundle, id)
       const inner = vm.$el.querySelector('.event-bubble-inner')
 
