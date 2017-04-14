@@ -491,7 +491,7 @@
         if(strongSelf) {
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
-            if ([strongSelf.view.layer.sublayers containsObject:_gradientLayer]) {
+            if (_gradientLayer && [strongSelf.view.layer.sublayers containsObject:_gradientLayer]) {
                 [_gradientLayer removeFromSuperlayer];
             }
              _gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
