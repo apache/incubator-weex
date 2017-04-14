@@ -106,51 +106,21 @@ export function init (app, code, data, services) {
         const handler = function () {
           args[0](...args.slice(2))
         }
-
-        let timerId, callbackId
-
-        if (global.setTimeoutWeex && (typeof global.setTimeoutWeex === 'function')) {
-          callbackId = app.doc.taskCenter.normalize(handler)
-          timerId = global.setTimeoutWeex(app.id, callbackId, args[1])
-          return timerId
-        }
-        else {
-          timer.setTimeout(handler, args[1])
-          return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
-        }
+        timer.setTimeout(handler, args[1])
+        return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
       },
       setInterval: (...args) => {
         const handler = function () {
           args[0](...args.slice(2))
         }
-
-        let timerId, callbackId
-
-        if (global.setIntervalWeex && (typeof global.setIntervalWeex === 'function')) {
-          callbackId = app.doc.taskCenter.normalize(handler)
-          timerId = global.setIntervalWeex(app.id, callbackId, args[1])
-          return timerId
-        }
-        else {
-          timer.setInterval(handler, args[1])
-          return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
-        }
+        timer.setInterval(handler, args[1])
+        return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
       },
       clearTimeout: (n) => {
-        if (global.clearTimeoutWeex && (typeof global.clearTimeoutWeex === 'function')) {
-          global.clearTimeoutWeex(n)
-        }
-        else {
-          timer.clearTimeout(n)
-        }
+        timer.clearTimeout(n)
       },
       clearInterval: (n) => {
-        if (global.clearIntervalWeex && (typeof global.clearIntervalWeex === 'function')) {
-          global.clearIntervalWeex(n)
-        }
-        else {
-          timer.clearInterval(n)
-        }
+        timer.clearInterval(n)
       }
     })
   }

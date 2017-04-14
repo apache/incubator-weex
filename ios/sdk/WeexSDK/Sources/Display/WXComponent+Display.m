@@ -564,7 +564,7 @@ do {\
     WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:rect topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     WXRadii *radii = borderRect.radii;
     BOOL hasBorderRadius = [radii hasBorderRadius];
-    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0;
+    return (!hasBorderRadius) && _opacity == 1.0 && CGColorGetAlpha(_backgroundColor.CGColor) == 1.0 && [self _needsDrawBorder];
 }
 
 #pragma mark - Deprecated
