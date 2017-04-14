@@ -6,6 +6,7 @@ window.weex = weex
 
 ; ['getComponentStyle',
   'extractComponentStyle',
+  'createEventMap',
   'trimTextVNodes'].forEach(function (method) {
     weex[method] = core[method].bind(weex)
   })
