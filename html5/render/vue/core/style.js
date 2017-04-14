@@ -106,83 +106,83 @@ export function getHeadStyleMap () {
   return res
 }
 
-export function getScopeIds (context) {
-  const arr = []
-  let ctx = context
-  let scopeId
-  while (ctx) {
-    scopeId = ctx.$options._scopeId
-    scopeId && arr.push(scopeId)
-    ctx = ctx.$options.parent
-  }
-  return arr
+// export function getScopeIds (context) {
+//   const arr = []
+//   let ctx = context
+//   let scopeId
+//   while (ctx) {
+//     scopeId = ctx.$options._scopeId
+//     scopeId && arr.push(scopeId)
+//     ctx = ctx.$options.parent
+//   }
+//   return arr
+// }
+
+export function getScopeId (vnode) {
+  return vnode.context.$options._scopeId
 }
 
 /**
  * get style in <style scoped> tags for this component.
  */
-export function getScopeStyle (context, classNames) {
-  const scopeIds = getScopeIds(context)
+export function getScopeStyle (vnode, classNames) {
+  const scopeId = getScopeId(vnode)
   const style = {}
   const styleMap = weex.styleMap
-  let map
-  let cls
-  let clsNmsIdx
-  let scpIdsIdx
+  let clsNmsIdx = 0
   const clsNmsLen = classNames.length
-  const scpIdsLen = scopeIds.length
-  if (clsNmsLen <= 0) {
-    return {}
-  }
-  clsNmsIdx = 0
   while (clsNmsIdx < clsNmsLen) {
-    scpIdsIdx = 0
-    while (scpIdsIdx < scpIdsLen) {
-      cls = `.${classNames[clsNmsIdx]}[${scopeIds[scpIdsIdx]}]`
-      map = styleMap[cls]
-      if (!map) {
-        scpIdsIdx++
-        continue
-      }
-      for (const k in map) {
-        style[k] = map[k]
-      }
-      scpIdsIdx++
-    }
+    const cls = `.${classNames[clsNmsIdx]}[${scopeId}]`
+    const map = styleMap[cls]
+    map && extend(style, map)
     clsNmsIdx++
   }
   return style
+}
+
+function getStyle (vnode, extract) {
+  const data = vnode.data || {}
+  const staticClassNames = (typeof data.staticClass === 'string') ? data.staticClass.split(' ') : (data.staticClass || [])
+  const classNames = (typeof data.class === 'string') ? data.class.split(' ') : (data.class || [])
+  const clsNms = staticClassNames.concat(classNames)
+  const style = getScopeStyle(vnode, clsNms)
+  if (!data.cached) {
+    // cache staticStyle once in the beginning.
+    data.cached = extend({}, data.staticStyle)
+  }
+  // cache binding style every time since the binding style is variable.
+  extend(data.cached, data.style)
+  extend(style, data.cached)
+  data.staticStyle = style
+  if (extract) {
+    delete data.staticStyle
+    delete data.style
+  }
+  return camelizeKeys(style)
 }
 
 /**
  * get style merged with static styles, binding styles, and scoped class styles,
  * with keys in camelcase.
  */
-export function getComponentStyle (context) {
+export function getComponentStyle (context, extract) {
   if (!context.$vnode) {
     if (process.env.NODE_ENV === 'development') {
       return console.error('[vue-render] getComponentStyle failed: no $vnode in context.')
     }
     return {}
   }
-  const cached = context.$vnode.data.cached
-  const data = context.$vnode.data
-  const staticClassNames = (typeof data.staticClass === 'string') ? data.staticClass.split(' ') : (data.staticClass || [])
-  const classNames = (typeof data.class === 'string') ? data.class.split(' ') : (data.class || [])
-  const clsNms = staticClassNames.concat(classNames)
-  const style = getScopeStyle(context, clsNms)
-  const res = extend(style, cached, data.staticStyle, data.style)
-  context.$vnode.data.cached = res
-  return addPrefix(normalizeStyle(camelizeKeys(res)))
+  const style = {}
+  let vnode = context.$vnode
+  while (vnode) {
+    extend(style, getStyle(vnode, extract))
+    vnode = vnode.parent
+  }
+  return addPrefix(normalizeStyle(style))
 }
 
 export function extractComponentStyle (context) {
-  const style = getComponentStyle(context)
-  if (style) {
-    delete context.$vnode.data.staticStyle
-    delete context.$vnode.data.style
-  }
-  return style
+  return getComponentStyle(context, true)
 }
 
 /**
