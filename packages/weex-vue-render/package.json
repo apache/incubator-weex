@@ -3,7 +3,7 @@
   "version": "0.11.5",
   "description": "Weex built-in components for Vue 2.x.",
   "license": "Apache-2.0",
-  "main": "src/render/vue/index.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:alibaba/weex.git"
