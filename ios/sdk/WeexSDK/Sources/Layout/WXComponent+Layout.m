@@ -120,10 +120,10 @@
             
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
-                [strongSelf configBoxShadow:_boxShadow];
+                [strongSelf configBoxShadow:_boxShadow view:strongSelf.view];
             } else {
                 if (![strongSelf EqualBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
-                    [strongSelf configBoxShadow:_boxShadow];
+                    [strongSelf configBoxShadow:_boxShadow view:strongSelf.view];
                 }
             }
             

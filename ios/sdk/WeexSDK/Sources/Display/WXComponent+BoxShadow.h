@@ -28,7 +28,9 @@
  *
  *  @param boxShadow the boxshadow will be set
  *
+ *  @param view the view will be set
+ *
  *
  */
-- (void)configBoxShadow:(WXBoxShadow *_Nullable)boxShadow;
+- (void)configBoxShadow:(WXBoxShadow *_Nullable)boxShadow view:(UIView *_Nullable)view;
 @end

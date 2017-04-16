@@ -212,7 +212,7 @@
         }
         
         if (_boxShadow) {
-            [self configBoxShadow:_boxShadow];
+            [self configBoxShadow:_boxShadow view:_view];
         }
         
         _view.wx_component = self;
