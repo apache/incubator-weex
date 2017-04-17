@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import { danger, fail, warn } from "danger";
 import fs from "fs";
 import path from 'path';
@@ -24,7 +42,7 @@ const flowIgnorePaths = [
   'dist',
   'flow-typed'
 ].map(function (rel) {
-  return absolute('html5/' + rel)
+  return absolute(rel)
 });
 
 // new js files should have `@flow` at the top
@@ -103,7 +121,9 @@ for (let file of danger.git.modified_files) {
   if (
     file.endsWith(".h") ||
     file.endsWith(".m") ||
-    file.endsWith(".mm")
+    file.endsWith(".mm") ||
+    file.endsWith(".java") ||
+    file.endsWith(".js")
   ) {
     codefiles.push(file);
   }
@@ -113,7 +133,9 @@ if(danger.git.added_files){
     if (
       file.endsWith(".h") ||
       file.endsWith(".m") ||
-      file.endsWith(".mm")
+      file.endsWith(".mm") ||
+      file.endsWith(".java") ||
+      file.endsWith(".js")
     ) {
       codefiles.push(file);
     }
@@ -129,14 +151,33 @@ if (danger.git.lines_of_code > 100 && has_app_changes && !has_test_changes) {
 }
 
 //check ios copyright
+//see scripts/rh/header.template
 const copyright_header_components = [
-  "Created by Weex.",
-  "Copyright \\(c\\) .*, Alibaba, Inc. All rights reserved.",
-  "This source code is licensed under the Apache Licence 2.0.",
-  "For the full copyright and license information,please view the LICENSE file in the root directory of this source tree."
+  "Licensed to the Apache Software Foundation \\(ASF\\) under one",
+  "or more contributor license agreements.  See the NOTICE file",
+  "distributed with this work for additional information",
+  "regarding copyright ownership\\.  The ASF licenses this file",
+  'to you under the Apache License, Version 2\\.0 \\(the',
+  '"License"\\); you may not use this file except in compliance',
+  'with the License\\.  You may obtain a copy of the License at'
 ];
 
+//path prefix
+const ignoreCopyrightVerifyPath = [
+  'test',
+  'android/playground/app/src/main/assets',
+  'android/sdk/assets',
+  'ios/playground/bundlejs',
+  'ios/sdk/WeexSDK/Resources',
+  'ios/sdk/WeexSDK/Sources/Layout'
+]
+
 codefiles.forEach(filepath => {
+  for(var i=ignoreCopyrightVerifyPath.length-1;i>=0;i--){
+    if(filepath.startsWith(ignoreCopyrightVerifyPath[i])){
+      return
+    }
+  }
   const content = fs.readFileSync(filepath).toString();
   for (const line of copyright_header_components) {
     if (!content.match(new RegExp(line))) {

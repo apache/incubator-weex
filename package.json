@@ -3,8 +3,8 @@
   "version": "0.4.0",
   "subversion": {
     "browser": "0.5.0",
-    "vue-render": "0.11.2",
-    "framework": "0.19.16",
+    "framework": "0.20.4",
+    "vue-render": "0.11.5",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -64,7 +64,7 @@
     "lint": "eslint html5",
     "flow": "flow check",
     "test:case": "mocha --require reify html5/test/case/tester.js",
-    "test:vue": "karma start build/karma.vue.conf.js",
+    "test:vue": "webpack --config build/webpack.test.web.config.js && karma start build/karma.vue.conf.js",
     "test:unit": "mocha --require reify html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test": "npm run lint && npm run test:unit && npm run test:case && npm run test:vue",
     "test:cover-html": "babel-istanbul cover --report html node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js && open coverage/index.html",
@@ -94,10 +94,11 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.2.11",
-    "weex-vue-framework": "2.2.2-weex.1",
+    "weex-vue-framework": "2.2.2-weex.2",
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
+    "autoprefixer": "^6.7.7",
     "babel-core": "^6.17.0",
     "babel-eslint": "^7.2.1",
     "babel-istanbul": "^0.11.0",
@@ -110,6 +111,7 @@
     "cross-spawn": "^4.0.0",
     "css-loader": "^0.26.1",
     "danger": "^0.11.5",
+    "dateformat": "^2.0.0",
     "eslint": "^2.11.1",
     "eslint-plugin-flowtype": "^2.30.4",
     "flow-bin": "^0.42.0",
@@ -145,7 +147,7 @@
     "rollup-watch": "^2.5.0",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",
-    "sinon": "^1.17.4",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.4",
     "vue": "^2.2.6",
@@ -156,7 +158,7 @@
     "weex-components": "^0.2.0",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
-    "weex-wd": "^1.0.20",
+    "weex-wd": "^1.0.22",
     "wwp": "^0.3.5",
     "xml2map": "^1.0.2"
   }

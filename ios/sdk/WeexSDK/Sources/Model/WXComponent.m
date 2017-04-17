@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent.h"
@@ -68,6 +79,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
+        _componentType = WXComponentTypeCommon;
         _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
@@ -95,6 +107,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -174,13 +187,16 @@
 
 - (UIView *)view
 {
+    if (_componentType != WXComponentTypeCommon) {
+        return nil;
+    }
     if ([self isViewLoaded]) {
         return _view;
     } else {
         WXAssertMainThread();
         
         // compositing child will be drew by its composited ancestor
-        if (_compositingChild) {
+        if (_isCompositingChild) {
             return nil;
         }
         
@@ -332,6 +348,10 @@
         subcomponent->_isNeedJoinLayoutSystem = NO;
     }
     
+    if (_useCompositing || _isCompositingChild) {
+        subcomponent->_isCompositingChild = YES;
+    }
+    
     [self _recomputeCSSNodeChildren];
     [self setNeedsLayout];
 }
@@ -471,8 +491,11 @@
         if(strongSelf) {
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
-            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
-            [strongSelf.view.layer insertSublayer:gradientLayer atIndex:0];
+            if (_gradientLayer && [strongSelf.view.layer.sublayers containsObject:_gradientLayer]) {
+                [_gradientLayer removeFromSuperlayer];
+            }
+             _gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            [strongSelf.view.layer insertSublayer:_gradientLayer atIndex:0];
             strongSelf.view.layer.masksToBounds = YES;
         }
     });
@@ -480,6 +503,7 @@
 
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;

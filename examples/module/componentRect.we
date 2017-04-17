@@ -1,4 +1,4 @@
-<we-element name="multi-text">
+<element name="multi-text">
   <template>
     <div style="flex-direction: row;">
       <text class="text-style text-descript">{{descript}}</text>
@@ -20,7 +20,7 @@
       },
     }
   </script>
-</we-element>
+</element>
 
 <template>
   <div style="width:730;margin:10;border-width:3; border-color:#00FF00;">
