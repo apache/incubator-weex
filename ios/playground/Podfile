@@ -9,7 +9,7 @@ def common
     pod 'SocketRocket', '0.4.2'
     pod 'ATSDK-Weex', '0.0.1'
     
-    pod 'WeexGcanvas', '0.0.1.3'
+    pod 'WeexGcanvas', '0.0.1.5'
 end
 
 target 'WeexDemo' do
