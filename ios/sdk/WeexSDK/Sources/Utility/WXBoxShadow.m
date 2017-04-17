@@ -22,7 +22,6 @@
 #import "WXUtility.h"
 
 @implementation WXBoxShadow
-@synthesize shadowColor = _shadowColor;
 - (instancetype)init
 {
     self = [super init];
