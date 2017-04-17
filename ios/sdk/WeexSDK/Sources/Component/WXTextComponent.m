@@ -80,10 +80,13 @@
 
 @end
 
-static BOOL textRenderUsingCoreText = NO;
+static BOOL textRenderUsingCoreText = YES;
+
+NSString *const WXTextTruncationToken = @"\u2026";
+CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
-@property (nonatomic, assign)BOOL useCoreTextAttr;
+@property (nonatomic, assign) NSString *useCoreTextAttr;
 @end
 
 @implementation WXTextComponent
@@ -104,6 +107,8 @@ static BOOL textRenderUsingCoreText = NO;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
     CGFloat _lineHeight;
+    CGFloat _letterSpacing;
+    BOOL _truncationLine; // support trunk tail
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -127,9 +132,9 @@ static BOOL textRenderUsingCoreText = NO;
     if (self) {
         // just for coretext and textkit render replacement
         if ([attributes objectForKey:@"coretext"]) {
-            _useCoreTextAttr = [WXConvert BOOL:attributes[@"coretext"]];
+            _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
         } else {
-            _useCoreTextAttr = NO;
+            _useCoreTextAttr = nil;
         }
         
         [self fillCSSStyles:styles];
@@ -141,8 +146,11 @@ static BOOL textRenderUsingCoreText = NO;
 
 - (BOOL)useCoreText
 {
-    if (_useCoreTextAttr) {
+    if ([_useCoreTextAttr isEqualToString:@"yes"]) {
         return YES;
+    }
+    if ([_useCoreTextAttr isEqualToString:@"false"]) {
+        return NO;
     }
     if ([WXTextComponent textRenderUsingCoreText]) {
         return YES;
@@ -191,6 +199,7 @@ do {\
     WX_STYLE_FILL_TEXT(textDecoration, textDecoration, WXTextDecoration, YES)
     WX_STYLE_FILL_TEXT(textOverflow, textOverflow, NSString, NO)
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
+    WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     
     UIEdgeInsets padding = {
         WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
@@ -229,7 +238,13 @@ do {\
 
 - (void)viewDidLoad
 {
-    ((WXText *)self.view).textStorage = _textStorage;
+    BOOL useCoreText = NO;
+    if ([self.view.wx_component isKindOfClass:NSClassFromString(@"WXTextComponent")] && [self.view.wx_component respondsToSelector:@selector(useCoreText)]) {
+        useCoreText = [(WXTextComponent*)self.view.wx_component useCoreText];
+    }
+    if (!useCoreText) {
+        ((WXText *)self.view).textStorage = _textStorage;
+    }
     [self setNeedsDisplay];
 }
 
@@ -363,11 +378,11 @@ do {\
     }
     
     // set default lineBreakMode
-    // TODO:default clip
     paragraphStyle.lineBreakMode = NSLineBreakByCharWrapping;
+    _truncationLine = NO;
     if (_textOverflow && [_textOverflow length] > 0) {
         if (_lines && [_textOverflow isEqualToString:@"ellipsis"])
-            paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+            _truncationLine = YES;
     }
     
     if (_lineHeight) {
@@ -378,6 +393,10 @@ do {\
         [attributedString addAttribute:NSParagraphStyleAttributeName
                                  value:paragraphStyle
                                  range:(NSRange){0, attributedString.length}];
+    }
+    
+    if (_letterSpacing) {
+        [attributedString addAttribute:NSKernAttributeName value:@(_letterSpacing) range:(NSRange){0, attributedString.length}];
     }
     
     if ([self adjustLineHeight]) {
@@ -497,10 +516,15 @@ do {\
 - (void)syncTextStorageForView
 {
     CGFloat width = self.calculatedFrame.size.width - (_padding.left + _padding.right);
-    NSTextStorage *textStorage = [self textStorageWithWidth:width];
+    NSTextStorage *textStorage = nil;
+    if (![self useCoreText]) {
+        textStorage = [self textStorageWithWidth:width];
+    }
     [self.weexInstance.componentManager  _addUITask:^{
         if ([self isViewLoaded]) {
-            ((WXText *)self.view).textStorage = textStorage;
+            if (![self useCoreText]) {
+                ((WXText *)self.view).textStorage = textStorage;
+            }
             [self readyToRender]; // notify super component
             [self setNeedsDisplay];
         }
@@ -553,7 +577,7 @@ do {\
         
         [layoutManager drawBackgroundForGlyphRange:glyphRange atPoint:textFrame.origin];
         [layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:textFrame.origin];
-    }else {
+    } else {
         CGRect textFrame = UIEdgeInsetsInsetRect(bounds, padding);
         // sufficient height for text to draw, or frame lines will be empty
         textFrame.size.height = bounds.size.height * 2;
@@ -565,58 +589,189 @@ do {\
         
         NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
         //add path
-        CGPathRef path = NULL;
-        path = CGPathCreateWithRect(textFrame, NULL);
+        CGPathRef cgPath = NULL;
+        cgPath = CGPathCreateWithRect(textFrame, NULL);
         CTFramesetterRef framesetter = NULL;
         framesetter = CTFramesetterCreateWithAttributedString((CFTypeRef)attributedStringCopy);
-        CTFrameRef coretextFrameRef = NULL;
-        coretextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-        CGPathRelease(path);
-        path = NULL;
+        CTFrameRef _coreTextFrameRef = NULL;
+        if (_coreTextFrameRef) {
+            CFRelease(_coreTextFrameRef);
+        }
+        _coreTextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), cgPath, NULL);
         CFRelease(framesetter);
         framesetter = NULL;
-        CFArrayRef lines = NULL;
-        lines = CTFrameGetLines(coretextFrameRef);
-        CFIndex lineCount = CFArrayGetCount(lines);
+        CFArrayRef ctLines = NULL;
+        ctLines = CTFrameGetLines(_coreTextFrameRef);
+        CFIndex lineCount = CFArrayGetCount(ctLines);
+        NSMutableArray * mutableLines = [NSMutableArray new];
         CGPoint lineOrigins[lineCount];
-        CTFrameGetLineOrigins(coretextFrameRef, CFRangeMake(0, 0), lineOrigins);
-        for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
+        NSUInteger rowCount = 0;
+        BOOL needTruncation = NO;
+        CTLineRef ctTruncatedLine = NULL;
+        CTFrameGetLineOrigins(_coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
+        for (CFIndex lineIndex = 0;(!_lines || _lines >= lineIndex) && lineIndex < lineCount; lineIndex ++) {
             CTLineRef lineRef = NULL;
-            lineRef = CFArrayGetValueAtIndex(lines, lineIndex);
+            lineRef = CFArrayGetValueAtIndex(ctLines, lineIndex);
+            if (!lineRef) {
+                break;
+            }
             CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
             CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
-            CGFloat xHeight = 0, underLinePosition = 0, lineThickness = 0 ;
-            WXTextGetRunsMaxMetric(runs, &xHeight, &underLinePosition, &lineThickness);
-            CGPoint strikethroughStart;
-            strikethroughStart.x =  lineOrigin.x - underLinePosition;
-            strikethroughStart.y = lineOrigin.y + xHeight/2;
-            for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
-                CTRunRef run = NULL;
-                run = CFArrayGetValueAtIndex(runs, runIndex);
-                CTRunDraw(run, context, CFRangeMake(0, 0));
-                CFDictionaryRef attr = NULL;
-                attr = CTRunGetAttributes(run);
-                NSUnderlineStyle strikethrough = (NSUnderlineStyle)CFDictionaryGetValue(attr, NSStrikethroughStyleAttributeName);
-                
-                if (strikethrough) {
-                    // currently draw strikethrough
-                    CGPoint runPosition = CGPointZero;
-                    CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
-                    strikethroughStart.x = lineOrigin.x + runPosition.x;
-                    CGContextSetLineWidth(context, 1.5);
-                    double length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
-                    CGContextMoveToPoint(context, strikethroughStart.x, strikethroughStart.y);
-                    CGContextAddLineToPoint(context, strikethroughStart.x + length, strikethroughStart.y);
-                    CGContextStrokePath(context);
+            [mutableLines addObject:(__bridge id _Nonnull)(lineRef)];
+            // lineIndex base 0
+            rowCount = lineIndex + 1;
+            if (_lines > 0 && _truncationLine) {
+                if (_truncationLine && rowCount > _lines) {
+                    needTruncation = YES;
+                    do {
+                        NSUInteger lastRow = [mutableLines count];
+                        if (lastRow < rowCount) {
+                           break;
+                        }
+                        [mutableLines removeLastObject];
+                    } while (1);
+
                 }
             }
+            if (_lines > 0 && _truncationLine) {
+                if (rowCount >= _lines &&!needTruncation && (CTLineGetStringRange(lineRef).length + CTLineGetStringRange(lineRef).location) < attributedStringCopy.length) {
+                    needTruncation = YES;
+                }
+            }
+            
+            if (needTruncation) {
+                ctTruncatedLine = [self buildTruncatedLineWithRuns:runs lines:mutableLines path:cgPath];
+                if (ctTruncatedLine) {
+                    CFArrayRef truncatedRuns = CTLineGetGlyphRuns(ctTruncatedLine);
+                    [self drawTextWithRuns:truncatedRuns context:context lineOrigin:lineOrigin];
+                    CFRelease(ctTruncatedLine);
+                    ctTruncatedLine = NULL;
+                    continue;
+                }
+            }else {
+                [self drawTextWithRuns:runs context:context lineOrigin:lineOrigin];
+            }
         }
-        CFRelease(coretextFrameRef);
+        
+        [mutableLines removeAllObjects];
+        CGPathRelease(cgPath);
+        CFRelease(_coreTextFrameRef);
+        _coreTextFrameRef = NULL;
+        cgPath = NULL;
         CGContextRestoreGState(context);
     }
+}
+
+- (void)drawTextWithRuns:(CFArrayRef)runs context:(CGContextRef)context lineOrigin:(CGPoint)lineOrigin
+{
+    for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
+        CTRunRef run = NULL;
+        run = CFArrayGetValueAtIndex(runs, runIndex);
+        CTRunDraw(run, context, CFRangeMake(0, 0));
+        CFDictionaryRef attr = NULL;
+        attr = CTRunGetAttributes(run);
+        CFIndex glyphCount = CTRunGetGlyphCount(run);
+        if (glyphCount <= 0) continue;
+        
+        NSUnderlineStyle strikethrough = (NSUnderlineStyle)CFDictionaryGetValue(attr, NSStrikethroughStyleAttributeName);
+        
+        if (strikethrough) {
+            // draw strikethrough
+            [self drawLineThroughWithRun:runs context:context index:runIndex origin:lineOrigin];
+        }
+    }
+}
+
+- (CTLineRef)buildTruncatedLineWithRuns:(CFArrayRef)runs lines:(NSMutableArray*)mutableLines path:(CGPathRef)cgPath
+{
+    NSAttributedString * truncationToken = nil;
+    CTLineRef ctTruncatedLine = NULL;
+    CTLineRef lastLine = (__bridge CTLineRef)(mutableLines.lastObject);
+   
+    CFArrayRef lastLineRuns = CTLineGetGlyphRuns(lastLine);
+    NSUInteger lastLineRunCount = CFArrayGetCount(lastLineRuns);
+    
+    CTLineRef truncationTokenLine = NULL;
+    NSMutableDictionary *attrs = nil;
+    if (lastLineRunCount > 0) {
+        CTRunRef run = CFArrayGetValueAtIndex(runs, lastLineRunCount - 1);
+        attrs = (id)CTRunGetAttributes(run);
+        attrs = attrs ? attrs.mutableCopy : [NSMutableDictionary new];
+        CTFontRef font = (__bridge CTFontRef)(attrs[(id)kCTFontAttributeName]);
+        CGFloat fontSize = font ? CTFontGetSize(font):32 * self.weexInstance.pixelScaleFactor;
+        UIFont * uiFont = [UIFont systemFontOfSize:fontSize];
+        if (uiFont) {
+            font = CTFontCreateWithName((__bridge CFStringRef)uiFont.fontName, uiFont.pointSize, NULL);
+        }
+        if (font) {
+            attrs[(id)kCTFontAttributeName] = (__bridge id)(font);
+            uiFont = nil;
+            CFRelease(font);
+        }
+        CGColorRef color = (__bridge CGColorRef)(attrs[(id)kCTForegroundColorAttributeName]);
+        if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
+            [attrs removeObjectForKey:(id)kCTForegroundColorAttributeName];
+        }
+        
+        attrs = attrs?:[NSMutableDictionary new];
+        truncationToken = [[NSAttributedString alloc] initWithString:WXTextTruncationToken attributes:attrs];
+        truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
+    }
+    
+    if (truncationTokenLine) {
+        // default truncationType is kCTLineTruncationEnd
+        CTLineTruncationType truncationType = kCTLineTruncationEnd;
+        NSAttributedString *attributedString = [self buildCTAttributeString];
+        NSAttributedString * lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
+//        NSMutableAttributedString *.mutableCopy;
+        NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
+        [mutableLastLineText appendAttributedString:truncationToken];
+        CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
+        if (ctLastLineExtend) {
+            CGRect cgPathRect = CGRectZero;
+            CGFloat truncatedWidth = 0;
+            if (CGPathIsRect(cgPath, &cgPathRect)) {
+                truncatedWidth = cgPathRect.size.width;
+            }
+            ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth, truncationType, truncationTokenLine);
+            CFRelease(ctLastLineExtend);
+            ctLastLineExtend = NULL;
+            CFRelease(truncationTokenLine);
+            truncationTokenLine = NULL;
+        }
+    }
+    
+    return ctTruncatedLine;
+}
+
+- (void)drawLineThroughWithRun:(CFArrayRef)runs context:(CGContextRef)context index:(CFIndex)runIndex origin:(CGPoint)lineOrigin
+{
+    CFRetain(runs);
+    CGContextRetain(context);
+    
+    CGContextSaveGState(context);
+    CGFloat xHeight = 0, underLinePosition = 0, lineThickness = 0;
+    CTRunRef run = CFArrayGetValueAtIndex(runs, runIndex);
+    WXTextGetRunsMaxMetric(runs, &xHeight, &underLinePosition, &lineThickness);
+    
+    CGPoint strikethroughStart;
+    strikethroughStart.x =  lineOrigin.x - underLinePosition;
+    strikethroughStart.y = lineOrigin.y + xHeight/2;
+    CGPoint runPosition = CGPointZero;
+    CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
+    strikethroughStart.x = lineOrigin.x + runPosition.x;
+    CGContextSetLineWidth(context, WXTextDefaultLineThroughWidth);
+    double length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
+    CGContextMoveToPoint(context, strikethroughStart.x, strikethroughStart.y);
+    CGContextAddLineToPoint(context, strikethroughStart.x + length, strikethroughStart.y);
+    CGContextStrokePath(context);
+    
+    CGContextRestoreGState(context);
+    CFRelease(runs);
+    CGContextRelease(context);
 }
 
 - (CGSize)calculateTextHeightWithWidth:(CGFloat)aWidth
@@ -670,7 +825,9 @@ do {\
     return CGSizeMake(suggestSize.width, totalHeight);
 }
 
-static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness) {
+static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness)
+{
+    CFRetain(runs);
     CGFloat maxXHeight = 0;
     CGFloat maxUnderlinePos = 0;
     CGFloat maxLineThickness = 0;
@@ -709,6 +866,12 @@ static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *u
     if (lineThickness) {
         *lineThickness = maxLineThickness;
     }
+    
+    CFRelease(runs);
+}
+                                                                                                                                       
+NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
+    return NSMakeRange(range.location, range.length);
 }
 
 #ifdef UITEST
