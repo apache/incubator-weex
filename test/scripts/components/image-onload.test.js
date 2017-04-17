@@ -25,7 +25,7 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('image onload', function () {
+describe('image onload @ignore-ios', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
