@@ -52,8 +52,6 @@ public interface IWXBridge extends IWXObject {
    */
   void takeHeapSnapshot(String filename);
 
-  void clearInstanceCallback(String instanceId);
-
   /**
    * js call native
 

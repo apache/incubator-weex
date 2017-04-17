@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.20.3",
+    "framework": "0.20.4",
     "vue-render": "0.11.5",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -147,7 +147,7 @@
     "rollup-watch": "^2.5.0",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",
-    "sinon": "^1.17.4",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.4",
     "vue": "^2.2.6",
