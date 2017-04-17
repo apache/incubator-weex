@@ -236,6 +236,7 @@
     _view = nil;
     [_layer removeFromSuperlayer];
     _layer = nil;
+    _gradientLayer = nil;
     
     [self viewDidUnload];
 }
