@@ -190,13 +190,42 @@ export function getComponentStyle (context, extract) {
     }
     return {}
   }
-  const style = {}
+  let style = {}
   let vnode = context.$vnode
   while (vnode) {
     extend(style, getStyle(vnode, extract))
     vnode = vnode.parent
   }
-  return addPrefix(normalizeStyle(style))
+  style = addPrefix(normalizeStyle(style))
+  /**
+   * when prefixed value is a array, it should be applied to element
+   * during the next tick.
+   * e.g.
+   *  background-image:  linear-gradient(to top,#f5fefd,#ffffff);
+   *  will generate:
+   *  {
+   *    backgroundImage: [
+   *      "-webkit-linear-gradient(to top,#f5fefd,#ffffff)",
+   *      "-moz-linear-gradient(to top,#f5fefd,#ffffff)",
+   *      "linear-gradient(to top,#f5fefd,#ffffff)"]
+   *  }
+   */
+  for (const k in style) {
+    if (Array.isArray(style[k])) {
+      const vals = style[k]
+      context.$nextTick(function () {
+        const el = context.$el
+        if (el) {
+          for (let i = 0; i < vals.length; i++) {
+            el.style[k] = vals[i]
+          }
+        }
+      })
+      delete style[k]
+    }
+  }
+  return style
+  // return addPrefix(normalizeStyle(style))
 }
 
 export function extractComponentStyle (context) {
