@@ -296,6 +296,15 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    __weak typeof(self) weakSelf = self;
+    if (!weakSelf)
+    {
+        return;
+    }
+    //ensure that the end of scroll is fired.
+    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
+    
     UIView *itemView = nil;
     for (itemView in self.itemViews) {
         if ([self _isItemViewVisiable:itemView]) {
@@ -308,9 +317,6 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
-    //ensure that the end of scroll is fired.
-    //[self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -387,7 +393,7 @@
         }
         
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
-
+        
         if (attributes[@"offsetXAccuracy"]) {
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
@@ -489,7 +495,7 @@
     WXSliderView *sliderView = (WXSliderView *)_view;
     [sliderView removeItemView:view];
     [sliderView setCurrentIndex:0];
-}
+}ggg
 
 - (void)updateAttributes:(NSDictionary *)attributes
 {
@@ -509,7 +515,7 @@
         
         if (_autoPlay) {
             [self _startAutoPlayTimer];
-        } 
+        }
     }
     
     if (attributes[@"index"]) {
@@ -594,7 +600,7 @@
 - (void)_autoPlayOnTimer
 {
     WXSliderView *sliderView = (WXSliderView *)self.view;
-
+    
     int indicatorCnt = 0;
     for (int i = 0; i < [self.childrenView count]; ++i) {
         if ([self.childrenView[i] isKindOfClass:[WXIndicatorView class]]) {
