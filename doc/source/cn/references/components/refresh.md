@@ -36,7 +36,14 @@ version: 2.1
 ## 事件
 
 - `refresh`： 当 `<scroller>`/`<list>` 被下拉时触发。
-- `pullingdown`：仅在 Android 支持。当 `<scroller>`/`<list>` 被下拉时触发，可以从事件的参数对象中获取 dy，headerHeight，maxHeight
+- `pullingdown`<span class="weex-version">v0.6.1+</span>: 当 `<scroller>`/`<list>` 被下拉时触发，可以从事件的参数对象中获取 dy,pullingDistance, viewHeight, type
+
+  ```
+  dy: 前后两次回调滑动距离的差值
+  pullingDistance: 下拉的距离
+  viewHeight: refreshView 高度
+  type: "pullingdown" 常数字符串
+  ```
 
 ## 约束
 

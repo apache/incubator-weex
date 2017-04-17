@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/* eslint-disable */
 
 var path = require('path')
 var spawn = require('cross-spawn')
