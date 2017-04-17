@@ -66,7 +66,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self addEdgePop];
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self _renderWithURL:_sourceURL];
@@ -111,15 +110,7 @@
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
 }
 
-#pragma mark- UIGestureRecognizerDelegate
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-{
-    if (!self.navigationController || [self.navigationController.viewControllers count] == 1) {
-        return NO;
-    }
-    return YES;
-}
 
 - (void)_renderWithURL:(NSURL *)sourceURL
 {
