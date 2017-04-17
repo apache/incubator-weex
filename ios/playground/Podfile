@@ -8,6 +8,8 @@ def common
     pod 'SDWebImage', '3.7.5'
     pod 'SocketRocket', '0.4.2'
     pod 'ATSDK-Weex', '0.0.1'
+    
+    pod 'WeexGcanvas', '0.0.1.3'
 end
 
 target 'WeexDemo' do
