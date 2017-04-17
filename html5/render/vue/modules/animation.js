@@ -19,8 +19,8 @@
 import { nextFrame, toCSSText, autoPrefix, camelizeKeys, normalizeStyle } from '../utils'
 
 function transitionOnce (vnode, config, callback) {
-  const duration = config.duration || 1000 // ms
-  const timing = config.timingFunction || 'ease'
+  const duration = config.duration || 0 // ms
+  const timing = config.timingFunction || 'linear'
   const delay = config.delay || 0  // ms
 
   // TODO: parse transition properties
