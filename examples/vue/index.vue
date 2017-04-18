@@ -45,6 +45,9 @@
           // {name: root + '/showcase/minesweeper', title: 'Minesweeper'},
           // {name: root + '/showcase/ui', title: 'UI Gallery'},
           // {name: root + '/showcase/dropdown/dropdown-demo', title: 'Dropdown'}
+
+          // market
+          {name: root + '/market/gcanvas', title: 'Gcanvas'}
         ]
       }
     },
