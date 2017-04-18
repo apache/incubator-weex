@@ -21,8 +21,6 @@
 #import "WXAssert.h"
 #import "WXLog.h"
 #import "WXInvocationConfig.h"
-#import "WXHandlerFactory.h"
-#import "WXConfigProtocol.h"
 
 #import <objc/runtime.h>
 
@@ -190,11 +188,6 @@
     
     if(!config || !config.clazz) {
         return nil;
-    }
-    id<WXConfigProtocol> configHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXConfigProtocol")];
-    
-    if ([configHandler respondsToSelector:@selector(classWithName:)]) {
-        return [configHandler classWithName:name];
     }
     
     return NSClassFromString(config.clazz);
