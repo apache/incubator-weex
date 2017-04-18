@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { camelToKebab, appendCss } from '../utils'
+import { camelToKebab, appendCss, isArray } from '../utils'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
@@ -83,6 +83,13 @@ export default {
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
   scrollToElement: function (vnode, options) {
+    if (isArray(vnode)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+      }
+      vnode = vnode[0]
+    }
+
     const scroller = getParentScroller(vnode)
     const scrollDirection = scroller.scrollDirection || 'vertical'
 
@@ -126,6 +133,13 @@ export default {
    * @param {Function} callback
    */
   getComponentRect: function (vnode, callback) {
+    if (isArray(vnode)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+      }
+      vnode = vnode[0]
+    }
+
     const info = { result: false }
 
     if (vnode && vnode === 'viewport') {
