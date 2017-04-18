@@ -236,7 +236,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
       mNestedInstance.destroy();
       mNestedInstance = null;
     }
-    if (mIsVisible) {
+    if (mIsVisible && !TextUtils.isEmpty(this.src)) {
       loadContent();
     }
   }
