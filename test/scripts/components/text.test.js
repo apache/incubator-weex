@@ -47,6 +47,8 @@ describe('weex text', function () {
     .elementById('lines')
     .getRect()
     .then(rect => {
+       console.log(rect)
+       console.log(screenWidth)
        assert.equal(rect.width, screenWidth)
        assert.equal(rect.height, Math.floor(2 * 32 * scaleFactor))
        scroll(rect.height)
