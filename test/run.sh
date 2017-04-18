@@ -43,7 +43,6 @@ function runiOS {
     echo 'Run in iOS...'
     echo $1
     buildiOS
-    sleep 1m
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     # ps -ef

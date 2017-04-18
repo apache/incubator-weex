@@ -36,7 +36,7 @@ describe('slider infinite scroll', function () {
   });
 
   after(function () {
-      // return util.quit(driver);
+      return util.quit(driver);
   })
 
 
@@ -46,7 +46,7 @@ describe('slider infinite scroll', function () {
     .elementById('txt1')
     .text()
     .then((text)=>{
-        assert.equal(text, 1);
+        assert.equal(text>=1, true);
     })
     .elementById('txt2')
     .text()
