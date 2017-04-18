@@ -343,6 +343,7 @@ static BOOL WXNotStat;
 {
     NSMutableDictionary * linearGradient = nil;
     if ([backgroundImage hasPrefix:@"linear-gradient"] && [backgroundImage hasSuffix:@")"] ) {
+        backgroundImage = [backgroundImage stringByReplacingOccurrencesOfString:@" " withString:@""];
         NSRange range = NSMakeRange(16, backgroundImage.length - 17);
         NSString *str = [backgroundImage substringWithRange:range];
         NSArray *array = [str componentsSeparatedByString:@","];
