@@ -16,8 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { getThrottleLazyload, watchAppear } from '../utils'
-import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated, tagBegin, tagEnd } from '../utils/perf'
+import {
+  getThrottleLazyload,
+  watchAppear,
+  toCSSText
+} from '../utils'
+
+import {
+  tagBeforeCreate,
+  tagMounted,
+  tagBeforeUpdate,
+  tagUpdated,
+  tagBegin,
+  tagEnd
+} from '../utils/perf'
+
+import { extractComponentStyle } from '../core'
 
 const scrollableTypes = ['scroller', 'list']
 
@@ -66,6 +80,13 @@ export default {
   updated () {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
+    }
+    if (this.$vnode && this.$vnode.data) {
+      const style = extractComponentStyle(this)
+      const el = this.$el
+      if (style && el && el.nodeType !== 8) {
+        this.$el.style.cssText += toCSSText(style)
+      }
     }
     watchAppear(this)
   },
