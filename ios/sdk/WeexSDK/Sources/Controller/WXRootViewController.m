@@ -23,7 +23,7 @@
 
 typedef void(^OperationBlock)(void);
 
-@interface WXRootViewController()
+@interface WXRootViewController() <UIGestureRecognizerDelegate>
 
 @property(nonatomic, strong) WXThreadSafeMutableArray *operationArray;
 @property (nonatomic, assign) BOOL operationInProcess;
@@ -31,6 +31,11 @@ typedef void(^OperationBlock)(void);
 @end
 
 @implementation WXRootViewController
+
+- (void)viewDidLoad
+{
+    self.interactivePopGestureRecognizer.delegate = self;
+}
 
 - (id)initWithSourceURL:(NSURL *)sourceURL
 {
@@ -112,6 +117,16 @@ typedef void(^OperationBlock)(void);
         _operationInProcess = YES;
         operation();
     }
+}
+
+#pragma mark- UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    if ([self.viewControllers count] == 1) {
+        return NO;
+    }
+    return YES;
 }
 
 - (NSMutableArray *)pendingBlocks

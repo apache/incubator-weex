@@ -1,4 +1,10 @@
 #!/bin/bash -eu
+set -e
+
+function startMacacaServer {
+    macaca server --verbose &
+    while ! nc -z 127.0.0.1 3456; do sleep 5; done
+}
 
 function buildAndroid {
     dir=$(pwd)
@@ -11,7 +17,7 @@ function buildAndroid {
 }
 function runAndroid {
     buildAndroid
-    macaca server &
+    startMacacaServer
     platform=android ./node_modules/mocha/bin/mocha  $1 -f '@ignore-android' -i --recursive --bail
 }
 
@@ -41,30 +47,31 @@ function runiOS {
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     # ps -ef
-    macaca server &
-    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail
+    startMacacaServer
+    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
 }
 
 function runWeb {
     echo 'run web'
-    macaca server &
+    startMacacaServer
     browser=chrome ./node_modules/mocha/bin/mocha  $1 -f '@ignore-web' -i --recursive --bail
+}
+
+function killserver {
+    ps -ef | grep 'macaca-cli-server' | grep -v grep | awk '{print $2}' | xargs kill || echo 'nothing to kill'
 }
 
 platform_android='android'
 platform=${1:-$platform_android}
  
- #get test folder
- 
- #setup devices
- 
- #run tests
- if [ $platform = $platform_android ]; then
-     runAndroid ./test/scripts/
- elif [ $platform = 'web' ]; 
- then
+killserver
+#run tests
+if [ $platform = $platform_android ]; then
+    runAndroid ./test/scripts/
+elif [ $platform = 'web' ]; 
+then
     runWeb ./test/scripts/
- else
-     runiOS ./test/scripts/
- fi
-
+else
+    runiOS ./test/scripts/
+fi
+killserver
