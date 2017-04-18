@@ -54,7 +54,10 @@
         {name: 'showcase/ui', title: 'UI Gallery'},
         {name: 'showcase/dropdown/dropdown-demo', title: 'Dropdown'},
         {name: 'showcase/pseudo-class', title: 'PseudoClass'},
-        {name: 'showcase/boxshadow', title: 'boxshadow'}
+        {name: 'showcase/boxshadow', title: 'boxshadow'},
+
+        // market
+        {name: 'market/gcanvas', title: 'Gcanvas'},
       ]
     }
   }
