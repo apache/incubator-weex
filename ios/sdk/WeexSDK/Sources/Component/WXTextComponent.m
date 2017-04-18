@@ -609,7 +609,7 @@ do {\
         BOOL needTruncation = NO;
         CTLineRef ctTruncatedLine = NULL;
         CTFrameGetLineOrigins(_coreTextFrameRef, CFRangeMake(0, 0), lineOrigins);
-        for (CFIndex lineIndex = 0;(!_lines || _lines >= lineIndex) && lineIndex < lineCount; lineIndex ++) {
+        for (CFIndex lineIndex = 0;(!_lines || _lines > lineIndex) && lineIndex < lineCount; lineIndex ++) {
             CTLineRef lineRef = NULL;
             lineRef = CFArrayGetValueAtIndex(ctLines, lineIndex);
             if (!lineRef) {
