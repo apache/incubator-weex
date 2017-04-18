@@ -726,7 +726,6 @@ do {\
         CTLineTruncationType truncationType = kCTLineTruncationEnd;
         NSAttributedString *attributedString = [self buildCTAttributeString];
         NSAttributedString * lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
-//        NSMutableAttributedString *.mutableCopy;
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
         CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
@@ -819,7 +818,7 @@ do {\
         actualLineCount ++;
     }
     
-    totalHeight = totalHeight + actualLineCount*leading;
+    totalHeight = totalHeight + actualLineCount * leading;
     CFRelease(frameRef);
     
     return CGSizeMake(suggestSize.width, totalHeight);
