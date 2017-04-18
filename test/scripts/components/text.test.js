@@ -50,7 +50,7 @@ describe('weex text', function () {
        console.log(rect)
        console.log(screenWidth)
        assert.equal(rect.width, screenWidth)
-       assert.equal(rect.height, Math.floor(2 * 32 * scaleFactor))
+       assert.closeTo(rect.height, 32 * scaleFactor*2, 2)
        scroll(rect.height)
     })
   })
