@@ -3,12 +3,13 @@ platform :ios, '7.0'
 #inhibit_all_warnings!
 
 def common
-    pod 'WeexSDK', :path=>'../sdk/'
+    pod 'WeexSDK', :path=>'../../'
     pod 'WXDevtool', '0.9.5'
     pod 'SDWebImage', '3.7.5'
     pod 'SocketRocket', '0.4.2'
     pod 'ATSDK-Weex', '0.0.1'
     
+    # WeexGcanvas is added by Weex Plugin, more info at https://market.dotwe.org/ext/list.htm
     pod 'WeexGcanvas', '0.0.1.5'
 end
 

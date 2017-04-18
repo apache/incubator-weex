@@ -27,17 +27,15 @@ Pod::Spec.new do |s|
   s.platform     = :ios
   s.ios.deployment_target = '7.0'
   s.source =  { :path => '.' }
-  s.source_files = 'ios/playground/WeexSDK/Sources/**/*.{h,m,mm,c}'
-  s.resources = 'ios/playground/WeexSDK/Resources/main.js', 'ios/playground/WeexSDK/Resources/wx_load_error@3x.png'
+  s.source_files = 'ios/sdk/WeexSDK/Sources/**/*.{h,m,mm,c}'
+  s.resources = 'ios/sdk/WeexSDK/Resources/main.js', 'ios/sdk/WeexSDK/Resources/wx_load_error@3x.png'
 
   s.requires_arc = true
-  s.prefix_header_file = 'ios/playground/WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
+  s.prefix_header_file = 'ios/sdk/WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch'
 
 #  s.xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => '$(inherited) DEBUG=1' }
 
   s.xcconfig = { "OTHER_LINK_FLAG" => '$(inherited) -ObjC'}
-
-  s.user_target_xcconfig  = { 'FRAMEWORK_SEARCH_PATHS' => "'$(PODS_ROOT)/WeexSDK'" }
 
   s.frameworks = 'CoreMedia','MediaPlayer','AVFoundation','AVKit','JavaScriptCore', 'GLKit'
 
