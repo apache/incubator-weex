@@ -179,7 +179,8 @@ export default {
     "height": "174px"
   },
   ".title-ctn[data-v-2c9fb3eb]": {
-    "margin-top": "12px"
+    "margin-top": "12px",
+    "width": "162px"
   },
   ".badge[data-v-2c9fb3eb]": {
     "position": "absolute",
