@@ -33,7 +33,7 @@ const isApproximate = (x, y) =>  {
   return Math.abs(x - y) <= (isAndroid ? 2 : 1.5)
 }
 
-describe('recycler', function () {
+describe('recycler @ignore-android @ignore-ios', function () {
   this.timeout(util.getTimeoutMills())
   const driver = util.createDriver(wd)
 

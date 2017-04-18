@@ -31,8 +31,9 @@
 
 - (void)sliderView:(WXSliderView *)sliderView sliderViewDidScroll:(UIScrollView *)scrollView;
 - (void)sliderView:(WXSliderView *)sliderView didScrollToItemAtIndex:(NSInteger)index;
-- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStartScroll:(UIScrollView *)scrollView;
-- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStopScroll:(UIScrollView *)scrollView;
+
+@optional
+- (void)sliderView:(WXSliderView *)sliderView scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView;
 
 @end
 
@@ -44,7 +45,6 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) NSMutableArray *itemViews;
 @property (nonatomic, assign) NSInteger currentIndex;
-@property (nonatomic, assign) BOOL isStartScroll;
 
 - (UIScrollView *)scrollView;
 - (void)insertItemView:(UIView *)view atIndex:(NSInteger)index;
@@ -308,9 +308,6 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
-    //ensure that the end of scroll is fired.
-    //[self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -330,8 +327,8 @@
 // called when setContentOffset/scrollRectVisible:animated: finishes. called from the performselector in scrollViewDidScroll if not animating.
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:scrollViewDidStopScroll:)]) {
-        [self.delegate sliderView:self scrollViewDidStopScroll:scrollView];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:scrollViewDidEndScrollingAnimation:)]) {
+        [self.delegate sliderView:self scrollViewDidEndScrollingAnimation:scrollView];
     }
 }
 
@@ -350,9 +347,6 @@
 @property (nonatomic, assign) CGFloat offsetXAccuracy;
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
-@property (nonatomic, assign) BOOL  sliderScrollStartEvent;
-@property (nonatomic, assign) BOOL  sliderScrollEndEvent;
-@property (nonatomic, assign) BOOL  sliderStartEventFired;
 @property (nonatomic, strong) NSMutableArray *childrenView;
 @property (nonatomic, assign) BOOL scrollable;
 
@@ -387,7 +381,7 @@
         }
         
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
-
+        
         if (attributes[@"offsetXAccuracy"]) {
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
@@ -509,7 +503,7 @@
         
         if (_autoPlay) {
             [self _startAutoPlayTimer];
-        } 
+        }
     }
     
     if (attributes[@"index"]) {
@@ -538,12 +532,6 @@
     if ([eventName isEqualToString:@"scroll"]) {
         _sliderScrollEvent = YES;
     }
-    if ([eventName isEqualToString:@"scrollstart"]) {
-        _sliderScrollStartEvent = YES;
-    }
-    if ([eventName isEqualToString:@"scrollend"]) {
-        _sliderScrollEndEvent = YES;
-    }
 }
 
 - (void)removeEvent:(NSString *)eventName
@@ -553,12 +541,6 @@
     }
     if ([eventName isEqualToString:@"scroll"]) {
         _sliderScrollEvent = NO;
-    }
-    if ([eventName isEqualToString:@"scrollstart"]) {
-        _sliderScrollStartEvent = NO;
-    }
-    if ([eventName isEqualToString:@"scrollend"]) {
-        _sliderScrollEndEvent = NO;
     }
 }
 
@@ -594,7 +576,7 @@
 - (void)_autoPlayOnTimer
 {
     WXSliderView *sliderView = (WXSliderView *)self.view;
-
+    
     int indicatorCnt = 0;
     for (int i = 0; i < [self.childrenView count]; ++i) {
         if ([self.childrenView[i] isKindOfClass:[WXIndicatorView class]]) {
@@ -624,9 +606,6 @@
             [self fireEvent:@"scroll" params:@{@"offsetXRatio":[NSNumber numberWithFloat:offsetXRatio]} domChanges:nil];
         }
     }
-    if (!_sliderStartEventFired) {
-        [self sliderView:sliderView scrollViewDidStartScroll:scrollView];
-    }
 }
 
 - (void)sliderView:(WXSliderView *)sliderView didScrollToItemAtIndex:(NSInteger)index
@@ -635,22 +614,6 @@
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
     }
-}
-
-- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStartScroll:(UIScrollView *)scrollView
-{
-    if (_sliderScrollStartEvent) {
-        [self fireEvent:@"scrollstart" params:nil domChanges:nil];
-    }
-    _sliderStartEventFired = YES;
-}
-
-- (void)sliderView:(WXSliderView *)sliderView scrollViewDidStopScroll:(UIScrollView *)scrollView
-{
-    if (_sliderScrollEndEvent) {
-        [self fireEvent:@"scrollend" params:nil domChanges:nil];
-    }
-    _sliderStartEventFired = NO;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView

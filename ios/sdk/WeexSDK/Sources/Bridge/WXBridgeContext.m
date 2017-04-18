@@ -258,7 +258,7 @@ _Pragma("clang diagnostic pop") \
         [self.insStack removeObject:instance];
     }
     
-    if(_jsBridge){
+    if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
         [_jsBridge removeTimers:instance];
     }
 

@@ -42,7 +42,7 @@
 }
 
 - (void)testInstanceAndWeexRootFrame {
-    CGRect instanceFrame = CGRectMake(1, 2, 345, 678);
+    /*CGRect instanceFrame = CGRectMake(1, 2, 345, 678);
     CGRect templateRootFrame = CGRectMake(8, 7, 654, 321);
     NSDictionary *templateRootFrameData = @{@"left":@(templateRootFrame.origin.x),
                                             @"top":@(templateRootFrame.origin.y),
@@ -140,7 +140,7 @@
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
-    }];
+    }];*/
 }
 
 
