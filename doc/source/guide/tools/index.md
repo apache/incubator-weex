@@ -7,5 +7,4 @@ version: 2.1
 
 # Tools  
 
-- [Devtools](./devtools.html)
-- [Weexpack](./weexpack.html)
+- [weex-toolkit](./toolkit.html)

@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 
 function installAndroidSDK {
     # brew install android-sdk
@@ -32,51 +32,13 @@ function waitForEmulator {
   adb shell input keyevent 82 &
 }
 
-function setup_cpt {
-    target_android='android'
-    target_ios='ios'
-    target_danger='danger'
-    target_jsfm='jsfm'
-
-    target=${1:-$target_android}
-    
-    setupBasic
-
-    if [ $target = $target_android ]; then
-        # setupBasic
-        # installAndroidSDK
-        npm install -g macaca-cli
-        npm install -g macaca-android
-        createAVD
-        startAVD &
-        npm install
-        export DISPLAY=:99.0
-    elif [ $target = $target_ios ]
-    then
-        # setupBasic
-        npm install -g macaca-cli
-        brew update
-        brew install ios-webkit-debug-proxy
-        npm install -g macaca-ios
-        npm install
-        gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
-    elif [ $target = $target_jsfm ]
-    then
-        # setupBasic
-        npm install
-    else
-        npm install
-    fi
-}
-
-function setupBasic {
+function installNode {
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    bash "$NVM_DIR/nvm.sh"
     export CHROME_BIN=chromium-browser
     nvm install 7.0.0
     nvm use 7.0.0
-    
 }
 
 function printEnvInfo {
@@ -85,37 +47,22 @@ function printEnvInfo {
     printenv
 }
 
-function test_cpt {
-    echo 'cilog:start test ......'
-
-    target_android='android'
-    target_ios='ios'
+function runJSTest {
+    set -e
     target_danger='danger'
     target_jsfm='jsfm'
 
-    target=${1:-$target_android}
+    target=${1:-$target_jsfm}
     echo "cilog: target: $target"
-    
-    if [ $target = $target_android ]; then
-        ./test/serve.sh 2&>1 > /dev/null &
-        set -eu
-        # export ANDROID_HOME=/usr/local/opt/android-sdk
-        cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
-        waitForEmulator
-        run_in_ci=true ./test/run.sh
-    elif [ $target = $target_ios ]
-    then
-        set -eu
-        ./test/serve.sh 2&>1 > /dev/null &
-        xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
-        run_in_ci=true ./test/run.sh ios
-        bundle exec danger --dangerfile=Dangerfile-ios
-    elif [ $target = $target_jsfm ]
+
+    if [ $target = $target_jsfm ]
     then
         npm run build
         npm run test
-    else
+    elif [ $target = $target_danger ]
+    then
         npm run danger
     fi
 }
+
 
