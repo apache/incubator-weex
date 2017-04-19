@@ -80,7 +80,7 @@
 
 @end
 
-static BOOL textRenderUsingCoreText = YES;
+static BOOL textRenderUsingCoreText = NO;
 
 NSString *const WXTextTruncationToken = @"\u2026";
 CGFloat WXTextDefaultLineThroughWidth = 1.2;

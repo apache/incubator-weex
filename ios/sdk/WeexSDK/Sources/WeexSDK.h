@@ -48,7 +48,6 @@
 #import "WXDefine.h"
 #import "WXDebugTool.h"
 #import "WXConvert.h"
-#import "WXConfigProtocol.h"
 #import "WXComponentManager.h"
 #import "WXComponent.h"
 #import "WXBridgeProtocol.h"
