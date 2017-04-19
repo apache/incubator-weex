@@ -73,6 +73,45 @@ function getEntries (): Array<any> {
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }
 
+function _d (func: Function, wait: number) {
+  let timerId
+  let now
+  function later (now) {
+    timerId = null
+    func(now)
+  }
+  return function () {
+    now = getNow()
+    clearTimeout(timerId)
+    timerId = setTimeout(later.bind(null, now), wait)
+  }
+}
+
+export function tagFirstScreen (time?: number): void {
+  if (!time) {
+    time = getNow()
+  }
+  perf.latestRenderFinishes.push(time)
+  const start = Math.max(earliestBeforeCreateTime, earliestBeforeUpdateTime)
+  perf.renderTime.push({
+    start,
+    end: time,
+    duration: time - start
+  })
+
+  const num = perf.renderTime.length
+  perf[`screenTime${num}`] = time
+  window.weex.emit('renderfinish', time)
+  if (!isFirstScreenDetected) {
+    isFirstScreenDetected = true
+    window.weex.emit('firstscreenfinish', time)
+  }
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`screenTime[${num}]: ${time} ms.`)
+    console.log('_weex_perf:', window._weex_perf)
+  }
+}
+
 /**
  * get first screen time.
  */
@@ -90,25 +129,7 @@ const debouncedTagImg = debounce(function () {
     })
     i++
   }
-  perf.latestRenderFinishes.push(end)
-  const start = Math.max(earliestBeforeCreateTime, earliestBeforeUpdateTime)
-  perf.renderTime.push({
-    start,
-    end,
-    duration: end - start
-  })
-
-  const num = perf.renderTime.length
-  perf[`screenTime${num}`] = end
-  window.weex.emit('renderfinish', end)
-  if (!isFirstScreenDetected) {
-    isFirstScreenDetected = true
-    window.weex.emit('firstscreenfinish', end)
-  }
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`screenTime[${num}]: ${end} ms.`)
-    console.log('_weex_perf:', window._weex_perf)
-  }
+  tagFirstScreen(end)
 }, IMG_REC_INDENT)
 
 export function tagImg (): void {
@@ -128,11 +149,21 @@ export function tagBeforeCreate (): void {
   depressedTagBeforeCreate()
 }
 
+export function tagRootMounted (): void {
+  const now = getNow()
+  perf.latestMounts.push(now)
+  if (!perf.firstAllMountedTime) {
+    perf.firstAllMountedTime = now
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`first all mounted time: ${now} ms.`)
+    }
+  }
+}
+
 /**
  * recording the latest 'mounted' time.
  */
-const debouncedTagMounted = debounce(function () {
-  const now = getNow()
+const debouncedTagMounted = _d(function (now) {
   perf.latestMounts.push(now)
   perf.createTime.push({
     start: earliestBeforeCreateTime,
@@ -168,8 +199,7 @@ export function tagBeforeUpdate (): void {
 /**
  * recording the latest 'updated' time.
  */
-const debouncedTagUpdated = debounce(function () {
-  const now = getNow()
+const debouncedTagUpdated = _d(function (now) {
   perf.latestUpdates.push(now)
   perf.updateTime.push({
     start: earliestBeforeUpdateTime,

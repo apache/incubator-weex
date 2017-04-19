@@ -24,7 +24,9 @@ import {
 
 import {
   tagBeforeCreate,
-  tagMounted,
+  // tagMounted,
+  tagRootMounted,
+  tagFirstScreen,
   tagBeforeUpdate,
   tagUpdated,
   tagBegin,
@@ -61,14 +63,20 @@ export default {
   },
 
   mounted () {
+    if (this.$options._componentTag === 'image') {
+      global._has_image_in_first_screen = true
+    }
+    if (this === this.$root) {
+      tagRootMounted()
+      if (!global._has_image_in_first_screen) {
+        tagFirstScreen()
+      }
+    }
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
     }
     watchAppear(this)
-    if (process.env.NODE_ENV === 'development') {
-      tagMounted()
-    }
   },
 
   beforeUpdate () {
