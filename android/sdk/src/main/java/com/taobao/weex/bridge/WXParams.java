@@ -124,6 +124,9 @@ public class WXParams {
   }
 
   public String getLogLevel() {
+    if(logLevel == null){
+      return "";
+    }
     return logLevel;
   }
 
@@ -132,6 +135,9 @@ public class WXParams {
   }
 
   public String getNeedInitV8() {
+    if(needInitV8 ==null){
+      return "";
+    }
     return this.needInitV8;
   }
 

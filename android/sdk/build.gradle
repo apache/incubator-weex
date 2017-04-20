@@ -61,7 +61,7 @@ android {
     println jsfmVersion
 
 
-    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexv8.so").length();
+    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
     def X86_Size = new File(projectDir,"libs/x86/libweexv8.so").length();
     println "ARMEABI_Size: "+ARMEABI_Size;
     println "X86_Size:" + X86_Size;

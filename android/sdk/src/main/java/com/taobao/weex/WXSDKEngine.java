@@ -103,7 +103,7 @@ public class WXSDKEngine {
 
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
 
-  private static final String V8_SO_NAME = "weexv8";
+  private static final String V8_SO_NAME = "weexjsc";
   private volatile static boolean mIsInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
