@@ -100,5 +100,11 @@ didReceiveResponse:(NSURLResponse *)response
     }
     [_delegates removeObjectForKey:task];
 }
+    
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics
+{
+    id<WXResourceRequestDelegate> delegate = [_delegates objectForKey:task];
+    [delegate request:(WXResourceRequest *)task.originalRequest didFinishCollectingMetrics:metrics];
+}
 
 @end
