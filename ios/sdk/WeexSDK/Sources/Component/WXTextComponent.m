@@ -75,7 +75,10 @@
             return self.wx_component->_ariaLabel;
         }
     }
-    return _textStorage.string;
+    if (![(WXTextComponent*)self.wx_component useCoreText]) {
+        return _textStorage.string;
+    }
+    return [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
 }
 
 @end
@@ -146,12 +149,18 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
+    if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+        // there is something wrong with coreText drawing lineHeight, trying to fix this, or anyone who can help me to fix this.
+        return NO;
+    }
+    
     if ([_useCoreTextAttr isEqualToString:@"yes"]) {
         return YES;
     }
     if ([_useCoreTextAttr isEqualToString:@"false"]) {
         return NO;
     }
+    
     if ([WXTextComponent textRenderUsingCoreText]) {
         return YES;
     }
