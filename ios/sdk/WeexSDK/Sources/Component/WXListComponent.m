@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -276,15 +276,16 @@
         }
         
         [self.weexInstance.componentManager _addUITask:^{
-            WXLogDebug(@"Insert section:%ld", insertIndex);
-            [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
-            if (completedReloadSection) {
-                WXLogDebug(@"Reload section:%ld", insertIndex - 1);
-                _completedSections[insertIndex - 1] = completedReloadSection;
-            }
+            WXLogDebug(@"Insert section:%ld", (unsigned long)insertIndex);
             
             [UIView performWithoutAnimation:^{
                 [_tableView beginUpdates];
+                
+                [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
+                if (completedReloadSection) {
+                    WXLogDebug(@"Reload section:%u", insertIndex - 1);
+                    _completedSections[insertIndex - 1] = completedReloadSection;
+                }
                 
                 [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
                 

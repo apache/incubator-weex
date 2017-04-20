@@ -1,8 +1,33 @@
 <project xmlns:rat="antlib:org.apache.rat.anttasks"
     xmlns="antlib:org.apache.tools.ant">
     <rat:report>
-        <fileset dir="../ios" includes="**/*.m,**/*.h,**/*.mm" excludes="**/WeexSDKTests/** **/WeexSDK/Sources/Layout/**,**/Pods/**,**/build/**,**/WeexUITestDemoUITests/**,**/WeexDemoTests/**"/>
-        <fileset dir="../android" includes="**/*.java" excludes="**/playground/app/src/androidTest/**,**/build/**,**/sdk/src/main/java/com/taobao/weex/dom/flex/**,**/playground/app/src/main/java_zxing/**"/>
-        <fileset dir="../html5" includes="**/*.js" excludes="**/test/**"/>
+        <fileset dir="../" includes="**/*.xml,**/*.m,**/*.h,**/*.mm,**/*.java,**/*.js">
+        <exclude name="**/scripts/*.xml"/>
+        <exclude name="**/ios/sdk/WeexSDKTests/*.js"/>
+        <exclude name="**/packages/weex-html5/demo/build/**.js"/>
+        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/*.*"/>
+        <exclude name="**/ios/sdk/WeexSDK/Resources/*.js"/>
+        <exclude name="**/ios/playground/bundlejs/**/*.js"/>
+        <exclude name="**/ios/playground/bundlejs/**/*.js"/>
+        <exclude name="**/doc/themes/**/*.js"/>
+        <exclude name="**/android/sdk/src/main/java/com/taobao/weex/dom/flex/*.java"/>
+        <exclude name="**/android/sdk/assets/**/*.js"/>
+        <exclude name="**/android/playground/app/src/main/java_zxing/**/*.java"/>
+        <exclude name="**/android/playground/app/src/main/assets/**/*.js"/>
+        <exclude name="**/html5/frameworks/legacy/*.js"/>
+        <exclude name="**/*.output.js"/>
+        <exclude name="**/html5/test/render/vue/vender/vue-*.js"/>
+        <exclude name="**/flow-typed/**/*.js"/>
+        <!-- 
+        exclude:
+        - generated js exmpales under ios folder
+        - weex html render builder artifacts 
+        - ios test dependency folder
+        - generated js framework under ios and android sdk 
+        - third part js under doc theme folder
+        - css layout source code under android sdk
+        - html 5 legacy framework
+        -->
+        </fileset>
     </rat:report>
 </project>

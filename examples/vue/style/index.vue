@@ -1,5 +1,5 @@
 <template>
-  <scroller>
+  <scroller style="overflow-x:hidden;">
     <style-box></style-box>
     <style-flex></style-flex>
     <panel title="opacity" type="primary">

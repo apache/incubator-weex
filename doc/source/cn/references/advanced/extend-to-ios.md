@@ -5,6 +5,12 @@ order: 11.1
 version: 2.1
 ---
 
+## 注意
+
+**Weex 所有暴露给  JS 的内置 module 或 component API 都是安全和可控的， 它们不会去访问系统的私有 API ，也不会去做任何 runtime 上的 hack 更不会去改变应用原有的功能定位。**
+
+**如果需要扩展自定义的 module 或者 component ，一定注意不要将 OC 的 runtime 暴露给 JS ， 不要将一些诸如 `dlopen()`， `dlsym()`， `respondsToSelector:`，`performSelector:`，`method_exchangeImplementations()` 的动态和不可控的方法暴露给JS， 也不要将系统的私有API暴露给JS**
+
 ## Module 扩展
 
 [swift](https://github.com/weexteam/article/issues/55) 扩展 module 
@@ -19,7 +25,7 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
 4. Module 方法会在UI线程中被调用，所以不要做太多耗时的任务在这里，如果要在其他线程执行整个module 方法，需要实现`WXModuleProtocol`中`- (NSThread *)targetExecuteThread`的方法，这样，分发到这个module的任务会在指定的线程中运行
 5. Weex 的参数可以是 String 或者Map
 6. Module 支持返回值给 JavaScript中的回调，回调的类型是`WXModuleCallback`,回调的参数可以是String或者Map
-    
+
     ```object-c
     @implementation WXEventModule
     @synthesize weexInstance;
@@ -32,18 +38,50 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
         } else if (![url hasPrefix:@"http"]) {
             newURL = [NSURL URLWithString:url relativeToURL:weexInstance.scriptURL].absoluteString;
         }
-    
+
         UIViewController *controller = [[WXDemoViewController alloc] init];
         ((WXDemoViewController *)controller).url = [NSURL URLWithString:newURL];
-    
+
         [[weexInstance.viewController navigationController] pushViewController:controller animated:YES];
         callback(@{@"result":@"success"});
     }
-    
+
     @end
     ```
 
-另外，`0.10.0` 开始支持同步模块 API 调用，您可以使用宏 `WX_EXPORT_METHOD_SYNC` 导出模块方法，这些方法可以使 JavaScript 接受从 native 返回的值，它只能在 JS 线程被调用。
+#### 暴露同步方法<span class="api-version">v0.10+</span>
+
+如果你想要暴露同步的native方法给JS， 即JS可以直接拿到Native的返回值。 你可以使用`WX_EXPORT_METHOD_SYNC` 宏。
+
+native 代码:
+
+```objective-c
+@implementation WXEventModule
+
+WX_EXPORT_METHOD_SYNC(@selector(getString))
+  
+- (NSString *)getString
+{
+    return @"testString";
+}
+
+@end
+```
+
+js 代码:
+
+```javascript
+const eventModule = weex.requireModule('event')
+const returnString = syncTest.getString()  // return "testString"
+```
+
+除了string, 你也可以返回 `number/array/dictionary` 类型.
+
+`注意:`  暴露的同步方法只能在 JS 线程执行，请不要做太多同步的工作导致JS执行阻塞。
+
+`注意:`  Vue 2.0 还未支持这个特性，最早会在 0.12 版本支持
+
+
 
 ### 注册 module
 
@@ -117,7 +155,7 @@ WXImageLoaderProtocol.h
 ```
 
 ### handler注册
- 
+
 你可以通过WXSDKEngine 中的 `registerHandler:withProtocol`注册handler
 
 ```object-c
@@ -177,19 +215,19 @@ attribute 中拿到的值的类型都是 `id`，我们可以用转换方法把�
 
 native 的 component 是由 Weex 管理的，Weex 创建，布局，渲染，销毁。Weex 的 component 生命周期都是可以 hook 的，你可以在这些生命周期中去做自己的事情。
 
-| 方法 | 描述 |
-| :-: | --- |
-| initWithRef:type:... | 用给定的属性初始化一个component. |
-| layoutDidFinish | 在component完成布局时候会调用. |
-| loadView | 创建component管理的view. |
-| viewWillLoad | 在component的view加载之前会调用. |
-| viewDidLoad | 在component的view加载完之后调用. |
-| viewWillUnload | 在component的view被释放之前调用. |
-| viewDidUnload | 在component的view被释放之后调用. |
-| updateStyles: | 在component的style更新时候调用. |
-| updateAttributes: | 在component的attribute更新时候调用. |
-| addEvent: | 给component添加event的时候调用. |
-| removeEvent: | 在event移除的时候调用. |
+|          方法          | 描述                          |
+| :------------------: | --------------------------- |
+| initWithRef:type:... | 用给定的属性初始化一个component.       |
+|   layoutDidFinish    | 在component完成布局时候会调用.        |
+|       loadView       | 创建component管理的view.         |
+|     viewWillLoad     | 在component的view加载之前会调用.     |
+|     viewDidLoad      | 在component的view加载完之后调用.     |
+|    viewWillUnload    | 在component的view被释放之前调用.     |
+|    viewDidUnload     | 在component的view被释放之后调用.     |
+|    updateStyles:     | 在component的style更新时候调用.     |
+|  updateAttributes:   | 在component的attribute更新时候调用. |
+|      addEvent:       | 给component添加event的时候调用.     |
+|     removeEvent:     | 在event移除的时候调用.              |
 
 在 image component 的例子里面，如果我们需要我们自己的 image view 的话，可以复写 `loadView`这个方法.
 
@@ -244,9 +282,9 @@ return [[WXImageView alloc] init];
 ##### component 方法
 
 WeexSDK 0.9.5 之后支持了在 js 中直接调用 component 的方法，这里提供一个例子
-  
+
 - 自定义一个 WXMyCompoenent 的组件
-  
+
   ```
   @implementation WXMyComponent
   WX_EXPORT_METHOD(@selector(focus)) // 暴露该方法给js
@@ -266,7 +304,7 @@ WeexSDK 0.9.5 之后支持了在 js 中直接调用 component 的方法，这里
   }
   @end
   ```
-	
+
 - 注册组件 `[WXSDKEngine registerComponent:@"mycomponent" withClass:[WXMyComponent class]]`
 
 - 在 weex 文件中调用
@@ -282,4 +320,4 @@ WeexSDK 0.9.5 之后支持了在 js 中直接调用 component 的方法，这里
       }
     }
   </script>
-  ``` 
+  ```

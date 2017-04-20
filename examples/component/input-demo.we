@@ -11,7 +11,7 @@
                 <div style="background-color: #286090">
                     <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = text</text>
                 </div>
-                <input type="text" placeholder="Input Text" class="input" :autofocus="autofocus" value="" onchange="onchange" oninput="oninput"/>
+                <input type="text" placeholder="Input Text" class="input" autofocus=true value="" onchange="onchange" oninput="oninput"/>
             </div>
 
             <div>
@@ -58,42 +58,42 @@
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = default</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = default</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="default" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = go</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = go</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="go" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = next</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = next</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="next" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = search</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = search</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="search" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = send</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = send</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="send" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>
 
             <div>
                 <div style="background-color: #286090">
-                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input keyboard = done</text>
+                    <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input return-key-type = done</text>
                 </div>
                 <input type="text" placeholder="please input" return-key-type="done" class="input" onchange="onchange" onreturn = "onreturn" oninput="oninput" />
             </div>

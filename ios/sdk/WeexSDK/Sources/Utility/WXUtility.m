@@ -33,6 +33,8 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import <coreText/CoreText.h>
 
+#import "WXTextComponent.h"
+
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
@@ -341,6 +343,7 @@ static BOOL WXNotStat;
 {
     NSMutableDictionary * linearGradient = nil;
     if ([backgroundImage hasPrefix:@"linear-gradient"] && [backgroundImage hasSuffix:@")"] ) {
+        backgroundImage = [backgroundImage stringByReplacingOccurrencesOfString:@" " withString:@""];
         NSRange range = NSMakeRange(16, backgroundImage.length - 17);
         NSString *str = [backgroundImage substringWithRange:range];
         NSArray *array = [str componentsSeparatedByString:@","];
@@ -442,7 +445,7 @@ static BOOL WXNotStat;
     return [self fontWithSize:size textWeight:textWeight textStyle:textStyle fontFamily:fontFamily scaleFactor:[self defaultPixelScaleFactor]];
 }
 
-+ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor useCoreText:(BOOL)useCoreText
 {
     CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
     UIFont *font = nil;
@@ -455,20 +458,40 @@ static BOOL WXNotStat;
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
             if (fontURL) {
-                CFErrorRef error = nil;
-                CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
-                if (error) {
-                    CFRelease(error);
-                    error = nil;
-                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
-                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                if (useCoreText) {
+                    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
+                    if (fontDataProvider) {
+                        CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
+                        CFErrorRef error = nil;
+                        CTFontManagerRegisterGraphicsFont(newFont, &error);
+                        // the same font family, remove it and register new one.
+                        if (error) {
+                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                            CTFontManagerRegisterGraphicsFont(newFont, NULL);
+                            CFRelease(error);
+                            error = nil;
+                        }
+                        fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
+                        CGFontRelease(newFont);
+                        CFRelease(fontURL);
+                        CFRelease(fontDataProvider);
+                    }
+                } else {
+                    CFErrorRef error = nil;
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                    if (error) {
+                        CFRelease(error);
+                        error = nil;
+                        CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                        CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    }
+                    NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+                    // length of descriptors here will be only one.
+                    for (UIFontDescriptor *desc in descriptors) {
+                        font = [UIFont fontWithDescriptor:desc size:fontSize];
+                    }
+                    CFRelease(fontURL);
                 }
-                NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
-                // length of descriptors here will be only one.
-                for (UIFontDescriptor *desc in descriptors) {
-                    font = [UIFont fontWithDescriptor:desc size:fontSize];
-                }
-                CFRelease(fontURL);
             }
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
@@ -507,6 +530,11 @@ static BOOL WXNotStat;
     }
     
     return font;
+}
+
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
+{
+    return [self fontWithSize:size textWeight:textWeight textStyle:textStyle fontFamily:fontFamily scaleFactor:scaleFactor useCoreText:NO];
 }
 
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock

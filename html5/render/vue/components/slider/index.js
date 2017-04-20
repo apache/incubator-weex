@@ -16,9 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// import { validateStyles } from '../../validator'
+import { extractComponentStyle, createEventMap } from '../../core'
 import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
+
+const _css = `
+.weex-slider-wrapper {
+  overflow: hidden;
+}
+
+.weex-slider-inner {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.weex-slider-cell {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+`
 
 export default {
   mixins: [slideMixin],
@@ -144,11 +172,12 @@ export default {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
         staticClass: 'weex-slider weex-slider-wrapper weex-ct',
-        on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
+        on: extend(createEventMap(this, ['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd
-        })
+        }),
+        staticStyle: extractComponentStyle(this)
       },
       [
         createElement('ul', {
@@ -158,5 +187,7 @@ export default {
         this._indicator
       ]
     )
-  }
+  },
+  // export default css styles for this component.
+  _css
 }

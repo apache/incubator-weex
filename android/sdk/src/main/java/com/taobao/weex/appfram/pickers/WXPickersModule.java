@@ -280,10 +280,12 @@ public class WXPickersModule extends WXModule {
 
                     if (confirmTitle != null) {
                         confirm.setText(confirmTitle);
+                        confirm.setAllCaps(false);
                     }
 
                     if (confirmColor != Color.TRANSPARENT) {
                         confirm.setTextColor(confirmColor);
+                        confirm.setAllCaps(false);
                     }
                 }
 

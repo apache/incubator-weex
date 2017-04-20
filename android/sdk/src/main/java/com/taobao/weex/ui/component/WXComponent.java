@@ -488,8 +488,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * After component's layout result is apply to view. May be invoke multiple times since
    * DOM can be changed in js runtime.
    */
-  protected void onFinishLayout(){
-
+  protected void onFinishLayout() {
+    Object param = mDomObj.getStyles() != null ? mDomObj.getStyles().get(Constants.Name.BACKGROUND_IMAGE) : null;
+    if (param != null) {
+      setBackgroundImage(param.toString());
+    }
   }
 
   public void setPadding(Spacing padding, Spacing border) {

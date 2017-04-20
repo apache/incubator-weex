@@ -16,6 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { extractComponentStyle, trimTextVNodes, createEventMap } from '../core'
+// import { validateStyles } from '../validator'
+
+const _css = `
+.weex-a {
+  text-decoration: none;
+}
+`
 
 export default {
   name: 'weex-a',
@@ -32,8 +40,10 @@ export default {
         'weex-type': 'a',
         href: this.href
       },
-      on: this._createEventMap(),
-      staticClass: 'weex-a weex-ct'
-    }, this._trimTextNodeChildren(this.$slots.default))
-  }
+      on: createEventMap(this),
+      staticClass: 'weex-a weex-ct',
+      staticStyle: extractComponentStyle(this)
+    }, trimTextVNodes(this.$slots.default))
+  },
+  _css
 }

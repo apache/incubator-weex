@@ -265,7 +265,8 @@ public class WXSDKEngine {
         true,
         WXBasicComponentType.SLIDER_NEIGHBOR
       );
-      registerComponent(SimpleListComponent.class,false,"simplelist");
+      String simpleList = "simplelist";
+      registerComponent(SimpleListComponent.class,false,simpleList);
       registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
@@ -297,6 +298,7 @@ public class WXSDKEngine {
       registerModule("webSocket", WebSocketModule.class);
 
 
+      registerDomObject(simpleList, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.INDICATOR, WXIndicator.IndicatorDomNode.class);
       registerDomObject(WXBasicComponentType.TEXT, WXTextDomObject.class);
       registerDomObject(WXBasicComponentType.HEADER, WXCellDomObject.class);

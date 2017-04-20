@@ -17,7 +17,7 @@ To be rendered properly, the refresh/loading Components must appear inside the S
 **example**
 
 ```html
-<template>
+`<template>
   <list>
     <header>
       <div class="center">
@@ -27,7 +27,7 @@ To be rendered properly, the refresh/loading Components must appear inside the S
     <loading onloading="onloading" display="{{loadingDisplay}}" style="width:750;flex-direction: row;justify-content: center;">
       <loading-indicator style="height:160;width:160;color:#3192e1"></loading-indicator>
     </loading>
-    <cell onappear="onappear" ondisappear="ondisappear" class="row" repeat="{{staffs}}" index="{{$index}}">
+    <cell onappear="onappear($event, $index)" ondisappear="ondisappear($event, $index)" class="row" repeat="{{staffs}}" index="{{$index}}">
         <div class="item">
           <text>{{name}}</text>
         </div>
@@ -69,13 +69,12 @@ To be rendered properly, the refresh/loading Components must appear inside the S
       this.staffs=[{name:'inns'},{name:'connon'},{name:'baos'},{name:'anna'},{name:'dolley'},{name:'lucy'},{name:'john'}, {name:'lily'},{name:'locke'},{name:'jack'},{name:'danny'},{name:'rose'},{name:'harris'},{name:'lotus'},{name:'louis'}];
     },
     methods:{
-      onappear: function (e) {
-        var index = e.target.attr.index
-        // nativeLog('+++++', index);
+      onappear: function (e, index) {
+        // console.log('+++++', index);
         // console.log(this.staffs[index].name + ' is appearing...');
       },
-      ondisappear:function (e) {
-        // nativeLog('+++++', e.target.attr.index);
+      ondisappear:function (e, index) {
+        // console.log('+++++', index);
       },
       onloading:function(e){
         console.log('onloading...');

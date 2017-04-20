@@ -3,8 +3,8 @@
   "version": "0.4.0",
   "subversion": {
     "browser": "0.5.0",
-    "vue-render": "0.11.2",
-    "framework": "0.20.3",
+    "framework": "0.20.4",
+    "vue-render": "0.11.5",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -47,8 +47,8 @@
     "build:examples:native": "webpack --config build/webpack.examples.config.js",
     "build:examples:web": "webpack --config build/webpack.examples.web.config.js",
     "build:test": "webpack --config build/webpack.test.config.js",
-    "build:ci:web": "webpack --config build/webpack.ci.web.config.js",
-    "build:ci:native": "webpack --config build/webpack.ci.config.js",
+    "build:ci:web": "webpack --watch --config build/webpack.ci.web.config.js",
+    "build:ci:native": "webpack --watch --config build/webpack.ci.config.js",
     "build:ci": "npm run build:ci:native && npm run build:ci:web",
     "build": "npm run build:native && npm run build:browser && npm run build:vue && npm run build:examples && npm run build:test",
     "dist:vue": "npm run build:vue && bash ./bin/dist-vue.sh",
@@ -64,7 +64,7 @@
     "lint": "eslint html5",
     "flow": "flow check",
     "test:case": "mocha --require reify html5/test/case/tester.js",
-    "test:vue": "karma start build/karma.vue.conf.js",
+    "test:vue": "webpack --config build/webpack.test.web.config.js && karma start build/karma.vue.conf.js",
     "test:unit": "mocha --require reify html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test": "npm run lint && npm run test:unit && npm run test:case && npm run test:vue",
     "test:cover-html": "babel-istanbul cover --report html node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js && open coverage/index.html",
@@ -147,7 +147,7 @@
     "rollup-watch": "^2.5.0",
     "selenium-server": "2.53.1",
     "serve": "^1.4.0",
-    "sinon": "^1.17.4",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.4",
     "vue": "^2.2.6",
@@ -160,6 +160,8 @@
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.22",
     "wwp": "^0.3.5",
-    "xml2map": "^1.0.2"
+    "xml2map": "^1.0.2",
+    "weex-gcanvas":"^0.3.5"
+
   }
 }

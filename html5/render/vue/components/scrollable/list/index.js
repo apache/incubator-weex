@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { extractComponentStyle, createEventMap } from '../../../core'
 import { scrollable } from '../../../mixins'
 // import { validateStyles } from '../../../validator'
 import { extend } from '../../../utils'
@@ -74,12 +75,13 @@ export default {
       ref: 'wrapper',
       attrs: { 'weex-type': 'list' },
       staticClass: this.wrapperClass,
-      on: extend(this._createEventMap(), {
+      on: extend(createEventMap(this), {
         scroll: this.handleListScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
         touchend: this.handleTouchEnd
-      })
+      }),
+      staticStyle: extractComponentStyle(this)
     }, this.createChildren(createElement))
   }
 }

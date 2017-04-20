@@ -7,7 +7,7 @@
 
 # Created by Builder
 examples/build
-examples/web-entry
+web-entry
 test/build
 weex_tmp
 coverage

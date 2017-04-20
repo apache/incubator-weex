@@ -491,8 +491,11 @@
         if(strongSelf) {
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
-            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
-            [strongSelf.view.layer insertSublayer:gradientLayer atIndex:0];
+            if (_gradientLayer && [strongSelf.view.layer.sublayers containsObject:_gradientLayer]) {
+                [_gradientLayer removeFromSuperlayer];
+            }
+             _gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            [strongSelf.view.layer insertSublayer:_gradientLayer atIndex:0];
             strongSelf.view.layer.masksToBounds = YES;
         }
     });
