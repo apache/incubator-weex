@@ -273,6 +273,8 @@ public class Constants {
 
     String POSITION = "position";
 
+    String KEEP_SCROLL_POSITION = "keepScrollPosition";
+
     String TEXT_DECORATION = "textDecoration";
     String TEXT_ALIGN = "textAlign";
     String FONT_WEIGHT = "fontWeight";
@@ -294,13 +296,17 @@ public class Constants {
     String RESIZE_MODE = "resizeMode";
     String SHOW_INDICATORS = "showIndicators";
     String AUTO_PLAY = "autoPlay";
-    String SHOW_SCROLLBAR = "showScrollbar";
     String SCROLL_DIRECTION = "scrollDirection";
     String SCOPE = "scope";
     String RECYCLE = "recycle";
     String LOADMORERETRY = "loadmoreretry";
     String LOADMOREOFFSET = "loadmoreoffset";
     String RECYCLE_IMAGE = "recycleImage";
+    String LAYOUT = "layout";
+    String COLUMN_WIDTH= "columnWidth";
+    String COLUMN_COUNT= "columnCount";
+    String COLUMN_GAP= "columnGap";
+    String SHOW_SCROLLBAR= "showScrollbar";
     String OVERFLOW = "overflow";
     String TYPE = "type";
     String PLACEHOLDER = "placeholder";
@@ -347,12 +353,25 @@ public class Constants {
     String RETURN_KEY_TYPE = "returnKeyType";
     String OFFSET = "offset";
     String ANIMATED = "animated";
+
+    String INSERT_CELL_ANIMATION = "insertAnimation";
+    String DELETE_CELL_ANIMATION = "deleteAnimation";
+    String AUTO = "auto";
+    String NORMAL = "normal";
+    String ARIA_LABEL = "ariaLabel";
+    String ARIA_HIDDEN = "ariaHidden";
   }
 
   public interface Value {
 
+    int DENSITY = 3;
     int NAV_BAR_SHOWN = 0;
     int NAV_BAR_HIDDEN = 1;
+    int AUTO = -1;
+    int COLUMN_GAP_NORMAL = 32;
+    int COLUMN_COUNT_NORMAL = 1;
+    String MULTI_COLUMN= "multi-column";
+    String GRID= "grid";
     String STICKY = "sticky";
     String FIXED = "fixed";
     String LEFT = "left";
@@ -381,6 +400,9 @@ public class Constants {
     String DIRECTION_RIGHT = "right";
     String DIRECTION_UP = "up";
     String DIRECTION_DOWN = "down";
+
+    String NONE = "none";
+    String DEFAULT = "default";
   }
 
   public interface Event {
@@ -428,5 +450,13 @@ public class Constants {
     String HTTPS = "https";
     String HTTP = "http";
     String LOCAL = "local";
+  }
+
+  public interface CodeCache {
+    String URL = "bundleUrl";
+    String DIGEST = "bundleDigest";
+    String PATH = "codeCachePath";
+    String BANNER_DIGEST = "digest";
+    String SAVE_PATH = "v8";
   }
 }

@@ -212,6 +212,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSLayoutContext;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -240,6 +242,10 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
   public static final String ROOT = "_root";
   public static final String TRANSFORM = "transform";
   public static final String TRANSFORM_ORIGIN = "transformOrigin";
+  static final WXDomObject DESTROYED = new WXDomObject();
+  static{
+    DESTROYED.mRef = "_destroyed";
+  }
   private AtomicBoolean sDestroy = new AtomicBoolean();
 
   private int mViewPortWidth =750;
@@ -266,7 +272,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
 
   private boolean mYoung = false;
 
-  /** package **/ void traverseTree(Consumer...consumers){
+  public void traverseTree(Consumer...consumers){
     if (consumers == null) {
       return;
     }
@@ -812,9 +818,28 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       }
 
       String type = (String) json.get(TYPE);
+
+      if (wxsdkInstance.isNeedValidate()) {
+        WXValidateProcessor processor = WXSDKManager.getInstance()
+                .getValidateProcessor();
+        if (processor != null) {
+          WXValidateProcessor.WXComponentValidateResult result = processor
+                  .onComponentValidate(wxsdkInstance, type);
+          if (result != null && !result.isSuccess) {
+            type = TextUtils.isEmpty(result.replacedComponent) ? WXBasicComponentType.DIV
+                    : result.replacedComponent;
+            json.put(TYPE, type);
+            if(WXEnvironment.isApkDebugable()&&result.validateInfo!=null){
+              String tag = "[WXDomObject]onComponentValidate failure. >>> "+result.validateInfo.toJSONString();
+              WXLogUtils.e(tag);
+            }
+          }
+        }
+      }
+
       WXDomObject domObject = WXDomObjectFactory.newInstance(type);
 
-      domObject.setViewPortWidth(wxsdkInstance.getViewPortWidth());
+      domObject.setViewPortWidth(wxsdkInstance.getInstanceViewPortWidth());
 
       if(domObject == null){
         return null;
@@ -834,7 +859,7 @@ public class WXDomObject extends CSSNode implements Cloneable,ImmutableDomObject
       return domObject;
   }
 
-  interface Consumer{
+  public interface Consumer{
     void accept(WXDomObject dom);
   }
 }

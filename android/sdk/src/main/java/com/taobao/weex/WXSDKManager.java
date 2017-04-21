@@ -139,6 +139,7 @@ import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
@@ -148,6 +149,7 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -156,6 +158,7 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +177,7 @@ public class WXSDKManager {
 
   private IWXUserTrackAdapter mIWXUserTrackAdapter;
   private IWXImgLoaderAdapter mIWXImgLoaderAdapter;
+  private IWXSoLoaderAdapter mIWXSoLoaderAdapter;
   private IDrawableLoader mDrawableLoader;
   private IWXHttpAdapter mIWXHttpAdapter;
   private IWXDebugAdapter mIWXDebugAdapter;
@@ -184,13 +188,70 @@ public class WXSDKManager {
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
   private IWXStorageAdapter mIWXStorageAdapter;
+  private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
+  private WXValidateProcessor mWXValidateProcessor;
+  // Tell weexv8 to initialize v8, default is true.
+  private boolean mNeedInitV8 = true;
 
   private WXSDKManager() {
-    mWXRenderManager = new WXRenderManager();
+    this(new WXRenderManager());
+  }
+
+  private WXSDKManager(WXRenderManager renderManager) {
+    mWXRenderManager = renderManager;
     mWXDomManager = new WXDomManager(mWXRenderManager);
     mBridgeManager = WXBridgeManager.getInstance();
+  }
+
+  /**
+   * Used in junit test
+   */
+  static void initInstance(WXRenderManager renderManager){
+    sManager = new WXSDKManager(renderManager);
+  }
+
+  public void registerStatisticsListener(IWXStatisticsListener listener) {
+    mStatisticsListener = listener;
+  }
+
+  public IWXStatisticsListener getWXStatisticsListener() {
+    return mStatisticsListener;
+  }
+
+  public void onSDKEngineInitialize() {
+    if (mStatisticsListener != null) {
+      mStatisticsListener.onSDKEngineInitialize();
+    }
+  }
+
+  public void setNeedInitV8(boolean need) {
+    mNeedInitV8 = need;
+  }
+
+  public boolean needInitV8() {
+    return mNeedInitV8;
+  }
+
+  public void takeJSHeapSnapshot(String path) {
+    File file = new File(path);
+    if (!file.exists()) {
+      if (!file.mkdir()) {
+        return;
+      }
+    }
+
+    String name = String.valueOf(sInstanceId.get());
+    String filename = path;
+
+    if (!path.endsWith(File.separator)) {
+      filename += File.separator;
+    }
+    filename += name;
+    filename += ".heapsnapshot";
+
+    mBridgeManager.takeJSHeapSnapshot(filename);
   }
 
   public static WXSDKManager getInstance() {
@@ -205,7 +266,7 @@ public class WXSDKManager {
   }
 
   public static int getInstanceViewPortWidth(String instanceId){
-    return getInstance().getSDKInstance(instanceId).getViewPortWidth();
+    return getInstance().getSDKInstance(instanceId).getInstanceViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -342,7 +403,7 @@ public class WXSDKManager {
     return mIWXJSExceptionAdapter;
   }
 
-   void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
+  void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
     mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
   }
 
@@ -360,6 +421,10 @@ public class WXSDKManager {
     return mURIAdapter;
   }
 
+  public IWXSoLoaderAdapter getIWXSoLoaderAdapter() {
+    return mIWXSoLoaderAdapter;
+  }
+
   void setInitConfig(InitConfig config){
     this.mIWXDebugAdapter = config.getDebugAdapter();
     this.mIWXHttpAdapter = config.getHttpAdapter();
@@ -370,6 +435,7 @@ public class WXSDKManager {
     this.mURIAdapter = config.getURIAdapter();
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
     this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
+    this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
   }
 
   public IWXDebugAdapter getIWXDebugAdapter() {
@@ -404,12 +470,34 @@ public class WXSDKManager {
   public void notifyTrimMemory() {
     mBridgeManager.notifyTrimMemory();
   }
+
+  /**
+   * Weex embedders can use <code>notifySerializeCodeCache</code> to
+   * serialize code caches if the jsfm has the alility to compile 'new Function'
+   * against js bundles on the weex native side.
+   *
+   * It's a good time to serialize a code cache after exiting a weex page.
+   * Then, the next time of entering the same weex page, V8 would compile
+   * 'new Function' against the code cache deseriazed from the js bundle.
+   */
+  public void notifySerializeCodeCache() {
+    mBridgeManager.notifySerializeCodeCache();
+  }
+
   public @Nullable
   IWebSocketAdapter getIWXWebSocketAdapter() {
     if (mIWebSocketAdapterFactory != null) {
       return mIWebSocketAdapterFactory.createWebSocketAdapter();
     }
     return null;
+  }
+
+  public void registerValidateProcessor(WXValidateProcessor processor){
+    this.mWXValidateProcessor = processor;
+  }
+
+  public WXValidateProcessor getValidateProcessor(){
+    return mWXValidateProcessor;
   }
 
 }

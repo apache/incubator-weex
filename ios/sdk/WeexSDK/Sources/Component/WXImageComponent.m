@@ -94,6 +94,7 @@ static dispatch_queue_t WXImageUpdateQueue;
             NSString *matchString = [filter substringWithRange:matchRange];
             if (matchString && matchString.length > 0) {
                 _blurRadius = [matchString doubleValue];
+                [self updateImage];
             }
         }
     }

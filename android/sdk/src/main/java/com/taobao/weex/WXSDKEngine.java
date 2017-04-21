@@ -143,11 +143,10 @@ import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXDomRegistry;
 import com.taobao.weex.dom.WXListDomObject;
+import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
-import com.taobao.weex.ui.component.list.SimpleListComponent;
-import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.http.WXStreamModule;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
@@ -176,9 +175,11 @@ import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
+import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.module.WXMetaModule;
+import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
 import com.taobao.weex.utils.WXLogUtils;
@@ -261,13 +262,16 @@ public class WXSDKEngine {
       public void run() {
         long start = System.currentTimeMillis();
         WXSDKManager sm = WXSDKManager.getInstance();
+        sm.onSDKEngineInitialize();
         if(config != null ) {
           sm.setInitConfig(config);
           if(config.getDebugAdapter()!=null){
             config.getDebugAdapter().initDebug(application);
           }
         }
-        WXSoInstallMgrSdk.init(application);
+        WXSoInstallMgrSdk.init(application,
+                              sm.getIWXSoLoaderAdapter(),
+                              sm.getWXStatisticsListener());
         boolean isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, 1, config!=null?config.getUtAdapter():null);
         if (!isSoInitSuccess) {
           return;
@@ -352,7 +356,7 @@ public class WXSDKEngine {
         WXBasicComponentType.SLIDER_NEIGHBOR
       );
       registerComponent(SimpleListComponent.class,false,"simplelist");
-      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST);
+      registerComponent(WXListComponent.class, false,WXBasicComponentType.LIST,WXBasicComponentType.VLIST,WXBasicComponentType.RECYCLER,WXBasicComponentType.WATERFALL);
       registerComponent(HorizontalListComponent.class,false,WXBasicComponentType.HLIST);
       registerComponent(WXBasicComponentType.CELL, WXCell.class, true);
       registerComponent(WXBasicComponentType.INDICATOR, WXIndicator.class, true);
@@ -392,6 +396,8 @@ public class WXSDKEngine {
       registerDomObject(WXBasicComponentType.VLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.HLIST, WXListDomObject.class);
       registerDomObject(WXBasicComponentType.SCROLLER, WXScrollerDomObject.class);
+      registerDomObject(WXBasicComponentType.RECYCLER, WXRecyclerDomObject.class);
+      registerDomObject(WXBasicComponentType.WATERFALL, WXRecyclerDomObject.class);
     } catch (WXException e) {
       WXLogUtils.e("[WXSDKEngine] register:", e);
     }

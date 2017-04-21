@@ -207,9 +207,8 @@ package com.taobao.weex.dom;
 import android.os.Handler;
 import android.os.Message;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.taobao.weex.bridge.JSCallback;
+import com.taobao.weex.dom.action.Actions;
 
 /**
  * Handler for dom operations.
@@ -245,70 +244,19 @@ public class WXDomHandler implements Handler.Callback {
       mWXDomManager.sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_BATCH, DELAY_TIME);
     }
     switch (what) {
-      case MsgType.WX_DOM_CREATE_BODY:
-        mWXDomManager.createBody(task.instanceId, (JSONObject) task.args.get(0));
-        break;
-      case MsgType.WX_DOM_UPDATE_ATTRS:
-        mWXDomManager.updateAttrs(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
+      case MsgType.WX_EXECUTE_ACTION:
+        mWXDomManager.executeAction(task.instanceId, (DOMAction) task.args.get(0), (boolean) task.args.get(1));
         break;
       case MsgType.WX_DOM_UPDATE_STYLE:
-        mWXDomManager.updateStyle(
-            task.instanceId,
-            (String) task.args.get(0),
+        //keep this for direct native call
+        mWXDomManager.executeAction(task.instanceId, Actions.getUpdateStyle((String) task.args.get(0),
             (JSONObject) task.args.get(1),
-            task.args.size() > 2 && (boolean) task.args.get(2)
-        );
-        break;
-      case MsgType.WX_DOM_ADD_DOM:
-        mWXDomManager.addDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1), (Integer) task.args.get(2));
-        break;
-      case MsgType.WX_DOM_REMOVE_DOM:
-        mWXDomManager.removeDom(task.instanceId, (String) task.args.get(0));
-        break;
-      case MsgType.WX_DOM_MOVE_DOM:
-        mWXDomManager.moveDom(task.instanceId, (String) task.args.get(0), (String) task.args.get(1), (Integer) task.args.get(2));
-        break;
-      case MsgType.WX_DOM_ADD_EVENT:
-        mWXDomManager.addEvent(task.instanceId, (String) task.args.get(0), (String) task.args.get(1));
-        break;
-      case MsgType.WX_DOM_REMOVE_EVENT:
-        mWXDomManager.removeEvent(task.instanceId, (String) task.args.get(0), (String) task.args.get(1));
-        break;
-      case MsgType.WX_DOM_CREATE_FINISH:
-        mWXDomManager.createFinish(task.instanceId);
-        break;
-      case MsgType.WX_DOM_REFRESH_FINISH:
-        mWXDomManager.refreshFinish(task.instanceId);
-        break;
-      case MsgType.WX_DOM_UPDATE_FINISH:
-        mWXDomManager.updateFinish(task.instanceId);
-        break;
-      case MsgType.WX_ANIMATION:
-        mWXDomManager.startAnimation(task.instanceId,
-                                     (String) task.args.get(0),
-                                     (String) task.args.get(1),
-                                     (String) task.args.get(2));
+            task.args.size() > 2 && (boolean) task.args.get(2)),false);
         break;
       case MsgType.WX_DOM_BATCH:
+
         mWXDomManager.batch();
         mHasBatch = false;
-        break;
-
-      case MsgType.WX_DOM_SCROLLTO:
-        mWXDomManager.scrollToDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
-        break;
-      case MsgType.WX_DOM_ADD_RULE:
-        mWXDomManager.addRule(task.instanceId,(String) task.args.get(0), (JSONObject) task.args.get(1));
-        break;
-      case MsgType.WX_COMPONENT_SIZE:
-        mWXDomManager.getComponentSize(task.instanceId, (String) task.args.get(0), (JSCallback) task.args.get(1));
-        break;
-      case MsgType.WX_DOM_INVOKE:
-        mWXDomManager.invokeMethod(
-            task.instanceId,
-            (String)task.args.get(0),
-            (String)task.args.get(1),
-            (JSONArray)task.args.get(2));
         break;
       default:
         break;
@@ -319,24 +267,42 @@ public class WXDomHandler implements Handler.Callback {
 
   public static class MsgType {
 
+    @Deprecated
     public static final int WX_DOM_CREATE_BODY = 0x0;
+    @Deprecated
     public static final int WX_DOM_UPDATE_ATTRS = 0x01;
+    @Deprecated
     public static final int WX_DOM_UPDATE_STYLE = 0x02;
+    @Deprecated
     public static final int WX_DOM_ADD_DOM = 0x03;
+    @Deprecated
     public static final int WX_DOM_REMOVE_DOM = 0x04;
+    @Deprecated
     public static final int WX_DOM_MOVE_DOM = 0x05;
+    @Deprecated
     public static final int WX_DOM_ADD_EVENT = 0x06;
+    @Deprecated
     public static final int WX_DOM_REMOVE_EVENT = 0x07;
+    @Deprecated
     public static final int WX_DOM_SCROLLTO = 0x08;
+    @Deprecated
     public static final int WX_DOM_CREATE_FINISH = 0x09;
+    @Deprecated
     public static final int WX_DOM_REFRESH_FINISH = 0x0a;
+    @Deprecated
     public static final int WX_DOM_UPDATE_FINISH = 0x0b;
+    @Deprecated
     public static final int WX_ANIMATION=0xc;
+    @Deprecated
     public static final int WX_DOM_ADD_RULE=0xd;
+    @Deprecated
     public static final int WX_DOM_INVOKE=0xe;
 
+    public static final int WX_EXECUTE_ACTION = 0xfe;
     public static final int WX_DOM_BATCH = 0xff;
 
+    @Deprecated
     public static final int WX_COMPONENT_SIZE= 0xff1;
+
   }
 }

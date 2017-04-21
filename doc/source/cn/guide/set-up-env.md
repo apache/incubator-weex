@@ -1,7 +1,7 @@
 ---
 title: 搭建开发环境 
 type: guide
-order: 2
+order: 1.1
 version: 2.1
 has_chapter_content: true
 ---

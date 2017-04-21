@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "7a417d023cb6eb6ea5079386a155fec5"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -523,8 +531,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2309,6 +2316,114 @@
 	          },
 	          "attr": {
 	            "value": "bold"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "100"
+	          },
+	          "attr": {
+	            "value": "100"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "200"
+	          },
+	          "attr": {
+	            "value": "200"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "300"
+	          },
+	          "attr": {
+	            "value": "300"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "400"
+	          },
+	          "attr": {
+	            "value": "400"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "500"
+	          },
+	          "attr": {
+	            "value": "500"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "600"
+	          },
+	          "attr": {
+	            "value": "600"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "700"
+	          },
+	          "attr": {
+	            "value": "700"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "800"
+	          },
+	          "attr": {
+	            "value": "800"
+	          }
+	        },
+	        {
+	          "type": "text",
+	          "classList": [
+	            "txt"
+	          ],
+	          "style": {
+	            "fontWeight": "900"
+	          },
+	          "attr": {
+	            "value": "900"
 	          }
 	        }
 	      ]

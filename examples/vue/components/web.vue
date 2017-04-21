@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .wrapper {
     width: 750;
     position: absolute;

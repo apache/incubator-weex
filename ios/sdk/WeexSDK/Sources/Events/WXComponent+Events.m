@@ -159,6 +159,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(touchend, addTouchEndEvent)
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
     
+    if(_isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = YES;
+    }
+    
     [self addEvent:addEventName];
 }
 

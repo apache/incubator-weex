@@ -12,6 +12,8 @@
 #import "WXLayoutDefine.h"
 #import "WXType.h"
 
+@class WXLength;
+@class WXBoxShadow;
 @interface WXConvert : NSObject
 
 + (BOOL)BOOL:(id)value;
@@ -36,6 +38,7 @@ typedef CGFloat WXPixelType;
 + (UIViewContentMode)UIViewContentMode:(id)value;
 + (WXImageQuality)WXImageQuality:(id)value;
 + (WXImageSharp)WXImageSharp:(id)value;
++ (UIAccessibilityTraits)WXUIAccessibilityTraits:(id)value;
 
 + (UIColor *)UIColor:(id)value;
 + (CGColorRef)CGColor:(id)value;
@@ -67,6 +70,9 @@ typedef BOOL WXClipType;
 + (WXVisibility)WXVisibility:(id)value;
 
 + (WXGradientType)gradientType:(id)value;
+
++ (WXLength *)WXLength:(id)value isFloat:(BOOL)isFloat scaleFactor:(CGFloat)scaleFactor;
++ (WXBoxShadow *)WXBoxShadow:(id)value scaleFactor:(CGFloat)scaleFactor;
 
 @end
 

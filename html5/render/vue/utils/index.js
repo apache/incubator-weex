@@ -1,6 +1,9 @@
 export * from './func'
 export * from './event'
 export * from './component'
+export * from './lazyload'
+export * from './style'
+export * from './type'
 
 /**
  * Create a cached version of a pure function.
@@ -21,6 +24,14 @@ export const camelize = cached(str => {
   return str.replace(camelizeRE, (_, c) => c.toUpperCase())
 })
 
+export function camelizeKeys (obj) {
+  const res = {}
+  for (const key in obj) {
+    res[camelize(key)] = obj[key]
+  }
+  return res
+}
+
 /**
  * Capitalize a string.
  */
@@ -39,21 +50,31 @@ export const hyphenate = cached(str => {
     .toLowerCase()
 })
 
+export function hyphenateKeys (obj) {
+  const res = {}
+  for (const key in obj) {
+    res[hyphenate(key)] = obj[key]
+  }
+  return res
+}
+
+// const vendorsReg = /webkit-|moz-|o-|ms-/
+// export function hyphenateStyleKeys (obj) {
+//   const res = {}
+//   for (const key in obj) {
+//     const hk = hyphenate(key).replace(vendorsReg, function ($0) {
+//       return '-' + $0
+//     })
+//     res[hk] = obj[key]
+//   }
+//   return res
+// }
+
 export function camelToKebab (name) {
   if (!name) { return '' }
   return name.replace(/([A-Z])/g, function (g, g1) {
     return `-${g1.toLowerCase()}`
   })
-}
-
-/**
- * Mix properties into target object.
- */
-export function extend (to, _from) {
-  for (const key in _from) {
-    to[key] = _from[key]
-  }
-  return to
 }
 
 export function appendStyle (css, styleId, replace) {
@@ -69,20 +90,6 @@ export function appendStyle (css, styleId, replace) {
     document.getElementsByTagName('head')[0].appendChild(style)
   }
   style.appendChild(document.createTextNode(css))
-}
-
-/**
- * Strict object type check. Only returns true
- * for plain JavaScript objects.
- *
- * @param {*} obj
- * @return {Boolean}
- */
-
-const toString = Object.prototype.toString
-const OBJECT_STRING = '[object Object]'
-export function isPlainObject (obj) {
-  return toString.call(obj) === OBJECT_STRING
 }
 
 export function nextFrame (callback) {

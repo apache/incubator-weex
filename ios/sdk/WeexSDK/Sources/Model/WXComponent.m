@@ -8,7 +8,6 @@
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
-#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -26,6 +25,7 @@
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
+#import "WXComponent+BoxShadow.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -167,7 +167,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ ref=%@> %@", _type, _ref, _view];
+    return [NSString stringWithFormat:@"<%@:%p ref=%@> %@", _type, self, _ref, _view];
 }
 
 #pragma mark Property
@@ -201,7 +201,7 @@
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
         }
-        
+
         if (_backgroundImage) {
             [self setGradientLayer];
         }
@@ -210,9 +210,15 @@
             [_transform applyTransformForView:_view];
         }
         
+        if (_boxShadow) {
+            [self configBoxShadow:_boxShadow];
+        }
+        
         _view.wx_component = self;
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
+        
+        [self _configWXComponentA11yWithAttributes:_attributes];
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -231,7 +237,7 @@
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-        
+
         [self _handleFirstScreenTime];
         
         return _view;
@@ -423,6 +429,7 @@
     [self _updateNavBarAttributes:attributes];
     
     [self updateAttributes:attributes];
+    [self _configWXComponentA11yWithAttributes:attributes];
 }
 
 - (void)updateStyles:(NSDictionary *)styles
@@ -440,6 +447,60 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     WXAssertMainThread();
+    
+}
+
+- (void)setGradientLayer
+{
+    if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        return;
+    }
+    NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:_backgroundImage];
+    if (!linearGradient) {
+        return ;
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        /*
+         must insert the gradientLayer at index 0, and then set masksToBounds to match the view bounds
+         or the subview will be invisible
+         */
+        
+        if(strongSelf) {
+            UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
+            UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
+            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            [strongSelf.view.layer insertSublayer:gradientLayer atIndex:0];
+            strongSelf.view.layer.masksToBounds = YES;
+        }
+    });
+}
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
+{
+    if (attributes[@"role"]){
+        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        self.view.accessibilityTraits = _role;
+    }
+    if (attributes[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        self.view.accessibilityElementsHidden = _ariaHidden;
+    }
+    if (attributes[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        self.view.accessibilityValue = _ariaLabel;
+    }
+    
+    if (attributes[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
+    }
+    
+    // set accessibilityFrame for view which has no subview
+    if (0 == [self.subcomponents count]) {
+        self.view.isAccessibilityElement = YES;
+    }
 }
 
 #pragma mark Reset

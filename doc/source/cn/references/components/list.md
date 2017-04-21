@@ -43,8 +43,6 @@ version: 2.1
 
 - `loadmoreoffset {number}`：默认值为 0，触发 `loadmore` 事件所需要的垂直偏移距离（设备屏幕底部与 `<list>` 底部之间的距离）。当 `<list>` 的滚动条滚动到足够接近 `<list>` 底部时将会触发 `loadmore` 这个事件。
 
-  ![mobile_preview](../images/list_4.jpg)
-
 ## 样式
 
 - 通用样式：支持所有通用样式
@@ -60,8 +58,6 @@ version: 2.1
 ## 事件
 
 - `loadmore` <sup class="wx-v">0.5+</sup>：如果列表滚动到底部将会立即触发这个事件，你可以在这个事件的处理函数中加载下一页的列表项。
-
-  [体验一下](http://dotwe.org/bc445ede8746a31360e3607d210304c5)
 
 - 通用事件
 

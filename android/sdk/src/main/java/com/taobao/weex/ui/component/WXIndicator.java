@@ -321,7 +321,7 @@ public class WXIndicator extends WXComponent<WXCircleIndicator> {
     if (itemSize < 0) {
       return;
     }
-    getHostView().setRadius(WXViewUtils.getRealPxByWidth(itemSize,getInstance().getViewPortWidth()) / 2.0f);
+    getHostView().setRadius(WXViewUtils.getRealPxByWidth(itemSize,getInstance().getInstanceViewPortWidth()) / 2.0f);
     getHostView().forceLayout();
     getHostView().requestLayout();
   }

@@ -246,6 +246,11 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
   }
 
   @Override
+  public boolean canRecycled() {
+    return false;
+  }
+
+  @Override
   public void onRefresh() {
     if(isDestoryed()){
       return;

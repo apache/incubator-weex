@@ -40,6 +40,16 @@
     UIView *_view;
     CGFloat _opacity;
     WXVisibility  _visibility;
+    WXBoxShadow *_originalBoxShadow;
+    WXBoxShadow *_lastBoxShadow;
+    WXBoxShadow *_boxShadow;
+    
+    /**
+     * accessibility support
+     */
+    UIAccessibilityTraits _role; //accessibility
+    NSString * _ariaLabel; //accessibilityLabel
+    BOOL _ariaHidden; // accessibilityElementsHidden
     
     /**
      *  PseudoClass
@@ -184,4 +194,9 @@
 - (void)_updatePseudoClassStyles:(NSString *)key;
 
 - (void)_restoreViewStyles;
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
+
+- (void)setGradientLayer;
+
 @end

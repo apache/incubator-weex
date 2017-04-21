@@ -8,6 +8,7 @@
 
 #ifdef __OBJC__
 
+#import "WXValidateProtocol.h"
 #import "WXUtility.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXType.h"
@@ -43,6 +44,7 @@
 #import "WXBaseViewController.h"
 #import "WXAppMonitorProtocol.h"
 #import "WXAppConfiguration.h"
+#import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
 #import "Layout.h"
 

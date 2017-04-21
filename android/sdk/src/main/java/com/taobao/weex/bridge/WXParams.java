@@ -141,6 +141,7 @@ public class WXParams {
   private String deviceHeight;
   private String shouldInfoCollect;
   private String logLevel;
+  private String needInitV8;
 
   private Map<String, String> options;
 
@@ -237,5 +238,17 @@ public class WXParams {
 
   public void setLogLevel(String logLevel) {
     this.logLevel = logLevel;
+  }
+
+  public String getNeedInitV8() {
+    return this.needInitV8;
+  }
+
+  public void setNeedInitV8(boolean need) {
+    if (need) {
+      this.needInitV8 = "1";
+    } else {
+      this.needInitV8 = "0";
+    }
   }
 }

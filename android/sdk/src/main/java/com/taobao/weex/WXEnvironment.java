@@ -219,6 +219,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.WXUtils;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -409,6 +410,23 @@ public class WXEnvironment {
       cachePath = context.getCacheDir().getPath();
     }
     return cachePath;
+  }
+
+  public static String getFilesDir(Context context) {
+    if (context == null) {
+      return "";
+    }
+    File filesDir = context.getFilesDir();
+    String path = "";
+    if (filesDir != null) {
+      path = filesDir.getPath();
+    } else {
+      path = WXEnvironment.getApplication().getApplicationInfo().dataDir;
+      path += File.separator;
+      path += "files";
+    }
+
+    return path;
   }
 
 }

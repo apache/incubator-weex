@@ -411,8 +411,7 @@ public class WXAnimationBean {
           }
         }
       }
-      return parsePivot(Arrays.asList(WXAnimationBean.Style.CENTER,
-                                      WXAnimationBean.Style.CENTER), width, height,viewportW);
+      return null;
     }
 
     private static Pair<Float, Float> parsePivot(@NonNull List<String> list, int width, int height,int viewportW) {
@@ -469,7 +468,7 @@ public class WXAnimationBean {
       return defaultMap;
     }
 
-    public Pair<Float, Float> getPivot() {
+    public @Nullable Pair<Float, Float> getPivot() {
       return pivot;
     }
 

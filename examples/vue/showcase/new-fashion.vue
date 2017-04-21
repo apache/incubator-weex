@@ -19,7 +19,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .content {
     color: #353535;
     background-color: #666;
