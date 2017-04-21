@@ -34,7 +34,7 @@ const noUnitsNumberKeys = [
  * remove comments from a cssText.
  */
 export function trimComment (cssText: string): string {
-  return cssText.replace(/(?:\/\*).*\*\//g, '')
+  return cssText.replace(/(?:\/\*)[\s\S]*\*\//g, '')
 }
 
 let support: boolean | null = null
