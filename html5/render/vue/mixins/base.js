@@ -18,8 +18,7 @@
  */
 import {
   getThrottleLazyload,
-  watchAppear,
-  toCSSText
+  watchAppear
 } from '../utils'
 
 import {
@@ -33,7 +32,7 @@ import {
   tagEnd
 } from '../utils/perf'
 
-import { extractComponentStyle } from '../core'
+// import { extractComponentStyle } from '../core'
 
 const scrollableTypes = ['scroller', 'list']
 
@@ -89,19 +88,10 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
-    function remergeStyle (vm) {
-      const style = extractComponentStyle(vm)
-      const el = vm.$el
-      if (style && el && el.nodeType !== 8) {
-        vm.$el.style.cssText = toCSSText(style)
-      }
-    }
     const children = this.$children
     if (children) {
       children.forEach((childVm) => {
-        this.$nextTick(function () {
-          remergeStyle(childVm)
-        })
+        childVm._watcher.run()
       })
     }
     watchAppear(this)
