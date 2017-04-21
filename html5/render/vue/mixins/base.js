@@ -89,12 +89,20 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
-    if (this.$vnode && this.$vnode.data) {
-      const style = extractComponentStyle(this)
-      const el = this.$el
+    function remergeStyle (vm) {
+      const style = extractComponentStyle(vm)
+      const el = vm.$el
       if (style && el && el.nodeType !== 8) {
-        this.$el.style.cssText += toCSSText(style)
+        vm.$el.style.cssText += toCSSText(style)
       }
+    }
+    const children = this.$children
+    if (children) {
+      children.forEach((childVm) => {
+        this.$nextTick(function () {
+          remergeStyle(childVm)
+        })
+      })
     }
     watchAppear(this)
   },
