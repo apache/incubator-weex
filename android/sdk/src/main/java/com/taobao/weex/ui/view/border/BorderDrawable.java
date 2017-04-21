@@ -450,9 +450,13 @@ public class BorderDrawable extends Drawable {
     invalidateSelf();
   }
 
-  public void setImage(Shader shader){
-    mShader=shader;
+  public void setImage(Shader shader) {
+    mShader = shader;
     invalidateSelf();
+  }
+
+  public boolean hasImage(){
+    return mShader!=null;
   }
 
   public boolean isRounded() {
@@ -629,7 +633,6 @@ public class BorderDrawable extends Drawable {
     Shader shader = borderStyle.getLineShader(borderWidth, color, side);
     mPaint.setShader(shader);
     mPaint.setColor(color);
-    mPaint.setStrokeWidth(borderWidth);
     mPaint.setStrokeCap(Paint.Cap.ROUND);
   }
 }

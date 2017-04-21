@@ -14,7 +14,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .tip {
     padding-left: 36px;
     padding-right: 36px;

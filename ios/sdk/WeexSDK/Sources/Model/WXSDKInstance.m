@@ -26,6 +26,7 @@
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXValidateProtocol.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -125,6 +126,8 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
@@ -439,7 +442,11 @@ typedef enum : NSUInteger {
         //had not registered yet
         observer = [NSMutableDictionary new];
         [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
-        [_moduleEventObservers addEntriesFromDictionary:observer];
+        if (_moduleEventObservers[moduleClassName]) { //support multi event
+            [_moduleEventObservers[moduleClassName] addEntriesFromDictionary:observer[moduleClassName]];
+        }else {
+            [_moduleEventObservers addEntriesFromDictionary:observer];
+        }
     } else {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];

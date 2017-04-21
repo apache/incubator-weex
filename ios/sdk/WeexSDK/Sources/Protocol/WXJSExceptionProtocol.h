@@ -8,14 +8,14 @@
 
 #import "WXJSExceptionInfo.h"
 
-@protocol WXJSExceptionProtocol<NSObject>
+@protocol WXJSExceptionProtocol <NSObject>
 
 /**
  * report js exception
  *
- * @param exception {@link WXJSException}
+ * @param exception WXJSExceptionInfo
  */
 
-- (void)onJSException:(WXJSExceptionInfo *)exception;
+- (void)onJSException:(WXJSExceptionInfo*) exception;
 
 @end

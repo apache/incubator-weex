@@ -94,6 +94,6 @@ your/we/path/`demo/test.we` 可以通过http://lcoalhost:8088/weex/demo/index.js
 ![debugger-breakpoint](https://img.alicdn.com/tps/TB1_trbKFXXXXc0XVXXXXXXXXXX-2880-1800.png)
 #### 集成devtools
 - Android
-  - 请参考文档 [Weex devtools (Android)](https://github.com/alibaba/weex/blob/dev/android/inspector/README.md), 其中有详细说明。
+  - 请参考文档 [Weex devtools (Android)](../advanced/integrate-devtools-to-android.html), 其中有详细说明。
 - IOS
-  - 请参考文档 [Weex devtools (IOS)](https://github.com/alibaba/weex/blob/dev/ios/WXDevtool/README.md), 其中有详细说明。
+  - 请参考文档 [Weex devtools (IOS)](../advanced/integrate-devtools-to-ios.html), 其中有详细说明。

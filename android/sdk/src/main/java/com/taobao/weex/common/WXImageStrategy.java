@@ -221,7 +221,7 @@ public class WXImageStrategy {
   public boolean isSharpen;
 
   /**
-   * The blur radius of the image. [0,10],0 means no blur.
+   * The blur radius of the image. 0 means no blur.
    * */
   public int blurRadius;
 

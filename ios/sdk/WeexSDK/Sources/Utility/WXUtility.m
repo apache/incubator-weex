@@ -342,13 +342,22 @@ static BOOL WXNotStat;
         if ([self isFileExist:fpath]) {
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
-            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
-            CFRelease(fontURL);
-            CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
-            CGDataProviderRelease(fontDataProvider);
-            CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
-            CFRelease(graphicFont);
-            font = (__bridge_transfer UIFont*)smallFont;
+            if (fontURL) {
+                CFErrorRef error = nil;
+                CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                if (error) {
+                    CFRelease(error);
+                    error = nil;
+                    CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                }
+                NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+                // length of descriptors here will be only one.
+                for (UIFontDescriptor *desc in descriptors) {
+                    font = [UIFont fontWithDescriptor:desc size:fontSize];
+                }
+                CFRelease(fontURL);
+            }
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -394,7 +403,7 @@ static BOOL WXNotStat;
         if ([url isFileURL]) {
             // local file url
             NSError * error = nil;
-            if (![WXUtility isFileExist:url.absoluteString]) {
+            if (![WXUtility isFileExist:url.path]) {
                 error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
             }
             completionBlock(url, error);
@@ -432,7 +441,6 @@ static BOOL WXNotStat;
 
 + (BOOL)isFileExist:(NSString *)filePath
 {
-    
     return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 

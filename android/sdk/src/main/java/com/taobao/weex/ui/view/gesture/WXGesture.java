@@ -559,8 +559,8 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     globalEventOffset.set((int) eventX, (int) eventY);
     component.getRealView().getGlobalVisibleRect(globalRect, globalOffset);
     globalEventOffset.offset(globalOffset.x, globalOffset.y);
-    return new PointF(WXViewUtils.getWebPxByWidth(globalEventOffset.x,component.getInstance().getViewPortWidth()),
-                      WXViewUtils.getWebPxByWidth(globalEventOffset.y,component.getInstance().getViewPortWidth()));
+    return new PointF(WXViewUtils.getWebPxByWidth(globalEventOffset.x,component.getInstance().getInstanceViewPortWidth()),
+                      WXViewUtils.getWebPxByWidth(globalEventOffset.y,component.getInstance().getInstanceViewPortWidth()));
   }
 
   /**
@@ -605,8 +605,8 @@ public class WXGesture extends GestureDetector.SimpleOnGestureListener implement
     locLeftTop.set(0, 0);
     component.computeVisiblePointInViewCoordinate(locLeftTop);
     locEventOffset.offset(locLeftTop.x, locLeftTop.y);
-    return new PointF(WXViewUtils.getWebPxByWidth(locEventOffset.x,component.getInstance().getViewPortWidth()),
-                      WXViewUtils.getWebPxByWidth(locEventOffset.y,component.getInstance().getViewPortWidth()));
+    return new PointF(WXViewUtils.getWebPxByWidth(locEventOffset.x,component.getInstance().getInstanceViewPortWidth()),
+                      WXViewUtils.getWebPxByWidth(locEventOffset.y,component.getInstance().getInstanceViewPortWidth()));
   }
 
   private static class GestureHandler extends android.os.Handler {
