@@ -20,10 +20,15 @@ import { camelToKebab, appendCss, isArray } from '../utils'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
-  if (vnode.weexType === 'scroller' || vnode.weexType === 'list') {
-    return vnode
+  const vm = vnode.$el
+    ? vnode : vnode.elm
+    ? vnode.componentInstance || vnode.context : null
+  if (!vm) return null
+  const type = vm.$el && vm.$el.getAttribute('weex-type')
+  if (type === 'scroller' || type === 'list') {
+    return vm
   }
-  return getParentScroller(vnode.$parent)
+  return getParentScroller(vm.$parent)
 }
 
 function now () {
@@ -78,7 +83,7 @@ function ease (k) {
 export default {
   /**
    * scrollToElement
-   * @param  {String} vnode
+   * @param  {Vnode | VComponent} vnode
    * @param  {Object} options {offset:Number}
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
@@ -95,7 +100,7 @@ export default {
 
     const isWindow = !scroller
     const ct = isWindow ? document.body : scroller.$el
-    const el = vnode.$el
+    const el = vnode.$el || vnode.elm
 
     if (ct && el) {
       // if it's a list, then the listVnode.scrollDirection is undefined. just

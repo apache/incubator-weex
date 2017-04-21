@@ -17,8 +17,6 @@
  * under the License.
  */
 
-/* global Vue */
-
 import './wx-env'
 import * as utils from '../utils'
 
@@ -96,7 +94,7 @@ const weex = {
 ; ['on', 'once', 'off', 'emit'].forEach(function (method) {
   weex[method] = function (...args) {
     if (!this._vue) {
-      this._vue = new Vue()
+      this._vue = new this.__vue__()
     }
     return this._vue[`$${method}`](...args)
   }

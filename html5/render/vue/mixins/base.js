@@ -93,7 +93,7 @@ export default {
       const style = extractComponentStyle(vm)
       const el = vm.$el
       if (style && el && el.nodeType !== 8) {
-        vm.$el.style.cssText += toCSSText(style)
+        vm.$el.style.cssText = toCSSText(style)
       }
     }
     const children = this.$children
