@@ -220,8 +220,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
     WXComponent *component = [self _buildComponentForData:componentData];
-    
-    index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    if (!supercomponent.subcomponents) {
+        index = 0;
+    } else {
+        index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    }
     
     [supercomponent _insertSubcomponent:component atIndex:index];
     // use _lazyCreateView to forbid component like cell's view creating
