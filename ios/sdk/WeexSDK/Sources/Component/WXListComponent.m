@@ -276,15 +276,16 @@
         }
         
         [self.weexInstance.componentManager _addUITask:^{
-            WXLogDebug(@"Insert section:%ld", insertIndex);
-            [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
-            if (completedReloadSection) {
-                WXLogDebug(@"Reload section:%ld", insertIndex - 1);
-                _completedSections[insertIndex - 1] = completedReloadSection;
-            }
+            WXLogDebug(@"Insert section:%ld", (unsigned long)insertIndex);
             
             [UIView performWithoutAnimation:^{
                 [_tableView beginUpdates];
+                
+                [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
+                if (completedReloadSection) {
+                    WXLogDebug(@"Reload section:%u", insertIndex - 1);
+                    _completedSections[insertIndex - 1] = completedReloadSection;
+                }
                 
                 [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
                 
