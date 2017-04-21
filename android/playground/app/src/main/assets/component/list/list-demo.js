@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "f49cbcb21d54f4a3a48fecc9429d1df2"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};

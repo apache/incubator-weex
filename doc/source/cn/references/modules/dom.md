@@ -11,7 +11,7 @@ version: 2.1
 
 这部分API是通过把 virtual-dom 的消息发送到 native 渲染器来做到的。
 
-开发者在日常开发中，唯一可在 `.we` 文件中使用的是 `scrollToElement`。
+开发者在日常开发中，唯一可在 `.vue` 文件中使用的是 `scrollToElement`。
 ~~你也可以调用 `$scrollTo` 方法来使用它~~
 
 这个页面提及的其他的 API，只在 `callNative` 进程中的 native 渲染器用。
@@ -30,7 +30,7 @@ version: 2.1
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
   - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
-
+ - `animated {bool}`：设置是否有滚动动画，默认是 true
 #### 示例
 
 ```html
@@ -144,8 +144,8 @@ version: 2.1
 
 ```html
 <template>
-  <div class="wrapper">
-    <div ref="box" class="box">
+  <div class="wrapper" style='margin-top:200px'>
+    <div ref="box"  class="box">
       <text class="info">Width: {{size.width}}</text>
       <text class="info">Height: {{size.height}}</text>
       <text class="info">Top: {{size.top}}</text>
@@ -153,11 +153,26 @@ version: 2.1
       <text class="info">Left: {{size.left}}</text>
       <text class="info">Right: {{size.right}}</text>
     </div>
+    
+    <text class="info btn"  @click='click()'>{{this.tip}}</text>
+      
   </div>
-</template>
+</template> 
 
 <script>
   const dom = weex.requireModule('dom')
+  
+ function round(size) {
+      var roundSize = {
+        'width': Math.round(size.width),
+        'height': Math.round(size.height),
+        'top': Math.round(size.top),
+        'bottom': Math.round(size.bottom),
+        'left': Math.round(size.left),
+        'right': Math.round(size.right)
+      }
+      return roundSize
+  }
 
   export default {
     data () {
@@ -169,26 +184,60 @@ version: 2.1
           bottom: 0,
           left: 0,
           right: 0
-        }
+        },
+        ref:"viewport",
+        tip:"get box rect"
       }
     },
     mounted () {
-      const result = dom.getComponentRect(this.$refs.box, option => {
+      const result = dom.getComponentRect(this.ref, option => {
         console.log('getComponentRect:', option)
-        this.size = option.size
+        this.size = round.call(this,option.size);
       })
-      console.log('return value:', result)
-      console.log('viewport:', dom.getComponentRect('viewport'))
+    },
+    
+    methods:{
+      click:function() {
+        if (this.ref === 'viewport') {
+          this.ref = this.$refs.box;
+          this.tip = "get viewport rect"
+        } else {
+          this.ref = 'viewport'
+          this.tip = "get box rect"
+        }
+          
+         const result = dom.getComponentRect(this.ref, option => {
+          console.log('getComponentRect:', option)
+          this.size = round.call(this,option.size);
+        })
+      }
     }
+    
   }
 </script>
 
 <style scoped>
+  .btn {
+    margin-top:20px;
+    border-width:2px;
+    border-style: solid;
+    border-radius:10px;
+    width:300px;
+    margin-left:170px;
+    padding-left:35px;
+    border-color: rgb(162, 217, 192);
+    
+  }
+  .btn:active {
+    background-color: #8fbc8f;
+		border-color: gray;
+  }
+  
   .box {
-    margin-top: 200px;
+    align-items:center;
     margin-left: 150px;
-    width: 450px;
-    height: 450px;
+    width: 350px;
+    height: 400px;
     background-color: #DDD;
     border-width: 2px;
     border-style: solid;
@@ -197,13 +246,15 @@ version: 2.1
   }
   .info {
     font-size: 40px;
+    top:30px;
+    margin-left:20px;
     font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
     color: #41B883;
   }
 </style>
 ```
 
-[try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
+[try it](http://dotwe.org/vue/d069a9bf0f0781b914f12a9a7b9a1447)
 
 ## 其他
 

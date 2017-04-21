@@ -9,22 +9,16 @@ var util = require("./util.js");
 
 describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
-      .get('wxpage://' + util.getDeviceHost() +'/dom-operation.js')
+    return util.init(driver)
+      .get(util.getPage('/dom-operation.js'))
       .waitForElementByXPath('//div/text[2]',util.getGETActionWaitTimeMills(),1000);
   });
 
   after(function () {
-      return driver
-      .sleep(1000)
-      .quit()
+      return util.quit(driver)
   })
 
   it('#1 Repeat', ()=>{
@@ -67,6 +61,15 @@ describe('weex mobile index', function () {
     .then((noexist)=>{
         assert.equal(noexist,undefined)
     })
+  })
+
+  it('#3 Update DOM attr', ()=>{
+      return driver
+      .elementByXPath("//div/text[3]")
+      .text()
+      .then((text)=>{
+          assert.equal("finished",text);
+      })
   })
 
   

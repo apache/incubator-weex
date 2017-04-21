@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXSliderComponent.h"
@@ -39,6 +50,7 @@
 - (void)insertItemView:(UIView *)view atIndex:(NSInteger)index;
 - (void)removeItemView:(UIView *)view;
 - (void)scroll2ItemView:(NSInteger)index animated:(BOOL)animated;
+- (void)layoutItemViews;
 - (void)loadData;
 
 @end
@@ -72,7 +84,7 @@
     if (_scrollView) {
         _scrollView.delegate = nil;
     }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void)setIndicator:(WXIndicatorView *)indicator
@@ -157,6 +169,11 @@
     }
 }
 
+- (void)layoutItemViews {
+    [self _resortItemViews];
+    [self _resetItemFrames];
+}
+
 - (void)loadData
 {
     self.scrollView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
@@ -168,8 +185,7 @@
 #pragma mark Private Methods
 
 - (void)_configSubViews {
-    [self _resortItemViews];
-    [self _resetItemFrames];
+    [self layoutItemViews];
     [self _scroll2Center];
     [self _resetItemCountLessThanOrEqualToTwo];
     [self setNeedsLayout];
@@ -233,7 +249,8 @@
 {
     if (self.itemViews.count > 2) {
         UIView *itemView = [self.itemViews objectAtIndex:[self _centerItemIndex]];
-        [self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        //[self.scrollView scrollRectToVisible:itemView.frame animated:NO];
+        [self.scrollView setContentOffset:CGPointMake(itemView.frame.origin.x, itemView.frame.origin.y) animated:NO];
     }
 }
 
@@ -291,9 +308,9 @@
     if (self.delegate && [self.delegate respondsToSelector:@selector(sliderView:sliderViewDidScroll:)]) {
         [self.delegate sliderView:self sliderViewDidScroll:self.scrollView];
     }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];
     //ensure that the end of scroll is fired.
-    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
+    //[self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -321,7 +338,7 @@
 
 @end
 
-@interface WXSliderComponent ()<WXSliderViewDelegate>
+@interface WXSliderComponent () <WXSliderViewDelegate,WXIndicatorComponentDelegate>
 
 @property (nonatomic, strong) WXSliderView *sliderView;
 @property (nonatomic, strong) NSTimer *autoTimer;
@@ -334,8 +351,7 @@
 @property (nonatomic, assign) BOOL  sliderChangeEvent;
 @property (nonatomic, assign) BOOL  sliderScrollEvent;
 @property (nonatomic, assign) BOOL  sliderScrollStartEvent;
-@property (nonatomic, assign) BOOL  sliderScrollStopEvent;
-@property (nonatomic, assign) BOOL  sliderScrollCancelEvent;
+@property (nonatomic, assign) BOOL  sliderScrollEndEvent;
 @property (nonatomic, assign) BOOL  sliderStartEventFired;
 @property (nonatomic, strong) NSMutableArray *childrenView;
 @property (nonatomic, assign) BOOL scrollable;
@@ -437,6 +453,7 @@
         
         WXSliderView *sliderView = (WXSliderView *)self.view;
         if ([view isKindOfClass:[WXIndicatorView class]]) {
+            ((WXIndicatorComponent *)subcomponent).delegate = self;
             [sliderView addSubview:view];
             return;
         }
@@ -499,7 +516,8 @@
         _index = [attributes[@"index"] integerValue];
         
         self.currentIndex = _index;
-        [_sliderView scroll2ItemView:self.currentIndex animated:YES];
+        self.sliderView.currentIndex = _index;
+        [self.sliderView layoutItemViews];
     }
     
     if (attributes[@"scrollable"]) {
@@ -523,11 +541,8 @@
     if ([eventName isEqualToString:@"scrollstart"]) {
         _sliderScrollStartEvent = YES;
     }
-    if ([eventName isEqualToString:@"scrollstop"]) {
-        _sliderScrollStopEvent = YES;
-    }
-    if ([eventName isEqualToString:@"dragcancel"]) {
-        _sliderScrollCancelEvent = YES;
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _sliderScrollEndEvent = YES;
     }
 }
 
@@ -542,15 +557,12 @@
     if ([eventName isEqualToString:@"scrollstart"]) {
         _sliderScrollStartEvent = NO;
     }
-    if ([eventName isEqualToString:@"scrollstop"]) {
-        _sliderScrollStopEvent = NO;
-    }
-    if ([eventName isEqualToString:@"dragcancel"]) {
-        _sliderScrollCancelEvent = NO;
+    if ([eventName isEqualToString:@"scrollend"]) {
+        _sliderScrollEndEvent = NO;
     }
 }
 
-#pragma mark Public Methods
+#pragma mark WXIndicatorComponentDelegate Methods
 
 -(void)setIndicatorView:(WXIndicatorView *)indicatorView
 {
@@ -635,17 +647,10 @@
 
 - (void)sliderView:(WXSliderView *)sliderView scrollViewDidStopScroll:(UIScrollView *)scrollView
 {
-    if (_sliderScrollStopEvent) {
-        [self fireEvent:@"scrollstop" params:nil domChanges:nil];
+    if (_sliderScrollEndEvent) {
+        [self fireEvent:@"scrollend" params:nil domChanges:nil];
     }
     _sliderStartEventFired = NO;
-}
-
-- (void)sliderView:(WXSliderView *)sliderView scrollViewDidCancelDraging:(UIScrollView *)scrollView
-{
-    if (_sliderScrollCancelEvent) {
-        [self fireEvent:@"dragcancel" params:nil domChanges:nil];
-    }
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -657,13 +662,6 @@
 {
     if (_autoPlay) {
         [self _startAutoPlayTimer];
-    }
-    //DidEndDragging and index is not changed mean that cancel dragging
-    CGFloat width = scrollView.frame.size.width;
-    CGFloat XDeviation = scrollView.frame.origin.x - (scrollView.contentOffset.x - width);
-    CGFloat offsetXRatio = (XDeviation / width);
-    if (fabs(offsetXRatio) < 0.5) {
-        [self sliderView:self.sliderView scrollViewDidCancelDraging:self.sliderView.scrollView];
     }
 }
 

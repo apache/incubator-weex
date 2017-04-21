@@ -11,7 +11,8 @@ function buildAndroid {
 }
 function runAndroid {
     buildAndroid
-    platform=android macaca run -d $1
+    macaca server &
+    platform=android ./node_modules/mocha/bin/mocha  $1 -f '@ignore-android' -i --recursive --bail
 }
 
 function buildiOS {
@@ -40,11 +41,18 @@ function runiOS {
     echo 'killAll Simulator......'
     killAll Simulator || echo 'killall failed'
     # ps -ef
-    platform=ios macaca run -d $1
+    macaca server &
+    platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail
+}
+
+function runWeb {
+    echo 'run web'
+    macaca server &
+    browser=chrome ./node_modules/mocha/bin/mocha  $1 -f '@ignore-web' -i --recursive --bail
 }
 
 platform_android='android'
- platform=${1:-$platform_android}
+platform=${1:-$platform_android}
  
  #get test folder
  
@@ -53,6 +61,9 @@ platform_android='android'
  #run tests
  if [ $platform = $platform_android ]; then
      runAndroid ./test/scripts/
+ elif [ $platform = 'web' ]; 
+ then
+    runWeb ./test/scripts/
  else
      runiOS ./test/scripts/
  fi

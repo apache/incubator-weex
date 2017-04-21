@@ -9,22 +9,16 @@ var util = require("../util.js");
 
 describe('list scroll event', function () {
   this.timeout(util.getTimeoutMills());
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
-      .get('wxpage://' + util.getDeviceHost() +'/list-scroll.js')
+    return util.init(driver)
+      .get(util.getPage('/list-scroll.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
-      return driver
-      .sleep(1000)
-      .quit()
+      return util.quit(driver);
   })
 
 
@@ -57,22 +51,16 @@ describe('list scroll event', function () {
 
 describe('scroller scroll event', function () {
   this.timeout(util.getTimeoutMills());
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
-      .get('wxpage://' + util.getDeviceHost() +'/scroller-scroll.js')
+    return util.init(driver)
+      .get(util.getPage('/scroller-scroll.js'))
       .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
-      return driver
-      .sleep(1000)
-      .quit()
+      return util.quit(driver)
   })
 
 
@@ -90,3 +78,5 @@ describe('scroller scroll event', function () {
     })
   })
 });
+
+

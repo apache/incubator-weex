@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXJSCoreBridge.h"
@@ -21,6 +32,8 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "WXPolyfillSet.h"
 #import "JSValue+Weex.h"
+#import "WXJSExceptionProtocol.h"
+#import "WXSDKManager.h"
 
 #import <dlfcn.h>
 
@@ -30,6 +43,7 @@
 @interface WXJSCoreBridge ()
 
 @property (nonatomic, strong)  JSContext *jsContext;
+@property (nonatomic, strong)  NSMutableArray *timers;
 
 @end
 
@@ -44,6 +58,7 @@
         if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             _jsContext.name = @"Weex Context";
         }
+        _timers = [NSMutableArray new];
         
         __weak typeof(self) weakSelf = self;
         
@@ -55,6 +70,15 @@
             [weakSelf performSelector: @selector(triggerTimeout:) withObject:^() {
                 [function callWithArguments:@[]];
             } afterDelay:[timeout toDouble] / 1000];
+        };
+        
+        _jsContext[@"setTimeoutWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg ) {
+            [weakSelf triggerTimeout:[appid toString] ret:[ret toString] arg:[arg toString]];
+        };
+        
+        _jsContext[@"setIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
+            [weakSelf triggerInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+            
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -96,7 +120,13 @@
         _jsContext.exceptionHandler = ^(JSContext *context, JSValue *exception){
             context.exception = exception;
             NSString *message = [NSString stringWithFormat:@"[%@:%@:%@] %@\n%@", exception[@"sourceURL"], exception[@"line"], exception[@"column"], exception, [exception[@"stack"] toObject]];
+            id<WXJSExceptionProtocol> jsExceptionHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXJSExceptionProtocol)];
             
+            WXSDKInstance *instance = [WXSDKEngine topInstance];
+            if ([jsExceptionHandler respondsToSelector:@selector(onJSException:)]) {
+                WXJSExceptionInfo * jsExceptionInfo = [[WXJSExceptionInfo alloc] initWithInstanceId:instance.instanceId bundleUrl:[instance.scriptURL absoluteString] errorCode:@"" functionName:@"" exception:[NSString stringWithFormat:@"%@\n%@",[exception toString], exception[@"stack"]] userInfo:nil];
+                [jsExceptionHandler onJSException:jsExceptionInfo];
+            }
             WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_JS_EXECUTE, message);
         };
         
@@ -222,11 +252,76 @@ typedef void (*WXJSCGarbageCollect)(JSContextRef);
 //    }
 }
 
+#pragma mark - Public
+-(void)removeTimers:(NSString *)instance
+{
+    if(instance && [_timers containsObject:instance])
+    {
+        [_timers removeObject:instance];
+    }
+}
+
 #pragma mark - Private
 
 - (void)triggerTimeout:(void(^)())block
 {
     block();
+}
+
+- (void)callBack:(NSDictionary *)dic
+{
+    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
+    }
+}
+
+
+- (void)callBackInterval:(NSDictionary *)dic
+{
+    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+        [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:nil keepAlive:YES];
+        [self triggerInterval:[dic objectForKey:@"appid"] ret:[dic objectForKey:@"ret"] arg:[dic objectForKey:@"arg"]];
+    }
+    
+}
+
+- (void)triggerTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    
+    double interval = [arg doubleValue]/1000.0f;
+    if(WXFloatEqual(interval,0)) {
+        return;
+    }
+    if(![_timers containsObject:appid]){
+        [_timers addObject:appid];
+    }
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
+    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableDictionary *dic = [NSMutableDictionary new];
+        [dic setObject:appid forKey:@"appid"];
+        [dic setObject:ret forKey:@"ret"];
+        [dic setObject:arg forKey:@"arg"];
+        [self performSelector:@selector(callBack:) withObject:dic ];
+    });
+}
+
+- (void)triggerInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    double interval = [arg doubleValue]/1000.0f;
+    if(WXFloatEqual(interval,0)) {
+        return;
+    }
+    if(![_timers containsObject:appid]){
+        [_timers addObject:appid];
+    }
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
+    dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableDictionary *dic = [NSMutableDictionary new];
+        [dic setObject:appid forKey:@"appid"];
+        [dic setObject:ret forKey:@"ret"];
+        [dic setObject:arg forKey:@"arg"];
+        [self performSelector:@selector(callBackInterval:) withObject:dic ];
+    });
 }
 
 @end

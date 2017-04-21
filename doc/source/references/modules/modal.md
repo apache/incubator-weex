@@ -18,6 +18,8 @@ A toast provides simple feedback about an operation in a small popup. For exampl
 - `options` (object): toast options.
  - `message` (string): the text message that the toast shows.
  - `duration` (number): the duration(seconds) that the toast shows.   
+   - For Android: If the duration is longer than 3, it will use a system defined variable called **LONG**, otherwise it will use another variable called **SHORT**
+   - For iOS: It will show the toast during the specified time.
  
 ### alert(options, callback)    
 

@@ -1,7 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import { extractComponentStyle } from '../../core'
 import LoadingIndicator from './loading-indicator'
 
 export default {
-  // name: 'loading',
   components: { LoadingIndicator },
   props: {
     display: {
@@ -14,19 +32,51 @@ export default {
   },
   data () {
     return {
-      height: 0
+      height: -1,
+      viewHeight: 0
+    }
+  },
+  mounted () {
+    this.viewHeight = this.$el.offsetHeight
+    if (this.display === 'hide') {
+      this.height = 0
+    }
+    else {
+      this.height = this.viewHeight
+    }
+  },
+  updated () {
+  },
+  watch: {
+    height (val) {
+      this.$el.style.height = val * weex.config.env.scale + 'px'
+    },
+    display (val) {
+      if (val === 'hide') {
+        this.height = 0
+      }
+      else {
+        this.height = this.viewHeight
+      }
     }
   },
   methods: {
-    show () {
-      this.$emit('loading')
-      this.height = '1.6rem'
-      this.visibility = 'visible'
+    pulling (offsetY = 0) {
+      this.height = offsetY
     },
-    reset () {
-      this.height = 0
-      this.visibility = 'hidden'
-      this.$emit('loadingfinish')
+    pullingUp (offsetY) {
+      this.$el.style.transition = `height 0s`
+      this.pulling(offsetY)
+    },
+    pullingEnd () {
+      this.$el.style.transition = `height .2s`
+      if (this.height >= this.viewHeight) {
+        this.pulling(this.viewHeight)
+        this.$emit('loading')
+      }
+      else {
+        this.pulling(0)
+      }
     },
     getChildren () {
       const children = this.$slots.default || []
@@ -40,11 +90,12 @@ export default {
     }
   },
   render (createElement) {
+    this.$parent._loading = this
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },
-      style: { height: this.height, visibility: this.visibility },
-      staticClass: 'weex-loading'
+      staticClass: 'weex-loading weex-ct',
+      staticStyle: extractComponentStyle(this)
     }, this.getChildren())
   }
 }

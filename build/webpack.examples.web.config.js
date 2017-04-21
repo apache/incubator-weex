@@ -1,3 +1,8 @@
+/**
+ * you should use vue-loader to pack .vue files for weex-vue-render.
+ * you definitely should use compoilerModules to add $processStyle for weex-vue-render.
+ */
+
 var path = require('path');
 var fs = require('fs-extra');
 var webpack = require('webpack');
@@ -45,9 +50,6 @@ var bannerPlugin = new webpack.BannerPlugin(banner, {
 
 module.exports = {
   entry: entry,
-  // entry: {
-    // 'examples/build/web/vue-bundle': path.resolve('examples/vue', 'entry.js')
-  // },
   output: {
     path: '.',
     filename: '[name].js'
@@ -64,5 +66,20 @@ module.exports = {
       }
     ]
   },
+  // vue: {
+  //   /**
+  //    * important! should use postTransformNode to add $processStyle for
+  //    * inline style prefixing.
+  //    */
+  //   compilerModules: [
+  //     {
+  //       postTransformNode: el => {
+  //         el.staticStyle = `$processStyle(${el.staticStyle})`
+  //         el.styleBinding = `$processStyle(${el.styleBinding})`
+  //       }
+  //     }
+  //   ],
+  //   postcss: [require('autoprefixer')()]
+  // },
   plugins: [bannerPlugin]
 }

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXAnimationModule.h"
@@ -23,6 +34,7 @@
 @property (nonatomic, assign) double duration;
 @property (nonatomic, assign) double delay;
 @property (nonatomic, strong) CAMediaTimingFunction *timingFunction;
+@property (nonatomic, assign) CGPoint originAnchorPoint;
 
 @end
 
@@ -73,6 +85,10 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
+    if (!_animationInfo.target || ![_animationInfo.target isViewLoaded]) {
+        return;
+    }
+    
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
@@ -80,11 +96,34 @@
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
     } else if ([_animationInfo.propertyName isEqualToString:@"opacity"]) {
         _animationInfo.target.view.layer.opacity = [_animationInfo.toValue floatValue];
+    } else if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
+        CGRect newBounds = _animationInfo.target.view.layer.bounds;
+        if ([_animationInfo.propertyName isEqualToString:@"bounds.size.width"]) {
+            newBounds.size = CGSizeMake([_animationInfo.toValue floatValue], newBounds.size.height);
+        }else if ([_animationInfo.propertyName isEqualToString:@"bounds.size.height"]) {
+            newBounds.size = CGSizeMake(newBounds.size.width,[_animationInfo.toValue floatValue]);
+        }
+        _animationInfo.target.view.layer.bounds = newBounds;
     }
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
+    if (!_animationInfo.target) {
+        return;
+    }
+    
+    if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
+        /*
+         * http://ronnqvi.st/about-the-anchorpoint/
+         */
+        //
+        CGRect originFrame = _animationInfo.target.view.layer.frame;
+        _animationInfo.target.view.layer.anchorPoint = _animationInfo.originAnchorPoint;
+        _animationInfo.target.view.layer.frame = originFrame;
+    }
+    [_animationInfo.target.layer removeAllAnimations];
+    
     if (_finishBlock) {
         _finishBlock(flag);
     }
@@ -172,16 +211,16 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             if ((wxTransform.translateX && ![wxTransform.translateX isEqualToLength:oldTransform.translateX]) || (!wxTransform.translateX && oldTransform.translateX)) {
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.translation.x";
-                newInfo.fromValue = @([oldTransform.translateX valueForMaximumValue:view.bounds.size.width]);
-                newInfo.toValue = @([wxTransform.translateX valueForMaximumValue:view.bounds.size.width]);
+                newInfo.fromValue = @([oldTransform.translateX valueForMaximum:view.bounds.size.width]);
+                newInfo.toValue = @([wxTransform.translateX valueForMaximum:view.bounds.size.width]);
                 [infos addObject:newInfo];
             }
             
             if ((wxTransform.translateY && ![wxTransform.translateY isEqualToLength:oldTransform.translateY]) || (!wxTransform.translateY && oldTransform.translateY)) {
                 WXAnimationInfo *newInfo = [info copy];
                 newInfo.propertyName = @"transform.translation.y";
-                newInfo.fromValue = @([oldTransform.translateY valueForMaximumValue:view.bounds.size.height]);
-                newInfo.toValue = @([wxTransform.translateY valueForMaximumValue:view.bounds.size.height]);
+                newInfo.fromValue = @([oldTransform.translateY valueForMaximum:view.bounds.size.height]);
+                newInfo.toValue = @([wxTransform.translateY valueForMaximum:view.bounds.size.height]);
                 [infos addObject:newInfo];
             }
             
@@ -197,18 +236,18 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @([value floatValue]);
             [infos addObject:info];
         } else if ([property isEqualToString:@"width"]) {
-            info.propertyName = @"bounds";
-            info.fromValue = [NSValue valueWithCGRect:layer.bounds];
+            info.propertyName = @"bounds.size.width";
+            info.fromValue = @(layer.bounds.size.width);
             CGRect newBounds = layer.bounds;
             newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
-            info.toValue = [NSValue valueWithCGRect:newBounds];
+            info.toValue = @(newBounds.size.width);
             [infos addObject:info];
         } else if ([property isEqualToString:@"height"]) {
-            info.propertyName = @"bounds";
-            info.fromValue = [NSValue valueWithCGRect:layer.bounds];
+            info.propertyName = @"bounds.size.height";
+            info.fromValue = @(layer.bounds.size.height);
             CGRect newBounds = layer.bounds;
             newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
-            info.toValue = [NSValue valueWithCGRect:newBounds];
+            info.toValue = @(newBounds.size.height);
             [infos addObject:info];
         }
     }
@@ -256,6 +295,16 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     animation.delegate = delegate;
     
     CALayer *layer = info.target.layer;
+    if ([info.propertyName hasPrefix:@"bounds"]) {
+        info.originAnchorPoint = layer.anchorPoint;
+        CGRect originFrame = layer.frame;
+         /*
+          * if anchorPoint changed, the origin of layer's frame will change
+          * http://ronnqvi.st/about-the-anchorpoint/
+         */
+        layer.anchorPoint = CGPointZero;
+        layer.frame = originFrame;
+    }
     [layer addAnimation:animation forKey:info.propertyName];
 }
 

@@ -45,6 +45,7 @@ android {
     }
     sourceSets {
         main {
+            jniLibs.srcDir(['libs'])
             java {
                 srcDirs = ["src/main/java", "src/main/java_zxing"];
             }
@@ -76,6 +77,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'design'
         exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
     })
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.squareup.picasso:picasso:2.5.2'

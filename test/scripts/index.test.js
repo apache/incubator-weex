@@ -9,28 +9,22 @@ var util = require("./util.js");
 
 describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
-  var driver = wd(util.getConfig()).initPromiseChain();
-  driver.configureHttp({
-    timeout: 100000
-  });
+  var driver = util.createDriver(wd);
 
   before(function () {
-    return driver
-      .initDriver()
-      .get('wxpage://' + util.getDeviceHost() +'/index.js')
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000);
+    return util.init(driver)
+      .get(util.getPage('/index.js'))
+      .waitForElementById('title',util.getGETActionWaitTimeMills(),1000);
   });
 
   after(function () {
-      return driver
-      .sleep(1000)
-      .quit()
+      return util.quit(driver);
   })
 
 
   it('#1 Index', () => {
     return driver
-    .elementByXPath('//div/text[1]')
+    .elementById('title')
     .text()
     .then((text)=>{
       assert.equal(text,'hello world.')
@@ -39,9 +33,9 @@ describe('weex mobile index', function () {
 
   it('#2 Click Button', () => {
     return driver
-    .elementByXPath('//div/text[3]')
+    .elementById('button')
     .click()
-    .elementByXPath('//div/text[2]')
+    .elementById('status')
     .text()
     .then((text)=>{
       assert.equal(text,'btn click.')
@@ -50,11 +44,11 @@ describe('weex mobile index', function () {
 
   it('#3 Input Blur', () => {
     return driver
-    .elementByXPath('//div/input')
+    .elementById('input')
     .click()
-    .elementByXPath('//div/text[4]')
+    .elementById('button2')
     .click()
-    .elementByXPath('//div/text[2]')
+    .elementById('status')
     .text()
     .then((text)=>{
       assert.equal(text,'input blur.')

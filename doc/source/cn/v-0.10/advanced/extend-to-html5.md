@@ -77,7 +77,7 @@ export default { init }
 - `appendChild` 在子节点列表的最后加上一个节点.
 - `removeChild` 移除一个子节点.
 
-**进阶**：更多关于组件定制和扩展的细节和代码展示，可以参考 [weex 主仓库的代码](https://github.com/alibaba/weex/tree/dev/html5/browser/extend/components)，这里的组件基本上都是通过上述方式进行定义的。
+**进阶**：更多关于组件定制和扩展的细节和代码展示，可以参考 [weex 主仓库的代码](https://github.com/apache/incubator-weex/tree/dev/html5)，这里的组件基本上都是通过上述方式进行定义的。
 
 重要的一点，注册组件的关键方法是 `Weex.registerComponent`，如示例里的 `weex-hello` 组件的注册：
 

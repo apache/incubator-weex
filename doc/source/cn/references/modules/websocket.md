@@ -13,9 +13,9 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
 
 ## **注意：**
 - iOS和h5提供 WebSockets 的 protocol 默认实现，安卓使用需要提供自定义 adapter 实现，source:  
-  - [DefaultWebSocketAdapter.java](https://github.com/alibaba/weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
-  - [DefaultWebSocketAdapterFactory.java](https://github.com/alibaba/weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
-  - 集成例子参考weex [playground](https://github.com/alibaba/weex/tree/dev/android/playground)
+  - [DefaultWebSocketAdapter.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
+  - [DefaultWebSocketAdapterFactory.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
+  - 集成例子参考weex [playground](https://github.com/apache/incubator-weex/tree/dev/android/playground)
 
 - 只在.we文件支持，不支持vue2.0
 

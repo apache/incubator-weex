@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXTransform.h"
@@ -87,7 +98,7 @@
     }
     
     if (_translateX || _translateY) {
-        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximumValue:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximumValue:view.bounds.size.height] : 0);
+        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximum:view.bounds.size.height] : 0);
     }
     
     nativeTransform = CGAffineTransformScale(nativeTransform, _scaleX, _scaleY);
@@ -131,8 +142,8 @@
           * http://ronnqvi.st/translate-rotate-translate/
           **/
         CGPoint anchorPoint = CGPointMake(
-                                          _originX ? [_originX valueForMaximumValue:view.bounds.size.width] / view.bounds.size.width : 0.5,
-                                          _originY ? [_originY valueForMaximumValue:view.bounds.size.width] / view.bounds.size.height : 0.5);
+                                          _originX ? [_originX valueForMaximum:view.bounds.size.width] / view.bounds.size.width : 0.5,
+                                          _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
     
@@ -220,8 +231,8 @@
         }
     }
     
-    _originX = [WXLength lengthWithValue:originX type:typeX];
-    _originY = [WXLength lengthWithValue:originY type:typeY];
+    _originX = [WXLength lengthWithFloat:originX type:typeX];
+    _originY = [WXLength lengthWithFloat:originY type:typeY];
 }
 
 - (void)parseRotate:(NSArray *)value
@@ -235,20 +246,20 @@
     WXLength *translateX;
     double x = [value[0] doubleValue];
     if ([value[0] hasSuffix:@"%"]) {
-        translateX = [WXLength lengthWithValue:x type:WXLengthTypePercent];
+        translateX = [WXLength lengthWithFloat:x type:WXLengthTypePercent];
     } else {
         x = WXPixelScale(x, self.weexInstance.pixelScaleFactor);
-        translateX = [WXLength lengthWithValue:x type:WXLengthTypeFixed];
+        translateX = [WXLength lengthWithFloat:x type:WXLengthTypeFixed];
     }
 
     WXLength *translateY;
     if (value.count > 1) {
         double y = [value[1] doubleValue];
         if ([value[1] hasSuffix:@"%"]) {
-            translateY = [WXLength lengthWithValue:y type:WXLengthTypePercent];
+            translateY = [WXLength lengthWithFloat:y type:WXLengthTypePercent];
         } else {
             y = WXPixelScale(y, self.weexInstance.pixelScaleFactor);
-            translateY = [WXLength lengthWithValue:y type:WXLengthTypeFixed];
+            translateY = [WXLength lengthWithFloat:y type:WXLengthTypeFixed];
         }
     }
     

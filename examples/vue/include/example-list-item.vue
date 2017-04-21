@@ -4,7 +4,7 @@
   </list-item>
 </template>
 
-<style>
+<style scoped>
   .item-txt {
     font-size: 48px;
     color: #555;

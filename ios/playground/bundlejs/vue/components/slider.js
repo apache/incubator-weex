@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(432)
+	__vue_styles__.push(__webpack_require__(450)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(433)
+	__vue_exports__ = __webpack_require__(451)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(442)
+	var __vue_template__ = __webpack_require__(460)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/slider.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/slider.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-5e494ae2"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,21 +91,21 @@
 
 /***/ },
 
-/***/ 381:
+/***/ 399:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(382)
+	__vue_styles__.push(__webpack_require__(400)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(383)
+	__vue_exports__ = __webpack_require__(401)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(384)
+	var __vue_template__ = __webpack_require__(402)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,22 +117,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-46407d45"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 382:
+/***/ 400:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -182,7 +190,7 @@
 
 /***/ },
 
-/***/ 383:
+/***/ 401:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -227,16 +235,16 @@
 
 /***/ },
 
-/***/ 384:
+/***/ 402:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -244,7 +252,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -252,13 +260,13 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 432:
+/***/ 450:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -283,7 +291,7 @@
 
 /***/ },
 
-/***/ 433:
+/***/ 451:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -459,8 +467,8 @@
 	    };
 	  },
 	  components: {
-	    panel: __webpack_require__(381),
-	    sliderPage: __webpack_require__(434)
+	    panel: __webpack_require__(399),
+	    sliderPage: __webpack_require__(452)
 	  },
 	  methods: {
 	    togglePlay: function togglePlay() {
@@ -487,21 +495,21 @@
 
 /***/ },
 
-/***/ 434:
+/***/ 452:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(435)
+	__vue_styles__.push(__webpack_require__(453)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(436)
+	__vue_exports__ = __webpack_require__(454)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(441)
+	var __vue_template__ = __webpack_require__(459)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -513,22 +521,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/slider-page.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/slider-page.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-8d84a608"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 435:
+/***/ 453:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -542,7 +554,7 @@
 
 /***/ },
 
-/***/ 436:
+/***/ 454:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -569,27 +581,27 @@
 	    items: { default: [] }
 	  },
 	  components: {
-	    sliderItem: __webpack_require__(437)
+	    sliderItem: __webpack_require__(455)
 	  }
 	};
 
 /***/ },
 
-/***/ 437:
+/***/ 455:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(438)
+	__vue_styles__.push(__webpack_require__(456)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(439)
+	__vue_exports__ = __webpack_require__(457)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(440)
+	var __vue_template__ = __webpack_require__(458)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -601,22 +613,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/slider-item.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/slider-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-679a3900"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 438:
+/***/ 456:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -628,7 +644,7 @@
 
 /***/ },
 
-/***/ 439:
+/***/ 457:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -647,11 +663,11 @@
 
 /***/ },
 
-/***/ 440:
+/***/ 458:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('image', {
+	  return _c('image', {
 	    staticClass: ["slider-item"],
 	    attrs: {
 	      "src": _vm.image
@@ -662,236 +678,17 @@
 
 /***/ },
 
-/***/ 441:
+/***/ 459:
 /***/ function(module, exports) {
 
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
-	    staticClass: ["slider-page"]
-	  }, [_vm._l((_vm.items), function(v) {
-	    return _h('slider-item', {
-	      attrs: {
-	        "image": v.image,
-	        "link": v.link
-	      }
-	    })
-	  })])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
+	module.exports={render:function(){},staticRenderFns:[]}
 
 /***/ },
 
-/***/ 442:
+/***/ 460:
 /***/ function(module, exports) {
 
-	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', {
-	    staticClass: ["body"]
-	  }, [_h('panel', {
-	    attrs: {
-	      "title": "auto-play",
-	      "type": "primary"
-	    }
-	  }, [_h('panel', {
-	    attrs: {
-	      "title": "auto-play = false",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[1].interval,
-	      "autoPlay": "false"
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"]
-	  }), _vm._l((_vm.sliders[1].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "auto-play = true",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[0].interval,
-	      "autoPlay": _vm.sliders[0].autoPlay
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"]
-	  }), _vm._l((_vm.sliders[0].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])])]), _h('panel', {
-	    attrs: {
-	      "title": 'Event, ' + _vm.eventCnt + ' change',
-	      "type": "primary"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[0].interval,
-	      "autoPlay": _vm.sliders[0].autoPlay
-	    },
-	    on: {
-	      "change": _vm.handleSliderChange
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"]
-	  }), _vm._l((_vm.sliders[0].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "Indicator",
-	      "type": "primary"
-	    }
-	  }, [_h('panel', {
-	    attrs: {
-	      "title": "default style",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[0].interval,
-	      "autoPlay": _vm.sliders[0].autoPlay
-	    },
-	    on: {
-	      "change": _vm.handleSliderChange
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"]
-	  }), _vm._l((_vm.sliders[0].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "width & height",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[0].interval,
-	      "autoPlay": _vm.sliders[0].autoPlay
-	    }
-	  }, [_h('indicator', {
-	    staticStyle: {
-	      itemColor: "#dddddd",
-	      width: "714",
-	      height: "460"
-	    }
-	  }), _vm._l((_vm.sliders[0].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "left & top",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[1].interval,
-	      "autoPlay": _vm.sliders[1].autoPlay
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"],
-	    staticStyle: {
-	      top: "-140",
-	      left: "-240"
-	    }
-	  }), _vm._l((_vm.sliders[1].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "itemColor & itemSelectedColor",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[2].interval,
-	      "autoPlay": _vm.sliders[2].autoPlay
-	    }
-	  }, [_h('indicator', {
-	    staticClass: ["indicator"],
-	    staticStyle: {
-	      itemSelectedColor: "rgb(217, 83, 79)"
-	    }
-	  }), _vm._l((_vm.sliders[2].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])]), _h('panel', {
-	    attrs: {
-	      "title": "itemSize",
-	      "padding-body": "0"
-	    }
-	  }, [_h('slider', {
-	    staticClass: ["slider"],
-	    appendAsTree: true,
-	    attrs: {
-	      "append": "tree",
-	      "interval": _vm.sliders[1].interval,
-	      "autoPlay": _vm.sliders[1].autoPlay
-	    }
-	  }, [_h('indicator', {
-	    staticStyle: {
-	      itemColor: "#dddddd",
-	      itemSize: "40",
-	      top: "140",
-	      left: "180",
-	      width: "700",
-	      height: "380"
-	    }
-	  }), _vm._l((_vm.sliders[1].sliderPages), function(v) {
-	    return _h('slider-page', {
-	      attrs: {
-	        "items": v.items
-	      }
-	    })
-	  })])])])])
-	},staticRenderFns: []}
-	module.exports.render._withStripped = true
+	module.exports={render:function(){},staticRenderFns:[]}
 
 /***/ }
 

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXSDKInstance.h"
@@ -26,6 +37,7 @@
 #import "WXResourceResponse.h"
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
+#import "WXValidateProtocol.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -125,6 +137,8 @@ typedef enum : NSUInteger {
         WXLogError(@"Url must be passed if you use renderWithURL");
         return;
     }
+    
+    self.needValidate = [[WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)] needValidate:url];
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
@@ -290,6 +304,9 @@ typedef enum : NSUInteger {
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
 
+    if (_componentManager) {
+        [_componentManager invalidate];
+    }
     __weak typeof(self) weakSelf = self;
     WXPerformBlockOnComponentThread(^{
         __strong typeof(self) strongSelf = weakSelf;
@@ -439,7 +456,11 @@ typedef enum : NSUInteger {
         //had not registered yet
         observer = [NSMutableDictionary new];
         [observer setObject:[@{event:[@[callbackInfo] mutableCopy]} mutableCopy] forKey:moduleClassName];
-        [_moduleEventObservers addEntriesFromDictionary:observer];
+        if (_moduleEventObservers[moduleClassName]) { //support multi event
+            [_moduleEventObservers[moduleClassName] addEntriesFromDictionary:observer[moduleClassName]];
+        }else {
+            [_moduleEventObservers addEntriesFromDictionary:observer];
+        }
     } else {
         observer = _moduleEventObservers[moduleClassName];
         [[observer objectForKey:event] addObject:callbackInfo];

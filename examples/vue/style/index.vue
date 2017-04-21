@@ -1,5 +1,5 @@
 <template>
-  <scroller>
+  <scroller style="overflow-x:hidden;">
     <style-box></style-box>
     <style-flex></style-flex>
     <panel title="opacity" type="primary">
@@ -22,7 +22,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .bg-item {
     width: 690px;
     margin-bottom: 10px;

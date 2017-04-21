@@ -5,7 +5,7 @@
 # Site
 title: Weex
 subtitle:
-description:
+description: A framework for building Mobile cross-platform UIs. Different from a "web app", "HTML5 app", or "hybrid app", you can use Weex to build a real mobile app. The code that you write is relatively simple, because you can build native applications just using HTML, CSS, Javascript. But underneath, the core of the application is Objective-C or Java. At the same time, Weex will provide a lot of native components or modules for developers to use.
 author: Jinjiang
 language: 
   - en
@@ -322,3 +322,7 @@ alias:
   cn/doc/references/events/blur.html: cn/references/index.html
   cn/doc/references/events/input.html: cn/references/index.html
   cn/doc/references/events/focus.html: cn/references/index.html
+  cn/guide/tools/devtools.html: cn/guide/tools/toolkit.html
+  cn/guide/tools/weexpack.html: cn/guide/tools/toolkit.html
+  guide/tools/devtools.html: guide/tools/toolkit.html
+  guide/tools/weexpack.html: guide/tools/toolkit.html

@@ -17,7 +17,7 @@ layout: post
 
 ## Windows 指令错误
 
-请先安装 [Git for Windows](https://git-scm.com/download/win)，在 [For Windows](https://github.com/alibaba/weex/tree/dev#for-windows) 中查看更多信息。
+请先安装 [Git for Windows](https://git-scm.com/download/win)，在 [For Windows](https://github.com/apache/incubator-weex/tree/dev#for-windows) 中查看更多信息。
 
 
 ## Android Studio 中 Gradle 错误

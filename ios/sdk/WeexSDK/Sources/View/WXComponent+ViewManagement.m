@@ -1,14 +1,25 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent+ViewManagement.h"
 #import "WXComponent_internal.h"
-#import "WXComponent+GradientColor.h"
+#import "WXComponent+BoxShadow.h"
 #import "WXAssert.h"
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
@@ -34,6 +45,7 @@
 {
     WXAssertMainThread();
     
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.rootView addSubview:subcomponent.view];
         return;
@@ -65,6 +77,7 @@
 
 - (void)moveToSuperview:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
     [self removeFromSuperview];
     [newSupercomponent insertSubview:self atIndex:index];
 }
@@ -100,15 +113,26 @@
     _visibility = styles[@"visibility"] ? [WXConvert WXVisibility:styles[@"visibility"]] : WXVisibilityShow;
     _positionType = styles[@"position"] ? [WXConvert WXPositionType:styles[@"position"]] : WXPositionTypeRelative;
     _transform = styles[@"transform"] || styles[@"transformOrigin"] ?
-    [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:styles[@"transformOrigin"] instance:self.weexInstance] :
+    [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:styles[@"transformOrigin"]] instance:self.weexInstance] :
     [[WXTransform alloc] initWithCSSValue:nil origin:nil instance:self.weexInstance];
+    _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
+    if (_boxShadow) {
+        _lastBoxShadow = _boxShadow;
+    }
 }
 
 - (void)_updateViewStyles:(NSDictionary *)styles
 {
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
+    if (styles[@"boxShadow"]) {
+        _lastBoxShadow = _boxShadow;
+        _boxShadow = styles[@"boxShadow"]?[WXConvert WXBoxShadow:styles[@"boxShadow"] scaleFactor:self.weexInstance.pixelScaleFactor]:nil;
+        [self configBoxShadow:_boxShadow];
+        [self setNeedsDisplay];
+    }
+    
     if (styles[@"backgroundColor"]) {
         _backgroundColor = [WXConvert UIColor:styles[@"backgroundColor"]];
-        _layer.backgroundColor = _backgroundColor.CGColor;
         [self setNeedsDisplay];
     }
     
@@ -163,7 +187,7 @@
     
     if (styles[@"transformOrigin"] || styles[@"transform"]) {
         id transform = styles[@"transform"] ? : self.styles[@"transform"];
-        id transformOrigin = styles[@"transformOrigin"] ? : self.styles[@"transformOrigin"];
+        id transformOrigin = styles[@"transformOrigin"] ? [WXConvert NSString:styles[@"transformOrigin"]] : [WXConvert NSString:self.styles[@"transformOrigin"]];
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:transform] origin:transformOrigin instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
@@ -176,7 +200,11 @@
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
         _backgroundColor = [UIColor clearColor];
-        _layer.backgroundColor = _backgroundColor.CGColor;
+        [self setNeedsDisplay];
+    }
+    if (styles && [styles containsObject:@"boxShadow"]) {
+        _lastBoxShadow = _boxShadow;
+        _boxShadow = nil;
         [self setNeedsDisplay];
     }
 }
