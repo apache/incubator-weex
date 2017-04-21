@@ -1,11 +1,27 @@
-import { base, event } from '../../mixins'
-import { validateStyles } from '../../validator'
-import { throttle, bind, extend } from '../../utils'
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 export default {
-  mixins: [base, event, slideMixin],
+  mixins: [slideMixin],
   props: {
     'auto-play': {
       type: [String, Boolean],
@@ -14,7 +30,12 @@ export default {
     interval: {
       type: [String, Number],
       default: 3000
+    },
+    infinite: {
+      type: [String, Boolean],
+      default: true
     }
+
   },
 
   data () {
@@ -58,14 +79,12 @@ export default {
           staticClass: 'weex-slider-cell'
         }, [vnode])
       })
-      this._indicator = createElement(indicator, {
-        staticClass: indicatorVnode.data.staticClass,
-        staticStyle: indicatorVnode.data.staticStyle,
-        attrs: {
-          count: cells.length,
-          active: this.currentIndex
-        }
-      })
+      if (indicatorVnode) {
+        indicatorVnode.data.attrs = indicatorVnode.data.attrs || {}
+        indicatorVnode.data.attrs.count = cells.length
+        indicatorVnode.data.attrs.active = this.currentIndex
+        this._indicator = createElement(indicator, indicatorVnode.data)
+      }
       return cells
     }
   },
@@ -83,6 +102,10 @@ export default {
   beforeUpdate () {
     this.updateLayout()
     this.reorder()
+  },
+
+  updated () {
+    fireLazyload(this.$el, true)
   },
 
   mounted () {
@@ -103,17 +126,15 @@ export default {
 
       this._autoPlayTimer = setTimeout(autoPlayFn, interval)
     }
-
     this.reorder()
+    fireLazyload(this.$el, true)
   },
 
   render (createElement) {
-    this.prerender()
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
-
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length
 
@@ -122,8 +143,8 @@ export default {
       {
         ref: 'wrapper',
         attrs: { 'weex-type': 'slider' },
-        staticClass: 'weex-slider weex-slider-wrapper',
-        on: extend(this.createEventMap(), {
+        staticClass: 'weex-slider weex-slider-wrapper weex-ct',
+        on: extend(this._createEventMap(['scroll', 'scrollstart', 'scrollend']), {
           touchstart: this.handleTouchStart,
           touchmove: throttle(bind(this.handleTouchMove, this), 25),
           touchend: this.handleTouchEnd
@@ -132,7 +153,7 @@ export default {
       [
         createElement('ul', {
           ref: 'inner',
-          staticClass: 'weex-slider-inner'
+          staticClass: 'weex-slider-inner weex-ct'
         }, this._cells),
         this._indicator
       ]

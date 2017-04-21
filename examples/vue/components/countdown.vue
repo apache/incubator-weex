@@ -27,7 +27,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .ctno1 {
     border-radius: 8;
     padding-top: 6;

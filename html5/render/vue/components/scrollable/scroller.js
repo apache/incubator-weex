@@ -1,11 +1,28 @@
-import { base, scrollable } from '../../mixins'
-import { validateStyles } from '../../validator'
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import { scrollable } from '../../mixins'
+// import { validateStyles } from '../../validator'
 import { extend } from '../../utils'
-import * as shared from './shared'
 import listMixin from './list/listMixin'
 
 export default {
-  mixins: [base, scrollable, listMixin],
+  mixins: [scrollable, listMixin],
   props: {
     scrollDirection: {
       type: [String],
@@ -27,9 +44,12 @@ export default {
 
   computed: {
     wrapperClass () {
-      const classArray = ['weex-scroller', 'weex-scroller-wrapper']
+      const classArray = ['weex-scroller', 'weex-scroller-wrapper', 'weex-ct']
       if (this.scrollDirection === 'horizontal') {
         classArray.push('weex-scroller-horizontal')
+      }
+      else {
+        classArray.push('weex-scroller-vertical')
       }
       return classArray.join(' ')
     }
@@ -40,19 +60,13 @@ export default {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {
         if (!vnode.tag || !vnode.componentOptions) return false
-        switch (vnode.componentOptions.tag) {
-          case 'loading': this._loading = shared.createLoading(this, h, vnode); return false
-          case 'refresh': this._refresh = shared.createRefresh(this, h, vnode); return false
-        }
         return true
       })
       return [
-        this._refresh,
         h('html:div', {
           ref: 'inner',
-          staticClass: 'weex-scroller-inner'
-        }, this._cells),
-        this._loading
+          staticClass: 'weex-scroller-inner weex-ct'
+        }, this._cells)
       ]
     },
     scrollTo (vnode) {
@@ -67,9 +81,9 @@ export default {
     this.weexType = 'scroller'
 
     /* istanbul ignore next */
-    if (process.env.NODE_ENV === 'development') {
-      validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('scroller', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
 
     this._cells = this.$slots.default || []
     this.$nextTick(() => {
@@ -80,7 +94,7 @@ export default {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
       staticClass: this.wrapperClass,
-      on: extend(this.createEventMap(), {
+      on: extend(this._createEventMap(), {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,

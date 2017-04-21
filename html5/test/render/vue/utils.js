@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import * as utils from '../../../render/vue/utils'
 
 describe('utils', function () {

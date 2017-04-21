@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 /**
  * @fileOverview
  * instance controls from native
@@ -78,6 +96,7 @@ export function init (app, code, data, services) {
   // run code and get result
   const { WXEnvironment } = global
   const timerAPIs = {}
+
   /* istanbul ignore if */
   if (WXEnvironment && WXEnvironment.platform !== 'Web') {
     // timer APIs polyfill in native
@@ -87,19 +106,51 @@ export function init (app, code, data, services) {
         const handler = function () {
           args[0](...args.slice(2))
         }
-        timer.setTimeout(handler, args[1])
+
+        let timerId, callbackId
+
+        if (global.setTimeoutWeex && (typeof global.setTimeoutWeex === 'function')) {
+          callbackId = app.doc.taskCenter.normalize(handler)
+          timerId = global.setTimeoutWeex(app.id, callbackId, args[1])
+          return timerId
+        }
+        else {
+          timer.setTimeout(handler, args[1])
+          return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
+        }
       },
       setInterval: (...args) => {
         const handler = function () {
           args[0](...args.slice(2))
         }
-        timer.setInterval(handler, args[1])
+
+        let timerId, callbackId
+
+        if (global.setIntervalWeex && (typeof global.setIntervalWeex === 'function')) {
+          callbackId = app.doc.taskCenter.normalize(handler)
+          timerId = global.setIntervalWeex(app.id, callbackId, args[1])
+          return timerId
+        }
+        else {
+          timer.setInterval(handler, args[1])
+          return app.doc.taskCenter.callbackManager.lastCallbackId.toString()
+        }
       },
       clearTimeout: (n) => {
-        timer.clearTimeout(n)
+        if (global.clearTimeoutWeex && (typeof global.clearTimeoutWeex === 'function')) {
+          global.clearTimeoutWeex(n)
+        }
+        else {
+          timer.clearTimeout(n)
+        }
       },
       clearInterval: (n) => {
-        timer.clearInterval(n)
+        if (global.clearIntervalWeex && (typeof global.clearIntervalWeex === 'function')) {
+          global.clearIntervalWeex(n)
+        }
+        else {
+          timer.clearInterval(n)
+        }
       }
     })
   }
@@ -117,7 +168,11 @@ export function init (app, code, data, services) {
     __weex_viewmodel__: bundleVm,
     weex: weexGlobalObject
   }, timerAPIs, services)
-  callFunction(globalObjects, functionBody)
+  if (!callFunctionNative(globalObjects, functionBody)) {
+    // If failed to compile functionBody on native side,
+    // fallback to callFunction.
+    callFunction(globalObjects, functionBody)
+  }
 
   return result
 }
@@ -139,4 +194,52 @@ function callFunction (globalObjects, body) {
 
   const result = new Function(...globalKeys)
   return result(...globalValues)
+}
+
+/**
+ * Call a new function generated on the V8 native side.
+ * @param  {object} globalObjects
+ * @param  {string} body
+ * @return {boolean} return true if no error occurred.
+ */
+function callFunctionNative (globalObjects, body) {
+  if (typeof compileAndRunBundle !== 'function') {
+    return false
+  }
+
+  let fn = void 0
+  let isNativeCompileOk = false
+  let script = '(function ('
+  const globalKeys = []
+  const globalValues = []
+  for (const key in globalObjects) {
+    globalKeys.push(key)
+    globalValues.push(globalObjects[key])
+  }
+  for (let i = 0; i < globalKeys.length - 1; ++i) {
+    script += globalKeys[i]
+    script += ','
+  }
+  script += globalKeys[globalKeys.length - 1]
+  script += ') {'
+  script += body
+  script += '} )'
+
+  try {
+    const weex = globalObjects.weex || {}
+    const config = weex.config || {}
+    fn = compileAndRunBundle(script,
+                             config.bundleUrl,
+                             config.bundleDigest,
+                             config.codeCachePath)
+    if (fn && typeof fn === 'function') {
+      fn(...globalValues)
+      isNativeCompileOk = true
+    }
+  }
+  catch (e) {
+    console.error(e)
+  }
+
+  return isNativeCompileOk
 }

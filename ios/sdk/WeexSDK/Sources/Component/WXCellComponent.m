@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXSDKInstance.h"
@@ -11,10 +22,16 @@
 #import "WXCellComponent.h"
 #import "WXListComponent.h"
 #import "WXComponent_internal.h"
+#import "WXDiffUtil.h"
+
+@interface WXCellComponent ()
+
+@end
 
 @implementation WXCellComponent
 {
     NSIndexPath *_indexPathBeforeMove;
+    BOOL _isUseContainerWidth;
 }
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
@@ -26,6 +43,7 @@
         _isRecycle = attributes[@"recycle"] ? [WXConvert BOOL:attributes[@"recycle"]] : YES;
         _insertAnimation = [WXConvert UITableViewRowAnimation:attributes[@"insertAnimation"]];
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
+        _keepScrollPosition = attributes[@"keepScrollPosition"] ? [WXConvert BOOL:attributes[@"keepScrollPosition"]] : NO;
         _lazyCreateView = YES;
         _isNeedJoinLayoutSystem = NO;
     }
@@ -38,24 +56,23 @@
     
 }
 
+- (BOOL)isEqualToWXObject:(id<WXDiffable>)object
+{
+    return self == object;
+}
+
 - (void)_frameDidCalculated:(BOOL)isChanged
 {
     [super _frameDidCalculated:isChanged];
     
     if (isChanged) {
-        [self.list cellDidLayout:self];
+        [self.delegate cellDidLayout:self];
     }
 }
 
-- (WXDisplayCompletionBlock)displayCompletionBlock
+- (void)didFinishDrawingLayer:(BOOL)success
 {
-    return ^(CALayer *layer, BOOL finished) {
-        if ([super displayCompletionBlock]) {
-            [super displayCompletionBlock](layer, finished);
-        }
-        
-        [self.list cellDidRendered:self];
-    };
+    [self.delegate cellDidRendered:self];
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
@@ -75,12 +92,16 @@
     if (attributes[@"deleteAnimation"]) {
         _deleteAnimation = [WXConvert UITableViewRowAnimation:attributes[@"deleteAnimation"]];
     }
+    
+    if (attributes[@"keepScrollPosition"]) {
+        _keepScrollPosition = [WXConvert BOOL:attributes[@"keepScrollPosition"]];
+    }
 }
 
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index
 {
-    if (self.list == newSupercomponent) {
-        [self.list cell:self didMoveToIndex:index];
+    if (self.delegate == newSupercomponent) {
+        [self.delegate cell:self didMoveToIndex:index];
         [super _removeFromSupercomponent];
         [newSupercomponent _insertSubcomponent:self atIndex:index];
     } else {
@@ -92,7 +113,7 @@
 {
     [super _removeFromSupercomponent];
     
-    [self.list cellDidRemove:self];
+    [self.delegate cellDidRemove:self];
 }
 
 - (void)removeFromSuperview
@@ -102,8 +123,10 @@
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
-    if (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) && self.list) {
-        self.cssNode->style.dimensions[CSS_WIDTH] = self.list.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    if (self.delegate && (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) || _isUseContainerWidth)) {
+        self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate containerWidthForLayout:self];
+        //TODO: set _isUseContainerWidth to NO if updateStyles have width
+        _isUseContainerWidth = YES;
     }
     
     if ([self needsLayout]) {

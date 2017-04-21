@@ -44,7 +44,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .txt {
     margin-bottom: 12px;
     font-size: 40px;

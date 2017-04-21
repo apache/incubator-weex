@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "3a484987637f61a6bce81312d94081e0"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -523,8 +531,7 @@
 	  "panel-header-danger": {
 	    "backgroundColor": "rgb(217,83,79)",
 	    "color": "#ffffff"
-	  },
-	  "panel-body": {}
+	  }
 	}
 
 /***/ },
@@ -2254,7 +2261,6 @@
 	module.exports = {
 	    methods: {
 	        goback: function goback() {
-	            var $webview = __weex_require__('@weex-module/webview');
 	            var webElement = this.$el('webview');
 	            $webview.goBack(webElement.ref);
 	        },
