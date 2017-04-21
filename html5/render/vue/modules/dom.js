@@ -91,20 +91,30 @@ export default {
     }
 
     const scroller = getParentScroller(vnode)
-    const scrollDirection = scroller.scrollDirection || 'vertical'
+    const scrollDirection = scroller && scroller.scrollDirection || 'vertical'
 
-    if (scroller && scroller.$el && vnode.$el) {
+    const isWindow = !scroller
+    const ct = isWindow ? document.body : scroller.$el
+    const el = vnode.$el
+
+    if (ct && el) {
       // if it's a list, then the listVnode.scrollDirection is undefined. just
       // assum it is the default value 'vertical'.
       const dSuffix = ({
         horizontal: 'Left',
         vertical: 'Top'
       })[scrollDirection]
-      let offset = vnode.$el[`offset${dSuffix}`]
+
+      const ctRect = ct.getBoundingClientRect()
+      const elRect = el.getBoundingClientRect()
+
+      const dir = dSuffix.toLowerCase()
+      let offset = el[`scroll${dSuffix}`] + elRect[dir] - ctRect[dir]
+      // let offset = el[`offset${dSuffix}`]
 
       if (options) {
-        offset += Number(options.offset) || 0
-        offset *= weex.config.env.scale /* adapt offset to different screen scales. */
+        offset += options.offset && options.offset * weex.config.env.scale || 0
+        // offset *= weex.config.env.scale /* adapt offset to different screen scales. */
       }
       else if (process.env.NODE_ENV === 'development') {
         console.warn('[Vue Render] The second parameter of "scrollToElement" is required, '
@@ -112,14 +122,14 @@ export default {
       }
 
       if (options && options.animated === false) {
-        return scrollElement.call(scroller.$el, dSuffix, offset)
+        return scrollElement.call(ct, dSuffix, offset)
       }
 
       step({
-        scrollable: scroller.$el,
+        scrollable: ct,
         startTime: now(),
         frame: null,
-        startPosition: scroller.$el[`scroll${dSuffix}`],
+        startPosition: ct[`scroll${dSuffix}`],
         position: offset,
         method: scrollElement,
         dSuffix: dSuffix
