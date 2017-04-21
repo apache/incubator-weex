@@ -347,7 +347,11 @@ public final class WXDomModule extends WXModule {
           if (args == null) {
             return null;
           }
-          scrollToElement((String) args.get(0), (JSONObject) args.get(1));
+          JSONObject option =null;
+          if(args.size()>1) {
+            option = (JSONObject) args.get(1);
+          }
+          scrollToElement((String) args.get(0),option);
           break;
         case ADD_RULE:
           if (args == null) {
@@ -609,7 +613,7 @@ public final class WXDomModule extends WXModule {
    * @param options scroll option, like {offset:0, duration:300}
    */
   public void scrollToElement(String ref, JSONObject options) {
-    if (TextUtils.isEmpty(ref) || options == null) {
+    if (TextUtils.isEmpty(ref) ) {
       return;
     }
 
@@ -660,11 +664,11 @@ public final class WXDomModule extends WXModule {
     } else if ("viewport".equalsIgnoreCase(ref)) {
       if (mWXSDKInstance.getContainerView() != null) {
         Map<String, Object> options = new HashMap<>();
-        Map<String, String> sizes = new HashMap<>();
+        Map<String, Float> sizes = new HashMap<>();
         int[] location = new int[2];
         mWXSDKInstance.getContainerView().getLocationOnScreen(location);
-        sizes.put("left", "0");
-        sizes.put("top", "0");
+        sizes.put("left", 0f);
+        sizes.put("top", 0f);
         sizes.put("right", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
         sizes.put("bottom", getWebPxValue(mWXSDKInstance.getContainerView().getHeight()));
         sizes.put("width", getWebPxValue(mWXSDKInstance.getContainerView().getWidth()));
@@ -692,7 +696,7 @@ public final class WXDomModule extends WXModule {
   }
 
   @NonNull
-  private String getWebPxValue(int value) {
-    return String.valueOf(WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getViewPortWidth()));
+  private float getWebPxValue(int value) {
+    return WXViewUtils.getWebPxByWidth(value,mWXSDKInstance.getInstanceViewPortWidth());
   }
 }

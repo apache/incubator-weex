@@ -1,10 +1,11 @@
-//
-//  WXComponent+GradientColor.m
-//  Pods
-//
-//  Created by bobning on 16/12/23.
-//
-//
+/**
+ * Created by Weex.
+ * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+ *
+ * This source code is licensed under the Apache Licence 2.0.
+ * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ */
+
 
 #import "WXComponent+GradientColor.h"
 #import "WXComponent_internal.h"
@@ -13,6 +14,9 @@
 @implementation  WXComponent (GradientColor)
 
 - (void)setGradientLayer {
+    if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        return;
+    }
     //parse gradient-color, linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
     if ([_backgroundImage hasPrefix:@"linear-gradient"] && [_backgroundImage hasSuffix:@")"] ) {
         NSRange range = NSMakeRange(16, _backgroundImage.length - 17);

@@ -1,4 +1,5 @@
-* {
+.weex-root,
+.weex-root * {
   color: initial;
   cursor: initial;
   direction: initial;
@@ -17,48 +18,43 @@
   font-family: BlinkMacSystemFont, 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-*,
-*::before,
-*::after {
+.weex-root,
+.weex-root *,
+.weex-root *::before,
+.weex-root *::after {
   box-sizing: border-box;
   -webkit-text-size-adjust: none;
       -ms-text-size-adjust: none;
           text-size-adjust: none;
 }
 
-html, body {
-  -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: transparent;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-}
-
-a,
-button,
-[role="button"],
-input,
-label,
-select,
-textarea {
+.weex-root a,
+.weex-root button,
+.weex-root [role="button"],
+.weex-root input,
+.weex-root label,
+.weex-root select,
+.weex-root textarea {
   -ms-touch-action: manipulation;
       touch-action: manipulation;
 }
 
-p, ol, ul, dl {
+.weex-root p,
+.weex-root ol,
+.weex-root ul,
+.weex-root dl {
   margin: 0;
   padding: 0;
 }
 
-li {
+.weex-root li {
   list-style: none;
 }
 
-figure {
+.weex-root figure {
   margin: 0;
 }
 
-textarea {
+.weex-root textarea {
   resize: none;
 }

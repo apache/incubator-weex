@@ -51,10 +51,10 @@
 	var __vue_styles__ = []
 
 	/* script */
-	__vue_exports__ = __webpack_require__(390)
+	__vue_exports__ = __webpack_require__(408)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(395)
+	var __vue_template__ = __webpack_require__(413)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -66,15 +66,18 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/components/a.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/components/a.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -83,21 +86,21 @@
 
 /***/ },
 
-/***/ 381:
+/***/ 399:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(382)
+	__vue_styles__.push(__webpack_require__(400)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(383)
+	__vue_exports__ = __webpack_require__(401)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(384)
+	var __vue_template__ = __webpack_require__(402)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -109,22 +112,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-46407d45"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 382:
+/***/ 400:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -178,7 +185,7 @@
 
 /***/ },
 
-/***/ 383:
+/***/ 401:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -223,16 +230,16 @@
 
 /***/ },
 
-/***/ 384:
+/***/ 402:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -240,7 +247,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -248,13 +255,13 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 390:
+/***/ 408:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -278,28 +285,28 @@
 	    };
 	  },
 	  components: {
-	    panel: __webpack_require__(381),
-	    tip: __webpack_require__(391)
+	    panel: __webpack_require__(399),
+	    tip: __webpack_require__(409)
 	  }
 	};
 
 /***/ },
 
-/***/ 391:
+/***/ 409:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(392)
+	__vue_styles__.push(__webpack_require__(410)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(393)
+	__vue_exports__ = __webpack_require__(411)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(394)
+	var __vue_template__ = __webpack_require__(412)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -311,22 +318,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/tip.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/tip.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-6ec9a69c"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 392:
+/***/ 410:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -372,7 +383,7 @@
 
 /***/ },
 
-/***/ 393:
+/***/ 411:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -394,34 +405,34 @@
 
 /***/ },
 
-/***/ 394:
+/***/ 412:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['tip', 'tip-' + _vm.type]
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['tip-txt', 'tip-txt-' + _vm.type]
-	  }, [_vm._s(_vm.value)])])
+	  }, [_vm._v(_vm._s(_vm.value))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 395:
+/***/ 413:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('scroller', [_h('panel', {
+	  return _c('scroller', [_c('panel', {
 	    attrs: {
 	      "title": "Hyperlink",
 	      "type": "primary"
 	    }
-	  }, [_h('a', {
+	  }, [_c('a', {
 	    attrs: {
 	      "href": "http://alibaba.github.io/weex/index.html"
 	    }
-	  }, [_h('tip', {
+	  }, [_c('tip', {
 	    staticStyle: {
 	      marginBottom: "20px"
 	    },
@@ -429,7 +440,7 @@
 	      "type": "info",
 	      "value": "Click me to see how 'A' element opens a new world."
 	    }
-	  })])])])
+	  })], 1)], 1)], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

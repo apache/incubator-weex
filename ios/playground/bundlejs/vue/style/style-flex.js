@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(552)
+	__vue_styles__.push(__webpack_require__(576)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(553)
+	__vue_exports__ = __webpack_require__(577)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(554)
+	var __vue_template__ = __webpack_require__(578)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/style/style-flex.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/style/style-flex.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-32f80d0a"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,21 +91,21 @@
 
 /***/ },
 
-/***/ 381:
+/***/ 399:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(382)
+	__vue_styles__.push(__webpack_require__(400)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(383)
+	__vue_exports__ = __webpack_require__(401)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(384)
+	var __vue_template__ = __webpack_require__(402)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -113,22 +117,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/include/panel.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/include/panel.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-46407d45"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 382:
+/***/ 400:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -182,7 +190,7 @@
 
 /***/ },
 
-/***/ 383:
+/***/ 401:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -227,16 +235,16 @@
 
 /***/ },
 
-/***/ 384:
+/***/ 402:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    class: ['panel', 'panel-' + _vm.type],
 	    style: {
 	      borderWidth: _vm.border
 	    }
-	  }, [_h('text', {
+	  }, [_c('text', {
 	    class: ['panel-header', 'panel-header-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingHead,
@@ -244,7 +252,7 @@
 	      paddingLeft: _vm.paddingHead * 1.5,
 	      paddingRight: _vm.paddingHead * 1.5
 	    }
-	  }, [_vm._s(_vm.title)]), _h('div', {
+	  }, [_vm._v(_vm._s(_vm.title))]), _c('div', {
 	    class: ['panel-body', 'panel-body-' + _vm.type],
 	    style: {
 	      paddingTop: _vm.paddingBody,
@@ -252,27 +260,27 @@
 	      paddingLeft: _vm.paddingBody * 1.5,
 	      paddingRight: _vm.paddingBody * 1.5
 	    }
-	  }, [_vm._t("default")])])
+	  }, [_vm._t("default")], 2)])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 
 /***/ },
 
-/***/ 546:
+/***/ 570:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(547)
+	__vue_styles__.push(__webpack_require__(571)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(548)
+	__vue_exports__ = __webpack_require__(572)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(549)
+	var __vue_template__ = __webpack_require__(573)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -284,22 +292,26 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/style/style-item.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/style/style-item.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-768350d6"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 
 
 /***/ },
 
-/***/ 547:
+/***/ 571:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -319,7 +331,7 @@
 
 /***/ },
 
-/***/ 548:
+/***/ 572:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -346,11 +358,11 @@
 
 /***/ },
 
-/***/ 549:
+/***/ 573:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('text', {
+	  return _c('text', {
 	    staticClass: ["item", "txt"],
 	    style: {
 	      backgroundColor: _vm.bgColor
@@ -364,7 +376,7 @@
 
 /***/ },
 
-/***/ 552:
+/***/ 576:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -382,7 +394,7 @@
 
 /***/ },
 
-/***/ 553:
+/***/ 577:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -507,239 +519,239 @@
 
 	module.exports = {
 	  components: {
-	    panel: __webpack_require__(381),
-	    styleItem: __webpack_require__(546)
+	    panel: __webpack_require__(399),
+	    styleItem: __webpack_require__(570)
 	  }
 	};
 
 /***/ },
 
-/***/ 554:
+/***/ 578:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', [_h('panel', {
+	  return _c('div', [_c('panel', {
 	    attrs: {
 	      "title": "flex-direction",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexDirection: "row"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "row"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "type": "1"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexDirection: "column"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "column"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "type": "1"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "justify-content",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "flex-end"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "center"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      justifyContent: "space-between"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "align-items",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "flex-end"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "center"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row", "row-align"],
 	    staticStyle: {
 	      alignItems: "stretch"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "flex",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
@@ -747,26 +759,26 @@
 	      "value": "no flex",
 	      "type": "1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0"
 	    },
 	    attrs: {
 	      "value": "no flex"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -775,7 +787,7 @@
 	      "type": "1",
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "2"
@@ -783,12 +795,12 @@
 	    attrs: {
 	      "value": "flex:2"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -796,7 +808,7 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -805,7 +817,7 @@
 	      "type": "1",
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -813,12 +825,12 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      alignItems: "flex-start"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "1"
@@ -826,7 +838,7 @@
 	    attrs: {
 	      "value": "flex:1"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "2"
@@ -835,7 +847,7 @@
 	      "type": "1",
 	      "value": "flex:2"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    staticStyle: {
 	      marginRight: "0",
 	      flex: "3"
@@ -843,74 +855,74 @@
 	    attrs: {
 	      "value": "flex:3"
 	    }
-	  })])]), _h('panel', {
+	  })], 1)]), _c('panel', {
 	    attrs: {
 	      "title": "flex-wrap",
 	      "type": "primary"
 	    }
-	  }, [_h('div', {
+	  }, [_c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexWrap: "wrap",
 	      backgroundColor: "grey",
 	      padding: "10"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "1:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "2:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "3:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "4:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "5:wrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "6:wrap"
 	    }
-	  })]), _h('div', {
+	  })], 1), _c('div', {
 	    staticClass: ["row"],
 	    staticStyle: {
 	      flexWrap: "nowrap",
 	      backgroundColor: "grey",
 	      padding: "10"
 	    }
-	  }, [_h('style-item', {
+	  }, [_c('style-item', {
 	    attrs: {
 	      "value": "1:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "2:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "3:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "4:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "5:nowrap"
 	    }
-	  }), _h('style-item', {
+	  }), _c('style-item', {
 	    attrs: {
 	      "value": "6:nowrap"
 	    }
-	  })])])])
+	  })], 1)])], 1)
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

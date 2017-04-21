@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .container {
     flex-direction: row; 
     position: fixed; 

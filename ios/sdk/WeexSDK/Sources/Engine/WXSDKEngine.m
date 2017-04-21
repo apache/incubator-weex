@@ -72,6 +72,8 @@
     [self registerComponent:@"image" withClass:NSClassFromString(@"WXImageComponent") withProperties:nil];
     [self registerComponent:@"scroller" withClass:NSClassFromString(@"WXScrollerComponent") withProperties:nil];
     [self registerComponent:@"list" withClass:NSClassFromString(@"WXListComponent") withProperties:nil];
+    [self registerComponent:@"recycler" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
+    [self registerComponent:@"waterfall" withClass:NSClassFromString(@"WXRecyclerComponent") withProperties:nil];
     
     [self registerComponent:@"header" withClass:NSClassFromString(@"WXHeaderComponent")];
     [self registerComponent:@"cell" withClass:NSClassFromString(@"WXCellComponent")];
@@ -167,14 +169,10 @@
 
 + (void)initSDKEnvironment
 {
-    WX_MONITOR_PERF_START(WXPTInitalize)
-    WX_MONITOR_PERF_START(WXPTInitalizeSync)
     
     NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
-    
-    WX_MONITOR_PERF_END(WXPTInitalizeSync)
     
 #if TARGET_OS_SIMULATOR
     static dispatch_once_t onceToken;
@@ -204,6 +202,10 @@
 
 + (void)initSDKEnvironment:(NSString *)script
 {
+    
+    WX_MONITOR_PERF_START(WXPTInitalize)
+    WX_MONITOR_PERF_START(WXPTInitalizeSync)
+    
     if (!script || script.length <= 0) {
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_LOAD, @"framework loading is failure!");
         return;
@@ -213,6 +215,9 @@
         [self registerDefaults];
         [[WXSDKManager bridgeMgr] executeJsFramework:script];
     });
+    
+    WX_MONITOR_PERF_END(WXPTInitalizeSync)
+    
 }
 
 + (void)registerDefaults

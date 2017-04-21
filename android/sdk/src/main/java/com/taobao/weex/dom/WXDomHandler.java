@@ -290,10 +290,10 @@ public class WXDomHandler implements Handler.Callback {
                                      (String) task.args.get(2));
         break;
       case MsgType.WX_DOM_BATCH:
+
         mWXDomManager.batch();
         mHasBatch = false;
         break;
-
       case MsgType.WX_DOM_SCROLLTO:
         mWXDomManager.scrollToDom(task.instanceId, (String) task.args.get(0), (JSONObject) task.args.get(1));
         break;
