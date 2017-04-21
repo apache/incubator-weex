@@ -111,7 +111,7 @@ public class WXSoInstallMgrSdk {
     }
 
     boolean InitSuc = false;
-    if (checkSoIsValid(libName, 7816288) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
+    if (checkSoIsValid(libName, BuildConfig.ARMEABI_Size) ||checkSoIsValid(libName, BuildConfig.X86_Size)) {
 
       /**
        * Load library with {@link System#loadLibrary(String)}
