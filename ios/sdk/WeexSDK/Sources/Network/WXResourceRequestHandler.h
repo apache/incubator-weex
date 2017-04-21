@@ -38,6 +38,9 @@
 
 // Tells the delegate that the request failed to load successfully.
 - (void)request:(WXResourceRequest *)request didFailWithError:(NSError *)error;
+    
+// Tells the delegate that when complete statistics information has been collected for the task.
+- (void)request:(WXResourceRequest *)request didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics API_AVAILABLE(macosx(10.12), ios(10.0), watchos(3.0), tvos(10.0));
 
 @end
 
