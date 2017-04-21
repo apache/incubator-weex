@@ -24,17 +24,6 @@
 
 @implementation WXInvocationConfig
 
-+ (instancetype)sharedInstance
-{
-    static id _sharedInstance;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedInstance = [[self alloc] init];
-    });
-    
-    return _sharedInstance;
-}
-
 - (instancetype)init
 {
     
@@ -105,6 +94,5 @@
     }
     
 }
-
 
 @end

@@ -24,7 +24,7 @@ version: 2.1
 
 <style>
 .text {
-  font-size: 70;
+  font-size: 70px;
   color: #ff0000
 }
 </style>
@@ -32,7 +32,7 @@ version: 2.1
 <script></script>
 ```
 
-[体验一下](http://dotwe.org/a468998152ee680413588c38bd61c29e)
+[体验一下](http://dotwe.org/vue/ea4f528a0b381640b77ba03fcc69a90a)
 
 ![mobile_preview](../images/div_1.jpg)
 
@@ -84,11 +84,11 @@ version: 2.1
   <script></script>
   ```
 
-  [体验一下](http://dotwe.org/3ef3ba3f0f162b27e24c525250c46a04)
+  [体验一下](http://dotwe.org/vue/541f016de379c8764ddcdd9da0cabc24)
 
-2. `<div>` 不可滚动，即使显式设置高度也一样。
+2. `<div>` 在 native 中不可滚动，即使显式设置高度也一样。
 
-  [错误示例](http://dotwe.org/a2cc491c5b9e6f6eb06795e45e725efd)
+  [错误示例](http://dotwe.org/vue/6795753d1a51662b8a7282b129dc7ddf)
 
 ## 示例
 

@@ -8,7 +8,7 @@ version: 0.10
 # How to preview weex code in sample-app ?
    
 ### Weex Sample Step By Step
-1. Clone Weex from github [`https://github.com/alibaba/weex/`](https://github.com/alibaba/weex/)
+1. Clone Weex from github [`https://github.com/apache/incubator-weex/`](https://github.com/apache/incubator-weex/)
 2. Use Android Studio open Android Sample 。
 3. run Sample project.
 4. into Sample homePage，you will see this picture  

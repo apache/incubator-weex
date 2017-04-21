@@ -19,8 +19,8 @@ version: 0.10
 
 - 已经安装了[JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) version>=1.7 并配置了环境变量
 - 已经安装[Android SDK](https://developer.android.com/studio/index.html) 并配置环境变量。
-- Android SDK version 23 (compileSdkVersion in [`build.gradle`](https://github.com/alibaba/weex/blob/master/android/sdk/build.gradle))
-- SDK build tools version 23.0.1 (buildToolsVersion in [`build.gradle`](https://github.com/alibaba/weex/blob/master/android/sdk/build.gradle))
+- Android SDK version 23 (compileSdkVersion in [`build.gradle`](https://github.com/apache/incubator-weex/blob/master/android/sdk/build.gradle))
+- SDK build tools version 23.0.1 (buildToolsVersion in [`build.gradle`](https://github.com/apache/incubator-weex/blob/master/android/sdk/build.gradle))
 - Android Support Repository >= 17 (for Android Support Library)
 
 ## 快速接入

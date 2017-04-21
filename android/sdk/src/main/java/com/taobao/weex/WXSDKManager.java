@@ -148,6 +148,7 @@ import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
+import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
@@ -187,6 +188,8 @@ public class WXSDKManager {
   private URIAdapter mURIAdapter;
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
 
+  private WXValidateProcessor mWXValidateProcessor;
+
   private WXSDKManager() {
     mWXRenderManager = new WXRenderManager();
     mWXDomManager = new WXDomManager(mWXRenderManager);
@@ -205,7 +208,7 @@ public class WXSDKManager {
   }
 
   public static int getInstanceViewPortWidth(String instanceId){
-    return getInstance().getSDKInstance(instanceId).getViewPortWidth();
+    return getInstance().getSDKInstance(instanceId).getInstanceViewPortWidth();
   }
 
   static void setInstance(WXSDKManager manager){
@@ -410,6 +413,14 @@ public class WXSDKManager {
       return mIWebSocketAdapterFactory.createWebSocketAdapter();
     }
     return null;
+  }
+
+  public void registerValidateProcessor(WXValidateProcessor processor){
+    this.mWXValidateProcessor = processor;
+  }
+
+  public WXValidateProcessor getValidateProcessor(){
+    return mWXValidateProcessor;
   }
 
 }
