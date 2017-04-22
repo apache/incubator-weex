@@ -483,20 +483,14 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong typeof(self) strongSelf = weakSelf;
-        /*
-         must insert the gradientLayer at index 0, and then set masksToBounds to match the view bounds
-         or the subview will be invisible
-         */
-        
         if(strongSelf) {
             UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
             UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
-            if (_gradientLayer && [strongSelf.view.layer.sublayers containsObject:_gradientLayer]) {
-                [_gradientLayer removeFromSuperlayer];
+            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            if (gradientLayer) {
+                _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                strongSelf.view.backgroundColor = _backgroundColor;
             }
-             _gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
-            [strongSelf.view.layer insertSublayer:_gradientLayer atIndex:0];
-            strongSelf.view.layer.masksToBounds = YES;
         }
     });
 }
@@ -525,6 +519,15 @@
     if (0 == [self.subcomponents count]) {
         self.view.isAccessibilityElement = YES;
     }
+}
+
+- (UIImage *)imageFromLayer:(CALayer *)layer
+{
+    UIGraphicsBeginImageContextWithOptions(layer.frame.size, NO, 0);
+    [layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return outputImage;
 }
 
 #pragma mark Reset
