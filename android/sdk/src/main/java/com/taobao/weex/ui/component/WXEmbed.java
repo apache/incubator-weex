@@ -205,6 +205,8 @@
 package com.taobao.weex.ui.component;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -215,6 +217,7 @@ import android.widget.ImageView;
 
 import com.taobao.weappplus_sdk.R;
 import com.taobao.weex.IWXRenderListener;
+import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXRenderErrorCode;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -225,8 +228,9 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
+
 @Component(lazyload = false)
-public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
+public class WXEmbed extends WXVContainer<FrameLayout> implements WXSDKInstance.OnInstanceVisibleListener,NestedContainer {
 
   public static final String ITEM_ID = "itemId";
 
@@ -327,9 +331,7 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
     @Override
     public void onViewCreated(WXSDKInstance instance, View view) {
-      FrameLayout hostView = mComponent.getHostView();
-      hostView.removeAllViews();
-      hostView.addView(view);
+
     }
 
     @Override
@@ -367,6 +369,11 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
         ((EmbedManager) instance).putEmbed(itemId.toString(), this);
       }
     }
+  }
+
+  @Override
+  protected FrameLayout initComponentHostView(@NonNull Context context) {
+    return new RenderContainer(context);
   }
 
   @Override
@@ -439,6 +446,9 @@ public class WXEmbed extends WXDiv implements WXSDKInstance.OnInstanceVisibleLis
 
   private WXSDKInstance createInstance() {
     WXSDKInstance sdkInstance = getInstance().createNestedInstance(this);
+    if(getHostView() instanceof RenderContainer) {
+      sdkInstance.setRenderContainer((RenderContainer) getHostView());
+    }
     getInstance().addOnInstanceVisibleListener(this);
     sdkInstance.registerRenderListener(mListener);
 
