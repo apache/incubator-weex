@@ -1,20 +1,28 @@
-# How to Contribute
+---
+title: 如何参与社区
+type: guide
+order: 6
+has_chapter_content: true
+version: 2.1
+---
 
-Welcome to create [pull requests](https://github.com/apache/incubator-weex/compare) or join in our [mailing list](http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/) for bugfix, doc, example, suggestion and anything.
+# 如何参与社区
 
-## Join in Weex Mailing List
+## 加入 Weex 邮件列表 (Mailing List)
 
-In Weex community all discussion will happen on mailing list.
+在 Weex 官方社区所有的信息都会汇聚于邮件列表。订阅开发邮件列表的方式是发送邮件到 `dev-subscribe@weex.incubator.apache.org` 然后你的邮箱会收到一封来自 Apache 的回信 (英文)，把 Apache 的这封回信再次回复过去，即可完成订阅。
 
-Just send an email to `dev-subscribe@weex.incubator.apache.org` and follow the instructions to subscribe Weex dev mailing list. And then you will receive all discussions and community messages by your personal email. In the same time you can freely send your own emails to join in us.
+这里需要强调的是 Apache 是一个面向全球的全英文的社区，所以我们希望您能够用英文在邮件列表中跟大家交流。
 
-At the same time you can see the archives of all the mails through the web: [http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/](http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/)
+如果您确实对使用英文存在很大的疑虑或困惑，我们也非常欢迎大家来中文问答平台 [SegmentFault](https://segmentfault.com/t/weex) 提问，这里有非常多热心的开发者一起讨论和解答 Weex 相关的问题。
 
-*If you won't follow the mailing list any more. There is another way to unsubscribe it: send an email to `dev-unsubscribe@weex.incubator.apache.org` and follow the instructions.*
+使用邮件列表的另外一个好处是它可以方便大家随时查阅之前的邮件记录: [http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/](http://mail-archives.apache.org/mod_mbox/incubator-weex-dev/)
 
-Besides Weex dev mailing list, we also have some other mailing lists for you. You can check them out here: [http://mail-archives.apache.org/mod_mbox/#weex.incubator](http://mail-archives.apache.org/mod_mbox/#weex.incubator)
+*如果您对邮件列表中的内容已经不再感兴趣，这里也有退订邮件列表的方法: 发送邮件至 `dev-unsubscribe@weex.incubator.apache.org` 并根据回信的提示进行二次回复确认，完成退订。*
 
-## Branch Management
+除了开发 (dev) 邮件列表，我们还有另外几个的邮件列表供大家查阅：[http://mail-archives.apache.org/mod_mbox/#weex.incubator](http://mail-archives.apache.org/mod_mbox/#weex.incubator)
+
+## 分支管理 (英)
 
 ```
 master
@@ -33,7 +41,7 @@ dev         <--- PR(hotfix/typo/3rd-PR)
     0. The branch for a developing iteration, e.g. `android-feature-20160607` is an android developing iteration which is done at 2016.06.07. `{domain}` consists of `android`, `ios`, `jsfm` and `html5`. 
     0. **DO NOT commit any PR to such a branch**.
 
-### Branch Name 
+### 分支命名
 
 ```
 {module}-{action}-{shortName}
@@ -51,7 +59,7 @@ for example:
 * `jsfm-feature-communication`
 * `android-hotfix-compute-layout`
 
-## Commit Log
+## 提交日志格式 (英)
 
 ```
 {action} [{module}] {description}
@@ -72,7 +80,7 @@ for example:
 * `* [doc] fix #123, update video auto-play property`
 * `- [example] remove abc`
 
-## Pull Request
+## 发送 Pull Request (英)
 
 You can [create pull requests](https://github.com/apache/incubator-weex/compare) in GitHub.
 
@@ -81,7 +89,7 @@ You can [create pull requests](https://github.com/apache/incubator-weex/compare)
 3. Finish the job you want to do.
 4. Create a pull request.
 
-## Code Style Guide
+## 编码规范 (英)
 
 ### Objective-C
 
