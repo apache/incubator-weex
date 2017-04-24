@@ -182,4 +182,10 @@
     _response = nil;
 }
 
+- (void)request:(WXResourceRequest *)request didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics
+{
+    WXLogDebug(@"request:%@ didFinishCollectingMetrics", request);
+}
+
+
 @end

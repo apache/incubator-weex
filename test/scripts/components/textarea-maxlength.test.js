@@ -32,7 +32,7 @@ describe('textarea maxlength vue test2 ', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/components/textarea-maxlength.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('textarea',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -41,10 +41,10 @@ describe('textarea maxlength vue test2 ', function () {
 
   it('#1 textarea maxlenght', () => {
     return driver
-      .waitForElementByXPath('//div/textarea')
+      .elementById('textarea')
       .sendKeys('12345678')
       .sleep(2000)
-      .elementByXPath('//div/text[1]')
+      .elementById('status')
       .text()
       .then((text)=>{
       assert.equal(text,'1234')
