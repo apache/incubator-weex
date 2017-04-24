@@ -36,10 +36,12 @@ function preLoadImg (src: string,
   img.src = src
 }
 
-export function applySrc (item: HTMLElement, src: ?string, placeholderSrc: ?string): void {
+export function applySrc (item: any, src: ?string, placeholderSrc: ?string): void {
   if (!src) { return }
   function finallCb () {
     item.removeAttribute('img-src')
+    delete item._src_loading
+    item._src_loaded = true
     if (doRecord) {
       if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
         tagImg() // tag lastest img onload time.
@@ -49,13 +51,25 @@ export function applySrc (item: HTMLElement, src: ?string, placeholderSrc: ?stri
       }
     }
   }
+  if (item._src_loading || item._src_loaded) {
+    return
+  }
+  item._src_loading = true
   preLoadImg(src, function (evt) {
     item.style.backgroundImage = `url(${src || ''})`
     const { width: naturalWidth, height: naturalHeight } = this
-    dispatchEvent(item, createEvent(item, 'load', { naturalWidth, naturalHeight }))
+    const params = {
+      success: true,
+      size: { naturalWidth, naturalHeight }
+    }
+    dispatchEvent(item, createEvent(item, 'load', params))
     finallCb()
   }, function (evt) {
-    dispatchEvent(item, createEvent(item, 'error'))
+    const params = {
+      success: false,
+      size: { naturalWidth: 0, naturalHeight: 0 }
+    }
+    dispatchEvent(item, createEvent(item, 'load', params))
     if (placeholderSrc) {
       preLoadImg(placeholderSrc, function () {
         item.style.backgroundImage = `url(${placeholderSrc || ''})`
@@ -65,7 +79,7 @@ export function applySrc (item: HTMLElement, src: ?string, placeholderSrc: ?stri
   })
 }
 
-export function fireLazyload (el: Array<HTMLElement> | HTMLElement | null, ignoreVisibility: ?boolean): void {
+export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?boolean): void {
   if (Array.isArray(el)) {
     return el.forEach(ct => fireLazyload(ct))
   }
@@ -101,7 +115,7 @@ export function fireLazyload (el: Array<HTMLElement> | HTMLElement | null, ignor
  */
 const cache = {}
 let _uid: number = 1
-export function getThrottleLazyload (wait: number = 16, el: HTMLElement | null = document.body) {
+export function getThrottleLazyload (wait: number = 16, el: any | null = document.body) {
   let id: number = +(el && el.dataset.throttleId)
   if (isNaN(id) || id <= 0) {
     id = _uid++

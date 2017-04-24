@@ -33,7 +33,8 @@
     "notifyTrimMemory": false,
     "markupState": false,
     "compileAndRunBundle": false,
-    "expect": false
+    "expect": false,
+    "sinon": false
   },
 
   "rules": {

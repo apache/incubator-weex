@@ -388,8 +388,8 @@ CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelS
 
 /**
  @discusstion parse gradient-color string to a dictionary, then you can get gradientLayer from @see gradientLayerFromColors:colors:locations:frame:locations
- @param a linear-gradient string like linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
- @return A dictionary with endColor, startColor and gradientType value
+ @param backgroundImage  linear-gradient string like linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
+ @return dictionary with endColor, startColor and gradientType value
  @code
     NSDictionary * linearGradient = [self linearGradientWithBackgroundImage:@"linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))"];
     CAGradientLayer * gradientLayer = [self gradientLayerFromColors:@[linearGradient[@"startColor"], linearGradient[@"endColor"]],nil,bounds,[linearGradient[@"gradientType"] integerValue]];

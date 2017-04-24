@@ -18,7 +18,7 @@
  */
 import weex from './env'
 import { setVue } from './env'
-import * as components from './components'
+import components from './components'
 import { base, style } from './mixins'
 // import styleMixin from './mixins/style'
 

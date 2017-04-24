@@ -1,14 +1,12 @@
 <template>
-    <div>
         <scroller style="background-color: beige; width: 750px; height: 900px" offset-accuracy="10" @scroll="onscroll">
+            <text style="font-size: 40px;position:fixed;top:0;left:0;" test-id="status">{{status}}</text>
             <div v-for="row in rows" style="padding: 10px;">
                 <text style="width: 750px; height: 150px; background-color: aqua">
                     {{row.id}}
                 </text>
             </div>
         </scroller>
-        <text style="font-size: 40px;">{{status}}</text>
-    </div>
 </template>
 
 <script>

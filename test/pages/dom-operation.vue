@@ -1,17 +1,13 @@
 <template>
-    <div>
-        <div style="height:100;background-color:blue">
-            <text v-if="display">item</text>
-        </div>
-        <div>
+    <scroller>
+            <text v-if="display" test-id="maynotexist">item</text>
             <div v-for="item in repeat_items">
-                <text>repeat</text>
+                <text :test-id="'item'+item">repeat item:{{item}}</text>
             </div>
-        </div>
-        <text @click="onclick">display</text>
-        <text @click="onclick2">display</text>
-        <text @click="onclick3">{{text}}</text>
-    </div>
+        <text test-id="btn1" @click="onclick">display</text>
+        <text test-id="status" @click="onclick2">display</text>
+        <text test-id="status2" @click="onclick3">{{text}}</text>
+    </scroller>
 </template>
 <script>
     module.exports = {

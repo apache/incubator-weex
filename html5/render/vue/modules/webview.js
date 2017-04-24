@@ -20,19 +20,37 @@
 /**
  * Webview module
  */
-
+import { isArray } from '../utils'
 export default {
   goBack (vnode) {
+    if (isArray(vnode)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+      }
+      vnode = vnode[0]
+    }
     if (vnode && typeof vnode.goBack === 'function') {
       vnode.goBack()
     }
   },
   goForward (vnode) {
+    if (isArray(vnode)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+      }
+      vnode = vnode[0]
+    }
     if (vnode && typeof vnode.goForward === 'function') {
       vnode.goForward()
     }
   },
   reload (vnode) {
+    if (isArray(vnode)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+      }
+      vnode = vnode[0]
+    }
     if (vnode && typeof vnode.reload === 'function') {
       vnode.reload()
     }

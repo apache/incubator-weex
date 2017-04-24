@@ -24,8 +24,8 @@ import Vue from 'vue/dist/vue.runtime.esm.js'
 import { base, style } from '../../../../render/vue/mixins'
 import weex from '../../../../render/vue/env/weex'
 import { setVue } from '../../../../render/vue/env'
-
-import * as utils from './utils'
+import helper from './main'
+import { doneMixin } from './mixin'
 
 /**
  * Describe tests for current versions of Vue.
@@ -42,45 +42,15 @@ export function init (title, fn) {
       Vue.mixin(base)
       Vue.mixin(style)
 
+      // for test only mixins.
+      Vue.mixin(doneMixin)
+
       window.global = window
       global.weex = weex
       setVue(Vue)
 
       window._no_remove_style_sheets = true
     })
-
-    const helper = {
-
-      utils,
-      /**
-       * register a component.
-       * @param  {string} name,
-       * @param  {object} component.
-       */
-      register (name, component) {
-        global.weex.registerComponent(name, component)
-        // components[name] = component
-      },
-
-      /**
-       * create a vm instance of Vue.
-       * @param  {Object} options.
-       * @return {Vue} vue instance.
-       */
-      createVm (options = {}) {
-        // options.components = components
-        return new Vue(options).$mount()
-      },
-
-      /**
-       * [compile description]
-       * @param  {[type]} template [description]
-       * @return {[type]}          [description]
-       */
-      compile (template) {
-        return helper.createVm({ template })
-      }
-    }
 
     /**
      * describe a vue-render test for certain vue verson.

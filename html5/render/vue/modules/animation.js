@@ -16,11 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { nextFrame, toCSSText, autoPrefix, camelizeKeys, normalizeStyle } from '../utils'
+import {
+  nextFrame,
+  toCSSText,
+  autoPrefix,
+  camelizeKeys,
+  normalizeStyle,
+  isArray
+} from '../utils'
 
 function transitionOnce (vnode, config, callback) {
-  const duration = config.duration || 1000 // ms
-  const timing = config.timingFunction || 'ease'
+  if (isArray(vnode)) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
+    }
+    vnode = vnode[0]
+  }
+
+  const duration = config.duration || 0 // ms
+  const timing = config.timingFunction || 'linear'
   const delay = config.delay || 0  // ms
 
   // TODO: parse transition properties
