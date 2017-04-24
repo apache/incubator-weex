@@ -32,7 +32,7 @@ describe('weex mobile index', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/dom-operation.js'))
-      .waitForElementByXPath('//div/text[2]',util.getGETActionWaitTimeMills(),1000);
+      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000);
   });
 
   after(function () {
@@ -41,11 +41,11 @@ describe('weex mobile index', function () {
 
   it('#1 Repeat', ()=>{
     return driver
-    .elementsByXPath("//div/div[2]/div")
-    .then((elems)=>{
-        assert.equal(elems.length,5)
+    .elementById("item5")
+    .then((elem)=>{
+        assert.notEqual(elem ,undefined)
     })
-    .elementByXPath("//div/div[1]/text")
+    .elementById("maynotexist")
     .then((noexist)=>{
         assert.equal(noexist,undefined)
     })
@@ -53,37 +53,37 @@ describe('weex mobile index', function () {
 
   it('#2 Add new item', ()=>{
     return driver
-    .elementByXPath("//div/text[1]")
+    .elementById("btn1")
     .click()
-    .sleep(1000)
-    .elementsByXPath("//div/div[2]/div")
-    .then((elems)=>{
-        assert.equal(elems.length,6)
+    .sleep(2000)
+    .elementById("item6")
+    .then((elem)=>{
+        assert.notEqual(elem ,undefined)
     })
-    .elementByXPath("//div/div[1]/text")
+    .elementById("maynotexist")
     .then((existed)=>{
         assert.notEqual(existed,undefined)
     })
   })
 
-  it('#2 Remove item', ()=>{
+  it('#3 Remove item', ()=>{
     return driver
-    .elementByXPath("//div/text[2]")
+    .elementById("status")
     .click()
-    .sleep(1000)
-    .elementsByXPath("//div/div[2]/div")
-    .then((elems)=>{
-        assert.equal(elems.length,5)
+    .sleep(2000)
+    .elementById("item6")
+    .then((elem)=>{
+        assert.equal(elem,undefined)
     })
-    .elementByXPath("//div/div[1]/text")
+    .elementById("maynotexist")
     .then((noexist)=>{
         assert.equal(noexist,undefined)
     })
   })
 
-  it('#3 Update DOM attr', ()=>{
+  it('#4 Update DOM attr', ()=>{
       return driver
-      .elementByXPath("//div/text[3]")
+      .elementById("status2")
       .text()
       .then((text)=>{
           assert.equal("finished",text);
