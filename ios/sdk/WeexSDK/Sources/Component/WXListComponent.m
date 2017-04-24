@@ -283,7 +283,7 @@
                 
                 [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
                 if (completedReloadSection) {
-                    WXLogDebug(@"Reload section:%u", insertIndex - 1);
+                    WXLogDebug(@"Reload section:%lu", insertIndex - 1);
                     _completedSections[insertIndex - 1] = completedReloadSection;
                 }
                 
