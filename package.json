@@ -94,7 +94,7 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.2.11",
-    "weex-vue-framework": "2.2.2-weex.4",
+    "weex-vue-framework": "2.2.2-weex.5",
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
