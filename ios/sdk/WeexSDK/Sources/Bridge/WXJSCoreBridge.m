@@ -78,7 +78,14 @@
         
         _jsContext[@"setIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
             [weakSelf triggerInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
-            
+        };
+        
+        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
+            [weakSelf triggerClearInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+        };
+        
+        _jsContext[@"clearTimeoutWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
+            [weakSelf triggerClearTimeout:[appid toString] ret:[ret toString] arg:[arg toString]];
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -282,7 +289,6 @@
         [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:nil keepAlive:YES];
         [self triggerInterval:[dic objectForKey:@"appid"] ret:[dic objectForKey:@"ret"] arg:[dic objectForKey:@"arg"]];
     }
-    
 }
 
 - (void)triggerTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
@@ -324,4 +330,17 @@
     });
 }
 
+- (void)triggerClearInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    if(![_timers containsObject:appid]){
+        [_timers removeObject:appid];
+    }
+}
+
+- (void)triggerClearTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    if(![_timers containsObject:appid]){
+        [_timers removeObject:appid];
+    }
+}
 @end
