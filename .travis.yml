@@ -27,7 +27,7 @@ matrix:
     include:
       - os: osx
         env: TEST_SUITE=ios
-        osx_image: xcode8.3
+        osx_image: xcode8.1
         language: objective-c
         before_script:
           - source test/ci-funcs.sh
@@ -39,10 +39,12 @@ matrix:
           - npm install
           - npm install mocha
           - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
+          - export run_in_ci=true
         script:
           - ./test/serve.sh 2&>1 > /dev/null &
           - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
           - bundle exec danger --dangerfile=Dangerfile-ios
+          -  travis_retry bash test/run.sh ios
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8
@@ -67,6 +69,7 @@ matrix:
           - npm install
           - npm install mocha
           - export DISPLAY=:99.0
+          - export run_in_ci=true
         script:
           - source ./test/ci-funcs.sh
           - ./test/serve.sh 2&>1 > /dev/null &
@@ -74,7 +77,7 @@ matrix:
           - ./run-ci.sh 
           - cd $TRAVIS_BUILD_DIR
           - waitForEmulator
-          - run_in_ci=true bash test/run.sh
+          - travis_retry bash test/run.sh
 cache:
   directories:
   - node_modules

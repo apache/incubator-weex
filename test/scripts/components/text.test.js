@@ -7,7 +7,7 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('weex text', function () {
+describe('weex text @ignore-ios', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 

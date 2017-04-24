@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <scroller>
         <text test-id="txt1">{{d1}}</text>
         <slider auto-play="true" @change="change" style="width: 750px;height: 400px;background-color: blue" interval="500" infinite="false">
             <div style="flex: 1;background-color: beige;align-items: center;" v-for="item in items">
@@ -19,7 +19,7 @@
             </div>
             <indicator style="height: 20px"></indicator>
         </slider>
-    </div>
+    </scroller>
 </template>
 
 <script>
