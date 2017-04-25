@@ -144,7 +144,7 @@
 {
     WXAssertParam(frameworkScript);
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
+        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"native-bundle-main.js"]];
     }else{
         [_jsContext evaluateScript:frameworkScript];
     }
