@@ -54,6 +54,12 @@ android {
     resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
+    copy {
+        from '../../dist'
+        into new File(projectDir,"assets")
+        include 'native-bundle-main.js'
+        rename('native-bundle-main.js','main.js')
+    }
     def line
     new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
     def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
