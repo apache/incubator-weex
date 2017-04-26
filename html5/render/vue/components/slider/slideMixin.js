@@ -115,10 +115,13 @@ export default {
         }
 
         elm.style.width = this.wrapperWidth + 'px'
-        addTransform(elm, {
-          translate: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
-          scale: this.isNeighbor && `scale(${neighborScale})`
-        })
+        const transObj = {
+          translate: `translate3d(${offsetX}px, ${offsetY}px, 0px)`
+        }
+        if (this.isNeighbor) {
+          transObj.scale = `scale(${neighborScale})`
+        }
+        addTransform(elm, transObj)
       }
 
       const removeClone = (clone, prevElm) => {
