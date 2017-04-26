@@ -182,7 +182,7 @@
 + (void)initSDKEnvironment
 {
     
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
     
@@ -274,7 +274,7 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [self restartWithScript:script];
 }
