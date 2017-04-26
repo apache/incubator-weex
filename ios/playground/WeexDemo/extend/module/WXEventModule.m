@@ -27,6 +27,8 @@
 
 WX_EXPORT_METHOD(@selector(openURL:))
 
+WX_EXPORT_METHOD(@selector(fireNativeGlobalEvent:callback:))
+
 - (void)openURL:(NSString *)url
 {
     NSString *newURL = url;
@@ -41,6 +43,20 @@ WX_EXPORT_METHOD(@selector(openURL:))
     ((WXDemoViewController *)controller).url = [NSURL URLWithString:newURL];
     
     [[weexInstance.viewController navigationController] pushViewController:controller animated:YES];
+}
+
+
+/**
+ a test method for macaca case, you can fire globalEvent when download finish、device shaked and so on.
+ @param event event name
+ */
+- (void)fireNativeGlobalEvent:(NSString *)event callback:(WXModuleCallback)callback
+{
+    [weexInstance fireGlobalEvent:event params:@{@"eventParam":@"eventValue"}];
+    if (callback) {
+        NSDictionary * result = @{@"ok": @true};
+        callback(result);
+    }
 }
 
 @end
