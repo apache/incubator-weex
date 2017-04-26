@@ -406,6 +406,7 @@
         [_styles addEntriesFromDictionary:styles];
         pthread_mutex_unlock(&_propertyMutex);
     }
+    styles = [self parseStyles:styles];
     [self _updateCSSNodeStyles:styles];
     [self _resetCSSNodeStyles:resetStyles];
 }
