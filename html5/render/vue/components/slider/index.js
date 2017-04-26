@@ -19,7 +19,7 @@
 // import { validateStyles } from '../../validator'
 import { extractComponentStyle, createEventMap } from '../../core'
 import { throttle, bind, extend, fireLazyload } from '../../utils'
-import indicator from './indicator'
+// import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 const _css = `
@@ -111,7 +111,7 @@ export default {
         indicatorVnode.data.attrs = indicatorVnode.data.attrs || {}
         indicatorVnode.data.attrs.count = cells.length
         indicatorVnode.data.attrs.active = this.currentIndex
-        this._indicator = createElement(indicator, indicatorVnode.data)
+        this._indicator = indicatorVnode
       }
       return cells
     }
