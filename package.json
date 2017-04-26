@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.20.4",
+    "framework": "0.20.5",
     "vue-render": "0.11.12",
     "transformer": ">=0.1.5 <0.5"
   },
@@ -94,7 +94,7 @@
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
     "weex-rax-framework": "0.2.11",
-    "weex-vue-framework": "2.2.2-weex.2",
+    "weex-vue-framework": "2.2.2-weex.5",
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
@@ -162,6 +162,5 @@
     "wwp": "^0.3.5",
     "xml2map": "^1.0.2",
     "weex-gcanvas":"^0.3.5"
-
   }
 }
