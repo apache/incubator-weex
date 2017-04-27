@@ -45,7 +45,7 @@ export function extendTruthy (to: {}, ...args: Array<{}>): {} {
     if (typeof from !== 'object') { return }
     let i
     for (const key in from) {
-      if (((i = from[key]) || i === '') && i !== 'undefined') {
+      if (((i = from[key]) || i === '' || i === 0) && i !== 'undefined') {
         to[key] = i
       }
     }
