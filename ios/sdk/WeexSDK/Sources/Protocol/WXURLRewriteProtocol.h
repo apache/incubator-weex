@@ -22,12 +22,11 @@
 
 @class WXSDKInstance;
 
-#define WX_REWRITE_URL(url, resourceType, instance, newUrl)\
+#define WX_REWRITE_URL(url, resourceType, instance)\
 do {\
-    (*newUrl) = nil;\
     id<WXURLRewriteProtocol> rewriteHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXURLRewriteProtocol)];\
     if ([rewriteHandler respondsToSelector:@selector(rewriteURL:withResourceType:withInstance:)]) {\
-        (*newUrl) = [[rewriteHandler rewriteURL:url withResourceType:WXResourceTypeLink withInstance:instance].absoluteString mutableCopy];\
+        newURL = [[rewriteHandler rewriteURL:url withResourceType:WXResourceTypeLink withInstance:instance].absoluteString mutableCopy];\
     }\
 } while(0);
 
