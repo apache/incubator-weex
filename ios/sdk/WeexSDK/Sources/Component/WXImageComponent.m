@@ -322,7 +322,7 @@ static dispatch_queue_t WXImageUpdateQueue;
                         [strongSelf setNeedsDisplay];
                     }
                     
-                    if (weakSelf.imageLoadEvent) {
+                    if (strongSelf.imageLoadEvent) {
                         NSMutableDictionary *sizeDict = [NSMutableDictionary new];
                         sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
                         sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
