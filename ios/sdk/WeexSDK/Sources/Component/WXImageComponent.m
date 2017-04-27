@@ -295,7 +295,7 @@ static dispatch_queue_t WXImageUpdateQueue;
         WXLogDebug(@"Updating image:%@, component:%@", self.imageSrc, self.ref);
         NSDictionary *userInfo = @{@"imageQuality":@(self.imageQuality), @"imageSharp":@(self.imageSharp), @"blurRadius":@(self.blurRadius)};
         NSMutableString * newURL = [imageSrc mutableCopy];
-        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance);
+        WX_REWRITE_URL(imageSrc, WXResourceTypeImage, self.weexInstance)
         __weak typeof(self) weakSelf = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             weakSelf.imageOperation = [[weakSelf imageLoader] downloadImageWithURL:newURL imageFrame:weakSelf.calculatedFrame userInfo:userInfo completed:^(UIImage *image, NSError *error, BOOL finished) {
