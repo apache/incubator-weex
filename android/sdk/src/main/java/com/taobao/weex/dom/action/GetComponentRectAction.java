@@ -48,8 +48,9 @@ class GetComponentRectAction implements RenderAction {
   }
   @Override
   public void executeRender(RenderActionContext context) {
+    WXSDKInstance instance = context.getInstance();
     JSCallback jsCallback = new SimpleJSCallback(context.getInstance().getInstanceId(), mCallback);
-    if (context.getInstance().isDestroy()) {
+    if (instance == null ||instance.isDestroy()) {
       //do nothing
     }else if (TextUtils.isEmpty(mRef)) {
       Map<String, Object> options = new HashMap<>();
@@ -62,14 +63,15 @@ class GetComponentRectAction implements RenderAction {
       WXComponent component = context.getComponent(mRef);
       Map<String, Object> options = new HashMap<>();
       if (component != null) {
+        int viewPort = instance.getInstanceViewPortWidth();
         Map<String, Float> size = new HashMap<>();
         Rect sizes = component.getComponentSize();
-        size.put("width", getWebPxValue(sizes.width()));
-        size.put("height", getWebPxValue(sizes.height()));
-        size.put("bottom", getWebPxValue(sizes.bottom));
-        size.put("left", getWebPxValue(sizes.left));
-        size.put("right", getWebPxValue(sizes.right));
-        size.put("top", getWebPxValue(sizes.top));
+        size.put("width", getWebPxValue(sizes.width(),viewPort));
+        size.put("height", getWebPxValue(sizes.height(),viewPort));
+        size.put("bottom", getWebPxValue(sizes.bottom,viewPort));
+        size.put("left", getWebPxValue(sizes.left,viewPort));
+        size.put("right", getWebPxValue(sizes.right,viewPort));
+        size.put("top", getWebPxValue(sizes.top,viewPort));
         options.put("size", size);
         options.put("result", true);
       } else {
@@ -87,12 +89,13 @@ class GetComponentRectAction implements RenderAction {
       Map<String, Float> sizes = new HashMap<>();
       int[] location = new int[2];
       instance.getContainerView().getLocationOnScreen(location);
+      int viewport = instance.getInstanceViewPortWidth();
       sizes.put("left", 0f);
       sizes.put("top", 0f);
-      sizes.put("right", getWebPxValue(container.getWidth()));
-      sizes.put("bottom", getWebPxValue(container.getHeight()));
-      sizes.put("width", getWebPxValue(container.getWidth()));
-      sizes.put("height", getWebPxValue(container.getHeight()));
+      sizes.put("right", getWebPxValue(container.getWidth(),viewport));
+      sizes.put("bottom", getWebPxValue(container.getHeight(),viewport));
+      sizes.put("width", getWebPxValue(container.getWidth(),viewport));
+      sizes.put("height", getWebPxValue(container.getHeight(),viewport));
       options.put("size", sizes);
       options.put("result", true);
       jsCallback.invoke(options);
@@ -105,8 +108,8 @@ class GetComponentRectAction implements RenderAction {
   }
 
   @NonNull
-  private float getWebPxValue(int value) {
-    return WXViewUtils.getWebPxByWidth(value, WXSDKInstance.getViewPortWidth());
+  private float getWebPxValue(int value,int viewport) {
+    return WXViewUtils.getWebPxByWidth(value, viewport);
   }
 
 

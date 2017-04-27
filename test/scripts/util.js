@@ -20,6 +20,8 @@
 
 var path = require('path');
 var os = require('os')
+var fs = require('fs')
+const BlinkDiff = require('blink-diff');
 
 var platform = process.env.platform || 'android';
 platform = platform.toLowerCase();
@@ -67,6 +69,36 @@ function getIpAddress(){
     return addresses[0];
 }
 
+function diffImage(imageAPath, imageB, threshold, outputPath) {
+  if (!fs.existsSync(imageAPath)) {
+    fs.writeFileSync(imageAPath, imageB, 'base64', function(err) {
+        console.log(err);
+    });
+  }
+  
+  return new Promise((resolve, reject) => {
+    var diff = new BlinkDiff({
+      imageAPath: imageAPath, // Path
+      imageB: imageB,         // Buffer
+      thresholdType: BlinkDiff.THRESHOLD_PIXEL,
+      threshold: threshold,
+      imageOutputPath: outputPath,
+      cropImageA:{y : (isIOS ? 128 : 0)},
+      cropImageB:{y : (isIOS ? 128 : 0)}
+    });
+
+    diff.run((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      var ifPassed = diff.hasPassed(result.code);
+      console.log(ifPassed ? 'Image Comparison Passed' : 'Image Comparison Failed');
+      console.log(`Found ${result.differences} pixel differences between two images.`);
+      resolve(ifPassed);
+    });
+  });
+}
+
 
 module.exports = {
     getConfig:function(){
@@ -94,6 +126,7 @@ module.exports = {
     getGETActionWaitTimeMills:function(){
         return (isRunInCI ? 120 : 5 ) * 1000;
     },
+    diffImage, 
     createDriver:function(wd){
         var driver = global._wxDriver;
         if(!driver){

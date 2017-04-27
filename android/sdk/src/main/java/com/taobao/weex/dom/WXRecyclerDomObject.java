@@ -67,7 +67,9 @@ public class WXRecyclerDomObject extends WXDomObject{
             if (!mIsPreCalculateCellWidth) {
                 preCalculateCellWidth();
             }
-            child.getStyles().put(Constants.Name.WIDTH, mColumnWidth);
+            if(mColumnWidth!=0 && mColumnWidth!= Float.NaN) {
+                child.getStyles().put(Constants.Name.WIDTH, mColumnWidth);
+            }
         }
     }
 
@@ -104,6 +106,10 @@ public class WXRecyclerDomObject extends WXDomObject{
 
     public void updateRecyclerAttr(){
         preCalculateCellWidth();
+        if(mColumnWidth!=0 && mColumnWidth!= Float.NaN){
+            WXLogUtils.w("preCalculateCellWidth mColumnGap :" + mColumnGap + " mColumnWidth:" + mColumnWidth + " mColumnCount:" + mColumnCount);
+            return;
+        }
         int count = getChildCount();
         for(int i=0;i<count; i++){
             WXDomObject domObject = getChild(i);
