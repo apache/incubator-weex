@@ -35,6 +35,25 @@ export function extend (to: {}, ...args: Array<{}>): {} {
 }
 
 /**
+ * Mix truthy or '' property values into target object.
+ * mostly for merging styles. (that's why '' is falsy but still should be counted in.)
+ * the rightest object's value has the highest priority.
+ */
+export function extendTruthy (to: {}, ...args: Array<{}>): {} {
+  if (!args || args.length <= 0) { return to }
+  args.forEach(from => {
+    if (typeof from !== 'object') { return }
+    let i
+    for (const key in from) {
+      if (((i = from[key]) || i === '') && i !== 'undefined') {
+        to[key] = i
+      }
+    }
+  })
+  return to
+}
+
+/**
  * Mix specified properties into target object.
  */
 export function extendKeys (to: {}, from: {} = {}, keys: Array<string>): {} {

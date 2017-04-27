@@ -20,6 +20,7 @@ import {
   camelizeKeys,
   // hyphenateKeys,
   extend,
+  extendTruthy,
   trimComment,
   normalizeStyle
 } from '../utils'
@@ -154,7 +155,7 @@ export function getScopeStyle (vnode, classNames) {
   while (clsNmsIdx < clsNmsLen) {
     const cls = `.${classNames[clsNmsIdx]}[${scopeId}]`
     const map = styleMap[cls]
-    map && extend(style, map)
+    map && extendTruthy(style, map)
     clsNmsIdx++
   }
   return style
@@ -168,10 +169,10 @@ function getStyle (vnode, extract) {
   const style = getScopeStyle(vnode, clsNms)
   if (!data.cached) {
     // cache staticStyle once in the beginning.
-    data.cached = extend({}, data.staticStyle)
+    data.cached = extendTruthy({}, data.staticStyle)
   }
   // cache binding style every time since the binding style is variable.
-  extend(data.cached, data.style)
+  extendTruthy(data.cached, data.style)
   extend(style, data.cached)
   data.staticStyle = style
   if (extract) {
