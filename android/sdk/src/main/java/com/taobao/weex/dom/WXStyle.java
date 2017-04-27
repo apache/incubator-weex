@@ -311,10 +311,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return temp;
   }
 
-  public float getBorderTopWidth() {
-    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
-  }
-
   private float getBorderWidth(String key) {
     float temp = WXUtils.getFloat(get(key));
     if (WXUtils.isUndefined(temp)) {
@@ -323,6 +319,13 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return temp;
   }
 
+  private float getBorderWidth(String key, int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(key), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      return getBorderWidth(viewport);
+    }
+    return temp;
+  }
   //TODO fix : only when set backgroundColor
   @Deprecated
   public float getBorderWidth() {
@@ -337,12 +340,33 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
   }
 
+  public float getBorderTopWidth() {
+    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
+  }
+
   public float getBorderBottomWidth() {
     return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH);
   }
 
   public float getBorderLeftWidth() {
     return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
+  }
+
+
+  public float getBorderRightWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, viewport);
+  }
+
+  public float getBorderTopWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH, viewport);
+  }
+
+  public float getBorderBottomWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, viewport);
+  }
+
+  public float getBorderLeftWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH, viewport);
   }
 
   public String getBorderColor() {
@@ -409,6 +433,41 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   }
 
   /*
+   * margin
+   **/
+  public float getMarginTop(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_TOP), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginLeft(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_LEFT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginRight(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_RIGHT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginBottom(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_BOTTOM), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  /*
    * padding
    **/
   public float getPaddingTop() {
@@ -439,6 +498,42 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     float temp = WXUtils.getFloat(get(Constants.Name.PADDING_BOTTOM));
     if (WXUtils.isUndefined(temp)) {
       temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+    }
+    return temp;
+  }
+
+
+  /*
+   * padding
+   **/
+  public float getPaddingTop(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_TOP), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingLeft(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_LEFT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingRight(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_RIGHT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingBottom(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_BOTTOM), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
     }
     return temp;
   }

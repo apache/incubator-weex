@@ -93,7 +93,7 @@ public class WXUtils {
     String temp = value.toString().trim();
     if (temp.endsWith("wx")) {
       try {
-        return transferWx(temp);
+        return transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {
@@ -131,16 +131,6 @@ public class WXUtils {
     Float f = Float.parseFloat(temp);
     float density = Float.parseFloat(WXEnvironment.getConfig().get(WXConfig.scale));
     return density * f * viewport / WXViewUtils.getScreenWidth();
-  }
-
-  /**
-   * @use transferWx(String stringWithWXPostfix, int viewport)
-   * @param stringWithWXPostfix
-   * @return
-   */
-  @Deprecated
-  private static float transferWx(String stringWithWXPostfix) {
-    return transferWx(stringWithWXPostfix, WXSDKInstance.getViewPortWidth());
   }
 
   public static float fastGetFloat(String raw, int precision){
@@ -218,7 +208,7 @@ public class WXUtils {
           WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
         }
         try {
-          return (int) transferWx(temp);
+          return (int) transferWx(temp, 750);
         } catch (NumberFormatException e) {
           WXLogUtils.e("Argument format error! value is " + value, e);
         } catch (Exception e) {
@@ -264,7 +254,7 @@ public class WXUtils {
         WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
       }
       try {
-        return (long)transferWx(temp);
+        return (long)transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {
@@ -308,7 +298,7 @@ public class WXUtils {
         WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
       }
       try {
-        return transferWx(temp);
+        return transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {
