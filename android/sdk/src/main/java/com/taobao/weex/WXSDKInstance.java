@@ -186,6 +186,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /*
+  *  Warning: use setInstanceViewPortWidth instead.
   *  store custom ViewPort Width
   */
   @Deprecated
@@ -193,6 +194,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mViewPortWidth = viewPortWidth;
   }
 
+  /**
+   * Warning: use getInstanceViewPortWidth instead.
+   * @return
+   */
   @Deprecated
   public static int getViewPortWidth() {
     return mViewPortWidth;
