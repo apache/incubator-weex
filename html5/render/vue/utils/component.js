@@ -33,11 +33,12 @@ export function hasIntersection (rect, ctRect) {
 }
 
 /**
- * [isElementVisible description]
+ * isElementVisible
  * @param  {HTMLElement}  el    a dom element.
  * @param  {HTMLElement}  container  optional, the container of this el.
  */
 export function isElementVisible (el, container) {
+  if (!el.getBoundingClientRect) { return false }
   const bodyRect = {
     top: 0,
     left: 0,
@@ -68,10 +69,23 @@ export function isComponentVisible (component) {
   return false
 }
 
-// TODO: improve the efficiency
-export function watchAppear (context) {
-  if (!context) return null
+// to trigger the appear/disappear event.
+function triggerEvent (elm, handlers, isShow, dir) {
+  const evt = isShow ? 'appear' : 'disappear'
+  let listener = handlers[evt]
+  if (listener && listener.fn) {
+    listener = listener.fn
+  }
+  if (listener) {
+    listener(createEvent(elm, evt, {
+      direction: dir
+    }))
+  }
+}
 
+export function watchAppear (context) {
+  if (!context || !context.$el) return null
+  const el = context.$el
   context.$nextTick(() => {
     if ((context.$options && context.$options._parentListeners)
       || (context.$vnode && context.$vnode.data && context.$vnode.data.on)) {
@@ -86,42 +100,37 @@ export function watchAppear (context) {
         else {
           isWindow = true
         }
-        let lastScrollTop = container.scrollTop || window.pageYOffset
-
-        context._visible = isElementVisible(context.$el, isWindow ? document.body : container)
-        if (context._visible && on.appear) {
-          if (on.appear.fn) {
-            on.appear = on.appear.fn
-          }
-          on.appear(createEvent(context.$el, 'appear', { direction: null }))
+        const visible = isElementVisible(el, isWindow ? document.body : container)
+        context._visible = visible
+        // if the component hasn't appeared for once yet, then it shouldn't trigger
+        // a disappear event at all.
+        if (context._appearedOnce) {
+          triggerEvent(el, on, visible, null)
         }
-        const handler = throttle(event => {
-          const visible = isElementVisible(context.$el, isWindow ? document.body : container)
-          let listener = null
-          let type = null
-          if (visible !== context._visible) {
-            context._visible = visible
-            if (visible) {
-              listener = on.appear
-              type = 'appear'
-            }
-            else {
-              listener = on.disappear
-              type = 'disappear'
-            }
-            if (listener && listener.fn) {
-              listener = listener.fn
-            }
-            const scrollTop = container.scrollTop || window.pageYOffset
-            listener && listener(createEvent(context.$el, type, {
-              direction: scrollTop < lastScrollTop ? 'down'
-                : scrollTop > lastScrollTop ? 'up' : null
-            }))
-            lastScrollTop = scrollTop
-          }
-        }, 25, true)
+        else if (visible) {
+          context._appearedOnce = true
+          triggerEvent(el, on, true, null)
+        }
 
-        container.addEventListener('scroll', handler, false)
+        let lastScrollTop = container.scrollTop || window.pageYOffset
+        // no need to watch the same vComponent again.
+        if (!context._scrollWatched) {
+          context._scrollWatched = true
+          const handler = throttle(event => {
+            const visible = isElementVisible(el, isWindow ? document.body : container)
+            if (visible !== context._visible) {
+              context._visible = visible
+              const scrollTop = container.scrollTop || window.pageYOffset
+              const dir = scrollTop < lastScrollTop
+                ? 'down' : scrollTop > lastScrollTop
+                ? 'up' : null
+              triggerEvent(el, on, visible, dir)
+              lastScrollTop = scrollTop
+            }
+          }, 25, true)
+
+          container.addEventListener('scroll', handler, false)
+        }
       }
     }
   })

@@ -45,7 +45,7 @@ init('core style', (Vue, helper) => {
     helper.register('image', image)
   })
 
-  it('should get normalized merged styles.', function () {
+  it('should get normalized merged styles.', function (done) {
     const vm = helper.createVm(scopedStyleBundle)
     const el = vm.$refs.foo.$el || vm.$refs.foo
     expect(el).to.be.ok
@@ -79,5 +79,18 @@ init('core style', (Vue, helper) => {
       transformRes.push(el.style[k] === expectedTransform[k])
     }
     expect(transformRes).to.include(true)
+
+    const id = 'test-style'
+    helper.registerDone(id, () => {
+      expect(el.style.backgroundImage).to.match(
+        /(?:-webkit-|-moz-|-ms-|-o-)?linear-gradient\(to top, (?:rgb\(245, 254, 253\)|#f5fefd), (?:rgb\(255, 255, 255\)|#ffffff)\)/)
+      expect(['-webkit-box',
+        '-moz-box',
+        '-ms-flexbox',
+        '-webkit-flex',
+        'flex']).to.include(el.style.display)
+      helper.unregisterDone(id)
+      done()
+    })
   })
 })

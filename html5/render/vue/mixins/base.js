@@ -16,8 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { getThrottleLazyload, watchAppear } from '../utils'
-import { tagBeforeCreate, tagMounted, tagBeforeUpdate, tagUpdated, tagBegin, tagEnd } from '../utils/perf'
+import {
+  getThrottleLazyload,
+  watchAppear,
+  toCSSText
+} from '../utils'
+
+import {
+  tagBeforeCreate,
+  // tagMounted,
+  tagRootMounted,
+  tagFirstScreen,
+  tagBeforeUpdate,
+  tagUpdated,
+  tagBegin,
+  tagEnd
+} from '../utils/perf'
+
+import { extractComponentStyle } from '../core'
 
 const scrollableTypes = ['scroller', 'list']
 
@@ -47,14 +63,20 @@ export default {
   },
 
   mounted () {
+    if (this.$options._componentTag === 'image') {
+      global._has_image_in_first_screen = true
+    }
+    if (this === this.$root) {
+      tagRootMounted()
+      if (!global._has_image_in_first_screen) {
+        tagFirstScreen()
+      }
+    }
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
     }
     watchAppear(this)
-    if (process.env.NODE_ENV === 'development') {
-      tagMounted()
-    }
   },
 
   beforeUpdate () {
@@ -67,6 +89,22 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
+    function remergeStyle (vm) {
+      const style = extractComponentStyle(vm)
+      const el = vm.$el
+      if (style && el && el.nodeType !== 8) {
+        vm.$el.style.cssText += toCSSText(style)
+      }
+    }
+    const children = this.$children
+    if (children) {
+      children.forEach((childVm) => {
+        this.$nextTick(function () {
+          remergeStyle(childVm)
+        })
+      })
+    }
+    watchAppear(this)
   },
 
   methods: {

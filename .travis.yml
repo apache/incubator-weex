@@ -27,20 +27,12 @@ matrix:
     include:
       - os: osx
         env: TEST_SUITE=ios
-        osx_image: xcode8.3
+        osx_image: xcode8.1
         language: objective-c
         before_script:
-          - source test/ci-funcs.sh
-          - installNode
-          - npm install -g macaca-cli
           - brew update
-          - brew install ios-webkit-debug-proxy
-          - npm install -g macaca-ios
-          - npm install
-          - npm install mocha
           - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
         script:
-          - ./test/serve.sh 2&>1 > /dev/null &
           - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
           - bundle exec danger --dangerfile=Dangerfile-ios
       - os: linux
@@ -57,24 +49,10 @@ matrix:
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
-        before_script:
-          - source test/ci-funcs.sh
-          - installNode
-          - npm install -g macaca-cli
-          - npm install -g macaca-android
-          - createAVD
-          - startAVD &
-          - npm install
-          - npm install mocha
-          - export DISPLAY=:99.0
         script:
-          - source ./test/ci-funcs.sh
-          - ./test/serve.sh 2&>1 > /dev/null &
           - cd android
           - ./run-ci.sh 
           - cd $TRAVIS_BUILD_DIR
-          - waitForEmulator
-          - run_in_ci=true bash test/run.sh
 cache:
   directories:
   - node_modules

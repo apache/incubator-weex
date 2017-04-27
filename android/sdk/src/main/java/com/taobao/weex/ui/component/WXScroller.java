@@ -158,11 +158,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
             Map<String, Object> contentSize = new HashMap<>(2);
             Map<String, Object> contentOffset = new HashMap<>(2);
 
-            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(frame.width(), getInstance().getViewPortWidth()));
-            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(frame.height(), getInstance().getViewPortWidth()));
+            int viewport = getInstance().getInstanceViewPortWidth();
 
-            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(x, getInstance().getViewPortWidth()));
-            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(y, getInstance().getViewPortWidth()));
+            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(frame.width(), viewport));
+            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(frame.height(), viewport));
+
+            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(x, viewport));
+            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(y, viewport));
 
             event.put(Constants.Name.CONTENT_SIZE, contentSize);
             event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
@@ -487,7 +489,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   @WXComponentProp(name = Constants.Name.OFFSET_ACCURACY)
   public void setOffsetAccuracy(int accuracy) {
-    float realPx = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getViewPortWidth());
+    float realPx = WXViewUtils.getRealPxByWidth(accuracy, getInstance().getInstanceViewPortWidth());
     this.mOffsetAccuracy = (int) realPx;
   }
 
@@ -562,7 +564,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       smooth = WXUtils.getBoolean(options.get(Constants.Name.ANIMATED), true);
       if (offset != null) {
         try {
-          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getViewPortWidth());
+          offsetFloat = WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getInstanceViewPortWidth());
         }catch (Exception e ){
           WXLogUtils.e("Float parseFloat error :"+e.getMessage());
         }
@@ -672,7 +674,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       if (TextUtils.isEmpty(offset)) {
         return;
       }
-      int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), WXSDKInstance.getViewPortWidth());
+      int offsetInt = (int)WXViewUtils.getRealPxByWidth(Float.parseFloat(offset), getInstance().getInstanceViewPortWidth());
 
       int contentH = scrollView.getChildAt(0).getHeight();
       int scrollerH = scrollView.getHeight();

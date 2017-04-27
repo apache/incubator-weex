@@ -1,24 +1,25 @@
 #!/user/bin/env bash
 
 echo ''
-echo ' => cping files for vue dist...'
+# echo ' => cping files for vue dist...'
 
 base_dir=./packages/weex-vue-render
 src_dir=./html5
 vue_dir=${src_dir}/render/vue
-browser_dir=${src_dir}/render/browser
-shared_dir=${src_dir}/shared
 
-dist_dir=./packages/weex-vue-render/src
+# browser_dir=${src_dir}/render/browser
+# shared_dir=${src_dir}/shared
 
-rm -rf ${dist_dir}
+# dist_dir=./packages/weex-vue-render/src
 
-mkdir $dist_dir
-mkdir $dist_dir/render
+# rm -rf ${dist_dir}
 
-cp -fR ${browser_dir} ${dist_dir}/render/
-cp -fR ${vue_dir} ${dist_dir}/render/
-cp -fR ${shared_dir} ${dist_dir}/
+# mkdir $dist_dir
+# mkdir $dist_dir/render
+
+# cp -fR ${browser_dir} ${dist_dir}/render/
+# cp -fR ${vue_dir} ${dist_dir}/render/
+# cp -fR ${shared_dir} ${dist_dir}/
 
 echo " => cp READEME.md to dist path..."
 

@@ -91,6 +91,9 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
+    if(TextUtils.isEmpty(temp)){
+      return df;
+    }
     if (temp.endsWith("wx")) {
       try {
         return transferWx(temp, 750);

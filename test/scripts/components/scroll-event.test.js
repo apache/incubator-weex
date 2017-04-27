@@ -32,7 +32,7 @@ describe('list scroll event', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/list-scroll.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -58,7 +58,7 @@ describe('list scroll event', function () {
       duration: 0.5
     })
     .sleep(2000)
-    .elementByXPath('//div/text')
+    .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
@@ -74,7 +74,7 @@ describe('scroller scroll event', function () {
   before(function () {
     return util.init(driver)
       .get(util.getPage('/scroller-scroll.js'))
-      .waitForElementByXPath('//div/text[1]',util.getGETActionWaitTimeMills(),1000)
+      .waitForElementById('status',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
@@ -88,7 +88,7 @@ describe('scroller scroll event', function () {
     .sleep(2000)
     .touch('drag', {fromX:200, fromY:500, toX:100, toY:200})
     .sleep(2000)
-    .elementByXPath('//div/text')
+    .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))

@@ -25,7 +25,6 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-
 const platform = process.env.platform.toLowerCase() || 'android';
 const isAndroid = platform === 'android';
 
@@ -220,9 +219,6 @@ describe('recycler @ignore-android @ignore-ios', function () {
     .getRect()
     .then((rect)=>{
       console.log(`cell 1 rect after changing column width to 600:${JSON.stringify(rect)}`)
-      console.log(`navBarHeight:${navBarHeight}`)
-      console.log(`scaleFactor:${scaleFactor}`)
-      console.log(`recyclerWidth:${recyclerWidth}`)
 
       cell1Height = rect.height
       assert.isOk(isApproximate(rect.x, 0))
@@ -337,7 +333,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
       console.log(`sticking header rect after setting padding to 12:${JSON.stringify(rect)}`)
   
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
-      assert.isOk(isApproximate(rect.y, navBarHeight+12 * scaleFactor))
+      assert.isOk(isApproximate(rect.y, navBarHeight + (isAndroid ? 12 * scaleFactor : 0)))
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
@@ -350,10 +346,10 @@ describe('recycler @ignore-android @ignore-ios', function () {
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
       assert.isOk(isApproximate(rect.height, 94 * scaleFactor))
     })
-    .elementById('cell26')
+    .elementById((isAndroid ? 'cell26' : 'cell27'))
     .getRect()
     .then((rect)=>{
-      console.log(`cell 26 rect after setting padding to 12:${JSON.stringify(rect)}`)
+      console.log(`cell 27 rect after setting padding to 12:${JSON.stringify(rect)}`)
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
       assert.isOk(isApproximate(rect.width, 357 * scaleFactor))
     })
@@ -362,12 +358,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   it('#11 test onscroll', () => {
     let originContentOffset = 0
     return driver
-    .elementById('cell27')
-    .getRect()
-    .then((rect)=>{
-      console.log(`cell 29 rect:${JSON.stringify(rect)}`)
-    })
-    .elementById('cell27')
+    .elementById((isAndroid ? 'cell27' : 'cell28'))
     .click()
     .elementById('stickyText1')
     .text() 
@@ -392,7 +383,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   it('#12 test scrollable', () => {
     let originContentOffset = 0
     return driver
-    .elementById('cell25')
+    .elementById((isAndroid ? 'cell25' : 'cell26'))
     .click()
     .elementById('stickyText1')
     .text()
