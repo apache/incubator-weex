@@ -173,6 +173,11 @@ static dispatch_queue_t WXImageUpdateQueue;
     
 }
 
+- (BOOL)_needsDrawBorder
+{
+    return NO;
+}
+
 - (BOOL)needsDrawRect
 {
     if (_isCompositingChild) {
