@@ -186,7 +186,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /*
-  *  Warning: use getInstanceViewPortWidth instead.
+  *  Warning: use setInstanceViewPortWidth instead.
   *  store custom ViewPort Width
   */
   @Deprecated
