@@ -112,7 +112,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean trackComponent;
   private boolean enableLayerType = true;
   private boolean mNeedValidate = false;
-  private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
 
   /**
@@ -185,18 +184,6 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return mNeedValidate;
   }
 
-  /*
-  *  store custom ViewPort Width
-  */
-  @Deprecated
-  public void setViewPortWidth(int viewPortWidth) {
-    mViewPortWidth = viewPortWidth;
-  }
-
-  @Deprecated
-  public static int getViewPortWidth() {
-    return mViewPortWidth;
-  }
 
   public void setInstanceViewPortWidth(int instanceViewPortWidth) {
     this.mInstanceViewPortWidth = instanceViewPortWidth;
