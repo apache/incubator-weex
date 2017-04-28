@@ -270,8 +270,10 @@ public class WXNavigatorModule extends WXModule {
     @JSMethod(uiThread = true)
     public void setNavBarTitle(String param, JSCallback callback) {
         if (!TextUtils.isEmpty(param)) {
+            JSONObject jsObj = JSON.parseObject(param);
+            String title = jsObj.getString("title");
             if (WXSDKEngine.getActivityNavBarSetter() != null) {
-                if (WXSDKEngine.getActivityNavBarSetter().setNavBarTitle(param)) {
+                if (WXSDKEngine.getActivityNavBarSetter().setNavBarTitle(title)) {
                     if (callback != null) {
                         callback.invoke(MSG_SUCCESS);
                     }
