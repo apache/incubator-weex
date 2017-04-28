@@ -1,13 +1,24 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import <Foundation/Foundation.h>
-#import "WXSDkInstance.h"
+#import "WXSDKInstance.h"
 
 typedef NS_ENUM(int, WXSDKErrCode)
 {
@@ -16,11 +27,11 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_ERR_JSFRAMEWORK_EXECUTE = -1003,
     WX_ERR_JSFRAMEWORK_END = -1099,
     
-    WX_ERR_JSBRIAGE_START = -2001,
+    WX_ERR_JSBRIDGE_START = -2001,
     WX_ERR_JSFUNC_PARAM = -2009,
     WX_ERR_INVOKE_NATIVE = -2012,
     WX_ERR_JS_EXECUTE = -2013,
-    WX_ERR_JSBRIAGE_END = -2099,
+    WX_ERR_JSBRIDGE_END = -2099,
     
     WX_ERR_RENDER_START = -2100,
     WX_ERR_RENDER_CREATEBODY = -2100,
@@ -34,9 +45,10 @@ typedef NS_ENUM(int, WXSDKErrCode)
     WX_ERR_RENDER_SCROLLTOELEMENT = -2110,
     WX_ERR_RENDER_END = -2199,
     
-    WX_ERR_JSDOWNLOAD_START = -2201,
+    WX_ERR_DOWNLOAD_START = -2201,
     WX_ERR_JSBUNDLE_DOWNLOAD = -2202,
     WX_ERR_JSBUNDLE_STRING_CONVERT = -2203,
-    WX_ERR_JSDOWNLOAD_END = -2299,
+    WX_ERR_CANCEL = -2204,
+    WX_ERR_DOWNLOAD_END = -2299,
 };
 

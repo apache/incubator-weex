@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 'use strict'
 
 import scroll from 'scroll-to'
@@ -5,6 +23,65 @@ import scroll from 'scroll-to'
 let camelToKebab, appendStyle
 
 const dom = {
+
+  /**
+   * createBody: create root component
+   * @param  {object} element
+   *    container|listview|scrollview
+   * @return {[type]}      [description]
+   */
+  createBody: function (element) {
+    const componentManager = this.getComponentManager()
+    element.instanceId = componentManager.instanceId
+    return componentManager.createBody(element)
+  },
+
+  addElement: function (parentRef, element, index) {
+    const componentManager = this.getComponentManager()
+    element.instanceId = componentManager.instanceId
+    return componentManager.addElement(parentRef, element, index)
+  },
+
+  removeElement: function (ref) {
+    const componentManager = this.getComponentManager()
+    return componentManager.removeElement(ref)
+  },
+
+  moveElement: function (ref, parentRef, index) {
+    const componentManager = this.getComponentManager()
+    return componentManager.moveElement(ref, parentRef, index)
+  },
+
+  addEvent: function (ref, type) {
+    const componentManager = this.getComponentManager()
+    return componentManager.addEvent(ref, type)
+  },
+
+  removeEvent: function (ref, type) {
+    const componentManager = this.getComponentManager()
+    return componentManager.removeEvent(ref, type)
+  },
+
+  /**
+   * updateAttrs: update attributes of component
+   * @param  {string} ref
+   * @param  {obj} attr
+   */
+  updateAttrs: function (ref, attr) {
+    const componentManager = this.getComponentManager()
+    return componentManager.updateAttrs(ref, attr)
+  },
+
+  /**
+   * updateStyle: udpate style of component
+   * @param {string} ref
+   * @param {obj} style
+   */
+  updateStyle: function (ref, style) {
+    const componentManager = this.getComponentManager()
+    return componentManager.updateStyle(ref, style)
+  },
+
   /**
    * scrollToElement
    * @param  {string} ref
@@ -13,7 +90,7 @@ const dom = {
    */
   scrollToElement: function (ref, options) {
     !options && (options = {})
-    const offset = (Number(options.offset) || 0) * this.scale
+    const offset = Number(options.offset) || 0
     const elem = this.getComponentManager().getComponent(ref)
     if (!elem) {
       return console.error(`[h5-render] component of ref ${ref} doesn't exist.`)
@@ -82,11 +159,56 @@ const dom = {
     }
     const styleText = `@${key}{${stylesText}}`
     appendStyle(styleText, 'dom-added-rules')
+  },
+
+  createFinish (callback) {
+    return this.getComponentManager().createFinish()
+  },
+
+  updateFinish (callback) {
+    return this.getComponentManager().updateFinish()
+  },
+
+  refreshFinish (callback) {
+    return this.getComponentManager().refreshFinish()
   }
 }
 
 const meta = {
   dom: [{
+    name: 'createBody',
+    args: ['object']
+  }, {
+    name: 'addElement',
+    args: ['string', 'object', 'number']
+  }, {
+    name: 'removeElement',
+    args: ['string']
+  }, {
+    name: 'moveElement',
+    args: ['string', 'string', 'number']
+  }, {
+    name: 'addEvent',
+    args: ['string', 'string']
+  }, {
+    name: 'removeEvent',
+    args: ['string', 'string']
+  }, {
+    name: 'updateAttrs',
+    args: ['string', 'object']
+  }, {
+    name: 'updateStyle',
+    args: ['string', 'object']
+  }, {
+    name: 'createFinish',
+    args: []
+  }, {
+    name: 'updateFinish',
+    args: []
+  }, {
+    name: 'refreshFinish',
+    args: []
+  }, {
     name: 'scrollToElement',
     args: ['string', 'object']
   }, {

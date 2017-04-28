@@ -10,7 +10,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
   .btn {font-size: 36px; text-align: center; color: white; background-color: gray; padding: 20px; border-radius: 5px;}
 </style>
@@ -23,6 +23,7 @@
     methods: {
       toggle: function (e) {
         this.flag = !this.flag
+        console.log('this.flag:', this.flag)
       }
     }
   }

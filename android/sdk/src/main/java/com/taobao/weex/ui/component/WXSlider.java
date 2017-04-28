@@ -1,213 +1,30 @@
-/**
- *
- *                                  Apache License
- *                            Version 2.0, January 2004
- *                         http://www.apache.org/licenses/
- *
- *    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
- *
- *    1. Definitions.
- *
- *       "License" shall mean the terms and conditions for use, reproduction,
- *       and distribution as defined by Sections 1 through 9 of this document.
- *
- *       "Licensor" shall mean the copyright owner or entity authorized by
- *       the copyright owner that is granting the License.
- *
- *       "Legal Entity" shall mean the union of the acting entity and all
- *       other entities that control, are controlled by, or are under common
- *       control with that entity. For the purposes of this definition,
- *       "control" means (i) the power, direct or indirect, to cause the
- *       direction or management of such entity, whether by contract or
- *       otherwise, or (ii) ownership of fifty percent (50%) or more of the
- *       outstanding shares, or (iii) beneficial ownership of such entity.
- *
- *       "You" (or "Your") shall mean an individual or Legal Entity
- *       exercising permissions granted by this License.
- *
- *       "Source" form shall mean the preferred form for making modifications,
- *       including but not limited to software source code, documentation
- *       source, and configuration files.
- *
- *       "Object" form shall mean any form resulting from mechanical
- *       transformation or translation of a Source form, including but
- *       not limited to compiled object code, generated documentation,
- *       and conversions to other media types.
- *
- *       "Work" shall mean the work of authorship, whether in Source or
- *       Object form, made available under the License, as indicated by a
- *       copyright notice that is included in or attached to the work
- *       (an example is provided in the Appendix below).
- *
- *       "Derivative Works" shall mean any work, whether in Source or Object
- *       form, that is based on (or derived from) the Work and for which the
- *       editorial revisions, annotations, elaborations, or other modifications
- *       represent, as a whole, an original work of authorship. For the purposes
- *       of this License, Derivative Works shall not include works that remain
- *       separable from, or merely link (or bind by name) to the interfaces of,
- *       the Work and Derivative Works thereof.
- *
- *       "Contribution" shall mean any work of authorship, including
- *       the original version of the Work and any modifications or additions
- *       to that Work or Derivative Works thereof, that is intentionally
- *       submitted to Licensor for inclusion in the Work by the copyright owner
- *       or by an individual or Legal Entity authorized to submit on behalf of
- *       the copyright owner. For the purposes of this definition, "submitted"
- *       means any form of electronic, verbal, or written communication sent
- *       to the Licensor or its representatives, including but not limited to
- *       communication on electronic mailing lists, source code control systems,
- *       and issue tracking systems that are managed by, or on behalf of, the
- *       Licensor for the purpose of discussing and improving the Work, but
- *       excluding communication that is conspicuously marked or otherwise
- *       designated in writing by the copyright owner as "Not a Contribution."
- *
- *       "Contributor" shall mean Licensor and any individual or Legal Entity
- *       on behalf of whom a Contribution has been received by Licensor and
- *       subsequently incorporated within the Work.
- *
- *    2. Grant of Copyright License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       copyright license to reproduce, prepare Derivative Works of,
- *       publicly display, publicly perform, sublicense, and distribute the
- *       Work and such Derivative Works in Source or Object form.
- *
- *    3. Grant of Patent License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       (except as stated in this section) patent license to make, have made,
- *       use, offer to sell, sell, import, and otherwise transfer the Work,
- *       where such license applies only to those patent claims licensable
- *       by such Contributor that are necessarily infringed by their
- *       Contribution(s) alone or by combination of their Contribution(s)
- *       with the Work to which such Contribution(s) was submitted. If You
- *       institute patent litigation against any entity (including a
- *       cross-claim or counterclaim in a lawsuit) alleging that the Work
- *       or a Contribution incorporated within the Work constitutes direct
- *       or contributory patent infringement, then any patent licenses
- *       granted to You under this License for that Work shall terminate
- *       as of the date such litigation is filed.
- *
- *    4. Redistribution. You may reproduce and distribute copies of the
- *       Work or Derivative Works thereof in any medium, with or without
- *       modifications, and in Source or Object form, provided that You
- *       meet the following conditions:
- *
- *       (a) You must give any other recipients of the Work or
- *           Derivative Works a copy of this License; and
- *
- *       (b) You must cause any modified files to carry prominent notices
- *           stating that You changed the files; and
- *
- *       (c) You must retain, in the Source form of any Derivative Works
- *           that You distribute, all copyright, patent, trademark, and
- *           attribution notices from the Source form of the Work,
- *           excluding those notices that do not pertain to any part of
- *           the Derivative Works; and
- *
- *       (d) If the Work includes a "NOTICE" text file as part of its
- *           distribution, then any Derivative Works that You distribute must
- *           include a readable copy of the attribution notices contained
- *           within such NOTICE file, excluding those notices that do not
- *           pertain to any part of the Derivative Works, in at least one
- *           of the following places: within a NOTICE text file distributed
- *           as part of the Derivative Works; within the Source form or
- *           documentation, if provided along with the Derivative Works; or,
- *           within a display generated by the Derivative Works, if and
- *           wherever such third-party notices normally appear. The contents
- *           of the NOTICE file are for informational purposes only and
- *           do not modify the License. You may add Your own attribution
- *           notices within Derivative Works that You distribute, alongside
- *           or as an addendum to the NOTICE text from the Work, provided
- *           that such additional attribution notices cannot be construed
- *           as modifying the License.
- *
- *       You may add Your own copyright statement to Your modifications and
- *       may provide additional or different license terms and conditions
- *       for use, reproduction, or distribution of Your modifications, or
- *       for any such Derivative Works as a whole, provided Your use,
- *       reproduction, and distribution of the Work otherwise complies with
- *       the conditions stated in this License.
- *
- *    5. Submission of Contributions. Unless You explicitly state otherwise,
- *       any Contribution intentionally submitted for inclusion in the Work
- *       by You to the Licensor shall be under the terms and conditions of
- *       this License, without any additional terms or conditions.
- *       Notwithstanding the above, nothing herein shall supersede or modify
- *       the terms of any separate license agreement you may have executed
- *       with Licensor regarding such Contributions.
- *
- *    6. Trademarks. This License does not grant permission to use the trade
- *       names, trademarks, service marks, or product names of the Licensor,
- *       except as required for reasonable and customary use in describing the
- *       origin of the Work and reproducing the content of the NOTICE file.
- *
- *    7. Disclaimer of Warranty. Unless required by applicable law or
- *       agreed to in writing, Licensor provides the Work (and each
- *       Contributor provides its Contributions) on an "AS IS" BASIS,
- *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *       implied, including, without limitation, any warranties or conditions
- *       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
- *       PARTICULAR PURPOSE. You are solely responsible for determining the
- *       appropriateness of using or redistributing the Work and assume any
- *       risks associated with Your exercise of permissions under this License.
- *
- *    8. Limitation of Liability. In no event and under no legal theory,
- *       whether in tort (including negligence), contract, or otherwise,
- *       unless required by applicable law (such as deliberate and grossly
- *       negligent acts) or agreed to in writing, shall any Contributor be
- *       liable to You for damages, including any direct, indirect, special,
- *       incidental, or consequential damages of any character arising as a
- *       result of this License or out of the use or inability to use the
- *       Work (including but not limited to damages for loss of goodwill,
- *       work stoppage, computer failure or malfunction, or any and all
- *       other commercial damages or losses), even if such Contributor
- *       has been advised of the possibility of such damages.
- *
- *    9. Accepting Warranty or Additional Liability. While redistributing
- *       the Work or Derivative Works thereof, You may choose to offer,
- *       and charge a fee for, acceptance of support, warranty, indemnity,
- *       or other liability obligations and/or rights consistent with this
- *       License. However, in accepting such obligations, You may act only
- *       on Your own behalf and on Your sole responsibility, not on behalf
- *       of any other Contributor, and only if You agree to indemnify,
- *       defend, and hold each Contributor harmless for any liability
- *       incurred by, or claims asserted against, such Contributor by reason
- *       of your accepting any such warranty or additional liability.
- *
- *    END OF TERMS AND CONDITIONS
- *
- *    APPENDIX: How to apply the Apache License to your work.
- *
- *       To apply the Apache License to your work, attach the following
- *       boilerplate notice, with the fields enclosed by brackets "[]"
- *       replaced with your own identifying information. (Don't include
- *       the brackets!)  The text should be enclosed in the appropriate
- *       comment syntax for the file format. We also recommend that a
- *       file or class name and description of purpose be included on the
- *       same "printed page" as the copyright notice for easier
- *       identification within third-party archives.
- *
- *    Copyright 2016 Alibaba Group
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -216,7 +33,7 @@ import android.widget.FrameLayout;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.common.Component;
+import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXEvent;
@@ -224,10 +41,12 @@ import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.view.WXCircleIndicator;
 import com.taobao.weex.ui.view.WXCirclePageAdapter;
 import com.taobao.weex.ui.view.WXCircleViewPager;
+import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -236,18 +55,27 @@ import java.util.Map;
 
 public class WXSlider extends WXVContainer<FrameLayout> {
 
+  public static final String INDEX = "index";
+  public static final String INFINITE = "infinite";
+
+  private boolean isInfinite = true;
+
   Map<String, Object> params = new HashMap<>();
+  private float offsetXAccuracy = 0.1f;
 
   public static class Creator implements ComponentCreator {
-    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-      return new WXSlider(instance, node, parent, lazy);
+    public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+      return new WXSlider(instance, node, parent);
     }
   }
 
   /**
    * Scrollable sliderview
    */
-  /** package **/ WXCircleViewPager mViewPager;
+  /**
+   * package
+   **/
+  WXCircleViewPager mViewPager;
   /**
    * Circle indicator
    */
@@ -264,24 +92,29 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Deprecated
   public WXSlider(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
-    this(instance, dom, parent, isLazy);
+    this(instance, dom, parent);
   }
 
-  public WXSlider(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+  public WXSlider(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+    super(instance, node, parent);
   }
 
   @Override
   protected FrameLayout initComponentHostView(@NonNull Context context) {
     FrameLayout view = new FrameLayout(context);
     // init view pager
+    if (getDomObject() != null && getDomObject().getAttrs() != null) {
+      Object obj = getDomObject().getAttrs().get(INFINITE);
+      isInfinite = WXUtils.getBoolean(obj, true);
+    }
     FrameLayout.LayoutParams pagerParams = new FrameLayout.LayoutParams(
-         LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     mViewPager = new WXCircleViewPager(context);
+    mViewPager.setCircle(isInfinite);
     mViewPager.setLayoutParams(pagerParams);
 
     // init adapter
-    mAdapter = new WXCirclePageAdapter();
+    mAdapter = new WXCirclePageAdapter(isInfinite);
     mViewPager.setAdapter(mAdapter);
     // add to parent
     view.addView(mViewPager);
@@ -292,14 +125,46 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     return view;
   }
 
-  //TODO Slider don't support any gesture for now.
+  /**
+   * Slider is not a regular container,top/left/right/bottom not apply to view,expect indicator.
+   */
+  @Override
+  public LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom) {
+    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    if (lp == null) {
+      lp = new FrameLayout.LayoutParams(width, height);
+    } else {
+      lp.width = width;
+      lp.height = height;
+    }
+
+    if (lp instanceof ViewGroup.MarginLayoutParams) {
+      //expect indicator .
+      if (child instanceof WXIndicator) {
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(left, top, right, bottom);
+      } else {
+        ((ViewGroup.MarginLayoutParams) lp).setMargins(0, 0, 0, 0);
+      }
+    }
+    return lp;
+  }
+
+
   @Override
   public void addEvent(String type) {
     super.addEvent(type);
-    if (getRealView() != null) {
-      getRealView().setOnTouchListener(null);
+    if (Constants.Event.SCROLL.equals(type)) {
+      if (mViewPager == null) {
+        return;
+      }
+      mViewPager.addOnPageChangeListener(new SliderOnScrollListener(this));
     }
-    mGestureType.clear();
+  }
+
+  @Override
+  public boolean containsGesture(WXGestureType WXGestureType) {
+    //TODO Slider don't support any gesture for now.
+    return false;
   }
 
   @Override
@@ -317,16 +182,13 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       return;
     }
     mAdapter.addPageView(view);
-    mAdapter.notifyDataSetChanged();
+    hackTwoItemsInfiniteScroll();
+
+    mViewPager.setCurrentItem(0);
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
     }
-  }
-
-  @Override
-  public void remove(WXComponent child) {
-    remove(child, true);
   }
 
   @Override
@@ -336,7 +198,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
 
     mAdapter.removePageView(child.getHostView());
-    mAdapter.notifyDataSetChanged();
+    hackTwoItemsInfiniteScroll();
+    super.remove(child,destroy);
   }
 
   @Override
@@ -359,7 +222,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @Override
   public void onActivityStop() {
     if (mViewPager != null) {
-      mViewPager.stopAutoScroll();
+      mViewPager.pauseAutoScroll();
     }
   }
 
@@ -411,6 +274,16 @@ public class WXSlider extends WXVContainer<FrameLayout> {
           setIndex(index);
         }
         return true;
+      case Constants.Name.OFFSET_X_ACCURACY:
+        Float accuracy = WXUtils.getFloat(param, 0.1f);
+        if (accuracy != 0) {
+          setOffsetXAccuracy(accuracy);
+        }
+        return true;
+      case Constants.Name.SCROLLABLE:
+        boolean scrollable = WXUtils.getBoolean(param, true);
+        setScrollable(scrollable);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -423,13 +296,13 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
     int i;
     try {
-      i = Integer.valueOf(value);
+      i = Integer.parseInt(value);
     } catch (NumberFormatException e) {
       WXLogUtils.e("", e);
       return;
     }
 
-    mViewPager.setCurrentItem(i);
+    setIndex(i);
   }
 
   @WXComponentProp(name = Constants.Name.AUTO_PLAY)
@@ -466,15 +339,40 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @WXComponentProp(name = Constants.Name.INDEX)
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
-      if(index >= mAdapter.getRealCount() || index < 0){
+      if (index >= mAdapter.getRealCount() || index < 0) {
         return;
       }
-      index = index % mAdapter.getRealCount();
       mViewPager.setCurrentItem(index);
+      if (mIndicator != null && mIndicator.getHostView() != null
+              && mIndicator.getHostView().getRealCurrentItem() != index) {
+        //OnPageChangeListener not triggered
+        WXLogUtils.d("setIndex >>>> correction indicator to " + index);
+        mIndicator.getHostView().setRealCurrentItem(index);
+        mIndicator.getHostView().invalidate();
+
+        if (mPageChangeListener != null && mAdapter != null) {
+          mPageChangeListener.onPageSelected(mAdapter.getFirst() + index);
+        }
+      }
+    }
+  }
+  @WXComponentProp(name = Constants.Name.SCROLLABLE)
+  public void setScrollable(boolean scrollable) {
+    if (mViewPager != null && mAdapter != null) {
+      if(mAdapter.getRealCount() > 0){
+        mViewPager.setScrollable(scrollable);
+      }
     }
   }
 
+  @WXComponentProp(name = Constants.Name.OFFSET_X_ACCURACY)
+  public void setOffsetXAccuracy(float accuracy) {
+    this.offsetXAccuracy = accuracy;
+  }
+
   protected class SliderPageChangeListener implements OnPageChangeListener {
+
+    private int lastPos = -1;
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -483,14 +381,17 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
     @Override
     public void onPageSelected(int pos) {
+      if (mAdapter.getRealPosition(pos) == lastPos) {
+        return;
+      }
       if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("onPageSelected >>>>" + pos);
+        WXLogUtils.d("onPageSelected >>>>" + mAdapter.getRealPosition(pos) + " lastPos: " + lastPos);
       }
       if (mAdapter == null || mAdapter.getRealCount() == 0) {
         return;
       }
 
-      int realPosition = pos % mAdapter.getRealCount();
+      int realPosition = mAdapter.getRealPosition(pos);
       if (mChildren == null || realPosition >= mChildren.size()) {
         return;
       }
@@ -501,26 +402,152 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       WXEvent event = getDomObject().getEvents();
       String ref = getDomObject().getRef();
       if (event.contains(Constants.Event.CHANGE) && WXViewUtils.onScreenArea(getHostView())) {
-        params.put("index", realPosition);
+        params.put(INDEX, realPosition);
 
         Map<String, Object> domChanges = new HashMap<>();
         Map<String, Object> attrsChanges = new HashMap<>();
-        attrsChanges.put("value", realPosition);
+        attrsChanges.put(INDEX, realPosition);
         domChanges.put("attrs", attrsChanges);
-        WXSDKManager.getInstance().fireEvent(mInstanceId, ref,
+        WXSDKManager.getInstance().fireEvent(getInstanceId(), ref,
             Constants.Event.CHANGE, params, domChanges);
       }
 
       mViewPager.requestLayout();
       getHostView().invalidate();
+      lastPos = mAdapter.getRealPosition(pos);
     }
 
     @Override
     public void onPageScrollStateChanged(int arg0) {
       FrameLayout root = getHostView();
-      if(null != root) {
+      if (null != root) {
         root.invalidate();
       }
+    }
+  }
+
+  protected static class SliderOnScrollListener implements OnPageChangeListener {
+    private float lastPositionOffset = 99f;
+    private int selectedPosition;
+    private WXSlider target;
+
+    public SliderOnScrollListener(WXSlider target) {
+      this.target = target;
+      this.selectedPosition = target.mViewPager.superGetCurrentItem();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+      if (lastPositionOffset == 99f) {
+        lastPositionOffset = positionOffset;
+        return;
+      }
+
+      float offset = positionOffset - lastPositionOffset;
+
+      if (Math.abs(offset) >= target.offsetXAccuracy) {
+        if (position == selectedPosition) {
+          //slide to left. positionOffset[0 -> 1]
+          Map<String,Object> event = new HashMap<>(1);
+          event.put(Constants.Name.OFFSET_X_RATIO, -positionOffset);
+          target.fireEvent(Constants.Event.SCROLL, event);
+        } else if (position < selectedPosition) {
+          //slide to right. positionOffset[1 -> 0]
+          Map<String,Object> event = new HashMap<>(1);
+          event.put(Constants.Name.OFFSET_X_RATIO, (1f - positionOffset));
+          target.fireEvent(Constants.Event.SCROLL, event);
+        }
+        lastPositionOffset = positionOffset;
+      }
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+      selectedPosition = position;
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+      /**
+       * @homeblog@vip.qq.com
+       *
+       *  add scrollstart & scrollend event
+       *
+       */
+      switch (state) {
+        case ViewPager.SCROLL_STATE_IDLE:
+          lastPositionOffset = 99f;
+          target.fireEvent("scrollend");
+          break;
+        case ViewPager.SCROLL_STATE_DRAGGING:
+          target.fireEvent("scrollstart");
+          break;
+        case ViewPager.SCROLL_STATE_SETTLING:
+          break;
+
+      }
+    }
+  }
+
+  private void hackTwoItemsInfiniteScroll() {
+    if (mViewPager == null || mAdapter == null) {
+      return;
+    }
+    if (isInfinite) {
+      if (mAdapter.getRealCount() == 2) {
+        final GestureDetector gestureDetector = new GestureDetector(getContext(), new FlingGestureListener(mViewPager));
+        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+          }
+        });
+      } else {
+        mViewPager.setOnTouchListener(null);
+      }
+    }
+  }
+
+  private static class FlingGestureListener extends GestureDetector.SimpleOnGestureListener {
+    private static final int SWIPE_MIN_DISTANCE = WXViewUtils.dip2px(50);
+    private static final int SWIPE_MAX_OFF_PATH = WXViewUtils.dip2px(250);
+    private static final int SWIPE_THRESHOLD_VELOCITY = WXViewUtils.dip2px(200);
+    private WeakReference<WXCircleViewPager> pagerRef;
+
+    FlingGestureListener(WXCircleViewPager pager) {
+      this.pagerRef = new WeakReference<>(pager);
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+      WXCircleViewPager mViewPager = pagerRef.get();
+      if (mViewPager == null) {
+        return false;
+      }
+
+      try {
+        if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH) {
+          return false;
+        }
+
+        if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                && mViewPager.superGetCurrentItem() == 1) {
+          // right to left swipe
+          mViewPager.setCurrentItem(0, false);
+          return true;
+        } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                && mViewPager.superGetCurrentItem() == 0) {
+          // left to right swipe
+          mViewPager.setCurrentItem(1, false);
+          return true;
+        }
+      } catch (Exception e) {
+        // ignore
+      }
+      return false;
     }
   }
 }

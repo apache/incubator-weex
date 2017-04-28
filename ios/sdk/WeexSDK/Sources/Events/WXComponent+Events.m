@@ -1,20 +1,34 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent+Events.h"
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
 #import "WXSDKInstance.h"
+#import "WXComponentManager.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKManager.h"
+#import "WXSDKInstance_private.h"
 #import <objc/runtime.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
+#import "WXComponent+PseudoClassManagement.h"
 
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
@@ -71,6 +85,7 @@
 @property (nonatomic, assign) BOOL listenTouchMove;
 @property (nonatomic, assign) BOOL listenTouchEnd;
 @property (nonatomic, assign) BOOL listenTouchCancel;
+@property (nonatomic, assign) BOOL listenPseudoTouch;
 
 - (instancetype)initWithComponent:(WXComponent *)component NS_DESIGNATED_INITIALIZER;
 
@@ -122,9 +137,15 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)_initEvents:(NSArray *)events
 {
-    NSArray *eventsCopy = [events copy];
-    for (NSString *addEventName in eventsCopy) {
+    for (NSString *addEventName in events) {
         [self _addEventOnMainThread:addEventName];
+    }
+}
+
+- (void)_initPseudoEvents:(BOOL)isListenPseudoTouch
+{
+    if(isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = YES;
     }
 }
 
@@ -141,10 +162,17 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(panmove, addPanMoveEvent)
     WX_ADD_EVENT(panend, addPanEndEvent)
     
+    WX_ADD_EVENT(horizontalpan, addHorizontalPanEvent)
+    WX_ADD_EVENT(verticalpan, addVerticalPanEvent)
+    
     WX_ADD_EVENT(touchstart, addTouchStartEvent)
     WX_ADD_EVENT(touchmove, addTouchMoveEvent)
     WX_ADD_EVENT(touchend, addTouchEndEvent)
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
+    
+    if(_isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = YES;
+    }
     
     [self addEvent:addEventName];
 }
@@ -162,11 +190,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(panmove, removePanMoveEvent)
     WX_REMOVE_EVENT(panend, removePanEndEvent)
     
+    WX_REMOVE_EVENT(horizontalpan, removeHorizontalPanEvent)
+    WX_REMOVE_EVENT(verticalpan, removeVerticalPanEvent)
+    
     WX_REMOVE_EVENT(touchstart, removeTouchStartEvent)
     WX_REMOVE_EVENT(touchmove, removeTouchMoveEvent)
     WX_REMOVE_EVENT(touchend, removeTouchEndEvent)
     WX_REMOVE_EVENT(touchcancel, removeTouchCancelEvent)
     
+    if(_isListenPseudoTouch) {
+        self.touchGesture.listenPseudoTouch = NO;
+    }
+
     [self removeEvent:removeEventName];
 }
 
@@ -177,11 +212,16 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self removePanStartEvent];
     [self removePanMoveEvent];
     [self removePanEndEvent];
+    [self removeHorizontalPanEvent];
+    [self removeVerticalPanEvent];
+    
     [self removeTouchStartEvent];
     [self removeTouchMoveEvent];
     [self removeTouchEndEvent];
     [self removeTouchCancelEvent];
     [self removeSwipeEvent];
+    [self removePseudoTouchEvent];
+
 }
 
 #pragma mark - Appear & Disappear
@@ -210,6 +250,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self.ancestorScroller removeScrollToListener:self];
 }
 
+- (void)removePseudoTouchEvent
+{
+    _touchGesture.listenPseudoTouch = NO;
+    [self checkRemoveTouchGesture];
+}
+
 #pragma mark - Click Event
 
 - (void)addClickEvent
@@ -232,13 +278,16 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)onClick:(__unused UITapGestureRecognizer *)recognizer
 {
     NSMutableDictionary *position = [[NSMutableDictionary alloc] initWithCapacity:4];
-    
-    if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
-        CGRect frame = [self.view.superview convertRect:self.calculatedFrame toView:self.view.window];
-        position[@"x"] = @(frame.origin.x);
-        position[@"y"] = @(frame.origin.y);
-        position[@"width"] = @(frame.size.width);
-        position[@"height"] = @(frame.size.height);
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+    if (![self isViewLoaded]) {
+        return;
+    }
+    if (!CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        CGRect frame = [self.view.superview convertRect:self.view.frame toView:self.view.window];
+        position[@"x"] = @(frame.origin.x/scaleFactor);
+        position[@"y"] = @(frame.origin.y/scaleFactor);
+        position[@"width"] = @(frame.size.width/scaleFactor);
+        position[@"height"] = @(frame.size.height/scaleFactor);
     }
 
     [self fireEvent:@"click" params:@{@"position":position}];
@@ -357,7 +406,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
 }
 
-#pragma makr - Pan
+#pragma mark - Pan
 
 - (void)addPanGesture
 {
@@ -386,22 +435,56 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self addPanGesture];
 }
 
+- (void)addHorizontalPanEvent
+{
+    _listenHorizontalPan = YES;
+    [self addPanGesture];
+}
+
+- (void)addVerticalPanEvent
+{
+    _listenVerticalPan = YES;
+    [self addPanGesture];
+}
+
+
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
+    NSString *state = @"";
     NSDictionary *resultTouch = [self touchResultWithScreenLocation:screenLocation pageLocation:pageLoacation identifier:gesture.wx_identifier];
     
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        eventName = @"panstart";
+        if (_listenPanStart) {
+            eventName = @"panstart";
+        }
+        state = @"start";
     } else if (gesture.state == UIGestureRecognizerStateEnded) {
-        eventName = @"panend";
+        if (_listenPanEnd) {
+            eventName = @"panend";
+        }
+        state = @"end";
         gesture.wx_identifier = nil;
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
-        eventName = @"panmove";
+        if (_listenPanMove) {
+             eventName = @"panmove";
+        }
+        state = @"move";
     }
     
+    
+    CGPoint translation = [_panGesture translationInView:self.view];
+    
+    if (_listenHorizontalPan && fabs(translation.y) <= fabs(translation.x)) {
+        [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    }
+        
+    if (_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+        [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
+    }
+        
     if (eventName) {
         [self fireEvent:eventName params:@{@"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
@@ -425,9 +508,24 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self checkRemovePanGesture];
 }
 
+- (void)removeHorizontalPanEvent
+{
+    _listenHorizontalPan = NO;
+    [self checkRemovePanGesture];
+}
+
+- (void)removeVerticalPanEvent
+{
+    _listenVerticalPan = NO;
+    [self checkRemovePanGesture];
+}
+
 - (void)checkRemovePanGesture
 {
-    if (_panGesture && !_listenPanStart && !_listenPanMove && !_listenPanEnd) {
+    if (_panGesture
+        && !_listenPanStart && !_listenPanMove && !_listenPanEnd
+        && !_listenHorizontalPan && !_listenVerticalPan
+        ) {
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -492,7 +590,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)checkRemoveTouchGesture
 {
-    if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel) {
+    if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel && !_touchGesture.listenPseudoTouch) {
         _touchGesture.delegate = nil;
         _touchGesture = nil;
     }
@@ -507,6 +605,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
+    if (gestureRecognizer == _panGesture) {
+        CGPoint translation = [_panGesture translationInView:self.view];
+        if (_listenHorizontalPan && !_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+            return NO;
+        }
+    }
     return YES;
 }
 
@@ -525,13 +629,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         return YES;
     }
     
-//#ifdef DEBUG
-//    if ([gestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]
-//        || [otherGestureRecognizer isKindOfClass:[WXDebugLongPressGestureRecognizer class]]) {
-//        return YES;
-//    }
-//#endif
-    
     return NO;
 }
 
@@ -540,10 +637,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (NSDictionary *)touchResultWithScreenLocation:(CGPoint)screenLocation pageLocation:(CGPoint)pageLocation identifier:(NSNumber *)identifier
 {
     NSMutableDictionary *resultTouch = [[NSMutableDictionary alloc] initWithCapacity:5];
-    resultTouch[@"screenX"] = @(screenLocation.x/WXScreenResizeRadio());
-    resultTouch[@"screenY"] = @(screenLocation.y/WXScreenResizeRadio());
-    resultTouch[@"pageX"] = @(pageLocation.x/WXScreenResizeRadio());
-    resultTouch[@"pageY"] = @(pageLocation.y/WXScreenResizeRadio());
+    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
+    resultTouch[@"screenX"] = @(screenLocation.x/scaleFactor);
+    resultTouch[@"screenY"] = @(screenLocation.y/scaleFactor);
+    resultTouch[@"pageX"] = @(pageLocation.x/scaleFactor);
+    resultTouch[@"pageY"] = @(pageLocation.y/scaleFactor);
     resultTouch[@"identifier"] = identifier;
     
     return resultTouch;
@@ -585,6 +683,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if (_listenTouchStart) {
         [self fireTouchEvent:@"touchstart" withTouches:touches];
     }
+    if(_listenPseudoTouch) {
+        NSMutableDictionary *styles = [_component getPseudoClassStyles:@"active"];
+        [_component updatePseudoClassStyles:styles];
+    }
+
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -604,6 +707,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if (_listenTouchEnd) {
         [self fireTouchEvent:@"touchend" withTouches:touches];
     }
+    if(_listenPseudoTouch) {
+        [self recoveryPseudoStyles:_component.styles];
+    }
+
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -612,6 +719,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     
     if (_listenTouchCancel) {
         [self fireTouchEvent:@"touchcancel" withTouches:touches];
+    }
+    if(_listenPseudoTouch) {
+        [self recoveryPseudoStyles:_component.styles];
     }
 }
 
@@ -630,6 +740,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];
+}
+
+- (void)recoveryPseudoStyles:(NSDictionary *)styles
+{
+    [_component recoveryPseudoStyles:styles];
 }
 
 - (void)touchResponse:(UIGestureRecognizer *)gesture

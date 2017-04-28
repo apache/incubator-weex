@@ -6,7 +6,7 @@
 
 <template>
   <list>
-    <cell v-for="item in items">
+    <cell v-for="(item,i) in items" :key="i" >
       <text>{{item.title}}</text>
       <item :title="'a'"></item>
     </cell>
@@ -15,12 +15,14 @@
 
 <script>
   module.exports = {
-    data: {
-      items: [
-        {title: 'A', url: 'a'},
-        {title: 'B', url: 'b'},
-        {title: 'C', url: 'c'}
-      ]
+    data: function () {
+      return {
+        items: [
+          {title: 'A', url: 'a'},
+          {title: 'B', url: 'b'},
+          {title: 'C', url: 'c'}
+        ]
+      }
     },
     components: {
       item: require('./include/sub.vue')

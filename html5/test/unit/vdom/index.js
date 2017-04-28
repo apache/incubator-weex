@@ -1,30 +1,35 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import chai from 'chai'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 const { expect } = chai
 chai.use(sinonChai)
 
-global.callNative = function () {}
-global.callAddElement = function () {}
-
 import {
   Document,
   Element,
-  Comment
+  Comment,
+  elementTypes,
+  registerElement,
+  clearElementTypes
 } from '../../../runtime/vdom'
-
-global.callNative = function () {}
-global.callAddElement = function () {}
-
-const tempHandler = Document.handler
-
-before(() => {
-  Document.handler = global.callNative
-})
-
-after(() => {
-  Document.handler = tempHandler
-})
 
 describe('document constructor', () => {
   it('create & destroy document', () => {
@@ -35,6 +40,49 @@ describe('document constructor', () => {
     expect(doc.documentElement).is.an.object
     expect(doc.documentElement.role).equal('documentElement')
     doc.destroy()
+  })
+})
+
+describe('component methods management', () => {
+  before(() => {
+    registerElement('x', ['foo', 'bar'])
+    registerElement('y', [])
+    registerElement('z')
+  })
+
+  after(() => {
+    clearElementTypes()
+  })
+
+  it('has registered element types', () => {
+    expect(Object.keys(elementTypes)).eql(['x'])
+  })
+
+  it('will call component method', () => {
+    const spy = sinon.spy()
+    const doc = new Document('test', '', spy)
+    const x = new Element('x')
+    const y = new Element('y')
+    const z = new Element('z')
+    const n = new Element('n')
+    expect(x.foo).is.function
+    expect(x.bar).is.function
+    expect(x.baz).is.undefined
+    expect(y.foo).is.undefined
+    expect(z.foo).is.undefined
+    expect(n.foo).is.undefined
+
+    doc.createBody('r')
+    doc.documentElement.appendChild(doc.body)
+    doc.body.appendChild(x)
+    doc.body.appendChild(y)
+    doc.body.appendChild(z)
+    doc.body.appendChild(n)
+    expect(spy.args.length).eql(5)
+
+    x.foo(1, 2, 3)
+    expect(spy.args.length).eql(6)
+    expect(spy.args[5]).eql([[{ component: 'x', method: 'foo', ref: x.ref, args: [1, 2, 3] }]])
   })
 })
 
@@ -435,12 +483,12 @@ describe('complicated situations', () => {
     doc = new Document('foo', '', spy)
     doc.createBody('r')
     doc.documentElement.appendChild(doc.body)
-    el = new Element('bar', null, doc)
-    el2 = new Element('baz', null, doc)
-    el3 = new Element('qux', null, doc)
-    c = new Comment('aaa', doc)
-    c2 = new Comment('bbb', doc)
-    c3 = new Comment('ccc', doc)
+    el = new Element('bar')
+    el2 = new Element('baz')
+    el3 = new Element('qux')
+    c = new Comment('aaa')
+    c2 = new Comment('bbb')
+    c3 = new Comment('ccc')
   })
 
   afterEach(() => {

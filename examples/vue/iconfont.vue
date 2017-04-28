@@ -7,7 +7,7 @@
   </div>
 
 </template>
-<style>
+<style scoped>
   .title1 {
     color: red;
     font-size: 36;
@@ -34,7 +34,7 @@
 </style>
 
 <script>
-  var domModule = require('@weex-module/dom');
+  var domModule = weex.requireModule('dom');
   module.exports = {
     created: function() {
       //目前支持ttf、woff文件，不支持svg、eot类型

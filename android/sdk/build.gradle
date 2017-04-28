@@ -13,11 +13,8 @@ buildscript {
 }
 
 
-allprojects {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
+plugins {
+    id "com.github.hierynomus.license" version "0.13.1"
 }
 
 apply plugin: 'com.android.library'
@@ -25,13 +22,14 @@ apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'checkstyle'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
-
 if(!disableCov.toBoolean()){
     apply plugin: 'com.vanniktech.android.junit.jacoco'
     junitJacoco {
         excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
     }
 }
+
+project.ext.set("androidTargetSDK",project.hasProperty('targetSDK') ? project.getProperty('targetSDK') as int : 21 )
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
@@ -42,14 +40,13 @@ task checkstyle(type: Checkstyle) {
     exclude '**/test/**'
     exclude '**/com/taobao/weex/dom/flex/**'
     classpath = files()
-    
 }
 
 checkstyle {
     toolVersion = '6.9'
 }
 
-version = "0.7.0"
+version = "0.9.4"
 
 android {
     compileSdkVersion 23
@@ -57,23 +54,26 @@ android {
     resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
+    def line
+    new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
+    def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
+    def jsfmVersion = m[0][1]
+    println jsfmVersion
 
-    def jsfmVersion = "0.15.2"
-    try{
-        def line
-        new File("assets/main.js").withReader { line = it.readLine() }
-        def m = line =~ /[A-Z\s]+\:\s+([0-9\.]+)\s+Build\s+[0-9]+/;
-        jsfmVersion = m[0][1]
-        println jsfmVersion
-    } catch (java.lang.Exception e) {
 
-    }
+    def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
+    def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
+    println "ARMEABI_Size: "+ARMEABI_Size;
+    println "X86_Size:" + X86_Size;
+
 
     defaultConfig {
+        buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
+        buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion project.androidTargetSDK
         versionCode 1
         versionName "1.0"
         ndk {
@@ -84,10 +84,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "boolean", "ENABLE_TRACE", "false"
         }
 
         debug {
             testCoverageEnabled true
+            buildConfigField "boolean", "ENABLE_TRACE", "true"
         }
     }
 
@@ -113,6 +115,7 @@ android {
     }
     testOptions {
         unitTests.all {
+            maxHeapSize = "1024m"
             jvmArgs += ['-XX:-UseSplitVerifier', '-noverify','-Xverify:none']/* fix VerifyError  */
         }
     }
@@ -144,35 +147,22 @@ dependencies {
     testCompile 'org.json:json:20160212'
 }
 
-license{
-    header=file('license/LICENSE')
-    excludes (["**/WXDataStructureUtil.java",
-               "**/Spacing.java",
-               "**/MeasureOutput.java",
-               "**/LayoutEngine.java",
-               "**/FloatUtil.java",
-               "**/CSSWrap.java",
-               "**/CSSStyle.java",
-               "**/CSSPositionType.java",
-               "**/CSSNode.java",
-               "**/CSSLayoutContext.java",
-               "**/CSSLayout.java",
-               "**/CSSJustify.java",
-               "**/CSSFlexDirection.java",
-               "**/CSSDirection.java",
-               "**/CSSConstants.java",
-               "**/CSSAlign.java",
-               "**/CachedCSSLayout.java",
-               "**/CSSAlignConvert.java",
-               "**/CSSFlexDirectionConvert.java",
-               "**/CSSJustifyConvert.java",
-               "**/CSSPositionTypeConvert.java",
-               "**/CSSTransformFromStyle.java",
-               "**/CSSWrapConvert.java",
-               "**/WXTextDomObject.java",
-               "**/WXCustomStyleSpan.java"])
+task licenseFormatWeex (type:nl.javadude.gradle.plugins.license.License) {
+    source = fileTree(dir: "../",
+            includes: [
+                    "sdk/src/main/java/**/*.java",
+                    "common/src/main/java/**/*.java",
+                    "playground/app/src/main/java/**/*.java"
+            ],
+            excludes: [
+            "**/dom/flex/*.java"
+            ])
 }
-preBuild.dependsOn licenseFormat
+
+license{
+    header=file("license/LICENSE")
+}
+preBuild.dependsOn licenseFormatWeex
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.10'

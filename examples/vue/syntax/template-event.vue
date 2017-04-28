@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
   .subtitle {font-size: 36px;}
   .btn {font-size: 36px; text-align: center; color: white; background-color: gray; padding: 20px; border-radius: 5px;}
@@ -20,16 +20,20 @@
 
 <script>
   module.exports = {
-    data: {
-      name: 'Steve',
-      temp: 'Mike'
+    data: function () {
+      return {
+        name: 'Steve',
+        temp: 'Mike'
+      }
     },
     methods: {
       update: function (e) {
         this.setName('David')
+        console.log('setName', this.name)
       },
       setName: function (value) {
         this.name = value
+        console.log('name', this.name)
       }
     }
   }

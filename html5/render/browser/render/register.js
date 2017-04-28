@@ -1,7 +1,47 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import ComponentManager from '../dom/componentManager'
 import { registerLoader } from './loader'
 import { protocol } from '../bridge'
 import { extend } from '../utils'
+import { addEventListener, removeAllEventListeners } from '../base/moduleEvent'
+
+/**
+ * register module event listener for every api module except 'globalEvent'.
+ */
+function registerModuleEventListener (name, module, meta) {
+  if (name !== 'globalEvent') {
+    module['addEventListener'] = function (evt, callbackId, options) {
+      return addEventListener.call(this, name, evt, callbackId, options)
+    }
+    module['removeAllEventListeners'] = function (evt) {
+      return removeAllEventListeners.call(this, name, evt)
+    }
+    ; [{
+      name: 'addEventListener',
+      args: ['string', 'function', 'object']
+    }, {
+      name: 'removeAllEventListeners',
+      args: ['string']
+    }].forEach(info => meta[name].push(info))
+  }
+}
 
 const methods = {
   // Register a new component with the specified name.
@@ -13,6 +53,7 @@ const methods = {
   // If the module already exists, just add methods from the
   // new module to the old one.
   registerApiModule (name, module, meta) {
+    registerModuleEventListener(name, module, meta)
     if (!protocol.apiModule[name]) {
       protocol.apiModule[name] = module
     }

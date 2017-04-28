@@ -101,7 +101,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .row {
     flex-direction: row;
     margin-bottom: 10px;
@@ -118,7 +118,7 @@
 <script>
   module.exports = {
     components: {
-      panel: require('weex-vue-components/panel.vue'),
+      panel: require('../include/panel.vue'),
       styleItem: require('./style-item.vue')
     }
   }

@@ -1,16 +1,33 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 import chai from 'chai'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 const { expect } = chai
 chai.use(sinonChai)
 
-global.callNative = function () {}
-global.callAddElement = function () {}
-
 import Vm from '../../../../frameworks/legacy/vm'
 import { Document } from '../../../../runtime/vdom'
-import Listener from '../../../../runtime/listener'
+import { init as resetTaskHandler } from '../../../../runtime/task-center'
 import Differ from '../../../../frameworks/legacy/app/differ'
+
+const oriCallNative = global.callNative
 
 describe('generate virtual dom for a single vm', () => {
   const spy = sinon.spy()
@@ -25,7 +42,7 @@ describe('generate virtual dom for a single vm', () => {
       actions.forEach((action) => {
         spy.apply(null, ['test', action.method].concat(action.args))
       })
-    }, Listener)
+    })
     customComponentMap = {}
   })
 
@@ -942,13 +959,16 @@ describe('generate virtual dom for sub vm', () => {
   let differ
 
   beforeEach(() => {
-    doc = new Document('test', null, null, Listener)
+    global.callNative = function () {}
+    resetTaskHandler()
+    doc = new Document('test', null, null)
     customComponentMap = {}
     differ = new Differ('test')
   })
 
   afterEach(() => {
     doc.destroy()
+    global.callNative = oriCallNative
   })
 
   it('generate sub elements', () => {
@@ -1588,7 +1608,7 @@ describe('generate dom actions', () => {
       actions.forEach((action) => {
         spy.apply(null, ['bar', action.method].concat(action.args))
       })
-    }, Listener)
+    })
     differ = new Differ('foo')
     customComponentMap = {}
     app = { doc, customComponentMap, differ }

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import <UIKit/UIKit.h>
@@ -20,31 +31,40 @@
 @protocol WXModuleProtocol <NSObject>
 
 /**
- *  @abstract the module callback , result can be string or dictionary.
+ * @abstract the module callback , result can be string or dictionary.
+ * @discussion callback data to js, the id of callback function will be removed to save memory.
  */
 typedef void (^WXModuleCallback)(id result);
-typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 
 /**
- *  @abstract export public method
+ * @abstract the module callback , result can be string or dictionary.
+ * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed until instance destroyed, so you can call it repetitious.
  */
-
-#define WX_EXPORT_METHOD(method) \
-+ (NSString *)WX_CONCAT_WRAPPER(wx_export_method_, __LINE__) { \
-    return NSStringFromSelector(method); \
-}
+typedef void (^WXModuleKeepAliveCallback)(id result, BOOL keepAlive);
 
 #define WX_EXPORT_MODULE(module) 
 
 @optional
 
 /**
- *  @abstract Returns the execute thread for this target
+ *  @abstract returns the execute queue for the module
  *
- *  @return  a NSThread Object
+ *  @return dispatch queue that module's methods will be invoked on
  *
- *  @discussion the implementation of this interface is optional. If you want to execute module actions in the special thread, you can create a new
- *  one.
+ *  @discussion the implementation is optional. Implement it if you want to execute module actions in the special queue.
+ *  Default dispatch queue will be the main queue.
+ *
+ */
+- (dispatch_queue_t)targetExecuteQueue;
+
+/**
+ *  @abstract returns the execute thread for the module
+ *
+ *  @return  thread that module's methods will be invoked on
+ *
+ *  @discussion the implementation is optional. If you want to execute module actions in the special thread, you can create a new one. 
+ *  If `targetExecuteQueue` is implemented,  the queue returned will be respected first.
+ *  Default is the main thread.
  *
  */
 - (NSThread *)targetExecuteThread;

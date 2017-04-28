@@ -17,7 +17,9 @@
     "a",
     "embed",
     "spinner",
-    "web"
+    "web",
+    "neighbor",
+    "richtext"
   ],
   "apis": [
     "animation",
@@ -26,11 +28,16 @@
     "event",
     "geolocation",
     "globalEvent",
+    "meta",
     "modal",
     "navigator",
     "pageInfo",
     "storage",
     "stream",
-    "webview"
+    "webview",
+    "webSocket"
+  ],
+  "npm": [
+    "weex-picker"
   ]
 }

@@ -10,7 +10,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .a {font-size: 48px;}
   .b {color: #ff0000;}
 </style>
@@ -23,6 +23,7 @@
     methods: {
       update: function (e) {
         this.x = 'b'
+        console.log('x', this.x)
       }
     }
   }

@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 /* global lib, WebSocket */
 
 'use strict'
@@ -14,6 +33,10 @@ const { framework, transformer } = subversion
 // register framework meta info
 global.frameworkVersion = framework
 global.transformerVersion = transformer
+
+// init bridge.
+import { Sender, receiver } from '../bridge'
+receiver.init()
 
 // init frameworks
 import Listener from '../dom/componentManager'
@@ -34,7 +57,6 @@ for (const methodName in globalMethods) {
 import config from './config'
 import { load } from './loader'
 import * as utils from '../utils'
-import { Sender, receiver } from '../bridge'
 import Component from '../base/component'
 import Atomic from '../base/atomic'
 import ComponentManager from '../dom/componentManager'
@@ -58,12 +80,17 @@ global.WXEnvironment = {
   osName: lib.env.browser ? lib.env.browser.name : null,
   osVersion: lib.env.browser ? lib.env.browser.version.val : null,
   deviceWidth: window.innerWidth,
-  deviceHeight: window.innerHeight
+  deviceHeight: window.innerHeight,
+  devicePixelRatio: window.devicePixelRatio ? window.devicePixelRatio : (window.screen.width >= 1440 ? 3.5 : (window.screen.width >= 1080 ? 3 : (window.screen.width >= 800 ? 2.5 : (window.screen.width >= 640 ? 2 : (window.screen.width >= 480 ? 1.5 : 1)))))
 }
 
 const _weexInstance = {}
 
 function noop () {}
+
+function setupViewport (width) {
+  document.querySelector('meta[name=viewport]').setAttribute('content', `width=${width}, user-scalable=no`)
+}
 
 ; (function initializeWithUrlParams () {
   // in casperjs the protocol is file.
@@ -107,11 +134,13 @@ export default function Weex (options) {
   this.bundleUrl = options.bundleUrl || location.href
   this.instanceId = options.appId
   this.rootId = options.rootId || (DEFAULT_ROOT_ID + utils.getRandom(10))
-  this.designWidth = options.designWidth || DEFAULT_DESIGN_WIDTH
   this.jsonpCallback = options.jsonpCallback || DEFAULT_JSONP_CALLBACK_NAME
   this.source = options.source
   this.loader = options.loader
   this.embed = options.embed
+
+  // init viewport
+  setupViewport(DEFAULT_DESIGN_WIDTH)
 
   // downgrade options.
   const dg = options.downgrade || []
@@ -120,8 +149,6 @@ export default function Weex (options) {
   })
 
   this.data = options.data
-  this.scale = this.width / this.designWidth
-  receiver.init(this)
   this.sender = new Sender(this)
 
   _weexInstance[this.instanceId] = this

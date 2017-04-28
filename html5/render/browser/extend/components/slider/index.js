@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 /* global lib */
 
 'use strict'
@@ -66,6 +84,7 @@ const proto = {
   create () {
     const node = document.createElement('div')
     node.classList.add('slider')
+    node.classList.add('weex-container')
     node.style.position = 'relative'
     node.style.overflow = 'hidden'
     return node
@@ -89,7 +108,6 @@ const proto = {
     this.sliderContainer = sliderContainer
 
     const children = this.data.children
-    const scale = this.data.scale
     const fragment = document.createDocumentFragment()
     let indicatorData, width, height
     let childWidth = 0
@@ -98,7 +116,6 @@ const proto = {
     if (children && children.length) {
       for (let i = 0; i < children.length; i++) {
         let child
-        children[i].scale = this.data.scale
         children[i].instanceId = this.data.instanceId
         if (children[i].type === 'indicator') {
           indicatorData = extend(children[i], {
@@ -129,7 +146,7 @@ const proto = {
         this.node.appendChild(this.indicator.node)
       }
 
-      sliderContainer.style.height = scale * this.data.style.height + 'px'
+      sliderContainer.style.height = this.data.style.height + 'px'
       sliderContainer.appendChild(fragment)
     }
   },

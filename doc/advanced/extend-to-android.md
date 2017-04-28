@@ -29,7 +29,22 @@ Refer to the following example:
     }
 
 ```
+#### Support synchronous/asynchronous callback 
+you can add  `` @JSMethod (uiThread = false or true ) `` annotation to choose the  callback mode of moudle . see the follow  example.
+```java
+     // as sync-callback mode 
+    @JSMethod (uiThread = false)
+    public void testSyncCall(){
+        WXLogUtils.d("WXComponentSyncTest :"+ Thread.currentThread().getName());
+    }
+    
+    // as async-callback mode 
+    @JSMethod (uiThread = true)
+    public void testAsyncCall(){
+        WXLogUtils.e("WXComponentASynTest :"+ Thread.currentThread().getName() );
+    }
 
+```
 #### Register the moulde
 
 ```java
@@ -42,7 +57,7 @@ Refer to the following example:
 Now `event` moudle is avaiable in weex, use the module like this:   
 ```javascript
 
-var event = require('@weex-module/event');
+var event = weex.requireModule('event');
 event.openURL("http://www.github.com");
 
 ```

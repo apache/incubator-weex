@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXModuleProtocol.h"
@@ -119,18 +130,39 @@ typedef void (^WXNavigationResultBlock)(NSString *code, NSDictionary * responseD
                         completion:(WXNavigationResultBlock)block
                      withContainer:(UIViewController *)container;
 
+    
+@optional
+    
 /**
- * @abstract Pops all the view controllers on the stack except the root view controller.
+ * @abstract open the resource at the specified URL which supports many common schemes, including the http, https, tel and mailto schemes.
  *
  * @param param The data which is passed to the implementation of the protocol.
  *
- * @param block A block called once the action is completed.
+ * @param success A block called once the action is completed successfully.
+ *
+ * @param failure A block called once the action failed to be completed.
  *
  * @param container The target controller.
  *
  */
-- (void)popToRootViewControllerWithParam:(NSDictionary *)param
-                              completion:(WXNavigationResultBlock)block
-                           withContainer:(UIViewController *)container;
+- (void)open:(NSDictionary *)param success:(WXModuleCallback)success
+                                   failure:(WXModuleCallback)failure
+                             withContainer:(UIViewController *)container;
 
+
+/**
+  * @abstract close the current weex page
+  *
+  * @param param The data which is passed to the implementation of the protocol.
+  *
+  * @param success A block called once the action is completed successfully.
+  *
+  * @param failure A block called once the action failed to be completed.
+  *
+  * @param container The target controller.
+  *
+  */
+- (void)close:(NSDictionary *)param success:(WXModuleCallback)success
+                                   failure:(WXModuleCallback)failure
+                             withContainer:(UIViewController *)container;
 @end

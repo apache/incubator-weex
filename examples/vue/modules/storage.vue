@@ -22,17 +22,19 @@
 
 
 <script>
-  var storage = require('@weex-module/storage')
+  var storage = weex.requireModule('storage')
   module.exports = {
-    data: {
-      setItemResult:'loading',
-      getItemResult:'loading',
-      removeItemResult:'loading',
-      lengthResult:'loading',
-      getAllKeysResult:'loading'
+    data: function () {
+      return {
+        setItemResult:'loading',
+        getItemResult:'loading',
+        removeItemResult:'loading',
+        lengthResult:'loading',
+        getAllKeysResult:'loading'
+      }
     },
     components: {
-      panel: require('weex-vue-components/panel.vue')
+      panel: require('../include/panel.vue')
     },
     created: function() {
       var me = this

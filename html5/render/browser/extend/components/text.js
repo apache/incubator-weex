@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 'use strict'
 
 const DEFAULT_FONT_SIZE = 32
@@ -7,7 +25,7 @@ const proto = {
   create () {
     const node = document.createElement('div')
     node.classList.add('weex-container')
-    node.style.fontSize = DEFAULT_FONT_SIZE * this.data.scale + 'px'
+    node.style.fontSize = DEFAULT_FONT_SIZE + 'px'
     this.textNode = document.createElement('span')
     // Give the developers the ability to control space
     // and line-breakers.
@@ -15,7 +33,7 @@ const proto = {
     this.textNode.style.wordWrap = 'break-word'
     this.textNode.style.display = '-webkit-box'
     this.textNode.style.webkitBoxOrient = 'vertical'
-    this.style.lines.call(this, this.data.style.lines)
+    this.style.lines.call(this, (this.data.style || {}).lines)
     node.appendChild(this.textNode)
     return node
   },

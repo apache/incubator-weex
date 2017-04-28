@@ -15,15 +15,17 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
 </style>
 
 <script>
   module.exports = {
-    data: {
-      x: 1,
-      y: 2
+    data: function () {
+      return {
+        x: 1,
+        y: 2
+      }
     },
     methods: {
       foo: function () {
@@ -53,7 +55,7 @@
         // this.$refs['sub'].$emit('custom')
 
         // // find element
-        // var dom = require('@weex-module/dom')
+        // var dom = weex.requireModule('dom')
         // dom.scrollToElement(this.$el('title'), {offset: 0})
       }
     },

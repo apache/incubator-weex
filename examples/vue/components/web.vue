@@ -11,12 +11,12 @@
         style="margin-left:30px;width:210px; margin-top:5px; margin-bottom:5px"
         @click.native="refresh"></button>
     </div>
-    <web class="content" ref="webview" src='https://m.taobao.com/?spm=0.0.0.0&v=0#index'
+    <web class="content" ref="webview" src='http://alibaba.github.io/weex/index.html'
       @pagestart="startload" @pagefinish="finishload" @error="failload"></web>
   </div>
 </template>
 
-<style>
+<style scoped>
   .wrapper {
     width: 750;
     position: absolute;
@@ -45,10 +45,10 @@
 </style>
 
 <script>
-  var webview = require('@weex-module/webview');
+  var webview = weex.requireModule('webview');
   module.exports = {
     components: {
-      button: require('weex-vue-components/button.vue')
+      button: require('../include/button.vue')
     },
     methods: {
       goback: function() {

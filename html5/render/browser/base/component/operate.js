@@ -1,7 +1,30 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 'use strict'
 
-import { extend } from '../../utils'
+import { extend, camelToKebab } from '../../utils'
 import { getFilters } from './valueFilter'
+
+let pseudoId = 0
+function getPseudoId () {
+  return '' + (pseudoId++)
+}
 
 export function create (nodeType) {
   return document.createElement(nodeType || 'div')
@@ -16,7 +39,6 @@ export function createChildren () {
     let isFlex = false
     for (let i = 0; i < children.length; i++) {
       children[i].instanceId = this.data.instanceId
-      children[i].scale = this.data.scale
       const child = componentManager.createElement(children[i])
       fragment.appendChild(child.node)
       child.parentRef = parentRef
@@ -132,20 +154,111 @@ export function updateAttrs (attrs) {
 }
 
 export function updateStyle (style) {
+  const pseudoData = {}
   for (const key in style) {
     let value = style[key]
-    const styleSetter = this.style[key]
+    const pseudoClassReg = /^([^:]+)((?::[^:]+)+)/
+    const match = key.match(pseudoClassReg)
+    let styleName, pseudoName
+    if (match) {
+      styleName = match[1]
+      pseudoName = match[2]
+    }
+    else {
+      styleName = key
+    }
+
+    const styleSetter = this.style[styleName]
     if (typeof styleSetter === 'function') {
       styleSetter.call(this, value)
       continue
     }
-    const parser = getFilters(key,
-      { scale: this.data.scale })[typeof value]
+    const parser = getFilters(styleName)[typeof value]
     if (typeof parser === 'function') {
       value = parser(value)
     }
-    this.node.style[key] = value
+
+    if (!match) {
+      this.node.style[styleName] = value
+      continue
+    }
+
+    if (pseudoData[pseudoName]) {
+      pseudoData[pseudoName][styleName] = value
+    }
+    else {
+      pseudoData[pseudoName] = { [styleName]: value }
+    }
   }
+
+  if (Object.keys(pseudoData).length > 0) {
+    processPseudoClass(this, 'data-pseudo-id', pseudoData)
+  }
+}
+
+// modify styles of pseudo class.
+function processPseudoClass (component, idName, pseudoData) {
+  let pseudoId = component.node.getAttribute('data-pseudo-id')
+
+  function getCssText (selector, rulesObj) {
+    // TODO: must process vendors if needed.
+    // !important is needed since the style rules is inline for most components.
+    const rulesText = Object.keys(rulesObj).map(key => `${camelToKebab(key)}:${rulesObj[key]}!important;`).join('')
+    return `${selector}{${rulesText}}`
+  }
+
+  if (!pseudoId) {
+    pseudoId = getPseudoId()
+    component.node.setAttribute('data-pseudo-id', pseudoId)
+    const style = document.createElement('style')
+    style.type = 'text/css'
+    style.setAttribute('data-pseudo-id', pseudoId)
+    document.getElementsByTagName('head')[0].appendChild(style)
+    const cssText = Object.keys(pseudoData).map(pseudo => {
+      const rules = pseudoData[pseudo]
+      return getCssText(`[data-pseudo-id="${pseudoId}"]${pseudo}`, rules)
+    }).join('')
+    return style.appendChild(document.createTextNode(cssText))
+  }
+
+  const styleSheets = Array.prototype.slice.call(document.styleSheets || [])
+    .filter(style => style.ownerNode.getAttribute('data-pseudo-id') === pseudoId)
+  if (!styleSheets || styleSheets.length <= 0) {
+    return
+  }
+  const styleSheet = styleSheet[0]
+  const rules = styleSheet.cssRules || styleSheet.rules
+  Object.keys(pseudoData).forEach(pseudo => {
+    const data = pseudoData[pseudo]
+    const selector = `[data-pseudo-id="${pseudoId}"]${pseudo}`
+    const res = Array.prototype.slice.call(rules).reduce((res, rule, idx) => {
+      (rule.selectorText === selector) && (res.idx = idx)
+      return res
+    }, { idx: -1 })
+    const { idx } = res
+    if (idx !== -1) {
+      const pseudoRule = rules[idx]
+      const match = pseudoRule.cssText.match(/^[^{]+\{([^}]+)\}/)
+      if (match && match[1]) {
+        const rulesData = match[1].split(';').reduce((res, str) => {
+          const match = str.match(/(\S+)\s*:\s*(\S+)/)
+          if (match && match[1] && match[2]) {
+            res[match[1]] = match[2]
+          }
+          return res
+        }, {})
+        extend(rulesData, data)
+        Object.keys(rulesData).forEach(rule => {
+          if (!rulesData[rule]) { delete rulesData[rule] }
+        })
+        styleSheet.deleteRule(idx)
+        styleSheet.insertRule(getCssText(selector, rulesData), rules.length - 1)
+      }
+    }
+    else {
+      styleSheet.insertRule(getCssText(selector, data), rules.length)
+    }
+  })
 }
 
 export function bindEvents (evts) {

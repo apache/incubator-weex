@@ -4,7 +4,7 @@
   </list-item>
 </template>
 
-<style>
+<style scoped>
   .item-txt {
     font-size: 48px;
     color: #555;
@@ -12,14 +12,14 @@
 </style>
 
 <script>
-  var event = require('@weex-module/event')
+  var event = weex.requireModule('event')
   module.exports = {
     props: {
       title: { default: '456' },
       url: { default: '' }
     },
     components: {
-      listItem: require('weex-vue-components/list-item.vue')
+      listItem: require('./list-item.vue')
     },
     methods: {
       redirect: function() {

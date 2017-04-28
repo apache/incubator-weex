@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXModalUIModule.h"
@@ -60,6 +71,9 @@ typedef enum : NSUInteger {
 @end
 
 @implementation WXModalUIModule
+{
+    NSMutableSet *_alertViews;
+}
 
 @synthesize weexInstance;
 
@@ -67,6 +81,26 @@ WX_EXPORT_METHOD(@selector(toast:))
 WX_EXPORT_METHOD(@selector(alert:callback:))
 WX_EXPORT_METHOD(@selector(confirm:callback:))
 WX_EXPORT_METHOD(@selector(prompt:callback:))
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _alertViews = [NSMutableSet setWithCapacity:1];
+    }
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    if (WX_SYS_VERSION_LESS_THAN(@"8.0")) {
+        for (UIAlertView *alerView in _alertViews) {
+            alerView.delegate = nil;
+        }
+    }
+    
+    [_alertViews removeAllObjects];
+}
 
 #pragma mark - Toast
 
@@ -260,7 +294,9 @@ static const CGFloat WXToastDefaultPadding = 30.0;
 - (void)alert:(NSString *)message okTitle:(NSString *)okTitle cancelTitle:(NSString *)cancelTitle defaultText:(NSString *)defaultText type:(WXModalType)type callback:(WXModuleCallback)callback
 {
     if (!message) {
-        callback(@"Error: message should be passed correctly.");
+        if (callback) {
+            callback(@"Error: message should be passed correctly.");
+        }
         return;
     }
     
@@ -272,6 +308,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         textField.placeholder = defaultText;
     }
     objc_setAssociatedObject(alertView, &WXModalCallbackKey, [callback copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
+    [_alertViews addObject:alertView];
     
     WXPerformBlockOnMainThread(^{
         [alertView show];
@@ -283,7 +320,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
     WXModuleCallback callback = objc_getAssociatedObject(alertView, &WXModalCallbackKey);
     if (!callback) return;
     
-    NSString *result = @"";
+    id result = @"";
     switch (alertView.tag) {
         case WXModalTypeAlert: {
             result = @"";
@@ -297,13 +334,15 @@ static const CGFloat WXToastDefaultPadding = 30.0;
         case WXModalTypePrompt: {
             NSString *clickTitle = [alertView buttonTitleAtIndex:buttonIndex];
             NSString *text= [[alertView textFieldAtIndex:0] text] ?: @"";
-            result = [WXUtility JSONString:@{ @"result": clickTitle, @"data": text }];
+            result = @{ @"result": clickTitle, @"data": text };
         }
         default:
             break;
     }
     
     callback(result);
+    
+    [_alertViews removeObject:alertView];
 }
 
 - (NSString*)stringValue:(id)value

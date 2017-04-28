@@ -19,7 +19,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .content {
     color: #353535;
     background-color: #666;
@@ -40,8 +40,8 @@
 </style>
 
 <script>
-  var modal = require('@weex-module/modal')
-  var timer = require('@weex-module/timer')
+  var modal = weex.requireModule('modal')
+  var timer = weex.requireModule('timer')
 
   module.exports = {
     components: {

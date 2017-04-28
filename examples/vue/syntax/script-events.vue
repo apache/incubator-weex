@@ -6,22 +6,25 @@
 
 <template>
   <div>
-    <text class="title" v-for="value in list">{{value}}</text>
+    <text class="title" v-for="(value, i) in list" :key="i" >{{value}}</text>
   </div>
 </template>
 
-<style>
+<style scoped>
   .title {font-size: 48px;}
 </style>
 
 <script>
   module.exports = {
-    data: {
-      list: []
+    data: function () {
+      return {
+        list: []
+      }
     },
     mounted: function () {
       function custom(e) {
         this.list.push('custom: ' + JSON.stringify(e))
+        console.log(this.list)
       }
 
       this.$emit('custom', {x: 1})

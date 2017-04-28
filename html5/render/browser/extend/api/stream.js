@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 /* global lib, XMLHttpRequest */
 /* deps: httpurl */
 
@@ -6,14 +24,10 @@
 let utils
 
 import 'httpurl'
+import qs from 'query-string'
 
 let jsonpCnt = 0
 const ERROR_STATE = -1
-
-const TYPE_JSON = 'application/json;charset=UTF-8'
-const TYPE_FORM = 'application/x-www-form-urlencoded'
-
-const REG_FORM = /^(?:[^&=]+=[^&=]+)(?:&[^&=]+=[^&=]+)*$/
 
 function _jsonp (config, callback, progressCallback) {
   const cbName = 'jsonp_' + (++jsonpCnt)
@@ -126,7 +140,7 @@ function _xhr (config, callback, progressCallback) {
     })
   }
 
-  xhr.send(config.body)
+  xhr.send(config.body || null)
 }
 
 const stream = {
@@ -221,6 +235,22 @@ const stream = {
       return console.error('[h5-render] options.url should be set for \'fetch\' API.')
     }
 
+    // validate body content for method 'GET'.
+    if (config.method.toUpperCase() === 'GET') {
+      let body = config.body
+      if (utils.isPlainObject(body)) {
+        body = qs.stringify(body)
+      }
+      let url = config.url
+      let hashIdx = url.indexOf('#')
+      hashIdx <= -1 && (hashIdx = url.length)
+      let hash = url.substr(hashIdx)
+      hash && (hash = '#' + hash)
+      url = url.substring(0, hashIdx)
+      url += (config.url.indexOf('?') <= -1 ? '?' : '&') + body + hash
+      config.url = url
+    }
+
     // validate options.mode
     if (typeof config.mode === 'undefined') {
       config.mode = DEFAULT_MODE
@@ -249,24 +279,6 @@ const stream = {
     config.headers = config.headers || {}
     if (!utils.isPlainObject(config.headers)) {
       return console.error('[h5-render] options.headers should be a plain object')
-    }
-
-    // validate options.body
-    const body = config.body
-    if (!config.headers['Content-Type'] && body) {
-      if (utils.isPlainObject(body)) {
-        // is a json data
-        try {
-          config.body = JSON.stringify(body)
-          config.headers['Content-Type'] = TYPE_JSON
-        }
-        catch (e) {}
-      }
-      else if (utils.getType(body) === 'string' && body.match(REG_FORM)) {
-        // is form-data
-        config.body = encodeURI(body)
-        config.headers['Content-Type'] = TYPE_FORM
-      }
     }
 
     // validate options.timeout

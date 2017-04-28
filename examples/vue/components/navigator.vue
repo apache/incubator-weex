@@ -20,19 +20,22 @@
 </template>
 
 <script>
-  var navigator = require('@weex-module/navigator')
+  var navigator = weex.requireModule('navigator')
   var getBaseURL = require('../include/base-url.js').getBaseURL
   module.exports = {
-    data: {
-      navBarHeight: 88,
-      title: 'Navigator',
-      dir: 'examples',
-      baseURL: '',
+    data: function () {
+      return {
+        navBarHeight: 88,
+        title: 'Navigator',
+        dir: 'examples',
+        baseURL: '',
+        subPath: weex.config.env.platform === 'Web' ? 'vue-web/' : ''
+      }
     },
     components: {
-      panel: require('weex-vue-components/panel.vue'),
-      navpage: require('weex-vue-components/navpage.vue'),
-      button: require('weex-vue-components/button.vue')
+      panel: require('../include/panel.vue'),
+      navpage: require('../include/navpage.vue'),
+      button: require('../include/button.vue')
     },
     created: function() {
       this.$getConfig(function (config) {
@@ -41,7 +44,7 @@
           var scale = env.scale;
           var deviceWidth = env.deviceWidth / scale;
           this.navBarHeight = 64.0 * 750.0 / deviceWidth;
-        }   
+        }
       }.bind(this));
       this.baseURL = getBaseURL(this)
     },
@@ -54,14 +57,14 @@
       },
       push: function () {
         var params = {
-          'url':  this.baseURL + 'vue/components/navigator.js?test=1',
+          'url':  this.baseURL + this.subPath + 'vue/components/navigator.js?test=1',
           'animated' : 'true',
         }
         navigator.push(params, function () {});
       },
       pop: function () {
         var params = {
-          'url':  this.baseURL + 'vue/components/navigator.js?test=1',
+          'url':  this.baseURL + this.subPath + 'vue/components/navigator.js?test=1',
           'animated' : 'true',
         }
         navigator.pop(params, function () {});

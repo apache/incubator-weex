@@ -40,14 +40,27 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
+/***/ function(module, exports, __webpack_require__) {
+
+	var __weex_template__ = __webpack_require__(319)
+
+	__weex_define__('@weex-component/25608f094c039b891a20c8161b9c650b', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+
+	    __weex_module__.exports.template = __weex_template__
+
+	})
+
+	__weex_bootstrap__('@weex-component/25608f094c039b891a20c8161b9c650b',undefined,undefined)
+
+/***/ },
+
+/***/ 319:
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/75fa664881af170bd77523af20e79ce3", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;__weex_module__.exports.template = __weex_module__.exports.template || {}
-	;Object.assign(__weex_module__.exports.template, {
+	module.exports = {
 	  "type": "div",
 	  "style": {
 	    "alignItems": "center",
@@ -57,7 +70,7 @@
 	    {
 	      "type": "image",
 	      "attr": {
-	        "src": "http://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
+	        "src": "https://alibaba.github.io/weex/img/weex_logo_blue@3x.png"
 	      },
 	      "style": {
 	        "width": 360,
@@ -74,11 +87,8 @@
 	      }
 	    }
 	  ]
-	})
-	})
-	;__weex_bootstrap__("@weex-component/75fa664881af170bd77523af20e79ce3", {
-	  "transformerVersion": "0.3.1"
-	},undefined)
+	}
 
 /***/ }
-/******/ ]);
+
+/******/ });

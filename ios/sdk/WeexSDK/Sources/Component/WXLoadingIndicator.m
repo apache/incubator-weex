@@ -1,77 +1,87 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXLoadingIndicator.h"
 #import "WXConvert.h"
 
-@interface WXLoadingIndicator()
-
-@property (nonatomic, strong) UIActivityIndicatorView* indicator;
-
-@end
-
-@implementation WXLoadingIndicator
+@implementation WXLoadingIndicator {
+    UIActivityIndicatorView *_indicator;
+    UIColor *_indicatorColor;
+}
 
 - (instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        _indicator = [[UIActivityIndicatorView alloc] init];
         if (styles[@"color"]) {
-            [self setColor:[WXConvert UIColor:styles[@"color"]]];
+            _indicatorColor = [WXConvert UIColor:styles[@"color"]];
         }
     }
-    
     return self;
 }
 
-- (void)updateStyles:(NSDictionary *)styles
-{
-    if (styles[@"color"]) {
-        [self setColor:[WXConvert UIColor:styles[@"color"]]];
+- (UIView *)loadView {
+    return [[UIActivityIndicatorView alloc] init];
+}
+
+- (void)viewDidLoad {
+    _indicator = (UIActivityIndicatorView *)self.view;
+    
+    if (_indicatorColor) {
+        _indicator.color = _indicatorColor;
     }
 }
 
-- (UIView *)loadView
-{
-    return _indicator;
+- (void)updateStyles:(NSDictionary *)styles {
+    if (styles[@"color"]) {
+        _indicatorColor = [WXConvert UIColor:styles[@"color"]];
+        _indicator.color = _indicatorColor;
+    }
 }
 
 #pragma mark - lifeCircle
-- (void)viewWillUnload
-{
-    [_indicator stopAnimating];
-    _indicator = nil;
 
+- (void)viewWillUnload {
+    if (_indicator) {
+        [_indicator stopAnimating];
+        _indicator = nil;
+    }
 }
 
-- (void)viewDidLoad
-{
-    [self setFrame:self.calculatedFrame];
+- (void)start {
+    if (_indicator) {
+        [_indicator startAnimating];
+    }
 }
 
-- (void)setColor:(UIColor *)color
-{
-    _indicator.color = color;
+- (void)stop {
+    if (_indicator) {
+        [_indicator stopAnimating];
+    }
 }
 
-- (void)start
-{
-    [_indicator startAnimating];
-}
+#pragma mark -reset color
 
-- (void)stop
-{
-    [_indicator stopAnimating];
-}
-
-- (void)setFrame:(CGRect)frame
-{
-    [_indicator setFrame:frame];
+- (void)resetStyles:(NSArray *)styles {
+    if ([styles containsObject:@"color"]) {
+        _indicatorColor = [UIColor blackColor];
+        _indicator.color = _indicatorColor;
+    }
 }
 
 @end

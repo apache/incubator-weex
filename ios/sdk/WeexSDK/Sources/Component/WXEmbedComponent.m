@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXEmbedComponent.h"
@@ -151,16 +162,18 @@
     };
     
     _embedInstance.onFailed = ^(NSError *error) {
-        if (weakSelf.errorView) {
-            return ;
-        }
-        
-        WXErrorView *errorView = [[WXErrorView alloc]initWithFrame:CGRectMake(0.0f, 0.0f, 135.0f, 130.0f)];
-        errorView.center = CGPointMake(weakSelf.view.bounds.size.width / 2.0f, weakSelf.view.bounds.size.height / 2.0f);
-        errorView.delegate = weakSelf;
-        [weakSelf.view addSubview:errorView];
-        
-        weakSelf.errorView = errorView;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (weakSelf.errorView) {
+                return ;
+            }
+            
+            WXErrorView *errorView = [[WXErrorView alloc]initWithFrame:CGRectMake(0.0f, 0.0f, 135.0f, 130.0f)];
+            errorView.center = CGPointMake(weakSelf.view.bounds.size.width / 2.0f, weakSelf.view.bounds.size.height / 2.0f);
+            errorView.delegate = weakSelf;
+            [weakSelf.view addSubview:errorView];
+            
+            weakSelf.errorView = errorView;
+        });
     };
     
     _embedInstance.renderFinish = ^(UIView *view) {
@@ -178,7 +191,7 @@
             [self setNavigationWithStyles:self.embedInstance.naviBarStyles];
             [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewappear" params:nil domChanges:nil];
         }
-        else if (state == WeexInstanceDisappear ){
+        else if (state == WeexInstanceDisappear) {
             [[WXSDKManager bridgeMgr] fireEvent:self.embedInstance.instanceId ref:WX_SDK_ROOT_REF type:@"viewdisappear" params:nil domChanges:nil];
         }
     }

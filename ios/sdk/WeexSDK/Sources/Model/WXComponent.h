@@ -1,15 +1,39 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import <Foundation/Foundation.h>
 #import "WXLayoutDefine.h"
+#import "WXType.h"
 
 @class WXSDKInstance;
+
+/**
+ * @abstract the component callback , result can be string or dictionary.
+ * @discussion callback data to js, the id of callback function will be removed to save memory.
+ */
+typedef void (^WXCallback)(_Nonnull id result);
+
+/**
+ * @abstract the component callback , result can be string or dictionary.
+ * @discussion callback data to js, you can specify the keepAlive parameter to keep callback function id keepalive or not. If the keepAlive is true, it won't be removed unitl instance destroyed, so you can call it repetitious.
+ */
+typedef void (^WXKeepAliveCallback)(_Nonnull id result, BOOL keepAlive);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,9 +73,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSString *type;
 
 /**
+ *  @abstract The component's type.
+ */
+@property (nonatomic, assign) WXComponentType componentType;
+
+/**
  *  @abstract The component's styles.
  */
 @property (nonatomic, readonly, strong) NSDictionary *styles;
+
+/**
+ *  @abstract The component's pseudoClassStyles.
+ */
+@property (nonatomic, readonly, strong) NSDictionary *pseudoClassStyles;
 
 /**
  *  @abstract The component's attributes.
@@ -128,14 +162,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract return a measure block for measure component's layout
  *
- * @param constrainedSize The maximum size the receiver should fit in.
+ * constrainedSize: The maximum size the receiver should fit in.
  *
  * @return A block which will ask the component to measure and return the size that best fits for a constrained size.
  *
  * @discussion Subclasses can override this method to perform their own layout behaviour.  Weex will use the returned block to measure the component's layout, ignoring its own layout mechanism.
  *
  */
-- (nullable CGSize (^)(CGSize))measureBlock;
+- (nullable CGSize (^)(CGSize constrainedSize))measureBlock;
 
 /**
  * @abstract Called on main thread when the component has just laid out.
@@ -216,6 +250,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertSubview:(WXComponent *)subcomponent atIndex:(NSInteger)index;
 
 /**
+ * @abstract Tells the component that a subcomponent's view is about to be removed.
+ *
+ * @discussion The method is called on the main thread.
+ */
+- (void)willRemoveSubview:(WXComponent *)component;
+
+/**
  * @abstract Remove the component's view from its superview.
  *
  * @discussion The method is called on the main thread.
@@ -265,6 +306,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateStyles:(NSDictionary *)styles;
 
 /**
+ * @abstract Called when component's style are reset
+ *
+ * @param styles The reset style's elements
+ * @discussion It can be overrided to handle specific style reseting. The method is called on the main thread.
+ **/
+- (void)resetStyles:(NSArray *)styles;
+
+/**
  * @abstract Called when component's attributes are updated
  *
  * @param attributes The updated attributes dictionary
@@ -281,7 +330,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addEvent:(NSString *)eventName;
 
 /**
- * @abstract Called when removing an event frome the component
+ * @abstract Called when removing an event from the component
  *
  * @param eventName The removed event's name
  * @discussion It can be overrided to handle specific event removing. The method is called on the main thread.
@@ -292,13 +341,65 @@ NS_ASSUME_NONNULL_BEGIN
 /// @name Display
 ///--------------------------------------
 
-typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
-typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
-
 /**
  * @abstract Marks the view as needing display. The method should be called on the main thread.
+ * @discussion You can use this method to notify the system that your component's contents need to be redrawn. This method makes a note of the request and returns immediately. The component is not actually redrawn until the next drawing cycle, at which point all invalidated components are updated.
+ *
  */
 - (void)setNeedsDisplay;
+
+/**
+ * @abstract Returns a Boolean indicating whether the component needs to be drawn by `drawRect:`
+ */
+- (BOOL)needsDrawRect;
+
+/**
+ * @abstract Draws the component’s image within the passed-in rectangle.
+ * @parameter rect The rectangle which is the entire visible bounds of your component. 
+ * @return A UIImage containing the contents of the current bitmap graphics context.
+ * @discussion 
+ * Subclasses that use technologies such as Core Graphics and UIKit to draw their own component’s content should override this method and implement their drawing code there. You do not need to override this method if your component sets its content in superclass's way.
+ * By the time this method is called, UIKit has configured the drawing environment appropriately for your view and you can simply call whatever drawing methods and functions you need to render your content. Specifically, Weex creates and configures a graphics context for drawing and adjusts the transform of that context so that its origin matches the origin of your components’s bounds rectangle. You can get a reference to the graphics context using the `UIGraphicsGetCurrentContext` function, but do not establish a strong reference to the graphics context because it can change between calls to the drawRect: method.
+ * If you already have an image that represents the content of the component, then you should just return the image and do no drawing, otherwise you should draw your content in the current context and return nil.
+ * You should never call this method directly yourself. To invalidate part of your component's content, and thus cause that portion to be redrawn, call the `setNeedsDisplay` method instead.
+ */
+- (UIImage *)drawRect:(CGRect)rect;
+
+/**
+ * @abstract Called when a component finishes drawing its content.
+ * @discussion Do not call this method directly. Weex calls this method at appropriate times to finish updating the component's content.
+ * Subclasses can override this method to perform additional work on components that were rendered.
+ */
+- (void)didFinishDrawingLayer:(BOOL)success;
+
+/**
+ * readyToRender, do not use it, will be deprecated soon
+ */
+- (void)readyToRender;
+
+/**
+ * @abstract trigger display if you do not have a WXLayer
+ */
+- (void)triggerDisplay;
+
+/**
+ * @abstract Creates a  graphics context with the specified bounds, the context will be used for `drawRect:` in compositing environment
+ * @discussion You can override this method to use your own graphics context.
+ */
+- (CGContextRef)beginDrawContext:(CGRect)bounds;
+
+/**
+ * @abstract Removes the current graphics context and returns an image based on the contents of the current graphics context.
+ * @discussion You can override this method to use your own graphics context. The image will be set to layer,  if your drawing system do not have layer and do not need image, returning nil is fine.
+ */
+- (UIImage *)endDrawContext:(CGContextRef)context;
+
+@end
+
+@interface WXComponent (Deprecated)
+
+typedef UIImage * _Nonnull(^WXDisplayBlock)(CGRect bounds, BOOL(^isCancelled)(void));
+typedef void(^WXDisplayCompletionBlock)(CALayer *layer, BOOL finished);
 
 /**
  * @abstract Return a block to be called to draw layer.
@@ -306,7 +407,7 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on any thread.
  *
  */
-- (WXDisplayBlock)displayBlock;
+- (WXDisplayBlock)displayBlock DEPRECATED_MSG_ATTRIBUTE("use drawRect: method instead.");
 
 /**
  * @abstract Return a block to be called while drawing is finished.
@@ -314,7 +415,8 @@ typedef void(^WXDisplayCompeletionBlock)(CALayer *layer, BOOL finished);
  * @discussion The block returned will be called on main thread.
  *
  */
-- (WXDisplayCompeletionBlock)displayCompeletionBlock;
+- (WXDisplayCompletionBlock)displayCompletionBlock DEPRECATED_MSG_ATTRIBUTE("use didFinishDrawingLayer: method instead.");
+
 
 @end
 

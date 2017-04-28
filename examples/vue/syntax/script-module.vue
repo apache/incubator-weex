@@ -1,5 +1,5 @@
 <!--
-  * `var module = require('@weex-module/module')` to import a native module
+  * `var module = weex.requireModule('module')` to import a native module
   * `module.method(...)` to call a native API
 -->
 
@@ -9,12 +9,12 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .btn {font-size: 36px; text-align: center; color: white; background-color: gray; padding: 20px; border-radius: 5px;}
 </style>
 
 <script>
-  var modal = require('@weex-module/modal')
+  var modal = weex.requireModule('modal')
   module.exports = {
     methods: {
       test: function () {

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXDebugTool.h"
@@ -13,13 +24,40 @@
 #import "WXUtility.h"
 #import "WXSDKManager.h"
 #import "WXSDKEngine.h"
+#import "WXResourceRequest.h"
+#import "WXResourceResponse.h"
+#import "WXResourceLoader.h"
 
 static BOOL WXIsDebug;
 static BOOL WXIsDevToolDebug;
 static NSString* WXDebugrepBundleJS;
 static NSString* WXDebugrepJSFramework;
 
+
+@interface WXDebugTool ()
+// store service
+@property (nonatomic, strong) NSMutableDictionary *jsServiceDic;
+
+@end
+
 @implementation WXDebugTool
+
++ (instancetype)sharedInstance {
+    static id _sharedInstance = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&oncePredicate, ^{
+        _sharedInstance = [[self alloc] init];
+    });
+    return _sharedInstance;
+}
+
+- (instancetype)init
+{
+    if(self = [super init]){
+        _jsServiceDic = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
 
 //+ (void)showFPS
 //{
@@ -68,8 +106,7 @@ static NSString* WXDebugrepJSFramework;
     void(^scriptLoadFinish)(NSString*, NSString*) = ^(NSString* key, NSString* script){
         if ([key isEqualToString:@"jsframework"]) {
             WXDebugrepJSFramework = script;
-            [[WXSDKManager bridgeMgr] unload];
-            [WXSDKEngine initSDKEnviroment:script];
+            [WXSDKEngine restartWithScript:script];
         }else {
             WXDebugrepBundleJS = script;
         }
@@ -80,7 +117,7 @@ static NSString* WXDebugrepJSFramework;
             NSString *path = [url path];
             NSData *scriptData = [[NSFileManager defaultManager] contentsAtPath:path];
             NSString *script = [[NSString alloc] initWithData:scriptData encoding:NSUTF8StringEncoding];
-            if (!script) {
+            if (!script || script.length <= 0) {
                 NSString *errorDesc = [NSString stringWithFormat:@"File read error at url: %@", url];
                 WXLogError(@"%@", errorDesc);
             }
@@ -88,34 +125,50 @@ static NSString* WXDebugrepJSFramework;
         });
     } else {
         // HTTP/HTTPS URL
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        [request setValue:[WXUtility userAgent] forHTTPHeaderField:@"User-Agent"];
+        WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:nil cachePolicy:NSURLRequestUseProtocolCachePolicy];
+        request.userAgent = [WXUtility userAgent];
+        WXResourceLoader *loader = [[WXResourceLoader alloc] initWithRequest:request];
         
-        id<WXNetworkProtocol> networkHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXNetworkProtocol)];
+        loader.onFinished = ^(const WXResourceResponse * response, NSData *data) {
+            if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
+                __unused NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+                                                              code:((NSHTTPURLResponse *)response).statusCode
+                                                          userInfo:@{@"message":@"status code error."}];
+                
+                return ;
+            }
+            
+            NSString * script = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            scriptLoadFinish(key, script);
+        };
         
-        __block NSURLResponse *urlResponse;
-        [networkHandler sendRequest:request
-                    withSendingData:^(int64_t bytesSent, int64_t totalBytes) {}
-                       withResponse:^(NSURLResponse *response) {
-                           urlResponse = response;
-                       }
-                    withReceiveData:^(NSData *data) {}
-                    withCompeletion:^(NSData *totalData, NSError *error) {
-                        if (error) {
-                            
-                        } else {
-                            if ([urlResponse isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)urlResponse).statusCode != 200) {
-                                __unused NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
-                                                                     code:((NSHTTPURLResponse *)urlResponse).statusCode
-                                                                 userInfo:@{@"message":@"status code error."}];
-                                
-                                return ;
-                            }
-                            NSString * script = [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding];
-                            scriptLoadFinish(key, script);
-                        }
-                    }];
+        [loader start];
     }
+}
+
++ (BOOL) cacheJsService: (NSString *)name withScript: (NSString *)script withOptions: (NSDictionary *) options
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] setObject:@{ @"name": name, @"script": script, @"options": options } forKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
++ (BOOL) removeCacheJsService: (NSString *)name
+{
+    if(WXIsDebug) {
+        [[[self sharedInstance] jsServiceDic] removeObjectForKey:name];
+        return YES;
+    }else {
+        return NO;
+    }
+}
+
++ (NSDictionary *) jsServiceCache
+{
+    return [NSDictionary dictionaryWithDictionary:[[self sharedInstance] jsServiceDic]];
 }
 
 @end

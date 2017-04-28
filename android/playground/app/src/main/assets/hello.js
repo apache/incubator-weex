@@ -1,3 +1,11 @@
+/*!197
+ * {
+ *   version: "0.4.0.20170207",
+ *   create: "20170207145011",
+ *   git: "origin-taobao/u4_v8_shared_sdk_jsfm-feature-0.19--027e045",
+ *   digest: "86ed5dd60f58efe1a84b64e8c7eacb7a"
+ * }
+ !*/
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -40,14 +48,27 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ 0:
+/***/ function(module, exports, __webpack_require__) {
+
+	var __weex_template__ = __webpack_require__(191)
+
+	__weex_define__('@weex-component/3bfdbb5ef29172e6db527e1bc85ec8fd', [], function(__weex_require__, __weex_exports__, __weex_module__) {
+
+	    __weex_module__.exports.template = __weex_template__
+
+	})
+
+	__weex_bootstrap__('@weex-component/3bfdbb5ef29172e6db527e1bc85ec8fd',undefined,undefined)
+
+/***/ },
+
+/***/ 191:
 /***/ function(module, exports) {
 
-	;__weex_define__("@weex-component/0f3c9ae76450de3e67cfabcbf5621bf7", [], function(__weex_require__, __weex_exports__, __weex_module__){
-
-	;__weex_module__.exports.template = __weex_module__.exports.template || {}
-	;Object.assign(__weex_module__.exports.template, {
+	module.exports = {
 	  "type": "div",
 	  "children": [
 	    {
@@ -60,11 +81,8 @@
 	      }
 	    }
 	  ]
-	})
-	})
-	;__weex_bootstrap__("@weex-component/0f3c9ae76450de3e67cfabcbf5621bf7", {
-	  "transformerVersion": "0.3.1"
-	},undefined)
+	}
 
 /***/ }
-/******/ ]);
+
+/******/ });

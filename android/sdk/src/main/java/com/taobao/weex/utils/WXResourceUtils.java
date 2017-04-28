@@ -1,216 +1,35 @@
-/**
- *
- *                                  Apache License
- *                            Version 2.0, January 2004
- *                         http://www.apache.org/licenses/
- *
- *    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
- *
- *    1. Definitions.
- *
- *       "License" shall mean the terms and conditions for use, reproduction,
- *       and distribution as defined by Sections 1 through 9 of this document.
- *
- *       "Licensor" shall mean the copyright owner or entity authorized by
- *       the copyright owner that is granting the License.
- *
- *       "Legal Entity" shall mean the union of the acting entity and all
- *       other entities that control, are controlled by, or are under common
- *       control with that entity. For the purposes of this definition,
- *       "control" means (i) the power, direct or indirect, to cause the
- *       direction or management of such entity, whether by contract or
- *       otherwise, or (ii) ownership of fifty percent (50%) or more of the
- *       outstanding shares, or (iii) beneficial ownership of such entity.
- *
- *       "You" (or "Your") shall mean an individual or Legal Entity
- *       exercising permissions granted by this License.
- *
- *       "Source" form shall mean the preferred form for making modifications,
- *       including but not limited to software source code, documentation
- *       source, and configuration files.
- *
- *       "Object" form shall mean any form resulting from mechanical
- *       transformation or translation of a Source form, including but
- *       not limited to compiled object code, generated documentation,
- *       and conversions to other media types.
- *
- *       "Work" shall mean the work of authorship, whether in Source or
- *       Object form, made available under the License, as indicated by a
- *       copyright notice that is included in or attached to the work
- *       (an example is provided in the Appendix below).
- *
- *       "Derivative Works" shall mean any work, whether in Source or Object
- *       form, that is based on (or derived from) the Work and for which the
- *       editorial revisions, annotations, elaborations, or other modifications
- *       represent, as a whole, an original work of authorship. For the purposes
- *       of this License, Derivative Works shall not include works that remain
- *       separable from, or merely link (or bind by name) to the interfaces of,
- *       the Work and Derivative Works thereof.
- *
- *       "Contribution" shall mean any work of authorship, including
- *       the original version of the Work and any modifications or additions
- *       to that Work or Derivative Works thereof, that is intentionally
- *       submitted to Licensor for inclusion in the Work by the copyright owner
- *       or by an individual or Legal Entity authorized to submit on behalf of
- *       the copyright owner. For the purposes of this definition, "submitted"
- *       means any form of electronic, verbal, or written communication sent
- *       to the Licensor or its representatives, including but not limited to
- *       communication on electronic mailing lists, source code control systems,
- *       and issue tracking systems that are managed by, or on behalf of, the
- *       Licensor for the purpose of discussing and improving the Work, but
- *       excluding communication that is conspicuously marked or otherwise
- *       designated in writing by the copyright owner as "Not a Contribution."
- *
- *       "Contributor" shall mean Licensor and any individual or Legal Entity
- *       on behalf of whom a Contribution has been received by Licensor and
- *       subsequently incorporated within the Work.
- *
- *    2. Grant of Copyright License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       copyright license to reproduce, prepare Derivative Works of,
- *       publicly display, publicly perform, sublicense, and distribute the
- *       Work and such Derivative Works in Source or Object form.
- *
- *    3. Grant of Patent License. Subject to the terms and conditions of
- *       this License, each Contributor hereby grants to You a perpetual,
- *       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
- *       (except as stated in this section) patent license to make, have made,
- *       use, offer to sell, sell, import, and otherwise transfer the Work,
- *       where such license applies only to those patent claims licensable
- *       by such Contributor that are necessarily infringed by their
- *       Contribution(s) alone or by combination of their Contribution(s)
- *       with the Work to which such Contribution(s) was submitted. If You
- *       institute patent litigation against any entity (including a
- *       cross-claim or counterclaim in a lawsuit) alleging that the Work
- *       or a Contribution incorporated within the Work constitutes direct
- *       or contributory patent infringement, then any patent licenses
- *       granted to You under this License for that Work shall terminate
- *       as of the date such litigation is filed.
- *
- *    4. Redistribution. You may reproduce and distribute copies of the
- *       Work or Derivative Works thereof in any medium, with or without
- *       modifications, and in Source or Object form, provided that You
- *       meet the following conditions:
- *
- *       (a) You must give any other recipients of the Work or
- *           Derivative Works a copy of this License; and
- *
- *       (b) You must cause any modified files to carry prominent notices
- *           stating that You changed the files; and
- *
- *       (c) You must retain, in the Source form of any Derivative Works
- *           that You distribute, all copyright, patent, trademark, and
- *           attribution notices from the Source form of the Work,
- *           excluding those notices that do not pertain to any part of
- *           the Derivative Works; and
- *
- *       (d) If the Work includes a "NOTICE" text file as part of its
- *           distribution, then any Derivative Works that You distribute must
- *           include a readable copy of the attribution notices contained
- *           within such NOTICE file, excluding those notices that do not
- *           pertain to any part of the Derivative Works, in at least one
- *           of the following places: within a NOTICE text file distributed
- *           as part of the Derivative Works; within the Source form or
- *           documentation, if provided along with the Derivative Works; or,
- *           within a display generated by the Derivative Works, if and
- *           wherever such third-party notices normally appear. The contents
- *           of the NOTICE file are for informational purposes only and
- *           do not modify the License. You may add Your own attribution
- *           notices within Derivative Works that You distribute, alongside
- *           or as an addendum to the NOTICE text from the Work, provided
- *           that such additional attribution notices cannot be construed
- *           as modifying the License.
- *
- *       You may add Your own copyright statement to Your modifications and
- *       may provide additional or different license terms and conditions
- *       for use, reproduction, or distribution of Your modifications, or
- *       for any such Derivative Works as a whole, provided Your use,
- *       reproduction, and distribution of the Work otherwise complies with
- *       the conditions stated in this License.
- *
- *    5. Submission of Contributions. Unless You explicitly state otherwise,
- *       any Contribution intentionally submitted for inclusion in the Work
- *       by You to the Licensor shall be under the terms and conditions of
- *       this License, without any additional terms or conditions.
- *       Notwithstanding the above, nothing herein shall supersede or modify
- *       the terms of any separate license agreement you may have executed
- *       with Licensor regarding such Contributions.
- *
- *    6. Trademarks. This License does not grant permission to use the trade
- *       names, trademarks, service marks, or product names of the Licensor,
- *       except as required for reasonable and customary use in describing the
- *       origin of the Work and reproducing the content of the NOTICE file.
- *
- *    7. Disclaimer of Warranty. Unless required by applicable law or
- *       agreed to in writing, Licensor provides the Work (and each
- *       Contributor provides its Contributions) on an "AS IS" BASIS,
- *       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *       implied, including, without limitation, any warranties or conditions
- *       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
- *       PARTICULAR PURPOSE. You are solely responsible for determining the
- *       appropriateness of using or redistributing the Work and assume any
- *       risks associated with Your exercise of permissions under this License.
- *
- *    8. Limitation of Liability. In no event and under no legal theory,
- *       whether in tort (including negligence), contract, or otherwise,
- *       unless required by applicable law (such as deliberate and grossly
- *       negligent acts) or agreed to in writing, shall any Contributor be
- *       liable to You for damages, including any direct, indirect, special,
- *       incidental, or consequential damages of any character arising as a
- *       result of this License or out of the use or inability to use the
- *       Work (including but not limited to damages for loss of goodwill,
- *       work stoppage, computer failure or malfunction, or any and all
- *       other commercial damages or losses), even if such Contributor
- *       has been advised of the possibility of such damages.
- *
- *    9. Accepting Warranty or Additional Liability. While redistributing
- *       the Work or Derivative Works thereof, You may choose to offer,
- *       and charge a fee for, acceptance of support, warranty, indemnity,
- *       or other liability obligations and/or rights consistent with this
- *       License. However, in accepting such obligations, You may act only
- *       on Your own behalf and on Your sole responsibility, not on behalf
- *       of any other Contributor, and only if You agree to indemnify,
- *       defend, and hold each Contributor harmless for any liability
- *       incurred by, or claims asserted against, such Contributor by reason
- *       of your accepting any such warranty or additional liability.
- *
- *    END OF TERMS AND CONDITIONS
- *
- *    APPENDIX: How to apply the Apache License to your work.
- *
- *       To apply the Apache License to your work, attach the following
- *       boilerplate notice, with the fields enclosed by brackets "[]"
- *       replaced with your own identifying information. (Don't include
- *       the brackets!)  The text should be enclosed in the appropriate
- *       comment syntax for the file format. We also recommend that a
- *       file or class name and description of purpose be included on the
- *       same "printed page" as the copyright notice for easier
- *       identification within third-party archives.
- *
- *    Copyright 2016 Alibaba Group
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.taobao.weex.utils;
 
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 /**
  * Class for parse color
@@ -218,8 +37,45 @@ import java.util.regex.Pattern;
 public class WXResourceUtils {
 
   private final static Map<String, Integer> colorMap = new HashMap<>();
-  private final static Pattern RGB_PATTERN = Pattern.compile("^#[0-9a-fA-F]{3,9}$");
-  private final static Pattern FUNCTION_RGBA_PATTERN = Pattern.compile("^(rgba?[\\(])([\\s]*[0-9%]+[\\s]*),([\\s]*[0-9%]+[\\s]*),(([\\s]*[0-9%]+[\\s]*),)?([\\s]*[0-9.]+[\\s]*)[\\)]$");
+  private final static int RGB_SIZE = 3;
+  private final static int RGBA_SIZE = 4;
+  private final static int HEX = 16;
+  private final static int COLOR_RANGE = 255;
+  private final static String RGB = "rgb";
+  private final static String RGBA = "rgba";
+  private final static SingleFunctionParser.FlatMapper<Integer> FUNCTIONAL_RGB_MAPPER =
+      new SingleFunctionParser.FlatMapper<Integer>() {
+        @Override
+        public Integer map(String raw) {
+          int color = WXUtils.parseUnitOrPercent(raw, COLOR_RANGE);
+          if (color < 0) {
+            color = 0;
+          } else if (color > COLOR_RANGE) {
+            color = COLOR_RANGE;
+          }
+          return color;
+        }
+      };
+
+  private final static SingleFunctionParser.NonUniformMapper<Number> FUNCTIONAL_RGBA_MAPPER =
+      new SingleFunctionParser.NonUniformMapper<Number>() {
+        @Override
+        public List<Number> map(List<String> raw) {
+          List<Number> result = new ArrayList<>(RGBA_SIZE);
+          int i, color;
+          for (i = 0; i < RGB_SIZE; i++) {
+            color = WXUtils.parseUnitOrPercent(raw.get(i), COLOR_RANGE);
+            if (color < 0) {
+              color = 0;
+            } else if (color > COLOR_RANGE) {
+              color = COLOR_RANGE;
+            }
+            result.add(color);
+          }
+          result.add(Float.valueOf(raw.get(i)));
+          return result;
+        }
+      };
 
   static {
     colorMap.put("aliceblue", 0XFFF0F8FF);
@@ -372,7 +228,6 @@ public class WXResourceUtils {
     colorMap.put("transparent", 0x00000000);
   }
 
-
   public static int getColor(String color) {
     return getColor(color, Integer.MIN_VALUE);
   }
@@ -384,124 +239,202 @@ public class WXResourceUtils {
     color = color.trim(); //remove non visible codes
 
     int resultColor = defaultColor;
-    try {
-      ColorConvertHandler[] handlers = ColorConvertHandler.values();
-      Integer convertedColor;
-      for (ColorConvertHandler handler : handlers) {
-        convertedColor = handler.handle(color);
-        if (convertedColor != null) {
-          resultColor = convertedColor;
+    Pair<Boolean, Integer> result;
+    ColorConvertHandler[] handlers = ColorConvertHandler.values();
+    for (ColorConvertHandler handler : handlers) {
+      try {
+        result = handler.handle(color);
+        if (result.first) {
+          resultColor = result.second;
           break;
         }
+      } catch (RuntimeException e) {
+        WXLogUtils.v("Color_Parser", WXLogUtils.getStackTrace(e));
       }
-    } catch (Exception e) {
-      WXLogUtils.e("WXResourceUtils getColor failed: " + color);
     }
     return resultColor;
+  }
+
+  /**
+   * Assembly gradients
+   * @param image gradient values contains direction、colors
+   * @param width component width
+   * @param height component height
+   * @return gradient shader
+   */
+  public static Shader getShader(String image, float width, float height) {
+    List<String> valueList = parseGradientValues(image);
+    if (valueList != null && valueList.size() == 3) {
+      float[] points = parseGradientDirection(valueList.get(0), width, height);
+      Shader shader = new LinearGradient(points[0], points[1],
+                                         points[2], points[3],
+                                         getColor(valueList.get(1), Color.WHITE), getColor(valueList.get(2), Color.WHITE),
+                                         Shader.TileMode.REPEAT);
+      return shader;
+    }
+    return null;
+  }
+
+  /**
+   * parse gradient values contains direction、colors
+   * @param image gradient values
+   * @return split values by comma
+   */
+  @NonNull
+  private static List<String> parseGradientValues(String image) {
+    if (TextUtils.isEmpty(image)) {
+      return null;
+    }
+    image.trim();
+    if(image.startsWith("linear-gradient")){
+      String valueStr = image.substring(image.indexOf("(") + 1, image.lastIndexOf(")"));
+      StringTokenizer tokenizer = new StringTokenizer(valueStr, ",");
+      List<String> values = new ArrayList<>();
+      String temp = null;
+      while (tokenizer.hasMoreTokens()) {
+        String token = tokenizer.nextToken();
+        if (token.contains("(")) {
+          temp = token + ",";
+          continue;
+        }
+        if (token.contains(")")) {
+          temp += token;
+          values.add(temp);
+          temp = null;
+          continue;
+        }
+        if (temp != null) {
+          temp += (token + ",");
+          continue;
+        }
+        values.add(token);
+      }
+      return values;
+    }
+    return null;
+  }
+
+  /**
+   * parse gradient direction
+   * @param direction gradient direction
+   * @param width component width
+   * @param height component height
+   * @return gradient points
+   */
+  private static float[] parseGradientDirection(String direction, float width, float height) {
+    int x1 = 0, y1 = 1, x2 = 2, y2 = 3;
+    float[] points = {0, 0, 0, 0};
+
+    if (!TextUtils.isEmpty(direction)) {
+      direction = direction.replaceAll("\\s*", "").toLowerCase();
+    }
+
+    switch (direction) {
+      //to right
+      case "toright":
+        points[x2] = width;
+        break;
+      //to left
+      case "toleft":
+        points[x1] = width;
+        break;
+      //to bottom
+      case "tobottom":
+        points[y2] = height;
+        break;
+      //to top
+      case "totop":
+        points[y1] = height;
+        break;
+      //to bottom right
+      case "tobottomright":
+        points[x2] = width;
+        points[y2] = height;
+        break;
+      //to top left
+      case "totopleft":
+        points[x1] = width;
+        points[y1] = height;
+        break;
+    }
+    return points;
   }
 
   enum ColorConvertHandler {
     NAMED_COLOR_HANDLER {
       @Override
-      Integer handle(String rawColor) {
-        return colorMap.get(rawColor);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        if (colorMap.containsKey(rawColor)) {
+          return new Pair<>(Boolean.TRUE, colorMap.get(rawColor));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
+        }
       }
     },
     RGB_HANDLER {
       @Override
-      Integer handle(String rawColor) {
-        if (RGB_PATTERN.matcher(rawColor).matches()) {
-          if (rawColor.length() == 4) {
-            //#eee, #333
-            int result = 0;
-            for (int i = 1; i < 4; i++) {
-              result = (result << 8) + 17 * Character.digit(rawColor.charAt(i), 16);
-            }
-            return result | 0xff000000;
-          } else if (rawColor.length() == 7 || rawColor.length() == 9) {
-            //#eeeeee, #333333
-            return Color.parseColor(rawColor);
-          } else {
-            throw new IllegalArgumentException("ColorConvertHandler invalid color: " + rawColor);
-          }
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        if (rawColor.length() == 4) {
+          //#eee, #333
+          int r, g, b;
+          r = Integer.parseInt(rawColor.substring(1, 2), HEX);
+          g = Integer.parseInt(rawColor.substring(2, 3), HEX);
+          b = Integer.parseInt(rawColor.substring(3, 4), HEX);
+          return new Pair<>(Boolean.TRUE, Color.rgb(r + (r << 4), g + (g << 4), b + (b << 4)));
+        } else if (rawColor.length() == 7 || rawColor.length() == 9) {
+          //#eeeeee, #333333
+          return new Pair<>(Boolean.TRUE, Color.parseColor(rawColor));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
         }
-        return null;
       }
     },
+    FUNCTIONAL_RGB_HANDLER {
+      @Override
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        SingleFunctionParser<Integer> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGB_MAPPER);
+        List<Integer> rgb = functionParser.parse(RGB);
+        if (rgb.size() == RGB_SIZE) {
+          return new Pair<>(Boolean.TRUE, Color.rgb(rgb.get(0), rgb.get(1), rgb.get(2)));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
+        }
+      }
+    },
+
     FUNCTIONAL_RGBA_HANDLER {
       @Override
-      Integer handle(String rawColor) {
-        return convertFunctionalColor(rawColor);
+      @NonNull Pair<Boolean, Integer> handle(String rawColor) {
+        SingleFunctionParser<Number> functionParser = new SingleFunctionParser<>(rawColor, FUNCTIONAL_RGBA_MAPPER);
+        List<Number> rgba = functionParser.parse(RGBA);
+        if (rgba.size() == RGBA_SIZE) {
+          return new Pair<>(Boolean.TRUE, Color.argb(
+              parseAlpha(rgba.get(3).floatValue()),
+              rgba.get(0).intValue(),
+              rgba.get(1).intValue(),
+              rgba.get(2).intValue()));
+        } else {
+          return new Pair<>(Boolean.FALSE, Color.TRANSPARENT);
+        }
       }
     };
 
     /**
-     * Parse a functional RGB to #RRGGBB or functional RGBA to #AARRGGBB
-     * @param raw functional RGB or functional RGBA
-     * @return #RRGGBB or #AARRGGBB
-     */
-    private static Integer convertFunctionalColor(String raw) {
-      Matcher matcher = FUNCTION_RGBA_PATTERN.matcher(raw);
-      if (matcher.matches()) {
-        boolean alpha = matcher.group(1).startsWith("rgba");
-        String[] gradients = new String [alpha ? 4 : 3];
-        gradients[0] = matcher.group(2);
-        gradients[1] = matcher.group(3);
-        if (alpha) {
-          gradients[2] = matcher.group(5);
-          gradients[3] = matcher.group(6);
-        } else {
-          gradients[2] = matcher.group(6);
-        }
-        return parseRGBA(gradients);
-      }
-      return null;
-    }
-
-    /**
-     * Parse Functional RGB to RRGGBB mode
-     * @param gradients gradients of functional RGB
-     * @return RRGGBB color
-     */
-    private static Integer parseRGBA(String[] gradients) {
-      int[] digits = new int[4];
-      if (gradients.length == 3) {
-        digits[3] = 0xff;
-      }
-      int percent_loc;
-      int value;
-      String gradient;
-      for (int i = 0; i < gradients.length; i++) {
-        gradient = gradients[i].trim();
-        if ((percent_loc = gradient.lastIndexOf("%")) != -1) {
-          gradient = gradient.substring(0, percent_loc);
-          value = (int) (Float.parseFloat(gradient) / 100 * 255);
-        } else {
-          float temp = Float.parseFloat(gradient);
-          if (0f < temp && temp <= 1f && i == 3) {
-            value = (int) (temp * 255);
-          } else {
-            value = (int) temp;
-          }
-        }
-        if (value < 0 || value > 255) {
-          throw new IllegalArgumentException("ColorConvertHandler invalid gradient: " + gradient);
-        }
-        digits[i] = value;
-      }
-
-      int result = digits[3];
-      for (int i = 0; i < 3; i++) {
-        result = (result << 8) + digits[i];
-      }
-      return result;
-    }
-
-    /**
      * Parse color to #RRGGBB or #AARRGGBB. The parsing algorithm depends on sub-class.
+     *
      * @param rawColor color, maybe functional RGB(RGBA), #RGB, keywords color or transparent
      * @return #RRGGBB or #AARRGGBB
      */
-    abstract Integer handle(String rawColor);
+    @NonNull abstract Pair<Boolean, Integer> handle(String rawColor);
+
+    /**
+     * Parse alpha gradient of color from range 0-1 to range 0-255
+     *
+     * @param alpha the alpha value, in range 0-1
+     * @return the alpha value, in range 0-255
+     */
+    private static int parseAlpha(float alpha) {
+      return (int) (alpha * COLOR_RANGE);
+    }
   }
 }

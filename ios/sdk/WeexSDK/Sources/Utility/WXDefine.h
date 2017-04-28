@@ -1,15 +1,26 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.8.0"
+#define WX_SDK_VERSION @"0.12.0"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))
@@ -34,7 +45,7 @@
 
 #define WX_SDK_ROOT_REF     @"_root"
 
-#define WX_TEXT_FONT_SIZE   (32.0 * WXScreenResizeRadio())
+#define WX_TEXT_FONT_SIZE   (32.0 * self.weexInstance.pixelScaleFactor)
 
 #define WX_UPDATE_CONFIG(prefix, name, configs) \
 NSString *selStr = [NSString stringWithFormat:@"%@_%@", prefix, name];\
@@ -62,6 +73,10 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 
 #define WX_ERROR_DOMAIN @"WXErrorDomain"
 
+#define WX_APPLICATION_WILL_RESIGN_ACTIVE @"WXApplicationWillResignActiveEvent"
+
+#define WX_APPLICATION_DID_BECOME_ACTIVE @"WXApplicationDidBecomeActiveEvent"
+
 #define WX_INSTANCE_NOTIFICATION_UPDATE_STATE @"WXInstUpdateState"
 
 #define WX_COMPONENT_THREAD_NAME @"com.taobao.weex.component"
@@ -69,6 +84,37 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
 #define WX_BRIDGE_THREAD_NAME @"com.taobao.weex.bridge"
 
 #define WX_FONT_DOWNLOAD_DIR [[WXUtility cacheDirectory] stringByAppendingPathComponent:[NSString stringWithFormat:@"wxdownload"]]
+
+#define WX_EXPORT_METHOD_INTERNAL(method, token) \
++ (NSString *)WX_CONCAT_WRAPPER(token, __LINE__) { \
+    return NSStringFromSelector(method); \
+}
+
+#define WX_MODULE_EVENT_FIRE_NOTIFICATION  @"WX_MODULE_EVENT_FIRE_NOTIFICATION"
+#define WX_ICONFONT_DOWNLOAD_NOTIFICATION  @"WX_ICONFONT_DOWNLOAD_FINISH_NOTIFICATION"
+
+/**
+ *  @abstract export public method
+ */
+#define WX_EXPORT_METHOD(method) WX_EXPORT_METHOD_INTERNAL(method,wx_export_method_)
+
+/**
+ *  @abstract export public method, support sync return value
+ *  @warning the method can only be called on js thread
+ */
+#define WX_EXPORT_METHOD_SYNC(method) WX_EXPORT_METHOD_INTERNAL(method,wx_export_method_sync_)
+
+/** extern "C" makes a function-name in C++ have 'C' linkage (compiler does not mangle the name)
+ * so that client C code can link to (i.e use) your function using a 'C' compatible header file that contains just the declaration of your function.
+ *  http://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c
+ */
+#ifdef __cplusplus
+# define WX_EXTERN_C_BEGIN extern "C" {
+# define WX_EXTERN_C_END   }
+#else
+# define WX_EXTERN_C_BEGIN
+# define WX_EXTERN_C_END
+#endif
 
 /**
  *  @abstract Compared with system version of current device 
@@ -109,6 +155,17 @@ parts = [parts subarrayWithRange:(NSRange){0, parts.count - 1}];\
  *
  */
 #define WX_SYS_LESS_THAN_OR_EQUAL_TO(v)             ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+
+/**
+ *  @abstract Estimate component's type. If the type isn't equal to WXComponentTypeCommon, then return.
+ */
+#define WX_CHECK_COMPONENT_TYPE(type)\
+do {\
+if (type != WXComponentTypeCommon) {\
+return;\
+}\
+} while (0);
+
 
 
 #if __has_attribute(objc_requires_super)

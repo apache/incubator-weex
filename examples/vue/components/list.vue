@@ -3,10 +3,12 @@
     <list class="list">
       <cell
         v-for="(v,i) in rows"
+        append="tree"
         :index="i"
+        :key="i"
         class="row"
-        @appear="onappear"
-        @disappear="ondisappear">
+        @appear="onappear(i, $event)"
+        @disappear="ondisappear(i, $event)">
         <div class="item">
           <text class="item-title">row {{v.id}}</text>
         </div>
@@ -16,7 +18,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .list {
     height:850px
   }
@@ -39,6 +41,9 @@
     height: 100px;
     padding:20px;
   }
+  .item:active {
+     background-color: #00BDFF;
+   }
   .item-title {
   }
 </style>
@@ -46,16 +51,16 @@
 <script>
   module.exports = {
     methods: {
-      onappear: function (e) {
-        var appearId = this.rows[e.target.attr.index].id;
-        nativeLog('+++++', appearId);
+      onappear: function (idx, e) {
+        var appearId = this.rows[idx].id;
+        console.log('+++++', appearId);
         var appearIds = this.appearIds;
         appearIds.push(appearId);
         this.getMinAndMaxIds(appearIds);
       },
-      ondisappear:function (e) {
-        var disAppearId = this.rows[e.target.attr.index].id;
-        nativeLog('+++++', disAppearId);
+      ondisappear:function (idx, e) {
+        var disAppearId = this.rows[idx].id;
+        console.log('+++++', disAppearId);
         var appearIds = this.appearIds;
         var index = appearIds.indexOf(disAppearId);
         if (index > -1) {
@@ -72,41 +77,43 @@
         this.appearMin = appearIds[0];
       }
     },
-    data: {
-      appearMin:1,
-      appearMax:1,
-      appearIds:[],
-      rows:[
-        {id: 1},
-        {id: 2},
-        {id: 3},
-        {id: 4},
-        {id: 5},
-        {id: 6},
-        {id: 7},
-        {id: 8},
-        {id: 9},
-        {id: 10},
-        {id: 11},
-        {id: 12},
-        {id: 13},
-        {id: 14},
-        {id: 15},
-        {id: 16},
-        {id: 17},
-        {id: 18},
-        {id: 19},
-        {id: 20},
-        {id: 21},
-        {id: 22},
-        {id: 23},
-        {id: 24},
-        {id: 25},
-        {id: 26},
-        {id: 27},
-        {id: 28},
-        {id: 29}
-      ]
+    data: function () {
+      return {
+        appearMin:1,
+        appearMax:1,
+        appearIds:[],
+        rows:[
+          {id: 1},
+          {id: 2},
+          {id: 3},
+          {id: 4},
+          {id: 5},
+          {id: 6},
+          {id: 7},
+          {id: 8},
+          {id: 9},
+          {id: 10},
+          {id: 11},
+          {id: 12},
+          {id: 13},
+          {id: 14},
+          {id: 15},
+          {id: 16},
+          {id: 17},
+          {id: 18},
+          {id: 19},
+          {id: 20},
+          {id: 21},
+          {id: 22},
+          {id: 23},
+          {id: 24},
+          {id: 25},
+          {id: 26},
+          {id: 27},
+          {id: 28},
+          {id: 29}
+        ]
+      }
     }
   }
 </script>

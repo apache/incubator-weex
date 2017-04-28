@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import <Foundation/Foundation.h>
@@ -12,7 +23,7 @@
 #import "WXType.h"
 #import "WXLog.h"
 
-// The default screen width which helps us to caculate the real size or scale in different devices.
+// The default screen width which helps us to calculate the real size or scale in different devices.
 static const CGFloat WXDefaultScreenWidth = 750.0;
 
 #define WX_ENUMBER_CASE(_invoke, idx, code, obj, _type, op, _flist) \
@@ -82,21 +93,29 @@ extern void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
 extern void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
 
 /**
+ * @abstract execute action block on the specific thread.
+ *
+ */
+extern void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+
+/**
  * @abstract swizzling methods.
  *
  */
-extern void WXSwizzleInstanceMethod(_Nonnull Class class, _Nonnull SEL original, _Nonnull SEL replaced);
+extern void WXSwizzleInstanceMethod(_Nonnull Class className, _Nonnull SEL original, _Nonnull SEL replaced);
 
-extern void WXSwizzleInstanceMethodWithBlock(_Nonnull Class class, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
+extern void WXSwizzleInstanceMethodWithBlock(_Nonnull Class className, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
 
 extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 @interface WXUtility : NSObject
 
++ (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
+
 + (void)setNotStat:(BOOL)notStat;
 + (BOOL)notStat;
 /**
- * @abstract Returns the environment of current application, you can get some nessary properties such as appVersion、sdkVersion、appName etc.
+ * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
  * @return A dictionary object which contains these properties.
  *
@@ -114,9 +133,9 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 + (NSString *_Nonnull)userAgent;
 
 /**
- * @abstract JSON Decode Mehthod
+ * @abstract JSON Decode Method
  *
- * @param JSON String.
+ * @param json String.
  *
  * @return A json object by decoding json string.
  *
@@ -126,9 +145,9 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 #define WXDecodeJson(json)  [WXUtility objectFromJSON:json]
 
 /**
- * @abstract JSON Encode Mehthod
+ * @abstract JSON Encode Method
  *
- * @param JSON Object.
+ * @param object Object.
  *
  * @return A json string by encoding json object.
  *
@@ -150,9 +169,9 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 #define WXJSONObjectFromData(data) [WXUtility JSONObject:data error:nil]
 /**
- * @abstract JSON Object Copy Mehthod
+ * @abstract JSON Object Copy Method
  *
- * @param JSON Object.
+ * @param object Object.
  *
  * @return A json object by copying.
  *
@@ -180,9 +199,9 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 /**
  * @abstract Returns a standard error object
  *
- * @param error code.
+ * @param code code.
  *
- * @param error message.
+ * @param message message.
  *
  * @return A error object type of NSError.
  *
@@ -192,45 +211,46 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 /**
  * @abstract Returns a Font Object by setting some properties such as size、weight、style and fontFamily.
  *
- * @param textSize.
+ * @param size font size
  *
- * @param textWeight. The type of WXTextWeight (Normal or Bold).
+ * @param textWeight font weight
  *
- * @param textStyle. The type of WXTextStyle (Normal or Italic).
+ * @param textStyle  The type of WXTextStyle (Normal or Italic).
  *
- * @param fontFamily.
+ * @param fontFamily font family
+ *
+ * @param scaleFactor please use instance's scale factor
  *
  * @return A font object according to the above params.
  *
  */
-+ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(WXTextWeight)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily;
++ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily scaleFactor:(CGFloat)scaleFactor;
+
++ (UIFont *_Nonnull)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *_Nullable)fontFamily scaleFactor:(CGFloat)scaleFactor useCoreText:(BOOL)useCoreText;
 
 /**
  * @abstract download remote font from specified url
- * @param url for remote font
+ * @param fontURL for remote font
  *
  */
 + (void)getIconfont:(NSURL * _Nonnull)fontURL completion:( void(^ _Nullable )(NSURL * _Nonnull url, NSError * _Nullable error)) completionBlock;
+
+/**
+ * @abstract Returns the main screen's size when the device is in portrait mode,.
+ */
++ (CGSize)portraitScreenSize;
+
+/**
+ * @abstract Returns the default pixel scale factor
+ * @discussion If orientation is equal to landscape, the value is caculated as follows: WXScreenSize().height / WXDefaultScreenWidth, otherwise, WXScreenSize().width / WXDefaultScreenWidth.
+ */
++ (CGFloat)defaultPixelScaleFactor;
 
 /**
  * @abstract Returns the scale of the main screen.
  *
  */
 CGFloat WXScreenScale();
-
-/**
- * @abstract Returns the metrics of the main screen.
- *
- */
-CGSize WXScreenSize();
-
-/**
- * @abstract Returns the resize radio of the main screen. 
- *
- * @discussion If orientation is equal to landscape, the value is caculated as follows: WXScreenSize().height / WXDefaultScreenWidth, otherwise, WXScreenSize().width / WXDefaultScreenWidth.
- *
- */
-CGFloat WXScreenResizeRadio(void);
 
 /**
  * @abstract Returns a Round float coordinates to the main screen pixel.
@@ -249,24 +269,6 @@ CGFloat WXFloorPixelValue(CGFloat value);
  *
  */
 CGFloat WXCeilPixelValue(CGFloat value);
-
-/**
- *  @abstract Returns a resized pixel which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGFloat WXPixelResize(CGFloat value);
-
-/**
- *  @abstract Returns a resized frame which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGRect WXPixelFrameResize(CGRect value);
-
-/**
- *  @abstract Returns a resized point which is caculated according to the WXScreenResizeRadio.
- *
- */
-CGPoint WXPixelPointResize(CGPoint value);
 
 /**
  *  @abstract check whether the file is exist
@@ -296,7 +298,7 @@ CGPoint WXPixelPointResize(CGPoint value);
  */
 + (NSString *_Nonnull)libraryDirectory;
 
-#define WXLibararyPath  [WXUtility libraryDirectory]
+#define WXLibraryPath  [WXUtility libraryDirectory]
 
 /**
  *  @abstract Returns the global cache whose size is 5M.
@@ -325,5 +327,111 @@ CGPoint WXPixelPointResize(CGPoint value);
  *
  */
 + (NSString *_Nullable)uuidString;
+
+/**
+ *  @abstract convert date string with formatter yyyy-MM-dd to date.
+ *
+ */
++ (NSDate *_Nullable)dateStringToDate:(NSString *_Nullable)dateString;
+
+/**
+ *  @abstract convert time string with formatter HH:mm to date.
+ *
+ */
++ (NSDate *_Nullable)timeStringToDate:(NSString *_Nullable)timeString;
+
+/**
+ *  @abstract convert date to date string with formatter yyyy-MM-dd .
+ *
+ */
++ (NSString *_Nullable)dateToString:(NSDate *_Nullable)date;
+
+/**
+ *  @abstract convert date to time string with formatter HH:mm .
+ *
+ */
++ (NSString *_Nullable)timeToString:(NSDate *_Nullable)date;
+
+/**
+ *  @abstract get the repeat substring number of string.
+ *
+ */
++ (NSUInteger)getSubStringNumber:(NSString *_Nullable)string subString:(NSString *_Nullable)subString;
+
+/**
+ *  @abstract Returns a resized pixel which is calculated according to the WXScreenResizeRadio.
+ *
+ */
+CGFloat WXPixelScale(CGFloat value, CGFloat scaleFactor);
+
+CGFloat WXScreenResizeRadio(void) DEPRECATED_MSG_ATTRIBUTE("Use [WXUtility defaultPixelScaleFactor] instead");
+CGFloat WXPixelResize(CGFloat value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
+CGRect WXPixelFrameResize(CGRect value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
+CGPoint WXPixelPointResize(CGPoint value) DEPRECATED_MSG_ATTRIBUTE("Use WXPixelScale Instead");
++ (UIFont  * _Nullable )fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString * _Nullable)fontFamily DEPRECATED_MSG_ATTRIBUTE("Use +[WXUtility fontWithSize:textWeight:textStyle:fontFamily:scaleFactor:]");
+
+
+/**
+ @discusstion construct a gradientLayer from the colors locations, gradientType
+ @param colors The array of UIColor objects defining the color of each gradient
+ stop. Defaults to nil
+ @param locations An optional array of NSNumber objects defining the location of each
+  gradient stop as a value in the range [0,1].
+ @param frame the layer frame
+ @param gradientType WXGradientType value specify the gradient location
+ @return gradient layer
+ */
++ (CAGradientLayer *_Nullable)gradientLayerFromColors:(NSArray*_Nullable)colors
+                                           locations:(NSArray*_Nullable)locations
+                                               frame:(CGRect)frame
+                                        gradientType:(WXGradientType)gradientType;
+
+/**
+ @discusstion parse gradient-color string to a dictionary, then you can get gradientLayer from @see gradientLayerFromColors:colors:locations:frame:locations
+ @param backgroundImage  linear-gradient string like linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))
+ @return dictionary with endColor, startColor and gradientType value
+ @code
+    NSDictionary * linearGradient = [self linearGradientWithBackgroundImage:@"linear-gradient(to right, #a80077,rgba(200, 54, 54, 0.5))"];
+    CAGradientLayer * gradientLayer = [self gradientLayerFromColors:@[linearGradient[@"startColor"], linearGradient[@"endColor"]],nil,bounds,[linearGradient[@"gradientType"] integerValue]];
+ @endcode
+ */
++ (NSDictionary *_Nullable)linearGradientWithBackgroundImage:(NSString *_Nullable)backgroundImage;
+
+/**
+ *  @abstract compare float a and b, if a equal b, return true,or reture false.
+ *
+ */
+BOOL WXFloatEqual(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision, if a equal b, return true,or reture false.
+ *
+ */
+BOOL WXFloatEqualWithPrecision(CGFloat a, CGFloat b ,double precision);
+/**
+ *  @abstract compare float a and b, if a less than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatLessThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b,user give the compare precision, if a less than b,return true,or reture false.
+ *
+ */
+BOOL WXFloatLessThanWithPrecision(CGFloat a, CGFloat b,double precision);
+/**
+ *  @abstract compare float a and b, if a great than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatGreaterThan(CGFloat a, CGFloat b);
+/**
+ *  @abstract compare float a and b, user give the compare precision,if a great than b, return true,or reture false.
+ *
+ */
+BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
+
+/**
+ *  @abstract convert returnKeyType to type string .
+ *
+ */
++ (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type;
 
 @end

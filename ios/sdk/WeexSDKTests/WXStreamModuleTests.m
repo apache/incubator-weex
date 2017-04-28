@@ -1,15 +1,26 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import <XCTest/XCTest.h>
 #import "WXStreamModule.h"
 #import <WeexSDK/WeexSDK.h>
-#import "WXNetworkDefaultImpl.h"
+#import "WXResourceRequestHandlerDefaultImpl.h"
 
 @interface WXStreamModuleTests : XCTestCase
 @property (nonatomic, strong)  WXStreamModule *streamModule;
@@ -22,50 +33,13 @@
 - (void)setUp {
     [super setUp];
     _streamModule = [[WXStreamModule alloc] init];
-    [WXSDKEngine registerHandler:[WXNetworkDefaultImpl new] withProtocol:@protocol(WXNetworkProtocol)];
+    [WXSDKEngine registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     _exp = [self expectationWithDescription:@"SendRequestSuccess Unit Test Error!"];
 }
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
-}
-
-- (void)testSendHttpGet {
-    
-    NSDictionary *getOption = @{
-        @"method" : @"GET",
-        @"url"    : @"http://httpbin.org/get"
-    };
-    [self sendHttp:getOption];
-    
-}
-- (void)testSendHttpPost {
-    NSDictionary *postOption = @{
-        @"method" : @"POST",
-        @"url"    : @"http://httpbin.org/post",
-        @"body"   : @"username=weex&&password=weex"
-    };
-    [self sendHttp:postOption];
-}
-
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
-}
-
-- (void)sendHttp:(NSDictionary*)options {
-    __block id callbackResult = nil;
-    [_streamModule sendHttp:options callback:^(id result) {
-        callbackResult = result;
-        [_exp fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:10 handler:^(NSError * error) {
-        XCTAssertNotNil(callbackResult);
-    }];
-    
 }
 
 - (void)fetch:(NSDictionary*)options {

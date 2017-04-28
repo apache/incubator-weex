@@ -32,7 +32,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   .item {
     padding-top: 25px;
     padding-bottom: 25px;

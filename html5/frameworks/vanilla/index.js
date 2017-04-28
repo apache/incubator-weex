@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 const config = {}
 
 const instanceMap = {}
@@ -17,9 +35,10 @@ function registerMethods (apis) {}
 
 function prepareInstance (id, options, data) {}
 
-function createInstance (id, code, options, data) {
+function createInstance (id, code, options, data, serviceObjects) {
   const document = new config.Document(id, options.bundleUrl)
   const callbacks = {}
+
   let lastCallbackId = 0
   document.addCallback = func => {
     lastCallbackId++
@@ -34,27 +53,25 @@ function createInstance (id, code, options, data) {
     return callback(data)
   }
   instanceMap[id] = document
-  const result = new Function(
-    'Document',
-    'Element',
-    'Comment',
-    'sendTasks',
-    'id',
-    'options',
-    'data',
-    'document',
-    code
-  )
-  return result(
-    config.Document,
-    config.Element,
-    config.Comment,
-    config.sendTasks,
-    id,
-    options,
-    data,
-    document
-  )
+
+  const globalObjects = Object.assign({
+    Document: config.Document,
+    Element: config.Element,
+    Comment: config.Comment,
+    sendTasks: config.sendTasks,
+    id, options, data, document
+  }, serviceObjects)
+
+  const globalKeys = []
+  const globalValues = []
+  for (const key in globalObjects) {
+    globalKeys.push(key)
+    globalValues.push(globalObjects[key])
+  }
+  globalKeys.push(code)
+
+  const result = new Function(...globalKeys)
+  return result(...globalValues)
 }
 
 function refreshInstance (id, data) {}

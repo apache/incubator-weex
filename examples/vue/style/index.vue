@@ -1,5 +1,5 @@
 <template>
-  <scroller>
+  <scroller style="overflow-x:hidden;">
     <style-box></style-box>
     <style-flex></style-flex>
     <panel title="opacity" type="primary">
@@ -22,7 +22,7 @@
   </scroller>
 </template>
 
-<style>
+<style scoped>
   .bg-item {
     width: 690px;
     margin-bottom: 10px;
@@ -32,7 +32,7 @@
 <script>
   module.exports = {
     components: {
-      panel: require('weex-vue-components/panel.vue'),
+      panel: require('../include/panel.vue'),
       styleBox: require('./style-box.vue'),
       styleFlex: require('./style-flex.vue'),
       styleItem: require('./style-item.vue')

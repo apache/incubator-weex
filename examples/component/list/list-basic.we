@@ -21,7 +21,7 @@
 
 <style>
   .list {
-    height:850
+    height:850;
   }
   .count {
     font-size: 48;
@@ -49,6 +49,11 @@
     height: 100;
     padding:20;
   }
+
+  .item:active {
+    background-color: #00BFFF;
+  }
+
   .item-title {
   }
   .refresh-view {
