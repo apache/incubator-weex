@@ -44,7 +44,7 @@
 <script>
     var tfnId;
     var ifnId;
-    var old_timer = require('@weex-module/timer');
+    var old_timer = weex.requireModule('timer')
     module.exports = {
         data: function () {
             return {

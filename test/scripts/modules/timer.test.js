@@ -9,9 +9,9 @@ var util = require("../util.js");
 
 do_test('Time Module in .we', '/modules/we_timer.js');
 
-do_test('Old way of Time Module in .we', '/modules/we_old_timer.js');
-
 do_test('Time Module in .vue', '/modules/vue_timer.js');
+
+do_test('Old way of Time Module in .we', '/modules/we_old_timer.js');
 
 do_test('Old way of Time Module in .vue', '/modules/vue_old_timer.js')
 
