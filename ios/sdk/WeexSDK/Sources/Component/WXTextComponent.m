@@ -834,6 +834,7 @@ do {\
     CFRelease(frameRef);
     
     if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+        // there is something wrong with coreText drawing text height, trying to fix this with more efficent way.
         if(actualLineCount && actualLineCount < lineCount) {
             suggestSize.height = suggestSize.height * actualLineCount / lineCount;
         }
