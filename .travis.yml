@@ -61,4 +61,6 @@ cache:
 script:
   - source test/ci-funcs.sh
   - runJSTest $TEST_SUITE
+notifications:
+  webhooks: https://oapi.dingtalk.com/robot/send?access_token=553a6d23676da61499b0001a8e28d4436be776f5642fff9259f5c946ffac45d2
   
