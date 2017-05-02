@@ -149,10 +149,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
-    if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
-        // there is something wrong with coreText drawing lineHeight, trying to fix this, or anyone who can help me to fix this.
-        return NO;
-    }
     
     if ([_useCoreTextAttr isEqualToString:@"yes"]) {
         return YES;
@@ -372,6 +368,7 @@ do {\
                                            NULL);
     if (ctFont) {
         [attributedString addAttribute:(id)kCTFontAttributeName value:(__bridge id)(ctFont) range:NSMakeRange(0, string.length)];
+        CFRelease(ctFont);
     }
     
     if(_textDecoration == WXTextDecorationUnderline){
@@ -415,8 +412,6 @@ do {\
                                      range:(NSRange){0, attributedString.length}];
         }
     }
-    
-    CFRelease(ctFont);
     
     return attributedString;
 }
@@ -485,6 +480,9 @@ do {\
 
 - (BOOL)adjustLineHeight
 {
+    if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+        return true;
+    }
     return ![self useCoreText];
 }
 
@@ -627,7 +625,6 @@ do {\
             CGPoint lineOrigin = lineOrigins[lineIndex];
             lineOrigin.x += padding.left;
             lineOrigin.y -= padding.top;
-            CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
             CFArrayRef runs = CTLineGetGlyphRuns(lineRef);
             [mutableLines addObject:(__bridge id _Nonnull)(lineRef)];
             // lineIndex base 0
@@ -652,6 +649,7 @@ do {\
             }
             
             if (needTruncation) {
+                CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
                 ctTruncatedLine = [self buildTruncatedLineWithRuns:runs lines:mutableLines path:cgPath];
                 if (ctTruncatedLine) {
                     CFArrayRef truncatedRuns = CTLineGetGlyphRuns(ctTruncatedLine);
@@ -679,9 +677,14 @@ do {\
     for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runs); runIndex ++) {
         CTRunRef run = NULL;
         run = CFArrayGetValueAtIndex(runs, runIndex);
-        CTRunDraw(run, context, CFRangeMake(0, 0));
         CFDictionaryRef attr = NULL;
         attr = CTRunGetAttributes(run);
+        NSNumber *baselineOffset = (NSNumber*)CFDictionaryGetValue(attr, NSBaselineOffsetAttributeName);
+        if (baselineOffset) {
+            lineOrigin.y += [baselineOffset doubleValue];
+        }
+        CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
+        CTRunDraw(run, context, CFRangeMake(0, 0));
         CFIndex glyphCount = CTRunGetGlyphCount(run);
         if (glyphCount <= 0) continue;
         
@@ -829,6 +832,13 @@ do {\
     
     totalHeight = totalHeight + actualLineCount * leading;
     CFRelease(frameRef);
+    
+    if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+        if(actualLineCount && actualLineCount < lineCount) {
+            suggestSize.height = suggestSize.height * actualLineCount / lineCount;
+        }
+        return suggestSize;
+    }
     
     return CGSizeMake(suggestSize.width, totalHeight);
 }
