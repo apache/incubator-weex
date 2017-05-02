@@ -78,7 +78,8 @@
     "copy:js": "cp -vf ./dist/native.js ./android/sdk/assets/main.js",
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples",
-    "danger": "danger"
+    "danger": "danger",
+    "danger:junit": "danger -- --dangerfile dangerfile-junit.js"
   },
   "dependencies": {
     "animationjs": "^0.1.5",
@@ -155,11 +156,11 @@
     "vue-template-compiler": "^2.2.6",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
+    "weex-gcanvas": "^0.3.5",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.23",
     "wwp": "^0.3.5",
-    "weex-gcanvas":"^0.3.5"
-
+    "xmldom": "^0.1.27"
   }
 }
