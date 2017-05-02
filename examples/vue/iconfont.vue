@@ -12,24 +12,28 @@
         color: red;
         font-size: 36;
         fontFamily: iconfont1;
+        font-family: iconfont3;
     }
 
     .title2 {
         color: red;
         font-size: 36;
         fontFamily: iconfont2;
+        font-family: iconfont3;
     }
 
     .title3 {
         color: red;
         font-size: 36;
         fontFamily: iconfont3;
+        font-family: iconfont3;
     }
 
     .title4 {
         color: red;
         font-size: 36;
         fontFamily: iconfont4;
+        font-family: iconfont4;
     }
 </style>
 
