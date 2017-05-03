@@ -1409,10 +1409,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         status,
         pesudoStyles,
         styles.getPesudoResetStyles());
-    updateStyleByPesudo(resultStyles);
+    updateStyleByPseudo(resultStyles);
   }
 
-  private void updateStyleByPesudo(Map<String,Object> styles){
+  private void updateStyleByPseudo(Map<String,Object> styles){
     Message message = Message.obtain();
     WXDomTask task = new WXDomTask();
     task.instanceId = getInstanceId();
