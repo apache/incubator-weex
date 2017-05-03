@@ -41,7 +41,6 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
   function finallCb () {
     item.removeAttribute('img-src')
     delete item._src_loading
-    item._src_loaded = true
     if (doRecord) {
       if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
         tagImg() // tag lastest img onload time.
@@ -51,7 +50,7 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
       }
     }
   }
-  if (item._src_loading || item._src_loaded) {
+  if (item._src_loading) {
     return
   }
   item._src_loading = true
