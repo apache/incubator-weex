@@ -18,7 +18,7 @@ describe('weex text @ignore-ios', function () {
   });
 
   after(function () {
-    // return util.quit(driver);
+    return util.quit(driver);
   })
 
 

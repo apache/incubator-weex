@@ -307,12 +307,6 @@ static dispatch_queue_t WXImageUpdateQueue;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     __strong typeof(self) strongSelf = weakSelf;
                     
-                    if (weakSelf.imageLoadEvent) {
-                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
-                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
-                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
-                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
-                    }
                     if (error) {
                         downloadFailedBlock(imageSrc, error);
                         [strongSelf readyToRender];
@@ -331,6 +325,13 @@ static dispatch_queue_t WXImageUpdateQueue;
                         strongSelf.imageDownloadFinish = YES;
                         strongSelf->_image = image;
                         [strongSelf setNeedsDisplay];
+                    }
+                    
+                    if (strongSelf.imageLoadEvent) {
+                        NSMutableDictionary *sizeDict = [NSMutableDictionary new];
+                        sizeDict[@"naturalWidth"] = @(image.size.width * image.scale);
+                        sizeDict[@"naturalHeight"] = @(image.size.height * image.scale);
+                        [strongSelf fireEvent:@"load" params:@{ @"success": error? @false : @true,@"size":sizeDict}];
                     }
                 });
             }];

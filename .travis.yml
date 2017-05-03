@@ -49,10 +49,15 @@ matrix:
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
+        before_script:
+          - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+          - nvm install 7.0
+          - npm install
         script:
           - cd android
           - ./run-ci.sh 
           - cd $TRAVIS_BUILD_DIR
+          - npm run danger:junit
 cache:
   directories:
   - node_modules
@@ -61,4 +66,6 @@ cache:
 script:
   - source test/ci-funcs.sh
   - runJSTest $TEST_SUITE
+notifications:
+  webhooks: https://oapi.dingtalk.com/robot/send?access_token=553a6d23676da61499b0001a8e28d4436be776f5642fff9259f5c946ffac45d2
   

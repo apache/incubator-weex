@@ -42,6 +42,7 @@
     [self setupNaviBar];
     UITapGestureRecognizer * tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleClick:)];
     [self.tableView addGestureRecognizer:tapGestureRecognizer];
+    tapGestureRecognizer.delegate = self;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadHistory) name:NSUserDefaultsDidChangeNotification object:nil];
 }
 
@@ -71,6 +72,7 @@
     }
     UILongPressGestureRecognizer * longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     longPressGesture.minimumPressDuration = 1.0;
+    longPressGesture.delegate = self;
     [cell addGestureRecognizer:longPressGesture];
     NSMutableAttributedString * attributeString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ld %@",(long)indexPath.row+1,[_scanner_history objectAtIndex:indexPath.row]]];
     [attributeString addAttribute:(NSString*)NSForegroundColorAttributeName value:(id)[UIColor redColor].CGColor range:NSMakeRange(0, 1)];
@@ -95,7 +97,8 @@
     }
 }
 
-- (void)reloadHistory {
+- (void)reloadHistory
+{
     if ([_scanner_history count]) {
         [_qrCodeImageView removeFromSuperview];
         [_scanner_history removeAllObjects];
@@ -103,15 +106,29 @@
     }
 }
 
-- (void)handleClick:(UITapGestureRecognizer*)gestureRecognizer {
+- (void)handleClick:(UITapGestureRecognizer*)gestureRecognizer
+{
     CGPoint clickPoint = [gestureRecognizer locationInView:self.tableView];
     if (!CGRectContainsPoint(_qrCodeImageView.frame, clickPoint)) {
         [_qrCodeImageView removeFromSuperview];
     }
-    
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+        if ([_qrCodeImageView superview]) {
+            return YES;
+        }
+    }
+    if ([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
     if (gestureRecognizer.state != UIGestureRecognizerStateBegan) {
         return ;
     }
