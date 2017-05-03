@@ -8,7 +8,7 @@ function startMacacaServer {
 
 function buildAndroid {
     dir=$(pwd)
-    builddir=$dir'/android/playground'
+    builddir=$dir'/android'
     current_dir=$PWD;
     cd $builddir;
     ./gradlew assembleDebug;
