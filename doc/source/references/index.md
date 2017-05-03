@@ -16,3 +16,4 @@ version: 2.1
 - [Gesture](./gesture.html)
 - [path](./path.html)
 - [event bubble](./bubble.html)
+- [downgrade](./downgrade.html)
