@@ -88,12 +88,28 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
+
+    /**
+     * During updating process, updateChildren will not process the render function of the
+     * children's components. Therefore it is necessary to process children's static styles in
+     * this hook func.
+     */
     const children = this.$children
     if (children) {
       children.forEach((childVm) => {
+        /**
+         * Has to delete the previousVnode's staticStyle. Otherwise some style props may not
+         * be attached on the dom, since the previous staticStyle val is equal with the new
+         * updated style val.
+         */
+        let i
+        if ((i = childVm._vnode) && (i = childVm._vnode.data)) {
+          delete i.staticStyle
+        }
         childVm._watcher.run()
       })
     }
+
     watchAppear(this)
   },
 
