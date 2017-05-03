@@ -85,7 +85,7 @@ export function normalizeString (styleKey: string, styleVal: string): string {
   if (unitsNum) { return unitsNum }
 
   // 2. test if is a translate scale. e.g. `transform: translate2d(1px, 2px);`
-  const regTranslateString = /translate[^(]*\([\d ,.pwx]+\)/i // unit support: wx, px.
+  const regTranslateString = /translate[^(]*\([+-\d ,.pwx]+\)/i // unit support: wx, px.
   if (styleKey.match(/transform/i) && regTranslateString.test(styleVal)) {
     const val = styleVal.replace(regTranslateString, function (translate) {
       const reg = /([+-]?\d+(?:\.\d+)?)([p,w]x)?(?![dD])/g
