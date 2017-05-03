@@ -206,6 +206,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         // ignore
       }
 
+      //FIXME:
       WXServiceManager.execAllCacheJsService();
     }
     if (remoteDebug && mWxDebugProxy != null) {

@@ -12,6 +12,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
         mavenCentral()
         jcenter()
     }
