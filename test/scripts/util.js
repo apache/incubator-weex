@@ -42,7 +42,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
-  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground.apk`)
+  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground-debug.apk`)
 };
 
 var androidChromeOpts = {
