@@ -33,6 +33,7 @@
 #import "WXInvocationConfig.h"
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
+#import "WXJSPrerenderManager.h"
 
 static NSThread *WXComponentThread;
 
@@ -49,6 +50,7 @@ static NSThread *WXComponentThread;
     // access only on component thread
     NSMapTable<NSString *, WXComponent *> *_indexDict;
     NSMutableArray<dispatch_block_t> *_uiTaskQueue;
+    NSMutableDictionary *_uiPrerenderTaskQueue;
     
     WXComponent *_rootComponent;
     NSMutableArray *_fixedComponents;
@@ -165,8 +167,33 @@ static NSThread *WXComponentThread;
 
 - (void)_addUITask:(void (^)())block
 {
-    [_uiTaskQueue addObject:block];
+    
+//    [_uiTaskQueue addObject:block];
+    if(!_uiPrerenderTaskQueue){
+        _uiPrerenderTaskQueue = [NSMutableDictionary new];
+    }
+    if(self.weexInstance.needPrerender){
+        NSMutableArray *m = [_uiPrerenderTaskQueue objectForKey:[[WXJSPrerenderManager sharedInstance] prerenderUrl:self.weexInstance.scriptURL]];
+        if (!m){
+            m = [NSMutableArray new];
+        }
+        [m addObject:block];
+        [_uiPrerenderTaskQueue setValue:m forKey:[[WXJSPrerenderManager sharedInstance] prerenderUrl:self.weexInstance.scriptURL]];
+    }else{
+        [_uiTaskQueue addObject:block];
+    }
 }
+
+- (void)excutePrerenderUITask:(NSString *)url
+{
+    if(url){
+        NSMutableArray *m = [_uiPrerenderTaskQueue objectForKey:[[WXJSPrerenderManager sharedInstance] prerenderUrl:self.weexInstance.scriptURL]];
+        for (id block in m) {
+            [_uiTaskQueue addObject:block];
+        }
+    }
+}
+
 
 #pragma mark Component Tree Building
 

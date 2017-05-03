@@ -60,6 +60,7 @@
     [self registerModule:@"picker" withClass:NSClassFromString(@"WXPickerModule")];
     [self registerModule:@"meta" withClass:NSClassFromString(@"WXMetaModule")];
     [self registerModule:@"webSocket" withClass:NSClassFromString(@"WXWebSocketModule")];
+    [self registerModule:@"prerender" withClass:NSClassFromString(@"WXJSPrerenderModule")];
 }
 
 + (void)registerModule:(NSString *)name withClass:(Class)clazz

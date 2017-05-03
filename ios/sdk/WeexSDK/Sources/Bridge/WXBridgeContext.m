@@ -39,6 +39,7 @@
 #import "WXModuleMethod.h"
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
+#import "WXJSPrerenderManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -140,7 +141,12 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+        if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
+            [[WXJSPrerenderManager sharedInstance] storePrerenderModuleTasks:method forUrl:[[WXJSPrerenderManager sharedInstance] prerenderUrl:instance.scriptURL]];
+            return nil;
+        }
         return [method invoke];
+        
     }];
     
     [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {

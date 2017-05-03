@@ -55,4 +55,9 @@
  **/
 + (WXModuleManager *)moduleMgr DEPRECATED_MSG_ATTRIBUTE();
 
+/**
+ * @abstract Returns weex instance for specific identifier
+ **/
++ (WXSDKInstance *)instanceForID:(NSString *)identifier;
+
 @end
