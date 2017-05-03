@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 23
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -31,7 +31,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    provided 'com.android.support:appcompat-v7:23.1.1'
+    provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     //compile 'com.taobao.android:weex_sdk:0.4.+'
