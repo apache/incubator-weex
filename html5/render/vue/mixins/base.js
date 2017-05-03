@@ -18,7 +18,8 @@
  */
 import {
   getThrottleLazyload,
-  watchAppear
+  watchAppear,
+  extend
 } from '../utils'
 
 import {
@@ -75,6 +76,13 @@ export default {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
     }
+
+    // bind attrs to $el.
+    let i, j
+    if (this.$el && (i = j = this.$vnode) && (i = i.data) && (j = j.componentOptions)) {
+      this.$el.attrs = extend({}, i.attrs, j.propsData)
+    }
+
     watchAppear(this)
   },
 
