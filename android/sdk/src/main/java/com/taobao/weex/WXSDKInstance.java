@@ -397,9 +397,30 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    mWXPerformance.pageName = pageName;
-    mWXPerformance.JSTemplateSize = template.length() / 1024;
+    if(!TextUtils.isEmpty(pageName)){
+      Uri pageNameUri = Uri.parse(pageName);
+      Uri.Builder pageNameBuilder = pageNameUri.buildUpon();
 
+      String scheme = pageNameUri.getScheme();
+      String spm    = pageNameUri.getQueryParameter("spm");
+      String  [] spmList = {};
+      if (null != spm){
+        spmList = spm.split(".");
+      }
+      String spmAB = "spmAB";
+
+      if(spmList.length > 1){
+        spmAB = spmList[0] + "." + spmList[1];
+      }
+      pageNameBuilder.scheme("");
+      mWXPerformance.pageName = pageNameBuilder.toString();
+      mWXPerformance.spmAB = spmAB;
+      mWXPerformance.scheme = scheme;
+    }else{
+      mWXPerformance.pageName = WXPerformance.DEFAULT;
+    }
+
+    mWXPerformance.JSTemplateSize = template.length() / 1024;
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
 
