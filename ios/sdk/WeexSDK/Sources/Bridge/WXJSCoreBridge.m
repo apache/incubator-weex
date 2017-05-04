@@ -90,6 +90,20 @@
             [weakSelf triggerClearTimeout:[ret toString]];
         };
         
+        _jsContext[@"btoa"] = ^(JSValue *value ) {
+            NSData *nsdata = [[value toString]
+                              dataUsingEncoding:NSUTF8StringEncoding];
+            NSString *base64Encoded = [nsdata base64EncodedStringWithOptions:0];
+            return base64Encoded;
+        };
+        _jsContext[@"atob"] = ^(JSValue *value ) {
+            NSData *nsdataFromBase64String = [[NSData alloc]
+                                              initWithBase64EncodedString:[value toString] options:0];
+            NSString *base64Decoded = [[NSString alloc]
+                                       initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
+            return base64Decoded;
+        };
+        
         _jsContext[@"nativeLog"] = ^() {
             static NSDictionary *levelMap;
             static dispatch_once_t onceToken;
