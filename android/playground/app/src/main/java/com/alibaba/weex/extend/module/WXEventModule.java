@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.alibaba.weex.WXPageActivity;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
 
@@ -49,7 +50,9 @@ public class WXEventModule extends WXModule {
     }
 
     Uri uri = Uri.parse(builder.toString());
-    Intent intent = new Intent(WEEX_ACTION, uri);
+    Intent intent = new Intent(mWXSDKInstance.getContext(),WXPageActivity.class);
+    intent.setAction(WEEX_ACTION);
+    intent.setData(uri);
     intent.addCategory(WEEX_CATEGORY);
     mWXSDKInstance.getContext().startActivity(intent);
 
