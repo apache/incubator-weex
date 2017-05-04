@@ -178,7 +178,7 @@ function getStyle (vnode, extract) {
   }
   // cache binding style every time since the binding style is variable.
   extendTruthy(data.cached, data.style)
-  extend(style, camelizeKeys(data.cached))
+  extend(style, data.cached)
   data.staticStyle = style
   if (extract) {
     delete data.staticStyle
