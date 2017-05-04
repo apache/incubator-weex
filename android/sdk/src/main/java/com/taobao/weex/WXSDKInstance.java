@@ -405,7 +405,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       String spm    = pageNameUri.getQueryParameter("spm");
       String  [] spmList = {};
       if (null != spm){
-        spmList = spm.split(".");
+        spmList = spm.split("\\.");
       }
       String spmAB = "spmAB";
 
@@ -413,7 +413,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
         spmAB = spmList[0] + "." + spmList[1];
       }
       pageNameBuilder.scheme("");
-      mWXPerformance.pageName = pageNameBuilder.toString();
+      mWXPerformance.pageName = pageNameBuilder.toString().
+              replaceFirst("^(/|://|http://www\\.|http://|www\\.)","");
       mWXPerformance.spmAB = spmAB;
       mWXPerformance.scheme = scheme;
     }else{
