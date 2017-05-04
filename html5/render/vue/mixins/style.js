@@ -22,8 +22,10 @@ import {
   extractComponentStyle
 } from '../core'
 
-let warned = false
-const warnInfo = `[vue-render] after v0.11.3 there's no need to add $processStyle in vue-loader config anymore.`
+import {
+  normalizeStyle,
+  camelizeKeys
+} from '../utils'
 
 export default {
   beforeCreate () {
@@ -35,11 +37,11 @@ export default {
 
   methods: {
     $processStyle (style) {
-      if (!warned) {
-        warned = true
-        console.warn(warnInfo)
+      window._style_processing_added = true
+      if (!style) {
+        return
       }
-      return style
+      return normalizeStyle(camelizeKeys(style))
     },
 
     _extractComponentStyle () {

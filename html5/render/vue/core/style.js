@@ -158,7 +158,7 @@ export function getScopeStyle (vnode, classNames) {
     map && extendTruthy(style, map)
     clsNmsIdx++
   }
-  return style
+  return camelizeKeys(style)
 }
 
 function getStyle (vnode, extract) {
@@ -166,20 +166,25 @@ function getStyle (vnode, extract) {
   const staticClassNames = (typeof data.staticClass === 'string') ? data.staticClass.split(' ') : (data.staticClass || [])
   const classNames = (typeof data.class === 'string') ? data.class.split(' ') : (data.class || [])
   const clsNms = staticClassNames.concat(classNames)
-  const style = getScopeStyle(vnode, clsNms)
+  const style = normalizeStyle(getScopeStyle(vnode, clsNms))
+  /**
+   * cache static style and bind style.
+   * cached staticStyle (including style and staticStyle) has already been normalized
+   * in $processStyle. So there's no need to normalize it again.
+   */
   if (!data.cached) {
     // cache staticStyle once in the beginning.
     data.cached = extendTruthy({}, data.staticStyle)
   }
   // cache binding style every time since the binding style is variable.
   extendTruthy(data.cached, data.style)
-  extend(style, data.cached)
+  extend(style, camelizeKeys(data.cached))
   data.staticStyle = style
   if (extract) {
     delete data.staticStyle
     delete data.style
   }
-  return camelizeKeys(style)
+  return style
 }
 
 /**
@@ -199,7 +204,7 @@ export function getComponentStyle (context, extract) {
     extend(style, getStyle(vnode, extract))
     vnode = vnode.parent
   }
-  style = addPrefix(normalizeStyle(style))
+  style = addPrefix(style)
   /**
    * when prefixed value is a array, it should be applied to element
    * during the next tick.

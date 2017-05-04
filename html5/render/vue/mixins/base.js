@@ -52,6 +52,17 @@ function watchLazyload () {
   })
 }
 
+let warned = false
+const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js'
+function warnProcessStyle () {
+  if (!warned) {
+    warned = true
+    const page = window._process_style_note_page || notePage
+    console.warn(`[vue-render]: you should add vue-loader config with $processStyle to enable inline styles's `
+      + `normalization. see ${page} If you already did this, please ignore this message.`)
+  }
+}
+
 export default {
   beforeCreate () {
     if (!lazyloadWatched) {
@@ -77,6 +88,11 @@ export default {
       weex._root.classList.add('weex-root')
     }
 
+    // give warning for not using $processStyle in vue-loader config.
+    if (!warned && !window._style_processing_added) {
+      warnProcessStyle()
+    }
+
     // bind attrs to $el.
     let i, j
     if (this.$el && (i = j = this.$vnode) && (i = i.data) && (j = j.componentOptions)) {
@@ -96,28 +112,6 @@ export default {
     if (process.env.NODE_ENV === 'development') {
       tagUpdated()
     }
-
-    /**
-     * During updating process, updateChildren will not process the render function of the
-     * children's components. Therefore it is necessary to process children's static styles in
-     * this hook func.
-     */
-    const children = this.$children
-    if (children) {
-      children.forEach((childVm) => {
-        /**
-         * Has to delete the previousVnode's staticStyle. Otherwise some style props may not
-         * be attached on the dom, since the previous staticStyle val is equal with the new
-         * updated style val.
-         */
-        let i
-        if ((i = childVm._vnode) && (i = childVm._vnode.data)) {
-          delete i.staticStyle
-        }
-        childVm._watcher.run()
-      })
-    }
-
     watchAppear(this)
   },
 
