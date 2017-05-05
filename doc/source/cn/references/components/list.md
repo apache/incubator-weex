@@ -45,6 +45,8 @@ version: 2.1
 
   ![mobile_preview](../images/list_4.jpg)
 
+- `offset-accuracy`：默认值是0，触发 `scroll` 事件所需要的垂直偏移距离。
+
 ## 样式
 
 - 通用样式：支持所有通用样式
@@ -62,6 +64,10 @@ version: 2.1
 - `loadmore` <sup class="wx-v">0.5+</sup>：如果列表滚动到底部将会立即触发这个事件，你可以在这个事件的处理函数中加载下一页的列表项。
 
   [体验一下](http://dotwe.org/bc445ede8746a31360e3607d210304c5)
+
+- `scroll` <sup class="wx-v">0.12+</sup>：列表滚动时触发这个事件。此事件回调中会给出当前`contentOffset`值。
+
+  [体验一下](http://dotwe.org/weex/5837c1b7f1f69e5adf1fc4cac0747c34)
 
 - 通用事件
 

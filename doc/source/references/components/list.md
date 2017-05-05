@@ -74,6 +74,7 @@ Notes: The list now supports the following child components: cell, header, refre
 * scroll-direction: <string> define scroll direction of component, horizontal or vertical
 * loadmoreoffset : <number> default value is 0. The loadmore event will be triggered when the list is loadmoreoffset left to reach the bottom of the list view. e.g. a list has total content length of 1000, and the loadmoreoffset is set to 400, the loadmore event will be triggered when 600 has beed scrolled and there is less than 400 left.
 * loadmoreretry : <number> default value 0，whether to reset loadmore related UI when loadmore failed, will be deprecated in further release.
+* offset-accuracy：<number> default value is 0, the vertical offset distance required to trigger the scroll event.
 
 Please checkout [Scroller Component Attributes](./scroller.html) to have a look at the inherited attributes from direct parent.
 
@@ -89,6 +90,10 @@ common styles: check out [common styles for components](../common-style.html)
 ### Events
 
 onloadmore  0.5 used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
+
+scroll  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.
+
+[try](http://dotwe.org/weex/5837c1b7f1f69e5adf1fc4cac0747c34)
 
 common events: check out the [common events](../common-event.html)
 
