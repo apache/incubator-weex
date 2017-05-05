@@ -1,4 +1,14 @@
 {
+  "parser": "babel-eslint",
+
+  "extends": [
+    "plugin:flowtype/recommended"
+  ],
+
+  "plugins": [
+    "flowtype"
+  ],
+
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
@@ -19,10 +29,16 @@
     "callNative": false,
     "callNativeModule": false,
     "callAddElement":false,
-    "callJS": false
+    "callJS": false,
+    "notifyTrimMemory": false,
+    "markupState": false,
+    "compileAndRunBundle": false,
+    "expect": false,
+    "sinon": false
   },
 
   "rules": {
+    "flowtype/no-types-missing-file-annotation": 0,
     "accessor-pairs": 2,
     "arrow-spacing": [2, { "before": true, "after": true }],
     "block-spacing": [2, "always"],
@@ -137,8 +153,14 @@
     "no-var": 2,
     "prefer-const": 2,
     "object-curly-spacing": [2, "always", {
-      objectsInObjects: false
+      "objectsInObjects": false
     }],
     "array-bracket-spacing": [2, "never"]
+  },
+
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
   }
 }

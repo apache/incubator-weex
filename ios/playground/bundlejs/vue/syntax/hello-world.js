@@ -51,14 +51,14 @@
 	var __vue_styles__ = []
 
 	/* styles */
-	__vue_styles__.push(__webpack_require__(556)
+	__vue_styles__.push(__webpack_require__(580)
 	)
 
 	/* script */
-	__vue_exports__ = __webpack_require__(557)
+	__vue_exports__ = __webpack_require__(581)
 
 	/* template */
-	var __vue_template__ = __webpack_require__(558)
+	var __vue_template__ = __webpack_require__(582)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -70,15 +70,19 @@
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
-	__vue_options__.__file = "/Users/bobning/work/source/weex_fork/examples/vue/syntax/hello-world.vue"
+	__vue_options__.__file = "/Users/bobning/work/source/apache-incubator-weex/examples/vue/syntax/hello-world.vue"
 	__vue_options__.render = __vue_template__.render
 	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+	__vue_options__._scopeId = "data-v-0311aa73"
 	__vue_options__.style = __vue_options__.style || {}
 	__vue_styles__.forEach(function (module) {
-	for (var name in module) {
-	__vue_options__.style[name] = module[name]
-	}
+	  for (var name in module) {
+	    __vue_options__.style[name] = module[name]
+	  }
 	})
+	if (typeof __register_static_styles__ === "function") {
+	  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+	}
 
 	module.exports = __vue_exports__
 	module.exports.el = 'true'
@@ -87,7 +91,7 @@
 
 /***/ },
 
-/***/ 556:
+/***/ 580:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -106,7 +110,7 @@
 
 /***/ },
 
-/***/ 557:
+/***/ 581:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -158,23 +162,23 @@
 
 /***/ },
 
-/***/ 558:
+/***/ 582:
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _h('div', {
+	  return _c('div', {
 	    staticClass: ["wrapper"],
 	    on: {
 	      "click": _vm.update
 	    }
-	  }, [_h('image', {
+	  }, [_c('image', {
 	    staticClass: ["logo"],
 	    attrs: {
 	      "src": _vm.logoUrl
 	    }
-	  }), _h('text', {
+	  }), _c('text', {
 	    staticClass: ["title"]
-	  }, ["Hello " + _vm._s(_vm.target)])])
+	  }, [_vm._v("Hello " + _vm._s(_vm.target))])])
 	},staticRenderFns: []}
 	module.exports.render._withStripped = true
 

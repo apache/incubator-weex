@@ -46,7 +46,6 @@ version: 2.1
   ![mobile_preview](../images/list_4.jpg)
 
 - `offset-accuracy`：默认值是0，触发 `scroll` 事件所需要的垂直偏移距离。
-
 ## 样式
 
 - 通用样式：支持所有通用样式

@@ -7,7 +7,7 @@
 
 # Created by Builder
 examples/build
-examples/web-entry
+web-entry
 test/build
 weex_tmp
 coverage
@@ -30,6 +30,9 @@ pids
 html5/test/e2e/reports
 html5/test/e2e/screenshots
 html5/test/e2e/logs
+
+# render test
+html5/test/render/vue/data/build
 
 # Created by Weex Web Packer
 html5/browser/extend/packer.js

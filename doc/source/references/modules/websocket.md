@@ -13,9 +13,9 @@ WebSockets is an advanced technology that makes it possible to open an interacti
 
 ## **Notes:**
 - iOS and h5 provide  webSocket default handle. if you use webSocket in android environment . you should provide custom adapter implementation,source:
-  - [DefaultWebSocketAdapter.java](https://github.com/alibaba/weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
-  - [DefaultWebSocketAdapterFactory.java](https://github.com/alibaba/weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
-  - refer:  [weex playground](https://github.com/alibaba/weex/tree/dev/android/playground)
+  - [DefaultWebSocketAdapter.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
+  - [DefaultWebSocketAdapterFactory.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
+  - refer:  [weex playground](https://github.com/apache/incubator-weex/tree/dev/android/playground)
 - only support in .we file,not support in vue2.0
 
 ## API

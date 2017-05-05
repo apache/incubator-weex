@@ -35,45 +35,45 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
   外边距，元素和元素之间的空白距离。值类型为 length，默认值 0
 
   可有如下写法：
-  
+
   - `margin-left {length}`：，默认值 0
   - `margin-right {length}`：，默认值 0
   - `margin-top {length}`：，默认值 0
   - `margin-bottom {length}`：，默认值 0
 - border：
-  
+
   设定边框，`border` 目前不支持类似这样 `border: 1 solid #ff0000;` 的组合写法。
 
   可有如下写法：
-  
+
   - `border-style`：
 
     设定边框样式，值类型为 string，可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
 
     可有如下写法：
-  
+
     - `border-left-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-top-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-right-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-bottom-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
 
   - `border-width {length}`：
-  
+
     设定边框宽度，非负值, 默认值 0
 
     可有如下写法：
-  
+
     - `border-left-width {length}`：，非负值, 默认值 0
     - `border-top-width {length}`：，非负值, 默认值 0
     - `border-right-width {length}`：，非负值, 默认值 0
     - `border-bottom-width {length}`：，非负值, 默认值 0
 
   - `border-color {color}`：
-  
+
     设定边框颜色，默认值 `#000000`
-  
+
     可有如下写法：
-  
+
     - `border-left-color {color}`：，默认值 `#000000`
     - `border-top-color {color}`：，默认值 `#000000`
     - `border-right-color {color}`：，默认值 `#000000`
@@ -83,7 +83,7 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
     设定圆角，默认值 0
 
     可有如下写法：
-  
+
     - `border-bottom-left-radius {length}`：，非负值, 默认值 0
     - `border-bottom-right-radius {length}`：，非负值, 默认值 0
     - `border-top-left-radius {length}`：，非负值, 默认值 0
@@ -91,15 +91,16 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
 
 
 ### 注意：
+
 Weex 盒模型的 `box-sizing` 默认为 `border-box`，即盒子的宽高包含内容、内边距和边框的宽度，不包含外边距的宽度。
 
-目前在 `<image>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。该约束只对iOS生效，Android并不受此限制。
+目前在 `<image>` 组件上尚无法只定义一个或几个角的 `border-radius`。比如你无法在这两个组件上使用 `border-top-left-radius`。该约束只对 iOS 生效，Android 并不受此限制。
 
-尽管 `overflow:hidden` 在android上是默认行为，但只有下列条件都满足时，一个父view才会去clip它的子view。这个限制只对Android生效，iOS不受影响。
+尽管 `overflow:hidden` 在 Android 上是默认行为，但只有下列条件都满足时，一个父 view 才会去 clip 它的子 view。这个限制只对 Android 生效，iOS 不受影响。
 * 父view是`div`, `a`, `cell`, `refresh` 或 `loading`。
-* 系统版本是Android 4.3或更高。
-* 系统版本不是Andorid 7.0。
-* 父view没有`background-image`属性或系统版本是Android 5.0或更高。
+* 系统版本是 Android 4.3 或更高。
+* 系统版本不是 Andorid 7.0。
+* 父 view 没有 `background-image` 属性或系统版本是 Android 5.0 或更高。
 
 ### 示例：
 
@@ -235,7 +236,7 @@ flex 属性定义了 flex 成员项可以占用容器中剩余空间的大小。
 Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 `position` 后，可通过 `top`、`right`、`bottom`、`left` 四个属性设置元素坐标。
 
 - `position {string}`：
-  
+
   设置定位类型。可选值为 `relative` | `absolute` | `fixed` | `sticky`，默认值为 `relative`。
 
   - `relative` 是默认值，指的是相对定位；
@@ -250,7 +251,7 @@ Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 
 **注意：**
 
 1. Weex 目前不支持 `z-index` 设置元素层级关系，但靠后的元素层级更高，因此，对于层级高的元素，可将其排列在后面。
-2. 如果定位元素超过容器边界，在 Android 下，超出部分将**不可见**，原因在于 Android 端元素 `overflow` 默认值为 `hidden`，但目前 Android 暂不支持设置 `overflow: visible`。 
+2. 如果定位元素超过容器边界，在 Android 下，超出部分将**不可见**，原因在于 Android 端元素 `overflow` 默认值为 `hidden`，但目前 Android 暂不支持设置 `overflow: visible`。
 
 ### 示例
 
@@ -327,19 +328,19 @@ Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
 
 <style scoped>
   .wrapper {
-    align-items: center; 
+    align-items: center;
     margin-top: 120px;
   }
   .title {
     font-size: 48px;
   }
   .logo {
-    width: 360px; 
+    width: 360px;
     height: 82px;
     background-color: red;
   }
   .logo:active {
-    width: 180px; 
+    width: 180px;
     height: 82px;
     background-color: green;
   }
@@ -455,6 +456,58 @@ Weex 目前只支持两种颜色的渐变，渐变方向如下：
     color: white;
   }
 </style>
+```
+
+## 阴影(box-shadow) <span class="api-version">v0.11+</span>
+
+Weex 支持阴影属性：`active`, `focus`, `disabled`, `enabled` `inset(可选)`,`offset-x`,`offset-y`, `blur-radius`,`color`
+
+
+### 注意
+
+- box-shadow仅仅支持iOS
+
+### 示例
+
+```html
+<template>
+  <div class="wrapper">
+    <div style="width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px rgb(255, 69, 0);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow: 20px  10px 5px rgba(255, 69, 0, 0.8);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:inset 20px  10px 5px rgba(255, 69, 0, 0.8);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:inset 20px  10px 5px rgb(255, 69, 0);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px 5px black;">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px 5px #008B00;">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+  .wrapper {align-items: center; margin-top: 120px;}
+  .title {font-size: 48px;}
+</style>
+
+<script>
+  module.exports = {
+    data: function () {
+      return {
+        logoUrl: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png',
+        target: 'World'
+      };
+    }
+  };
+</script>
 ```
 
 ## 其他基本样式

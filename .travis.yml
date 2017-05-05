@@ -1,22 +1,67 @@
-language: objective-c
+os:
+  - osx
+  - linux
+language: node_js
+node_js: 7
 rvm: 2.0.0
-osx_image: xcode8.2
-jdk: oraclejdk8
 env:
-    matrix:
-        - TEST_SUITE=android
-        - TEST_SUITE=ios
-        - TEST_SUITE=danger
-        - TEST_SUITE=jsfm
+  - TEST_SUITE=ios
+  - TEST_SUITE=danger
+  - TEST_SUITE=jsfm
+  - TEST_SUITE=android
 matrix:
     fast_finish: true
+    exclude:
+      - os: linux
+        env: TEST_SUITE=ios
+      - os: osx
+        env: TEST_SUITE=danger
+      - os: osx
+        env: TEST_SUITE=jsfm
+      - os: osx
+        env: TEST_SUITE=android
+      - os: osx
+        env: TEST_SUITE=ios
+      - os: linux
+        env: TEST_SUITE=android
+    include:
+      - os: osx
+        env: TEST_SUITE=ios
+        osx_image: xcode8.1
+        language: objective-c
+        before_script:
+          - brew update
+          - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
+        script:
+          - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
+          - bundle exec danger --dangerfile=Dangerfile-ios
+      - os: linux
+        env: TEST_SUITE=android
+        jdk: oraclejdk8
+        language: android
+        android:
+          components:
+            - platform-tools
+            - tools
+            - build-tools-23.0.2
+            - android-24
+            - android-23
+            - android-22
+            - extra-google-m2repository
+            - extra-android-m2repository
+            - sys-img-armeabi-v7a-android-22
+        script:
+          - cd android
+          - ./run-ci.sh 
+          - cd $TRAVIS_BUILD_DIR
 cache:
   directories:
   - node_modules
   - $HOME/.m2
   - $HOME/.gradle
-before_install:
-  - source test/ci-funcs.sh && setup_cpt $TEST_SUITE
 script:
-  - test_cpt $TEST_SUITE
+  - source test/ci-funcs.sh
+  - runJSTest $TEST_SUITE
+notifications:
+  webhooks: https://oapi.dingtalk.com/robot/send?access_token=553a6d23676da61499b0001a8e28d4436be776f5642fff9259f5c946ffac45d2
   

@@ -1,7 +1,7 @@
 ---
 title: Integrate to Your App  
 type: guide
-order: 3
+order: 1.2
 has_chapter_content: false
 chapter_title: Intro
 version: 2.1
@@ -12,7 +12,7 @@ version: 2.1
 ## Integrate to Android
 Tip：The following documents assume that you already have a certain Android development experience.    
 
-### Android has tow ways to integrate weex
+### Android has two ways to integrate weex
 1.using source code: Can quickly use the latest features of WEEX, according to your own characteristics of the project. So, you can do some related improvements.
 
 2.using SDK: WEEX will regularly release a stable version at jcenter.[jcenter](https://bintray.com/alibabaweex/maven/weex_sdk/view)       
@@ -29,7 +29,7 @@ Make sure the following configuration is complete:
 ### Quick to use
 If you are the first time to try or have a higher demand for stability, you can use the way to dependence on the SDK.      
 The steps are as follows:       
- 
+
 1. Create an Android project. There is nothing to be specified, according to your habits to.
 2. Update build.gradle by adding the following dependencies:
 
@@ -258,7 +258,8 @@ Weex supports both full page rendering and partial rendering. What you need to d
     _instance.renderFinish = ^ (UIView *view) {
         //process renderFinish
     };
-    [_instance renderWithURL:self.url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"js"]
+    [_instance renderWithURL:url options:@{@"bundleUrl":[self.url absoluteString]} data:nil];
 }
 ```
 

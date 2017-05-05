@@ -26,7 +26,8 @@ Weex 封装了原生的触摸事件以提供手势系统。使用手势类似于
 	- `panstart`
 	- `panmove`
 	- `panend`
-
+	- `horizontalpan` <span class="api-version">v0.10+</span>：手势的 `start/move/end` 状态保存在 `state` 特性中。目前该手势在 Android 下会与 click 事件冲突。
+	- `verticalpan` <span class="api-version">v0.10+</span>：势的 `start/move/end` 状态保存在 `state` 特性中。目前该手势在 Android 下会与 click 事件冲突。
 - **Swipe**：`swipe` 将会在用户在屏幕上滑动时触发，一次连续的滑动只会触发一次 `swiper` 手势。
 - **LongPress**：`LongPress` 将会在触摸点连续保持 500 ms以上时触发。
 

@@ -1,10 +1,21 @@
-//
-//  WXStorageTests.m
-//  WeexSDK
-//
-//  Created by Jun Shi on 7/22/16.
-//  Copyright © 2016 taobao. All rights reserved.
-//
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 #import <XCTest/XCTest.h>
 #import "WeexSDK.h"
@@ -120,16 +131,11 @@
                 NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
                 NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
                 
-                NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-                NSTimeInterval ts = [infoDic[@"key1"][@"ts"] doubleValue];
-                NSLog(@"ts:%f",ts);
-                
                 XCTAssert([@"success" isEqualToString:result[@"result"]]);
                 XCTAssert([@"shortValue12" isEqualToString:dic[@"key1"]]);
                 XCTAssertEqual(infoDic[@"key1"][@"persistent"], @(NO));
                 XCTAssertEqual(infoDic[@"key1"][@"size"], @([@"shortValue12" length]));
                 XCTAssertTrue([indexArray containsObject:@"key1"]);
-                XCTAssertTrue(ABS(tsNow - ts) <= 0.1);
             }];
         }];
     });
@@ -225,16 +231,12 @@
             NSDictionary *infoDic = [NSDictionary dictionaryWithContentsOfFile:weakSelf.infoPath];
             NSArray *indexArray = [NSArray arrayWithContentsOfFile:weakSelf.indexPath];
             
-            NSTimeInterval tsNow = [[NSDate date] timeIntervalSince1970];
-            NSTimeInterval ts = [infoDic[@"key4"][@"ts"] doubleValue];
-            
             XCTAssertEqual(result[@"result"], @"success");
             XCTAssertNotEqual(dic[@"key4"], longValue);
             XCTAssertTrue([dic[@"key4"] isEqualToString:@"#{eulaVlluNegarotSXW}"]);
             XCTAssertFalse([infoDic[@"key4"][@"persistent"] boolValue]);
             XCTAssertTrue([infoDic[@"key4"][@"size"] integerValue] == [longValue length]);
             XCTAssertTrue([indexArray containsObject:@"key4"]);
-            XCTAssertTrue(ABS(tsNow - ts) <= 0.5);
             
             [self.storage getItem:@"key4" callback:^(id result) {
                 [expectation fulfill];

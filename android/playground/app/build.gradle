@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
         applicationId "com.alibaba.weex"
-        minSdkVersion 15
-        targetSdkVersion 23
+        minSdkVersion project.appMinSdkVersion
+        targetSdkVersion project.targetSdkVersion
         versionCode 13
         versionName "0.5.2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -34,17 +34,13 @@ android {
         }
     }
     buildTypes {
-//        release {
-//            signingConfig signingConfigs.release
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
         debug {
             testCoverageEnabled false
         }
     }
     sourceSets {
         main {
+            jniLibs.srcDir(['libs'])
             java {
                 srcDirs = ["src/main/java", "src/main/java_zxing"];
             }
@@ -76,6 +72,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'design'
         exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
     })
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.squareup.picasso:picasso:2.5.2'
@@ -100,11 +97,11 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     compile 'com.squareup.okio:okio:1.0.1'
-    compile 'com.alibaba:fastjson:1.1.46.android'
-    compile 'com.android.support:support-v4:23.2.1'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:23.2.1'
-    compile 'com.android.support:support-annotations:23.2.1'
+    compile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
+    compile "com.android.support:support-v4:${project.supportLibVersion}"
+    compile "com.android.support:appcompat-v7:${project.supportLibVersion}"
+    compile "com.android.support:design:${project.supportLibVersion}"
+    compile "com.android.support:support-annotations:${project.supportLibVersion}"
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'

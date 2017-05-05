@@ -36,12 +36,8 @@
   }
 
   .row {
-    font-size: 14px;
+    font-size: 12px;
     margin: 8px 0;
-  } 
-
-  .row span {
-    color: $text-gray;
   } 
 
   .row .icon-baichuan {
@@ -59,5 +55,17 @@
     display: inline-block;
     margin-left: 2px;
     @include triangle-down($border-gray, 4px);
+  }
+  .disclaimer{
+    max-width: 800px;
+    line-height: 150%
+  }
+  hr{
+    border: 0;
+    border-top: 1px solid #e6e6e6;
+  }
+  .disclaimer .title{
+    font-weight: bold;
+    margin-bottom: 10px;
   }
 }
