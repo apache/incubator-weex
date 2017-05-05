@@ -38,6 +38,8 @@
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
 #import "WXValidateProtocol.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXTextComponent.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -187,9 +189,14 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
-    
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+    
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@false isDefault:NULL] boolValue];
+        [WXTextComponent setRenderUsingCoreText:useCoreText];
+    }
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
