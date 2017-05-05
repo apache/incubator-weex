@@ -349,6 +349,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onSwipe:(UISwipeGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     UISwipeGestureRecognizerDirection direction = gesture.direction;
     
     NSString *directionString;
@@ -396,6 +400,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onLongPress:(UILongPressGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint screenLocation = [gesture locationInView:self.view.window];
         CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
@@ -450,6 +458,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
