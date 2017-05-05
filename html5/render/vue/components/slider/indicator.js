@@ -156,7 +156,7 @@ function _reLayout (context, virtualRect, ltbr) {
   }]
   Object.keys(axisMap).forEach(key => {
     const { dir, scale } = axisMap[key]
-    el.style[dir] = ltbr[dir] + virtualRect[scale] / 2 - rect[scale] / 2 + 'px'
+    el.style[dir] = (ltbr[dir] || 0) + virtualRect[scale] / 2 - rect[scale] / 2 + 'px'
   })
 }
 
