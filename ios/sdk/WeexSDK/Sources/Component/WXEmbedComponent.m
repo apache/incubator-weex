@@ -197,6 +197,12 @@
     }
 }
 
+- (void)_frameDidCalculated:(BOOL)isChanged
+{
+    [super _frameDidCalculated:isChanged];
+    self.embedInstance.frame = self.calculatedFrame;
+}
+
 - (void)onclickErrorView
 {
     if (self.errorView) {
