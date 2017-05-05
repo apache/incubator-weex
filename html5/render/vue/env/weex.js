@@ -33,7 +33,7 @@ const weex = {
     bundleUrl: location.href
   },
 
-  document: {},
+  document: { body: {} },
 
   requireModule (moduleName) {
     return weexModules[moduleName]
@@ -57,7 +57,7 @@ const weex = {
       }
       return
     }
-    this.document.children.push(root.$el)
+    this.document.body.children.push(root.$el)
   },
 
   // @deprecated
@@ -112,7 +112,7 @@ const weex = {
   }
 }
 
-Object.defineProperty(weex.document, 'children', {
+Object.defineProperty(weex.document.body, 'children', {
   get () { return _roots }
 })
 
