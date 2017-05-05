@@ -16,7 +16,7 @@
       gcanvas.disable();
     },
     mounted: function () {
-      var ref = this.$refs.canvas_holder.ref;
+      var ref = this.$refs.canvas_holder;
       gcanvas.start(ref, function () {
         var ctx = gcanvas.getContext('2d');
 
