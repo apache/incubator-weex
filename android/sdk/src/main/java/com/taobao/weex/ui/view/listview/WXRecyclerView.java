@@ -73,7 +73,7 @@ public class WXRecyclerView extends RecyclerView implements WXGestureObservable 
     if (type == TYPE_GRID_LAYOUT) {
       setLayoutManager(new GridLayoutManager(context, columnCount,orientation,false));
     } else if (type == TYPE_STAGGERED_GRID_LAYOUT) {
-      setLayoutManager(new StaggeredGridLayoutManager(columnCount, orientation));
+      setLayoutManager(new ExtendedStaggeredGridLayoutManager(columnCount, orientation));
     } else if (type == TYPE_LINEAR_LAYOUT) {
       setLayoutManager(new ExtendedLinearLayoutManager(context,orientation,false));
     }
