@@ -105,7 +105,12 @@
 
 - (void)dealloc
 {
-    [_instance destroyInstance];
+    NSMutableDictionary *m = [[WXJSPrerenderManager sharedInstance] prerenderTasksForUrl:[self.url absoluteString]];
+
+    if(!m)
+    {
+        [_instance destroyInstance];
+    }
     
 #ifdef DEBUG
     [_instance forceGarbageCollection];
@@ -121,7 +126,6 @@
     
     __weak typeof(self) weakSelf = self;
 
-    [_instance destroyInstance];
     NSMutableDictionary *m = [[WXJSPrerenderManager sharedInstance] prerenderTasksForUrl:[self.url absoluteString]];
     if(m){
         _instance = [m objectForKey:@"instance"];
@@ -149,6 +153,8 @@
 //        [[WXJSPrerenderManager sharedInstance] removePrerenderTaskforUrl:[self.url absoluteString]];
         return;
     }
+    [_instance destroyInstance];
+
     _instance = [[WXSDKInstance alloc] init];
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);

@@ -169,6 +169,7 @@ static NSThread *WXComponentThread;
 {
     
 //    [_uiTaskQueue addObject:block];
+//    return;
     if(!_uiPrerenderTaskQueue){
         _uiPrerenderTaskQueue = [NSMutableDictionary new];
     }
