@@ -38,6 +38,8 @@
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
 #import "WXValidateProtocol.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXTextComponent.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -187,9 +189,20 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
-    
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+    
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@false isDefault:NULL] boolValue];
+        [WXTextComponent setRenderUsingCoreText:useCoreText];
+        NSString *className = [[configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL] stringValue];
+        if(className.length>0 && NSClassFromString(className)){
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(className)];
+        }else{
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+        }
+    }
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
@@ -260,7 +273,8 @@ typedef enum : NSUInteger {
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {
         NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ occurs an error:%@", request.URL, loadError.localizedDescription];
-        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
+        
+        WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, [loadError.domain isEqualToString:NSURLErrorDomain] && loadError.code == NSURLErrorNotConnectedToInternet ? WX_ERR_NOT_CONNECTED_TO_INTERNET : WX_ERR_JSBUNDLE_DOWNLOAD, errorMessage, weakSelf.pageName);
         
         if (weakSelf.onFailed) {
             weakSelf.onFailed(error);
