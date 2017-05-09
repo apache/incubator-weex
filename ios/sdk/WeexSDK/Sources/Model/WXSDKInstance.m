@@ -40,6 +40,7 @@
 #import "WXValidateProtocol.h"
 #import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
+#import "WXConvert.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -196,9 +197,14 @@ typedef enum : NSUInteger {
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@false isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
-        NSString *className = [[configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL] stringValue];
-        if(className.length>0 && NSClassFromString(className)){
-            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(className)];
+        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL];
+        if(sliderConfig){
+            NSString *sliderClassName = [WXConvert NSString:sliderConfig];
+            if(sliderClassName.length>0){
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
+            }else{
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+            }
         }else{
             [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
         }
