@@ -124,8 +124,8 @@ public class StickyHeaderHelper {
         component.recoverySticky();
       }
     }));
-    if (component.getDomObject().getEvents().contains("unSticky")) {
-      component.fireEvent("unSticky");
+    if (component.getDomObject().getEvents().contains("unsticky")) {
+      component.fireEvent("unsticky");
     }
   }
 
