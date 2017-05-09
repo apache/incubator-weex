@@ -9,6 +9,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "de.undercouch.download" version "3.2.0"
+}
+
 repositories {
         mavenCentral()
         jcenter()
@@ -42,3 +46,4 @@ subprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
