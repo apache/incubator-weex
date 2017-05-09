@@ -585,8 +585,8 @@
     if (self.currentTopVisibleSection != topCellPath.section) {
         if (self.currentTopVisibleSection) {
             WXSection *removeSection = [_sections objectAtIndex:self.currentTopVisibleSection];
-            if (removeSection.header && [removeSection.header.events containsObject:@"unSticky"]) {
-                [removeSection.header fireEvent:@"unSticky" params:nil];
+            if (removeSection.header && [removeSection.header.events containsObject:@"unsticky"]) {
+                [removeSection.header fireEvent:@"unsticky" params:nil];
             }
         }
         self.currentTopVisibleSection = topCellPath.section;
