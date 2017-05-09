@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import { extend } from '../utils'
+
 /**
  * remove text nodes in the nodes array.
  * @param  {Array} nodes
@@ -52,7 +54,7 @@ function getListeners (vnode, evt) {
 }
 
 const supportedEvents = [
-  'click', 'longpress', 'appear', 'disappear',
+  'longpress', 'appear', 'disappear',
   // 'touchstart', 'touchmove', 'touchend',
   'panstart', 'panmove', 'panend', 'swipe', 'longpress'
 ]
@@ -63,34 +65,44 @@ const supportedEvents = [
  */
 export function createEventMap (context, extras = []) {
   const eventMap = {}
-  supportedEvents.concat(extras).forEach(name => {
-    eventMap[name] = function (e) {
-      // no original bubbling.
-      e.stopPropagation()
-      // but should trigger the closest parent which has bound the
-      // event handler.
-      let vm = context
-      while (vm) {
-        const ons = getListeners(vm.$vnode, name)
-        const len = ons.length
-        let idx = 0
-        while (idx < len) {
-          let on = ons[idx]
-          if (on && on.fn) {
-            on = on.fn
+  /**
+   * bind name with evt event. e.g. bind 'click' with 'tap' event.
+   */
+  const bindFunc = (evt) => {
+    return name => {
+      const evtType = evt || name
+      eventMap[evtType] = function (e) {
+        // no original bubbling.
+        e.stopPropagation()
+        // but should trigger the closest parent which has bound the
+        // event handler.
+        let vm = context
+        while (vm) {
+          const ons = getListeners(vm.$vnode, name)
+          const len = ons.length
+          let idx = 0
+          while (idx < len) {
+            let on = ons[idx]
+            if (on && on.fn) {
+              on = on.fn
+            }
+            on && on.call(vm,
+              evtType === name ? e : extend({}, e, { type: name })
+            )
+            idx++
           }
-          on && on.call(vm, e)
-          idx++
-        }
 
-        // once a parent node (or self node) has triggered the handler,
-        // then it stops bubble immediately.
-        if (len > 0) {
-          return
+          // once a parent node (or self node) has triggered the handler,
+          // then it stops bubble immediately.
+          if (len > 0) {
+            return
+          }
+          vm = vm.$parent
         }
-        vm = vm.$parent
       }
     }
-  })
+  }
+  supportedEvents.concat(extras).forEach(bindFunc())
+  bindFunc('tap')('click')
   return eventMap
 }

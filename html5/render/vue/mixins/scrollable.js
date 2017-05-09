@@ -110,7 +110,7 @@ export default {
 
     handleTouchStart (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._loading || this._refresh) {
         const touch = event.changedTouches[0]
         this._touchParams = {
@@ -126,7 +126,7 @@ export default {
 
     handleTouchMove (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner
         const { startY, reachTop, reachBottom } = this._touchParams
@@ -146,7 +146,7 @@ export default {
 
     handleTouchEnd (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner
         const { reachTop, reachBottom } = this._touchParams

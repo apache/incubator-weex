@@ -179,7 +179,7 @@ export default {
     },
 
     handleTouchStart (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const touch = event.changedTouches[0]
       this._touchParams = {
         originalTransform: this.$refs.inner.style.webkitTransform || this.$refs.inner.style.transform,
@@ -191,7 +191,7 @@ export default {
     },
 
     handleTouchMove (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const tp = this._touchParams
       if (!tp) { return }
       const { startX, startY } = this._touchParams
@@ -225,7 +225,7 @@ export default {
     },
 
     handleTouchEnd (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const tp = this._touchParams
       if (!tp) { return }
       const isV = tp.isVertical
