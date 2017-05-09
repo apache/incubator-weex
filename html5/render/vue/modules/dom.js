@@ -114,7 +114,7 @@ export default {
       const elRect = el.getBoundingClientRect()
 
       const dir = dSuffix.toLowerCase()
-      let offset = el[`scroll${dSuffix}`] + elRect[dir] - ctRect[dir]
+      let offset = ct[`scroll${dSuffix}`] + elRect[dir] - ctRect[dir]
       // let offset = el[`offset${dSuffix}`]
 
       if (options) {
