@@ -31,7 +31,7 @@ init('core node', (Vue, helper) => {
        * child vnode -> parent vnode.
        *  e.g.  div -> foo (whoes root element is the div.)
        */
-      const evt = new Event('click', { bubbles: true })
+      const evt = new Event('tap', { bubbles: true })
       el.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
@@ -49,7 +49,7 @@ init('core node', (Vue, helper) => {
        * click inner div. should just trigget the inner handler and
        * shouldn't bubbe to outter div.
        */
-      const evt = new Event('click', { bubbles: true })
+      const evt = new Event('tap', { bubbles: true })
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
