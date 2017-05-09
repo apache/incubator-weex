@@ -74,10 +74,14 @@ function getUnitScaleMap () {
   }
 }
 
+function limitScale (val, limit) {
+  limit = limit || 1
+  return Math.abs(val) > limit ? val : Math.sign(val) * limit
+}
+
 function parseScale (val: number, unit: string): string {
   const unitScaleMap = getUnitScaleMap()
-  const res = val * unitScaleMap[unit]
-  return (res === 0 ? 0 : res > 1 ? res : 1) + 'px'
+  return limitScale(val * unitScaleMap[unit]) + 'px'
 }
 
 export function normalizeString (styleKey: string, styleVal: string): string {
@@ -105,7 +109,7 @@ export function normalizeString (styleKey: string, styleVal: string): string {
     const unitScaleMap = getUnitScaleMap()
     const val = styleVal.replace(numReg, function (m, $0, $1) {
       const res = parseFloat($0) * unitScaleMap[$1]
-      return (res === 0 ? 0 : res > 1 ? res : 1) + 'px'
+      return limitScale(res) + 'px'
     })
     return val
   }
