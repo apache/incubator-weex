@@ -32,6 +32,7 @@ version: 2.1
 ## 特性
 
 - `show-scrollbar {boolean}`：可选值为 `true`/ `false`，默认值为 `true`。控制是否出现滚动条。
+
 - `scroll-direction {string}`：可选为 `horizontal` 或者 `vertical`，默认值为 `vertical` 。定义滚动的方向。
   - `scroll-direction`定义了 scroller 的滚动方向，`flex-direction` 定义了 scroller 的布局方向，两个方向必须一致。
   - `scroll-direction` 的默认值是 `vertical`, `flex-direction` 的默认值是 `row`。
@@ -42,6 +43,8 @@ version: 2.1
   ![mobile_preview](../images/scroller_1.jpg)
 
 - `loadmoreretry {number}`：默认值为 0，当 `loadmore` 失败时是否重置 `loadmore` 相关的 UI，值不一样就会重置。
+
+- `offset-accuracy`：默认值是0，触发 `scroll` 事件所需要的垂直偏移距离。
 
 ## 样式
 
@@ -58,6 +61,9 @@ version: 2.1
 ## 事件
 
 - `loadmore` <sup class="wx-v">v0.5+</sup>：如果滚动到底部将会立即触发这个事件，你可以在这个事件的处理函数中加载下一页的列表项。
+
+- `scroll` <sup class="wx-v">0.12+</sup>：列表滚动时触发这个事件。此事件回调中会给出当前`contentOffset`值。
+
 - 通用事件
 
   支持所有通用事件：

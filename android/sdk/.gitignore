@@ -12,3 +12,4 @@ gen
 *.iml
 lint.xml
 project.properties
+assets/main.js
