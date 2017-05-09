@@ -33,7 +33,9 @@ const weex = {
     bundleUrl: location.href
   },
 
-  document: { body: {} },
+  document: {
+    body: {}
+  },
 
   requireModule (moduleName) {
     return weexModules[moduleName]
@@ -43,6 +45,10 @@ const weex = {
     return this.registerApiModule(...args)
   },
 
+  /**
+   * Register a new vue instance in this weex instance. Put its root element into weex.document.body.children, so
+   * that user can use weex.document.body to walk through all dom structures in all vue instances in the page.
+   */
   registerVueInstance (instance) {
     if (!instance instanceof Vue) {
       if (process.env.NODE_ENV === 'development') {
