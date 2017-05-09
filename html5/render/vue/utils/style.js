@@ -76,7 +76,7 @@ function getUnitScaleMap () {
 
 function parseScale (val: number, unit: string): string {
   const unitScaleMap = getUnitScaleMap()
-  const res = val  * unitScaleMap[unit]
+  const res = val * unitScaleMap[unit]
   return (res === 0 ? 0 : res > 1 ? res : 1) + 'px'
 }
 
