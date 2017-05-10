@@ -25,6 +25,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('cell', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    this._renderHook()
     return createElement('section', {
       attrs: { 'weex-type': 'cell' },
       on: createEventMap(this),

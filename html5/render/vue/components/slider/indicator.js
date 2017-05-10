@@ -181,6 +181,7 @@ export default {
     const { count, active } = this.$vnode.data.attrs || {}
     this.count = count
     this.active = active
+    this._renderHook()
     return _render(this, createElement)
   },
   _css

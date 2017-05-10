@@ -56,6 +56,7 @@ export default {
     // }
 
     // TODO: support playStatus
+    this._renderHook()
     return createElement('html:video', {
       attrs: {
         'weex-type': 'video',

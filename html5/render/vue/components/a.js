@@ -35,6 +35,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    this._renderHook()
     return createElement('html:a', {
       attrs: {
         'weex-type': 'a',

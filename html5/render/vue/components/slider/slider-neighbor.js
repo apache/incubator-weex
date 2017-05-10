@@ -157,6 +157,7 @@ export default {
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length
 
+    this._renderHook()
     return createElement(
       'nav',
       {
