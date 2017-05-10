@@ -214,8 +214,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
-- (void)resetScrollView {
-    if (self.scrollView.contentOffset.x / self.width == 1)
+- (void)resetScrollView
+{
+    if (WXFloatEqual(self.scrollView.contentOffset.x / self.width , 1.0))
     {
         return;
     }
