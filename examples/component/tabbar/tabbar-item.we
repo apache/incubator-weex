@@ -34,7 +34,7 @@
 
             if (bundleUrl.indexOf("tab1") > 0){
                 this.color = '#ff0000';
-                this.text = 'This is Tab 1 Test.';
+                this.text = 'This is Tab 55555->111 Test.';
             }
             else if (bundleUrl.indexOf("tab2") > 0){
                 this.color = '#00ff00';

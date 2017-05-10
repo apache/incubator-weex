@@ -43,6 +43,8 @@
       ],
     },
     created: function() {
+
+        console.log("333==vue====")
         var bundleUrl = this.$getConfig().bundleUrl;
         console.log('hit', bundleUrl);
         var nativeBase;

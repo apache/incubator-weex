@@ -237,7 +237,7 @@ public class IndexActivity extends AbstractWeexActivity {
 
   private static final String TAG = "IndexActivity";
   private static final int CAMERA_PERMISSION_REQUEST_CODE = 0x1;
-  private static final String DEFAULT_IP = "your_current_IP";
+  private static final String DEFAULT_IP = "192.168.1.222";
   private static String sCurrentIp = DEFAULT_IP; // your_current_IP
 
   private ProgressBar mProgressBar;
@@ -267,9 +267,10 @@ public class IndexActivity extends AbstractWeexActivity {
       return;
     }
 
-    if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("index.js", this), getIndexUrl());
-    } else {
+//    if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
+//      renderPage(WXFileUtils.loadAsset("index.js", this), getIndexUrl());
+//    } else
+      {
       renderPageByURL(getIndexUrl());
     }
 
@@ -364,7 +365,7 @@ public class IndexActivity extends AbstractWeexActivity {
   }
 
   private static String getIndexUrl() {
-    return "http://" + sCurrentIp + ":12580/examples/build/index.js";
+    return "http://" + sCurrentIp + ":12580/examples/build/vue/index.js";
   }
 }
 

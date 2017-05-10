@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>weex-vue-demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no, email=no">
+  <!-- <style>body > div { height: 100%; }</style> -->
+  <style>body::before { content: "1"; height: 1px; overflow: hidden; color: transparent; display: block; }</style>
+  <script src="../node_modules/vue/dist/vue.runtime.js"></script>
+  <script src="../node_modules/weex-vue-render/dist/index.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+<script>
+  (function () {
+//    function getUrlParam (key) {
+//
+//      var reg = new RegExp('[?|&]' + key + '=([^&]+)')
+//      var match = location.search.match(reg)
+//      return match && match[1]
+//    };
+//    var page = getUrlParam('/dist/vod_controller/change_channel.js') || '/dist/index.js';
+//
+//    console.log("page===" + page)
+    var bundle = document.createElement('script')
+    // only for web
+//    bundle.src = page.replace(/\.js$/, '.web.js')
+      bundle.src = "/build/vue-web/vue/index.js";
+
+//      bundle.src = "/dist/vod_controller/change_channel.web.js";
+
+      console.log(bundle.src)
+    document.body.appendChild(bundle)
+  })();
+</script>
+
+</body>
+</html>

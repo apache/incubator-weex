@@ -207,6 +207,8 @@ package com.taobao.weex.ui.view.listview.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.taobao.weex.utils.WXLogUtils;
+
 
 /**
  * Adapter for recyclerView
@@ -222,7 +224,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public T onCreateViewHolder(ViewGroup parent, int viewType) {
-    //        WXLogUtils.d(TAG, "onCreateViewHolder viewType:" + viewType);
+            WXLogUtils.d(TAG, "onCreateViewHolder viewType:" + viewType);
     if (iRecyclerAdapterListener != null) {
       return (T) iRecyclerAdapterListener.onCreateViewHolder(parent, viewType);
     }
@@ -232,7 +234,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public void onBindViewHolder(T viewHolder, int i) {
-    //        WXLogUtils.d(TAG, "onBindViewHolder position: " + i);
+            WXLogUtils.d(TAG, "onBindViewHolder position: " + i);
     if (iRecyclerAdapterListener != null) {
       iRecyclerAdapterListener.onBindViewHolder(viewHolder, i);
     }
@@ -240,7 +242,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public int getItemViewType(int position) {
-    //        WXLogUtils.d(TAG, "getItemViewType position:"+position);
+           WXLogUtils.d(TAG, "getItemViewType position:"+position);
     if (iRecyclerAdapterListener != null) {
       return iRecyclerAdapterListener.getItemViewType(position);
     }
@@ -262,7 +264,7 @@ public class RecyclerViewBaseAdapter<T extends ListBaseViewHolder> extends Recyc
 
   @Override
   public void onViewRecycled(T holder) {
-    //        WXLogUtils.d(TAG, "onViewRecycled position ");
+           WXLogUtils.d(TAG, "onViewRecycled position ");
     if (iRecyclerAdapterListener != null) {
       iRecyclerAdapterListener.onViewRecycled(holder);
     }

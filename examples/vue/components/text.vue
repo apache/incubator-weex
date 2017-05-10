@@ -48,6 +48,7 @@
   .txt {
     margin-bottom: 12px;
     font-size: 40px;
+    background-color: green;
   }
 </style>
 

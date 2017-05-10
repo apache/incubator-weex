@@ -48,6 +48,8 @@
       tabbar: require('../include/tabbar.vue')
     },
     created: function() {
+
+        console.log("==vue============")
       var baseURL = getBaseURL(this)
       for(var i = 0; i < this.tabItems.length; i++) {
         var tabItem = this.tabItems[i];

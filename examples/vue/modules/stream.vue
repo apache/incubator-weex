@@ -1,6 +1,6 @@
 <template>
   <scroller>
-    <panel title="stream.fetch" type="primary">
+    <wxc-panel title="stream.fetch" type="primary">
       <panel title="method = GET">
         <text>{{getResult}}</text>
       </panel>
