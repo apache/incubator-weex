@@ -371,6 +371,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             break;
         default:
             directionString = @"unknown";
+            break;
     }
     
     CGPoint screenLocation = [gesture locationInView:self.view.window];
