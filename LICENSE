@@ -204,7 +204,27 @@
 
    BSD License
 
-For yoga software
+For the CSSLayout components:
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CachedCSSLayout.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSAlign.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSDirection.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSFlexDirection.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSJustify.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSLayout.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSLayoutContext.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSNode.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSPositionType.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSStyle.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/CSSWrap.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/FloatUtil.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/LayoutEngine.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/MeasureOutput.java
+android/sdk/src/main/java/com/taobao/weex/dom/flex/Spacing.java
+ios/sdk/WeexSDK/Sources/Layout/Layout.c
+ios/sdk/WeexSDK/Sources/Layout/Layout.h
+
+/*
+BSD License
 
 Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
 
@@ -233,8 +253,16 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+*/
 
-
+For the vuejs components:
+html5/frameworks/legacy/core/array.js
+html5/frameworks/legacy/core/dep.js
+html5/frameworks/legacy/core/object.js
+html5/frameworks/legacy/core/observer.js
+html5/frameworks/legacy/core/state.js
+html5/frameworks/legacy/core/watcher.js
+/*
 The MIT License (MIT)
 
 Copyright (c) 2013-2015 Yuxi Evan You
@@ -256,3 +284,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
