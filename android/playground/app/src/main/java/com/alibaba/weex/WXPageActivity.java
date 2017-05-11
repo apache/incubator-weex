@@ -132,7 +132,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     Log.e("TestScript_Guide mUri==", mUri.toString());
     initUIAndData();
 
-    if(WXPAGE.equals(mUri.getScheme())) {
+    if(WXPAGE.equals(mUri.getScheme())||
+       TextUtils.equals("true",mUri.getQueryParameter("_wxpage"))) {
       mUri = mUri.buildUpon().scheme("http").build();
       loadWXfromService(mUri.toString());
       startHotRefresh();

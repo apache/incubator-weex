@@ -128,7 +128,6 @@
     "karma-sinon-chai": "^1.2.4",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.8.0",
-    "macaca-cli": "^1.1.0",
     "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
     "nightwatch": "^0.9.4",
@@ -154,14 +153,12 @@
     "vue": "^2.2.6",
     "vue-loader": "^11.3.3",
     "vue-template-compiler": "^2.2.6",
-    "webdriver-client": "~1.0.0",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.23",
     "wwp": "^0.3.5",
-    "xml2map": "^1.0.2",
     "weex-gcanvas":"^0.3.5"
 
   }

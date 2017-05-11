@@ -71,18 +71,28 @@ public class WXStyle implements Map<String, Object>,Cloneable {
    * text-decoration
    **/
   public static WXTextDecoration getTextDecoration(Map<String, Object> style) {
-    Object obj = style.get(Constants.Name.TEXT_DECORATION);
-    if (obj == null) {
-      return WXTextDecoration.NONE;
+    Object obj;
+    WXTextDecoration ret;
+    if (style == null || (obj = style.get(Constants.Name.TEXT_DECORATION)) == null) {
+      ret = WXTextDecoration.NONE;
+    } else {
+      String textDecoration = obj.toString();
+      switch (textDecoration) {
+        case "underline":
+          ret = WXTextDecoration.UNDERLINE;
+          break;
+        case "line-through":
+          ret = WXTextDecoration.LINETHROUGH;
+          break;
+        case "none":
+          ret = WXTextDecoration.NONE;
+          break;
+        default:
+          ret = WXTextDecoration.INVALID;
+          break;
+      }
     }
-    String textDecoration = obj.toString();
-    if (textDecoration.equals("underline")) {
-      return WXTextDecoration.UNDERLINE;
-    }
-    if (textDecoration.equals("line-through")) {
-      return WXTextDecoration.LINETHROUGH;
-    }
-    return WXTextDecoration.NONE;
+    return ret;
   }
 
   public static String getTextColor(Map<String, Object> style) {

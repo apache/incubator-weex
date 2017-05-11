@@ -397,9 +397,9 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       return;
     }
 
-    mWXPerformance.pageName = pageName;
-    mWXPerformance.JSTemplateSize = template.length() / 1024;
+    handlePageNameThenTrack(pageName);
 
+    mWXPerformance.JSTemplateSize = template.length() / 1024;
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
 
@@ -503,6 +503,39 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void renderByUrl(String pageName, final String url, Map<String, Object> options, final String jsonInitData, final WXRenderStrategy flag) {
     renderByUrlInternal(pageName,url,options,jsonInitData,flag);
+  }
+
+  /**
+   * handle biz pageName then track pageName and spmAB & scheme
+   * @param pageName
+   */
+  private void handlePageNameThenTrack(String pageName){
+    if(TextUtils.isEmpty(pageName)){
+      mWXPerformance.pageName = WXPerformance.DEFAULT;
+      return;
+    }
+
+    Uri pageNameUri = Uri.parse(pageName);
+    Uri.Builder pageNameBuilder = pageNameUri.buildUpon();
+
+    String scheme = pageNameUri.getScheme();
+    String spm    = pageNameUri.getQueryParameter("spm");
+    String  [] spmList = {};
+    String spmAB = "";
+
+    if (null != spm){
+      spmList = spm.split("\\.");
+    }
+    if(spmList.length > 1){
+      spmAB = spmList[0] + "." + spmList[1];
+    }
+
+    pageNameBuilder.scheme("");
+    mWXPerformance.pageName = pageNameBuilder.toString().
+            replaceFirst("^(/|://|http://www\\.|http://|www\\.)","");
+
+    mWXPerformance.spmAB = spmAB;
+    mWXPerformance.scheme = scheme;
   }
 
   private String wrapPageName(String pageName, String url) {
