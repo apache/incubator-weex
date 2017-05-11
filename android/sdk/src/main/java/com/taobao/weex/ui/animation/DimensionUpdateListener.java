@@ -27,6 +27,9 @@ import android.support.v4.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.view.IRenderResult;
+
 public class DimensionUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
   private View view;
@@ -67,6 +70,15 @@ public class DimensionUpdateListener implements ValueAnimator.AnimatorUpdateList
       }
       if (preHeight != layoutParams.height || preWidth != layoutParams.width) {
         view.requestLayout();
+      }
+
+      if (view instanceof IRenderResult) {
+        WXComponent component = ((IRenderResult) view).getComponent();
+        if (component != null) {
+          if (preWidth != layoutParams.width || preHeight != layoutParams.height) {
+            component.notifyNativeSizeChanged(layoutParams.width, layoutParams.height);
+          }
+        }
       }
     }
   }
