@@ -18,8 +18,8 @@
  */
 package com.taobao.weex.dom;
 
-import android.view.View;
-
+import android.content.Context;
+import android.view.View.MeasureSpec;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.view.WXSwitchView;
@@ -29,24 +29,21 @@ public class WXSwitchDomObject extends WXDomObject {
 
   private static final MeasureFunction SWITCH_MEASURE_FUNCTION = new MeasureFunction() {
 
-    private boolean measured;
-    private int mWidth;
-    private int mHeight;
-
     @Override
     public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
       try {
-        if (!measured) {
-          WXSwitchView wxSwitchView = new WXSwitchView(((WXDomObject) node).getDomContext().getUIContext());
-          int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-          int widthSpec = View.MeasureSpec.makeMeasureSpec((int) width, View.MeasureSpec.AT_MOST);
-          wxSwitchView.measure(widthSpec, heightSpec);
-          mWidth = wxSwitchView.getMeasuredWidth();
-          mHeight = wxSwitchView.getMeasuredHeight();
-          measured = true;
+        Context context=((WXDomObject) node).getDomContext().getUIContext();
+        WXSwitchView wxSwitchView = new WXSwitchView(context);
+        int widthSpec, heightSpec;
+        heightSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        if (Float.isNaN(width)) {
+          widthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        } else {
+          widthSpec = MeasureSpec.makeMeasureSpec((int) width, MeasureSpec.AT_MOST);
         }
-        measureOutput.width = mWidth;
-        measureOutput.height = mHeight;
+        wxSwitchView.measure(widthSpec, heightSpec);
+        measureOutput.width = wxSwitchView.getMeasuredWidth();
+        measureOutput.height = wxSwitchView.getMeasuredHeight();
       } catch (RuntimeException e) {
         WXLogUtils.e(TAG, WXLogUtils.getStackTrace(e));
       }
