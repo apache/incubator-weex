@@ -315,7 +315,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       return null;
     }
 
-    if (parent instanceof WXListComponent) {
+    if (parent instanceof BasicListComponent) {
       return comp;
     }
 
@@ -551,7 +551,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   /**
-   * Append a child component to the end of WXListComponent. This will not refresh the underlying
+   * Append a child component to the end of list. This will not refresh the underlying
    * view immediately. The message of index of the inserted child is given to the adapter, and the
    * adapter will determine when to refresh. The default implementation of adapter will push the
    * message into a message and refresh the view in a period of time.
@@ -661,7 +661,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   /**
-   * Remove the child from WXListComponent. This method will use {@link
+   * Remove the child from list. This method will use {@link
    * java.util.List#indexOf(Object)} to retrieve the component to be deleted. Like {@link
    * #addChild(WXComponent)}, this method will not refresh the view immediately, the adapter will
    * decide when to refresh.
@@ -743,7 +743,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
    * Bind the component of the position to the holder. Then flush the view.
    *
    * @param holder   viewHolder, which holds reference to the view
-   * @param position position of component in WXListComponent
+   * @param position position of component in list
    */
   @Override
   public void onBindViewHolder(ListBaseViewHolder holder, int position) {
