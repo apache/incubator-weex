@@ -128,7 +128,7 @@ function collectStat (): void {
           const res: any = extend({}, entry)
           extend(perf.stat, {
             templateUrl: res.name,
-            JSTemplateSize: parseInt(res.transferSize / 1024),
+            JSTemplateSize: (res.transferSize / 1024).toFixed(2),
             networkTime: parseInt(res.duration)
           })
           break

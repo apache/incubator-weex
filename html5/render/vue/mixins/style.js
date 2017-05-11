@@ -29,8 +29,12 @@ import {
 
 export default {
   beforeCreate () {
-    // get static class style map from document's styleSheets.
-    if (!weex.styleMap) {
+    /**
+     * get static class style map from document's styleSheets.
+     * Weex.on will create a Vue instance. In this case we'll ignore it, since
+     * it's not sure whether the scoped style has already attached to head or not.
+     */
+    if (!weex.styleMap && this.$options && this.$options._scopeId) {
       weex.styleMap = getHeadStyleMap()
     }
   },
