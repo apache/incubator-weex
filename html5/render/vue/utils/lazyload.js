@@ -84,7 +84,8 @@ export function fireLazyload (el: Array<any> | any | null, ignoreVisibility: ?bo
   }
   el = el || document.body
   if (!el) { return }
-  const imgs: NodeList = (el || document.body).querySelectorAll('[img-src]')
+  let imgs: NodeList | Array<any> = (el || document.body).querySelectorAll('[img-src]')
+  if (el.getAttribute('img-src')) { imgs = [el] }
   for (let i: number = 0; i < imgs.length; i++) {
     const img = imgs[i]
     if (typeof ignoreVisibility === 'boolean' && ignoreVisibility) {
