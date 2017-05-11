@@ -9,6 +9,7 @@
 # This line only include folder itself, not files or subfolder under it.
 + /scripts/
 + /scripts/rat-ant-build.xml
++ /scripts/build_from_source.sh
 + /LICENSE
 + /NOTICE
 + /POSSIBLE-NOTICES-FOR-BIN-DIST

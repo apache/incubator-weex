@@ -1,7 +1,15 @@
+# Weex Apache Source Release   
+Weex produce SDKs to integrate to iOS/Android/Mobile web applications. This file will cover how to build Weex from source. You can either use the script we provided or manually build from source step by step.   
+See `README.md` for further information about Weex Framework.
 
+## Build with Script
 
+Run build script:   
+> `$ bash script/build_from_source.sh`
 
-## Build from source   
+This's may take a while. After that, you can look into `dist/`, `android/sdk/build/output/` and `ios/sdk/Products` for Web/Android/iOS SDK artifacts.
+
+## Build Step by Step
 
 ### Build Javascript Framework and Html5 SDK
 Javascript Framework is required by SDKs. **So this must be built first.**  
