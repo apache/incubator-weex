@@ -48,6 +48,16 @@ public class WXPerformance {
   public String pageName = DEFAULT;
 
   /**
+   * spmAB of renderUrl
+   */
+  public String spmAB ;
+
+  /**
+   * scheme of renderUrl
+   */
+  public String scheme ;
+
+  /**
    * Size of JavaScript framework, the unit is KB
    */
   public double JSLibSize;
@@ -215,6 +225,8 @@ public class WXPerformance {
     quotas.put("WXSDKVersion", WXSDKVersion);
     quotas.put("connectionType",connectionType);
     quotas.put("requestType",requestType);
+    quotas.put("spmAB", spmAB);
+    quotas.put("scheme", scheme);
 
     return quotas;
   }
