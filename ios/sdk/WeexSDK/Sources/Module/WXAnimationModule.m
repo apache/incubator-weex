@@ -80,7 +80,6 @@
         _animationInfo = info;
         _finishBlock = finishBlock;
     }
-    
     return self;
 }
 
@@ -254,6 +253,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @(newBounds.size.width);
             [infos addObject:info];
             if (_needLayout) {
+                _animationLayout.widthInfo = [[WXAnimationLayoutInfo alloc] init];
                 _animationLayout.widthInfo.toValue = info.toValue;
                 _animationLayout.widthInfo.fromValue = info.fromValue;
                 _animationLayout.widthInfo.propertyName = info.propertyName;
@@ -266,6 +266,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             info.toValue = @(newBounds.size.height);
             [infos addObject:info];
             if (_needLayout) {
+                _animationLayout.heightInfo = [[WXAnimationLayoutInfo alloc] init];
                 _animationLayout.heightInfo.toValue = info.toValue;
                 _animationLayout.heightInfo.fromValue = info.fromValue;
                 _animationLayout.heightInfo.propertyName = info.propertyName;
