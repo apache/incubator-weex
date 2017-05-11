@@ -24,7 +24,7 @@
 #import "WXTransform.h"
 #import "WXUtility.h"
 #import "WXLength.h"
-#import "NSTimer+Weex.h"
+#import "WXAnimationLayout.h"
 
 @interface WXAnimationInfo : NSObject<NSCopying>
 
@@ -134,15 +134,8 @@
 
 @interface WXAnimationModule ()
 
-@property (nonatomic,retain) NSTimer *updateStyleTimer;
-@property (nonatomic,retain) WXComponent *targetComponent;
-@property (nonatomic,retain) NSDate *animationStartDate;
-@property (nonatomic,retain) WXAnimationInfo *widthInfo;
-@property (nonatomic,retain) WXAnimationInfo *heightInfo;
-@property (nonatomic,assign) double animationDuration;
-@property (nonatomic,assign) double animationDelay;
-@property (nonatomic,retain) NSDictionary *needUpdateStyles;
-@property (nonatomic,assign) BOOL needlayout;
+@property (nonatomic,strong) WXAnimationLayout *animationLayout;
+@property (nonatomic,assign) BOOL needLayout;
 @end
 
 @implementation WXAnimationModule
@@ -153,7 +146,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
 - (void)transition:(NSString *)nodeRef args:(NSDictionary *)args callback:(WXModuleCallback)callback
 {
-    _needlayout = NO;
+    _needLayout = NO;
+    _animationLayout = [[WXAnimationLayout alloc] init];
+    _animationLayout.weexInstance = self.weexInstance;
     WXPerformBlockOnComponentThread(^{
         WXComponent *targetComponent = [self.weexInstance componentForRef:nodeRef];
         if (!targetComponent) {
@@ -177,11 +172,11 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
 
     double duration = [args[@"duration"] doubleValue] / 1000;
     double delay = [args[@"delay"] doubleValue] / 1000;
-    if (args[@"needlayout"]) {
-        _needlayout = [WXConvert BOOL:args[@"needlayout"]];
+    if (args[@"needLayout"]) {
+        _needLayout = [WXConvert BOOL:args[@"needLayout"]];
     }
-    _animationDuration = duration * 1000;
-    _animationDelay = delay * 1000;
+    _animationLayout.animationDuration = duration * 1000;
+    _animationLayout.animationDelay = delay * 1000;
     CAMediaTimingFunction *timingFunction = [WXConvert CAMediaTimingFunction:args[@"timingFunction"]];
     NSDictionary *styles = args[@"styles"];
     for (NSString *property in styles) {
@@ -258,8 +253,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             newBounds.size = CGSizeMake([WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor], newBounds.size.height);
             info.toValue = @(newBounds.size.width);
             [infos addObject:info];
-            if (_needlayout) {
-                _widthInfo = info;
+            if (_needLayout) {
+                _animationLayout.widthInfo.toValue = info.toValue;
+                _animationLayout.widthInfo.fromValue = info.fromValue;
+                _animationLayout.widthInfo.propertyName = info.propertyName;
             }
         } else if ([property isEqualToString:@"height"]) {
             info.propertyName = @"bounds.size.height";
@@ -268,8 +265,10 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
             newBounds.size = CGSizeMake(newBounds.size.width, [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor]);
             info.toValue = @(newBounds.size.height);
             [infos addObject:info];
-            if (_needlayout) {
-                _heightInfo = info;
+            if (_needLayout) {
+                _animationLayout.heightInfo.toValue = info.toValue;
+                _animationLayout.heightInfo.fromValue = info.fromValue;
+                _animationLayout.heightInfo.propertyName = info.propertyName;
             }
         }
     }
@@ -298,14 +297,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     }
     
     [CATransaction commit];
-    if (_needlayout) {
-        _targetComponent = targetComponent;
-        _animationStartDate = [NSDate date];
-        if (_animationDelay > 0) {
-            [self performSelector:@selector(startUpdateStyleTimer) withObject:nil afterDelay:_animationDelay/1000];
-        } else {
-            [self startUpdateStyleTimer];
-        }
+    if (_needLayout) {
+        _animationLayout.targetComponent = targetComponent;
+        [_animationLayout layoutForAnimation];
     }
 }
 
@@ -339,71 +333,4 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
     [layer addAnimation:animation forKey:info.propertyName];
 }
 
-#pragma mark UpdateStyle Methods
-
-- (void)startUpdateStyleTimer
-{
-    if (!self.updateStyleTimer || ![self.updateStyleTimer isValid]) {
-        __weak __typeof__(self) weakSelf = self;
-        self.updateStyleTimer = [NSTimer wx_scheduledTimerWithTimeInterval:16/1000.0f block:^() {
-            [weakSelf updateStyleOnTimer];
-        } repeats:YES];
-        [[NSRunLoop currentRunLoop] addTimer:self.updateStyleTimer forMode:NSRunLoopCommonModes];
-    }
-}
-
-- (void)stopUpdateStyleTimer
-{
-    if (self.updateStyleTimer && [self.updateStyleTimer isValid]) {
-        [self.updateStyleTimer invalidate];
-        self.updateStyleTimer = nil;
-    }
-}
-
-- (void)updateStyleOnTimer
-{
-    NSTimeInterval startMsecond = [_animationStartDate timeIntervalSince1970]*1000;
-    NSTimeInterval nowMsecond = [[NSDate date] timeIntervalSince1970]*1000;
-    NSTimeInterval interval = nowMsecond - startMsecond;
-    if (!(_widthInfo || _heightInfo)) {
-        [self stopUpdateStyleTimer];
-        return;
-    }
-    if (interval > _animationDuration + _animationDelay) {
-        [self stopUpdateStyleTimer];
-        return;
-    }
-    CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
-    _needUpdateStyles = [[NSMutableDictionary alloc] init];
-    if (_widthInfo) {
-        double currentValue = (([_widthInfo.toValue doubleValue] - [_widthInfo.fromValue doubleValue]) * ((interval - _animationDelay) / _animationDuration) + [_widthInfo.fromValue doubleValue]) / scaleFactor;
-        [_needUpdateStyles setValue:[NSNumber numberWithDouble:currentValue] forKey:@"width"];
-    }
-    if (_heightInfo) {
-        double currentValue = (([_heightInfo.toValue doubleValue] - [_heightInfo.fromValue doubleValue]) * ((interval - _animationDelay) / _animationDuration) + [_heightInfo.fromValue doubleValue]) / scaleFactor;
-        [_needUpdateStyles setValue:[NSNumber numberWithDouble:currentValue] forKey:@"height"];
-    }
-    [self updateStyle:_needUpdateStyles];
-}
-
-- (void)updateStyle:(NSDictionary *)styles
-{
-    if ([styles count]>0) {
-        __weak typeof(self) weakSelf = self;
-        WXPerformBlockOnComponentThread(^{
-            WXComponentManager *manager = weakSelf.weexInstance.componentManager;
-            if (!manager.isValid) {
-                return;
-            }
-            [manager updateStyles:styles forComponent:_targetComponent.ref];
-            [manager startComponentTasks];
-        });
-    }
-}
-
-- (void)dealloc
-{
-    [self stopUpdateStyleTimer];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-}
 @end
