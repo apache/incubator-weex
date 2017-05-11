@@ -296,6 +296,15 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    __weak typeof(self) weakSelf = self;
+    if (!weakSelf)
+    {
+        return;
+    }
+    //ensure that the end of scroll is fired.
+    [self performSelector:@selector(scrollViewDidEndScrollingAnimation:) withObject:nil afterDelay:0.3];
+    
     UIView *itemView = nil;
     for (itemView in self.itemViews) {
         if ([self _isItemViewVisiable:itemView]) {
