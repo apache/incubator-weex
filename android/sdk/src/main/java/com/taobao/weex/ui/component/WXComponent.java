@@ -1452,10 +1452,16 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return getInstance().isLayerTypeEnabled();
   }
 
+  /**
+   * Sets whether or not to relayout page during animation, default is false
+   */
   public void setNeedLayoutOnAnimation(boolean need) {
     this.mNeedLayoutOnAnimation = need;
   }
 
+  /**
+   * Trigger a updateStyle invoke to relayout current page
+   */
   public void notifyNativeSizeChanged(int w, int h) {
     if (!mNeedLayoutOnAnimation) {
       return;

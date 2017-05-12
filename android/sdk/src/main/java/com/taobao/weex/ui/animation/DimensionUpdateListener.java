@@ -76,6 +76,8 @@ public class DimensionUpdateListener implements ValueAnimator.AnimatorUpdateList
         WXComponent component = ((IRenderResult) view).getComponent();
         if (component != null) {
           if (preWidth != layoutParams.width || preHeight != layoutParams.height) {
+            //Notify the animated component it native size has changed
+            //The component will decides whether to update domobject
             component.notifyNativeSizeChanged(layoutParams.width, layoutParams.height);
           }
         }
