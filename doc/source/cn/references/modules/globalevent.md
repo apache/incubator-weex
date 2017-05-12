@@ -66,7 +66,7 @@ mWXSDKInstance.fireGlobalEventCallback("geolocation",params);
 #### 示例
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule('@weex-module/globalEvent');
 globalEvent.addEventListener("geolocation", function (e) {
   console.log("get geolocation")
 });
@@ -83,6 +83,6 @@ globalEvent.addEventListener("geolocation", function (e) {
 #### 示例
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule('@weex-module/globalEvent');
 globalEvent.removeEventListener("geolocation");
 ```
