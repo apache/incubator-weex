@@ -349,6 +349,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onSwipe:(UISwipeGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     UISwipeGestureRecognizerDirection direction = gesture.direction;
     
     NSString *directionString;
@@ -367,6 +371,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             break;
         default:
             directionString = @"unknown";
+            break;
     }
     
     CGPoint screenLocation = [gesture locationInView:self.view.window];
@@ -396,6 +401,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onLongPress:(UILongPressGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint screenLocation = [gesture locationInView:self.view.window];
         CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
@@ -450,6 +459,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
@@ -616,16 +629,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
+    NSString * panGestureRecog = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"UIScrollV", @"iewPanG", @"estur",@"eRecog",@"nize",@"r"];
+    NSString * textTap = [NSString stringWithFormat:@"%@%@%@%@%@",@"UITe",@"xtTa",@"pReco",@"gniz",@"er"];
     // trigger touches
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
     // swipe and scroll
-    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(@"UIScrollViewPanGestureRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
         return YES;
     }
     // onclick and textviewInput
-    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(@"UITextTapRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(textTap)]) {
         return YES;
     }
     

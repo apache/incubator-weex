@@ -43,6 +43,7 @@
 #import "WXLayoutDefine.h"
 #import "WXJSExceptionProtocol.h"
 #import "WXJSExceptionInfo.h"
+#import "WXIndicatorComponent.h"
 #import "WXImgLoaderProtocol.h"
 #import "WXEventModuleProtocol.h"
 #import "WXDefine.h"
