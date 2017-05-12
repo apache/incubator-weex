@@ -20,7 +20,7 @@ under the License.
     xmlns="antlib:org.apache.tools.ant">
     <rat:report>
         <fileset dir="../" includes="**/*.xml,**/*.m,**/*.h,**/*.mm,**/*.java,**/*.js">
-        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/*.*"/>
+        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/Layout.*"/>
         <exclude name="**/android/sdk/src/main/java/com/taobao/weex/dom/flex/*.java"/>
         <!-- 
         exclude:
