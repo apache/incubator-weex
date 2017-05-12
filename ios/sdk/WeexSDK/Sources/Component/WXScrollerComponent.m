@@ -67,6 +67,8 @@
     BOOL _showScrollBar;
 
     css_node_t *_scrollerCSSNode;
+    
+    NSHashTable* _delegates;
 }
 
 WX_EXPORT_METHOD(@selector(resetLoadmore))
@@ -414,6 +416,28 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     [scrollView setContentInset:contentInset];
 }
 
+- (void)addScrollDelegate:(id<UIScrollViewDelegate>)delegate
+{
+    if (delegate) {
+        if (!_delegates) {
+            _delegates = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
+        }
+        [_delegates addObject:delegate];
+    }
+}
+
+- (void)removeScrollDelegate:(id<UIScrollViewDelegate>)delegate
+{
+    if (delegate) {
+        [_delegates removeObject:delegate];
+    }
+}
+
+- (WXScrollDirection)scrollDirection
+{
+    return _scrollDirection;
+}
+
 #pragma mark UIScrollViewDelegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -468,6 +492,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         if (fabs(distance) >= _offsetAccuracy) {
             [self fireEvent:@"scroll" params:@{@"contentSize":contentSizeData,@"contentOffset":contentOffsetData} domChanges:nil];
             _lastScrollEventFiredOffset = scrollView.contentOffset;
+        }
+    }
+    
+    for (id<UIScrollViewDelegate> delegate in _delegates) {
+        if ([delegate respondsToSelector:@selector(scrollViewDidScroll:)]) {
+            [delegate scrollViewDidScroll:scrollView];
         }
     }
 }
