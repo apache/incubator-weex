@@ -16,6 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+set -e
 if [ ! -f scripts/build_from_source.sh ];then
     echo "This script must execute in project root"
     exit 1
