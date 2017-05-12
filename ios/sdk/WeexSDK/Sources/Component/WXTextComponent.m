@@ -213,6 +213,10 @@ do {\
         WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
     };
     
+    if (styles[@"lineHeight"] && WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+        self.useCoreTextAttr = @"false";
+    }
+    
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         _padding = padding;
         [self setNeedsRepaint];
