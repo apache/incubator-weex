@@ -150,6 +150,10 @@ static dispatch_queue_t WXImageUpdateQueue;
         _imageSrc = [[WXConvert NSString:attributes[@"src"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [self updateImage];
     }
+    if (attributes[@"quality"]) {
+        _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        [self updateImage];
+    }
     
     [self configPlaceHolder:attributes];
     
