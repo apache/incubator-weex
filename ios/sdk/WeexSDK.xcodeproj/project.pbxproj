@@ -37,6 +37,8 @@
 		2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2AFEB17B1C747139000507FA /* WXInstanceWrap.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AFEB1791C747139000507FA /* WXInstanceWrap.h */; };
 		2AFEB17C1C747139000507FA /* WXInstanceWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AFEB17A1C747139000507FA /* WXInstanceWrap.m */; };
+		375A228F1EC440A600BC2086 /* WXAnimationLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 375A228D1EC440A600BC2086 /* WXAnimationLayout.m */; };
+		375A22901EC440A600BC2086 /* WXAnimationLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 375A228E1EC440A600BC2086 /* WXAnimationLayout.h */; };
 		37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */; };
 		37B51EE51E97804D0040A743 /* WXCycleSliderComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B51EE31E97804D0040A743 /* WXCycleSliderComponent.m */; };
 		591324A31D49B7F1004E89ED /* WXTimerModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */; };
@@ -347,6 +349,8 @@
 		2AE5B7551CABA04E0082FDDB /* WXEventModuleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEventModuleProtocol.h; sourceTree = "<group>"; };
 		2AFEB1791C747139000507FA /* WXInstanceWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXInstanceWrap.h; sourceTree = "<group>"; };
 		2AFEB17A1C747139000507FA /* WXInstanceWrap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXInstanceWrap.m; sourceTree = "<group>"; };
+		375A228D1EC440A600BC2086 /* WXAnimationLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXAnimationLayout.m; sourceTree = "<group>"; };
+		375A228E1EC440A600BC2086 /* WXAnimationLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXAnimationLayout.h; sourceTree = "<group>"; };
 		37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCycleSliderComponent.h; sourceTree = "<group>"; };
 		37B51EE31E97804D0040A743 /* WXCycleSliderComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXCycleSliderComponent.m; sourceTree = "<group>"; };
 		591324A21D49B7F1004E89ED /* WXTimerModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimerModuleTests.m; sourceTree = "<group>"; };
@@ -1070,6 +1074,8 @@
 				74A4BAA51CB4F98300195969 /* WXStreamModule.m */,
 				594C28911CF9E61A009793A4 /* WXAnimationModule.h */,
 				594C28901CF9E61A009793A4 /* WXAnimationModule.m */,
+				375A228D1EC440A600BC2086 /* WXAnimationLayout.m */,
+				375A228E1EC440A600BC2086 /* WXAnimationLayout.h */,
 				2AFEB1791C747139000507FA /* WXInstanceWrap.h */,
 				2AFEB17A1C747139000507FA /* WXInstanceWrap.m */,
 				77E659D81C07F594008B8775 /* WXDomModule.h */,
@@ -1226,6 +1232,7 @@
 				2A837AB41CD9DE9200AEDF03 /* WXLoadingIndicator.h in Headers */,
 				747A787C1D1BAAC900DED9D0 /* WXComponent+ViewManagement.h in Headers */,
 				DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */,
+				375A22901EC440A600BC2086 /* WXAnimationLayout.h in Headers */,
 				2AE5B7561CABA04E0082FDDB /* WXEventModuleProtocol.h in Headers */,
 				C4C30DE91E1B833D00786B6C /* WXComponent+PseudoClassManagement.h in Headers */,
 				591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */,
@@ -1552,6 +1559,7 @@
 				59A5961D1CB630F10012CD52 /* WXComponent+Navigation.m in Sources */,
 				77D161631C02ED790010B15B /* WXLog.m in Sources */,
 				744BEA5A1D0520F300452B5D /* WXComponent+Layout.m in Sources */,
+				375A228F1EC440A600BC2086 /* WXAnimationLayout.m in Sources */,
 				59A582FD1CF5B17B0081FD3E /* WXBridgeContext.m in Sources */,
 				743933B51C7ED9AA00773BB7 /* WXSimulatorShortcutManager.m in Sources */,
 				74BB5FBA1DFEE81A004FC3DF /* WXMetaModule.m in Sources */,
