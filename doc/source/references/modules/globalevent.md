@@ -66,7 +66,7 @@ register global event.
 #### Example
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule("globalEvent");
 globalEvent.addEventListener("geolocation", function (e) {
 	console.log("get geolocation")
 });
@@ -83,7 +83,7 @@ remove global event
 #### Example
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule("globalEvent");
 globalEvent.removeEventListener("geolocation");
 ```
 
