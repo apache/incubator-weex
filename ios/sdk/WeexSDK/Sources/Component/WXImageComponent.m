@@ -383,6 +383,7 @@ static dispatch_queue_t WXImageUpdateQueue;
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
     shapeLayer.path = bezierPath.CGPath;
     self.layer.mask = shapeLayer;
+    self.layer.cornerRadius = 0;
 }
 
 #ifdef UITEST
