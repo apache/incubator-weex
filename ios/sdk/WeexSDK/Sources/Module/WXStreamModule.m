@@ -239,7 +239,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
 - (NSString *)deleteSpecialCharacters:(NSString *)str{
     NSArray<NSString *> *components = [str componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]];
     components = [components filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self <> ''"]];
-    str = [components componentsJoinedByString:@" "];
+    str = [components componentsJoinedByString:@""];
     return str;
 }
 
