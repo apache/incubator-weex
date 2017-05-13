@@ -109,7 +109,7 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 ```html
 <template>
   <div class="wrapper">
-    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur">
+    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur"></input>
   </div>
 </template>
 
@@ -168,4 +168,4 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 </style>
 ```
 
-[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)
+[try it](http://dotwe.org/vue/e56d9ebeede8f80bbc8b53637395d22f)
