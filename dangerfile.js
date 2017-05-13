@@ -165,6 +165,7 @@ const copyright_header_components = [
 //path prefix
 const ignoreCopyrightVerifyPath = [
   'test',
+  'pre-build',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',
