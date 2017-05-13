@@ -7,7 +7,8 @@
         :index="i"
         class="row"
         @appear="onappear"
-        @disappear="ondisappear">
+        @disappear="ondisappear"
+        >
         <div class="item">
           <text class="item-title">row {{v.id}}</text>
         </div>

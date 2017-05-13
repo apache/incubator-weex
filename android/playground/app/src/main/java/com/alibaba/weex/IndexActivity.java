@@ -365,7 +365,7 @@ public class IndexActivity extends AbstractWeexActivity {
   }
 
   private static String getIndexUrl() {
-    return "http://" + sCurrentIp + ":12580/examples/build/vue/index.js";
+    return "http://" + sCurrentIp + ":12580/examples/build/index.js";
   }
 }
 

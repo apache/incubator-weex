@@ -1050,6 +1050,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   @Override
   public void onLoadMore(int offScreenY) {
+
     try {
       String offset = getDomObject().getAttrs().getLoadMoreOffset();
 
@@ -1057,17 +1058,23 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         offset = "0";
       }
 
+      WXLogUtils.d(TAG, "offScreenY:" + offScreenY + ",offset:" + offset);
+
       if (offScreenY < Integer.parseInt(offset)) {
         String loadMoreRetry = getDomObject().getAttrs().getLoadMoreRetry();
         if (loadMoreRetry == null) {
           loadMoreRetry = mLoadMoreRetry;
         }
 
+        WXLogUtils.d(TAG, "mListCellCount:" + mListCellCount + ",size:" + mChildren.size());
+
         if (mListCellCount != mChildren.size()
             || mLoadMoreRetry == null || !mLoadMoreRetry.equals(loadMoreRetry)) {
           fireEvent(Constants.Event.LOADMORE);
           mListCellCount = mChildren.size();
           mLoadMoreRetry = loadMoreRetry;
+          WXLogUtils.d(TAG, "run loadmore event");
+
         }
       }
     } catch (Exception e) {

@@ -18,7 +18,7 @@
             icon: '',
             image: 'http://gtms01.alicdn.com/tps/i1/TB1qw.hMpXXXXagXXXX9t7RGVXX-46-46.png',
             selectedImage: 'http://gtms04.alicdn.com/tps/i4/TB16jjPMpXXXXazXVXX9t7RGVXX-46-46.png',
-            src: 'component/tabbar/tabbar-item.js?itemId=tab1',
+            src: 'component/tabbar/tabbar-item.js2?itemId=tab1',
             visibility: 'visible',
           },
           {
