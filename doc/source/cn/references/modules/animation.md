@@ -37,7 +37,7 @@ version: 2.1
 | height | 动画执行后应用到组件上的高度值 | length | 无 |
 | backgroundColor | 动画执行后应用到组件上的背景颜色 | string | none |
 | opacity | 动画执行后应用到组件上的不透明度值 | 介于 0 到 1 间的数值 | `1` |
-| transformOrigin | 定义变化过程的中心点. 参数 `x-aris` 可能的值为 `left`、`center`、`right`、长度值或百分比值, 参数 `y-axis` 可能的值为 `top`、`center`、`bottom`、长度值或百分比值 | `x-axis y-axis` | `center center` |
+| transformOrigin | 定义变化过程的中心点. 参数 `x-axis` 可能的值为 `left`、`center`、`right`、长度值或百分比值, 参数 `y-axis` 可能的值为 `top`、`center`、`bottom`、长度值或百分比值 | `x-axis y-axis` | `center center` |
 | transform | 定义应用在元素上的变换类型，支持下表列出的属性 | object | 无 |
 
 `transform`属性的合法值:
