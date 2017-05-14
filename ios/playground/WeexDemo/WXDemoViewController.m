@@ -25,6 +25,8 @@
 #import <WeexSDK/WXSDKManager.h>
 #import "UIViewController+WXDemoNaviBar.h"
 #import "DemoDefine.h"
+#import "WXPrerenderManager.h"
+#import "WXMonitor.h"
 
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
@@ -104,7 +106,10 @@
 
 - (void)dealloc
 {
-    [_instance destroyInstance];
+    if(![[WXPrerenderManager sharedInstance] isTaskExist:[self.url absoluteString]])
+    {
+        [_instance destroyInstance];
+    }
     
 #ifdef DEBUG
     [_instance forceGarbageCollection];
@@ -116,6 +121,26 @@
 - (void)render
 {
     CGFloat width = self.view.frame.size.width;
+    if([[WXPrerenderManager sharedInstance] isTaskExist:[self.url absoluteString]]){
+        _instance = [[WXPrerenderManager sharedInstance] instanceFromUrl:self.url.absoluteString];
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        _instance.viewController = self;
+        _instance.needPrerender = NO;
+        _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
+        [self.weexView removeFromSuperview];
+        self.weexView = [[WXPrerenderManager sharedInstance] viewFromUrl:self.url.absoluteString];
+        [self.view addSubview:self.weexView];
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.weexView);
+        _instance.renderFinish = ^(UIView *view) {
+            WXLogDebug(@"%@", @"Render Finish...");
+        };
+        [[WXPrerenderManager sharedInstance] renderFromCache:[self.url absoluteString]];
+        return;
+    }
+    
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
     _instance.viewController = self;

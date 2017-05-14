@@ -39,6 +39,7 @@
 #import "WXModuleMethod.h"
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
+#import "WXPrerenderManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -140,6 +141,10 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+        if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
+            [[WXPrerenderManager sharedInstance] storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
+            return nil;
+        }
         return [method invoke];
     }];
     
