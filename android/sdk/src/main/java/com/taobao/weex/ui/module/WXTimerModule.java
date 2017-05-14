@@ -23,6 +23,7 @@ import android.os.Message;
 import android.support.annotation.IntRange;
 import android.support.annotation.VisibleForTesting;
 
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXHashMap;
@@ -30,6 +31,7 @@ import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -57,12 +59,16 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   @JSMethod(uiThread = false)
   public void setTimeout(@IntRange(from = 1) int funcId, @IntRange(from = 0) int delay) {
-    postMessage(WXJSBridgeMsgType.MODULE_TIMEOUT, funcId, delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+    if(mWXSDKInstance != null) {
+      postOrHoldMessage(WXJSBridgeMsgType.MODULE_TIMEOUT, funcId, delay, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+    }
   }
 
   @JSMethod(uiThread = false)
   public void setInterval(@IntRange(from = 1) int funcId, @IntRange(from = 0) int interval) {
-    postMessage(WXJSBridgeMsgType.MODULE_INTERVAL, funcId, interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+    if(mWXSDKInstance != null) {
+      postOrHoldMessage(WXJSBridgeMsgType.MODULE_INTERVAL, funcId, interval, Integer.parseInt(mWXSDKInstance.getInstanceId()));
+    }
   }
 
   @JSMethod(uiThread = false)
@@ -70,7 +76,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     if (funcId <= 0) {
       return;
     }
-    handler.removeMessages(WXJSBridgeMsgType.MODULE_TIMEOUT, funcId);
+    removeOrHoldMessage(WXJSBridgeMsgType.MODULE_TIMEOUT, funcId);
   }
 
   @JSMethod(uiThread = false)
@@ -78,7 +84,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     if (funcId <= 0) {
       return;
     }
-    handler.removeMessages(WXJSBridgeMsgType.MODULE_INTERVAL, funcId);
+    removeOrHoldMessage(WXJSBridgeMsgType.MODULE_INTERVAL, funcId);
   }
 
   @Override
@@ -150,4 +156,32 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
       handler.sendMessageDelayed(message, interval);
     }
   }
+
+
+  private void postOrHoldMessage(final int what,final int funcId,final int interval,final int instanceId) {
+    if(mWXSDKInstance.isPreRenderMode()) {
+      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableAction(new Runnable() {
+        @Override
+        public void run() {
+          postMessage(what,funcId,interval,instanceId);
+        }
+      }),false);
+    } else {
+      postMessage(what,funcId,interval,instanceId);
+    }
+  }
+
+  private void removeOrHoldMessage(final int what,final int funcId) {
+    if(mWXSDKInstance.isPreRenderMode()) {
+      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableAction(new Runnable() {
+        @Override
+        public void run() {
+          handler.removeMessages(what, funcId);
+        }
+      }),false);
+    } else {
+      handler.removeMessages(what, funcId);
+    }
+  }
+
 }

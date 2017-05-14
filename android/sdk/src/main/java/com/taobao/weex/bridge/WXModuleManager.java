@@ -19,6 +19,7 @@
 package com.taobao.weex.bridge;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
 
@@ -28,7 +29,9 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -140,9 +143,12 @@ public class WXModuleManager {
 
     final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
-     return instance
-          .getNativeInvokeHelper()
-          .invoke(wxModule,invoker,args);
+      if(instance != null) {
+        return dispatchCallModuleMethod(instance,wxModule,args,invoker);
+      } else {
+        WXLogUtils.e("callModuleMethod >>> instance is null");
+        return null;
+      }
     } catch (Exception e) {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
@@ -150,6 +156,21 @@ public class WXModuleManager {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
         wxModule.mWXSDKInstance = null;
       }
+    }
+  }
+
+  private static Object dispatchCallModuleMethod(@NonNull WXSDKInstance instance, @NonNull WXModule wxModule,
+                                                 @NonNull JSONArray args, @NonNull Invoker invoker) throws Exception{
+    if(!instance.isPreRenderMode()) {
+      return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
+    }
+    // we are in preRender mode
+    if(invoker.isRunOnUIThread()) {/*ASYNC CALL*/
+      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
+      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
+      return null;
+    } else {/*SYNC CALL*/
+      return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
     }
   }
 

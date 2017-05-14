@@ -72,6 +72,9 @@ public class WXDomHandler implements Handler.Callback {
         mWXDomManager.batch();
         mHasBatch = false;
         break;
+      case MsgType.WX_CONSUME_RENDER_TASKS:
+        mWXDomManager.consumeRenderTask(task.instanceId);
+        break;
       default:
         break;
     }
@@ -114,6 +117,7 @@ public class WXDomHandler implements Handler.Callback {
 
     public static final int WX_EXECUTE_ACTION = 0xfe;
     public static final int WX_DOM_BATCH = 0xff;
+    public static final int WX_CONSUME_RENDER_TASKS = 0xfa;
 
     @Deprecated
     public static final int WX_COMPONENT_SIZE= 0xff1;

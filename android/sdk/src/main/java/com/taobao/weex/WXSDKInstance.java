@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -122,7 +123,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /**
    * Render start time
    */
-  private long mRenderStartTime;
+  //this field may accessed outside
+  public long mRenderStartTime;
   /**
    * Refresh start time
    */
@@ -132,6 +134,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private WXScrollViewListener mWXScrollViewListener;
 
   private List<OnWXScrollListener> mWXScrollListeners;
+
+  /**
+   * whether we are in preRender mode
+   * */
+  private volatile boolean isPreRenderMode;
+
+  private LayoutFinishListener mLayoutFinishListener;
+
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -625,6 +635,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
+
+  public boolean isPreRenderMode() {
+    return this.isPreRenderMode;
+  }
+
+  public void setPreRenderMode(final boolean isPreRenderMode) {
+    WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        WXSDKInstance.this.isPreRenderMode = isPreRenderMode;
+      }
+    },0);
+  }
+
+  public void replaceContext(@NonNull Context context) {
+    this.mContext = context;
+  }
+
   /********************************
    * begin register listener
    ********************************************************/
@@ -640,6 +668,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
   }
+
+  public void setLayoutFinishListener(@Nullable LayoutFinishListener listener) {
+    this.mLayoutFinishListener = listener;
+  }
+
+  public LayoutFinishListener getLayoutFinishListener() {
+    return this.mLayoutFinishListener;
+  }
+
 
   /********************************
    * end register listener

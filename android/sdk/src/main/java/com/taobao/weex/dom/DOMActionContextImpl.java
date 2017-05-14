@@ -227,17 +227,24 @@ class DOMActionContextImpl implements DOMActionContext {
     }
     parseAnimation();
 
-    int count = mNormalTasks.size();
-    for (int i = 0; i < count && !mDestroy; ++i) {
-      mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
+    boolean isPreRenderMode = instance != null && instance.isPreRenderMode();
+    if(!isPreRenderMode) {
+      consumeRenderTasks();
     }
-    mNormalTasks.clear();
     mAddDom.clear();
     animations.clear();
     mDirty = false;
     if (instance != null) {
       instance.batchTime(System.currentTimeMillis() - start0);
     }
+  }
+
+  void consumeRenderTasks() {
+    int count = mNormalTasks.size();
+    for (int i = 0; i < count && !mDestroy; ++i) {
+      mWXRenderManager.runOnThread(mInstanceId, mNormalTasks.get(i));
+    }
+    mNormalTasks.clear();
   }
 
   private class ApplyUpdateConsumer implements WXDomObject.Consumer{
