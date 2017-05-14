@@ -41,6 +41,7 @@
 #import "WXConfigCenterProtocol.h"
 #import "WXTextComponent.h"
 #import "WXConvert.h"
+#import "WXPrerenderManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -317,10 +318,16 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    if([[WXPrerenderManager sharedInstance] isTaskExist:[self.scriptURL absoluteString]])
+    {
+        return;
+    }
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    
+    [[WXPrerenderManager sharedInstance] destroyTask:self.instanceId];
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
 

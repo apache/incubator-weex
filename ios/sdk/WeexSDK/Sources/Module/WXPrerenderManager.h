@@ -36,7 +36,6 @@ typedef void (^PrerenderCallback) (PrerenderStatus status, NSString* urlStr, NSS
 - (instancetype) init NS_UNAVAILABLE;
 + (instancetype) sharedInstance;
 - (void) executeTask:(NSString *) urlStr WXInstance:(NSString *) instanceId callback:(WXModuleCallback)callback;
-- (void) cancelTask:(NSString *) instanceId;
 - (BOOL) isTaskExist:(NSString *)url;
 - (void) renderFromCache:(NSString *)url;
 - (UIView *)viewFromUrl:(NSString *)url;
@@ -44,4 +43,5 @@ typedef void (^PrerenderCallback) (PrerenderStatus status, NSString* urlStr, NSS
 -  (void)removePrerenderTaskforUrl:(NSString *)url;
 - (void)storePrerenderModuleTasks:(NSMutableDictionary *)prerenderModuleTask forUrl:(NSString *)url;
 - (void)excuteModuleTasksForUrl:(NSString *)url;
+- (void)destroyTask:(NSString *)parentInstanceId;
 @end

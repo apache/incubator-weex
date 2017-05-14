@@ -106,11 +106,8 @@
 
 - (void)dealloc
 {
-    if(![[WXPrerenderManager sharedInstance] isTaskExist:[self.url absoluteString]])
-    {
-        [_instance destroyInstance];
-    }
     
+    [_instance destroyInstance];
 #ifdef DEBUG
     [_instance forceGarbageCollection];
 #endif

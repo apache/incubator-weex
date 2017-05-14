@@ -80,16 +80,6 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     self.prerenderTasks = nil;
 }
 
-- (void) cancelTask:(NSString *)instanceId{
-    dispatch_async(self.queue, ^{
-        for(NSURLSessionDataTask *task in _prerenderTasks[instanceId]){
-            [task cancel];
-        }
-        
-        [_prerenderTasks removeObjectForKey:instanceId];
-    });
-}
-
 - (void) executeTask:(NSString *)urlStr WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback{
     NSURL *url = [NSURL URLWithString:urlStr];
     if(!url){
@@ -186,6 +176,8 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     return NO;
 }
 
+
+
 - (void) renderFromCache:(NSString *)url
 {
     if([self isTaskExist:url])
@@ -241,6 +233,26 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
             [method invoke];
         }
     }
+}
+
+- (void)destroyTask:(NSString *)parentInstanceId
+{
+    if(!self.prerenderTasks || [self.prerenderTasks count] == 0){
+        return;
+    }
+    
+    [self.prerenderTasks enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
+        WXPrerenderTask *task = self.prerenderTasks[key];
+        if ([task.parentInstanceId isEqualToString:parentInstanceId]) {
+            [self removeTask:task];
+        }
+    }];
+}
+
+- (void)removeTask:(WXPrerenderTask *)task
+{
+    [task.instance destroyInstance];
+    [self.prerenderTasks removeObjectForKey:task.url];
 }
 
 @end
