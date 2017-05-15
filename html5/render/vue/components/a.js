@@ -24,11 +24,27 @@ const _css = `
   text-decoration: none;
 }
 `
+let cnt = 0
 
 export default {
   name: 'weex-a',
   props: {
     href: String
+  },
+  mounted () {
+    const $el = this.$el
+    const id = $el.id
+
+    /**
+     * if there is a child component already triggered a click handler, then
+     * this link jumping should be prevented.
+     */
+    $el.addEventListener('click', (e) => {
+      const el = e._triggered && e._triggered.el
+      if (el && (el !== $el) && !el.querySelector(`#${id}`)) {
+        e.preventDefault()
+      }
+    })
   },
   render (createElement) {
     /* istanbul ignore next */
@@ -36,9 +52,11 @@ export default {
     //   validateStyles('a', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
     this._renderHook()
+    const id = cnt++
     return createElement('html:a', {
       attrs: {
         'weex-type': 'a',
+        'id': `weex-a-${id}`,
         href: this.href
       },
       on: createEventMap(this),

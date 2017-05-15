@@ -54,7 +54,7 @@ function getListeners (vnode, evt) {
 }
 
 const supportedEvents = [
-  'longpress', 'appear', 'disappear',
+  'tap', 'click', 'longpress', 'appear', 'disappear',
   // 'touchstart', 'touchmove', 'touchend',
   'panstart', 'panmove', 'panend', 'swipe', 'longpress'
 ]
@@ -72,8 +72,13 @@ export function createEventMap (context, extras = []) {
     return name => {
       const evtType = evt || name
       eventMap[evtType] = function (e) {
-        // no original bubbling.
-        e.stopPropagation()
+        /**
+         * allow original bubbling.
+         * use '_triggered' to control actural bubbling.
+         */
+        if (e._triggered) {
+          return
+        }
         // but should trigger the closest parent which has bound the
         // event handler.
         let vm = context
@@ -93,8 +98,11 @@ export function createEventMap (context, extras = []) {
           }
 
           // once a parent node (or self node) has triggered the handler,
-          // then it stops bubble immediately.
+          // then it stops bubble immediately, and a '_triggered' object is set.
           if (len > 0) {
+            e._triggered = {
+              el: vm.$el
+            }
             return
           }
           vm = vm.$parent
@@ -103,6 +111,7 @@ export function createEventMap (context, extras = []) {
     }
   }
   supportedEvents.concat(extras).forEach(bindFunc())
-  bindFunc('tap')('click')
+  // bindFunc('tap')('click')
+
   return eventMap
 }
