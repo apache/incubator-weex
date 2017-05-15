@@ -76,7 +76,8 @@ function getUnitScaleMap () {
 
 function limitScale (val, limit) {
   limit = limit || 1
-  return Math.abs(val) > limit ? val : Math.sign(val) * limit
+  const sign = val === 0 ? 0 : val > 0 ? 1 : -1
+  return Math.abs(val) > limit ? val : sign * limit
 }
 
 function parseScale (val: number, unit: string): string {

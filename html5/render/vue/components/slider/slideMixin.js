@@ -45,7 +45,8 @@ export default {
       const newIndex = this.normalizeIndex(index)
       const inner = this.$refs.inner
       const step = this._cells.length <= 1 ? 0 : this.currentIndex - index
-      this.innerOffset += Math.sign(step) * this.wrapperWidth
+      const sign = step === 0 ? 0 : step > 0 ? 1 : -1
+      this.innerOffset += sign * this.wrapperWidth
       if (inner) {
         // const match = (inner.style.transform || inner.style.webkitTransform).match(/(\d+)px/)
         // const currentOffset = parseFloat(match[1])
