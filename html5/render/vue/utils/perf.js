@@ -112,7 +112,7 @@ function collectStat (): void {
     bizType: 'weex',
     JSLibVersion: version
   })
-
+  const performance = window.performance
   // get templateUrl && JSTemplateSize
   const entries = performance && performance.getEntries && performance.getEntries()
   if (entries) {
@@ -145,10 +145,12 @@ export function collectStatPerf (name: string, val: string | number): void {
 }
 
 function getNow (): number {
+  const performance = window.performance
   return performance && performance.now ? performance.now() : new Date().getTime()
 }
 
 function getEntries (): Array<any> {
+  const performance = window.performance
   return performance && performance.getEntries
     ? performance.getEntries()
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
