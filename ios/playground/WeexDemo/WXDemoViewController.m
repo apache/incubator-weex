@@ -131,8 +131,13 @@
         self.weexView = [[WXPrerenderManager sharedInstance] viewFromUrl:self.url.absoluteString];
         [self.view addSubview:self.weexView];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.weexView);
+        __weak typeof(self) weakSelf = self;
         _instance.renderFinish = ^(UIView *view) {
             WXLogDebug(@"%@", @"Render Finish...");
+            [weakSelf updateInstanceState:WeexInstanceAppear];
+        };
+        _instance.updateFinish = ^(UIView *view) {
+            WXLogDebug(@"%@", @"Update Finish...");
         };
         [[WXPrerenderManager sharedInstance] renderFromCache:[self.url absoluteString]];
         return;

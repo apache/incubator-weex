@@ -83,7 +83,7 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 - (void) executeTask:(NSString *)urlStr WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback{
     NSURL *url = [NSURL URLWithString:urlStr];
     if(!url){
-        callback(@{@"url":urlStr,@"error":MSG_PRERENDER_INTERNAL_ERROR});
+        callback(@{@"url":urlStr,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
         return;
     }
     
@@ -93,6 +93,21 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     });
 }
 
+-(BOOL)isSwitchOn
+{
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        id switchOnValue = [configCenter configForKey:@"weex_prerender_config.is_switch_on" defaultValue:@true isDefault:NULL];
+        BOOL switchOn = YES; // defautle YES
+        if(switchOnValue){
+            switchOn = [switchOnValue boolValue];
+        }
+        if(!switchOn){
+            return NO;
+        }
+    }
+    return YES;
+}
 
 - (void) prerender:(NSURL *)url WXInstance:(NSString *)instanceId callback:(WXModuleCallback) callback{
 
@@ -102,18 +117,17 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     }
     WXPrerenderTask *task = [WXPrerenderTask new];
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        BOOL switchOn = [[configCenter configForKey:@"weex_prerender_config.is_switch_on" defaultValue:@false isDefault:NULL] boolValue];
-        if(!switchOn){
-            callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
-            return;
-        }
+    if(![self isSwitchOn]){
+        callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        return;
     }
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        long long time = [[configCenter configForKey:@"weex_prerender_config.time" defaultValue:@false isDefault:NULL] longLongValue];
+        long long time = [[configCenter configForKey:@"weex_prerender_config.time" defaultValue:@300000 isDefault:NULL] longLongValue];
+        task.beginDate = [NSDate date];
         if(time){
             task.cacheTime = time;
-            task.beginDate = [NSDate date];
+        }else {
+            task.cacheTime = 300000;
         }
     }
     WXSDKInstance *instance = [[WXSDKInstance alloc] init];
@@ -135,12 +149,6 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     instance.onFailed = ^(NSError *error) {
         
     };
-    
-    instance.renderFinish = ^(UIView *view) {
-        WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
-        task.state = WeexInstanceAppear;
-        [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
-    };
 }
 
 -(NSString *)prerenderUrl:(NSURL *)scriptUrl
@@ -157,12 +165,8 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     if(!task ){
         return NO;
     }
-    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
-    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        BOOL switchOn = [[configCenter configForKey:@"weex_prerender_config.is_switch_on" defaultValue:@false isDefault:NULL] boolValue];
-        if(!switchOn){
-            return NO;
-        }
+    if(![self isSwitchOn]){
+        return NO;
     }
     // compare cache time with begin time
     NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:task.beginDate];
@@ -175,8 +179,6 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     }
     return NO;
 }
-
-
 
 - (void) renderFromCache:(NSString *)url
 {
