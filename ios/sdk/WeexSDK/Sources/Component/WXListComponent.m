@@ -581,18 +581,20 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     [super scrollViewDidScroll:scrollView];
-    NSIndexPath *topCellPath = [[_tableView indexPathsForVisibleRows] objectAtIndex:0];
-    if (self.currentTopVisibleSection != topCellPath.section) {
-        if (self.currentTopVisibleSection) {
-            WXSection *removeSection = [_sections objectAtIndex:self.currentTopVisibleSection];
-            if (removeSection.header && [removeSection.header.events containsObject:@"unsticky"]) {
-                [removeSection.header fireEvent:@"unsticky" params:nil];
+    if ([[_tableView indexPathsForVisibleRows] count] > 0) {
+        NSIndexPath *topCellPath = [[_tableView indexPathsForVisibleRows] objectAtIndex:0];
+        if (self.currentTopVisibleSection != topCellPath.section) {
+            if (self.currentTopVisibleSection) {
+                WXSection *removeSection = [_sections objectAtIndex:self.currentTopVisibleSection];
+                if (removeSection.header && [removeSection.header.events containsObject:@"unsticky"]) {
+                    [removeSection.header fireEvent:@"unsticky" params:nil];
+                }
             }
-        }
-        self.currentTopVisibleSection = topCellPath.section;
-        WXSection *showSection = [_sections objectAtIndex:topCellPath.section];
-        if (showSection.header && [showSection.header.events containsObject:@"sticky"]) {
-            [showSection.header fireEvent:@"sticky" params:nil];
+            self.currentTopVisibleSection = topCellPath.section;
+            WXSection *showSection = [_sections objectAtIndex:topCellPath.section];
+            if (showSection.header && [showSection.header.events containsObject:@"sticky"]) {
+                [showSection.header fireEvent:@"sticky" params:nil];
+            }
         }
     }
 }
