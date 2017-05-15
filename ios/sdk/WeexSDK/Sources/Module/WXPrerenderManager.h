@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <WeexSDk/WeexSDK.h>
 
+@class WXModuleMethod;
 typedef NS_ENUM(NSUInteger, PrerenderStatus) {
     PrerenderSucceed = 0,
     PrerenderFail = 1,
@@ -39,9 +40,9 @@ typedef void (^PrerenderCallback) (PrerenderStatus status, NSString* urlStr, NSS
 - (BOOL) isTaskExist:(NSString *)url;
 - (void) renderFromCache:(NSString *)url;
 - (UIView *)viewFromUrl:(NSString *)url;
-- (id )instanceFromUrl:(NSString *)url;
--  (void)removePrerenderTaskforUrl:(NSString *)url;
-- (void)storePrerenderModuleTasks:(NSMutableDictionary *)prerenderModuleTask forUrl:(NSString *)url;
+- (id)instanceFromUrl:(NSString *)url;
+- (void)removePrerenderTaskforUrl:(NSString *)url;
+- (void)storePrerenderModuleTasks:(WXModuleMethod *)prerenderModuleTask forUrl:(NSString *)url;
 - (void)excuteModuleTasksForUrl:(NSString *)url;
 - (void)destroyTask:(NSString *)parentInstanceId;
 @end

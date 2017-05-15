@@ -46,7 +46,9 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
 @property (nonatomic, strong) NSMutableArray *cachedUrlList;
 @property (nonatomic, strong) dispatch_queue_t queue;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableDictionary*> *prerenderTasks;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, WXPrerenderTask*> *prerenderTasks;
+@property (nonatomic) NSInteger maxCacheNumber;
+
 
 @end
 
@@ -95,10 +97,10 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
 -(BOOL)isSwitchOn
 {
+    BOOL switchOn = YES; // defautle YES
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         id switchOnValue = [configCenter configForKey:@"weex_prerender_config.is_switch_on" defaultValue:@true isDefault:NULL];
-        BOOL switchOn = YES; // defautle YES
         if(switchOnValue){
             switchOn = [switchOnValue boolValue];
         }
@@ -121,13 +123,20 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
         return;
     }
+    task.beginDate = [NSDate date];
+    task.cacheTime = 300000;
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
         long long time = [[configCenter configForKey:@"weex_prerender_config.time" defaultValue:@300000 isDefault:NULL] longLongValue];
         task.beginDate = [NSDate date];
         if(time){
             task.cacheTime = time;
-        }else {
-            task.cacheTime = 300000;
+        }
+    }
+    self.maxCacheNumber = 1;
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        NSInteger max = [[configCenter configForKey:@"weex_prerender_config.max_cache_num" defaultValue:@1 isDefault:NULL] integerValue];
+        if(max){
+            self.maxCacheNumber = max;
         }
     }
     WXSDKInstance *instance = [[WXSDKInstance alloc] init];
@@ -136,19 +145,21 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     task.parentInstanceId = instanceId;
     task.url = url.absoluteString;
     
-    [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
     
-    [self.prerenderTasks setObject:task forKey:url.absoluteString];
-    __weak typeof(self) weakSelf = self;
-    instance.onCreate = ^(UIView *view) {
-        WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
-        task.view = view;
-        [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
-    };
-    
-    instance.onFailed = ^(NSError *error) {
+    if(!self.prerenderTasks || self.prerenderTasks.count<self.maxCacheNumber){
+        [self.prerenderTasks setObject:task forKey:url.absoluteString];
+        [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
+        __weak typeof(self) weakSelf = self;
+        instance.onCreate = ^(UIView *view) {
+            WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
+            task.view = view;
+            [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+        };
         
-    };
+        instance.onFailed = ^(NSError *error) {
+            
+        };
+    }
 }
 
 -(NSString *)prerenderUrl:(NSURL *)scriptUrl
@@ -191,7 +202,7 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         });
         __weak typeof(self) weakSelf = self;
         WXPerformBlockOnBridgeThread(^(){
-            [self excuteModuleTasksForUrl:url];
+            [weakSelf excuteModuleTasksForUrl:url];
         });
         
     }
