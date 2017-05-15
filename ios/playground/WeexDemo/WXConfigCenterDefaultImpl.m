@@ -33,7 +33,7 @@
     if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"is_switch_on"]){
         return @YES;
     }
-    if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"time"]){
+    if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"cacheTime"]){
         return @300000;
     }
     if ([keys[0] isEqualToString:@"weex_prerender_config"] && [keys[1] isEqualToString:@"max_cache_num"]){
