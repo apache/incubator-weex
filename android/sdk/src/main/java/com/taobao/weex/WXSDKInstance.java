@@ -123,8 +123,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   /**
    * Render start time
    */
-  //this field may accessed outside
-  public long mRenderStartTime;
+  private long mRenderStartTime;
   /**
    * Refresh start time
    */
@@ -649,7 +648,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     },0);
   }
 
-  public void replaceContext(@NonNull Context context) {
+  public void setContext(@NonNull Context context) {
     this.mContext = context;
   }
 
@@ -677,6 +676,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return this.mLayoutFinishListener;
   }
 
+
+  /**set render start time*/
+  public void setRenderStartTime(long renderStartTime) {
+    this.mRenderStartTime = renderStartTime;
+  }
 
   /********************************
    * end register listener

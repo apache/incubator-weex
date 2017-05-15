@@ -170,7 +170,7 @@ public class Actions {
   }
 
   public static DOMAction getExecutableAction(@NonNull Runnable runnable) {
-    return new ExecutableAction(runnable);
+    return new ExecutableRenderAction(runnable);
   }
 
 }

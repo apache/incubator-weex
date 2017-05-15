@@ -5,11 +5,11 @@ import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 
-class ExecutableAction implements DOMAction, RenderAction {
+class ExecutableRenderAction implements DOMAction, RenderAction {
 
     private Runnable mRunnable;
 
-    ExecutableAction(Runnable runnable) {
+    ExecutableRenderAction(Runnable runnable) {
         this.mRunnable = runnable;
     }
 
