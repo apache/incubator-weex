@@ -44,7 +44,9 @@ public class DefaultUriAdapter implements URIAdapter {
     Uri base = Uri.parse(instance.getBundleUrl());
     Uri.Builder resultBuilder = uri.buildUpon();
 
-    if (uri.isRelative()) {
+    if(uri.getEncodedPath().length() == 0){
+      return base;
+    }else if (uri.isRelative()) {
       resultBuilder = buildRelativeURI(resultBuilder, base, uri);
       return resultBuilder.build();
     }
