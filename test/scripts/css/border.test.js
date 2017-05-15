@@ -28,10 +28,6 @@ describe('border test', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
 
-  if (process.env.platform !== 'ios') {
-    return;
-  }
-
   before(function () {
     return util.init(driver)
       .get(util.getPage('/css/border.js'))
