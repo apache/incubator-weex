@@ -64,13 +64,12 @@ export default {
       // nextFrame()
 
       if (newIndex !== this.currentIndex) {
-        this.currentIndex = newIndex
         // replace $el with { attr, style } is a legacy usage. Is it necessary to
         // do this ? Or just tell devers to use inline functions to access attrs ?
         this.$emit('change', createEvent(this.$el, 'change', {
           index: this.currentIndex
         }))
-        setTimeout(() => { this.reorder() }, TRANSITION_TIME)
+        setTimeout(() => { this.reorder(newIndex) }, TRANSITION_TIME)
       }
     },
     order () {
@@ -84,7 +83,10 @@ export default {
         // this.reorder()
       })
     },
-    reorder () {
+    reorder (newIndex) {
+      if (!newIndex && newIndex !== 0) {
+        newIndex = this.currentIndex
+      }
       // dir: 'current' | 'prev' | 'next'
       const setPosition = (elm, dir) => {
         const scale = window.weex.config.env.scale
@@ -144,11 +146,11 @@ export default {
           return
         }
         const lastPrev = this._prevElm
-        const prevIndex = this.normalizeIndex(this.currentIndex - 1)
-        const nextIndex = this.normalizeIndex(this.currentIndex + 1)
+        const prevIndex = this.normalizeIndex(newIndex - 1)
+        const nextIndex = this.normalizeIndex(newIndex + 1)
         let prevElm = this._prevElm = this._cells[prevIndex].elm
         const nextElm = this._cells[nextIndex].elm
-        const currentElm = this._cells[this.currentIndex].elm
+        const currentElm = this._cells[newIndex].elm
 
         // put current slide on the top.
         setPosition(currentElm, 'current')
@@ -168,6 +170,7 @@ export default {
 
         setPosition(prevElm, 'prev')
         setPosition(nextElm, 'next')
+        this.currentIndex = newIndex
       })
     },
 

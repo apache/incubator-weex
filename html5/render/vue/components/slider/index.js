@@ -51,6 +51,10 @@ const _css = `
 export default {
   mixins: [slideMixin],
   props: {
+    index: {
+      type: [String, Number],
+      default: 0
+    },
     'auto-play': {
       type: [String, Boolean],
       default: false
@@ -63,13 +67,18 @@ export default {
       type: [String, Boolean],
       default: true
     }
+  },
 
+  watch: {
+    index () {
+      this.currentIndex = this.normalizeIndex(this.index)
+    }
   },
 
   data () {
     return {
-      currentIndex: 0,
-      frameCount: 0
+      frameCount: 0,
+      currentIndex: this.index
     }
   },
 
@@ -119,7 +128,6 @@ export default {
 
   created () {
     this.weexType = 'slider'
-    this.currentIndex = 0
     this.innerOffset = 0
     this._indicator = null
     this.$nextTick(() => {
