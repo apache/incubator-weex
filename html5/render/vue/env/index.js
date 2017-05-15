@@ -19,7 +19,6 @@
 import '../styles/reset.css'
 import '../styles/base.css'
 
-// import 'lazyimg'
 import '../../browser/render/gesture'
 
 import '../../../shared/arrayFrom'
