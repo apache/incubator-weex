@@ -126,8 +126,7 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     task.beginDate = [NSDate date];
     task.cacheTime = 300000;
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        long long time = [[configCenter configForKey:@"weex_prerender_config.time" defaultValue:@300000 isDefault:NULL] longLongValue];
-        task.beginDate = [NSDate date];
+        long long time = [[configCenter configForKey:@"weex_prerender_config.cacheTime" defaultValue:@300000 isDefault:NULL] longLongValue];
         if(time){
             task.cacheTime = time;
         }
@@ -144,7 +143,6 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     task.instance = instance;
     task.parentInstanceId = instanceId;
     task.url = url.absoluteString;
-    
     
     if(!self.prerenderTasks || self.prerenderTasks.count<self.maxCacheNumber){
         [self.prerenderTasks setObject:task forKey:url.absoluteString];
@@ -204,7 +202,6 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         WXPerformBlockOnBridgeThread(^(){
             [weakSelf excuteModuleTasksForUrl:url];
         });
-        
     }
 }
 
