@@ -318,8 +318,7 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
-    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]])
-    {
+    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
         return;
     }
     if (!self.instanceId) {
