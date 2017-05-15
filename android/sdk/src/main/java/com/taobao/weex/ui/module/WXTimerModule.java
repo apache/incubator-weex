@@ -160,7 +160,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void postOrHoldMessage(final int what,final int funcId,final int interval,final int instanceId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableAction(new Runnable() {
+      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
         @Override
         public void run() {
           postMessage(what,funcId,interval,instanceId);
@@ -173,7 +173,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
 
   private void removeOrHoldMessage(final int what,final int funcId) {
     if(mWXSDKInstance.isPreRenderMode()) {
-      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableAction(new Runnable() {
+      WXSDKManager.getInstance().getWXDomManager().postAction(mWXSDKInstance.getInstanceId(), Actions.getExecutableRenderAction(new Runnable() {
         @Override
         public void run() {
           handler.removeMessages(what, funcId);

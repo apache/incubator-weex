@@ -35,7 +35,6 @@ final class CreateFinishAction extends AbstractLayoutFinishAction {
   @Override
   public void executeDom(DOMActionContext context) {
     super.executeDom(context);
-    //add by chuyi
     final WXSDKInstance instance = context.getInstance();
     final LayoutFinishListener listener;
     if(instance != null && (listener = instance.getLayoutFinishListener()) != null) {

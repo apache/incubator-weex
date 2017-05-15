@@ -169,7 +169,7 @@ public class Actions {
     return new ModuleInvocationAction(wxModule, args, invoker);
   }
 
-  public static DOMAction getExecutableAction(@NonNull Runnable runnable) {
+  public static DOMAction getExecutableRenderAction(@NonNull Runnable runnable) {
     return new ExecutableRenderAction(runnable);
   }
 
