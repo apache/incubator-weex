@@ -202,10 +202,8 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         WXPerformBlockOnComponentThread(^{
             [task.instance.componentManager excutePrerenderUITask:url];
         });
-        WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-        __weak typeof(self) weakSelf = manager;
         WXPerformBlockOnBridgeThread(^(){
-            [weakSelf excuteModuleTasksForUrl:url];
+            [WXPrerenderManager excuteModuleTasksForUrl:url];
         });
     }
 }
@@ -250,9 +248,10 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     [manager.prerenderTasks setObject:task forKey:url];
 }
 
-- (void)excuteModuleTasksForUrl:(NSString *)url
++ (void)excuteModuleTasksForUrl:(NSString *)url
 {
-    WXPrerenderTask *task = [self.prerenderTasks objectForKey:url];
+    WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
+    WXPrerenderTask *task = [manager.prerenderTasks objectForKey:url];
     
     if (task.moduleTasks && [task.moduleTasks count]>0){
         for (WXModuleMethod *method in task.moduleTasks) {

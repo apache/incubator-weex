@@ -118,33 +118,12 @@
 - (void)render
 {
     CGFloat width = self.view.frame.size.width;
-    if([[WXPrerenderManager sharedInstance] isTaskExist:[self.url absoluteString]]){
-        _instance = [[WXPrerenderManager sharedInstance] instanceFromUrl:self.url.absoluteString];
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
-        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
-        _instance.viewController = self;
-        _instance.needPrerender = NO;
-        _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
-        [self.weexView removeFromSuperview];
-        self.weexView = [[WXPrerenderManager sharedInstance] viewFromUrl:self.url.absoluteString];
-        [self.view addSubview:self.weexView];
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.weexView);
-        __weak typeof(self) weakSelf = self;
-        _instance.renderFinish = ^(UIView *view) {
-            WXLogDebug(@"%@", @"Render Finish...");
-            [weakSelf updateInstanceState:WeexInstanceAppear];
-        };
-        _instance.updateFinish = ^(UIView *view) {
-            WXLogDebug(@"%@", @"Update Finish...");
-        };
-        [[WXPrerenderManager sharedInstance] renderFromCache:[self.url absoluteString]];
-        return;
-    }
-    
     [_instance destroyInstance];
     _instance = [[WXSDKInstance alloc] init];
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        _instance = [WXPrerenderManager instanceFromUrl:self.url.absoluteString];
+    }
+    
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
     
@@ -181,6 +160,20 @@
     };
     if (!self.url) {
         WXLogError(@"error: render url is nil");
+        return;
+    }
+    if([WXPrerenderManager isTaskExist:[self.url absoluteString]]){
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        UIView *view = [WXPrerenderManager viewFromUrl:self.url.absoluteString];
+        _instance.onCreate(view);
+        NSError *error = [WXPrerenderManager errorFromUrl:self.url.absoluteString];
+        if(error){
+            _instance.onFailed(error);
+        }
+        [WXPrerenderManager renderFromCache:[self.url absoluteString]];
         return;
     }
     NSURL *URL = [self testURL: [self.url absoluteString]];
