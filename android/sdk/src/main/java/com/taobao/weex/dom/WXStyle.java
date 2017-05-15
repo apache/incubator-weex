@@ -240,7 +240,9 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   /*
    * base
+   * @see getWidth(int viewport)
    **/
+  @Deprecated
   public float getWidth() {
     return WXUtils.getFloat(get(Constants.Name.WIDTH));
   }
@@ -257,6 +259,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return WXUtils.getFloat(get(Constants.Name.MAX_WIDTH));
   }
 
+  @Deprecated
   public float getHeight() {
     return WXUtils.getFloat(get(Constants.Name.HEIGHT));
   }
@@ -273,6 +276,30 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return WXUtils.getFloat(get(Constants.Name.MAX_HEIGHT));
   }
 
+
+  public float getWidth(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.WIDTH), viewport);
+  }
+
+  public float getMinWidth(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.MIN_WIDTH), viewport);
+  }
+
+  public float getMaxWidth(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.MAX_WIDTH), viewport);
+  }
+
+  public float getHeight(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.HEIGHT), viewport);
+  }
+
+  public float getMinHeight(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.MIN_HEIGHT), viewport);
+  }
+
+  public float getMaxHeight(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.MAX_HEIGHT), viewport);
+  }
   /*
    * border
    **/
@@ -284,10 +311,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return temp;
   }
 
-  public float getBorderTopWidth() {
-    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
-  }
-
   private float getBorderWidth(String key) {
     float temp = WXUtils.getFloat(get(key));
     if (WXUtils.isUndefined(temp)) {
@@ -296,13 +319,29 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return temp;
   }
 
+  private float getBorderWidth(String key, int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(key), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      return getBorderWidth(viewport);
+    }
+    return temp;
+  }
   //TODO fix : only when set backgroundColor
+  @Deprecated
   public float getBorderWidth() {
     return WXUtils.getFloat(get(Constants.Name.BORDER_WIDTH));
   }
 
+  public float getBorderWidth(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.BORDER_WIDTH), viewport);
+  }
+
   public float getBorderRightWidth() {
     return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
+  }
+
+  public float getBorderTopWidth() {
+    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
   }
 
   public float getBorderBottomWidth() {
@@ -311,6 +350,23 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public float getBorderLeftWidth() {
     return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
+  }
+
+
+  public float getBorderRightWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, viewport);
+  }
+
+  public float getBorderTopWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH, viewport);
+  }
+
+  public float getBorderBottomWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH, viewport);
+  }
+
+  public float getBorderLeftWidth(int viewport) {
+    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH, viewport);
   }
 
   public String getBorderColor() {
@@ -323,12 +379,22 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return borderStyle == null ? null : borderStyle.toString();
   }
 
+  @Deprecated
   public float getMargin(){
     return WXUtils.getFloat(get(Constants.Name.MARGIN));
   }
 
+  @Deprecated
   public float getPadding(){
     return WXUtils.getFloat(get(Constants.Name.PADDING));
+  }
+
+  public float getMargin(int viewport){
+    return WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+  }
+
+  public float getPadding(int viewport){
+    return WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
   }
 
   /*
@@ -367,6 +433,41 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   }
 
   /*
+   * margin
+   **/
+  public float getMarginTop(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_TOP), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginLeft(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_LEFT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginRight(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_RIGHT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  public float getMarginBottom(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN_BOTTOM), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.MARGIN), viewport);
+    }
+    return temp;
+  }
+
+  /*
    * padding
    **/
   public float getPaddingTop() {
@@ -397,6 +498,42 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     float temp = WXUtils.getFloat(get(Constants.Name.PADDING_BOTTOM));
     if (WXUtils.isUndefined(temp)) {
       temp = WXUtils.getFloat(get(Constants.Name.PADDING));
+    }
+    return temp;
+  }
+
+
+  /*
+   * padding
+   **/
+  public float getPaddingTop(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_TOP), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingLeft(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_LEFT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingRight(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_RIGHT), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
+    }
+    return temp;
+  }
+
+  public float getPaddingBottom(int viewport) {
+    float temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING_BOTTOM), viewport);
+    if (WXUtils.isUndefined(temp)) {
+      temp = WXUtils.getFloatByViewport(get(Constants.Name.PADDING), viewport);
     }
     return temp;
   }
@@ -442,6 +579,22 @@ public class WXStyle implements Map<String, Object>,Cloneable {
 
   public float getBottom() {
     return WXUtils.getFloat(get(Constants.Name.BOTTOM));
+  }
+
+  public float getLeft(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.LEFT), viewport);
+  }
+
+  public float getTop(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.TOP), viewport);
+  }
+
+  public float getRight(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.RIGHT), viewport);
+  }
+
+  public float getBottom(int viewport) {
+    return WXUtils.getFloatByViewport(get(Constants.Name.BOTTOM), viewport);
   }
 
   /*

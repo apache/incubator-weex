@@ -1,32 +1,31 @@
+<!-- 
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 <project xmlns:rat="antlib:org.apache.rat.anttasks"
     xmlns="antlib:org.apache.tools.ant">
     <rat:report>
         <fileset dir="../" includes="**/*.xml,**/*.m,**/*.h,**/*.mm,**/*.java,**/*.js">
-        <exclude name="**/scripts/*.xml"/>
-        <exclude name="**/ios/sdk/WeexSDKTests/*.js"/>
-        <exclude name="**/packages/weex-html5/demo/build/**.js"/>
-        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/*.*"/>
-        <exclude name="**/ios/sdk/WeexSDK/Resources/*.js"/>
-        <exclude name="**/ios/playground/bundlejs/**/*.js"/>
-        <exclude name="**/ios/playground/bundlejs/**/*.js"/>
-        <exclude name="**/doc/themes/**/*.js"/>
+        <exclude name="**/ios/sdk/WeexSDK/Sources/Layout/Layout.*"/>
         <exclude name="**/android/sdk/src/main/java/com/taobao/weex/dom/flex/*.java"/>
-        <exclude name="**/android/sdk/assets/**/*.js"/>
-        <exclude name="**/android/playground/app/src/main/java_zxing/**/*.java"/>
-        <exclude name="**/android/playground/app/src/main/assets/**/*.js"/>
-        <exclude name="**/html5/frameworks/legacy/*.js"/>
-        <exclude name="**/*.output.js"/>
-        <exclude name="**/html5/test/render/vue/vender/vue-*.js"/>
-        <exclude name="**/flow-typed/**/*.js"/>
         <!-- 
         exclude:
-        - generated js exmpales under ios folder
-        - weex html render builder artifacts 
         - ios test dependency folder
-        - generated js framework under ios and android sdk 
-        - third part js under doc theme folder
         - css layout source code under android sdk
-        - html 5 legacy framework
         -->
         </fileset>
     </rat:report>

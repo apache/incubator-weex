@@ -13,7 +13,7 @@ version: 2.1
 
 支持任意类型的 Weex 组件作为其子组件。 其中，还支持以下组件作为子组件展示特殊效果：
 
- - `<indicator>`：用于显示轮播图指示器效果，必须充当 [`<slider>`](./slider.html) 组件的子组件使用。
+- `<indicator>`：用于显示轮播图指示器效果，必须充当 [`<slider>`](./slider.html) 组件的子组件使用。
 
 ## 特性
 
@@ -22,6 +22,10 @@ version: 2.1
   该值决定是否自动播放轮播。重置 `loadmore` 相关的 UI，值不一样就会重置。
 
 - `interval {number}`：值为毫秒数，此值设定 slider 切换时间间隔。当 `auto-play` 值为 `true` 时生效。
+
+- `infinite {boolean}`：循环播放，可选值为 `true`/`false`，默认的是 `true`。
+
+- `offset-x-accuracy {float}`：设定 `scroll`事件触发精度，精度数值代表滚动距离占一页宽度的比例。
 
 ## 样式
 
@@ -41,6 +45,10 @@ version: 2.1
 
   事件中 event 对象属性：
   - `index`：展示的图片索引
+
+- `scroll` <sup class="wx-v">0.11+</sup>：滚动时触发这个事件。此事件回调中会给出当前`offsetXRatio`值。
+
+  [体验一下](http://dotwe.org/vue/832e8f50cc325975b9d3aba93a9f6c39)
 
 - 通用事件
 

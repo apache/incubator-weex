@@ -45,6 +45,42 @@ public class WXUtils {
     return Float.isNaN(value);
   }
 
+
+  public static float getFloatByViewport(Object value, int viewport) {
+    if (value == null) {
+      return Float.NaN;
+    }
+
+    String temp = value.toString().trim();
+    if (temp.endsWith("wx")) {
+      try {
+        return transferWx(temp, viewport);
+      } catch (NumberFormatException e) {
+        WXLogUtils.e("Argument format error! value is " + value, e);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
+      }
+    }else if (temp.endsWith("px")) {
+      try {
+        temp = temp.substring(0, temp.indexOf("px"));
+        return Float.parseFloat(temp);
+      } catch (NumberFormatException nfe) {
+        WXLogUtils.e("Argument format error! value is " + value, nfe);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
+      }
+    }else {
+      try {
+        return Float.parseFloat(temp);
+      } catch (NumberFormatException nfe) {
+        WXLogUtils.e("Argument format error! value is " + value, nfe);
+      } catch (Exception e) {
+        WXLogUtils.e("Argument error! value is " + value, e);
+      }
+    }
+    return Float.NaN;
+  }
+
   public static float getFloat(Object value) {
     return getFloat(value, Float.NaN);
   }
@@ -55,9 +91,12 @@ public class WXUtils {
     }
 
     String temp = value.toString().trim();
+    if(TextUtils.isEmpty(temp)){
+      return df;
+    }
     if (temp.endsWith("wx")) {
       try {
-        return transferWx(temp);
+        return transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {
@@ -84,7 +123,7 @@ public class WXUtils {
     return df;
   }
 
-  private static float transferWx(String stringWithWXPostfix) {
+  private static float transferWx(String stringWithWXPostfix, int viewport) {
     if(null == stringWithWXPostfix) {
       return 0;
     }
@@ -94,7 +133,7 @@ public class WXUtils {
     }
     Float f = Float.parseFloat(temp);
     float density = Float.parseFloat(WXEnvironment.getConfig().get(WXConfig.scale));
-    return density * f * WXSDKInstance.getViewPortWidth() / WXViewUtils.getScreenWidth();
+    return density * f * viewport / WXViewUtils.getScreenWidth();
   }
 
   public static float fastGetFloat(String raw, int precision){
@@ -168,8 +207,11 @@ public class WXUtils {
       String temp = value.toString().trim();
 
       if (temp.endsWith("wx")) {
+        if (WXEnvironment.isApkDebugable()) {
+          WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
+        }
         try {
-          return (int) transferWx(temp);
+          return (int) transferWx(temp, 750);
         } catch (NumberFormatException e) {
           WXLogUtils.e("Argument format error! value is " + value, e);
         } catch (Exception e) {
@@ -211,8 +253,11 @@ public class WXUtils {
     long result = 0;
     String temp = value.toString().trim();
     if (temp.endsWith("wx")) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
+      }
       try {
-        return (long)transferWx(temp);
+        return (long)transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {
@@ -252,8 +297,11 @@ public class WXUtils {
     double result = 0;
     String temp = value.toString().trim();
     if (temp.endsWith("wx")) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.w("the value of " + value + " use wx unit, which will be not supported soon after.");
+      }
       try {
-        return transferWx(temp);
+        return transferWx(temp, 750);
       } catch (NumberFormatException e) {
         WXLogUtils.e("Argument format error! value is " + value, e);
       } catch (Exception e) {

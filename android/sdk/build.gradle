@@ -1,24 +1,10 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.3'
-        classpath files('license/license-gradle-plugin-0.12.1.jar')
-        classpath files('license/maven-license-plugin-1.10.b1.jar')
-        classpath files('license/plexus-utils-3.0.24.jar')
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
 }
 
-
-plugins {
-    id "com.github.hierynomus.license" version "0.13.1"
-}
-
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'checkstyle'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
@@ -49,8 +35,8 @@ checkstyle {
 version = "0.9.4"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
     resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
@@ -60,6 +46,19 @@ android {
     def jsfmVersion = m[0][1]
     println jsfmVersion
 
+    if(project.hasProperty('asfRelease')){
+        //download so file if not exist, when compile in source release
+        download{
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/armeabi/libweexjsc.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/armeabi/libweexjsc.so"
+            overwrite false
+        }
+        download{
+            src 'https://git-wip-us.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexjsc.so;hb=refs/heads/master'
+            dest "${projectDir}/libs/x86/libweexjsc.so"
+            overwrite false
+        }
+    }
 
     def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexjsc.so").length();
     def X86_Size = new File(projectDir,"libs/x86/libweexjsc.so").length();
@@ -123,12 +122,12 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    provided 'com.android.support:recyclerview-v7:23.1.1'
-    provided 'com.android.support:support-v4:23.1.1'
-    provided 'com.android.support:appcompat-v7:23.1.1'
-    provided 'com.alibaba:fastjson:1.1.46.android'
+    provided "com.android.support:recyclerview-v7:${project.supportLibVersion}"
+    provided "com.android.support:support-v4:${project.supportLibVersion}"
+    provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
+    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
 
-    testCompile 'com.alibaba:fastjson:1.1.46.android'
+    testCompile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-core:1.3'
     testCompile 'org.javassist:javassist:3.20.0-GA'
@@ -145,25 +144,4 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.0'
     testCompile "org.robolectric:shadows-httpclient:3.0"
     testCompile 'org.json:json:20160212'
-}
-
-task licenseFormatWeex (type:nl.javadude.gradle.plugins.license.License) {
-    source = fileTree(dir: "../",
-            includes: [
-                    "sdk/src/main/java/**/*.java",
-                    "common/src/main/java/**/*.java",
-                    "playground/app/src/main/java/**/*.java"
-            ],
-            excludes: [
-            "**/dom/flex/*.java"
-            ])
-}
-
-license{
-    header=file("license/LICENSE")
-}
-preBuild.dependsOn licenseFormatWeex
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
 }
