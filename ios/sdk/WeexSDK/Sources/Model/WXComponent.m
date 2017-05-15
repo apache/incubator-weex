@@ -499,6 +499,11 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
+    
+    if (!attributes) {
+        return;
+    }
+    
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
