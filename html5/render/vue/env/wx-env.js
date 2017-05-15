@@ -33,8 +33,8 @@ export function initEnv (viewportInfo, envInfo) {
     platform: 'Web',
     weexVersion: 'process.env.WEEX_VERSION',
     userAgent: navigator.userAgent,
-    appName: navigator.appName,
-    appVersion: navigator.appVersion,
+    appName: browserName,
+    appVersion: browserVersion,
     osName: envInfo.browser ? envInfo.browser.name : null,
     osVersion: envInfo.browser ? envInfo.browser.version.val : null,
     deviceModel: envInfo.os.name || null
