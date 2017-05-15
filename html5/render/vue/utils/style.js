@@ -119,7 +119,13 @@ export function normalizeString (styleKey: string, styleVal: string): string {
 }
 
 export function autoPrefix (style: {}): {} {
-  return addPrefix(style)
+  const prefixed = addPrefix(style)
+  // flex only added WebkitFlex. Should add WebkitBoxFlex also.
+  const flex = prefixed.flex
+  if (flex) {
+    prefixed.WebkitBoxFlex = flex
+  }
+  return prefixed
 }
 
 export function normalizeNumber (styleKey: string, styleVal: number): string {

@@ -22,11 +22,11 @@ import {
   extend,
   extendTruthy,
   trimComment,
-  normalizeStyle
+  normalizeStyle,
+  autoPrefix
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 /* istanbul ignore next */
-import addPrefix from 'inline-style-prefixer/static'
 
 /**
  * get scoped class style map from stylesheets in <head>.
@@ -204,7 +204,7 @@ export function getComponentStyle (context, extract) {
     extend(style, getStyle(vnode, extract))
     vnode = vnode.parent
   }
-  style = addPrefix(style)
+  style = autoPrefix(style)
   /**
    * when prefixed value is a array, it should be applied to element
    * during the next tick.
