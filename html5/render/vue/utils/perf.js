@@ -114,7 +114,7 @@ function collectStat (): void {
   })
 
   // get templateUrl && JSTemplateSize
-  const entries = performance.getEntries && performance.getEntries()
+  const entries = performance && performance.getEntries && performance.getEntries()
   if (entries) {
     const params = window.lib.httpurl(location.href).params
     const bundle = params.page || params._wx_tpl
@@ -145,11 +145,11 @@ export function collectStatPerf (name: string, val: string | number): void {
 }
 
 function getNow (): number {
-  return performance.now ? performance.now() : new Date().getTime()
+  return performance && performance.now ? performance.now() : new Date().getTime()
 }
 
 function getEntries (): Array<any> {
-  return performance.getEntries
+  return performance && performance.getEntries
     ? performance.getEntries()
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }
