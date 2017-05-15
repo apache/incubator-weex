@@ -25,7 +25,8 @@
 #import <WeexSDK/WXSDKManager.h>
 #import "UIViewController+WXDemoNaviBar.h"
 #import "DemoDefine.h"
-
+#import "WXJSPrerenderManager.h"
+#import "WXSDKInstance_private.h"
 
 @interface WXDemoViewController () <UIScrollViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) WXSDKInstance *instance;
@@ -104,7 +105,12 @@
 
 - (void)dealloc
 {
-    [_instance destroyInstance];
+    NSMutableDictionary *m = [[WXJSPrerenderManager sharedInstance] prerenderTasksForUrl:[self.url absoluteString]];
+
+    if(!m)
+    {
+        [_instance destroyInstance];
+    }
     
 #ifdef DEBUG
     [_instance forceGarbageCollection];
@@ -116,12 +122,43 @@
 - (void)render
 {
     CGFloat width = self.view.frame.size.width;
+
+    
+    __weak typeof(self) weakSelf = self;
+
+    NSMutableDictionary *m = [[WXJSPrerenderManager sharedInstance] prerenderTasksForUrl:[self.url absoluteString]];
+    if(m){
+        _instance = [m objectForKey:@"instance"];
+//        _instance = [[WXSDKInstance alloc] init];
+        _instance.viewController = self;
+//        _instance.needPrerender = NO;
+        _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
+        
+        [self.weexView removeFromSuperview];
+        self.weexView = [m objectForKey:@"view"];
+        [self.view addSubview:weakSelf.weexView];
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.weexView);
+        _instance.renderFinish = ^(UIView *view) {
+            WXLogDebug(@"%@", @"Render Finish...");
+            [weakSelf updateInstanceState:WeexInstanceAppear];
+            [weakSelf excuteModuleTasksForUrl:weakSelf.url];
+        };
+        WXPerformBlockOnComponentThread(^{
+            [weakSelf.instance.componentManager excutePrerenderUITask:[[WXJSPrerenderManager sharedInstance] prerenderUrl:weakSelf.url]];
+
+        });
+        
+//        WXComponentManager *manager = _instance.componentManager;
+//        [manager excutePrerenderUITask:[self.url absoluteString]];
+//        [[WXJSPrerenderManager sharedInstance] removePrerenderTaskforUrl:[self.url absoluteString]];
+        return;
+    }
     [_instance destroyInstance];
+
     _instance = [[WXSDKInstance alloc] init];
     _instance.viewController = self;
     _instance.frame = CGRectMake(self.view.frame.size.width-width, 0, width, _weexHeight);
     
-    __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
         [weakSelf.weexView removeFromSuperview];
         weakSelf.weexView = view;
@@ -159,6 +196,12 @@
     NSURL *URL = [self testURL: [self.url absoluteString]];
     NSString *randomURL = [NSString stringWithFormat:@"%@%@random=%d",URL.absoluteString,URL.query?@"&":@"?",arc4random()];
     [_instance renderWithURL:[NSURL URLWithString:randomURL] options:@{@"bundleUrl":URL.absoluteString} data:nil];
+}
+
+- (void)excuteModuleTasksForUrl:(NSURL *)url
+{
+    WXJSPrerenderManager *m = [WXJSPrerenderManager sharedInstance];
+    [m excuteModuleTasksForUrl:[m prerenderUrl:url ]];
 }
 
 - (void)updateInstanceState:(WXState)state

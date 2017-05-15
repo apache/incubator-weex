@@ -18,6 +18,7 @@
  */
 
 #import "WXBridgeMethod.h"
+#import "WXModuleProtocol.h"
 
 typedef enum : NSUInteger {
     WXModuleMethodTypeSync,
@@ -35,5 +36,6 @@ typedef enum : NSUInteger {
                           instance:(WXSDKInstance *)instance;
 
 - (NSInvocation *)invoke;
+- (void)dispatchInvocation:(NSInvocation *)invocation moduleInstance:(id<WXModuleProtocol>)moduleInstance;
 
 @end

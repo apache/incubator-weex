@@ -18,7 +18,7 @@
 
 <template>
   <div class="wrapper" @click="update">
-    <image :src="logoUrl" class="logo"></image>
+    <image :src="logoUrl" :trackId="logoUrl" class="logo"></image>
     <text class="title">Hello {{target}}</text>
   </div>
 </template>
@@ -30,10 +30,14 @@
 </style>
 
 <script>
+  var modal = weex.requireModule('modal')
   module.exports = {
     data: {
       logoUrl: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png',
       target: 'World'
+    },
+    created: function() {
+      modal.toast({ message: "Click Alert OK Bnt!!" });
     },
     methods: {
       update: function (e) {

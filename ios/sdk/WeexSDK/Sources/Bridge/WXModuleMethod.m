@@ -27,6 +27,9 @@
 #import "WXSDKInstance_private.h"
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
+#import "WXModalUIModule.h"
+#import "WXJSPrerenderManager.h"
+#import "WXModalUIModule.h"
 
 @implementation WXModuleMethod
 
@@ -138,4 +141,8 @@
     }
 }
 
+- (void)dispatchInvocation:(NSInvocation *)invocation moduleInstance:(id<WXModuleProtocol>)moduleInstance;
+{
+    [self _dispatchInvocation:invocation moduleInstance:moduleInstance];
+}
 @end

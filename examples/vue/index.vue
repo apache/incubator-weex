@@ -3,6 +3,7 @@
 </template>
 
 <script>
+  var prerender = weex.requireModule('prerender')
   module.exports = {
     data: function () {
       var root = typeof window === 'object' ? 'vue-web/vue' : 'vue'
@@ -60,6 +61,8 @@
       if (platform === 'ios') {
         this.items.push({name: root + '/showcase/compositing', title: 'Compositing'})
       }
+      prerender.addTask('http://127.0.0.1:12580/examples/build/vue/syntax/hello-world.js',function(){});
+
     }
   }
 </script>

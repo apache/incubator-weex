@@ -2,15 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>wxpage</string>
-			</array>
-		</dict>
-	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -54,14 +45,14 @@
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>scan_history</string>
+			<key>UIApplicationShortcutItemSubtitle</key>
+			<string>history</string>
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Scan history</string>
 			<key>UIApplicationShortcutItemType</key>
 			<string>com.taobao.WeexDemo.scan.history</string>
-			<key>UIApplicationShortcutItemSubtitle</key>
-			<string>history</string>
-			<key>UIApplicationShortcutItemIconFile</key>
-			<string>scan_history</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconFile</key>

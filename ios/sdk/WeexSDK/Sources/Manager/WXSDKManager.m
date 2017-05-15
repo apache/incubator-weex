@@ -25,6 +25,7 @@
 @property (nonatomic, strong) WXBridgeManager *bridgeMgr;
 
 @property (nonatomic, strong) WXThreadSafeMutableDictionary *instanceDict;
+@property (nonatomic, strong) WXThreadSafeMutableDictionary *prerenderInstanceDict;
 
 @end
 
@@ -39,6 +40,7 @@ static WXSDKManager *_sharedInstance = nil;
         if (!_sharedInstance) {
             _sharedInstance = [[self alloc] init];
             _sharedInstance.instanceDict = [[WXThreadSafeMutableDictionary alloc] init];
+            _sharedInstance.prerenderInstanceDict = [[WXThreadSafeMutableDictionary alloc] init];
         }
     });
     return _sharedInstance;
@@ -85,5 +87,7 @@ static WXSDKManager *_sharedInstance = nil;
 {
     return nil;
 }
+
+
 
 @end
