@@ -124,33 +124,12 @@
     if (!sourceURL) {
         return;
     }
-
-    if([[WXPrerenderManager sharedInstance] isTaskExist:[self.sourceURL absoluteString]]){
-        _instance = [[WXPrerenderManager sharedInstance] instanceFromUrl:self.sourceURL.absoluteString];
-        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
-        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
-        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
-        _instance.viewController = self;
-        _instance.needPrerender = NO;
-        _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
-        [self.weexView removeFromSuperview];
-        self.weexView = [[WXPrerenderManager sharedInstance] viewFromUrl:self.sourceURL.absoluteString];
-        [self.view addSubview:self.weexView];
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, self.weexView);
-        __weak typeof(self) weakSelf = self;
-        _instance.renderFinish = ^(UIView *view) {
-            WXLogDebug(@"%@", @"Render Finish...");
-            [weakSelf _updateInstanceState:WeexInstanceAppear];
-        };
-        _instance.updateFinish = ^(UIView *view) {
-            WXLogDebug(@"%@", @"Update Finish...");
-        };
-        [[WXPrerenderManager sharedInstance] renderFromCache:[self.sourceURL absoluteString]];
-        return;
-    }
     
     [_instance destroyInstance];
+    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+        _instance = [WXPrerenderManager instanceFromUrl:self.sourceURL.absoluteString];
+    }
+
     _instance = [[WXSDKInstance alloc] init];
     _instance.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height);
     _instance.pageObject = self;
@@ -180,6 +159,21 @@
     _instance.renderFinish = ^(UIView *view) {
         [weakSelf _updateInstanceState:WeexInstanceAppear];
     };
+    
+    if([WXPrerenderManager isTaskExist:[self.sourceURL absoluteString]]){
+        WX_MONITOR_INSTANCE_PERF_START(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
+        WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
+        UIView *view = [WXPrerenderManager viewFromUrl:self.sourceURL.absoluteString];
+        _instance.onCreate(view);
+        NSError *error = [WXPrerenderManager errorFromUrl:self.sourceURL.absoluteString];
+        if(error){
+            _instance.onFailed(error);
+        }
+        [WXPrerenderManager renderFromCache:[self.sourceURL absoluteString]];
+        return;
+    }
 }
 
 - (void)_updateInstanceState:(WXState)state

@@ -318,7 +318,7 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
-    if([[WXPrerenderManager sharedInstance] isTaskExist:[self.scriptURL absoluteString]])
+    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]])
     {
         return;
     }
@@ -327,7 +327,7 @@ typedef enum : NSUInteger {
         return;
     }
     
-    [[WXPrerenderManager sharedInstance] destroyTask:self.instanceId];
+    [WXPrerenderManager destroyTask:self.instanceId];
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
 

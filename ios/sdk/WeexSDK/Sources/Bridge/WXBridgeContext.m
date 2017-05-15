@@ -142,7 +142,7 @@ _Pragma("clang diagnostic pop") \
         
         WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
         if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
-            [[WXPrerenderManager sharedInstance] storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
+            [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
             return nil;
         }
         return [method invoke];

@@ -36,13 +36,14 @@ typedef void (^PrerenderCallback) (PrerenderStatus status, NSString* urlStr, NSS
 
 - (instancetype) init NS_UNAVAILABLE;
 + (instancetype) sharedInstance;
-- (void) executeTask:(NSString *) urlStr WXInstance:(NSString *) instanceId callback:(WXModuleCallback)callback;
-- (BOOL) isTaskExist:(NSString *)url;
-- (void) renderFromCache:(NSString *)url;
-- (UIView *)viewFromUrl:(NSString *)url;
-- (id)instanceFromUrl:(NSString *)url;
-- (void)removePrerenderTaskforUrl:(NSString *)url;
-- (void)storePrerenderModuleTasks:(WXModuleMethod *)prerenderModuleTask forUrl:(NSString *)url;
-- (void)excuteModuleTasksForUrl:(NSString *)url;
-- (void)destroyTask:(NSString *)parentInstanceId;
++ (void) addTask:(NSString *) urlStr WXInstance:(NSString *) instanceId callback:(WXModuleCallback)callback;
++ (BOOL) isTaskExist:(NSString *)url;
++ (NSError *)errorFromUrl:(NSString *)url;
++ (void) renderFromCache:(NSString *)url;
++ (UIView *)viewFromUrl:(NSString *)url;
++ (id)instanceFromUrl:(NSString *)url;
++ (void)removePrerenderTaskforUrl:(NSString *)url;
++ (void)storePrerenderModuleTasks:(WXModuleMethod *)prerenderModuleTask forUrl:(NSString *)url;
++ (void)excuteModuleTasksForUrl:(NSString *)url;
++ (void)destroyTask:(NSString *)parentInstanceId;
 @end

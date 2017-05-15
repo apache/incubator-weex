@@ -50,7 +50,7 @@ WX_EXPORT_METHOD(@selector(addTask:callback:))
     
     _instanceId = [[self weexInstance] instanceId];
 
-    [[WXPrerenderManager sharedInstance] executeTask:urlStr WXInstance:[self.weexInstance instanceId] callback:callback];
+    [WXPrerenderManager addTask:urlStr WXInstance:[self.weexInstance instanceId] callback:callback];
 }
 
 @end
