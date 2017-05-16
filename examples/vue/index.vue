@@ -10,12 +10,13 @@
       return {
         items: [ 
           // common
-          {name: root + '/syntax/hello-world', title: 'Hello World'},
+          {name: root + '/hello', title: 'Hello World'},
           {name: root + '/style/index', title: 'Common Style'},
           {name: root + '/animation', title: 'Animation'},
 
           // component
           {name: root + '/components/text', title: 'Text'},
+          {name: root + 'iconfont', title: 'iconfont'},
           {name: root + '/components/image', title: 'Image'},
           {name: root + '/components/input', title: 'Input'},
           {name: root + '/components/scroller', title: 'Scroller'},
