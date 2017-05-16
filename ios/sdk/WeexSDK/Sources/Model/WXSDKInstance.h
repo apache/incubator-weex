@@ -69,6 +69,11 @@ extern NSString *const bundleUrlOptionKey;
 @property (nonatomic, strong) NSString *instanceId;
 
 /**
+ * Which indicates current instance needs to be prerender or not,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needPrerender;
+
+/**
  * The state of current instance.
  **/
 typedef NS_ENUM(NSInteger, WXState) {//state.code
