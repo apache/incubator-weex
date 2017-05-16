@@ -43,12 +43,15 @@ public class DefaultUriAdapter implements URIAdapter {
 
     Uri base = Uri.parse(instance.getBundleUrl());
     Uri.Builder resultBuilder = uri.buildUpon();
-
-    if(uri.getEncodedPath().length() == 0){
-      return base;
-    }else if (uri.isRelative()) {
-      resultBuilder = buildRelativeURI(resultBuilder, base, uri);
-      return resultBuilder.build();
+    
+   if (uri.isRelative()) {
+      //When uri is empty, means use the base url instead. Web broswer behave this way.
+      if(uri.getEncodedPath().length() == 0){
+        return base;
+      } else {
+        resultBuilder = buildRelativeURI(resultBuilder, base, uri);
+        return resultBuilder.build();
+      }
     }
     return uri;
   }
