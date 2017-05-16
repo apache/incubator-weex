@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <WeexSDk/WeexSDK.h>
+#import "WXModuleProtocol.h"
 
 @class WXModuleMethod;
 

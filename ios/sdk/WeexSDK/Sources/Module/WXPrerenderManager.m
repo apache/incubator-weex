@@ -23,6 +23,8 @@
 #import "WXBridgeManager.h"
 #import "WXSDKInstance_private.h"
 #import "WXBridgeManager.h"
+#import "WXSDKEngine.h"
+#import "WXUtility.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
