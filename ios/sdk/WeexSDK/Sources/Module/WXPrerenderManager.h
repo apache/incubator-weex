@@ -21,29 +21,68 @@
 #import <WeexSDk/WeexSDK.h>
 
 @class WXModuleMethod;
-typedef NS_ENUM(NSUInteger, PrerenderStatus) {
-    PrerenderSucceed = 0,
-    PrerenderFail = 1,
-};
-typedef NS_ENUM(NSUInteger, PrerenderTaskType) {
-    PrerenderUITaskType = 0,
-    PrerenderMethodType = 1,
-};
-
-typedef void (^PrerenderCallback) (PrerenderStatus status, NSString* urlStr, NSString * msg);
 
 @interface WXPrerenderManager : NSObject
 
 - (instancetype) init NS_UNAVAILABLE;
-+ (instancetype) sharedInstance;
-+ (void) addTask:(NSString *) urlStr WXInstance:(NSString *) instanceId callback:(WXModuleCallback)callback;
+
+/**
+ *  @abstract add prerender task
+ *
+ *  @param url The prerender url string
+ *
+ *  @param instanceId  The instanceId that its instance add prerender task
+ *
+ *  @param callback  the module method callback
+ *
+ **/
++ (void) addTask:(NSString *) url WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback;
+
+/**
+ *  @abstract Returns true if url is exist in task .
+ *
+ **/
 + (BOOL) isTaskExist:(NSString *)url;
+
+/**
+ *  @abstract Returns error if url is prerender fail .
+ *
+ **/
 + (NSError *)errorFromUrl:(NSString *)url;
+
+/**
+ *  @abstract excute render from prerender cache .
+ *
+ **/
 + (void) renderFromCache:(NSString *)url;
+
+/**
+ *  @abstract Returns prerender root view .
+ *
+ **/
 + (UIView *)viewFromUrl:(NSString *)url;
+
+/**
+ *  @abstract Returns prerender instance .
+ *
+ **/
 + (id)instanceFromUrl:(NSString *)url;
+
+/**
+ *  @abstract Remove prerender task by url .
+ *
+ **/
 + (void)removePrerenderTaskforUrl:(NSString *)url;
+
+/**
+ *  @abstract store prerender module task by url .
+ *
+ **/
 + (void)storePrerenderModuleTasks:(WXModuleMethod *)prerenderModuleTask forUrl:(NSString *)url;
-+ (void)excuteModuleTasksForUrl:(NSString *)url;
+
+/**
+ *  @abstract destroy task , it will destroy instance also.
+ *
+ **/
 + (void)destroyTask:(NSString *)parentInstanceId;
 @end

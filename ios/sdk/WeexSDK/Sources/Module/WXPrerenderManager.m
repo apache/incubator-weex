@@ -83,17 +83,17 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     self.prerenderTasks = nil;
 }
 
-+ (void) addTask:(NSString *)urlStr WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback{
-    NSURL *url = [NSURL URLWithString:urlStr];
-    if(!url){
-        callback(@{@"url":urlStr,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
++ (void) addTask:(NSString *)url WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback{
+    NSURL *newUrl = [NSURL URLWithString:url];
+    if(!newUrl){
+        callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
         return;
     }
     
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
     __weak WXPrerenderManager *weakSelf = manager;
     dispatch_async(manager.queue, ^{
-        [weakSelf prerender:url WXInstance:instanceId callback:callback];
+        [weakSelf prerender:newUrl WXInstance:instanceId callback:callback];
     });
 }
 
@@ -156,13 +156,17 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         instance.onCreate = ^(UIView *view) {
             WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
             task.view = view;
-            [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+            if(task){
+                [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+            }
         };
         
         instance.onFailed = ^(NSError *error) {
             WXPrerenderTask *task  = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
             task.error = error;
-            [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+            if(task){
+                [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+            }
         };
     }
 }
@@ -245,7 +249,9 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
         task.moduleTasks = [NSMutableArray new];
     }
     [task.moduleTasks addObject:method];
-    [manager.prerenderTasks setObject:task forKey:url];
+    if(task){
+        [manager.prerenderTasks setObject:task forKey:url];
+    }
 }
 
 + (void)excuteModuleTasksForUrl:(NSString *)url
