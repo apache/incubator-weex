@@ -35,6 +35,12 @@
   
 </template>
 <style>
+  .title1 {
+    color: red;
+    font-size: 36;
+    font-family: iconfont1;
+  }
+
   .title2 {
     color: gray;
     font-size: 36;
@@ -46,21 +52,42 @@
     font-size: 36;
     font-family: iconfont3;
   }
-  
-  @font-face {
-    font-family: 'iconfont2';
-    src:url('http://at.alicdn.com/t/font_1469606063_76593.ttf')
+
+  .title4 {
+    color: red;
+    font-size: 36;
+    font-family: iconfont4;
   }
-  
-  @font-face {
-    font-family: 'iconfont3';
-    src:url('http://at.alicdn.com/t/font_1469606522_9417143.woff')
-  }
-  
-  @font-face {
-    font-family: 'iconfont4';
-    src:url('http://at.alicdn.com/t/font_52q3wc15lk07wrk9.ttf')
-  }
-    
-  
 </style>
+
+<script>
+  module.exports = {
+    created: function() {
+
+      var domModule = weex.requireModule('dom');
+      //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
+      
+      domModule.addRule('fontFace', {
+        'fontFamily': "iconfont2",
+        'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+      });
+      domModule.addRule('fontFace', {
+        'fontFamily': "iconfont3",
+        'src': "url('http://at.alicdn.com/t/font_1469606522_9417143.woff')"
+      });
+      
+        domModule.addRule('fontFace', {
+        'fontFamily': "iconfont4",
+        'src': "url('http://at.alicdn.com/t/font_zn5b3jswpofuhaor.ttf')"
+      });
+
+
+      // you can use the absolute path or the local:// scheme path
+      //  domModule.addRule('fontFace', {
+      //   'fontFamily': "iconfont4",
+      //   'src': "url('file:///storage/emulated/0/Android/data/com.alibaba.weex/cache/http:__at.alicdn.com_t_font_1469606063_76593.ttf')"
+      // });
+      
+    }
+  }
+</script>

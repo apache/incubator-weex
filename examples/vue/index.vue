@@ -16,7 +16,7 @@
 
           // component
           {name: root + '/components/text', title: 'Text'},
-          {name: root + 'iconfont', title: 'iconfont'},
+          {name: root + '/iconfont', title: 'iconfont'},
           {name: root + '/components/image', title: 'Image'},
           {name: root + '/components/input', title: 'Input'},
           {name: root + '/components/scroller', title: 'Scroller'},
