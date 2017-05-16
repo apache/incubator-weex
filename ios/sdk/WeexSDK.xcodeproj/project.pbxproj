@@ -237,6 +237,8 @@
 		C401945E1E344E8300D19C31 /* WXFloatCompareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */; };
 		C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */; };
 		C41E1A981DC1FD15009C7F90 /* WXDatePickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */; };
+		C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */; };
+		C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */; };
 		C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = C4B3D6D21E6954300013F38D /* WXEditComponent.h */; };
 		C4B3D6D51E6954300013F38D /* WXEditComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B3D6D31E6954300013F38D /* WXEditComponent.m */; };
 		C4B834271DE69B09007AD27E /* WXPickerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C4B834251DE69B09007AD27E /* WXPickerModule.m */; };
@@ -553,6 +555,8 @@
 		C401945D1E344E8300D19C31 /* WXFloatCompareTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXFloatCompareTests.m; sourceTree = "<group>"; };
 		C41E1A951DC1FD15009C7F90 /* WXDatePickerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDatePickerManager.h; sourceTree = "<group>"; };
 		C41E1A961DC1FD15009C7F90 /* WXDatePickerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDatePickerManager.m; sourceTree = "<group>"; };
+		C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXPrerenderManager.h; sourceTree = "<group>"; };
+		C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXPrerenderManager.m; sourceTree = "<group>"; };
 		C4B3D6D21E6954300013F38D /* WXEditComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEditComponent.h; sourceTree = "<group>"; };
 		C4B3D6D31E6954300013F38D /* WXEditComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXEditComponent.m; sourceTree = "<group>"; };
 		C4B834251DE69B09007AD27E /* WXPickerModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXPickerModule.m; sourceTree = "<group>"; };
@@ -1058,6 +1062,8 @@
 		77E659D71C07F585008B8775 /* Module */ = {
 			isa = PBXGroup;
 			children = (
+				C43C03E41EC8ACA40044C7FF /* WXPrerenderManager.h */,
+				C43C03E51EC8ACA40044C7FF /* WXPrerenderManager.m */,
 				C4F012801E1502E9003378D0 /* WXWebSocketModule.h */,
 				C4F012811E1502E9003378D0 /* WXWebSocketModule.m */,
 				C4B834251DE69B09007AD27E /* WXPickerModule.m */,
@@ -1299,6 +1305,7 @@
 				59A582D41CF481110081FD3E /* WXAppMonitorProtocol.h in Headers */,
 				2A44AB111C1AD5B00067A7EA /* WXSliderComponent.h in Headers */,
 				2A837AB61CD9DE9200AEDF03 /* WXRefreshComponent.h in Headers */,
+				C43C03E81EC8ACA40044C7FF /* WXPrerenderManager.h in Headers */,
 				74B232D21D2A2BA4006322EA /* WXLayoutDefine.h in Headers */,
 				C4B834281DE69B09007AD27E /* WXPickerModule.h in Headers */,
 				59A596311CB632050012CD52 /* WXRootViewController.h in Headers */,
@@ -1546,6 +1553,7 @@
 				77E65A1A1C155F25008B8775 /* WXScrollerComponent.m in Sources */,
 				747A787D1D1BAAC900DED9D0 /* WXComponent+ViewManagement.m in Sources */,
 				C4E375371E5FCBD3009B2D9C /* WXComponent+BoxShadow.m in Sources */,
+				C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */,
 				2A837AB51CD9DE9200AEDF03 /* WXLoadingIndicator.m in Sources */,
 				C4F012831E1502E9003378D0 /* WXWebSocketModule.m in Sources */,
 				59D3CA401CF9ED57008835DC /* Layout.c in Sources */,
