@@ -569,7 +569,7 @@ static BOOL WXNotStat;
                 [mgr createDirectoryAtPath:[file stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
             }
             
-            BOOL result = [data writeToFile:downloadPath atomically:NO];
+            BOOL result = [data writeToFile:downloadPath.path atomically:NO];
             if (!result) {
                 downloadPath = nil;
             }
