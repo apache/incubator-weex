@@ -149,7 +149,7 @@ export function getScopeId (vnode) {
 export function getScopeStyle (vnode, classNames) {
   const scopeId = getScopeId(vnode)
   const style = {}
-  const styleMap = weex.styleMap
+  const styleMap = weex.styleMap || {}
   let clsNmsIdx = 0
   const clsNmsLen = classNames.length
   while (clsNmsIdx < clsNmsLen) {
