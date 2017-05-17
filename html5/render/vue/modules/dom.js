@@ -64,7 +64,12 @@ function step (context) {
   context.method.call(context.scrollable, context.dSuffix, currentPosition)
 
   // return when end points have been reached
-  if (currentPosition === context.position) {
+  /**
+   * NOTE: should use ~~ to parse position number into integer. Otherwise
+   * this two float numbers maybe have a slicely little difference, which
+   * will cause this function never to stop.
+   */
+  if (~~currentPosition === ~~context.position) {
     window.cancelAnimationFrame(context.frame)
     return
   }
