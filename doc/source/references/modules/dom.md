@@ -257,7 +257,7 @@ Example Useage:
 
 
 ### addRule
-<sup class="wx-v">0.12.0</sup>
+`support:v0.12.0`
 
 you can add your rule for dom by this, now we support `fontFace` only for building your custom `font-family`, use it on [text](../components/text.html#iconfont) directly.
 

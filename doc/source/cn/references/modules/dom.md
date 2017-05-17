@@ -259,9 +259,9 @@ version: 2.1
 
 
 ### addRule
-<sup class="wx-v">0.12.0</sup>
+`支持版本:v0.12.0`
 
-addRule是可以为dom 添加一条规则，目前支持自定义字体fontFace规则，构建自定义的font-family，可以在[text](../components/text.html#iconfont)
+addRule是可以为dom 添加一条规则，目前支持自定义字体fontFace规则，构建自定义的font-family，可以在[text](../components/text.html#iconfont)使用
 
 #### fontFace
 
