@@ -96,3 +96,36 @@ check out [common events](../common-event.html)
 ```
 
 [try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)
+
+##iconfont
+<sup class="wx-v">0.12.0</sup>
+
+1. support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`
+
+
+```
+<template>
+    <div style='flex-direction:row;margin-top:50px'>
+        <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
+        <text style='font-family:iconfont4;font-size:50;'>&#xe614;&#xe612;&#xe613;&#xe61d;&#xe714;</text>
+        <text style='font-family:iconfont4;font-size:60;color:blue'>&#xe711;</text>
+        <text style='font-family:iconfont4;font-size:60;color:green'>&#xe71c;&#xe60b;</text>
+    </div>
+</template>
+<script>
+    module.exports = {
+        created: function() {
+
+        var domModule = weex.requireModule('dom');
+        //目前支持ttf、woff文件，不支持svg、eot类型,moreItem at http://www.iconfont.cn/
+
+        domModule.addRule('fontFace', {
+            'fontFamily': "iconfont2",
+            'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+        });
+    }
+}
+</script>
+```
+
+[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)
