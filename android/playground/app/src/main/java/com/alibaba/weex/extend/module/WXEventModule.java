@@ -24,9 +24,11 @@ import android.text.TextUtils;
 
 import com.alibaba.weex.WXPageActivity;
 import com.taobao.weex.annotation.JSMethod;
+import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class WXEventModule extends WXModule {
@@ -62,6 +64,22 @@ public class WXEventModule extends WXModule {
       params.put("param2","param2");
       params.put("param3","param3");
       mWXSDKInstance.fireModuleEvent("event", this, params);
+    }
+  }
+  /*
+   * a test method for macaca case, you can fire globalEvent when download finish、device shaked and so on.
+   * @param event event name
+  * */
+  @JSMethod(uiThread = true)
+  public void fireNativeGlobalEvent(String event, JSCallback callback) {
+    Map<String,Object> params=new HashMap<String,Object>();
+    params.put("eventParam","value");
+
+    mWXSDKInstance.fireGlobalEventCallback(event, params);
+    if (null != callback) {
+      Map<String, Boolean> result = new HashMap<String, Boolean>();
+      result.put("ok",true);
+      callback.invoke(result);
     }
   }
 }
