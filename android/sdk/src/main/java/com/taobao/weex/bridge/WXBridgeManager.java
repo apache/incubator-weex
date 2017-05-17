@@ -249,6 +249,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.taobao.weex.bridge.WXModuleManager.getDomModule;
 
@@ -329,9 +330,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     return mInit;
   }
 
-  private List<Map<String, Object>> mRegisterComponentFailList = new ArrayList<>(8);
-  private List<Map<String, Object>> mRegisterModuleFailList = new ArrayList<>(8);
-  private List<String> mRegisterServiceFailList = new ArrayList<>(8);
+  private List<Map<String, Object>> mRegisterComponentFailList = new CopyOnWriteArrayList<>();
+  private List<Map<String, Object>> mRegisterModuleFailList = new CopyOnWriteArrayList<>();
+  private List<String> mRegisterServiceFailList = new CopyOnWriteArrayList<>();
 
   private List<String> mDestroyedInstanceId = new ArrayList<>();
 
