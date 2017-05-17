@@ -4,7 +4,7 @@
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.20.5",
-    "vue-render": "0.11.34",
+    "vue-render": "0.11.35",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
