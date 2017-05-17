@@ -29,8 +29,9 @@ version: 2.1
 #### 参数
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
-  - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
- - `animated {bool}`：设置是否有滚动动画，默认是 true
+- `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
+- `animated {boolean}` <sup class="wx-v">0.10+</sup>：是否需要附带滚动动画，默认是`true`
+
 #### 示例
 
 ```html

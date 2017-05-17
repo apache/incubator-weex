@@ -22,10 +22,8 @@ version: 2.1
   该值决定是否自动播放轮播。重置 `loadmore` 相关的 UI，值不一样就会重置。
 
 - `interval {number}`：值为毫秒数，此值设定 slider 切换时间间隔。当 `auto-play` 值为 `true` 时生效。
-
 - `infinite {boolean}`：循环播放，可选值为 `true`/`false`，默认的是 `true`。
-
-- `offset-x-accuracy {float}`：设定 `scroll`事件触发精度，精度数值代表滚动距离占一页宽度的比例。
+- `offset-x-accuracy {number}`<sup class="wx-v">0.11+</sup>：控制`onscroll`事件触发的频率，默认值为10，表示两次`onscroll`事件之间Slider Page至少滚动了10px。注意，将该值设置为较小的数值会提高滚动事件采样的精度，但同时也会降低页面的性能。
 
 ## 样式
 
@@ -45,10 +43,11 @@ version: 2.1
 
   事件中 event 对象属性：
   - `index`：展示的图片索引
-
-- `scroll` <sup class="wx-v">0.11+</sup>：滚动时触发这个事件。此事件回调中会给出当前`offsetXRatio`值。
-
+  - `scroll` <sup class="wx-v">0.11+</sup>: 列表发生滚动时将会触发该事件，事件的默认抽样率为10px，即列表每滚动10px触发一次，可通过属性`offset-accuracy`设置抽样率。    
   [体验一下](http://dotwe.org/vue/832e8f50cc325975b9d3aba93a9f6c39)
+  事件中 event 对象属性：  
+  - `offsetXRatio {number}`：表示当前页面的偏移比例，取值范围为[-1, 1]，负值表示向左侧滚动，正值向右。例如，`-0.2`表示当前item有20%的区域被滚动到slider左侧边界以外，`0.3`表示当前item有30%的区域被滚动到slider右侧边界以外。
+
 
 - 通用事件
 
