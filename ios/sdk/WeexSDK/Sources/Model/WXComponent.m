@@ -248,6 +248,7 @@
         }
         
         [self setNeedsDisplay];
+        [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
         
         if (_lazyCreateView) {
