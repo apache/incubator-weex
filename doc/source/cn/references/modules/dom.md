@@ -257,14 +257,14 @@ version: 2.1
 [try it](http://dotwe.org/vue/d069a9bf0f0781b914f12a9a7b9a1447)
 
 
-###addRule
+### addRule
 <sup class="wx-v">0.12.0</sup>
 
 addRule是可以为dom 添加一条规则，目前支持自定义字体fontFace规则，构建自定义的font-family，可以在[text](../components/text.html#iconfont)
 
-####fontFace
+#### fontFace
 
-```
+```html
 var domModule = weex.requireModule('dom');
 domModule.addRule('fontFace', {
     'fontFamily': "iconfont2",

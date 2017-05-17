@@ -256,14 +256,14 @@ Example Useage:
 [try it](http://dotwe.org/vue/87d4ed571de129ab28052b06a5d65fc8)
 
 
-###addRule
+### addRule
 <sup class="wx-v">0.12.0</sup>
 
 you can add your rule for dom by this, now we support `fontFace` only for building your custom `font-family`, use it on [text](../components/text.html#iconfont) directly.
 
-####fontFace
+#### fontFace
 
-```
+```html
 var domModule = weex.requireModule('dom');
 domModule.addRule('fontFace', {
     'fontFamily': "iconfont2",

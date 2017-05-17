@@ -97,13 +97,14 @@ check out [common events](../common-event.html)
 
 [try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)
 
-##iconfont
-<sup class="wx-v">0.12.0</sup>
+## iconfont
 
-1. support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`
+`support:v0.12.0`
+
+support `ttf` and `woff` font format to custom your text, call [addRule](../modules/dom.html#addRule) in dom module to build your own `font-family`
 
 
-```
+```html
 <template>
     <div style='flex-direction:row;margin-top:50px'>
         <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>

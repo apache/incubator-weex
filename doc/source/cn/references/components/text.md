@@ -100,11 +100,13 @@ version: 2.1
 
 [try it](http://dotwe.org/vue/154e20171d350a081fba7878c53cf7d2)
 
-## iconfont
-<sup class="wx-v">0.12.0</sup>
-1. 支持ttf和woff字体格式的自定义字体, 可以通过调用`dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用
+## iconfont 
 
-```
+`支持版本:v0.12.0`
+
+支持ttf和woff字体格式的自定义字体, 可以通过调用`dom` module 里面的 [addRule](../modules/dom.html#addRule)方法, 构建自定义的`font-family`使用
+
+```html
 <template>
     <div style='flex-direction:row;margin-top:50px'>
         <text style='font-family:iconfont4;font-size:50;color:green'>&#xe614;&#xe612;&#xe613;</text>
