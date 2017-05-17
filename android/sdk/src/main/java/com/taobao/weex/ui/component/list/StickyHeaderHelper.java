@@ -53,7 +53,7 @@ public class StickyHeaderHelper {
     mHeaderComps.put(component.getRef(),component);
     if(mCurrentStickyRef != null){
       WXCell cell = mHeaderComps.get(mCurrentStickyRef);
-      if(component.getScrollPositon() > cell.getScrollPositon()){
+      if(cell ==null || component.getScrollPositon() > cell.getScrollPositon()){
         mCurrentStickyRef = component.getRef();
       }
     }else{

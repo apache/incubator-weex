@@ -18,42 +18,43 @@
  */
 'use strict';
 
+var _ = require('macaca-utils');
 var assert = require('chai').assert
 var wd = require('weex-wd')
 var path = require('path');
+var os = require('os');
 var util = require("../util.js");
-var assert = require('chai').assert
 
-describe('border test', function () {
+describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
   before(function () {
     return util.init(driver)
-      .get(util.getPage('/css/border.js'))
-      .waitForElementById('test-text',util.getGETActionWaitTimeMills() + 2000,1000)
+      .get(util.getPage('/modules/globalEvent.js'))
+      .waitForElementById('button',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
-    return util.quit(driver);
+      return util.quit(driver)
   })
 
-
-  it('#1 border screenshot diff', () => {
-    return driver
-    .takeScreenshot()
-    .then(imgData => {
-      var newImg = new Buffer(imgData, 'base64');
-      var screenshotFolder = path.resolve(__dirname, '../../screenshot');
-      var oldImgPath = path.join(screenshotFolder, process.env.platform === 'android' ? 'border-android.png' : 'border-ios.png');
-      var diffImgPath = path.join(screenshotFolder, process.env.platform === 'android' ? 'border-android-diff.png' : 'border-ios-diff.png');
-      return util.diffImage(oldImgPath, newImg, 1, diffImgPath);
+  it('#0 fireEvent',()=>{
+      return driver
+      .elementById("button")
+      .click()
+      .sleep(2000)
+      .text()
+      .then((elem)=>{
+        assert.equal(elem, "posted")
     })
-    .then(result => {
-      console.log(result)
-      assert.isOk(result)
+  })
+
+  it('#1 received event', ()=>{
+    return driver
+    .elementById("content")
+    .text()
+    .then((elem)=>{
+        assert.equal(elem, "I received event")
     })
   })
 });
-
-
