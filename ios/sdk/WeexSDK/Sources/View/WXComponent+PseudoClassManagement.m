@@ -29,7 +29,10 @@
 -(NSMutableDictionary *)parseStyles:(NSDictionary *)styles
 {
     NSMutableDictionary *newStyles = [NSMutableDictionary new];
-    _pseudoClassStyles = [NSMutableDictionary new];
+    if(!_pseudoClassStyles)
+    {
+        _pseudoClassStyles = [NSMutableDictionary new];
+    }
     if (styles && [styles count] > 0 ) {
         for (NSString *key in styles){
             if([key rangeOfString:@":"].location != NSNotFound){
