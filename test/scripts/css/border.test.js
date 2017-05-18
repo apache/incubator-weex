@@ -47,7 +47,7 @@ describe('border test', function () {
       var screenshotFolder = path.resolve(__dirname, '../../screenshot');
       var oldImgPath = path.join(screenshotFolder, process.env.platform === 'android' ? 'border-android.png' : 'border-ios.png');
       var diffImgPath = path.join(screenshotFolder, process.env.platform === 'android' ? 'border-android-diff.png' : 'border-ios-diff.png');
-      return util.diffImage(oldImgPath, newImg, 1, diffImgPath);
+      return util.diffImage(oldImgPath, newImg, 100, diffImgPath);
     })
     .then(result => {
       console.log(result)
