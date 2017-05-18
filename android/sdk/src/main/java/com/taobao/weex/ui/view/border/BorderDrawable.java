@@ -154,7 +154,6 @@ public class BorderDrawable extends Drawable {
 
   }
 
-  @SuppressWarnings("WrongConstant")
   @Override
   public int getOpacity() {
     return mShader!=null?PixelFormat.OPAQUE:
