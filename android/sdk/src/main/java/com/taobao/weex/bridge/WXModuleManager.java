@@ -26,6 +26,7 @@ import android.view.Menu;
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
@@ -35,6 +36,7 @@ import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,6 +56,13 @@ public class WXModuleManager {
   private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
+
+  /**
+   * monitor keys
+   */
+  private static String MONITOR_ERROR_CODE = "errCode";
+  private static String MONITOR_ARG = "arg";
+  private static String MONITOR_ERROR_MSG = "errMsg";
 
   /**
    * module object dictionary
@@ -144,6 +153,14 @@ public class WXModuleManager {
     final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
       if(instance != null) {
+        IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+        if(userTrackAdapter != null) {
+          HashMap<String, Serializable> data = new HashMap<String, Serializable>();
+          data.put(MONITOR_ERROR_CODE, "101");
+          data.put(MONITOR_ARG, moduleStr + "." + methodStr);
+          data.put(MONITOR_ERROR_MSG, instance.getBundleUrl());
+          userTrackAdapter.commit(instance.getContext(), null, IWXUserTrackAdapter.INVOKE_MODULE, null, data);
+        }
         return dispatchCallModuleMethod(instance,wxModule,args,invoker);
       } else {
         WXLogUtils.e("callModuleMethod >>> instance is null");
