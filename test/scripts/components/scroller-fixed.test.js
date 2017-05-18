@@ -42,10 +42,7 @@ describe('scroller fixed position item ', function () {
 
   it('#1 position:fixed items', () => {
     return driver
-    .touch('drag', {fromX:200, fromY:500, toX:200, toY: 400})
-    .sleep(2000)
-    .touch('drag', {fromX:200, fromY:400, toX:200, toY: 500})
-    .sleep(2000)
+    .dragUpAndDown()
     .elementByXPath('//scroller[1]/div[1]/text[1]')
     .text()
     .then((text)=>{
