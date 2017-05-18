@@ -9,6 +9,7 @@
     "server": "hexo server"
   },
   "dependencies": {
+    "cheerio": "^0.20.0",
     "hexo": "^3.2.2",
     "hexo-autoprefixer": "^1.0.0",
     "hexo-deployer-git": "git@github.com:Jinjiang/hexo-deployer-git.git",
