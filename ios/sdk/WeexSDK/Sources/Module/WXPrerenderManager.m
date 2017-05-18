@@ -179,6 +179,9 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
 - (BOOL)isTaskExist:(NSString *)url
 {
+    if( !url ||url.length == 0){
+        return NO;
+    }
     WXPrerenderTask *task  = [self.prerenderTasks objectForKey:url];
     if(!task ){
         return NO;
