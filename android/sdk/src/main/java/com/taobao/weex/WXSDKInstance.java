@@ -347,6 +347,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param jsonInitData Initial data for rendering
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
+  @Deprecated
   public void render(String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     render(WXPerformance.DEFAULT, template, options, jsonInitData, flag);
   }
@@ -371,6 +372,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
+       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
+       return;
+    }
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
