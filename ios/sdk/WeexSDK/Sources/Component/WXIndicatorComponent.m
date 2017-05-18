@@ -167,6 +167,9 @@
     _indicatorView.lightColor = _itemSelectedColor;
     _indicatorView.pointSize = _itemSize;
     
+    if (self.delegate && [self.delegate respondsToSelector:@selector(setIndicatorView:)]) {
+        [self.delegate setIndicatorView:_indicatorView];
+    }
     
 }
 
