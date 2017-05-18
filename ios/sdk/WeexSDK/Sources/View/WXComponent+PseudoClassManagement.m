@@ -29,8 +29,7 @@
 -(NSMutableDictionary *)parseStyles:(NSDictionary *)styles
 {
     NSMutableDictionary *newStyles = [NSMutableDictionary new];
-    if(!_pseudoClassStyles)
-    {
+    if(!_pseudoClassStyles) {
         _pseudoClassStyles = [NSMutableDictionary new];
     }
     if (styles && [styles count] > 0 ) {
