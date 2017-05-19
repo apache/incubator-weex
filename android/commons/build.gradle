@@ -37,7 +37,7 @@ dependencies {
     compile project(':weex_sdk')
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.facebook.fresco:fresco:0.10.0'
-    compile 'com.taobao.android.weex_inspection:protocol:1.1.2'
+    compile 'com.taobao.android.weex_inspection:protocol:1.1.4.1'
 
     provided 'com.taobao.android:weex_analyzer:0.1.0.5'
     provided 'com.squareup.okhttp:okhttp:2.3.0'
