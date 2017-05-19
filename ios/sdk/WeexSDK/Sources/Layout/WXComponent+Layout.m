@@ -119,6 +119,7 @@
             
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
+                strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
                 [strongSelf configBoxShadow:_boxShadow];
             } else {
                 if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
