@@ -485,16 +485,17 @@ if ([removeEventName isEqualToString:@#eventName]) {\
              eventName = @"panmove";
         }
         state = @"move";
+    } else if (gesture.state == UIGestureRecognizerStateCancelled) {
+        state = @"cancel";
     }
-    
     
     CGPoint translation = [_panGesture translationInView:self.view];
     
-    if (_listenHorizontalPan && fabs(translation.y) <= fabs(translation.x)) {
+    if (_listenHorizontalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) <= fabs(translation.x))) {
         [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
-    if (_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+    if (_listenVerticalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) > fabs(translation.x))) {
         [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
