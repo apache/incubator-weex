@@ -181,20 +181,7 @@
 - (CGPoint)computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
 {
     // Not need absolutePosition any more
- //   [self _computeNewAbsolutePosition:superAbsolutePosition];
     return superAbsolutePosition;
-}
-
-- (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
-{
-    CGPoint newAbsolutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
-                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
-    
-    if(!CGPointEqualToPoint(_absolutePosition, newAbsolutePosition)){
-        _absolutePosition = newAbsolutePosition;
-    }
-    
-    return newAbsolutePosition;
 }
 
 - (void)_layoutDidFinish
