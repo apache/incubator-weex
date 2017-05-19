@@ -83,7 +83,7 @@
 
 @end
 
-static BOOL textRenderUsingCoreText = NO;
+static BOOL textRenderUsingCoreText = YES;
 
 NSString *const WXTextTruncationToken = @"\u2026";
 CGFloat WXTextDefaultLineThroughWidth = 1.2;
@@ -213,7 +213,7 @@ do {\
         WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
     };
     
-    if (styles[@"lineHeight"] && WX_SYS_VERSION_LESS_THAN(@"10.0")) {
+    if (styles[@"lineHeight"] && WX_SYS_VERSION_LESS_THAN(@"10.0") && WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
         self.useCoreTextAttr = @"false";
     }
     
