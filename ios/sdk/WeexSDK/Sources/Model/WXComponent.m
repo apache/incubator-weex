@@ -337,6 +337,9 @@
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssert(subcomponent, @"The subcomponent to insert to %@ at index %d must not be nil", self, index);
+    if (index > [_subcomponents count]) {
+        return;
+    }
     
     subcomponent->_supercomponent = self;
     
