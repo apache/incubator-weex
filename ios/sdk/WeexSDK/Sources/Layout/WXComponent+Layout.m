@@ -355,16 +355,6 @@ do {\
     WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
 }
 
-- (void)_fillAbsolutePositions
-{
-    CGPoint absolutePosition = _absolutePosition;
-    NSArray *subcomponents = self.subcomponents;
-    for (WXComponent *subcomponent in subcomponents) {
-        subcomponent->_absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
-        [subcomponent _fillAbsolutePositions];
-    }
-}
-
 #pragma mark CSS Node Override
 
 static void cssNodePrint(void *context)
