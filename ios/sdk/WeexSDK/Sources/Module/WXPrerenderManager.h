@@ -36,7 +36,7 @@
  *  @param callback  the module method callback
  *
  **/
-+ (void) addTask:(NSString *) url WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback;
++ (void) addTask:(NSString *) url instanceId:(NSString *)instanceId callback:(WXModuleCallback)callback;
 
 /**
  *  @abstract Returns true if url is exist in task .
@@ -52,6 +52,7 @@
 
 /**
  *  @abstract excute render from prerender cache .
+ * @discussion this method should be excuted after oncreat and onfail block created
  *
  **/
 + (void) renderFromCache:(NSString *)url;
