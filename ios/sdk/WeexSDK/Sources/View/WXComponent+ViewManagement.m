@@ -198,6 +198,22 @@
     }
 }
 
+#define WX_BOARD_RADIUS_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;\
+        [self setNeedsLayout];\
+    }\
+} while(0);
+
+#define WX_BOARD_RADIUS_RESET(key)\
+do {\
+if (styles && [styles containsObject:@#key]) {\
+    _##key = 0;\
+    [self setNeedsLayout];\
+    }\
+} while(0);
+
 -(void)_resetStyles:(NSArray *)styles
 {
     if (styles && [styles containsObject:@"backgroundColor"]) {
@@ -209,14 +225,11 @@
         _boxShadow = nil;
         [self setNeedsDisplay];
     }
-    if (styles && [styles containsObject:@"borderRadius"]) {
-        //reset
-        _borderTopStyle = _borderRightStyle = _borderBottomStyle = _borderLeftStyle = WXBorderStyleSolid;
-        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];
-        _borderTopWidth = _borderLeftWidth = _borderRightWidth = _borderBottomWidth = 0;
-        _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;
-        [self setNeedsDisplay];
-    }
+    WX_BOARD_RADIUS_RESET_ALL(borderRadius);
+    WX_BOARD_RADIUS_RESET(borderTopLeftRadius);
+    WX_BOARD_RADIUS_RESET(borderTopRightRadius);
+    WX_BOARD_RADIUS_RESET(borderBottomLeftRadius);
+    WX_BOARD_RADIUS_RESET(borderBottomRightRadius);
 }
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing
