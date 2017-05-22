@@ -25,6 +25,23 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 
+
+#define WX_BOARD_RADIUS_RESET_ALL(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+        _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;\
+        [self setNeedsLayout];\
+    }\
+} while(0);
+
+#define WX_BOARD_RADIUS_RESET(key)\
+do {\
+    if (styles && [styles containsObject:@#key]) {\
+    _##key = 0;\
+    [self setNeedsLayout];\
+    }\
+} while(0);
+
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
 
 @implementation WXComponent (ViewManagement)
@@ -198,21 +215,6 @@
     }
 }
 
-#define WX_BOARD_RADIUS_RESET_ALL(key)\
-do {\
-    if (styles && [styles containsObject:@#key]) {\
-        _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;\
-        [self setNeedsLayout];\
-    }\
-} while(0);
-
-#define WX_BOARD_RADIUS_RESET(key)\
-do {\
-if (styles && [styles containsObject:@#key]) {\
-    _##key = 0;\
-    [self setNeedsLayout];\
-    }\
-} while(0);
 
 -(void)_resetStyles:(NSArray *)styles
 {
