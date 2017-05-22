@@ -14,6 +14,10 @@ let id = 0
 export default {
   mixins: [slideMixin],
   props: {
+    index: {
+      type: [String, Number],
+      default: 0
+    },
     autoPlay: {
       type: [String, Boolean],
       default: false
@@ -60,9 +64,15 @@ export default {
     }
   },
 
+  watch: {
+    index () {
+      this.currentIndex = this.normalizeIndex(this.index)
+    }
+  },
+
   data () {
     return {
-      currentIndex: 0,
+      currentIndex: this.index,
       frameCount: 0
     }
   },
@@ -98,7 +108,7 @@ export default {
       }).map(vnode => {
         return createElement('li', {
           ref: 'cells',
-          staticClass: 'weex-slider-cell'
+          staticClass: 'weex-slider-cell weex-ct weex-neighbor-item'
         }, [vnode])
       })
       if (indicatorVnode) {
@@ -117,7 +127,6 @@ export default {
 
   created () {
     this.weexType = 'slider-neighbor'
-    this.currentIndex = 0
     this.innerOffset = 0
     this._indicator = null
     this.id = id++
@@ -129,10 +138,6 @@ export default {
   beforeUpdate () {
     this.updateLayout()
     this.reorder()
-  },
-
-  updated () {
-    fireLazyload(this.$el, true)
   },
 
   mounted () {

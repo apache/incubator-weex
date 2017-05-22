@@ -26,6 +26,19 @@ const MAIN_SLIDE_OPACITY = 1
 // const scrollDam = 16
 
 export default {
+  updated () {
+    const children = this.$children
+    const len = children && children.length
+    if (children && len > 0) {
+      const indicator = children[len - 1]
+      if (indicator.$options._componentTag === 'indicator'
+        || indicator.$vnode.data.ref === 'indicator') {
+        indicator._watcher.get()
+      }
+    }
+    fireLazyload(this.$el, true)
+  },
+
   methods: {
     // get standard index
     normalizeIndex (index) {
@@ -99,6 +112,8 @@ export default {
           opacity = MAIN_SLIDE_OPACITY
         }
 
+        elm.style.visibility = 'visible'
+
         const origin = dir === 'prev' ? '100% 0' : '0 0'
         elm.style.webkitTransformOrigin = origin
         elm.style.transformOrigin = origin
@@ -153,6 +168,9 @@ export default {
 
         // put current slide on the top.
         setPosition(currentElm, 'current')
+        currentElm.style.webkitBoxAlign = 'center'
+        currentElm.style.webkitAlignItems = 'center'
+        currentElm.style.AlignItems = 'center'
 
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
@@ -168,7 +186,13 @@ export default {
         }
 
         setPosition(prevElm, 'prev')
+        prevElm.style.webkitBoxAlign = 'end'
+        prevElm.style.webkitAlignItems = 'flex-end'
+        prevElm.style.AlignItems = 'flex-end'
         setPosition(nextElm, 'next')
+        nextElm.style.webkitBoxAlign = 'start'
+        nextElm.style.webkitAlignItems = 'flex-start'
+        nextElm.style.AlignItems = 'flex-start'
         this.currentIndex = newIndex
       })
     },

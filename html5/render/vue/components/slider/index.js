@@ -35,7 +35,6 @@ const _css = `
 }
 
 .weex-slider-cell {
-  display: block;
   position: absolute;
   top: 0;
   left: 0;
@@ -138,18 +137,6 @@ export default {
   beforeUpdate () {
     this.updateLayout()
     this.reorder()
-  },
-
-  updated () {
-    const children = this.$children
-    const len = children && children.length
-    if (children && len > 0) {
-      const indicator = children[len - 1]
-      if (indicator.$options._componentTag === 'indicator') {
-        indicator._watcher.get()
-      }
-    }
-    fireLazyload(this.$el, true)
   },
 
   mounted () {
