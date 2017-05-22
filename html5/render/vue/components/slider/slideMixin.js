@@ -20,7 +20,6 @@ import { createEvent/*, nextFrame*/, fireLazyload, addTransform } from '../../ut
 
 const TRANSITION_TIME = 200
 
-const MAIN_SLIDE_SCALE = 0.9
 const MAIN_SLIDE_OPACITY = 1
 
 // trigger scroll event frequency.
@@ -96,7 +95,7 @@ export default {
         let offsetY = 0
         if (dir === 'current') {
           elm.style.zIndex = 1
-          neighborScale = MAIN_SLIDE_SCALE
+          neighborScale = this.currentItemScale
           opacity = MAIN_SLIDE_OPACITY
         }
 
