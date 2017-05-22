@@ -213,10 +213,6 @@ do {\
         WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
     };
     
-    if (styles[@"lineHeight"] && WX_SYS_VERSION_LESS_THAN(@"10.0") && WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
-        self.useCoreTextAttr = @"false";
-    }
-    
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         _padding = padding;
         [self setNeedsRepaint];
@@ -683,9 +679,11 @@ do {\
         run = CFArrayGetValueAtIndex(runs, runIndex);
         CFDictionaryRef attr = NULL;
         attr = CTRunGetAttributes(run);
-        NSNumber *baselineOffset = (NSNumber*)CFDictionaryGetValue(attr, NSBaselineOffsetAttributeName);
-        if (baselineOffset) {
-            lineOrigin.y += [baselineOffset doubleValue];
+        if (0 == runIndex) {
+            NSNumber *baselineOffset = (NSNumber*)CFDictionaryGetValue(attr, NSBaselineOffsetAttributeName);
+            if (baselineOffset) {
+                lineOrigin.y += [baselineOffset doubleValue];
+            }
         }
         CGContextSetTextPosition(context, lineOrigin.x, lineOrigin.y);
         CTRunDraw(run, context, CFRangeMake(0, 0));
