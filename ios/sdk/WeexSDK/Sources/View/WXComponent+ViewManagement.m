@@ -209,6 +209,14 @@
         _boxShadow = nil;
         [self setNeedsDisplay];
     }
+    if (styles && [styles containsObject:@"borderRadius"]) {
+        //reset
+        _borderTopStyle = _borderRightStyle = _borderBottomStyle = _borderLeftStyle = WXBorderStyleSolid;
+        _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];
+        _borderTopWidth = _borderLeftWidth = _borderRightWidth = _borderBottomWidth = 0;
+        _borderTopLeftRadius = _borderTopRightRadius = _borderBottomLeftRadius = _borderBottomRightRadius = 0;
+        [self setNeedsDisplay];
+    }
 }
 
 - (void)_unloadViewWithReusing:(BOOL)isReusing
