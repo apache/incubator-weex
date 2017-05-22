@@ -46,7 +46,7 @@ do {\
 do {\
     if (styles && [styles containsObject:@#key]) {\
         _borderTopWidth = _borderLeftWidth = _borderRightWidth = _borderBottomWidth = 0;\
-        [self setNeedsDisplay];\
+        [self setNeedsLayout];\
     }\
 } while(0);
 
@@ -62,7 +62,7 @@ do {\
 do {\
     if (styles && [styles containsObject:@#key]) {\
         _borderTopColor = _borderLeftColor = _borderRightColor = _borderBottomColor = [UIColor blackColor];\
-        [self setNeedsLayout];\
+        [self setNeedsDisplay];\
     }\
 } while(0);
 
