@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { danger, fail, warn, message, markdown } from "danger";
+import { schedule, danger, fail, warn, message, markdown } from "danger";
 import fs from "fs";
 import path from 'path';
 import GitHubApi from 'github';
@@ -194,9 +194,12 @@ codefiles.forEach(filepath => {
  * try to find the appropriate reviewer according to the blame info
  * will be seperated to a danger plugin
  */
-findReviewer()
 
-function findReviewer() {
+schedule(new Promise((resolve, reject) => {
+  findReviewer(resolve, reject)
+}));
+
+function findReviewer(resolve, reject) {
   var github = new GitHubApi({
     protocol: "https",
     host: "api.github.com",
@@ -225,6 +228,7 @@ function findReviewer() {
         fileToBlamesMap[danger.git.modified_files[index]] = parseBlame(data);
       });
       findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToBlamesMap)
+      resolve()
     })
   });
 }
@@ -329,9 +333,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     })
     
     console.log(names)
-    console.log('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
-    warn(`According to the blame info, we recommended **${names.join(', ')}** to be the reviewers.`)
-    message("According to the blame info, we recommended **" + names.join(', ') + "** to be the reviewers.")
+    markdown("According to the blame info, we recommended **" + names.join(', ') + "** to be the reviewers.")
   }
 }
 
