@@ -196,7 +196,12 @@ codefiles.forEach(filepath => {
  */
 
 schedule(new Promise((resolve, reject) => {
-  findReviewer(resolve, reject)
+  try {
+    findReviewer(resolve, reject)
+  } catch (e) {
+    console.log(e)
+    resolve()
+  }
 }));
 
 function findReviewer(resolve, reject) {
@@ -331,7 +336,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     names = names.map(name => {
       return '@' + name
     })
-    
+
     message("According to the blame info, we recommended " + names.join(' , ') + " to be the reviewers.")
   }
 }
