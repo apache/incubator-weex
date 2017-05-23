@@ -481,7 +481,7 @@
     NSIndexPath *fromIndexPath = [self indexPathForCell:cell sections:_sections];
     NSIndexPath *toIndexPath = [self indexPathForSubIndex:index];
     if (toIndexPath.row > [_sections[toIndexPath.section].rows count] || toIndexPath.row < 0) {
-        WXLogError(@"toIndexPath %@ is out of range as the current is %d",toIndexPath ,[_sections[toIndexPath.section].rows count]);
+        WXLogError(@"toIndexPath %@ is out of range as the current is %lu",toIndexPath ,(unsigned long)[_sections[toIndexPath.section].rows count]);
         return;
     }
     [self removeCellForIndexPath:fromIndexPath withSections:_sections];
