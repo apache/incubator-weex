@@ -329,8 +329,9 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     })
     
     console.log(names)
-    markdown('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
-    message('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
+    console.log('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
+    warn("According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.")
+    message("According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.")
   }
 }
 
