@@ -25,6 +25,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXDebugAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -74,7 +75,7 @@ public class WXSDKManager {
   private IWXDebugAdapter mIWXDebugAdapter;
   private IActivityNavBarSetter mActivityNavBarSetter;
 
-
+  private ICrashInfoReporter mCrashInfo;
 
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
@@ -268,6 +269,7 @@ public class WXSDKManager {
   }
 
   void destroyInstance(String instanceId) {
+    setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,"");
     if (TextUtils.isEmpty(instanceId)) {
       return;
     }
@@ -395,6 +397,17 @@ public class WXSDKManager {
 
   public WXValidateProcessor getValidateProcessor(){
     return mWXValidateProcessor;
+  }
+
+
+  public void setCrashInfoReporter(ICrashInfoReporter mCrashInfo) {
+    this.mCrashInfo = mCrashInfo;
+  }
+
+  public void setCrashInfo(String key, String value) {
+    if(mCrashInfo!=null){
+      mCrashInfo.addCrashInfo(key,value);
+    }
   }
 
 }
