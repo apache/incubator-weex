@@ -19,6 +19,8 @@
 import { danger, fail, warn, message, markdown } from "danger";
 import fs from "fs";
 import path from 'path';
+import GitHubApi from 'github';
+import parseDiff from 'parse-diff';
 
 // Make sure there are changelog entries
 const hasChangelog = danger.git.modified_files.includes("changelog.md")
@@ -313,6 +315,11 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
     return reviewers[name1] > reviewers[name2] ? -1 : 1 
   })
 
+  var prUser = danger.github.pr.user.login
+  names.splice(names.findIndex(el => {
+    return el === prUser
+  }), 1)
+
   if (names.length > 0) {
     if (names.length > 2) {
       names = names.slice(0, 2)
@@ -321,6 +328,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
       return '@' + name
     })
     
+    console.log(names)
     markdown('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
     message('According to the blame info, we recommended **' + names.join(', ') + '** to be the reviewers.')
   }
