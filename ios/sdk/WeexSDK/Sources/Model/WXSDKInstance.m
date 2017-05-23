@@ -194,9 +194,18 @@ typedef enum : NSUInteger {
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
     
+    [self _handleConfigCenter];
+    
+    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    
+    WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
+}
+
+- (void)_handleConfigCenter
+{
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
     if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
-        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@false isDefault:NULL] boolValue];
+        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
         [WXTextComponent setRenderUsingCoreText:useCoreText];
         id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL];
         if(sliderConfig){
@@ -210,12 +219,7 @@ typedef enum : NSUInteger {
             [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
         }
     }
-    
-    [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
-    
-    WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
-
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {

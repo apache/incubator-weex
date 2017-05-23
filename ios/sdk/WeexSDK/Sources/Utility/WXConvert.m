@@ -798,7 +798,11 @@ WX_NUMBER_CONVERT(NSUInteger, unsignedIntegerValue)
     } else if ([role isEqualToString:@"search"]) {
         accessibilityTrait = UIAccessibilityTraitSearchField;
     } else if ([role isEqualToString:@"tab"]) {
-        accessibilityTrait = UIAccessibilityTraitTabBar;
+#ifdef __IPHONE_10_0
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+            accessibilityTrait = UIAccessibilityTraitTabBar;
+        }
+#endif
     }
     
     return accessibilityTrait;
