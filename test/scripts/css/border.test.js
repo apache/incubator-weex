@@ -41,7 +41,7 @@ describe('border test', function () {
 
   it('#1 border screenshot diff', () => {
     return driver
-    .sleep(2000)
+    .sleep(10000)
     .takeScreenshot()
     .then(imgData => {
       var newImg = new Buffer(imgData, 'base64');
