@@ -162,17 +162,19 @@
             [self.ancestorScroller removeStickyComponent:self];
         }
         
-        if (positionType == WXPositionTypeFixed) {
-            [self.weexInstance.componentManager addFixedComponent:self];
-            _isNeedJoinLayoutSystem = NO;
-            [self.supercomponent _recomputeCSSNodeChildren];
-        } else if (_positionType == WXPositionTypeFixed) {
-            [self.weexInstance.componentManager removeFixedComponent:self];
-            _isNeedJoinLayoutSystem = YES;
-            [self.supercomponent _recomputeCSSNodeChildren];
-        }
-        
-        _positionType = positionType;
+        WXPerformBlockOnComponentThread(^{
+            if (positionType == WXPositionTypeFixed) {
+                [self.weexInstance.componentManager addFixedComponent:self];
+                _isNeedJoinLayoutSystem = NO;
+                [self.supercomponent _recomputeCSSNodeChildren];
+            } else if (_positionType == WXPositionTypeFixed) {
+                [self.weexInstance.componentManager removeFixedComponent:self];
+                _isNeedJoinLayoutSystem = YES;
+                [self.supercomponent _recomputeCSSNodeChildren];
+            }
+            
+            _positionType = positionType;
+        });
     }
     
     if (styles[@"visibility"]) {

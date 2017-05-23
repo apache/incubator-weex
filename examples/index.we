@@ -20,6 +20,7 @@
 
         // component
         {name: 'component/text-demo', title: 'Text'},
+        {name: 'iconfont', title: 'iconfont'},
         {name: 'component/image-demo', title: 'Image'},
         {name: 'component/input-demo', title: 'Input'},
         {name: 'component/scroller-demo', title: 'Scroller'},

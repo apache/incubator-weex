@@ -42,7 +42,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
-  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground-debug.apk`)
+  app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
 };
 
 var androidChromeOpts = {
@@ -83,8 +83,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:{y : (isIOS ? 128 : 0)},
-      cropImageB:{y : (isIOS ? 128 : 0)}
+      cropImageA:isIOS?{y:128}:{y:72,height:1700},
+      cropImageB:isIOS?{y:128}:{y:72,height:1700}
     });
 
     diff.run((err, result) => {
@@ -131,7 +131,31 @@ module.exports = {
         var driver = global._wxDriver;
         if(!driver){
             console.log('Create new driver');
-            driver = wd(this.getConfig()).initPromiseChain();
+            let driverFactory = wd(this.getConfig())
+            driverFactory.addPromiseChainMethod('dragUpAndDown',function(){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.7, toX:middleX, toY: size.height*0.3, duration: 1})
+                    .sleep(1000)
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.3, toX:middleX, toY: size.height*0.7, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driverFactory.addPromiseChainMethod('dragUp',function(distance){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    let startY = size.height * 0.7
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000
             });

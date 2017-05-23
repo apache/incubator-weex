@@ -248,6 +248,7 @@
         }
         
         [self setNeedsDisplay];
+        [[NSNotificationCenter defaultCenter] postNotificationName:WX_COMPONENT_NOTIFICATION_VIEW_LOADED object:self];
         [self viewDidLoad];
         
         if (_lazyCreateView) {
@@ -280,7 +281,7 @@
 
 - (void)_resetNativeBorderRadius
 {
-    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopRightRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     _layer.cornerRadius = borderRect.radii.topLeft;
 }
 
@@ -499,6 +500,11 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
+    
+    if (!attributes) {
+        return;
+    }
+    
     if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;

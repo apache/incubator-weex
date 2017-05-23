@@ -166,8 +166,6 @@
 
 - (NSUInteger)_childrenCountForLayout;
 
-- (void)_fillAbsolutePositions;
-
 ///--------------------------------------
 /// @name Private Methods
 ///--------------------------------------

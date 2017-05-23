@@ -23,23 +23,26 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Path;
+import android.graphics.PixelFormat;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Build.VERSION_CODES;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.ui.view.border.BorderDrawable;
-
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -47,19 +50,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WXViewUtils {
 
-  /**
-   * System chooses a format that supports translucency (many alpha bits)
-   */
-  public static final int TRANSLUCENT = -3;
+  @IntDef({PixelFormat.TRANSLUCENT, PixelFormat.TRANSPARENT, PixelFormat.OPAQUE})
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface Opacity {}
 
   /**
-   * System chooses a format that supports transparency (at least 1 alpha bit)
+   * Use {@link PixelFormat#TRANSLUCENT} instead
    */
-  public static final int TRANSPARENT = -2;
+  @Deprecated
+  public static final int TRANSLUCENT = PixelFormat.TRANSLUCENT;
+
   /**
-   * System chooses an opaque format (no alpha bits required)
+   * Use {@link PixelFormat#TRANSPARENT} instead.
    */
-  public static final int OPAQUE = -1;
+  @Deprecated
+  public static final int TRANSPARENT = PixelFormat.TRANSPARENT;
+
+  /**
+   * Use {@link PixelFormat#OPAQUE} instead
+   */
+  @Deprecated
+  public static final int OPAQUE = PixelFormat.OPAQUE;
+
   public static final int DIMENSION_UNSET = -1;
   private static final boolean mUseWebPx = false;
   private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
@@ -322,14 +334,15 @@ public class WXViewUtils {
     return (multipliedAlpha << 24) | (color & 0x00FFFFFF);
   }
 
+  @Opacity
   public static int getOpacityFromColor(int color) {
     int colorAlpha = color >>> 24;
     if (colorAlpha == 255) {
-      return OPAQUE;
+      return PixelFormat.OPAQUE;
     } else if (colorAlpha == 0) {
-      return TRANSPARENT;
+      return PixelFormat.TRANSPARENT;
     } else {
-      return TRANSLUCENT;
+      return PixelFormat.TRANSLUCENT;
     }
   }
 
@@ -395,7 +408,7 @@ public class WXViewUtils {
    * As the compile version of weex_sdk is 23, so API level 24 has to be hard-code.
    */
   private static boolean clipCanvasIfAnimationExist() {
-    return Build.VERSION.SDK_INT != 24;
+    return Build.VERSION.SDK_INT != VERSION_CODES.N;
   }
 
   /**

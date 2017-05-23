@@ -60,6 +60,11 @@
 
 - (void)openURL
 {
+    if (_href && [_href length] == 0) {
+        // href is empty string
+        _href = self.weexInstance.scriptURL.absoluteString;
+    }
+    
     if (_href && [_href length] > 0) {
         NSMutableString *newURL = [_href mutableCopy];
         WX_REWRITE_URL(_href, WXResourceTypeLink, self.weexInstance)

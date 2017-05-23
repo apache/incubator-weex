@@ -25,30 +25,36 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-describe('scroller fixed position item ', function () {
+describe('weex mobile index', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
   before(function () {
     return util.init(driver)
-      .get(util.getPage('/components/scroller-fixed.js'))
-      .waitForElementByXPath('//scroller[1]/div[1]',util.getGETActionWaitTimeMills(),1000)
+      .get(util.getPage('/modules/globalEvent.js'))
+      .waitForElementById('button',util.getGETActionWaitTimeMills(),1000)
   });
 
   after(function () {
       return util.quit(driver)
   })
 
+  it('#0 fireEvent',()=>{
+      return driver
+      .elementById("button")
+      .click()
+      .sleep(2000)
+      .text()
+      .then((elem)=>{
+        assert.equal(elem, "posted")
+    })
+  })
 
-  it('#1 position:fixed items', () => {
+  it('#1 received event', ()=>{
     return driver
-    .dragUpAndDown()
-    .elementByXPath('//scroller[1]/div[1]/text[1]')
+    .elementById("content")
     .text()
-    .then((text)=>{
-        var parts = text.split("|");
-        assert.equal(parts[0],parts[1]);
-        assert.equal(parts[2],0);
+    .then((elem)=>{
+        assert.equal(elem, "I received event")
     })
   })
 });
