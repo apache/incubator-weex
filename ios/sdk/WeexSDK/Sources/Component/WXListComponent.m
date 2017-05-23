@@ -480,6 +480,10 @@
     
     NSIndexPath *fromIndexPath = [self indexPathForCell:cell sections:_sections];
     NSIndexPath *toIndexPath = [self indexPathForSubIndex:index];
+    if (toIndexPath.row > [_sections[toIndexPath.section].rows count] || toIndexPath.row < 0) {
+        WXLogError(@"toIndexPath %@ is out of range as the current is %lu",toIndexPath ,(unsigned long)[_sections[toIndexPath.section].rows count]);
+        return;
+    }
     [self removeCellForIndexPath:fromIndexPath withSections:_sections];
     [self insertCell:cell forIndexPath:toIndexPath withSections:_sections];
     
@@ -713,6 +717,10 @@
 - (void)insertCell:(WXCellComponent *)cell forIndexPath:(NSIndexPath *)indexPath withSections:(NSMutableArray *)sections
 {
     WXSection *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    if (indexPath.row > [section.rows count] || indexPath.row < 0) {
+        WXLogError(@"inserting cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
+        return;
+    }
     WXAssert(section, @"inserting cell at indexPath:%@ section has not been inserted to list before, sections:%@", indexPath, sections);
     WXAssert(indexPath.row <= section.rows.count, @"inserting cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
     [section.rows insertObject:cell atIndex:indexPath.row];

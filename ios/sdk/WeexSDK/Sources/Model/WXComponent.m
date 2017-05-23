@@ -337,6 +337,10 @@
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssert(subcomponent, @"The subcomponent to insert to %@ at index %d must not be nil", self, index);
+    if (index > [_subcomponents count]) {
+        WXLogError(@"the index of inserted %ld is out of range as the current is %ld", index, [_subcomponents count]);
+        return;
+    }
     
     subcomponent->_supercomponent = self;
     
