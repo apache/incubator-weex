@@ -127,7 +127,10 @@ export default {
             offsetX += this.wrapperWidth * (1 - neighborScale) / 2
           }
           else {
-            offsetX = offsetX - sign * this.neighborSpace * scale
+            // offsetX = offsetX - sign * this.neighborSpace * scale
+            offsetX = offsetX - sign * (
+              (this.wrapperWidth - this._origItemWidth * this.currentItemScale) / 2
+              - this.neighborSpace * scale)
           }
         }
 
@@ -165,6 +168,10 @@ export default {
         let prevElm = this._prevElm = this._cells[prevIndex].elm
         const nextElm = this._cells[nextIndex].elm
         const currentElm = this._cells[newIndex].elm
+
+        if (!this._origItemWidth) {
+          this._origItemWidth = currentElm.firstElementChild.getBoundingClientRect().width
+        }
 
         // put current slide on the top.
         setPosition(currentElm, 'current')

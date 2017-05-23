@@ -5,7 +5,7 @@ import { throttle, bind, extend, fireLazyload } from '../../utils'
 import indicator from './indicator'
 import slideMixin from './slideMixin'
 
-const DEFAULT_NEIGHBOR_SPACE = 20
+const DEFAULT_NEIGHBOR_SPACE = 25
 const DEFAULT_NEIGHBOR_ALPHA = 0.6
 const DEFAULT_NEIGHBOR_SCALE = 0.8
 const DEFAULT_CURRENT_ITEM_SCALE = 0.9
