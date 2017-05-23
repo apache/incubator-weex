@@ -78,8 +78,7 @@
     "copy:js": "cp -vf ./dist/native.js ./android/sdk/assets/main.js",
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples",
-    "danger": "danger",
-    "danger:junit": "danger -- --dangerfile dangerfile-junit.js"
+    "danger": "danger"
   },
   "dependencies": {
     "animationjs": "^0.1.5",

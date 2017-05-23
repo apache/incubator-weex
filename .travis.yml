@@ -56,7 +56,6 @@ matrix:
           - cd android
           - ./run-ci.sh 
           - cd $TRAVIS_BUILD_DIR
-          - npm run danger:junit
 cache:
   directories:
   - node_modules
