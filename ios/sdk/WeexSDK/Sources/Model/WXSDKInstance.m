@@ -245,7 +245,7 @@ typedef enum : NSUInteger {
     _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        
+        NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
             NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
                                         code:((NSHTTPURLResponse *)response).statusCode
@@ -253,7 +253,15 @@ typedef enum : NSUInteger {
             if (strongSelf.onFailed) {
                 strongSelf.onFailed(error);
             }
-            return ;
+        }
+        
+        if (strongSelf.onJSDownloadedFinish) {
+            strongSelf.onJSDownloadedFinish(response, request, data, error);
+        }
+        
+        if (error) {
+            // if an error occurs, just return.
+            return;
         }
 
         if (!data) {
@@ -274,7 +282,7 @@ typedef enum : NSUInteger {
 
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
-
+        
         [strongSelf _renderWithMainBundleString:jsBundleString];
     };
     
