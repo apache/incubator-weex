@@ -525,11 +525,7 @@
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
     }
-    
-    // set accessibilityFrame for view which has no subview
-    if (0 == [self.subcomponents count]) {
-        self.view.isAccessibilityElement = YES;
-    }
+
 }
 
 - (UIImage *)imageFromLayer:(CALayer *)layer
