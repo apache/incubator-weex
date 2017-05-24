@@ -39,7 +39,6 @@ function preLoadImg (src: string,
 export function applySrc (item: any, src: ?string, placeholderSrc: ?string): void {
   if (!src) { return }
   function finallCb () {
-    item.removeAttribute('img-src')
     delete item._src_loading
     if (doRecord) {
       if (window._weex_perf.renderTime.length < SCREEN_REC_LIMIT) {
@@ -50,13 +49,12 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
       }
     }
   }
-
   /**
    * 1. apply src immediately in case javscript blocks the image loading
    *  before next tick.
    */
   item.style.backgroundImage = `url(${src || ''})`
-
+  item.removeAttribute('img-src')
   /**
    * 2. then load the img src with Image constructor (but would not post
    *  a request again), just to trigger the load event.
