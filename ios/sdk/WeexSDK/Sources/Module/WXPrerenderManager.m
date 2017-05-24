@@ -27,6 +27,7 @@
 #import "WXUtility.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
+static NSString *const MSG_PRERENDER_SUCCESS = @"OK";
 
 @interface WXPrerenderTask:NSObject
 
@@ -171,7 +172,7 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
                 }
             };
         });
-        
+        callback(@{@"url":url,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
     }
 }
 
