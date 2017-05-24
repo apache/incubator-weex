@@ -1021,9 +1021,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       for (int i = 0, moduleCount = mRegisterModuleFailList.size(); i < moduleCount; ++i) {
         invokeRegisterModules(mRegisterModuleFailList.get(i), moduleReceiver);
       }
-      mRegisterComponentFailList.clear();
+      mRegisterModuleFailList.clear();
       if (moduleReceiver.size() > 0) {
-        mRegisterComponentFailList.addAll(moduleReceiver);
+        mRegisterModuleFailList.addAll(moduleReceiver);
       }
     }
 
