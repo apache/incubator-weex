@@ -1,6 +1,6 @@
 {
   "name": "weex",
-  "version": "0.4.0",
+  "version": "0.12.0",
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.20.5",
@@ -11,11 +11,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:alibaba/weex.git"
+    "url": "git@github.com:apache/incubator-weex.git"
   },
-  "homepage": "http://alibaba.github.io/weex/",
+  "homepage": "http://weex.apache.org/",
   "bugs": {
-    "url": "https://github.com/alibaba/weex/issues"
+    "url": "https://issues.apache.org/jira/browse/WEEX/"
   },
   "private": true,
   "keywords": [
