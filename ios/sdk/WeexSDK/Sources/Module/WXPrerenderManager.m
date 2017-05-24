@@ -179,7 +179,7 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"success";
             };
         });
         if(callback){
-            callback(@{@"url":url,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
+            callback(@{@"url":url.absoluteString,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
         }
     }
 }
