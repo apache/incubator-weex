@@ -262,6 +262,9 @@ typedef enum : NSUInteger {
         
         if([response isKindOfClass:[NSHTTPURLResponse class]]){
             NSString* cacheType = [[(NSHTTPURLResponse*)response allHeaderFields] valueForKey:@"X-Cache"];
+            if(!strongSelf.userInfo){
+                strongSelf.userInfo = [[NSMutableDictionary alloc] init];
+            }
             strongSelf.userInfo[@"X-Cache"] = cacheType;
         }
 
