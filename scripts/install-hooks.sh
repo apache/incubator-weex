@@ -16,12 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-if ! test -e ./bin/.welcome; then
-  touch ./bin/.welcome
-  echo '********************************************************************************'
-  echo '*                                                                              *'
-  echo '*                       Thanks for contributing Weex!                          *'
-  echo '*       See https://github.com/alibaba/weex/blob/master/CONTRIBUTING.md        *'
-  echo '*                                                                              *'
-  echo '********************************************************************************\n'
+if test -e .git/hooks; then
+  ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit 
+  ln -sf ../../scripts/commit-msg.sh .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg 
+  ln -sf ../../scripts/pre-push.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push 
 fi

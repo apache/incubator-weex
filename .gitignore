@@ -50,3 +50,6 @@ doc/db.json
 doc/node_modules/
 doc/public/
 doc/.deploy*/
+
+# release
+apache_release_temp

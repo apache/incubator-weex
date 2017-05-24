@@ -10,6 +10,11 @@
 + /scripts/
 + /scripts/rat-ant-build.xml
 + /scripts/build_from_source.sh
++ /scripts/dist-*.sh
++ /scripts/install-hooks.sh
++ /scripts/pre-commit.sh
++ /scripts/pre-push.sh
++ /scripts/commit-msg.sh
 + /LICENSE
 + /NOTICE
 + /POSSIBLE-NOTICES-FOR-BIN-DIST
@@ -22,8 +27,6 @@
 + /.eslintrc
 + /.eslintignore
 + /.babelrc
-+ /bin
-+ /bin/*.sh
 + /src
 - /src/h5-render/dist/index.js
 - /src/h5-render/node_modules

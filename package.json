@@ -37,7 +37,7 @@
     "node": ">=4"
   },
   "scripts": {
-    "postinstall": "bash ./bin/install-hooks.sh",
+    "postinstall": "bash ./scripts/install-hooks.sh",
     "build:native": "node build/build.js native",
     "build:runtime": "node build/build.js runtime",
     "install:buildtools": "npm i rollup rollup-watch rollup-plugin-buble rollup-plugin-json rollup-plugin-eslint rollup-plugin-commonjs rollup-plugin-flow rollup-plugin-flow-no-whitespace rollup-plugin-postcss rollup-plugin-replace rollup-plugin-uglify rollup-plugin-node-resolve wwp flow-bin babel-core babel-eslint babel-istanbul babel-loader babel-plugin-coverage babel-preset-es2015 babel-runtime eslint-plugin-flowtype",
@@ -53,8 +53,8 @@
     "build:ci:native": "webpack --watch --config build/webpack.ci.config.js",
     "build:ci": "npm run build:ci:native && npm run build:ci:web",
     "build": "npm run build:native && npm run build:browser && npm run build:vue && npm run build:examples && npm run build:test",
-    "dist:vue": "npm run build:vue && bash ./bin/dist-vue.sh",
-    "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./bin/dist-browser.sh",
+    "dist:vue": "npm run build:vue && bash ./scripts/dist-vue.sh",
+    "dist:browser": "npm run build:browser && npm run build:browser:common && bash ./scripts/dist-browser.sh",
     "dist": "npm run dist:browser && npm run dist:vue",
     "dev:native": "node build/build.js native --watch",
     "dev:runtime": "node build/build.js runtime --watch",
