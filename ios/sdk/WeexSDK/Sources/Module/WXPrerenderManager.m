@@ -89,7 +89,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"OK";
 + (void) addTask:(NSString *)url instanceId:(NSString *)instanceId callback:(WXModuleCallback)callback{
     NSURL *newUrl = [NSURL URLWithString:url];
     if(!newUrl){
-        callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
         return;
     }
     
@@ -120,13 +122,17 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"OK";
 
     NSString *str = url.absoluteString;
     if(str.length==0){
-        callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
         return;
     }
     WXPrerenderTask *task = [WXPrerenderTask new];
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
     if(![self isSwitchOn]){
-        callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
         return;
     }
     task.beginDate = [NSDate date];
@@ -172,7 +178,9 @@ static NSString *const MSG_PRERENDER_SUCCESS = @"OK";
                 }
             };
         });
-        callback(@{@"url":url,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
+        if(callback){
+            callback(@{@"url":url,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
+        }
     }
 }
 
