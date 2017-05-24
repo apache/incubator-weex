@@ -27,7 +27,7 @@
 #import "WXUtility.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
-static NSString *const MSG_PRERENDER_SUCCESS = @"OK";
+static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 
 @interface WXPrerenderTask:NSObject
 
