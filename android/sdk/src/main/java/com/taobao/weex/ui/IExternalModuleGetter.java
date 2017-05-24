@@ -18,12 +18,13 @@
  */
 package com.taobao.weex.ui;
 
-import com.taobao.weex.WXSDKInstance;
+import android.content.Context;
+
 import com.taobao.weex.common.WXModule;
 
 /**
  * Created by zhengshihan on 16/8/25.
  */
-public interface IExternalMoudleGetter {
-    Class<? extends WXModule> getExternalMoudleClass(String type, WXSDKInstance instance);
+public interface IExternalModuleGetter {
+    Class<? extends WXModule> getExternalModuleClass(String type, Context context);
 }
