@@ -75,11 +75,11 @@ export default {
 
   mounted () {
     if (this.$options._componentTag === 'image') {
-      global._has_image_in_first_screen = true
+      window._has_image_in_first_screen = true
     }
     if (this === this.$root) {
       tagRootMounted()
-      if (!global._has_image_in_first_screen) {
+      if (!window._has_image_in_first_screen) {
         tagFirstScreen()
       }
     }

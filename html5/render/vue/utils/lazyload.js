@@ -50,6 +50,17 @@ export function applySrc (item: any, src: ?string, placeholderSrc: ?string): voi
       }
     }
   }
+
+  /**
+   * 1. apply src immediately in case javscript blocks the image loading
+   *  before next tick.
+   */
+  item.style.backgroundImage = `url(${src || ''})`
+
+  /**
+   * 2. then load the img src with Image constructor (but would not post
+   *  a request again), just to trigger the load event.
+   */
   if (item._src_loading) {
     return
   }

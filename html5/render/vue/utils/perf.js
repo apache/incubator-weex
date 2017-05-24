@@ -92,6 +92,7 @@ const perf: {
 const tmp = {}
 
 const IMG_REC_INDENT: number = 500  // record loading events after 500ms towards last recording.
+const REGEXP_IMG_TYPE = /(.png|.jpg|.webp|.gif)$/  // image file type regexp.
 
 let earliestBeforeUpdateTime: number = 0
 let earliestBeforeCreateTime: number = 0
@@ -153,6 +154,9 @@ function getEntries (): Array<any> {
   const performance = window.performance
   return performance && performance.getEntries
     ? performance.getEntries()
+      .filter(function (entry) {
+        return entry.initiatorType === 'img' || REGEXP_IMG_TYPE.test(entry.name)
+      })
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }
 
@@ -209,6 +213,13 @@ export function tagFirstScreen (time?: number): void {
 const debouncedTagImg = debounce(function () {
   const entries = getEntries()
   const len = entries.length
+  if (!len) {
+    /**
+     * no image loaded. This probably happened because of the disabling of images' loading
+     * events. So just tag now as the first screen time.
+     */
+    return tagFirstScreen()
+  }
   let i = 0
   let end = 0
   while (i < len) {
