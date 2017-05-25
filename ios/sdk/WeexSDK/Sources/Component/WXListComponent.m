@@ -281,24 +281,33 @@
             WXLogDebug(@"Insert section:%ld", (unsigned long)insertIndex);
             
             [UIView performWithoutAnimation:^{
-                [_tableView beginUpdates];
                 
-                [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
-                if (completedReloadSection) {
-                    WXLogDebug(@"Reload section:%lu", insertIndex - 1);
-                    _completedSections[insertIndex - 1] = completedReloadSection;
+                @try {
+                    [_tableView beginUpdates];
+                    
+                    [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
+                    if (completedReloadSection) {
+                        WXLogDebug(@"Reload section:%lu", insertIndex - 1);
+                        _completedSections[insertIndex - 1] = completedReloadSection;
+                    }
+                    
+                    [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+                    
+                    if (completedReloadSection) {
+                        [_tableView reloadSections:[NSIndexSet indexSetWithIndex:insertIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
+                    }
+                    
+                    [_tableView endUpdates];
+                } @catch (NSException *exception) {
+                    WXLogError(@"list insert component occurs exception %@", exception);
+                } @finally {
+                     // nothing
                 }
                 
-                [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
-                
-                if (completedReloadSection) {
-                    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:insertIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
-                }
-                
-                [_tableView endUpdates];
             }];
             
         }];
+        
     }
 }
 

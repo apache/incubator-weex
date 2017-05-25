@@ -417,6 +417,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mRenderStartTime = System.currentTimeMillis();
     mRenderStrategy = flag;
 
+    WXSDKManager.getInstance().setCrashInfo(WXEnvironment.WEEX_CURRENT_KEY,pageName);
+
     WXSDKManager.getInstance().createInstance(this, template, renderOptions, jsonInitData);
     mRendered = true;
 

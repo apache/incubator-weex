@@ -149,7 +149,7 @@ module.exports = {
                 .getWindowSize()
                 .then(size=>{
                     let middleX = size.width * 0.5
-                    let startY = size.height * 0.7
+                    let startY = size.height * 0.3
                     return this
                     .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
                     .sleep(1000)
