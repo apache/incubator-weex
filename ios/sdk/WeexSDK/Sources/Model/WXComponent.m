@@ -500,7 +500,7 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    NSMutableDictionary *attributesCpy = [attributes mutableCopy];
+    NSDictionary *attributesCpy = [attributes copy];
     if (!attributesCpy) {
         return;
     }
