@@ -500,26 +500,26 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    
-    if (!attributes) {
+    NSMutableDictionary *attributesCpy = [attributes mutableCopy];
+    if (!attributesCpy) {
         return;
     }
     
-    if (attributes[@"role"]){
+    if (attributesCpy[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
     }
-    if (attributes[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+    if (attributesCpy[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributesCpy[@"ariaHidden"]];
         self.view.accessibilityElementsHidden = _ariaHidden;
     }
-    if (attributes[@"ariaLabel"]) {
-        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+    if (attributesCpy[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributesCpy[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
     }
     
-    if (attributes[@"testId"]) {
-        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
+    if (attributesCpy[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributesCpy[@"testId"]]];
     }
     
     // set accessibilityFrame for view which has no subview
