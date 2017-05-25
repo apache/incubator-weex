@@ -436,7 +436,7 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
 + (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type;
 
 /**
- *  @abstract check whether the file is exist
+ *  @abstract custorm monitor info
  *
  */
 + (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value;
