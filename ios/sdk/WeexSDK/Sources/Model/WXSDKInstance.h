@@ -20,7 +20,8 @@
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
 #import "WXJSExceptionInfo.h"
-@class WXResourceRequest;
+#import "WXResourceResponse.h"
+#import "WXResourceRequest.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -153,6 +154,12 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^onRenderProgress)(CGRect renderRect);
 
 /**
+ * The callback triggered when the bundleJS request finished in the renderWithURL.
+ * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
+ */
+@property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
+
+/**
  *  the frame of current instance.
  **/
 @property (nonatomic, assign) CGRect frame;
@@ -257,6 +264,9 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 /**
  * fire module event;
+ * @param module which module you fire event to
+ * @param eventName the event name
+ * @param params event params
  */
 - (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 

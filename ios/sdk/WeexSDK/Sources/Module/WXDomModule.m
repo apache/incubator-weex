@@ -196,6 +196,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                 __strong typeof (weakSelf) strongSelf = weakSelf;
                 NSMutableDictionary * callbackRsp = nil;
                 if (!component) {
+                    callbackRsp = [NSMutableDictionary new];
                     [callbackRsp setObject:@(false) forKey:@"result"];
                     [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found", ref] forKey:@"errMsg"];
                 } else {
