@@ -44,6 +44,7 @@ import java.util.Map;
 public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadingListener {
 
   public static final String HIDE = "hide";
+  public static final String SHOW = "show";
 
   public WXLoading(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
     super(instance, node, parent, lazy);
@@ -100,6 +101,10 @@ public class WXLoading extends WXBaseRefresh implements WXSwipeLayout.WXOnLoadin
             ((BaseBounceView) getParent().getHostView()).finishPullLoad();
             ((BaseBounceView) getParent().getHostView()).onLoadmoreComplete();
           }
+        }
+      } else if (display.equals(SHOW)) {
+        if (!((BaseBounceView)getParent().getHostView()).getSwipeLayout().isRefreshing()) {
+          ((BaseBounceView) getParent().getHostView()).startPullLoad();
         }
       }
     }

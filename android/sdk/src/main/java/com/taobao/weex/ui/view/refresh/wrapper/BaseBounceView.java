@@ -42,9 +42,15 @@ import com.taobao.weex.utils.WXUtils;
  */
 public abstract class BaseBounceView<T extends View> extends FrameLayout {
 
+    private static final int INVALID = -1;
+    private static final int PULL_REFRESH = 0;
+    private static final int LOAD_MORE = 1;
+
     private int mOrientation = OrientationHelper.VERTICAL;
     protected WXSwipeLayout swipeLayout;
     private T mInnerView;
+    private int mTriggerAction = INVALID; // save pull refresh or load more action if refreshView or load more view isn't set.
+
 
     public BaseBounceView(Context context,int orientation) {
         this(context, null,orientation);
@@ -77,14 +83,32 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
             swipeLayout.setOnLoadingListener(onLoadingListener);
     }
 
+    public void startPullRefresh() {
+        if (swipeLayout != null && swipeLayout.isPullRefreshEnable())
+            swipeLayout.triggerRefresh();
+        else
+            mTriggerAction = PULL_REFRESH;
+    }
+
     public void finishPullRefresh() {
         if (swipeLayout != null)
             swipeLayout.finishPullRefresh();
+        else
+            mTriggerAction = INVALID;
+    }
+
+    public void startPullLoad() {
+        if (swipeLayout != null && swipeLayout.isPullLoadEnable())
+            swipeLayout.triggerLoadMore();
+        else
+            mTriggerAction = LOAD_MORE;
     }
 
     public void finishPullLoad() {
         if (swipeLayout != null)
             swipeLayout.finishPullLoad();
+        else
+            mTriggerAction = INVALID;
     }
 
     /**
@@ -134,6 +158,8 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
                         }
                     }
                     refreshView.setRefreshView(refresh.getHostView());
+                    if (mTriggerAction == PULL_REFRESH)
+                        swipeLayout.triggerRefresh();
                 }
             }
         }
@@ -163,6 +189,8 @@ public abstract class BaseBounceView<T extends View> extends FrameLayout {
                         }
                     }
                     refreshView.setRefreshView(loading.getHostView());
+                    if (mTriggerAction == LOAD_MORE)
+                        swipeLayout.triggerLoadMore();
                 }
             }
         }
