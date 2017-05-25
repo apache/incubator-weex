@@ -281,7 +281,8 @@
             WXLogDebug(@"Insert section:%ld", (unsigned long)insertIndex);
             
             [UIView performWithoutAnimation:^{
-                 @try {
+                
+                @try {
                     [_tableView beginUpdates];
                     
                     [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
@@ -297,11 +298,12 @@
                     }
                     
                     [_tableView endUpdates];
-                 } @catch (NSException *exception) {
-                     WXLog(@"%@ %@",NSStringFromSelector(_cmd), exception);
-                 } @finally {
-                     
-                 }
+                } @catch (NSException *exception) {
+                    WXLogError(@"list insert component occurs exception %@", exception);
+                } @finally {
+                     // nothing
+                }
+                
             }];
             
         }];
