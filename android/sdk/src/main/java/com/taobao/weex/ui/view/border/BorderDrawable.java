@@ -104,6 +104,8 @@ public class BorderDrawable extends Drawable {
   public void draw(@NonNull Canvas canvas) {
     canvas.save();
     updateBorderOutline();
+    //Shader uses alpha as well.
+    mPaint.setAlpha(255);
     if (mPathForBorderOutline != null) {
       int useColor = WXViewUtils.multiplyColorAlpha(mColor, mAlpha);
       if (mShader != null) {
@@ -152,7 +154,6 @@ public class BorderDrawable extends Drawable {
 
   }
 
-  @SuppressWarnings("WrongConstant")
   @Override
   public int getOpacity() {
     return mShader!=null?PixelFormat.OPAQUE:

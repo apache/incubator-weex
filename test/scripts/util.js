@@ -20,6 +20,8 @@
 
 var path = require('path');
 var os = require('os')
+var fs = require('fs')
+const BlinkDiff = require('blink-diff');
 
 var platform = process.env.platform || 'android';
 platform = platform.toLowerCase();
@@ -40,7 +42,7 @@ var androidOpts = {
   platformName: 'Android',
   target: 'android',
   slowEnv: isRunInCI,
-  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground.apk`)
+  app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
 };
 
 var androidChromeOpts = {
@@ -65,6 +67,36 @@ function getIpAddress(){
         })
     }
     return addresses[0];
+}
+
+function diffImage(imageAPath, imageB, threshold, outputPath) {
+  if (!fs.existsSync(imageAPath)) {
+    fs.writeFileSync(imageAPath, imageB, 'base64', function(err) {
+        console.log(err);
+    });
+  }
+  
+  return new Promise((resolve, reject) => {
+    var diff = new BlinkDiff({
+      imageAPath: imageAPath, // Path
+      imageB: imageB,         // Buffer
+      thresholdType: BlinkDiff.THRESHOLD_PIXEL,
+      threshold: threshold,
+      imageOutputPath: outputPath,
+      cropImageA:isIOS?{y:128}:{y:72,height:1700},
+      cropImageB:isIOS?{y:128}:{y:72,height:1700}
+    });
+
+    diff.run((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      var ifPassed = diff.hasPassed(result.code);
+      console.log(ifPassed ? 'Image Comparison Passed' : 'Image Comparison Failed');
+      console.log(`Found ${result.differences} pixel differences between two images.`);
+      resolve(ifPassed);
+    });
+  });
 }
 
 
@@ -94,11 +126,36 @@ module.exports = {
     getGETActionWaitTimeMills:function(){
         return (isRunInCI ? 120 : 5 ) * 1000;
     },
+    diffImage, 
     createDriver:function(wd){
         var driver = global._wxDriver;
         if(!driver){
             console.log('Create new driver');
-            driver = wd(this.getConfig()).initPromiseChain();
+            let driverFactory = wd(this.getConfig())
+            driverFactory.addPromiseChainMethod('dragUpAndDown',function(){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.7, toX:middleX, toY: size.height*0.3, duration: 1})
+                    .sleep(1000)
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.3, toX:middleX, toY: size.height*0.7, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driverFactory.addPromiseChainMethod('dragUp',function(distance){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    let startY = size.height * 0.7
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000
             });

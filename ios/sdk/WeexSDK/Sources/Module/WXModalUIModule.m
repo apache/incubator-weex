@@ -335,6 +335,7 @@ static const CGFloat WXToastDefaultPadding = 30.0;
             NSString *clickTitle = [alertView buttonTitleAtIndex:buttonIndex];
             NSString *text= [[alertView textFieldAtIndex:0] text] ?: @"";
             result = @{ @"result": clickTitle, @"data": text };
+            break;
         }
         default:
             break;

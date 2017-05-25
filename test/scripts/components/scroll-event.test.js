@@ -42,27 +42,13 @@ describe('list scroll event', function () {
 
   it('#1 Drag list', () => {
     return driver
-    .touch('drag', {
-        fromX: 200,
-        fromY: 500,
-        toX: 200,
-        toY: 200,
-        duration: 0.5
-    })
-    .sleep(2000)
-    .touch('drag', {
-      fromX:200, 
-      fromY:600, 
-      toX:100, 
-      toY:200,
-      duration: 0.5
-    })
-    .sleep(2000)
+    .dragUp(20)
+    .dragUp(20)
     .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
-      assert.equal(y > 200,true)
+      assert.equal(y > 20,true)
     })
   })
 });
@@ -84,15 +70,14 @@ describe('scroller scroll event', function () {
 
   it('#1 Drag scroller', () => {
     return driver
-    .touch('drag', {fromX:200, fromY:500, toX:200, toY: 200})
-    .sleep(2000)
-    .touch('drag', {fromX:200, fromY:500, toX:100, toY:200})
-    .sleep(2000)
+    .dragUp(20)
+    .dragUp(20)
     .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
-      assert.equal(y > 200,true)
+      console.log(`y=${y}`)
+      assert.equal(y > 20,true)
     })
   })
 });

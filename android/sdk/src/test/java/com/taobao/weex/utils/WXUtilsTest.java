@@ -110,27 +110,27 @@ public class WXUtilsTest extends TestCase {
 
     @Test
     public void testGetFloatWX() throws Exception {
-        Float test_float = WXUtils.getFloat("100wx");
+        Float test_float = WXUtils.getFloatByViewport("100wx", TEST_VIEW_PORT);
         Float want = 100 * TEST_DENSITY * TEST_VIEW_PORT / TEST_SCREEN_WIDTH;
         assertEquals(test_float, want , 0.01);
 
-        test_float = WXUtils.getFloat("100px");
+        test_float = WXUtils.getFloatByViewport("100px", TEST_VIEW_PORT);
         want = 100F;
         assertEquals(test_float, want);
 
-        test_float = WXUtils.getFloat("100.2");
+        test_float = WXUtils.getFloatByViewport("100.2", TEST_VIEW_PORT);
         want = 100.2F;
         assertEquals(test_float, want);
 
-        test_float = WXUtils.getFloat(100.2F);
+        test_float = WXUtils.getFloatByViewport(100.2F, TEST_VIEW_PORT);
         want = 100.2F;
         assertEquals(test_float, want, 0.0001);
 
-        test_float = WXUtils.getFloat(100.2D);
+        test_float = WXUtils.getFloatByViewport(100.2D, TEST_VIEW_PORT);
         want = 100.2F;
         assertEquals(test_float, want, 0.0001);
 
-        test_float = WXUtils.getFloat("NaN");
+        test_float = WXUtils.getFloatByViewport("NaN", TEST_VIEW_PORT);
         want = Float.NaN;
         assertEquals(test_float, want);
     }
@@ -138,7 +138,7 @@ public class WXUtilsTest extends TestCase {
     @Test
     public void testGetIntWX() throws Exception {
         Integer test_int = WXUtils.getInt("100wx");
-        Integer want = (int)(100 * TEST_DENSITY * TEST_VIEW_PORT / TEST_SCREEN_WIDTH);
+        Integer want = (int)(100 * TEST_DENSITY * 750 / TEST_SCREEN_WIDTH);
         assertEquals(test_int, want);
 
         test_int = WXUtils.getInt("100px");
@@ -161,7 +161,7 @@ public class WXUtilsTest extends TestCase {
     @Test
     public void testGetDoubleWX() throws Exception {
         Double test_double = WXUtils.getDouble("100.32wx");
-        Double want = (100.32D * TEST_DENSITY * TEST_VIEW_PORT / TEST_SCREEN_WIDTH);
+        Double want = (100.32D * TEST_DENSITY * 750 / TEST_SCREEN_WIDTH);
         assertEquals(test_double, want, 0.01);
 
         test_double = WXUtils.getDouble("100px");

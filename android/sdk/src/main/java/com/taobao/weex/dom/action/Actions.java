@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.bridge.Invoker;
+import com.taobao.weex.common.WXModule;
 import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.ui.animation.WXAnimationBean;
@@ -161,4 +163,14 @@ public class Actions {
                                                 @Nullable String callback){
     return new AnimationAction(ref, animationBean, callback);
   }
+
+  public static DOMAction getModuleInvocationAction(@NonNull WXModule wxModule, @NonNull JSONArray args,
+                                                    @NonNull Invoker invoker) {
+    return new ModuleInvocationAction(wxModule, args, invoker);
+  }
+
+  public static DOMAction getExecutableRenderAction(@NonNull Runnable runnable) {
+    return new ExecutableRenderAction(runnable);
+  }
+
 }

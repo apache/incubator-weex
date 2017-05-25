@@ -32,6 +32,7 @@ import com.taobao.weex.ui.component.WXImage;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.ImageDrawable;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -130,8 +131,19 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Override
   public int getNaturalWidth() {
     Drawable drawable = getDrawable();
-    if (drawable != null && drawable instanceof ImageDrawable) {
-      return ((ImageDrawable) drawable).getBitmapWidth();
+    if (drawable != null) {
+      if (drawable instanceof ImageDrawable) {
+        return ((ImageDrawable) drawable).getBitmapWidth();
+      } else if (drawable instanceof BitmapDrawable) {
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        if (bitmap != null) {
+          return bitmap.getWidth();
+        } else {
+          WXLogUtils.w("WXImageView", "Bitmap on " + drawable.toString() + " is null");
+        }
+      } else {
+        WXLogUtils.w("WXImageView", "Not supported drawable type: " + drawable.getClass().getSimpleName());
+      }
     }
     return -1;
   }
@@ -139,8 +151,19 @@ public class WXImageView extends ImageView implements WXGestureObservable,
   @Override
   public int getNaturalHeight() {
     Drawable drawable = getDrawable();
-    if (drawable != null && drawable instanceof ImageDrawable) {
-      return ((ImageDrawable) drawable).getBitmapHeight();
+    if (drawable != null) {
+      if (drawable instanceof ImageDrawable) {
+        return ((ImageDrawable) drawable).getBitmapHeight();
+      } else if (drawable instanceof BitmapDrawable) {
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        if (bitmap != null) {
+          return bitmap.getHeight();
+        } else {
+          WXLogUtils.w("WXImageView", "Bitmap on " + drawable.toString() + " is null");
+        }
+      } else {
+        WXLogUtils.w("WXImageView", "Not supported drawable type: " + drawable.getClass().getSimpleName());
+      }
     }
     return -1;
   }

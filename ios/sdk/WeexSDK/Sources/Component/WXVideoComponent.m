@@ -150,13 +150,13 @@
 
 - (void)setURL:(NSURL *)URL
 {
-    NSMutableString *urlStr = nil;
-    WX_REWRITE_URL(URL.absoluteString, WXResourceTypeVideo, self.weexSDKInstance, &urlStr)
+    NSMutableString *newURL = nil;
+    WX_REWRITE_URL(URL.absoluteString, WXResourceTypeVideo, self.weexSDKInstance)
     
-    if (!urlStr) {
+    if (!newURL) {
         return;
     }
-    NSURL *newURL = [NSURL URLWithString:urlStr];
+    NSURL *videoNewURL = [NSURL URLWithString:newURL];
     if ([self greater8SysVer]) {
         
         AVPlayerViewController *AVVC = (AVPlayerViewController*)_playerViewController;
@@ -165,7 +165,7 @@
             [AVVC.player removeObserver:self forKeyPath:@"rate"];
             [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object: _playerItem];
         }
-        _playerItem = [[AVPlayerItem alloc] initWithURL:newURL];
+        _playerItem = [[AVPlayerItem alloc] initWithURL:videoNewURL];
         AVPlayer *player = [AVPlayer playerWithPlayerItem: _playerItem];
         AVVC.player = player;
         
@@ -183,7 +183,7 @@
     }
     else {
         MPMoviePlayerViewController *MPVC = (MPMoviePlayerViewController*)_playerViewController;
-        [MPVC moviePlayer].contentURL = newURL;
+        [MPVC moviePlayer].contentURL = videoNewURL;
     }
 }
 

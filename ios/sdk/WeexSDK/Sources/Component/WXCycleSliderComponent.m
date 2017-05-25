@@ -120,9 +120,9 @@ typedef NS_ENUM(NSInteger, Direction) {
             }
         }else if (_direction == DirectionLeft) {
             self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
-            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+            self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         }else {
-            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+            self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         }
         [self resetAllViewsFrame];
     } else {
@@ -158,7 +158,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         }
     }else if (_direction == DirectionLeft){
         self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
-        self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+        self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         UIView *view = [self getItemAtIndex:_nextIndex];
         if (view) {
             view.frame = _nextItemFrame;
@@ -214,8 +214,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
-- (void)resetScrollView {
-    if (self.scrollView.contentOffset.x / self.width == 1)
+- (void)resetScrollView
+{
+    if (WXFloatEqual(self.scrollView.contentOffset.x / self.width , 1.0))
     {
         return;
     }

@@ -1,0 +1,9 @@
+rootProject.name = 'weex-project'
+include ":playground"
+project(":playground").projectDir=new File("playground/app")
+
+include ":weex_sdk"
+project(":weex_sdk").projectDir=new File("sdk")
+
+include ":commons"
+include ":weex_debug"

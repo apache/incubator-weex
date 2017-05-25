@@ -177,5 +177,5 @@ extern void WXPerformBlockOnComponentThread(void (^block)());
 
 - (void)_addUITask:(void (^)())block;
 
-
+- (void)excutePrerenderUITask:(NSString *)url;
 @end

@@ -18,7 +18,7 @@ describe('weex text @ignore-ios', function () {
   });
 
   after(function () {
-    // return util.quit(driver);
+    return util.quit(driver);
   })
 
 
@@ -49,7 +49,7 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, screenWidth)
         assert.closeTo(rect.height, 32 * scaleFactor * 2, 2)
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
@@ -60,7 +60,7 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, screenWidth)
         assert.isAtLeast(rect.height, Math.floor(2 * 48 * scaleFactor))
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
@@ -71,7 +71,7 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, Math.floor(300 * scaleFactor))
         assert.equal(rect.height, Math.floor(100 * scaleFactor))
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
@@ -82,7 +82,7 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, Math.floor(500 * scaleFactor))
         assert.equal(rect.height, Math.floor(300 * scaleFactor))
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
@@ -93,7 +93,7 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, Math.floor(500 * scaleFactor))
         assert.closeTo(rect.height, 40 * scaleFactor, 1)
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
@@ -104,28 +104,20 @@ describe('weex text @ignore-ios', function () {
       .then(rect => {
         assert.equal(rect.width, Math.floor(500 * scaleFactor))
         assert.closeTo(rect.height, 300 * scaleFactor, 1)
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
   it('#9 flex:1; align-Items: auto; flex-direction:column', () => {
     return driver
+      .sleep(2000)
       .elementById('flexgrow-column')
       .getRect()
       .then(rect => {
         assert.isBelow(rect.width, 500 * scaleFactor / 2)
         assert.closeTo(rect.height, 300 * scaleFactor, 1)
-        scroll(rect.height)
+        return driver.dragUp(rect.height)
       })
   })
 
-  function scroll(height) {
-    driver.touch('drag', {
-      fromX: 100,
-      fromY: 300 + height,
-      toX: 100,
-      toY: 300,
-      duration: 0.5
-    })
-  }
 });

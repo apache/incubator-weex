@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -134,6 +135,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private List<OnWXScrollListener> mWXScrollListeners;
 
   /**
+   * whether we are in preRender mode
+   * */
+  private volatile boolean isPreRenderMode;
+
+  private LayoutFinishListener mLayoutFinishListener;
+
+
+  /**
    * If anchor is created manually(etc. define a layout xml resource ),
    * be aware do not add it to twice when {@link IWXRenderListener#onViewCreated(WXSDKInstance, View)}.
    * @param a
@@ -186,6 +195,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   }
 
   /*
+  *  Warning: use setInstanceViewPortWidth instead.
   *  store custom ViewPort Width
   */
   @Deprecated
@@ -193,6 +203,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mViewPortWidth = viewPortWidth;
   }
 
+  /**
+   * Warning: use getInstanceViewPortWidth instead.
+   * @return
+   */
   @Deprecated
   public static int getViewPortWidth() {
     return mViewPortWidth;
@@ -333,6 +347,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param jsonInitData Initial data for rendering
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
+  @Deprecated
   public void render(String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     render(WXPerformance.DEFAULT, template, options, jsonInitData, flag);
   }
@@ -357,6 +372,10 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
+    if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
+       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
+       return;
+    }
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
@@ -620,6 +639,24 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
   }
 
+
+  public boolean isPreRenderMode() {
+    return this.isPreRenderMode;
+  }
+
+  public void setPreRenderMode(final boolean isPreRenderMode) {
+    WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        WXSDKInstance.this.isPreRenderMode = isPreRenderMode;
+      }
+    },0);
+  }
+
+  public void setContext(@NonNull Context context) {
+    this.mContext = context;
+  }
+
   /********************************
    * begin register listener
    ********************************************************/
@@ -634,6 +671,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public void registerStatisticsListener(IWXStatisticsListener listener) {
     mStatisticsListener = listener;
+  }
+
+  public void setLayoutFinishListener(@Nullable LayoutFinishListener listener) {
+    this.mLayoutFinishListener = listener;
+  }
+
+  public LayoutFinishListener getLayoutFinishListener() {
+    return this.mLayoutFinishListener;
+  }
+
+
+  /**set render start time*/
+  public void setRenderStartTime(long renderStartTime) {
+    this.mRenderStartTime = renderStartTime;
   }
 
   /********************************

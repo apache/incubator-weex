@@ -1,31 +1,20 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-    }
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-}
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 23
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
+
+    lintOptions {
+          abortOnError false
+    }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -42,9 +31,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    provided 'com.android.support:appcompat-v7:23.1.1'
+    provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
-    provided 'com.alibaba:fastjson:1.1.45'
+    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     //compile 'com.taobao.android:weex_sdk:0.4.+'
     provided project(':weex_sdk')
 }
