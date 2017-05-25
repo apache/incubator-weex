@@ -64,4 +64,13 @@ if (typeof window !== 'undefined' && window.Vue) {
   init(window.Vue)
 }
 
+// perf stat for componentCount.
+window._component_count = 0
+
+// perf stat for JSLibInitTime.
+window._jslib_init_end = window.performance && window.performance.now() || +new Date()
+window._weex_perf.stat.JSLibInitTime = parseInt(window._jslib_init_end - window._jslib_init_start)
+delete window._jslib_init_end
+delete window._jslib_init_start
+
 export default weex

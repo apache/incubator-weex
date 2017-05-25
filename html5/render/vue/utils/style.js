@@ -34,7 +34,7 @@ const noUnitsNumberKeys = [
  * remove comments from a cssText.
  */
 export function trimComment (cssText: string): string {
-  return cssText.replace(/(?:\/\*).*\*\//g, '')
+  return cssText.replace(/(?:\/\*)[\s\S]*?\*\//g, '')
 }
 
 let support: boolean | null = null
@@ -66,13 +66,23 @@ export function normalizeUnitsNum (val: string): string {
   return parseScale(parseFloat(match[1]), unit)
 }
 
-function parseScale (val: number, unit: string): string {
+function getUnitScaleMap () {
   const { scale, dpr } = getViewportInfo()
-  const unitScaleMap = {
+  return {
     px: scale,
     wx: scale * dpr
   }
-  return val * unitScaleMap[unit] + 'px'
+}
+
+function limitScale (val, limit) {
+  limit = limit || 1
+  const sign = val === 0 ? 0 : val > 0 ? 1 : -1
+  return Math.abs(val) > limit ? val : sign * limit
+}
+
+function parseScale (val: number, unit: string): string {
+  const unitScaleMap = getUnitScaleMap()
+  return limitScale(val * unitScaleMap[unit]) + 'px'
 }
 
 export function normalizeString (styleKey: string, styleVal: string): string {
@@ -80,31 +90,27 @@ export function normalizeString (styleKey: string, styleVal: string): string {
     return styleVal
   }
 
-  // 1. test if is a regular scale css. e.g. `width: 100px;`
+  /**
+   * 1. test if is a regular scale css. e.g. `width: 100px;`
+   *  this should be a standalone number value with or without unit, otherwise
+   *  it shouldn't be changed.
+   */
   const unitsNum = normalizeUnitsNum(styleVal)
   if (unitsNum) { return unitsNum }
 
-  // 2. test if is a translate scale. e.g. `transform: translate2d(1px, 2px);`
-  const regTranslateString = /translate[^(]*\([\d ,.pwx]+\)/i // unit support: wx, px.
-  if (styleKey.match(/transform/i) && regTranslateString.test(styleVal)) {
-    const val = styleVal.replace(regTranslateString, function (translate) {
-      const reg = /([+-]?\d+(?:\.\d+)?)([p,w]x)?(?![dD])/g
-      return translate.replace(reg, function (m, $1, $2) {
-        const unit = $2 || 'px'
-        return parseScale($1, unit)
-      })
-    })
-    return val
-  }
-
-  // 3. test if is a border style. e.g. `border: 1px solid red;`
-  const regBorderKey = /^border(?:-(?:top|bottom|left|right))?$/
-  const regBorderVal = /^([+-]?\d+(?:\.\d+)?)([p ,w]x)?\s+/
-  if (regBorderKey.test(styleKey) && regBorderVal.test(styleVal)) {
-    const reg = /^([+-]?\d+(?:\.\d+)?)([p,w]x)?/
-    const val = styleVal.replace(reg, function (m, $1, $2) {
-      const unit = $2 || 'px'
-      return parseScale($1, unit)
+  /**
+   * 2. if a string contains multiple px values, than they should be all normalized.
+   *  values should have wx or px units, otherwise they should be left unchanged.
+   *  e.g.
+   *    transform: translate(10px, 6px, 0)
+   *    border: 2px solid red
+   */
+  const numReg = /([+-]?[\d.]+)([p,w]x)/ig
+  if (numReg.test(styleVal)) {
+    const unitScaleMap = getUnitScaleMap()
+    const val = styleVal.replace(numReg, function (m, $0, $1) {
+      const res = parseFloat($0) * unitScaleMap[$1]
+      return limitScale(res) + 'px'
     })
     return val
   }
@@ -114,7 +120,13 @@ export function normalizeString (styleKey: string, styleVal: string): string {
 }
 
 export function autoPrefix (style: {}): {} {
-  return addPrefix(style)
+  const prefixed = addPrefix(style)
+  // flex only added WebkitFlex. Should add WebkitBoxFlex also.
+  const flex = prefixed.flex
+  if (flex) {
+    prefixed.WebkitBoxFlex = flex
+  }
+  return prefixed
 }
 
 export function normalizeNumber (styleKey: string, styleVal: number): string {

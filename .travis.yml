@@ -31,10 +31,8 @@ matrix:
         language: objective-c
         before_script:
           - brew update
-          - gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
         script:
-          - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
-          - bundle exec danger --dangerfile=Dangerfile-ios
+          - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8
@@ -44,12 +42,17 @@ matrix:
             - platform-tools
             - tools
             - build-tools-23.0.2
+            - build-tools-24.0.3
             - android-24
             - android-23
             - android-22
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
+        before_script:
+          - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+          - nvm install 7.0
+          - npm install
         script:
           - cd android
           - ./run-ci.sh 

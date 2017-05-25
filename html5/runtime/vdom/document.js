@@ -172,11 +172,13 @@ Object.assign(Document.prototype, {
     e = e || {}
     e.type = type
     e.target = el
+    e.currentTarget = el
     e.timestamp = Date.now()
     if (domChanges) {
       updateElement(el, domChanges)
     }
-    return el.fireEvent(type, e)
+    const isBubble = this.getRef('_root').attr['bubble'] === 'true'
+    return el.fireEvent(type, e, isBubble)
   },
 
   /**

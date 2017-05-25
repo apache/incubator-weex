@@ -30,7 +30,7 @@ export default `
   background-color: #000;
   color: #fff;
   text-align: center;
-  opacity: 0.6;
+  opacity: 0.7;
   -webkit-transition: all 0.4s ease-in-out;
           transition: all 0.4s ease-in-out;
   border-radius: 0.066667rem;

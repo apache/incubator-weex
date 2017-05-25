@@ -64,7 +64,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile 'com.android.support:support-annotations:23.2.1'
+    androidTestCompile "com.android.support:support-annotations:${project.supportLibVersion}"
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2', {

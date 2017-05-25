@@ -31,7 +31,8 @@ function showToastWindow (msg, callback) {
   }
   if (!toastWin) {
     toastWin = document.createElement('div')
-    toastWin.classList.add(TOAST_WIN_CLASS_NAME, 'hide')
+    toastWin.classList.add(TOAST_WIN_CLASS_NAME)
+    toastWin.classList.add('hide')
     document.body.appendChild(toastWin)
   }
   toastWin.textContent = msg

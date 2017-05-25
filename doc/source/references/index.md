@@ -15,3 +15,5 @@ version: 2.1
 - [Color name](./color-names.html)
 - [Gesture](./gesture.html)
 - [path](./path.html)
+- [event bubble](./bubble.html)
+- [downgrade](./downgrade.html)

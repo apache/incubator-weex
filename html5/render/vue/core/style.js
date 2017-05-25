@@ -20,12 +20,13 @@ import {
   camelizeKeys,
   // hyphenateKeys,
   extend,
+  extendTruthy,
   trimComment,
-  normalizeStyle
+  normalizeStyle,
+  autoPrefix
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 /* istanbul ignore next */
-import addPrefix from 'inline-style-prefixer/static'
 
 /**
  * get scoped class style map from stylesheets in <head>.
@@ -148,16 +149,16 @@ export function getScopeId (vnode) {
 export function getScopeStyle (vnode, classNames) {
   const scopeId = getScopeId(vnode)
   const style = {}
-  const styleMap = weex.styleMap
+  const styleMap = weex.styleMap || {}
   let clsNmsIdx = 0
   const clsNmsLen = classNames.length
   while (clsNmsIdx < clsNmsLen) {
     const cls = `.${classNames[clsNmsIdx]}[${scopeId}]`
     const map = styleMap[cls]
-    map && extend(style, map)
+    map && extendTruthy(style, map)
     clsNmsIdx++
   }
-  return style
+  return camelizeKeys(style)
 }
 
 function getStyle (vnode, extract) {
@@ -165,20 +166,25 @@ function getStyle (vnode, extract) {
   const staticClassNames = (typeof data.staticClass === 'string') ? data.staticClass.split(' ') : (data.staticClass || [])
   const classNames = (typeof data.class === 'string') ? data.class.split(' ') : (data.class || [])
   const clsNms = staticClassNames.concat(classNames)
-  const style = getScopeStyle(vnode, clsNms)
+  const style = normalizeStyle(getScopeStyle(vnode, clsNms))
+  /**
+   * cache static style and bind style.
+   * cached staticStyle (including style and staticStyle) has already been normalized
+   * in $processStyle. So there's no need to normalize it again.
+   */
   if (!data.cached) {
     // cache staticStyle once in the beginning.
-    data.cached = extend({}, data.staticStyle)
+    data.cached = extendTruthy({}, data.staticStyle)
   }
   // cache binding style every time since the binding style is variable.
-  extend(data.cached, data.style)
+  extendTruthy(data.cached, data.style)
   extend(style, data.cached)
   data.staticStyle = style
   if (extract) {
     delete data.staticStyle
     delete data.style
   }
-  return camelizeKeys(style)
+  return style
 }
 
 /**
@@ -198,7 +204,7 @@ export function getComponentStyle (context, extract) {
     extend(style, getStyle(vnode, extract))
     vnode = vnode.parent
   }
-  style = addPrefix(normalizeStyle(style))
+  style = autoPrefix(style)
   /**
    * when prefixed value is a array, it should be applied to element
    * during the next tick.

@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 /* global Vue */
 
 import './wx-env'
 import * as utils from '../utils'
 
 const weexModules = {}
+const _roots = []
 
 const weex = {
   __vue__: null,
@@ -33,12 +33,37 @@ const weex = {
     bundleUrl: location.href
   },
 
+  document: {
+    body: {}
+  },
+
   requireModule (moduleName) {
     return weexModules[moduleName]
   },
 
   registerModule (...args) {
     return this.registerApiModule(...args)
+  },
+
+  /**
+   * Register a new vue instance in this weex instance. Put its root element into weex.document.body.children, so
+   * that user can use weex.document.body to walk through all dom structures in all vue instances in the page.
+   */
+  registerVueInstance (instance) {
+    if (!instance instanceof Vue) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[vue-render] registerVueInstance: invalid instance, not a vue instance.`)
+      }
+      return
+    }
+    const root = instance.$root
+    if (!root || !root.$el) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[vue-render] registerVueInstance: instance has no root.`)
+      }
+      return
+    }
+    this.document.body.children.push(root.$el)
   },
 
   // @deprecated
@@ -93,10 +118,14 @@ const weex = {
   }
 }
 
+Object.defineProperty(weex.document.body, 'children', {
+  get () { return _roots }
+})
+
 ; ['on', 'once', 'off', 'emit'].forEach(function (method) {
   weex[method] = function (...args) {
     if (!this._vue) {
-      this._vue = new Vue()
+      this._vue = new this.__vue__()
     }
     return this._vue[`$${method}`](...args)
   }

@@ -107,8 +107,8 @@ function _getVirtualRect (context, mergedStyle) {
 function _getLtbr (context, mergedStyle) {
   return ['left', 'top', 'bottom', 'right'].reduce((pre, key) => {
     const msv = mergedStyle && mergedStyle[key]
-    // undefined, null, or '0px' -> o
-    pre[key] = msv && parseFloat(msv) || 0
+    if (!msv && msv !== 0) { return pre }
+    pre[key] = parseFloat(msv)
     return pre
   }, {})
 }
@@ -143,13 +143,20 @@ function _reLayout (context, virtualRect, ltbr) {
     return pre
   }, {})
   extend(el.style, rectWithPx)
-  const axisMap = [
-    { dir: ltbr.left ? 'left' : ltbr.right ? 'right' : 'left', scale: 'width' },
-    { dir: ltbr.top ? 'top' : ltbr.bottom ? 'bottom' : 'top', scale: 'height' }
-  ]
+  const axisMap = [{
+    dir: ltbr.left || ltbr.left === 0
+      ? 'left' : ltbr.right || ltbr.right === 0
+      ? 'right' : 'left',
+    scale: 'width'
+  }, {
+    dir: ltbr.top || ltbr.top === 0
+      ? 'top' : ltbr.bottom || ltbr.bottom === 0
+      ? 'bottom' : 'top',
+    scale: 'height'
+  }]
   Object.keys(axisMap).forEach(key => {
     const { dir, scale } = axisMap[key]
-    el.style[dir] = ltbr[dir] + virtualRect[scale] / 2 - rect[scale] / 2 + 'px'
+    el.style[dir] = (ltbr[dir] || 0) + virtualRect[scale] / 2 - rect[scale] / 2 + 'px'
   })
 }
 
@@ -160,11 +167,21 @@ export default {
       this.$el.style.visibility = 'visible'
     }
   },
-  props: {
-    count: [Number, String],
-    active: [Number, String]
+  data () {
+    return {
+      count: 0,
+      active: 0
+    }
   },
+  // props: {
+  //   count: [Number, String],
+  //   active: [Number, String]
+  // },
   render (createElement) {
+    const { count, active } = this.$vnode.data.attrs || {}
+    this.count = count
+    this.active = active
+    this._renderHook()
     return _render(this, createElement)
   },
   _css

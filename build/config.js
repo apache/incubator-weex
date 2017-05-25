@@ -83,7 +83,9 @@ const configs = {
     moduleName: 'WeexVueRender',
     entry: absolute('html5/render/vue/index.js'),
     dest: absolute('packages/weex-vue-render/dist/index.js'),
-    banner: `console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
+    banner:`
+console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');
+window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
     format: 'umd',
     plugins: [
       postcss(),

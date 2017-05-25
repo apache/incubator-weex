@@ -133,6 +133,9 @@ class AnimationAction implements DOMAction, RenderAction {
 
   private void startAnimation(@NonNull WXSDKInstance instance, @Nullable WXComponent component) {
     if (component != null) {
+      if (mAnimationBean != null) {
+        component.setNeedLayoutOnAnimation(mAnimationBean.needLayout);
+      }
       if (component.getHostView() == null) {
         WXAnimationModule.AnimationHolder holder = new WXAnimationModule.AnimationHolder(mAnimationBean, callback);
         component.postAnimation(holder);
