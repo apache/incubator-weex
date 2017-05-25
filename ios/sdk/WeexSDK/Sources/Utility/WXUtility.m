@@ -890,7 +890,7 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
 
 + (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value
 {
-    if(!key || key.length == 0||!value||!instance){
+    if([self isBlankString:key]||!value||!instance){
         return ;
     }
     if(!instance.userInfo){
