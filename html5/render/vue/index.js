@@ -32,6 +32,8 @@ import { base, style } from './mixins'
 let _inited = false
 function init (Vue/*, options = {}*/) {
   if (_inited) { return }
+  _inited = true
+
   setVue(Vue)
 
   Vue.prototype.$getConfig = () => {
