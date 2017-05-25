@@ -92,7 +92,7 @@ const perf: {
 const tmp = {}
 
 const IMG_REC_INDENT: number = 500  // record loading events after 500ms towards last recording.
-const REGEXP_IMG_TYPE = /(.png|.jpg|.webp|.gif)$/  // image file type regexp.
+const REGEXP_IMG_TYPE = /(.png|.jpg|.jpeg|.webp|.gif)$/  // image file type regexp.
 
 let earliestBeforeUpdateTime: number = 0
 let earliestBeforeCreateTime: number = 0
@@ -155,7 +155,7 @@ function getEntries (): Array<any> {
   return performance && performance.getEntries
     ? performance.getEntries()
       .filter(function (entry) {
-        return entry.initiatorType === 'img' || REGEXP_IMG_TYPE.test(entry.name)
+        return REGEXP_IMG_TYPE.test(entry.name)
       })
     : [{ responseEnd: getNow() - IMG_REC_INDENT }]
 }

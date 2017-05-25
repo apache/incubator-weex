@@ -146,7 +146,7 @@ export default {
       if (process.env.NODE_ENV === 'development') {
         tagBegin('base._fireLazyload')
       }
-      getThrottleLazyload(16)()
+      getThrottleLazyload(500)()
       if (process.env.NODE_ENV === 'development') {
         tagEnd('base._fireLazyload')
       }
