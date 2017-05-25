@@ -34,6 +34,7 @@
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
 #import <coreText/CoreText.h>
+#import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
 
@@ -887,6 +888,21 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
     return typeStr;
 }
 
++ (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value
+{
+    if(!key || key.length == 0||!value||!instance){
+        return ;
+    }
+    if(!instance.userInfo){
+        instance.userInfo = [NSMutableDictionary new];
+    }
+    NSMutableDictionary *custormMonitorDict = instance.userInfo[WXCUSTOMMONITORINFO];
+    if(!custormMonitorDict){
+        custormMonitorDict = [NSMutableDictionary new];
+    }
+    [custormMonitorDict setObject:value forKey:key];
+    instance.userInfo[WXCUSTOMMONITORINFO] = custormMonitorDict;
+}
 @end
 
 
