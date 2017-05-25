@@ -1,21 +1,21 @@
 {
   "name": "weex",
-  "version": "0.4.0",
+  "version": "0.12.0",
   "subversion": {
     "browser": "0.5.0",
     "framework": "0.20.6",
-    "vue-render": "0.11.10",
+    "vue-render": "0.11.41",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:alibaba/weex.git"
+    "url": "git@github.com:apache/incubator-weex.git"
   },
-  "homepage": "http://alibaba.github.io/weex/",
+  "homepage": "http://weex.apache.org/",
   "bugs": {
-    "url": "https://github.com/alibaba/weex/issues"
+    "url": "https://issues.apache.org/jira/browse/WEEX/"
   },
   "private": true,
   "keywords": [
@@ -78,8 +78,7 @@
     "copy:js": "cp -vf ./dist/native.js ./android/sdk/assets/main.js",
     "copy:examples": "rm -rf ./android/playground/app/src/main/assets/* && cp -vrf ./examples/build/* ./android/playground/app/src/main/assets/",
     "copy": "npm run copy:js && npm run copy:examples",
-    "danger": "danger",
-    "danger:junit": "danger -- --dangerfile dangerfile-junit.js"
+    "danger": "danger"
   },
   "dependencies": {
     "animationjs": "^0.1.5",
@@ -95,7 +94,7 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.2.11",
+    "weex-rax-framework": "0.3.5",
     "weex-vue-framework": "2.2.6-weex.1",
     "weex-styler": "0.1.9"
   },
@@ -112,12 +111,13 @@
     "chromedriver": "^2.21.2",
     "cross-spawn": "^4.0.0",
     "css-loader": "^0.26.1",
-    "danger": "^0.11.5",
+    "danger": "^0.18.0",
     "dateformat": "^2.0.0",
     "eslint": "^2.11.1",
     "eslint-plugin-flowtype": "^2.30.4",
     "flow-bin": "^0.42.0",
     "fs-extra": "^2.0.0",
+    "github": "^9.2.0",
     "http-server": "^0.9.0",
     "json-loader": "^0.5.4",
     "karma": "^1.3.0",
@@ -132,6 +132,7 @@
     "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
     "nightwatch": "^0.9.4",
+    "parse-diff": "^0.4.0",
     "phantomjs-prebuilt": "^2.1.7",
     "reify": "^0.3.8",
     "rollup": "^0.36.0",

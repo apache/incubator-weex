@@ -281,7 +281,7 @@
 
 - (void)_resetNativeBorderRadius
 {
-    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopRightRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
+    WXRoundedRect *borderRect = [[WXRoundedRect alloc] initWithRect:_calculatedFrame topLeft:_borderTopLeftRadius topRight:_borderTopRightRadius bottomLeft:_borderBottomLeftRadius bottomRight:_borderBottomRightRadius];
     _layer.cornerRadius = borderRect.radii.topLeft;
 }
 
@@ -337,6 +337,10 @@
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index
 {
     WXAssert(subcomponent, @"The subcomponent to insert to %@ at index %d must not be nil", self, index);
+    if (index > [_subcomponents count]) {
+        WXLogError(@"the index of inserted %ld is out of range as the current is %ld", index, [_subcomponents count]);
+        return;
+    }
     
     subcomponent->_supercomponent = self;
     
@@ -521,11 +525,7 @@
     if (attributes[@"testId"]) {
         [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
     }
-    
-    // set accessibilityFrame for view which has no subview
-    if (0 == [self.subcomponents count]) {
-        self.view.isAccessibilityElement = YES;
-    }
+
 }
 
 - (UIImage *)imageFromLayer:(CALayer *)layer

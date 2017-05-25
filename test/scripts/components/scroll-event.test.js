@@ -64,7 +64,7 @@ describe('scroller scroll event', function () {
   });
 
   after(function () {
-      // return util.quit(driver)
+      return util.quit(driver)
   })
 
 

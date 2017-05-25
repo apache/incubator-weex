@@ -19,8 +19,8 @@
 import '../styles/reset.css'
 import '../styles/base.css'
 
-// import 'lazyimg'
-import '../../browser/render/gesture'
+// import '../../browser/render/gesture'
+import '../lib/gesture'
 
 import '../../../shared/arrayFrom'
 import '../../../shared/objectAssign'

@@ -101,15 +101,17 @@ export function watchAppear (context) {
           isWindow = true
         }
         const visible = isElementVisible(el, isWindow ? document.body : container)
-        context._visible = visible
-        // if the component hasn't appeared for once yet, then it shouldn't trigger
-        // a disappear event at all.
-        if (context._appearedOnce) {
-          triggerEvent(el, on, visible, null)
-        }
-        else if (visible) {
-          context._appearedOnce = true
-          triggerEvent(el, on, true, null)
+        if (context._visible !== visible) {
+          context._visible = visible
+          // if the component hasn't appeared for once yet, then it shouldn't trigger
+          // a disappear event at all.
+          if (context._appearedOnce) {
+            triggerEvent(el, on, visible, null)
+          }
+          else if (visible) {
+            context._appearedOnce = true
+            triggerEvent(el, on, true, null)
+          }
         }
 
         let lastScrollTop = container.scrollTop || window.pageYOffset

@@ -182,10 +182,12 @@
     _response = nil;
 }
 
+#ifdef __IPHONE_10_0
 - (void)request:(WXResourceRequest *)request didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics
 {
     WXLogDebug(@"request:%@ didFinishCollectingMetrics", request);
 }
+#endif
 
 
 @end

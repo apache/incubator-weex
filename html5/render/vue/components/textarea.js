@@ -57,6 +57,7 @@ export default {
     //   validateStyles('textarea', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
     const events = extend(createEventMap(this), mapFormEvents(this))
+    this._renderHook()
     return createElement('html:textarea', {
       attrs: {
         'weex-type': 'textarea',

@@ -99,6 +99,7 @@ export default {
   },
   render (createElement) {
     this.$parent._refresh = this
+    this._renderHook()
     return createElement('aside', {
       ref: 'refresh',
       attrs: { 'weex-type': 'refresh' },

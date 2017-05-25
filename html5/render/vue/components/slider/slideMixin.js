@@ -20,13 +20,25 @@ import { createEvent/*, nextFrame*/, fireLazyload, addTransform } from '../../ut
 
 const TRANSITION_TIME = 200
 
-const MAIN_SLIDE_SCALE = 0.9
 const MAIN_SLIDE_OPACITY = 1
 
 // trigger scroll event frequency.
 // const scrollDam = 16
 
 export default {
+  updated () {
+    const children = this.$children
+    const len = children && children.length
+    if (children && len > 0) {
+      const indicator = children[len - 1]
+      if (indicator.$options._componentTag === 'indicator'
+        || indicator.$vnode.data.ref === 'indicator') {
+        indicator._watcher.get()
+      }
+    }
+    fireLazyload(this.$el, true)
+  },
+
   methods: {
     // get standard index
     normalizeIndex (index) {
@@ -45,7 +57,8 @@ export default {
       const newIndex = this.normalizeIndex(index)
       const inner = this.$refs.inner
       const step = this._cells.length <= 1 ? 0 : this.currentIndex - index
-      this.innerOffset += Math.sign(step) * this.wrapperWidth
+      const sign = step === 0 ? 0 : step > 0 ? 1 : -1
+      this.innerOffset += sign * this.wrapperWidth
       if (inner) {
         // const match = (inner.style.transform || inner.style.webkitTransform).match(/(\d+)px/)
         // const currentOffset = parseFloat(match[1])
@@ -63,13 +76,12 @@ export default {
       // nextFrame()
 
       if (newIndex !== this.currentIndex) {
-        this.currentIndex = newIndex
         // replace $el with { attr, style } is a legacy usage. Is it necessary to
         // do this ? Or just tell devers to use inline functions to access attrs ?
         this.$emit('change', createEvent(this.$el, 'change', {
           index: this.currentIndex
         }))
-        setTimeout(() => { this.reorder() }, TRANSITION_TIME)
+        setTimeout(() => { this.reorder(newIndex) }, TRANSITION_TIME)
       }
     },
     order () {
@@ -83,7 +95,10 @@ export default {
         // this.reorder()
       })
     },
-    reorder () {
+    reorder (newIndex) {
+      if (!newIndex && newIndex !== 0) {
+        newIndex = this.currentIndex
+      }
       // dir: 'current' | 'prev' | 'next'
       const setPosition = (elm, dir) => {
         const scale = window.weex.config.env.scale
@@ -93,9 +108,11 @@ export default {
         let offsetY = 0
         if (dir === 'current') {
           elm.style.zIndex = 1
-          neighborScale = MAIN_SLIDE_SCALE
+          neighborScale = this.currentItemScale
           opacity = MAIN_SLIDE_OPACITY
         }
+
+        elm.style.visibility = 'visible'
 
         const origin = dir === 'prev' ? '100% 0' : '0 0'
         elm.style.webkitTransformOrigin = origin
@@ -110,15 +127,21 @@ export default {
             offsetX += this.wrapperWidth * (1 - neighborScale) / 2
           }
           else {
-            offsetX = offsetX - sign * this.neighborSpace * scale
+            // offsetX = offsetX - sign * this.neighborSpace * scale
+            offsetX = offsetX - sign * (
+              (this.wrapperWidth - this._origItemWidth * this.currentItemScale) / 2
+              - this.neighborSpace * scale)
           }
         }
 
         elm.style.width = this.wrapperWidth + 'px'
-        addTransform(elm, {
-          translate: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
-          scale: this.isNeighbor && `scale(${neighborScale})`
-        })
+        const transObj = {
+          translate: `translate3d(${offsetX}px, ${offsetY}px, 0px)`
+        }
+        if (this.isNeighbor) {
+          transObj.scale = `scale(${neighborScale})`
+        }
+        addTransform(elm, transObj)
       }
 
       const removeClone = (clone, prevElm) => {
@@ -140,14 +163,21 @@ export default {
           return
         }
         const lastPrev = this._prevElm
-        const prevIndex = this.normalizeIndex(this.currentIndex - 1)
-        const nextIndex = this.normalizeIndex(this.currentIndex + 1)
+        const prevIndex = this.normalizeIndex(newIndex - 1)
+        const nextIndex = this.normalizeIndex(newIndex + 1)
         let prevElm = this._prevElm = this._cells[prevIndex].elm
         const nextElm = this._cells[nextIndex].elm
-        const currentElm = this._cells[this.currentIndex].elm
+        const currentElm = this._cells[newIndex].elm
+
+        if (!this._origItemWidth) {
+          this._origItemWidth = currentElm.firstElementChild.getBoundingClientRect().width
+        }
 
         // put current slide on the top.
         setPosition(currentElm, 'current')
+        currentElm.style.webkitBoxAlign = 'center'
+        currentElm.style.webkitAlignItems = 'center'
+        currentElm.style.AlignItems = 'center'
 
         // clone prevCell if there are only tow slides.
         if (this._cells.length === 2) {
@@ -163,7 +193,14 @@ export default {
         }
 
         setPosition(prevElm, 'prev')
+        prevElm.style.webkitBoxAlign = 'end'
+        prevElm.style.webkitAlignItems = 'flex-end'
+        prevElm.style.AlignItems = 'flex-end'
         setPosition(nextElm, 'next')
+        nextElm.style.webkitBoxAlign = 'start'
+        nextElm.style.webkitAlignItems = 'flex-start'
+        nextElm.style.AlignItems = 'flex-start'
+        this.currentIndex = newIndex
       })
     },
 
@@ -176,7 +213,7 @@ export default {
     },
 
     handleTouchStart (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const touch = event.changedTouches[0]
       this._touchParams = {
         originalTransform: this.$refs.inner.style.webkitTransform || this.$refs.inner.style.transform,
@@ -188,7 +225,7 @@ export default {
     },
 
     handleTouchMove (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const tp = this._touchParams
       if (!tp) { return }
       const { startX, startY } = this._touchParams
@@ -222,7 +259,7 @@ export default {
     },
 
     handleTouchEnd (event) {
-      event.stopPropagation()
+      // event.stopPropagation()
       const tp = this._touchParams
       if (!tp) { return }
       const isV = tp.isVertical

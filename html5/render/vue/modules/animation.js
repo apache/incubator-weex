@@ -41,6 +41,9 @@ function transitionOnce (vnode, config, callback) {
   const transitionValue = `all ${duration}ms ${timing} ${delay}ms`
 
   const dom = vnode.$el
+  // trigger image lazyloading by force.
+  dom && weex.utils.fireLazyload(dom, true)
+
   const transitionEndHandler = function (event) {
     event.stopPropagation()
     dom.removeEventListener('webkitTransitionEnd', transitionEndHandler)

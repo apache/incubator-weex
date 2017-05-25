@@ -271,7 +271,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   })
 
   it('#7 test sticky and fixed', () => {
-    return driver  
+    return driver
    .elementById('fixed1')
     .getRect()
     .then((rect)=>{
@@ -331,7 +331,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
     .getRect()
     .then((rect)=>{
       console.log(`sticking header rect after setting padding to 12:${JSON.stringify(rect)}`)
-  
+
       assert.isOk(isApproximate(rect.x, 12 * scaleFactor))
       assert.isOk(isApproximate(rect.y, navBarHeight + (isAndroid ? 12 * scaleFactor : 0)))
       assert.isOk(isApproximate(rect.width, recyclerWidth - 24 * scaleFactor))
@@ -374,7 +374,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
     .then(text => {
       console.log(text)
       const contentOffset = Number.parseInt(text.replace('Content Offset:-',''))
-       assert.isOk(originContentOffset - contentOffset > screenHeight / scaleFactor)
+      assert.isOk(originContentOffset - contentOffset > 20 / scaleFactor)
     })
     .elementById('fixed1')
     .click()

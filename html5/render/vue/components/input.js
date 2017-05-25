@@ -70,6 +70,7 @@ export default {
     //   validateStyles('input', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
     const events = extend(createEventMap(this), mapFormEvents(this))
+    this._renderHook()
     return createElement('html:input', {
       attrs: {
         'weex-type': 'input',

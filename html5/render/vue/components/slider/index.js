@@ -19,7 +19,7 @@
 // import { validateStyles } from '../../validator'
 import { extractComponentStyle, createEventMap } from '../../core'
 import { throttle, bind, extend, fireLazyload } from '../../utils'
-import indicator from './indicator'
+// import indicator from './indicator'
 import slideMixin from './slideMixin'
 
 const _css = `
@@ -35,7 +35,6 @@ const _css = `
 }
 
 .weex-slider-cell {
-  display: block;
   position: absolute;
   top: 0;
   left: 0;
@@ -51,6 +50,10 @@ const _css = `
 export default {
   mixins: [slideMixin],
   props: {
+    index: {
+      type: [String, Number],
+      default: 0
+    },
     'auto-play': {
       type: [String, Boolean],
       default: false
@@ -63,13 +66,18 @@ export default {
       type: [String, Boolean],
       default: true
     }
+  },
 
+  watch: {
+    index () {
+      this.currentIndex = this.normalizeIndex(this.index)
+    }
   },
 
   data () {
     return {
-      currentIndex: 0,
-      frameCount: 0
+      frameCount: 0,
+      currentIndex: this.index
     }
   },
 
@@ -111,7 +119,7 @@ export default {
         indicatorVnode.data.attrs = indicatorVnode.data.attrs || {}
         indicatorVnode.data.attrs.count = cells.length
         indicatorVnode.data.attrs.active = this.currentIndex
-        this._indicator = createElement(indicator, indicatorVnode.data)
+        this._indicator = indicatorVnode
       }
       return cells
     }
@@ -119,7 +127,6 @@ export default {
 
   created () {
     this.weexType = 'slider'
-    this.currentIndex = 0
     this.innerOffset = 0
     this._indicator = null
     this.$nextTick(() => {
@@ -130,10 +137,6 @@ export default {
   beforeUpdate () {
     this.updateLayout()
     this.reorder()
-  },
-
-  updated () {
-    fireLazyload(this.$el, true)
   },
 
   mounted () {
@@ -166,6 +169,7 @@ export default {
     this._cells = this.formatChildren(createElement)
     this.frameCount = this._cells.length
 
+    this._renderHook()
     return createElement(
       'nav',
       {

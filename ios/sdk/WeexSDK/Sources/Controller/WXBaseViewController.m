@@ -165,12 +165,6 @@
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, _instance);
         WX_MONITOR_INSTANCE_PERF_START(WXPTFirstScreenRender, _instance);
         WX_MONITOR_INSTANCE_PERF_START(WXPTAllRender, _instance);
-        UIView *view = [WXPrerenderManager viewFromUrl:self.sourceURL.absoluteString];
-        _instance.onCreate(view);
-        NSError *error = [WXPrerenderManager errorFromUrl:self.sourceURL.absoluteString];
-        if(error){
-            _instance.onFailed(error);
-        }
         [WXPrerenderManager renderFromCache:[self.sourceURL absoluteString]];
         return;
     }

@@ -56,6 +56,7 @@ const _css = `
 export default {
   render (createElement) {
     this.weexType = 'loading-indicator'
+    this._renderHook()
     return createElement('mark', {
       attrs: { 'weex-type': 'loading-indicator' },
       staticClass: 'weex-loading-indicator weex-ct',

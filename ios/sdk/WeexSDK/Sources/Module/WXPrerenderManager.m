@@ -27,6 +27,7 @@
 #import "WXUtility.h"
 
 static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
+static NSString *const MSG_PRERENDER_SUCCESS = @"success";
 
 @interface WXPrerenderTask:NSObject
 
@@ -85,10 +86,12 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     self.prerenderTasks = nil;
 }
 
-+ (void) addTask:(NSString *)url WXInstance:(NSString *)instanceId callback:(WXModuleCallback)callback{
++ (void) addTask:(NSString *)url instanceId:(NSString *)instanceId callback:(WXModuleCallback)callback{
     NSURL *newUrl = [NSURL URLWithString:url];
     if(!newUrl){
-        callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":url,@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
         return;
     }
     
@@ -119,12 +122,17 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
     NSString *str = url.absoluteString;
     if(str.length==0){
-        callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
+        return;
     }
     WXPrerenderTask *task = [WXPrerenderTask new];
     id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
     if(![self isSwitchOn]){
-        callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        if(callback){
+            callback(@{@"url":[url absoluteString],@"message":MSG_PRERENDER_INTERNAL_ERROR,@"result":@"error"});
+        }
         return;
     }
     task.beginDate = [NSDate date];
@@ -148,28 +156,31 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     task.parentInstanceId = instanceId;
     task.url = url.absoluteString;
     
-    if(!self.prerenderTasks || self.prerenderTasks.count<self.maxCacheNumber){
+    if(self.prerenderTasks && self.prerenderTasks.count<self.maxCacheNumber){
         [self.prerenderTasks setObject:task forKey:url.absoluteString];
         WXPerformBlockOnMainThread(^{
             [instance renderWithURL:url options:@{@"bundleUrl":url.absoluteString} data:nil];
+            WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
+            __weak typeof(self) weakSelf = manager;
+            instance.onCreate = ^(UIView *view) {
+                WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
+                task.view = view;
+                if(task){
+                    [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+                }
+            };
+            
+            instance.onFailed = ^(NSError *error) {
+                WXPrerenderTask *task  = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
+                task.error = error;
+                if(task){
+                    [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
+                }
+            };
         });
-        WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
-        __weak typeof(self) weakSelf = manager;
-        instance.onCreate = ^(UIView *view) {
-            WXPrerenderTask *task = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
-            task.view = view;
-            if(task){
-                [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
-            }
-        };
-        
-        instance.onFailed = ^(NSError *error) {
-            WXPrerenderTask *task  = [weakSelf.prerenderTasks objectForKey:url.absoluteString];
-            task.error = error;
-            if(task){
-                [weakSelf.prerenderTasks setObject:task forKey:url.absoluteString];
-            }
-        };
+        if(callback){
+            callback(@{@"url":url.absoluteString,@"message":MSG_PRERENDER_SUCCESS,@"result":@"success"});
+        }
     }
 }
 
@@ -179,6 +190,9 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
 
 - (BOOL)isTaskExist:(NSString *)url
 {
+    if( !url ||url.length == 0){
+        return NO;
+    }
     WXPrerenderTask *task  = [self.prerenderTasks objectForKey:url];
     if(!task ){
         return NO;
@@ -198,13 +212,21 @@ static NSString *const MSG_PRERENDER_INTERNAL_ERROR = @"internal_error";
     return NO;
 }
 
-+ (void) renderFromCache:(NSString *)url
++ (void)renderFromCache:(NSString *)url
 {
     WXPrerenderManager *manager = [WXPrerenderManager sharedInstance];
     if([manager isTaskExist:url])
     {
         WXPrerenderTask *task  = [manager.prerenderTasks objectForKey:url];
         task.instance.needPrerender = NO;
+        UIView *view = [self viewFromUrl:url];
+        NSError *error = [self errorFromUrl:url];
+        if(task.instance.onCreate){
+            task.instance.onCreate(view);
+        }
+        if(error && task.instance.onFailed){
+            task.instance.onFailed(error);
+        }
         WXPerformBlockOnComponentThread(^{
             [task.instance.componentManager excutePrerenderUITask:url];
         });
