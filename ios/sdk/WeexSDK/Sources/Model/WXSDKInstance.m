@@ -247,7 +247,7 @@ typedef enum : NSUInteger {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+            error = [NSError errorWithDomain:WX_ERROR_DOMAIN
                                         code:((NSHTTPURLResponse *)response).statusCode
                                     userInfo:@{@"message":@"status code error."}];
             if (strongSelf.onFailed) {
