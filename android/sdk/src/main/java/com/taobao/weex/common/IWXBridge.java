@@ -58,6 +58,8 @@ public interface IWXBridge extends IWXObject {
    */
   int callNative(String instanceId, String tasks, String callback);
 
+  int callCreateBody(String instanceId, String tasks, String callback);
+
   int callAddElement(String instanceId, String ref,String dom,String index, String callback);
 
   void reportJSException(String instanceId, String func, String exception);

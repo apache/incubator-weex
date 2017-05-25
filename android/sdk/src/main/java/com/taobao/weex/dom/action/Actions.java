@@ -130,6 +130,51 @@ public class Actions {
   }
 
   /**
+   * getCreateBody
+   * @param data json
+   * @return DOMAction
+   */
+  public static DOMAction getCreateBody(JSONObject data) {
+    return new CreateBodyAction(data);
+  }
+
+  /**
+   * getUpdateFinish
+   * @return DOMAction
+   */
+  public static DOMAction getUpdateFinish() {
+    return new UpdateFinishAction();
+  }
+
+  /**
+   * getRefreshFinish
+   * @return DOMAction
+   */
+  public static DOMAction getRefreshFinish() {
+    return new RefreshFinishAction();
+  }
+
+  /**
+   * getCreateFinish
+   * @return DOMAction
+   */
+  public static DOMAction getCreateFinish() {
+    return new CreateFinishAction();
+  }
+
+  public static DOMAction getUpdateAttrs(String ref, JSONObject data) {
+    return new UpdateAttributeAction(ref, data);
+  }
+
+  public static DOMAction getRemoveElement(String ref) {
+    return new RemoveElementAction(ref);
+  }
+
+  public static DOMAction getMoveElement(String ref, String parentref, int index) {
+    return new MoveElementAction(ref, parentref, index);
+  }
+
+  /**
    * Bridge will get this action directly.
    * @param data
    * @param parentRef
@@ -137,16 +182,21 @@ public class Actions {
    * @return
    */
   public static DOMAction getAddElement(JSONObject data, String parentRef, int index){
-    return new AddElementAction(data,parentRef,index);
+    return new AddElementAction(data, parentRef, index);
   }
 
   public static DOMAction getUpdateStyle(String ref, JSONObject data, boolean byPesudo){
-    return new UpdateStyleAction(ref,data,byPesudo);
+    return new UpdateStyleAction(ref, data, byPesudo);
   }
 
-  public static DOMAction getAddEvent(String ref, String type) {
-    return new AddEventAction(ref,type);
+  public static DOMAction getAddEvent(String ref, String event) {
+    return new AddEventAction(ref, event);
   }
+
+  public static DOMAction getRemoveEvent(String ref, String event) {
+    return new RemoveEventAction(ref, event);
+  }
+
 
   public static DOMAction getAnimationAction(@NonNull final String ref, @NonNull String animation,
                                              @Nullable final String callBack){
