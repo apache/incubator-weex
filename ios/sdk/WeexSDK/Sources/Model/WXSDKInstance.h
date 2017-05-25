@@ -264,6 +264,9 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 /**
  * fire module event;
+ * @param module which module you fire event to
+ * @param eventName the event name
+ * @param params event params
  */
 - (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 
