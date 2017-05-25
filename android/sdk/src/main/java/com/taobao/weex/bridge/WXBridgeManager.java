@@ -1186,10 +1186,16 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       String err = "function:" + function + "#exception:" + exception;
       commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_JS_EXECUTE, err);
 
-      IWXJSExceptionAdapter adapter = WXSDKManager.getInstance().getIWXJSExceptionAdapter();
-      if (adapter != null) {
+      List<IWXJSExceptionAdapter> adapterList = WXSDKManager.getInstance().getIWXJSExceptionAdapters();
+      if (adapterList != null) {
         WXJSExceptionInfo jsException = new WXJSExceptionInfo(instanceId, instance.getBundleUrl(), WXErrorCode.WX_ERR_JS_EXECUTE.getErrorCode(), function, exception, null);
-        adapter.onJSException(jsException);
+        for(IWXJSExceptionAdapter adapter : adapterList) {
+          try {
+            adapter.onJSException(jsException);
+          } catch (Throwable e) {
+            // ignore adapter's exception
+          }
+        }
         if (WXEnvironment.isApkDebugable()) {
           WXLogUtils.d(jsException.toString());
         }
