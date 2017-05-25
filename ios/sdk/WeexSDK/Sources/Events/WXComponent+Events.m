@@ -270,6 +270,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeClickEvent
 {
     if (_tapGesture) {
+        [_tapGesture removeTarget:self action:@selector(onClick:)];
+        [self.view removeGestureRecognizer:_tapGesture];
         _tapGesture.delegate = nil;
         _tapGesture = nil;
     }
@@ -341,6 +343,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
   
     for (UISwipeGestureRecognizer *recognizer in _swipeGestures) {
+        [recognizer removeTarget:self action:@selector(onSwipe:)];
+        [self.view removeGestureRecognizer:recognizer];
         recognizer.delegate = nil;
     }
     
@@ -394,6 +398,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeLongPressEvent
 {
     if (_longPressGesture) {
+        [_longPressGesture removeTarget:self action:@selector(onLongPress:)];
+        [self.view removeGestureRecognizer:_longPressGesture];
         _longPressGesture.delegate = nil;
         _longPressGesture = nil;
     }
@@ -540,6 +546,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         && !_listenPanStart && !_listenPanMove && !_listenPanEnd
         && !_listenHorizontalPan && !_listenVerticalPan
         ) {
+        [_panGesture removeTarget:self action:@selector(onPan:)];
+        [self.view removeGestureRecognizer:_panGesture];
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
