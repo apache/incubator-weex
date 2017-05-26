@@ -116,6 +116,8 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     CGFloat _lineHeight;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
+    
+    BOOL _notifyRepaint;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -137,6 +139,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
+        _notifyRepaint = NO;
         // just for coretext and textkit render replacement
         if ([attributes objectForKey:@"coretext"]) {
             _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
@@ -169,7 +172,9 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (_notifyRepaint) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+    }
 }
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
@@ -361,6 +366,7 @@ do {\
         //custom localSrc is cached
         if (!fontLocalSrc && fontSrc) {
             // if use custom font, when the custom font download finish, refresh text.
+            _notifyRepaint = YES;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         }
     }
