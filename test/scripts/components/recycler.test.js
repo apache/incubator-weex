@@ -43,7 +43,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
   });
 
   after(function () {
-      return util.quit(driver); 
+      return util.quit(driver);
   })
 
   let scaleFactor = 0
@@ -361,7 +361,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
     .elementById((isAndroid ? 'cell27' : 'cell28'))
     .click()
     .elementById('stickyText1')
-    .text() 
+    .text()
     .then(text => {
       console.log(text)
       originContentOffset = Number.parseInt(text.replace('Content Offset:-',''))
@@ -391,7 +391,7 @@ describe('recycler @ignore-android @ignore-ios', function () {
       console.log(text)
       originContentOffset = Number.parseInt(text.replace('Content Offset:-',''))
     })
-    .touch('drag', {fromX:recyclerWidth / 2, fromY:screenHeight / 5, toX:recyclerWidth / 2, toY: screenHeight * 4 / 5})
+    .touch('drag', {fromX:recyclerWidth / 2, fromY:screenHeight / 5, toX:recyclerWidth / 2, toY: screenHeight * 4 / 5,duration: 2})
     .elementById('stickyText1')
     .text()
     .then(text => {

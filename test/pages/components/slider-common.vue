@@ -182,14 +182,14 @@
         }
         this.progress = 233 * this.index + 233 * -ratio;
         this.count++;
-        this.flag = this.count / 100 < this.switchCount;
+        this.flag = this.count <= 100;
       },
       onchange(e) {
         this.goto(parseInt(e.index));
         this.switchCount++;
+        this.count = 0;
       },
       update(index) {
-        console.log('update switch count >>>')
         if (index == 1) {
           this.count1++;
         } else if (index == 2) {
