@@ -468,7 +468,7 @@
     WXAssertMainThread();
 }
 
-- (void)updateTransform:(CGAffineTransform)transform
+- (void)setNativeTransform:(CGAffineTransform)transform
 {
     WXAssertMainThread();
     

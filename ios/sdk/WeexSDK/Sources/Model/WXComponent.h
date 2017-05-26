@@ -340,7 +340,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract Update component's transform with native transform struct
  **/
-- (void)updateTransform:(CGAffineTransform)transform;
+- (void)setNativeTransform:(CGAffineTransform)transform;
 
 ///--------------------------------------
 /// @name Display
