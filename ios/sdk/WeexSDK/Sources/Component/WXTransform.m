@@ -38,6 +38,9 @@
     WXLength *_translateY;
     WXLength *_originX;
     WXLength *_originY;
+    
+    CGAffineTransform _nativeTransform;
+    BOOL _useNativeTransform;
 }
 
 - (instancetype)initWithCSSValue:(NSString *)cssValue origin:(NSString *)origin instance:(WXSDKInstance *)instance
@@ -50,6 +53,17 @@
         
         [self parseTransform:cssValue];
         [self parseTransformOrigin:origin];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithNativeTransform:(CGAffineTransform)transform instance:(WXSDKInstance *)instance
+{
+    if (self = [super init]) {
+        _weexInstance = instance;
+        _nativeTransform = transform;
+        _useNativeTransform = YES;
     }
     
     return self;
@@ -80,8 +94,17 @@
     return _scaleY;
 }
 
+- (void)setTransformOrigin:(NSString *)transformOriginCSS
+{
+    [self parseTransformOrigin:transformOriginCSS];
+}
+
 - (CGAffineTransform)nativeTransformWithView:(UIView *)view
 {
+    if (_useNativeTransform) {
+        return _nativeTransform;
+    }
+    
     CGAffineTransform nativeTransform = [self nativeTransformWithoutRotateWithView:view];
     
     nativeTransform = CGAffineTransformRotate(nativeTransform, _rotateAngle);

@@ -463,6 +463,22 @@
     WXAssertMainThread();
 }
 
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+- (void)updateTransform:(CGAffineTransform)transform
+{
+    WXAssertMainThread();
+    
+    _transform = [[WXTransform alloc] initWithNativeTransform:transform instance:self.weexInstance];
+    if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
+        [_transform applyTransformForView:_view];
+        [_layer setNeedsDisplay];
+    }
+}
+
 - (void)readyToRender
 {
     if (self.weexInstance.trackComponent) {
@@ -470,11 +486,6 @@
     }
 }
 
-- (void)updateAttributes:(NSDictionary *)attributes
-{
-    WXAssertMainThread();
-    
-}
 
 - (void)setGradientLayer
 {
