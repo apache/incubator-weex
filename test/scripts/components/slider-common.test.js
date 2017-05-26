@@ -25,20 +25,9 @@ var path = require('path');
 var os = require('os');
 var util = require("../util.js");
 
-const platform = process.env.platform.toLowerCase() || 'android';
-const isAndroid = platform === 'android';
-var dragOption = {};
-
 describe('slider common', function () {
   this.timeout(util.getTimeoutMills());
   var driver = util.createDriver(wd);
-
-  if (isAndroid) {
-    dragOption = {fromX: 1000, toX: -1000, fromY: 700, toY: 700, duration: 5, steps: 100};
-  } else {
-    //TODO: add drag option for iOS
-    dragOption = {fromX:350, fromY:150, toX:650, toY: 150, duration: 2}
-  }
 
   before(function () {
     return util.init(driver)
