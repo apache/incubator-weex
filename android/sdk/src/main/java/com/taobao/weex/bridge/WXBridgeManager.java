@@ -173,14 +173,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void initWXBridge(boolean remoteDebug) {
-    if (remoteDebug) {
+    if (remoteDebug && WXEnvironment.isApkDebugable()) {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
     if (mWxDebugProxy != null) {
       mWxDebugProxy.stop(false);
     }
-    if (WXEnvironment.sDebugServerConnectable) {
+    if (WXEnvironment.sDebugServerConnectable && WXEnvironment.isApkDebugable()) {
       if (WXEnvironment.getApplication() != null) {
         try {
           Class clazz = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
