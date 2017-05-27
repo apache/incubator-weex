@@ -280,7 +280,15 @@ public class WXPerformance {
               + " firstScreenRenderTime:" + screenRenderTime
               + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
               + " componentCount:" + componentCount
-              + "  totalTime:" + totalTime;
+              + "  JSTemplateSize:" + JSTemplateSize
+              + "  maxDeepViewLayer:" + maxDeepViewLayer
+              + "  SDKInitTime:" + WXEnvironment.sSDKInitTime
+              + "  totalTime:" + totalTime
+              + "  JSLibVersion:" + JSLibVersion
+              + "  WXSDKVersion:" + WXSDKVersion
+              + "  pageName:" + pageName
+              + "  useScroller:" + useScroller;
+
   }
 
   public String getErrMsg() {
