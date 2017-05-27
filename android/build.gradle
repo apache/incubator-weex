@@ -29,12 +29,12 @@ subprojects {
         }
     }
     ext {
-        compileSdkVersion=24
-        buildToolsVersion="24.0.3"
+        compileSdkVersion=23
+        buildToolsVersion="23.0.3"
         minSdkVersion=14
         appMinSdkVersion=15
-        targetSdkVersion=24
-        supportLibVersion="24.2.0"
+        targetSdkVersion=23
+        supportLibVersion="23.4.0"
         fastjsonLibVersion="1.1.46.android"
     }
 }
