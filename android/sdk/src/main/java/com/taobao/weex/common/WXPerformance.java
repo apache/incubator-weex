@@ -281,7 +281,6 @@ public class WXPerformance {
               + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
               + " componentCount:" + componentCount
               + "  JSTemplateSize:" + JSTemplateSize
-              + "  maxDeepViewLayer:" + maxDeepViewLayer
               + "  SDKInitTime:" + WXEnvironment.sSDKInitTime
               + "  totalTime:" + totalTime
               + "  JSLibVersion:" + JSLibVersion
