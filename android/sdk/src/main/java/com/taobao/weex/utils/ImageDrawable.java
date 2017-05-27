@@ -217,6 +217,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
+import java.lang.ref.WeakReference;
+
 public class ImageDrawable extends PaintDrawable {
 
   public static Drawable createImageDrawable(@Nullable Drawable original,
@@ -230,9 +232,7 @@ public class ImageDrawable extends PaintDrawable {
       if (original instanceof BitmapDrawable &&
           (bm = ((BitmapDrawable) original).getBitmap()) != null) {
         ImageDrawable imageDrawable;
-        imageDrawable = new ImageDrawable();
-        imageDrawable.bitmapWidth = bm.getWidth();
-        imageDrawable.bitmapHeight = bm.getHeight();
+        imageDrawable = new ImageDrawable(bm);
         BitmapShader bitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         updateShaderAndSize(scaleType, vWidth, vHeight, imageDrawable, bitmapShader);
         imageDrawable.getPaint().setShader(bitmapShader);
@@ -252,16 +252,19 @@ public class ImageDrawable extends PaintDrawable {
 
   private static void updateShaderAndSize(@NonNull ImageView.ScaleType scaleType, int vWidth, int vHeight, ImageDrawable imageDrawable, BitmapShader bitmapShader) {
     Matrix matrix = createShaderMatrix(scaleType, vWidth, vHeight,
-                                       imageDrawable.bitmapWidth,
-                                       imageDrawable.bitmapHeight);
+                                       imageDrawable.getBitmapWidth(),
+                                       imageDrawable.getBitmapHeight());
     int intrinsicWidth = vWidth, intrinsicHeight = vHeight;
     if (scaleType == ImageView.ScaleType.FIT_CENTER) {
-      RectF bitmapRect = new RectF(0, 0, imageDrawable.bitmapWidth, imageDrawable.bitmapHeight), contentRect = new RectF();
+      RectF bitmapRect = new RectF(0, 0, imageDrawable.getBitmapWidth(),
+                                   imageDrawable.getBitmapHeight()),
+          contentRect = new RectF();
       matrix.mapRect(contentRect, bitmapRect);
       intrinsicWidth = (int) contentRect.width();
       intrinsicHeight = (int) contentRect.height();
-      matrix = createShaderMatrix(scaleType, intrinsicWidth, intrinsicHeight, imageDrawable
-          .bitmapWidth, imageDrawable.bitmapHeight);
+      matrix = createShaderMatrix(scaleType, intrinsicWidth, intrinsicHeight,
+                                  imageDrawable.getBitmapWidth(),
+                                  imageDrawable.getBitmapHeight());
     }
     imageDrawable.setIntrinsicWidth(intrinsicWidth);
     imageDrawable.setIntrinsicHeight(intrinsicHeight);
@@ -295,12 +298,15 @@ public class ImageDrawable extends PaintDrawable {
     return mMatrix;
   }
 
+  private final int bitmapWidth;
+  private final int bitmapHeight;
+  private final WeakReference<Bitmap> bitmapWeakReference;
   private float[] radii;
-  private int bitmapHeight;
-  private int bitmapWidth;
 
-  private ImageDrawable() {
-
+  private ImageDrawable(@NonNull Bitmap bitmap) {
+    bitmapWidth = bitmap.getWidth();
+    bitmapHeight = bitmap.getHeight();
+    bitmapWeakReference =  new WeakReference<Bitmap>(bitmap);
   }
 
   @Override
@@ -323,4 +329,7 @@ public class ImageDrawable extends PaintDrawable {
     return bitmapWidth;
   }
 
+  public @Nullable Bitmap getBitmap(){
+    return bitmapWeakReference.get();
+  }
 }
