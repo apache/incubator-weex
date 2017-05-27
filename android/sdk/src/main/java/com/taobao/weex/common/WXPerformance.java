@@ -280,13 +280,13 @@ public class WXPerformance {
               + " firstScreenRenderTime:" + screenRenderTime
               + " firstScreenJSFExecuteTime:" + firstScreenJSFExecuteTime
               + " componentCount:" + componentCount
-              + "  JSTemplateSize:" + JSTemplateSize
-              + "  SDKInitTime:" + WXEnvironment.sSDKInitTime
-              + "  totalTime:" + totalTime
-              + "  JSLibVersion:" + JSLibVersion
-              + "  WXSDKVersion:" + WXSDKVersion
-              + "  pageName:" + pageName
-              + "  useScroller:" + useScroller;
+              + " JSTemplateSize:" + JSTemplateSize
+              + " SDKInitTime:" + WXEnvironment.sSDKInitTime
+              + " totalTime:" + totalTime
+              + " JSLibVersion:" + JSLibVersion
+              + " WXSDKVersion:" + WXSDKVersion
+              + " pageName:" + pageName
+              + " useScroller:" + useScroller;
 
   }
 
