@@ -162,6 +162,35 @@ export function normalizeStyle (style: {}) {
 }
 
 /**
+ * get transformObj
+ */
+export function getTransformObj (elm: HTMLElement): any {
+  let styleObj = {}
+  if (!elm) { return styleObj }
+  const transformStr = elm.style.webkitTransform || elm.style.transform
+  if (transformStr && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
+    styleObj = transformStr.trim().replace(/, +/g, ',').split(' ').reduce(function (pre, str) {
+      ['translate', 'scale', 'rotate'].forEach(function (name) {
+        if (new RegExp(name, 'i').test(str)) {
+          pre[name] = str
+        }
+      })
+      return pre
+    }, {})
+  }
+  return styleObj
+}
+
+/**
+ * translate a transform string from a transformObj.
+ */
+export function getTransformStr (obj: {}): string {
+  return Object.keys(obj).reduce(function (pre, key) {
+    return pre + obj[key] + ' '
+  }, '')
+}
+
+/**
  * add transform style to element.
  * @param {HTMLElement} elm
  * @param {object} style: transform object, format is like this:
