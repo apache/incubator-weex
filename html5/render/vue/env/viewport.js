@@ -46,7 +46,6 @@ if (metaWidth && !isNaN(metaWidth) && metaWidth > 0) {
 }
 
 let dpr: number = 0
-let deRect: mixed = null
 let screenWidth: number = 0
 let screenHeight: number = 0
 
@@ -116,9 +115,8 @@ export function init (viewportWidth: number = width): ?{
     }
 
     dpr = info.dpr = window.devicePixelRatio
-    deRect = doc.documentElement.getBoundingClientRect()
-    screenWidth = deRect.width
-    screenHeight = deRect.height
+    screenWidth = doc.documentElement.clientWidth
+    screenHeight = doc.documentElement.clientHeight
 
     // set root font for rem.
     setRootFont(screenWidth)
