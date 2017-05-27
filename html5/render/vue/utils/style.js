@@ -169,7 +169,7 @@ export function getTransformObj (elm: HTMLElement): any {
   if (!elm) { return styleObj }
   const transformStr = elm.style.webkitTransform || elm.style.transform
   if (transformStr && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
-    styleObj = transformStr.trim().split(' ').reduce(function (pre, str) {
+    styleObj = transformStr.trim().replace(/, +/g, ',').split(' ').reduce(function (pre, str) {
       ['translate', 'scale', 'rotate'].forEach(function (name) {
         if (new RegExp(name, 'i').test(str)) {
           pre[name] = str
