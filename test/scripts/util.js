@@ -167,6 +167,18 @@ module.exports = {
                       .sleep(1000)
                   })
           })
+          driverFactory.addPromiseChainMethod('swipeRight', function (distanceRatio, yRatio) {
+            return this
+              .getWindowSize()
+              .then(size => {
+                let y = yRatio * size.height;
+                let startX = size.width * 0.2;
+                let endX = startX + size.width * distanceRatio;
+                return this
+                  .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                  .sleep(1000)
+              })
+          })
             driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000
