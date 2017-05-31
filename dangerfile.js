@@ -219,8 +219,9 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff'}
   }, function (err, result) {
-    if (!result || !result.data || err) {
+    if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
       reject()
+      return
     }
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
     var promises = danger.git.modified_files.map(function(file) {
