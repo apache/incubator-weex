@@ -71,26 +71,41 @@
 
 - (float)rotateAngle
 {
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.b, _nativeTransform.a);
+    }
     return _rotateAngle;
 }
 
 - (WXLength *)translateX
 {
+    if (_useNativeTransform) {
+        return [WXLength lengthWithFloat:_nativeTransform.tx type:WXLengthTypeFixed];
+    }
     return _translateX;
 }
 
 - (WXLength *)translateY
 {
+    if (_useNativeTransform) {
+        return [WXLength lengthWithFloat:_nativeTransform.ty type:WXLengthTypeFixed];
+    }
     return _translateY;
 }
 
 - (float)scaleX
 {
+    if (_useNativeTransform) {
+        return sqrt(_nativeTransform.a * _nativeTransform.a + _nativeTransform.c * _nativeTransform.c);
+    }
     return _scaleX;
 }
 
 - (float)scaleY
 {
+    if (_useNativeTransform) {
+        return sqrt(_nativeTransform.b * _nativeTransform.b + _nativeTransform.d * _nativeTransform.d);
+    }
     return _scaleY;
 }
 
