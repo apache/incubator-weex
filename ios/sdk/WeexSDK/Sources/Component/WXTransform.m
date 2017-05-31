@@ -31,13 +31,19 @@
 
 @implementation WXTransform
 {
-    float _rotateAngle;
+    float _rotateAngle; //for rotate
     float _scaleX;
     float _scaleY;
     WXLength *_translateX;
     WXLength *_translateY;
     WXLength *_originX;
     WXLength *_originY;
+    
+    //3d rotate
+    float _rotateX;
+    float _rotateY;
+    float _rotateZ;
+    
 }
 
 - (instancetype)initWithCSSValue:(NSString *)cssValue origin:(NSString *)origin instance:(WXSDKInstance *)instance
@@ -46,6 +52,9 @@
         _weexInstance = instance;
         _scaleX = 1.0;
         _scaleY = 1.0;
+        _rotateX = 0.0;
+        _rotateY = 0.0;
+        _rotateZ = 0.0;
         _rotateAngle = 0.0;
         
         [self parseTransform:cssValue];
@@ -58,6 +67,21 @@
 - (float)rotateAngle
 {
     return _rotateAngle;
+}
+
+- (float)rotateX
+{
+    return _rotateX;
+}
+
+- (float)rotateY
+{
+    return _rotateY;
+}
+
+- (float)rotateZ
+{
+    return _rotateZ;
 }
 
 - (WXLength *)translateX
@@ -80,30 +104,51 @@
     return _scaleY;
 }
 
-- (CGAffineTransform)nativeTransformWithView:(UIView *)view
+- (CATransform3D)nativeTransformWithView:(UIView *)view
 {
-    CGAffineTransform nativeTransform = [self nativeTransformWithoutRotateWithView:view];
+    CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     
-    nativeTransform = CGAffineTransformRotate(nativeTransform, _rotateAngle);
+    float x = 0,y = 0,z = 0;
+    float rotateAngle = 0;
+    if (_rotateZ != 0) {
+        z = 1;
+        rotateAngle = _rotateZ;
+    }
+    if (_rotateAngle != 0) {
+        rotateAngle = _rotateAngle;
+    }
+    if (_rotateY != 0) {
+        y = 1;
+        rotateAngle = _rotateY;
+    }
+    if (_rotateX != 0) {
+        x = 1;
+        rotateAngle = _rotateX;
+    }
     
-    return nativeTransform;
+    nativeTransform3d = CATransform3DRotate(nativeTransform3d, rotateAngle, x, y, z);
+//    nativeTransform = CGAffineTransformRotate(nativeTransform, _rotateAngle);
+    
+    return nativeTransform3d;
 }
 
-- (CGAffineTransform)nativeTransformWithoutRotateWithView:(UIView *)view
+- (CATransform3D)nativeTransformWithoutRotateWithView:(UIView *)view
 {
-    CGAffineTransform nativeTransform = CGAffineTransformIdentity;
+//    CGAffineTransform nativeTransform = CGAffineTransformIdentity;
+    CATransform3D nativeTansform3D = CATransform3DIdentity;
     
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
-        return nativeTransform;
+        return nativeTansform3D;
     }
     
     if (_translateX || _translateY) {
-        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximum:view.bounds.size.height] : 0);
+        
+        nativeTansform3D = CATransform3DTranslate(nativeTansform3D, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0, _translateY ? [_translateY valueForMaximum:view.bounds.size.height]:0, 0);
+//        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximum:view.bounds.size.height] : 0);
     }
+    nativeTansform3D = CATransform3DScale(nativeTansform3D, _scaleX, _scaleY, 1.0);
     
-    nativeTransform = CGAffineTransformScale(nativeTransform, _scaleX, _scaleY);
-    
-    return nativeTransform;
+    return nativeTansform3D;
 }
 
 -(void)setAnchorPoint:(CGPoint)anchorPoint forView:(UIView *)view
@@ -146,11 +191,9 @@
                                           _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
-    
-    CGAffineTransform nativeTransform = [self nativeTransformWithView:view];
-    
-    if (!CGAffineTransformEqualToTransform(view.transform, nativeTransform)) {
-        view.transform = nativeTransform;
+    CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
+    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
+        view.layer.transform = nativeTransform3d;
     }
 }
 
@@ -239,6 +282,21 @@
 {
     float rotateAngle = [self getAngle:value[0]];
     _rotateAngle = rotateAngle;
+}
+
+- (void)parseRotatex:(NSArray *)value
+{
+    _rotateX = [self getAngle:value[0]];
+}
+
+- (void)parseRotatey:(NSArray *)value
+{
+    _rotateY = [self getAngle:value[0]];
+}
+
+- (void)parseRotatez:(NSArray *)value
+{
+   _rotateZ = [self getAngle:value[0]];
 }
 
 - (void)parseTranslate:(NSArray *)value

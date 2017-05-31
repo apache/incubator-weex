@@ -25,6 +25,9 @@
 @interface WXTransform : NSObject
 
 @property (nonatomic, assign, readonly) float rotateAngle;
+@property (nonatomic, assign, readonly) float rotateX;
+@property (nonatomic, assign, readonly) float rotateY;
+@property (nonatomic, assign, readonly) float rotateZ;
 @property (nonatomic, strong, readonly) WXLength *translateX;
 @property (nonatomic, strong, readonly) WXLength *translateY;
 @property (nonatomic, assign, readonly) float scaleX;
