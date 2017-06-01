@@ -655,6 +655,10 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   public void setSelectionRange(int selectionStart, int selectionEnd) {
     EditText hostView;
     if ((hostView = getHostView()) != null) {
+      int length = getHostView().length();
+      if (selectionStart > length || selectionEnd > length) {
+        return;
+      }
       focus();
       hostView.setSelection(selectionStart, selectionEnd);
     }
