@@ -746,17 +746,16 @@ do {\
         CTLineTruncationType truncationType = kCTLineTruncationEnd;
         NSAttributedString *attributedString = [self buildCTAttributeString];
         NSAttributedString * lastLineText = nil;
-        @try {
-            lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
-        } @catch (NSException *exception) {
-            lastLineText = attributedString;
-        } @finally {
-            if (!lastLineText) {
-                lastLineText = attributedString;
-            }
-            //nothing
+        NSRange lastLineTextRange = WXNSRangeFromCFRange(CTLineGetStringRange(lastLine));
+        NSRange attributeStringRange = NSRangeFromString(attributedString.string);
+        if (!NSEqualRanges(NSUnionRange(lastLineTextRange, attributeStringRange), attributeStringRange)) {
+            // out of bounds
+            lastLineTextRange = NSMakeRange(attributeStringRange.location, attributeStringRange.length);
         }
-        
+        lastLineText = [attributedString attributedSubstringFromRange: lastLineTextRange];
+        if (!lastLineText) {
+            lastLineText = attributedString;
+        }
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
         CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
