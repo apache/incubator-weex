@@ -73,6 +73,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
+  private boolean mIgnoreNextOnInputEvent = false;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -155,6 +156,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
     editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, WXStyle.getFontSize(getDomObject().getStyles(),getInstance().getInstanceViewPortWidth()));
     editText.setText(getDomObject().getAttrs().optString(Constants.Name.VALUE));
+    mIgnoreNextOnInputEvent = true;
   }
 
 
@@ -224,10 +226,15 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
             return;
           }
 
+          mBeforeText = s.toString();
+
+          if (mIgnoreNextOnInputEvent) {
+            mIgnoreNextOnInputEvent = false;
+            return;
+          }
+
           String event = domObject.getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
           fireEvent(event, s.toString());
-
-          mBeforeText = s.toString();
         }
 
         @Override
@@ -442,6 +449,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
     view.setText(value);
     view.setSelection(value == null?0:value.length());
+    mIgnoreNextOnInputEvent = true;
   }
 
   @WXComponentProp(name = Constants.Name.COLOR)
