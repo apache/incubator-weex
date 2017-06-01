@@ -349,9 +349,9 @@ do {\
     });
 }
 
-- (NSMutableAttributedString *)buildCTAttributeString {
-    
-    NSString *string = [self text] ?: @"";
+- (NSMutableAttributedString *)buildCTAttributeString
+{
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@", [self text] ?: @""];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
@@ -745,7 +745,18 @@ do {\
         // default truncationType is kCTLineTruncationEnd
         CTLineTruncationType truncationType = kCTLineTruncationEnd;
         NSAttributedString *attributedString = [self buildCTAttributeString];
-        NSAttributedString * lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
+        NSAttributedString * lastLineText = nil;
+        @try {
+            lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
+        } @catch (NSException *exception) {
+            lastLineText = attributedString;
+        } @finally {
+            if (!lastLineText) {
+                lastLineText = attributedString;
+            }
+            //nothing
+        }
+        
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
         CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
