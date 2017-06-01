@@ -748,9 +748,10 @@ do {\
         NSAttributedString * lastLineText = nil;
         NSRange lastLineTextRange = WXNSRangeFromCFRange(CTLineGetStringRange(lastLine));
         NSRange attributeStringRange = NSRangeFromString(attributedString.string);
-        if (!NSEqualRanges(NSUnionRange(lastLineTextRange, attributeStringRange), attributeStringRange)) {
+        NSRange interSectionRange = NSIntersectionRange(lastLineTextRange, attributeStringRange);
+        if (!NSEqualRanges(interSectionRange, lastLineTextRange)) {
             // out of bounds
-            lastLineTextRange = NSMakeRange(attributeStringRange.location, attributeStringRange.length);
+            lastLineTextRange = interSectionRange;
         }
         lastLineText = [attributedString attributedSubstringFromRange: lastLineTextRange];
         if (!lastLineText) {
