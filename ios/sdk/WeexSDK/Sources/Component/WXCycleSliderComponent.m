@@ -431,6 +431,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         if ([view isKindOfClass:[WXIndicatorView class]]) {
             ((WXIndicatorComponent *)subcomponent).delegate = self;
             [recycleSliderView addSubview:view];
+            [self setIndicatorView:(WXIndicatorView *)view];
             return;
         }
         
