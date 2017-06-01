@@ -954,7 +954,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private void invokeCallJSBatch(Message message) {
     if (mNextTickTasks.isEmpty() || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized!!  message:"+message.toString());
       }
       return;
     }
@@ -1021,9 +1021,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       for (int i = 0, moduleCount = mRegisterModuleFailList.size(); i < moduleCount; ++i) {
         invokeRegisterModules(mRegisterModuleFailList.get(i), moduleReceiver);
       }
-      mRegisterComponentFailList.clear();
+      mRegisterModuleFailList.clear();
       if (moduleReceiver.size() > 0) {
-        mRegisterComponentFailList.addAll(moduleReceiver);
+        mRegisterModuleFailList.addAll(moduleReceiver);
       }
     }
 
@@ -1116,7 +1116,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   private void invokeRegisterModules(Map<String, Object> modules, List<Map<String, Object>> failReceiver) {
     if (modules == null || !isJSFrameworkInit()) {
       if (!isJSFrameworkInit()) {
-        WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+        WXLogUtils.e("[WXBridgeManager] invokeRegisterModules: framework.js uninitialized.");
       }
       failReceiver.add(modules);
       return;
@@ -1137,7 +1137,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       throw new RuntimeException("Fail receiver should not use source.");
     }
     if (!isJSFrameworkInit()) {
-      WXLogUtils.e("[WXBridgeManager] invokeCallJSBatch: framework.js uninitialized.");
+      WXLogUtils.e("[WXBridgeManager] invokeRegisterComponents: framework.js uninitialized.");
 
       for (Map<String,Object> comp:components){
         failReceiver.add(comp);

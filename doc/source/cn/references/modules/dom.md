@@ -29,8 +29,9 @@ version: 2.1
 #### 参数
 - `node {Node}`：你要滚动到的那个节点
 - `options {Object}`：如下选项
-  - `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
- - `animated {bool}`：设置是否有滚动动画，默认是 true
+- `offset {number}`：一个到其可见位置的偏移距离，默认是 `0`
+- `animated {boolean}` <sup class="wx-v">0.10+</sup>：是否需要附带滚动动画，默认是`true`
+
 #### 示例
 
 ```html
@@ -255,6 +256,25 @@ version: 2.1
 ```
 
 [try it](http://dotwe.org/vue/d069a9bf0f0781b914f12a9a7b9a1447)
+
+
+### addRule
+`支持版本:v0.12.0`
+
+addRule是可以为dom 添加一条规则，目前支持自定义字体fontFace规则，构建自定义的font-family，可以在[text](../components/text.html#iconfont)使用
+
+#### fontFace
+
+```html
+var domModule = weex.requireModule('dom');
+domModule.addRule('fontFace', {
+    'fontFamily': "iconfont2",
+    'src': "url('http://at.alicdn.com/t/font_1469606063_76593.ttf')"
+});
+
+```
+
+[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)
 
 ## 其他
 

@@ -250,6 +250,7 @@ Weex supports both full page rendering and partial rendering. What you need to d
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
         [weakSelf.weexView removeFromSuperview];
+        weakSelf.weexView = view;
         [weakSelf.view addSubview:weakSelf.weexView];
     };
     _instance.onFailed = ^(NSError *error) {

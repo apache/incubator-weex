@@ -64,7 +64,11 @@
 {
     NSString *superDescription = super.description;
     NSRange semicolonRange = [superDescription rangeOfString:@";"];
-    NSString *replacement = [NSString stringWithFormat:@"; text: %@; frame:%f,%f,%f,%f", _textStorage.string, self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height];
+    NSString * content = _textStorage.string;
+    if ([(WXTextComponent*)self.wx_component useCoreText]) {
+        content = [(WXTextComponent*)self.wx_component valueForKey:@"_text"];
+    }
+    NSString *replacement = [NSString stringWithFormat:@"; text: %@; frame:%f,%f,%f,%f", content, self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height];
     return [superDescription stringByReplacingCharactersInRange:semicolonRange withString:replacement];
 }
 

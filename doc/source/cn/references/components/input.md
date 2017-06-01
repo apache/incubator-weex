@@ -131,7 +131,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 ```html
 <template>
   <div class="wrapper">
-    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur">
+    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur"></input>
   </div>
 </template>
 
@@ -190,4 +190,4 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 </style>
 ```
 
-[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)
+[try it](http://dotwe.org/vue/e56d9ebeede8f80bbc8b53637395d22f)

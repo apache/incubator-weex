@@ -7,9 +7,9 @@ version: 2.1
 
 # 全局事件
 
-<span class="weex-version">0.8 (开发中)</span>
+<span class="weex-version">0.8</span>
 
-`globalEvent` 用于监听持久性事件，例如定位信息，陀螺仪等的变化。全局事件是需要额外 APIs 处理的次要 API。你能通过 `addEventListener` 注册事件监听，当你不再需要的时候，也可以通过 `removeEventListener` 取消事件监听。Vue 版本暂不支持 `globalEvent`。
+`globalEvent` 用于监听持久性事件，例如定位信息，陀螺仪等的变化。全局事件是需要额外 APIs 处理的次要 API。你能通过 `addEventListener` 注册事件监听，当你不再需要的时候，也可以通过 `removeEventListener` 取消事件监听。
 
 *提醒*
 
@@ -66,7 +66,7 @@ mWXSDKInstance.fireGlobalEventCallback("geolocation",params);
 #### 示例
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule('globalEvent');
 globalEvent.addEventListener("geolocation", function (e) {
   console.log("get geolocation")
 });
@@ -83,6 +83,6 @@ globalEvent.addEventListener("geolocation", function (e) {
 #### 示例
 
 ```javascript
-var globalEvent = require('@weex-module/globalEvent');
+var globalEvent = weex.requireModule('globalEvent');
 globalEvent.removeEventListener("geolocation");
 ```

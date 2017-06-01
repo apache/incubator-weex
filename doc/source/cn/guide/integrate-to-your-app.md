@@ -287,6 +287,7 @@ Weex 支持整体页面渲染和部分渲染两种模式，你需要做的事情
     __weak typeof(self) weakSelf = self;
     _instance.onCreate = ^(UIView *view) {
         [weakSelf.weexView removeFromSuperview];
+        weakSelf.weexView = view;
         [weakSelf.view addSubview:weakSelf.weexView];
     };
 
