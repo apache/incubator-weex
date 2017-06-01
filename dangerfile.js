@@ -169,7 +169,8 @@ const ignoreCopyrightVerifyPath = [
   'android/sdk/assets',
   'ios/playground/bundlejs',
   'ios/sdk/WeexSDK/Resources',
-  'ios/sdk/WeexSDK/Sources/Layout'
+  'ios/sdk/WeexSDK/Sources/Layout',
+  'ios/sdk/WeexSDK/dependency/SRWebSocket'
 ]
 
 codefiles.forEach(filepath => {
