@@ -139,7 +139,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
-        _notifyRepaint = NO;
         // just for coretext and textkit render replacement
         _needsRemoveObserver = NO;
         if ([attributes objectForKey:@"coretext"]) {
