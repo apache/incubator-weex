@@ -1369,8 +1369,27 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
      */
   @CheckResult
   protected Object convertEmptyProperty(String propName, Object originalValue) {
-    if (Constants.Name.BACKGROUND_COLOR.equals(propName)) {
-      return "transparent";
+    switch (propName) {
+      case Constants.Name.BACKGROUND_COLOR:
+        return "transparent";
+      case Constants.Name.BORDER_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
+      case Constants.Name.BORDER_TOP_LEFT_RADIUS:
+      case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
+        return 0;
+      case Constants.Name.BORDER_WIDTH:
+      case Constants.Name.BORDER_TOP_WIDTH:
+      case Constants.Name.BORDER_LEFT_WIDTH:
+      case Constants.Name.BORDER_RIGHT_WIDTH:
+      case Constants.Name.BORDER_BOTTOM_WIDTH:
+        return 0;
+      case Constants.Name.BORDER_COLOR:
+      case Constants.Name.BORDER_TOP_COLOR:
+      case Constants.Name.BORDER_LEFT_COLOR:
+      case Constants.Name.BORDER_RIGHT_COLOR:
+      case Constants.Name.BORDER_BOTTOM_COLOR:
+        return "black";
     }
     return originalValue;
   }

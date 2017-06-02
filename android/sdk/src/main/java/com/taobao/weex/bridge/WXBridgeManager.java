@@ -58,7 +58,6 @@ import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -174,39 +173,35 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   private void initWXBridge(boolean remoteDebug) {
-    if (remoteDebug) {
+    if (remoteDebug && WXEnvironment.isApkDebugable()) {
       WXEnvironment.sDebugServerConnectable = true;
     }
 
     if (mWxDebugProxy != null) {
       mWxDebugProxy.stop(false);
     }
-    if (WXEnvironment.sDebugServerConnectable) {
-      try {
-        Class clazz =  Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
-        if (clazz != null) {
-          Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
-          if (constructor != null) {
-            mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
-                WXEnvironment.getApplication(), WXBridgeManager.this);
-            if (mWxDebugProxy != null) {
-              mWxDebugProxy.start();
+    if (WXEnvironment.sDebugServerConnectable && WXEnvironment.isApkDebugable()) {
+      if (WXEnvironment.getApplication() != null) {
+        try {
+          Class clazz = Class.forName("com.taobao.weex.devtools.debug.DebugServerProxy");
+          if (clazz != null) {
+            Constructor constructor = clazz.getConstructor(Context.class, WXBridgeManager.class);
+            if (constructor != null) {
+              mWxDebugProxy = (IWXDebugProxy) constructor.newInstance(
+                      WXEnvironment.getApplication(), WXBridgeManager.this);
+              if (mWxDebugProxy != null) {
+                mWxDebugProxy.start();
+              }
             }
           }
+        } catch (Throwable e) {
+          //Ignore, It will throw Exception on Release environment
         }
-      } catch (ClassNotFoundException e) {
-        // ignore
-      } catch (NoSuchMethodException e) {
-        // ignore
-      } catch (InstantiationException e) {
-        // ignore
-      } catch (IllegalAccessException e) {
-        // ignore
-      } catch (InvocationTargetException e) {
-        // ignore
+        WXServiceManager.execAllCacheJsService();
+      } else {
+        WXLogUtils.e("WXBridgeManager", "WXEnvironment.sApplication is null, skip init Inspector");
+        WXLogUtils.w("WXBridgeManager", new Throwable("WXEnvironment.sApplication is null when init Inspector"));
       }
-
-      WXServiceManager.execAllCacheJsService();
     }
     if (remoteDebug && mWxDebugProxy != null) {
       mWXBridge = mWxDebugProxy.getWXBridge();
@@ -892,7 +887,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     mWXBridge.execJS(instanceId, namespace, function, args);
   }
 
-  private void invokeInitFramework(Message msg) {   
+  private void invokeInitFramework(Message msg) {
     String framework = "";
     if (msg.obj != null) {
       framework = (String) msg.obj;

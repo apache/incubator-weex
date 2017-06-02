@@ -117,7 +117,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     CGFloat _letterSpacing;
     BOOL _truncationLine; // support trunk tail
     
-    BOOL _notifyRepaint;
+    BOOL _needsRemoveObserver;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -141,6 +141,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if (self) {
         _notifyRepaint = NO;
         // just for coretext and textkit render replacement
+        _needsRemoveObserver = NO;
         if ([attributes objectForKey:@"coretext"]) {
             _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
         } else {
@@ -172,7 +173,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (void)dealloc
 {
-    if (_notifyRepaint) {
+    if (_needsRemoveObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
     }
 }
@@ -350,9 +351,9 @@ do {\
     });
 }
 
-- (NSMutableAttributedString *)buildCTAttributeString {
-    
-    NSString *string = [self text] ?: @"";
+- (NSMutableAttributedString *)buildCTAttributeString
+{
+    NSMutableString *string = [NSMutableString stringWithFormat:@"%@", [self text] ?: @""];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
@@ -366,7 +367,7 @@ do {\
         //custom localSrc is cached
         if (!fontLocalSrc && fontSrc) {
             // if use custom font, when the custom font download finish, refresh text.
-            _notifyRepaint = YES;
+            _needsRemoveObserver = YES;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         }
     }
@@ -445,6 +446,7 @@ do {\
         //custom localSrc is cached
         if (!fontLocalSrc && fontSrc) {
             // if use custom font, when the custom font download finish, refresh text.
+            _needsRemoveObserver = YES;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
         }
     }
@@ -749,7 +751,18 @@ do {\
         // default truncationType is kCTLineTruncationEnd
         CTLineTruncationType truncationType = kCTLineTruncationEnd;
         NSAttributedString *attributedString = [self buildCTAttributeString];
-        NSAttributedString * lastLineText = [attributedString attributedSubstringFromRange: WXNSRangeFromCFRange(CTLineGetStringRange(lastLine))];
+        NSAttributedString * lastLineText = nil;
+        NSRange lastLineTextRange = WXNSRangeFromCFRange(CTLineGetStringRange(lastLine));
+        NSRange attributeStringRange = NSMakeRange(0, attributedString.string.length);
+        NSRange interSectionRange = NSIntersectionRange(lastLineTextRange, attributeStringRange);
+        if (!NSEqualRanges(interSectionRange, lastLineTextRange)) {
+            // out of bounds
+            lastLineTextRange = interSectionRange;
+        }
+        lastLineText = [attributedString attributedSubstringFromRange: lastLineTextRange];
+        if (!lastLineText) {
+            lastLineText = attributedString;
+        }
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
         CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
