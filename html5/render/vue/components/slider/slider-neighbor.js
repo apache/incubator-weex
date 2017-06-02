@@ -18,7 +18,6 @@
  */
 import slideMixin from './slideMixin'
 
-const DEFAULT_MAIN_SLIDE_SCALE = 0.9
 const DEFAULT_NEIGHBOR_SPACE = 20
 const DEFAULT_NEIGHBOR_ALPHA = 0.6
 const DEFAULT_NEIGHBOR_SCALE = 0.8
@@ -73,7 +72,7 @@ export default {
         val = parseFloat(val)
         return !isNaN(val) && val >= 0 && val <= 1
       },
-      default: DEFAULT_MAIN_SLIDE_SCALE
+      default: DEFAULT_CURRENT_ITEM_SCALE
     }
   },
 

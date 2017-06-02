@@ -242,7 +242,7 @@ export function addTranslateX (elm: HTMLElement, toAdd: number): void {
 export function copyTransform (from: HTMLElement, to: HTMLElement, key: string | void): void {
   let str
   if (!key) {
-    str = to.style.webkitTransform || to.style.transform
+    str = from.style.webkitTransform || from.style.transform
   }
   else {
     const fromObj = getTransformObj(from)

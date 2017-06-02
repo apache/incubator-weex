@@ -25,16 +25,15 @@ import {
   fireLazyload,
   addTransform,
   copyTransform,
+  getTransformObj,
   bind
 } from '../../utils'
 import { extractComponentStyle, createEventMap } from '../../core'
 
-// const TRANSITION_TIME = 200
-const TRANSITION_TIME = 1000
+const TRANSITION_TIME = 100
+const NEIGHBOR_SCALE_TIME = 50
 const MAIN_SLIDE_OPACITY = 1
-
-// trigger scroll event frequency.
-// const scrollDam = 16
+const THROTTLE_SCROLL_TIME = 16
 
 export default {
   created () {
@@ -48,7 +47,6 @@ export default {
 
   beforeUpdate () {
     this._updateLayout()
-    // this._reorder()
   },
 
   updated () {
@@ -62,13 +60,16 @@ export default {
       }
     }
     fireLazyload(this.$el, true)
+    this._preIndex = this._showNodes[0].index
+    if (this._preIndex !== this.currentIndex) {
+      this._slideTo(this.currentIndex)
+    }
   },
 
   mounted () {
     this._updateLayout()
     this._startAutoPlay()
     this._slideTo(this.currentIndex)
-    // this._reorder()
     fireLazyload(this.$el, true)
   },
 
@@ -127,7 +128,8 @@ export default {
           on: extend(createEventMap(this, ['scroll', 'scrollstart', 'scrollend']), {
             touchstart: this._handleTouchStart,
             touchmove: throttle(bind(this._handleTouchMove, this), 25),
-            touchend: this._handleTouchEnd
+            touchend: this._handleTouchEnd,
+            touchcancel: this._handleTouchCancel
           }),
           staticClass: 'weex-slider weex-slider-wrapper weex-ct',
           staticStyle: extractComponentStyle(this)
@@ -179,7 +181,7 @@ export default {
       }
     },
 
-    _slideTo (index) {
+    _slideTo (index, isTouchScroll) {
       if (!this.infinite || this.infinite === 'false') {
         if (index === -1 || index > (this.frameCount - 1)) {
           this._slideTo(this.currentIndex)
@@ -187,87 +189,103 @@ export default {
         }
       }
 
+      if (!this._preIndex && this._preIndex !== 0) {
+        if (this._showNodes && this._showNodes[0]) {
+          this._preIndex = this._showNodes[0].index
+        }
+        else {
+          this._preIndex = this.currentIndex
+        }
+      }
+
+      if (this._sliding) {
+        return
+      }
+      this._sliding = true
+
       const newIndex = this._normalizeIndex(index)
       const inner = this.$refs.inner
-      let step = this._step = this.frameCount <= 1 ? 0 : this.currentIndex - index
-      // newIndex: 0 -> 1, sign: -1; newIndex: 1 -> 0, sign: 1.
-      const sign = step === 0 ? 0 : step > 0 ? 1 : -1
-
-      if (Math.abs(step) > 1) {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('[vue-render] slider step should be no more than 1.')
-        }
-        step = sign
-      }
+      const step = this._step = this.frameCount <= 1 ? 0 : this._preIndex - index
 
       if (inner) {
         this._prepareNodes()
-
-        this.innerOffset += sign * this.wrapperWidth
+        const translate = getTransformObj(inner).translate
+        const match = translate && translate.match(/translate[^(]+\(([+-\d.]+)/)
+        const innerX = match && match[1] || 0
+        const dist = innerX - this.innerOffset
+        this.innerOffset += step * this.wrapperWidth
         // transform the whole slides group.
-        // inner.style.webkitTransition = `-webkit-transform ${TRANSITION_TIME / 1000}s ease-in-out`
-        // inner.style.transition = `transform ${TRANSITION_TIME / 1000}s ease-in-out`
-        // inner.style.webkitTransform = `translate3d(${this.innerOffset}px, 0, 0)`
-        // inner.style.transform = `translate3d(${this.innerOffset}px, 0, 0)`
+        inner.style.webkitTransition = `-webkit-transform ${TRANSITION_TIME / 1000}s ease-in-out`
+        inner.style.transition = `transform ${TRANSITION_TIME / 1000}s ease-in-out`
+        inner.style.webkitTransform = `translate3d(${this.innerOffset}px, 0, 0)`
+        inner.style.transform = `translate3d(${this.innerOffset}px, 0, 0)`
+
+        // emit scroll events.
+        if (!isTouchScroll) {
+          this._emitScrollEvent('scrollstart')
+        }
+        setTimeout(() => {
+          this._throttleEmitScroll(dist, () => {
+            this._emitScrollEvent('scrollend')
+          })
+        }, THROTTLE_SCROLL_TIME)
 
         this._loopShowNodes(step)
 
-        if (this.isNeighbor) {
-          // set neighbors
-          setTimeout(this._setNeighbors.bind(this), 0)
-        }
-
-        // current arrange index changed since the slides position begin to change.
-        // this._currentIndexInArrangeArray = this._currentIndexInArrangeArray - step
-
         setTimeout(() => {
-          // inner.style.webkitTransition = ''
-          // inner.style.transition = ''
-          for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
-            const node = this._showNodes[i]
-            if (!node) { continue }
-            const elm = node.firstElementChild
-            elm.style.webkitTransition = ''
-            elm.style.transition = ''
+          if (this.isNeighbor) {
+            this._setNeighbors()
           }
 
-          // this._loopShowNodes(step)
-
-          // clean cloned nodes and rearrange slide cells.
-          this._rearrangeNodes(newIndex)
+          setTimeout(() => {
+            inner.style.webkitTransition = ''
+            inner.style.transition = ''
+            for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
+              const node = this._showNodes[i]
+              if (!node) { continue }
+              const elm = node.firstElementChild
+              elm.style.webkitTransition = ''
+              elm.style.transition = ''
+            }
+            // this._loopShowNodes(step)
+            // clean cloned nodes and rearrange slide cells.
+            this._rearrangeNodes(newIndex)
+          }, NEIGHBOR_SCALE_TIME)
         }, TRANSITION_TIME)
       }
 
       // TODO: emit scroll event.
       // nextFrame()
 
-      if (newIndex !== this.currentIndex) {
+      if (newIndex !== this._preIndex) {
         // replace $el with { attr, style } is a legacy usage. Is it necessary to
         // do this ? Or just tell devers to use inline functions to access attrs ?
         this.$emit('change', createEvent(this.$el, 'change', {
           index: newIndex
         }))
-        // setTimeout(() => { this._reorder(newIndex) }, TRANSITION_TIME)
+      }
+    },
+
+    _clearNodesOffset () {
+      const end = this._showEndIdx
+      for (let i = this._showStartIdx; i <= end; i++) {
+        addTransform(this._showNodes[i].firstElementChild, {
+          translate: 'translate3d(0px, 0px, 0px)'
+        })
       }
     },
 
     _loopShowNodes (step) {
-      const sign = step > 0 ? 1 : -1
-      let val = Math.abs(step)
-      while (val--) {
-        let i = sign < 0 ? this._showStartIdx : this._showEndIdx
-        const end = sign < 0 ? this._showEndIdx : this._showStartIdx
-        for (; i !== end - sign; i -= sign) {
-          const nextIdx = i + sign
-          this._positionNode(this._showNodes[i], nextIdx)
-          // this._showNodes[nextIdx] = this._showNodes[i]
-          // this._showNodes[nextIdx]._showIndex = nextIdx
-          // this._positionNode(this._showNodes[nextIdx], nextIdx)
-        }
+      if (!step) {
+        return
       }
-      const begin = sign < 0 ? this._showEndIdx : this._showStartIdx
-      const end = begin - step
-      for (let i = begin; i !== end; i -= sign) {
+      const sign = step > 0 ? 1 : -1
+      let i = step <= 0 ? this._showStartIdx : this._showEndIdx
+      const end = step <= 0 ? this._showEndIdx : this._showStartIdx
+      for (; i !== end - sign; i -= sign) {
+        const nextIdx = i + step
+        this._showNodes[nextIdx] = this._showNodes[i]
+        this._showNodes[nextIdx]._showIndex = nextIdx
         delete this._showNodes[i]
       }
       this._showStartIdx += step
@@ -283,22 +301,11 @@ export default {
         this._initNodes()
         this._inited = true
         this._showNodes = {}
-      //   // prepare nodes for the first time.
-      //   // just generate the arrangeArray.
-      //   for (let i = 0; i < total; i++) {
-      //     const node = cells[i].elm
-      //     node.index = i
-      //     node.style.zIndex = 0
-      //     node.style.opacity = 0
-      //     node._showIndex = i
-      //   }
-      //   // this._positionNodes(start, end, cellBeginIndex)
       }
 
       const showCount = this._showCount = Math.abs(step) + 3
-
-      this._showStartIdx = step <= 0 ? -1 : 1
-      this._showEndIdx = step <= 0 ? showCount - 2 : 2 - showCount
+      this._showStartIdx = step <= 0 ? -1 : 2 - showCount
+      this._showEndIdx = step <= 0 ? showCount - 2 : 1
       this._positionNodes(this._showStartIdx, this._showEndIdx, step)
     },
 
@@ -314,11 +321,13 @@ export default {
       }
     },
 
-    _positionNodes (begin, end, step) {
+    _positionNodes (begin, end, step, anim) {
       const cells = this._cells
+      const start = step <= 0 ? begin : end
+      const stop = step <= 0 ? end : begin
       const sign = step <= 0 ? -1 : 1
-      let cellIndex = this.currentIndex + sign
-      for (let i = begin; i !== end - sign; i = i - sign) {
+      let cellIndex = this._preIndex + sign
+      for (let i = start; i !== stop - sign; i = i - sign) {
         const node = cells[this._normalizeIndex(cellIndex)].elm
         cellIndex = cellIndex - sign
         this._positionNode(node, i)
@@ -329,9 +338,6 @@ export default {
      * index: position index in the showing cells' view.
      */
     _positionNode (node, index) {
-      // if (this._showNodes[index]) {
-      //   return
-      // }
       if (node._inShow && this._showNodes[index] !== node) {
         node = this._getClone(node.index)
       }
@@ -397,6 +403,7 @@ export default {
     _clearNodes (begin, end) {
       for (let i = begin; i <= end; i++) {
         const node = this._showNodes[i]
+        if (!node) { return }
         if (node._isClone) {
           this._removeClone(node)
         }
@@ -419,11 +426,19 @@ export default {
       origNode.style.left = clone.style.left
       origNode.style.opacity = clone.style.opacity
       origNode.style.zIndex = clone.style.zIndex
-      copyTransform(clone, origNode)
-      origNode.firstElementChild.style.left = clone.firstElementChild.style.left
+      // copyTransform(clone, origNode)
+      const transObj = getTransformObj(clone)
+      transObj.translate = transObj.translate.replace(/[+-\d.]+[pw]x/, ($0) => {
+        return pos * this.wrapperWidth - this.innerOffset + 'px'
+      })
+      addTransform(origNode, transObj)
+      copyTransform(clone.firstElementChild, origNode.firstElementChild)
+      // origNode.firstElementChild.style.left = clone.firstElementChild.style.left
       this._removeClone(clone)
-      delete this._showNodes[clone._showIndex]
+      // delete this._showNodes[clone._showIndex]
+      delete this._showNodes[origNode._showIndex]
       this._showNodes[pos] = origNode
+      origNode._showIndex = pos
     },
 
     _rearrangeNodes (newIndex) {
@@ -447,22 +462,14 @@ export default {
       }
 
       this._clearNodes(this._showStartIdx, -2)
+      this._showStartIdx = -1
       this._clearNodes(2, this._showEndIdx)
-
-      // const curNode = shows[0]
-      // if (curNode._isClone) {
-      //   // replace this cloned node with the original node.
-      //   const idx = curNode.index
-      //   for (let i = 0; i < nodesLen; i++) {
-      //     if (nodes[i].index === idx) {
-      //       break
-      //     }
-      //   }
-      //   this._replaceCloneNode(curNode, i)
-      // }
+      this._showEndIdx = 1
+      this._sliding = false
 
       // set current index to the new index.
       this.currentIndex = newIndex
+      this._preIndex = newIndex
     },
 
     /**
@@ -478,147 +485,29 @@ export default {
 
       for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
         const elm = this._showNodes[i].firstElementChild
-        elm.style.webkitTransition = `all ${TRANSITION_TIME / 1000}s ease`
-        elm.style.transition = `all ${TRANSITION_TIME / 1000}s ease`
+        elm.style.webkitTransition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
+        elm.style.transition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
         const transObj = {
           scale: `scale(${i === 0 ? this.currentItemScale : this.neighborScale})`
         }
-        addTransform(elm, transObj)
+        let translateX
         if (!this._neighborWidth) {
           this._neighborWidth = parseFloat(elm.style.width) || elm.getBoundingClientRect().width
         }
         // calculate position offsets according to neighbor scales.
         if (Math.abs(i) === 1) {
-          const dist = (this.wrapperWidth - this._neighborWidth * this.neighborScale) / 2
-            + this.neighborSpace * weex.config.env.scale
-          elm.style.left = `${-i * dist}px`
+          const dist = ((this.wrapperWidth - this._neighborWidth * this.neighborScale) / 2
+            + this.neighborSpace * weex.config.env.scale) / this.neighborScale
+          translateX = -i * dist
         }
-        // clear position offsets.
         else {
-          elm.style.left = ''
+          // clear position offsets.
+          translateX = 0
         }
-      }
-    },
-
-    _order () {
-      this.$nextTick(() => {
-        for (let i = 1, l = this._cells.length; i < l; i++) {
-          const nextElm = this._cells[i].elm
-          const nextOffset = this.wrapperWidth * i
-          nextElm.style.webkitTransform = `translate3d(${nextOffset}px, 0, 0)`
-          nextElm.style.transform = `translate3d(${nextOffset}px, 0, 0)`
-        }
-        // this._reorder()
-      })
-    },
-
-    _reorder (newIndex) {
-      if (!newIndex && newIndex !== 0) {
-        newIndex = this.currentIndex
-      }
-      // dir: 'current' | 'prev' | 'next'
-      const setPosition = (elm, dir) => {
-        const scale = window.weex.config.env.scale
-        let neighborScale = this.neighborScale
-        let opacity = this.neighborAlpha
-        let offsetX = -this.innerOffset
-        let offsetY = 0
-        if (dir === 'current') {
-          elm.style.zIndex = 1
-          neighborScale = this.currentItemScale
-          opacity = MAIN_SLIDE_OPACITY
-        }
-
-        elm.style.visibility = 'visible'
-
-        const origin = dir === 'prev' ? '100% 0' : '0 0'
-        elm.style.webkitTransformOrigin = origin
-        elm.style.transformOrigin = origin
-
-        const sign = dir === 'current' ? 0 : dir === 'prev' ? -1 : 1
-        offsetX = -this.innerOffset + sign * this.wrapperWidth
-        if (this.isNeighbor) {
-          offsetY = (1 - neighborScale) * this.wrapperHeight / 2
-          elm.style.opacity = opacity
-          if (dir === 'current') {
-            offsetX += this.wrapperWidth * (1 - neighborScale) / 2
-          }
-          else {
-            // offsetX = offsetX - sign * this.neighborSpace * scale
-            offsetX = offsetX - sign * (
-              (this.wrapperWidth - this._origItemWidth * this.currentItemScale) / 2
-              - this.neighborSpace * scale)
-          }
-        }
-
-        elm.style.width = this.wrapperWidth + 'px'
-        const transObj = {
-          translate: `translate3d(${offsetX}px, ${offsetY}px, 0px)`
-        }
-        if (this.isNeighbor) {
-          transObj.scale = `scale(${neighborScale})`
-        }
+        transObj.translate = `translate3d(${translateX}px, 0px, 0px)`
         addTransform(elm, transObj)
+        elm.style.opacity = i === 0 ? MAIN_SLIDE_OPACITY : this.neighborAlpha
       }
-
-      const removeClone = (clone, prevElm) => {
-        // switch current page.
-        setPosition(prevElm, 'current')
-        // const curTransform = `translate3d(${-this.innerOffset}px, 0, 0)`
-        // prevElm.style.transform = curTransform
-        // prevElm.style.webkitTransform = curTransform
-        // remove clone node.
-        clone && clone.parentElement.removeChild(clone)
-      }
-
-      this.$nextTick(() => {
-        if (this._cells.length <= 1) {
-          return
-        }
-        if (!this.infinite || this.infinite === 'false') {
-          this._order()
-          return
-        }
-        const lastPrev = this._prevElm
-        const prevIndex = this._normalizeIndex(newIndex - 1)
-        const nextIndex = this._normalizeIndex(newIndex + 1)
-        let prevElm = this._prevElm = this._cells[prevIndex].elm
-        const nextElm = this._cells[nextIndex].elm
-        const currentElm = this._cells[newIndex].elm
-
-        if (!this._origItemWidth) {
-          this._origItemWidth = currentElm.firstElementChild.getBoundingClientRect().width
-        }
-
-        // put current slide on the top.
-        setPosition(currentElm, 'current')
-        currentElm.style.webkitBoxAlign = 'center'
-        currentElm.style.webkitAlignItems = 'center'
-        currentElm.style.AlignItems = 'center'
-
-        // clone prevCell if there are only tow slides.
-        if (this._cells.length === 2) {
-          this._clonePrev && removeClone(this._clonePrev, lastPrev)
-          this._clonePrev = prevElm.cloneNode(true)
-          this._clonePrev.classList.add('weex-slide-clone-prev')
-          prevElm.parentElement.insertBefore(this._clonePrev, currentElm)
-          if (!this._prevFired) {
-            fireLazyload(this._clonePrev, true)
-            this._prevFired = true
-          }
-          prevElm = this._clonePrev
-        }
-
-        setPosition(prevElm, 'prev')
-        prevElm.style.webkitBoxAlign = 'end'
-        prevElm.style.webkitAlignItems = 'flex-end'
-        prevElm.style.AlignItems = 'flex-end'
-        setPosition(nextElm, 'next')
-        nextElm.style.webkitBoxAlign = 'start'
-        nextElm.style.webkitAlignItems = 'flex-start'
-        nextElm.style.AlignItems = 'flex-start'
-        this.currentIndex = newIndex
-      })
     },
 
     _next () {
@@ -630,7 +519,6 @@ export default {
     },
 
     _handleTouchStart (event) {
-      // event.stopPropagation()
       const touch = event.changedTouches[0]
       this._stopAutoPlay()
       this._touchParams = {
@@ -643,9 +531,14 @@ export default {
     },
 
     _handleTouchMove (event) {
-      // event.stopPropagation()
       const tp = this._touchParams
       if (!tp) { return }
+      if (this._sliding) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[vue-render] warn: can't scroll the slider during sliding.`)
+        }
+        return
+      }
       const { startX, startY } = this._touchParams
       const touch = event.changedTouches[0]
       const offsetX = touch.pageX - startX
@@ -656,7 +549,7 @@ export default {
       if (typeof isV === 'undefined') {
         isV = tp.isVertical = Math.abs(offsetX) < Math.abs(offsetY)
         if (!isV) {
-          this.$emit('scrollstart', createEvent(this.$el, 'scrollstart', {}))
+          this._emitScrollEvent('scrollstart')
         }
       }
       // vertical scroll. just ignore it.
@@ -667,17 +560,20 @@ export default {
       event.preventDefault()
       const inner = this.$refs.inner
       if (inner && offsetX) {
+        if (!this._nodesOffsetCleared) {
+          this._nodesOffsetCleared = true
+          this._clearNodesOffset()
+        }
         // TODO: add throttle.
-        this.$emit('scroll', createEvent(this.$el, 'scroll', {
+        this._emitScrollEvent('scroll', {
           offsetXRatio: offsetX / this.wrapperWidth
-        }))
+        })
         inner.style.transform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
         inner.style.webkitTransform = `translate3d(${this.innerOffset + offsetX}px, 0, 0)`
       }
     },
 
     _handleTouchEnd (event) {
-      // event.stopPropagation()
       this._startAutoPlay()
       const tp = this._touchParams
       if (!tp) { return }
@@ -688,14 +584,43 @@ export default {
       const inner = this.$refs.inner
       const { offsetX } = tp
       if (inner) {
-        this.$emit('scrollend', createEvent(this.$el, 'scrollend'))
+        this._nodesOffsetCleared = false
         // TODO: test the velocity if it's less than 0.2.
         const reset = Math.abs(offsetX / this.wrapperWidth) < 0.2
         const direction = offsetX > 0 ? 1 : -1
         const newIndex = reset ? this.currentIndex : (this.currentIndex - direction)
-        this._slideTo(newIndex)
+        this._slideTo(newIndex, true)
       }
       delete this._touchParams
+    },
+
+    _handleTouchCancel (event) {
+      return this._handleTouchEnd(event)
+    },
+
+    _emitScrollEvent (type, data = {}) {
+      this.$emit(type, createEvent(this.$el, type, data))
+    },
+
+    _throttleEmitScroll (offset, callback) {
+      let i = 0
+      const throttleTime = THROTTLE_SCROLL_TIME
+      const cnt = parseInt(TRANSITION_TIME / throttleTime) - 1
+      const sign = offset > 0 ? 1 : -1
+      const r = Math.abs(offset / this.wrapperWidth)
+      const throttledScroll = () => {
+        if (++i > cnt) {
+          return callback && callback.call(this)
+        }
+        const ratio = this._step === 0
+          ? sign * r * (1 - i / cnt)
+          : sign * (r + (1 - r) * i / cnt)
+        this._emitScrollEvent('scroll', {
+          offsetXRatio: ratio
+        })
+        setTimeout(throttledScroll, THROTTLE_SCROLL_TIME)
+      }
+      throttledScroll()
     }
   }
 }
