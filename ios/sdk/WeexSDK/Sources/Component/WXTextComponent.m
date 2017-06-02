@@ -754,7 +754,7 @@ do {\
         NSAttributedString *attributedString = [self buildCTAttributeString];
         NSAttributedString * lastLineText = nil;
         NSRange lastLineTextRange = WXNSRangeFromCFRange(CTLineGetStringRange(lastLine));
-        NSRange attributeStringRange = NSRangeFromString(attributedString.string);
+        NSRange attributeStringRange = NSMakeRange(0, attributedString.string.length);
         NSRange interSectionRange = NSIntersectionRange(lastLineTextRange, attributeStringRange);
         if (!NSEqualRanges(interSectionRange, lastLineTextRange)) {
             // out of bounds
