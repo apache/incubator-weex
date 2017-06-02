@@ -93,7 +93,6 @@ public class WXSDKEngineTest {
 
     assertFalse(WXSDKEngine.registerModuleWithFactory(null,new TestModuleFactory(TestModule.class),true));
     assertTrue(WXSDKEngine.registerModuleWithFactory("test1",new TestModuleFactory(TestModule.class),true));
-    assertFalse(WXSDKEngine.registerModuleWithFactory("test1",null,true));
   }
 
 

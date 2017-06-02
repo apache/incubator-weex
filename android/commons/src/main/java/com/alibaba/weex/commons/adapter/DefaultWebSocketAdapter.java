@@ -20,6 +20,8 @@ package com.alibaba.weex.commons.adapter;
 
 import android.support.annotation.Nullable;
 
+import com.alibaba.weex.commons.util.WSEventReporter;
+import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -28,9 +30,13 @@ import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.appfram.websocket.WebSocketCloseCodes;
+import com.taobao.weex.http.Status;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import okio.Buffer;
 import okio.BufferedSource;
@@ -43,10 +49,12 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
 
     private WebSocket ws;
     private EventListener eventListener;
+    private WSEventReporter wsEventReporter;
 
     @Override
-    public void connect(String url, @Nullable String protocol, EventListener listener) {
+    public void connect(String url, @Nullable final String protocol, EventListener listener) {
         this.eventListener = listener;
+        this.wsEventReporter = WSEventReporter.newInstance();
         OkHttpClient okHttpClient = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
@@ -56,17 +64,51 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
         }
 
         builder.url(url);
+        wsEventReporter.created(url);
 
-        WebSocketCall.create(okHttpClient, builder.build()).enqueue(new WebSocketListener() {
+        Request wsRequest = builder.build();
+        WebSocketCall webSocketCall = WebSocketCall.create(okHttpClient, wsRequest);
+
+        try {
+            Field field = WebSocketCall.class.getDeclaredField("request");
+            field.setAccessible(true);
+            Request realRequest = (Request) field.get(webSocketCall);
+            Headers wsHeaders = realRequest.headers();
+            Map<String, String> headers = new HashMap<>();
+            for (String name : wsHeaders.names()) {
+                headers.put(name, wsHeaders.values(name).toString());
+            }
+            wsEventReporter.willSendHandshakeRequest(headers, null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        webSocketCall.enqueue(new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Request request, Response response) throws IOException {
                 ws = webSocket;
                 eventListener.onOpen();
+                Headers wsHeaders = response.headers();
+                Map<String, String> headers = new HashMap<>();
+                for (String name : wsHeaders.names()) {
+                    headers.put(name, wsHeaders.values(name).toString());
+                }
+                wsEventReporter.handshakeResponseReceived(response.code(),
+                        Status.getStatusText(String.valueOf(response.code())),
+                        headers);
             }
 
             @Override
             public void onMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
-                eventListener.onMessage(payload.readUtf8());
+                if (type == WebSocket.PayloadType.BINARY) {
+                    wsEventReporter.frameReceived(payload.readByteArray());
+                } else {
+                    String message = payload.readUtf8();
+                    eventListener.onMessage(message);
+                    wsEventReporter.frameReceived(message);
+                }
                 payload.close();
             }
 
@@ -78,6 +120,7 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
             @Override
             public void onClose(int code, String reason) {
                 eventListener.onClose(code, reason, true);
+                wsEventReporter.closed();
             }
 
             @Override
@@ -85,8 +128,10 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
                 e.printStackTrace();
                 if (e instanceof EOFException) {
                     eventListener.onClose(WebSocketCloseCodes.CLOSE_NORMAL.getCode(), WebSocketCloseCodes.CLOSE_NORMAL.name(), true);
+                    wsEventReporter.closed();
                 } else {
                     eventListener.onError(e.getMessage());
+                    wsEventReporter.frameError(e.getMessage());
                 }
             }
         });
@@ -100,9 +145,12 @@ public class DefaultWebSocketAdapter implements IWebSocketAdapter {
                 ws.sendMessage(WebSocket.PayloadType.TEXT, buffer.buffer());
                 buffer.flush();
                 buffer.close();
+
+                wsEventReporter.frameSent(data);
             } catch (Exception e) {
                 e.printStackTrace();
                 reportError(e.getMessage());
+                wsEventReporter.frameError(e.getMessage());
             }
         } else {
             reportError("WebSocket is not ready");
