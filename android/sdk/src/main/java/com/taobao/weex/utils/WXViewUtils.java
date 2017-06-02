@@ -28,7 +28,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -408,7 +407,7 @@ public class WXViewUtils {
    * As the compile version of weex_sdk is 23, so API level 24 has to be hard-code.
    */
   private static boolean clipCanvasIfAnimationExist() {
-    return Build.VERSION.SDK_INT != VERSION_CODES.N;
+    return Build.VERSION.SDK_INT != 24;
   }
 
   /**
