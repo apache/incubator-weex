@@ -20,11 +20,15 @@
   top: 0px;
   left: 0px;
   background: transparent !important;
-  overflow: visible !important;
+  overflow: hidden;
   -webkit-box-align: center;
   -webkit-align-items: center;
   align-items: center;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   justify-content: center;
+}
+
+.neighbor-cell {
+  overflow: visible !important;
 }

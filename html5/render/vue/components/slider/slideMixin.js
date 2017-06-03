@@ -21,35 +21,34 @@ import {
   throttle,
   extend,
   createEvent,
-  /* nextFrame, */
   fireLazyload,
   addTransform,
   copyTransform,
   getTransformObj,
-  bind
+  bind,
+  extendKeys
 } from '../../utils'
 import { extractComponentStyle, createEventMap } from '../../core'
 
-const TRANSITION_TIME = 100
-const NEIGHBOR_SCALE_TIME = 50
+const TRANSITION_TIME = 400
+const NEIGHBOR_SCALE_TIME = 100
 const MAIN_SLIDE_OPACITY = 1
-const THROTTLE_SCROLL_TIME = 16
+const THROTTLE_SCROLL_TIME = 25
+const INTERVAL_MINIMUM = 200
 
 export default {
   created () {
     this._clones = []
     this.innerOffset = 0
     this._indicator = null
-    this.$nextTick(() => {
-      this._updateLayout()
-    })
   },
 
   beforeUpdate () {
-    this._updateLayout()
+    this._getWrapperSize()
   },
 
   updated () {
+    this._startAutoPlay()
     const children = this.$children
     const len = children && children.length
     if (children && len > 0) {
@@ -67,28 +66,20 @@ export default {
   },
 
   mounted () {
-    this._updateLayout()
+    this._getWrapperSize()
     this._startAutoPlay()
     this._slideTo(this.currentIndex)
     fireLazyload(this.$el, true)
   },
 
   methods: {
-    _computeWrapperSize () {
+    _getWrapperSize () {
       const wrapper = this.$refs.wrapper
       if (wrapper) {
         const rect = wrapper.getBoundingClientRect()
         this.wrapperWidth = rect.width
         this.wrapperHeight = rect.height
       }
-    },
-
-    _updateLayout () {
-      this._computeWrapperSize()
-      // const inner = this.$refs.inner
-      // if (inner) {
-      //   inner.style.width = this.wrapperWidth * this.frameCount + 'px'
-      // }
     },
 
     _formatChildren (createElement) {
@@ -104,7 +95,7 @@ export default {
       }).map(vnode => {
         return createElement('li', {
           ref: 'cells',
-          staticClass: 'weex-slider-cell weex-ct'
+          staticClass: `weex-slider-cell weex-ct${this.isNeighbor ? ' neighbor-cell' : ''}`
         }, [vnode])
       })
       if (indicatorVnode) {
@@ -158,20 +149,9 @@ export default {
         clearTimeout(this._autoPlayTimer)
         this._autoPlayTimer = null
       }
-      const interval = parseInt(this.interval)
-      this._lastSlideTime = Date.now()
-
-      const autoPlayFn = bind(function () {
-        clearTimeout(this._autoPlayTimer)
-        const now = Date.now()
-        let nextTick = this._lastSlideTime + interval - now
-        nextTick = nextTick > 100 ? nextTick : interval
-        this._next()
-        this._lastSlideTime = now
-        this._autoPlayTimer = setTimeout(autoPlayFn, nextTick)
-      }, this)
-
-      this._autoPlayTimer = setTimeout(autoPlayFn, interval)
+      let interval = parseInt(this.interval - TRANSITION_TIME - NEIGHBOR_SCALE_TIME)
+      interval = interval > INTERVAL_MINIMUM ? interval : INTERVAL_MINIMUM
+      this._autoPlayTimer = setTimeout(bind(this._next, this), interval)
     },
 
     _stopAutoPlay () {
@@ -247,19 +227,13 @@ export default {
               elm.style.webkitTransition = ''
               elm.style.transition = ''
             }
-            // this._loopShowNodes(step)
             // clean cloned nodes and rearrange slide cells.
             this._rearrangeNodes(newIndex)
           }, NEIGHBOR_SCALE_TIME)
         }, TRANSITION_TIME)
       }
 
-      // TODO: emit scroll event.
-      // nextFrame()
-
       if (newIndex !== this._preIndex) {
-        // replace $el with { attr, style } is a legacy usage. Is it necessary to
-        // do this ? Or just tell devers to use inline functions to access attrs ?
         this.$emit('change', createEvent(this.$el, 'change', {
           index: newIndex
         }))
@@ -269,6 +243,9 @@ export default {
     _clearNodesOffset () {
       const end = this._showEndIdx
       for (let i = this._showStartIdx; i <= end; i++) {
+        let node = this._showNodes[i]
+        node = node && node.firstElementChild
+        if (!node) { continue }
         addTransform(this._showNodes[i].firstElementChild, {
           translate: 'translate3d(0px, 0px, 0px)'
         })
@@ -276,7 +253,7 @@ export default {
     },
 
     _loopShowNodes (step) {
-      if (!step) {
+      if (!step || this.frameCount <= 1) {
         return
       }
       const sign = step > 0 ? 1 : -1
@@ -302,10 +279,21 @@ export default {
         this._inited = true
         this._showNodes = {}
       }
-
+      if (this.frameCount <= 1) {
+        this._showStartIdx = this._showEndIdx = 0
+        const node = this._cells[0].elm
+        node.style.opacity = 1
+        node.style.zIndex = 99
+        node.index = 0
+        this._showNodes[0] = node
+        node._inShow = true
+        node._showIndex = 0
+        return
+      }
       const showCount = this._showCount = Math.abs(step) + 3
       this._showStartIdx = step <= 0 ? -1 : 2 - showCount
       this._showEndIdx = step <= 0 ? showCount - 2 : 1
+      this._clearNodesOffset()
       this._positionNodes(this._showStartIdx, this._showEndIdx, step)
     },
 
@@ -338,7 +326,9 @@ export default {
      * index: position index in the showing cells' view.
      */
     _positionNode (node, index) {
-      if (node._inShow && this._showNodes[index] !== node) {
+      const holder = this._showNodes[index]
+      if (node._inShow && holder !== node) {
+        if (holder) { this._removeClone(holder) }
         node = this._getClone(node.index)
       }
       else if (node._inShow) {
@@ -346,15 +336,10 @@ export default {
       }
 
       node._inShow = true
-      // else if (!this._showNodes[index]) {
-        // node = this._getClone(node.index)
-      // }
       const translateX = index * this.wrapperWidth - this.innerOffset
       addTransform(node, {
         translate: `translate3d(${translateX}px, 0px, 0px)`
       })
-      // node.style.left = (index + this._step) * this.wrapperWidth - this.innerOffset + 'px'
-      // node.style.left = index * this.wrapperWidth + 'px'
       node.style.zIndex = 99 - Math.abs(index)
       node.style.opacity = 1
       node._showIndex = index
@@ -372,7 +357,6 @@ export default {
         clone._isClone = true
         clone._inShow = origNode._inShow
         clone.index = origNode.index
-        clone.style.left = 0
         clone.style.opacity = 0
         clone.style.zIndex = 0
         const ct = this.$refs.inner
@@ -392,7 +376,6 @@ export default {
     _hideNode (node) {
       node._inShow = false
       node.style.opacity = 0
-      node.style.left = 0
       node.style.zIndex = 0
     },
 
@@ -415,6 +398,23 @@ export default {
     },
 
     /**
+     * copy node style props (opacity and zIndex) and transform status from
+     * one element to another.
+     */
+    _copyStyle (from, to, styles = ['opacity', 'zIndex'], transformExtra = {}) {
+      extendKeys(to.style, from.style, styles)
+      const transObj = getTransformObj(from)
+      for (const k in transformExtra) {
+        transObj[k] = transformExtra[k]
+      }
+      addTransform(to, transObj)
+      const fromInner = from.firstElementChild
+      const toInner = to.firstElementChild
+      toInner.style.opacity = fromInner.style.opacity
+      copyTransform(fromInner, toInner)
+    },
+
+    /**
      * replace a clone node with the original node if it's not in use.
      */
     _replaceClone (clone, pos) {
@@ -422,32 +422,40 @@ export default {
       if (origNode._inShow) {
         return
       }
+      const origShowIndex = origNode._showIndex
+      const styleProps = ['opacity', 'zIndex']
+      let cl
+      if (Math.abs(origShowIndex) <= 1) {
+        // leave a clone to replace the origNode in the show zone(-1 ~ 1).
+        cl = this._getClone(origNode.index)
+        this._copyStyle(origNode, cl)
+        this._showNodes[origShowIndex] = cl
+      }
       origNode._inShow = true
-      origNode.style.left = clone.style.left
-      origNode.style.opacity = clone.style.opacity
-      origNode.style.zIndex = clone.style.zIndex
-      // copyTransform(clone, origNode)
       const transObj = getTransformObj(clone)
       transObj.translate = transObj.translate.replace(/[+-\d.]+[pw]x/, ($0) => {
         return pos * this.wrapperWidth - this.innerOffset + 'px'
       })
-      addTransform(origNode, transObj)
-      copyTransform(clone.firstElementChild, origNode.firstElementChild)
-      // origNode.firstElementChild.style.left = clone.firstElementChild.style.left
+      this._copyStyle(clone, origNode, styleProps, transObj)
       this._removeClone(clone)
-      // delete this._showNodes[clone._showIndex]
-      delete this._showNodes[origNode._showIndex]
+      if (!cl) {
+        delete this._showNodes[origShowIndex]
+      }
       this._showNodes[pos] = origNode
       origNode._showIndex = pos
     },
 
     _rearrangeNodes (newIndex) {
+      if (this.frameCount <= 1) {
+        this._sliding = false
+        this.currentIndex = 0
+        return
+      }
       /**
        * clean nodes. replace current node with non-cloned node.
        * set current index to the new index.
        */
       const shows = this._showNodes
-
       for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
         shows[i]._inShow = false
       }
@@ -479,10 +487,6 @@ export default {
      * 3. set other cells' scale and alpha.
      */
     _setNeighbors () {
-      // const curIdx = this._currentIndexInArrangeArray
-      // const step = this._step
-      // const newBegin = -1 - step
-
       for (let i = this._showStartIdx; i <= this._showEndIdx; i++) {
         const elm = this._showNodes[i].firstElementChild
         elm.style.webkitTransition = `all ${NEIGHBOR_SCALE_TIME / 1000}s ease`
@@ -511,11 +515,19 @@ export default {
     },
 
     _next () {
-      this._slideTo(this.currentIndex + 1)
+      let next = this.currentIndex + 1
+      if (this.frameCount <= 1) {
+        next--
+      }
+      this._slideTo(next)
     },
 
     _prev () {
-      this._slideTo(this.currentIndex - 1)
+      let prev = this.currentIndex - 1
+      if (this.frameCount <= 1) {
+        prev++
+      }
+      this._slideTo(prev)
     },
 
     _handleTouchStart (event) {
@@ -564,7 +576,6 @@ export default {
           this._nodesOffsetCleared = true
           this._clearNodesOffset()
         }
-        // TODO: add throttle.
         this._emitScrollEvent('scroll', {
           offsetXRatio: offsetX / this.wrapperWidth
         })
