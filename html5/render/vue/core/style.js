@@ -42,12 +42,13 @@ export function getHeadStyleMap () {
        * why not using styleSheet.rules || styleSheet.cssRules to get css rules ?
        * because weex's components defined non-standard style attributes, which is
        * auto ignored when access rule.cssText.
+       * another reason not to use cssRules directy:
+       * @issue: https://stackoverflow.com/questions/21642277/security-error-the-operation-is-insecure-in-firefox-document-stylesheets
        */
-      if (!styleSheet.cssRules
-        || (styleSheet.ownerNode.tagName.toLowerCase() === 'link')
+      if ((styleSheet.ownerNode.tagName.toLowerCase() === 'link')
         || !styleSheet.ownerNode.textContent) {
         /**
-         * no rules, or in a link. just ignore this. probably a link stylesheet.
+         * css in a link. just ignore this. probably a link stylesheet.
          */
         return pre
       }
