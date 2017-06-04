@@ -43,11 +43,10 @@ export function getHeadStyleMap () {
        * because weex's components defined non-standard style attributes, which is
        * auto ignored when access rule.cssText.
        */
-      if (!styleSheet.cssRules
-        || (styleSheet.ownerNode.tagName.toLowerCase() === 'link')
+      if ((styleSheet.ownerNode.tagName.toLowerCase() === 'link')
         || !styleSheet.ownerNode.textContent) {
         /**
-         * no rules, or in a link. just ignore this. probably a link stylesheet.
+         * css in a link. just ignore this. probably a link stylesheet.
          */
         return pre
       }
