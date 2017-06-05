@@ -2,7 +2,7 @@ os:
   - osx
   - linux
 language: node_js
-node_js: 7
+node_js: 7.6
 rvm: 2.0.0
 env:
   - TEST_SUITE=ios
