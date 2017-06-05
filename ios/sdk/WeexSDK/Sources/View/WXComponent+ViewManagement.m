@@ -236,10 +236,16 @@ do {\
         }
     }
     
-    if (styles[@"transformOrigin"] || styles[@"transform"]) {
-        id transform = styles[@"transform"] ? : self.styles[@"transform"];
-        id transformOrigin = styles[@"transformOrigin"] ? [WXConvert NSString:styles[@"transformOrigin"]] : [WXConvert NSString:self.styles[@"transformOrigin"]];
-        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:transform] origin:transformOrigin instance:self.weexInstance];
+    if (styles[@"transform"]) {
+        _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
+        if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
+            [_transform applyTransformForView:_view];
+            [_layer setNeedsDisplay];
+        }
+    }
+    
+    if (styles[@"transformOrigin"]) {
+        [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];

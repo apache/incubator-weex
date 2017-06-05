@@ -35,6 +35,10 @@
 
 - (instancetype)initWithCSSValue:(NSString *)cssValue origin:(NSString *)origin instance:(WXSDKInstance *)instance;
 
+- (instancetype)initWithNativeTransform:(CATransform3D)transform instance:(WXSDKInstance *)instance;
+
 - (void)applyTransformForView:(UIView *)view;
+
+- (void)setTransformOrigin:(NSString *)transformOriginCSS;
 
 @end

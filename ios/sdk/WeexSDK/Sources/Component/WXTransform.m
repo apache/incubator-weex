@@ -43,7 +43,10 @@
     float _rotateX;
     float _rotateY;
     float _rotateZ;
+    float _perspective;
     
+    CATransform3D _nativeTransform;
+    BOOL _useNativeTransform;
 }
 
 - (instancetype)initWithCSSValue:(NSString *)cssValue origin:(NSString *)origin instance:(WXSDKInstance *)instance
@@ -64,18 +67,37 @@
     return self;
 }
 
+- (instancetype)initWithNativeTransform:(CATransform3D)transform instance:(WXSDKInstance *)instance
+{
+    if (self = [super init]) {
+        _weexInstance = instance;
+        _nativeTransform = transform;
+        _useNativeTransform = YES;
+    }
+    return self;
+}
+
 - (float)rotateAngle
 {
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.m11, _nativeTransform.m12);
+    }
     return _rotateAngle;
 }
 
 - (float)rotateX
 {
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.m22, _nativeTransform.m23);
+    }
     return _rotateX;
 }
 
 - (float)rotateY
 {
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.m11, _nativeTransform.m31);
+    }
     return _rotateY;
 }
 
@@ -86,26 +108,46 @@
 
 - (WXLength *)translateX
 {
+    if (_useNativeTransform) {
+        return [WXLength lengthWithFloat:_nativeTransform.m41 type:WXLengthTypeFixed];
+    }
     return _translateX;
 }
 
 - (WXLength *)translateY
 {
+    if (_useNativeTransform) {
+        return [WXLength lengthWithFloat:_nativeTransform.m42 type:WXLengthTypeFixed];
+    }
     return _translateY;
 }
 
 - (float)scaleX
 {
+    if (_useNativeTransform) {
+        return sqrt(_nativeTransform.m11 * _nativeTransform.m11 + _nativeTransform.m21 * _nativeTransform.m21);
+    }
     return _scaleX;
 }
 
 - (float)scaleY
 {
+    if (_useNativeTransform) {
+        return sqrt(_nativeTransform.m12 * _nativeTransform.m12 + _nativeTransform.m22 * _nativeTransform.m22);
+    }
     return _scaleY;
+}
+
+- (void)setTransformOrigin:(NSString *)transformOriginCSS
+{
+    [self parseTransformOrigin:transformOriginCSS];
 }
 
 - (CATransform3D)nativeTransformWithView:(UIView *)view
 {
+    if (_useNativeTransform) {
+        return _nativeTransform;
+    }
     CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     
     float x = 0,y = 0,z = 0;
@@ -127,14 +169,12 @@
     }
     
     nativeTransform3d = CATransform3DRotate(nativeTransform3d, rotateAngle, x, y, z);
-//    nativeTransform = CGAffineTransformRotate(nativeTransform, _rotateAngle);
     
     return nativeTransform3d;
 }
 
 - (CATransform3D)nativeTransformWithoutRotateWithView:(UIView *)view
 {
-//    CGAffineTransform nativeTransform = CGAffineTransformIdentity;
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
@@ -144,7 +184,6 @@
     if (_translateX || _translateY) {
         
         nativeTansform3D = CATransform3DTranslate(nativeTansform3D, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0, _translateY ? [_translateY valueForMaximum:view.bounds.size.height]:0, 0);
-//        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximum:view.bounds.size.height] : 0);
     }
     nativeTansform3D = CATransform3DScale(nativeTansform3D, _scaleX, _scaleY, 1.0);
     

@@ -431,6 +431,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         if ([view isKindOfClass:[WXIndicatorView class]]) {
             ((WXIndicatorComponent *)subcomponent).delegate = self;
             [recycleSliderView addSubview:view];
+            [self setIndicatorView:(WXIndicatorView *)view];
             return;
         }
         
@@ -585,9 +586,10 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    self.currentIndex = index;
-    if (_sliderChangeEvent) {
+    
+    if (_sliderChangeEvent && index != self.currentIndex) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
+        self.currentIndex = index;
     }
 }
 
