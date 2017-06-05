@@ -104,6 +104,9 @@ static WXThreadSafeMutableDictionary *globalPerformanceDict;
     if (instance.userInfo[@"weex_bundlejs_requestType"]) {
         commitDict[@"requestType"] = instance.userInfo[@"weex_bundlejs_requestType"];
     }
+    if (instance.userInfo[WXXCACHE]) {
+        commitDict[WXXCACHE] = instance.userInfo[WXXCACHE];
+    }
     if (instance.userInfo[WXCUSTOMMONITORINFO]) {
         if([instance.userInfo[WXCUSTOMMONITORINFO] isKindOfClass:[NSDictionary class]]) {
             commitDict[WXCUSTOMMONITORINFO] = [WXUtility JSONString:instance.userInfo[WXCUSTOMMONITORINFO]];

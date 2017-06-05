@@ -26,6 +26,7 @@
 #define WXREQUESTTYPE       @"requestType"
 #define WXCONNECTIONTYPE    @"connectionType"
 #define WXCUSTOMMONITORINFO @"customMonitorInfo"
+#define WXXCACHE            @"X-Cache"
 
 #define SDKINITTIME         @"SDKInitTime"
 #define SDKINITINVOKETIME   @"SDKInitInvokeTime"

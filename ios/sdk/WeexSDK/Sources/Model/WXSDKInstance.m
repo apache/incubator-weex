@@ -267,6 +267,14 @@ typedef enum : NSUInteger {
             // if an error occurs, just return.
             return;
         }
+        
+        if([response isKindOfClass:[NSHTTPURLResponse class]]){
+            NSString* cacheType = [[(NSHTTPURLResponse*)response allHeaderFields] valueForKey:@"X-Cache"];
+            if(!strongSelf.userInfo){
+                strongSelf.userInfo = [[NSMutableDictionary alloc] init];
+            }
+            strongSelf.userInfo[@"X-Cache"] = cacheType;
+        }
 
         if (!data) {
             NSString *errorMessage = [NSString stringWithFormat:@"Request to %@ With no data return", request.URL];
