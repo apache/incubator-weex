@@ -50,7 +50,7 @@ public class WXA extends WXDiv {
         ImmutableDomObject domObject = getDomObject();
         if (domObject != null) {
           WXAttr attr = domObject.getAttrs();
-          if (attr !=null && (href = (String)attr.get("href")) != null) {
+          if (attr != null && (href = (String)attr.get("href")) != null && !TextUtils.isEmpty(href)) {
             ATagUtil.onClick(null, getInstanceId(), href);
           }
         } else {
