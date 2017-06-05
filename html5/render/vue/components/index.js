@@ -53,6 +53,7 @@ export default {
   cell,
   scroller,
   slider,
+  cycleslider: slider,
   'slider-neighbor': neighbor,
   indicator,
   refresh,
