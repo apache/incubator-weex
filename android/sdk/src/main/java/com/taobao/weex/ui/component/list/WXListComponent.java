@@ -66,7 +66,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private float mPaddingLeft;
   private float mPaddingRight;
 
-  private WXDragHelper mWXDragHelper;
+  private DragHelper mDragHelper;
 
   /**
    * attributes for cell
@@ -131,7 +131,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       return;
     }
 
-    mWXDragHelper = new DefaultDragHelper(mChildren, recyclerView, new EventTrigger() {
+    mDragHelper = new DefaultDragHelper(mChildren, recyclerView, new EventTrigger() {
       @Override
       public void triggerEvent(String type, Map<String, Object> args) {
         fireEvent(type, args);
@@ -144,8 +144,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   @WXComponentProp(name = DRAGGABLE)
   @SuppressWarnings("unused")
   public void setDraggable(boolean isDraggable) {
-    if (mWXDragHelper != null) {
-      mWXDragHelper.setDraggable(isDraggable);
+    if (mDragHelper != null) {
+      mDragHelper.setDraggable(isDraggable);
     }
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("set draggable : " + isDraggable);
@@ -156,7 +156,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   public void onBindViewHolder(final ListBaseViewHolder holder, int position) {
     super.onBindViewHolder(holder, position);
 
-    if (mWXDragHelper == null) {
+    if (mDragHelper == null) {
       return;
     }
 
@@ -164,12 +164,12 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       mTriggerType = (mTriggerType == null) ? DEFAULT_TRIGGER_TYPE : mTriggerType;
 
       WXCell cell = (WXCell) holder.getComponent();
-      boolean isExcluded = getExcluded(cell.getDomObject());
-      mWXDragHelper.setDragExcluded(holder, isExcluded);
+      boolean isExcluded = isDragExcluded(cell.getDomObject());
+      mDragHelper.setDragExcluded(holder, isExcluded);
 
       //NOTICE: event maybe consumed by other views
       if (DragTriggerType.PAN.equals(mTriggerType)) {
-        mWXDragHelper.setLongPressDragEnabled(false);
+        mDragHelper.setLongPressDragEnabled(false);
 
         WXComponent anchorComponent = findComponentByAnchorName(cell, DRAG_ANCHOR);
 
@@ -179,7 +179,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
               if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-                mWXDragHelper.startDrag(holder);
+                mDragHelper.startDrag(holder);
               }
               return true;
             }
@@ -195,7 +195,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
         }
 
       } else if (DragTriggerType.LONG_PRESS.equals(mTriggerType)) {
-        mWXDragHelper.setLongPressDragEnabled(true);
+        mDragHelper.setLongPressDragEnabled(true);
       }
     }
   }
@@ -417,7 +417,7 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     return triggerType;
   }
 
-  private boolean getExcluded(@Nullable ImmutableDomObject domObject) {
+  private boolean isDragExcluded(@Nullable ImmutableDomObject domObject) {
     if (domObject == null) {
       return DEFAULT_EXCLUDED;
     }
