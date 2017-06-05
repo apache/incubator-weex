@@ -245,7 +245,7 @@ class DefaultDragHelper implements WXDragHelper {
 
     private static final String TAG = "WXListExComponent";
 
-    private boolean isDraggable = true;
+    private boolean isDraggable = false;
 
     DefaultDragHelper(@NonNull List<WXComponent> dataSource, @NonNull RecyclerView recyclerView, @NonNull EventTrigger trigger) {
         this.mDataSource = dataSource;
