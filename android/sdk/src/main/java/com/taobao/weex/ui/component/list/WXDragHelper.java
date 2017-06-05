@@ -220,29 +220,11 @@ import com.taobao.weex.ui.component.WXComponent;
  * Time: 上午11:34<br/>
  */
 interface WXDragHelper {
-    /**
-     *  开始拖拽
-     *
-     *  1. 发送dragstart事件
-     *  2. 设置选中的样式
-     *
-     * */
+
     void onDragStart(@NonNull WXComponent component, int from);
 
-    /**
-     *
-     *  1. 发送gragend事件
-     *  2. 恢复样式
-     *
-     *  from 可能 等于 to， 代表没有发生位置变化
-     *
-     * */
     void onDragEnd(@NonNull WXComponent component, int from, int to);
 
-
-    /**
-     * 处理数据源变化
-     * */
     void onDragging(int fromPos, int toPos);
 
     boolean isLongPressDragEnabled();

@@ -215,8 +215,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Description:
- * An implementation of {@link ItemTouchHelper.Callback}.
- * with drag&drop support:)
+ * An implementation of {@link ItemTouchHelper.Callback}. with drag&drop support:)
  *
  * <p>
  * Created by rowandjj(chuyi)<br/>

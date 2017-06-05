@@ -344,14 +344,6 @@ class DefaultDragHelper implements WXDragHelper {
         return viewHolder.itemView.getTag() != null && TAG_EXCLUDED.equals(viewHolder.itemView.getTag());
     }
 
-    /**
-     * timestamp
-     * target
-     * fromIndex
-     * toIndex
-     *
-     *
-     * */
     private Map<String, Object> buildEvent(@Nullable String target, int fromIndex, int toIndex) {
         Map<String, Object> args = new HashMap<>(4);
         args.put("target", target == null ? "unknown" : target);
