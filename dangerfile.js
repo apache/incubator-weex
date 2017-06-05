@@ -104,9 +104,8 @@ for (let file of danger.git.modified_files) {
   }
 
   if (!is_ignored_public_check(file) && file.endsWith(".java")) {
-    var diff = danger.git.diffForFile(file);
-    // console.log("diff：" + diff+ typeof diff);
-    if (diff && diff.match(/^-\s*?public\s+[\s\S]+$/gm)) {
+    var diff = await danger.git.diffForFile(file);
+    if (diff && diff.removed && diff.removed.match(/^-\s*?public\s+[\s\S]+$/gm)) {
       if (methion_break_change) {
         warn("Potential BREAK CHANGE. Modify public in   " + file);
       } else {
