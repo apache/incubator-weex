@@ -30,6 +30,7 @@ import com.alibaba.weex.extend.adapter.InterceptWXHttpAdapter;
 import com.alibaba.weex.extend.component.RichText;
 import com.alibaba.weex.extend.component.WXComponentSyncTest;
 import com.alibaba.weex.extend.component.WXMask;
+import com.alibaba.weex.extend.component.WXParallax;
 import com.alibaba.weex.extend.component.dom.WXMaskDomObject;
 import com.alibaba.weex.extend.module.GeolocationModule;
 import com.alibaba.weex.extend.module.MyModule;
@@ -75,6 +76,7 @@ public class WXApplication extends Application {
     try {
       Fresco.initialize(this);
       WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
+      WXSDKEngine.registerComponent(WXParallax.PARALLAX, WXParallax.class);
 
       WXSDKEngine.registerComponent("richtext", RichText.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
