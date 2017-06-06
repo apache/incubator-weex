@@ -83,8 +83,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:isIOS?{y:128}:{y:72,height:1700},
-      cropImageB:isIOS?{y:128}:{y:72,height:1700}
+      cropImageA:isIOS?{y:128}:{y:242,height:1530},//android: 242 - status bar(72)+navigator bar(170)
+      cropImageB:isIOS?{y:128}:{y:242,height:1530}
     });
 
     diff.run((err, result) => {
@@ -155,6 +155,30 @@ module.exports = {
                     .sleep(1000)
                 })
             })
+          driverFactory.addPromiseChainMethod('swipeLeft', function (distanceRatio, yRatio) {
+                return this
+                  .getWindowSize()
+                  .then(size => {
+                    let y = yRatio * size.height;
+                    let startX = size.width * 0.8;
+                    let endX = startX - size.width * distanceRatio;
+                    return this
+                      .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                      .sleep(1000)
+                  })
+          })
+          driverFactory.addPromiseChainMethod('swipeRight', function (distanceRatio, yRatio) {
+            return this
+              .getWindowSize()
+              .then(size => {
+                let y = yRatio * size.height;
+                let startX = size.width * 0.2;
+                let endX = startX + size.width * distanceRatio;
+                return this
+                  .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                  .sleep(1000)
+              })
+          })
             driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000
