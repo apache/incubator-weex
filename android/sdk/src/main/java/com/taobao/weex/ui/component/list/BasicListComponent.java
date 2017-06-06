@@ -43,6 +43,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
@@ -273,7 +274,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         if (listeners != null && listeners.size() > 0) {
           for (OnWXScrollListener listener : listeners) {
             if (listener != null) {
-              listener.onScrolled(recyclerView, dx, dy);
+              if(listener instanceof ICheckBindingScroller){
+                if(((ICheckBindingScroller) listener).isNeedScroller(getRef(),null)){
+                  listener.onScrolled(recyclerView, dx, dy);
+                }
+              }else {
+                listener.onScrolled(recyclerView, dx, dy);
+              }
             }
           }
         }
