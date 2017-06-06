@@ -216,11 +216,16 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
             NSUInteger end = [responseData rangeOfString:@")" options:NSBackwardsSearch].location;
             if (end < [responseData length] && end > start) {
                 responseData = [responseData substringWithRange:NSMakeRange(start, end-start)];
+                if(responseData){
+                    responseData = [self deleteSpecialCharacters:responseData];
+                }
             }
         }
         id jsonObj = [self _JSONObjFromData:[responseData dataUsingEncoding:NSUTF8StringEncoding]];
         if (jsonObj) {
             [callbackRsp setObject:jsonObj forKey:@"data"];
+        } else if(responseData && [responseData length]>0){
+            WXLogError(@"not supported parse");
         }
         
     } else {
@@ -229,6 +234,13 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
             [callbackRsp setObject:responseData forKey:@"data"];
         }
     }
+}
+
+- (NSString *)deleteSpecialCharacters:(NSString *)str{
+    NSArray<NSString *> *components = [str componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]];
+    components = [components filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"self <> ''"]];
+    str = [components componentsJoinedByString:@""];
+    return str;
 }
 
 - (NSString*)_stringfromData:(NSData *)data encode:(NSString *)encoding
