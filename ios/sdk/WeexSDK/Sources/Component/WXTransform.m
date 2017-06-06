@@ -161,6 +161,7 @@
     }
     if (_rotateAngle != 0) {
         rotateAngle = _rotateAngle;
+        z = 1;
     }
     if (_rotateY != 0) {
         y = 1;
