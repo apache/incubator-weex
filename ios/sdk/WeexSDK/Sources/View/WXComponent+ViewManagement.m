@@ -169,10 +169,9 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
     if (styles[@"perspective"]) {
-        if ([styles[@"perspective"] isEqualToString:@"none"]) {
+        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        if (_perspective <= 0) {
             _perspective = CGFLOAT_MAX;
-        }else {
-            _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
         
         _transform.perspective = _perspective;
@@ -245,10 +244,9 @@ do {\
         }
     }
     if (styles[@"perspective"]) {
-        if ([styles[@"perspective"] isEqualToString:@"none"]) {
+        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        if (_perspective <= 0) {
             _perspective = CGFLOAT_MAX;
-        }else {
-            _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
         }
     }
     if (styles[@"transform"]) {
