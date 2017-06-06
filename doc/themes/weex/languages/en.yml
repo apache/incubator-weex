@@ -50,7 +50,18 @@ index:
     youku:
       title: Youku
       content: Youku is one of China's top online video and streaming service platforms.
-
+    taopiaopiao:
+      title: Tao Tickets Pro
+      content: Tao Tickets Pro is a product for the film to provide valuable data. Through the combination of Ali and the amount of user data, for the film people to provide a second real-time box office, film, theater business, release calendar and user portraits and other data services.
+    fliggy:
+      title: Fliggy
+      content: Fliggy is Alibaba Group's travel brand, designed to provide users with convenient, more cost-effective travel services. 
+    juhuasuan:
+      title: Juhuasuan
+      content: Juhuasuan is Alibaba Group's platform for Taobao, Lynx business from 800 million commodities in the carefully selected high-quality goods, independent network to carry out activities to sell, with higher service standards to provide you with cost-effective goods.
+    qianniu: 
+      title: Qianniu
+      content:  Alibaba produced for the seller stop working units, for the seller the integration of the shop management tools, business information and news, business partnerships, in order to enhance the operational efficiency of the sellers, in order to promote cooperation between the two win, so that the seller can...
   feedback:
     title: People say
     user1:
