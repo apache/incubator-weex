@@ -356,7 +356,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         _lastOffsetXRatio = 0;
         
         if (attributes[@"autoPlay"]) {
-            _autoPlay = NO;
+            _autoPlay = [WXConvert BOOL:attributes[@"autoPlay"]];
         }
         
         if (attributes[@"interval"]) {
