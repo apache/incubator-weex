@@ -850,6 +850,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  /**
+   * get Scroller components
+   */
+  @Nullable
+  public Scrollable getFirstScroller() {
+   if(this instanceof Scrollable){
+     return (Scrollable)this;
+   }
+   return null;
+  }
+
   public WXVContainer getParent() {
     return mParent;
   }
