@@ -17,7 +17,7 @@ This component supports no child components.
 
 ## Attributes
 
-* `type`: the type of controls to display. The default value is `text`, if this attribute is not specified. Possible values are `text`, `password`, `tel`, `email`, `url` etc. each of which has the same meaning with W3C standard.
+* `type`: the type of controls to display. The default value is `text`, if this attribute is not specified. Possible values are `text`, `password`, `tel`, `email`, `url` , `number` etc. each of which has the same meaning with W3C standard.
 
 * `value`: the value(text) of the control.
 
