@@ -103,7 +103,8 @@ for (let file of danger.git.modified_files) {
     has_test_changes = true;
   }
 
-  if (!is_ignored_public_check(file) && file.endsWith(".java")) {
+  /* diffforFile
+   * if (!is_ignored_public_check(file) && file.endsWith(".java")) {
     var diff = await danger.git.diffForFile(file);
     if (diff && diff.removed && diff.removed.match(/^-\s*?public\s+[\s\S]+$/gm)) {
       if (methion_break_change) {
@@ -116,7 +117,7 @@ for (let file of danger.git.modified_files) {
         );
       }
     }
-  }
+  }*/
 
   if (
     file.endsWith(".h") ||
