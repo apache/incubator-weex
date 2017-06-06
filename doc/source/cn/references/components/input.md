@@ -19,7 +19,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 
 ## 特性
 
-- `type {string}`：控件的类型，默认值是 `<text>`。`type` 值可以是 `text`，`password`，`url`，`email`，`tel` 。每个 `type` 值都符合 W3C 标准。
+- `type {string}`：控件的类型，默认值是 `<text>`。`type` 值可以是 `text`，`password`，`url`，`email`，`tel` ，`number` 。每个 `type` 值都符合 W3C 标准。
 - `value {string}`：组件的接收到的输入字符。
 - `placeholder {string}`：提示用户可以输入什么。 提示文本不能有回车或换行。
 - `disabled {boolean}`：布尔类型的数据，表示是否支持输入。通常 `click` 事件在 `disabled` 控件上是失效的。
