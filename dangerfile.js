@@ -93,6 +93,21 @@ function is_ignored_public_check(file) {
   return false;
 }
 
+async function checkBreakChange(file){
+  var diff = await danger.git.diffForFile(file);
+  if (diff && diff.removed && diff.removed.match(/^-\s*?public\s+[\s\S]+$/gm)) {
+    if (methion_break_change) {
+      warn("Potential BREAK CHANGE. Modify public in   " + file);
+    } else {
+      warn(
+        "Potential BREAK CHANGE. Modify public in " +
+          file +
+          " without metion it in commit message. You'd better add 'break change' in your commit log. "
+      );
+    }
+  }
+}
+
 var has_app_changes = false;
 var has_test_changes = false;
 var codefiles = [];
@@ -104,19 +119,9 @@ for (let file of danger.git.modified_files) {
   }
 
   if (!is_ignored_public_check(file) && file.endsWith(".java")) {
-    var diff = danger.git.diffForFile(file);
-    // console.log("diff：" + diff+ typeof diff);
-    if (diff && diff.match(/^-\s*?public\s+[\s\S]+$/gm)) {
-      if (methion_break_change) {
-        warn("Potential BREAK CHANGE. Modify public in   " + file);
-      } else {
-        warn(
-          "Potential BREAK CHANGE. Modify public in " +
-            file +
-            " without metion it in commit message. You'd better add 'break change' in your commit log. "
-        );
-      }
-    }
+    schedule(async ()=> {
+      await checkBreakChange(file)
+    })
   }
 
   if (

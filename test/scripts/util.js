@@ -83,8 +83,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:isIOS?{y:128}:{y:72,height:1700},
-      cropImageB:isIOS?{y:128}:{y:72,height:1700}
+      cropImageA:isIOS?{y:128}:{y:242,height:1530},//android: 242 - status bar(72)+navigator bar(170)
+      cropImageB:isIOS?{y:128}:{y:242,height:1530}
     });
 
     diff.run((err, result) => {
