@@ -18,7 +18,11 @@
  */
 import { getThrottleLazyload, throttle } from '../utils'
 
+const DEFAULT_OFFSET_ACCURACY = 10
+const DEFAULT_LOADMORE_OFFSET = 0
+
 function getThrottledScroll (context) {
+  const scale = weex.config.env.scale
   if (!context._throttleScroll) {
     const wrapper = context.$refs.wrapper
     const inner = context.$refs.inner
@@ -30,7 +34,7 @@ function getThrottledScroll (context) {
       const offset = context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop
-      const indent = parseInt(context.offsetAccuracy)
+      const indent = parseInt(context.offsetAccuracy) * scale
       function triggerScroll () {
         const rect = inner.getBoundingClientRect()
         evt.contentSize = { width: rect.width, height: rect.height }
@@ -52,15 +56,9 @@ function getThrottledScroll (context) {
         }
         context.$emit('scroll', evt)
       }
-      if (indent
-        && !isNaN(indent)
-        && indent > 0
-        && Math.abs(offset - preOffset) >= indent) {
+      if (Math.abs(offset - preOffset) >= indent) {
         triggerScroll()
         preOffset = offset
-      }
-      else if (!indent || isNaN(indent) || indent <= 0) {
-        triggerScroll()
       }
     }, 16, true)
   }
@@ -69,8 +67,30 @@ function getThrottledScroll (context) {
 
 export default {
   props: {
-    offsetAccuracy: [Number, String]
+    loadmoreoffset: {
+      type: [String, Number],
+      default: DEFAULT_LOADMORE_OFFSET,
+      validator (value) {
+        const val = parseInt(value)
+        return !isNaN(val) && val >= DEFAULT_LOADMORE_OFFSET
+      }
+    },
+
+    offsetAccuracy: {
+      type: [Number, String],
+      default: DEFAULT_OFFSET_ACCURACY,
+      validator (value) {
+        const val = parseInt(value)
+        return !isNaN(val) && val >= DEFAULT_OFFSET_ACCURACY
+      }
+    }
   },
+
+  created () {
+    // should call resetLoadmore() to enable loadmore event.
+    this._loadmoreReset = true
+  },
+
   methods: {
     updateLayout () {
       const wrapper = this.$refs.wrapper
@@ -81,11 +101,37 @@ export default {
       }
     },
 
+    resetLoadmore () {
+      this._loadmoreReset = true
+    },
+
     handleScroll (event) {
       getThrottleLazyload(25, this.$el, 'scroll')()
       getThrottledScroll(this)(event)
-      if (this.reachBottom()) {
-        this.$emit('loadmore', event)
+
+      // fire loadmore event.
+      const inner = this.$refs.inner
+      if (inner) {
+        const innerRect = inner.getBoundingClientRect()
+        const innerLength = this.scrollDirection === 'horizontal'
+          ? innerRect.width
+          : innerRect.height
+        // hscroller not support loadmore event yet.
+        if (this.scrollDirection === 'horizontal') {
+          return
+        }
+        if (!this._innerLength) {
+          this._innerLength = innerLength
+        }
+        if (this._innerLength !== innerLength) {
+          console.log(this._innerLength, innerLength)
+          this._innerLength = innerLength
+          this._loadmoreReset = true
+        }
+        if (this._loadmoreReset && this.reachBottom()) {
+          this._loadmoreReset = false
+          this.$emit('loadmore', event)
+        }
       }
     },
 
@@ -97,12 +143,20 @@ export default {
     reachBottom () {
       const wrapper = this.$refs.wrapper
       const inner = this.$refs.inner
-      const offset = Number(this.loadmoreoffset) || 0
+      const offset = parseInt(this.loadmoreoffset) * weex.config.env.scale
 
       if (wrapper && inner) {
-        const innerHeight = inner.getBoundingClientRect().height
-        const wrapperHeight = wrapper.getBoundingClientRect().height
-        return wrapper.scrollTop >= innerHeight - wrapperHeight - offset
+        const innerRect = inner.getBoundingClientRect()
+        const wrapperRect = wrapper.getBoundingClientRect()
+        const key = this.scrollDirection === 'horizontal'
+          ? 'width'
+          : 'height'
+        const innerLength = innerRect[key]
+        const wrapperLength = wrapperRect[key]
+        const scrollOffset = this.scrollDirection === 'horizontal'
+          ? wrapper.scrollLeft
+          : wrapper.scrollTop
+        return scrollOffset >= innerLength - wrapperLength - offset
       }
       return false
     },
