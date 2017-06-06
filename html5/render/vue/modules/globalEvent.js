@@ -26,25 +26,44 @@ const handlerTraker = {}
 export default {
   /**
    * addEventListener
+   * NOTE: one callback can only be bound to the same event once. Bind a callback twice doesn't
+   *  mean it will be called twice when the event fired once.
    * @param {string} evt - the event name to add a listener on.
    */
   addEventListener (evt, callback) {
-    // const cb = e => this.sender.performCallback(callbackId, e)
-    const cb = e => callback && callback(e)
-    if (!handlerTraker[evt]) {
-      handlerTraker[evt] = [cb]
+    if (!callback) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[vue-render] missing callback arg in globalEvent.addEventListener.`)
+      }
+      return
     }
-    else {
-      handlerTraker.push(cb)
+    let handlers = handlerTraker[evt]
+    if (!handlers) {
+      handlers = handlerTraker[evt] = []
     }
-    document.addEventListener(evt, cb)
+    const len = handlers.length
+    for (let i = 0; i < len; i++) {
+      if (handlers[i] === callback) {
+        // this callback is already bound. no need to bind it again.
+        return
+      }
+    }
+    handlers.push(callback)
+    document.addEventListener(evt, callback)
   },
 
   /**
    * removeEventListener
+   * NOTE: remove all the event handlers for the specified event type.
    * @param {string} evt - the event name to remove a listener from.
    */
   removeEventListener (evt) {
-    handlerTraker[evt].forEach(cb => document.removeEventListener(evt, cb))
+    const handlers = handlerTraker[evt]
+    if (!handlers) {
+      // evt handlers has been already removed.
+      return
+    }
+    handlers.forEach(cb => document.removeEventListener(evt, cb))
+    delete handlerTraker[evt]
   }
 }
