@@ -8,7 +8,7 @@ HTML5[![npm version](https://badge.fury.io/js/weex-html5.svg)](https://www.npmjs
 
 [![CircleCI](https://circleci.com/gh/alibaba/weex/tree/dev.svg?style=svg&circle-token=b83b047a3a01f6ec26458a455530a5ddc261925f)](https://circleci.com/gh/alibaba/weex/tree/dev)
 
-Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+ (android 4.0.1+, ios 6.0+).
+Support Android 4.1 (API 16), iOS 8.0+ and WebKit 534.30+ (Android 4.0.1+, iOS 6.0+).
 
 ## For Windows
 
