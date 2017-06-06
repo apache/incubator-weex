@@ -117,7 +117,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static final int INIT_FRAMEWORK_OK = 1;
 
-  private static long LOW_MEM_VALUE = 80;
+  private static long LOW_MEM_VALUE = 120;
 
   static volatile WXBridgeManager mBridgeManager;
 
