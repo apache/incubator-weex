@@ -321,6 +321,10 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
   Object.keys(fileToNormalLinesMap).forEach(function (file) {
     let normalLines = fileToNormalLinesMap[file];
     var blames = fileToBlamesMap[file]
+    if (!blames) {
+      console.error(`failed to find blame info for (${file})`)
+      return;
+    }
     normalLines.forEach(lineNumber => {
       var name = blames[lineNumber]
       reviewers[name] = (reviewers[name] || 0) + 1
