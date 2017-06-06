@@ -179,7 +179,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         _currentItemFrame = CGRectMake(self.width, 0, self.width, self.height);
         for (int i = 0; i < self.itemViews.count; i++) {
             UIView *view = [self.itemViews objectAtIndex:i];
-            if (i != self.currentIndex && i != self.nextIndex) {
+            if (i != self.currentIndex ) {
                 view.frame = CGRectMake(self.frame.size.width * 3, 0, self.width, self.height);;
             }
         }
