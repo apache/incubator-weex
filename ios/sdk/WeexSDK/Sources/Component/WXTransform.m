@@ -234,10 +234,10 @@
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
+    if (_perspective) {
+        nativeTransform3d.m34 = -1.0/_perspective;
+    }
     if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
-        if (_perspective) {
-            nativeTransform3d.m34 = -1.0/_perspective;
-        }
         view.layer.transform = nativeTransform3d;
     }
 }

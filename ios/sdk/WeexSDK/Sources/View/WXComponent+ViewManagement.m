@@ -169,7 +169,12 @@ do {\
         _lastBoxShadow = _boxShadow;
     }
     if (styles[@"perspective"]) {
-        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        if ([styles[@"perspective"] isEqualToString:@"none"]) {
+            _perspective = CGFLOAT_MAX;
+        }else {
+            _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        }
+        
         _transform.perspective = _perspective;
     }
 }
@@ -240,7 +245,11 @@ do {\
         }
     }
     if (styles[@"perspective"]) {
-        _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        if ([styles[@"perspective"] isEqualToString:@"none"]) {
+            _perspective = CGFLOAT_MAX;
+        }else {
+            _perspective = [WXConvert WXPixelType:styles[@"perspective"] scaleFactor:self.weexInstance.pixelScaleFactor];
+        }
     }
     if (styles[@"transform"]) {
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
