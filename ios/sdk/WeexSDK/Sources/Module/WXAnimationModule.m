@@ -91,6 +91,8 @@
     
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
+        float perspective = [[_animationInfo.target valueForKey:@"perspective"] floatValue];
+        transform.perspective = perspective;
         [transform applyTransformForView:_animationInfo.target.view];
     } else if ([_animationInfo.propertyName isEqualToString:@"backgroundColor"]) {
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
