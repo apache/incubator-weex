@@ -168,6 +168,10 @@ do {\
     if (_boxShadow) {
         _lastBoxShadow = _boxShadow;
     }
+    if (styles[@"perspective"]) {
+        _perspective = [WXConvert CGFloat:styles[@"perspective"]];
+        _transform.perspective = _perspective;
+    }
 }
 
 - (void)_updateViewStyles:(NSDictionary *)styles
@@ -235,9 +239,12 @@ do {\
             self.view.hidden = YES;
         }
     }
-    
+    if (styles[@"perspective"]) {
+        _perspective = [WXConvert CGFloat:styles[@"perspective"]];
+    }
     if (styles[@"transform"]) {
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
+        _transform.perspective = _perspective;
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
             [_layer setNeedsDisplay];
