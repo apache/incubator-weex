@@ -6,6 +6,7 @@ version: 2.1
 ---
 
 # WebSocket
+<span class="weex-version">v0.12+</span>
 
 ## Summary
 
