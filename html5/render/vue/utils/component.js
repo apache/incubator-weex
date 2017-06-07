@@ -162,7 +162,7 @@ export function triggerAppear (context, visible) {
     if (scroller && scroller.$el) {
       container = scroller.$el
     }
-    const visible = isElementVisible(context.$el, container)
+    visible = isElementVisible(context.$el, container)
   }
   return detectAppear(context, visible)
 }
