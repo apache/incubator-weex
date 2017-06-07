@@ -70,11 +70,11 @@ if (unFlowedFiles.length > 0) {
 }
 
 // Error or Warn when delete public interface
-var methion_break_change = false;
+var isNotDanger = false;
 for (let c of danger.git.commits) {
   // console.log("msg:" + c.message);
-  if (c.message && c.message.match(/break\s+change/i)) {
-    methion_break_change = true;
+  if (c.message && c.message.match(/@notdanger/i)) {
+    isNotDanger = true;
     break;
   }
 }
@@ -96,34 +96,87 @@ function is_ignored_public_check(file) {
 async function checkBreakChange(file){
   var diff = await danger.git.diffForFile(file);
   if (diff && diff.removed && diff.removed.match(/^-\s*?public\s+[\s\S]+$/gm)) {
-    if (methion_break_change) {
+    if (isNotDanger) {
       warn("Potential BREAK CHANGE. Modify public in   " + file);
     } else {
       warn(
         "Potential BREAK CHANGE. Modify public in " +
           file +
-          " without metion it in commit message. You'd better add 'break change' in your commit log. "
+          " without metion it in commit message. You'd better add '@notdanger' in your commit log. "
       );
     }
   }
 }
 
-var has_app_changes = false;
+var has_sdk_changes = false;
 var has_test_changes = false;
-var codefiles = [];
-for (let file of danger.git.modified_files) {
-  if (file.match(/WeexSDK\/Source/)) {
-    has_app_changes = true;
-  } else if (file.match(/WeexSDKTests/)) {
-    has_test_changes = true;
-  }
+var has_doc_changes = false;
+var filesToVerifySrcHeader = [];
+var fileCount = 0;
 
-  if (!is_ignored_public_check(file) && file.endsWith(".java")) {
-    schedule(async ()=> {
-      await checkBreakChange(file)
-    })
-  }
+const type_unknown = 0;
+const type_ios_sdk = 1;
+const type_android_sdk = 2;
+const type_ios_test = 3;
+const type_android_test = 4;
+const type_jsfm = 5;
+const type_jsfm_test = 6;
+const type_doc = 7;
+const type_ui_test = 8;
 
+const getFileType = file => {
+  if (file.match(/WeexSDK\/Sources\/.+\.(m|h|mm)/)) {
+    return type_ios_sdk;
+  } else if (file.match(/WeexSDKTests\//)) {
+    return type_ios_test;
+  } else if (file.match(/android\/sdk\/src\/test\/.+\.java/)) {
+    return type_android_test;
+  } else if (file.match(/android\/sdk\/src\/main\/java\/.+\.java/)) {
+    return type_android_sdk;
+  } else if (
+    file.match(/html5\/(shared|frameworks|render|runtime|services)\/.+\.js/)
+  ) {
+    return type_jsfm;
+  } else if (file.match(/html5\/test\/.+\.js/)) {
+    return type_jsfm_test;
+  } else if (file.match(/doc\/\.+\.md/)) {
+    return type_doc;
+  } else if(file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
+    return type_ui_test
+  }else{
+    return type_unknown
+  }
+}
+
+const checkChangedFile = file => {
+  fileCount++;
+  console.log("check changed file:"+file)
+  let fileType = getFileType(file)
+
+  has_sdk_changes =
+    has_sdk_changes ||
+    fileType == type_android_sdk ||
+    fileType == type_ios_sdk ||
+    fileType == type_jsfm;
+  has_test_changes =
+    has_test_changes ||
+    fileType == type_android_test ||
+    fileType == type_ios_test ||
+    fileType == type_jsfm_test ||
+    fileType == type_ui_test
+  has_doc_changes = has_doc_changes || fileType == type_doc;
+
+};
+
+const checkAndroidBreakChange = file => {
+  if (getFileType(file) == type_android_sdk && !is_ignored_public_check(file)) {
+    schedule(async () => {
+      await checkBreakChange(file);
+    });
+  }
+}
+
+const checkFileToVerifySrcHeader = file => {
   if (
     file.endsWith(".h") ||
     file.endsWith(".m") ||
@@ -131,30 +184,39 @@ for (let file of danger.git.modified_files) {
     file.endsWith(".java") ||
     file.endsWith(".js")
   ) {
-    codefiles.push(file);
+    filesToVerifySrcHeader.push(file);
   }
+};
+
+if (danger.git.modified_files) {
+  danger.git.modified_files.forEach(file => {
+    checkChangedFile(file);
+    checkAndroidBreakChange(file);
+    checkFileToVerifySrcHeader(file);
+  });
 }
-if(danger.git.added_files){
-  for (let file of danger.git.added_files) {
-    if (
-      file.endsWith(".h") ||
-      file.endsWith(".m") ||
-      file.endsWith(".mm") ||
-      file.endsWith(".java") ||
-      file.endsWith(".js")
-    ) {
-      codefiles.push(file);
-    }
-  }
+if (danger.git.added_files) {
+  danger.git.added_files.forEach(file => {
+    checkChangedFile(file);
+    checkFileToVerifySrcHeader(file);
+  });
+}
+if (danger.git.deleted_files) {
+  danger.git.deleted_files.forEach(file => {
+    checkChangedFile(file);
+    checkAndroidBreakChange(file);
+  });
 }
 
-if (danger.git.lines_of_code > 500) {
-  warn("Big PR");
+if (has_sdk_changes && !has_test_changes) {
+  if(isNotDanger) warn("This PR modify SDK code without add/modify testcases.")
+  else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
 }
 
-if (danger.git.lines_of_code > 100 && has_app_changes && !has_test_changes) {
-  warn("This PR may need tests.");
+if (has_sdk_changes && !has_doc_changes) {
+  warn("This PR should update related documents as well. ");
 }
+
 
 //check ios copyright
 //see scripts/rh/header.template
@@ -179,7 +241,7 @@ const ignoreCopyrightVerifyPath = [
   'ios/sdk/WeexSDK/Sources/Layout'
 ]
 
-codefiles.forEach(filepath => {
+filesToVerifySrcHeader.forEach(filepath => {
   for(var i=ignoreCopyrightVerifyPath.length-1;i>=0;i--){
     if(filepath.startsWith(ignoreCopyrightVerifyPath[i])){
       return
