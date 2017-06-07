@@ -15,7 +15,7 @@ version: 2.1
 
 #### 参数
 
-* `el {Element}`：将要执行动画的元素，通常可以通过调用 [`this.$el(id)`](../api.html) 来获取元素的引用。
+* `el {Element}`：将要执行动画的元素，例如指定动画的元素 `ref` 属性为 `test` , 可以通过调用 `this.refs.test` 来获取元素的引用。
 * `options {Object}`：描述动画过程的对象。
   * `options.duration {number}`：指定动画的持续时间 (单位是毫秒)，默认值是 `0`，表示没有动画效果。
   * `options.delay {number}`：指定请求动画操作到执行动画之间的时间间隔 (单位是毫秒)，默认值是 `0`，表示没有延迟，在请求后立即执行动画。
@@ -44,7 +44,7 @@ version: 2.1
 
 | 名称 | 描述 | 值类型 | 默认值 | 示例 |
 | ---- | ---- | ---- | ---- | ---- |
-| `translate`/`translateX`/`translateY` | 指定元素移动的偏移量 | 像素值或百分比 | 无 |
+| `translate`/`translateX`/`translateY` | 指定元素要移动到的位置 | 像素值或百分比 | 无 |
 | `rotate` | 指定元素将被旋转的角度，单位是度 | number | 无 |
 | `scale`/`scaleX`/`scaleY` | 按比例放大或缩小元素 | number | 无 |
 
