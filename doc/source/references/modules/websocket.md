@@ -16,7 +16,6 @@ WebSockets is an advanced technology that makes it possible to open an interacti
   - [DefaultWebSocketAdapter.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapter.java);
   - [DefaultWebSocketAdapterFactory.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
   - refer:  [weex playground](https://github.com/apache/incubator-weex/tree/dev/android/playground)
-- only support in .we file,not support in vue2.0
 
 ## API
 ### `WebSocket(url, protocol)`
