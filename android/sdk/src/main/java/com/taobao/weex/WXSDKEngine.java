@@ -207,7 +207,7 @@ public class WXSDKEngine {
   }
 
   public static void setJSExcetptionAdapter(IWXJSExceptionAdapter excetptionAdapter){
-    WXSDKManager.getInstance().setIWXJSExceptionAdapter(excetptionAdapter);
+    WXSDKManager.getInstance().addIWXJSExceptionAdapter(excetptionAdapter);
   }
 
   private static void register() {

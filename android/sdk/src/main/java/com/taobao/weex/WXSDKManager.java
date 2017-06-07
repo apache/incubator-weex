@@ -51,6 +51,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class WXSDKManager {
 
   private ICrashInfoReporter mCrashInfo;
 
-  private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
+  private List<IWXJSExceptionAdapter> mIWXJSExceptionAdapters;
 
   private IWXStorageAdapter mIWXStorageAdapter;
   private IWXStatisticsListener mStatisticsListener;
@@ -298,12 +299,39 @@ public class WXSDKManager {
     return mDrawableLoader;
   }
 
+  /**
+   * use getIWXJSExceptionAdapters instead.
+   */
+  @Deprecated
   public IWXJSExceptionAdapter getIWXJSExceptionAdapter() {
-    return mIWXJSExceptionAdapter;
+    return mIWXJSExceptionAdapters != null && mIWXJSExceptionAdapters.size() > 0 ? mIWXJSExceptionAdapters.get(0) : null;
   }
 
+  @Nullable
+  public List<IWXJSExceptionAdapter> getIWXJSExceptionAdapters() {
+    return mIWXJSExceptionAdapters;
+  }
+
+  /**
+   * use addIWXJSExceptionAdapter instead
+   * @param IWXJSExceptionAdapter
+   */
+  @Deprecated
   void setIWXJSExceptionAdapter(IWXJSExceptionAdapter IWXJSExceptionAdapter) {
-    mIWXJSExceptionAdapter = IWXJSExceptionAdapter;
+    addIWXJSExceptionAdapter(IWXJSExceptionAdapter);
+  }
+
+  void addIWXJSExceptionAdapter(IWXJSExceptionAdapter adapter) {
+
+    if(null == mIWXJSExceptionAdapters) {
+      synchronized (WXSDKManager.class) {
+        if (null == mIWXJSExceptionAdapters) {
+          mIWXJSExceptionAdapters = new ArrayList<>();
+        }
+      }
+    }
+
+    mIWXJSExceptionAdapters.add(adapter);
   }
 
   public @NonNull IWXHttpAdapter getIWXHttpAdapter() {
@@ -333,7 +361,7 @@ public class WXSDKManager {
     this.mIWXUserTrackAdapter = config.getUtAdapter();
     this.mURIAdapter = config.getURIAdapter();
     this.mIWebSocketAdapterFactory = config.getWebSocketAdapterFactory();
-    this.mIWXJSExceptionAdapter = config.getJSExceptionAdapter();
+    addIWXJSExceptionAdapter(config.getJSExceptionAdapter());
     this.mIWXSoLoaderAdapter = config.getIWXSoLoaderAdapter();
   }
 
