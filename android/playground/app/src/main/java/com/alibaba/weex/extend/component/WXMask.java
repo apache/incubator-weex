@@ -21,6 +21,7 @@ package com.alibaba.weex.extend.component;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.view.Gravity;
@@ -56,7 +57,13 @@ public class WXMask extends WXVContainer {
     mPopupWindow.setContentView(mContainerView);
     mPopupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
     mPopupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getDomObject().getLayoutX(), (int) getDomObject().getLayoutY());
+    mPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+    mPopupWindow.setFocusable(true);
+
+    Rect outRect = new Rect();
+    ((Activity) context).getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
+
+    mPopupWindow.showAtLocation(((Activity) context).getWindow().getDecorView(), Gravity.TOP, (int) getDomObject().getLayoutX(), (int) getDomObject().getLayoutY() + outRect.top);
 
     return mContainerView;
   }
