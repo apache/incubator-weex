@@ -3,7 +3,7 @@
 <article class="article article-type-<%= page_type %>">
   <div class="article-entry" itemprop="articleBody">
     <%- partial('post/title', {post: post}) %>
-    <%- post.content %>
+    <%- page_anchor(post.content) %>
   </div>
   <% if (page_type === 'article') { %>
      <%- partial('_partial/post/nav') %>

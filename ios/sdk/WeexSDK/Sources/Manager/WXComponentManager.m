@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponentManager.h"
@@ -20,6 +31,8 @@
 #import "WXSDKManager.h"
 #import "WXSDKError.h"
 #import "WXInvocationConfig.h"
+#import "WXHandlerFactory.h"
+#import "WXValidateProtocol.h"
 
 static NSThread *WXComponentThread;
 
@@ -130,10 +143,10 @@ static NSThread *WXComponentThread;
     if (_rootCSSNode) {
         [self _applyRootFrame:frame toRootCSSNode:_rootCSSNode];
         if (!_rootComponent.styles[@"width"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_WIDTH] = frame.size.width;
+            _rootComponent.cssNode->style.dimensions[CSS_WIDTH] = frame.size.width ?: CSS_UNDEFINED;
         }
         if (!_rootComponent.styles[@"height"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_HEIGHT] = frame.size.height;
+            _rootComponent.cssNode->style.dimensions[CSS_HEIGHT] = frame.size.height ?: CSS_UNDEFINED;
         }
         [_rootComponent setNeedsLayout];
         [self startComponentTasks];
@@ -185,7 +198,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXComponentManager *manager = (__bridge WXComponentManager *)(context);
     if (i == 0) {
         return manager->_rootComponent.cssNode;
-    } else if(manager->_fixedComponents.count > 0) {
+    } else if(manager->_fixedComponents.count >= i) {
         return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
     }
     
@@ -207,8 +220,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_recursivelyAddComponent:(NSDictionary *)componentData toSupercomponent:(WXComponent *)supercomponent atIndex:(NSInteger)index appendingInTree:(BOOL)appendingInTree
 {
     WXComponent *component = [self _buildComponentForData:componentData];
-    
-    index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    if (!supercomponent.subcomponents) {
+        index = 0;
+    } else {
+        index = (index == -1 ? supercomponent->_subcomponents.count : index);
+    }
     
     [supercomponent _insertSubcomponent:component atIndex:index];
     // use _lazyCreateView to forbid component like cell's view creating
@@ -319,6 +335,17 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     NSDictionary *attributes = data[@"attr"];
     NSArray *events = data[@"event"];
     
+    if (self.weexInstance.needValidate) {
+        id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
+        if (validateHandler) {
+            WXComponentValidateResult* validateResult =  [validateHandler validateWithWXSDKInstance:self.weexInstance component:type];
+            if (validateResult && !validateResult.isSuccess) {
+                type = validateResult.replacedComponent? validateResult.replacedComponent : @"div";
+                WXLogError(@"%@",[validateResult.error.userInfo objectForKey:@"errorMsg"]);
+            }
+        }
+    }
+
     Class clazz = [WXComponentFactory classWithComponentName:type];
     WXComponent *component = [[clazz alloc] initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:self.weexInstance];
     WXAssert(component, @"Component build failed for data:%@", data);
@@ -520,6 +547,11 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     [self _stopDisplayLink];
     
+    _isValid = NO;
+}
+
+- (void)invalidate
+{
     _isValid = NO;
 }
 

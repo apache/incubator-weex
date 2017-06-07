@@ -25,6 +25,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 - `disabled {boolean}`：布尔类型的数据，表示是否支持输入。通常 `click` 事件在 `disabled` 控件上是失效的。
 - `autofocus {boolean}`：布尔类型的数据，表示是否在页面加载时控件自动获得输入焦点。
 - `maxlength {nubmer}`：<sup class="wx-v">v0.7</sup>一个数值类型的值，表示输入的最大长度。
+- `return-key-type {string}`：<sup class="wx-v">v0.11</sup>键盘返回键的类型,支持 defalut;go;next;search;send,done。
 
 ## 样式
 
@@ -84,6 +85,12 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
   事件中 event 对象属性：
 
   - `timestamp`: 事件发生时的时间戳。
+- `return`: 键盘点击返回键。
+
+    事件中 event 对象属性：
+
+    - `returnKeyType`: 事件发生时的返回键类型。
+    - `value`: 触发事件的组件的文本；
 
 - 通用事件
 
@@ -109,7 +116,12 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 - `blur()` <span class="api-version">v0.9+</span>
 
   `blur()` 方法用于从 `input` 组件中移除焦点并关闭软键盘（如果它具有焦点）。
-
+- `setSelectionRange(selectionStart,selectionEnd)`  <span class="api-version">v0.11+</span>设置文本选区
+  - `selectionStart {number}`：设置文本选区的起始点
+  - `selectionEnd {number}`：设置文本选区的起终点
+- `getEditSelectionRange(callback[selectionStart,selectionEnd])`  <span class="api-version">v0.11+</span>设置文本选区
+    - `selectionStart {number}`：获取文本选区的起始点
+    - `selectionEnd {number}`：获取文本选区的起终点
 ## 约束
 
 目前不支持 `this.$el(id).value = ''` 这种方式改写 input value。只支持在 `<input>` 组件的 `input`、`change` 事件中改写。
@@ -119,7 +131,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 ```html
 <template>
   <div class="wrapper">
-    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur">
+    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur"></input>
   </div>
 </template>
 
@@ -178,4 +190,4 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 </style>
 ```
 
-[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)
+[try it](http://dotwe.org/vue/e56d9ebeede8f80bbc8b53637395d22f)

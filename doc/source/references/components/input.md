@@ -29,6 +29,8 @@ This component supports no child components.
 
 * `maxlength`: <span class="api-version">v0.7+</span> a number value to specify maxlength of input.
 
+* `return-key-type {string}`：<sup class="wx-v">v0.11</sup>the keybord returen key type support defalut;go;next;search;send,done.
+
 ## Styles
 
 * placeholder-color: the color of placeholder. Default value is '#999999'.
@@ -62,14 +64,20 @@ check out [common styles for components](../common-style.html)
 * change: the change event is fired when a change to the component's value is commited by the user. It always come after a 'blur' event.
 * focus: a component has received focus.
 * blur: a component has lost focus.
+* `return`:the return key click.
+
+     the object property of event:
+
+    - `returnKeyType`: return key Type  of component
+    - `value`: component text value
 
 ### common events
 check out [common events](../common-event.html)
 
-* support 'appear' / 'disappear' event. 
+* support 'appear' / 'disappear' event.
 
 
-### Methoads 
+### Methoads
 
  - `focus()` <span class="api-version">v0.9+</span>
 
@@ -78,6 +86,15 @@ check out [common events](../common-event.html)
  - `blur()`<span class="api-version">v0.9+</span>
 
   The `blur()` method is used to remove focus from an input component and close soft keybord(if it has focus).
+
+- `setSelectionRange(selectionStart,selectionEnd)`  <span class="api-version">v0.11+</span>set text selection range of input or textarea
+
+  - `selectionStart {number}`:set starting location text selection range
+  - `selectionEnd {number}`:set end location text selection range
+
+- `getEditSelectionRange(callback[selectionStart,selectionEnd])`  <span class="api-version">v0.11+</span>get text selection range of input or textarea
+    - `selectionStart {number}`:get starting location text selection range
+    - `selectionEnd {number}`: get end location text selection range
 
 ### Notes
 does not support the common-event 'click'. Please listen to the 'input' or 'change' event instead.
@@ -92,7 +109,7 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 ```html
 <template>
   <div class="wrapper">
-    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur">
+    <input ref="input" class="input" type="text" @input="oninput" @change="onchange" @focus="onfocus" @blur="onblur"></input>
   </div>
 </template>
 
@@ -151,4 +168,4 @@ does not support the common-event 'click'. Please listen to the 'input' or '
 </style>
 ```
 
-[try it](http://dotwe.org/vue/c1b1a5fdcf0937df1d847f8812a7ccb2)
+[try it](http://dotwe.org/vue/e56d9ebeede8f80bbc8b53637395d22f)

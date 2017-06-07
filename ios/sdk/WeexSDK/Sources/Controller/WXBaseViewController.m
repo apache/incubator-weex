@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXBaseViewController.h"
@@ -66,14 +77,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self addEdgePop];
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self _renderWithURL:_sourceURL];
-    
     if ([self.navigationController isKindOfClass:[WXRootViewController class]]) {
-        self.navigationController.navigationBarHidden = YES;
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
     }
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -86,6 +96,7 @@
     [super viewDidAppear:animated];
     [_instance fireGlobalEvent:WX_APPLICATION_DID_BECOME_ACTIVE params:nil];
     [self _updateInstanceState:WeexInstanceAppear];
+    
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -104,21 +115,6 @@
 - (void)refreshWeex
 {
     [self _renderWithURL:_sourceURL];
-}
-
-- (void)addEdgePop
-{
-    self.navigationController.interactivePopGestureRecognizer.delegate = self;
-}
-
-#pragma mark- UIGestureRecognizerDelegate
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-{
-    if (!self.navigationController || [self.navigationController.viewControllers count] == 1) {
-        return NO;
-    }
-    return YES;
 }
 
 - (void)_renderWithURL:(NSURL *)sourceURL

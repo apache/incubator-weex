@@ -1,7 +1,7 @@
 ---
 title: Using Vue
 type: guide
-order: 5.3
+order: 4.3
 version: 2.1
 ---
 

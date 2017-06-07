@@ -1,18 +1,20 @@
+#!/bin/bash -eu
+
 function installAndroidSDK {
-    brew install android-sdk
-    export ANDROID_HOME=/usr/local/opt/android-sdk
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-    echo yes | android update sdk --all --no-ui --force -t 2 #platform tools
-    echo yes | android update sdk --all --no-ui --force -t 1 #tools
-    echo yes | android update sdk --all --no-ui --force -t 11 #build-tool
-    echo yes | android update sdk --all --no-ui --force -t 39 #sdk android-19
-    echo yes | android update sdk --all --no-ui --force -t 35 #sdk android-23
-    echo yes | android update sdk --all --no-ui --force -t 96 #sys-img
-    echo yes | android update sdk --all --no-ui --force -t 160 #support
+    # brew install android-sdk
+    # export ANDROID_HOME=/usr/local/opt/android-sdk
+    # export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+    echo yes | android update sdk --all --no-ui --force -t platform-tools #platform tools
+    echo yes | android update sdk --all --no-ui --force -t tools #tools
+    echo yes | android update sdk --all --no-ui --force -t build-tools-23.0.2 #build-tool
+    echo yes | android update sdk --all --no-ui --force -t android-19 #sdk android-19
+    echo yes | android update sdk --all --no-ui --force -t android-23 #sdk android-23
+    echo yes | android update sdk --all --no-ui --force -t sys-img-armeabi-v7a-android-21 #sys-img
+    echo yes | android update sdk --all --no-ui --force -t extra-android-m2repository #support
 }
 
 function createAVD {
-    echo no | android create avd --force -n weexavd -t android-19 --abi default/armeabi-v7a
+    echo no | android create avd --force -n weexavd -t android-22 --abi default/armeabi-v7a
 }
 
 function startAVD {
@@ -30,44 +32,13 @@ function waitForEmulator {
   adb shell input keyevent 82 &
 }
 
-function setup_cpt {
-    target_android='android'
-    target_ios='ios'
-    target_danger='danger'
-    target_jsfm='jsfm'
-
-    target=${1:-$target_android}
-    
-    if [ $target = $target_android ]; then
-        setupBasic
-        installAndroidSDK
-        JAVA_HOME=$(/usr/libexec/java_home) npm install -g macaca-android
-        createAVD
-        startAVD &
-        npm install
-        export DISPLAY=:99.0
-    elif [ $target = $target_ios ]
-    then
-        setupBasic
-        npm install -g macaca-ios
-        npm install
-        gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
-    elif [ $target = $target_jsfm ]
-    then
-        npm install
-    else
-        gem install danger danger-xcode_summary xcpretty xcpretty-json-formatter
-    fi
-}
-
-function setupBasic {
-    brew update
-    brew install nvm
+function installNode {
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    bash "$NVM_DIR/nvm.sh"
     export CHROME_BIN=chromium-browser
-    source $(brew --prefix nvm)/nvm.sh
     nvm install 7.0.0
-    brew install ios-webkit-debug-proxy
-    npm install -g macaca-cli
+    nvm use 7.0.0
 }
 
 function printEnvInfo {
@@ -76,35 +47,22 @@ function printEnvInfo {
     printenv
 }
 
-function test_cpt {
-    echo 'cilog:start test ......'
-
-    target_android='android'
-    target_ios='ios'
+function runJSTest {
+    set -e
     target_danger='danger'
     target_jsfm='jsfm'
 
-    target=${1:-$target_android}
+    target=${1:-$target_jsfm}
     echo "cilog: target: $target"
-    
-    if [ $target = $target_android ]; then
-        ./test/serve.sh 2&>1 > /dev/null &
-        export ANDROID_HOME=/usr/local/opt/android-sdk
-        cd android && ./run-ci.sh && cd $TRAVIS_BUILD_DIR
-        waitForEmulator
-        JAVA_HOME=$(/usr/libexec/java_home) run_in_ci=true ./test/run.sh
-    elif [ $target = $target_ios ]
-    then
-        ./test/serve.sh 2&>1 > /dev/null &
-        xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
-        run_in_ci=true ./test/run.sh ios
-    elif [ $target = $target_jsfm ]
+
+    if [ $target = $target_jsfm ]
     then
         npm run build
         npm run test
-    else
-        xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6' | XCPRETTY_JSON_FILE_OUTPUT=ios/sdk/xcodebuild.json xcpretty -f `xcpretty-json-formatter`
-        bundle exec danger
+    elif [ $target = $target_danger ]
+    then
+        npm run danger
     fi
 }
+
 

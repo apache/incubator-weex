@@ -1,16 +1,38 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 'use strict'
 
 var path = require('path');
 var os = require('os')
+var fs = require('fs')
+const BlinkDiff = require('blink-diff');
 
 var platform = process.env.platform || 'android';
 platform = platform.toLowerCase();
+var browser = process.env.browser || '';
 
 const isIOS = platform === 'ios';
 const isRunInCI = process.env.run_in_ci?true:false;
 
 var iOSOpts = {
   deviceName: 'iPhone 6',
+  target: 'ios',
   platformName: 'iOS',
   slowEnv: isRunInCI,
   app: path.join(__dirname, '..', '../ios/playground/build/Debug-iphonesimulator/WeexDemo.app')
@@ -18,8 +40,15 @@ var iOSOpts = {
 
 var androidOpts = {
   platformName: 'Android',
+  target: 'android',
   slowEnv: isRunInCI,
-  app: path.join(__dirname, '..', `../android/playground/app/build/outputs/apk/playground.apk`)
+  app: path.join(__dirname, '..', '../android/playground/app/build/outputs/apk/playground-debug.apk')
+};
+
+var androidChromeOpts = {
+  platformName: 'Android',
+  target: 'web',
+  browserName: 'Chrome'
 };
 
 if(isRunInCI){
@@ -40,18 +69,112 @@ function getIpAddress(){
     return addresses[0];
 }
 
+function diffImage(imageAPath, imageB, threshold, outputPath) {
+  if (!fs.existsSync(imageAPath)) {
+    fs.writeFileSync(imageAPath, imageB, 'base64', function(err) {
+        console.log(err);
+    });
+  }
+  
+  return new Promise((resolve, reject) => {
+    var diff = new BlinkDiff({
+      imageAPath: imageAPath, // Path
+      imageB: imageB,         // Buffer
+      thresholdType: BlinkDiff.THRESHOLD_PIXEL,
+      threshold: threshold,
+      imageOutputPath: outputPath,
+      cropImageA:{y : (isIOS ? 128 : 0)},
+      cropImageB:{y : (isIOS ? 128 : 0)}
+    });
+
+    diff.run((err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      var ifPassed = diff.hasPassed(result.code);
+      console.log(ifPassed ? 'Image Comparison Passed' : 'Image Comparison Failed');
+      console.log(`Found ${result.differences} pixel differences between two images.`);
+      resolve(ifPassed);
+    });
+  });
+}
+
 
 module.exports = {
     getConfig:function(){
+        if(browser){
+            return androidChromeOpts;
+        }
         return isIOS? iOSOpts : androidOpts;
     },
     getDeviceHost:function(){
         return getIpAddress()+":12581";
+    },
+    getPage:function(name){
+        let url
+        if(browser){
+             url = 'http://'+ getIpAddress()+':12581/vue.html?page=/test/build-web'+name
+        }else{
+            url = 'wxpage://' + getIpAddress()+":12581/test/build"+name;
+        }
+        console.log(url)
+        return url
     },
     getTimeoutMills:function(){
         return ( isRunInCI ? 60 : 10 ) * 60 * 1000;
     },
     getGETActionWaitTimeMills:function(){
         return (isRunInCI ? 120 : 5 ) * 1000;
+    },
+    diffImage, 
+    createDriver:function(wd){
+        var driver = global._wxDriver;
+        if(!driver){
+            console.log('Create new driver');
+            let driverFactory = wd(this.getConfig())
+            driverFactory.addPromiseChainMethod('dragUpAndDown',function(){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.7, toX:middleX, toY: size.height*0.3, duration: 1})
+                    .sleep(1000)
+                    .touch('drag', {fromX:middleX, fromY:size.height*0.3, toX:middleX, toY: size.height*0.7, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driverFactory.addPromiseChainMethod('dragUp',function(distance){
+                return this
+                .getWindowSize()
+                .then(size=>{
+                    let middleX = size.width * 0.5
+                    let startY = size.height * 0.7
+                    return this
+                    .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
+                    .sleep(1000)
+                })
+            })
+            driver = driverFactory.initPromiseChain();
+            driver.configureHttp({
+                timeout: 100000
+            });
+            global._wxDriver = driver;
+        }
+        
+        return driver;
+    },
+    init:function(driver){
+        if(driver._isInit)
+            return driver.status()
+        else{
+            driver._isInit = true;
+            return driver.initDriver()
+        }
+    },
+    quit:function(driver){
+        if(browser)
+            return driver.quit()
+        return driver.sleep(1000).back().sleep(1000);
     }
 }

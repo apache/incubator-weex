@@ -35,45 +35,45 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
   外边距，元素和元素之间的空白距离。值类型为 length，默认值 0
 
   可有如下写法：
-  
+
   - `margin-left {length}`：，默认值 0
   - `margin-right {length}`：，默认值 0
   - `margin-top {length}`：，默认值 0
   - `margin-bottom {length}`：，默认值 0
 - border：
-  
+
   设定边框，`border` 目前不支持类似这样 `border: 1 solid #ff0000;` 的组合写法。
 
   可有如下写法：
-  
+
   - `border-style`：
 
     设定边框样式，值类型为 string，可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
 
     可有如下写法：
-  
+
     - `border-left-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-top-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-right-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
     - `border-bottom-style {string}`：可选值为 `solid` | `dashed` | `dotted`，默认值 `solid`
 
   - `border-width {length}`：
-  
+
     设定边框宽度，非负值, 默认值 0
 
     可有如下写法：
-  
+
     - `border-left-width {length}`：，非负值, 默认值 0
     - `border-top-width {length}`：，非负值, 默认值 0
     - `border-right-width {length}`：，非负值, 默认值 0
     - `border-bottom-width {length}`：，非负值, 默认值 0
 
   - `border-color {color}`：
-  
+
     设定边框颜色，默认值 `#000000`
-  
+
     可有如下写法：
-  
+
     - `border-left-color {color}`：，默认值 `#000000`
     - `border-top-color {color}`：，默认值 `#000000`
     - `border-right-color {color}`：，默认值 `#000000`
@@ -83,7 +83,7 @@ Weex 对于长度值目前只支持*像素*值，不支持相对单位（`em`、
     设定圆角，默认值 0
 
     可有如下写法：
-  
+
     - `border-bottom-left-radius {length}`：，非负值, 默认值 0
     - `border-bottom-right-radius {length}`：，非负值, 默认值 0
     - `border-top-left-radius {length}`：，非负值, 默认值 0
@@ -126,8 +126,8 @@ Flexbox 包含 flex 容器和 flex 成员项。如果一个 Weex 元素可以容
 
   定义了 flex 容器中 flex 成员项的排列方向。可选值为 `row` | `column`，默认值为 `column`
 
-   - `column`：从上到下排列。
-   - `row`：从左到右排列。
+  - `column`：从上到下排列。
+  - `row`：从左到右排列。
 
 - `justify-content`：
 
@@ -140,7 +140,7 @@ Flexbox 包含 flex 容器和 flex 成员项。如果一个 Weex 元素可以容
 
   ![justify-content @400*](./images/css-flexbox-justify.svg)
 
--  `align-items`：
+- `align-items`：
 
   定义了 flex 容器中 flex 成员项在纵轴方向上如何排列以处理空白部分。可选值为 `stretch` | `flex-start` | `center` | `flex-end`，默认值为 `stretch`。
 
@@ -236,7 +236,7 @@ flex 属性定义了 flex 成员项可以占用容器中剩余空间的大小。
 Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 `position` 后，可通过 `top`、`right`、`bottom`、`left` 四个属性设置元素坐标。
 
 - `position {string}`：
-  
+
   设置定位类型。可选值为 `relative` | `absolute` | `fixed` | `sticky`，默认值为 `relative`。
 
   - `relative` 是默认值，指的是相对定位；
@@ -251,7 +251,7 @@ Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 
 **注意：**
 
 1. Weex 目前不支持 `z-index` 设置元素层级关系，但靠后的元素层级更高，因此，对于层级高的元素，可将其排列在后面。
-2. 如果定位元素超过容器边界，在 Android 下，超出部分将**不可见**，原因在于 Android 端元素 `overflow` 默认值为 `hidden`，但目前 Android 暂不支持设置 `overflow: visible`。 
+2. 如果定位元素超过容器边界，在 Android 下，超出部分将**不可见**，原因在于 Android 端元素 `overflow` 默认值为 `hidden`，但目前 Android 暂不支持设置 `overflow: visible`。
 
 ### 示例
 
@@ -301,6 +301,44 @@ Weex 支持 `position` 定位，用法与 CSS position 类似。为元素设置 
 </style>
 ```
 
+## transform
+
+transform 属性向元素应用 2D 转换。该属性允许我们对元素进行旋转、缩放、移动或倾斜。
+
+目前支持的 transform 声明格式:
+
+- translate( <number/percentage> [, <number/percentage>]?)
+- translateX( <number/percentage> )
+- translateY( <number/percentage> )
+- scale( <number>)
+- scaleX( <number> )
+- scaleY( <number> )
+- rotate( <angle/degree> )
+- transform-origin: number/percentage/keyword(top/left/right/bottom)
+
+### 示例
+
+```HTML
+<template>
+  <div class="wrapper">
+    <div class="transform">
+     <text class="title">Transformed element</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .transform {
+    align-items: center; 
+    transform: translate(150px,200px) rotate(20deg);
+    transform-origin: 0 -250px;
+    border-color:red;
+    border-width:2px;
+  }
+  .title {font-size: 48px;}
+</style>
+```
+
 ## 伪类 <span class="api-version">v0.9.5+</span>
 
 Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
@@ -328,19 +366,19 @@ Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
 
 <style scoped>
   .wrapper {
-    align-items: center; 
+    align-items: center;
     margin-top: 120px;
   }
   .title {
     font-size: 48px;
   }
   .logo {
-    width: 360px; 
+    width: 360px;
     height: 82px;
     background-color: red;
   }
   .logo:active {
-    width: 180px; 
+    width: 180px;
     height: 82px;
     background-color: green;
   }
@@ -456,6 +494,58 @@ Weex 目前只支持两种颜色的渐变，渐变方向如下：
     color: white;
   }
 </style>
+```
+
+## 阴影(box-shadow) <span class="api-version">v0.11+</span>
+
+Weex 支持阴影属性：`active`, `focus`, `disabled`, `enabled` `inset(可选)`,`offset-x`,`offset-y`, `blur-radius`,`color`
+
+
+### 注意
+
+- box-shadow仅仅支持iOS
+
+### 示例
+
+```html
+<template>
+  <div class="wrapper">
+    <div style="width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px rgb(255, 69, 0);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow: 20px  10px 5px rgba(255, 69, 0, 0.8);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:inset 20px  10px 5px rgba(255, 69, 0, 0.8);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:inset 20px  10px 5px rgb(255, 69, 0);">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px 5px black;">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+    <div style="margin-top: 80px;width:400px; height:60px;background-color: #FFE4C4; box-shadow:20px  10px 5px #008B00;">
+      <text class="title" style="text-align: center">Hello {{target}}</text>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+  .wrapper {align-items: center; margin-top: 120px;}
+  .title {font-size: 48px;}
+</style>
+
+<script>
+  module.exports = {
+    data: function () {
+      return {
+        logoUrl: 'https://alibaba.github.io/weex/img/weex_logo_blue@3x.png',
+        target: 'World'
+      };
+    }
+  };
+</script>
 ```
 
 ## 其他基本样式

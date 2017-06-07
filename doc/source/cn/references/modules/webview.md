@@ -47,7 +47,7 @@ version: 2.1
 <template>
   <div class="wrapper">
     <div class="group">
-      <input class="input" ref="input" type="url" autofocus="false" value="https://m.taobao.com"></input>
+      <input class="input" v-model="value" ref="input" type="url" autofocus="false"></input>
     </div>
     <div class="group">
       <text class="button" @click="loadURL">LoadURL</text>
@@ -64,12 +64,13 @@ version: 2.1
   export default {
     data () {
       return {
-        url : 'https://m.alibaba.com'
+        url : 'https://m.alibaba.com',
+        value: 'https://m.alibaba.com'
       }
     },
     methods: {
       loadURL (event) {
-        this.url = this.$refs.input.value
+        this.url = this.value
         modal.toast({ message: 'load url:' + this.url })
         setTimeout(() => {
           console.log('will go back.')
@@ -90,7 +91,7 @@ version: 2.1
         console.log('pagefinish', event)
         modal.toast({ message: 'pagefinish' })
       },
-      finish (event) {
+      error (event) {
         console.log('error', event)
         modal.toast({ message: 'error' })
       }
@@ -134,4 +135,4 @@ version: 2.1
 </style>
 ```
 
-[try it](http://dotwe.org/vue/154c7fa8ac13e87ff4e7bf9862147d50)
+[try it](http://dotwe.org/vue/221ff37113a12d692a7a92a100f20162)

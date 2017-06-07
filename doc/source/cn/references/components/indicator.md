@@ -107,6 +107,7 @@ version: 2.1
     item-color: green;
     item-selected-color: red;
     item-size: 50px;
+    position: absolute;
     top: 200px;
     left: 200px;
   }
@@ -132,4 +133,4 @@ version: 2.1
 </script>
 ```
 
-[try it](http://dotwe.org/vue/d2a654c4b75f1b4d80336c8a5fe133b9)
+[try it](http://dotwe.org/vue/e1b4fd8a37ed4cafd8f5e161698754aa)

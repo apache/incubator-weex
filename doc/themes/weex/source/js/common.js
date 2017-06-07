@@ -72,6 +72,7 @@
 
   initSidebar()
 
+
   /**
    * Switch language
    */
@@ -572,4 +573,33 @@
 
     initBack2Top()
   } else {}
+
+function initVersionChange(){
+    var btns = document.querySelectorAll('.versionBtn')
+    btns.forEach(function (btn) {
+      btn.addEventListener('change', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        var target = e.target
+        var url = location.protocol + '//' + location.host
+        var stype = target.getAttribute('stype')
+        var iscn = location.href.indexOf('/cn/')? '/cn/' : '/'
+        if(target.value === '2v' ){
+          url += stype + '/index.html' 
+        }else{
+          if( stype.indexOf('/cn/') != -1 ){
+            url += stype.replace('/cn/','/cn/v-0.10/') + '/index.html'
+          }else{
+            url += '/v-0.10' + stype + '/index.html'
+          }
+        }
+        location.href = url
+      })
+    })
+  }
+  initVersionChange()
+
+
 })();
+
+  

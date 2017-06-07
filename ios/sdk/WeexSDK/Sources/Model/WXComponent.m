@@ -1,14 +1,24 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXComponent.h"
 #import "WXComponent_internal.h"
-#import "WXComponent+GradientColor.h"
 #import "WXComponentManager.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance.h"
@@ -26,6 +36,7 @@
 #import "WXRoundedRect.h"
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
+#import "WXComponent+BoxShadow.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -68,6 +79,7 @@
         _ref = ref;
         _type = type;
         _weexInstance = weexInstance;
+        _componentType = WXComponentTypeCommon;
         _styles = [self parseStyles:styles];
         _attributes = attributes ? [NSMutableDictionary dictionaryWithDictionary:attributes] : [NSMutableDictionary dictionary];
         _events = events ? [NSMutableArray arrayWithArray:events] : [NSMutableArray array];
@@ -95,6 +107,7 @@
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
         [self _initCSSNodeWithStyles:_styles];
         [self _initViewPropertyWithStyles:_styles];
+        [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
     }
     
@@ -167,20 +180,23 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ ref=%@> %@", _type, _ref, _view];
+    return [NSString stringWithFormat:@"<%@:%p ref=%@> %@", _type, self, _ref, _view];
 }
 
 #pragma mark Property
 
 - (UIView *)view
 {
+    if (_componentType != WXComponentTypeCommon) {
+        return nil;
+    }
     if ([self isViewLoaded]) {
         return _view;
     } else {
         WXAssertMainThread();
         
         // compositing child will be drew by its composited ancestor
-        if (_compositingChild) {
+        if (_isCompositingChild) {
             return nil;
         }
         
@@ -201,7 +217,7 @@
             _layer.opacity = _opacity;
             _view.backgroundColor = _backgroundColor;
         }
-        
+
         if (_backgroundImage) {
             [self setGradientLayer];
         }
@@ -210,9 +226,15 @@
             [_transform applyTransformForView:_view];
         }
         
+        if (_boxShadow) {
+            [self configBoxShadow:_boxShadow];
+        }
+        
         _view.wx_component = self;
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
+        
+        [self _configWXComponentA11yWithAttributes:_attributes];
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -231,7 +253,7 @@
         if (_lazyCreateView) {
             [self _buildViewHierarchyLazily];
         }
-        
+
         [self _handleFirstScreenTime];
         
         return _view;
@@ -324,6 +346,10 @@
     if (subcomponent->_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
         subcomponent->_isNeedJoinLayoutSystem = NO;
+    }
+    
+    if (_useCompositing || _isCompositingChild) {
+        subcomponent->_isCompositingChild = YES;
     }
     
     [self _recomputeCSSNodeChildren];
@@ -423,6 +449,7 @@
     [self _updateNavBarAttributes:attributes];
     
     [self updateAttributes:attributes];
+    [self _configWXComponentA11yWithAttributes:attributes];
 }
 
 - (void)updateStyles:(NSDictionary *)styles
@@ -440,6 +467,67 @@
 - (void)updateAttributes:(NSDictionary *)attributes
 {
     WXAssertMainThread();
+    
+}
+
+- (void)setGradientLayer
+{
+    if (CGRectEqualToRect(self.view.frame, CGRectZero)) {
+        return;
+    }
+    NSDictionary * linearGradient = [WXUtility linearGradientWithBackgroundImage:_backgroundImage];
+    if (!linearGradient) {
+        return ;
+    }
+    
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(self) strongSelf = weakSelf;
+        if(strongSelf) {
+            UIColor * startColor = (UIColor*)linearGradient[@"startColor"];
+            UIColor * endColor = (UIColor*)linearGradient[@"endColor"];
+            CAGradientLayer * gradientLayer = [WXUtility gradientLayerFromColors:@[startColor, endColor] locations:nil frame:strongSelf.view.bounds gradientType:[linearGradient[@"gradientType"] integerValue]];
+            if (gradientLayer) {
+                _backgroundColor = [UIColor colorWithPatternImage:[strongSelf imageFromLayer:gradientLayer]];
+                strongSelf.view.backgroundColor = _backgroundColor;
+            }
+        }
+    });
+}
+
+- (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
+{
+    WX_CHECK_COMPONENT_TYPE(self.componentType)
+    if (attributes[@"role"]){
+        _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        self.view.accessibilityTraits = _role;
+    }
+    if (attributes[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        self.view.accessibilityElementsHidden = _ariaHidden;
+    }
+    if (attributes[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        self.view.accessibilityValue = _ariaLabel;
+    }
+    
+    if (attributes[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
+    }
+    
+    // set accessibilityFrame for view which has no subview
+    if (0 == [self.subcomponents count]) {
+        self.view.isAccessibilityElement = YES;
+    }
+}
+
+- (UIImage *)imageFromLayer:(CALayer *)layer
+{
+    UIGraphicsBeginImageContextWithOptions(layer.frame.size, NO, 0);
+    [layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return outputImage;
 }
 
 #pragma mark Reset

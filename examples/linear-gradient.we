@@ -1,5 +1,8 @@
 <template>
     <scroller style="background-color: #3a3a3a">
+        <div class="container1" style="background-image:linear-gradient(to right,rgba(255,100,100,0),rgba(255,100,100,1));">
+            <text class="direction">Alpha gradient</text>
+        </div>
         <div class="container1" style="background-image:linear-gradient(to right,#43C6AC,#F8FFAE);">
             <text class="direction">to right</text>
         </div>

@@ -1,9 +1,20 @@
-/**
- * Created by Weex.
- * Copyright (c) 2016, Alibaba, Inc. All rights reserved.
- *
- * This source code is licensed under the Apache Licence 2.0.
- * For the full copyright and license information,please view the LICENSE file in the root directory of this source tree.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 #import "WXUtility.h"
@@ -13,6 +24,7 @@
 #import "WXThreadSafeMutableDictionary.h"
 #import "WXRuleManager.h"
 #import "WXSDKEngine.h"
+#import "WXConvert.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <sys/utsname.h>
@@ -20,6 +32,8 @@
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
 #import <coreText/CoreText.h>
+
+#import "WXTextComponent.h"
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
@@ -325,12 +339,113 @@ static BOOL WXNotStat;
     return [NSError errorWithDomain:@"WeexErrorDomain" code:code userInfo:@{@"errMsg":message}];
 }
 
++ (NSDictionary *)linearGradientWithBackgroundImage:(NSString *)backgroundImage
+{
+    NSMutableDictionary * linearGradient = nil;
+    if ([backgroundImage hasPrefix:@"linear-gradient"] && [backgroundImage hasSuffix:@")"] ) {
+        backgroundImage = [backgroundImage stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSRange range = NSMakeRange(16, backgroundImage.length - 17);
+        NSString *str = [backgroundImage substringWithRange:range];
+        NSArray *array = [str componentsSeparatedByString:@","];
+        WXGradientType gradientType = WXGradientTypeToTop;
+        UIColor *startColor, *endColor;
+        if ([array count] < 3) {
+            return linearGradient;
+        }
+        if ([array count] == 3) {
+            gradientType = [WXConvert gradientType:array[0]];
+            startColor = [WXConvert UIColor:array[1]];
+            endColor = [WXConvert UIColor:array[2]];
+        } else if ([array count] > 3) {
+            NSString *gradientTypeStr = array[0];
+            NSString *subStr = [str substringFromIndex:gradientTypeStr.length + 1];
+            if ([subStr hasPrefix:@"rgb"]) {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                range = [subStr rangeOfString:@")"];
+                NSString *startColorStr = [subStr substringToIndex:range.location + 1];
+                NSString *endColorStr = [subStr substringFromIndex:range.location + 2];
+                startColor = [WXConvert UIColor:startColorStr];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+            else {
+                gradientType = [WXConvert gradientType:gradientTypeStr];
+                
+                startColor = [WXConvert UIColor:array[1]];
+                
+                NSString *startColorStr = array[1];
+                NSString *endColorStr = [subStr substringFromIndex:startColorStr.length + 1];
+                endColor = [WXConvert UIColor:endColorStr];
+            }
+        }
+        
+        if (endColor || startColor) {
+            linearGradient = [NSMutableDictionary new];
+            [linearGradient setValue:startColor forKey:@"startColor"];
+            [linearGradient setValue:endColor forKey:@"endColor"];
+            [linearGradient setValue:@(gradientType) forKey:@"gradientType"];
+        }
+    }
+    return linearGradient;
+}
+
++ (CAGradientLayer *)gradientLayerFromColors:(NSArray*)colors locations:(NSArray*)locations frame:(CGRect)frame gradientType:(WXGradientType)gradientType
+{
+    CAGradientLayer * gradientLayer = [CAGradientLayer layer];
+    NSMutableArray *newColors = [NSMutableArray new];
+    for(UIColor *color in colors) {
+        [newColors addObject:(id)color.CGColor];
+    }
+    if (colors) {
+        gradientLayer.colors = newColors;
+    }
+    if (locations) {
+        gradientLayer.locations = locations;
+    }
+    CGPoint start = CGPointZero;
+    CGPoint end = CGPointZero;
+    switch (gradientType) {
+        case WXGradientTypeToTop:
+            start = CGPointMake(0.0, 1.0);
+            end = CGPointMake(0.0, 0.0);
+            break;
+        case WXGradientTypeToBottom:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(0.0, 1.0);
+            break;
+        case WXGradientTypeToLeft:
+            start = CGPointMake(1.0, 0.0);
+            end = CGPointMake(0.0, 0.0);
+            break;
+        case WXGradientTypeToRight:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(1.0, 0.0);
+            break;
+        case WXGradientTypeToTopleft:
+            start = CGPointMake(1.0, 1.0);
+            end = CGPointMake(0.0, 0.0f);
+            break;
+        case WXGradientTypeToBottomright:
+            start = CGPointMake(0.0, 0.0);
+            end = CGPointMake(1.0, 1.0);
+            break;
+        default:
+            break;
+    }
+    
+    gradientLayer.startPoint = start;
+    gradientLayer.endPoint = end;
+    gradientLayer.frame = frame;
+    
+    return gradientLayer;
+}
+
 + (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily
 {
     return [self fontWithSize:size textWeight:textWeight textStyle:textStyle fontFamily:fontFamily scaleFactor:[self defaultPixelScaleFactor]];
 }
 
-+ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor useCoreText:(BOOL)useCoreText
 {
     CGFloat fontSize = (isnan(size) || size == 0) ?  32 * scaleFactor : size;
     UIFont *font = nil;
@@ -342,13 +457,42 @@ static BOOL WXNotStat;
         if ([self isFileExist:fpath]) {
             // if the font file is not the correct font file. it will crash by singal 9
             CFURLRef fontURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (__bridge CFStringRef)fpath, kCFURLPOSIXPathStyle, false);
-            CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
-            CFRelease(fontURL);
-            CGFontRef graphicFont = CGFontCreateWithDataProvider(fontDataProvider);
-            CGDataProviderRelease(fontDataProvider);
-            CTFontRef smallFont = CTFontCreateWithGraphicsFont(graphicFont, size, NULL, NULL);
-            CFRelease(graphicFont);
-            font = (__bridge_transfer UIFont*)smallFont;
+            if (fontURL) {
+                if (useCoreText) {
+                    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL(fontURL);
+                    if (fontDataProvider) {
+                        CGFontRef newFont = CGFontCreateWithDataProvider(fontDataProvider);
+                        CFErrorRef error = nil;
+                        CTFontManagerRegisterGraphicsFont(newFont, &error);
+                        // the same font family, remove it and register new one.
+                        if (error) {
+                            CTFontManagerUnregisterGraphicsFont(newFont, NULL);
+                            CTFontManagerRegisterGraphicsFont(newFont, NULL);
+                            CFRelease(error);
+                            error = nil;
+                        }
+                        fontFamily = (__bridge_transfer  NSString*)CGFontCopyPostScriptName(newFont);
+                        CGFontRelease(newFont);
+                        CFRelease(fontURL);
+                        CFRelease(fontDataProvider);
+                    }
+                } else {
+                    CFErrorRef error = nil;
+                    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, &error);
+                    if (error) {
+                        CFRelease(error);
+                        error = nil;
+                        CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                        CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeProcess, NULL);
+                    }
+                    NSArray *descriptors = (__bridge_transfer NSArray *)CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+                    // length of descriptors here will be only one.
+                    for (UIFontDescriptor *desc in descriptors) {
+                        font = [UIFont fontWithDescriptor:desc size:fontSize];
+                    }
+                    CFRelease(fontURL);
+                }
+            }
         }else {
             [[WXRuleManager sharedInstance] removeRule:@"fontFace" rule:@{@"fontFamily": fontFamily}];
         }
@@ -388,13 +532,18 @@ static BOOL WXNotStat;
     return font;
 }
 
++ (UIFont *)fontWithSize:(CGFloat)size textWeight:(CGFloat)textWeight textStyle:(WXTextStyle)textStyle fontFamily:(NSString *)fontFamily scaleFactor:(CGFloat)scaleFactor
+{
+    return [self fontWithSize:size textWeight:textWeight textStyle:textStyle fontFamily:fontFamily scaleFactor:scaleFactor useCoreText:NO];
+}
+
 + (void)getIconfont:(NSURL *)url completion:(void(^)(NSURL *url, NSError *error))completionBlock
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         if ([url isFileURL]) {
             // local file url
             NSError * error = nil;
-            if (![WXUtility isFileExist:url.absoluteString]) {
+            if (![WXUtility isFileExist:url.path]) {
                 error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:-1 userInfo:@{@"errMsg":[NSString stringWithFormat:@"local font %@ is't exist", url.absoluteString]}];
             }
             completionBlock(url, error);
@@ -432,7 +581,6 @@ static BOOL WXNotStat;
 
 + (BOOL)isFileExist:(NSString *)filePath
 {
-    
     return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
 }
 

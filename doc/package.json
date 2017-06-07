@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.2.2"
+    "version": "3.3.1"
   },
   "scripts": {
     "server": "hexo server"
   },
   "dependencies": {
-    "hexo": "^3.2.2",
+    "cheerio": "^0.20.0",
+    "hexo": "3.3.1",
     "hexo-autoprefixer": "^1.0.0",
     "hexo-deployer-git": "git@github.com:Jinjiang/hexo-deployer-git.git",
     "hexo-generator-alias": "git+https://github.com/hexojs/hexo-generator-alias.git",
