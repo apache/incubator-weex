@@ -19,12 +19,22 @@
 import { throttle, extend } from './func'
 import { createEvent } from './event'
 
-export function getParentScroller (vnode) {
-  if (!vnode) return null
-  if (vnode.weexType === 'scroller' || vnode.weexType === 'list') {
-    return vnode
+const scrollableTypes = ['scroller', 'list']
+
+export function getParentScroller (vm) {
+  if (!vm) return null
+  if (vm._parentScroller) {
+    return vm._parentScroller
   }
-  return getParentScroller(vnode.$parent)
+  function _getParentScroller (parent) {
+    if (!parent) { return }
+    if (scrollableTypes.indexOf(parent.weexType) > -1) {
+      vm._parentScroller = parent
+      return parent
+    }
+    return _getParentScroller(parent.$parent)
+  }
+  return _getParentScroller(vm.$parent)
 }
 
 export function hasIntersection (rect, ctRect) {

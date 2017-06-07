@@ -17,6 +17,7 @@
  * under the License.
  */
 import { getThrottleLazyload, throttle } from '../utils'
+import { processSticky } from '../core'
 
 const DEFAULT_OFFSET_ACCURACY = 10
 const DEFAULT_LOADMORE_OFFSET = 0
@@ -108,6 +109,8 @@ export default {
     handleScroll (event) {
       getThrottleLazyload(25, this.$el, 'scroll')()
       getThrottledScroll(this)(event)
+
+      processSticky(this)
 
       // fire loadmore event.
       const inner = this.$refs.inner

@@ -106,14 +106,14 @@ body > .weex-scroller {
   height: 100%;
 }
 
-.iossticky {
+.weex-ios-sticky {
   position: -webkit-sticky !important;
   position: sticky !important;
   z-index: 9999;
   top: 0;
 }
 
-.sticky {
+.weex-sticky {
   position: fixed;
   top: 0;
   z-index: 9999;
