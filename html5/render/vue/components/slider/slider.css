@@ -1,0 +1,34 @@
+.weex-slider-wrapper {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.weex-slider-inner {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-orient: horizontal;
+}
+
+.weex-slider-cell {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: transparent !important;
+  overflow: hidden;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+
+.neighbor-cell {
+  overflow: visible !important;
+}

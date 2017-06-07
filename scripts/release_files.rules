@@ -20,7 +20,8 @@
 + /POSSIBLE-NOTICES-FOR-BIN-DIST
 + /DISCLAIMER
 + /README.MD
-+ /README_RELEASE.md
++ /HOW-TO-BUILD.md
++ /RUN-RAT.md
 + /package.json
 + /.wwprc
 + /.flowconfig

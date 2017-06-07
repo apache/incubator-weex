@@ -18,16 +18,15 @@
  */
 import { getThrottleLazyload, throttle } from '../utils'
 
-let throttleScroll
 function getThrottledScroll (context) {
-  if (!throttleScroll) {
+  if (!context._throttleScroll) {
     const wrapper = context.$refs.wrapper
     const inner = context.$refs.inner
     let preOffset = (context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop)
       || 0
-    throttleScroll = throttle(function (evt) {
+    context._throttleScroll = throttle(function (evt) {
       const offset = context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop
@@ -65,7 +64,7 @@ function getThrottledScroll (context) {
       }
     }, 16, true)
   }
-  return throttleScroll
+  return context._throttleScroll
 }
 
 export default {
