@@ -43,7 +43,6 @@
     float _rotateX;
     float _rotateY;
     float _rotateZ;
-    float _perspective;
     
     CATransform3D _nativeTransform;
     BOOL _useNativeTransform;
@@ -59,9 +58,6 @@
         _rotateY = 0.0;
         _rotateZ = 0.0;
         _rotateAngle = 0.0;
-        
-        // default is parallel projection
-        _perspective = CGFLOAT_MAX;
         
         [self parseTransform:cssValue];
         [self parseTransformOrigin:origin];
@@ -235,9 +231,6 @@
         [self setAnchorPoint:anchorPoint forView:view];
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
-    if (_perspective) {
-        nativeTransform3d.m34 = -1.0/_perspective;
-    }
     if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
         view.layer.transform = nativeTransform3d;
     }

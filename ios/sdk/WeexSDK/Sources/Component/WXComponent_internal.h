@@ -55,7 +55,6 @@
     WXBoxShadow *_lastBoxShadow;
     WXBoxShadow *_boxShadow;
     
-    CGFloat _perspective;
     /**
      * accessibility support
      */
