@@ -91,6 +91,7 @@ export default {
   },
   render (createElement) {
     this.$parent._loading = this
+    this._renderHook()
     return createElement('aside', {
       ref: 'loading',
       attrs: { 'weex-type': 'loading' },

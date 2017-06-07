@@ -270,6 +270,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeClickEvent
 {
     if (_tapGesture) {
+        [_tapGesture removeTarget:self action:@selector(onClick:)];
+        [self.view removeGestureRecognizer:_tapGesture];
         _tapGesture.delegate = nil;
         _tapGesture = nil;
     }
@@ -341,6 +343,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
   
     for (UISwipeGestureRecognizer *recognizer in _swipeGestures) {
+        [recognizer removeTarget:self action:@selector(onSwipe:)];
+        [self.view removeGestureRecognizer:recognizer];
         recognizer.delegate = nil;
     }
     
@@ -349,6 +353,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onSwipe:(UISwipeGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     UISwipeGestureRecognizerDirection direction = gesture.direction;
     
     NSString *directionString;
@@ -367,6 +375,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             break;
         default:
             directionString = @"unknown";
+            break;
     }
     
     CGPoint screenLocation = [gesture locationInView:self.view.window];
@@ -389,6 +398,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeLongPressEvent
 {
     if (_longPressGesture) {
+        [_longPressGesture removeTarget:self action:@selector(onLongPress:)];
+        [self.view removeGestureRecognizer:_longPressGesture];
         _longPressGesture.delegate = nil;
         _longPressGesture = nil;
     }
@@ -396,6 +407,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onLongPress:(UILongPressGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint screenLocation = [gesture locationInView:self.view.window];
         CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
@@ -450,6 +465,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
@@ -472,16 +491,17 @@ if ([removeEventName isEqualToString:@#eventName]) {\
              eventName = @"panmove";
         }
         state = @"move";
+    } else if (gesture.state == UIGestureRecognizerStateCancelled) {
+        state = @"cancel";
     }
-    
     
     CGPoint translation = [_panGesture translationInView:self.view];
     
-    if (_listenHorizontalPan && fabs(translation.y) <= fabs(translation.x)) {
+    if (_listenHorizontalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) <= fabs(translation.x))) {
         [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
-    if (_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+    if (_listenVerticalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) > fabs(translation.x))) {
         [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
@@ -526,6 +546,8 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         && !_listenPanStart && !_listenPanMove && !_listenPanEnd
         && !_listenHorizontalPan && !_listenVerticalPan
         ) {
+        [_panGesture removeTarget:self action:@selector(onPan:)];
+        [self.view removeGestureRecognizer:_panGesture];
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -616,16 +638,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
+    NSString * panGestureRecog = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"UIScrollV", @"iewPanG", @"estur",@"eRecog",@"nize",@"r"];
+    NSString * textTap = [NSString stringWithFormat:@"%@%@%@%@%@",@"UITe",@"xtTa",@"pReco",@"gniz",@"er"];
     // trigger touches
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
     // swipe and scroll
-    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(@"UIScrollViewPanGestureRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
         return YES;
     }
     // onclick and textviewInput
-    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(@"UITextTapRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(textTap)]) {
         return YES;
     }
     

@@ -22,24 +22,30 @@ import {
   extractComponentStyle
 } from '../core'
 
-let warned = false
-const warnInfo = `[vue-render] after v0.11.3 there's no need to add $processStyle in vue-loader config anymore.`
+import {
+  normalizeStyle,
+  camelizeKeys
+} from '../utils'
 
 export default {
   beforeCreate () {
-    // get static class style map from document's styleSheets.
-    if (!weex.styleMap) {
+    /**
+     * get static class style map from document's styleSheets.
+     * Weex.on will create a Vue instance. In this case we'll ignore it, since
+     * it's not sure whether the scoped style has already attached to head or not.
+     */
+    if (!weex.styleMap && this.$options && this.$options._scopeId) {
       weex.styleMap = getHeadStyleMap()
     }
   },
 
   methods: {
     $processStyle (style) {
-      if (!warned) {
-        warned = true
-        console.warn(warnInfo)
+      window._style_processing_added = true
+      if (!style) {
+        return
       }
-      return style
+      return normalizeStyle(camelizeKeys(style))
     },
 
     _extractComponentStyle () {

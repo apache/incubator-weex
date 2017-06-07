@@ -91,6 +91,7 @@ export default {
       this.updateLayout()
     })
 
+    this._renderHook()
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },

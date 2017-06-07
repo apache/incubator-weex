@@ -3,8 +3,8 @@
   "version": "0.12.0",
   "subversion": {
     "browser": "0.5.0",
-    "framework": "0.20.5",
-    "vue-render": "0.11.10",
+    "framework": "0.20.6",
+    "vue-render": "0.11.44",
     "transformer": ">=0.1.5 <0.5"
   },
   "description": "A framework for building Mobile cross-platform UI",
@@ -97,8 +97,8 @@
     "scroll-to": "0.0.2",
     "semver": "^5.1.0",
     "weex-picker": "^0.1.0",
-    "weex-rax-framework": "0.2.11",
-    "weex-vue-framework": "2.2.2-weex.5",
+    "weex-rax-framework": "0.3.5",
+    "weex-vue-framework": "2.2.6-weex.1",
     "weex-styler": "0.1.9"
   },
   "devDependencies": {
@@ -113,12 +113,13 @@
     "chromedriver": "^2.21.2",
     "cross-spawn": "^4.0.0",
     "css-loader": "^0.26.1",
-    "danger": "^0.11.5",
+    "danger": "^0.18.0",
     "dateformat": "^2.0.0",
     "eslint": "^2.11.1",
     "eslint-plugin-flowtype": "^2.30.4",
     "flow-bin": "^0.42.0",
     "fs-extra": "^2.0.0",
+    "github": "^9.2.0",
     "http-server": "^0.9.0",
     "json-loader": "^0.5.4",
     "karma": "^1.3.0",
@@ -130,10 +131,10 @@
     "karma-sinon-chai": "^1.2.4",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.8.0",
-    "macaca-cli": "^1.1.0",
     "macaca-utils": "^0.1.9",
     "mocha": "^2.5.3",
     "nightwatch": "^0.9.4",
+    "parse-diff": "^0.4.0",
     "phantomjs-prebuilt": "^2.1.7",
     "reify": "^0.3.8",
     "rollup": "^0.36.0",
@@ -156,15 +157,13 @@
     "vue": "^2.2.6",
     "vue-loader": "^11.3.3",
     "vue-template-compiler": "^2.2.6",
-    "webdriver-client": "~1.0.0",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
+    "weex-gcanvas": "^0.3.5",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.23",
     "wwp": "^0.3.5",
-    "xml2map": "^1.0.2",
-    "weex-gcanvas":"^0.3.5"
-
+    "xmldom": "^0.1.27"
   }
 }

@@ -21,7 +21,8 @@ import {
   // normalizeStyle,
   normalizeString,
   normalizeNumber,
-  normalizeUnitsNum
+  normalizeUnitsNum,
+  trimComment
 } from '../../../../render/vue/utils/style'
 import { init } from '../../../../render/vue/env/viewport'
 
@@ -54,6 +55,12 @@ describe('style', function () {
 
   it('should normalize style object', function () {
     //
+  })
+
+  it('should trim comment in style.', function () {
+    const cssText = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  /* left: 43px;\n  top: 71px;*/\n}'
+    const trimmed = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  \n}'
+    expect(trimComment(cssText)).to.equal(trimmed)
   })
 })
 

@@ -130,6 +130,7 @@
             
             if (!CGRectEqualToRect(strongSelf.view.frame,strongSelf.calculatedFrame)) {
                 strongSelf.view.frame = strongSelf.calculatedFrame;
+                strongSelf->_absolutePosition = CGPointMake(NAN, NAN);
                 [strongSelf configBoxShadow:_boxShadow];
             } else {
                 if (![strongSelf equalBoxShadow:_boxShadow withBoxShadow:_lastBoxShadow]) {
@@ -192,20 +193,7 @@
 - (CGPoint)computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
 {
     // Not need absolutePosition any more
- //   [self _computeNewAbsolutePosition:superAbsolutePosition];
     return superAbsolutePosition;
-}
-
-- (CGPoint)_computeNewAbsolutePosition:(CGPoint)superAbsolutePosition
-{
-    CGPoint newAbsolutePosition = CGPointMake(WXRoundPixelValue(superAbsolutePosition.x + _cssNode->layout.position[CSS_LEFT]),
-                                              WXRoundPixelValue(superAbsolutePosition.y + _cssNode->layout.position[CSS_TOP]));
-    
-    if(!CGPointEqualToPoint(_absolutePosition, newAbsolutePosition)){
-        _absolutePosition = newAbsolutePosition;
-    }
-    
-    return newAbsolutePosition;
 }
 
 - (void)_layoutDidFinish
@@ -364,16 +352,6 @@ do {\
     WX_STYLE_RESET_CSS_NODE(paddingLeft, padding[CSS_LEFT], 0.0)
     WX_STYLE_RESET_CSS_NODE(paddingRight, padding[CSS_RIGHT], 0.0)
     WX_STYLE_RESET_CSS_NODE(paddingBottom, padding[CSS_BOTTOM], 0.0)
-}
-
-- (void)_fillAbsolutePositions
-{
-    CGPoint absolutePosition = _absolutePosition;
-    NSArray *subcomponents = self.subcomponents;
-    for (WXComponent *subcomponent in subcomponents) {
-        subcomponent->_absolutePosition = CGPointMake(absolutePosition.x + subcomponent.calculatedFrame.origin.x, absolutePosition.y + subcomponent.calculatedFrame.origin.y);
-        [subcomponent _fillAbsolutePositions];
-    }
 }
 
 #pragma mark CSS Node Override

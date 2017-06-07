@@ -19,19 +19,24 @@
 package com.taobao.weex.bridge;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
 
 import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,6 +56,13 @@ public class WXModuleManager {
   private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
+
+  /**
+   * monitor keys
+   */
+  private static String MONITOR_ERROR_CODE = "errCode";
+  private static String MONITOR_ARG = "arg";
+  private static String MONITOR_ERROR_MSG = "errMsg";
 
   /**
    * module object dictionary
@@ -140,9 +152,20 @@ public class WXModuleManager {
 
     final Invoker invoker = factory.getMethodInvoker(methodStr);
     try {
-     return instance
-          .getNativeInvokeHelper()
-          .invoke(wxModule,invoker,args);
+      if(instance != null) {
+        IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+        if(userTrackAdapter != null) {
+          HashMap<String, Serializable> data = new HashMap<String, Serializable>();
+          data.put(MONITOR_ERROR_CODE, "101");
+          data.put(MONITOR_ARG, moduleStr + "." + methodStr);
+          data.put(MONITOR_ERROR_MSG, instance.getBundleUrl());
+          userTrackAdapter.commit(instance.getContext(), null, IWXUserTrackAdapter.INVOKE_MODULE, null, data);
+        }
+        return dispatchCallModuleMethod(instance,wxModule,args,invoker);
+      } else {
+        WXLogUtils.e("callModuleMethod >>> instance is null");
+        return null;
+      }
     } catch (Exception e) {
       WXLogUtils.e("callModuleMethod >>> invoke module:" + moduleStr + ", method:" + methodStr + " failed. ", e);
       return null;
@@ -150,6 +173,21 @@ public class WXModuleManager {
       if (wxModule instanceof WXDomModule || wxModule instanceof WXTimerModule) {
         wxModule.mWXSDKInstance = null;
       }
+    }
+  }
+
+  private static Object dispatchCallModuleMethod(@NonNull WXSDKInstance instance, @NonNull WXModule wxModule,
+                                                 @NonNull JSONArray args, @NonNull Invoker invoker) throws Exception{
+    if(!instance.isPreRenderMode()) {
+      return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
+    }
+    // we are in preRender mode
+    if(invoker.isRunOnUIThread()) {/*ASYNC CALL*/
+      DOMAction moduleInvocationAction = Actions.getModuleInvocationAction(wxModule,args,invoker);
+      WXSDKManager.getInstance().getWXDomManager().postAction(instance.getInstanceId(), moduleInvocationAction,false);
+      return null;
+    } else {/*SYNC CALL*/
+      return instance.getNativeInvokeHelper().invoke(wxModule,invoker,args);
     }
   }
 

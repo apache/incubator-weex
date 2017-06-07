@@ -32,6 +32,7 @@ export default {
     // if (process.env.NODE_ENV === 'development') {
     //   validateStyles('div', this.$vnode.data && this.$vnode.data.staticStyle)
     // }
+    this._renderHook()
     return createElement('html:div', {
       attrs: { 'weex-type': 'div' },
       on: createEventMap(this),

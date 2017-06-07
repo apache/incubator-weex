@@ -22,6 +22,7 @@
 #import "WXDefine.h"
 #import "WXType.h"
 #import "WXLog.h"
+#import "WXSDKInstance.h"
 
 // The default screen width which helps us to calculate the real size or scale in different devices.
 static const CGFloat WXDefaultScreenWidth = 750.0;
@@ -433,5 +434,11 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  *
  */
 + (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type;
+
+/**
+ *  @abstract custorm monitor info
+ *
+ */
++ (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value;
 
 @end

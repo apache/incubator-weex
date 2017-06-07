@@ -54,6 +54,7 @@ public class WXAnimationBean {
   public long duration;
   public String timingFunction;
   public Style styles;
+  public boolean needLayout;
 
   public static class Style {
 

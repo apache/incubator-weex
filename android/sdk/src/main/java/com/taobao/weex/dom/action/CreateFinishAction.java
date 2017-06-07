@@ -18,8 +18,12 @@
  */
 package com.taobao.weex.dom.action;
 
+import com.taobao.weex.LayoutFinishListener;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
 
 /**
@@ -27,6 +31,22 @@ import com.taobao.weex.dom.RenderActionContext;
  */
 
 final class CreateFinishAction extends AbstractLayoutFinishAction {
+
+  @Override
+  public void executeDom(DOMActionContext context) {
+    super.executeDom(context);
+    final WXSDKInstance instance = context.getInstance();
+    final LayoutFinishListener listener;
+    if(instance != null && (listener = instance.getLayoutFinishListener()) != null) {
+      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(WXThread.secure(new Runnable() {
+        @Override
+        public void run() {
+          listener.onLayoutFinish(instance);
+        }
+      }),0);
+    }
+  }
+
   @Override
   public void executeRender(RenderActionContext context) {
     WXSDKInstance instance = context.getInstance();

@@ -18,16 +18,15 @@
  */
 import { getThrottleLazyload, throttle } from '../utils'
 
-let throttleScroll
 function getThrottledScroll (context) {
-  if (!throttleScroll) {
+  if (!context._throttleScroll) {
     const wrapper = context.$refs.wrapper
     const inner = context.$refs.inner
     let preOffset = (context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop)
       || 0
-    throttleScroll = throttle(function (evt) {
+    context._throttleScroll = throttle(function (evt) {
       const offset = context.scrollDirection === 'horizontal'
         ? wrapper.scrollLeft
         : wrapper.scrollTop
@@ -65,7 +64,7 @@ function getThrottledScroll (context) {
       }
     }, 16, true)
   }
-  return throttleScroll
+  return context._throttleScroll
 }
 
 export default {
@@ -110,7 +109,7 @@ export default {
 
     handleTouchStart (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._loading || this._refresh) {
         const touch = event.changedTouches[0]
         this._touchParams = {
@@ -126,7 +125,7 @@ export default {
 
     handleTouchMove (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner
         const { startY, reachTop, reachBottom } = this._touchParams
@@ -146,7 +145,7 @@ export default {
 
     handleTouchEnd (event) {
       // event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       if (this._touchParams) {
         const inner = this.$refs.inner
         const { reachTop, reachBottom } = this._touchParams

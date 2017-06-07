@@ -182,7 +182,7 @@
 + (void)initSDKEnvironment
 {
     
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [WXSDKEngine initSDKEnvironment:script];
     
@@ -274,7 +274,7 @@ static NSDictionary *_customEnvironment;
 
 + (void)restart
 {
-    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"main" ofType:@"js"];
+    NSString *filePath = [[NSBundle bundleForClass:self] pathForResource:@"native-bundle-main" ofType:@"js"];
     NSString *script = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
     [self restartWithScript:script];
 }
@@ -314,6 +314,7 @@ static NSDictionary *_customEnvironment;
 }
 
 + (void)_originalRegisterComponents:(NSDictionary *)components {
+    NSMutableDictionary * mutableComponents = [components mutableCopy];
     void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         
         NSString *name = mObj[@"name"];
@@ -324,23 +325,25 @@ static NSDictionary *_customEnvironment;
         }
         [self registerComponent:name withClass:NSClassFromString(componentClass) withProperties:pros];
     };
-    [components enumerateKeysAndObjectsUsingBlock:componentBlock];
+    [mutableComponents enumerateKeysAndObjectsUsingBlock:componentBlock];
     
 }
 
 + (void)_originalRegisterModules:(NSDictionary *)modules {
+    NSMutableDictionary * mutableModules = [modules mutableCopy];
     void (^moduleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         
         [self registerModule:mKey withClass:NSClassFromString(mObj)];
     };
-    [modules enumerateKeysAndObjectsUsingBlock:moduleBlock];
+    [mutableModules enumerateKeysAndObjectsUsingBlock:moduleBlock];
 }
 
 + (void)_originalRegisterHandlers:(NSDictionary *)handlers {
+    NSMutableDictionary * mutableHandlers = [handlers mutableCopy];
     void (^handlerBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
         [self registerHandler:mObj withProtocol:NSProtocolFromString(mKey)];
     };
-    [handlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
+    [mutableHandlers enumerateKeysAndObjectsUsingBlock:handlerBlock];
 }
 
 @end
