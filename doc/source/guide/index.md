@@ -12,7 +12,7 @@ Weex is a framework for building Mobile cross-platform high performance UI. Deve
 
 ## What is Vue?
 
-[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi). Now Weex and Vue has supported each other officially. Weex put Vue 2.x as its built-in JS Framework, and Vue has already been able to develop native mobile app.
+[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi). Now Weex and Vue has supported each other officially. Weex put Vue 2.x as its built-in JS Framework, and Vue has already been able to develop native mobile apps.
 
 ## Hello world
 
@@ -21,7 +21,7 @@ The easiest way to try Weex is to use the [Playground App](../playground.html) a
 - Install the [Playground App](../playground.html) for your phone.
 - Open [the Hello World example](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) in a new tab, click run, and then use the Playground App to scan the QR code.
 
-Nailed it! In this case, We can see HTML semantic tags, CSS styles and Javascript code. This is one of the simplest Weex examples. It rendered a "Hello World" in the page. Please note that this is not a Web page.
+Nailed it! In this case, We can see HTML semantic tags, CSS styles and Javascript code. This is one of the simplest Weex examples. It renders a "Hello World" in the page. Please note that this is not a web page.
 
 ![mobile_preview](https://img.alicdn.com/tps/TB1Ymw3OpXXXXcvXpXXXXXXXXXX-500-1013.jpg)
 
@@ -53,6 +53,6 @@ As shown in the following code：
 </script>
 ```
 
-It's too easy，right? Let's focus on the syntax, obviously this is vue.
+It's too easy, right? Let's focus on the syntax, obviously this is vue.
 
 You can try to modify the Hello World, then generate a new QR code to scan.
