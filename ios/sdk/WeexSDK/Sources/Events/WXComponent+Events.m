@@ -760,7 +760,20 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             touch.wx_identifier = @(_touchIdentifier++);
         }
         NSDictionary *resultTouch = [_component touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
-        [resultTouches addObject:resultTouch];
+        NSMutableDictionary * mutableResultTouch = [resultTouch mutableCopy];
+        
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
+            float value = touch.force*60;
+            float maxValue = touch.maximumPossibleForce*60;
+            if (touch.maximumPossibleForce) {
+                // the forece value will be range 1 from 0.
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:value/maxValue] forKey:@"force"];
+            }else {
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:0.0] forKey:@"force"];
+            }
+        }
+        
+        [resultTouches addObject:mutableResultTouch];
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];
