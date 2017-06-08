@@ -19,18 +19,10 @@
 package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.view.MotionEventCompat;
-import android.view.MotionEvent;
-import android.view.View;
 
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.ImmutableDomObject;
-import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXRecyclerDomObject;
 import com.taobao.weex.dom.flex.Spacing;
@@ -45,10 +37,7 @@ import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.ui.view.listview.adapter.ListBaseViewHolder;
 import com.taobao.weex.ui.view.refresh.wrapper.BounceRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXUtils;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Map;
 
 /**
@@ -65,34 +54,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   private WXRecyclerDomObject mDomObject;
   private float mPaddingLeft;
   private float mPaddingRight;
-
-  private DragHelper mDragHelper;
-
-  /**
-   * attributes for cell
-   */
-  private static final String EXCLUDED = "dragExcluded";
-
-  /**
-   * attributes for list self
-   */
-  private static final String DRAGGABLE = "draggable";
-  private static final String DRAG_TRIGGER_TYPE = "dragTriggerType";
-
-  private static final String DEFAULT_TRIGGER_TYPE = DragTriggerType.LONG_PRESS;
-  private static final boolean DEFAULT_EXCLUDED = false;
-
-  private static final String DRAG_ANCHOR = "dragAnchor";
-
-  /**
-   * gesture type which can trigger drag&drop
-   */
-  interface DragTriggerType {
-    String PAN = "pan";
-    String LONG_PRESS = "longpress";
-  }
-
-  private String mTriggerType;
 
   @Deprecated
   public WXListComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -117,87 +78,8 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   @Override
-  protected void onHostViewInitialized(BounceRecyclerView host) {
-    super.onHostViewInitialized(host);
-
-    WXRecyclerView recyclerView = host.getInnerView();
-    if (recyclerView == null || recyclerView.getAdapter() == null) {
-      WXLogUtils.e(TAG, "RecyclerView is not found or Adapter is not bound");
-      return;
-    }
-
-    if (mChildren == null) {
-      WXLogUtils.e(TAG, "children is null");
-      return;
-    }
-
-    mDragHelper = new DefaultDragHelper(mChildren, recyclerView, new EventTrigger() {
-      @Override
-      public void triggerEvent(String type, Map<String, Object> args) {
-        fireEvent(type, args);
-      }
-    });
-
-    mTriggerType = getTriggerType(getDomObject());
-  }
-
-  @WXComponentProp(name = DRAGGABLE)
-  @SuppressWarnings("unused")
-  public void setDraggable(boolean isDraggable) {
-    if (mDragHelper != null) {
-      mDragHelper.setDraggable(isDraggable);
-    }
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("set draggable : " + isDraggable);
-    }
-  }
-
-  @Override
   public void onBindViewHolder(final ListBaseViewHolder holder, int position) {
     super.onBindViewHolder(holder, position);
-
-    if (mDragHelper == null) {
-      return;
-    }
-
-    if (holder != null && holder.getComponent() != null && holder.getComponent() instanceof WXCell) {
-      mTriggerType = (mTriggerType == null) ? DEFAULT_TRIGGER_TYPE : mTriggerType;
-
-      WXCell cell = (WXCell) holder.getComponent();
-      boolean isExcluded = isDragExcluded(cell.getDomObject());
-      mDragHelper.setDragExcluded(holder, isExcluded);
-
-      //NOTICE: event maybe consumed by other views
-      if (DragTriggerType.PAN.equals(mTriggerType)) {
-        mDragHelper.setLongPressDragEnabled(false);
-
-        WXComponent anchorComponent = findComponentByAnchorName(cell, DRAG_ANCHOR);
-
-        if (anchorComponent != null && anchorComponent.getHostView() != null && !isExcluded) {
-          View anchor = anchorComponent.getHostView();
-          anchor.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-              if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-                mDragHelper.startDrag(holder);
-              }
-              return true;
-            }
-          });
-        } else {
-          if (WXEnvironment.isApkDebugable()) {
-            if(!isExcluded) {
-              WXLogUtils.e(TAG, "[error] onBindViewHolder: the anchor component or view is not found");
-            } else {
-              WXLogUtils.d(TAG, "onBindViewHolder: position "+ position + " is drag excluded");
-            }
-          }
-        }
-
-      } else if (DragTriggerType.LONG_PRESS.equals(mTriggerType)) {
-        mDragHelper.setLongPressDragEnabled(true);
-      }
-    }
   }
 
   @Override
@@ -361,67 +243,4 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     }
   }
 
-  @Nullable
-  private WXComponent findComponentByAnchorName(@NonNull WXComponent root, @NonNull String anchorName) {
-    long start = 0;
-    if (WXEnvironment.isApkDebugable()) {
-      start = System.currentTimeMillis();
-    }
-
-    Deque<WXComponent> deque = new ArrayDeque<>();
-    deque.add(root);
-    while (!deque.isEmpty()) {
-      WXComponent curComponent = deque.removeFirst();
-      ImmutableDomObject object = curComponent.getDomObject();
-      if (object != null) {
-        String isAnchorSet = WXUtils.getString(object.getAttrs().get(anchorName), null);
-
-        //hit
-        if (isAnchorSet != null && isAnchorSet.equals("true")) {
-          if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d("dragPerf", "findComponentByAnchorName time: " + (System.currentTimeMillis() - start) + "ms");
-          }
-          return curComponent;
-        }
-      }
-      if (curComponent instanceof WXVContainer) {
-        WXVContainer container = (WXVContainer) curComponent;
-        for (int i = 0, len = container.childCount(); i < len; i++) {
-          WXComponent child = container.getChild(i);
-          deque.add(child);
-        }
-      }
-    }
-
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("dragPerf", "findComponentByAnchorName elapsed time: " + (System.currentTimeMillis() - start) + "ms");
-    }
-    return null;
-
-  }
-
-  private String getTriggerType(@Nullable ImmutableDomObject domObject) {
-    String triggerType = DEFAULT_TRIGGER_TYPE;
-    if (domObject == null) {
-      return triggerType;
-    }
-    triggerType = WXUtils.getString(domObject.getAttrs().get(DRAG_TRIGGER_TYPE), DEFAULT_TRIGGER_TYPE);
-    if (!DragTriggerType.LONG_PRESS.equals(triggerType) && !DragTriggerType.PAN.equals(triggerType)) {
-      triggerType = DEFAULT_TRIGGER_TYPE;
-    }
-
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "trigger type is " + triggerType);
-    }
-
-    return triggerType;
-  }
-
-  private boolean isDragExcluded(@Nullable ImmutableDomObject domObject) {
-    if (domObject == null) {
-      return DEFAULT_EXCLUDED;
-    }
-    WXAttr cellAttrs = domObject.getAttrs();
-    return WXUtils.getBoolean(cellAttrs.get(EXCLUDED), DEFAULT_EXCLUDED);
-  }
 }
