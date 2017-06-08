@@ -160,22 +160,32 @@ export default {
       vnode = vnode[0]
     }
 
+    const scale = window.weex.config.env.scale
     const info = { result: false }
+    const rectKeys = ['width', 'height', 'top', 'bottom', 'left', 'right']
+
+    function recalc (rect) {
+      const res = {}
+      rectKeys.forEach(key => {
+        res[key] = rect[key] / scale
+      })
+      return res
+    }
 
     if (vnode && vnode === 'viewport') {
       info.result = true
-      info.size = {
+      info.size = recalc({
         width: document.documentElement.clientWidth,
         height: document.documentElement.clientHeight,
         top: 0,
         left: 0,
         right: document.documentElement.clientWidth,
         bottom: document.documentElement.clientHeight
-      }
+      })
     }
     else if (vnode && vnode.$el) {
       info.result = true
-      info.size = vnode.$el.getBoundingClientRect()
+      info.size = recalc(vnode.$el.getBoundingClientRect())
     }
 
     const message = info.result ? info : {

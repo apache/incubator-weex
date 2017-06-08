@@ -18,10 +18,16 @@
  */
 package com.taobao.weex.bridge;
 
+import static junit.framework.Assert.assertNotNull;
+
 import android.os.Handler;
 import android.os.Message;
 import com.taobao.weappplus_sdk.BuildConfig;
-import com.taobao.weex.*;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKInstanceTest;
+import com.taobao.weex.WXSDKManagerTest;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXJSBridgeMsgType;
 import com.taobao.weex.dom.WXDomModule;
@@ -32,19 +38,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
 
-import static junit.framework.Assert.assertNotNull;
-
 
 /**
  * Created by lixinke on 16/2/24.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest(WXModuleManager.class)

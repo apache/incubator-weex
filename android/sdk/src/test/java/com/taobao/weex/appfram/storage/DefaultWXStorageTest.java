@@ -18,50 +18,48 @@
  */
 package com.taobao.weex.appfram.storage;
 
-import com.taobao.weappplus_sdk.BuildConfig;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
-
 import static org.mockito.Mockito.anyMapOf;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import com.taobao.weappplus_sdk.BuildConfig;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 /**
  * Created by sospartan on 7/28/16.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
-@PrepareForTest(WXSQLiteOpenHelper.class)
 public class DefaultWXStorageTest {
 
+  @Mock
   WXSQLiteOpenHelper supplier;
-  DefaultWXStorage storage;
+  @Mock
   IWXStorageAdapter.OnResultReceivedListener listener;
+  DefaultWXStorage storage;
 
   @Rule
   public PowerMockRule rule = new PowerMockRule();
 
   @Before
   public void setup() throws Exception{
-    supplier = Mockito.mock(WXSQLiteOpenHelper.class);
-    listener = Mockito.mock(IWXStorageAdapter.OnResultReceivedListener.class);
+    MockitoAnnotations.initMocks(this);
     storage = new DefaultWXStorage(RuntimeEnvironment.application);
-
     mockStatic(WXSQLiteOpenHelper.class);
-    PowerMockito.whenNew(WXSQLiteOpenHelper.class)
+    whenNew(WXSQLiteOpenHelper.class)
             .withArguments(RuntimeEnvironment.application)
             .thenReturn(supplier);
   }
