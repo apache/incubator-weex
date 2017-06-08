@@ -254,10 +254,10 @@ function Scroll(element, options) {
   this.viewport.addEventListener('panend', panendHandler, false)
 
   if (options.isPrevent) {
-    this.viewport.addEventListener('touchstart', function (e) {
-      panning = true
+    this.viewport.addEventListener('panstart', function (e) {
+      panning = isEnabled(e)
     }, false)
-    that.viewport.addEventListener('touchend', function (e) {
+    that.viewport.addEventListener('panend', function (e) {
       panning = false
     }, false)
   }
