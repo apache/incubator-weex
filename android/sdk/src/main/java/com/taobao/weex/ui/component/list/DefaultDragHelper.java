@@ -67,7 +67,11 @@ class DefaultDragHelper implements DragHelper {
 
         //attach
         this.mItemTouchHelper = new ItemTouchHelper(new DragSupportCallback(this, true));
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        try {
+            mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        }catch (Throwable e) {
+            //ignore
+        }
     }
 
     @Override
