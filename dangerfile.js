@@ -195,8 +195,8 @@ if (danger.git.modified_files) {
     checkFileToVerifySrcHeader(file);
   });
 }
-if (danger.git.added_files) {
-  danger.git.added_files.forEach(file => {
+if (danger.git.created_files) {
+  danger.git.created_files.forEach(file => {
     checkChangedFile(file);
     checkFileToVerifySrcHeader(file);
   });
