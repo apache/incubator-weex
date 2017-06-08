@@ -44,11 +44,12 @@ public class WXFileUtilsTest {
 
   @Test
   public void testLoadFileContent() throws Exception {
-    File folder = new File("build/intermediates/bundles/debug");
+    File folder = new File("build/intermediates/bundles/debug/assets/");
     if(!folder.exists()){
-      folder = new File("build/intermediates/bundles/release");
+      folder = new File("build/intermediates/bundles/debug/assets/");
+      folder.mkdirs();
     }
-    File file = new File(folder,"assets/test");
+    File file = new File(folder,"test");
     System.out.println(file.getAbsolutePath());
     if(!file.exists()){
       file.createNewFile();
