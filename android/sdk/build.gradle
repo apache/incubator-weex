@@ -19,8 +19,6 @@ if(!disableCov.toBoolean()){
     }
 }
 
-project.ext.set("androidTargetSDK",project.hasProperty('targetSDK') ? project.getProperty('targetSDK') as int : 21 )
-
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
     // configProperties.checkstyleSuppressionsPath = file("${project.rootDir}/config/quality/checkstyle/suppressions.xml").absolutePath // Where is my suppressions file for checkstyle is...
@@ -82,7 +80,7 @@ android {
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
         minSdkVersion 14
-        targetSdkVersion project.androidTargetSDK
+        targetSdkVersion project.targetSdkVersion
         versionCode 1
         versionName "1.0"
         ndk {
@@ -151,8 +149,8 @@ dependencies {
     testCompile 'org.powermock:powermock-module-testng:1.6.4'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    testCompile 'org.robolectric:robolectric:3.0'
-    testCompile "org.robolectric:shadows-httpclient:3.0"
+    testCompile 'org.robolectric:robolectric:3.3.2'
+    testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
 }
 

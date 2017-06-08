@@ -18,26 +18,22 @@
  */
 package com.taobao.weex.utils;
 
-import android.content.res.AssetManager;
 import com.taobao.weappplus_sdk.BuildConfig;
+import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 /**
  * Created by sospartan on 8/2/16.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
 @PrepareForTest()
@@ -48,11 +44,12 @@ public class WXFileUtilsTest {
 
   @Test
   public void testLoadFileContent() throws Exception {
-    File folder = new File("build/intermediates/bundles/debug");
+    File folder = new File("build/intermediates/bundles/debug/assets/");
     if(!folder.exists()){
-      folder = new File("build/intermediates/bundles/release");
+      folder = new File("build/intermediates/bundles/debug/assets/");
+      folder.mkdirs();
     }
-    File file = new File(folder,"assets/test");
+    File file = new File(folder,"test");
     System.out.println(file.getAbsolutePath());
     if(!file.exists()){
       file.createNewFile();
