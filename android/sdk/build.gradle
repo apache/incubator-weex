@@ -4,6 +4,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
 
@@ -151,3 +155,9 @@ dependencies {
     testCompile "org.robolectric:shadows-httpclient:3.0"
     testCompile 'org.json:json:20160212'
 }
+
+license {
+    header = file('../license/LICENSE')
+    excludes(["com/taobao/weex/dom/flex/*.java"])
+}
+preBuild.dependsOn licenseFormat
