@@ -78,11 +78,6 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
   }
 
   @Override
-  public void onBindViewHolder(final ListBaseViewHolder holder, int position) {
-    super.onBindViewHolder(holder, position);
-  }
-
-  @Override
   protected BounceRecyclerView generateListView(Context context, int orientation) {
 
     return new BounceRecyclerView(context,mLayoutType,mColumnCount,mColumnGap,orientation);
@@ -242,5 +237,4 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
       getHostView().removeHeaderView(child);
     }
   }
-
 }

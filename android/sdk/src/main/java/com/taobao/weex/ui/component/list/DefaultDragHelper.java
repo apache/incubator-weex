@@ -34,6 +34,7 @@ import java.util.Map;
 
 /**
  * Description:
+ * Drag-drop support for list
  * <p>
  * Created by rowandjj(chuyi)<br/>
  */
