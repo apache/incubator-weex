@@ -202,11 +202,10 @@ static NSThread *WXComponentThread;
     _rootComponent = [self _buildComponentForData:data];
     
     [self _initRootCSSNode];
-    
-    self.weexInstance.rootView.wx_component = _rootComponent;
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;
+        strongSelf.weexInstance.rootView.wx_component = strongSelf->_rootComponent;
         [strongSelf.weexInstance.rootView addSubview:strongSelf->_rootComponent.view];
     }];
 }
@@ -508,7 +507,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     WXAssertComponentThread();
     
     WXSDKInstance *instance  = self.weexInstance;
-    [self _addUITask:^{        
+    [self _addUITask:^{
         UIView *rootView = instance.rootView;
         
         WX_MONITOR_INSTANCE_PERF_END(WXPTFirstScreenRender, instance);
