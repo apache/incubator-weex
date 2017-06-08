@@ -37,6 +37,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.ICheckBindingScroller;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.WXDomObject;
@@ -397,7 +398,13 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
           if(listeners!=null && listeners.size()>0){
             for (OnWXScrollListener listener : listeners) {
               if (listener != null) {
-                listener.onScrolled(scrollView, x, y);
+                if(listener instanceof ICheckBindingScroller){
+                  if(((ICheckBindingScroller) listener).isNeedScroller(getRef(),null)){
+                    listener.onScrolled(scrollView, x, y);
+                  }
+                }else {
+                  listener.onScrolled(scrollView, x, y);
+                }
               }
             }
           }

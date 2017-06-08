@@ -47,6 +47,7 @@
 #import "WXIndicatorComponent.h"
 #import "WXImgLoaderProtocol.h"
 #import "WXEventModuleProtocol.h"
+#import "WXErrorView.h"
 #import "WXDefine.h"
 #import "WXDebugTool.h"
 #import "WXConvert.h"
