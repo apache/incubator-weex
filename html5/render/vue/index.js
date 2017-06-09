@@ -29,7 +29,11 @@ import { base, style } from './mixins'
  *         - components.
  *         - modules.
  */
+let _inited = false
 function init (Vue/*, options = {}*/) {
+  if (_inited) { return }
+  _inited = true
+
   setVue(Vue)
 
   Vue.prototype.$getConfig = () => {
@@ -63,5 +67,16 @@ function init (Vue/*, options = {}*/) {
 if (typeof window !== 'undefined' && window.Vue) {
   init(window.Vue)
 }
+
+weex.init = init
+
+// perf stat for componentCount.
+window._component_count = 0
+
+// perf stat for JSLibInitTime.
+window._jslib_init_end = window.performance && window.performance.now() || +new Date()
+window._weex_perf.stat.JSLibInitTime = parseInt(window._jslib_init_end - window._jslib_init_start)
+delete window._jslib_init_end
+delete window._jslib_init_start
 
 export default weex

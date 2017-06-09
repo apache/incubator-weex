@@ -41,6 +41,7 @@ import {
 } from './element-types'
 
 const DEFAULT_TAG_NAME = 'div'
+const BUBBLE_EVENTS = ['click', 'longpress', 'touchstart', 'touchmove', 'touchend', 'panstart', 'panmove', 'panend', 'horizontalpan', 'verticalpan', 'swipe']
 
 export default function Element (type = DEFAULT_TAG_NAME, props, isExtended) {
   const XElement = elementTypes[type]
@@ -387,14 +388,28 @@ Object.assign(Element.prototype, {
 
   /**
    * Fire an event manually.
-   * @param {string} event type
-   * @param {function} event handler
+   * @param {string} type type
+   * @param {function} e handler
+   * @param {boolean} isBubble whether or not event bubble
    * @return {} anything returned by handler function
    */
-  fireEvent (type, e) {
+  fireEvent (type, e, isBubble) {
+    let isStopPropagation = false
     const handler = this.event[type]
-    if (handler) {
-      return handler.call(this, e)
+    if (handler && e) {
+      e.stopPropagation = () => {
+        isStopPropagation = true
+      }
+      handler.call(this, e)
+    }
+
+    if (isStopPropagation) {
+      return
+    }
+
+    if (isBubble && BUBBLE_EVENTS.includes(type) && this.parentNode && this.parentNode.fireEvent) {
+      e.currentTarget = this.parentNode
+      this.parentNode.fireEvent(type, e, isBubble)
     }
   },
 

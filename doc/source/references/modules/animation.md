@@ -13,13 +13,13 @@ Smooth and meaningful animation is very effective for enhancing the user experie
 ### transition(node, options, callback)
 
 #### Arguments
-##### node    
+##### node
 
 **type:** node
 
-**position:** An element that will be animated, normally you can get this by calling `this.$el(id)`.   
+**position:** An element that will be animated, for example , specify the `ref` attribute for the element you want to animated as `element`, so you can get this element by calling `this.refs.element`.
 
-##### options    
+##### options
 
 **type:** object   
 
@@ -51,11 +51,11 @@ properties of `transform`:
 
 | name | description | value type | default value |
 | :--- | :--- | :--- | :--- |
-|translate/translateX/translateY|Specifies the location of which the element will be translated.|pixel or percent|none|
+|translate/translateX/translateY|Specifies the location of which the element will be translated to.|pixel or percent|none|
 |rotate|Specifies the angle of which the element will be rotated, the unit is degree.|number|none|
 |scale/scaleX/scaleY|Stretch or shrink the element.|number|none|  
 
-#### callback    
+##### callback
 **type:** function
 
 **position:** Callback which is called after the completion of transition.

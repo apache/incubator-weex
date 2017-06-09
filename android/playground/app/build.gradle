@@ -64,7 +64,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile 'com.android.support:support-annotations:23.2.1'
+    androidTestCompile "com.android.support:support-annotations:${project.supportLibVersion}"
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2', {
@@ -105,5 +105,5 @@ dependencies {
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
-    compile 'com.taobao.android:weex_inspector:0.10.0.5@aar'
+    compile 'com.taobao.android:weex_inspector:0.11.0'
 }

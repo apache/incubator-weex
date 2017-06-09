@@ -122,6 +122,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
   private int mType = TYPE_COMMON;
+  private boolean mNeedLayoutOnAnimation = false;
 
   public static final int TYPE_COMMON = 0;
   public static final int TYPE_VIRTUAL = 1;
@@ -849,6 +850,17 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  /**
+   * get Scroller components
+   */
+  @Nullable
+  public Scrollable getFirstScroller() {
+   if(this instanceof Scrollable){
+     return (Scrollable)this;
+   }
+   return null;
+  }
+
   public WXVContainer getParent() {
     return mParent;
   }
@@ -1368,8 +1380,27 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
      */
   @CheckResult
   protected Object convertEmptyProperty(String propName, Object originalValue) {
-    if (Constants.Name.BACKGROUND_COLOR.equals(propName)) {
-      return "transparent";
+    switch (propName) {
+      case Constants.Name.BACKGROUND_COLOR:
+        return "transparent";
+      case Constants.Name.BORDER_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_LEFT_RADIUS:
+      case Constants.Name.BORDER_BOTTOM_RIGHT_RADIUS:
+      case Constants.Name.BORDER_TOP_LEFT_RADIUS:
+      case Constants.Name.BORDER_TOP_RIGHT_RADIUS:
+        return 0;
+      case Constants.Name.BORDER_WIDTH:
+      case Constants.Name.BORDER_TOP_WIDTH:
+      case Constants.Name.BORDER_LEFT_WIDTH:
+      case Constants.Name.BORDER_RIGHT_WIDTH:
+      case Constants.Name.BORDER_BOTTOM_WIDTH:
+        return 0;
+      case Constants.Name.BORDER_COLOR:
+      case Constants.Name.BORDER_TOP_COLOR:
+      case Constants.Name.BORDER_LEFT_COLOR:
+      case Constants.Name.BORDER_RIGHT_COLOR:
+      case Constants.Name.BORDER_BOTTOM_COLOR:
+        return "black";
     }
     return originalValue;
   }
@@ -1449,5 +1480,41 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   public boolean isLayerTypeEnabled() {
     return getInstance().isLayerTypeEnabled();
+  }
+
+  /**
+   * Sets whether or not to relayout page during animation, default is false
+   */
+  public void setNeedLayoutOnAnimation(boolean need) {
+    this.mNeedLayoutOnAnimation = need;
+  }
+
+  /**
+   * Trigger a updateStyle invoke to relayout current page
+   */
+  public void notifyNativeSizeChanged(int w, int h) {
+    if (!mNeedLayoutOnAnimation) {
+      return;
+    }
+
+    Message message = Message.obtain();
+    WXDomTask task = new WXDomTask();
+    task.instanceId = getInstanceId();
+    if (task.args == null) {
+      task.args = new ArrayList<>();
+    }
+
+    JSONObject style = new JSONObject(2);
+    float webW = WXViewUtils.getWebPxByWidth(w);
+    float webH = WXViewUtils.getWebPxByWidth(h);
+
+    style.put("width", webW);
+    style.put("height", webH);
+
+    task.args.add(getRef());
+    task.args.add(style);
+    message.obj = task;
+    message.what = WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE;
+    WXSDKManager.getInstance().getWXDomManager().sendMessage(message);
   }
 }

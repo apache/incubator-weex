@@ -38,6 +38,10 @@
 #import "WXResourceLoader.h"
 #import "WXSDKEngine.h"
 #import "WXValidateProtocol.h"
+#import "WXConfigCenterProtocol.h"
+#import "WXTextComponent.h"
+#import "WXConvert.h"
+#import "WXPrerenderManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -187,15 +191,35 @@ typedef enum : NSUInteger {
             self.onCreate(_rootView);
         }
     });
-    
     // ensure default modules/components/handlers are ready before create instance
     [WXSDKEngine registerDefaults];
+    
+    [self _handleConfigCenter];
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
 
+- (void)_handleConfigCenter
+{
+    id configCenter = [WXSDKEngine handlerForProtocol:@protocol(WXConfigCenterProtocol)];
+    if ([configCenter respondsToSelector:@selector(configForKey:defaultValue:isDefault:)]) {
+        BOOL useCoreText = [[configCenter configForKey:@"iOS_weex_ext_config.text_render_useCoreText" defaultValue:@YES isDefault:NULL] boolValue];
+        [WXTextComponent setRenderUsingCoreText:useCoreText];
+        id sliderConfig =  [configCenter configForKey:@"iOS_weex_ext_config.slider_class_name" defaultValue:@"WXSliderComponent" isDefault:NULL];
+        if(sliderConfig){
+            NSString *sliderClassName = [WXConvert NSString:sliderConfig];
+            if(sliderClassName.length>0){
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
+            }else{
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+            }
+        }else{
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+        }
+    }
+}
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
 {
@@ -215,7 +239,7 @@ typedef enum : NSUInteger {
     _options = [newOptions copy];
   
     if (!self.pageName || [self.pageName isEqualToString:@""]) {
-        self.pageName = [WXUtility urlByDeletingParameters:url].absoluteString ? : @"";
+        self.pageName = url.absoluteString ? : @"";
     }
     
     request.userAgent = [WXUtility userAgent];
@@ -225,15 +249,23 @@ typedef enum : NSUInteger {
     _mainBundleLoader = [[WXResourceLoader alloc] initWithRequest:request];;
     _mainBundleLoader.onFinished = ^(WXResourceResponse *response, NSData *data) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        
+        NSError *error = nil;
         if ([response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)response).statusCode != 200) {
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN
+            error = [NSError errorWithDomain:WX_ERROR_DOMAIN
                                         code:((NSHTTPURLResponse *)response).statusCode
                                     userInfo:@{@"message":@"status code error."}];
             if (strongSelf.onFailed) {
                 strongSelf.onFailed(error);
             }
-            return ;
+        }
+        
+        if (strongSelf.onJSDownloadedFinish) {
+            strongSelf.onJSDownloadedFinish(response, request, data, error);
+        }
+        
+        if (error) {
+            // if an error occurs, just return.
+            return;
         }
 
         if (!data) {
@@ -254,7 +286,7 @@ typedef enum : NSUInteger {
 
         WX_MONITOR_SUCCESS_ON_PAGE(WXMTJSDownload, strongSelf.pageName);
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
-
+        
         [strongSelf _renderWithMainBundleString:jsBundleString];
     };
     
@@ -298,10 +330,15 @@ typedef enum : NSUInteger {
 
 - (void)destroyInstance
 {
+    if([WXPrerenderManager isTaskExist:[self.scriptURL absoluteString]]) {
+        return;
+    }
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
         return;
     }
+    
+    [WXPrerenderManager destroyTask:self.instanceId];
     
     [[WXSDKManager bridgeMgr] destroyInstance:self.instanceId];
 

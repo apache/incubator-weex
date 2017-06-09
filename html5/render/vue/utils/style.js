@@ -34,7 +34,7 @@ const noUnitsNumberKeys = [
  * remove comments from a cssText.
  */
 export function trimComment (cssText: string): string {
-  return cssText.replace(/(?:\/\*).*\*\//g, '')
+  return cssText.replace(/(?:\/\*)[\s\S]*?\*\//g, '')
 }
 
 let support: boolean | null = null
@@ -66,13 +66,23 @@ export function normalizeUnitsNum (val: string): string {
   return parseScale(parseFloat(match[1]), unit)
 }
 
-function parseScale (val: number, unit: string): string {
+function getUnitScaleMap () {
   const { scale, dpr } = getViewportInfo()
-  const unitScaleMap = {
+  return {
     px: scale,
     wx: scale * dpr
   }
-  return val * unitScaleMap[unit] + 'px'
+}
+
+function limitScale (val, limit) {
+  limit = limit || 1
+  const sign = val === 0 ? 0 : val > 0 ? 1 : -1
+  return Math.abs(val) > limit ? val : sign * limit
+}
+
+function parseScale (val: number, unit: string): string {
+  const unitScaleMap = getUnitScaleMap()
+  return limitScale(val * unitScaleMap[unit]) + 'px'
 }
 
 export function normalizeString (styleKey: string, styleVal: string): string {
@@ -80,31 +90,27 @@ export function normalizeString (styleKey: string, styleVal: string): string {
     return styleVal
   }
 
-  // 1. test if is a regular scale css. e.g. `width: 100px;`
+  /**
+   * 1. test if is a regular scale css. e.g. `width: 100px;`
+   *  this should be a standalone number value with or without unit, otherwise
+   *  it shouldn't be changed.
+   */
   const unitsNum = normalizeUnitsNum(styleVal)
   if (unitsNum) { return unitsNum }
 
-  // 2. test if is a translate scale. e.g. `transform: translate2d(1px, 2px);`
-  const regTranslateString = /translate[^(]*\([\d ,.pwx]+\)/i // unit support: wx, px.
-  if (styleKey.match(/transform/i) && regTranslateString.test(styleVal)) {
-    const val = styleVal.replace(regTranslateString, function (translate) {
-      const reg = /([+-]?\d+(?:\.\d+)?)([p,w]x)?(?![dD])/g
-      return translate.replace(reg, function (m, $1, $2) {
-        const unit = $2 || 'px'
-        return parseScale($1, unit)
-      })
-    })
-    return val
-  }
-
-  // 3. test if is a border style. e.g. `border: 1px solid red;`
-  const regBorderKey = /^border(?:-(?:top|bottom|left|right))?$/
-  const regBorderVal = /^([+-]?\d+(?:\.\d+)?)([p ,w]x)?\s+/
-  if (regBorderKey.test(styleKey) && regBorderVal.test(styleVal)) {
-    const reg = /^([+-]?\d+(?:\.\d+)?)([p,w]x)?/
-    const val = styleVal.replace(reg, function (m, $1, $2) {
-      const unit = $2 || 'px'
-      return parseScale($1, unit)
+  /**
+   * 2. if a string contains multiple px values, than they should be all normalized.
+   *  values should have wx or px units, otherwise they should be left unchanged.
+   *  e.g.
+   *    transform: translate(10px, 6px, 0)
+   *    border: 2px solid red
+   */
+  const numReg = /([+-]?[\d.]+)([p,w]x)/ig
+  if (numReg.test(styleVal)) {
+    const unitScaleMap = getUnitScaleMap()
+    const val = styleVal.replace(numReg, function (m, $0, $1) {
+      const res = parseFloat($0) * unitScaleMap[$1]
+      return limitScale(res) + 'px'
     })
     return val
   }
@@ -114,7 +120,13 @@ export function normalizeString (styleKey: string, styleVal: string): string {
 }
 
 export function autoPrefix (style: {}): {} {
-  return addPrefix(style)
+  const prefixed = addPrefix(style)
+  // flex only added WebkitFlex. Should add WebkitBoxFlex also.
+  const flex = prefixed.flex
+  if (flex) {
+    prefixed.WebkitBoxFlex = flex
+  }
+  return prefixed
 }
 
 export function normalizeNumber (styleKey: string, styleVal: number): string {
@@ -150,6 +162,35 @@ export function normalizeStyle (style: {}) {
 }
 
 /**
+ * get transformObj
+ */
+export function getTransformObj (elm: HTMLElement): any {
+  let styleObj = {}
+  if (!elm) { return styleObj }
+  const transformStr = elm.style.webkitTransform || elm.style.transform
+  if (transformStr && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
+    styleObj = transformStr.trim().replace(/, +/g, ',').split(' ').reduce(function (pre, str) {
+      ['translate', 'scale', 'rotate'].forEach(function (name) {
+        if (new RegExp(name, 'i').test(str)) {
+          pre[name] = str
+        }
+      })
+      return pre
+    }, {})
+  }
+  return styleObj
+}
+
+/**
+ * translate a transform string from a transformObj.
+ */
+export function getTransformStr (obj: {}): string {
+  return Object.keys(obj).reduce(function (pre, key) {
+    return pre + obj[key] + ' '
+  }, '')
+}
+
+/**
  * add transform style to element.
  * @param {HTMLElement} elm
  * @param {object} style: transform object, format is like this:
@@ -162,20 +203,9 @@ export function normalizeStyle (style: {}) {
  */
 export function addTransform (elm: HTMLElement, style: {}, replace: boolean): void {
   if (!style) { return }
-  const transformStr = elm.style.webkitTransform || elm.style.transform
   let styleObj = {}
-  if (
-    transformStr
-    && !replace
-    && transformStr.match(/(?: *(?:translate|rotate|scale)[^(]*\([^(]+\))+/i)) {
-    styleObj = transformStr.trim().split(' ').reduce(function (pre, str) {
-      ['translate', 'scale', 'rotate'].forEach(function (name) {
-        if (new RegExp(name, 'i').test(str)) {
-          pre[name] = str
-        }
-      })
-      return pre
-    }, {})
+  if (!replace) {
+    styleObj = getTransformObj(elm)
   }
   for (const key in style) {
     const val = style[key]
@@ -183,9 +213,44 @@ export function addTransform (elm: HTMLElement, style: {}, replace: boolean): vo
       styleObj[key] = val
     }
   }
-  const resStr = Object.keys(style).reduce(function (pre, key) {
-    return pre + style[key] + ' '
-  }, '')
+  const resStr = getTransformStr(styleObj)
   elm.style.webkitTransform = resStr
   elm.style.transform = resStr
+}
+
+/**
+ * add translate X to the element.
+ */
+export function addTranslateX (elm: HTMLElement, toAdd: number): void {
+  if (!toAdd) { return }
+  const styleObj = getTransformObj(elm)
+  if (!styleObj.translate) {
+    styleObj.translate = 'translate3d(0px, 0px, 0px)'
+  }
+  styleObj.translate = styleObj.translate.replace(/[+-\d.]+[pw]x/, function ($0) {
+    return (parseFloat($0) + toAdd) + 'px'
+  })
+  const resStr = getTransformStr(styleObj)
+  elm.style.webkitTransform = resStr
+  elm.style.transform = resStr
+}
+
+/**
+ * copy a transform behaviour from one element to another.
+ * key could be: 'translate' | 'scale' | 'rotate'
+ */
+export function copyTransform (from: HTMLElement, to: HTMLElement, key: string | void): void {
+  let str
+  if (!key) {
+    str = from.style.webkitTransform || from.style.transform
+  }
+  else {
+    const fromObj = getTransformObj(from)
+    if (!fromObj[key]) { return }
+    const toObj = getTransformObj(to)
+    toObj[key] = fromObj[key]
+    str = getTransformStr(toObj)
+  }
+  to.style.webkitTransform = str
+  to.style.transform = str
 }

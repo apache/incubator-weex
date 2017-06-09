@@ -109,6 +109,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (currentIndex >= _itemViews.count || currentIndex < 0) {
         currentIndex = 0;
     }
+    NSInteger oldIndex = _currentIndex;
     _currentIndex = currentIndex;
     if (_infinite) {
         if (_direction == DirectionRight) {
@@ -120,9 +121,9 @@ typedef NS_ENUM(NSInteger, Direction) {
             }
         }else if (_direction == DirectionLeft) {
             self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
-            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+            self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         }else {
-            self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+            self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         }
         [self resetAllViewsFrame];
     } else {
@@ -130,7 +131,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
     [self resetIndicatorPoint];
     if (self.delegate && [self.delegate respondsToSelector:@selector(recycleSliderView:didScrollToItemAtIndex:)]) {
-        [self.delegate recycleSliderView:self didScrollToItemAtIndex:_currentIndex];
+        if (oldIndex != _currentIndex) {
+            [self.delegate recycleSliderView:self didScrollToItemAtIndex:_currentIndex];
+        }
     }
 }
 
@@ -158,7 +161,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         }
     }else if (_direction == DirectionLeft){
         self.nextItemFrame = CGRectMake(self.width * 2, 0, self.width, self.height);
-        self.nextIndex = (self.currentIndex + 1) % _itemViews.count;
+        self.nextIndex = _itemViews.count?(self.currentIndex + 1) % _itemViews.count:0;
         UIView *view = [self getItemAtIndex:_nextIndex];
         if (view) {
             view.frame = _nextItemFrame;
@@ -179,7 +182,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         _currentItemFrame = CGRectMake(self.width, 0, self.width, self.height);
         for (int i = 0; i < self.itemViews.count; i++) {
             UIView *view = [self.itemViews objectAtIndex:i];
-            if (i != self.currentIndex && i != self.nextIndex) {
+            if (i != self.currentIndex) {
                 view.frame = CGRectMake(self.frame.size.width * 3, 0, self.width, self.height);;
             }
         }
@@ -214,8 +217,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
 }
 
-- (void)resetScrollView {
-    if (self.scrollView.contentOffset.x / self.width == 1)
+- (void)resetScrollView
+{
+    if (WXFloatEqual(self.scrollView.contentOffset.x / self.width , 1.0))
     {
         return;
     }
@@ -430,6 +434,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         if ([view isKindOfClass:[WXIndicatorView class]]) {
             ((WXIndicatorComponent *)subcomponent).delegate = self;
             [recycleSliderView addSubview:view];
+            [self setIndicatorView:(WXIndicatorView *)view];
             return;
         }
         
@@ -584,9 +589,10 @@ typedef NS_ENUM(NSInteger, Direction) {
 
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
-    self.currentIndex = index;
+    
     if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
+        self.currentIndex = index;
     }
 }
 

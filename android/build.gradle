@@ -9,10 +9,10 @@ buildscript {
     }
 }
 
+
 plugins {
     id "de.undercouch.download" version "3.2.0"
 }
-
 repositories {
         mavenCentral()
         jcenter()
@@ -33,12 +33,12 @@ subprojects {
         }
     }
     ext {
-        compileSdkVersion=24
-        buildToolsVersion="23.0.2"
+        compileSdkVersion=23
+        buildToolsVersion="23.0.3"
         minSdkVersion=14
         appMinSdkVersion=15
         targetSdkVersion=23
-        supportLibVersion="24.2.0"
+        supportLibVersion="23.4.0"
         fastjsonLibVersion="1.1.46.android"
     }
 }
@@ -46,4 +46,3 @@ subprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-

@@ -83,8 +83,8 @@ function diffImage(imageAPath, imageB, threshold, outputPath) {
       thresholdType: BlinkDiff.THRESHOLD_PIXEL,
       threshold: threshold,
       imageOutputPath: outputPath,
-      cropImageA:{y : (isIOS ? 128 : 0)},
-      cropImageB:{y : (isIOS ? 128 : 0)}
+      cropImageA:isIOS?{y:128}:{y:242,height:1530},//android: 242 - status bar(72)+navigator bar(170)
+      cropImageB:isIOS?{y:128}:{y:242,height:1530}
     });
 
     diff.run((err, result) => {
@@ -149,12 +149,36 @@ module.exports = {
                 .getWindowSize()
                 .then(size=>{
                     let middleX = size.width * 0.5
-                    let startY = size.height * 0.7
+                    let startY = size.height * 0.3
                     return this
                     .touch('drag', {fromX:middleX, fromY:startY+distance, toX:middleX, toY: startY, duration: 1})
                     .sleep(1000)
                 })
             })
+          driverFactory.addPromiseChainMethod('swipeLeft', function (distanceRatio, yRatio) {
+                return this
+                  .getWindowSize()
+                  .then(size => {
+                    let y = yRatio * size.height;
+                    let startX = size.width * 0.8;
+                    let endX = startX - size.width * distanceRatio;
+                    return this
+                      .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                      .sleep(1000)
+                  })
+          })
+          driverFactory.addPromiseChainMethod('swipeRight', function (distanceRatio, yRatio) {
+            return this
+              .getWindowSize()
+              .then(size => {
+                let y = yRatio * size.height;
+                let startX = size.width * 0.2;
+                let endX = startX + size.width * distanceRatio;
+                return this
+                  .touch('drag', {fromX: startX, toX: endX, fromY: y, toY: y, duration: 1})
+                  .sleep(1000)
+              })
+          })
             driver = driverFactory.initPromiseChain();
             driver.configureHttp({
                 timeout: 100000

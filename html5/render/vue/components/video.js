@@ -1,4 +1,4 @@
-/*
+ /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -29,7 +29,6 @@ export default {
         return ['play', 'pause'].indexOf(value) !== -1
       }
     },
-
     autoplay: {
       type: [String, Boolean],
       default: false
@@ -38,10 +37,9 @@ export default {
       type: [String, Boolean],
       default: false
     },
-
     playsinline: {
       type: [String, Boolean],
-      default: false
+      default: true
     },
     controls: {
       type: [String, Boolean],
@@ -50,17 +48,25 @@ export default {
   },
 
   render (createElement) {
-    /* istanbul ignore next */
-    // if (process.env.NODE_ENV === 'development') {
-    //   validateStyles('video', this.$vnode.data && this.$vnode.data.staticStyle)
-    // }
+    this._renderHook()
 
-    // TODO: support playStatus
+    if (this.playStatus === 'play') {
+      this.$nextTick(function () {
+        this.$el && this.$el.play()
+      })
+    }
+    else if (this.playStatus === 'pause') {
+      this.$nextTick(function () {
+        this.$el && this.$el.pause()
+      })
+    }
+
     return createElement('html:video', {
       attrs: {
         'weex-type': 'video',
-        autoplay: (this.autoplay !== 'false' && this.autoplay !== false),
-        autoPlay: (this.autoplay !== 'false' && this.autoplay !== false),
+        autoplay: ((this.autoplay !== 'false' && this.autoplay !== false)
+          || (this.autoPlay !== 'false' && this.autoPlay !== false)),
+        'webkit-playsinline': this.playsinline,
         controls: this.controls,
         src: this.src
       },

@@ -1658,7 +1658,7 @@ describe('generate dom actions', () => {
     expect(doc.body.event.click).is.a.function
     expect(handler.args.length).eql(0)
     doc.body.fireEvent('click')
-    expect(handler.args.length).eql(1)
+    expect(handler.args.length).eql(0)
   })
 
   it('received actions for a template with if & repeat', () => {

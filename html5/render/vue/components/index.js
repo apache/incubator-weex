@@ -17,7 +17,6 @@
  * under the License.
  */
 import _switch from './switch'
-export { _switch as switch }
 
 import a from './a'
 import div from './div'
@@ -48,6 +47,7 @@ export default {
   image,
   img: image,
   input,
+  switch: _switch,
   header,
   list,
   cell,

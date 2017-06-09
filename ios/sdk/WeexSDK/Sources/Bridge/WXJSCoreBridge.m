@@ -44,6 +44,7 @@
 
 @property (nonatomic, strong)  JSContext *jsContext;
 @property (nonatomic, strong)  NSMutableArray *timers;
+@property (nonatomic, strong)  NSMutableDictionary *callbacks;
 
 @end
 
@@ -59,6 +60,7 @@
             _jsContext.name = @"Weex Context";
         }
         _timers = [NSMutableArray new];
+        _callbacks = [NSMutableDictionary new];
         
         __weak typeof(self) weakSelf = self;
         
@@ -78,7 +80,28 @@
         
         _jsContext[@"setIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
             [weakSelf triggerInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
-            
+        };
+        
+        _jsContext[@"clearIntervalWeex"] = ^(JSValue *appid, JSValue *ret,JSValue *arg) {
+            [weakSelf triggerClearInterval:[appid toString] ret:[ret toString] arg:[arg toString]];
+        };
+        
+        _jsContext[@"clearTimeoutWeex"] = ^(JSValue *ret) {
+            [weakSelf triggerClearTimeout:[ret toString]];
+        };
+        
+        _jsContext[@"btoa"] = ^(JSValue *value ) {
+            NSData *nsdata = [[value toString]
+                              dataUsingEncoding:NSUTF8StringEncoding];
+            NSString *base64Encoded = [nsdata base64EncodedStringWithOptions:0];
+            return base64Encoded;
+        };
+        _jsContext[@"atob"] = ^(JSValue *value ) {
+            NSData *nsdataFromBase64String = [[NSData alloc]
+                                              initWithBase64EncodedString:[value toString] options:0];
+            NSString *base64Decoded = [[NSString alloc]
+                                       initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
+            return base64Decoded;
         };
         
         _jsContext[@"nativeLog"] = ^() {
@@ -144,7 +167,7 @@
 {
     WXAssertParam(frameworkScript);
     if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
-        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"main.js"]];
+        [_jsContext evaluateScript:frameworkScript withSourceURL:[NSURL URLWithString:@"native-bundle-main.js"]];
     }else{
         [_jsContext evaluateScript:frameworkScript];
     }
@@ -255,13 +278,37 @@
 #pragma mark - Public
 -(void)removeTimers:(NSString *)instance
 {
-    if(instance && [_timers containsObject:instance])
-    {
-        [_timers removeObject:instance];
+    if([_callbacks objectForKey:instance]){
+        NSMutableArray *arr = [_callbacks objectForKey:instance];
+        if(arr && [arr count]>0){
+            for (NSString *callback in arr) {
+                if([_timers containsObject:callback]){
+                    [_timers removeObject:callback];
+                }
+            }
+        }
     }
 }
 
 #pragma mark - Private
+-(void)addInstance:(NSString *)instance callback:(NSString *)callback
+{
+    if(instance.length > 0){
+        if([_callbacks objectForKey:instance]){
+            NSMutableArray *arr = [_callbacks objectForKey:instance];
+            if (callback.length>0 && ![arr containsObject:callback]) {
+                [arr addObject:callback];
+                [_callbacks setObject:arr forKey:instance];
+            }
+        }else {
+            NSMutableArray *arr = [NSMutableArray new];
+            if (callback.length>0 && ![arr containsObject:callback]) {
+                [arr addObject:callback];
+                [_callbacks setObject:arr forKey:instance];
+            }
+        }
+    }
+}
 
 - (void)triggerTimeout:(void(^)())block
 {
@@ -270,7 +317,7 @@
 
 - (void)callBack:(NSDictionary *)dic
 {
-    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+    if([dic objectForKey:@"ret"] && [_timers containsObject:[dic objectForKey:@"ret"]]) {
         [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:[dic objectForKey:@"arg"] keepAlive:NO];
     }
 }
@@ -278,11 +325,10 @@
 
 - (void)callBackInterval:(NSDictionary *)dic
 {
-    if([dic objectForKey:@"appid"] && [_timers containsObject:[dic objectForKey:@"appid"]]) {
+    if([dic objectForKey:@"ret"] && [_timers containsObject:[dic objectForKey:@"ret"]]) {
         [[WXSDKManager bridgeMgr] callBack:[dic objectForKey:@"appid"] funcId:[dic objectForKey:@"ret"]  params:nil keepAlive:YES];
         [self triggerInterval:[dic objectForKey:@"appid"] ret:[dic objectForKey:@"ret"] arg:[dic objectForKey:@"arg"]];
     }
-    
 }
 
 - (void)triggerTimeout:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
@@ -292,8 +338,9 @@
     if(WXFloatEqual(interval,0)) {
         return;
     }
-    if(![_timers containsObject:appid]){
-        [_timers addObject:appid];
+    if(![_timers containsObject:ret]){
+        [_timers addObject:ret];
+        [self addInstance:appid callback:ret];
     }
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -311,8 +358,9 @@
     if(WXFloatEqual(interval,0)) {
         return;
     }
-    if(![_timers containsObject:appid]){
-        [_timers addObject:appid];
+    if(![_timers containsObject:ret]){
+        [_timers addObject:ret];
+        [self addInstance:appid callback:ret];
     }
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, interval*NSEC_PER_SEC);
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -324,4 +372,17 @@
     });
 }
 
+- (void)triggerClearInterval:(NSString *)appid ret:(NSString *)ret arg:(NSString *)arg
+{
+    if([_timers containsObject:ret]){
+        [_timers removeObject:ret];
+    }
+}
+
+- (void)triggerClearTimeout:(NSString *)ret
+{
+    if([_timers containsObject:ret]){
+        [_timers removeObject:ret];
+    }
+}
 @end
