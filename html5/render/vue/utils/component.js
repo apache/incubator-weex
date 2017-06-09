@@ -94,13 +94,22 @@ function triggerEvent (elm, handlers, isShow, dir) {
 }
 
 /**
- * get all event listeners. including v-on binding and ons in config.
+ * get all event listeners. including bound handlers in all parent vnodes.
  */
 export function getEventHandlers (context) {
-  const parentListeners = context.$options && context.$options._parentListeners
-  const dataOn = context.$vnode && context.$vnode.data && context.$vnode.data.on
-  const on = extend({}, parentListeners, dataOn)
-  return on
+  let vnode = context.$vnode
+  const handlers = {}
+  const attachedVnodes = []
+  while (vnode) {
+    attachedVnodes.push(vnode)
+    vnode = vnode.parent
+  }
+  attachedVnodes.forEach(function (vnode) {
+    const parentListeners = vnode.componentOptions && vnode.componentOptions.listeners
+    const dataOn = vnode.data && vnode.data.on
+    extend(handlers, parentListeners, dataOn)
+  })
+  return handlers
 }
 
 /**
