@@ -128,7 +128,9 @@ WX_EXPORT_METHOD(@selector(clearInterval:))
             NSTimer *timer = _timers[callbackID];
             [timer invalidate];
         }
-        [_timers removeAllObjects];
+        if([_timers count]>0){
+             [_timers removeAllObjects];
+        }
         _timers = nil;
     }
 }

@@ -6,6 +6,7 @@ version: 2.1
 ---
 
 # WebSocket
+<span class="weex-version">v0.12+</span>
 
 ## Summary
 
@@ -17,7 +18,6 @@ WebSockets 是一种先进的技术, 这使得在用户的 H5/iOS/Android 和一
   - [DefaultWebSocketAdapterFactory.java](https://github.com/apache/incubator-weex/blob/dev/android/commons/src/main/java/com/alibaba/weex/commons/adapter/DefaultWebSocketAdapterFactory.java);
   - 集成例子参考weex [playground](https://github.com/apache/incubator-weex/tree/dev/android/playground)
 
-- 只在.we文件支持，不支持vue2.0
 
 ## API
 ### `WebSocket(url, protocol)`
