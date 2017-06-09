@@ -23,7 +23,7 @@ import com.taobao.weappplus_sdk.BuildConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.Stack;
@@ -31,7 +31,7 @@ import java.util.Stack;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class,manifest = Config.NONE)
 public class WXHashMapTest {
 	private WXHashMap<String, String> mWXHashMap = new WXHashMap<>();

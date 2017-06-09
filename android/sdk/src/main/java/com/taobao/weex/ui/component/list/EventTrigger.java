@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,33 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.taobao.weex.dom.action;
+package com.taobao.weex.ui.component.list;
 
-import com.taobao.weex.dom.DOMAction;
-import com.taobao.weex.dom.DOMActionContext;
-import com.taobao.weex.dom.RenderAction;
-import com.taobao.weex.dom.RenderActionContext;
+import java.util.Map;
 
-class ExecutableRenderAction implements DOMAction, RenderAction {
-
-    private Runnable mRunnable;
-
-    ExecutableRenderAction(Runnable runnable) {
-        this.mRunnable = runnable;
-    }
-
-    @Override
-    public void executeDom(DOMActionContext context) {
-        if (context.isDestory()) {
-            return;
-        }
-        context.postRenderTask(this);
-    }
-
-    @Override
-    public void executeRender(RenderActionContext context) {
-        if (mRunnable != null) {
-            mRunnable.run();
-        }
-    }
+interface EventTrigger {
+    void triggerEvent(String type, Map<String, Object> args);
 }

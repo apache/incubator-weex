@@ -468,8 +468,6 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _direction = @"up";
         [self handleLoadMore];
     }
-   
-    _lastContentOffset = scrollView.contentOffset;
     
     CGFloat scaleFactor = self.weexInstance.pixelScaleFactor;
     [_refreshComponent pullingdown:@{
@@ -478,7 +476,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
              REFRESH_PULLINGDISTANCE: @(scrollView.contentOffset.y/scaleFactor),
              @"type":@"pullingdown"
     }];
-
+    _lastContentOffset = scrollView.contentOffset;
+    
     // check sticky
     [self adjustSticky];
     [self handleAppear];
