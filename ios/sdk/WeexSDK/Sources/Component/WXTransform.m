@@ -31,7 +31,7 @@
 
 @implementation WXTransform
 {
-    float _rotateAngle;
+    float _rotateAngle; //for rotate
     float _scaleX;
     float _scaleY;
     WXLength *_translateX;
@@ -39,7 +39,12 @@
     WXLength *_originX;
     WXLength *_originY;
     
-    CGAffineTransform _nativeTransform;
+    //3d rotate
+    float _rotateX;
+    float _rotateY;
+    float _rotateZ;
+    
+    CATransform3D _nativeTransform;
     BOOL _useNativeTransform;
 }
 
@@ -49,6 +54,9 @@
         _weexInstance = instance;
         _scaleX = 1.0;
         _scaleY = 1.0;
+        _rotateX = 0.0;
+        _rotateY = 0.0;
+        _rotateZ = 0.0;
         _rotateAngle = 0.0;
         
         [self parseTransform:cssValue];
@@ -58,29 +66,49 @@
     return self;
 }
 
-- (instancetype)initWithNativeTransform:(CGAffineTransform)transform instance:(WXSDKInstance *)instance
+- (instancetype)initWithNativeTransform:(CATransform3D)transform instance:(WXSDKInstance *)instance
 {
     if (self = [super init]) {
         _weexInstance = instance;
         _nativeTransform = transform;
         _useNativeTransform = YES;
     }
-    
     return self;
 }
 
 - (float)rotateAngle
 {
     if (_useNativeTransform) {
-        return atan2(_nativeTransform.b, _nativeTransform.a);
+        return atan2(_nativeTransform.m11, _nativeTransform.m12);
     }
     return _rotateAngle;
+}
+
+- (float)rotateX
+{
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.m22, _nativeTransform.m23);
+    }
+    return _rotateX;
+}
+
+- (float)rotateY
+{
+    if (_useNativeTransform) {
+        return atan2(_nativeTransform.m11, _nativeTransform.m31);
+    }
+    return _rotateY;
+}
+
+- (float)rotateZ
+{
+    return _rotateZ;
 }
 
 - (WXLength *)translateX
 {
     if (_useNativeTransform) {
-        return [WXLength lengthWithFloat:_nativeTransform.tx type:WXLengthTypeFixed];
+        return [WXLength lengthWithFloat:_nativeTransform.m41 type:WXLengthTypeFixed];
     }
     return _translateX;
 }
@@ -88,7 +116,7 @@
 - (WXLength *)translateY
 {
     if (_useNativeTransform) {
-        return [WXLength lengthWithFloat:_nativeTransform.ty type:WXLengthTypeFixed];
+        return [WXLength lengthWithFloat:_nativeTransform.m42 type:WXLengthTypeFixed];
     }
     return _translateY;
 }
@@ -96,7 +124,7 @@
 - (float)scaleX
 {
     if (_useNativeTransform) {
-        return sqrt(_nativeTransform.a * _nativeTransform.a + _nativeTransform.c * _nativeTransform.c);
+        return sqrt(_nativeTransform.m11 * _nativeTransform.m11 + _nativeTransform.m21 * _nativeTransform.m21);
     }
     return _scaleX;
 }
@@ -104,7 +132,7 @@
 - (float)scaleY
 {
     if (_useNativeTransform) {
-        return sqrt(_nativeTransform.b * _nativeTransform.b + _nativeTransform.d * _nativeTransform.d);
+        return sqrt(_nativeTransform.m12 * _nativeTransform.m12 + _nativeTransform.m22 * _nativeTransform.m22);
     }
     return _scaleY;
 }
@@ -114,34 +142,52 @@
     [self parseTransformOrigin:transformOriginCSS];
 }
 
-- (CGAffineTransform)nativeTransformWithView:(UIView *)view
+- (CATransform3D)nativeTransformWithView:(UIView *)view
 {
     if (_useNativeTransform) {
         return _nativeTransform;
     }
+    CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     
-    CGAffineTransform nativeTransform = [self nativeTransformWithoutRotateWithView:view];
+    float x = 0,y = 0,z = 0;
+    float rotateAngle = 0;
+    if (_rotateZ != 0) {
+        z = 1;
+        rotateAngle = _rotateZ;
+    }
+    if (_rotateAngle != 0) {
+        rotateAngle = _rotateAngle;
+        z = 1;
+    }
+    if (_rotateY != 0) {
+        y = 1;
+        rotateAngle = _rotateY;
+    }
+    if (_rotateX != 0) {
+        x = 1;
+        rotateAngle = _rotateX;
+    }
     
-    nativeTransform = CGAffineTransformRotate(nativeTransform, _rotateAngle);
+    nativeTransform3d = CATransform3DRotate(nativeTransform3d, rotateAngle, x, y, z);
     
-    return nativeTransform;
+    return nativeTransform3d;
 }
 
-- (CGAffineTransform)nativeTransformWithoutRotateWithView:(UIView *)view
+- (CATransform3D)nativeTransformWithoutRotateWithView:(UIView *)view
 {
-    CGAffineTransform nativeTransform = CGAffineTransformIdentity;
+    CATransform3D nativeTansform3D = CATransform3DIdentity;
     
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
-        return nativeTransform;
+        return nativeTansform3D;
     }
     
     if (_translateX || _translateY) {
-        nativeTransform = CGAffineTransformTranslate(nativeTransform, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0,  _translateY ? [_translateY valueForMaximum:view.bounds.size.height] : 0);
+        
+        nativeTansform3D = CATransform3DTranslate(nativeTansform3D, _translateX ? [_translateX valueForMaximum:view.bounds.size.width] : 0, _translateY ? [_translateY valueForMaximum:view.bounds.size.height]:0, 0);
     }
+    nativeTansform3D = CATransform3DScale(nativeTansform3D, _scaleX, _scaleY, 1.0);
     
-    nativeTransform = CGAffineTransformScale(nativeTransform, _scaleX, _scaleY);
-    
-    return nativeTransform;
+    return nativeTansform3D;
 }
 
 -(void)setAnchorPoint:(CGPoint)anchorPoint forView:(UIView *)view
@@ -184,11 +230,9 @@
                                           _originY ? [_originY valueForMaximum:view.bounds.size.width] / view.bounds.size.height : 0.5);
         [self setAnchorPoint:anchorPoint forView:view];
     }
-    
-    CGAffineTransform nativeTransform = [self nativeTransformWithView:view];
-    
-    if (!CGAffineTransformEqualToTransform(view.transform, nativeTransform)) {
-        view.transform = nativeTransform;
+    CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
+    if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
+        view.layer.transform = nativeTransform3d;
     }
 }
 
@@ -277,6 +321,21 @@
 {
     float rotateAngle = [self getAngle:value[0]];
     _rotateAngle = rotateAngle;
+}
+
+- (void)parseRotatex:(NSArray *)value
+{
+    _rotateX = [self getAngle:value[0]];
+}
+
+- (void)parseRotatey:(NSArray *)value
+{
+    _rotateY = [self getAngle:value[0]];
+}
+
+- (void)parseRotatez:(NSArray *)value
+{
+   _rotateZ = [self getAngle:value[0]];
 }
 
 - (void)parseTranslate:(NSArray *)value
