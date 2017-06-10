@@ -472,7 +472,7 @@
 {
     WXAssertMainThread();
     
-    _transform = [[WXTransform alloc] initWithNativeTransform:transform instance:self.weexInstance];
+    _transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
         [_layer setNeedsDisplay];

@@ -48,7 +48,7 @@
 
 .horizon{
   .textbox {
-    flex: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -426,9 +426,24 @@
       background: $bg-light-blue url("../images/youku.png") 50% 50% / 64px 64px no-repeat;
       background-origin: content-box;
     }
-
     .ding-logo {
       background: $bg-light-blue url("../images/ding.png") 50% 50% / 64px 64px no-repeat;
+      background-origin: content-box;
+    }
+    .taopiaopiao-logo {
+      background: $bg-light-blue url("../images/taopiaopiao.png") 50% 50% / 64px 64px no-repeat;
+      background-origin: content-box;
+    }
+    .fliggy-logo {
+      background: $bg-light-blue url("../images/fliggy.png") 50% 50% / 64px 64px no-repeat;
+      background-origin: content-box;
+    }
+    .juhuasuan-logo {
+      background: $bg-light-blue url("../images/juhuasuan.png") 50% 50% / 64px 64px no-repeat;
+      background-origin: content-box;
+    }
+    .qianniu-logo {
+      background: $bg-light-blue url("../images/qianniu.png") 50% 50% / 64px 64px no-repeat;
       background-origin: content-box;
     }
   }

@@ -93,7 +93,7 @@ onloadmore  0.5 used with loadmoreoffset attribute. if the view has less than lo
 
 scroll  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.
 
-[try](http://dotwe.org/weex/5837c1b7f1f69e5adf1fc4cac0747c34)
+[try](http://dotwe.org/weex/7ba3b6222d912b4b0b4aafb8248ca22f)
 
 common events: check out the [common events](../common-event.html)
 

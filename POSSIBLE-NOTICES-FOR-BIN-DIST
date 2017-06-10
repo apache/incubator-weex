@@ -97,3 +97,6 @@ by The Android Open Source Project , licensed under the Apache 2.0 License.
 
 This product contains software SDWebImage(https://github.com/rs/SDWebImage) developed
 by Olivier Poitrey  , licensed under the MIT License.
+
+This product contains software Guava(https://github.com/google/guava) developed
+by google  , licensed under the Apache License.

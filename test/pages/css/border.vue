@@ -62,12 +62,12 @@
         <text>transparent</text>
     </div>
     <div class="container">
-        <image class="box topleft" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box topright" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box bottomleft" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box bottomright" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="box" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
-        <image class="circle" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg"></image>
+        <image class="box topleft" :src="img"></image>
+        <image class="box topright" :src="img"></image>
+        <image class="box bottomleft" :src="img"></image>
+        <image class="box bottomright" :src="img"></image>
+        <image class="box" :src="img"></image>
+        <image class="circle" :src="img"></image>
         <text>image</text>
     </div>
   </scroller>
@@ -362,6 +362,7 @@
   module.exports = {
     data : function(){
       return {
+        img: 'http://gw.alicdn.com/tfs/TB1bg8SQFXXXXcHXXXXXXXXXXXX-85-170.png'
       }
     },
     methods : {
