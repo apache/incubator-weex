@@ -42,13 +42,13 @@ describe('list scroll event', function () {
 
   it('#1 Drag list', () => {
     return driver
-    .dragUp(20)
-    .dragUp(20)
+    .dragUp(200)
+    .dragUp(200)
     .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
-      assert.equal(y > 20,true)
+      assert.equal(y > 200,true)
     })
   })
 });
@@ -64,20 +64,20 @@ describe('scroller scroll event', function () {
   });
 
   after(function () {
-      return util.quit(driver)
+      // return util.quit(driver)
   })
 
 
   it('#1 Drag scroller', () => {
     return driver
-    .dragUp(20)
-    .dragUp(20)
+    .dragUp(200)
+    .dragUp(200)
     .elementById('status')
     .text()
     .then((text)=>{
       var y = Math.abs(parseInt(text))
       console.log(`y=${y}`)
-      assert.equal(y > 20,true)
+      assert.equal(y > 200,true)
     })
   })
 });

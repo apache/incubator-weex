@@ -19,7 +19,8 @@ It supports all kinds of weex components as its slides, especially the `indicato
 
 - `auto-play`: &lt;boolean&gt; `true` | `false`. This value determines whether the slides plays automatically after the page rendering finished. The default value is `false`.
 - `interval`: &lt;number&gt; millisecond. This value determines time interval for each page displayed in slider.
-- `index`: &lt;number&gt; . This value determines the  index of current shown slide. The default value is `0`.
+- `index`: <number> . This value determines the  index of current shown slide. The default value is `0`.
+- `offset-x-accuracy {float}`：set the scroll event trigger precision, precision value represents the rolling distance of a page width ratio.
 
 ## Styles
 
@@ -33,6 +34,7 @@ It supports all kinds of weex components as its slides, especially the `indicato
 ## Events
 
 - `change`: triggerd when the slide's index is changed. The event object contains the attribute of `index`, which is the index number of the currently shown slide.
+- `scroll` <sup class="wx-v">0.11+</sup>：this event is fired when scrolling. The current offsetXRatio value is given in this event callback.
 
 **common events**: check out the [common events](../common-event.html)
 

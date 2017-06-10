@@ -81,12 +81,12 @@ public class DefaultUriAdapterTest {
 
 
     instance.renderByUrl("", bundle, null, null, 0, 0, WXRenderStrategy.APPEND_ONCE);
-    testRelative(host, base);
+    testRelative(host, base, bundle);
     instance.renderByUrl("", bundleWithSlash, null, null, 0, 0, WXRenderStrategy.APPEND_ONCE);
-    testRelative(host, base);
+    testRelative(host, base, bundleWithSlash);
   }
 
-  private void testRelative(String host, String baseWithSlash) {
+  private void testRelative(String host, String baseWithSlash, String bundleUrl) {
     Uri uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("./456"));
     assertEquals(Uri.parse(baseWithSlash + "./456"), uri);
 
@@ -108,6 +108,9 @@ public class DefaultUriAdapterTest {
 
     uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse("/test2"));
     assertEquals(Uri.parse(host + "/test2"), uri);
+
+    uri = adapter.rewrite(instance, URIAdapter.IMAGE, Uri.parse(""));
+    assertEquals(Uri.parse(bundleUrl), uri);
   }
 
 }

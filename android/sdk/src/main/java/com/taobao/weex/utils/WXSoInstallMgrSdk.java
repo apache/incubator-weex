@@ -21,6 +21,7 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weappplus_sdk.BuildConfig;
@@ -204,6 +205,9 @@ public class WXSoInstallMgrSdk {
       if(WXSoInstallMgrSdk.class.getClassLoader() instanceof PathClassLoader ) {
 
         String path = ((PathClassLoader) (WXSoInstallMgrSdk.class.getClassLoader())).findLibrary(libName);
+        if(TextUtils.isEmpty(path) ){
+          return false;
+        }
         File file = new File(path);
 
         if (!file.exists() || size == file.length()) {

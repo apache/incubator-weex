@@ -1,14 +1,9 @@
-\---
-
+---
 title: <waterfall>
-
 type: references
-
 order: 2.5
-
 version: 2.1
-
-\---
+---
 
 # waterfall
 
@@ -18,7 +13,7 @@ A component providing waterfall layout.
 
 ### Child Components
 
-Notes: The waterfall now supports the following child components: cell, header, refresh, loading and fixed-position components. Other kinds of components will not be guaranteed to be displayed correctly. 
+Notes: The waterfall now supports the following child components: cell, header, refresh, loading and fixed-position components. Other kinds of components will not be guaranteed to be displayed correctly.
 
 * cell: presents the content for a single data item in waterfall
 * header: components that need to stretch across multiple columns. It can be sticky by using css position.
@@ -33,7 +28,7 @@ Notes: The waterfall now supports the following child components: cell, header, 
   * `<integer>`: describes the optimal number of columns into which the content of the element will be flowed. Values must be greater than 0. If both column-width and column-count have non-auto values, the integer value describes the maximum number of columns.
 * **column-gap**:sets the gap between columns. if `normal` is specified,  the gap will be `32`.
 
-To see other attributes,  please checkout [List Component Attributes](./list.html) 
+To see other attributes,  please checkout [List Component Attributes](./list.html)
 
 ### Styles
 

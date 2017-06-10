@@ -449,6 +449,7 @@
         if ([view isKindOfClass:[WXIndicatorView class]]) {
             ((WXIndicatorComponent *)subcomponent).delegate = self;
             [sliderView addSubview:view];
+            [self setIndicatorView:(WXIndicatorView *)view];
             return;
         }
         

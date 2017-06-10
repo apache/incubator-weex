@@ -463,6 +463,22 @@
     WXAssertMainThread();
 }
 
+- (void)updateAttributes:(NSDictionary *)attributes
+{
+    WXAssertMainThread();
+}
+
+- (void)setNativeTransform:(CGAffineTransform)transform
+{
+    WXAssertMainThread();
+    
+    _transform = [[WXTransform alloc] initWithNativeTransform:transform instance:self.weexInstance];
+    if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
+        [_transform applyTransformForView:_view];
+        [_layer setNeedsDisplay];
+    }
+}
+
 - (void)readyToRender
 {
     if (self.weexInstance.trackComponent) {
@@ -470,11 +486,6 @@
     }
 }
 
-- (void)updateAttributes:(NSDictionary *)attributes
-{
-    WXAssertMainThread();
-    
-}
 
 - (void)setGradientLayer
 {
@@ -504,26 +515,26 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    
-    if (!attributes) {
+    NSDictionary *attributesCpy = [attributes copy];
+    if (!attributesCpy) {
         return;
     }
     
-    if (attributes[@"role"]){
+    if (attributesCpy[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
     }
-    if (attributes[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+    if (attributesCpy[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributesCpy[@"ariaHidden"]];
         self.view.accessibilityElementsHidden = _ariaHidden;
     }
-    if (attributes[@"ariaLabel"]) {
-        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+    if (attributesCpy[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributesCpy[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
     }
     
-    if (attributes[@"testId"]) {
-        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
+    if (attributesCpy[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributesCpy[@"testId"]]];
     }
 
 }
