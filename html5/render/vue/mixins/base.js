@@ -37,7 +37,7 @@ import {
 
 // import { extractComponentStyle } from '../core'
 
-const scrollableTypes = ['scroller', 'list']
+import config from '../config'
 
 let lazyloadWatched = false
 function watchLazyload () {
@@ -141,7 +141,7 @@ export default {
 
     _getParentScroller () {
       let parent = this
-      while (parent && scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
+      while (parent && config.scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
         parent = parent.$options.parent
       }
       return parent

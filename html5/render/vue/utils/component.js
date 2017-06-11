@@ -18,8 +18,7 @@
  */
 import { throttle, extend } from './func'
 import { createEvent } from './event'
-
-const scrollableTypes = ['scroller', 'list']
+import config from '../config'
 
 export function getParentScroller (vm) {
   if (!vm) return null
@@ -28,7 +27,7 @@ export function getParentScroller (vm) {
   }
   function _getParentScroller (parent) {
     if (!parent) { return }
-    if (scrollableTypes.indexOf(parent.weexType) > -1) {
+    if (config.scrollableTypes.indexOf(parent.weexType) > -1) {
       vm._parentScroller = parent
       return parent
     }

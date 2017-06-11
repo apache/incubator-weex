@@ -242,7 +242,15 @@ export function getComponentStyle (context, extract) {
    */
   const pos = style.position
   const reg = /sticky$/
-  if (isArray(pos) && pos[0].match(reg) || (pos + '').match(reg)) {
+  if (pos === 'fixed') {
+    context.$nextTick(function () {
+      const el = context.$el
+      if (el) {
+        el.classList.add('weex-fixed')
+      }
+    })
+  }
+  else if (isArray(pos) && pos[0].match(reg) || (pos + '').match(reg)) {
     delete style.position
     // use native sticky.
     if (supportSticky()) {

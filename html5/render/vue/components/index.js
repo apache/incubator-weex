@@ -24,6 +24,7 @@ import image from './image'
 import input from './input'
 import header from './scrollable/header'
 import list from './scrollable/list'
+import waterfall from './scrollable/waterfall'
 import cell from './scrollable/list/cell'
 import scroller from './scrollable/scroller'
 import slider from './slider'
@@ -50,6 +51,7 @@ export default {
   switch: _switch,
   header,
   list,
+  waterfall,
   cell,
   scroller,
   slider,
