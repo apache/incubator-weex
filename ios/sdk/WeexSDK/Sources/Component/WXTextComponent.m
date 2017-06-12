@@ -118,6 +118,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     BOOL _truncationLine; // support trunk tail
     
     BOOL _needsRemoveObserver;
+    NSMutableAttributedString * _ctAttributedString;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -241,6 +242,7 @@ do {\
 - (void)setNeedsRepaint
 {
     _textStorage = nil;
+    _ctAttributedString = nil;
 }
 
 #pragma mark - Subclass
@@ -333,6 +335,14 @@ do {\
 - (NSString *)text
 {
     return _text;
+}
+
+- (NSMutableAttributedString *)ctAttributedString
+{
+    if (!_ctAttributedString) {
+        _ctAttributedString = [self buildCTAttributeString];
+    }
+    return _ctAttributedString;
 }
 
 - (void)repaintText:(NSNotification *)notification
@@ -605,7 +615,7 @@ do {\
         CGContextTranslateCTM(context, 0, textFrame.size.height);
         CGContextScaleCTM(context, 1.0, -1.0);
         
-        NSMutableAttributedString * attributedStringCopy = [self buildCTAttributeString];
+        NSMutableAttributedString * attributedStringCopy = [self ctAttributedString];
         //add path
         CGPathRef cgPath = NULL;
         cgPath = CGPathCreateWithRect(textFrame, NULL);
@@ -749,7 +759,7 @@ do {\
     if (truncationTokenLine) {
         // default truncationType is kCTLineTruncationEnd
         CTLineTruncationType truncationType = kCTLineTruncationEnd;
-        NSAttributedString *attributedString = [self buildCTAttributeString];
+        NSAttributedString *attributedString = [self ctAttributedString];
         NSAttributedString * lastLineText = nil;
         NSRange lastLineTextRange = WXNSRangeFromCFRange(CTLineGetStringRange(lastLine));
         NSRange attributeStringRange = NSMakeRange(0, attributedString.string.length);
@@ -817,7 +827,7 @@ do {\
     
     CGFloat totalHeight = 0;
     CGSize suggestSize = CGSizeZero;
-    NSAttributedString * attributedStringCpy = [self buildCTAttributeString];
+    NSAttributedString * attributedStringCpy = [self ctAttributedString];
     CTFramesetterRef framesetterRef = NULL;
     framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
         
