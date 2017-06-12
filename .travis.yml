@@ -67,5 +67,14 @@ script:
   - source test/ci-funcs.sh
   - runJSTest $TEST_SUITE
 notifications:
-  webhooks: https://oapi.dingtalk.com/robot/send?access_token=553a6d23676da61499b0001a8e28d4436be776f5642fff9259f5c946ffac45d2
-  
+  webhooks:
+    on_pull_requests: false
+    urls:
+      - https://oapi.dingtalk.com/robot/send?access_token=5a6be5eb6ad180fa4d04bdda0b24857ee49c3dd985361efdf0964aa9134ee623
+    on_success: change 
+    on_failure: always
+  email:
+    recipients:
+      - dev@weex.apache.org
+    on_success: change
+    on_failure: always
