@@ -18,8 +18,6 @@
  */
 package com.taobao.weex.dom;
 
-import android.os.Message;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;

@@ -24,10 +24,12 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.common.WXTracing;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.ArrayList;
@@ -102,14 +104,18 @@ public class WXRenderManager {
   }
 
   public void runOnThread(final String instanceId, final RenderAction action) {
+    final long start = System.nanoTime();
+    final String actionName = WXTracing.getFunctionName(action.getClass());
     mWXRenderHandler.post(WXThread.secure(new Runnable() {
-
       @Override
       public void run() {
+        long s = System.nanoTime();
+        WXLogUtils.e("Tracing", "Method " + actionName + ", Queue time " + (s - start) + " ns");
         if (mRegistries.get(instanceId) == null) {
           return;
         }
         action.executeRender(getRenderContext(instanceId));
+        WXLogUtils.e("Tracing", "Method " + actionName + ", Render time " + (System.nanoTime() - s) + " ns");
       }
     }));
   }

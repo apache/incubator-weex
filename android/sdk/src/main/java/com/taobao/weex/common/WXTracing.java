@@ -1,5 +1,10 @@
 package com.taobao.weex.common;
 
+import android.os.Message;
+
+import com.taobao.weex.dom.WXDomHandler;
+import com.taobao.weex.dom.WXDomTask;
+import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,5 +44,33 @@ public class WXTracing {
             sb.append('}');
             return sb.toString();
         }
+    }
+
+    public static String getFunctionName(Message msg) {
+        Object obj = msg.obj;
+        if (obj != null && obj instanceof WXDomTask) {
+            Object action = ((WXDomTask) obj).args.get(0);
+            if (action instanceof Action) {
+                return getFunctionName(action.getClass());
+            }
+        }
+
+        String actionName = "unknown";
+        int what = msg.what;
+        if (what == WXDomHandler.MsgType.WX_DOM_BATCH) {
+            actionName = "domBatch";
+        } else if (what == WXDomHandler.MsgType.WX_DOM_UPDATE_STYLE) {
+            actionName = "updateStyle";
+        } else if (what == WXDomHandler.MsgType.WX_CONSUME_RENDER_TASKS) {
+            actionName = "consumeRenderTasks";
+        }
+        return actionName;
+    }
+
+    public static String getFunctionName(Class clazz) {
+        String simpleName = clazz.getSimpleName();
+        char[] chars = simpleName.replace("Action", "").toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 }

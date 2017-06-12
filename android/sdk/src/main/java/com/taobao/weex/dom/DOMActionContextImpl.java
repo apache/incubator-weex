@@ -31,6 +31,7 @@ import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.Stopwatch;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -181,8 +182,9 @@ class DOMActionContextImpl implements DOMActionContext {
       return;
     }
     long start0 = System.currentTimeMillis();
-
+    Stopwatch.tick();
     rebuildingFixedDomTree(rootDom);
+    WXLogUtils.e("Tracing", "rebuildingFixedDomTree " + Stopwatch.tackAndTick() + " ms");
 
     rootDom.traverseTree( new WXDomObject.Consumer() {
       @Override
@@ -193,10 +195,13 @@ class DOMActionContextImpl implements DOMActionContext {
         dom.layoutBefore();
       }
     });
+    WXLogUtils.e("Tracing", "layoutBefore " + Stopwatch.tackAndTick() + " ms");
     long start = System.currentTimeMillis();
 
 
+    long s = System.nanoTime();
     rootDom.calculateLayout(mLayoutContext);
+    WXLogUtils.e("Tracing", "layout " + Stopwatch.tackAndTick() + " ms");
 
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
     if (instance != null) {
@@ -212,9 +217,11 @@ class DOMActionContextImpl implements DOMActionContext {
         dom.layoutAfter();
       }
     });
+    WXLogUtils.e("Tracing", "layoutAfter " + Stopwatch.tackAndTick() + " ms");
 
     start = System.currentTimeMillis();
     rootDom.traverseTree(new ApplyUpdateConsumer());
+    WXLogUtils.e("Tracing", "applyUpdateConsumer " + Stopwatch.tackAndTick() + " ms");
 
     if (instance != null) {
       instance.applyUpdateTime(System.currentTimeMillis() - start);
@@ -225,6 +232,7 @@ class DOMActionContextImpl implements DOMActionContext {
     if (instance != null) {
       instance.updateDomObjTime(System.currentTimeMillis() - start);
     }
+    WXLogUtils.e("Tracing", "updateDomObj " + Stopwatch.tack() + " ms");
     parseAnimation();
 
     boolean isPreRenderMode = instance != null && instance.isPreRenderMode();

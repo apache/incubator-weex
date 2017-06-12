@@ -27,6 +27,8 @@ import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.Stopwatch;
+import com.taobao.weex.utils.WXLogUtils;
 
 /**
  * Created by sospartan on 01/03/2017.
@@ -69,8 +71,11 @@ class AddEventAction implements DOMAction, RenderAction {
     WXComponent comp = context.getComponent(mRef);
     if(comp != null){
       //sync dom change to component
+      Stopwatch.tick();
       comp.updateDom(mUpdatedDom);
+      WXLogUtils.e("Tracing", "updateDom " + Stopwatch.tackAndTick() + " ms");
       comp.addEvent(mEvent);
+      WXLogUtils.e("Tracing", "addEvent " + Stopwatch.tackAndTick() + " ms");
     }
   }
 }

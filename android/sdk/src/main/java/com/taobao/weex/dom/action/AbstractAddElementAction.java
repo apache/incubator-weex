@@ -31,6 +31,7 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentFactory;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.Stopwatch;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -80,7 +81,9 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
     }
 
     //only non-root has parent.
+    Stopwatch.tick();
     WXDomObject domObject = WXDomObject.parse(dom, instance);
+    WXLogUtils.e("Tracing", "Component " + domObject.getRef() + " parseDomObject " + Stopwatch.tackAndTick() + " ms");
 
     if (domObject == null || context.getDomByRef(domObject.getRef()) != null) {
       if (WXEnvironment.isApkDebugable()) {
@@ -90,11 +93,14 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
       return;
     }
     appendDomToTree(context, domObject);
+    WXLogUtils.e("Tracing", "Component " + domObject.getRef() + " appendDomToTree " + Stopwatch.tackAndTick() + " ms");
 
     domObject.traverseTree(
         context.getAddDOMConsumer(),
         context.getApplyStyleConsumer()
     );
+    WXLogUtils.e("Tracing", "Component " + domObject.getRef() + " traverseTree " + Stopwatch.tackAndTick() + " ms");
+
 
     //Create component in dom thread
     WXComponent component = createComponent(context, domObject);
@@ -103,6 +109,8 @@ abstract class AbstractAddElementAction implements DOMAction, RenderAction {
       //stop redner, some fatal happened.
       return;
     }
+    WXLogUtils.e("Tracing", "Component " + domObject.getRef() + " createComponent " + Stopwatch.tackAndTick() + " ms");
+
     context.addDomInfo(domObject.getRef(), component);
     context.postRenderTask(this);
     addAnimationForDomTree(context, domObject);

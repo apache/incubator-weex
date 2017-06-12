@@ -27,6 +27,7 @@ import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXVContainer;
+import com.taobao.weex.utils.Stopwatch;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -97,11 +98,14 @@ final class AddElementAction extends AbstractAddElementAction {
       if (parent == null || component == null) {
         return;
       }
-
+      Stopwatch.tick();
       parent.addChild(component, mAddIndex);
       parent.createChildViewAt(mAddIndex);
+      WXLogUtils.e("Tracing", "Component " + mRef + " createViewTree " + Stopwatch.tackAndTick() + " ms");
       component.applyLayoutAndEvent(component);
+      WXLogUtils.e("Tracing", "Component " + mRef + " applyLayoutAndEvent " + Stopwatch.tackAndTick() + " ms");
       component.bindData(component);
+      WXLogUtils.e("Tracing", "Component " + mRef + " bindData " + Stopwatch.tackAndTick() + " ms");
     } catch (Exception e) {
       WXLogUtils.e("add component failed.", e);
     }
