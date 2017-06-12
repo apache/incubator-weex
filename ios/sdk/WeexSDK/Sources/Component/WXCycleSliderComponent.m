@@ -302,8 +302,6 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (_infinite) {
         [self resetScrollView];
     } else {
-        NSLog(@"scrollViewDidEndDecelerating _scrollView.contentOffset.x %f",_scrollView.contentOffset.x);
-        NSLog(@"scrollViewDidEndDecelerating self.width %f",self.width);
         NSInteger index = _scrollView.contentOffset.x / self.width;
         [self setCurrentIndex:index];
     }
@@ -313,8 +311,6 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (_infinite) {
         [self resetScrollView];
     } else {
-        NSLog(@"scrollViewDidEndScrollingAnimation _scrollView.contentOffset.x %f",_scrollView.contentOffset.x);
-        NSLog(@"scrollViewDidEndScrollingAnimation self.width %f",self.width);
         NSInteger index = _scrollView.contentOffset.x / self.width;
         [self setCurrentIndex:index];
     }
