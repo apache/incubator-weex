@@ -73,3 +73,8 @@ notifications:
       - https://oapi.dingtalk.com/robot/send?access_token=5a6be5eb6ad180fa4d04bdda0b24857ee49c3dd985361efdf0964aa9134ee623
     on_success: change 
     on_failure: always
+  email:
+    recipients:
+      - dev@weex.apache.org
+    on_success: change
+    on_failure: always

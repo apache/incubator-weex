@@ -62,12 +62,12 @@
         <text>transparent</text>
     </div>
     <div class="container">
-        <image class="box topleft" :src="img"></image>
-        <image class="box topright" :src="img"></image>
-        <image class="box bottomleft" :src="img"></image>
-        <image class="box bottomright" :src="img"></image>
-        <image class="box" :src="img"></image>
-        <image class="circle" :src="img"></image>
+        <image class="box topleft" :src="img" @load="onload"></image>
+        <image class="box topright" :src="img" @load="onload"></image>
+        <image class="box bottomleft" :src="img" @load="onload"></image>
+        <image class="box bottomright" :src="img" @load="onload"></image>
+        <image class="box" :src="img" @load="onload"></image>
+        <image class="circle" :src="img" @load="onload"></image>
         <text>image</text>
     </div>
   </scroller>
@@ -366,6 +366,9 @@
       }
     },
     methods : {
+      onload: function(){
+        console.log("image onload")
+      }
     }
   }
 </script>

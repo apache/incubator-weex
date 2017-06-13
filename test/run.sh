@@ -1,5 +1,6 @@
 #!/bin/bash -eu
 set -e
+port="${serport:-12581}"
 
 function startMacacaServer {
     macaca server --verbose &
@@ -7,7 +8,8 @@ function startMacacaServer {
 }
 
 function startWeexServer {
-    while ! nc -z 127.0.0.1 12581; do sleep 5; done
+    echo "local serve at port:$port"
+    while ! nc -z 127.0.0.1 $port; do sleep 5; done
 }
 
 function buildAndroid {
