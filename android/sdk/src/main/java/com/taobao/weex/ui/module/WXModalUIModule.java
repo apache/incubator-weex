@@ -128,6 +128,7 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
       });
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
+      alertDialog.setCancelable(false);
       alertDialog.show();
       tracking(alertDialog);
     } else {
@@ -181,6 +182,7 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
       });
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
+      alertDialog.setCancelable(false);
       alertDialog.show();
       tracking(alertDialog);
     } else {
@@ -244,6 +246,7 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
       });
       AlertDialog alertDialog = builder.create();
       alertDialog.setCanceledOnTouchOutside(false);
+      alertDialog.setCancelable(false);
       alertDialog.show();
       tracking(alertDialog);
     } else {
