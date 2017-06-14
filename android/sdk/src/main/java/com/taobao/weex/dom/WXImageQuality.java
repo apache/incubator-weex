@@ -26,5 +26,9 @@ public enum WXImageQuality {
 
   NORMAL,
 
-  HIGH
+  HIGH,
+
+  RAW,
+
+  NONE
 }

@@ -199,6 +199,7 @@ public class Constants {
     String LOW = "low";
     String NORMAL = "normal";
     String HIGH = "high";
+    String RAW = "raw";
     String VISIBLE = "visible";
     String HIDDEN = "hidden";
     String TEXT = "text";
