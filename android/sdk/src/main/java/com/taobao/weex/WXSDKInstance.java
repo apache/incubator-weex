@@ -141,6 +141,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private LayoutFinishListener mLayoutFinishListener;
 
+  private ComponentObserver mComponentObserver;
+
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -273,6 +275,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
 
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
+  }
+
+  /**
+   * Set a Observer for component.
+   * This observer will be called in each component, should not doing
+   * anything will impact render performance.
+   *
+   * @param observer
+   */
+  public void setComponentObserver(ComponentObserver observer){
+    mComponentObserver = observer;
+  }
+
+  public ComponentObserver getComponentObserver(){
+    return mComponentObserver;
   }
 
   public NativeInvokeHelper getNativeInvokeHelper() {

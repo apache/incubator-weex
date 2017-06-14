@@ -41,6 +41,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -225,6 +226,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mGestureType = new HashSet<>();
     ++mComponentNum;
     onCreate();
+    ComponentObserver observer;
+    if ((observer = getInstance().getComponentObserver()) != null) {
+      observer.onCreate(this);
+    }
   }
 
   protected void onCreate(){
@@ -902,6 +907,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
       if(mHost != null){
         mHost.setId(WXViewUtils.generateViewId());
+        ComponentObserver observer;
+        if ((observer = getInstance().getComponentObserver()) != null) {
+          observer.onViewCreated(this, mHost);
+        }
       }
       onHostViewInitialized(mHost);
     }else{
@@ -1273,6 +1282,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void destroy() {
+    ComponentObserver observer;
+    if ((observer = getInstance().getComponentObserver()) != null) {
+      observer.onPreDestory(this);
+    }
+
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXComponent] destroy can only be called in main thread");
     }
