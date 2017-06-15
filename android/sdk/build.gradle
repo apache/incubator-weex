@@ -153,7 +153,7 @@ dependencies {
     testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
 }
-if(new File('../license/LICENSE').exists()){
+if(file('../license/LICENSE').exists()){
     license {
         header = file('../license/LICENSE')
         excludes(["com/taobao/weex/dom/flex/*.java"])
