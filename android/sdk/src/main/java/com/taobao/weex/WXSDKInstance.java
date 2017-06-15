@@ -81,7 +81,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -142,7 +141,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private LayoutFinishListener mLayoutFinishListener;
 
-  private AtomicBoolean mCurrentGround = new AtomicBoolean(false);
+  private boolean mCurrentGround = false;
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -764,13 +763,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     WXLogUtils.i("Application onActivityPause()");
-    if (!mCurrentGround.get()) {
+    if (!mCurrentGround) {
       WXLogUtils.i("Application to be in the backround");
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
       mContext.sendBroadcast(intent);
-      this.mCurrentGround.set(true);
+      this.mCurrentGround = true;
     }
   }
 
@@ -787,13 +786,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    if (mCurrentGround.get()) {
+    if (mCurrentGround) {
       WXLogUtils.i("Application  to be in the foreground");
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
       mContext.sendBroadcast(intent);
-      mCurrentGround.set(false);
+      mCurrentGround = false;
     }
 
     onViewAppear();
