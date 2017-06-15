@@ -113,6 +113,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
+  private boolean mStable = false;
 
   private RecyclerView.ItemAnimator mItemAnimator;
 
@@ -398,6 +399,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       case Constants.Name.OFFSET_ACCURACY:
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
+        return true;
+      case Constants.Name.STABLE:
+        this.mStable = WXUtils.getBoolean(param, false);
         return true;
       case Constants.Name.DRAGGABLE:
         boolean draggable = WXUtils.getBoolean(param,false);
@@ -1230,11 +1234,20 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
       WXRecyclerView innerView = getHostView().getInnerView();
       innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        private int totalDy = 0;
+
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
           super.onScrolled(recyclerView, dx, dy);
           int offsetX = recyclerView.computeHorizontalScrollOffset();
-          int offsetY = recyclerView.computeVerticalScrollOffset();
+          int offsetY = 0;
+          if (mStable) {
+            totalDy -= dy;
+            offsetY = totalDy;
+          } else {
+            offsetY = recyclerView.computeVerticalScrollOffset();
+          }
+
           if (shouldReport(offsetX, offsetY)) {
             int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
             int contentHeight = recyclerView.computeVerticalScrollRange();

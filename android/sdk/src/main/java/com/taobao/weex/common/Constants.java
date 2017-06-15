@@ -168,6 +168,7 @@ public class Constants {
     String RETURN_KEY_TYPE = "returnKeyType";
     String OFFSET = "offset";
     String ANIMATED = "animated";
+    String STABLE = "stable";
 
     String INSERT_CELL_ANIMATION = "insertAnimation";
     String DELETE_CELL_ANIMATION = "deleteAnimation";
