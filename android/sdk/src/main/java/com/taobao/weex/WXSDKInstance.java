@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
@@ -737,6 +738,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
     return true;
   }
+  private AtomicBoolean currentGround = new AtomicBoolean(false);
 
   @Override
   public void onActivityPause() {
@@ -760,10 +762,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    WXLogUtils.i("Application onActivityPause()");
+    if (!currentGround.get()) {
+      WXLogUtils.i("Application to be in the backround");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      this.currentGround.set(true);
+    }
   }
 
 
@@ -779,10 +786,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    if (currentGround.get()) {
+      WXLogUtils.i("Application  to be in the foreground");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      currentGround.set(false);
+      mContext.sendBroadcast(intent);
+    }
 
     onViewAppear();
 
