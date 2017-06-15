@@ -400,6 +400,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
         return true;
+      case Constants.Name.STABLE:
+        this.mStable = WXUtils.getBoolean(param, false);
+        return true;
       case Constants.Name.DRAGGABLE:
         boolean draggable = WXUtils.getBoolean(param,false);
         setDraggable(draggable);
