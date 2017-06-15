@@ -406,8 +406,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       case Constants.Name.DRAGGABLE:
         boolean draggable = WXUtils.getBoolean(param,false);
         setDraggable(draggable);
-      case Constants.Name.STABLE:
-        this.mStable = WXUtils.getBoolean(param, false);
         return true;
     }
     return super.setProperty(key, param);
