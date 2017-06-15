@@ -142,6 +142,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private LayoutFinishListener mLayoutFinishListener;
 
+  private AtomicBoolean mCurrentGround = new AtomicBoolean(false);
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -738,7 +739,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
     return true;
   }
-  private AtomicBoolean currentGround = new AtomicBoolean(false);
+
 
   @Override
   public void onActivityPause() {
@@ -763,13 +764,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     }
 
     WXLogUtils.i("Application onActivityPause()");
-    if (!currentGround.get()) {
+    if (!mCurrentGround.get()) {
       WXLogUtils.i("Application to be in the backround");
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
       mContext.sendBroadcast(intent);
-      this.currentGround.set(true);
+      this.mCurrentGround.set(true);
     }
   }
 
@@ -786,13 +787,13 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    if (currentGround.get()) {
+    if (mCurrentGround.get()) {
       WXLogUtils.i("Application  to be in the foreground");
       Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
       intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
       intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
-      currentGround.set(false);
       mContext.sendBroadcast(intent);
+      mCurrentGround.set(false);
     }
 
     onViewAppear();
