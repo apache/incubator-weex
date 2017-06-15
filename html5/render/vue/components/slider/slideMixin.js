@@ -59,7 +59,6 @@ export default {
       }
     }
     fireLazyload(this.$el, true)
-    this._preIndex = this._showNodes[0].index
     if (this._preIndex !== this.currentIndex) {
       this._slideTo(this.currentIndex)
     }
@@ -162,6 +161,9 @@ export default {
     },
 
     _slideTo (index, isTouchScroll) {
+      if (this.frameCount <= 0) {
+        return
+      }
       if (!this.infinite || this.infinite === 'false') {
         if (index === -1 || index > (this.frameCount - 1)) {
           this._slideTo(this.currentIndex)
