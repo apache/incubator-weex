@@ -6,8 +6,24 @@ layout: post
 
 # Release Note
 
-## v0.12.0 ( First Offical Release)
+## v0.13.0
+------
+### Notable Changes
+* Slider implemention is refactored [Pull Request#414](https://github.com/apache/incubator-weex/pull/414)
+* Improve integration test. We are working with macaca team, to write better test code.[Pull Request#411](https://github.com/apache/incubator-weex/pull/411) [Pull Request#397](https://github.com/apache/incubator-weex/pull/397) [Pull Request#402](https://github.com/apache/incubator-weex/pull/402) [Pull Request#413](https://github.com/apache/incubator-weex/pull/413) [Pull Request#390](https://github.com/apache/incubator-weex/pull/390) [Pull Request#346](https://github.com/apache/incubator-weex/pull/346) [Pull Request#319](https://github.com/apache/incubator-weex/pull/319) [Pull Request#304](https://github.com/apache/incubator-weex/pull/304) [Pull Request#295](https://github.com/apache/incubator-weex/pull/295)
+* `scroller` now has `pagingEnabled` attribute, which can enable `paging` feature in native [Pull Request#393](https://github.com/apache/incubator-weex/pull/393)
+* New 'prerender' mechanism, which will support rendering a page in background. [Pull Request#343](https://github.com/apache/incubator-weex/pull/343) Pull Request#342](https://github.com/apache/incubator-weex/pull/342)
+* Fix `line-height` feature in iOS. [Pull Request#377](https://github.com/apache/incubator-weex/pull/377) [Pull Request#305](https://github.com/apache/incubator-weex/pull/305)
+* Add `needLayout` option in animation module operation after animation finished [Pull Request#337](https://github.com/apache/incubator-weex/pull/337) [Pull Request#336](https://github.com/apache/incubator-weex/pull/336)
+* `list` component has new type of event for `sticky` feature [Pull Request#332](https://github.com/apache/incubator-weex/pull/332)
+* Support bota and atob [Pull Request#315](https://github.com/apache/incubator-weex/pull/315)
+* Fix mixing background-color and border-color(rgba) in android [Pull Request#359](https://github.com/apache/incubator-weex/pull/359)
 
+
+Beside these, lots of crashes and bugs are fixed.[Pull Request#441](https://github.com/apache/incubator-weex/pull/441) [Pull Request#413](https://github.com/apache/incubator-weex/pull/413) [Pull Request#403](https://github.com/apache/incubator-weex/pull/403) [Pull Request#373](https://github.com/apache/incubator-weex/pull/373)
+
+## v0.12.0 ( First Offical Release)
+---------
 - C++ timer  by lycool
 Discussed in https://lists.apache.org/thread.html/567c9b19d68ccf3e0d24c1467298ebcd4316ffa524c557a34c6c087f@%3Cdev.weex.apache.org%3E
 relate pull requests:[apache/incubator-weex/pull/228|https://github.com/apache/incubator-weex/pull/228], [apache/incubator-weex/pull/232|https://github.com/apache/incubator-weex/pull/232], [apache/incubator-weex/pull/221|https://github.com/apache/incubator-weex/pull/221]
