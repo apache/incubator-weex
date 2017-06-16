@@ -29,6 +29,7 @@ import clipboard from '../../browser/extend/api/clipboard'
 // custom modules
 import animation from './animation'
 import dom from './dom'
+import globalEvent from './globalEvent'
 import modal from './modal'
 import navigator from './navigator'
 import webview from './webview'
@@ -45,6 +46,7 @@ const legacyModules = {
 const modules = {
   animation,
   dom,
+  globalEvent,
   navigator,
   webview
 }

@@ -23,7 +23,10 @@ import {
   extendTruthy,
   trimComment,
   normalizeStyle,
-  autoPrefix
+  autoPrefix,
+  isArray,
+  getParentScroller,
+  supportSticky
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 /* istanbul ignore next */
@@ -230,11 +233,55 @@ export function getComponentStyle (context, extract) {
           }
         }
       })
-      delete style[k]
+      if (k !== 'position') { delete style[k] }
     }
   }
+
+  /**
+   * If position is 'sticky', then add it to the stickyChildren of the parent scroller.
+   */
+  const pos = style.position
+  const reg = /sticky$/
+  if (pos === 'fixed') {
+    context.$nextTick(function () {
+      const el = context.$el
+      if (el) {
+        el.classList.add('weex-fixed')
+      }
+    })
+  }
+  else if (isArray(pos) && pos[0].match(reg) || (pos + '').match(reg)) {
+    delete style.position
+    // use native sticky.
+    if (supportSticky()) {
+      context.$nextTick(function () {
+        const el = context.$el
+        if (el) {
+          el.classList.add('weex-ios-sticky')
+        }
+      })
+    }
+    // use re-implementation of sticky.
+    else if (!context._stickyAdded) {
+      const uid = context._uid
+      const scroller = getParentScroller(context)
+      if (scroller) {
+        context._stickyAdded = true
+        if (!scroller._stickyChildren) {
+          scroller._stickyChildren = {}
+        }
+        scroller._stickyChildren[uid] = context
+      }
+      context.$nextTick(function () {
+        const el = context.$el
+        if (el) {
+          context._initOffsetTop = el.offsetTop
+        }
+      })
+    }
+  }
+
   return style
-  // return addPrefix(normalizeStyle(style))
 }
 
 export function extractComponentStyle (context) {
@@ -242,27 +289,37 @@ export function extractComponentStyle (context) {
 }
 
 /**
- * get { width, height } (size) of current component from components' styles.
+ * process sticky children in scrollable components.
+ * current only support list and vertical scroller.
  */
-export function getSize (context) {
-  if (!context.$vnode) {
-    if (process.env.NODE_ENV === 'development') {
-      return console.error('[vue-render] getComponentStyle failed: no $vnode in context.')
+export function processSticky (context) {
+  /**
+   * current browser support 'sticky' or '-webkit-sticky', so there's no need
+   * to do further more.
+   */
+  if (supportSticky()) {
+    return
+  }
+  // current only support list and vertical scroller.
+  if (container.scrollDirection === 'horizontal') {
+    return
+  }
+  const stickyChildren = context._stickyChildren
+  const len = stickyChildren && stickyChildren.length || 0
+  if (len <= 0) { return }
+
+  const container = context.$el
+  if (!container) { return }
+  const scrollTop = container.scrollTop
+
+  let stickyChild
+  for (let i = 0; i < len; i++) {
+    stickyChild = stickyChildren[i]
+    if (stickyChild._initOffsetTop < scrollTop) {
+      stickyChild._addSticky()
     }
-    return {}
+    else {
+      stickyChild._removeSticky()
+    }
   }
-  const data = context.$vnode.data
-  const wh = {}
-  const classes = typeof data.class === 'string' ? data.class.split(' ') : (data.class || [])
-  const staticClass = typeof data.staticClass === 'string' ? data.staticClass.split(' ') : (data.class || [])
-  const clsNms = staticClass.concat(classes)
-  function extendWHFrom (to, from) {
-    if (!from) { return }
-    from.width && (to.width = from.width)
-    from.height && (to.height = from.height)
-  }
-  extendWHFrom(wh, this._getScopeStyle(clsNms))
-  extendWHFrom(wh, data.staticStyle)
-  extendWHFrom(wh, data.style)
-  return wh
 }

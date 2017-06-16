@@ -65,27 +65,34 @@
 }
 
 body > .weex-list,
-body > .weex-scroller {
+body > .weex-scroller,
+body > .weex-waterfall {
   max-height: 100%;
 }
 
 .weex-list-wrapper,
-.weex-scroller-wrapper {
+.weex-scroller-wrapper,
+.weex-waterfall-wrapper {
   -webkit-overflow-scrolling: touch;
 }
 
-.weex-list-wrapper {
+.weex-list-wrapper,
+.weex-waterfall-wrapper {
   overflow-y: scroll !important;
+  overflow-x: hidden !important;
 }
 
 .weex-list-inner,
-.weex-scroller-inner {
+.weex-scroller-inner,
+.weex-waterfall-inner {
   -webkit-overflow-scrolling: touch;
-  width: 100%;
 }
 
-.weex-scroller-inner::-webkit-scrollbar {
-    width: 0;
+.weex-waterfall-inner-columns {
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-orient: horizontal;
 }
 
 .weex-scroller-wrapper.weex-scroller-vertical {
@@ -106,14 +113,19 @@ body > .weex-scroller {
   height: 100%;
 }
 
-.iossticky {
+.weex-ios-sticky {
   position: -webkit-sticky !important;
   position: sticky !important;
   z-index: 9999;
   top: 0;
 }
 
-.sticky {
+.weex-fixed {
+  position: fixed;
+  z-index: 1;
+}
+
+.weex-sticky {
   position: fixed;
   top: 0;
   z-index: 9999;
