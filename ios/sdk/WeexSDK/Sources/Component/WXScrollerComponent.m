@@ -305,8 +305,9 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 - (void)removeScrollToListener:(WXComponent *)target
 {
     WXScrollToTarget *targetData = nil;
-    for (WXScrollToTarget *targetData in self.listenerArray) {
-        if (targetData.target == target) {
+    for (WXScrollToTarget *targetDataTmp in self.listenerArray) {
+        if (targetDataTmp.target == target) {
+            targetData = targetDataTmp;
             break;
         }
     }
