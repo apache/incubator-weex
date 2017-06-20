@@ -13,7 +13,7 @@ layout: post
 - [Advanced](./v-0.10/advanced/index.html)
 - [Tools](./v-0.10/tools/index.html)
 
-## Command errors in Windows
+## Command errors in MS Windows
 
 Please install [Git for Windows](https://git-scm.com/download/win) first, see [For Windows](https://github.com/apache/incubator-weex/tree/dev#for-windows) for more information.
 
