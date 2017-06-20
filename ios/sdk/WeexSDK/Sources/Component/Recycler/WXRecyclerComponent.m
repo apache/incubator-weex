@@ -335,7 +335,7 @@ typedef enum : NSUInteger {
 {
     NSInteger numberOfItems = [self.dataController numberOfItemsInSection:section];
     
-    WXLogDebug(@"Number of items is %ld in section:%ld", numberOfItems, section);
+    WXLogDebug(@"Number of items is %ld in section:%ld", (long)numberOfItems, (long)section);
     
     return numberOfItems;
 }

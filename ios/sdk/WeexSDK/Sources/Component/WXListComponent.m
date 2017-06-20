@@ -287,7 +287,7 @@
                     
                     [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
                     if (completedReloadSection) {
-                        WXLogDebug(@"Reload section:%lu", insertIndex - 1);
+                        WXLogDebug(@"Reload section:%lu", (unsigned long)insertIndex - 1);
                         _completedSections[insertIndex - 1] = completedReloadSection;
                     }
                     
@@ -363,10 +363,10 @@
     BOOL keepScrollPosition = header.keepScrollPosition;
     
     [self.weexInstance.componentManager _addUITask:^{
-        WXLogDebug(@"delete section:%ld", deleteIndex);
+        WXLogDebug(@"delete section:%ld", (long)deleteIndex);
         [_completedSections removeObjectAtIndex:deleteIndex];
         if (completedReloadSection) {
-            WXLogDebug(@"Reload section:%ld", deleteIndex - 1);
+            WXLogDebug(@"Reload section:%ld", (long)deleteIndex - 1);
             _completedSections[deleteIndex - 1] = completedReloadSection;
         }
         

@@ -275,6 +275,17 @@
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
 		DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0F99301D48E5320087C6AF /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DC969DB41EF811FF0004EBA1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC969DB31EF811FF0004EBA1 /* UIKit.framework */; };
+		DC969DB51EF8120A0004EBA1 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938F61D3D0DFD00DBB801 /* CoreMedia.framework */; };
+		DC969DB71EF812170004EBA1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC969DB61EF812170004EBA1 /* CoreGraphics.framework */; };
+		DC969DB81EF812270004EBA1 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938ED1D3D079100DBB801 /* JavaScriptCore.framework */; };
+		DC969DBA1EF8123F0004EBA1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC969DB91EF8123F0004EBA1 /* QuartzCore.framework */; };
+		DC969DBC1EF812530004EBA1 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC969DBB1EF812530004EBA1 /* CoreText.framework */; };
+		DC969DBD1EF812600004EBA1 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
+		DC969DBE1EF812750004EBA1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938F41D3D0DDE00DBB801 /* AVFoundation.framework */; };
+		DC969DBF1EF812BC0004EBA1 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938F81D3D0E0300DBB801 /* MediaPlayer.framework */; };
+		DC969DC01EF812CE0004EBA1 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 740938FA1D3D0E1700DBB801 /* AVKit.framework */; };
+		DC969DC21EF812D80004EBA1 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC969DC11EF812D80004EBA1 /* OpenGLES.framework */; };
 		DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
 		DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */; };
 		DC9F46871D61BA8C00A88239 /* wx_load_error@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 59AC02501D2A7E6E00355112 /* wx_load_error@3x.png */; };
@@ -593,6 +604,11 @@
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
 		DC0F99301D48E5320087C6AF /* WeexSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeexSDK.h; sourceTree = "<group>"; };
 		DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterProtocol.h; sourceTree = "<group>"; };
+		DC969DB31EF811FF0004EBA1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		DC969DB61EF812170004EBA1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		DC969DB91EF8123F0004EBA1 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		DC969DBB1EF812530004EBA1 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		DC969DC11EF812D80004EBA1 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		DC9867431D826D1E000AF388 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStreamModuleTests.m; sourceTree = "<group>"; };
 		DCA0EF621D6EED6F00CB18B9 /* WXGlobalEventModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXGlobalEventModule.h; sourceTree = "<group>"; };
@@ -637,6 +653,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC969DC21EF812D80004EBA1 /* OpenGLES.framework in Frameworks */,
+				DC969DC01EF812CE0004EBA1 /* AVKit.framework in Frameworks */,
+				DC969DBF1EF812BC0004EBA1 /* MediaPlayer.framework in Frameworks */,
+				DC969DBE1EF812750004EBA1 /* AVFoundation.framework in Frameworks */,
+				DC969DBD1EF812600004EBA1 /* GLKit.framework in Frameworks */,
+				DC969DBC1EF812530004EBA1 /* CoreText.framework in Frameworks */,
+				DC969DBA1EF8123F0004EBA1 /* QuartzCore.framework in Frameworks */,
+				DC969DB81EF812270004EBA1 /* JavaScriptCore.framework in Frameworks */,
+				DC969DB71EF812170004EBA1 /* CoreGraphics.framework in Frameworks */,
+				DC969DB51EF8120A0004EBA1 /* CoreMedia.framework in Frameworks */,
+				DC969DB41EF811FF0004EBA1 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1161,6 +1188,11 @@
 		A5818E244F9E235722E3B938 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DC969DC11EF812D80004EBA1 /* OpenGLES.framework */,
+				DC969DBB1EF812530004EBA1 /* CoreText.framework */,
+				DC969DB91EF8123F0004EBA1 /* QuartzCore.framework */,
+				DC969DB61EF812170004EBA1 /* CoreGraphics.framework */,
+				DC969DB31EF811FF0004EBA1 /* UIKit.framework */,
 				74EF31BE1DE5ED5900667A07 /* libstdc++.tbd */,
 				DC9867431D826D1E000AF388 /* GLKit.framework */,
 				740938FA1D3D0E1700DBB801 /* AVKit.framework */,
@@ -1845,6 +1877,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				GCC_PREFIX_HEADER = "WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1854,9 +1887,10 @@
 				);
 				INFOPLIST_FILE = WeexSDK/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-isystem",
@@ -1868,6 +1902,8 @@
 					"\"CFNetwork\"",
 					"-framework",
 					"\"Security\"",
+					"-undefined",
+					dynamic_lookup,
 				);
 				PODS_ROOT = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
@@ -1889,6 +1925,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				GCC_PREFIX_HEADER = "WeexSDK/Sources/Supporting Files/WeexSDK-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -1898,9 +1935,10 @@
 				);
 				INFOPLIST_FILE = WeexSDK/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
+				MACH_O_TYPE = mh_dylib;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-isystem",
@@ -1912,6 +1950,8 @@
 					"\"CFNetwork\"",
 					"-framework",
 					"\"Security\"",
+					"-undefined",
+					dynamic_lookup,
 				);
 				PODS_ROOT = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
