@@ -6,7 +6,7 @@ layout: post
 
 # FAQ
 
-## where are legacy docs?
+## Where are legacy docs?
 
 - [Guide](./v-0.10/guide/index.html)
 - [References](./v-0.10/references/index.html)
