@@ -271,6 +271,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_tapGesture) {
         _tapGesture.delegate = nil;
+        if ([self.view.gestureRecognizers containsObject:_tapGesture]) {
+            [_view removeGestureRecognizer:_tapGesture];
+        }
         _tapGesture = nil;
     }
 }
@@ -342,8 +345,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
   
     for (UISwipeGestureRecognizer *recognizer in _swipeGestures) {
         recognizer.delegate = nil;
+        if ([[self.view gestureRecognizers] containsObject:recognizer]) {
+            [self.view removeGestureRecognizer:recognizer];
+        }
     }
-    
     _swipeGestures = nil;
 }
 
@@ -395,6 +400,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_longPressGesture) {
         _longPressGesture.delegate = nil;
+        
+        if([[self.view gestureRecognizers] containsObject:_longPressGesture]) {
+            [self.view removeGestureRecognizer:_longPressGesture];
+        }
         _longPressGesture = nil;
     }
 }
@@ -540,6 +549,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         && !_listenPanStart && !_listenPanMove && !_listenPanEnd
         && !_listenHorizontalPan && !_listenVerticalPan
         ) {
+        
+        if ([[self.view gestureRecognizers] containsObject:_panGesture]) {
+            [self.view removeGestureRecognizer:_panGesture];
+        }
+        
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -606,6 +620,9 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel && !_touchGesture.listenPseudoTouch) {
         _touchGesture.delegate = nil;
+        if ([[self.view gestureRecognizers] containsObject:_touchGesture]) {
+            [self.view removeGestureRecognizer:_touchGesture];
+        }
         _touchGesture = nil;
     }
 }
