@@ -65,9 +65,9 @@ On Android Platform , Weex code is executed in [weex_v8core](https://github.com/
 
   - **[CocoaPods](https://cocoapods.org)**
     Add the following line to your Podfile:
-	 	```
-	 	   pod 'WeexSDK'
-	 	```
+	 ```
+	 	 pod 'WeexSDK'
+	 ```
     run `pod install`
   - **[Carthage](https://github.com/carthage/carthage)**
 	 Add the following line to your Cartfile:
