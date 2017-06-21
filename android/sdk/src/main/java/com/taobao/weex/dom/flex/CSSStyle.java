@@ -17,6 +17,7 @@ import static com.taobao.weex.dom.flex.CSSLayout.POSITION_TOP;
 /**
  * The CSS style definition for a {@link CSSNode}.
  */
+@Deprecated
 public class CSSStyle {
 
   public CSSDirection direction;

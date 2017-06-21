@@ -220,7 +220,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mContext = mInstance.getContext();
     mParent = parent;
     mType = type;
-    mDomObj = dom.clone();
+    mDomObj = dom.asResult();
     mCurrentRef = mDomObj.getRef();
     mGestureType = new HashSet<>();
     ++mComponentNum;
@@ -969,11 +969,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     return mAbsoluteX;
   }
 
-  public void updateDom(WXDomObject dom) {
+  public void updateDom(ImmutableDomObject dom) {
     if (dom == null) {
       return;
     }
-    mDomObj = dom.clone();
+    mDomObj = dom;
   }
 
   public final void removeEvent(String type) {

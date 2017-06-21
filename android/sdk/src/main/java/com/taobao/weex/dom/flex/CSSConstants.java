@@ -5,6 +5,7 @@
  */
 package com.taobao.weex.dom.flex;
 
+@Deprecated
 public class CSSConstants {
 
   public static final float UNDEFINED = Float.NaN;

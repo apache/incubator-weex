@@ -34,6 +34,10 @@ import android.text.style.AbsoluteSizeSpan;
 import android.text.style.AlignmentSpan;
 import android.text.style.ForegroundColorSpan;
 
+import com.facebook.yoga.YogaMeasureFunction;
+import com.facebook.yoga.YogaMeasureMode;
+import com.facebook.yoga.YogaMeasureOutput;
+import com.facebook.yoga.YogaNode;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
@@ -86,24 +90,20 @@ public class WXTextDomObject extends WXDomObject {
 
   /**
    * Object for calculating text's width and height. This class is an anonymous class of
-   * implementing {@link com.taobao.weex.dom.flex.CSSNode.MeasureFunction}
+   * implementing {@link YogaMeasureFunction}
    */
-  /** package **/ static final CSSNode.MeasureFunction TEXT_MEASURE_FUNCTION = new CSSNode.MeasureFunction() {
+  /** package **/ static final YogaMeasureFunction TEXT_MEASURE_FUNCTION = new YogaMeasureFunction() {
     @Override
-    public void measure(CSSNode node, float width, @NonNull MeasureOutput measureOutput) {
-      WXTextDomObject textDomObject = (WXTextDomObject) node;
-      if (CSSConstants.isUndefined(width)) {
-        width = node.cssstyle.maxWidth;
-      }
+    public long measure(YogaNode yogaNode, float width, YogaMeasureMode widthMeasureMode, float height, YogaMeasureMode heightMeasureMode) {
+      WXTextDomObject textDomObject = (WXTextDomObject) yogaNode;
+
       if(textDomObject.getTextWidth(textDomObject.mTextPaint,width,false)>0) {
         textDomObject.layout = textDomObject.createLayout(width, false, null);
         textDomObject.hasBeenMeasured = true;
         textDomObject.previousWidth = textDomObject.layout.getWidth();
-        measureOutput.height = textDomObject.layout.getHeight();
-        measureOutput.width = textDomObject.previousWidth;
+        return YogaMeasureOutput.make(textDomObject.previousWidth,textDomObject.layout.getHeight());
       }else{
-        measureOutput.height = 0;
-        measureOutput.width = 0;
+        return YogaMeasureOutput.make(0,0);
       }
     }
   };
@@ -139,7 +139,7 @@ public class WXTextDomObject extends WXDomObject {
   /**
    * Create an instance of current class, and set {@link #TEXT_MEASURE_FUNCTION} as the
    * measureFunction
-   * @see CSSNode#setMeasureFunction(MeasureFunction)
+   * @see YogaMeasureFunction
    */
   public WXTextDomObject() {
     super();
@@ -163,6 +163,11 @@ public class WXTextDomObject extends WXDomObject {
     spanned = createSpanned(mText);
     super.dirty();
     super.layoutBefore();
+  }
+
+  @Override
+  protected boolean isNecessaryToMarkDirty() {
+    return true;
   }
 
   @Override

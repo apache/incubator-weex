@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.dom.flex.CSSWrap;
 
+@Deprecated
 class CSSWrapConvert {
 
   public static CSSWrap convert(String s) {

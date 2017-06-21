@@ -80,7 +80,7 @@ public class WXRecyclerDomObject extends WXDomObject{
             mColumnWidth = getAttrs().getColumnWidth();
             mColumnGap =  getAttrs().getColumnGap();
 
-            mAvailableWidth = getStyleWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
+            mAvailableWidth = getLayoutWidth()-getPadding().get(Spacing.LEFT)-getPadding().get(Spacing.RIGHT);
             mAvailableWidth = WXViewUtils.getWebPxByWidth(mAvailableWidth,getViewPortWidth());
 
             if (Constants.Value.AUTO == mColumnCount && Constants.Value.AUTO == mColumnWidth) {

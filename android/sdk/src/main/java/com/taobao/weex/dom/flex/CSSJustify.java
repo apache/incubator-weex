@@ -5,6 +5,7 @@
  */
 package com.taobao.weex.dom.flex;
 
+@Deprecated
 public enum CSSJustify {
   FLEX_START,
   CENTER,

@@ -25,6 +25,7 @@ import static com.taobao.weex.dom.flex.CSSLayout.POSITION_TOP;
  * {@link #calculateLayout(CSSLayoutContext)}, {@link #csslayout} will be filled with the results of
  * the csslayout.
  */
+@Deprecated
 public class CSSNode {
 
   // VisibleForTesting

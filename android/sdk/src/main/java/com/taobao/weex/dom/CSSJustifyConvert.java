@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.dom.flex.CSSJustify;
 
+@Deprecated
 class CSSJustifyConvert {
 
   public static CSSJustify convert(String s) {

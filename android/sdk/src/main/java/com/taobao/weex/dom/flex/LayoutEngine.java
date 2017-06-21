@@ -16,6 +16,7 @@ import static com.taobao.weex.dom.flex.CSSLayout.POSITION_TOP;
  * Calculates layouts based on CSS cssstyle. See {@link #layoutNode(CSSLayoutContext, CSSNode,
  * float, CSSDirection)}.
  */
+@Deprecated
 public class LayoutEngine {
 
   private static final int CSS_FLEX_DIRECTION_COLUMN =

@@ -8,6 +8,7 @@ package com.taobao.weex.dom.flex;
 /**
  * POJO to hold the output of the measure function.
  */
+@Deprecated
 public class MeasureOutput {
 
   public float width;

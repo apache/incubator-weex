@@ -5,6 +5,7 @@
  */
 package com.taobao.weex.dom.flex;
 
+@Deprecated
 public enum CSSDirection {
   INHERIT,
   LTR,

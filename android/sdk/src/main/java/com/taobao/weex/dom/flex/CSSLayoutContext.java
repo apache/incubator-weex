@@ -12,6 +12,7 @@ package com.taobao.weex.dom.flex;
  * be used when {@link CSSNode#calculateLayout} is called concurrently on
  * different node hierarchies.
  */
+@Deprecated
 public class CSSLayoutContext {
 
   /*package*/ final MeasureOutput measureOutput = new MeasureOutput();

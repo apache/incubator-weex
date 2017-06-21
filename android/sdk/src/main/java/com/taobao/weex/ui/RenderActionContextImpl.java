@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.dom.RenderActionContext;
@@ -74,7 +75,7 @@ class RenderActionContextImpl implements RenderActionContext {
   /**
    * set layout information of View
    */
-  void setLayout(String ref, WXDomObject domObject) {
+  void setLayout(String ref, ImmutableDomObject domObject) {
     WXComponent component = mRegistry.get(ref);
     if (component == null) {
       return;

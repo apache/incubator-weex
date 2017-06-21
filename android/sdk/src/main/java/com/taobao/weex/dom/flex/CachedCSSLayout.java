@@ -10,6 +10,7 @@ package com.taobao.weex.dom.flex;
  * {@link #requestedWidth} and {@link #requestedHeight} are the width and height the parent set on
  * this node before calling layout visited us.
  */
+@Deprecated
 public class CachedCSSLayout extends CSSLayout {
 
   public float requestedWidth = CSSConstants.UNDEFINED;

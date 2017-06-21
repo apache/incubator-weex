@@ -35,11 +35,11 @@ subprojects {
     ext {
         compileSdkVersion=23
         buildToolsVersion="23.0.3"
-        minSdkVersion=14
         appMinSdkVersion=15
         targetSdkVersion=23
         supportLibVersion="23.4.0"
         fastjsonLibVersion="1.1.46.android"
+        yogaLibVersion="1.5.1"
     }
 }
 

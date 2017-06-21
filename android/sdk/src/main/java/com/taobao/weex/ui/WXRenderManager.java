@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
@@ -118,7 +119,7 @@ public class WXRenderManager {
     mRegistries.put(instance.getInstanceId(), new RenderActionContextImpl(instance));
   }
 
-  public void setLayout(String instanceId, String ref, WXDomObject domObject) {
+  public void setLayout(String instanceId, String ref, ImmutableDomObject domObject) {
     RenderActionContextImpl statement = mRegistries.get(instanceId);
     if (statement == null) {
       return;

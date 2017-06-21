@@ -25,10 +25,12 @@ import android.support.v4.util.ArrayMap;
 import android.text.Layout;
 import android.text.TextUtils;
 
+import com.facebook.yoga.YogaAlign;
+import com.facebook.yoga.YogaFlexDirection;
+import com.facebook.yoga.YogaJustify;
+import com.facebook.yoga.YogaPositionType;
+import com.facebook.yoga.YogaWrap;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSAlign;
-import com.taobao.weex.dom.flex.CSSFlexDirection;
-import com.taobao.weex.dom.flex.CSSJustify;
 import com.taobao.weex.dom.flex.CSSPositionType;
 import com.taobao.weex.dom.flex.CSSWrap;
 import com.taobao.weex.ui.component.WXText;
@@ -204,48 +206,48 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   /*
    * flexbox
    **/
-  public CSSAlign getAlignItems() {
+  public YogaAlign getAlignItems() {
     Object alignItems = get(Constants.Name.ALIGN_ITEMS);
     if (alignItems == null) {
-      return CSSAlign.STRETCH;
+      return YogaAlign.STRETCH;
     }
-    return CSSAlignConvert.convert2AlignItems(alignItems.toString().trim());
+    return YogaUtility.alignItems(alignItems.toString().trim());
   }
 
-  public CSSAlign getAlignSelf() {
+  public YogaAlign getAlignSelf() {
     Object alignSelf = get(Constants.Name.ALIGN_SELF);
     if (alignSelf == null) {
-      return CSSAlign.AUTO;
+      return YogaAlign.AUTO;
     }
-    return CSSAlignConvert.convert2AlignSelf(alignSelf.toString().trim());
+    return YogaUtility.alignSelf(alignSelf.toString().trim());
   }
 
   public float getFlex() {
     return WXUtils.getFloat(get(Constants.Name.FLEX));
   }
 
-  public CSSFlexDirection getFlexDirection() {
+  public YogaFlexDirection getFlexDirection() {
     Object flexDirection = get(Constants.Name.FLEX_DIRECTION);
     if (flexDirection == null) {
-      return CSSFlexDirection.COLUMN;
+      return YogaFlexDirection.COLUMN;
     }
-    return CSSFlexDirectionConvert.convert(flexDirection.toString().trim());
+    return YogaUtility.flexDirection(flexDirection.toString().trim());
   }
 
-  public CSSJustify getJustifyContent() {
+  public YogaJustify getJustifyContent() {
     Object justifyContent = get(Constants.Name.JUSTIFY_CONTENT);
     if (justifyContent == null) {
-      return CSSJustify.FLEX_START;
+      return YogaJustify.FLEX_START;
     }
-    return CSSJustifyConvert.convert(justifyContent.toString().trim());
+    return YogaUtility.justify(justifyContent.toString().trim());
   }
 
-  public CSSWrap getCSSWrap() {
+  public YogaWrap getCSSWrap() {
     Object cssWrap = get(Constants.Name.FLEX_WRAP);
     if (cssWrap == null) {
-      return CSSWrap.NOWRAP;
+      return YogaWrap.NO_WRAP;
     }
-    return CSSWrapConvert.convert(cssWrap.toString().trim());
+    return YogaUtility.wrap(cssWrap.toString().trim());
   }
 
   /*
@@ -551,12 +553,12 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   /*
    * position
    **/
-  public CSSPositionType getPosition() {
+  public YogaPositionType getPosition() {
     Object position = get(Constants.Name.POSITION);
     if (position == null) {
-      return CSSPositionType.RELATIVE;
+      return YogaPositionType.RELATIVE;
     }
-    return CSSPositionTypeConvert.convert(position.toString().trim());
+    return YogaUtility.positionType(position.toString().trim());
   }
 
   public boolean isSticky() {

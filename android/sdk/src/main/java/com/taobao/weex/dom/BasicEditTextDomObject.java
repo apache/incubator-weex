@@ -19,6 +19,11 @@
 package com.taobao.weex.dom;
 
 import android.text.TextPaint;
+
+import com.facebook.yoga.YogaMeasureFunction;
+import com.facebook.yoga.YogaMeasureMode;
+import com.facebook.yoga.YogaMeasureOutput;
+import com.facebook.yoga.YogaNode;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
@@ -43,14 +48,10 @@ public class BasicEditTextDomObject extends WXDomObject {
   public BasicEditTextDomObject() {
     super();
     mPaint.setTextSize(WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,getViewPortWidth()));
-    setMeasureFunction(new MeasureFunction() {
+    setMeasureFunction(new  YogaMeasureFunction() {
       @Override
-      public void measure(CSSNode node, float width, MeasureOutput measureOutput) {
-        if (CSSConstants.isUndefined(width)) {
-          width = node.cssstyle.maxWidth;
-        }
-        measureOutput.height = getMeasureHeight();
-        measureOutput.width = width;
+      public long measure(YogaNode yogaNode, float width, YogaMeasureMode yogaMeasureMode, float v1, YogaMeasureMode yogaMeasureMode1) {
+        return YogaMeasureOutput.make(width,getMeasureHeight());
       }
     });
   }

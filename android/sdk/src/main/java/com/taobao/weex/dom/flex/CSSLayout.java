@@ -11,6 +11,7 @@ import java.util.Arrays;
  * Where the output of {@link LayoutEngine#layoutNode(CSSLayoutContext, CSSNode, float,
  * CSSDirection)} will go in the CSSNode.
  */
+@Deprecated
 public class CSSLayout {
 
   public static final int POSITION_LEFT = 0;

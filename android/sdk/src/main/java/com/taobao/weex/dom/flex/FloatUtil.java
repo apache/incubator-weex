@@ -5,6 +5,7 @@
  */
 package com.taobao.weex.dom.flex;
 
+@Deprecated
 public class FloatUtil {
 
   private static final float EPSILON = .00001f;

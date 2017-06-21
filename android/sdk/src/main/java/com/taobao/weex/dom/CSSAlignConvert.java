@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.dom.flex.CSSAlign;
 
+@Deprecated
 final class CSSAlignConvert {
 
   public static CSSAlign convert2AlignItems(String s) {

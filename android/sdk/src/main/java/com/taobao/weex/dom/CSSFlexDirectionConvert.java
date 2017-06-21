@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.dom.flex.CSSFlexDirection;
 
+@Deprecated
 class CSSFlexDirectionConvert {
 
   public static CSSFlexDirection convert(String s) {

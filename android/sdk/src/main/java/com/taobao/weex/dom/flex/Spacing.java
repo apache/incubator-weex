@@ -14,6 +14,7 @@ import java.util.Arrays;
  * properly implement interactions and updates for properties like margin, marginLeft, and
  * marginHorizontal.
  */
+@Deprecated
 public class Spacing /**implements Cloneable**/
 {
 

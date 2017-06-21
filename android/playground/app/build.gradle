@@ -66,13 +66,16 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile "com.android.support:support-annotations:${project.supportLibVersion}"
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.google.code.findbugs'
+    })
     androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'design'
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'recyclerview-v7'
+        exclude group: 'com.google.code.findbugs'
     })
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.squareup.picasso:picasso:2.5.2'
@@ -102,6 +105,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:${project.supportLibVersion}"
     compile "com.android.support:design:${project.supportLibVersion}"
     compile "com.android.support:support-annotations:${project.supportLibVersion}"
+    compile "com.facebook.yoga:yoga:${project.yogaLibVersion}"
     compile 'com.jakewharton.scalpel:scalpel:1.1.2'
     compile 'com.taobao.android.weex_inspection:urlconnection_interceptor:1.0.0'
     compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
