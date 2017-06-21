@@ -65,7 +65,7 @@
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
 {
     WXAssert(name && clazz, @"Fail to register the module, please check if the parameters are correct ！");
-    if (!clazz || name) {
+    if (!clazz || !name) {
         return;
     }
     NSString *moduleName = [WXModuleFactory registerModule:name withClass:clazz];
