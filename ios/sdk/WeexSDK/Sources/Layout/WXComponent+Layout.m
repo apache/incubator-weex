@@ -148,7 +148,6 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
-            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }

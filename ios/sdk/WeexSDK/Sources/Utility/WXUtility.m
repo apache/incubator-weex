@@ -861,10 +861,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
 
 + (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type
 {
-    NSString *typeStr = @"defalut";
+    NSString *typeStr = @"default";
     switch (type) {
         case UIReturnKeyDefault:
-            typeStr = @"defalut";
+            typeStr = @"default";
             break;
         case UIReturnKeyGo:
             typeStr = @"go";

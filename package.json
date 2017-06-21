@@ -73,7 +73,7 @@
     "test:cover": "babel-istanbul cover --report text node_modules/mocha/bin/_mocha -- --require reify --reporter dot html5/test/unit/*/*.js html5/test/unit/*/*/*.js",
     "test:e2e": "npm run build:browser && node html5/test/e2e/runner.js",
     "serve": "serve ./ -p 12580",
-    "serve:ui-test": "serve ./ -p 12581",
+    "serve:no-port": "serve ./",
     "clean:examples": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mexamples\\033[0m\" && rm -vrf examples/build/*",
     "clean:test": "echo \"\\033[36;1m[Clean]\\033[0m \\033[33mtest\\033[0m\" && rm -vrf test/build/*",
     "clean": "npm run clean:examples && npm run clean:test",
