@@ -67,7 +67,7 @@ On Android Platform , Weex code is executed in [weex_v8core](https://github.com/
   
      Add the following line to your Podfile:
 	 ```
-	 	 pod 'WeexSDK'
+	   pod 'WeexSDK'
 	 ```
     run `pod install`
     
