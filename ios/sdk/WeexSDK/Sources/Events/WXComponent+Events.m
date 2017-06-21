@@ -272,7 +272,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     if (_tapGesture) {
         _tapGesture.delegate = nil;
         if ([self.view.gestureRecognizers containsObject:_tapGesture]) {
-            [_view removeGestureRecognizer:_tapGesture];
+            [self.view removeGestureRecognizer:_tapGesture];
         }
         _tapGesture = nil;
     }
