@@ -238,7 +238,7 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
     
     UIBarButtonItem* doneBtn ;
     if (self.confirmTitle.length >0) {
-        doneBtn = [[UIBarButtonItem alloc] initWithTitle:self.confirmTitle style:UIBarButtonItemStyleBordered target:self action:@selector(done:)];
+        doneBtn = [[UIBarButtonItem alloc] initWithTitle:self.confirmTitle style:UIBarButtonItemStylePlain target:self action:@selector(done:)];
     }else {
        doneBtn = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
     }
