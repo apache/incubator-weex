@@ -181,10 +181,10 @@ function processStyle (vm) {
   const style = extractComponentStyle(vm)
   const color = style.color
   const rgb = color && getRgb(color)
-  if (!rgb) {
-    return
+  if (rgb) {
+    setKeyframeColor(vm, rgb)
   }
-  setKeyframeColor(vm, rgb)
+  return style
 }
 
 export default {
