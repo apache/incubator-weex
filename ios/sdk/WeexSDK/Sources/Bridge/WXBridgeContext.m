@@ -20,7 +20,6 @@
 #import "WXBridgeContext.h"
 #import "WXBridgeProtocol.h"
 #import "WXJSCoreBridge.h"
-#import "WXDebugLoggerBridge.h"
 #import "WXLog.h"
 #import "WXUtility.h"
 #import "WXModuleFactory.h"
@@ -52,7 +51,7 @@ _Pragma("clang diagnostic pop") \
 @interface WXBridgeContext ()
 
 @property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
-@property (nonatomic, strong) WXDebugLoggerBridge *devToolSocketBridge;
+@property (nonatomic, strong) id<WXBridgeProtocol> devToolSocketBridge;
 @property (nonatomic, assign) BOOL  debugJS;
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
@@ -589,7 +588,7 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToWebSocket:(NSURL *)url
 {
-    _devToolSocketBridge = [[WXDebugLoggerBridge alloc] initWithURL:url];
+    _devToolSocketBridge = [[NSClassFromString(@"WXDebugLoggerBridge") alloc] initWithURL:url];
 }
 
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message
