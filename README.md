@@ -64,13 +64,16 @@ On Android Platform , Weex code is executed in [weex_v8core](https://github.com/
 * integrate to your application
 
   - **[CocoaPods](https://cocoapods.org)**
-    Add the following line to your Podfile:
+  
+     Add the following line to your Podfile:
 	 ```
 	 	 pod 'WeexSDK'
 	 ```
     run `pod install`
+    
   - **[Carthage](https://github.com/carthage/carthage)**
-	 Add the following line to your Cartfile:
+  
+	  Add the following line to your Cartfile:
 	 ```
 	   github "apache/incubator-weex"
 	 ```
