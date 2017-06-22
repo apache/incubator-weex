@@ -26,9 +26,6 @@ export default (function () {
   let instance = null
   const registerListeners = ['onopen', 'onmessage', 'onerror', 'onclose']
   const ws = {
-    hasOwnProperty: function (e) {
-      return true
-    },
     WebSocket: function (url, protocol) {
       if (!url) {
         return
