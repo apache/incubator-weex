@@ -352,7 +352,7 @@ do {\
     if (!_ctAttributedString) {
         _ctAttributedString = [self buildCTAttributeString];
     }
-    return _ctAttributedString;
+    return [_ctAttributedString mutableCopy];
 }
 
 - (CTFramesetterRef)ctFramesetterRef
