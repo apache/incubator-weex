@@ -25,13 +25,6 @@ import listMixin from './listMixin'
 export default {
   name: 'list',
   mixins: [scrollable, listMixin],
-  props: {
-    loadmoreoffset: {
-      type: [String, Number],
-      default: 0
-    }
-  },
-
   computed: {
     wrapperClass () {
       const classArray = ['weex-list', 'weex-list-wrapper', 'weex-ct']
@@ -42,9 +35,6 @@ export default {
   },
 
   methods: {
-    resetLoadmore () {
-      this._availableToFireLoadmore = true
-    },
     createChildren (h) {
       const slots = this.$slots.default || []
       this._cells = slots.filter(vnode => {

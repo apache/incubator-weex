@@ -31,15 +31,6 @@ export default {
       validator (value) {
         return ['horizontal', 'vertical'].indexOf(value) !== -1
       }
-    },
-    loadmoreoffset: {
-      type: [String, Number],
-      default: 0
-    },
-    // TODO: support loadmore retry
-    loadmoreretry: {
-      type: [String, Number],
-      default: 0
     }
   },
 
@@ -69,12 +60,6 @@ export default {
           staticClass: 'weex-scroller-inner weex-ct'
         }, this._cells)
       ]
-    },
-    scrollTo (vnode) {
-      if (vnode && vnode.$el) {
-        // TODO: add animation
-        this.$el.scrollTop = vnode.$el.offsetTop
-      }
     }
   },
 

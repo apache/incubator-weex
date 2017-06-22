@@ -70,7 +70,7 @@ export default {
       on: createEventMap(this),
       ref: 'header',
       staticClass: 'weex-header weex-ct',
-      class: { sticky: this.sticky, iossticky: this.supportSticky },
+      class: { 'weex-sticky': this.sticky, 'weex-ios-sticky': this.supportSticky },
       staticStyle: extractComponentStyle(this)
     }, this.$slots.default)
   }
