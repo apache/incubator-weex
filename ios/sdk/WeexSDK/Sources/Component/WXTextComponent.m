@@ -158,7 +158,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
-    
     if ([_useCoreTextAttr isEqualToString:@"true"]) {
         return YES;
     }
