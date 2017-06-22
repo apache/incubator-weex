@@ -287,3 +287,19 @@ export function getRgb (color: string) {
     }
   }
 }
+
+/**
+ * get style sheet with owner node's id
+ * @param {string} id owner node id.
+ */
+export function getStyleSheetById (id?: string) {
+  if (!id) { return }
+  const styleSheets = document.styleSheets
+  const len = styleSheets.length
+  for (let i = 0; i < len; i++) {
+    const styleSheet = styleSheets[i]
+    if (styleSheet.ownerNode.id === id) {
+      return styleSheet
+    }
+  }
+}
