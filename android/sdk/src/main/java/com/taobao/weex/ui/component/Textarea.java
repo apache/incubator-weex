@@ -37,6 +37,12 @@ public class Textarea extends AbstractEditComponent {
   }
 
   @Override
+  protected void onHostViewInitialized(WXEditText host) {
+    host.setAllowDisableMovement(false);
+    super.onHostViewInitialized(host);
+  }
+
+  @Override
   protected void appleStyleAfterCreated(WXEditText editText) {
     super.appleStyleAfterCreated(editText);
     String rowsStr = (String) getDomObject().getStyles().get(Constants.Name.ROWS);

@@ -24,7 +24,8 @@ import {
 
 import {
   normalizeStyle,
-  camelizeKeys
+  camelizeKeys,
+  extend
 } from '../utils'
 
 export default {
@@ -34,8 +35,12 @@ export default {
      * Weex.on will create a Vue instance. In this case we'll ignore it, since
      * it's not sure whether the scoped style has already attached to head or not.
      */
-    if (!weex.styleMap && this.$options && this.$options._scopeId) {
-      weex.styleMap = getHeadStyleMap()
+    if (this === this.$root && this.$options && !this._styleMapGot) {
+      if (!weex.styleMap) {
+        weex.styleMap = {}
+      }
+      this._styleMapGot = true
+      extend(weex.styleMap, getHeadStyleMap())
     }
   },
 
