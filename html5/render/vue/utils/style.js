@@ -254,3 +254,36 @@ export function copyTransform (from: HTMLElement, to: HTMLElement, key: string |
   to.style.webkitTransform = str
   to.style.transform = str
 }
+
+/**
+ * get color's r, g, b value.
+ * @param {string} color support all kinds of value of color.
+ */
+export function getRgb (color: string) {
+  const haxReg = /#([\da-fA-F]{2})([\da-fA-F]{2})([\da-fA-F]{2})/
+  const rgbReg = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/
+  const span = document.createElement('span')
+  const body = document.body
+  span.style.cssText = `color: ${color}; width: 0px; height: 0px;`
+  body && body.appendChild(span)
+  color = window.getComputedStyle(span).color + ''
+  body && body.removeChild(span)
+
+  let match
+  match = color.match(haxReg)
+  if (match) {
+    return {
+      r: parseInt(match[1], 16),
+      g: parseInt(match[2], 16),
+      b: parseInt(match[3], 16)
+    }
+  }
+  match = color.match(rgbReg)
+  if (match) {
+    return {
+      r: parseInt(match[1]),
+      g: parseInt(match[2]),
+      b: parseInt(match[3])
+    }
+  }
+}
