@@ -210,18 +210,20 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+          if (mIgnoreNextOnInputEvent) {
+            mIgnoreNextOnInputEvent = false;
+          }
+
           if (mBeforeText.equals(s.toString())) {
             return;
           }
 
           mBeforeText = s.toString();
 
-          if (mIgnoreNextOnInputEvent) {
-            mIgnoreNextOnInputEvent = false;
-            return;
+          if (!mIgnoreNextOnInputEvent) {
+            fireEvent(Constants.Event.INPUT, s.toString());
           }
-
-          fireEvent(Constants.Event.INPUT, s.toString());
         }
 
         @Override
@@ -331,7 +333,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         Integer maxLength = WXUtils.getInteger(param, null);
         if (maxLength != null)
           setMaxLength(maxLength);
-          return true;
+        return true;
       case Constants.Name.MAX:
         setMax(String.valueOf(param));
         return true;
