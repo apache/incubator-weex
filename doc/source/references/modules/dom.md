@@ -271,6 +271,6 @@ domModule.addRule('fontFace', {
 });
 
 ```
-[try it](http://dotwe.org/vue/d96b6f89aadd1d628111c16a30e80482)
+[try it](http://dotwe.org/vue/6ece072d0abd9a9e5718eb26bd5719f8)
 
 
