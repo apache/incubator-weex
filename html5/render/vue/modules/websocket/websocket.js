@@ -19,35 +19,36 @@
 /**
  * websocket module
  */
-export default (function() {
+export default (function () {
   const registerListeners = ['onopen', 'onmessage', 'onerror', 'onclose']
   const ws = {
     INSTANCE: null,
-    WebSocket: function(url, protocol) {
+    WebSocket: function (url, protocol) {
       if (!url) {
         return
       }
       if (!protocol) {
         ws.INSTANCE = new WebSocket(url)
-      } else {
+      }
+      else {
         ws.INSTANCE = new WebSocket(url, protocol)
       }
       return ws.INSTANCE
     },
-    send: function(messages) {
+    send: function (messages) {
       ws.INSTANCE && ws.INSTANCE.send(messages)
     },
-    close: function() {
+    close: function () {
       ws.INSTANCE && ws.INSTANCE.close()
     }
   }
   for (const i in registerListeners) {
     if (registerListeners.hasOwnProperty(i)) {
       Object.defineProperty(ws, registerListeners[i], {
-        get: function() {
+        get: function () {
           return ws.INSTANCE && ws.INSTANCE[registerListeners[i]]
         },
-        set: function(fn) {
+        set: function (fn) {
           if (ws.INSTANCE) {
             ws.INSTANCE[registerListeners[i]] = fn
           }
