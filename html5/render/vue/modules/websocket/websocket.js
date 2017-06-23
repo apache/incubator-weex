@@ -16,44 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 /**
  * websocket module
  */
-// let instance = null
-
-export default (function () {
-  let instance = null
+export default (function() {
   const registerListeners = ['onopen', 'onmessage', 'onerror', 'onclose']
   const ws = {
-    WebSocket: function (url, protocol) {
+    INSTANCE: null,
+    WebSocket: function(url, protocol) {
       if (!url) {
         return
       }
       if (!protocol) {
-        instance = new WebSocket(url)
+        ws.INSTANCE = new WebSocket(url)
+      } else {
+        ws.INSTANCE = new WebSocket(url, protocol)
       }
-      else {
-        instance = new WebSocket(url, protocol)
-      }
-      return instance
+      return ws.INSTANCE
     },
-    send: function (messages) {
-      instance && instance.send(messages)
+    send: function(messages) {
+      ws.INSTANCE && ws.INSTANCE.send(messages)
     },
-    close: function () {
-      instance && instance.close()
+    close: function() {
+      ws.INSTANCE && ws.INSTANCE.close()
     }
   }
   for (const i in registerListeners) {
     if (registerListeners.hasOwnProperty(i)) {
       Object.defineProperty(ws, registerListeners[i], {
-        get: function () {
-          return instance && instance[registerListeners[i]]
+        get: function() {
+          return ws.INSTANCE && ws.INSTANCE[registerListeners[i]]
         },
-        set: function (fn) {
-          if (instance) {
-            instance[registerListeners[i]] = fn
+        set: function(fn) {
+          if (ws.INSTANCE) {
+            ws.INSTANCE[registerListeners[i]] = fn
           }
         }
       })
