@@ -125,7 +125,7 @@ module.exports = {
         return ( isRunInCI ? 60 : 10 ) * 60 * 1000;
     },
     getGETActionWaitTimeMills:function(){
-        return (isRunInCI ? 120 : 5 ) * 1000;
+        return (isRunInCI ? 5 : 1 ) * 1000;
     },
     diffImage, 
     createDriver:function(wd){
