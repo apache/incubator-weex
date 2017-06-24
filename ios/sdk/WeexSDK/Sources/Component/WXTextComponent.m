@@ -118,7 +118,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     BOOL _truncationLine; // support trunk tail
     
     BOOL _needsRemoveObserver;
-    NSMutableAttributedString * _ctAttributedString;
+    NSAttributedString * _ctAttributedString;
     CTFramesetterRef _ctframeSetter;
 }
 
@@ -346,12 +346,12 @@ do {\
     return _text;
 }
 
-- (NSMutableAttributedString *)ctAttributedString
+- (NSAttributedString *)ctAttributedString
 {
     if (!_ctAttributedString) {
-        _ctAttributedString = [self buildCTAttributeString];
+        _ctAttributedString = [[self buildCTAttributeString] copy];
     }
-    return [_ctAttributedString mutableCopy];
+    return [_ctAttributedString copy];
 }
 
 - (CTFramesetterRef)ctFramesetterRef
@@ -379,7 +379,7 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@", [self text] ?: @""];
+    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
@@ -632,7 +632,7 @@ do {\
         CGContextTranslateCTM(context, 0, textFrame.size.height);
         CGContextScaleCTM(context, 1.0, -1.0);
         
-        NSMutableAttributedString * attributedStringCopy = [self ctAttributedString];
+        NSAttributedString * attributedStringCopy = [self ctAttributedString];
         //add path
         CGPathRef cgPath = NULL;
         cgPath = CGPathCreateWithRect(textFrame, NULL);
@@ -787,7 +787,7 @@ do {\
         }
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
-        CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
+        CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)[mutableLastLineText copy]);
         if (ctLastLineExtend) {
             CGRect cgPathRect = CGRectZero;
             CGFloat truncatedWidth = 0;
