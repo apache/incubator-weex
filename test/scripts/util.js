@@ -194,7 +194,7 @@ module.exports = {
             return driver.status()
         else{
             driver._isInit = true;
-            return driver.initDriver()
+            return driver.initDriver().sleep(20000)
         }
     },
     quit:function(driver){
