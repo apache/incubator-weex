@@ -48,7 +48,7 @@ describe('@ignore-android textarea maxlength vue test2 ', function () {
       .elementById('status')
       .text()
       .then((text)=>{
-        console.log(text())
+        console.log(text)
         assert.equal(text,'1234')
      })
   })
