@@ -39,7 +39,7 @@ export function setNativeConsole () {
 
   /* istanbul ignore next */
   if (
-    typeof global.console === 'undefined' || // Android
+    // typeof global.console === 'undefined' || // Android // remove android hack
     (global.WXEnvironment && global.WXEnvironment.platform === 'iOS') // iOS
   ) {
     global.console = {
