@@ -24,7 +24,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
 import com.taobao.weex.utils.WXResourceUtils;
 
 import org.junit.Before;

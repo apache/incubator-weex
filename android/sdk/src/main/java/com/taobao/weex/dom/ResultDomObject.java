@@ -20,8 +20,6 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.dom.flex.Spacing;
-
 /**
  * Created by sospartan on 22/06/2017.
  */

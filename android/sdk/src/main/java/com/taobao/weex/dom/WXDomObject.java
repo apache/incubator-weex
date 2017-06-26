@@ -32,9 +32,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXValidateProcessor;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSLayoutContext;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
@@ -266,7 +263,7 @@ public class WXDomObject extends YogaNode implements Cloneable,ImmutableDomObjec
 
   /**
    * Tell whether this object need to be updated. This is usually called when
-   * {@link CSSNode#calculateLayout(CSSLayoutContext)} finishes and new layout has been
+   * {@link WXDomObject} finishes and new layout has been
    * calculated. This method is a simple wrapper method for {@link #hasNewLayout()} and
    * {@link #isDirty()}.
    * @return true for need update since last update.

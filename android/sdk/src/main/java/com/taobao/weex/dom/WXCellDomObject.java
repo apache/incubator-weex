@@ -18,12 +18,7 @@
  */
 package com.taobao.weex.dom;
 
-import com.facebook.yoga.YogaMeasureFunction;
-import com.facebook.yoga.YogaMeasureMode;
-import com.facebook.yoga.YogaMeasureOutput;
 import com.facebook.yoga.YogaNode;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
 

@@ -20,7 +20,6 @@ package com.taobao.weex.dom;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;

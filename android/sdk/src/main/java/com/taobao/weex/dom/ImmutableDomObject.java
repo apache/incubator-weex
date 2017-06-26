@@ -20,10 +20,6 @@ package com.taobao.weex.dom;
 
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.dom.flex.Spacing;
-
-import static com.taobao.weex.dom.WXDomObject.DESTROYED;
-
 /**
  * Created by sospartan on 25/10/2016.
  */

@@ -40,10 +40,6 @@ import com.facebook.yoga.YogaMeasureOutput;
 import com.facebook.yoga.YogaNode;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSConstants;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.FloatUtil;
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXDomUtils;
@@ -174,7 +170,7 @@ public class WXTextDomObject extends WXDomObject {
   public void layoutAfter() {
     if (hasBeenMeasured) {
       if (layout != null &&
-          !FloatUtil.floatsEqual(WXDomUtils.getContentWidth(this), previousWidth)) {
+          !LayoutUtility.floatsEqual(WXDomUtils.getContentWidth(this), previousWidth)) {
         recalculateLayout();
       }
     } else {
@@ -304,7 +300,7 @@ public class WXTextDomObject extends WXDomObject {
     float textWidth;
     textWidth = getTextWidth(mTextPaint, width, forceWidth);
     Layout layout;
-    if (!FloatUtil.floatsEqual(previousWidth, textWidth) || previousLayout == null) {
+    if (!LayoutUtility.floatsEqual(previousWidth, textWidth) || previousLayout == null) {
       layout = new StaticLayout(spanned, mTextPaint, (int) Math.ceil(textWidth),
                                 Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
     } else {
@@ -363,7 +359,7 @@ public class WXTextDomObject extends WXDomObject {
       textWidth = outerWidth;
     } else {
       float desiredWidth = Layout.getDesiredWidth(spanned, textPaint);
-      if (CSSConstants.isUndefined(outerWidth) || desiredWidth < outerWidth) {
+      if (LayoutUtility.isUndefined(outerWidth) || desiredWidth < outerWidth) {
         textWidth = desiredWidth;
       } else {
         textWidth = outerWidth;

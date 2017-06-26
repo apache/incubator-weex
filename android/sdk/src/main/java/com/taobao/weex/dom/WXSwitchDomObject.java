@@ -25,8 +25,6 @@ import com.facebook.yoga.YogaMeasureFunction;
 import com.facebook.yoga.YogaMeasureMode;
 import com.facebook.yoga.YogaMeasureOutput;
 import com.facebook.yoga.YogaNode;
-import com.taobao.weex.dom.flex.CSSNode;
-import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.view.WXSwitchView;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -39,7 +37,7 @@ public class WXSwitchDomObject extends WXDomObject {
         Context context=((WXDomObject) yogaNode).getDomContext().getUIContext();
         WXSwitchView wxSwitchView = new WXSwitchView(context);
         int widthSpec, heightSpec;
-        heightSpec = MeasureSpec.makeMeasureSpec((int)height, YogaUtility.viewMeasureSpec(widthMeasureMode));
+        heightSpec = MeasureSpec.makeMeasureSpec((int)height, LayoutUtility.viewMeasureSpec(widthMeasureMode));
         if (Float.isNaN(width)) {
           widthSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         } else {

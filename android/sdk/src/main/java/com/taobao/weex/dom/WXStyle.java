@@ -31,8 +31,6 @@ import com.facebook.yoga.YogaJustify;
 import com.facebook.yoga.YogaPositionType;
 import com.facebook.yoga.YogaWrap;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSPositionType;
-import com.taobao.weex.dom.flex.CSSWrap;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXTextDecoration;
 import com.taobao.weex.utils.WXUtils;
@@ -211,7 +209,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (alignItems == null) {
       return YogaAlign.STRETCH;
     }
-    return YogaUtility.alignItems(alignItems.toString().trim());
+    return LayoutUtility.alignItems(alignItems.toString().trim());
   }
 
   public YogaAlign getAlignSelf() {
@@ -219,7 +217,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (alignSelf == null) {
       return YogaAlign.AUTO;
     }
-    return YogaUtility.alignSelf(alignSelf.toString().trim());
+    return LayoutUtility.alignSelf(alignSelf.toString().trim());
   }
 
   public float getFlex() {
@@ -231,7 +229,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (flexDirection == null) {
       return YogaFlexDirection.COLUMN;
     }
-    return YogaUtility.flexDirection(flexDirection.toString().trim());
+    return LayoutUtility.flexDirection(flexDirection.toString().trim());
   }
 
   public YogaJustify getJustifyContent() {
@@ -239,7 +237,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (justifyContent == null) {
       return YogaJustify.FLEX_START;
     }
-    return YogaUtility.justify(justifyContent.toString().trim());
+    return LayoutUtility.justify(justifyContent.toString().trim());
   }
 
   public YogaWrap getCSSWrap() {
@@ -247,7 +245,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (cssWrap == null) {
       return YogaWrap.NO_WRAP;
     }
-    return YogaUtility.wrap(cssWrap.toString().trim());
+    return LayoutUtility.wrap(cssWrap.toString().trim());
   }
 
   /*
@@ -558,7 +556,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (position == null) {
       return YogaPositionType.RELATIVE;
     }
-    return YogaUtility.positionType(position.toString().trim());
+    return LayoutUtility.positionType(position.toString().trim());
   }
 
   public boolean isSticky() {

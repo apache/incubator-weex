@@ -27,16 +27,20 @@ import com.facebook.yoga.YogaJustify;
 import com.facebook.yoga.YogaMeasureMode;
 import com.facebook.yoga.YogaPositionType;
 import com.facebook.yoga.YogaWrap;
-import com.taobao.weex.dom.flex.CSSFlexDirection;
-import com.taobao.weex.dom.flex.CSSJustify;
-import com.taobao.weex.dom.flex.CSSPositionType;
-import com.taobao.weex.dom.flex.CSSWrap;
+
 
 /**
  * Created by sospartan on 21/06/2017.
  */
 
-class YogaUtility {
+public class LayoutUtility {
+  public static final float UNDEFINED = Float.NaN;
+  private static final float EPSILON = .00001f;
+
+  public static boolean isUndefined(float value) {
+    return Float.compare(value, UNDEFINED) == 0;
+  }
+
   public static YogaAlign alignItems(String s) {
     YogaAlign align = YogaAlign.STRETCH;
     if (TextUtils.isEmpty(s)) {
@@ -132,5 +136,12 @@ class YogaUtility {
     } else {
       return View.MeasureSpec.UNSPECIFIED;
     }
+  }
+
+  public static boolean floatsEqual(float f1, float f2) {
+    if (Float.isNaN(f1) || Float.isNaN(f2)) {
+      return Float.isNaN(f1) && Float.isNaN(f2);
+    }
+    return Math.abs(f2 - f1) < EPSILON;
   }
 }

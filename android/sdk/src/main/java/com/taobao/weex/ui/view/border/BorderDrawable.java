@@ -36,8 +36,8 @@ import android.support.annotation.VisibleForTesting;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-import com.taobao.weex.dom.flex.FloatUtil;
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
+import com.taobao.weex.dom.LayoutUtility;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -178,7 +178,7 @@ public class BorderDrawable extends Drawable {
       mBorderWidth = new SparseArray<>(5);
       mBorderWidth.put(Spacing.ALL, DEFAULT_BORDER_WIDTH);
     }
-    if (!FloatUtil.floatsEqual(getBorderWidth(position), width)) {
+    if (!LayoutUtility.floatsEqual(getBorderWidth(position), width)) {
       BorderUtil.updateSparseArray(mBorderWidth, position, width);
       mBorderWidth.put(position, width);
       mNeedUpdatePath = true;
@@ -195,7 +195,7 @@ public class BorderDrawable extends Drawable {
       mBorderRadius = new SparseArray<>(5);
       mBorderRadius.put(Spacing.ALL, DEFAULT_BORDER_RADIUS);
     }
-    if (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, position), radius)) {
+    if (!LayoutUtility.floatsEqual(getBorderRadius(mBorderRadius, position), radius)) {
       BorderUtil.updateSparseArray(mBorderRadius, position, radius, true);
       mNeedUpdatePath = true;
       invalidateSelf();
@@ -276,10 +276,10 @@ public class BorderDrawable extends Drawable {
 
   public boolean isRounded() {
     return mBorderRadius != null &&
-           (!FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS), 0) ||
-            !FloatUtil.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS), 0));
+           (!LayoutUtility.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_LEFT_RADIUS), 0) ||
+            !LayoutUtility.floatsEqual(getBorderRadius(mBorderRadius, BORDER_TOP_RIGHT_RADIUS), 0) ||
+            !LayoutUtility.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_RIGHT_RADIUS), 0) ||
+            !LayoutUtility.floatsEqual(getBorderRadius(mBorderRadius, BORDER_BOTTOM_LEFT_RADIUS), 0));
   }
 
   public
@@ -397,7 +397,7 @@ public class BorderDrawable extends Drawable {
   }
 
   private void updateFactor(@NonNull List<Float> list, float numerator, float denominator) {
-    if (!FloatUtil.floatsEqual(denominator, 0)) {
+    if (!LayoutUtility.floatsEqual(denominator, 0)) {
       list.add(numerator / denominator);
     }
   }
@@ -435,7 +435,7 @@ public class BorderDrawable extends Drawable {
   }
 
   private void drawOneSide(Canvas canvas, @NonNull BorderEdge borderEdge) {
-    if (!FloatUtil.floatsEqual(0, getBorderWidth(borderEdge.getEdge()))) {
+    if (!LayoutUtility.floatsEqual(0, getBorderWidth(borderEdge.getEdge()))) {
       preparePaint(borderEdge.getEdge());
       borderEdge.drawEdge(canvas, mPaint);
     }

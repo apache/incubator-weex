@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
-import com.taobao.weex.dom.flex.Spacing;
+import com.taobao.weex.dom.Spacing;
 
 class BorderUtil {
 

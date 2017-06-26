@@ -22,7 +22,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.dom.flex.FloatUtil;
+import com.taobao.weex.dom.LayoutUtility;
 
 abstract class BorderCorner {
 
@@ -58,7 +58,7 @@ abstract class BorderCorner {
    * @return true for a rounded outer corner, otherwise false.
    */
   boolean hasOuterCorner() {
-    return getOuterCornerRadius() > 0 && !FloatUtil.floatsEqual(0, getOuterCornerRadius());
+    return getOuterCornerRadius() > 0 && !LayoutUtility.floatsEqual(0, getOuterCornerRadius());
   }
 
   protected float getPreBorderWidth() {
