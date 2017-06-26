@@ -121,6 +121,12 @@ autoprefixer:
   browsers:
     - 'last 5 versions'
 
+# docsearch
+docsearch:
+  enable: true
+  en: weex
+  cn: weex_cn
+
 alias:
   doc/index.html: index.html
   doc/guide.html: guide/index.html
