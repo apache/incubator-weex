@@ -763,6 +763,9 @@
 - (void)removeCellForIndexPath:(NSIndexPath *)indexPath withSections:(NSMutableArray *)sections
 {
     WXSection *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    if (0 == [section.rows count]) {
+        return;
+    }
     WXAssert(section, @"Removing cell at indexPath:%@ has not been inserted to cell list before, sections:%@", indexPath, sections);
     WXAssert(indexPath.row < section.rows.count, @"Removing cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
     [section.rows removeObjectAtIndex:indexPath.row];
