@@ -78,6 +78,9 @@ const weex = {
     if (!weexModules[name]) {
       weexModules[name] = {}
     }
+    if (!!meta && meta.mountType === 'full') {
+      weexModules[name] = module
+    }
     for (const key in module) {
       if (module.hasOwnProperty(key)) {
         weexModules[name][key] = utils.bind(module[key], this)
