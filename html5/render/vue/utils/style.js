@@ -303,3 +303,31 @@ export function getStyleSheetById (id?: string) {
     }
   }
 }
+
+function getChildrenTotalWidth (children) {
+  const len = children.length
+  let total = 0
+  for (let i = 0; i < len; i++) {
+    total += children[i].getBoundingClientRect().width
+  }
+  return total
+}
+/**
+ * get total content width of the element.
+ * @param {HTMLElement} elm
+ */
+export function getRangeWidth (elm: HTMLElement) {
+  const children = elm.children
+  if (!children) {
+    return elm.getBoundingClientRect().width
+  }
+  if (!Range) {
+    return getChildrenTotalWidth(children)
+  }
+  const range = document.createRange()
+  if (!range.selectNodeContents) {
+    return getChildrenTotalWidth(children)
+  }
+  range.selectNodeContents(elm)
+  return range.getBoundingClientRect().width
+}
