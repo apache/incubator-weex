@@ -96,7 +96,7 @@ public class WXAttr implements Map<String, Object>,Cloneable {
 
   public WXImageQuality getImageQuality() {
     Object obj = containsKey(Name.QUALITY) ? get(Name.QUALITY) : get(Name.IMAGE_QUALITY);
-    WXImageQuality imageQuality = WXImageQuality.NONE;
+    WXImageQuality imageQuality = WXImageQuality.AUTO;
     String value;
     if (obj != null && !TextUtils.isEmpty(value = obj.toString())) {
       try {
