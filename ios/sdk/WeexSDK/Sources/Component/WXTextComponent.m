@@ -640,8 +640,12 @@ do {\
         if (_coreTextFrameRef) {
             CFRelease(_coreTextFrameRef);
         }
-        _coreTextFrameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, 0), cgPath, NULL);
+        _coreTextFrameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, attributedStringCopy.length), cgPath, NULL);
         CFArrayRef ctLines = NULL;
+        if (NULL == _coreTextFrameRef) {
+            // try to protect crash from frame is NULL
+            return;
+        }
         ctLines = CTFrameGetLines(_coreTextFrameRef);
         CFIndex lineCount = CFArrayGetCount(ctLines);
         NSMutableArray * mutableLines = [NSMutableArray new];
@@ -853,6 +857,10 @@ do {\
     CGPathRelease(path);
     
     CFArrayRef lines = NULL;
+    if (NULL == frameRef) {
+        //try to protect unexpected crash.
+        return suggestSize;
+    }
     lines = CTFrameGetLines(frameRef);
     CFIndex lineCount = CFArrayGetCount(lines);
     CGFloat ascent = 0;
