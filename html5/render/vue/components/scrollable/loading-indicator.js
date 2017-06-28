@@ -17,7 +17,7 @@
  * under the License.
  */
 import { extractComponentStyle } from '../../core'
-import { getRgb, loopArray } from '../../utils'
+import { getRgb, loopArray, getStyleSheetById } from '../../utils'
 
 const _css = `
 .weex-refresh-indicator,
@@ -112,14 +112,7 @@ function getStyleSheet (spinnerVm) {
   if (spinnerVm._styleSheet) {
     return
   }
-  const styleSheets = document.styleSheets
-  const len = styleSheets.length
-  for (let i = 0; i < len; i++) {
-    if (styleSheets[i].ownerNode.id === 'weex-cmp-loading-indicator') {
-      spinnerVm._styleSheet = styleSheets[i]
-      break
-    }
-  }
+  spinnerVm._styleSheet = getStyleSheetById('weex-cmp-loading-indicator')
 }
 
 function setKeyframeColor (spinnerVm, val) {

@@ -13,5 +13,20 @@
   <%- partial('_partial/after-footer') %>
   <%- js('js/reqwest.js') %>
   <%- js('js/common.js') %>
+  <% if (config.docsearch.enable){ %>    
+    <% index_name = page.path.indexOf('cn/') === 0 ? config.docsearch.cn : config.docsearch.en %>
+    <%- js('js/docsearch.min.js') %>
+    <script type="text/javascript">
+    docsearch({
+      appId: '2BE9FVK6FX',
+      apiKey: '4879a7b2e4f3a664bd3b219340657475',
+      indexName: "<%= index_name %>",
+      inputSelector: '#search-input-header',
+      algoliaOptions: {
+        hitsPerPage: 10
+      }
+    });
+    </script>
+  <% } %>
 </body>
 </html>
