@@ -31,20 +31,20 @@ describe('webSocket module', function() {
     context('should inherit', function() {
       let ws = websocket.WebSocket(TestUrl);
       it('methods', function() {
-        expect(websocket.close, 'to be defined');
-        expect(websocket.send, 'to be defined');
+        expect(websocket, 'should close method to be defined').to.have.property('close');
+        expect(websocket, 'should send method to be defined').to.have.property('send');
       });
       it('attributes', function() {
-        expect(websocket.onerror, 'to be defined');
-        expect(websocket.onmessage, 'to be defined');
-        expect(websocket.onopen, 'to be defined');
-        expect(websocket.onclose, 'to be defined');
-        expect(ws.binaryType, 'to be defined');
-        expect(ws.bufferedAmount, 'to be defined');
-        expect(ws.extensions, 'to be defined');
-        expect(ws.protocol, 'to be defined');
-        expect(ws.readyState, 'to be defined');
-        expect(ws.url, 'to be defined');
+        expect(websocket, 'should onerror to be defined').to.have.property('onerror');
+        expect(websocket, 'should onmessage to be defined').to.have.property('onmessage');
+        expect(websocket, 'should onopen to be defined').to.have.property('onopen');
+        expect(websocket, 'should onclose to be defined').to.have.property('onclose');
+        expect(ws, 'should binaryType to be defined').to.have.property('binaryType');
+        expect(ws, 'should bufferdAmount to be defined').to.have.property('bufferedAmount');
+        expect(ws, 'should extensions to be defined').to.have.property('extensions');
+        expect(ws, 'should protocol to be defined').to.have.property('protocol');
+        expect(ws, 'should readyState to be defined').to.have.property('readyState');
+        expect(ws, 'should url to be defined').to.have.property('url');
       });
  
       it('constants', function() {
@@ -54,7 +54,7 @@ describe('webSocket module', function() {
  
     context('should forward native events', function() {
       let ws;
- 
+      this.timeout(8000)
       beforeEach(function() {
         ws = websocket.WebSocket(TestUrl);
       });
