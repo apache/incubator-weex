@@ -1,9 +1,15 @@
 #!/bin/bash -eu
 set -e
+port="${serport:-12581}"
 
 function startMacacaServer {
     macaca server --verbose &
     while ! nc -z 127.0.0.1 3456; do sleep 5; done
+}
+
+function startWeexServer {
+    echo "local serve at port:$port"
+    while ! nc -z 127.0.0.1 $port; do sleep 5; done
 }
 
 function buildAndroid {
@@ -18,6 +24,7 @@ function buildAndroid {
 function runAndroid {
     buildAndroid
     startMacacaServer
+    startWeexServer
     platform=android ./node_modules/mocha/bin/mocha  $1 -f '@ignore-android' -i --recursive --bail
 }
 
@@ -47,12 +54,14 @@ function runiOS {
     killAll Simulator || echo 'killall failed'
     # ps -ef
     startMacacaServer
+    startWeexServer
     platform=ios ./node_modules/mocha/bin/mocha  $1 -f '@ignore-ios' -i --recursive --bail --verbose
 }
 
 function runWeb {
     echo 'run web'
     startMacacaServer
+    startWeexServer
     browser=chrome ./node_modules/mocha/bin/mocha  $1 -f '@ignore-web' -i --recursive --bail
 }
 

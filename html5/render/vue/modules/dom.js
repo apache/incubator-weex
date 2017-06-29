@@ -17,6 +17,7 @@
  * under the License.
  */
 import { camelToKebab, appendCss, isArray } from '../utils'
+import config from '../config'
 
 function getParentScroller (vnode) {
   if (!vnode) return null
@@ -25,7 +26,7 @@ function getParentScroller (vnode) {
     ? vnode.componentInstance || vnode.context : null
   if (!vm) return null
   const type = vm.$el && vm.$el.getAttribute('weex-type')
-  if (type === 'scroller' || type === 'list') {
+  if (config.scrollableTypes.indexOf(type) > -1) {
     return vm
   }
   return getParentScroller(vm.$parent)
@@ -116,11 +117,22 @@ export default {
       })[scrollDirection]
 
       const ctRect = ct.getBoundingClientRect()
-      const elRect = el.getBoundingClientRect()
+      let elRect = el.getBoundingClientRect()
+
+      /**
+       * if it's a waterfall, and you want to scroll to a header, then just
+       * scroll to the top.
+       */
+      if (scroller
+        && scroller.weexType === 'waterfall'
+        && scroller._headers
+        && scroller._headers.indexOf(vnode.$vnode || vnode) > -1) {
+        // it's in waterfall. just scroll to the top.
+        elRect = ct.firstElementChild.getBoundingClientRect()
+      }
 
       const dir = dSuffix.toLowerCase()
       let offset = (isWindow ? 0 : ct[`scroll${dSuffix}`]) + elRect[dir] - ctRect[dir]
-      // let offset = el[`offset${dSuffix}`]
 
       if (options) {
         offset += options.offset && options.offset * weex.config.env.scale || 0

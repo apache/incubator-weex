@@ -52,14 +52,16 @@ export default {
     const children = this.$children
     const len = children && children.length
     if (children && len > 0) {
-      const indicator = children[len - 1]
-      if (indicator.$options._componentTag === 'indicator'
-        || indicator.$vnode.data.ref === 'indicator') {
-        indicator._watcher.get()
+      for (let i = 0; i < len; i++) {
+        const vm = children[i]
+        if (vm.$options._componentTag === 'indicator'
+          || vm.$vnode.data.ref === 'indicator') {
+          vm._watcher.get()
+          break
+        }
       }
     }
     fireLazyload(this.$el, true)
-    this._preIndex = this._showNodes[0].index
     if (this._preIndex !== this.currentIndex) {
       this._slideTo(this.currentIndex)
     }
@@ -162,6 +164,9 @@ export default {
     },
 
     _slideTo (index, isTouchScroll) {
+      if (this.frameCount <= 0) {
+        return
+      }
       if (!this.infinite || this.infinite === 'false') {
         if (index === -1 || index > (this.frameCount - 1)) {
           this._slideTo(this.currentIndex)

@@ -24,6 +24,7 @@ jsonContent:
   ignore:
     - index.html
     - faq.html
+    - releasenote.html
     - download.html
     - playground.html
     - cn/index.html

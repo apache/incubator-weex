@@ -74,8 +74,8 @@ class UpdateStyleAction implements DOMAction, RenderAction {
     mBorder = domObject.getBorder();
 
     Map<String, Object> animationMap = new ArrayMap<>(2);
-    animationMap.put(WXDomObject.TRANSFORM, mData.remove(WXDomObject.TRANSFORM));
-    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.remove(WXDomObject.TRANSFORM_ORIGIN));
+    animationMap.put(WXDomObject.TRANSFORM, mData.get(WXDomObject.TRANSFORM));
+    animationMap.put(WXDomObject.TRANSFORM_ORIGIN, mData.get(WXDomObject.TRANSFORM_ORIGIN));
 
     context.addAnimationForElement(mRef, animationMap);
 

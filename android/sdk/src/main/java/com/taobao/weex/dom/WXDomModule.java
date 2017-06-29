@@ -92,6 +92,7 @@ public final class WXDomModule extends WXModule {
     if (method == null) {
       return null;
     }
+    WXLogUtils.e("shiwentao  callDomMethod:" + method);
     //TODO：add pooling
     try {
       Action action = Actions.get(method,args);
@@ -99,7 +100,7 @@ public final class WXDomModule extends WXModule {
         WXLogUtils.e("Unknown dom action.");
       }
       if(action instanceof DOMAction){
-        postAction((DOMAction)action, CREATE_BODY.equals(method));
+        postAction((DOMAction)action, CREATE_BODY.equals(method) || ADD_RULE.equals(method));
       }else {
         postAction((RenderAction)action);
       }

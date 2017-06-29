@@ -58,9 +58,6 @@ function getIndicatorItemStyle (spec, isActive) {
 function _render (context, h) {
   const children = []
   const mergedStyle = extractComponentStyle(context)
-  // const mergedStyle = context._getComponentStyle(context.$vnode.data)
-  // context.$vnode.data.cached = {}
-  // extendKeys(context.$vnode.data.cached, mergedStyle, ['width', 'height'])
   const indicatorSpecStyle = extendKeys(
       {},
       mergedStyle,
@@ -173,14 +170,11 @@ export default {
       active: 0
     }
   },
-  // props: {
-  //   count: [Number, String],
-  //   active: [Number, String]
-  // },
   render (createElement) {
     const { count, active } = this.$vnode.data.attrs || {}
     this.count = count
     this.active = active
+    if (!this.count) { return }
     this._renderHook()
     return _render(this, createElement)
   },

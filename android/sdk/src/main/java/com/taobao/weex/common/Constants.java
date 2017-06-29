@@ -153,6 +153,7 @@ public class Constants {
     String OFFSET_X_RATIO = "offsetXRatio";
     String ELEVATION = "elevation";
     String SCROLLABLE = "scrollable";
+    String DRAGGABLE = "draggable";
     String DISTANCE_Y = "dy";
     String PULLING_DISTANCE = "pullingDistance";
     String VIEW_HEIGHT = "viewHeight";
@@ -167,6 +168,7 @@ public class Constants {
     String RETURN_KEY_TYPE = "returnKeyType";
     String OFFSET = "offset";
     String ANIMATED = "animated";
+    String STABLE = "stable";
 
     String INSERT_CELL_ANIMATION = "insertAnimation";
     String DELETE_CELL_ANIMATION = "deleteAnimation";

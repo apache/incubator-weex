@@ -337,6 +337,11 @@ NS_ASSUME_NONNULL_BEGIN
  **/
 - (void)removeEvent:(NSString *)eventName;
 
+/**
+ * @abstract Update component's transform with native transform struct
+ **/
+- (void)setNativeTransform:(CGAffineTransform)transform;
+
 ///--------------------------------------
 /// @name Display
 ///--------------------------------------

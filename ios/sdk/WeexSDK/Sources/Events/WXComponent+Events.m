@@ -270,8 +270,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeClickEvent
 {
     if (_tapGesture) {
-        [_tapGesture removeTarget:self action:@selector(onClick:)];
-        [self.view removeGestureRecognizer:_tapGesture];
         _tapGesture.delegate = nil;
         _tapGesture = nil;
     }
@@ -343,8 +341,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     }
   
     for (UISwipeGestureRecognizer *recognizer in _swipeGestures) {
-        [recognizer removeTarget:self action:@selector(onSwipe:)];
-        [self.view removeGestureRecognizer:recognizer];
         recognizer.delegate = nil;
     }
     
@@ -398,8 +394,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 - (void)removeLongPressEvent
 {
     if (_longPressGesture) {
-        [_longPressGesture removeTarget:self action:@selector(onLongPress:)];
-        [self.view removeGestureRecognizer:_longPressGesture];
         _longPressGesture.delegate = nil;
         _longPressGesture = nil;
     }
@@ -546,8 +540,6 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         && !_listenPanStart && !_listenPanMove && !_listenPanEnd
         && !_listenHorizontalPan && !_listenVerticalPan
         ) {
-        [_panGesture removeTarget:self action:@selector(onPan:)];
-        [self.view removeGestureRecognizer:_panGesture];
         _panGesture.delegate = nil;
         _panGesture = nil;
     }
@@ -760,7 +752,20 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             touch.wx_identifier = @(_touchIdentifier++);
         }
         NSDictionary *resultTouch = [_component touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
-        [resultTouches addObject:resultTouch];
+        NSMutableDictionary * mutableResultTouch = [resultTouch mutableCopy];
+        
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
+            float value = touch.force*60;
+            float maxValue = touch.maximumPossibleForce*60;
+            if (touch.maximumPossibleForce) {
+                // the forece value will be range 1 from 0.
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:value/maxValue] forKey:@"force"];
+            }else {
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:0.0] forKey:@"force"];
+            }
+        }
+        
+        [resultTouches addObject:mutableResultTouch];
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];
