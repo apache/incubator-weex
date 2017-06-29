@@ -141,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @warning Subclasses must not override this.
  */
-@property(nonatomic, readonly, assign) css_node_t *cssNode;
+@property(nonatomic, readonly, assign) YGNodeRef cssNode;
 
 /**
  * @abstract Invalidates the component's layout and marks it as needing an update.

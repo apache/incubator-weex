@@ -145,10 +145,10 @@ static NSThread *WXComponentThread;
     if (_rootCSSNode) {
         [self _applyRootFrame:frame toRootCSSNode:_rootCSSNode];
         if (!_rootComponent.styles[@"width"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_WIDTH] = frame.size.width ?: CSS_UNDEFINED;
+            YGNodeStyleSetWidth(_rootComponent.cssNode, frame.size.width ?: YGUndefined);
         }
         if (!_rootComponent.styles[@"height"]) {
-            _rootComponent.cssNode->style.dimensions[CSS_HEIGHT] = frame.size.height ?: CSS_UNDEFINED;
+            YGNodeStyleSetHeight(_rootComponent.cssNode, frame.size.height ?: CSS_UNDEFINED);
         }
         [_rootComponent setNeedsLayout];
         [self startComponentTasks];
@@ -218,12 +218,12 @@ static bool rootNodeIsDirty(void *context)
 
 static css_node_t * rootNodeGetChild(void *context, int i)
 {
-    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
-    if (i == 0) {
-        return manager->_rootComponent.cssNode;
-    } else if(manager->_fixedComponents.count >= i) {
-        return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
-    }
+//    WXComponentManager *manager = (__bridge WXComponentManager *)(context);
+//    if (i == 0) {
+//        return manager->_rootComponent.cssNode;
+//    } else if(manager->_fixedComponents.count >= i) {
+//        return ((WXComponent *)((manager->_fixedComponents)[i-1])).cssNode;
+//    }
     
     return NULL;
 }
@@ -700,7 +700,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     
     _rootCSSNode->style.flex_wrap = CSS_NOWRAP;
     _rootCSSNode->is_dirty = rootNodeIsDirty;
-    _rootCSSNode->get_child = rootNodeGetChild;
     _rootCSSNode->context = (__bridge void *)(self);
     _rootCSSNode->children_count = 1;
 }

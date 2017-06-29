@@ -51,7 +51,7 @@
                 WXLogError(@"");
             }
         }
-        self.cssNode->style.position_type = CSS_POSITION_ABSOLUTE;
+        YGNodeStyleSetPositionType(self.cssNode, YGPositionTypeAbsolute);
     }
     return self;
 }
@@ -59,10 +59,16 @@
 - (void)viewDidLoad
 {
      _initFinished = YES;
-    
-    if (!_displayState) {
-        [_indicator.view setHidden:YES];
+    UIRefreshControl * refresh = (UIRefreshControl*)self.view;
+    refresh.frame = self.calculatedFrame;
+    if (_displayState) {
+        
     }
+}
+
+- (UIView *)loadView
+{
+    return [[UIRefreshControl alloc] init];
 }
 
 - (void)layoutDidFinish

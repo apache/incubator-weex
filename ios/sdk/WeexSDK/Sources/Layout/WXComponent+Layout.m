@@ -59,27 +59,27 @@
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-    _cssNode = new_css_node();
+    _cssNode = YGNodeNew();
     
-    _cssNode->print = cssNodePrint;
-    _cssNode->get_child = cssNodeGetChild;
-    _cssNode->is_dirty = cssNodeIsDirty;
+    YGNodeSetPrintFunc(_cssNode, cssNodePrint);
+//    _cssNode->get_child = cssNodeGetChild;
+//    _cssNode->is_dirty = cssNodeIsDirty;
     if ([self measureBlock]) {
-        _cssNode->measure = cssNodeMeasure;
+        YGNodeSetMeasureFunc(_cssNode, cssNodeMeasure);
     }
-    _cssNode->context = (__bridge void *)self;
+    YGNodeSetContext(_cssNode, (__bridge void *)self);
     
     [self _recomputeCSSNodeChildren];
     [self _fillCSSNode:styles];
     
     // To be in conformity with Android/Web, hopefully remove this in the future.
     if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
-        if (isUndefined(_cssNode->style.dimensions[CSS_HEIGHT]) && self.weexInstance.frame.size.height) {
-            _cssNode->style.dimensions[CSS_HEIGHT] = self.weexInstance.frame.size.height;
+        if (YGFloatIsUndefined(YGNodeStyleGetHeight(_cssNode).value) && self.weexInstance.frame.size.height) {
+            YGNodeStyleSetHeight(_cssNode, self.weexInstance.frame.size.height);
         }
         
-        if (isUndefined(_cssNode->style.dimensions[CSS_WIDTH]) && self.weexInstance.frame.size.width) {
-            _cssNode->style.dimensions[CSS_WIDTH] = self.weexInstance.frame.size.width;
+        if (YGFloatIsUndefined(YGNodeStyleGetWidth(_cssNode).value) && self.weexInstance.frame.size.width) {
+            YGNodeStyleSetWidth(_cssNode, self.weexInstance.frame.size.width);
         }
     }
 }
@@ -96,7 +96,7 @@
 
 - (void)_recomputeCSSNodeChildren
 {
-    _cssNode->children_count = (int)[self _childrenCountForLayout];
+//    _cssNode->children_count = (int)[self _childrenCountForLayout];
 }
 
 - (NSUInteger)_childrenCountForLayout
@@ -156,17 +156,20 @@
                            gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
     WXAssertComponentThread();
-    
-    if (!_cssNode->layout.should_update) {
+    if (!YGNodeGetHasNewLayout(_cssNode)) {
         return;
     }
-    _cssNode->layout.should_update = false;
+    YGNodeSetHasNewLayout(_cssNode, false);
+    
+    if (YGNodeStyleGetDisplay(_cssNode) == YGDisplayNone) {
+        return;
+    }
     _isLayoutDirty = NO;
     
-    CGRect newFrame = CGRectMake(WXRoundPixelValue(_cssNode->layout.position[CSS_LEFT]),
-                                 WXRoundPixelValue(_cssNode->layout.position[CSS_TOP]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_WIDTH]),
-                                 WXRoundPixelValue(_cssNode->layout.dimensions[CSS_HEIGHT]));
+    CGRect newFrame = CGRectMake(WXRoundPixelValue(YGNodeLayoutGetLeft(_cssNode)),
+                                 WXRoundPixelValue(YGNodeLayoutGetTop(_cssNode)),
+                                 WXRoundPixelValue(YGNodeLayoutGetWidth(_cssNode)),
+                                 WXRoundPixelValue(YGNodeLayoutGetHeight(_cssNode)));
     
     BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
@@ -177,10 +180,10 @@
     
     CGPoint newAbsolutePosition = [self computeNewAbsolutePosition:superAbsolutePosition];
     
-    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-    _cssNode->layout.position[CSS_LEFT] = 0;
-    _cssNode->layout.position[CSS_TOP] = 0;
+//    _cssNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
+//    _cssNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
+//    _cssNode->layout.position[CSS_LEFT] = 0;
+//    _cssNode->layout.position[CSS_TOP] = 0;
     
     [self _frameDidCalculated:isFrameChanged];
     
@@ -209,13 +212,12 @@
 do {\
     id value = styles[@#key];\
     if (value) {\
-        typeof(_cssNode->style.cssProp) convertedValue = (typeof(_cssNode->style.cssProp))[WXConvert type:value];\
-        _cssNode->style.cssProp = convertedValue;\
+    YGNodeStyleSet##cssProp(_cssNode,[WXConvert type:value]);\
         [self setNeedsLayout];\
     }\
 } while(0);
 
-#define WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp)\
+#define WX_STYLE_FILL_CSS_NODE_PIXEL(key, cssProp, edge)\
 do {\
     id value = styles[@#key];\
     if (value) {\
@@ -223,7 +225,7 @@ do {\
         if (isnan(pixel)) {\
             WXLogError(@"Invalid NaN value for style:%@, ref:%@", @#key, self.ref);\
         } else {\
-            _cssNode->style.cssProp = pixel;\
+            YGNodeStyleSet##cssProp(_cssNode,edge, pixel)\
             [self setNeedsLayout];\
         }\
     }\
@@ -246,22 +248,23 @@ do {\
 - (void)_fillCSSNode:(NSDictionary *)styles;
 {
     // flex
-    WX_STYLE_FILL_CSS_NODE(flex, flex, CGFloat)
-    WX_STYLE_FILL_CSS_NODE(flexDirection, flex_direction, css_flex_direction_t)
-    WX_STYLE_FILL_CSS_NODE(alignItems, align_items, css_align_t)
-    WX_STYLE_FILL_CSS_NODE(alignSelf, align_self, css_align_t)
-    WX_STYLE_FILL_CSS_NODE(flexWrap, flex_wrap, css_wrap_type_t)
-    WX_STYLE_FILL_CSS_NODE(justifyContent, justify_content, css_justify_t)
+    YGNodeStyleSe
+    WX_STYLE_FILL_CSS_NODE(flex, Flex, CGFloat)
+    WX_STYLE_FILL_CSS_NODE(flexDirection, FlexDirection, YGFlexDirection)
+    WX_STYLE_FILL_CSS_NODE(alignItems, AlignItems, YGAlign)
+    WX_STYLE_FILL_CSS_NODE(alignSelf, AlignSelf, YGAlign)
+    WX_STYLE_FILL_CSS_NODE(flexWrap, FlexWrap, YGWrap)
+    WX_STYLE_FILL_CSS_NODE(justifyContent, JustifyContent, YGJustify)
     
     // position
-    WX_STYLE_FILL_CSS_NODE(position, position_type, css_position_type_t)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(top, position[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(left, position[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(right, position[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position[CSS_BOTTOM])
+    WX_STYLE_FILL_CSS_NODE(position, PositionType, YGPositionType)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(top, position, YGEdgeTop)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(left, position, YGEdgeLeft)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(right, position, YGEdgeRight)
+    WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position, YGEdgeBottom)
     
     // dimension
-    WX_STYLE_FILL_CSS_NODE_PIXEL(width, dimensions[CSS_WIDTH])
+//    WX_STYLE_FILL_CSS_NODE_PIXEL(width, width)
     WX_STYLE_FILL_CSS_NODE_PIXEL(height, dimensions[CSS_HEIGHT])
     WX_STYLE_FILL_CSS_NODE_PIXEL(minWidth, minDimensions[CSS_WIDTH])
     WX_STYLE_FILL_CSS_NODE_PIXEL(minHeight, minDimensions[CSS_HEIGHT])
@@ -355,9 +358,9 @@ do {\
 
 #pragma mark CSS Node Override
 
-static void cssNodePrint(void *context)
+static void cssNodePrint(YGNodeRef node)
 {
-    WXComponent *component = (__bridge WXComponent *)context;
+    WXComponent *component = (__bridge WXComponent *)(YGNodeGetContext(node));
     // TODO:
     printf("%s:%s ", component.ref.UTF8String, component->_type.UTF8String);
 }
@@ -393,19 +396,24 @@ static bool cssNodeIsDirty(void *context)
     return needsLayout;
 }
 
-static css_dim_t cssNodeMeasure(void *context, float width, css_measure_mode_t widthMode, float height, css_measure_mode_t heightMode)
+//typedef YGSize (*YGMeasureFunc)(YGNodeRef node,
+//float width,
+//YGMeasureMode widthMode,
+//float height,
+//YGMeasureMode heightMode);
+static YGSize cssNodeMeasure(YGNodeRef node, float width, YGMeasureMode widthMode, float height, YGMeasureMode heightMode)
 {
-    WXComponent *component = (__bridge WXComponent *)context;
+    WXComponent *component = (__bridge WXComponent *)(YGNodeGetContext(node));
     CGSize (^measureBlock)(CGSize) = [component measureBlock];
     
     if (!measureBlock) {
-        return (css_dim_t){NAN, NAN};
+        return (YGSize){NAN, NAN};
     }
     
     CGSize constrainedSize = CGSizeMake(width, height);
     CGSize resultSize = measureBlock(constrainedSize);
     
-    return (css_dim_t){resultSize.width, resultSize.height};
+    return (YGSize){resultSize.width, resultSize.height};
 }
 
 @end

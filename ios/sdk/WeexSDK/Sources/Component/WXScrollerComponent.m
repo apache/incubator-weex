@@ -117,11 +117,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         
         // let scroller fill the rest space if it is a child component and has no fixed height & width
         if (((_scrollDirection == WXScrollDirectionVertical &&
-            isUndefined(self.cssNode->style.dimensions[CSS_HEIGHT])) ||
+            YGFloatIsUndefined(YGNodeStyleGetHeight(self.cssNode).value)) ||
             (_scrollDirection == WXScrollDirectionHorizontal &&
-              isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]))) &&
-             self.cssNode->style.flex <= 0.0) {
-            self.cssNode->style.flex = 1.0;
+              YGFloatIsUndefined(YGNodeStyleGetWidth(self.cssNode).value))) &&
+             YGNodeStyleGetFlex(self.cssNode) <= 0.0) {
+            YGNodeStyleSetFlex(self.cssNode, 1.0);
         }
     }
     
@@ -642,11 +642,11 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         
         if (_scrollDirection == WXScrollDirectionVertical) {
             _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_COLUMN;
-            _scrollerCSSNode->style.dimensions[CSS_WIDTH] = _cssNode->layout.dimensions[CSS_WIDTH];
+            _scrollerCSSNode->style.dimensions[CSS_WIDTH] = YGNodeLayoutGetWidth(_cssNode);
             _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
         } else {
             _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
-            _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = _cssNode->layout.dimensions[CSS_HEIGHT];
+            _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = YGNodeLayoutGetHeight(_cssNode);
             _scrollerCSSNode->style.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
         }
         

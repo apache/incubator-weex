@@ -44,9 +44,8 @@
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         _checked = attributes[@"checked"] ? [WXConvert BOOL:attributes[@"checked"]] : NO;
         _disabled = attributes[@"disabled"] ? [WXConvert BOOL:attributes[@"disabled"]] : NO;
-        
-        self.cssNode->style.dimensions[CSS_WIDTH] = 51;
-        self.cssNode->style.dimensions[CSS_HEIGHT] = 31;
+        YGNodeStyleSetWidth(self.cssNode, 51);
+        YGNodeStyleSetHeight(self.cssNode, 31);
     }
     return self;
 }

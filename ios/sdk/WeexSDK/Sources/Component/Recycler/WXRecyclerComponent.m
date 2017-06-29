@@ -574,10 +574,11 @@ typedef enum : NSUInteger {
 - (void)_fillPadding
 {
     UIEdgeInsets padding = {
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_TOP] + self.cssNode->style.border[CSS_TOP]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_LEFT] + self.cssNode->style.border[CSS_LEFT]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_BOTTOM] + self.cssNode->style.border[CSS_BOTTOM]),
-        WXFloorPixelValue(self.cssNode->style.padding[CSS_RIGHT] + self.cssNode->style.border[CSS_RIGHT])
+        
+        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeTop)),
+        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft)),
+        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom)),
+        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))
     };
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {

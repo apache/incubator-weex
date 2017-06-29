@@ -40,11 +40,11 @@ typedef CGFloat WXPixelType;
 // @parameter scaleFactor: please use weexInstance's pixelScaleFactor property
 + (WXPixelType)WXPixelType:(id)value scaleFactor:(CGFloat)scaleFactor;
 
-+ (css_flex_direction_t)css_flex_direction_t:(id)value;
-+ (css_align_t)css_align_t:(id)value;
-+ (css_wrap_type_t)css_wrap_type_t:(id)value;
-+ (css_justify_t)css_justify_t:(id)value;
-+ (css_position_type_t)css_position_type_t:(id)value;
++ (YGFlexDirection)YGFlexDirection:(id)value;
++ (YGAlign)YGAlign:(id)value;
++ (YGWrap)YGWrap:(id)value;
++ (YGJustify)YGJustify:(id)value;
++ (YGPositionType)YGPositionType:(id)value;
 
 + (UIViewContentMode)UIViewContentMode:(id)value;
 + (WXImageQuality)WXImageQuality:(id)value;
