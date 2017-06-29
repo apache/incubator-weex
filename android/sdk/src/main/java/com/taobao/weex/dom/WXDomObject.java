@@ -490,104 +490,104 @@ public class WXDomObject extends YogaNode implements Cloneable,ImmutableDomObjec
       for(Map.Entry<String,Object> item:stylesMap.entrySet()) {
         switch (item.getKey()) {
           case Constants.Name.ALIGN_ITEMS:
-            super.setAlignItems(stylesMap.getAlignItems());
+            setAlignItems(stylesMap.getAlignItems());
             break;
           case Constants.Name.ALIGN_SELF:
-            super.setAlignSelf(stylesMap.getAlignSelf());
+            setAlignSelf(stylesMap.getAlignSelf());
             break;
           case Constants.Name.FLEX:
-            super.setFlex(stylesMap.getFlex());
+            setFlex(stylesMap.getFlex());
             break;
           case Constants.Name.FLEX_DIRECTION:
-            super.setFlexDirection(stylesMap.getFlexDirection());
+            setFlexDirection(stylesMap.getFlexDirection());
             break;
           case Constants.Name.JUSTIFY_CONTENT:
-            super.setJustifyContent(stylesMap.getJustifyContent());
+            setJustifyContent(stylesMap.getJustifyContent());
             break;
           case Constants.Name.FLEX_WRAP:
-            super.setWrap(stylesMap.getCSSWrap());
+            setWrap(stylesMap.getCSSWrap());
             break;
           case Constants.Name.MIN_WIDTH:
-            super.setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth(vp),vp));
+            setMinWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMinWidth(vp),vp));
             break;
           case Constants.Name.MIN_HEIGHT:
-            super.setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight(vp),vp));
+            setMinHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMinHeight(vp),vp));
             break;
           case Constants.Name.MAX_WIDTH:
-            super.setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth(vp),vp));
+            setMaxWidth(WXViewUtils.getRealPxByWidth(stylesMap.getMaxWidth(vp),vp));
             break;
           case Constants.Name.MAX_HEIGHT:
-            super.setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight(vp),vp));
+            setMaxHeight(WXViewUtils.getRealPxByWidth(stylesMap.getMaxHeight(vp),vp));
             break;
           case Constants.Name.DEFAULT_HEIGHT:
           case Constants.Name.HEIGHT:
             //// TODO: 21/06/2017  support percent
-            super.setHeight(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.HEIGHT)?stylesMap.getHeight(vp):stylesMap.getDefaultHeight(),vp));
+            setHeight(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.HEIGHT)?stylesMap.getHeight(vp):stylesMap.getDefaultHeight(),vp));
             break;
           case Constants.Name.WIDTH:
           case Constants.Name.DEFAULT_WIDTH:
             //// TODO: 21/06/2017  support percent
-            super.setWidth(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.WIDTH)?stylesMap.getWidth(vp):stylesMap.getDefaultWidth(),vp));
+            setWidth(WXViewUtils.getRealPxByWidth(stylesMap.containsKey(Constants.Name.WIDTH)?stylesMap.getWidth(vp):stylesMap.getDefaultWidth(),vp));
             break;
           case Constants.Name.POSITION:
-            super.setPositionType(stylesMap.getPosition());
+            setPositionType(stylesMap.getPosition());
             break;
           case Constants.Name.LEFT:
-            super.setPosition(YogaEdge.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getLeft(vp),vp));
+            setPosition(YogaEdge.LEFT, WXViewUtils.getRealPxByWidth(stylesMap.getLeft(vp),vp));
             break;
           case Constants.Name.TOP:
-            super.setPosition(YogaEdge.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getTop(vp),vp));
+            setPosition(YogaEdge.TOP, WXViewUtils.getRealPxByWidth(stylesMap.getTop(vp),vp));
             break;
           case Constants.Name.RIGHT:
-            super.setPosition(YogaEdge.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getRight(vp),vp));
+            setPosition(YogaEdge.RIGHT, WXViewUtils.getRealPxByWidth(stylesMap.getRight(vp),vp));
             break;
           case Constants.Name.BOTTOM:
-            super.setPosition(YogaEdge.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getBottom(vp),vp));
+            setPosition(YogaEdge.BOTTOM, WXViewUtils.getRealPxByWidth(stylesMap.getBottom(vp),vp));
             break;
           case Constants.Name.MARGIN:
-            super.setMargin(YogaEdge.ALL, setAndGetSpacing(mSavedMargin,Spacing.ALL,stylesMap.getMargin(vp),vp));
+            setMargin(YogaEdge.ALL, setAndGetSpacing(mSavedMargin,Spacing.ALL,stylesMap.getMargin(vp),vp));
             break;
           case Constants.Name.MARGIN_LEFT:
-            super.setMargin(YogaEdge.LEFT, setAndGetSpacing(mSavedMargin,Spacing.LEFT,stylesMap.getMarginLeft(vp),vp));
+            setMargin(YogaEdge.LEFT, setAndGetSpacing(mSavedMargin,Spacing.LEFT,stylesMap.getMarginLeft(vp),vp));
             break;
           case Constants.Name.MARGIN_TOP:
-            super.setMargin(YogaEdge.TOP, setAndGetSpacing(mSavedMargin,Spacing.TOP,stylesMap.getMarginTop(vp),vp));
+            setMargin(YogaEdge.TOP, setAndGetSpacing(mSavedMargin,Spacing.TOP,stylesMap.getMarginTop(vp),vp));
             break;
           case Constants.Name.MARGIN_RIGHT:
-            super.setMargin(YogaEdge.RIGHT, setAndGetSpacing(mSavedMargin,Spacing.RIGHT,stylesMap.getMarginRight(vp),vp));
+            setMargin(YogaEdge.RIGHT, setAndGetSpacing(mSavedMargin,Spacing.RIGHT,stylesMap.getMarginRight(vp),vp));
             break;
           case Constants.Name.MARGIN_BOTTOM:
-            super.setMargin(YogaEdge.BOTTOM, setAndGetSpacing(mSavedMargin,Spacing.BOTTOM,stylesMap.getMarginBottom(vp),vp));
+            setMargin(YogaEdge.BOTTOM, setAndGetSpacing(mSavedMargin,Spacing.BOTTOM,stylesMap.getMarginBottom(vp),vp));
             break;
           case Constants.Name.BORDER_WIDTH:
-            super.setBorder(YogaEdge.ALL, setAndGetSpacing(mSavedBorder,Spacing.ALL,stylesMap.getBorderWidth(vp),vp));
+            setBorder(YogaEdge.ALL, setAndGetSpacing(mSavedBorder,Spacing.ALL,stylesMap.getBorderWidth(vp),vp));
             break;
           case Constants.Name.BORDER_TOP_WIDTH:
-            super.setBorder(YogaEdge.TOP, setAndGetSpacing(mSavedBorder,Spacing.TOP,stylesMap.getBorderTopWidth(vp),vp));
+            setBorder(YogaEdge.TOP, setAndGetSpacing(mSavedBorder,Spacing.TOP,stylesMap.getBorderTopWidth(vp),vp));
             break;
           case Constants.Name.BORDER_RIGHT_WIDTH:
-            super.setBorder(YogaEdge.RIGHT, setAndGetSpacing(mSavedBorder,Spacing.RIGHT,stylesMap.getBorderRightWidth(vp), vp));
+            setBorder(YogaEdge.RIGHT, setAndGetSpacing(mSavedBorder,Spacing.RIGHT,stylesMap.getBorderRightWidth(vp), vp));
             break;
           case Constants.Name.BORDER_BOTTOM_WIDTH:
-            super.setBorder(YogaEdge.BOTTOM, setAndGetSpacing(mSavedBorder,Spacing.BOTTOM,stylesMap.getBorderBottomWidth(vp), vp));
+            setBorder(YogaEdge.BOTTOM, setAndGetSpacing(mSavedBorder,Spacing.BOTTOM,stylesMap.getBorderBottomWidth(vp), vp));
             break;
           case Constants.Name.BORDER_LEFT_WIDTH:
-            super.setBorder(YogaEdge.LEFT, setAndGetSpacing(mSavedBorder,Spacing.LEFT,stylesMap.getBorderLeftWidth(vp), vp));
+            setBorder(YogaEdge.LEFT, setAndGetSpacing(mSavedBorder,Spacing.LEFT,stylesMap.getBorderLeftWidth(vp), vp));
             break;
           case Constants.Name.PADDING:
-            super.setPadding(YogaEdge.ALL, setAndGetSpacing(mSavedPadding,Spacing.ALL,stylesMap.getPadding(vp), vp));
+            setPadding(YogaEdge.ALL, setAndGetSpacing(mSavedPadding,Spacing.ALL,stylesMap.getPadding(vp), vp));
             break;
           case Constants.Name.PADDING_LEFT:
-            super.setPadding(YogaEdge.LEFT, setAndGetSpacing(mSavedPadding,Spacing.LEFT,stylesMap.getPaddingLeft(vp), vp));
+            setPadding(YogaEdge.LEFT, setAndGetSpacing(mSavedPadding,Spacing.LEFT,stylesMap.getPaddingLeft(vp), vp));
             break;
           case Constants.Name.PADDING_TOP:
-            super.setPadding(YogaEdge.TOP, setAndGetSpacing(mSavedPadding,Spacing.TOP,stylesMap.getPaddingTop(vp), vp));
+            setPadding(YogaEdge.TOP, setAndGetSpacing(mSavedPadding,Spacing.TOP,stylesMap.getPaddingTop(vp), vp));
             break;
           case Constants.Name.PADDING_RIGHT:
-            super.setPadding(YogaEdge.RIGHT, setAndGetSpacing(mSavedPadding,Spacing.RIGHT,stylesMap.getPaddingRight(vp), vp));
+            setPadding(YogaEdge.RIGHT, setAndGetSpacing(mSavedPadding,Spacing.RIGHT,stylesMap.getPaddingRight(vp), vp));
             break;
           case Constants.Name.PADDING_BOTTOM:
-            super.setPadding(YogaEdge.BOTTOM, setAndGetSpacing(mSavedPadding,Spacing.BOTTOM,stylesMap.getPaddingBottom(vp), vp));
+            setPadding(YogaEdge.BOTTOM, setAndGetSpacing(mSavedPadding,Spacing.BOTTOM,stylesMap.getPaddingBottom(vp), vp));
             break;
         }
       }
