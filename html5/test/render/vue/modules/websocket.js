@@ -48,7 +48,7 @@ describe('webSocket module', function() {
       });
  
       it('constants', function() {
-        expect(websocket.INSTANCE, 'to be defined');
+        expect(websocket, 'should INSTANCE to be defined').to.have.property('INSTANCE');
       });
     });
  
