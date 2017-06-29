@@ -263,6 +263,7 @@ do {\
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     BOOL useCoreText = NO;
     if ([self.view.wx_component isKindOfClass:NSClassFromString(@"WXTextComponent")] && [self.view.wx_component respondsToSelector:@selector(useCoreText)]) {
         useCoreText = [(WXTextComponent*)self.view.wx_component useCoreText];

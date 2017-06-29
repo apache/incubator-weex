@@ -213,4 +213,8 @@
 
 - (void)setGradientLayer;
 
+-(void)tracing:(NSString *)ph;
+
+-(void)getTracing;
+
 @end

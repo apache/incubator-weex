@@ -37,6 +37,7 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXTracingManager.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -124,10 +125,38 @@
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
+        [self tracing:@"B"];
     }
     
     return self;
 }
+
+-(void)tracing:(NSString *)ph
+{
+    if([WXTracingManager isTracing]){
+        WXComponentTracing *tracing = [WXComponentTracing new];
+        tracing.instance = self.weexInstance;
+        tracing.ref = _ref;
+        tracing.name = _type;
+        tracing.ph = ph;
+        tracing.ts = [[NSDate date] timeIntervalSince1970]*1000;
+        [WXTracingManager monitorComponent:tracing];
+    }
+}
+
+-(void)getTracing
+{
+    if([WXTracingManager isTracing]){
+        WXComponentTracing *tracing = [WXComponentTracing new];
+        tracing.instance = self.weexInstance;
+        tracing.ref = _ref;
+        tracing.name = _type;
+        tracing.ts = [[NSDate date] timeIntervalSince1970]*1000;
+        double dt = [WXTracingManager getMonitorComponent:tracing];
+                NSLog(@"jerry %f",dt);
+    }
+}
+
 
 - (void)dealloc
 {

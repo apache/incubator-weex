@@ -25,7 +25,6 @@
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
 
-
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
     if (styles && [styles containsObject:@#key]) {\
@@ -138,6 +137,8 @@ do {\
 
 - (void)viewDidLoad
 {
+    [self tracing:@"E"];
+    [self getTracing];
     WXAssertMainThread();
 }
 

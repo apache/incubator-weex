@@ -255,7 +255,10 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         component->_lazyCreateView = YES;
     }
     
+//    NSLog(@"jerry.s type %@",component.type);
+//    NSLog(@"jerry.s super type %@",supercomponent.type);
     [self _addUITask:^{
+        
         [supercomponent insertSubview:component atIndex:index];
     }];
 
@@ -633,6 +636,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_layoutAndSyncUI
 {
     [self _layout];
+//    NSLog(@"jerry.s uitask");
     if(_uiTaskQueue.count > 0){
         [self _syncUITasks];
         _noTaskTickCount = 0;
