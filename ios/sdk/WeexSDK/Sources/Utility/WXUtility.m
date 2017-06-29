@@ -133,7 +133,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return floor(value * scale) / scale;
 }
 
-static BOOL WXNotStat;
 @implementation WXUtility
 
 + (void)performBlock:(void (^)())block onThread:(NSThread *)thread
@@ -655,6 +654,9 @@ static BOOL WXNotStat;
 
 + (CGSize)portraitScreenSize
 {
+    if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
+        return [UIScreen mainScreen].bounds.size;
+    }
     static CGSize portraitScreenSize;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -668,6 +670,9 @@ static BOOL WXNotStat;
 
 + (CGFloat)defaultPixelScaleFactor
 {
+    if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
+        return [self portraitScreenSize].width / WXDefaultScreenWidth;
+    }
     static CGFloat defaultScaleFactor;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -738,14 +743,6 @@ static BOOL WXNotStat;
 + (void)delete:(NSString *)service {
     NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
     SecItemDelete((CFDictionaryRef)keychainQuery);
-}
-
-+ (void)setNotStat:(BOOL)notStat {
-    WXNotStat = YES;
-}
-
-+ (BOOL)notStat {
-    return WXNotStat;
 }
 
 + (NSURL *)urlByDeletingParameters:(NSURL *)url

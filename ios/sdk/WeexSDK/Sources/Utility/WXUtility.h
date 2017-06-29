@@ -113,8 +113,6 @@ extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
 
 + (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
 
-+ (void)setNotStat:(BOOL)notStat;
-+ (BOOL)notStat;
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
