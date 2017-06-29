@@ -264,33 +264,77 @@ do {\
     WX_STYLE_FILL_CSS_NODE_PIXEL(bottom, position, YGEdgeBottom)
     
     // dimension
-//    WX_STYLE_FILL_CSS_NODE_PIXEL(width, width)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(height, dimensions[CSS_HEIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(minWidth, minDimensions[CSS_WIDTH])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(minHeight, minDimensions[CSS_HEIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(maxWidth, maxDimensions[CSS_WIDTH])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(maxHeight, maxDimensions[CSS_HEIGHT])
+    if (styles[@"width"]) {
+        YGNodeStyleSetWidth(_cssNode, [WXConvert WXPixelType:styles[@"width"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (style[@"height"]) {
+        YGNodeStyleSetHeight(_cssNode, [WXConvert WXPixelType:style[@"height"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (style[@"minWidth"]) {
+        YGNodeStyleSetMinWidth(_cssNode, [WXConvert WXPixelType:styles[@"minWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"minHeight"]) {
+        YGNodeStyleSetMinHeight(_cssNode, [WXConvert WXPixelType:styles[@"minHeight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"maxWidth"]) {
+        YGNodeStyleSetMaxWidth(_cssNode, [WXConvert WXPixelType:styles[@"maxWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"maxHeight"]) {
+        YGNodeStyleSetMaxHeight(_cssNode, [WXConvert WXPixelType:styles[@"maxHeight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // margin
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(margin, margin)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginTop, margin[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginLeft, margin[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginRight, margin[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(marginBottom, margin[CSS_BOTTOM])
+    if (styles[@"margin"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"margin"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginTop"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginBottom"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginRight"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"marginLeft"]) {
+        YGNodeStyleSetMargin(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // border
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(borderWidth, border)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderTopWidth, border[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderLeftWidth, border[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderRightWidth, border[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(borderBottomWidth, border[CSS_BOTTOM])
+    if (styles[@"border"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"border"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"borderTopWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"borderTopWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    
+    if (styles[@"borderLeftWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"borderLeftWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    
+    if (styles[@"borderBottomWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"borderBottomWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"borderRightWidth"]) {
+        YGNodeStyleSetBorder(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"borderRightWidth"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
     
     // padding
-    WX_STYLE_FILL_CSS_NODE_ALL_DIRECTION(padding, padding)
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingTop, padding[CSS_TOP])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingLeft, padding[CSS_LEFT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingRight, padding[CSS_RIGHT])
-    WX_STYLE_FILL_CSS_NODE_PIXEL(paddingBottom, padding[CSS_BOTTOM])
+    if (styles[@"padding"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeAll, [WXConvert WXPixelType:styles[@"padding"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingTop"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"paddingTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingLeft"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"paddingLeft"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingBottom"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"paddingBottom"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
+    if (styles[@"paddingRight"]) {
+        YGNodeStyleSetPadding(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"paddingRight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+    }
 }
 
 #define WX_STYLE_RESET_CSS_NODE(key, cssProp, defaultValue)\
