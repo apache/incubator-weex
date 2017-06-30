@@ -28,7 +28,7 @@
 
 @property (nonatomic, assign) CGSize contentSize;
 
-@property (nonatomic, readonly, assign) css_node_t *scrollerCSSNode;
+@property (nonatomic, readonly, assign) YGNodeRef scrollerCSSNode;
 
 - (NSUInteger)childrenCountForScrollerLayout;
 

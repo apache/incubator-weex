@@ -74,8 +74,6 @@
 		59AC02511D2A7E6E00355112 /* wx_load_error@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 59AC02501D2A7E6E00355112 /* wx_load_error@3x.png */; };
 		59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 59CE27E61CC387DB000BE37A /* WXEmbedComponent.h */; };
 		59CE27E91CC387DB000BE37A /* WXEmbedComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 59CE27E71CC387DB000BE37A /* WXEmbedComponent.m */; };
-		59D3CA401CF9ED57008835DC /* Layout.c in Sources */ = {isa = PBXBuildFile; fileRef = 59D3CA3E1CF9ED57008835DC /* Layout.c */; };
-		59D3CA411CF9ED57008835DC /* Layout.h in Headers */ = {isa = PBXBuildFile; fileRef = 59D3CA3F1CF9ED57008835DC /* Layout.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		59D3CA471CFC3CC0008835DC /* WXSliderComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 59D3CA461CFC3CC0008835DC /* WXSliderComponent.m */; };
 		59D3CA4A1CFC3CE1008835DC /* NSTimer+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = 59D3CA481CFC3CE1008835DC /* NSTimer+Weex.h */; };
 		59D3CA4B1CFC3CE1008835DC /* NSTimer+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = 59D3CA491CFC3CE1008835DC /* NSTimer+Weex.m */; };
@@ -273,6 +271,13 @@
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
+		DC04C43A1F063EB8004D2DDD /* YGEnums.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4331F063EB8004D2DDD /* YGEnums.h */; };
+		DC04C43B1F063EB8004D2DDD /* Yoga.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4341F063EB8004D2DDD /* Yoga.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DC04C43C1F063EB8004D2DDD /* YGEnums.c in Sources */ = {isa = PBXBuildFile; fileRef = DC04C4351F063EB8004D2DDD /* YGEnums.c */; };
+		DC04C43D1F063EB8004D2DDD /* YGMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4361F063EB8004D2DDD /* YGMacros.h */; };
+		DC04C43E1F063EB8004D2DDD /* YGNodeList.c in Sources */ = {isa = PBXBuildFile; fileRef = DC04C4371F063EB8004D2DDD /* YGNodeList.c */; };
+		DC04C43F1F063EB8004D2DDD /* YGNodeList.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4381F063EB8004D2DDD /* YGNodeList.h */; };
+		DC04C4401F063EB8004D2DDD /* Yoga.c in Sources */ = {isa = PBXBuildFile; fileRef = DC04C4391F063EB8004D2DDD /* Yoga.c */; };
 		DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0F99301D48E5320087C6AF /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
@@ -388,8 +393,6 @@
 		59AC02501D2A7E6E00355112 /* wx_load_error@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "wx_load_error@3x.png"; sourceTree = "<group>"; };
 		59CE27E61CC387DB000BE37A /* WXEmbedComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXEmbedComponent.h; sourceTree = "<group>"; };
 		59CE27E71CC387DB000BE37A /* WXEmbedComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXEmbedComponent.m; sourceTree = "<group>"; };
-		59D3CA3E1CF9ED57008835DC /* Layout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Layout.c; path = Layout/Layout.c; sourceTree = "<group>"; };
-		59D3CA3F1CF9ED57008835DC /* Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Layout.h; path = Layout/Layout.h; sourceTree = "<group>"; };
 		59D3CA461CFC3CC0008835DC /* WXSliderComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXSliderComponent.m; sourceTree = "<group>"; };
 		59D3CA481CFC3CE1008835DC /* NSTimer+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Weex.h"; sourceTree = "<group>"; };
 		59D3CA491CFC3CE1008835DC /* NSTimer+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Weex.m"; sourceTree = "<group>"; };
@@ -591,6 +594,13 @@
 		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextAreaComponent.m; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
+		DC04C4331F063EB8004D2DDD /* YGEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGEnums.h; path = dependency/YGEnums.h; sourceTree = "<group>"; };
+		DC04C4341F063EB8004D2DDD /* Yoga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Yoga.h; path = dependency/Yoga.h; sourceTree = "<group>"; };
+		DC04C4351F063EB8004D2DDD /* YGEnums.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = YGEnums.c; path = dependency/YGEnums.c; sourceTree = "<group>"; };
+		DC04C4361F063EB8004D2DDD /* YGMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGMacros.h; path = dependency/YGMacros.h; sourceTree = "<group>"; };
+		DC04C4371F063EB8004D2DDD /* YGNodeList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = YGNodeList.c; path = dependency/YGNodeList.c; sourceTree = "<group>"; };
+		DC04C4381F063EB8004D2DDD /* YGNodeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGNodeList.h; path = dependency/YGNodeList.h; sourceTree = "<group>"; };
+		DC04C4391F063EB8004D2DDD /* Yoga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Yoga.c; path = dependency/Yoga.c; sourceTree = "<group>"; };
 		DC0F99301D48E5320087C6AF /* WeexSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeexSDK.h; sourceTree = "<group>"; };
 		DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterProtocol.h; sourceTree = "<group>"; };
 		DC9867431D826D1E000AF388 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -646,6 +656,13 @@
 		2A27E7D61C3E360400D7A552 /* dependency */ = {
 			isa = PBXGroup;
 			children = (
+				DC04C4331F063EB8004D2DDD /* YGEnums.h */,
+				DC04C4341F063EB8004D2DDD /* Yoga.h */,
+				DC04C4351F063EB8004D2DDD /* YGEnums.c */,
+				DC04C4361F063EB8004D2DDD /* YGMacros.h */,
+				DC04C4371F063EB8004D2DDD /* YGNodeList.c */,
+				DC04C4381F063EB8004D2DDD /* YGNodeList.h */,
+				DC04C4391F063EB8004D2DDD /* Yoga.c */,
 				2A27E7D71C3E360B00D7A552 /* SRWebSocket.h */,
 				2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */,
 			);
@@ -664,8 +681,6 @@
 		2AF626C61C191E2200E71A38 /* Layout */ = {
 			isa = PBXGroup;
 			children = (
-				59D3CA3E1CF9ED57008835DC /* Layout.c */,
-				59D3CA3F1CF9ED57008835DC /* Layout.h */,
 				744BEA571D0520F300452B5D /* WXComponent+Layout.h */,
 				744BEA581D0520F300452B5D /* WXComponent+Layout.m */,
 				74B232D11D2A2BA4006322EA /* WXLayoutDefine.h */,
@@ -1211,7 +1226,6 @@
 				74FD6E041C7C0E9600DBEB6D /* WXScrollerProtocol.h in Headers */,
 				77D161201C02DDB40010B15B /* WXSDKEngine.h in Headers */,
 				745ED2DA1C5F2C7E002DB5A8 /* WXView.h in Headers */,
-				59D3CA411CF9ED57008835DC /* Layout.h in Headers */,
 				2AE5B7521CAB7DBD0082FDDB /* WXAComponent.h in Headers */,
 				77D1614F1C02E3880010B15B /* WXUtility.h in Headers */,
 				743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h in Headers */,
@@ -1245,14 +1259,17 @@
 				042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */,
 				C4D872221E5DDEDA00E39BC1 /* WXInnerLayer.h in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
+				DC04C43A1F063EB8004D2DDD /* YGEnums.h in Headers */,
 				37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */,
 				77D161281C02DE1A0010B15B /* WXSDKManager.h in Headers */,
+				DC04C43B1F063EB8004D2DDD /* Yoga.h in Headers */,
 				59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */,
 				74BB5FB91DFEE81A004FC3DF /* WXMetaModule.h in Headers */,
 				DCA0EF641D6EED6F00CB18B9 /* WXGlobalEventModule.h in Headers */,
 				2A837AB21CD9DE9200AEDF03 /* WXLoadingComponent.h in Headers */,
 				7423899F1C32733800D748CA /* WXType.h in Headers */,
 				59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */,
+				DC04C43F1F063EB8004D2DDD /* YGNodeList.h in Headers */,
 				77D161621C02ED790010B15B /* WXLog.h in Headers */,
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
@@ -1291,6 +1308,7 @@
 				74862F7D1E03A0F300B7A041 /* WXModuleMethod.h in Headers */,
 				742AD7331DF98C45007DC46C /* WXResourceResponse.h in Headers */,
 				77E65A0D1C155E99008B8775 /* WXDivComponent.h in Headers */,
+				DC04C43D1F063EB8004D2DDD /* YGMacros.h in Headers */,
 				C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */,
 				C4F0127B1E1502A6003378D0 /* WXWebSocketDefaultImpl.h in Headers */,
 				7461F8901CFB373100F62D44 /* WXDisplayQueue.h in Headers */,
@@ -1552,7 +1570,6 @@
 				C43C03E91EC8ACA40044C7FF /* WXPrerenderManager.m in Sources */,
 				2A837AB51CD9DE9200AEDF03 /* WXLoadingIndicator.m in Sources */,
 				C4F012831E1502E9003378D0 /* WXWebSocketModule.m in Sources */,
-				59D3CA401CF9ED57008835DC /* Layout.c in Sources */,
 				DCF087621DCAE161005CD6EB /* WXInvocationConfig.m in Sources */,
 				77D161311C02DE4E0010B15B /* WXComponent.m in Sources */,
 				74862F7A1E02B88D00B7A041 /* JSValue+Weex.m in Sources */,
@@ -1574,6 +1591,7 @@
 				74AD99851D5B0E59008F0336 /* WXPolyfillSet.m in Sources */,
 				D317338D1C57257000BB7539 /* WXTransform.m in Sources */,
 				7461F8A91CFC33A800F62D44 /* WXThreadSafeMutableArray.m in Sources */,
+				DC04C4401F063EB8004D2DDD /* Yoga.c in Sources */,
 				745B2D6D1E5A8E1E0092D38A /* WXRecyclerDataController.m in Sources */,
 				2AC750251C7565690041D390 /* WXIndicatorComponent.m in Sources */,
 				591DD3311D23AD5800BE8709 /* WXErrorView.m in Sources */,
@@ -1593,6 +1611,7 @@
 				DCF343681E49CAEE00A2FB34 /* WXJSExceptionInfo.m in Sources */,
 				59CE27E91CC387DB000BE37A /* WXEmbedComponent.m in Sources */,
 				DCA0EF651D6EED6F00CB18B9 /* WXGlobalEventModule.m in Sources */,
+				DC04C43E1F063EB8004D2DDD /* YGNodeList.c in Sources */,
 				2A919DA71E321F1F006EB6B5 /* WXBridgeMethod.m in Sources */,
 				DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */,
 				77D161251C02DDD10010B15B /* WXSDKInstance.m in Sources */,
@@ -1629,6 +1648,7 @@
 				37B51EE51E97804D0040A743 /* WXCycleSliderComponent.m in Sources */,
 				77D161211C02DDB40010B15B /* WXSDKEngine.m in Sources */,
 				D33451091D3E19480083598A /* WXCanvasComponent.m in Sources */,
+				DC04C43C1F063EB8004D2DDD /* YGEnums.c in Sources */,
 				74A4BA971CB365D100195969 /* WXAppConfiguration.m in Sources */,
 				59A583091CF5B2FD0081FD3E /* WXNavigationDefaultImpl.m in Sources */,
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,

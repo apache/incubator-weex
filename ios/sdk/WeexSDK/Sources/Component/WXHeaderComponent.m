@@ -68,16 +68,17 @@
 
 - (void)_calculateFrameWithSuperAbsolutePosition:(CGPoint)superAbsolutePosition gatherDirtyComponents:(NSMutableSet<WXComponent *> *)dirtyComponents
 {
-    if (self.delegate && (isUndefined(self.cssNode->style.dimensions[CSS_WIDTH]) || _isUseContainerWidth)) {
-        self.cssNode->style.dimensions[CSS_WIDTH] = [self.delegate headerWidthForLayout:self];
-        //TODO: set _isUseContainerWidth to NO if updateStyles have width
+    if (self.delegate && (YGFloatIsUndefined(YGNodeStyleGetWidth(self.cssNode).value) || _isUseContainerWidth)) {
+        YGNodeStyleSetWidth(self.cssNode, [self.delegate headerWidthForLayout:self]);
+        //TODO: set _isUseContainerWidth to NO if updateStyles have widtbh
         _isUseContainerWidth = YES;
     }
     
     if ([self needsLayout]) {
-        layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
+        YGNodeCalculateLayout(self.cssNode, YGUndefined, YGUndefined, YGDirectionInherit);
+//        layoutNode(self.cssNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
         if ([WXLog logLevel] >= WXLogLevelDebug) {
-            print_css_node(self.cssNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+            YGNodePrint(self.cssNode, YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren);
         }
     }
     

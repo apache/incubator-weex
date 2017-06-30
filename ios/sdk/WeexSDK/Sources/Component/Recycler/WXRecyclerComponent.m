@@ -335,7 +335,7 @@ typedef enum : NSUInteger {
 {
     NSInteger numberOfItems = [self.dataController numberOfItemsInSection:section];
     
-    WXLogDebug(@"Number of items is %ld in section:%ld", numberOfItems, section);
+    WXLogDebug(@"Number of items is %ld in section:%ld", (long)numberOfItems, section);
     
     return numberOfItems;
 }
@@ -403,7 +403,7 @@ typedef enum : NSUInteger {
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView contentWidthForLayout:(UICollectionViewLayout *)collectionViewLayout
 {
-    return self.scrollerCSSNode->style.dimensions[CSS_WIDTH];
+    return YGNodeStyleGetWidth(self.scrollerCSSNode).value;
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath *)indexPath

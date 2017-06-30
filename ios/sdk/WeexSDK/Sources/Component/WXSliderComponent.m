@@ -386,7 +386,7 @@
             _offsetXAccuracy = [WXConvert CGFloat:attributes[@"offsetXAccuracy"]];
         }
         
-        self.cssNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
+        YGNodeStyleSetFlexDirection(self.cssNode, YGFlexDirectionRow);
     }
     return self;
 }

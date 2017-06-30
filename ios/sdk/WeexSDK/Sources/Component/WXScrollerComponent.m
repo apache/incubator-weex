@@ -67,7 +67,7 @@
     BOOL _showScrollBar;
     BOOL _pagingEnabled;
 
-    css_node_t *_scrollerCSSNode;
+    YGNodeRef _scrollerCSSNode;
     
     NSHashTable* _delegates;
 }
@@ -79,7 +79,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     _previousLoadMoreContentHeight=0;
 }
 
-- (css_node_t *)scrollerCSSNode
+- (YGNodeRef)scrollerCSSNode
 {
     return _scrollerCSSNode;
 }
@@ -113,7 +113,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _listenLoadMore = [events containsObject:@"loadmore"];
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
-        _scrollerCSSNode = new_css_node();
+        _scrollerCSSNode = YGNodeNew();
         
         // let scroller fill the rest space if it is a child component and has no fixed height & width
         if (((_scrollDirection == WXScrollDirectionVertical &&
@@ -634,32 +634,32 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
      *  layout from children to scroller to get scroller's contentSize
      */
     if ([self needsLayout]) {
-        memcpy(_scrollerCSSNode, self.cssNode, sizeof(css_node_t));
-        _scrollerCSSNode->children_count = (int)[self childrenCountForScrollerLayout];
-        
-        _scrollerCSSNode->style.position[CSS_LEFT] = 0;
-        _scrollerCSSNode->style.position[CSS_TOP] = 0;
+        YGNodeCopyStyle(_scrollerCSSNode, self.cssNode);
+//        _scrollerCSSNode->children_count = (int)[self childrenCountForScrollerLayout];
+        YGNodeStyleSetPosition(_scrollerCSSNode, YGEdgeLeft, 0);
+        YGNodeStyleSetPosition(_scrollerCSSNode, YGEdgeTop, 0);
         
         if (_scrollDirection == WXScrollDirectionVertical) {
-            _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_COLUMN;
-            _scrollerCSSNode->style.dimensions[CSS_WIDTH] = YGNodeLayoutGetWidth(_cssNode);
-            _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
+            YGNodeStyleSetFlexDirection(_scrollerCSSNode, YGFlexDirectionColumn);
+            YGNodeStyleSetWidth(_scrollerCSSNode, YGNodeLayoutGetWidth(_cssNode));
+            YGNodeStyleSetHeight(_scrollerCSSNode, YGUndefined);
         } else {
-            _scrollerCSSNode->style.flex_direction = CSS_FLEX_DIRECTION_ROW;
-            _scrollerCSSNode->style.dimensions[CSS_HEIGHT] = YGNodeLayoutGetHeight(_cssNode);
-            _scrollerCSSNode->style.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
+            YGNodeStyleSetFlexDirection(_scrollerCSSNode, YGFlexDirectionRow);
+            YGNodeStyleSetWidth(_scrollerCSSNode, YGUndefined);
+            YGNodeStyleSetHeight(_scrollerCSSNode, YGNodeLayoutGetHeight(_cssNode));
         }
         
-        _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-        _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
+//        _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
+//        _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
         
-        layoutNode(_scrollerCSSNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
+//        layoutNode(_scrollerCSSNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
+        YGNodeCalculateLayout(_scrollerCSSNode, YGUndefined, YGUndefined, YGDirectionInherit);
         if ([WXLog logLevel] >= WXLogLevelDebug) {
-            print_css_node(_scrollerCSSNode, CSS_PRINT_LAYOUT | CSS_PRINT_STYLE | CSS_PRINT_CHILDREN);
+            YGNodePrint(_scrollerCSSNode, YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren);
         }
         CGSize size = {
-            WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_WIDTH]),
-            WXRoundPixelValue(_scrollerCSSNode->layout.dimensions[CSS_HEIGHT])
+            WXRoundPixelValue(YGNodeLayoutGetWidth(_scrollerCSSNode)),
+            WXRoundPixelValue(YGNodeLayoutGetHeight(_scrollerCSSNode))
         };
 
         if (!CGSizeEqualToSize(size, _contentSize)) {
@@ -668,8 +668,8 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
             [dirtyComponents addObject:self];
         }
         
-        _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-        _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
+//        _scrollerCSSNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
+//        _scrollerCSSNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
     }
     
     [super _calculateFrameWithSuperAbsolutePosition:superAbsolutePosition gatherDirtyComponents:dirtyComponents];

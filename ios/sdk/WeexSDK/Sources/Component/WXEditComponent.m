@@ -422,12 +422,12 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 
 -(void)updatePattern
 {
-    UIEdgeInsets padding = UIEdgeInsetsMake(self.cssNode->style.padding[CSS_TOP], self.cssNode->style.padding[CSS_LEFT], self.cssNode->style.padding[CSS_BOTTOM], self.cssNode->style.padding[CSS_RIGHT]);
+    UIEdgeInsets padding = UIEdgeInsetsMake(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value, YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value, YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value, YGNodeStyleGetPadding(_cssNode, YGEdgeRight).value);
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         [self setPadding:padding];
     }
     
-    UIEdgeInsets border = UIEdgeInsetsMake(self.cssNode->style.border[CSS_TOP], self.cssNode->style.border[CSS_LEFT], self.cssNode->style.border[CSS_BOTTOM], self.cssNode->style.border[CSS_RIGHT]);
+    UIEdgeInsets border = UIEdgeInsetsMake(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop), YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft), YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom), YGNodeStyleGetBorder(self.cssNode, YGEdgeRight));
     if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
         [self setBorder:border];
     }
@@ -440,20 +440,20 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         
         CGSize computedSize = [[[NSString alloc] init]sizeWithAttributes:nil];
         //TODO:more elegant way to use max and min constrained size
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_WIDTH])) {
-            computedSize.width = MAX(computedSize.width, weakSelf.cssNode->style.minDimensions[CSS_WIDTH]);
+        if (!isnan(YGNodeStyleGetMinWidth(weakSelf.cssNode).value)) {
+            computedSize.width = MAX(computedSize.width, YGNodeStyleGetMinWidth(weakSelf.cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_WIDTH])) {
-            computedSize.width = MIN(computedSize.width, weakSelf.cssNode->style.maxDimensions[CSS_WIDTH]);
+        if (!isnan(YGNodeStyleGetMaxWidth(weakSelf.cssNode).value)) {
+            computedSize.width = MIN(computedSize.width, YGNodeStyleGetMaxWidth(weakSelf.cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.minDimensions[CSS_HEIGHT])) {
-            computedSize.height = MAX(computedSize.height, weakSelf.cssNode->style.minDimensions[CSS_HEIGHT]);
+        if (!isnan(YGNodeStyleGetMinHeight(weakSelf.cssNode).value)) {
+            computedSize.height = MAX(computedSize.height, YGNodeStyleGetMinHeight(weakSelf.cssNode).value);
         }
         
-        if (!isnan(weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT])) {
-            computedSize.height = MIN(computedSize.height, weakSelf.cssNode->style.maxDimensions[CSS_HEIGHT]);
+        if (!isnan(YGNodeStyleGetMaxHeight(weakSelf.cssNode).value)) {
+            computedSize.height = MIN(computedSize.height, YGNodeStyleGetMaxHeight(weakSelf.cssNode).value);
         }
         
         return (CGSize) {
