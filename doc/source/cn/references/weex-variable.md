@@ -19,7 +19,7 @@ has_chapter_content: true
     * `weexVersion: string`: Weex sdk 版本。
     * `appName: string`: 应用名字。
     * `appVersion: string`: 应用版本。
-    * `platform: string`: 平台信息，是 iOS、Android 还是 Web。
+    * `platform: string`: 平台信息，是 'iOS'、'android' 还是 'Web'。
     * `osVersion: string`: 系统版本。
     * `deviceModel: string`: 设备型号 (仅原生应用)。
     * `deviceWidth: number`: 设备宽度。Weex 默认以宽度为 750px 做适配渲染，要获得750px下的屏幕高度，可以通过 `height = 750/deviceWidth*deviceHeight`  公式获得，可以使用到 CSS 中，用来设置全屏尺寸
