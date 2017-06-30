@@ -91,9 +91,7 @@ common styles: check out [common styles for components](../common-style.html)
 
 onloadmore  0.5 used with loadmoreoffset attribute. if the view has less than loadmoreoffset to scroll down, the onloadmore event will be triggered.
 
-scroll  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback.
-
-[try](http://dotwe.org/weex/7ba3b6222d912b4b0b4aafb8248ca22f)
+scroll  <sup class="wx-v">0.12+</sup> used with offset-accuracy attribute. This event is fired when the list scrolls. The current contentOffset value is given in this event callback. See details in [scroll event demo](http://dotwe.org/vue/9ef0e52bacaa20182a693f2187d851aa).
 
 common events: check out the [common events](../common-event.html)
 
