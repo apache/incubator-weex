@@ -114,9 +114,14 @@ export function createEventMap (context, extras = []) {
                 if (on && on.fn) {
                   on = on.fn
                 }
-                on && on.call(vm,
-                  originalType === listenTo ? e : extend({}, e, { type: listenTo })
-                )
+                let evt = e
+                if (originalType === listenTo) {
+                  evt = extend({}, { type: listenTo })
+                  // weex didn't provide these two methods for event object.
+                  delete event.preventDefault
+                  delete event.stopPropagation
+                }
+                on && on.call(vm, evt)
                 idx++
               }
               // once a parent node (or self node) has triggered the handler, then
