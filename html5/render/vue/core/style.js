@@ -26,11 +26,13 @@ import {
   autoPrefix,
   isArray,
   getParentScroller,
-  supportSticky
+  supportSticky,
+  appendCss
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 /* istanbul ignore next */
 
+let pseudoId = 0
 /**
  * get scoped class style map from stylesheets in <head>.
  */
@@ -55,6 +57,9 @@ export function getHeadStyleMap () {
          */
         return pre
       }
+      if (styleSheet.ownerNode.id.match(/weex-pseudo-\d+/)) {
+        return pre
+      }
       const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/}/)
       const len = strArr.length
       const rules = []
@@ -65,7 +70,8 @@ export function getHeadStyleMap () {
         }
         /**
          * should match these cases:
-         * .a[data-v-xxx] { color: red }
+         * .a[data-v-xxx] { color: red; }
+         * .a[data-v-xxx]:active { color: green; }
          * .a[data-v-xxx], .b[data-v-xxx] { color: red; }
          *
          * should not match these cases:
@@ -92,6 +98,10 @@ export function getHeadStyleMap () {
       }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
+        let isPseudo = false
+        if (selector.match(/:(?:active|focus|enabled|disabled)/)) {
+          isPseudo = true
+        }
         const styleObj = trimComment(rule.cssText).split(';')
           .reduce((styleObj, statement) => {
             statement = statement.trim()
@@ -101,12 +111,19 @@ export function getHeadStyleMap () {
             }
             return styleObj
           }, {})
-        const res = pre[selector]
+        if (isPseudo) {
+          const txt = Object.keys(styleObj).reduce(function (pre, cur) {
+            return pre + `${cur}:${styleObj[cur]}!important;`
+          }, '')
+          appendCss(`${selector}{${txt}}`, `weex-pseudo-${pseudoId++}`)
+        }
+        const objMap = !isPseudo ? pre : pre.pseudo
+        const res = objMap[selector]
         if (!res) {
-          pre[selector] = styleObj
+          objMap[selector] = styleObj
         }
         else {
-          extend(pre[selector], styleObj)
+          extend(objMap[selector], styleObj)
         }
       })
       /**
@@ -116,7 +133,7 @@ export function getHeadStyleMap () {
        */
       needToRemoveStyleSheetNodes.push(styleSheet.ownerNode)
       return pre
-    }, {})
+    }, { pseudo: {}})
   if (!window._no_remove_style_sheets) {
     needToRemoveStyleSheetNodes.forEach(function (node) {
       node.parentNode.removeChild(node)
@@ -301,7 +318,7 @@ export function processSticky (context) {
     return
   }
   // current only support list and vertical scroller.
-  if (container.scrollDirection === 'horizontal') {
+  if (context.scrollDirection === 'horizontal') {
     return
   }
   const stickyChildren = context._stickyChildren

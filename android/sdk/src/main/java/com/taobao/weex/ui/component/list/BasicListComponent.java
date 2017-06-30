@@ -330,16 +330,20 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         super.onScrolled(recyclerView, dx, dy);
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         if (listeners != null && listeners.size() > 0) {
-          for (OnWXScrollListener listener : listeners) {
-            if (listener != null) {
-              if(listener instanceof ICheckBindingScroller){
-                if(((ICheckBindingScroller) listener).isNeedScroller(getRef(),null)){
+          try {
+            for (OnWXScrollListener listener : listeners) {
+              if (listener != null) {
+                if (listener instanceof ICheckBindingScroller) {
+                  if (((ICheckBindingScroller) listener).isNeedScroller(getRef(), null)) {
+                    listener.onScrolled(recyclerView, dx, dy);
+                  }
+                } else {
                   listener.onScrolled(recyclerView, dx, dy);
                 }
-              }else {
-                listener.onScrolled(recyclerView, dx, dy);
               }
             }
+          } catch (Exception e) {
+            e.printStackTrace();
           }
         }
       }

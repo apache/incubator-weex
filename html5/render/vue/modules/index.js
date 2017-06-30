@@ -33,6 +33,7 @@ import globalEvent from './globalEvent'
 import modal from './modal'
 import navigator from './navigator'
 import webview from './webview'
+import websocket from './websocket'
 
 const legacyModules = {
   event,
@@ -57,6 +58,7 @@ export default {
       weex.install(legacyModules[k])
     }
     weex.install(modal)
+    weex.install(websocket)
     for (const k in modules) {
       weex.registerModule(k, modules[k])
     }
