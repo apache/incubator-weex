@@ -159,7 +159,7 @@
     "vue-template-compiler": "^2.2.6",
     "webpack": "^1.13.1",
     "weex-components": "^0.2.0",
-    "weex-gcanvas": "^0.3.5",
+    "weex-gcanvas": "^0.4.2",
     "weex-loader": "^0.4.0",
     "weex-vdom-tester": "^0.2.0",
     "weex-wd": "^1.0.23",
