@@ -24,9 +24,16 @@ import java.util.Map;
 
 public class WXImageStrategy {
 
+
   /**
-   * Whether to clip image. The default value is false.
+   * <strong>Never!</strong>
+   * <strong>Never!</strong>
+   * <strong>Never!</strong>
+   * Never use this flag, ImageView has done all the job of clipping!
+   * There is no method to read this flag any more.
+   * This field will be removed when it's appropriate.
    */
+  @Deprecated
   public boolean isClipping;
 
   /**

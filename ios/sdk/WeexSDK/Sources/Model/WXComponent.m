@@ -90,6 +90,7 @@
         _isNeedJoinLayoutSystem = YES;
         _isLayoutDirty = YES;
         _isViewFrameSyncWithCalculated = YES;
+        _ariaHidden = NO;
         
         _async = NO;
         
@@ -102,6 +103,20 @@
             if (!_styles[@"top"] && !_styles[@"bottom"]) {
                 _styles[@"top"] = @0.0f;
             }
+        }
+        
+        if (attributes[@"role"]){
+            _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
+        }
+        if (attributes[@"ariaHidden"]) {
+            _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
+        }
+        if (attributes[@"ariaLabel"]) {
+            _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
+        }
+        
+        if (attributes[@"testId"]) {
+            _testId = [WXConvert NSString:attributes[@"testId"]];
         }
         
         [self _setupNavBarWithStyles:_styles attributes:_attributes];
@@ -234,7 +249,19 @@
         _view.wx_ref = self.ref;
         _layer.wx_component = self;
         
-        [self _configWXComponentA11yWithAttributes:_attributes];
+        if (_role) {
+            _view.accessibilityTraits |= _role;
+        }
+        
+        if (_testId) {
+            _view.accessibilityIdentifier = _testId;
+        }
+        
+        if (_ariaLabel) {
+            _view.accessibilityLabel = _ariaLabel;
+        }
+        
+        _view.accessibilityElementsHidden = _ariaHidden;
         
         [self _initEvents:self.events];
         [self _initPseudoEvents:_isListenPseudoTouch];
@@ -472,7 +499,7 @@
 {
     WXAssertMainThread();
     
-    _transform = [[WXTransform alloc] initWithNativeTransform:transform instance:self.weexInstance];
+    _transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
         [_layer setNeedsDisplay];
@@ -515,26 +542,22 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes
 {
     WX_CHECK_COMPONENT_TYPE(self.componentType)
-    NSDictionary *attributesCpy = [attributes copy];
-    if (!attributesCpy) {
-        return;
-    }
     
-    if (attributesCpy[@"role"]){
+    if (attributes[@"role"]){
         _role = [WXConvert WXUIAccessibilityTraits:attributes[@"role"]];
         self.view.accessibilityTraits = _role;
     }
-    if (attributesCpy[@"ariaHidden"]) {
-        _ariaHidden = [WXConvert BOOL:attributesCpy[@"ariaHidden"]];
+    if (attributes[@"ariaHidden"]) {
+        _ariaHidden = [WXConvert BOOL:attributes[@"ariaHidden"]];
         self.view.accessibilityElementsHidden = _ariaHidden;
     }
-    if (attributesCpy[@"ariaLabel"]) {
-        _ariaLabel = [WXConvert NSString:attributesCpy[@"ariaLabel"]];
+    if (attributes[@"ariaLabel"]) {
+        _ariaLabel = [WXConvert NSString:attributes[@"ariaLabel"]];
         self.view.accessibilityValue = _ariaLabel;
     }
     
-    if (attributesCpy[@"testId"]) {
-        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributesCpy[@"testId"]]];
+    if (attributes[@"testId"]) {
+        [self.view setAccessibilityIdentifier:[WXConvert NSString:attributes[@"testId"]]];
     }
 
 }

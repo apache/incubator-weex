@@ -80,6 +80,13 @@ typedef NS_ENUM(NSInteger, Direction) {
     return self;
 }
 
+- (void)dealloc
+{
+    if (_scrollView) {
+        _scrollView.delegate = nil;
+    }
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -109,6 +116,7 @@ typedef NS_ENUM(NSInteger, Direction) {
     if (currentIndex >= _itemViews.count || currentIndex < 0) {
         currentIndex = 0;
     }
+    NSInteger oldIndex = _currentIndex;
     _currentIndex = currentIndex;
     if (_infinite) {
         if (_direction == DirectionRight) {
@@ -130,7 +138,9 @@ typedef NS_ENUM(NSInteger, Direction) {
     }
     [self resetIndicatorPoint];
     if (self.delegate && [self.delegate respondsToSelector:@selector(recycleSliderView:didScrollToItemAtIndex:)]) {
-        [self.delegate recycleSliderView:self didScrollToItemAtIndex:_currentIndex];
+        if (oldIndex != _currentIndex) {
+            [self.delegate recycleSliderView:self didScrollToItemAtIndex:_currentIndex];
+        }
     }
 }
 
@@ -179,7 +189,7 @@ typedef NS_ENUM(NSInteger, Direction) {
         _currentItemFrame = CGRectMake(self.width, 0, self.width, self.height);
         for (int i = 0; i < self.itemViews.count; i++) {
             UIView *view = [self.itemViews objectAtIndex:i];
-            if (i != self.currentIndex && i != self.nextIndex) {
+            if (i != self.currentIndex) {
                 view.frame = CGRectMake(self.frame.size.width * 3, 0, self.width, self.height);;
             }
         }
@@ -206,9 +216,10 @@ typedef NS_ENUM(NSInteger, Direction) {
         if (_infinite) {
             [self.scrollView setContentOffset:CGPointMake(self.width * 2, 0) animated:YES];
         } else {
-            _currentIndex += 1;
-            if (_currentIndex - 1 < _itemViews.count) {
-                [self.scrollView setContentOffset:CGPointMake(_currentIndex * self.width, 0) animated:YES];
+            // the currentindex will be set at the end of animation
+            NSInteger nextIndex = self.currentIndex + 1;
+            if(nextIndex < _itemViews.count) {
+                [self.scrollView setContentOffset:CGPointMake(nextIndex * self.width, 0) animated:YES];
             }
         }
     }
@@ -587,7 +598,7 @@ typedef NS_ENUM(NSInteger, Direction) {
 - (void)recycleSliderView:(WXRecycleSliderView *)recycleSliderView didScrollToItemAtIndex:(NSInteger)index
 {
     
-    if (_sliderChangeEvent && index != self.currentIndex) {
+    if (_sliderChangeEvent) {
         [self fireEvent:@"change" params:@{@"index":@(index)} domChanges:@{@"attrs": @{@"index": @(index)}}];
         self.currentIndex = index;
     }

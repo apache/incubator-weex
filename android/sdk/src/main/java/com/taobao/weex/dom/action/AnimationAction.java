@@ -38,7 +38,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -48,9 +47,10 @@ import com.taobao.weex.dom.RenderAction;
 import com.taobao.weex.dom.RenderActionContext;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.animation.BackgroundColorProperty;
-import com.taobao.weex.ui.animation.DimensionUpdateListener;
+import com.taobao.weex.ui.animation.HeightProperty;
 import com.taobao.weex.ui.animation.WXAnimationBean;
 import com.taobao.weex.ui.animation.WXAnimationModule;
+import com.taobao.weex.ui.animation.WidthProperty;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.utils.SingleFunctionParser;
@@ -58,7 +58,6 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -190,6 +189,20 @@ class AnimationAction implements DOMAction, RenderAction {
               WXResourceUtils.getColor(style.backgroundColor)));
         }
       }
+
+      if (target.getLayoutParams() != null &&
+          (!TextUtils.isEmpty(style.width) || !TextUtils.isEmpty(style.height))) {
+        ViewGroup.LayoutParams layoutParams = target.getLayoutParams();
+        if (!TextUtils.isEmpty(style.width)) {
+          holders.add(PropertyValuesHolder.ofInt(new WidthProperty(), layoutParams.width,
+              (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.width), viewPortWidth)));
+        }
+        if (!TextUtils.isEmpty(style.height)) {
+          holders.add(PropertyValuesHolder.ofInt(new HeightProperty(), layoutParams.height,
+              (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.height), viewPortWidth)));
+        }
+      }
+
       if (style.getPivot() != null) {
         Pair<Float, Float> pair = style.getPivot();
         target.setPivotX(pair.first);
@@ -198,20 +211,6 @@ class AnimationAction implements DOMAction, RenderAction {
       animator = ObjectAnimator.ofPropertyValuesHolder(
           target, holders.toArray(new PropertyValuesHolder[holders.size()]));
       animator.setStartDelay(mAnimationBean.delay);
-      if (target.getLayoutParams() != null &&
-          (!TextUtils.isEmpty(style.width) || !TextUtils.isEmpty(style.height))) {
-        DimensionUpdateListener listener = new DimensionUpdateListener(target);
-        ViewGroup.LayoutParams layoutParams = target.getLayoutParams();
-        if (!TextUtils.isEmpty(style.width)) {
-          listener.setWidth(layoutParams.width,
-                            (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.width), viewPortWidth));
-        }
-        if (!TextUtils.isEmpty(style.height)) {
-          listener.setHeight(layoutParams.height,
-                             (int) WXViewUtils.getRealPxByWidth(WXUtils.getFloat(style.height), viewPortWidth));
-        }
-        animator.addUpdateListener(listener);
-      }
       return animator;
     } else {
       return null;
@@ -225,8 +224,8 @@ class AnimationAction implements DOMAction, RenderAction {
       return new AnimatorListenerAdapter() {
         @Override
         public void onAnimationEnd(Animator animation) {
-          if (instance == null) {
-            WXLogUtils.e("RenderActionContextImpl-onAnimationEnd WXSDKInstance == null NPE");
+          if (instance == null || instance.isDestroy()) {
+            WXLogUtils.e("RenderActionContextImpl-onAnimationEnd WXSDKInstance == null NPE or instance is destroyed");
           } else {
             WXSDKManager.getInstance().callback(instance.getInstanceId(),
                                                 callBack,

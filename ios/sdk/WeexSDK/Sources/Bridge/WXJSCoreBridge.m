@@ -216,6 +216,117 @@
     _jsContext[@"callAddElement"] = callAddElementBlock;
 }
 
+- (void)registerCallCreateBody:(WXJSCallCreateBody)callCreateBody
+{
+    id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *body,JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSDictionary *bodyData = [body toDictionary];
+        
+        WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
+        
+        return [JSValue valueWithInt32:(int32_t)callCreateBody(instanceIdString, bodyData) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callCreateBody"] = WXJSCallCreateBodyBlock;
+}
+
+- (void)registerCallRemoveElement:(WXJSCallRemoveElement)callRemoveElement
+{
+    id WXJSCallCreateBodyBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        
+        WXLogDebug(@"callRemoveElement...%@, %@,", instanceIdString, refString);
+        
+        return [JSValue valueWithInt32:(int32_t)callRemoveElement(instanceIdString, refString) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callRemoveElement"] = WXJSCallCreateBodyBlock;
+}
+
+- (void)registerCallMoveElement:(WXJSCallMoveElement)callMoveElement
+{
+    id WXJSCallMoveElementBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *parentRef,JSValue *index, JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        NSString *parentRefString = [parentRef toString];
+        NSInteger moveIndex = [[index toNumber] integerValue];
+        
+        WXLogDebug(@"callAddElement...%@, %@,", instanceIdString, refString);
+        
+        return [JSValue valueWithInt32:(int32_t)callMoveElement(instanceIdString, refString,parentRefString,moveIndex) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callMoveElement"] = WXJSCallMoveElementBlock;
+}
+
+- (void)registerCallUpdateAttrs:(WXJSCallUpdateAttrs)callUpdateAttrs
+{
+    id WXJSCallUpdateAttrsBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *attrs, JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        NSDictionary *attrsData = [attrs toDictionary];
+        
+        WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceIdString, refString,attrsData);
+        
+        return [JSValue valueWithInt32:(int32_t)callUpdateAttrs(instanceIdString, refString,attrsData) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callUpdateAttrs"] = WXJSCallUpdateAttrsBlock;
+}
+
+- (void)registerCallUpdateStyle:(WXJSCallUpdateStyle)callUpdateStyle
+{
+    id WXJSCallUpdateStyleBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *styles, JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        NSDictionary *stylessData = [styles toDictionary];
+        
+        WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceIdString, refString,stylessData);
+        
+        return [JSValue valueWithInt32:(int32_t)callUpdateStyle(instanceIdString, refString,stylessData) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callUpdateStyle"] = WXJSCallUpdateStyleBlock;
+}
+
+- (void)registerCallAddEvent:(WXJSCallAddEvent)callAddEvent
+{
+    id WXJSCallAddEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        NSString *eventString = [event toString];
+        
+        WXLogDebug(@"callAddEvent...%@, %@, %@", instanceIdString, refString,eventString);
+        
+        return [JSValue valueWithInt32:(int32_t)callAddEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callAddEvent"] = WXJSCallAddEventBlock;
+}
+
+- (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent
+{
+    id WXJSCallRemoveEventBlock = ^(JSValue *instanceId, JSValue *ref,JSValue *event, JSValue *ifCallback) {
+        
+        NSString *instanceIdString = [instanceId toString];
+        NSString *refString = [ref toString];
+        NSString *eventString = [event toString];
+        
+        WXLogDebug(@"callRemoveEvent...%@, %@, %@", instanceIdString, refString,eventString);
+        
+        return [JSValue valueWithInt32:(int32_t)callRemoveEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
+    };
+    
+    _jsContext[@"callRemoveEvent"] = WXJSCallRemoveEventBlock;
+}
+
 - (void)registerCallNativeModule:(WXJSCallNativeModule)callNativeModuleBlock
 {
     _jsContext[@"callNativeModule"] = ^JSValue *(JSValue *instanceId, JSValue *moduleName, JSValue *methodName, JSValue *args, JSValue *options) {

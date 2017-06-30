@@ -76,7 +76,7 @@ version: 2.1
 
 - `scroll` <sup class="wx-v">0.12+</sup>：列表滚动时触发这个事件。此事件回调中会给出当前`contentOffset`值。
 
-  [体验一下](http://dotwe.org/weex/5837c1b7f1f69e5adf1fc4cac0747c34)
+  [体验一下](http://dotwe.org/weex/7ba3b6222d912b4b0b4aafb8248ca22f)
 
 - 通用事件
 

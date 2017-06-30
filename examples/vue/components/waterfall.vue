@@ -1,16 +1,16 @@
 <template>
-  <waterfall class="page" ref="waterfall"
+  <waterfall class="page"
   v-bind:style="{padding:padding}"
-  :column-width="columnWidth" :column-count="columnCount" :column-gap="columnGap"
+  :columnWidth="columnWidth" :columnCount="columnCount" :columnGap="columnGap"
   :show-scrollbar="showScrollbar" :scrollable="scrollable"
-  @scroll="recylerScroll" @loadmore="loadmore" loadmoreoffset=3000
+  @scroll="recylerScroll"
   >
     <refresh class="refresh" @refresh="onrefresh" @pullingdown="onpullingdown" :display="refreshing ? 'show' : 'hide'">
       <loading-indicator class="indicator"></loading-indicator>
       <text class="refreshText">{{refreshText}}</text>
     </refresh>
     <header class="header" ref="header" v-if="showHeader">
-      <image class="banner" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover">
+      <div class="banner" src="https://gw.alicdn.com/tps/TB1ESN1PFXXXXX1apXXXXXXXXXX-1000-600.jpg" resize="cover">
         <div class="bannerInfo">
           <image class="avatar" src="https://gw.alicdn.com/tps/TB1EP9bPFXXXXbpXVXXXXXXXXXX-150-110.jpg" resize="cover"></image>
           <text class="name">Adam Cat</text>
@@ -21,9 +21,9 @@
         <div class="bannerPhotoWrap">
           <image class="bannerPhoto" v-for="photo in banner.photos" :src="photo.src"></image>
         </div>
-      </image>
+      </div>
     </header>
-    <header class="stickyHeader" @click="showOrRemoveHeader">
+    <header class="stickyHeader">
       <div v-if="stickyHeaderType === 'none'" class="stickyWrapper">
         <text class="stickyText">Sticky Header</text>
       </div>
@@ -41,7 +41,7 @@
         <text class="stickyText">Content Offset:{{contentOffset}}</text>
       </div>
     </header>
-    <cell v-for="(item, index) in items" :key="item.src" class="cell">
+    <cell v-for="(item, index) in items" :key="index" :ref="`cell${index}`" class="cell">
       <div class="item" @click="onItemclick(item.behaviour, index)" @appear="itemAppear(item.src)" @disappear="itemDisappear(item.src)">
         <text v-if="item.name" class="itemName">{{item.name}}</text>
         <image class="itemPhoto" :src="item.src"></image>
@@ -49,22 +49,19 @@
         <text v-if="item.behaviourName" class="itemClickBehaviour"> {{item.behaviourName}}</text>
       </div>
     </cell>
-    <header class="footer">
-      <text class="stickyText">Footer</text>
-    </header>
     <div class="fixedItem" @click="scrollToTop">
       <text class="fixedText">Top</text>
     </div>
   </waterfall>
 </template>
 
-<style>
+<style scoped>
   .page {
     background-color: #EFEFEF;
   }
   .refresh {
-    height: 128;
-    width: 750;
+    height: 128px;
+    width: 750px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -75,81 +72,82 @@
   }
   .indicator {
     color: #888888;
-    height: 40;
-    width: 40;
-    margin-right: 30;
+    height: 40px;
+    width: 40px;
+    margin-right: 30px;
   }
   .header {
+    background-color: #fff;
   }
   .banner {
-    height: 377;
+    height: 377px;
     flex-direction: row;
   }
   .bannerInfo {
-    width:270;
+    width: 270px;
     align-items: center;
     justify-content: center;
   }
   .avatar {
-    width: 148;
-    height: 108;
-    border-radius: 54;
-    border-width: 4;
+    width: 148px;
+    height: 108px;
+    border-radius: 54px;
+    border-width: 4px;
     border-color: #FFFFFF;
-    margin-bottom: 14;
+    margin-bottom: 14px;
   }
   .name {
     font-weight: bold;
-    font-size:32;
+    font-size:32px;
     color:#ffffff;
-    line-height:32;
+    line-height:32px;
     text-align:center;
-    margin-bottom: 16;
+    margin-bottom: 16px;
   }
   .titleWrap {
-    width: 100;
-    height: 24;
-    margin-bottom: 10;
+    width: 100px;
+    height: 24px;
+    margin-bottom: 10px;
     background-color: rgba(255,255,255,0.80);
-    border-radius: 12;
+    border-radius: 12px;
     justify-content: center;
     align-items: center;
   }
   .title {
-    font-size: 20;
+    font-size: 20px;
     color: #000000;
   }
   .bannerPhotoWrap {
-    width: 449;
-    height: 305;
+    width: 449px;
+    height: 305px;
     background-color: #FFFFFF;
-    border-radius: 12;
-    margin-top: 35;
-    padding: 12;
+    border-radius: 12px;
+    margin-top: 35px;
+    padding: 12px;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap:wrap;
   }
   .bannerPhoto {
-    width: 137;
-    height: 137;
-    margin-bottom: 6;
+    width: 137px;
+    height: 137px;
+    margin-bottom: 6px;
   }
   .stickyHeader {
     position: sticky;
-    height: 94;
+    height: 94px;
     flex-direction: row;
-    padding-bottom:6;
+    padding-bottom:6px;
   }
   .stickyWrapper {
     flex-direction: row;
     background-color:#00cc99;
     justify-content: center;
     align-items: center;
-    flex:1;
+    flex: 1;
   }
   .stickyTextImageWrapper {
-    flex:1;
+    flex: 1;
     justify-content: center;
     align-items: center;
     flex-direction: row;
@@ -157,75 +155,69 @@
   .stickyText {
     color: #FFFFFF;
     font-weight: bold;
-    font-size:32;
-    margin-right: 12;
+    font-size: 32px;
+    margin-right: 12px;
   }
   .stickyImage {
-    width: 64;
-    height: 64;
-    border-radius: 32;
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
   }
 
   .cell {
-    padding-top: 6;
-    padding-bottom: 6;
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
   .item {
     background-color: #FFFFFF;
     align-items: center;
   }
   .itemName {
-    font-size:28;
+    font-size: 28px;
     color:#333333;
-    line-height:42;
+    line-height: 42px;
     text-align:left;
-    margin-top: 24;
+    margin-top: 24px;
   }
   .itemPhoto {
-    margin-top: 18;
-    width: 220;
-    height: 220;
-    margin-bottom: 18;
+    margin-top: 18px;
+    width: 220px;
+    height: 220px;
+    margin-bottom: 18px;
   }
   .itemDesc {
-    font-size:24;
-    margin:12;
-    color:#999999;
-    line-height:36;
-    text-align:left;
+    font-size: 24px;
+    margin: 12px;
+    color: #999999;
+    line-height: 36px;
+    text-align: left;
   }
   .itemClickBehaviour {
-    font-size:36;
-    color:#00cc99;
-    line-height:36;
+    font-size: 36px;
+    color: #00cc99;
+    line-height: 36px;
     text-align:center;
-    margin-top: 6;
-    margin-left: 24;
-    margin-right: 24;
-    margin-bottom: 30;
-  }
-  .footer {
-    height: 94;
-    justify-content: center;
-    align-items: center;
-    background-color: #00cc99;
+    margin-top: 6px;
+    margin-left: 24px;
+    margin-right: 24px;
+    margin-bottom: 30px;
   }
 
   .fixedItem {
     position: fixed;
-    width:78;
-    height:78;
-    background-color:#00cc99;
-    right: 32;
-    bottom: 32;
-    border-radius: 39;
+    width: 78px;
+    height: 78px;
+    background-color: #00cc99;
+    right: 32px;
+    bottom: 32px;
+    border-radius: 39px;
     align-items: center;
     justify-content: center;
   }
   .fixedText {
-    font-size: 36;
+    font-size: 36px;
     color: white;
-    line-height: 36;
+    line-height: 36px;
   }
 
 </style>
@@ -335,10 +327,6 @@
       recylerScroll: function(e) {
         this.contentOffset = e.contentOffset.y
       },
-      loadmore: function(e) {
-        console.log('receive loadmore event')
-        // this.$refs.waterfall.resetLoadmore()
-      },
       showOrRemoveHeader: function() {
         this.showHeader = !this.showHeader
       },
@@ -427,10 +415,12 @@
       },
 
       scrollToTop: function() {
+        // weex.requireModule('dom').scrollToElement(this.$refs.cell0)
         weex.requireModule('dom').scrollToElement(this.$refs.header)
       },
 
       setRecyclerPadding: function() {
+        debugger;
         this.padding = (this.padding == 0 ? 12 : 0);
       },
 
@@ -439,6 +429,7 @@
       },
 
       moveCell: function(index) {
+        
         if (index == 0) {
           this.items.splice(this.items.length - 1, 0, this.items.splice(index, 1)[0]);
         } else {

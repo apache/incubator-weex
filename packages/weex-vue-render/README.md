@@ -4,9 +4,47 @@ This is a group of Vue 2.x components for Weex, which have the same behavior wit
 
 It can be run on browser only based on Vue 2.x (without Weex).
 
-## use vue-loader
+## how to use
 
-**NOTE: ** after `v0.11.3` there's no need to add `$processStyle` and `autoprefixer` in your vue-loader config anymore. The runtime render will take care of it once for all.
+If you prefer npm way, you should manually call `init` function to pass Vue constructor to weex.
+
+```javascript
+import Vue from 'vue'
+import weex from 'weex-vue-render'
+weex.init(Vue)
+
+import App from 'App.vue'
+new Vue(App)
+```
+
+If you perfer cdn way, and use script tag to import a script link, just import it into your html file, it will auto-init and you can just ignore it.
+
+```html
+<script>{{Vue}}</script>
+<script>{{weex-vue-render}}</script>
+<script>{{your js bundle}}</script>
+```
+
+## use vue-loader to bundle .vue file
+
+NOTE: you should inject `$processStyle` to preprocess vnode's style in vue-loader's postTransformNode hook.
+
+```javascript
+vue: {
+  /**
+    * important! should use postTransformNode to add $processStyle for
+    * inline style prefixing.
+    */
+  compilerModules: [
+    {
+      postTransformNode: el => {
+        el.staticStyle = `$processStyle(${el.staticStyle})`
+        el.styleBinding = `$processStyle(${el.styleBinding})`
+      }
+    }
+  ],
+}
+```
 
 ## component -> dom map
 

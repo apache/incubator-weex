@@ -8,20 +8,28 @@ has_chapter_content: true
 
 # Get Started
 
-Weex is a framework for building Mobile cross-platform high performance UI. Developers can write `*.vue` files to build native pages or an App. This page will help you write a Weex page in 2 minutes.
+Weex is a framework for building Mobile cross-platform high performance UI applications. Developers can leverage their existing knowledge of VueJS (a powerful JavaScript view library), by writing `*.vue` files to build native applications or pages. This page will help you to write a **Weex** application in 2 minutes.
 
-## What is Vue?
+## Introduction to VueJS
 
-[Vue.js](https://vuejs.org/) is an excellent progressive JavaScript framework written by [Evan You](https://twitter.com/youyuxi). Now Weex and Vue has supported each other officially. Weex put Vue 2.x as its built-in JS Framework, and Vue has already been able to develop native mobile app.
+>[Vue](https://vuejs.org/) (pronounced /vjuː/, like view) is a progressive framework for building user interfaces. Unlike other monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable. The core library is focused on the view layer only, and is very easy to pick up and integrate with other libraries or existing projects. On the other hand, Vue is also perfectly capable of powering sophisticated Single-Page Applications when used in combination with modern tooling and supporting libraries.
 
-## Hello world
+**VueJS is developed by [Evan You](https://twitter.com/youyuxi).**
 
-The easiest way to try Weex is to use the [Playground App](../playground.html) and write a Hello World example at [dotWe](https://dotwe.org). You don't need to consider installing the development environment or writing native code, just do the following two things:
+Weex now fully supports VueJS 2.x officailly. Weex put Vue 2.x as its built-in JS Framework, making it powerful for building native apps!.
 
-- Install the [Playground App](../playground.html) for your phone.
+## Hello world Example
+
+The easiest way to try Weex is to use the [Playground App](../playground.html) to write a **Hello World** example at [dotWe](https://dotwe.org). No installation is required and you do not even have to write native code. 
+
+To test Weex online using our Playground App:
+
+- Install the [Playground App](../playground.html) on your phone.
 - Open [the Hello World example](http://dotwe.org/vue/4d5a0471ece3daabd4681bc6d703c4c1) in a new tab, click run, and then use the Playground App to scan the QR code.
 
-Nailed it! In this case, We can see HTML semantic tags, CSS styles and Javascript code. This is one of the simplest Weex examples. It rendered a "Hello World" in the page. Please note that this is not a Web page.
+Nailed it! 
+
+If you took the procedure above, you can see simple HTML semantic tags, CSS styles and Javascript code. This is one of the simplest Weex examples. The demo applications renders a "Hello World" in the page. Please note that this is not a Web page. You are running native!.
 
 ![mobile_preview](https://img.alicdn.com/tps/TB1Ymw3OpXXXXcvXpXXXXXXXXXX-500-1013.jpg)
 
@@ -53,6 +61,6 @@ As shown in the following code：
 </script>
 ```
 
-It's too easy，right? Let's focus on the syntax, obviously this is vue.
+It's too easy，right? Take a look at the syntax, that is vue.
 
-You can try to modify the Hello World, then generate a new QR code to scan.
+You can try to modify the Hello World example if you have previous knowledge of building VueJS examples, then generate a new QR code to scan. If you don't have previous knowledge of VueJS, don't worry, this guide will teach you just that. Moreover, you can always learn from the [VueJS Guide](https://vuejs.org/v2/guide).

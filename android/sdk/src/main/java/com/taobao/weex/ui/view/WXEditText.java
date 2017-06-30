@@ -35,6 +35,7 @@ public class WXEditText extends EditText implements WXGestureObservable {
 
   private WXGesture wxGesture;
   private int mLines = 1;
+  private boolean mAllowDisableMovement = true;
 
   public WXEditText(Context context) {
     super(context);
@@ -86,9 +87,9 @@ public class WXEditText extends EditText implements WXGestureObservable {
     super.onSizeChanged(w, h, oldw, oldh);
     int contentH = getLayout().getHeight();
     //TODO: known issue,set movement to null will make cursor disappear.
-    if(h < contentH){
+    if(mAllowDisableMovement && h < contentH){
       setMovementMethod(null);
-    }else{
+    } else {
       setMovementMethod(getDefaultMovementMethod());
     }
   }
@@ -96,5 +97,9 @@ public class WXEditText extends EditText implements WXGestureObservable {
   @Override
   public boolean postDelayed(Runnable action, long delayMillis) {
     return super.postDelayed(WXThread.secure(action), delayMillis);
+  }
+
+  public void setAllowDisableMovement(boolean allow) {
+    mAllowDisableMovement = allow;
   }
 }

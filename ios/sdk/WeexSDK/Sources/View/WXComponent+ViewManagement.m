@@ -235,7 +235,6 @@ do {\
             self.view.hidden = YES;
         }
     }
-    
     if (styles[@"transform"]) {
         _transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:self.styles[@"transformOrigin"]] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {

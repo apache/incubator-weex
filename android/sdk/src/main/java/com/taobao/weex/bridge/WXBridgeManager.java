@@ -47,7 +47,9 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.DOMAction;
 import com.taobao.weex.dom.WXDomModule;
+import com.taobao.weex.dom.action.Action;
 import com.taobao.weex.dom.action.Actions;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -117,7 +119,7 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   private static final int INIT_FRAMEWORK_OK = 1;
 
-  private static long LOW_MEM_VALUE = 80;
+  private static long LOW_MEM_VALUE = 120;
 
   static volatile WXBridgeManager mBridgeManager;
 
@@ -427,6 +429,366 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         WXLogUtils.e("[WXBridgeManager] callNative exception: ", e);
         commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,"[WXBridgeManager] callNative exception "+e.getCause());
       }
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callCreateBody
+  public int callCreateBody(String instanceId, String tasks, String callback) {
+    if (TextUtils.isEmpty(tasks)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody: call CreateBody tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callCreateBody >>>> instanceId:").append(instanceId)
+              .append(", tasks:").append(tasks).append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        JSONObject domObject = JSON.parseObject(tasks);
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getCreateBody(domObject);
+        domModule.postAction((DOMAction)action, true);
+      }
+    } catch (Exception e) {
+        WXLogUtils.e("[WXBridgeManager] callCreateBody exception: ", e);
+        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_CREATEBODY,"[WXBridgeManager] callCreateBody exception "+e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateFinish
+  public int callUpdateFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)){
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getUpdateFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,"[WXBridgeManager] callUpdateFinish exception "+e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callCreateFinish
+  public int callCreateFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callCreateFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getCreateFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callCreateFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_CREATEFINISH,"[WXBridgeManager] callCreateFinish exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callRefreshFinish
+  public int callRefreshFinish(String instanceId, String callback) {
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRefreshFinish >>>> instanceId:").append(instanceId)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRefreshFinish();
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRefreshFinish exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERROR_DOM_REFRESHFINISH,"[WXBridgeManager] callRefreshFinish exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateAttrs
+  public int callUpdateAttrs(String instanceId, String ref, String task, String callback) {
+    if (TextUtils.isEmpty(task)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callUpdateAttrs: call UpdateAttrs tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATEATTRS,"[WXBridgeManager] callUpdateAttrs: call UpdateAttrs tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateAttrs >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", task:").append(task)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        JSONObject domObject = JSON.parseObject(task);
+        Action action = Actions.getUpdateAttrs(ref, domObject);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateAttrs exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATEATTRS,"[WXBridgeManager] callUpdateAttrs exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+
+  }
+
+  // callUpdateStyle
+  public int callUpdateStyle(String instanceId, String ref, String task, String callback) {
+    if (TextUtils.isEmpty(task)) {
+      if (WXEnvironment.isApkDebugable()) {
+        WXLogUtils.e("[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
+      }
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyle: call UpdateStyle tasks is null");
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callUpdateStyle >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", task:").append(task)
+              .append(", callback:").append(callback);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        JSONObject domObject = JSON.parseObject(task);
+        Action action = Actions.getUpdateStyle(ref, domObject, false);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callUpdateStyle exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_UPDATESTYLE,"[WXBridgeManager] callUpdateStyle exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callUpdateStyle
+  public int callRemoveElement(String instanceId, String ref, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveElement >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRemoveElement(ref);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEELEMENT,"[WXBridgeManager] callRemoveElement exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  // callMoveElement
+  public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callMoveElement >>>> instanceId:").append(instanceId)
+              .append(", parentref:").append(parentref)
+              .append(", index:").append(index)
+              .append(", ref:").append(ref);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getMoveElement(ref, parentref, Integer.parseInt(index));
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callMoveElement exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_MOVEELEMENT,"[WXBridgeManager] callMoveElement exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callAddEvent(String instanceId, String ref, String event, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callAddEvent >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", event:").append(event);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getAddEvent(ref, event);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callAddEvent exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_ADDEVENT,"[WXBridgeManager] callAddEvent exception " + e.getCause());
+    }
+
+    if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
+    }
+    // get next tick
+    getNextTick(instanceId, callback);
+    return IWXBridge.INSTANCE_RENDERING;
+  }
+
+  public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+
+    if (WXEnvironment.isApkDebugable()) {
+      mLodBuilder.append("[WXBridgeManager] callRemoveEvent >>>> instanceId:").append(instanceId)
+              .append(", ref:").append(ref)
+              .append(", event:").append(event);
+      WXLogUtils.d(mLodBuilder.substring(0));
+      mLodBuilder.setLength(0);
+    }
+
+    if(mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge .DESTROY_INSTANCE;
+    }
+
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getRemoveEvent(ref, event);
+        domModule.postAction((DOMAction)action, false);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callRemoveEvent exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_DOM_REMOVEEVENT,"[WXBridgeManager] callRemoveEvent exception " + e.getCause());
     }
 
     if (UNDEFINED.equals(callback) || NON_CALLBACK.equals(callback)) {

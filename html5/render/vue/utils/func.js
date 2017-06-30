@@ -19,6 +19,8 @@
 
 // @flow
 
+import { isArray } from './type'
+
 /**
  * Mix properties into target object.
  * the rightest object's value has the highest priority.
@@ -147,4 +149,32 @@ export function throttle (func: Function, wait: number, callLastTime: boolean) {
       last = time
     }
   }
+}
+
+// direction: 'l' | 'r', default is 'r'
+// num: how many times to loop, should be a positive integer
+export function loopArray (arr: any, num: number, direction: string) {
+  if (!isArray(arr)) {
+    return
+  }
+  let isLeft = (direction + '').toLowerCase() === 'l'
+  const len = arr.length
+  num = num % len
+  if (num < 0) {
+    num = -num
+    isLeft = !isLeft
+  }
+  if (num === 0) {
+    return arr
+  }
+  let lp, rp
+  if (isLeft) {
+    lp = arr.slice(0, num)
+    rp = arr.slice(num)
+  }
+  else {
+    lp = arr.slice(0, len - num)
+    rp = arr.slice(len - num)
+  }
+  return rp.concat(lp)
 }

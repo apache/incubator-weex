@@ -126,6 +126,19 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   }
 
 
+  public Scrollable getFirstScroller(){
+    if(this instanceof Scrollable){
+      return (Scrollable)this;
+    }else{
+      for (int i=0;i<getChildCount();i++){
+        Scrollable scrollable = getChild(i).getFirstScroller();
+        if(scrollable!=null){
+          return scrollable;
+        }
+      }
+    }
+    return null;
+  }
   @Override
   public void bindData(WXComponent component) {
     if(!isLazy()) {

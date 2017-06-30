@@ -201,6 +201,30 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
                 newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateAngle];
                 [infos addObject:newInfo];
             }
+            if (wxTransform.rotateX != oldTransform.rotateX)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.x";
+                newInfo.fromValue = @(oldTransform.rotateX);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateX];
+                 [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateY != oldTransform.rotateY)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.y";
+                newInfo.fromValue = @(oldTransform.rotateY);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateY];
+                [infos addObject:newInfo];
+            }
+            if (wxTransform.rotateZ != oldTransform.rotateZ)
+            {
+                WXAnimationInfo *newInfo = [info copy];
+                newInfo.propertyName = @"transform.rotation.z";
+                newInfo.fromValue = @(oldTransform.rotateZ);
+                newInfo.toValue = [NSNumber numberWithDouble:wxTransform.rotateZ];
+                [infos addObject:newInfo];
+            }
             
             if (wxTransform.scaleX != oldTransform.scaleX) {
                 WXAnimationInfo *newInfo = [info copy];

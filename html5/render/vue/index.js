@@ -19,7 +19,7 @@
 import weex from './env'
 import { setVue } from './env'
 import components from './components'
-import { base, style } from './mixins'
+import { base, style, sticky } from './mixins'
 // import styleMixin from './mixins/style'
 
 /**
@@ -29,7 +29,11 @@ import { base, style } from './mixins'
  *         - components.
  *         - modules.
  */
+let _inited = false
 function init (Vue/*, options = {}*/) {
+  if (_inited) { return }
+  _inited = true
+
   setVue(Vue)
 
   Vue.prototype.$getConfig = () => {
@@ -56,6 +60,7 @@ function init (Vue/*, options = {}*/) {
   //     + `[${Object.keys(components).join(', ')}].`)
   Vue.mixin(base)
   Vue.mixin(style)
+  Vue.mixin(sticky)
   // }
 }
 
@@ -63,6 +68,8 @@ function init (Vue/*, options = {}*/) {
 if (typeof window !== 'undefined' && window.Vue) {
   init(window.Vue)
 }
+
+weex.init = init
 
 // perf stat for componentCount.
 window._component_count = 0
