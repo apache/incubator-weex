@@ -1,6 +1,6 @@
 {
   "name": "weex-vue-render",
-  "version": "0.11.52",
+  "version": "0.11.53",
   "description": "Weex built-in components for Vue 2.x.",
   "license": "Apache-2.0",
   "main": "dist/index.js",
