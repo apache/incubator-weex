@@ -22,6 +22,8 @@ import * as core from '../core'
 window.global = window
 window.weex = weex
 
+weex._styleMap = {}
+
 ; ['getComponentStyle',
   'extractComponentStyle',
   'createEventMap',
