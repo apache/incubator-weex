@@ -40,6 +40,7 @@
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -120,6 +121,7 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXPerformBlockOnComponentThread(^{
+            [WXTracingManager tracingGloabalTask:@"addElement" instanceId:instanceId ph:WXTracingEnd];
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -355,17 +357,18 @@ _Pragma("clang diagnostic pop") \
         WXLogInfo(@"instance already destroyed, task ignored");
         return -1;
     }
-    
     for (NSDictionary *task in tasks) {
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
         if (task[@"component"]) {
+            [self tracingComponentTask:task instanceId:instanceId];
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
         } else {
             NSString *moduleName = task[@"module"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+            [self tracingModuleTask:task instanceId:instanceId];
             [method invoke];
         }
     }
@@ -373,6 +376,27 @@ _Pragma("clang diagnostic pop") \
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
     
     return 1;
+}
+
+-(void)tracingComponentTask:(NSDictionary *)task instanceId:(NSString *)instanceId
+{
+    WXTracing *tracing = [WXTracing new];
+    tracing.instanceId = instanceId;
+    tracing.ref = task[@"ref"];
+    tracing.name = task[@"method"];
+    tracing.ph = WXTracingBegin;
+    tracing.fName = task[@"method"];
+    [WXTracingManager startTracing:tracing];
+}
+
+-(void)tracingModuleTask:(NSDictionary *)task instanceId:(NSString *)instanceId
+{
+    WXTracing *tracing = [WXTracing new];
+    tracing.instanceId = instanceId;
+    tracing.name = task[@"module"];
+    tracing.ph = WXTracingBegin;
+    tracing.fName = task[@"method"];
+    [WXTracingManager startTracing:tracing];
 }
 
 - (void)createInstance:(NSString *)instance

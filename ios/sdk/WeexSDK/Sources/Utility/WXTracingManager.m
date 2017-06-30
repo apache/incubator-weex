@@ -19,7 +19,7 @@
 
 #import "WXTracingManager.h"
 
-@implementation WXComponentTracing
+@implementation WXTracing
 
 @end
 
@@ -30,7 +30,7 @@
 @interface WXTracingManager()
 
 @property (nonatomic) BOOL isTracing;
-@property (nonatomic, strong) NSMutableDictionary *tracingTasks;
+@property (nonatomic, strong) NSMutableDictionary *tracingTasks;  // every instance have a task
 
 @end
 
@@ -69,47 +69,60 @@
     return [WXTracingManager sharedInstance].isTracing;
 }
 
-+(void)monitorComponent:(WXComponentTracing *)componentTracing
++(void)startTracing:(WXTracing *)tracing
 {
     if([self isTracing]){
         if(![WXTracingManager sharedInstance].tracingTasks){
             [WXTracingManager sharedInstance].tracingTasks = [NSMutableDictionary new];
         }
-        if(![[WXTracingManager sharedInstance].tracingTasks objectForKey:componentTracing.instance.instanceId]){
+        if(![[WXTracingManager sharedInstance].tracingTasks objectForKey:tracing.instanceId]){
             WXTracingTask *task = [WXTracingTask new];
-            task.instance = componentTracing.instance;
-            [[WXTracingManager sharedInstance].tracingTasks setObject:task forKey:componentTracing.instance.instanceId];
+            task.instanceId = tracing.instanceId;
+            [[WXTracingManager sharedInstance].tracingTasks setObject:task forKey:tracing.instanceId];
         }
-        WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:componentTracing.instance.instanceId];
-        //        NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
-        //        componentTracing.ts = time;
-        if(!task.componentTracings){
-            task.componentTracings = [NSMutableArray new];
+        WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:tracing.instanceId];
+        if(!task.tracings){
+            task.tracings = [NSMutableArray new];
         }
-        [task.componentTracings addObject:componentTracing];
+        NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
+        tracing.ts = time;
+        [self updateTracings:task tracing:tracing];
     }
 }
 
-+(double)getMonitorComponent:(WXComponentTracing *)componentTracing
++(void)updateTracings:(WXTracingTask *)task tracing:(WXTracing *)tracing
 {
-    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:componentTracing.instance.instanceId];
-    NSArray *componentTracings = [task.componentTracings copy];
-    NSString *ref = componentTracing.ref;
-    NSTimeInterval b = 0;
-    for (WXComponentTracing *tracing in componentTracings) {
-        if(![ref isEqualToString:tracing.ref]){
-            continue;
-        }
-        if([@"B" isEqualToString:tracing.ph]){
-            b = tracing.ts;
-        }
-        if([@"E" isEqualToString:tracing.ph]){
-            double dt = tracing.ts - b;
-            NSLog(@"%@ %f",componentTracing.name,dt);
-            return dt;
+    if([WXTracingEnd isEqualToString:tracing.ph]){
+        NSMutableArray *tracings = [task.tracings copy];
+        for (WXTracing *bTracing in tracings) {
+            if(([bTracing.fName isEqualToString:tracing.fName] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+                bTracing.ph = WXTracingDuration;
+                bTracing.duration = [[NSDate date] timeIntervalSince1970]*1000 - bTracing.ts ;
+                return;
+            }
         }
     }
-    return 0;
+    [task.tracings addObject:tracing];
+}
+
++ (void)tracingGloabalTask:(NSString *)fName instanceId:(NSString *)instanceId ph:(NSString *)ph
+{
+    WXTracing *tracing = [WXTracing new];
+    tracing.instanceId = instanceId;
+    tracing.name = @"global";
+    tracing.ph = ph;
+    tracing.fName = fName;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [WXTracingManager startTracing:tracing];
+    });
+}
+
++(void)getTracingData:(NSString *)instanceId{
+    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:instanceId];
+    NSArray *tracings = [task.tracings copy];
+    for (WXTracing *tracing in tracings) {
+        NSLog(@"%@  %@  %f",tracing.fName,tracing.name,tracing.duration);
+    }
 }
 
 @end

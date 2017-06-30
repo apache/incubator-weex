@@ -20,28 +20,35 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
-@interface WXComponentTracing:NSObject
+#define WXTracingBegin             @"B"
+#define WXTracingEnd               @"E"
+#define WXTracingDuration          @"D"
+
+@interface WXTracing:NSObject
 
 @property (nonatomic, copy) NSString *ref;
-@property (nonatomic, copy) NSString *classStr;
+@property (nonatomic, copy) NSString *className;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *ph;
 @property (nonatomic) NSTimeInterval ts;
-@property (nonatomic, strong) WXSDKInstance *instance;
+@property (nonatomic) NSTimeInterval duration;
+@property (nonatomic, copy) NSString *fName;
+@property (nonatomic, copy) NSString *instanceId;
 
 @end
 
 @interface WXTracingTask:NSObject
 
-@property (nonatomic, strong) WXSDKInstance *instance;
-@property (nonatomic, strong) NSMutableArray *componentTracings;
+@property (nonatomic, copy) NSString *instanceId;
+@property (nonatomic, strong) NSMutableArray *tracings;
 
 @end
 
 @interface WXTracingManager : NSObject
 +(void)switchTracing:(BOOL)isTracing;
 +(BOOL)isTracing;
-+(void)monitorComponent:(WXComponentTracing *)componentTracing;
-+(double)getMonitorComponent:(WXComponentTracing *)componentTracing;
++(void)startTracing:(WXTracing*)tracing;
++ (void)tracingGloabalTask:(NSString *)fName instanceId:(NSString *)instanceId ph:(NSString *)ph;
++(void)getTracingData:(NSString *)instanceId;
 
 @end
