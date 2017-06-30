@@ -63,7 +63,6 @@ export function getHeadStyleMap () {
         || styleSheet.ownerNode.id.match(/weex-pseudo-\d+/)) {
         return pre
       }
-
       /**
        * start to analyze it's content.
        */

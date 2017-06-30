@@ -93,7 +93,7 @@ NSString *const WXTextTruncationToken = @"\u2026";
 CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
-@property (nonatomic, assign) NSString *useCoreTextAttr;
+@property (nonatomic, strong) NSString *useCoreTextAttr;
 @end
 
 @implementation WXTextComponent
@@ -118,7 +118,8 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     BOOL _truncationLine; // support trunk tail
     
     BOOL _needsRemoveObserver;
-    NSMutableAttributedString * _ctAttributedString;
+    NSAttributedString * _ctAttributedString;
+    CTFramesetterRef _ctframeSetter;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -157,7 +158,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 - (BOOL)useCoreText
 {
-    
     if ([_useCoreTextAttr isEqualToString:@"true"]) {
         return YES;
     }
@@ -175,6 +175,11 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
 {
     if (_needsRemoveObserver) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
+    }
+    _ctAttributedString = nil;
+    if(NULL != _ctframeSetter) {
+        CFRelease(_ctframeSetter);
+        _ctframeSetter = NULL;
     }
 }
 
@@ -243,6 +248,10 @@ do {\
 {
     _textStorage = nil;
     _ctAttributedString = nil;
+    if(NULL != _ctframeSetter) {
+        CFRelease(_ctframeSetter);
+        _ctframeSetter = NULL;
+    }
 }
 
 #pragma mark - Subclass
@@ -337,12 +346,20 @@ do {\
     return _text;
 }
 
-- (NSMutableAttributedString *)ctAttributedString
+- (NSAttributedString *)ctAttributedString
 {
     if (!_ctAttributedString) {
-        _ctAttributedString = [self buildCTAttributeString];
+        _ctAttributedString = [[self buildCTAttributeString] copy];
     }
-    return _ctAttributedString;
+    return [_ctAttributedString copy];
+}
+
+- (CTFramesetterRef)ctFramesetterRef
+{
+    if (NULL == _ctframeSetter) {
+        _ctframeSetter = CTFramesetterCreateWithAttributedString((CFTypeRef)[self ctAttributedString]);
+    }
+    return _ctframeSetter;
 }
 
 - (void)repaintText:(NSNotification *)notification
@@ -362,7 +379,7 @@ do {\
 
 - (NSMutableAttributedString *)buildCTAttributeString
 {
-    NSMutableString *string = [NSMutableString stringWithFormat:@"%@", [self text] ?: @""];
+    NSString *string = [NSString stringWithFormat:@"%@", [self text] ?: @""];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     if (_color) {
         [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
@@ -615,20 +632,20 @@ do {\
         CGContextTranslateCTM(context, 0, textFrame.size.height);
         CGContextScaleCTM(context, 1.0, -1.0);
         
-        NSMutableAttributedString * attributedStringCopy = [self ctAttributedString];
+        NSAttributedString * attributedStringCopy = [self ctAttributedString];
         //add path
         CGPathRef cgPath = NULL;
         cgPath = CGPathCreateWithRect(textFrame, NULL);
-        CTFramesetterRef framesetter = NULL;
-        framesetter = CTFramesetterCreateWithAttributedString((CFTypeRef)attributedStringCopy);
         CTFrameRef _coreTextFrameRef = NULL;
         if (_coreTextFrameRef) {
             CFRelease(_coreTextFrameRef);
         }
-        _coreTextFrameRef = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), cgPath, NULL);
-        CFRelease(framesetter);
-        framesetter = NULL;
+        _coreTextFrameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, attributedStringCopy.length), cgPath, NULL);
         CFArrayRef ctLines = NULL;
+        if (NULL == _coreTextFrameRef) {
+            // try to protect crash from frame is NULL
+            return;
+        }
         ctLines = CTFrameGetLines(_coreTextFrameRef);
         CFIndex lineCount = CFArrayGetCount(ctLines);
         NSMutableArray * mutableLines = [NSMutableArray new];
@@ -774,7 +791,7 @@ do {\
         }
         NSMutableAttributedString *mutableLastLineText = lastLineText.mutableCopy;
         [mutableLastLineText appendAttributedString:truncationToken];
-        CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)mutableLastLineText);
+        CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)[mutableLastLineText copy]);
         if (ctLastLineExtend) {
             CGRect cgPathRect = CGRectZero;
             CGFloat truncatedWidth = 0;
@@ -828,24 +845,22 @@ do {\
     CGFloat totalHeight = 0;
     CGSize suggestSize = CGSizeZero;
     NSAttributedString * attributedStringCpy = [self ctAttributedString];
-    CTFramesetterRef framesetterRef = NULL;
-    framesetterRef = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedStringCpy);
-        
-    suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetterRef, CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
-        
+    suggestSize = CTFramesetterSuggestFrameSizeWithConstraints([self ctFramesetterRef], CFRangeMake(0, attributedStringCpy.length), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
+    
     CGMutablePathRef path = NULL;
     path = CGPathCreateMutable();
         // sufficient height to draw text
     CGPathAddRect(path, NULL, CGRectMake(0, 0, aWidth, suggestSize.height * 10));
         
     CTFrameRef frameRef = NULL;
-    frameRef = CTFramesetterCreateFrame(framesetterRef, CFRangeMake(0, attributedStringCpy.length), path, NULL);
-        
-    CFRelease(framesetterRef);
+    frameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, attributedStringCpy.length), path, NULL);
     CGPathRelease(path);
-    framesetterRef = NULL;
     
     CFArrayRef lines = NULL;
+    if (NULL == frameRef) {
+        //try to protect unexpected crash.
+        return suggestSize;
+    }
     lines = CTFrameGetLines(frameRef);
     CFIndex lineCount = CFArrayGetCount(lines);
     CGFloat ascent = 0;
@@ -866,6 +881,7 @@ do {\
     
     totalHeight = totalHeight + actualLineCount * leading;
     CFRelease(frameRef);
+    frameRef = NULL;
     
     if (WX_SYS_VERSION_LESS_THAN(@"10.0")) {
         // there is something wrong with coreText drawing text height, trying to fix this with more efficent way.

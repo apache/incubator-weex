@@ -18,22 +18,22 @@
  */
 package com.taobao.weex.dom;
 
+import static java.lang.Boolean.parseBoolean;
+
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-
 import com.taobao.weex.common.Constants;
+import com.taobao.weex.common.Constants.Name;
 import com.taobao.weex.common.WXImageSharpen;
 import com.taobao.weex.ui.view.listview.WXRecyclerView;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import static java.lang.Boolean.parseBoolean;
 
 /**
  * store value of component attribute
@@ -95,27 +95,17 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   }
 
   public WXImageQuality getImageQuality() {
-
-    Object obj = get(Constants.Name.QUALITY);
-    if (obj == null) {
-      obj = get(Constants.Name.IMAGE_QUALITY);
+    Object obj = containsKey(Name.QUALITY) ? get(Name.QUALITY) : get(Name.IMAGE_QUALITY);
+    WXImageQuality imageQuality = WXImageQuality.AUTO;
+    String value;
+    if (obj != null && !TextUtils.isEmpty(value = obj.toString())) {
+      try {
+        imageQuality = WXImageQuality.valueOf(value.toUpperCase(Locale.US));
+      }catch (IllegalArgumentException e){
+        WXLogUtils.e("Image", "Invalid value image quality. Only low, normal, high, original are valid");
+      }
     }
-    if (obj == null) {
-      return WXImageQuality.LOW;
-    }
-    WXImageQuality waImageQuality = WXImageQuality.LOW;
-    String imageQuality = obj.toString();
-    if (imageQuality.equals(Constants.Value.ORIGINAL)) {
-      waImageQuality = WXImageQuality.ORIGINAL;
-    } else if (imageQuality.equals(Constants.Value.LOW)) {
-      waImageQuality = WXImageQuality.LOW;
-    } else if (imageQuality.equals(Constants.Value.NORMAL)) {
-      waImageQuality = WXImageQuality.NORMAL;
-    } else if (imageQuality.equals(Constants.Value.HIGH)) {
-      waImageQuality = WXImageQuality.HIGH;
-    }
-
-    return waImageQuality;
+    return imageQuality;
   }
 
   public WXImageSharpen getImageSharpen() {
