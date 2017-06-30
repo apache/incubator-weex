@@ -34,7 +34,7 @@ export function initEnv (viewportInfo, envInfo) {
     osName = 'iOS'
   }
   else if (osName.match(/Android/i)) {
-    osName = 'Android'
+    osName = 'android'
   }
   const osVersion = envInfo.os.version.val
   const env = {
