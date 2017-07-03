@@ -139,7 +139,6 @@ do {\
 - (void)viewDidLoad
 {
     [self tracing:WXTracingEnd];
-    [self getTracing];
     WXAssertMainThread();
 }
 

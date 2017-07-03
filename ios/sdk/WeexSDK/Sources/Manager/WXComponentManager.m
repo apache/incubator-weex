@@ -254,9 +254,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
-    
-//    NSLog(@"jerry.s type %@",component.type);
-//    NSLog(@"jerry.s super type %@",supercomponent.type);
+
     [self _addUITask:^{
         
         [supercomponent insertSubview:component atIndex:index];

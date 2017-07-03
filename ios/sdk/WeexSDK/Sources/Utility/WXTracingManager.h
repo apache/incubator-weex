@@ -20,26 +20,39 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
+#define WXTracingDataHanding          @"WXTracingDataHanding"
+#define WXTracingJSCall          @"jsCall"
+
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
 #define WXTracingDuration          @"D"
 
+typedef enum : NSUInteger {
+    // global
+    WXTDataHanding = 0,
+    WXTRender
+} WXTracingTag;
+
 @interface WXTracing:NSObject
 
-@property (nonatomic, copy) NSString *ref;
-@property (nonatomic, copy) NSString *className;
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, copy) NSString *ph;
-@property (nonatomic) NSTimeInterval ts;
+@property (nonatomic, copy) NSString *ref; // compnonet id
+@property (nonatomic, copy) NSString *className; // compnonet class name or module class name
+@property (nonatomic, copy) NSString *name; // register name
+@property (nonatomic, copy) NSString *ph; // phase
+@property (nonatomic) NSTimeInterval ts; // time
+@property (nonatomic) long long traceId;
 @property (nonatomic) NSTimeInterval duration;
-@property (nonatomic, copy) NSString *fName;
-@property (nonatomic, copy) NSString *instanceId;
+@property (nonatomic, copy) NSString *fName; // functionName
+@property (nonatomic, copy) NSString *iid; // instance id
+@property (nonatomic, copy) NSString *parentId;// parent event id
 
 @end
 
 @interface WXTracingTask:NSObject
 
-@property (nonatomic, copy) NSString *instanceId;
+@property (nonatomic, copy) NSString *iid;
+@property (nonatomic) long long counter;
+@property (nonatomic)  WXTracingTag tag;
 @property (nonatomic, strong) NSMutableArray *tracings;
 
 @end
@@ -48,6 +61,7 @@
 +(void)switchTracing:(BOOL)isTracing;
 +(BOOL)isTracing;
 +(void)startTracing:(WXTracing*)tracing;
++(void)startTracing:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
 + (void)tracingGloabalTask:(NSString *)fName instanceId:(NSString *)instanceId ph:(NSString *)ph;
 +(void)getTracingData:(NSString *)instanceId;
 

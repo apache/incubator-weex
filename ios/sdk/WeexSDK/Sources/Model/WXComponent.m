@@ -135,24 +135,13 @@
 {
     if([WXTracingManager isTracing]){
         WXTracing *tracing = [WXTracing new];
-        tracing.instanceId = self.weexInstance.instanceId;
+        tracing.iid = self.weexInstance.instanceId;
         tracing.ref = _ref;
         tracing.name = _type;
         tracing.ph = ph;
         [WXTracingManager startTracing:tracing];
     }
 }
-
--(void)getTracing
-{
-    if([WXTracingManager isTracing]){
-        WXTracing *tracing = [WXTracing new];
-        tracing.instanceId = self.weexInstance.instanceId;
-        tracing.ref = _ref;
-        tracing.name = _type;
-    }
-}
-
 
 - (void)dealloc
 {

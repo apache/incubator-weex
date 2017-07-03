@@ -150,6 +150,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager createRoot:bodyData];
+            [WXTracingManager tracingGloabalTask:@"createBody" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -172,6 +173,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager removeComponent:ref];
+            [WXTracingManager tracingGloabalTask:@"removeElement" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -194,6 +196,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager moveComponent:ref toSuper:parentRef atIndex:index];
+            [WXTracingManager tracingGloabalTask:@"moveElement" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -216,6 +219,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager updateAttributes:attrsData forComponent:ref];
+            [WXTracingManager tracingGloabalTask:@"updateAttrs" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -238,6 +242,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager updateStyles:stylesData forComponent:ref];
+            [WXTracingManager tracingGloabalTask:@"updateStyle" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -260,6 +265,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager addEvent:event toComponent:ref];
+            [WXTracingManager tracingGloabalTask:@"addEvent" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -282,6 +288,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager removeEvent:event fromComponent:ref];
+            [WXTracingManager tracingGloabalTask:@"removeEvent" instanceId:instanceId ph:WXTracingEnd];
         });
         
         return 0;
@@ -381,7 +388,7 @@ _Pragma("clang diagnostic pop") \
 -(void)tracingComponentTask:(NSDictionary *)task instanceId:(NSString *)instanceId
 {
     WXTracing *tracing = [WXTracing new];
-    tracing.instanceId = instanceId;
+    tracing.iid = instanceId;
     tracing.ref = task[@"ref"];
     tracing.name = task[@"method"];
     tracing.ph = WXTracingBegin;
@@ -392,7 +399,7 @@ _Pragma("clang diagnostic pop") \
 -(void)tracingModuleTask:(NSDictionary *)task instanceId:(NSString *)instanceId
 {
     WXTracing *tracing = [WXTracing new];
-    tracing.instanceId = instanceId;
+    tracing.iid = instanceId;
     tracing.name = task[@"module"];
     tracing.ph = WXTracingBegin;
     tracing.fName = task[@"method"];

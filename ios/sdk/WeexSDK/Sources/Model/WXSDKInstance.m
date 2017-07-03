@@ -42,6 +42,7 @@
 #import "WXTextComponent.h"
 #import "WXConvert.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 
 NSString *const bundleUrlOptionKey = @"bundleUrl";
 
@@ -146,6 +147,7 @@ typedef enum : NSUInteger {
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
+    [WXTracingManager startTracing:self.instanceId ref:nil className:nil name:WXTracingDataHanding ph:WXTracingBegin fName:@"renderWithURL" parentId:nil];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
@@ -156,6 +158,7 @@ typedef enum : NSUInteger {
     _jsData = data;
     
     [self _renderWithMainBundleString:source];
+    [WXTracingManager startTracing:self.instanceId ref:nil className:nil name:WXTracingDataHanding ph:WXTracingBegin fName:@"renderView" parentId:nil];
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString

@@ -92,10 +92,10 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 - (void)addElement:(NSString *)parentRef addElement:(NSDictionary *)element atIndex:(NSInteger)index
 {
     WXTracing *tracing = [WXTracing new];
-    tracing.instanceId = self.weexInstance.instanceId;
+    tracing.iid = self.weexInstance.instanceId;
     tracing.name = @"dom";
     tracing.ph = WXTracingEnd;
-    tracing.fName = @"addElement:addElement:atIndex";
+    tracing.fName = @"addElement";
     [WXTracingManager startTracing:tracing];
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
@@ -133,7 +133,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 - (void)createFinish
 {
     WXTracing *tracing = [WXTracing new];
-    tracing.instanceId = self.weexInstance.instanceId;
+    tracing.iid = self.weexInstance.instanceId;
     tracing.name = @"dom";
     tracing.ph = WXTracingEnd;
     tracing.fName = @"createFinish";

@@ -146,7 +146,9 @@
     
     _instance.renderFinish = ^(UIView *view) {
          WXLogDebug(@"%@", @"Render Finish...");
-        [WXTracingManager getTracingData:weakSelf.instance.instanceId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [WXTracingManager getTracingData:weakSelf.instance.instanceId];
+        });
         [weakSelf updateInstanceState:WeexInstanceAppear];
     };
     
