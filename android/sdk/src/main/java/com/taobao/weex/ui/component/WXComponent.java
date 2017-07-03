@@ -949,7 +949,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   @CallSuper
   protected void onHostViewInitialized(T host){
-    host.setCameraDistance(Float.MAX_VALUE);
+    if(host!=null){
+      host.setCameraDistance(Float.MAX_VALUE);
+    }
     if (mAnimationHolder != null) {
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);
