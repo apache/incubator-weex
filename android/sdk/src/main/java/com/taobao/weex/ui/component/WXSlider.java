@@ -163,8 +163,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public boolean containsGesture(WXGestureType WXGestureType) {
-    //TODO Slider don't support any gesture for now.
-    return false;
+    //Enable gesture for slider
+    return super.containsGesture(WXGestureType);
   }
 
   @Override

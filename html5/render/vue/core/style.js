@@ -23,11 +23,16 @@ import {
   extendTruthy,
   trimComment,
   normalizeStyle,
-  autoPrefix
+  autoPrefix,
+  isArray,
+  getParentScroller,
+  supportSticky,
+  appendCss
 } from '../utils'
 import { tagBegin, tagEnd } from '../utils/perf'
 /* istanbul ignore next */
 
+let pseudoId = 0
 /**
  * get scoped class style map from stylesheets in <head>.
  */
@@ -52,6 +57,9 @@ export function getHeadStyleMap () {
          */
         return pre
       }
+      if (styleSheet.ownerNode.id.match(/weex-pseudo-\d+/)) {
+        return pre
+      }
       const strArr = trimComment(styleSheet.ownerNode.textContent.trim()).split(/}/)
       const len = strArr.length
       const rules = []
@@ -62,7 +70,8 @@ export function getHeadStyleMap () {
         }
         /**
          * should match these cases:
-         * .a[data-v-xxx] { color: red }
+         * .a[data-v-xxx] { color: red; }
+         * .a[data-v-xxx]:active { color: green; }
          * .a[data-v-xxx], .b[data-v-xxx] { color: red; }
          *
          * should not match these cases:
@@ -89,6 +98,10 @@ export function getHeadStyleMap () {
       }
       Array.from(rules).forEach(rule => {
         const selector = rule.selectorText || ''
+        let isPseudo = false
+        if (selector.match(/:(?:active|focus|enabled|disabled)/)) {
+          isPseudo = true
+        }
         const styleObj = trimComment(rule.cssText).split(';')
           .reduce((styleObj, statement) => {
             statement = statement.trim()
@@ -98,12 +111,19 @@ export function getHeadStyleMap () {
             }
             return styleObj
           }, {})
-        const res = pre[selector]
+        if (isPseudo) {
+          const txt = Object.keys(styleObj).reduce(function (pre, cur) {
+            return pre + `${cur}:${styleObj[cur]}!important;`
+          }, '')
+          appendCss(`${selector}{${txt}}`, `weex-pseudo-${pseudoId++}`)
+        }
+        const objMap = !isPseudo ? pre : pre.pseudo
+        const res = objMap[selector]
         if (!res) {
-          pre[selector] = styleObj
+          objMap[selector] = styleObj
         }
         else {
-          extend(pre[selector], styleObj)
+          extend(objMap[selector], styleObj)
         }
       })
       /**
@@ -113,7 +133,7 @@ export function getHeadStyleMap () {
        */
       needToRemoveStyleSheetNodes.push(styleSheet.ownerNode)
       return pre
-    }, {})
+    }, { pseudo: {}})
   if (!window._no_remove_style_sheets) {
     needToRemoveStyleSheetNodes.forEach(function (node) {
       node.parentNode.removeChild(node)
@@ -230,11 +250,55 @@ export function getComponentStyle (context, extract) {
           }
         }
       })
-      delete style[k]
+      if (k !== 'position') { delete style[k] }
     }
   }
+
+  /**
+   * If position is 'sticky', then add it to the stickyChildren of the parent scroller.
+   */
+  const pos = style.position
+  const reg = /sticky$/
+  if (pos === 'fixed') {
+    context.$nextTick(function () {
+      const el = context.$el
+      if (el) {
+        el.classList.add('weex-fixed')
+      }
+    })
+  }
+  else if (isArray(pos) && pos[0].match(reg) || (pos + '').match(reg)) {
+    delete style.position
+    // use native sticky.
+    if (supportSticky()) {
+      context.$nextTick(function () {
+        const el = context.$el
+        if (el) {
+          el.classList.add('weex-ios-sticky')
+        }
+      })
+    }
+    // use re-implementation of sticky.
+    else if (!context._stickyAdded) {
+      const uid = context._uid
+      const scroller = getParentScroller(context)
+      if (scroller) {
+        context._stickyAdded = true
+        if (!scroller._stickyChildren) {
+          scroller._stickyChildren = {}
+        }
+        scroller._stickyChildren[uid] = context
+      }
+      context.$nextTick(function () {
+        const el = context.$el
+        if (el) {
+          context._initOffsetTop = el.offsetTop
+        }
+      })
+    }
+  }
+
   return style
-  // return addPrefix(normalizeStyle(style))
 }
 
 export function extractComponentStyle (context) {
@@ -242,27 +306,37 @@ export function extractComponentStyle (context) {
 }
 
 /**
- * get { width, height } (size) of current component from components' styles.
+ * process sticky children in scrollable components.
+ * current only support list and vertical scroller.
  */
-export function getSize (context) {
-  if (!context.$vnode) {
-    if (process.env.NODE_ENV === 'development') {
-      return console.error('[vue-render] getComponentStyle failed: no $vnode in context.')
+export function processSticky (context) {
+  /**
+   * current browser support 'sticky' or '-webkit-sticky', so there's no need
+   * to do further more.
+   */
+  if (supportSticky()) {
+    return
+  }
+  // current only support list and vertical scroller.
+  if (context.scrollDirection === 'horizontal') {
+    return
+  }
+  const stickyChildren = context._stickyChildren
+  const len = stickyChildren && stickyChildren.length || 0
+  if (len <= 0) { return }
+
+  const container = context.$el
+  if (!container) { return }
+  const scrollTop = container.scrollTop
+
+  let stickyChild
+  for (let i = 0; i < len; i++) {
+    stickyChild = stickyChildren[i]
+    if (stickyChild._initOffsetTop < scrollTop) {
+      stickyChild._addSticky()
     }
-    return {}
+    else {
+      stickyChild._removeSticky()
+    }
   }
-  const data = context.$vnode.data
-  const wh = {}
-  const classes = typeof data.class === 'string' ? data.class.split(' ') : (data.class || [])
-  const staticClass = typeof data.staticClass === 'string' ? data.staticClass.split(' ') : (data.class || [])
-  const clsNms = staticClass.concat(classes)
-  function extendWHFrom (to, from) {
-    if (!from) { return }
-    from.width && (to.width = from.width)
-    from.height && (to.height = from.height)
-  }
-  extendWHFrom(wh, this._getScopeStyle(clsNms))
-  extendWHFrom(wh, data.staticStyle)
-  extendWHFrom(wh, data.style)
-  return wh
 }

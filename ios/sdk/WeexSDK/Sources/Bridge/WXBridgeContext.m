@@ -131,6 +131,160 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
+    [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager createRoot:bodyData];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager removeComponent:ref];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId,NSString *ref,NSString *parentRef,NSInteger index) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager moveComponent:ref toSuper:parentRef atIndex:index];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *attrsData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager updateAttributes:attrsData forComponent:ref];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *stylesData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager updateStyles:stylesData forComponent:ref];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager addEvent:event toComponent:ref];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if (!instance) {
+            WXLogInfo(@"instance not found, maybe already destroyed");
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager removeEvent:event fromComponent:ref];
+        });
+        
+        return 0;
+    }];
+    
     [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
         
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];

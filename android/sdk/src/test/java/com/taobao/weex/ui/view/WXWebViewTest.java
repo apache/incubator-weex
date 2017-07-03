@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.ui.view;
 
+import static org.junit.Assert.assertNotNull;
+
 import android.app.Activity;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -31,18 +33,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.internal.Shadow;
 import org.robolectric.shadows.ShadowWebView;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sospartan on 9/7/16.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore( {"org.mockito.*", "org.robolectric.*", "android.*"})
 public class WXWebViewTest {

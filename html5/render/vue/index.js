@@ -19,7 +19,7 @@
 import weex from './env'
 import { setVue } from './env'
 import components from './components'
-import { base, style } from './mixins'
+import { base, style, sticky } from './mixins'
 // import styleMixin from './mixins/style'
 
 /**
@@ -60,6 +60,7 @@ function init (Vue/*, options = {}*/) {
   //     + `[${Object.keys(components).join(', ')}].`)
   Vue.mixin(base)
   Vue.mixin(style)
+  Vue.mixin(sticky)
   // }
 }
 

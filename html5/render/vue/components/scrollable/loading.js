@@ -45,11 +45,9 @@ export default {
       this.height = this.viewHeight
     }
   },
-  updated () {
-  },
   watch: {
     height (val) {
-      this.$el.style.height = val * weex.config.env.scale + 'px'
+      this.$el.style.height = `${val}px`
     },
     display (val) {
       if (val === 'hide') {

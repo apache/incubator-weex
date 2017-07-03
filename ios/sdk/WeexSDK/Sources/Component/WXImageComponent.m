@@ -76,7 +76,12 @@ static dispatch_queue_t WXImageUpdateQueue;
         [self configPlaceHolder:attributes];
         _resizeMode = [WXConvert UIViewContentMode:attributes[@"resize"]];
         [self configFilter:styles];
-        _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        if (styles[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:styles[@"quality"]];
+        }
+        if (attributes[@"quality"]) {
+            _imageQuality = [WXConvert WXImageQuality:attributes[@"quality"]];
+        }
         _imageSharp = [WXConvert WXImageSharp:styles[@"sharpen"]];
         _imageLoadEvent = NO;
         _imageDownloadFinish = NO;

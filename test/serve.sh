@@ -1,4 +1,5 @@
 #!/bin/bash -eu
 npm run build:vue
 npm run build:ci &
-npm run serve:ui-test 
+port="${serport:-12581}"
+npm run serve:no-port -- -p $port

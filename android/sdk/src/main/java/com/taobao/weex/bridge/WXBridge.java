@@ -107,10 +107,42 @@ class WXBridge implements IWXBridge {
     return errorCode;
   }
   public int callAddElement(String instanceId, String ref,byte[] dom,String index, String callback) {
-
-
     return callAddElement(instanceId,ref, new String(dom),index,callback);
   }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callCreateBody(String instanceId, byte [] tasks, String callback) {
+    return callCreateBody(instanceId,new String(tasks),callback);
+  }
+
+  public int callCreateBody(String instanceId, String tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateBody(instanceId, tasks, callback);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
 
   /**
    * JSF render Node by callAddElement
@@ -197,4 +229,269 @@ class WXBridge implements IWXBridge {
       WXEnvironment.JS_LIB_SDK_VERSION = version;
     }
   }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
+
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateFinish(instanceId, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateBody throw exception:"+e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callCreateFinish(String instanceId, byte [] tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callCreateFinish(instanceId, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateFinish throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callRefreshFinish(String instanceId, byte [] tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRefreshFinish(instanceId, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callCreateFinish throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callUpdateAttrs(String instanceId, String ref, byte [] tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateAttrs(instanceId, ref, new String(tasks), callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callUpdateAttrs throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   *
+   * @param instanceId
+   * @param tasks
+   * @param callback
+   */
+
+  public int callUpdateStyle(String instanceId, String ref, byte [] tasks, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callUpdateStyle(instanceId, ref, new String(tasks), callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callUpdateStyle throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   * @param instanceId
+   * @param ref
+   * @param callback
+   * @return int
+   */
+
+  public int callRemoveElement(String instanceId, String ref, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRemoveElement(instanceId, ref, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callRemoveElement throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   * @param instanceId
+   * @param ref
+   * @param parentref
+   * @param index
+   * @param callback
+   * @return int
+   */
+  public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      // Integer.parseInt(index)
+      errorCode = WXBridgeManager.getInstance().callMoveElement(instanceId, ref, parentref, index, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callMoveElement throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   * @param instanceId
+   * @param ref
+   * @param event
+   * @param callback
+   * @return int
+   */
+  public int callAddEvent(String instanceId, String ref, String event, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callAddEvent(instanceId, ref, event, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callAddEvent throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
+  /**
+   * JavaScript uses this methods to call Android code
+   * @param instanceId
+   * @param ref
+   * @param event
+   * @param callback
+   * @return int
+   */
+  public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+    long start = System.currentTimeMillis();
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if(instance != null) {
+      instance.firstScreenCreateInstanceTime(start);
+    }
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callRemoveEvent(instanceId, ref, event, callback);
+    } catch (Throwable e) {
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"callRemoveEvent throw exception:" + e.getMessage());
+      }
+    }
+    if(instance != null) {
+      instance.callNativeTime(System.currentTimeMillis() - start);
+    }
+    return errorCode;
+  }
+
 }
