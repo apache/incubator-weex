@@ -19,7 +19,6 @@
 import './slider.css'
 import {
   throttle,
-  extend,
   createEvent,
   fireLazyload,
   addTransform,
@@ -116,12 +115,16 @@ export default {
         {
           ref: 'wrapper',
           attrs: { 'weex-type': this.isNeighbor ? 'slider-neighbor' : 'slider' },
-          on: extend(createEventMap(this, ['scroll', 'scrollstart', 'scrollend']), {
-            touchstart: this._handleTouchStart,
-            touchmove: throttle(bind(this._handleTouchMove, this), 25),
-            touchend: this._handleTouchEnd,
-            touchcancel: this._handleTouchCancel
-          }),
+          on: createEventMap(
+            this,
+            ['scroll', 'scrollstart', 'scrollend'],
+            {
+              touchstart: this._handleTouchStart,
+              touchmove: throttle(bind(this._handleTouchMove, this), 25),
+              touchend: this._handleTouchEnd,
+              touchcancel: this._handleTouchCancel
+            }
+          ),
           staticClass: 'weex-slider weex-slider-wrapper weex-ct',
           staticStyle: extractComponentStyle(this)
         },

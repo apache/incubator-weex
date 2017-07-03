@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { extend } from '../utils'
+import { extend, isArray } from '../utils'
 
 /**
  * remove text nodes in the nodes array.
@@ -25,7 +25,7 @@ import { extend } from '../utils'
  * @return {Array} nodes without text nodes.
  */
 export function trimTextVNodes (vnodes) {
-  if (Array.isArray(vnodes)) {
+  if (isArray(vnodes)) {
     return vnodes.filter(vnode => !!vnode.tag)
   }
   return vnodes
@@ -55,7 +55,7 @@ function getListeners (vnode, evt) {
 
 const supportedEvents = [
   'longpress', 'appear', 'disappear',
-  // 'touchstart', 'touchmove', 'touchend',
+  'touchstart', 'touchmove', 'touchend',
   'panstart', 'panmove', 'panend', 'swipe', 'longpress'
 ]
 
@@ -76,9 +76,9 @@ function isInANode (el) {
 /**
  * emit native events to enable v-on.
  * @param {VComponent} context: which one to emit a event on.
- * @param {array} extras: extra events.
+ * @param {array | object} extras: extra events. You can pass in multiple arguments here.
  */
-export function createEventMap (context, extras = []) {
+export function createEventMap (context, ...extras) {
   const eventMap = {}
   /**
    * Bind some original type event to your specified type event handler.
@@ -88,11 +88,11 @@ export function createEventMap (context, extras = []) {
   const bindFunc = (originalType) => {
     return listenTo => {
       let handler
+      const evtName = originalType || listenTo
       if (typeof listenTo === 'function') {
         handler = listenTo
       }
       else if (typeof listenTo === 'string') {
-        if (!originalType) { originalType = listenTo }
         handler = function (e) {
           /**
            * allow original bubbling.
@@ -115,7 +115,7 @@ export function createEventMap (context, extras = []) {
                   on = on.fn
                 }
                 let evt = e
-                if (originalType === listenTo) {
+                if (originalType && evtName !== listenTo) {
                   evt = extend({}, { type: listenTo })
                   // weex didn't provide these two methods for event object.
                   delete event.preventDefault
@@ -135,10 +135,43 @@ export function createEventMap (context, extras = []) {
           }
         }
       }
-      eventMap[originalType] = handler
+      if (!eventMap[evtName]) {
+        eventMap[evtName] = []
+      }
+      eventMap[evtName].push(handler)
     }
   }
-  supportedEvents.concat(extras).forEach(bindFunc())
+
+  /**
+   * 1. Dispatch default supported events directly to user's event listeners. These
+   * listeners will be triggered before extras event handlers.
+   */
+  supportedEvents.forEach(bindFunc())
+
+  /**
+   * 2. component's extra event bindings. This is mostly for the needs of component's
+   * own special behaviours. These handlers will be processed after the user's
+   * corresponding event handlers.
+   */
+  if (extras) {
+    const len = extras.length
+    for (let i = 0; i < len; i++) {
+      const extra = extras[i]
+      if (isArray(extra)) {
+        extra.forEach(bindFunc())
+      }
+      else if (typeof extra === 'object') {
+        for (const key in extra) {
+          bindFunc(key)(extra[key])
+        }
+      }
+    }
+  }
+
+  /**
+   * 3. special binding for click event, which should be a fastclick event without
+   * 300ms latency.
+   */
   bindFunc('tap')('click')
   /**
    * Special treatment for click event:
