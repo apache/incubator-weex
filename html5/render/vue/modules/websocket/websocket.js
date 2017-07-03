@@ -25,6 +25,7 @@ export default (function () {
     INSTANCE: null,
     WebSocket: function (url, protocol) {
       if (!url) {
+        ws.INSTANCE = null
         return
       }
       if (!protocol) {

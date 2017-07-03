@@ -62,12 +62,11 @@ module.exports = function (config) {
     frameworks: ['mocha', 'sinon-chai'],
     browsers: ['PhantomJS'],
     files: [
-      // '../html5/test/render/vue/components/*.js'
-      '../html5/test/render/vue/**/*.js'
+      '../html5/test/render/vue/utils/*.js',
+      '../html5/test/render/vue/core/*.js',
+      '../html5/test/render/vue/!(utils|core)/*.js'
     ],
-
     exclude: [
-      '../html5/test/render/vue/helper.js',
       '../html5/test/render/vue/helper/*.js',
       '../html5/test/render/vue/vender/**/*.js',
       '../html5/test/render/vue/data/**/*.js'
@@ -83,7 +82,7 @@ module.exports = function (config) {
         { type: 'text-summary', dir: absolute('../coverage'), subdir: 'vue-renderer' }
       ]
     },
-
+    browserDisconnectTimeout:10000,
     preprocessors: {
       '../html5/test/**/*.js': ['rollup'],
       '../html5/test/**/!(components|examples|core)/*.js': ['rollup', 'coverage']
