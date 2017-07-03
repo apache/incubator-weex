@@ -170,6 +170,7 @@ CGFloat WXFloorPixelValue(CGFloat value)
     
     NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
                                     @"platform":platform,
+                                    @"osName":platform,//osName is eaqual to platorm name in native
                                     @"osVersion":sysVersion,
                                     @"weexVersion":weexVersion,
                                     @"deviceModel":machine,
