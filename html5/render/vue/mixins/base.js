@@ -37,7 +37,7 @@ import {
 
 // import { extractComponentStyle } from '../core'
 
-import config from '../config'
+// import config from '../config'
 
 let lazyloadWatched = false
 function watchLazyload () {
@@ -139,13 +139,13 @@ export default {
       return arr
     },
 
-    _getParentScroller () {
-      let parent = this
-      while (parent && config.scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
-        parent = parent.$options.parent
-      }
-      return parent
-    },
+    // _getParentScroller () {
+    //   let parent = this
+    //   while (parent && config.scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
+    //     parent = parent.$options.parent
+    //   }
+    //   return parent
+    // },
 
     _fireLazyload (el) {
       if (process.env.NODE_ENV === 'development') {
