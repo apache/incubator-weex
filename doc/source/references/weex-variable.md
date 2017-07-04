@@ -48,7 +48,11 @@ Returns the document object of the current Weex page.
 
 ## `weex.supports`
 
+<span class="weex-version">v0.15+</span>
+
 `weex.supports` is a method used to detect whether a feature is supported in the current environment.
+
+> Only supported in Weex DSL 2.0 (.vue).
 
 ### API
 

@@ -47,9 +47,12 @@ has_chapter_content: true
 返回当前 Weex 页面的文档对象。
 
 ## `weex.supports`
+
 <span class="weex-version">v0.15+</span>
 
 `weex.supports` 可以用来检测当前环境中是否支持某个特性。
+
+> 目前仅在 Weex DSL 2.0 (.vue) 中支持。
 
 ### API
 
