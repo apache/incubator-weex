@@ -24,6 +24,7 @@ jsonContent:
   ignore:
     - index.html
     - faq.html
+    - releasenote.html
     - download.html
     - playground.html
     - cn/index.html
@@ -118,6 +119,12 @@ autoprefixer:
   exclude:
   browsers:
     - 'last 5 versions'
+
+# docsearch
+docsearch:
+  enable: true
+  en: weex_io
+  cn: weex_io_cn
 
 alias:
   doc/index.html: index.html

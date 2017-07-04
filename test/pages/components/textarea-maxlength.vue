@@ -16,17 +16,9 @@
       oninput (event) {
         this.value = event.value
         console.log('oninput:', event.value)
-        modal.toast({
-          message: `oninput: ${event.value}`,
-          duration: 0.8
-        })
       },
       onchange (event) {
         console.log('onchange:', event.value)
-        modal.toast({
-          message: `onchange: ${event.value}`,
-          duration: 0.8
-        })
       },
     }
   }

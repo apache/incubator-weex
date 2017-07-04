@@ -80,6 +80,13 @@ typedef NS_ENUM(NSInteger, Direction) {
     return self;
 }
 
+- (void)dealloc
+{
+    if (_scrollView) {
+        _scrollView.delegate = nil;
+    }
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
