@@ -62,7 +62,7 @@ It can provide excellent experience and performance while still maintaining smoo
 
 Notes: The list now supports the following child components: cell, header, refresh, loading and fixed-position components. Other kinds of components will not be guaranteed to be displayed correctly.
 
-* cell 0.6.1 defines the attributes and behavior of the cells that appear in list. 
+* cell 0.6.1 defines the attributes and behavior of the cells that appear in list.
 * header 0.6.1 sticks to the top when it reaches the top of the screen.
 * refresh 0.6.1 used inside list to add pull-down-to-refresh functionality.
 * loading 0.6.1 used inside list to add pull-up-to-load-more functionality.
@@ -71,7 +71,6 @@ Notes: The list now supports the following child components: cell, header, refre
 ### Attributes
 
 * show-scrollbar: true/false whether show the scroll bar or not, default value is true
-* scroll-direction: <string> define scroll direction of component, horizontal or vertical
 * loadmoreoffset : <number> default value is 0. The loadmore event will be triggered when the list is loadmoreoffset left to reach the bottom of the list view. e.g. a list has total content length of 1000, and the loadmoreoffset is set to 400, the loadmore event will be triggered when 600 has beed scrolled and there is less than 400 left.
 * loadmoreretry : <number> default value 0，whether to reset loadmore related UI when loadmore failed, will be deprecated in further release.
 * offset-accuracy：<number> default value is 0, the vertical offset distance required to trigger the scroll event.
