@@ -82,14 +82,15 @@ menu:
   references: 手册
   doc: 文档
   faq: FAQ
-  note: 参考
+  note: 说明
   releasenote: 版本说明
   index: 首页
   blog: 博客
   showcase: 示例
   download: 下载
   resources: 资源
-  tools: 工具和服务
+  tools: 工具
+  invovled: 参与
   advanced: 高阶知识
   github: GitHub
   legacy: 旧语法文档
