@@ -83,9 +83,13 @@ const configs = {
     moduleName: 'WeexVueRender',
     entry: absolute('html5/render/vue/index.js'),
     dest: absolute('packages/weex-vue-render/dist/index.js'),
-    banner:`
-console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');
-window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
+    intro:`describe('ignore inject function from postcss', function () {
+      it('ignore', function () {
+        var shouldBe = 'test'
+        var expected = __$styleInject('.body{}',shouldBe)
+        expect(shouldBe).to.be.equal(expected)
+      })
+    })`,
     format: 'umd',
     plugins: [
       postcss(),
@@ -108,7 +112,7 @@ function getConfig (name, minify) {
     entry: opt.entry,
     dest: minify ? opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
     format: opt.format,
-    banner: opt.banner,
+    intro: opt.intro,
     plugins: opt.plugins.concat([
       json(),
       replace({
