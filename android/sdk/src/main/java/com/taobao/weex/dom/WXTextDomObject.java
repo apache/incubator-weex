@@ -254,9 +254,7 @@ public class WXTextDomObject extends WXDomObject {
     if (style != null) {
       if (style.containsKey(Constants.Name.LINES)) {
         int lines = WXStyle.getLines(style);
-        if (lines > 0) {
-          mNumberOfLines = lines;
-        }
+        mNumberOfLines = lines > 0 ? lines : UNSET;
       }
       if (style.containsKey(Constants.Name.FONT_SIZE)) {
         mFontSize = WXStyle.getFontSize(style,getViewPortWidth());
