@@ -20,22 +20,26 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
-#define WXTracingDataHanding          @"WXTracingDataHanding"
-#define WXTracingJSCall          @"jsCall"
+#define WXTDataHanding          @"WXTDataHanding"
+#define WXTJSCall          @"jsCall"
+#define WXTRender          @"WXTRender"
+#define WXTRenderFinish          @"WXTRenderFinish"
 
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
 #define WXTracingDuration          @"D"
+#define WXTracingInstant          @"i"
 
 typedef enum : NSUInteger {
     // global
-    WXTDataHanding = 0,
-    WXTRender
+    WXTracingDataHanding = 0,
+    WXTracingRender
 } WXTracingTag;
 
 @interface WXTracing:NSObject
 
 @property (nonatomic, copy) NSString *ref; // compnonet id
+@property (nonatomic, copy) NSString *parentRef; // compnonet id
 @property (nonatomic, copy) NSString *className; // compnonet class name or module class name
 @property (nonatomic, copy) NSString *name; // register name
 @property (nonatomic, copy) NSString *ph; // phase
@@ -58,11 +62,11 @@ typedef enum : NSUInteger {
 @end
 
 @interface WXTracingManager : NSObject
-+(void)switchTracing:(BOOL)isTracing;
++(void)switchTracing:(BOOL)isTracing; 
 +(BOOL)isTracing;
 +(void)startTracing:(WXTracing*)tracing;
-+(void)startTracing:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
-+ (void)tracingGloabalTask:(NSString *)fName instanceId:(NSString *)instanceId ph:(NSString *)ph;
++(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
++(WXTracingTask*)getTracingData;
 +(void)getTracingData:(NSString *)instanceId;
 
 @end

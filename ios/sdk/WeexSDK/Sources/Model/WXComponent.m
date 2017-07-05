@@ -125,22 +125,11 @@
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
-        [self tracing:WXTracingBegin];
+        
+        [WXTracingManager startTracing:self.weexInstance.instanceId ref:ref parentRef:self.supercomponent.ref className:nil name:type ph:WXTracingBegin fName:WXTRender parentId:self.supercomponent.ref];
     }
     
     return self;
-}
-
--(void)tracing:(NSString *)ph
-{
-    if([WXTracingManager isTracing]){
-        WXTracing *tracing = [WXTracing new];
-        tracing.iid = self.weexInstance.instanceId;
-        tracing.ref = _ref;
-        tracing.name = _type;
-        tracing.ph = ph;
-        [WXTracingManager startTracing:tracing];
-    }
 }
 
 - (void)dealloc

@@ -20,6 +20,7 @@
 #import "WXTracingManager.h"
 #import "WXComponentFactory.h"
 #import "WXModuleFactory.h"
+#import "WXSDKManager.h"
 
 @implementation WXTracing
 
@@ -33,6 +34,7 @@
 
 @property (nonatomic) BOOL isTracing;
 @property (nonatomic, strong) NSMutableDictionary *tracingTasks;  // every instance have a task
+@property (nonatomic, copy) NSString *currentInstanceId;  // every instance have a task
 
 @end
 
@@ -67,8 +69,12 @@
 
 +(BOOL)isTracing
 {
+#if DEBUG
     return YES;
     return [WXTracingManager sharedInstance].isTracing;
+#else
+    return NO;
+#endif
 }
 
 +(void)startTracing:(WXTracing *)tracing
@@ -89,23 +95,28 @@
         NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
         tracing.ts = time;
         if(![WXTracingEnd isEqualToString:tracing.ph]){ // end is should not update
-            tracing.traceId = task.counter++;
+            tracing.traceId = ++task.counter;
         }
-        if([WXTracingDataHanding isEqualToString:tracing.name] && [WXTracingBegin isEqualToString:tracing.ph]){
+        if([WXTDataHanding isEqualToString:tracing.name] && [WXTracingBegin isEqualToString:tracing.ph]){
             task.tag = WXTDataHanding;
         }
+        NSTimeInterval ts = [[NSDate date] timeIntervalSince1970]*1000;
+        tracing.ts = ts ;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateTracings:task tracing:tracing];
         });
     }
 }
 
-+(void)startTracing:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId
++(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId
 {
     if([self isTracing]){
         WXTracing *tracing = [WXTracing new];
         if(ref.length>0){
             tracing.ref = ref;
+        }
+        if(parentRef.length>0){
+            tracing.parentRef = parentRef;
         }
         if(className.length>0){
             tracing.className = className;
@@ -134,6 +145,9 @@
     WXTracing *newTracing = [WXTracing new];
     if(tracing.ref.length>0){
         newTracing.ref = tracing.ref;
+    }
+    if(tracing.parentRef.length>0){
+        newTracing.parentRef = tracing.parentRef;
     }
     if(tracing.className.length>0){
         newTracing.className = tracing.className;
@@ -175,34 +189,46 @@
         }
     }
     return  className;
-    
 }
 
 +(void)updateTracings:(WXTracingTask *)task tracing:(WXTracing *)tracing
 {
-    tracing.className = [self getclassName:tracing];
+    if(![WXTJSCall isEqualToString:tracing.name]){
+        tracing.className = [self getclassName:tracing];
+    }
     if(task.tag == WXTDataHanding){
-        if([WXTracingJSCall isEqualToString:tracing.name]){
+        if([WXTJSCall isEqualToString:tracing.name]){
             NSMutableArray *tracings = [task.tracings copy];
             [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
-                if(([WXTracingDataHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+                if(([WXTDataHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
                     WXTracing *newTracing = [self copyTracing:bTracing];
                     newTracing.iid = newTracing.iid;
                     newTracing.ph = WXTracingEnd;
-                    newTracing.duration = [[NSDate date] timeIntervalSince1970]*1000 - bTracing.ts ;
+                    newTracing.ts = [[NSDate date] timeIntervalSince1970]*1000 ;
+                    newTracing.duration = newTracing.ts - bTracing.ts ;
                     [task.tracings addObject:newTracing];
                     *stop = YES;
                 }
             }];
-            task.tag = WXTRender;
+            task.tag = WXTracingRender;
         }
     }
     if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
         NSMutableArray *tracings = [task.tracings copy];
         [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
-            if(([bTracing.fName isEqualToString:tracing.fName] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+            if(tracing.ref.length > 0 && bTracing.ref.length>0){
+                if(![tracing.ref isEqualToString:bTracing.ref]){
+                    return ;
+                }
+            }
+            
+            if([bTracing.fName isEqualToString:tracing.fName] &&[WXTracingBegin isEqualToString:bTracing.ph]){
                 tracing.iid = bTracing.iid;
-                tracing.duration = [[NSDate date] timeIntervalSince1970]*1000 - bTracing.ts ;
+                if(bTracing.ref.length > 0){
+                    tracing.ref = bTracing.ref;
+                }
+                tracing.duration = tracing.ts - bTracing.ts ;
+                tracing.traceId = bTracing.traceId;
                 *stop = YES;
             }
         }];
@@ -210,14 +236,11 @@
     [task.tracings addObject:tracing];
 }
 
-+ (void)tracingGloabalTask:(NSString *)fName instanceId:(NSString *)instanceId ph:(NSString *)ph
++(WXTracingTask *)getTracingData
 {
-    WXTracing *tracing = [WXTracing new];
-    tracing.iid = instanceId;
-    tracing.name = @"jsCall";
-    tracing.ph = ph;
-    tracing.fName = fName;
-    [WXTracingManager startTracing:tracing];
+    NSArray *instanceIds = [[WXSDKManager bridgeMgr] getInstanceIdStack];
+    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:[instanceIds firstObject]];
+    return task;
 }
 
 +(void)getTracingData:(NSString *)instanceId{
@@ -225,7 +248,7 @@
     NSArray *tracings = [task.tracings copy];
     for (WXTracing *tracing in tracings) {
         if(![WXTracingBegin isEqualToString:tracing.ph]){
-            NSLog(@"%@  %@  %@  %f",tracing.fName,tracing.name,tracing.className,tracing.duration);
+            NSLog(@"%lld %@  %@  %@  %f %f %@  %@",tracing.traceId,tracing.fName,tracing.name,tracing.className,tracing.ts,tracing.duration,tracing.ref,tracing.parentRef);
         }
     }
 }
