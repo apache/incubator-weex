@@ -356,6 +356,9 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         layer.frame = originFrame;
     }
     [layer addAnimation:animation forKey:info.propertyName];
+    if(WXFloatEqual(animation.duration, 0) || WXFloatLessThan(animation.duration, 0)){
+        [layer removeAllAnimations];
+    }
 }
 
 @end
