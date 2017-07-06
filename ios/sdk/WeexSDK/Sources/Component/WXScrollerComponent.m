@@ -96,6 +96,12 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     }
 }
 
+- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
+{
+//    [super _insertChildCssNode:subcomponent atIndex:index];
+    YGNodeInsertChild(self.scrollerCSSNode, subcomponent.cssNode, (int32_t)index);
+}
+
 -(instancetype)initWithRef:(NSString *)ref type:(NSString *)type styles:(NSDictionary *)styles attributes:(NSDictionary *)attributes events:(NSArray *)events weexInstance:(WXSDKInstance *)weexInstance
 {
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
@@ -113,7 +119,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         _listenLoadMore = [events containsObject:@"loadmore"];
         _scrollable = attributes[@"scrollable"] ? [WXConvert BOOL:attributes[@"scrollable"]] : YES;
         _offsetAccuracy = attributes[@"offsetAccuracy"] ? [WXConvert WXPixelType:attributes[@"offsetAccuracy"] scaleFactor:self.weexInstance.pixelScaleFactor] : 0;
-        _scrollerCSSNode = YGNodeNew();
+        _scrollerCSSNode = YGNodeNewWithConfig([[self class] yogaConfig]);
         
         // let scroller fill the rest space if it is a child component and has no fixed height & width
         if (((_scrollDirection == WXScrollDirectionVertical &&
@@ -654,6 +660,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
         
 //        layoutNode(_scrollerCSSNode, CSS_UNDEFINED, CSS_UNDEFINED, CSS_DIRECTION_INHERIT);
         YGNodeCalculateLayout(_scrollerCSSNode, YGUndefined, YGUndefined, YGDirectionInherit);
+        YGNodeSetHasNewLayout(_cssNode, true);
         if ([WXLog logLevel] >= WXLogLevelDebug) {
             YGNodePrint(_scrollerCSSNode, YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren);
         }

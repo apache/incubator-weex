@@ -142,6 +142,19 @@
 
 }
 
++ (YGConfigRef)yogaConfig
+{
+    static YGConfigRef yogaConfig;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        yogaConfig = YGConfigNew();
+        // Turnig off pixel rounding.
+        YGConfigSetPointScaleFactor(yogaConfig, 0.0);
+        YGConfigSetUseLegacyStretchBehaviour(yogaConfig, true);
+    });
+    return yogaConfig;
+}
+
 - (NSDictionary *)styles
 {
     NSDictionary *styles;
@@ -358,6 +371,11 @@
 - (WXComponent *)supercomponent
 {
     return _supercomponent;
+}
+
+- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index
+{
+    YGNodeInsertChild(self.cssNode, subcomponent.cssNode, (int32_t)index);
 }
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index

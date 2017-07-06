@@ -222,10 +222,10 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     
     UIEdgeInsets padding = {
-        WXFloorPixelValue(isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value + isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop)),
-        WXFloorPixelValue(isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value + isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft)),
-        WXFloorPixelValue(isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value + isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom)),
-        WXFloorPixelValue(isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value + isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight)))
     };
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {

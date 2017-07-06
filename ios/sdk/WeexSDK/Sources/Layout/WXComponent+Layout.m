@@ -59,7 +59,7 @@
 
 - (void)_initCSSNodeWithStyles:(NSDictionary *)styles
 {
-    _cssNode = YGNodeNew();
+    _cssNode = YGNodeNewWithConfig([[self class] yogaConfig]);
     YGNodeSetPrintFunc(_cssNode, cssNodePrint);
 //    _cssNode->get_child = cssNodeGetChild;
 //    _cssNode->is_dirty = cssNodeIsDirty;
@@ -163,11 +163,18 @@
         return;
     }
     _isLayoutDirty = NO;
-    
-    CGRect newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
+    CGRect newFrame = CGRectZero;
+    if ([self isKindOfClass:NSClassFromString(@"WXCellComponent")]) {
+        newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
+                              0,
+                              WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
+                              WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
+    }else {
+        newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
                                  WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetTop(_cssNode))?0:YGNodeLayoutGetTop(_cssNode)),
                                  WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
                                  WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
+    }
     
     BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {

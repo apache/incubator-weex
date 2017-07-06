@@ -251,8 +251,7 @@ static NSThread *WXComponentThread;
     }
     
     [supercomponent _insertSubcomponent:component atIndex:index];
-    YGNodeInsertChild(supercomponent.cssNode, component.cssNode, (int32_t)index);
-    
+    [supercomponent _insertChildCssNode:component atIndex:index];
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -697,7 +696,7 @@ static NSThread *WXComponentThread;
 
 - (void)_initRootCSSNode
 {
-    _rootCSSNode = YGNodeNew();
+    _rootCSSNode = YGNodeNewWithConfig([[_rootComponent class] yogaConfig]);
     [self _applyRootFrame:self.weexInstance.frame toRootCSSNode:_rootCSSNode];
     YGNodeStyleSetFlexWrap(_rootCSSNode, YGWrapNoWrap);
 //    _rootCSSNode->is_dirty = rootNodeIsDirty;

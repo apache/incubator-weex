@@ -142,6 +142,7 @@
 - (id<WXScrollerProtocol>)ancestorScroller;
 
 - (void)_insertSubcomponent:(WXComponent *)subcomponent atIndex:(NSInteger)index;
+- (void)_insertChildCssNode:(WXComponent*)subcomponent atIndex:(NSInteger)index;
 - (void)_removeFromSupercomponent;
 - (void)_moveToSupercomponent:(WXComponent *)newSupercomponent atIndex:(NSUInteger)index;
 
@@ -212,5 +213,7 @@
 - (void)_configWXComponentA11yWithAttributes:(NSDictionary *)attributes;
 
 - (void)setGradientLayer;
+
++ (YGConfigRef)yogaConfig;
 
 @end
