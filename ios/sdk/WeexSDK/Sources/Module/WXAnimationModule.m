@@ -89,6 +89,11 @@
         return;
     }
     
+    [self applyTransform];
+}
+
+-(void)applyTransform
+{
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
         WXTransform *transform = _animationInfo.target->_transform;
         [transform applyTransformForView:_animationInfo.target.view];
@@ -355,9 +360,13 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         layer.anchorPoint = CGPointZero;
         layer.frame = originFrame;
     }
-    [layer addAnimation:animation forKey:info.propertyName];
+    
     if(WXFloatEqual(animation.duration, 0) || WXFloatLessThan(animation.duration, 0)){
-        [layer removeAllAnimations];
+        if([delegate respondsToSelector:@selector(applyTransform)]) {
+            [delegate applyTransform];
+        }
+    } else {
+        [layer addAnimation:animation forKey:info.propertyName];
     }
 }
 
