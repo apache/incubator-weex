@@ -19,6 +19,12 @@
 import * as utils from '../../../../render/vue/utils'
 describe('utils', function () {
   describe('function', function () {
+    before(function(){
+      this.clock = sinon.useFakeTimers()
+    })
+    after(function(){
+      this.clock.restore()
+    })
     it('extend', function () {
       const {
         extend
@@ -108,12 +114,12 @@ describe('utils', function () {
         debounce
       } = utils
       const shouldBe = 'test'
-      const expected = debounce(function () {
-        return shouldBe
-      }, 100)
-      setTimeout(function () {
-        expect(shouldBe).to.be.equal(expected)
-      }, 100)
+      let expected
+      debounce(function () {
+        expected = shouldBe
+      },500)()
+      this.clock.tick(500)
+      expect(shouldBe).to.be.equal(expected)
       expect(debounce).to.be.a('function')
     })
     it('depress', function () {
@@ -121,12 +127,12 @@ describe('utils', function () {
         depress
       } = utils
       const shouldBe = 'test'
-      const expected = depress(function () {
-        return shouldBe
-      }, 100)
-      setTimeout(function () {
-        expect(shouldBe).to.be.equal(expected)
-      }, 100)
+      let expected
+      depress(function () {
+        expected = shouldBe
+      }, 100)()
+      this.clock.tick(100)
+      expect(shouldBe).to.be.equal(expected)
       expect(depress).to.be.a('function')
     })
     it('throttle', function () {
@@ -134,15 +140,18 @@ describe('utils', function () {
         throttle
       } = utils
       let expected
-      throttle(function () {
-        expected = 'test1'
-      }, 100)
-      throttle(function () {
-        expected = 'test2'
-      }, 50)
-      setTimeout(function () {
-        expect(expected).to.be.equal('test1')
-      }, 100)
+      const wait = 100
+      const throttlecb = throttle(function (parmas) {
+        expected = parmas
+      }, wait,true)
+      throttlecb('test1')
+      setTimeout(function(){
+        throttlecb('test2')
+      },50)
+      this.clock.tick(wait)
+      this.clock.tick(50)
+      this.clock.tick(wait + (wait > 25 ? wait : 25))
+      expect(expected).to.be.equal('test1')
       expect(throttle).to.be.a('function')
     })
     it('loopArray', function () {
