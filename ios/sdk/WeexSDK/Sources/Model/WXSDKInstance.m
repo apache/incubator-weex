@@ -213,10 +213,10 @@ typedef enum : NSUInteger {
             if(sliderClassName.length>0){
                 [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(sliderClassName)];
             }else{
-                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+                [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
             }
         }else{
-            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXSliderComponent")];
+            [WXSDKEngine registerComponent:@"slider" withClass:NSClassFromString(@"WXCycleSliderComponent")];
         }
     }
 }
