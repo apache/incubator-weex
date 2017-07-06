@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as type from '../../../../render/vue/utils'
+import * as type from '../../../../render/vue/utils/type'
 describe('utils', function () {
   describe('type', function () {
     it('isPlainObject', function () {
