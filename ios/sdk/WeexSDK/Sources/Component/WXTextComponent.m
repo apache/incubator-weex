@@ -120,6 +120,10 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     BOOL _needsRemoveObserver;
     NSAttributedString * _ctAttributedString;
     CTFramesetterRef _ctframeSetter;
+    
+    pthread_mutex_t _ctFrameSetterMutex;
+    pthread_mutex_t _ctAttributedStringMutex;
+    pthread_mutexattr_t _propertMutexAttr;
 }
 
 + (void)setRenderUsingCoreText:(BOOL)usingCoreText
@@ -143,6 +147,11 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if (self) {
         // just for coretext and textkit render replacement
         _needsRemoveObserver = NO;
+        pthread_mutexattr_init(&(_propertMutexAttr));
+        pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_init(&(_ctFrameSetterMutex), &(_propertMutexAttr));
+        pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
+        
         if ([attributes objectForKey:@"coretext"]) {
             _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
         } else {
@@ -181,6 +190,9 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
         CFRelease(_ctframeSetter);
         _ctframeSetter = NULL;
     }
+    pthread_mutex_destroy(&_ctAttributedStringMutex);
+    pthread_mutex_destroy(&_ctFrameSetterMutex);
+    pthread_mutexattr_destroy(&_propertMutexAttr);
 }
 
 #define WX_STYLE_FILL_TEXT(key, prop, type, needLayout)\
@@ -348,17 +360,21 @@ do {\
 
 - (NSAttributedString *)ctAttributedString
 {
+    pthread_mutex_lock(&(_ctAttributedStringMutex));
     if (!_ctAttributedString) {
         _ctAttributedString = [[self buildCTAttributeString] copy];
     }
+    pthread_mutex_unlock(&(_ctAttributedStringMutex));
     return [_ctAttributedString copy];
 }
 
 - (CTFramesetterRef)ctFramesetterRef
 {
+    pthread_mutex_lock(&(_ctFrameSetterMutex));
     if (NULL == _ctframeSetter) {
         _ctframeSetter = CTFramesetterCreateWithAttributedString((CFTypeRef)[self ctAttributedString]);
     }
+    pthread_mutex_unlock(&(_ctFrameSetterMutex));
     return _ctframeSetter;
 }
 
@@ -640,8 +656,12 @@ do {\
         if (_coreTextFrameRef) {
             CFRelease(_coreTextFrameRef);
         }
-        _coreTextFrameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, 0), cgPath, NULL);
+        _coreTextFrameRef = CTFramesetterCreateFrame([self ctFramesetterRef], CFRangeMake(0, attributedStringCopy.length), cgPath, NULL);
         CFArrayRef ctLines = NULL;
+        if (NULL == _coreTextFrameRef) {
+            // try to protect crash from frame is NULL
+            return;
+        }
         ctLines = CTFrameGetLines(_coreTextFrameRef);
         CFIndex lineCount = CFArrayGetCount(ctLines);
         NSMutableArray * mutableLines = [NSMutableArray new];
@@ -853,6 +873,10 @@ do {\
     CGPathRelease(path);
     
     CFArrayRef lines = NULL;
+    if (NULL == frameRef) {
+        //try to protect unexpected crash.
+        return suggestSize;
+    }
     lines = CTFrameGetLines(frameRef);
     CFIndex lineCount = CFArrayGetCount(lines);
     CGFloat ascent = 0;

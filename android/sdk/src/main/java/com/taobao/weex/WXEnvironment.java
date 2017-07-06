@@ -83,6 +83,10 @@ public class WXEnvironment {
   public static boolean sShow3DLayer=true;
 
   private static Map<String, String> options = new HashMap<>();
+  static {
+    options.put(WXConfig.os, OS);
+    options.put(WXConfig.osName, OS);
+  }
 
   /**
    * dynamic

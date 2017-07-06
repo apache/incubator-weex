@@ -81,6 +81,7 @@ module.exports = {
     ]
   },
   vue: {
+    optimizeSSR: false,
     /**
      * important! should use postTransformNode to add $processStyle for
      * inline style prefixing.
