@@ -133,6 +133,16 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final boolean DEFAULT_EXCLUDED = false;
 
   private static final String DRAG_ANCHOR = "dragAnchor";
+  private float mContentHeight = 0;
+
+  public void recalculateSize() {
+    float height = 0;
+    for(int i=0, c = getChildCount(); i<=c-1 ; i++){
+      height += getChild(i).getLayoutHeight();
+    }
+    mContentHeight = height;
+    fireScrollEvent(0,0);
+  }
 
   /**
    * gesture type which can trigger drag&drop
@@ -179,6 +189,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     });
 
     mTriggerType = getTriggerType(getDomObject());
+  }
+
+  @Override
+  protected void onFinishLayout() {
+    super.onFinishLayout();
+    recalculateSize();
   }
 
   /**
@@ -1254,26 +1270,35 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
           }
 
           if (shouldReport(offsetX, offsetY)) {
-            int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
-            int contentHeight = recyclerView.computeVerticalScrollRange();
-
-            Map<String, Object> event = new HashMap<>(2);
-            Map<String, Object> contentSize = new HashMap<>(2);
-            Map<String, Object> contentOffset = new HashMap<>(2);
-
-            contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
-            contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
-
-            contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getInstanceViewPortWidth()));
-            contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
-            event.put(Constants.Name.CONTENT_SIZE, contentSize);
-            event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
-
-            fireEvent(Constants.Event.SCROLL, event);
+            fireScrollEvent(offsetX, offsetY);
           }
         }
       });
     }
+  }
+
+  private void fireScrollEvent(int offsetX, int offsetY){
+    ListComponentView view = getHostView();
+    if(view == null){
+      return;
+    }
+    WXRecyclerView innerView = view.getInnerView();
+    int contentWidth = innerView.getMeasuredWidth() + innerView.computeHorizontalScrollRange();
+    int contentHeight = (int)mContentHeight;
+
+    Map<String, Object> event = new HashMap<>(2);
+    Map<String, Object> contentSize = new HashMap<>(2);
+    Map<String, Object> contentOffset = new HashMap<>(2);
+
+    contentSize.put(Constants.Name.WIDTH, WXViewUtils.getWebPxByWidth(contentWidth, getInstance().getInstanceViewPortWidth()));
+    contentSize.put(Constants.Name.HEIGHT, WXViewUtils.getWebPxByWidth(contentHeight, getInstance().getInstanceViewPortWidth()));
+
+    contentOffset.put(Constants.Name.X, - WXViewUtils.getWebPxByWidth(offsetX, getInstance().getInstanceViewPortWidth()));
+    contentOffset.put(Constants.Name.Y, - WXViewUtils.getWebPxByWidth(offsetY, getInstance().getInstanceViewPortWidth()));
+    event.put(Constants.Name.CONTENT_SIZE, contentSize);
+    event.put(Constants.Name.CONTENT_OFFSET, contentOffset);
+
+    fireEvent(Constants.Event.SCROLL, event);
   }
 
   private boolean shouldReport(int offsetX, int offsetY) {
