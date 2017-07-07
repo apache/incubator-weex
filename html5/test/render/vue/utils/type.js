@@ -20,26 +20,30 @@ import * as type from '../../../../render/vue/utils/type'
 describe('utils', function () {
   describe('type', function () {
     it('isPlainObject', function () {
-        const { isPlainObject } = type
-        expect(isPlainObject).to.be.a('function')
-        expect(isPlainObject({})).to.be.equal(true)
-        expect(isPlainObject(1)).to.be.equal(false)
-        expect(isPlainObject([1,2,3])).to.be.equal(false)
-        expect(isPlainObject('1')).to.be.equal(false)
-        expect(isPlainObject(new Date())).to.be.equal(false)
-        expect(isPlainObject(function(){})).to.be.equal(false)
-        expect(isPlainObject(new RegExp('/^.?/'))).to.be.equal(false)
+      const {
+        isPlainObject
+      } = type
+      expect(isPlainObject).to.be.a('function')
+      expect(isPlainObject({})).to.be.equal(true)
+      expect(isPlainObject(1)).to.be.equal(false)
+      expect(isPlainObject([1, 2, 3])).to.be.equal(false)
+      expect(isPlainObject('1')).to.be.equal(false)
+      expect(isPlainObject(new Date())).to.be.equal(false)
+      expect(isPlainObject(function () {})).to.be.equal(false)
+      expect(isPlainObject(new RegExp('/^.?/'))).to.be.equal(false)
     })
     it('isArray', function () {
-        const { isArray } = type
-        expect(isArray).to.be.a('function')
-        expect(isArray([1,2,3])).to.be.equal(true)
-        expect(isArray(1)).to.be.equal(false)
-        expect(isArray('1')).to.be.equal(false)
-        expect(isArray({})).to.be.equal(false)
-        expect(isArray(new Date())).to.be.equal(false)
-        expect(isArray(function(){})).to.be.equal(false)
-        expect(isArray(new RegExp('/^.?/'))).to.be.equal(false)
+      const {
+        isArray
+      } = type
+      expect(isArray).to.be.a('function')
+      expect(isArray([1, 2, 3])).to.be.equal(true)
+      expect(isArray(1)).to.be.equal(false)
+      expect(isArray('1')).to.be.equal(false)
+      expect(isArray({})).to.be.equal(false)
+      expect(isArray(new Date())).to.be.equal(false)
+      expect(isArray(function () {})).to.be.equal(false)
+      expect(isArray(new RegExp('/^.?/'))).to.be.equal(false)
     })
   })
 })
