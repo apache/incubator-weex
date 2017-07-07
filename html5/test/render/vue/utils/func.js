@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as utils from '../../../../render/vue/utils'
+import * as utils from '../../../../render/vue/utils/func'
 describe('utils', function () {
   describe('function', function () {
-    before(function(){
+    before(function () {
       this.clock = sinon.useFakeTimers()
     })
-    after(function(){
+    after(function () {
       this.clock.restore()
     })
     it('extend', function () {
@@ -117,7 +117,7 @@ describe('utils', function () {
       let expected
       debounce(function () {
         expected = shouldBe
-      },500)()
+      }, 500)()
       this.clock.tick(500)
       expect(shouldBe).to.be.equal(expected)
       expect(debounce).to.be.a('function')
@@ -143,11 +143,11 @@ describe('utils', function () {
       const wait = 100
       const throttlecb = throttle(function (parmas) {
         expected = parmas
-      }, wait,true)
+      }, wait, true)
       throttlecb('test1')
-      setTimeout(function(){
+      setTimeout(function () {
         throttlecb('test2')
-      },50)
+      }, 50)
       this.clock.tick(wait)
       this.clock.tick(50)
       this.clock.tick(wait + (wait > 25 ? wait : 25))
