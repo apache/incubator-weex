@@ -8,11 +8,11 @@ has_chapter_content: true
 
 # Set up development environment 
 
-Use dotWe is a good choice, But if you want to develop locally on your own machine, you will set up your development environment.
+Using [dotWe](http://dotwe.org/vue) is a good choice, but if you want to develop locally on your own machine, you will need to set up your development environment.
 
-You will need Node.js and the [Weex CLi](https://github.com/weexteam/weex-toolkit).
+You will need Node.js and the [Weex CLI](https://github.com/weexteam/weex-toolkit).
 
-You can installing Node using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active node.js versions). Run the following commands in a Terminal after installing nvm:
+You can install Node using [nvm](https://github.com/creationix/nvm) (Simple bash script to manage multiple active node.js versions). Run the following commands in a Terminal after installing nvm:
 
 ```bash
 $ nvm install 6.10.0
@@ -41,13 +41,13 @@ Then you can use the weex command to verify that the installation is successful:
 
 ### Generate a new Weex project
 
-You can use CLi to generate a Weex project called "awesome-project". Run the following command in a Terminal:
+You can use CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
 
 ```bash
 $ weex init awesome-project
 ```
 
-Then we enter the awesome-project folder, the CLi has been for us to generate a standard project structure.
+Then enter the awesome-project folder, the CLI has been for us to generate a standard project structure.
 
 ### Usage
 
@@ -57,7 +57,7 @@ We enter the awesome-project folder and install dependencies with the following 
 npm install
 ```
 
-Then we run `npm run dev` and `npm run serve` to start watch mode and static server.
+Then run `npm run dev` and `npm run serve` to start watch mode and static server.
 
 Finally, we can see the Weex page in `http://localhost:8080/index.html`.
 
@@ -66,8 +66,8 @@ You can modify this page in `src/foo.vue`. The code is shown below:
 ```html
 <template>
   <div class="wrapper">
-    <text class="weex">Hello Weex !</text>
-    <text class="vue">Hello Vue !</text>
+    <text class="weex">Hello Weex!</text>
+    <text class="vue">Hello Vue!</text>
   </div>
 </template>
 
@@ -90,4 +90,4 @@ You can modify this page in `src/foo.vue`. The code is shown below:
 </style>
 ```
 
-If you're curious to learn more about technical details, continue on to the next. And don't forget to write code at [dotWe](https://dotwe.org) and preview at anytime.
+If you're curious to learn more about technical details, continue on to the next section. And don't forget to write code at [dotWe](https://dotwe.org) and preview at anytime.
