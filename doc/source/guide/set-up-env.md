@@ -19,7 +19,7 @@ $ nvm install 6.10.0
 $ nvm use 6.10.0
 ```
 
-Node.js comes with npm, which lets you install the Weex Cli.
+Node.js comes with npm, which lets you install the Weex CLI.
 
 Run the following command in a Terminal:
 
@@ -35,13 +35,13 @@ weex-previewer : v1.3.4
 **NOTE: ** If you get an error like "permission error", try installing with `sudo`.
 
 
-Then you can use the weex command to verify that the installation is successful:
+Then you can use the Weex command to verify that the installation is successful:
 
 ![](https://img.alicdn.com/tfs/TB1NBhdQXXXXXXzXFXXXXXXXXXX-712-343.png)
 
 ### Generate a new Weex project
 
-You can use CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
+You can use the CLI to generate a Weex project called "awesome-project". Run the following command in a Terminal:
 
 ```bash
 $ weex init awesome-project
