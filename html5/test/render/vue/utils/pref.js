@@ -19,9 +19,18 @@
 import {
   collectStatPerf,
   tagFirstScreen,
-  tagImg
+  tagImg,  
+  tagBeforeCreate,
+  tagRootMounted,
+  tagMounted,
+  tagBeforeUpdate,
+  tagUpdated,
+  tagBegin,
+  tagEnd
 } from '../../../../render/vue/utils/perf'
 describe('utils', function () {
+  before(function(){
+  })
   describe('pref', function () {
     before(function () {
       this.clock = sinon.useFakeTimers()
@@ -31,17 +40,26 @@ describe('utils', function () {
     })
     it('collectStatPerf', function () {
       expect(collectStatPerf).to.be.a('function')
-      collectStatPerf('totalTime', (new Date()).getTime())
+      expect(collectStatPerf('totalTime', (new Date()).getTime())).to.be.a('undefined')
+      expect(collectStatPerf()).to.be.a('undefined')
     })
     it('tagFirstScreen', function () {
+      const weexEmit = sinon.stub(window.weex,'emit')
       expect(tagFirstScreen).to.be.a('function')
       tagFirstScreen()
+      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
+      expect(weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(0)
       window._first_screen_detected = false
       tagFirstScreen()
+      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(2)
+      expect(weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(1)
+      weexEmit.restore()
     })
     it('tagImg', function () {
+      const weexEmit = sinon.stub(window.weex,'emit')
       tagImg()
       this.clock.tick(500)
+      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
       expect(tagImg).to.be.a('function')
     })
   })
