@@ -24,7 +24,6 @@ describe('utils', function () {
         createEvent
       } = event
       const clickEvent = createEvent('', 'click')
-      console.log(createEvent('', 'click'))
       expect(createEvent).to.be.a('function')
       expect(clickEvent.type).to.be.equal('click')
       expect(clickEvent.target).to.be.a('null')
