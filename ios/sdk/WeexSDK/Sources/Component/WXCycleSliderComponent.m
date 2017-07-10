@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, Direction) {
             
             // check if should apply current contentOffset
             // in case inserting subviews after layoutDidFinish
-            if (index-offset == _index) {
+            if (index-offset == _index && _index>0) {
                 recycleSliderView.currentIndex = _index;
             }
         }
