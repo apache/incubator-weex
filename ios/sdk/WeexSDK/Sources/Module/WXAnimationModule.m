@@ -361,7 +361,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         layer.frame = originFrame;
     }
     
-    if(WXFloatEqual(animation.duration, 0) || WXFloatLessThan(animation.duration, 0)){
+    if(!WXFloatGreaterThan(animation.duration, 0)){
         if([delegate respondsToSelector:@selector(applyTransform)]) {
             [delegate applyTransform];
         }
