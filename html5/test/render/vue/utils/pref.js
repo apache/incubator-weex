@@ -19,7 +19,7 @@
 import {
   collectStatPerf,
   tagFirstScreen,
-  tagImg,  
+  tagImg,
   tagBeforeCreate,
   tagRootMounted,
   tagMounted,
@@ -29,8 +29,7 @@ import {
   tagEnd
 } from '../../../../render/vue/utils/perf'
 describe('utils', function () {
-  before(function(){
-  })
+  before(function () {})
   describe('pref', function () {
     before(function () {
       this.clock = sinon.useFakeTimers()
@@ -44,7 +43,7 @@ describe('utils', function () {
       expect(collectStatPerf()).to.be.a('undefined')
     })
     it('tagFirstScreen', function () {
-      const weexEmit = sinon.stub(window.weex,'emit')
+      const weexEmit = sinon.stub(window.weex, 'emit')
       expect(tagFirstScreen).to.be.a('function')
       tagFirstScreen()
       expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
@@ -56,11 +55,50 @@ describe('utils', function () {
       weexEmit.restore()
     })
     it('tagImg', function () {
-      const weexEmit = sinon.stub(window.weex,'emit')
+      const weexEmit = sinon.stub(window.weex, 'emit')
       tagImg()
       this.clock.tick(500)
       expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
       expect(tagImg).to.be.a('function')
+      weexEmit.restore()
+    })
+    it('tagBeforeCreate', function () {
+      const shouldBe = tagBeforeCreate()
+      this.clock.tick(25)
+      expect(shouldBe).to.be.a('undefined')
+      expect(tagBeforeCreate).to.be.a('function')
+    })
+    it('tagRootMounted', function () {
+      expect(tagRootMounted()).to.be.a('undefined')
+      expect(tagRootMounted).to.be.a('function')
+    })
+    it('tagMounted', function () {
+      const tagmount = tagMounted()
+      this.clock.tick(25)
+      expect(tagMounted).to.be.a('function')
+      expect(tagmount).to.be.a('undefined')
+    })
+    it('tagBeforeUpdate', function () {
+      const tagbeforeupdate = tagBeforeUpdate()
+      this.clock.tick(25)
+      expect(tagBeforeUpdate).to.be.a('function')
+      expect(tagbeforeupdate).to.be.a('undefined')
+    })
+    it('tagUpdated', function () {
+      const tagupdated = tagUpdated()
+      this.clock.tick(25)
+      expect(tagUpdated).to.be.a('function')
+      expect(tagupdated).to.be.a('undefined')
+    })
+    it('tagBegin', function () {
+      const tagbegin = tagBegin()
+      expect(tagbegin).to.be.a('undefined')
+      expect(tagBegin).to.be.a('function')
+    })
+    it('tagEnd', function () {
+      const tagend = tagEnd()
+      expect(tagend).to.be.a('undefined')
+      expect(tagEnd).to.be.a('function')
     })
   })
 })
