@@ -460,6 +460,12 @@ typedef NS_ENUM(NSInteger, Direction) {
                 }
             }
             [recycleSliderView insertItemView:view atIndex:index - offset];
+            
+            // check if should apply current contentOffset
+            // in case inserting subviews after layoutDidFinish
+            if (index-offset == _index) {
+                recycleSliderView.currentIndex = _index;
+            }
         }
         [recycleSliderView layoutSubviews];
     }
