@@ -34,6 +34,7 @@
           // module
           {name: root + '/modules/instance-api', title: 'Instance API'},
           {name: root + '/modules/modal', title: 'Modal'},
+          {name: root + '/modules/webSocket', title: 'WebSocket'},
           {name: root + '/modules/stream', title: 'Stream'},
           {name: root + '/modules/storage',title:'Storage'},
           // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing

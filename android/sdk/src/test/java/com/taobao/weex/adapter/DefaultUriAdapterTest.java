@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by sospartan on 21/11/2016.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 public class DefaultUriAdapterTest {

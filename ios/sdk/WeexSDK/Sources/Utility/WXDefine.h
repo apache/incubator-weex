@@ -20,7 +20,7 @@
 #ifndef __WX_DEFINE_H__
 #define __WX_DEFINE_H__
 
-#define WX_SDK_VERSION @"0.13.0"
+#define WX_SDK_VERSION @"0.15.0"
 
 #if defined(__cplusplus)
 #define WX_EXTERN extern "C" __attribute__((visibility("default")))

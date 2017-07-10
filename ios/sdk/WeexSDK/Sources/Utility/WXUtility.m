@@ -133,7 +133,6 @@ CGFloat WXFloorPixelValue(CGFloat value)
     return floor(value * scale) / scale;
 }
 
-static BOOL WXNotStat;
 @implementation WXUtility
 
 + (void)performBlock:(void (^)())block onThread:(NSThread *)thread
@@ -171,6 +170,7 @@ static BOOL WXNotStat;
     
     NSMutableDictionary *data = [NSMutableDictionary dictionaryWithDictionary:@{
                                     @"platform":platform,
+                                    @"osName":platform,//osName is eaqual to platorm name in native
                                     @"osVersion":sysVersion,
                                     @"weexVersion":weexVersion,
                                     @"deviceModel":machine,
@@ -655,6 +655,9 @@ static BOOL WXNotStat;
 
 + (CGSize)portraitScreenSize
 {
+    if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
+        return [UIScreen mainScreen].bounds.size;
+    }
     static CGSize portraitScreenSize;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -668,6 +671,9 @@ static BOOL WXNotStat;
 
 + (CGFloat)defaultPixelScaleFactor
 {
+    if ([[UIDevice currentDevice].model isEqualToString:@"iPad"]) {
+        return [self portraitScreenSize].width / WXDefaultScreenWidth;
+    }
     static CGFloat defaultScaleFactor;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -738,14 +744,6 @@ static BOOL WXNotStat;
 + (void)delete:(NSString *)service {
     NSMutableDictionary *keychainQuery = [self getKeychainQuery:service];
     SecItemDelete((CFDictionaryRef)keychainQuery);
-}
-
-+ (void)setNotStat:(BOOL)notStat {
-    WXNotStat = YES;
-}
-
-+ (BOOL)notStat {
-    return WXNotStat;
 }
 
 + (NSURL *)urlByDeletingParameters:(NSURL *)url
@@ -861,10 +859,10 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
 
 + (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type
 {
-    NSString *typeStr = @"defalut";
+    NSString *typeStr = @"default";
     switch (type) {
         case UIReturnKeyDefault:
-            typeStr = @"defalut";
+            typeStr = @"default";
             break;
         case UIReturnKeyGo:
             typeStr = @"go";

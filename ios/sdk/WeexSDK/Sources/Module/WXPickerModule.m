@@ -69,6 +69,13 @@ WX_EXPORT_METHOD(@selector(pickTime:callback:))
 -(void)dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
+    if (nil != _backgroundView.superview) {
+        UIView* backgroundView =  _backgroundView;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [backgroundView removeFromSuperview];
+        });
+    }
 }
 
 -(void)pick:(NSDictionary *)options callback:(WXModuleCallback)callback

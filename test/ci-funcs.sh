@@ -47,22 +47,4 @@ function printEnvInfo {
     printenv
 }
 
-function runJSTest {
-    set -e
-    target_danger='danger'
-    target_jsfm='jsfm'
-
-    target=${1:-$target_jsfm}
-    echo "cilog: target: $target"
-
-    if [ $target = $target_jsfm ]
-    then
-        npm run build
-        npm run test
-    elif [ $target = $target_danger ]
-    then
-        npm run danger
-    fi
-}
-
 

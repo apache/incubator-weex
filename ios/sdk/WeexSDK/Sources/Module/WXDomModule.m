@@ -181,14 +181,16 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 - (void)getComponentRect:(NSString*)ref callback:(WXModuleKeepAliveCallback)callback {
     [self performBlockOnComponentManager:^(WXComponentManager * manager) {
         UIView *rootView = manager.weexInstance.rootView;
-        CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
         if ([ref isEqualToString:@"viewport"]) {
-            NSMutableDictionary * callbackRsp = nil;
-            callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
-            [callbackRsp setObject:@(true) forKey:@"result"];
-            if (callback) {
-                callback(callbackRsp, false);
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSMutableDictionary * callbackRsp = nil;
+                CGRect rootRect = [rootView.superview convertRect:rootView.frame toView:rootView];
+                callbackRsp = [self _componentRectInfoWithViewFrame:rootRect];
+                [callbackRsp setObject:@(true) forKey:@"result"];
+                if (callback) {
+                    callback(callbackRsp, false);
+                }
+            });
         } else {
             WXComponent *component = [manager componentForRef:ref];
             __weak typeof (self) weakSelf = self;

@@ -39,9 +39,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.taobao.weex.ComponentObserver;
 import com.taobao.weex.IWXActivityStateListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
@@ -72,7 +72,6 @@ import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXResourceUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,6 +226,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     mGestureType = new HashSet<>();
     ++mComponentNum;
     onCreate();
+    ComponentObserver observer;
+    if ((observer = getInstance().getComponentObserver()) != null) {
+      observer.onCreate(this);
+    }
   }
 
   protected void onCreate(){
@@ -496,6 +499,14 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  public float getLayoutWidth(){
+    return mDomObj == null ? 0 : mDomObj.getLayoutWidth();
+  }
+
+  public float getLayoutHeight(){
+    return mDomObj == null ? 0 : mDomObj.getLayoutHeight();
+  }
+
   public void setPadding(Spacing padding, Spacing border) {
     int left = (int) (padding.get(Spacing.LEFT) + border.get(Spacing.LEFT));
     int top = (int) (padding.get(Spacing.TOP) + border.get(Spacing.TOP));
@@ -708,6 +719,19 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
     }
   }
 
+  private void setPerspective(Object param) {
+    T host = getHostView();
+    if (host != null) {
+      float value = WXUtils.getFloatByViewport(param, getInstance().getInstanceViewPortWidth());
+      float scale = host.getResources().getDisplayMetrics().density;
+      if (!Float.isNaN(value) && value > 0) {
+        host.setCameraDistance(value * scale);
+      } else {
+        host.setCameraDistance(Float.MAX_VALUE);
+      }
+    }
+  }
+
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
   protected void setAriaHidden(boolean isHidden) {
     View host = getHostView();
@@ -759,7 +783,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * @param type
    */
   public void addEvent(String type) {
-    if (TextUtils.isEmpty(type)) {
+    if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
     mAppendEvents.add(type);
@@ -891,6 +915,10 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
       }
       if(mHost != null){
         mHost.setId(WXViewUtils.generateViewId());
+        ComponentObserver observer;
+        if ((observer = getInstance().getComponentObserver()) != null) {
+          observer.onViewCreated(this, mHost);
+        }
       }
       onHostViewInitialized(mHost);
     }else{
@@ -929,6 +957,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    */
   @CallSuper
   protected void onHostViewInitialized(T host){
+    if(host!=null){
+      host.setCameraDistance(Float.MAX_VALUE);
+    }
     if (mAnimationHolder != null) {
       //Performs cached animation
       mAnimationHolder.execute(mInstance, this);
@@ -1261,6 +1292,11 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   }
 
   public void destroy() {
+    ComponentObserver observer;
+    if ((observer = getInstance().getComponentObserver()) != null) {
+      observer.onPreDestory(this);
+    }
+
     if (WXEnvironment.isApkDebugable() && !WXUtils.isUiThread()) {
       throw new WXRuntimeException("[WXComponent] destroy can only be called in main thread");
     }
