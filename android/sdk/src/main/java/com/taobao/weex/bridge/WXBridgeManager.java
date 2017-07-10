@@ -26,6 +26,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -863,6 +864,28 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     getNextTick(instanceId, callback);
     return IWXBridge.INSTANCE_RENDERING;
 
+  }
+
+  public int callReloadPage(String instanceId) {
+    mInit = false;
+    initScriptsFramework("");
+    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+      return IWXBridge.DESTROY_INSTANCE;
+    }
+    try {
+      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+        // JSONObject domObject = JSON.parseObject(tasks);
+        WXDomModule domModule = getDomModule(instanceId);
+        Action action = Actions.getReloadPage(instanceId);
+        domModule.postAction((DOMAction)action, true);
+      }
+    } catch (Exception e) {
+      WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
+      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
+    }
+
+
+    return IWXBridge.INSTANCE_RENDERING_ERROR;
   }
 
   private void getNextTick(final String instanceId, final String callback) {

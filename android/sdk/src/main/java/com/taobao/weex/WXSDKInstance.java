@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -47,6 +48,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
+import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.common.OnWXScrollListener;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXModule;
@@ -73,6 +75,7 @@ import com.taobao.weex.utils.WXJsonUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXReflectionUtils;
 import com.taobao.weex.utils.WXViewUtils;
+import com.taobao.weex.WXSDKEngine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -115,6 +118,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
+
+//  private String mPackage;
+//  private String mTemplate;
+//  private Map<String, Object> mOptions;
+//  private String mJsonInitData;
+//  private WXRenderStrategy mFlag;
 
   /**
    * Render strategy.
@@ -426,8 +435,19 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       renderOptions = new HashMap<>();
     }
 
+    // for reload
+//    mPackage = pageName;
+//    mTemplate = template;
+//    mOptions = renderOptions;
+//    mJsonInitData = jsonInitData;
+//    mFlag = flag;
+
     if (WXEnvironment.sDynamicMode && !TextUtils.isEmpty(WXEnvironment.sDynamicUrl) && renderOptions.get("dynamicMode") == null) {
       renderOptions.put("dynamicMode", "true");
+
+      // add for reload
+//      mOptions = renderOptions;
+
       renderByUrl(pageName, WXEnvironment.sDynamicUrl, renderOptions, jsonInitData, flag);
       return;
     }
@@ -567,6 +587,23 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return "";
   }
 
+  public void reloadPage() {
+    Log.e("reportServerCrash", "WXSDKInstance refreshInstance mBundleUrl:" + mBundleUrl);
+
+    WXSDKEngine.reload();
+
+    // 可以发送广播吗？
+    Intent intent = new Intent();
+    intent.setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
+    intent.putExtra("url", mBundleUrl);
+    mContext.sendBroadcast(intent);
+
+    // mRendered = false;
+    //    destroy();
+    // renderInternal(mPackage, mTemplate, mOptions, mJsonInitData, mFlag);
+    // refreshInstance("{}");
+
+  }
   /**
    * Refresh instance asynchronously.
    * @param data the new data

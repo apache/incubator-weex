@@ -19,6 +19,7 @@
 package com.taobao.weex.bridge;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -28,6 +29,11 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Communication interface for Java code and JavaScript code.
@@ -496,6 +502,55 @@ class WXBridge implements IWXBridge {
       instance.callNativeTime(System.currentTimeMillis() - start);
     }
     return errorCode;
+  }
+
+  public void callReloadPageNative(String instanceId, String namespace, String function) {
+    Log.e("reportServerCrash", "WXBridge reloadPageNative instanceId:" + instanceId + " namespace:" + namespace + " function:" + function);
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callReloadPage(instanceId);
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"reloadPageNative throw exception:"+e.getMessage());
+      }
+    }
+  }
+
+  public void reportServerCrash(String instanceId, String crashFile) {
+    Log.e("reportServerCrash", "WXBridge reportServerCrash instanceId:" + instanceId + " crashFile:" + crashFile);
+
+    String filename = "/data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs";
+    File oldfile = new File(crashFile);
+    File newfile = new File(filename);
+
+    if (newfile.exists() && newfile.isDirectory()) {
+      Date date = new Date();
+      DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+      String time = format.format(date);
+
+      filename += "/native" + time + "_bg_jni.log";
+      newfile=new File(filename);
+      Log.e("reportServerCrash", "WXBridge reportServerCrash time:" + time + " filename" + filename);
+      if(oldfile.exists()){
+        oldfile.renameTo(newfile);
+      }
+    } else {
+      Log.e("reportServerCrash", "WXBridge /data/data/com.taobao.taobao/app_tombstone/com.taobao.taobao/crashsdk/logs not exsist");
+    }
+
+
+    int errorCode = IWXBridge.INSTANCE_RENDERING;
+    try {
+      errorCode = WXBridgeManager.getInstance().callReloadPage(instanceId);
+
+      // upload crash log
+    }catch (Throwable e){
+      //catch everything during call native.
+      if(WXEnvironment.isApkDebugable()){
+        WXLogUtils.e(TAG,"reloadPageNative throw exception:"+e.getMessage());
+      }
+    }
   }
 
 }

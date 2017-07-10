@@ -115,6 +115,11 @@ public enum WXErrorCode {
   WX_ERR_DOM_SCROLLTO("-2110", "scrollToElement"),
 
   /**
+   *
+   */
+  WX_ERR_RELOAD_PAGE("-2111", "reloadPage"),
+
+  /**
    * JS Bundle download error
    */
 

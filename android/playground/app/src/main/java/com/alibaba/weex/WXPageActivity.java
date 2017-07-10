@@ -578,7 +578,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
-            loadWXfromService(mUri.toString());
+            String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
+            String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
+            loadWXfromService(url);
           } else {
             loadWXfromLocal(true);
           }

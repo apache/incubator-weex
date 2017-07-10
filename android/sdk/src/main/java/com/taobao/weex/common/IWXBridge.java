@@ -86,4 +86,8 @@ public interface IWXBridge extends IWXObject {
 
   int callRemoveEvent(String instanceId, String ref, String event, String callback);
 
+  void callReloadPageNative(String instanceId, String namespace, String function);
+
+  void reportServerCrash(String instanceId, String crashFile);
+
 }
