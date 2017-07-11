@@ -31,19 +31,19 @@ describe('style', function () {
   // const info = {}
   const { scale, dpr } = init()
 
-  it('should normalize units numbers', function () {
+  it('should normalize units numbers', () => {
     expect(normalizeUnitsNum('100px')).to.equal(100 * scale + 'px')
     expect(normalizeUnitsNum('100')).to.equal(100 * scale + 'px')
     expect(normalizeUnitsNum('100wx')).to.equal(100 * scale * dpr + 'px')
     expect(normalizeUnitsNum('20wm')).to.equal('')
   })
 
-  it('should normalize number style vals', function () {
+  it('should normalize number style vals', () => {
     expect(normalizeNumber('width', 10)).to.equal(10 * scale + 'px')
     expect(normalizeNumber('width', 1.2)).to.equal(1.2 * scale + 'px')
   })
 
-  it('should normalize string style vals', function () {
+  it('should normalize string style vals', () => {
     expect(normalizeString('width', '100%')).to.equal('100%')
     expect(normalizeString('transform', 'translate3d(10px, 10px, 10px)'))
       .to.equal(`translate3d(${10 * scale}px, ${10 * scale}px, ${10 * scale}px)`)
@@ -53,25 +53,25 @@ describe('style', function () {
       .to.equal(`${4 * scale * dpr}px dotted red`)
   })
 
-  it('should normalize style object', function () {
+  it('should normalize style object', () => {
     //
   })
 
-  it('should trim comment in style.', function () {
+  it('should trim comment in style.', () => {
     const cssText = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  /* left: 43px;\n  top: 71px;*/\n}'
     const trimmed = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  \n}'
     expect(trimComment(cssText)).to.equal(trimmed)
   })
 })
 
-describe('autoPrefix', function () {
+describe('autoPrefix', () => {
   const style = {
     width: '200px',
     flexDirection: 'row',
     transform: 'translate3d(100px, 100px, 0)'
   }
 
-  it('should add prefix for styles.', function () {
+  it('should add prefix for styles.', () => {
     const res = autoPrefix(style)
     const {
       WebkitBoxDirection,

@@ -19,13 +19,13 @@
 import * as utils from '../../../../render/vue/utils/func'
 describe('utils', function () {
   describe('function', function () {
-    before(function () {
+    before(() => {
       this.clock = sinon.useFakeTimers()
     })
-    after(function () {
+    after(() => {
       this.clock.restore()
     })
-    it('extend', function () {
+    it('extend', () => {
       const {
         extend
       } = utils
@@ -45,7 +45,7 @@ describe('utils', function () {
       })
       expect(extend(abc, {})).to.be.deep.equal(abc)
     })
-    it('extendTruthy', function () {
+    it('extendTruthy', () => {
       const {
         extendTruthy
       } = utils
@@ -59,7 +59,7 @@ describe('utils', function () {
       expect(extendTruthy({}, [from])[0]).to.be.deep.equal(from)
       expect(extendTruthy({}, [])).to.be.deep.equal({})
     })
-    it('extendKeys', function () {
+    it('extendKeys', () => {
       const {
         extendKeys
       } = utils
@@ -73,7 +73,7 @@ describe('utils', function () {
       }
       expect(extendKeys({}, from, ['test1'])).to.be.deep.equal(expected)
     })
-    it('extractKeys', function () {
+    it('extractKeys', () => {
       const {
         extractKeys
       } = utils
@@ -92,7 +92,7 @@ describe('utils', function () {
       expect(from).to.be.deep.equal(fromExpected)
       expect(extractKeys({}, {}, [])).to.be.deep.equal({})
     })
-    it('bind', function () {
+    it('bind', () => {
       const {
         bind
       } = utils
@@ -102,40 +102,40 @@ describe('utils', function () {
         }
         return this.name ? this.name : ''
       }
-      const TEST = function () {
+      function TEST () {
         this.name = 'test'
       }
       const shouldBe = bind(testfn, new TEST())()
       expect(bind).to.be.a('function')
       expect(shouldBe).to.be.equal('test')
     })
-    it('debounce', function () {
+    it('debounce', () => {
       const {
         debounce
       } = utils
       const shouldBe = 'test'
       let expected
-      debounce(function () {
+      debounce(() => {
         expected = shouldBe
       }, 500)()
       this.clock.tick(500)
       expect(shouldBe).to.be.equal(expected)
       expect(debounce).to.be.a('function')
     })
-    it('depress', function () {
+    it('depress', () => {
       const {
         depress
       } = utils
       const shouldBe = 'test'
       let expected
-      depress(function () {
+      depress(() => {
         expected = shouldBe
       }, 100)()
       this.clock.tick(100)
       expect(shouldBe).to.be.equal(expected)
       expect(depress).to.be.a('function')
     })
-    it('throttle', function () {
+    it('throttle', () => {
       const {
         throttle
       } = utils
@@ -145,7 +145,7 @@ describe('utils', function () {
         expected = parmas
       }, wait, true)
       throttlecb('test1')
-      setTimeout(function () {
+      setTimeout(() => {
         throttlecb('test2')
       }, 50)
       this.clock.tick(wait)
@@ -154,7 +154,7 @@ describe('utils', function () {
       expect(expected).to.be.equal('test1')
       expect(throttle).to.be.a('function')
     })
-    it('loopArray', function () {
+    it('loopArray', () => {
       const {
         loopArray
       } = utils
@@ -164,10 +164,10 @@ describe('utils', function () {
       expect(loopArray([1, 2, 3], -1)).to.be.deep.equal([2, 3, 1])
       expect(loopArray([1, 2, 3], 0)).to.be.deep.equal([1, 2, 3])
     })
-    it('cached', function () {
+    it('cached', () => {
       expect(utils.cached).to.be.a('function')
     })
-    it('camelize', function () {
+    it('camelize', () => {
       const {
         camelize
       } = utils
@@ -178,7 +178,7 @@ describe('utils', function () {
       expect(camelize('text-overflow')).to.be.equal('textOverflow')
       expect(camelize('a-b-c-d')).to.be.equal('aBCD')
     })
-    it('camelizeKeys', function () {
+    it('camelizeKeys', () => {
       const {
         camelizeKeys
       } = utils
@@ -194,7 +194,7 @@ describe('utils', function () {
       expect(camelizeKeys).to.be.a('function')
       expect(shouldBe).to.be.deep.equal(expected)
     })
-    it('capitalize', function () {
+    it('capitalize', () => {
       const {
         capitalize
       } = utils
@@ -205,7 +205,7 @@ describe('utils', function () {
       expect(capitalize('[string object]')).to.be.equal('[string object]')
       expect(capitalize('I have an apple')).to.be.equal('I have an apple')
     })
-    it('hyphenate', function () {
+    it('hyphenate', () => {
       const {
         hyphenate
       } = utils
@@ -216,7 +216,7 @@ describe('utils', function () {
       expect(hyphenate('textOverflow')).to.be.equal('text-overflow')
       expect(hyphenate('aBCD')).to.be.equal('a-b-c-d')
     })
-    it('hyphenateKeys', function () {
+    it('hyphenateKeys', () => {
       const {
         hyphenateKeys
       } = utils
@@ -232,7 +232,7 @@ describe('utils', function () {
       expect(hyphenateKeys).to.be.a('function')
       expect(shouldBe).to.be.deep.equal(expected)
     })
-    it('hyphenateStyleKeys', function () {
+    it('hyphenateStyleKeys', () => {
       const {
         hyphenateStyleKeys
       } = utils
@@ -248,7 +248,7 @@ describe('utils', function () {
       expect(hyphenateStyleKeys).to.be.a('function')
       expect(shouldBe).to.be.deep.equal(expected)
     })
-    it('camelToKebab', function () {
+    it('camelToKebab', () => {
       const {
         camelToKebab
       } = utils
@@ -256,7 +256,7 @@ describe('utils', function () {
       expect(camelToKebab('')).to.be.equal('')
       expect(camelToKebab('ABC')).to.be.equal('-a-b-c')
     })
-    it('appendCss', function () {
+    it('appendCss', () => {
       const {
         appendCss
       } = utils
@@ -271,13 +271,13 @@ describe('utils', function () {
       handler = document.querySelector('#' + cssid)
       expect(handler.textContent).to.be.equal(anothercss)
     })
-    it('nextFrame', function (done) {
+    it('nextFrame', done => {
       const {
         nextFrame
       } = utils
       let shouldBe
       const expected = 'test'
-      const cb = function () {
+      const cb = () => {
         shouldBe = expected
       }
       expect(nextFrame).to.be.a('function')
@@ -288,7 +288,7 @@ describe('utils', function () {
         done()
       }, 10)
     })
-    it('toCSSText', function () {
+    it('toCSSText', () => {
       const {
         toCSSText
       } = utils

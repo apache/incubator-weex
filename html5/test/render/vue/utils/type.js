@@ -19,7 +19,7 @@
 import * as type from '../../../../render/vue/utils/type'
 describe('utils', function () {
   describe('type', function () {
-    it('isPlainObject', function () {
+    it('isPlainObject', () => {
       const {
         isPlainObject
       } = type
@@ -29,10 +29,10 @@ describe('utils', function () {
       expect(isPlainObject([1, 2, 3])).to.be.equal(false)
       expect(isPlainObject('1')).to.be.equal(false)
       expect(isPlainObject(new Date())).to.be.equal(false)
-      expect(isPlainObject(function () {})).to.be.equal(false)
+      expect(isPlainObject(() => {})).to.be.equal(false)
       expect(isPlainObject(new RegExp('/^.?/'))).to.be.equal(false)
     })
-    it('isArray', function () {
+    it('isArray', () => {
       const {
         isArray
       } = type
@@ -42,7 +42,7 @@ describe('utils', function () {
       expect(isArray('1')).to.be.equal(false)
       expect(isArray({})).to.be.equal(false)
       expect(isArray(new Date())).to.be.equal(false)
-      expect(isArray(function () {})).to.be.equal(false)
+      expect(isArray(() => {})).to.be.equal(false)
       expect(isArray(new RegExp('/^.?/'))).to.be.equal(false)
     })
   })

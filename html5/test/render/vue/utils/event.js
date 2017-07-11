@@ -19,7 +19,7 @@
 import * as event from '../../../../render/vue/utils/event'
 describe('utils', function () {
   describe('event', function () {
-    it('createEvent', function () {
+    it('createEvent', () => {
       const {
         createEvent
       } = event
@@ -28,7 +28,7 @@ describe('utils', function () {
       expect(clickEvent.type).to.be.equal('click')
       expect(clickEvent.target).to.be.a('null')
     })
-    it('createCustomEvent', function () {
+    it('createCustomEvent', () => {
       const {
         createCustomEvent
       } = event
@@ -37,7 +37,7 @@ describe('utils', function () {
       expect(customEvent.type).to.be.equal('customEvent')
       expect(customEvent.target).to.be.a('null')
     })
-    it('dispatchEvent', function (done) {
+    it('dispatchEvent', (done) => {
       const {
         dispatchEvent
       } = event
@@ -45,7 +45,7 @@ describe('utils', function () {
       let expected
       const shouldBe = 'test'
       document.body.appendChild(node)
-      node.addEventListener('click', function () {
+      node.addEventListener('click', () => {
         expected = shouldBe
         document.body.removeChild(node)
         expect(expected).to.be.equal(shouldBe)
@@ -56,7 +56,7 @@ describe('utils', function () {
       dispatchEvent(node, clickevent)
       expected(dispatchEvent).to.be.a('function')
     })
-    it('mapFormEvents', function () {
+    it('mapFormEvents', () => {
       const {
         mapFormEvents
       } = event
@@ -64,7 +64,7 @@ describe('utils', function () {
         $el: {
           value: 'test'
         },
-        $emit: function () {}
+        $emit: () => {}
       }
       const spy = sinon.spy(context, '$emit')
       const map = mapFormEvents(context)
