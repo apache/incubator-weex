@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*global WebSocket*/
 import websocket from '../../../../render/vue/modules/websocket/websocket'
 const TestUrl = 'ws://echo.websocket.org'
 /** @test {webSocket module} */
@@ -47,7 +46,7 @@ describe('webSocket module', function () {
     context('should forward native events', function () {
       let ws = null
       beforeEach(function () {
-        ws = websocket.WebSocket(TestUrl,'')
+        ws = websocket.WebSocket(TestUrl, '')
       })
       afterEach(function () {
         websocket.close()
@@ -64,7 +63,7 @@ describe('webSocket module', function () {
         }
         websocket.onmessage = function (e) {
           expect(e.data).to.be.equal(message)
-          websocket.close()
+          setTimeout(() => { websocket.close() }, 200)
         }
         websocket.onopen = function () {
           websocket.send(message)
