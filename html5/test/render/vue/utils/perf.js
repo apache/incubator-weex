@@ -26,25 +26,25 @@ import {
   tagBeforeUpdate,
   tagUpdated,
   tagBegin,
-  tagEnd
+  tagEnd,
+  perf
 } from '../../../../render/vue/utils/perf'
 describe('utils', function () {
   describe('pref', function () {
-    before(function () {
+    before(() => {
       this.clock = sinon.useFakeTimers()
     })
-    after(function () {
+    after(() => {
       this.clock.restore()
     })
-    it('collectStatPerf', function () {
-      const perf = window._weex_perf
+    it('collectStatPerf', () => {
       const time = (new Date()).getTime()
       collectStatPerf('totalTime', time)
       expect(collectStatPerf).to.be.a('function')
       expect(perf.stat['totalTime']).to.be.equal(time)
       expect(collectStatPerf()).to.be.a('undefined')
     })
-    it('tagFirstScreen', function () {
+    it('tagFirstScreen', () => {
       const weexEmit = sinon.stub(window.weex, 'emit')
       expect(tagFirstScreen).to.be.a('function')
       tagFirstScreen()
@@ -56,7 +56,7 @@ describe('utils', function () {
       expect(weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(1)
       weexEmit.restore()
     })
-    it('tagImg', function () {
+    it('tagImg', () => {
       const weexEmit = sinon.stub(window.weex, 'emit')
       tagImg()
       this.clock.tick(500)
@@ -64,8 +64,7 @@ describe('utils', function () {
       expect(tagImg).to.be.a('function')
       weexEmit.restore()
     })
-    it('tagBeforeCreate', function () {
-      const perf = window._weex_perf
+    it('tagBeforeCreate', () => {
       tagBeforeCreate()
       this.clock.tick(25)
       const time = perf.earliestBeforeCreates[perf.earliestBeforeCreates.length - 1]
@@ -73,16 +72,14 @@ describe('utils', function () {
       expect(perf.earliestBeforeCreates).to.have.lengthOf(1)
       expect(tagBeforeCreate).to.be.a('function')
     })
-    it('tagRootMounted', function () {
-      const perf = window._weex_perf
+    it('tagRootMounted', () => {
       tagRootMounted()
       const time = perf.latestMounts[perf.latestMounts.length - 1]
       expect(time).to.be.a('number')
       expect(perf.stat['totalTime']).to.be.equal(parseInt(time))
       expect(tagRootMounted).to.be.a('function')
     })
-    it('tagMounted', function () {
-      const perf = window._weex_perf
+    it('tagMounted', () => {
       perf.firstAllMountedTime = 0
       tagMounted()
       this.clock.tick(25)
@@ -92,15 +89,13 @@ describe('utils', function () {
       expect(perf.createTime[perf.createTime.length - 1]).to.have.all.keys('start', 'end', 'duration')
       expect(perf.firstAllMountedTime).to.be.above(0)
     })
-    it('tagBeforeUpdate', function () {
-      const perf = window._weex_perf
+    it('tagBeforeUpdate', () => {
       tagBeforeUpdate()
       this.clock.tick(25)
       expect(tagBeforeUpdate).to.be.a('function')
       expect(perf.earliestBeforeUpdates).to.have.lengthOf(1)
     })
-    it('tagUpdated', function () {
-      const perf = window._weex_perf
+    it('tagUpdated', () => {
       tagUpdated()
       this.clock.tick(25)
       expect(tagUpdated).to.be.a('function')
@@ -108,13 +103,12 @@ describe('utils', function () {
       expect(perf.updateTime).to.have.lengthOf(1)
       expect(perf.updateTime[perf.updateTime.length - 1]).to.have.all.keys('start', 'end', 'duration')
     })
-    it('tagBegin', function () {
+    it('tagBegin', () => {
       const name = 'test'
       tagBegin(name)
       expect(tagBegin).to.be.a('function')
     })
-    it('tagEnd', function () {
-      const perf = window._weex_perf
+    it('tagEnd', () => {
       const name = 'test'
       tagEnd(name)
       expect(tagEnd).to.be.a('function')
