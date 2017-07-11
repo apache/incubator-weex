@@ -224,11 +224,6 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
-    public void callReloadPageNative(String instanceId, String namespace, String function) {
-
-    }
-
-    @Override
     public void reportServerCrash(String instanceId, String crashFile) {
 
     }
