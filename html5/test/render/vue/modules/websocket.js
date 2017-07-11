@@ -21,13 +21,6 @@ import websocket from '../../../../render/vue/modules/websocket/websocket'
 const TestUrl = 'ws://echo.websocket.org'
 /** @test {webSocket module} */
 describe('webSocket module', function () {
-  after(function (done) {
-    const ws = new WebSocket(TestUrl)
-    ws.addEventListener('open', function () {
-      ws.send('shutdown')
-      done()
-    })
-  })
   describe('extends Standard WebSocket API', function () {
     context('should inherit', function () {
       const ws = websocket.WebSocket(TestUrl)
@@ -54,33 +47,24 @@ describe('webSocket module', function () {
     context('should forward native events', function () {
       let ws = null
       beforeEach(function () {
-        ws = websocket.WebSocket(TestUrl)
+        ws = websocket.WebSocket(TestUrl,'')
       })
       afterEach(function () {
         websocket.close()
       })
-      it('open', function (done) {
-        websocket.onopen = function () {
-          done()
-        }
-      })
-      it('close', function (done) {
+      it('open && message && close', function (done) {
         let closed = false
+        const message = 'Test'
         ws.onclose = function () {
           if (!closed) {
-            done()
             closed = true
           }
+          expect(closed).to.be.true
+          done()
         }
-        websocket.onopen = function () {
-          websocket.close()
-        }
-      })
-      it('message', function (done) {
-        const message = 'Test'
         websocket.onmessage = function (e) {
           expect(e.data).to.be.equal(message)
-          done()
+          websocket.close()
         }
         websocket.onopen = function () {
           websocket.send(message)
