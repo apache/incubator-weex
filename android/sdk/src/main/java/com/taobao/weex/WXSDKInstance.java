@@ -115,6 +115,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
+  private List<ICreateFinishListener> mCreateFinishListeners;
 
   /**
    * Render strategy.
@@ -995,6 +996,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
               WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
             }
           }
+
+          if (mCreateFinishListeners != null) {
+            for (ICreateFinishListener listener : mCreateFinishListeners) {
+              listener.onCreateFinish();
+            }
+          }
         }
       });
     }
@@ -1589,5 +1596,18 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   public interface NestedInstanceInterceptor {
     void onCreateNestInstance(WXSDKInstance instance, NestedContainer container);
+  }
+
+  public void addCreateFinishListener(ICreateFinishListener listener) {
+    if (mCreateFinishListeners == null) {
+      mCreateFinishListeners = new ArrayList<>();
+    }
+    mCreateFinishListeners.add(listener);
+  }
+
+  public void removeCreateFinishListener(ICreateFinishListener listener) {
+    if (mCreateFinishListeners != null && listener != null) {
+      mCreateFinishListeners.remove(listener);
+    }
   }
 }
