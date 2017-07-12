@@ -132,6 +132,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
 
   static volatile WXBridgeManager mBridgeManager;
 
+  private static final int CRASHREINIT = 8;
+  private static int reInitCount = 1;
+
 
   /**
    * next tick tasks, can set priority
@@ -874,27 +877,29 @@ public class WXBridgeManager implements Callback,BactchExecutor {
   }
 
   public int callReportCrashReloadPage(String instanceId, String crashFile) {
-    callReportCrash(crashFile);
-    // reinit frame work
-    mInit = false;
-    initScriptsFramework("");
-    if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
-      return IWXBridge.DESTROY_INSTANCE;
-    }
-    try {
-      if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
-        // JSONObject domObject = JSON.parseObject(tasks);
-        WXDomModule domModule = getDomModule(instanceId);
-        Action action = Actions.getReloadPage(instanceId);
-        domModule.postAction((DOMAction)action, true);
+      callReportCrash(crashFile);
+      if (reInitCount > CRASHREINIT) {
+          return IWXBridge.INSTANCE_RENDERING_ERROR;
       }
-    } catch (Exception e) {
-      WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
-      commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
-    }
-
-
-    return IWXBridge.INSTANCE_RENDERING_ERROR;
+      reInitCount ++;
+      // reinit frame work
+      mInit = false;
+      initScriptsFramework("");
+      if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
+          return IWXBridge.DESTROY_INSTANCE;
+      }
+      try {
+          if (WXSDKManager.getInstance().getSDKInstance(instanceId) != null) {
+              // JSONObject domObject = JSON.parseObject(tasks);
+              WXDomModule domModule = getDomModule(instanceId);
+              Action action = Actions.getReloadPage(instanceId);
+              domModule.postAction((DOMAction)action, true);
+          }
+      } catch (Exception e) {
+          WXLogUtils.e("[WXBridgeManager] callReloadPage exception: ", e);
+          commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_RELOAD_PAGE,"[WXBridgeManager] callReloadPage exception "+e.getCause());
+      }
+      return IWXBridge.INSTANCE_RENDERING_ERROR;
   }
 
   public void callReportCrash(String crashFile) {
