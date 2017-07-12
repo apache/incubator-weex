@@ -116,6 +116,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
   private List<ICreateFinishListener> mCreateFinishListeners;
+  private List<IUpdateFinishListener> mUpdateFinishListeners;
 
   /**
    * Render strategy.
@@ -949,6 +950,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    */
   public void onUpdateFinish() {
     WXLogUtils.d("Instance onUpdateSuccess");
+    if (mUpdateFinishListeners != null && mUpdateFinishListeners.size() > 0) {
+      for (IUpdateFinishListener listener : mUpdateFinishListeners) {
+        listener.onUpdateFinish();
+      }
+    }
   }
 
 
@@ -1608,6 +1614,19 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void removeCreateFinishListener(ICreateFinishListener listener) {
     if (mCreateFinishListeners != null && listener != null) {
       mCreateFinishListeners.remove(listener);
+    }
+  }
+
+  public void addUpdateFinishListener(IUpdateFinishListener listener) {
+    if (mUpdateFinishListeners == null) {
+      mUpdateFinishListeners = new ArrayList<>();
+    }
+    mUpdateFinishListeners.add(listener);
+  }
+
+  public void removeUpdateFinishListener(IUpdateFinishListener listener) {
+    if (mUpdateFinishListeners != null && listener != null) {
+      mUpdateFinishListeners.remove(listener);
     }
   }
 }

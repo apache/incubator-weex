@@ -31,6 +31,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.ICreateFinishListener;
+import com.taobao.weex.IUpdateFinishListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -518,6 +519,16 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     getInstance().addCreateFinishListener(new ICreateFinishListener() {
       @Override
       public void onCreateFinish() {
+        if (mViewPager != null && initIndex != -1) {
+          mViewPager.setCurrentItem(initIndex);
+          initIndex = -1;
+        }
+      }
+    });
+
+    getInstance().addUpdateFinishListener(new IUpdateFinishListener() {
+      @Override
+      public void onUpdateFinish() {
         if (mViewPager != null && initIndex != -1) {
           mViewPager.setCurrentItem(initIndex);
           initIndex = -1;
