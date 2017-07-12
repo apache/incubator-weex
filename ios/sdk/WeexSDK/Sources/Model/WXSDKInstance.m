@@ -147,7 +147,7 @@ typedef enum : NSUInteger {
     
     WXResourceRequest *request = [WXResourceRequest requestWithURL:url resourceType:WXResourceTypeMainBundle referrer:@"" cachePolicy:NSURLRequestUseProtocolCachePolicy];
     [self _renderWithRequest:request options:options data:data];
-    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTDataHanding ph:WXTracingBegin fName:@"renderWithURL" parentId:nil];
+    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTNetworkHanding ph:WXTracingBegin fName:@"renderWithURL" parentId:nil];
 }
 
 - (void)renderView:(NSString *)source options:(NSDictionary *)options data:(id)data
@@ -158,7 +158,8 @@ typedef enum : NSUInteger {
     _jsData = data;
     
     [self _renderWithMainBundleString:source];
-    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTDataHanding ph:WXTracingBegin fName:@"renderView" parentId:nil];
+    
+    [WXTracingManager setBundleJSType:source instanceId:self.instanceId];
 }
 
 - (void)_renderWithMainBundleString:(NSString *)mainBundleString
@@ -200,6 +201,8 @@ typedef enum : NSUInteger {
     [self _handleConfigCenter];
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+    
+    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTDataHanding ph:WXTracingBegin fName:@"renderWithMainBundleString" parentId:nil];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
@@ -291,6 +294,7 @@ typedef enum : NSUInteger {
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSDownload, strongSelf);
         
         [strongSelf _renderWithMainBundleString:jsBundleString];
+        [WXTracingManager setBundleJSType:jsBundleString instanceId:weakSelf.instanceId];
     };
     
     _mainBundleLoader.onFailed = ^(NSError *loadError) {

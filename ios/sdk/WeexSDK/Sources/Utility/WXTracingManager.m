@@ -21,6 +21,10 @@
 #import "WXComponentFactory.h"
 #import "WXModuleFactory.h"
 #import "WXSDKManager.h"
+#import <WeexSDK/WXComponentFactory.h>
+#import <WeexSDK/WXModuleFactory.h>
+#import <WeexSDK/WXHandlerFactory.h>
+
 
 @implementation WXTracing
 
@@ -97,14 +101,32 @@
         if(![WXTracingEnd isEqualToString:tracing.ph]){ // end is should not update
             tracing.traceId = ++task.counter;
         }
-        if([WXTDataHanding isEqualToString:tracing.name] && [WXTracingBegin isEqualToString:tracing.ph]){
-            task.tag = WXTDataHanding;
+        if([WXTNetworkHanding isEqualToString:tracing.name] && [WXTracingBegin isEqualToString:tracing.ph]){
+            task.tag = WXTNetworkHanding;
         }
         NSTimeInterval ts = [[NSDate date] timeIntervalSince1970]*1000;
         tracing.ts = ts ;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateTracings:task tracing:tracing];
         });
+    }
+}
+
++(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid
+{
+    if([self isTracing] && iid.length >0){
+        WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:iid];
+        if(jsBundleString.length >0){
+            NSRange range = [jsBundleString rangeOfString:@"}"];
+            if (range.location != NSNotFound) {
+                NSString *searchStr =  [jsBundleString substringToIndex:range.location+range.length];
+                if ([searchStr rangeOfString:@"Vue"].location != NSNotFound){
+                    task.bundleJSType = @"Vue";
+                }else if([searchStr rangeOfString:@"Rax"].location != NSNotFound){
+                    task.bundleJSType = @"Rax";
+                }
+            }
+        }
     }
 }
 
@@ -196,25 +218,47 @@
     if(![WXTJSCall isEqualToString:tracing.name]){
         tracing.className = [self getclassName:tracing];
     }
-    if(task.tag == WXTDataHanding){
-        if([WXTJSCall isEqualToString:tracing.name]){
-            NSMutableArray *tracings = [task.tracings copy];
+    if([WXTNetworkHanding isEqualToString:task.tag]){
+        if([WXTDataHanding isEqualToString:tracing.name]){
+            NSMutableArray *tracings = task.tracings;
             [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
-                if(([WXTDataHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+                if(([WXTNetworkHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
                     WXTracing *newTracing = [self copyTracing:bTracing];
-                    newTracing.iid = newTracing.iid;
+                    newTracing.iid = tracing.iid;
                     newTracing.ph = WXTracingEnd;
-                    newTracing.ts = [[NSDate date] timeIntervalSince1970]*1000 ;
+                    newTracing.ts = tracing.ts ;
                     newTracing.duration = newTracing.ts - bTracing.ts ;
+                    bTracing.duration = newTracing.duration;
                     [task.tracings addObject:newTracing];
+                    NSLog(@"jerry0 %f,%f",bTracing.ts,bTracing.duration);
                     *stop = YES;
                 }
             }];
-            task.tag = WXTracingRender;
+            task.tag = WXTDataHanding;
+        }
+    }
+    
+    if([WXTDataHanding isEqualToString:task.tag]){
+        if([WXTJSCall isEqualToString:tracing.name]){
+            NSMutableArray *tracings = task.tracings;
+            [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
+                if(([WXTDataHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+                    WXTracing *newTracing = [self copyTracing:bTracing];
+                    newTracing.iid = tracing.iid;
+                    newTracing.ph = WXTracingEnd;
+                    newTracing.ts = tracing.ts ;
+                    newTracing.duration = newTracing.ts - bTracing.ts ;
+                    bTracing.duration = newTracing.duration;
+                    [task.tracings addObject:newTracing];
+                    NSLog(@"jerry1 %f,%f",bTracing.ts,bTracing.duration);
+                    *stop = YES;
+                }
+            }];
+            task.tag = WXTRender;
         }
     }
     if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
-        NSMutableArray *tracings = [task.tracings copy];
+        NSMutableArray *tracings = task.tracings;
         [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
             if(tracing.ref.length > 0 && bTracing.ref.length>0){
                 if(![tracing.ref isEqualToString:bTracing.ref]){
@@ -229,6 +273,8 @@
                 }
                 tracing.duration = tracing.ts - bTracing.ts ;
                 tracing.traceId = bTracing.traceId;
+                bTracing.duration = tracing.duration;
+                NSLog(@"jerry2 %f,%f",bTracing.ts,bTracing.duration);
                 *stop = YES;
             }
         }];
@@ -248,9 +294,60 @@
     NSArray *tracings = [task.tracings copy];
     for (WXTracing *tracing in tracings) {
         if(![WXTracingBegin isEqualToString:tracing.ph]){
-            NSLog(@"%lld %@  %@  %@  %f %f %@  %@",tracing.traceId,tracing.fName,tracing.name,tracing.className,tracing.ts,tracing.duration,tracing.ref,tracing.parentRef);
+//            NSLog(@"%lld %@  %@  %@  %f %f %@  %@",tracing.traceId,tracing.fName,tracing.name,tracing.className,tracing.ts,tracing.duration,tracing.ref,tracing.parentRef);
         }
     }
+}
+
++(NSDictionary *)getTacingApi
+{
+    NSMutableDictionary *dict = [NSMutableDictionary new];
+    NSMutableArray *componetArray = [NSMutableArray new];
+    NSMutableArray *moduleArray = [NSMutableArray new];
+    NSMutableArray *handleArray = [NSMutableArray new];
+    NSDictionary *componentConfigs = [WXComponentFactory componentConfigs];
+    void (^componentBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        NSMutableDictionary *componentConfig = [mObj mutableCopy];
+        NSDictionary *cDict = [WXComponentFactory componentMethodMapsWithName:componentConfig[@"name"]];
+        if(cDict && [cDict count]>0 && [cDict[@"methods"] count]>0){
+            [componentConfig setObject:cDict[@"methods"] forKey:@"methods"];
+        }
+        [componetArray addObject:componentConfig];
+    };
+    [componentConfigs enumerateKeysAndObjectsUsingBlock:componentBlock];
+    if(componetArray && [componetArray count]>0){
+        [dict setObject:componetArray forKey:@"componet"];
+    }
+    NSDictionary *moduleConfigs = [WXModuleFactory moduleConfigs];
+    void (^moduleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        NSDictionary *mDict = [WXModuleFactory moduleMethodMapsWithName:mKey];
+        NSMutableDictionary *subDict = [NSMutableDictionary new];
+        [subDict setObject:mKey forKey:@"name"];
+        [subDict setObject:mObj forKey:@"class"];
+        if([mDict objectForKey:mKey]){
+            [subDict setObject:[mDict objectForKey:mKey] forKey:@"methods"];
+        }
+        [moduleArray addObject:subDict];
+    };
+    [moduleConfigs enumerateKeysAndObjectsUsingBlock:moduleBlock];
+    if(moduleArray && [moduleArray count]>0){
+        [dict setObject:moduleArray forKey:@"module"];
+    }
+    
+    
+    NSDictionary *handleConfigs = [[WXHandlerFactory handlerConfigs] mutableCopy];
+    void (^handleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
+        NSMutableDictionary *subDict = [NSMutableDictionary new];
+        [subDict setObject:mKey forKey:@"class"];
+        [subDict setObject:NSStringFromClass([mObj class]) forKey:@"name"];
+        [handleArray addObject:subDict];
+    };
+    [handleConfigs enumerateKeysAndObjectsUsingBlock:handleBlock];
+    if(handleArray && [handleArray count]>0){
+        [dict setObject:handleArray forKey:@"handle"];
+    }
+    
+    return dict;
 }
 
 @end

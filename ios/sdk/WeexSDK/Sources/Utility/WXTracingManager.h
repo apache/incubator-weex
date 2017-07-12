@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
+#define WXTNetworkHanding          @"WXTNetworkHanding"
 #define WXTDataHanding          @"WXTDataHanding"
 #define WXTJSCall          @"jsCall"
 #define WXTRender          @"WXTRender"
@@ -32,9 +33,19 @@
 
 typedef enum : NSUInteger {
     // global
-    WXTracingDataHanding = 0,
+    WXTracingNetworkHanding = 0,
+    WXTracingDataHanding,
     WXTracingRender
 } WXTracingTag;
+
+
+@interface WXTracingApi:NSObject
+
+@property (nonatomic, copy) NSString *name; //
+@property (nonatomic, copy) NSString *className; //
+@property (nonatomic, copy) NSString *method; //
+
+@end
 
 @interface WXTracing:NSObject
 
@@ -56,8 +67,9 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, copy) NSString *iid;
 @property (nonatomic) long long counter;
-@property (nonatomic)  WXTracingTag tag;
+@property (nonatomic, copy)  NSString *tag;
 @property (nonatomic, strong) NSMutableArray *tracings;
+@property (nonatomic, copy) NSString *bundleJSType; //
 
 @end
 
@@ -67,6 +79,8 @@ typedef enum : NSUInteger {
 +(void)startTracing:(WXTracing*)tracing;
 +(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
 +(WXTracingTask*)getTracingData;
++(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
 +(void)getTracingData:(NSString *)instanceId;
++(NSDictionary *)getTacingApi;
 
 @end
