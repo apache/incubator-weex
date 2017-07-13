@@ -19,48 +19,49 @@
 import * as lazyload from '../../../../render/vue/utils/lazyload'
 describe('utils', function () {
   describe('lazyload', function () {
+    const validImage_transparent = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    const validImage_black = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+    const invalidImage = 'data:image/jpeg;base64,'
     before(() => {
-      this.clock = sinon.useFakeTimers()
+    //   this.clock = sinon.useFakeTimers()
     })
     after(() => {
-      this.clock.restore()
-    })
-    it('applySrc', () => {
-      const {
-        applySrc
-      } = lazyload
-      const node = document.createElement('figure')
-      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
-      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
-      document.body.appendChild(node)
-      expect(applySrc(node, '')).to.be.a('undefined')
-      expect(node.attributes[0].name).to.be.equal('img-src')
+    //   this.clock.restore()
     })
     it('fireLazyload', () => {
       const {
         fireLazyload
       } = lazyload
       const node = document.createElement('figure')
-      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
-      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
+      const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
+      node.style.height = '10px'
+      node.setAttribute('img-src', validImage_transparent)
+      node.setAttribute('img-placeholder', validImage_transparent)
       document.body.appendChild(node)
+      fireLazyload([node])
+      setTimeout(() => {
+          console.log(node)
+      },200)
+      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_transparent+')')
+      node.setAttribute('img-src', validImage_black)
       fireLazyload(node, true)
-      expect(node.style.backgroundImage).to.be.equal('url(http://via.placeholder.com/1x1)')
+      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_black+')')
+      document.body.removeChild(node)
     })
     it('getThrottleLazyload', () => {
       const {
         getThrottleLazyload
       } = lazyload
       const node = document.createElement('figure')
-      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
-      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
+      const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
+      const wait = 100,duration = wait + (wait > 25 ? wait : 25)
+      node.style.height = '10px'
+      node.setAttribute('img-src', validImage_transparent)
+      node.setAttribute('img-placeholder', validImage_transparent)
       document.body.appendChild(node)
-      const throttle = getThrottleLazyload(100, node)
-      expect(throttle).to.be.a('function')
-      throttle()
-        //   this.clock.tick(100)
-        //   console.log(node.style.backgroundImage)
-        //   expect(node.style.backgroundImage).to.be.equal('url(http://localhost:9876/img-src.jpg)')
+      getThrottleLazyload(wait, node)()
+      document.body.removeChild(node)
+      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_transparent+')')
     })
   })
 })
