@@ -18,11 +18,10 @@
  */
 import websocket from '../../../../render/vue/modules/websocket/websocket'
 const TestUrl = 'ws://echo.websocket.org'
-/** @test {webSocket module} */
-describe('webSocket module', () => {
-
-  describe('extends Standard WebSocket API', () => {
-    context('should inherit', () => {
+  /** @test {webSocket module} */
+describe('webSocket module', function () {
+  describe('extends Standard WebSocket API', function () {
+    context('should inherit', function () {
       let ws = null
       before(() => {
         ws = websocket.WebSocket(TestUrl)
@@ -48,45 +47,41 @@ describe('webSocket module', () => {
         expect(websocket, 'should INSTANCE to be defined').to.have.property('INSTANCE')
       })
     })
-    context('should forward native events', () => {
+    context('should forward native events', function () {
       let ws = null
       before(() => {
-        ws = websocket.WebSocket(TestUrl,'')
+        ws = websocket.WebSocket(TestUrl, '')
       })
       after(() => {
         websocket.close()
       })
       it('open', function () {
-        const open  = () => {
-        }
+        const open = () => {}
         websocket.onopen = open
         expect(ws.onopen).to.be.deep.equal(open)
       })
       it('close', function () {
-        const close  = () => {
-        }
+        const close = () => {}
         websocket.onclose = close
         expect(ws.onclose).to.be.deep.equal(close)
       })
       it('error', function () {
-        const error  = () => {
-        }
+        const error = () => {}
         websocket.onerror = error
         expect(ws.onerror).to.be.deep.equal(error)
       })
       it('message', function () {
-        const message  = () => {
-        }
+        const message = () => {}
         websocket.onmessage = message
         expect(ws.onmessage).to.be.deep.equal(message)
       })
     })
-    describe('should ignore', () => {
-      it('url is undefined', function (done) {
+    describe('should ignore', function () {
+      it('url is undefined', (done) => {
         websocket.WebSocket('')
         expect(websocket.INSTANCE).to.be.null
       })
-      it('both url and protocol is defined', function (done) {
+      it('both url and protocol is defined', (done) => {
         websocket.WebSocket(TestUrl, 'ws')
         expect(websocket.INSTANCE).not.to.be.null
       })
