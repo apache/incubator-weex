@@ -34,7 +34,7 @@ NSString *const WXURLLocalScheme = @"local";
     if ([completeURL isFileURL]) {
         return completeURL;
     } else if ([self isLocalURL:completeURL]) {
-        NSString *resourceName = [[completeURL host] stringByAppendingString:[completeURL path]];
+        NSString *resourceName = [[completeURL host]?:@"" stringByAppendingString:[completeURL path]];
         NSURL *resourceURL = [[NSBundle mainBundle] URLForResource:resourceName withExtension:@""];
         if (!resourceURL) {
             WXLogError(@"Invalid local resource URL:%@, no resouce found.", url);
