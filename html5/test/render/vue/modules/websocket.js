@@ -19,63 +19,69 @@
 import websocket from '../../../../render/vue/modules/websocket/websocket'
 const TestUrl = 'ws://echo.websocket.org'
 /** @test {webSocket module} */
-describe('webSocket module', function () {
-  describe('extends Standard WebSocket API', function () {
-    context('should inherit', function () {
-      const ws = websocket.WebSocket(TestUrl)
-      it('methods', function () {
+describe('webSocket module', () => {
+
+  describe('extends Standard WebSocket API', () => {
+    context('should inherit', () => {
+      let ws = null
+      before(() => {
+        ws = websocket.WebSocket(TestUrl)
+      })
+      after(() => {
+        websocket.close()
+      })
+      it('methods', () => {
         expect(websocket, 'should close method to be defined').to.have.property('close')
         expect(websocket, 'should send method to be defined').to.have.property('send')
       })
-      it('attributes', function () {
+      it('attributes', () => {
         expect(websocket, 'should onerror to be defined').to.have.property('onerror')
         expect(websocket, 'should onmessage to be defined').to.have.property('onmessage')
         expect(websocket, 'should onopen to be defined').to.have.property('onopen')
         expect(websocket, 'should onclose to be defined').to.have.property('onclose')
         expect(ws, 'should binaryType to be defined').to.have.property('binaryType')
-        expect(ws, 'should bufferdAmount to be defined').to.have.property('bufferedAmount')
-        expect(ws, 'should extensions to be defined').to.have.property('extensions')
         expect(ws, 'should protocol to be defined').to.have.property('protocol')
         expect(ws, 'should readyState to be defined').to.have.property('readyState')
         expect(ws, 'should url to be defined').to.have.property('url')
       })
-      it('constants', function () {
+      it('constants', () => {
         expect(websocket, 'should INSTANCE to be defined').to.have.property('INSTANCE')
       })
     })
-    context('should forward native events', function () {
+    context('should forward native events', () => {
       let ws = null
-      beforeEach(function () {
-        ws = websocket.WebSocket(TestUrl, '')
+      before(() => {
+        ws = websocket.WebSocket(TestUrl,'')
       })
-      afterEach(function () {
+      after(() => {
         websocket.close()
       })
-      it('open && message && close', function (done) {
-        let closed = false
-        const message = 'Test'
-        ws.onclose = function () {
-          if (!closed) {
-            closed = true
-          }
-          expect(closed).to.be.true
-          done()
+      it('open', function () {
+        const open  = () => {
         }
-        websocket.onmessage = function (e) {
-          expect(e.data).to.be.equal(message)
-          setTimeout(() => { websocket.close() }, 200)
+        websocket.onopen = open
+        expect(ws.onopen).to.be.deep.equal(open)
+      })
+      it('close', function () {
+        const close  = () => {
         }
-        websocket.onopen = function () {
-          websocket.send(message)
+        websocket.onclose = close
+        expect(ws.onclose).to.be.deep.equal(close)
+      })
+      it('error', function () {
+        const error  = () => {
         }
+        websocket.onerror = error
+        expect(ws.onerror).to.be.deep.equal(error)
+      })
+      it('message', function () {
+        const message  = () => {
+        }
+        websocket.onmessage = message
+        expect(ws.onmessage).to.be.deep.equal(message)
       })
     })
-    describe('should ignore', function () {
-      it('protocol is undefined', function (done) {
-        websocket.WebSocket(TestUrl)
-        expect(websocket.INSTANCE).not.to.be.null
-        done()
-      })
+    describe('should ignore', () => {
       it('url is undefined', function (done) {
         websocket.WebSocket('')
         expect(websocket.INSTANCE).to.be.null
