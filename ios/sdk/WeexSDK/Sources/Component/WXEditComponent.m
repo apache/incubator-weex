@@ -558,7 +558,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
-                .origin.y = -offset,
+                .origin.y = rect.origin.y - offset,
                 .size = rootViewFrame.size
             };
         }
