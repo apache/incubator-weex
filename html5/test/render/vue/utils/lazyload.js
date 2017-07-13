@@ -25,34 +25,42 @@ describe('utils', function () {
     after(() => {
       this.clock.restore()
     })
-    // it('applySrc', () => {
-
-    // })
+    it('applySrc', () => {
+      const {
+        applySrc
+      } = lazyload
+      const node = document.createElement('figure')
+      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
+      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
+      document.body.appendChild(node)
+      expect(applySrc(node, '')).to.be.a('undefined')
+      expect(node.attributes[0].name).to.be.equal('img-src')
+    })
     it('fireLazyload', () => {
-    //   const {
-    //     fireLazyload
-    //   } = lazyload
-    //   const node = document.createElement('figure')
-    //   node.setAttribute('img-src', 'http://some-domain/image-src.jpg')
-    //   node.setAttribute('img-placeholder', 'http://some-domain/image-placeholder')
-    //   document.body.appendChild(node)
-    //   fireLazyload(node, true)
-    //   expect(node.style.backgroundImage).to.be.equal('url(http://some-domain/image-src.jpg)')
+      const {
+        fireLazyload
+      } = lazyload
+      const node = document.createElement('figure')
+      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
+      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
+      document.body.appendChild(node)
+      fireLazyload(node, true)
+      expect(node.style.backgroundImage).to.be.equal('url(http://via.placeholder.com/1x1)')
     })
     it('getThrottleLazyload', () => {
       const {
         getThrottleLazyload
       } = lazyload
       const node = document.createElement('figure')
-      node.setAttribute('img-src', 'http://some-domain/image-src.jpg')
-      node.setAttribute('img-placeholder', 'http://some-domain/image-placeholder')
+      node.setAttribute('img-src', 'http://via.placeholder.com/1x1')
+      node.setAttribute('img-placeholder', 'http://via.placeholder.com/2x2')
       document.body.appendChild(node)
       const throttle = getThrottleLazyload(100, node)
       expect(throttle).to.be.a('function')
       throttle()
-    //   this.clock.tick(100)
-    //   console.log(node.style.backgroundImage)
-    //   expect(node.style.backgroundImage).to.be.equal('url(http://localhost:9876/img-src.jpg)')
+        //   this.clock.tick(100)
+        //   console.log(node.style.backgroundImage)
+        //   expect(node.style.backgroundImage).to.be.equal('url(http://localhost:9876/img-src.jpg)')
     })
   })
 })
