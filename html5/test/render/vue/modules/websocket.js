@@ -50,7 +50,7 @@ describe('webSocket module', function () {
     context('should forward native events', function () {
       let ws = null
       before(() => {
-        ws = websocket.WebSocket(TestUrl, '')
+        ws = websocket.WebSocket(TestUrl, 'ws')
       })
       after(() => {
         websocket.close()
@@ -80,10 +80,6 @@ describe('webSocket module', function () {
       it('url is undefined', (done) => {
         websocket.WebSocket('')
         expect(websocket.INSTANCE).to.be.null
-      })
-      it('both url and protocol is defined', (done) => {
-        websocket.WebSocket(TestUrl, 'ws')
-        expect(websocket.INSTANCE).not.to.be.null
       })
     })
   })
