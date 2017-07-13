@@ -85,12 +85,10 @@ describe('webSocket module', () => {
       it('url is undefined', function (done) {
         websocket.WebSocket('')
         expect(websocket.INSTANCE).to.be.null
-        done()
       })
       it('both url and protocol is defined', function (done) {
         websocket.WebSocket(TestUrl, 'ws')
         expect(websocket.INSTANCE).not.to.be.null
-        done()
       })
     })
   })
