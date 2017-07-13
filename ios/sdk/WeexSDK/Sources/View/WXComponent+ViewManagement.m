@@ -285,7 +285,7 @@ do {\
         [self setNeedsDisplay];
     }
     if (styles && [styles containsObject:@"backgroundImage"]) {
-        _backgroundImage = @"linear-gradient(to left,rgba(255,255,255,0),rgba(255,255,255,0))";
+        _backgroundImage = @"linear-gradient(to left,rgba(255,255,255,0),rgba(255,255,255,0))"; // if backgroundImage is nil, give defalut color value.
         [self setGradientLayer];
     }
     
