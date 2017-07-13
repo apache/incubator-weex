@@ -76,11 +76,5 @@ describe('webSocket module', function () {
         expect(ws.onmessage).to.be.deep.equal(message)
       })
     })
-    describe('should ignore', function () {
-      it('url is undefined', (done) => {
-        websocket.WebSocket('')
-        expect(websocket.INSTANCE).to.be.null
-      })
-    })
   })
 })
