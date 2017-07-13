@@ -896,7 +896,7 @@ do {\
         }
         return suggestSize;
     }
-    return CGSizeMake(!isnan(aWidth)? aWidth :suggestSize.width, totalHeight >suggestSize.height? totalHeight:suggestSize.height);
+    return CGSizeMake(!isnan(aWidth)? aWidth :suggestSize.width, totalHeight);
 }
 
 static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness)
