@@ -115,8 +115,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   private boolean mNeedValidate = false;
   private static volatile int mViewPortWidth = 750;
   private int mInstanceViewPortWidth = 750;
-  private List<ICreateFinishListener> mCreateFinishListeners;
-  private List<IUpdateFinishListener> mUpdateFinishListeners;
+  private List<CreateFinishListener> mCreateFinishListeners;
+  private List<UpdateFinishListener> mUpdateFinishListeners;
 
   /**
    * Render strategy.
@@ -951,7 +951,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void onUpdateFinish() {
     WXLogUtils.d("Instance onUpdateSuccess");
     if (mUpdateFinishListeners != null && mUpdateFinishListeners.size() > 0) {
-      for (IUpdateFinishListener listener : mUpdateFinishListeners) {
+      for (UpdateFinishListener listener : mUpdateFinishListeners) {
         listener.onUpdateFinish();
       }
     }
@@ -1004,7 +1004,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
           }
 
           if (mCreateFinishListeners != null) {
-            for (ICreateFinishListener listener : mCreateFinishListeners) {
+            for (CreateFinishListener listener : mCreateFinishListeners) {
               listener.onCreateFinish();
             }
           }
@@ -1604,27 +1604,27 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     void onCreateNestInstance(WXSDKInstance instance, NestedContainer container);
   }
 
-  public void addCreateFinishListener(ICreateFinishListener listener) {
+  public void addCreateFinishListener(CreateFinishListener listener) {
     if (mCreateFinishListeners == null) {
       mCreateFinishListeners = new ArrayList<>();
     }
     mCreateFinishListeners.add(listener);
   }
 
-  public void removeCreateFinishListener(ICreateFinishListener listener) {
+  public void removeCreateFinishListener(CreateFinishListener listener) {
     if (mCreateFinishListeners != null && listener != null) {
       mCreateFinishListeners.remove(listener);
     }
   }
 
-  public void addUpdateFinishListener(IUpdateFinishListener listener) {
+  public void addUpdateFinishListener(UpdateFinishListener listener) {
     if (mUpdateFinishListeners == null) {
       mUpdateFinishListeners = new ArrayList<>();
     }
     mUpdateFinishListeners.add(listener);
   }
 
-  public void removeUpdateFinishListener(IUpdateFinishListener listener) {
+  public void removeUpdateFinishListener(UpdateFinishListener listener) {
     if (mUpdateFinishListeners != null && listener != null) {
       mUpdateFinishListeners.remove(listener);
     }

@@ -30,8 +30,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
-import com.taobao.weex.ICreateFinishListener;
-import com.taobao.weex.IUpdateFinishListener;
+import com.taobao.weex.CreateFinishListener;
+import com.taobao.weex.UpdateFinishListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -516,20 +516,20 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   @Override
   protected void onHostViewInitialized(FrameLayout host) {
     super.onHostViewInitialized(host);
-    getInstance().addCreateFinishListener(new ICreateFinishListener() {
+    getInstance().addCreateFinishListener(new CreateFinishListener() {
       @Override
       public void onCreateFinish() {
-        if (mViewPager != null && initIndex != -1) {
+        if (mViewPager != null && initIndex != -1 && mAdapter != null && mAdapter.getRealCount() > initIndex) {
           mViewPager.setCurrentItem(initIndex);
           initIndex = -1;
         }
       }
     });
 
-    getInstance().addUpdateFinishListener(new IUpdateFinishListener() {
+    getInstance().addUpdateFinishListener(new UpdateFinishListener() {
       @Override
       public void onUpdateFinish() {
-        if (mViewPager != null && initIndex != -1) {
+        if (mViewPager != null && initIndex != -1 && mAdapter != null && mAdapter.getRealCount() > initIndex) {
           mViewPager.setCurrentItem(initIndex);
           initIndex = -1;
         }

@@ -19,9 +19,9 @@
 package com.taobao.weex;
 
 /**
- * Created by moxun on 2017/7/12.
+ * Created by moxun on 2017/7/13.
  */
 
-public interface ICreateFinishListener {
+public interface CreateFinishListener {
   void onCreateFinish();
 }
