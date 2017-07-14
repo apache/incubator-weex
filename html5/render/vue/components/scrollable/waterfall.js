@@ -23,7 +23,6 @@
  */
 import { extractComponentStyle, createEventMap } from '../../core'
 import { scrollable } from '../../mixins'
-import { extend } from '../../utils'
 
 const NORMAL_GAP_SIZE = 32
 const DEFAULT_COLUMN_COUNT = 1
@@ -325,7 +324,7 @@ export default {
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'waterfall' },
-      on: extend(createEventMap(this), {
+      on: createEventMap(this, {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
