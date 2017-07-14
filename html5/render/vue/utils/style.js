@@ -30,6 +30,29 @@ const noUnitsNumberKeys = [
   'lines'
 ]
 
+// whether to support using 0.5px to paint 1px width border.
+let _supportHairlines: ?boolean
+export function supportHairlines () {
+  if (typeof _supportHairlines === 'undefined') {
+    const dpr = window.devicePixelRatio
+    if (dpr && dpr >= 2 && document.documentElement) {
+      const docElm = document.documentElement
+      const testElm = document.createElement('div')
+      const fakeBody = document.createElement('body')
+      const beforeNode = docElm.firstElementChild || docElm.firstChild
+      testElm.style.border = '0.5px solid transparent'
+      fakeBody.appendChild(testElm)
+      docElm.insertBefore(fakeBody, beforeNode)
+      _supportHairlines = testElm.offsetHeight === 1
+      docElm.removeChild(fakeBody)
+    }
+    else {
+      _supportHairlines = false
+    }
+  }
+  return _supportHairlines
+}
+
 /**
  * remove comments from a cssText.
  */
@@ -77,7 +100,12 @@ function getUnitScaleMap () {
 function limitScale (val, limit) {
   limit = limit || 1
   const sign = val === 0 ? 0 : val > 0 ? 1 : -1
-  return Math.abs(val) > limit ? val : sign * limit
+  let newVal = Math.abs(val) > limit ? val : sign * limit
+  // support 1px device width.
+  if (newVal === 1 && val < 1 && supportHairlines()) {
+    newVal = 0.5
+  }
+  return newVal
 }
 
 function parseScale (val: number, unit: string): string {
