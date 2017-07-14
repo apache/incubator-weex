@@ -273,6 +273,22 @@
   }
 
   initSearch()
+
+
+  function hostbyaliyun(){
+    if(location.hostname === "weex-project.io" || location.hostname === 'localhost'){
+      var hosts = document.querySelectorAll('.hostbyaliyun');
+       hosts.forEach(function (i) {
+          i.style.display = 'block'
+        })
+      
+    }
+  }
+
+  hostbyaliyun()
+
+
+
   /*
    * LANDINGPAGE 
    */
