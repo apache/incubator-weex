@@ -846,8 +846,9 @@ do {\
         return CGSizeZero;
     }
     if (isnan(aWidth)) {
-        aWidth = [attributedStringCpy boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading context:nil].size.width;
+        aWidth = CGFLOAT_MAX;
     }
+    aWidth = [attributedStringCpy boundingRectWithSize:CGSizeMake(aWidth, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading context:nil].size.width;
     CTFramesetterRef ctframesetterRef = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(attributedStringCpy));
     suggestSize = CTFramesetterSuggestFrameSizeWithConstraints(ctframesetterRef, CFRangeMake(0, 0), NULL, CGSizeMake(aWidth, MAXFLOAT), NULL);
     
@@ -894,9 +895,9 @@ do {\
         if(actualLineCount && actualLineCount < lineCount) {
             suggestSize.height = suggestSize.height * actualLineCount / lineCount;
         }
-        return suggestSize;
+        return CGSizeMake(aWidth, suggestSize.height);
     }
-    return CGSizeMake(!isnan(aWidth)? aWidth :suggestSize.width, totalHeight);
+    return CGSizeMake(aWidth, totalHeight);
 }
 
 static void WXTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness)
