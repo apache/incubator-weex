@@ -2,6 +2,7 @@ import { init } from '../helper/runtime'
 import div from '../../../../render/vue/components/div'
 
 import firstScreenAppearBundle from '../data/build/dotvue/first-screen-appear.js'
+import * as components from '../../../../render/vue/utils/component'
 
 init('utils component', (Vue, helper) => {
   const spys = {
@@ -14,14 +15,27 @@ init('utils component', (Vue, helper) => {
   }
 
   const id = 'test-first-screen-appear'
+  let vm = null
 
   before(() => {
     helper.register('div', div)
+    vm =helper.createVm(firstScreenAppearBundle, id)
   })
-
-  describe('watchAppear', function () {
+  
+  describe('component functions', () => {
+    it('getParentScroller', () => {
+      const { getParentScroller } = components
+      expect(getParentScroller).to.be.a('function')
+      expect(getParentScroller(vm)).to.be.a('undefined')
+    })
+    it('isComponentVisible', () => {
+      const { isComponentVisible } = components
+      expect(isComponentVisible).to.be.a('function')
+      expect(isComponentVisible(vm)).to.be.true
+    })
+  })
+  describe('watchAppear', () => {
     it('should work when mounted and updated.', function (done) {
-      helper.createVm(firstScreenAppearBundle, id)
       helper.registerDone(id, () => {
         const { appear: appearSpy, disappear: disappearSpy } = spys
         expect(appearSpy.callCount).to.equal(2)
@@ -32,8 +46,11 @@ init('utils component', (Vue, helper) => {
         expect(appearSpy.args[0][0].direction).to.not.exist
         expect(appearSpy.args[1][0].direction).to.not.exist
         expect(disappearSpy.args[0][0].direction).to.not.exist
-        helper.unregisterDone(id)
-        done()
+        window.dispatchEvent(new Event('scroll'))
+        setTimeout(() => {
+          helper.unregisterDone(id)
+          done()
+        },25)
       })
     })
   })
