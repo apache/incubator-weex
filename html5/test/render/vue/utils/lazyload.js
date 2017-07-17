@@ -19,49 +19,55 @@
 import * as lazyload from '../../../../render/vue/utils/lazyload'
 describe('utils', function () {
   describe('lazyload', function () {
-    const validImage_transparent = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-    const validImage_black = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+    const validImageTransparent = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    const validImageBlack = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
     const invalidImage = 'data:image/jpeg;base64,'
     before(() => {
-    //   this.clock = sinon.useFakeTimers()
+      //   this.clock = sinon.useFakeTimers()
     })
     after(() => {
-    //   this.clock.restore()
+      //   this.clock.restore()
     })
-    it('fireLazyload', () => {
+    it('fireLazyload', (done) => {
       const {
         fireLazyload
       } = lazyload
       const node = document.createElement('figure')
       const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
+      //  const IMG_REC_INDENT = 500
+      node.setAttribute('img-src', invalidImage)
+      node.setAttribute('img-placeholder', validImageBlack)
       node.style.height = '10px'
-      node.setAttribute('img-src', validImage_transparent)
-      node.setAttribute('img-placeholder', validImage_transparent)
-      document.body.appendChild(node)
+        //  coverage branch if (item._src_loading)
+      node._src_loading = true
+        //  coverage branch if (Array.isArray(el))
       fireLazyload([node])
-      setTimeout(() => {
-          console.log(node)
-      },200)
-      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_transparent+')')
-      node.setAttribute('img-src', validImage_black)
+      node._src_loading = false
       fireLazyload(node, true)
-      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_black+')')
-      document.body.removeChild(node)
+      setTimeout(() => {
+        expect(node.style.backgroundImage.replace(urlReg, '')).to.be.equal('url(' + validImageBlack + ')')
+        done()
+        document.body.removeChild(node)
+      }, 100)
     })
-    it('getThrottleLazyload', () => {
+    it('getThrottleLazyload', (done) => {
       const {
         getThrottleLazyload
       } = lazyload
       const node = document.createElement('figure')
       const urlReg = /http(s)?:\/\/(\S+):(\d+)\//
-      const wait = 100,duration = wait + (wait > 25 ? wait : 25)
+      const wait = 100
       node.style.height = '10px'
-      node.setAttribute('img-src', validImage_transparent)
-      node.setAttribute('img-placeholder', validImage_transparent)
+      node.setAttribute('img-src', validImageTransparent)
+      node.setAttribute('img-placeholder', validImageBlack)
       document.body.appendChild(node)
+      window._weex_perf.renderTime.length = 3
       getThrottleLazyload(wait, node)()
-      document.body.removeChild(node)
-      expect(node.style.backgroundImage.replace(urlReg,'')).to.be.equal('url('+validImage_transparent+')')
+      setTimeout(() => {
+        expect(node.style.backgroundImage.replace(urlReg, '')).to.be.equal('url(' + validImageTransparent + ')')
+        done()
+        document.body.removeChild(node)
+      }, 100)
     })
   })
 })
