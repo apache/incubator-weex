@@ -1,3 +1,4 @@
+/*global Event*/
 import { init } from '../helper/runtime'
 import div from '../../../../render/vue/components/div'
 
@@ -19,9 +20,8 @@ init('utils component', (Vue, helper) => {
 
   before(() => {
     helper.register('div', div)
-    vm =helper.createVm(firstScreenAppearBundle, id)
+    vm = helper.createVm(firstScreenAppearBundle, id)
   })
-  
   describe('component functions', () => {
     it('getParentScroller', () => {
       const { getParentScroller } = components
@@ -50,7 +50,7 @@ init('utils component', (Vue, helper) => {
         setTimeout(() => {
           helper.unregisterDone(id)
           done()
-        },25)
+        }, 25)
       })
     })
   })
