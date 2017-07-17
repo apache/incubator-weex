@@ -82,7 +82,7 @@ version: 2.1
 
 ## 事件
 
-- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/vue/98ee340348d7cc3e6fbfe68dbaef1eed)
+- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/vue/e291159ac60b35dcd4994638a78d54ad)
 
   - 事件对象
     - `success`: 当图片成功加载时为`true`，否则为`false`

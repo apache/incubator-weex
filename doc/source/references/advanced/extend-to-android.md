@@ -203,3 +203,17 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   }
 </script>
 ``` 
+
+#### Proguard Rules
+
+If you want to using proguard to protect your source code, please add the following rules to your profile:
+
+```java
+-keep class com.taobao.weex.WXDebugTool{*;}
+-keep class com.taobao.weex.devtools.common.LogUtil{*;}
+-keep public class * extends com.taobao.weex.ui.component.WXComponent{*;}
+-keep public class * extends com.taobao.weex.common.WXModule{*;}
+-keepclassmembers class ** {
+  @com.taobao.weex.ui.component.WXComponentProp public *;
+}
+```
