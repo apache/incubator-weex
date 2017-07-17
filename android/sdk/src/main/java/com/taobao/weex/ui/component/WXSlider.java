@@ -30,6 +30,8 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.CreateFinishListener;
+import com.taobao.weex.UpdateFinishListener;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -62,6 +64,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
+  private int initIndex = -1;
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -340,6 +343,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
       if (index >= mAdapter.getRealCount() || index < 0) {
+        initIndex = index;
         return;
       }
       mViewPager.setCurrentItem(index);
@@ -507,6 +511,30 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         mViewPager.setOnTouchListener(null);
       }
     }
+  }
+
+  @Override
+  protected void onHostViewInitialized(FrameLayout host) {
+    super.onHostViewInitialized(host);
+    getInstance().addCreateFinishListener(new CreateFinishListener() {
+      @Override
+      public void onCreateFinish() {
+        if (mViewPager != null && initIndex != -1 && mAdapter != null && mAdapter.getRealCount() > initIndex) {
+          mViewPager.setCurrentItem(initIndex);
+          initIndex = -1;
+        }
+      }
+    });
+
+    getInstance().addUpdateFinishListener(new UpdateFinishListener() {
+      @Override
+      public void onUpdateFinish() {
+        if (mViewPager != null && initIndex != -1 && mAdapter != null && mAdapter.getRealCount() > initIndex) {
+          mViewPager.setCurrentItem(initIndex);
+          initIndex = -1;
+        }
+      }
+    });
   }
 
   private static class FlingGestureListener extends GestureDetector.SimpleOnGestureListener {
