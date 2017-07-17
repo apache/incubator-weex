@@ -17,17 +17,6 @@
  * under the License.
  */
 import './slider.css'
-import {
-  throttle,
-  createEvent,
-  fireLazyload,
-  addTransform,
-  copyTransform,
-  getTransformObj,
-  bind,
-  extendKeys
-} from '../../utils'
-import { extractComponentStyle, createEventMap } from '../../core'
 
 const TRANSITION_TIME = 400
 const NEIGHBOR_SCALE_TIME = 100
@@ -59,7 +48,7 @@ export default {
         }
       }
     }
-    fireLazyload(this.$el, true)
+    weex.utils.fireLazyload(this.$el, true)
     if (this._preIndex !== this.currentIndex) {
       this._slideTo(this.currentIndex)
     }
@@ -68,7 +57,7 @@ export default {
   mounted () {
     this._getWrapperSize()
     this._slideTo(this.currentIndex)
-    fireLazyload(this.$el, true)
+    weex.utils.fireLazyload(this.$el, true)
   },
 
   methods: {
@@ -109,24 +98,23 @@ export default {
     _renderSlides (createElement) {
       this._cells = this._formatChildren(createElement)
       this.frameCount = this._cells.length
-      this._renderHook()
       return createElement(
         'nav',
         {
           ref: 'wrapper',
           attrs: { 'weex-type': this.isNeighbor ? 'slider-neighbor' : 'slider' },
-          on: createEventMap(
+          on: weex.createEventMap(
             this,
             ['scroll', 'scrollstart', 'scrollend'],
             {
               touchstart: this._handleTouchStart,
-              touchmove: throttle(bind(this._handleTouchMove, this), 25),
+              touchmove: weex.utils.throttle(weex.utils.bind(this._handleTouchMove, this), 25),
               touchend: this._handleTouchEnd,
               touchcancel: this._handleTouchCancel
             }
           ),
           staticClass: 'weex-slider weex-slider-wrapper weex-ct',
-          staticStyle: extractComponentStyle(this)
+          staticStyle: weex.extractComponentStyle(this)
         },
         [
           createElement('ul', {
@@ -154,7 +142,7 @@ export default {
       }
       let interval = parseInt(this.interval - TRANSITION_TIME - NEIGHBOR_SCALE_TIME)
       interval = interval > INTERVAL_MINIMUM ? interval : INTERVAL_MINIMUM
-      this._autoPlayTimer = setTimeout(bind(this._next, this), interval)
+      this._autoPlayTimer = setTimeout(weex.utils.bind(this._next, this), interval)
     },
 
     _stopAutoPlay () {
@@ -195,7 +183,7 @@ export default {
 
       if (inner) {
         this._prepareNodes()
-        const translate = getTransformObj(inner).translate
+        const translate = weex.utils.getTransformObj(inner).translate
         const match = translate && translate.match(/translate[^(]+\(([+-\d.]+)/)
         const innerX = match && match[1] || 0
         const dist = innerX - this.innerOffset
@@ -240,7 +228,7 @@ export default {
       }
 
       if (newIndex !== this._preIndex) {
-        this.$emit('change', createEvent(this.$el, 'change', {
+        this.$emit('change', weex.utils.createEvent(this.$el, 'change', {
           index: newIndex
         }))
       }
@@ -252,7 +240,7 @@ export default {
         let node = this._showNodes[i]
         node = node && node.firstElementChild
         if (!node) { continue }
-        addTransform(this._showNodes[i].firstElementChild, {
+        weex.utils.addTransform(this._showNodes[i].firstElementChild, {
           translate: 'translate3d(0px, 0px, 0px)'
         })
       }
@@ -343,7 +331,7 @@ export default {
 
       node._inShow = true
       const translateX = index * this._wrapperWidth - this.innerOffset
-      addTransform(node, {
+      weex.utils.addTransform(node, {
         translate: `translate3d(${translateX}px, 0px, 0px)`
       })
       node.style.zIndex = 99 - Math.abs(index)
@@ -408,16 +396,16 @@ export default {
      * one element to another.
      */
     _copyStyle (from, to, styles = ['opacity', 'zIndex'], transformExtra = {}) {
-      extendKeys(to.style, from.style, styles)
-      const transObj = getTransformObj(from)
+      weex.utils.extendKeys(to.style, from.style, styles)
+      const transObj = weex.utils.getTransformObj(from)
       for (const k in transformExtra) {
         transObj[k] = transformExtra[k]
       }
-      addTransform(to, transObj)
+      weex.utils.addTransform(to, transObj)
       const fromInner = from.firstElementChild
       const toInner = to.firstElementChild
       toInner.style.opacity = fromInner.style.opacity
-      copyTransform(fromInner, toInner)
+      weex.utils.copyTransform(fromInner, toInner)
     },
 
     /**
@@ -438,7 +426,7 @@ export default {
         this._showNodes[origShowIndex] = cl
       }
       origNode._inShow = true
-      const transObj = getTransformObj(clone)
+      const transObj = weex.utils.getTransformObj(clone)
       transObj.translate = transObj.translate.replace(/[+-\d.]+[pw]x/, ($0) => {
         return pos * this._wrapperWidth - this.innerOffset + 'px'
       })
@@ -519,7 +507,7 @@ export default {
           translateX = 0
         }
         transObj.translate = `translate3d(${translateX}px, 0px, 0px)`
-        addTransform(elm, transObj)
+        weex.utils.addTransform(elm, transObj)
         elm.style.opacity = i === 0 ? MAIN_SLIDE_OPACITY : this.neighborAlpha
       }
     },
@@ -620,7 +608,7 @@ export default {
     },
 
     _emitScrollEvent (type, data = {}) {
-      this.$emit(type, createEvent(this.$el, type, data))
+      this.$emit(type, weex.utils.createEvent(this.$el, type, data))
     },
 
     _throttleEmitScroll (offset, callback) {

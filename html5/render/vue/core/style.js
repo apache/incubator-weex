@@ -311,38 +311,3 @@ export function extractComponentStyle (context) {
   return getComponentStyle(context, true)
 }
 
-/**
- * process sticky children in scrollable components.
- * current only support list and vertical scroller.
- */
-export function processSticky (context) {
-  /**
-   * current browser support 'sticky' or '-webkit-sticky', so there's no need
-   * to do further more.
-   */
-  if (supportSticky()) {
-    return
-  }
-  // current only support list and vertical scroller.
-  if (context.scrollDirection === 'horizontal') {
-    return
-  }
-  const stickyChildren = context._stickyChildren
-  const len = stickyChildren && stickyChildren.length || 0
-  if (len <= 0) { return }
-
-  const container = context.$el
-  if (!container) { return }
-  const scrollTop = container.scrollTop
-
-  let stickyChild
-  for (let i = 0; i < len; i++) {
-    stickyChild = stickyChildren[i]
-    if (stickyChild._initOffsetTop < scrollTop) {
-      stickyChild._addSticky()
-    }
-    else {
-      stickyChild._removeSticky()
-    }
-  }
-}

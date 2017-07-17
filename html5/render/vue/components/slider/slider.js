@@ -16,21 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// import { validateStyles } from '../../validator'
+// import indicator from './indicator'
 import slideMixin from './slideMixin'
 
-const DEFAULT_NEIGHBOR_SPACE = 20
-const DEFAULT_NEIGHBOR_ALPHA = 0.6
-const DEFAULT_NEIGHBOR_SCALE = 0.8
-const DEFAULT_CURRENT_ITEM_SCALE = 0.9
-
-const sliderNeighbor = {
+const slider = {
   mixins: [slideMixin],
   props: {
     index: {
       type: [String, Number],
       default: 0
     },
-    autoPlay: {
+    'auto-play': {
       type: [String, Boolean],
       default: false
     },
@@ -41,38 +38,6 @@ const sliderNeighbor = {
     infinite: {
       type: [String, Boolean],
       default: true
-    },
-    neighborSpace: {
-      type: [String, Number],
-      validator: function (val) {
-        val = parseFloat(val)
-        return !isNaN(val) && val > 0
-      },
-      default: DEFAULT_NEIGHBOR_SPACE
-    },
-    neighborAlpha: {
-      type: [String, Number],
-      validator: function (val) {
-        val = parseFloat(val)
-        return !isNaN(val) && val >= 0 && val <= 1
-      },
-      default: DEFAULT_NEIGHBOR_ALPHA
-    },
-    neighborScale: {
-      type: [String, Number],
-      validator: function (val) {
-        val = parseFloat(val)
-        return !isNaN(val) && val >= 0 && val <= 1
-      },
-      default: DEFAULT_NEIGHBOR_SCALE
-    },
-    currentItemScale: {
-      type: [String, Number],
-      validator: function (val) {
-        val = parseFloat(val)
-        return !isNaN(val) && val >= 0 && val <= 1
-      },
-      default: DEFAULT_CURRENT_ITEM_SCALE
     }
   },
 
@@ -84,23 +49,27 @@ const sliderNeighbor = {
 
   data () {
     return {
-      currentIndex: this.index,
-      frameCount: 0
+      frameCount: 0,
+      currentIndex: this.index
     }
   },
 
   beforeCreate () {
-    this.isNeighbor = true
-    this.weexType = 'slider-neighbor'
+    this.weexType = 'slider'
   },
 
   render (createElement) {
+    /* istanbul ignore next */
+    // if (process.env.NODE_ENV === 'development') {
+    //   validateStyles('slider', this.$vnode.data && this.$vnode.data.staticStyle)
+    // }
     return this._renderSlides(createElement)
   }
 }
 
 export default {
   init (weex) {
-    weex.registerComponent('slider-neighbor', sliderNeighbor)
+    weex.registerComponent('slider', slider)
+    weex.registerComponent('cycleslider', slider)
   }
 }

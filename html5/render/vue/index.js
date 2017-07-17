@@ -46,9 +46,9 @@ function init (Vue/*, options = {}*/) {
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
 
   // register sdk components.
-  for (const name in components) {
-    weex.registerComponent(name, components[name])
-  }
+  components.forEach(function (comp) {
+    weex.install(comp)
+  })
 
   /* istanbul ignore next */
   // if (process.env.NODE_ENV === 'development') {

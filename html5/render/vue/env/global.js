@@ -19,6 +19,8 @@
 import weex from './weex'
 import * as core from '../core'
 
+import { inputCommon } from '../mixins'
+
 window.global = window
 window.weex = weex
 
@@ -30,3 +32,7 @@ weex._styleMap = {}
   'trimTextVNodes'].forEach(function (method) {
     weex[method] = core[method].bind(weex)
   })
+
+weex.mixins = {
+  inputCommon
+}

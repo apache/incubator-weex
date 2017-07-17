@@ -121,12 +121,6 @@ export default {
   },
 
   methods: {
-    _renderHook () {
-      if (!window._first_screen_detected) {
-        window._component_count++
-      }
-    },
-
     _getScopeIds () {
       const arr = []
       let ctx = this
