@@ -37,6 +37,12 @@ describe('utils', function () {
     after(() => {
       this.clock.restore()
     })
+    beforeEach(() => {
+      this.weexEmit = sinon.stub(window.weex, 'emit')
+    })
+    afterEach(() => {
+      this.weexEmit.restore()
+    })
     it('collectStatPerf', () => {
       const time = (new Date()).getTime()
       collectStatPerf('totalTime', time)
@@ -45,24 +51,20 @@ describe('utils', function () {
       expect(collectStatPerf()).to.be.a('undefined')
     })
     it('tagFirstScreen', () => {
-      const weexEmit = sinon.stub(window.weex, 'emit')
       expect(tagFirstScreen).to.be.a('function')
       tagFirstScreen()
-      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
-      expect(weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(0)
+      expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
+      expect(this.weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(0)
       window._first_screen_detected = false
       tagFirstScreen()
-      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(2)
-      expect(weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(1)
-      weexEmit.restore()
+      expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(2)
+      expect(this.weexEmit.withArgs('firstscreenfinish').callCount).to.be.equal(1)
     })
     it('tagImg', () => {
-      const weexEmit = sinon.stub(window.weex, 'emit')
       tagImg()
       this.clock.tick(500)
-      expect(weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
+      expect(this.weexEmit.withArgs('renderfinish').callCount).to.be.equal(1)
       expect(tagImg).to.be.a('function')
-      weexEmit.restore()
     })
     it('tagBeforeCreate', () => {
       tagBeforeCreate()
