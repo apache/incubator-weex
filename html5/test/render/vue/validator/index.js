@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as validator from '../../../../render/vue/validator'
+import { validateStyles, validateProps, configure } from '../../../../render/vue/validator'
 
 describe('validator', function () {
-  const { validateStyles, validateProps, configure } = validator
   const warn = function () {}
 
   before(() => {
