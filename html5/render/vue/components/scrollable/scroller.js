@@ -19,7 +19,6 @@
 import { extractComponentStyle, createEventMap } from '../../core'
 import { scrollable } from '../../mixins'
 // import { validateStyles } from '../../validator'
-import { extend } from '../../utils'
 import listMixin from './list/listMixin'
 
 export default {
@@ -80,7 +79,7 @@ export default {
     return createElement('main', {
       ref: 'wrapper',
       attrs: { 'weex-type': 'scroller' },
-      on: extend(createEventMap(this), {
+      on: createEventMap(this, {
         scroll: this.handleScroll,
         touchstart: this.handleTouchStart,
         touchmove: this.handleTouchMove,
