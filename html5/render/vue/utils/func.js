@@ -24,7 +24,7 @@ import {
  * Mix properties into target object.
  * the rightest object's value has the highest priority.
  */
-export function extend (to: {}, ...args: Array < {} >): {} {
+export function extend (to: {}, ...args: Array<{}>): {} {
   if (!args || args.length <= 0) {
     return to
   }
@@ -43,7 +43,7 @@ export function extend (to: {}, ...args: Array < {} >): {} {
  * mostly for merging styles. (that's why '' is falsy but still should be counted in.)
  * the rightest object's value has the highest priority.
  */
-export function extendTruthy (to: {}, ...args: Array < {} >): {} {
+export function extendTruthy (to: {}, ...args: Array<{}>): {} {
   if (!args || args.length <= 0) {
     return to
   }
@@ -63,7 +63,7 @@ export function extendTruthy (to: {}, ...args: Array < {} >): {} {
 /**
  * Mix specified properties into target object.
  */
-export function extendKeys (to: {}, from: {} = {}, keys: Array < string >): {} {
+export function extendKeys (to: {}, from: {} = {}, keys: Array<string>): {} {
   (keys || []).forEach(key => {
     from && (to[key] = from[key])
   })
@@ -72,7 +72,7 @@ export function extendKeys (to: {}, from: {} = {}, keys: Array < string >): {} {
 /**
  * Extract specified properties from src to target object.
  */
-export function extractKeys (to: {}, from: {} = {}, keys: Array < string >) {
+export function extractKeys (to: {}, from: {} = {}, keys: Array<string>) {
   if (!from) {
     return to
   }
