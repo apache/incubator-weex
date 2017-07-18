@@ -218,6 +218,11 @@
     [_tableView setContentOffset:contentOffset animated:animated];
 }
 
+- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
+{
+    
+}
+
 
 #pragma mark - Inheritance
 
