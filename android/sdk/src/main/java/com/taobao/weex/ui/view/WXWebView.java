@@ -403,7 +403,6 @@ public class WXWebView implements IWebView {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                showWebView(newProgress == 100);
                 showProgressBar(newProgress != 100);
                 WXLogUtils.v("tag", "onPageProgressChanged " + newProgress);
             }
@@ -411,6 +410,7 @@ public class WXWebView implements IWebView {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
+                showWebView(newProgress == 100);
                 if (mOnPageListener != null) {
                     mOnPageListener.onReceivedTitle(view.getTitle());
                 }
