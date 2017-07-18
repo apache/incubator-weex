@@ -44,6 +44,18 @@ describe('utils', function () {
       this.weexEmit.restore()
     })
     it('collectStatPerf', () => {
+      window.performance = {
+        getEntries: () => {
+          return [{
+            entryType: 'resource',
+            name: 'weex-invalid.jpg'
+          }, {
+            entryType: 'resource',
+            name: 'weex-test.jpg'
+          }]
+        }
+      }
+      window.history.pushState(null, null, '?_wx_tpl=./weex-test.jpg')
       const time = (new Date()).getTime()
       collectStatPerf('totalTime', time)
       expect(collectStatPerf).to.be.a('function')
