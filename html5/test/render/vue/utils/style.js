@@ -66,28 +66,27 @@ describe('style', function () {
   })
 
   it('should normalize style object', () => {
-    //
+    const style = {
+      width: '200px',
+      flexDirection: 'row',
+      flex: 1,
+      fontSize: 12,
+      transform: 'translate3d(100px, 100px, 0)'
+    }
+    const res = normalizeStyle(style)
+    console.log(res)
+    expect(normalizeString('transform', style.transform)).to.equal(res.transform)
+    expect(normalizeString('width', style.width)).to.equal(res.width)
+    expect(normalizeString('flexDirection', style.flexDirection)).to.equal(res.flexDirection)
+    expect(normalizeNumber('fontSize', style.fontSize)).to.equal(res.fontSize)
+    // flex is in noUnitsNumberKeys array
+    expect(style.flex).to.equal(res.flex)
   })
 
   it('should trim comment in style.', () => {
     const cssText = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  /* left: 43px;\n  top: 71px;*/\n}'
     const trimmed = '.ani-point0[data-v-4c05cc1a] {\n  left: 88px;\n  top: 88px;\n}\n.ani-point1[data-v-4c05cc1a] {\n  \n}'
     expect(trimComment(cssText)).to.equal(trimmed)
-  })
-})
-describe('normalizeStyle', () => {
-  const style = {
-    width: '200px',
-    flexDirection: 'row',
-    flex: 1,
-    transform: 'translate3d(100px, 100px, 0)'
-  }
-  it('should switch to suitble case', () => {
-    const res = normalizeStyle(style)
-    expect(normalizeString('transform', style.transform)).to.equal(res.transform)
-    expect(normalizeString('width', style.width)).to.equal(res.width)
-    expect(normalizeString('flexDirection', style.flexDirection)).to.equal(res.flexDirection)
-    expect(style.flex).to.equal(res.flex)
   })
 })
 describe('autoPrefix', () => {
