@@ -410,7 +410,7 @@ public class WXWebView implements IWebView {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
-                showWebView(newProgress == 100);
+                showWebView(true);
                 if (mOnPageListener != null) {
                     mOnPageListener.onReceivedTitle(view.getTitle());
                 }
