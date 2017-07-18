@@ -21,6 +21,7 @@ init('utils component', (Vue, helper) => {
   before(() => {
     helper.register('div', div)
     vm = helper.createVm(firstScreenAppearBundle, id)
+    vm.$el.style.height = '100px'
   })
   describe('component functions', () => {
     it('getParentScroller', () => {
