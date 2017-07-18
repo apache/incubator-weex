@@ -17,6 +17,7 @@
  * under the License.
  */
 import {
+  supportHairlines,
   autoPrefix,
   // normalizeStyle,
   normalizeString,
@@ -30,7 +31,12 @@ describe('style', function () {
   // const rect = document.documentElement.getBoundingClientRect()
   // const info = {}
   const { scale, dpr } = init()
-
+  it('should support using 0.5px to paint 1px width border', () => {
+    expect(supportHairlines()).to.be.false
+    window.devicePixelRatio = 2
+    //phantomjs didn't support using 0.5px to paint 1px width border
+    expect(supportHairlines()).to.be.false
+  })
   it('should normalize units numbers', () => {
     expect(normalizeUnitsNum('100px')).to.equal(100 * scale + 'px')
     expect(normalizeUnitsNum('100')).to.equal(100 * scale + 'px')
@@ -68,6 +74,7 @@ describe('autoPrefix', () => {
   const style = {
     width: '200px',
     flexDirection: 'row',
+    flex: 1,
     transform: 'translate3d(100px, 100px, 0)'
   }
 
