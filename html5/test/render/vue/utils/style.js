@@ -87,7 +87,7 @@ describe('normalizeStyle', () => {
     expect(normalizeString('transform', style.transform)).to.equal(res.transform)
     expect(normalizeString('width', style.width)).to.equal(res.width)
     expect(normalizeString('flexDirection', style.flexDirection)).to.equal(res.flexDirection)
-    expect(normalizeNumber('flex', style.flex)).to.equal(res.flex)
+    expect(style.flex).to.equal(res.flex)
   })
 })
 describe('autoPrefix', () => {
