@@ -18,8 +18,9 @@
  */
 import {
   supportHairlines,
+  supportSticky,
   autoPrefix,
-  // normalizeStyle,
+  normalizeStyle,
   normalizeString,
   normalizeNumber,
   normalizeUnitsNum,
@@ -34,9 +35,14 @@ describe('style', function () {
   it('should support using 0.5px to paint 1px width border', () => {
     expect(supportHairlines()).to.be.false
     window.devicePixelRatio = 2
-    //phantomjs didn't support using 0.5px to paint 1px width border
+    // phantomjs didn't support using 0.5px to paint 1px width border
     expect(supportHairlines()).to.be.false
   })
+  it('should support stick style', () => {
+    // phantomjs support stick true
+    expect(supportSticky()).to.be.true
+  })
+
   it('should normalize units numbers', () => {
     expect(normalizeUnitsNum('100px')).to.equal(100 * scale + 'px')
     expect(normalizeUnitsNum('100')).to.equal(100 * scale + 'px')
@@ -69,7 +75,21 @@ describe('style', function () {
     expect(trimComment(cssText)).to.equal(trimmed)
   })
 })
-
+describe('normalizeStyle', () => {
+  const style = {
+    width: '200px',
+    flexDirection: 'row',
+    flex: 1,
+    transform: 'translate3d(100px, 100px, 0)'
+  }
+  it('should switch to suitble case', () => {
+    const res = normalizeStyle(style)
+    expect(normalizeString('transform', style.transform)).to.equal(res.transform)
+    expect(normalizeString('width', style.width)).to.equal(res.width)
+    expect(normalizeString('flexDirection', style.flexDirection)).to.equal(res.flexDirection)
+    expect(normalizeNumber('flex', style.flex)).to.equal(res.flex)
+  })
+})
 describe('autoPrefix', () => {
   const style = {
     width: '200px',
