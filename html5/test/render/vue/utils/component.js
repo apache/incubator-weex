@@ -66,6 +66,10 @@ init('utils component', (Vue, helper) => {
         expect(appearSpy.args[1][0].direction).to.not.exist
         expect(disappearSpy.args[0][0].direction).to.not.exist
         window.dispatchEvent(new Event('scroll'))
+        vm.$el.dispatchEvent(new Event('touchstart'))
+        vm.$el.dispatchEvent(new Event('touchmove'))
+        vm.$el.dispatchEvent(new Event('touchend'))
+        vm.$el.dispatchEvent(new Event('touchcancel'))
         setTimeout(() => {
           helper.unregisterDone(id)
           done()
