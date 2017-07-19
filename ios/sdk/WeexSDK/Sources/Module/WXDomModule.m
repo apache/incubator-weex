@@ -202,7 +202,13 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
                     [callbackRsp setObject:@(false) forKey:@"result"];
                     [callbackRsp setObject:[NSString stringWithFormat:@"Illegal parameter, no ref about \"%@\" can be found", ref] forKey:@"errMsg"];
                 } else {
-                    CGRect componentRect = [component.view.superview convertRect:component.view.frame toView:rootView];
+                    CGRect componentRect = CGRectZero;
+                    // if current component view is not loaded or it hasn't been inserted to its superview, so the position cannot be obtained correct except width and height
+                    if ([component isViewLoaded] && component.view.superview) {
+                        componentRect = [component.view.superview convertRect:component.view.frame toView:rootView];
+                    } else {
+                        componentRect = component.calculatedFrame;
+                    }
                     callbackRsp = [strongSelf _componentRectInfoWithViewFrame:componentRect];
                     [callbackRsp setObject:@(true)forKey:@"result"];
                 }
