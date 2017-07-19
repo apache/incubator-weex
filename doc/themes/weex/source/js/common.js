@@ -105,6 +105,28 @@
 
   initPickLang()
 
+ /**
+   * color name
+   */
+
+  function colorname(){
+    if(location.pathname.indexOf('references/color-names.html')>0){
+      var t = document.querySelectorAll("table");
+      Array.prototype.forEach.call(t, function (table) {
+          var d = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+          Array.prototype.forEach.call(d, function (tr) {
+            var r = tr.getElementsByTagName("td")[1];
+            r.innerHTML ='<span style="background:'+ r.innerHTML +';color:'+ r.innerHTML +'"> yy </span>  ' + r.innerHTML
+          });
+
+      });
+    }
+  }
+
+  colorname();
+
+
+
   /**
    *  Search
    */
