@@ -2,13 +2,14 @@ os:
   - osx
   - linux
 language: node_js
-node_js: 7
+node_js: 7.6
 rvm: 2.0.0
 env:
   - TEST_SUITE=ios
   - TEST_SUITE=danger
   - TEST_SUITE=jsfm
   - TEST_SUITE=android
+  - TEST_SUITE=release
 matrix:
     fast_finish: true
     exclude:
@@ -24,15 +25,19 @@ matrix:
         env: TEST_SUITE=ios
       - os: linux
         env: TEST_SUITE=android
+      - os: osx
+        env: TEST_SUITE=release
+      - os: linux
+        env: TEST_SUITE=release
     include:
+      - os: osx
+        env: TEST_SUITE=release
+        osx_image: xcode8.1
+        language: objective-c
       - os: osx
         env: TEST_SUITE=ios
         osx_image: xcode8.1
         language: objective-c
-        before_script:
-          - brew update
-        script:
-          - xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
       - os: linux
         env: TEST_SUITE=android
         jdk: oraclejdk8
@@ -41,31 +46,77 @@ matrix:
           components:
             - platform-tools
             - tools
-            - build-tools-23.0.2
             - build-tools-23.0.3
-            - build-tools-24.0.3
-            - android-24
             - android-23
-            - android-22
             - extra-google-m2repository
             - extra-android-m2repository
             - sys-img-armeabi-v7a-android-22
-        before_script:
-          - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
-          - nvm install 7.0
-          - npm install
-        script:
-          - cd android
-          - ./run-ci.sh 
-          - cd $TRAVIS_BUILD_DIR
 cache:
   directories:
   - node_modules
   - $HOME/.m2
   - $HOME/.gradle
+before_script:
+  - |
+    if [[ $TEST_SUITE = "android" ]]; then
+      curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+      nvm install 7.0
+      npm install
+    fi
+  - |
+    if [[ $TEST_SUITE = "ios" ]]; then
+      brew update
+    fi
+  - |
+    if [[ $TEST_SUITE = "release" ]]; then
+      brew update
+      #manual install android sdk
+      brew cask install android-sdk
+      brew install gradle
+      export ANDROID_HOME=/usr/local/share/android-sdk
+      export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+      echo yes | sdkmanager platform-tools
+      echo yes | sdkmanager tools #tools
+      echo yes | sdkmanager "build-tools;23.0.3" #build-tool
+      echo yes | sdkmanager "platforms;android-23" #compile target
+      echo yes | sdkmanager "extras;android;m2repository" #support
+    fi
 script:
-  - source test/ci-funcs.sh
-  - runJSTest $TEST_SUITE
+  - |
+    if [[ $TEST_SUITE = "android" ]]; then
+      cd android
+      ./gradlew clean assembleDebug :weex_sdk:testDebugUnitTest --info -PdisableCov=true -Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError" -Dfile.encoding=UTF-8 &&
+      cd $TRAVIS_BUILD_DIR
+    fi
+  - |
+    if [[ $TEST_SUITE = "ios" ]]; then
+      xcodebuild -project ios/sdk/WeexSDK.xcodeproj test -scheme WeexSDKTests CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 6'
+    fi
+  - |
+    if [[ $TEST_SUITE = "jsfm" ]]; then
+      npm run build &&
+      npm run test
+    fi
+  - |
+    if [[ $TEST_SUITE = "danger" ]]; then
+      npm run danger
+    fi
+  - |
+    if [[ $TEST_SUITE = "release" ]]; then
+      bash scripts/generate_apache_release.sh &&
+      cd apache_release_temp &&
+      bash scripts/build_from_source.sh &&
+      cd $TRAVIS_BUILD_DIR
+    fi
 notifications:
-  webhooks: https://oapi.dingtalk.com/robot/send?access_token=553a6d23676da61499b0001a8e28d4436be776f5642fff9259f5c946ffac45d2
-  
+  webhooks:
+    on_pull_requests: false
+    urls:
+      - https://oapi.dingtalk.com/robot/send?access_token=5a6be5eb6ad180fa4d04bdda0b24857ee49c3dd985361efdf0964aa9134ee623
+    on_success: never 
+    on_failure: always
+  email:
+    recipients:
+      - weexnotify@gmail.com
+    on_success: never
+    on_failure: always

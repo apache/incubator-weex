@@ -141,6 +141,8 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private LayoutFinishListener mLayoutFinishListener;
 
+  private boolean mCurrentGround = false;
+  private ComponentObserver mComponentObserver;
 
   /**
    * If anchor is created manually(etc. define a layout xml resource ),
@@ -275,6 +277,21 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mUserTrackAdapter=WXSDKManager.getInstance().getIWXUserTrackAdapter();
   }
 
+  /**
+   * Set a Observer for component.
+   * This observer will be called in each component, should not doing
+   * anything will impact render performance.
+   *
+   * @param observer
+   */
+  public void setComponentObserver(ComponentObserver observer){
+    mComponentObserver = observer;
+  }
+
+  public ComponentObserver getComponentObserver(){
+    return mComponentObserver;
+  }
+
   public NativeInvokeHelper getNativeInvokeHelper() {
     return mNativeInvokeHelper;
   }
@@ -372,10 +389,19 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
-    if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
-       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
-       return;
+    if(WXEnvironment.isApkDebugable()){
+      if(TextUtils.isEmpty(pageName) || WXPerformance.DEFAULT.equals(pageName)){
+        WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
+
+        final String pageNameNotSetting = "pageNameNotSetting";
+        final String pageNotSettingBundleJs = "https://gw.alicdn.com/bao/uploaded/TB1oK02SpXXXXXnaFXXXXXXXXXX.js?" +
+                "spm=a1z3i.a4.0.0.75ba3c68wlzSnR&file=TB1oK02SpXXXXXnaFXXXXXXXXXX.js";
+
+        renderByUrlInternal(pageNameNotSetting, pageNotSettingBundleJs, options, jsonInitData, flag);
+        return;
+      }
     }
+
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
@@ -738,6 +764,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     return true;
   }
 
+
   @Override
   public void onActivityPause() {
     onViewDisappear();
@@ -760,10 +787,15 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely,onActivityPause can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.PAUSE_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    WXLogUtils.i("Application onActivityPause()");
+    if (!mCurrentGround) {
+      WXLogUtils.i("Application to be in the backround");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.PAUSE_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      this.mCurrentGround = true;
+    }
   }
 
 
@@ -779,10 +811,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXLogUtils.w("Warning :Component tree has not build completely, onActivityResume can not be call!");
     }
 
-    Intent intent=new Intent(WXGlobalEventReceiver.EVENT_ACTION);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_NAME,Constants.Event.RESUME_EVENT);
-    intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID,getInstanceId());
-    mContext.sendBroadcast(intent);
+    if (mCurrentGround) {
+      WXLogUtils.i("Application  to be in the foreground");
+      Intent intent = new Intent(WXGlobalEventReceiver.EVENT_ACTION);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_NAME, Constants.Event.RESUME_EVENT);
+      intent.putExtra(WXGlobalEventReceiver.EVENT_WX_INSTANCEID, getInstanceId());
+      mContext.sendBroadcast(intent);
+      mCurrentGround = false;
+    }
 
     onViewAppear();
 

@@ -33,6 +33,8 @@ const weex = {
     bundleUrl: location.href
   },
 
+  _components: {},
+
   document: {
     body: {}
   },
@@ -78,6 +80,9 @@ const weex = {
     if (!weexModules[name]) {
       weexModules[name] = {}
     }
+    if (!!meta && meta.mountType === 'full') {
+      weexModules[name] = module
+    }
     for (const key in module) {
       if (module.hasOwnProperty(key)) {
         weexModules[name][key] = utils.bind(module[key], this)
@@ -89,6 +94,7 @@ const weex = {
     if (!this.__vue__) {
       return console.log('[Vue Render] Vue is not found. Please import Vue.js before register a component.')
     }
+    this._components[name] = 1
     if (component._css) {
       const css = component._css.replace(/\b[+-]?[\d.]+rem;?\b/g, function (m) {
         return parseFloat(m) * 75 * weex.config.env.scale + 'px'

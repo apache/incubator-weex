@@ -148,7 +148,6 @@
                 [strongSelf setGradientLayer];
             }
             [strongSelf setNeedsDisplay];
-            [strongSelf _configWXComponentA11yWithAttributes:nil];
         }];
     }
 }
@@ -244,7 +243,7 @@ do {\
     return [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];
 }
 
-- (void)_fillCSSNode:(NSDictionary *)styles;
+- (void)_fillCSSNode:(NSDictionary *)styles
 {
     // flex
     WX_STYLE_FILL_CSS_NODE(flex, flex, CGFloat)

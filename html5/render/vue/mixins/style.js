@@ -24,20 +24,67 @@ import {
 
 import {
   normalizeStyle,
-  camelizeKeys
+  camelizeKeys,
+  extend
 } from '../utils'
 
-export default {
-  beforeCreate () {
+/**
+ * get a beforeCreate hook, which has a mark to identify the hook function itself.
+ */
+function getIdentifiedBeforeCreate () {
+  const disposed = {} // disposed components. Already scanned.
+  function beforeCreate () {
     /**
      * get static class style map from document's styleSheets.
      * Weex.on will create a Vue instance. In this case we'll ignore it, since
      * it's not sure whether the scoped style has already attached to head or not.
      */
-    if (!weex.styleMap && this.$options && this.$options._scopeId) {
-      weex.styleMap = getHeadStyleMap()
+    const tagName = this.$options && this.$options._componentTag
+    /**
+     * For vue-loader ^11.3.x, there's no injectStyle function. The styleSheet
+     * is already injected into the head. Just scan it.
+     */
+    if (this === this.$root && this.$options && !this._firstScanned) {
+      this._firstScanned = true
+      extend(weex._styleMap, getHeadStyleMap())
     }
-  },
+    /**
+     * For vue-loader ^12.0, the injectStyle function is hooked. We should scan
+     * style map after the injectStyle hook called.
+     */
+    if (((this === this.$root && this.$options)
+      || (tagName
+      && !weex._components[tagName]
+      && !disposed[tagName]))
+      && !this._secondScanned) {
+      disposed[tagName] = 1
+      this._secondScanned = true
+      const hooks = this.$options.beforeCreate
+      const len = hooks.length
+      let thisHookIdx = 0 // index of this hook in the hooks array.
+      for (; thisHookIdx < len; thisHookIdx++) {
+        if (hooks[thisHookIdx]._styleMixin) { break }
+      }
+      for (let i = thisHookIdx + 1; i < len; i++) {
+        const func = hooks[i]
+        if (func.name === 'injectStyle') {
+          hooks[i] = function () {
+            // call the original injectStyle hook.
+            func.call(this)
+            // scan the new appended styleSheet.
+            extend(weex._styleMap, getHeadStyleMap())
+            hooks[i] = func
+          }
+        }
+      }
+    }
+  }
+  beforeCreate._styleMixin = true
+  return beforeCreate
+}
+
+export default {
+  beforeCreate: getIdentifiedBeforeCreate(),
 
   methods: {
     $processStyle (style) {

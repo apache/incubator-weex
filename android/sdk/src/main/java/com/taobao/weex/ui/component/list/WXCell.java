@@ -83,6 +83,15 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
         }
     }
 
+    @Override
+    protected void onFinishLayout() {
+        super.onFinishLayout();
+        WXVContainer container = getParent();
+        if(container != null && container instanceof BasicListComponent){
+            ((BasicListComponent)container).recalculateSize();
+        }
+    }
+
     public int getLocationFromStart(){
         return mLastLocationY;
     }

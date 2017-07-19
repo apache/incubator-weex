@@ -58,3 +58,8 @@
 .weex-root textarea {
   resize: none;
 }
+
+/* show no scroll bar. */
+::-webkit-scrollbar {
+  display: none;
+}
