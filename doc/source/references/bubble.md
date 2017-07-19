@@ -11,7 +11,7 @@ Weex 2.0 implements the W3C standard event bubbling mechanism.
 
 ### Usage
 
-```javascript
+```html
 <template>
   <div class="root" @click="rootClick" bubble="true">
     <text style="font-size: 40px;">{{rootText}}</text>
@@ -81,7 +81,7 @@ One thing should be noticed: **For compatibility with previous versions, Weex do
 
 In the event handler function, you can use the `e.stopPropagation()` method to prevent the event from escalating. Note that `e.stopPropagation()` differs from `bubble = "true"`, which affects only the current elements and the propagation of parent elements, without affecting the propagation of child elements; the latter is a switching mechanism that is added for compatibility, Will be a global shutdown or open the bubble mechanism, the two can co-exist, as follows:
 
-```javascript
+```html
 <template>
   <div class="root" @click="rootClick" bubble="true">
     <text style="font-size: 40px;">{{rootText}}</text>

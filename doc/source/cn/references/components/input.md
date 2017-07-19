@@ -135,13 +135,15 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
       <text style="font-size: 40px">oninput: {{txtInput}}</text>
       <text style="font-size: 40px">onchange: {{txtChange}}</text>
       <text style="font-size: 40px">onreturntype: {{txtReturnType}}</text>
+      <text style="font-size: 40px">selection: {{txtSelection}}</text>
+
     </div>
     <scroller>
       <div>
         <div style="background-color: #286090">
           <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = text</text>
         </div>
-        <input type="text" placeholder="Input Text" class="input" :autofocus=true value="" @change="onchange" @input="oninput" @focus="onfocus" @blur="onblur"/>
+        <input type="text" placeholder="Input Text" class="input" :autofocus=true value="" @change="onchange" @input="oninput"/>
       </div>
 
       <div>
@@ -177,6 +179,13 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
           <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = time</text>
         </div>
         <input type="time" placeholder="Input Time" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = number</text>
+        </div>
+        <input type="number" placeholder="Input number" class="input" @change="onchange" @input="oninput"/>
       </div>
 
       <div>
@@ -248,6 +257,7 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
         </div>
         <div style="flex-direction: row;margin-bottom: 16px;justify-content: space-between">
           <text class="button" value="setRange" type="primary" @click="setRange"></text>
+          <text class="button" value="getSelectionRange" type="primary" @click="getSelectionRange"></text>
         </div>
         <input type="text"  ref="inputselection" placeholder="please input" value="123456789"  class="input" @change="onchange" @return = "onreturn" @input="oninput"/>
       </div>
@@ -280,7 +290,6 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
 </style>
 
 <script>
-  const modal = weex.requireModule('modal')
   module.exports = {
     data: function () {
       return {
@@ -320,23 +329,16 @@ Weex 内置的 `<input>` 组件用来创建接收用户输入字符的输入组�
         console.log(this.$refs["inputselection"]);
         this.$refs["inputselection"].setSelectionRange(2, 6);
       },
-      onfocus () {
-        console.log('onfocus:');
-        modal.toast({
-          message: 'onfocus',
-          duration: 0.8
-        })
-      },
-      onblur () {
-        console.log('onblur:');
-        modal.toast({
-          message: 'input blur',
-          duration: 0.8
-        })
+      getSelectionRange: function() {
+        console.log(this.$refs["inputselection"]);
+        var self = this;
+        this.$refs["inputselection"].getSelectionRange(function(e) {
+          self.txtSelection = e.selectionStart +'-' + e.selectionEnd;
+        });
       }
     }
   };
 </script>
 ```
 
-[体验一下](http://dotwe.org/vue/dd83d941d2364f2849e45dc3c5d91ab4)
+[体验一下](http://dotwe.org/vue/3470e4d0194f3879a72d38e2ab02cc9f)
