@@ -368,14 +368,14 @@ _Pragma("clang diagnostic pop") \
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
         if (task[@"component"]) {
-            [self tracingComponentTask:task instanceId:instanceId];
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
+            [WXTracingManager startTracing:instanceId ref:task[@"ref"] parentRef:nil className:nil name:task[@"component"] ph:WXTracingBegin fName:task[@"method"] parentId:task[@"method"]];
         } else {
             NSString *moduleName = task[@"module"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
-            [self tracingModuleTask:task instanceId:instanceId];
+            [WXTracingManager startTracing:instanceId ref:nil parentRef:nil className:nil name:task[@"module"] ph:WXTracingBegin fName:task[@"method"] parentId:nil];
             [method invoke];
         }
     }
@@ -383,27 +383,6 @@ _Pragma("clang diagnostic pop") \
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
     
     return 1;
-}
-
--(void)tracingComponentTask:(NSDictionary *)task instanceId:(NSString *)instanceId
-{
-    WXTracing *tracing = [WXTracing new];
-    tracing.iid = instanceId;
-    tracing.ref = task[@"ref"];
-    tracing.name = task[@"method"];
-    tracing.ph = WXTracingBegin;
-    tracing.fName = task[@"method"];
-    [WXTracingManager startTracing:tracing];
-}
-
--(void)tracingModuleTask:(NSDictionary *)task instanceId:(NSString *)instanceId
-{
-    WXTracing *tracing = [WXTracing new];
-    tracing.iid = instanceId;
-    tracing.name = task[@"module"];
-    tracing.ph = WXTracingBegin;
-    tracing.fName = task[@"method"];
-    [WXTracingManager startTracing:tracing];
 }
 
 - (void)createInstance:(NSString *)instance

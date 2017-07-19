@@ -91,15 +91,10 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 - (void)addElement:(NSString *)parentRef element:(NSDictionary *)element atIndex:(NSInteger)index
 {
-    WXTracing *tracing = [WXTracing new];
-    tracing.iid = self.weexInstance.instanceId;
-    tracing.name = @"dom";
-    tracing.ph = WXTracingEnd;
-    tracing.fName = NSStringFromSelector(_cmd);
-    [WXTracingManager startTracing:tracing];
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
     }];
+    [WXTracingManager startTracing:self.weexInstance.instanceId ref:nil parentRef:nil className:nil name:@"dom" ph:WXTracingEnd fName:@"addElement" parentId:nil];
 }
 
 - (void)removeElement:(NSString *)ref
@@ -132,15 +127,10 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
 
 - (void)createFinish
 {
-    WXTracing *tracing = [WXTracing new];
-    tracing.iid = self.weexInstance.instanceId;
-    tracing.name = @"dom";
-    tracing.ph = WXTracingEnd;
-    tracing.fName = NSStringFromSelector(_cmd);
-    [WXTracingManager startTracing:tracing];
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
+    [WXTracingManager startTracing:self.weexInstance.instanceId ref:nil parentRef:nil className:nil name:@"dom" ph:WXTracingEnd fName:@"createFinish" parentId:nil];
 }
 
 - (void)updateFinish

@@ -60,7 +60,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *fName; // functionName
 @property (nonatomic, copy) NSString *iid; // instance id
 @property (nonatomic, copy) NSString *parentId;// parent event id
-
+-(NSDictionary *)dictionary;
 @end
 
 @interface WXTracingTask:NSObject
@@ -74,13 +74,10 @@ typedef enum : NSUInteger {
 @end
 
 @interface WXTracingManager : NSObject
-+(void)switchTracing:(BOOL)isTracing; 
-+(BOOL)isTracing;
-+(void)startTracing:(WXTracing*)tracing;
++(void)switchTracing:(BOOL)isTracing;
 +(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
 +(WXTracingTask*)getTracingData;
 +(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
-+(void)getTracingData:(NSString *)instanceId;
 +(NSDictionary *)getTacingApi;
 
 @end

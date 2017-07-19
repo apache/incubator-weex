@@ -24,10 +24,15 @@
 #import <WeexSDK/WXComponentFactory.h>
 #import <WeexSDK/WXModuleFactory.h>
 #import <WeexSDK/WXHandlerFactory.h>
+#import "WXUtility.h"
+#import "WXComponentManager.h"
 
 
 @implementation WXTracing
 
+-(NSDictionary *)dictionary {
+    return [NSDictionary dictionaryWithObjectsAndKeys:self.ref?:@"",@"ref",self.parentRef?:@"",@"parentRef",self.className?:@"",@"className",self.name?:@"",@"name",self.ph?:@"",@"ph",@(self.ts),@"ts",@(self.traceId),@"traceId",@(self.duration),@"duration",self.fName?:@"",@"fName",self.iid?:@"",@"iid",self.parentId?:@"",@"parentId", nil];
+}
 @end
 
 @implementation WXTracingTask
@@ -60,7 +65,7 @@
 - (instancetype) initPrivate{
     self = [super init];
     if(self){
-        self.isTracing = YES;
+        self.isTracing = NO;
     }
     
     return self;
@@ -74,7 +79,6 @@
 +(BOOL)isTracing
 {
 #if DEBUG
-    return YES;
     return [WXTracingManager sharedInstance].isTracing;
 #else
     return NO;
@@ -99,7 +103,7 @@
         NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
         tracing.ts = time;
         if(![WXTracingEnd isEqualToString:tracing.ph]){ // end is should not update
-            tracing.traceId = ++task.counter;
+            tracing.traceId = task.counter++;
         }
         if([WXTNetworkHanding isEqualToString:tracing.name] && [WXTracingBegin isEqualToString:tracing.ph]){
             task.tag = WXTNetworkHanding;
@@ -258,6 +262,17 @@
         }
     }
     if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
+        
+        if(tracing.ref.length>0){
+            WXPerformBlockOnComponentThread(^{
+                WXSDKInstance *instance = [WXSDKManager instanceForID:task.iid];
+                WXComponent *com = [instance componentForRef:tracing.ref];
+                if(com.supercomponent){
+                    tracing.parentRef = com.supercomponent.ref;
+                }
+            });
+            
+        }
         NSMutableArray *tracings = task.tracings;
         [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
             if(tracing.ref.length > 0 && bTracing.ref.length>0){
@@ -271,10 +286,12 @@
                 if(bTracing.ref.length > 0){
                     tracing.ref = bTracing.ref;
                 }
+                if(tracing.parentRef.length > 0){
+                    bTracing.parentRef = tracing.parentRef;
+                }
                 tracing.duration = tracing.ts - bTracing.ts ;
                 tracing.traceId = bTracing.traceId;
                 bTracing.duration = tracing.duration;
-                NSLog(@"jerry2 %f,%f",bTracing.ts,bTracing.duration);
                 *stop = YES;
             }
         }];
@@ -284,23 +301,23 @@
 
 +(WXTracingTask *)getTracingData
 {
+    if(![self isTracing]){
+        return nil;
+    }
     NSArray *instanceIds = [[WXSDKManager bridgeMgr] getInstanceIdStack];
     WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:[instanceIds firstObject]];
-    return task;
-}
-
-+(void)getTracingData:(NSString *)instanceId{
-    WXTracingTask *task = [[WXTracingManager sharedInstance].tracingTasks objectForKey:instanceId];
-    NSArray *tracings = [task.tracings copy];
-    for (WXTracing *tracing in tracings) {
-        if(![WXTracingBegin isEqualToString:tracing.ph]){
-//            NSLog(@"%lld %@  %@  %@  %f %f %@  %@",tracing.traceId,tracing.fName,tracing.name,tracing.className,tracing.ts,tracing.duration,tracing.ref,tracing.parentRef);
-        }
+    NSMutableArray *ary = [NSMutableArray new];
+    for (WXTracing *tracing in task.tracings) {
+        [ary addObject:[tracing dictionary]];
     }
+    return task;
 }
 
 +(NSDictionary *)getTacingApi
 {
+    if(![self isTracing]){
+        return @{};
+     }
     NSMutableDictionary *dict = [NSMutableDictionary new];
     NSMutableArray *componetArray = [NSMutableArray new];
     NSMutableArray *moduleArray = [NSMutableArray new];
