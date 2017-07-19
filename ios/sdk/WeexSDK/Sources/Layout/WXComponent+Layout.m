@@ -278,13 +278,13 @@
         YGNodeStyleSetMargin(_cssNode, YGEdgeTop, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
     }
     if (styles[@"marginBottom"]) {
-        YGNodeStyleSetMargin(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+        YGNodeStyleSetMargin(_cssNode, YGEdgeBottom, [WXConvert WXPixelType:styles[@"marginBottom"] scaleFactor:self.weexInstance.pixelScaleFactor]);
     }
     if (styles[@"marginRight"]) {
-        YGNodeStyleSetMargin(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+        YGNodeStyleSetMargin(_cssNode, YGEdgeRight, [WXConvert WXPixelType:styles[@"marginRight"] scaleFactor:self.weexInstance.pixelScaleFactor]);
     }
     if (styles[@"marginLeft"]) {
-        YGNodeStyleSetMargin(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"marginTop"] scaleFactor:self.weexInstance.pixelScaleFactor]);
+        YGNodeStyleSetMargin(_cssNode, YGEdgeLeft, [WXConvert WXPixelType:styles[@"marginLeft"] scaleFactor:self.weexInstance.pixelScaleFactor]);
     }
     
     // border
