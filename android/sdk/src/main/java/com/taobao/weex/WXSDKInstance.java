@@ -389,10 +389,19 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
    * @param flag     RenderStrategy {@link WXRenderStrategy}
    */
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
-    if(WXEnvironment.isApkDebugable() && WXPerformance.DEFAULT.equals(pageName)){
-       WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
-       return;
+    if(WXEnvironment.isApkDebugable()){
+      if(TextUtils.isEmpty(pageName) || WXPerformance.DEFAULT.equals(pageName)){
+        WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
+
+        final String pageNameNotSetting = "pageNameNotSetting";
+        final String pageNotSettingBundleJs = "https://gw.alicdn.com/bao/uploaded/TB1oK02SpXXXXXnaFXXXXXXXXXX.js?" +
+                "spm=a1z3i.a4.0.0.75ba3c68wlzSnR&file=TB1oK02SpXXXXXnaFXXXXXXXXXX.js";
+
+        renderByUrlInternal(pageNameNotSetting, pageNotSettingBundleJs, options, jsonInitData, flag);
+        return;
+      }
     }
+
     renderInternal(pageName,template,options,jsonInitData,flag);
   }
 
