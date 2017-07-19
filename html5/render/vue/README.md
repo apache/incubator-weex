@@ -27,7 +27,24 @@ If you perfer cdn way, and use script tag to import a script link, just import i
 
 ## use vue-loader to bundle .vue file
 
-**NOTE: ** after `v0.11.3` there's no need to add `$processStyle` and `autoprefixer` in your vue-loader config anymore. The runtime render will take care of it once for all.
+NOTE: you should inject `$processStyle` to preprocess vnode's style in vue-loader's postTransformNode hook.
+
+```javascript
+vue: {
+  /**
+    * important! should use postTransformNode to add $processStyle for
+    * inline style prefixing.
+    */
+  compilerModules: [
+    {
+      postTransformNode: el => {
+        el.staticStyle = `$processStyle(${el.staticStyle})`
+        el.styleBinding = `$processStyle(${el.styleBinding})`
+      }
+    }
+  ],
+}
+```
 
 ## component -> dom map
 

@@ -80,6 +80,13 @@ typedef NS_ENUM(NSInteger, Direction) {
     return self;
 }
 
+- (void)dealloc
+{
+    if (_scrollView) {
+        _scrollView.delegate = nil;
+    }
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -453,6 +460,12 @@ typedef NS_ENUM(NSInteger, Direction) {
                 }
             }
             [recycleSliderView insertItemView:view atIndex:index - offset];
+            
+            // check if should apply current contentOffset
+            // in case inserting subviews after layoutDidFinish
+            if (index-offset == _index && _index>0) {
+                recycleSliderView.currentIndex = _index;
+            }
         }
         [recycleSliderView layoutSubviews];
     }

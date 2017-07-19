@@ -38,10 +38,8 @@ export function setNativeConsole () {
   generateLevelMap()
 
   /* istanbul ignore next */
-  if (
-    typeof global.console === 'undefined' || // Android
-    (global.WXEnvironment && global.WXEnvironment.platform === 'iOS') // iOS
-  ) {
+  // mock console in native environment
+  if (global.WXEnvironment && global.WXEnvironment.platform !== 'Web') {
     global.console = {
       debug: (...args) => {
         if (checkLevel('debug')) { global.nativeLog(...format(args), '__DEBUG') }
@@ -60,7 +58,9 @@ export function setNativeConsole () {
       }
     }
   }
-  else { // HTML5 or Node
+
+  // Web or Node
+  else {
     const { debug, log, info, warn, error } = console
     console.__ori__ = { debug, log, info, warn, error }
     console.debug = (...args) => {

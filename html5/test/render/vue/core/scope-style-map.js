@@ -64,6 +64,10 @@ describe('style map', () => {
      * get style map.
      */
     window._no_remove_style_sheets = false
+    // clear mark set in other test cases.
+    Array.from(document.styleSheets).forEach(function (styleSheet) {
+      styleSheet.ownerNode.removeAttribute('weex-scanned')
+    })
     const styleMap = getHeadStyleMap()
     window._no_remove_style_sheets = true
 

@@ -6,35 +6,31 @@
 <script>
   //	var gcanvas = weex.requireModule('weex-gcanvas');
 
-  var gcanvas=require('weex-gcanvas');
-
+  var GCanvas=require('weex-gcanvas');
+  var Image=require('weex-gcanvas/gcanvasimage');
 
   module.exports = {
-
-    created: function () {
-      console.log('created gcanvas');
-      gcanvas.disable();
-    },
     mounted: function () {
       var ref = this.$refs.canvas_holder;
-      gcanvas.start(ref, function () {
-        var ctx = gcanvas.getContext('2d');
+      var gcanvas = GCanvas.start(ref)
+      var ctx = gcanvas.getContext('2d');
 
-        ctx.fillStyle = 'red';
-        ctx.fillRect(0, 0, 100, 100);
+      ctx.fillStyle = 'red';
+      ctx.fillRect(0, 0, 100, 100);
 
-        ctx.fillStyle = 'black';
-        ctx.fillRect(100, 100, 100, 100);
-        ctx.fillRect(25, 210, 700, 5);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(100, 100, 100, 100);
+      ctx.fillRect(25, 210, 700, 5);
 
-        ctx.arc(450, 200, 100, 0, Math.PI * 2, true);
-        ctx.fill();
+      ctx.arc(450, 200, 100, 0, Math.PI * 2, true);
+      ctx.fill();
 
-        var img = 'https://img.alicdn.com/tps/TB1TFNdKVXXXXbeaXXXXXXXXXXX-210-330.png';
+      var img = new Image();
+      img.onload = function(){
         ctx.drawImage(img, 100, 200, 210, 330);
-        //ctx.drawImage(img, 0,0,105,165, 100, 200, 210, 330);
-        ctx.render();
-      });
+        // ctx.drawImage(img, 0,0,105,165, 100, 200, 210, 330);
+      };
+      img.src = 'https://img.alicdn.com/tps/TB1TFNdKVXXXXbeaXXXXXXXXXXX-210-330.png';
     }
   };
 </script>
