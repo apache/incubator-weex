@@ -185,7 +185,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
         mConfigMap.put("bundleUrl", mUri.toString());
         String path = "file".equals(mUri.getScheme()) ? assembleFilePath(mUri) : mUri.toString();
-        mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
+        mInstance.render(null, WXFileUtils.loadAsset(path, WXPageActivity.this),
             mConfigMap, null,
             WXRenderStrategy.APPEND_ASYNC);
       }
