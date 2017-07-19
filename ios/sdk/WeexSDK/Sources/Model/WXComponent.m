@@ -131,7 +131,9 @@
 
 - (void)dealloc
 {
-    YGNodeFree(_cssNode);
+    if (_cssNode) {
+        YGNodeFree(_cssNode);
+    }
     [self _removeAllEvents];
     if (_positionType == WXPositionTypeFixed) {
         [self.weexInstance.componentManager removeFixedComponent:self];

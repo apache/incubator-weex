@@ -86,7 +86,9 @@ static NSThread *WXComponentThread;
 
 - (void)dealloc
 {
-    YGNodeFree(_rootCSSNode);
+    if (_rootCSSNode) {
+        YGNodeFree(_rootCSSNode);
+    }
     [NSMutableArray wx_releaseArray:_fixedComponents];
 }
 
