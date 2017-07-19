@@ -50,6 +50,13 @@
 
       <div>
         <div style="background-color: #286090">
+          <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = number</text>
+        </div>
+        <input type="number" placeholder="Input number" class="input" @change="onchange" @input="oninput"/>
+      </div>
+
+      <div>
+        <div style="background-color: #286090">
           <text class="title" style="height: 80 ;padding: 20;color: #FFFFFF">input type = date</text>
         </div>
         <input type="date" placeholder="Input Date" class="input" @change="onchange" @input="oninput" max="2017-12-12" min="2015-01-01"/>
