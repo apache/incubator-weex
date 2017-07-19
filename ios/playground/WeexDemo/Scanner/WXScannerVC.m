@@ -22,8 +22,7 @@
 #import "UIViewController+WXDemoNaviBar.h"
 #import "WXDemoViewController.h"
 #import "WXDebugTool.h"
-//#import <TBWXDevTool/WXDevTool.h>
-#import "WXDevTool.h"
+#import <TBWXDevTool/WXDevTool.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <WeexSDK/WeexSDK.h>
 
