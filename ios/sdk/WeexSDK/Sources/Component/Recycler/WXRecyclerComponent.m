@@ -140,6 +140,11 @@ typedef enum : NSUInteger {
     return [[WXCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:_collectionViewlayout];
 }
 
+- (void)_insertChildCssNode:(WXComponent *)subcomponent atIndex:(NSInteger)index
+{
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -574,11 +579,10 @@ typedef enum : NSUInteger {
 - (void)_fillPadding
 {
     UIEdgeInsets padding = {
-        
-        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeTop)),
-        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft)),
-        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom)),
-        WXFloorPixelValue(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value + YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))),
+        WXFloorPixelValue((isnan(YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeRight).value) + (isnan(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight)))
     };
     
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
