@@ -253,7 +253,9 @@ static NSThread *WXComponentThread;
     }
     
     [supercomponent _insertSubcomponent:component atIndex:index];
-    [supercomponent _insertChildCssNode:component atIndex:index];
+    if (component->_positionType != WXPositionTypeFixed) {
+        [supercomponent _insertChildCssNode:component atIndex:index];
+    }
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -667,7 +669,7 @@ static NSThread *WXComponentThread;
     }
     
 //    layoutNode(_rootCSSNode, _rootCSSNode->style.dimensions[CSS_WIDTH], _rootCSSNode->style.dimensions[CSS_HEIGHT], CSS_DIRECTION_INHERIT);
-    YGNodeCalculateLayout(_rootCSSNode, YGNodeStyleGetWidth(_rootCSSNode).value, YGNodeStyleGetHeight(_rootCSSNode).value, YGDirectionInherit);
+    YGNodeCalculateLayout(_rootComponent.cssNode, YGNodeStyleGetWidth(_rootCSSNode).value, YGNodeStyleGetHeight(_rootCSSNode).value, YGDirectionInherit);
     if ([_rootComponent needsLayout]) {
         if ([WXLog logLevel] >= WXLogLevelDebug) {
             YGNodePrint(_rootCSSNode, YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren);
