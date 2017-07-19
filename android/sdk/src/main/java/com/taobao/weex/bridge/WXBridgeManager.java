@@ -887,6 +887,9 @@ public class WXBridgeManager implements Callback,BactchExecutor {
       // reinit frame work
       mInit = false;
       initScriptsFramework("");
+      // statistic weexjsc process crash
+     commitJscCrashAlarmMonitor(IWXUserTrackAdapter.JS_BRIDGE,  WXErrorCode.WX_ERR_JSC_CRASH, "[WXBridgeManager] weexjsc process crash and reload");
+
       if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
           return IWXBridge.DESTROY_INSTANCE;
       }
@@ -1186,6 +1189,26 @@ public class WXBridgeManager implements Callback,BactchExecutor {
     userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
   }
 
+
+  public void commitJscCrashAlarmMonitor(final String type, final WXErrorCode errorCode, String errMsg) {
+    if (TextUtils.isEmpty(type) || errorCode == null) {
+      return;
+    }
+    if (WXSDKManager.getInstance().getWXStatisticsListener() != null) {
+      WXSDKManager.getInstance().getWXStatisticsListener().onException("0",
+              errorCode.getErrorCode(),
+              TextUtils.isEmpty(errMsg) ? errorCode.getErrorMsg() : errMsg);
+    }
+
+    final IWXUserTrackAdapter userTrackAdapter = WXSDKManager.getInstance().getIWXUserTrackAdapter();
+    if (userTrackAdapter == null) {
+      return;
+    }
+    WXPerformance performance = new WXPerformance();
+    performance.errCode = errorCode.getErrorCode();
+    performance.appendErrMsg(errMsg);
+    userTrackAdapter.commit(WXEnvironment.getApplication(), null, type, performance, null);
+  }
 
   /**
    * Create instance.

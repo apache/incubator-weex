@@ -120,6 +120,11 @@ public enum WXErrorCode {
   WX_ERR_RELOAD_PAGE("-2111", "reloadPage"),
 
   /**
+   *
+   */
+  WX_ERR_JSC_CRASH("-2112", "weexjscCrash"),
+
+  /**
    * JS Bundle download error
    */
 
