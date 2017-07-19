@@ -74,6 +74,7 @@ typedef enum : NSUInteger {
 @end
 
 @interface WXTracingManager : NSObject
++(BOOL)isTracing;
 +(void)switchTracing:(BOOL)isTracing;
 +(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
 +(WXTracingTask*)getTracingData;
