@@ -635,7 +635,6 @@ static css_node_t * rootNodeGetChild(void *context, int i)
 - (void)_layoutAndSyncUI
 {
     [self _layout];
-//    NSLog(@"jerry.s uitask");
     if(_uiTaskQueue.count > 0){
         [self _syncUITasks];
         _noTaskTickCount = 0;
