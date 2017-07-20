@@ -113,7 +113,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);
-  private boolean mStable = false;
 
   private RecyclerView.ItemAnimator mItemAnimator;
 
@@ -133,16 +132,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private static final boolean DEFAULT_EXCLUDED = false;
 
   private static final String DRAG_ANCHOR = "dragAnchor";
-  private float mContentHeight = 0;
-
-  public void recalculateSize() {
-    float height = 0;
-    for(int i=0, c = getChildCount(); i<=c-1 ; i++){
-      height += getChild(i).getLayoutHeight();
-    }
-    mContentHeight = height;
-    fireScrollEvent(0,0);
-  }
 
   /**
    * gesture type which can trigger drag&drop
@@ -189,12 +178,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     });
 
     mTriggerType = getTriggerType(getDomObject());
-  }
-
-  @Override
-  protected void onFinishLayout() {
-    super.onFinishLayout();
-    recalculateSize();
   }
 
   /**
@@ -419,9 +402,6 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       case Constants.Name.OFFSET_ACCURACY:
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
-        return true;
-      case Constants.Name.STABLE:
-        this.mStable = WXUtils.getBoolean(param, false);
         return true;
       case Constants.Name.DRAGGABLE:
         boolean draggable = WXUtils.getBoolean(param,false);
@@ -1255,36 +1235,47 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (Constants.Event.SCROLL.equals(type) && getHostView() != null && getHostView().getInnerView() != null) {
       WXRecyclerView innerView = getHostView().getInnerView();
       innerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-        private int totalDy = 0;
+        private int offsetXCorrection, offsetYCorrection;
+        private boolean mFirstEvent = true;
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
           super.onScrolled(recyclerView, dx, dy);
+//          WXLogUtils.e("SCROLL", dx + ", " + dy + ", " + recyclerView.computeHorizontalScrollRange()
+//          + ", " + recyclerView.computeVerticalScrollRange()
+//          + ", " + recyclerView.computeHorizontalScrollOffset()
+//          + ", " + recyclerView.computeVerticalScrollOffset());
+
           int offsetX = recyclerView.computeHorizontalScrollOffset();
-          int offsetY = 0;
-          if (mStable) {
-            totalDy -= dy;
-            offsetY = totalDy;
+          int offsetY = recyclerView.computeVerticalScrollOffset();
+
+          if (dx == 0 && dy == 0) {
+            offsetXCorrection = offsetX;
+            offsetYCorrection = offsetY;
+            offsetX = 0;
+            offsetY = 0;
           } else {
-            offsetY = recyclerView.computeVerticalScrollOffset();
+            offsetX = offsetX - offsetXCorrection;
+            offsetY = offsetY - offsetYCorrection;
+          }
+
+          if (mFirstEvent) {
+            //skip first event
+            mFirstEvent = false;
+            return;
           }
 
           if (shouldReport(offsetX, offsetY)) {
-            fireScrollEvent(offsetX, offsetY);
+            fireScrollEvent(recyclerView, offsetX, offsetY);
           }
         }
       });
     }
   }
 
-  private void fireScrollEvent(int offsetX, int offsetY){
-    ListComponentView view = getHostView();
-    if(view == null){
-      return;
-    }
-    WXRecyclerView innerView = view.getInnerView();
-    int contentWidth = innerView.getMeasuredWidth() + innerView.computeHorizontalScrollRange();
-    int contentHeight = (int)mContentHeight;
+  private void fireScrollEvent(RecyclerView recyclerView, int offsetX, int offsetY) {
+    int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
+    int contentHeight = recyclerView.computeVerticalScrollRange();
 
     Map<String, Object> event = new HashMap<>(2);
     Map<String, Object> contentSize = new HashMap<>(2);
@@ -1308,7 +1299,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       return true;
     }
 
-    if (Math.abs(mLastReport.x - offsetX) >= mOffsetAccuracy || Math.abs(mLastReport.y - offsetY) >= mOffsetAccuracy) {
+    int gapX = Math.abs(mLastReport.x - offsetX);
+    int gapY = Math.abs(mLastReport.y - offsetY);
+
+    if (gapX >= mOffsetAccuracy || gapY >= mOffsetAccuracy) {
       mLastReport.x = offsetX;
       mLastReport.y = offsetY;
       return true;

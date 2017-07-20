@@ -27,7 +27,6 @@ import android.widget.FrameLayout;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.dom.WXDomObject;
-import com.taobao.weex.dom.flex.CSSLayout;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 
@@ -80,15 +79,6 @@ public class WXCell extends WXVContainer<WXFrameLayout> {
             WXFrameLayout view = new WXFrameLayout(context);
             mRealView = view;
             return view;
-        }
-    }
-
-    @Override
-    protected void onFinishLayout() {
-        super.onFinishLayout();
-        WXVContainer container = getParent();
-        if(container != null && container instanceof BasicListComponent){
-            ((BasicListComponent)container).recalculateSize();
         }
     }
 

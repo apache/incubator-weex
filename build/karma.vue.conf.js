@@ -56,6 +56,13 @@ rollupConfig.plugins.splice(-2, 1, flow())
 
 rollupConfig.format = 'iife'
 rollupConfig.sourceMap = 'inline'
+rollupConfig.intro = `describe('ignore inject function from postcss', function () {
+    it('ignore', function () {
+        var shouldBe = 'test'
+        var expected = __$styleInject('.body{}',shouldBe)
+        expect(shouldBe).to.be.equal(expected)
+      })
+    })`
 
 module.exports = function (config) {
   config.set({
