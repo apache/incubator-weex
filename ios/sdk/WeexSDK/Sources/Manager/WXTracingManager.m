@@ -223,7 +223,7 @@
         tracing.className = [self getclassName:tracing];
     }
     if([WXTNetworkHanding isEqualToString:task.tag]){
-        if([WXTDataHanding isEqualToString:tracing.name]){
+        if([WXTExecJS isEqualToString:tracing.name]){
             NSMutableArray *tracings = task.tracings;
             [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
                 if(([WXTNetworkHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
@@ -234,19 +234,18 @@
                     newTracing.duration = newTracing.ts - bTracing.ts ;
                     bTracing.duration = newTracing.duration;
                     [task.tracings addObject:newTracing];
-                    NSLog(@"jerry0 %f,%f",bTracing.ts,bTracing.duration);
                     *stop = YES;
                 }
             }];
-            task.tag = WXTDataHanding;
+            task.tag = WXTExecJS;
         }
     }
     
-    if([WXTDataHanding isEqualToString:task.tag]){
+    if([WXTExecJS isEqualToString:task.tag]){
         if([WXTJSCall isEqualToString:tracing.name]){
             NSMutableArray *tracings = task.tracings;
             [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
-                if(([WXTDataHanding isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
+                if(([WXTExecJS isEqualToString:bTracing.name] || [bTracing.ref isEqualToString:tracing.ref])&&[WXTracingBegin isEqualToString:bTracing.ph]){
                     WXTracing *newTracing = [self copyTracing:bTracing];
                     newTracing.iid = tracing.iid;
                     newTracing.ph = WXTracingEnd;
@@ -269,6 +268,7 @@
                 WXComponent *com = [instance componentForRef:tracing.ref];
                 if(com.supercomponent){
                     tracing.parentRef = com.supercomponent.ref;
+                    task.bundleUrl = [instance.scriptURL absoluteString];
                 }
             });
             

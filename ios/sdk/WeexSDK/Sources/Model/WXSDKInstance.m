@@ -202,7 +202,7 @@ typedef enum : NSUInteger {
     
     [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
     
-    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTDataHanding ph:WXTracingBegin fName:@"renderWithMainBundleString" parentId:nil];
+    [WXTracingManager startTracing:self.instanceId ref:nil parentRef:nil className:nil name:WXTExecJS ph:WXTracingBegin fName:@"renderWithMainBundleString" parentId:nil];
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
 }
