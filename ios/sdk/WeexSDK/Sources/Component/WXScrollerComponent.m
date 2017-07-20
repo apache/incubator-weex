@@ -644,6 +644,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 //        _scrollerCSSNode->children_count = (int)[self childrenCountForScrollerLayout];
         YGNodeStyleSetPosition(_scrollerCSSNode, YGEdgeLeft, 0);
         YGNodeStyleSetPosition(_scrollerCSSNode, YGEdgeTop, 0);
+        YGNodeSetContext(_scrollerCSSNode, YGNodeGetContext(_cssNode));
         
         if (_scrollDirection == WXScrollDirectionVertical) {
             YGNodeStyleSetFlexDirection(_scrollerCSSNode, YGFlexDirectionColumn);

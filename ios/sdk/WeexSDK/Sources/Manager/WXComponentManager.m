@@ -669,7 +669,7 @@ static NSThread *WXComponentThread;
     }
     
 //    layoutNode(_rootCSSNode, _rootCSSNode->style.dimensions[CSS_WIDTH], _rootCSSNode->style.dimensions[CSS_HEIGHT], CSS_DIRECTION_INHERIT);
-    YGNodeCalculateLayout(_rootComponent.cssNode, YGNodeStyleGetWidth(_rootCSSNode).value, YGNodeStyleGetHeight(_rootCSSNode).value, YGDirectionInherit);
+    YGNodeCalculateLayout(_rootCSSNode, YGNodeStyleGetWidth(_rootCSSNode).value, YGNodeStyleGetHeight(_rootCSSNode).value, YGDirectionInherit);
     if ([_rootComponent needsLayout]) {
         if ([WXLog logLevel] >= WXLogLevelDebug) {
             YGNodePrint(_rootCSSNode, YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren);

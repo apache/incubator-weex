@@ -259,6 +259,7 @@ do {\
 - (void)setNeedsLayout
 {
     [super setNeedsLayout];
+    YGNodeMarkDirty(self.cssNode);
 }
 
 - (void)viewDidLoad

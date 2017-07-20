@@ -165,8 +165,8 @@
     _isLayoutDirty = NO;
     CGRect newFrame = CGRectZero;
     newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
-                                 WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetTop(_cssNode))?0:YGNodeLayoutGetTop(_cssNode)),
-                                 WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
+                                 WXRoundPixelValue(YGNodeLayoutGetTop(_cssNode)),
+                          WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
                                  WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
     
     BOOL isFrameChanged = NO;
