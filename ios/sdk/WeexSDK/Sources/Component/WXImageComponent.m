@@ -353,10 +353,16 @@ static dispatch_queue_t WXImageUpdateQueue;
 
 - (void)cancelImage
 {
-    [_imageOperation cancel];
-    _imageOperation = nil;
-    [_placeholderOperation cancel];
-    _placeholderOperation = nil;
+    if(_imageOperation){//判断空指针，以防止下面的代码崩溃
+        [_imageOperation cancel];
+        _imageOperation = nil;
+    }
+    
+    
+    if(_placeholderOperation){//判断空指针，以防止下面的代码崩溃
+        [_placeholderOperation cancel];
+        _placeholderOperation = nil;
+    }
 }
 
 - (id<WXImgLoaderProtocol>)imageLoader
