@@ -133,7 +133,7 @@ export function throttle (func: Function, wait: number, callLastTime: boolean) {
   let last = 0
   let lastTimer = null
   const lastTimeDuration = wait + (wait > 25 ? wait : 25) // plus half wait time.
-  return function (...args: Array <mixed>) {
+  return function (...args: Array<mixed>) {
     const context = this
     const time = new Date().getTime()
     if (time - last > wait) {
