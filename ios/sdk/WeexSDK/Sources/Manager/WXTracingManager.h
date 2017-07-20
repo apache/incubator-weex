@@ -20,11 +20,11 @@
 #import <Foundation/Foundation.h>
 #import "WXSDKInstance.h"
 
-#define WXTNetworkHanding          @"WXTNetworkHanding"
-#define WXTDataHanding          @"WXTDataHanding"
+#define WXTNetworkHanding          @"loadjs"
+#define WXTExecJS          @"execjs"
 #define WXTJSCall          @"jsCall"
-#define WXTRender          @"WXTRender"
-#define WXTRenderFinish          @"WXTRenderFinish"
+#define WXTRender          @"render"
+#define WXTRenderFinish          @"RenderFinish"
 
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
@@ -68,6 +68,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *iid;
 @property (nonatomic) long long counter;
 @property (nonatomic, copy)  NSString *tag;
+@property (nonatomic, copy)  NSString *bundleUrl;
 @property (nonatomic, strong) NSMutableArray *tracings;
 @property (nonatomic, copy) NSString *bundleJSType; //
 
