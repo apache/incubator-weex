@@ -1,6 +1,6 @@
 {
-  "name": "weex-vue-navigator",
-  "version": "0.1.0",
+  "name": "weex-vue-nav",
+  "version": "0.1.1",
   "description": "Weex built-in API module 'navigator' for Vue 2.x.",
   "license": "Apache-2.0",
   "main": "dist/index.js",

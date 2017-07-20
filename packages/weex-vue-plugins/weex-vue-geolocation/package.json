@@ -1,6 +1,6 @@
 {
   "name": "weex-vue-geolocation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Weex built-in API module 'geolocation' for Vue 2.x.",
   "license": "Apache-2.0",
   "main": "dist/index.js",
