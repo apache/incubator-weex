@@ -343,11 +343,11 @@ transform 属性向元素应用 2D 转换。该属性允许我们对元素进行
 
 Weex 支持四种伪类：`active`, `focus`, `disabled`, `enabled`
 
-所有组件都支持 `active`, 但只有 `input` 组件和 `textarea` 组件支持 `focus`, `enabled`, `diabled`。
+所有组件都支持 `active`, 但只有 `input` 组件和 `textarea` 组件支持 `focus`, `enabled`, `disabled`。
 
 ### 规则
 
-- 同时生效生效的时候，优先级高覆盖优先级低
+- 同时生效的时候，优先级高覆盖优先级低
 
    - 例如：`input:active:enabled` 和 `input:active` 同时生效，前者覆盖后者
 
