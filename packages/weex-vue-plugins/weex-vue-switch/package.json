@@ -1,6 +1,6 @@
 {
   "name": "weex-vue-switch",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Weex built-in 'switch' component for Vue 2.x.",
   "license": "Apache-2.0",
   "main": "dist/index.js",
