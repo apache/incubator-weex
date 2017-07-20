@@ -222,6 +222,7 @@
     if(![WXTJSCall isEqualToString:tracing.name]){
         tracing.className = [self getclassName:tracing];
     }
+    
     if([WXTNetworkHanding isEqualToString:task.tag]){
         if([WXTExecJS isEqualToString:tracing.name]){
             NSMutableArray *tracings = task.tracings;
@@ -260,8 +261,8 @@
             task.tag = WXTRender;
         }
     }
-    if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
-        
+    
+    if([WXTracingBegin isEqualToString:tracing.ph]){
         if(tracing.ref.length>0){
             WXPerformBlockOnComponentThread(^{
                 WXSDKInstance *instance = [WXSDKManager instanceForID:task.iid];
@@ -271,8 +272,9 @@
                     task.bundleUrl = [instance.scriptURL absoluteString];
                 }
             });
-            
         }
+    }
+    if([WXTracingEnd isEqualToString:tracing.ph]){  // deal end
         NSMutableArray *tracings = task.tracings;
         [tracings enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(WXTracing *bTracing, NSUInteger idx, BOOL *stop) {
             if(tracing.ref.length > 0 && bTracing.ref.length>0){
@@ -286,8 +288,8 @@
                 if(bTracing.ref.length > 0){
                     tracing.ref = bTracing.ref;
                 }
-                if(tracing.parentRef.length > 0){
-                    bTracing.parentRef = tracing.parentRef;
+                if(bTracing.parentRef.length > 0){
+                    tracing.parentRef = bTracing.parentRef;
                 }
                 tracing.duration = tracing.ts - bTracing.ts ;
                 tracing.traceId = bTracing.traceId;
@@ -350,7 +352,6 @@
     if(moduleArray && [moduleArray count]>0){
         [dict setObject:moduleArray forKey:@"module"];
     }
-    
     
     NSDictionary *handleConfigs = [[WXHandlerFactory handlerConfigs] mutableCopy];
     void (^handleBlock)(id, id, BOOL *) = ^(id mKey, id mObj, BOOL * mStop) {
