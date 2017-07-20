@@ -45,6 +45,17 @@ else {
   console.log('\nPlease specify the package you want to build. [native, runtime, browser, vue]')
 }
 
+function extend(to, ...froms) {
+  froms.forEach(function (from) {
+    for (const key in from) {
+      if (from.hasOwnProperty(key)) {
+        to[key] = from[key]
+      }
+    }
+  })
+  return to
+}
+
 function runRollupOnWatch(config) {
   const watcher = watch(rollup, config)
   watcher.on('event', event => {
@@ -84,6 +95,22 @@ function runRollup (config) {
   })
 }
 
+function getAllEntries (rootDir) {
+  return fs.readdirSync(rootDir)
+    .filter(function (file) {
+      return fs.statSync(path.join(rootDir, file)).isDirectory()
+    })
+    .map(function (file) {
+      var fullpath = path.join(rootDir, file)
+      var entry = path.join(fullpath, 'src/index.js')
+      var dest = path.join(fullpath, 'dist/index.js')
+      var name = file.replace(/-(\w)/g, function ($0, $1) {
+        return $1.toUpperCase()
+      })
+      return { entry, dest, name }
+    })
+}
+
 function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
@@ -91,12 +118,31 @@ function build (name) {
     case 'runtime': pkgName = 'weex-js-runtime'; break;
     case 'browser': pkgName = 'weex-web-render'; break;
     case 'vue': pkgName = 'weex-vue-render'; break;
+    case 'vue-plugins': pkgName = 'weex-vue-render-plugins'; break;
+    case 'vue-core': pkgName = 'weex-vue-render-core'; break;
   }
 
   const config = getConfig(pkgName)
   const minifyConfig = getConfig(pkgName, true)
 
-  if (isWatch) {
+  if (pkgName === 'weex-vue-render-plugins') {
+    // build multiple packages in a loop.
+    console.log(`\n => start to build ${name} (${pkgName})\n`)
+    const entries = getAllEntries(path.join(__dirname, '../packages/weex-vue-plugins'))
+    entries.forEach(function (item) {
+      const info = {
+        moduleName: item.name,
+        entry: item.entry
+      }
+      const itemConfig = extend({}, config, info, { dest: item.dest })
+      const itemMinConfig = extend({}, minifyConfig, info, { dest: item.dest.replace(/\.js$/, '.min.js') })
+      runRollup(itemConfig)
+        .then(() => {
+          return runRollup(itemMinConfig)
+        })
+    })
+  }
+  else if (isWatch) {
     return runRollupOnWatch(config)
   }
   else {

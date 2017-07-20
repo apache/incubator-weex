@@ -16,32 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { supportSticky } from '../../../utils/style'
+
+function getCell (weex) {
+  const { extractComponentStyle, createEventMap } = weex
+  return {
+    name: 'weex-cell',
+    render (createElement) {
+      return createElement('section', {
+        attrs: { 'weex-type': 'cell' },
+        on: createEventMap(this),
+        staticClass: 'weex-cell weex-ct',
+        staticStyle: extractComponentStyle(this)
+      }, this.$slots.default)
+    }
+  }
+}
 
 export default {
-  methods: {
-    handleListScroll (event) {
-      this.handleScroll(event)
-
-      if (supportSticky()) {
-        return
-      }
-
-      const scrollTop = this.$el.scrollTop
-      const h = this.$children.filter(vm => vm.$refs.header)
-
-      if (h.length <= 0) {
-        return
-      }
-
-      for (let i = 0; i < h.length; i++) {
-        if (h[i].initTop < scrollTop) {
-          h[i].addSticky()
-        }
-        else {
-          h[i].removeSticky()
-        }
-      }
-    }
+  init (weex) {
+    weex.registerComponent('cell', getCell(weex))
   }
 }

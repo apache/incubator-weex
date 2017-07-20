@@ -121,32 +121,6 @@ export default {
   },
 
   methods: {
-    _renderHook () {
-      if (!window._first_screen_detected) {
-        window._component_count++
-      }
-    },
-
-    _getScopeIds () {
-      const arr = []
-      let ctx = this
-      let scopeId
-      while (ctx) {
-        scopeId = ctx.$options._scopeId
-        scopeId && arr.push(scopeId)
-        ctx = ctx.$options.parent
-      }
-      return arr
-    },
-
-    // _getParentScroller () {
-    //   let parent = this
-    //   while (parent && config.scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
-    //     parent = parent.$options.parent
-    //   }
-    //   return parent
-    // },
-
     _fireLazyload (el) {
       if (process.env.NODE_ENV === 'development') {
         tagBegin('base._fireLazyload')

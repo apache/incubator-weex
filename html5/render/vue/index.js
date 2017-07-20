@@ -18,7 +18,6 @@
  */
 import weex from './env'
 import { setVue } from './env'
-import components from './components'
 import { base, style, sticky } from './mixins'
 // import styleMixin from './mixins/style'
 
@@ -44,11 +43,6 @@ function init (Vue/*, options = {}*/) {
   const htmlRegex = /^html:/i
   Vue.config.isReservedTag = tag => htmlRegex.test(tag)
   Vue.config.parsePlatformTagName = tag => tag.replace(htmlRegex, '')
-
-  // register sdk components.
-  for (const name in components) {
-    weex.registerComponent(name, components[name])
-  }
 
   /* istanbul ignore next */
   // if (process.env.NODE_ENV === 'development') {

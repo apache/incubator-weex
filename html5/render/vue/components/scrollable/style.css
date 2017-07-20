@@ -1,0 +1,66 @@
+body > .weex-list,
+body > .weex-scroller,
+body > .weex-waterfall {
+  max-height: 100%;
+}
+
+.weex-list-wrapper,
+.weex-scroller-wrapper,
+.weex-waterfall-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+.weex-list-wrapper,
+.weex-waterfall-wrapper {
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+}
+
+.weex-list-inner,
+.weex-scroller-inner,
+.weex-waterfall-inner {
+  -webkit-overflow-scrolling: touch;
+}
+
+.weex-waterfall-inner-columns {
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-orient: horizontal;
+}
+
+.weex-scroller-wrapper.weex-scroller-vertical {
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.weex-scroller-wrapper.weex-scroller-horizontal {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.weex-scroller-horizontal .weex-scroller-inner {
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-orient: horizontal;
+  height: 100%;
+}
+
+.weex-cell {
+  width: 100%;
+}
+
+.weex-refresh,
+.weex-loading {
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}

@@ -16,19 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-export default `
-body > .weex-list {
-  max-height: 100%;
-}
 
-.weex-list-wrapper {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: scroll !important;
-  overflow-x: hidden;
-}
+export default {
+  methods: {
+    handleListScroll (event) {
+      this.handleScroll(event)
 
-.weex-list-inner {
-  -webkit-overflow-scrolling: touch;
-  width: 100%;
+      if (weex.utils.supportSticky()) {
+        return
+      }
+
+      const scrollTop = this.$el.scrollTop
+      const h = this.$children.filter(vm => vm.$refs.header)
+
+      if (h.length <= 0) {
+        return
+      }
+
+      for (let i = 0; i < h.length; i++) {
+        if (h[i].initTop < scrollTop) {
+          h[i].addSticky()
+        }
+        else {
+          h[i].removeSticky()
+        }
+      }
+    }
+  }
 }
-`
