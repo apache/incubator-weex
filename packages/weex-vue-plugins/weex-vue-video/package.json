@@ -21,6 +21,6 @@
   ],
   "peerDependencies": {
     "weex-vue-render": "^0.12.0",
-    "weex-loader": "^12.0"
+    "vue-loader": "^12.0"
   }
 }
