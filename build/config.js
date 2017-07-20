@@ -81,7 +81,7 @@ const configs = {
   },
   'weex-vue-render': {
     moduleName: 'WeexVueRender',
-    entry: absolute('html5/render/vue/index.js'),
+    entry: absolute('packages/weex-vue-render/src/index.js'),
     dest: absolute('packages/weex-vue-render/dist/index.js'),
     banner:`
 console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');
@@ -98,6 +98,37 @@ window._jslib_init_start = window.performance && window.performance.now && windo
         'process.env.WEEX_VERSION': subversion['vue-render']
       })
     ]
+  },
+  'weex-vue-render-core': {
+    moduleName: 'WeexVueRenderCore',
+    entry: absolute('packages/weex-vue-render/src/index.core.js'),
+    dest: absolute('packages/weex-vue-render/dist/index.core.js'),
+    banner:`
+console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');
+window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
+    format: 'umd',
+    plugins: [
+      postcss(),
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true
+      }),
+      replace({
+        'process.env.WEEX_VERSION': subversion['vue-render']
+      })
+    ]
+  },
+  'weex-vue-render-plugins': {
+    format: 'umd',
+    plugins: [
+      postcss(),
+      nodeResolve({
+        jsnext: true,
+        main: true,
+        browser: true
+      })
+    ]
   }
 }
 
@@ -106,7 +137,7 @@ function getConfig (name, minify) {
   const config = {
     moduleName: opt.moduleName,
     entry: opt.entry,
-    dest: minify ? opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
+    dest: minify ? opt.dest && opt.dest.replace(/\.js$/, '.min.js') : opt.dest,
     format: opt.format,
     banner: opt.banner,
     plugins: opt.plugins.concat([

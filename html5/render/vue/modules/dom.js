@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { camelToKebab, appendCss, isArray } from '../utils'
 import config from '../config'
+
+const utils = {}
 
 function getParentScroller (vnode) {
   if (!vnode) return null
@@ -86,7 +87,7 @@ function ease (k) {
   return 0.5 * (1 - Math.cos(Math.PI * k))
 }
 
-export default {
+const dom = {
   /**
    * scrollToElement
    * @param  {Vnode | VComponent} vnode
@@ -94,6 +95,7 @@ export default {
    *   ps: scroll-to has 'ease' and 'duration'(ms) as options.
    */
   scrollToElement: function (vnode, options) {
+    const { isArray } = utils
     if (isArray(vnode)) {
       if (process.env.NODE_ENV === 'development') {
         console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
@@ -165,6 +167,7 @@ export default {
    * @param {Function} callback
    */
   getComponentRect: function (vnode, callback) {
+    const { isArray } = utils
     if (isArray(vnode)) {
       if (process.env.NODE_ENV === 'development') {
         console.warn('[vue-render] the ref passed to animation.transitionOnce is a array.')
@@ -215,6 +218,7 @@ export default {
    * @param {object} styles rules
    */
   addRule: function (key, styles) {
+    const { camelToKebab, appendCss } = utils
     key = camelToKebab(key)
     let stylesText = ''
     for (const k in styles) {
@@ -224,5 +228,18 @@ export default {
     }
     const styleText = `@${key}{${stylesText}}`
     appendCss(styleText, 'dom-added-rules')
+  }
+}
+
+export default {
+  init (weex) {
+    const extendKeys = weex.utils.extendKeys
+    extendKeys(utils, weex.utils, [
+      'camelToKebab',
+      'appendCss',
+      'isArray'
+    ])
+
+    weex.registerModule('dom', dom)
   }
 }

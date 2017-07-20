@@ -16,12 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import _switch from './switch'
-
 import a from './a'
 import div from './div'
 import image from './image'
 import input from './input'
+import _switch from './switch'
 import scrollable from './scrollable'
 import slider from './slider'
 import text from './text'
