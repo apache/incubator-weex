@@ -19,6 +19,7 @@
 /**
  * websocket module
  */
+/*global WebSocket*/
 export default (function () {
   const registerListeners = ['onopen', 'onmessage', 'onerror', 'onclose']
   const ws = {
