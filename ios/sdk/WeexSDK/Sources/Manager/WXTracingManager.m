@@ -139,7 +139,7 @@
     }
 }
 
--(void)clearTracingData
++(void)clearTracingData
 {
     [WXTracingManager sharedInstance].tracingTasks = nil;
 }
