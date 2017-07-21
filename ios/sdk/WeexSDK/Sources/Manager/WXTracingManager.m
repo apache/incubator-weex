@@ -280,9 +280,11 @@
             WXPerformBlockOnComponentThread(^{
                 WXSDKInstance *instance = [WXSDKManager instanceForID:task.iid];
                 WXComponent *com = [instance componentForRef:tracing.ref];
+                if(task.bundleUrl.length == 0){
+                    task.bundleUrl = [instance.scriptURL absoluteString];
+                }
                 if(com.supercomponent){
                     tracing.parentRef = com.supercomponent.ref;
-                    task.bundleUrl = [instance.scriptURL absoluteString];
                 }
             });
         }
