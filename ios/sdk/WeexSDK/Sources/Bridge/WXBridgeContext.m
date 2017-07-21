@@ -589,7 +589,9 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToWebSocket:(NSURL *)url
 {
-    _devToolSocketBridge = [[NSClassFromString(@"WXDebugLoggerBridge") alloc] initWithURL:url];
+    if (NSClassFromString(@"WXDebugLoggerBridge")) {
+        _devToolSocketBridge = [[NSClassFromString(@"WXDebugLoggerBridge") alloc] initWithURL:url];
+    }
 }
 
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message
