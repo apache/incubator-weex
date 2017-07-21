@@ -100,8 +100,13 @@
         if(!task.tracings){
             task.tracings = [NSMutableArray new];
         }
-        NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
-        tracing.ts = time;
+        if(WXFloatEqual(tracing.ts,0)){
+            NSTimeInterval time=[[NSDate date] timeIntervalSince1970]*1000;
+            tracing.ts = time;
+        }
+        if(WXFloatEqual(tracing.duration,0)){
+            tracing.duration = WXTracingDurationDefault;
+        }
         if(![WXTracingEnd isEqualToString:tracing.ph]){ // end is should not update
             tracing.traceId = task.counter++;
         }
@@ -134,15 +139,17 @@
     }
 }
 
-+(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId
+-(void)clearTracingData
+{
+    [WXTracingManager sharedInstance].tracingTasks = nil;
+}
+
++(void)startTracingWithInstanceId:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name phase:(NSString *)phase functionName:(NSString *)functionName options:(NSDictionary *)options
 {
     if([self isTracing]){
         WXTracing *tracing = [WXTracing new];
         if(ref.length>0){
             tracing.ref = ref;
-        }
-        if(parentRef.length>0){
-            tracing.parentRef = parentRef;
         }
         if(className.length>0){
             tracing.className = className;
@@ -150,17 +157,24 @@
         if(name.length>0){
             tracing.name = name;
         }
-        if(fName.length>0){
-            tracing.fName = fName;
+        if(functionName.length>0){
+            tracing.fName = functionName;
         }
-        if(ph.length>0){
-            tracing.ph = ph;
+        if(phase.length>0){
+            tracing.ph = phase;
         }
         if(iid.length>0){
             tracing.iid = iid;
         }
-        if(parentId.length>0){
-            tracing.parentId = parentId;
+        
+        if(options && options[@"ts"]){
+            tracing.ts = [options[@"ts"] floatValue];
+        }
+        if(options && options[@"duration"]){
+            tracing.duration =  [options[@"duration"] floatValue];
+        }
+        if(options && options[@"parentRef"]){
+            tracing.parentRef = options[@"parentRef"];
         }
         [self startTracing:tracing];
     }
@@ -254,7 +268,6 @@
                     newTracing.duration = newTracing.ts - bTracing.ts ;
                     bTracing.duration = newTracing.duration;
                     [task.tracings addObject:newTracing];
-                    NSLog(@"jerry1 %f,%f",bTracing.ts,bTracing.duration);
                     *stop = YES;
                 }
             }];

@@ -31,6 +31,8 @@
 #define WXTracingDuration          @"D"
 #define WXTracingInstant          @"i"
 
+#define WXTracingDurationDefault -1
+
 typedef enum : NSUInteger {
     // global
     WXTracingNetworkHanding = 0,
@@ -75,11 +77,49 @@ typedef enum : NSUInteger {
 @end
 
 @interface WXTracingManager : NSObject
+
+/**
+ *  @discusstion  weex perfermance  tracing state
+ *  @return isTracing , NO in the release environment.
+ */
 +(BOOL)isTracing;
+/**
+ *  @discusstion  set weex perfermance  tracing state
+ *  @param isTracing , YES weex will be traced, NO weex will not be traced in DEBUG environment.
+ */
 +(void)switchTracing:(BOOL)isTracing;
-+(void)startTracing:(NSString *)iid ref:(NSString*)ref parentRef:(NSString*)parentRef className:(NSString *)className name:(NSString *)name ph:(NSString *)ph fName:(NSString *)fName parentId:(NSString *)parentId;
+/**
+ *  @discusstion  weex perfermance  tracing state
+ *  @param iid, the instance id.
+ *  @param ref, the component ref
+ *  @param className, the module or component class name
+ *  @param name,  the module or component name
+ *  @param phase, the trace phase
+ *  @param functionName, function name
+ *  @param options, the optional refer:support ts,duration,parentRef
+ */
++(void)startTracingWithInstanceId:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name phase:(NSString *)phase functionName:(NSString *)functionName options:(NSDictionary *)options;
+/**
+ *  @discusstion  fetch tracing data
+ *  @return  the tracing data
+ */
 +(WXTracingTask*)getTracingData;
+
+/**
+ *  @discusstion  clear tracing data
+ */
++(void)clearTracingData;
+
+/**
+ *  @discusstion set bundle type
+ *  @param jsBundleString: the bundle source.
+ *  @param iid: the instance  id.
+ */
 +(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
+/**
+ *  @discusstion  fetch the weex moudle component handler info
+ *  @return  the weex moudle component handler info
+ */
 +(NSDictionary *)getTacingApi;
 
 @end

@@ -138,7 +138,7 @@ do {\
 
 - (void)viewDidLoad
 {
-    [WXTracingManager startTracing:self.weexInstance.instanceId ref:self.ref parentRef:self.supercomponent.ref className:nil name:_type ph:WXTracingEnd fName:WXTRender parentId:nil];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:self.ref className:nil name:_type phase:WXTracingEnd functionName:WXTRender options:nil];
     WXAssertMainThread();
 }
 

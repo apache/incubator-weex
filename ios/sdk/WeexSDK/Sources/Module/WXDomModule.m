@@ -94,7 +94,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
     }];
-    [WXTracingManager startTracing:self.weexInstance.instanceId ref:nil parentRef:nil className:nil name:@"dom" ph:WXTracingEnd fName:@"addElement" parentId:nil];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"addElement" options:nil];
 }
 
 - (void)removeElement:(NSString *)ref
@@ -130,7 +130,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
-    [WXTracingManager startTracing:self.weexInstance.instanceId ref:nil parentRef:nil className:nil name:@"dom" ph:WXTracingEnd fName:@"createFinish" parentId:nil];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
 - (void)updateFinish

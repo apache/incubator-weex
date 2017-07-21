@@ -121,7 +121,7 @@ _Pragma("clang diagnostic pop") \
         }
         
         WXPerformBlockOnComponentThread(^{
-            [WXTracingManager startTracing:instanceId ref:elementData[@"ref"] parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"addElement" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
             WXComponentManager *manager = instance.componentManager;
             if (!manager.isValid) {
                 return;
@@ -150,7 +150,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager createRoot:bodyData];
-            [WXTracingManager startTracing:instanceId ref:bodyData[@"ref"] parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"createBody" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:nil];
         });
         
         return 0;
@@ -173,7 +173,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager removeComponent:ref];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"removeElement" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
         });
         
         return 0;
@@ -196,7 +196,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager moveComponent:ref toSuper:parentRef atIndex:index];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"moveElement" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
         });
         
         return 0;
@@ -219,7 +219,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager updateAttributes:attrsData forComponent:ref];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"updateAttrs" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:nil];
         });
         
         return 0;
@@ -242,7 +242,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager updateStyles:stylesData forComponent:ref];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"updateStyles" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:nil];
         });
         
         return 0;
@@ -265,7 +265,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager addEvent:event toComponent:ref];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"addEvent" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
         });
         
         return 0;
@@ -288,7 +288,7 @@ _Pragma("clang diagnostic pop") \
             }
             [manager startComponentTasks];
             [manager removeEvent:event fromComponent:ref];
-            [WXTracingManager startTracing:instanceId ref:ref parentRef:nil className:nil name:WXTJSCall ph:WXTracingEnd fName:@"removeEvent" parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
         });
         
         return 0;
@@ -371,11 +371,11 @@ _Pragma("clang diagnostic pop") \
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
-            [WXTracingManager startTracing:instanceId ref:task[@"ref"] parentRef:nil className:nil name:task[@"component"] ph:WXTracingBegin fName:task[@"method"] parentId:task[@"method"]];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:task[@"ref"] className:nil name:task[@"component"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
         } else {
             NSString *moduleName = task[@"module"];
             WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
-            [WXTracingManager startTracing:instanceId ref:nil parentRef:nil className:nil name:task[@"module"] ph:WXTracingBegin fName:task[@"method"] parentId:nil];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
             [method invoke];
         }
     }

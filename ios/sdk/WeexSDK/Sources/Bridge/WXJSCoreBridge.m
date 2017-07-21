@@ -207,7 +207,7 @@
         NSDictionary *componentData = [element toDictionary];
         NSString *parentRef = [ref toString];
         NSInteger insertIndex = [[index toNumber] integerValue];
-        [WXTracingManager startTracing:instanceIdString ref:componentData[@"ref"] parentRef:parentRef className:nil name:WXTJSCall ph:WXTracingBegin fName:@"addElement" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:componentData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addElement" options:nil];
          WXLogDebug(@"callAddElement...%@, %@, %@, %ld", instanceIdString, parentRef, componentData, (long)insertIndex);
         
         return [JSValue valueWithInt32:(int32_t)callAddElement(instanceIdString, parentRef, componentData, insertIndex) inContext:[JSContext currentContext]];
@@ -224,7 +224,7 @@
         NSDictionary *bodyData = [body toDictionary];
         
         WXLogDebug(@"callCreateBody...%@, %@,", instanceIdString, bodyData);
-        [WXTracingManager startTracing:instanceIdString ref:bodyData[@"ref"] parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"createBody" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"createBody" options:nil];
         return [JSValue valueWithInt32:(int32_t)callCreateBody(instanceIdString, bodyData) inContext:[JSContext currentContext]];
     };
     
@@ -239,7 +239,7 @@
         NSString *refString = [ref toString];
         
         WXLogDebug(@"callRemoveElement...%@, %@,", instanceIdString, refString);
-        [WXTracingManager startTracing:instanceIdString ref:nil parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"removeElement" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeElement" options:nil];
         return [JSValue valueWithInt32:(int32_t)callRemoveElement(instanceIdString, refString) inContext:[JSContext currentContext]];
     };
     
@@ -256,7 +256,7 @@
         NSInteger moveIndex = [[index toNumber] integerValue];
         
         WXLogDebug(@"callAddElement...%@, %@,", instanceIdString, refString);
-        [WXTracingManager startTracing:instanceIdString ref:refString parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"moveElement" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"moveElement" options:nil];
         return [JSValue valueWithInt32:(int32_t)callMoveElement(instanceIdString, refString,parentRefString,moveIndex) inContext:[JSContext currentContext]];
     };
     
@@ -272,7 +272,7 @@
         NSDictionary *attrsData = [attrs toDictionary];
         
         WXLogDebug(@"callUpdateAttrs...%@, %@, %@", instanceIdString, refString,attrsData);
-        [WXTracingManager startTracing:instanceIdString ref:refString parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"updateAttrs" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateAttrs" options:nil];
         return [JSValue valueWithInt32:(int32_t)callUpdateAttrs(instanceIdString, refString,attrsData) inContext:[JSContext currentContext]];
     };
     
@@ -288,7 +288,7 @@
         NSDictionary *stylessData = [styles toDictionary];
         
         WXLogDebug(@"callUpdateStyle...%@, %@, %@", instanceIdString, refString,stylessData);
-        [WXTracingManager startTracing:instanceIdString ref:refString parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"updateStyle" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"updateStyle" options:nil];
         return [JSValue valueWithInt32:(int32_t)callUpdateStyle(instanceIdString, refString,stylessData) inContext:[JSContext currentContext]];
     };
     
@@ -304,7 +304,7 @@
         NSString *eventString = [event toString];
         
         WXLogDebug(@"callAddEvent...%@, %@, %@", instanceIdString, refString,eventString);
-        [WXTracingManager startTracing:instanceIdString ref:refString parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"addEvent" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"addEvent" options:nil];
         return [JSValue valueWithInt32:(int32_t)callAddEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
     };
     
@@ -320,7 +320,7 @@
         NSString *eventString = [event toString];
         
         WXLogDebug(@"callRemoveEvent...%@, %@, %@", instanceIdString, refString,eventString);
-        [WXTracingManager startTracing:instanceIdString ref:refString parentRef:nil className:nil name:WXTJSCall ph:WXTracingBegin fName:@"removeEvent" parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:refString className:nil name:WXTJSCall phase:WXTracingBegin functionName:@"removeEvent" options:nil];
         return [JSValue valueWithInt32:(int32_t)callRemoveEvent(instanceIdString, refString,eventString) inContext:[JSContext currentContext]];
     };
     
@@ -340,7 +340,7 @@
         
         NSInvocation *invocation = callNativeModuleBlock(instanceIdString, moduleNameString, methodNameString, argsArray, optionsDic);
         JSValue *returnValue = [JSValue wx_valueWithReturnValueFromInvocation:invocation inContext:[JSContext currentContext]];
-        [WXTracingManager startTracing:instanceIdString ref:nil parentRef:nil className:nil name:moduleNameString ph:WXTracingInstant fName:methodNameString parentId:nil];
+        [WXTracingManager startTracingWithInstanceId:instanceIdString ref:nil className:nil name:moduleNameString phase:WXTracingInstant functionName:methodNameString options:nil];
         return returnValue;
     };
 }
