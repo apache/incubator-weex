@@ -23,9 +23,8 @@
  */
 
 import { debounce, depress, extend } from './func'
-
 // performance tracker for weex.
-const perf: {
+export const perf: {
   earliestBeforeCreates: Array<number>,
   latestMounts: Array<number>,
   earliestBeforeUpdates: Array<number>,
