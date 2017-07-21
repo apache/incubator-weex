@@ -94,7 +94,7 @@
 
 /**
  *  Register Components Method
- *  @param components:   component list
+ *  @param components   component list
  **/
 - (void)registerComponents:(NSArray *)components;
 

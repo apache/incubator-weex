@@ -55,6 +55,35 @@
     XCTAssert(WXTransform3DApproximateToTransform(component.layer.transform, transformToVerify));
 }
 
+- (void)testAnimationRotateZ {
+    WXComponent *component = [self component];
+    WXAnimationModule *object = [[WXAnimationModule alloc]init];
+    [object animation:component args:@{@"duration":@500, @"timingFunction":@"ease-in-out", @"styles":@{@"transform":@"rotateZ(90deg)"}} callback:nil];
+    [TestSupportUtils waitSecs:1];
+    
+    CATransform3D transformToVerify = CATransform3DMakeRotation(M_PI/2, 0, 0, 1);
+    XCTAssert(WXTransform3DApproximateToTransform(component.layer.transform, transformToVerify));
+}
+
+- (void)testAnimationRotateY {
+    WXComponent *component = [self component];
+    WXAnimationModule *object = [[WXAnimationModule alloc]init];
+    [object animation:component args:@{@"duration":@500, @"timingFunction":@"ease-in-out", @"styles":@{@"transform":@"rotateY(90deg)"}} callback:nil];
+    [TestSupportUtils waitSecs:1];
+    
+    CATransform3D transformToVerify = CATransform3DMakeRotation(M_PI/2, 0, 1, 0);
+    XCTAssert(WXTransform3DApproximateToTransform(component.layer.transform, transformToVerify));
+}
+- (void)testAnimationRotateX {
+    WXComponent *component = [self component];
+    WXAnimationModule *object = [[WXAnimationModule alloc]init];
+    [object animation:component args:@{@"duration":@500, @"timingFunction":@"ease-in-out", @"styles":@{@"transform":@"rotateX(90deg)"}} callback:nil];
+    [TestSupportUtils waitSecs:1];
+    
+    CATransform3D transformToVerify = CATransform3DMakeRotation(M_PI/2, 1, 0, 0);
+    XCTAssert(WXTransform3DApproximateToTransform(component.layer.transform, transformToVerify));
+}
+
 - (void)testAnimationTranslate {
     WXComponent *component = [self component];
     WXAnimationModule *object = [[WXAnimationModule alloc]init];

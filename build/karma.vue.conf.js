@@ -56,18 +56,24 @@ rollupConfig.plugins.splice(-2, 1, flow())
 
 rollupConfig.format = 'iife'
 rollupConfig.sourceMap = 'inline'
+rollupConfig.intro = `describe('ignore inject function from postcss', function () {
+    it('ignore', function () {
+        var shouldBe = 'test'
+        var expected = __$styleInject('.body{}',shouldBe)
+        expect(shouldBe).to.be.equal(expected)
+      })
+    })`
 
 module.exports = function (config) {
   config.set({
     frameworks: ['mocha', 'sinon-chai'],
     browsers: ['PhantomJS'],
     files: [
-      // '../html5/test/render/vue/components/*.js'
-      '../html5/test/render/vue/**/*.js'
+      '../html5/test/render/vue/utils/*.js',
+      '../html5/test/render/vue/core/*.js',
+      '../html5/test/render/vue/!(utils|core)/*.js'
     ],
-
     exclude: [
-      '../html5/test/render/vue/helper.js',
       '../html5/test/render/vue/helper/*.js',
       '../html5/test/render/vue/vender/**/*.js',
       '../html5/test/render/vue/data/**/*.js'
@@ -83,7 +89,7 @@ module.exports = function (config) {
         { type: 'text-summary', dir: absolute('../coverage'), subdir: 'vue-renderer' }
       ]
     },
-
+    browserDisconnectTimeout:10000,
     preprocessors: {
       '../html5/test/**/*.js': ['rollup'],
       '../html5/test/**/!(components|examples|core)/*.js': ['rollup', 'coverage']

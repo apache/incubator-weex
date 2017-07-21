@@ -107,6 +107,14 @@ export default {
         this._innerWidth = rect.width
         this._innerHeight = rect.height
       }
+      const loadingEl = this._loading && this._loading.$el
+      const refreshEl = this._refresh && this._refresh.$el
+      if (loadingEl) {
+        this._innerHeight -= loadingEl.getBoundingClientRect().height
+      }
+      if (refreshEl) {
+        this._innerHeight -= refreshEl.getBoundingClientRect().height
+      }
       // inner width is always the viewport width somehow in horizontal
       // scoller, therefore the inner width should be reclaculated.
       if (this.scrollDirection === 'horizontal' && children) {
@@ -137,7 +145,7 @@ export default {
           this._innerLength = innerLength
           this._loadmoreReset = true
         }
-        if (this._loadmoreReset && this.reachBottom()) {
+        if (this._loadmoreReset && this.reachBottom(this.loadmoreoffset)) {
           this._loadmoreReset = false
           this.$emit('loadmore', event)
         }
@@ -149,19 +157,15 @@ export default {
       return (!!wrapper) && (wrapper.scrollTop <= 0)
     },
 
-    reachBottom () {
+    reachBottom (offset) {
       const wrapper = this.$refs.wrapper
       const inner = this.$refs.inner
-      const offset = parseInt(this.loadmoreoffset) * weex.config.env.scale
+      offset = parseInt(offset || 0) * weex.config.env.scale
 
       if (wrapper && inner) {
-        // const innerRect = inner.getBoundingClientRect()
-        // const wrapperRect = wrapper.getBoundingClientRect()
         const key = this.scrollDirection === 'horizontal'
           ? 'width'
           : 'height'
-        // const innerLength = innerRect[key]
-        // const wrapperLength = wrapperRect[key]
         const innerLength = this[`_inner${key[0].toUpperCase()}${key.substr(1)}`]
         const wrapperLength = this[`_wrapper${key[0].toUpperCase()}${key.substr(1)}`]
         const scrollOffset = this.scrollDirection === 'horizontal'

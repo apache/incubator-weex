@@ -39,7 +39,10 @@ export function createEvent (target, type, props) {
   // event.stopPropagation()
 
   extend(event, props)
-
+  //  phantomjs don't support customer event
+  if (window.navigator.userAgent.indexOf('PhantomJS') !== -1) {
+    return event
+  }
   try {
     Object.defineProperty(event, 'target', {
       enumerable: true,
@@ -49,7 +52,6 @@ export function createEvent (target, type, props) {
   catch (err) {
     return extend({}, event, { target: target || null })
   }
-
   return event
 }
 

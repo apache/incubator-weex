@@ -20,7 +20,6 @@
 #import "WXBridgeContext.h"
 #import "WXBridgeProtocol.h"
 #import "WXJSCoreBridge.h"
-#import "WXDebugLoggerBridge.h"
 #import "WXLog.h"
 #import "WXUtility.h"
 #import "WXModuleFactory.h"
@@ -53,7 +52,7 @@ _Pragma("clang diagnostic pop") \
 @interface WXBridgeContext ()
 
 @property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
-@property (nonatomic, strong) WXDebugLoggerBridge *devToolSocketBridge;
+@property (nonatomic, strong) id<WXBridgeProtocol> devToolSocketBridge;
 @property (nonatomic, assign) BOOL  debugJS;
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
@@ -104,6 +103,15 @@ _Pragma("clang diagnostic pop") \
     return _jsBridge;
 }
 
+- (NSInteger)checkInstance:(WXSDKInstance *)instance
+{
+    if (!instance) {
+        WXLogInfo(@"instance not found, maybe already destroyed");
+        return FALSE;
+    }
+    return TRUE;
+}
+
 - (void)registerGlobalFunctions
 {
     __weak typeof(self) weakSelf = self;
@@ -115,8 +123,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -138,8 +145,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -161,8 +167,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -184,8 +189,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -207,8 +211,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -230,8 +233,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -253,8 +255,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -276,8 +277,7 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -599,7 +599,9 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToWebSocket:(NSURL *)url
 {
-    _devToolSocketBridge = [[WXDebugLoggerBridge alloc] initWithURL:url];
+    if (NSClassFromString(@"WXDebugLoggerBridge")) {
+        _devToolSocketBridge = [[NSClassFromString(@"WXDebugLoggerBridge") alloc] initWithURL:url];
+    }
 }
 
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message

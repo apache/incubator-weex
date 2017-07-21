@@ -19,6 +19,7 @@ This variable contains all the environment information for the current Weex page
 + `AppName: string`: application name.
 + `AppVersion: string`: app version.
 + `Platform: string`: platform information, that is iOS, Android or Web.
++ `osName: string`: OS name information, that is iOS, Android.
 + `OsVersion: string`: system version.
 + `DeviceModel: string`: device model (native application only).
 + `DeviceWidth: number`: device width

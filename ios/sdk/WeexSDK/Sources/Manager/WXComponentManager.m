@@ -35,6 +35,7 @@
 #import "WXValidateProtocol.h"
 #import "WXPrerenderManager.h"
 #import "WXTracingManager.h"
+#import "WXLayoutDefine.h"
 
 static NSThread *WXComponentThread;
 

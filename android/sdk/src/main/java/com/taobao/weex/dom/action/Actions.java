@@ -103,7 +103,9 @@ public class Actions {
         if (args == null) {
           return null;
         }
-        return new ScrollToElementAction(args.getString(0),args.getJSONObject(1));
+        String ref = args.size() >= 1 ? args.getString(0) : null;
+        JSONObject options = args.size() >= 2 ? args.getJSONObject(1) : null;
+        return new ScrollToElementAction(ref, options);
       case ADD_RULE:
         if (args == null) {
           return null;

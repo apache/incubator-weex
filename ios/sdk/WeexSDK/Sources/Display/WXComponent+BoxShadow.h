@@ -26,10 +26,6 @@
 /**
  *  @abstract compare boxshadow
  *
- *  @param boxShadow
- *
- *  @param view
- *
  *  @return if not equal return NO, if equal return YES
  */
 - (BOOL)equalBoxShadow:(WXBoxShadow *_Nullable)boxShadow withBoxShadow:(WXBoxShadow *_Nullable)compareBoxShadow;
