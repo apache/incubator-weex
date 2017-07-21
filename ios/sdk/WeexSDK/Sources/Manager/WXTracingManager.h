@@ -31,7 +31,7 @@
 #define WXTracingDuration          @"D"
 #define WXTracingInstant          @"i"
 
-#define WXTracingDurationDefault -1
+#define WXTracingDurationDefault 0
 
 typedef enum : NSUInteger {
     // global
