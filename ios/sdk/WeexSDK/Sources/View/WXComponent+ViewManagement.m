@@ -24,7 +24,7 @@
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
-
+#import "WXTracingManager.h"
 
 #define WX_BOARD_RADIUS_RESET_ALL(key)\
 do {\
@@ -138,6 +138,7 @@ do {\
 
 - (void)viewDidLoad
 {
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:self.ref className:nil name:_type phase:WXTracingEnd functionName:WXTRender options:nil];
     WXAssertMainThread();
 }
 
