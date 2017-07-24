@@ -92,14 +92,13 @@ public class WXListComponent extends BasicListComponent<BounceRecyclerView> {
     setRefreshOrLoading(child);
 
     // Synchronize DomObject's attr to Component and Native View
-    if(mDomObject.getColumnWidth() != mColumnWidth ||
-            mDomObject.getColumnCount() != mColumnCount ||
-            mDomObject.getColumnGap() != mColumnGap) {
+    if(mDomObject != null && getHostView() != null && (mColumnWidth != mDomObject.getColumnWidth() ||
+            mColumnCount != mDomObject.getColumnCount() ||
+            mColumnGap != mDomObject.getColumnGap())) {
       updateRecyclerAttr();
       getHostView().getInnerView().initView(getContext(), mLayoutType,mColumnCount,mColumnGap,getOrientation());
     }
   }
-
 
   /**
    * Setting refresh view and loading view

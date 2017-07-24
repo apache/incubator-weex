@@ -37,6 +37,7 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXTracingManager.h"
 
 #pragma clang diagnostic ignored "-Wincomplete-implementation"
 #pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
@@ -124,6 +125,8 @@
         [self _initViewPropertyWithStyles:_styles];
         [self _initCompositingAttribute:_attributes];
         [self _handleBorders:styles isUpdating:NO];
+        
+        [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:ref className:nil name:type phase:WXTracingBegin functionName:WXTRender options:nil];
     }
     
     return self;
