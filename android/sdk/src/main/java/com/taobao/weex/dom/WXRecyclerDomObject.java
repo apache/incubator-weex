@@ -91,10 +91,14 @@ public class WXRecyclerDomObject extends WXDomObject{
             } else if (Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO == mColumnCount) {
                 mColumnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = mColumnCount > 0 ? mColumnCount :1;
+                if (mColumnCount <= 0)
+                    mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
                 mColumnWidth =((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             } else if(Constants.Value.AUTO != mColumnWidth && Constants.Value.AUTO != mColumnCount){
                 int columnCount = Math.round((mAvailableWidth + mColumnGap) / (mColumnWidth + mColumnGap)-0.5f);
                 mColumnCount = columnCount > mColumnCount ? mColumnCount :columnCount;
+                if (mColumnCount <= 0)
+                    mColumnCount = Constants.Value.COLUMN_COUNT_NORMAL;
                 mColumnWidth= ((mAvailableWidth + mColumnGap) / mColumnCount) - mColumnGap;
             }
             mIsPreCalculateCellWidth = true;

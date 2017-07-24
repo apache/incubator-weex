@@ -11,8 +11,7 @@ Actually, this module is made for the polyfill of HTML5 timer APIs, developers *
 
 ## API
 
-All timeout or interval in this module are measured in milliseconds.    
-Also, timeout and interval should be a non-negative integer(the max of integer is 0x7FFFFFFF). If timeout or interval is negative, then it will be reset to zero, e.g. the task will be put in the task queue immediately.     
+All timeout or interval in this module are measured in milliseconds. Also, timeout and interval should be a non-negative **integer**(the max of integer is 0x7FFFFFFF). The behavior of invalid value for timeout or interval is undefined.
 
 ### setTimeout(fn, timeout)    
 
