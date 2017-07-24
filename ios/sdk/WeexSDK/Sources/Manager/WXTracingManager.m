@@ -78,11 +78,7 @@
 
 +(BOOL)isTracing
 {
-#if DEBUG
     return [WXTracingManager sharedInstance].isTracing;
-#else
-    return NO;
-#endif
 }
 
 +(void)startTracing:(WXTracing *)tracing

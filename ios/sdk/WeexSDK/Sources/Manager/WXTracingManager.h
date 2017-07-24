@@ -84,8 +84,8 @@ typedef enum : NSUInteger {
  */
 +(BOOL)isTracing;
 /**
- *  @discusstion  set weex perfermance  tracing state
- *  @param isTracing , YES weex will be traced, NO weex will not be traced in DEBUG environment.
+ *  @discusstion  set weex perfermance  tracing state , you should use in debug environment
+ *  @param isTracing , YES weex will be traced, NO weex will not be traced .
  */
 +(void)switchTracing:(BOOL)isTracing;
 /**
