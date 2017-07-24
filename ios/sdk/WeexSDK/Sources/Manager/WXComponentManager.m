@@ -253,9 +253,7 @@ static NSThread *WXComponentThread;
     }
     
     [supercomponent _insertSubcomponent:component atIndex:index];
-    if (component->_positionType != WXPositionTypeFixed) {
-        [supercomponent _insertChildCssNode:component atIndex:index];
-    }
+    [supercomponent _insertChildCssNode:component atIndex:index];
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -737,14 +735,12 @@ static NSThread *WXComponentThread;
     [_fixedComponents addObject:fixComponent];
     // rootCssNode contains body and fixed component, and the body must be only one.
     // _rootCSSNode->children_count = (int)[_fixedComponents count] + 1;
-    YGNodeInsertChild(_rootCSSNode, fixComponent.cssNode, YGNodeGetChildCount(_rootCSSNode));
 }
 
 - (void)removeFixedComponent:(WXComponent *)fixComponent
 {
     [_fixedComponents removeObject:fixComponent];
 //    _rootCSSNode->children_count = (int)[_fixedComponents count] + 1;
-    YGNodeRemoveChild(_rootCSSNode, fixComponent.cssNode);
 }
 
 @end
