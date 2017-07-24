@@ -50,7 +50,7 @@
 //
 //#endif
 
-#import "Yoga.h"
+#import <Yoga/Yoga.h>
 
 
 

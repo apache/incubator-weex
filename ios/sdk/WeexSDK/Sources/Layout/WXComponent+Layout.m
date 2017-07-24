@@ -35,6 +35,10 @@
 {
     _isLayoutDirty = YES;
     WXComponent *supercomponent = [self supercomponent];
+    if ([self measureBlock]) {
+        YGNodeMarkDirty(self.cssNode);
+    }
+    YGNodeSetHasNewLayout(self.cssNode, true);
     if(supercomponent){
         [supercomponent setNeedsLayout];
     }
@@ -165,9 +169,9 @@
     _isLayoutDirty = NO;
     CGRect newFrame = CGRectZero;
     newFrame = CGRectMake(WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetLeft(_cssNode))?0:YGNodeLayoutGetLeft(_cssNode)),
-                                 WXRoundPixelValue(YGNodeLayoutGetTop(_cssNode)),
+                          WXRoundPixelValue((YGFloatIsUndefined(YGNodeLayoutGetTop(_cssNode)))?0:YGNodeLayoutGetTop(_cssNode)),
                           WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetWidth(_cssNode))?0:YGNodeLayoutGetWidth(_cssNode)),
-                                 WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
+                          WXRoundPixelValue(YGFloatIsUndefined(YGNodeLayoutGetHeight(_cssNode))?0:YGNodeLayoutGetHeight(_cssNode)));
     
     BOOL isFrameChanged = NO;
     if (!CGRectEqualToRect(newFrame, _calculatedFrame)) {
@@ -216,6 +220,9 @@
     // flex
     if (styles[@"flex"]) {
         YGNodeStyleSetFlex(_cssNode, [WXConvert CGFloat:styles[@"flex"]]);
+    }else {
+        // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
+        YGNodeStyleSetFlex(_cssNode, 0);
     }
     if (styles[@"flexDirection"]) {
         YGNodeStyleSetFlexDirection(_cssNode, [WXConvert YGFlexDirection:styles[@"flexDirection"]]);

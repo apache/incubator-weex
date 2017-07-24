@@ -422,12 +422,20 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
 
 -(void)updatePattern
 {
-    UIEdgeInsets padding = UIEdgeInsetsMake(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value, YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value, YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value, YGNodeStyleGetPadding(_cssNode, YGEdgeRight).value);
+    UIEdgeInsets padding = UIEdgeInsetsMake((YGFloatIsUndefined(YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeTop).value),
+                                            (YGFloatIsUndefined(YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeLeft).value),
+                                            (YGFloatIsUndefined(YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value)?0:YGNodeStyleGetPadding(self.cssNode, YGEdgeBottom).value),
+                                            (YGFloatIsUndefined(YGNodeStyleGetPadding(_cssNode, YGEdgeRight).value)?0:YGNodeStyleGetPadding(_cssNode, YGEdgeRight).value));
+    
     if (!UIEdgeInsetsEqualToEdgeInsets(padding, _padding)) {
         [self setPadding:padding];
     }
     
-    UIEdgeInsets border = UIEdgeInsetsMake(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop), YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft), YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom), YGNodeStyleGetBorder(self.cssNode, YGEdgeRight));
+    UIEdgeInsets border = UIEdgeInsetsMake((YGFloatIsUndefined(YGNodeStyleGetBorder(self.cssNode, YGEdgeTop))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeTop)),
+                                           (YGFloatIsUndefined(YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeLeft)),
+                                           (YGFloatIsUndefined(YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeBottom)),
+                                           (YGFloatIsUndefined(YGNodeStyleGetBorder(self.cssNode, YGEdgeRight))?0:YGNodeStyleGetBorder(self.cssNode, YGEdgeRight)));
+    
     if (!UIEdgeInsetsEqualToEdgeInsets(border, _border)) {
         [self setBorder:border];
     }

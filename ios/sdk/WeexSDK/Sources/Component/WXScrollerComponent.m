@@ -180,7 +180,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
     [self.stickyArray removeAllObjects];
     [self.listenerArray removeAllObjects];
     
-    free(_scrollerCSSNode);
+    YGNodeFree(_scrollerCSSNode);
 }
 
 - (void)updateAttributes:(NSDictionary *)attributes
