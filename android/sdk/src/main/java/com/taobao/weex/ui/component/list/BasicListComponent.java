@@ -300,16 +300,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
 
-        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-          for (ListBaseViewHolder holder : recycleViewList) {
-            if (holder != null
-                && holder.getComponent() != null
-                && !holder.getComponent().isUsing()) {
-               holder.recycled();
-            }
-          }
-          recycleViewList.clear();
-        }
+        if (newState == RecyclerView.SCROLL_STATE_IDLE)
+          recycleViewHolderList();
+
         List<OnWXScrollListener> listeners = getInstance().getWXScrollListeners();
         if (listeners != null && listeners.size() > 0) {
           for (OnWXScrollListener listener : listeners) {
@@ -363,6 +356,17 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
     });
     return bounceRecyclerView;
+  }
+
+  private void recycleViewHolderList() {
+    for (ListBaseViewHolder holder : recycleViewList) {
+      if (holder != null
+              && holder.getComponent() != null
+              && !holder.getComponent().isUsing()) {
+        holder.recycled();
+      }
+    }
+    recycleViewList.clear();
   }
 
   @Override
@@ -813,6 +817,12 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     holder.setComponentUsing(false);
     if(holder.canRecycled()) {
       recycleViewList.add(holder);
+
+      /**
+       * Recycle cache{@link recycleViewList} when recycleViewList.size() > list max child count
+       */
+      if (recycleViewList.size() > getChildCount() + 1)
+        recycleViewHolderList();
     } else {
       WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
     }
