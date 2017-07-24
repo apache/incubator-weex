@@ -864,7 +864,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       WXEvent events= comp.getDomObject().getEvents();
       boolean hasBackPressed = events.contains(Constants.Event.CLICKBACKITEM);
       if (hasBackPressed) {
-        WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.CLICKBACKITEM,null, null);
+        fireEvent(comp.getRef(), Constants.Event.CLICKBACKITEM,null, null);
       }
       return hasBackPressed;
     }
@@ -900,7 +900,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void onViewDisappear(){
     WXComponent comp = getRootComponent();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWDISAPPEAR, null, null);
+      fireEvent(comp.getRef(), Constants.Event.VIEWDISAPPEAR, null, null);
       //call disappear of nested instances
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onDisappear();
@@ -911,7 +911,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void onViewAppear(){
     WXComponent comp = getRootComponent();
     if(comp != null) {
-      WXBridgeManager.getInstance().fireEvent(this.mInstanceId, comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
+      fireEvent( comp.getRef(), Constants.Event.VIEWAPPEAR,null, null);
       for(OnInstanceVisibleListener instance:mVisibleListeners){
         instance.onAppear();
       }
