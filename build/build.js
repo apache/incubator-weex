@@ -24,6 +24,10 @@ const gzip = require('zlib').createGzip()
 const pkg = require('../package.json')
 const rollup = require('rollup')
 const watch = require('rollup-watch')
+const webpack = require('webpack')
+const scan = require('weex-vue-bundle-util')
+const webExamplesWebpackConfig = require('./webpack.examples.web.config')
+const exec = require('child_process').execSync
 
 const getConfig = require('./config')
 
@@ -111,6 +115,55 @@ function getAllEntries (rootDir) {
     })
 }
 
+function absolutePath (p) {
+  return path.join(__dirname, p)
+}
+
+function buildForWebExamples (config, minifyConfig) {
+  config.entry = minifyConfig.entry = absolutePath('../entry.js')
+  config.dest = absolutePath('../dist/render.vue.js')
+  delete config.banner
+  config.plugins = config.plugins.filter(function (plugin) {
+    return plugin.name !== 'eslint'
+  })
+  minifyConfig.dest = absolutePath('../dist/render.vue.min.js')
+  delete minifyConfig.banner
+
+  // bundle web examples.
+  scan(webpack, webExamplesWebpackConfig)
+    .then(function (res) {
+      var pkgs = res.pkgs
+      var names = []
+      var str = pkgs.map(function (pkgName) {
+        var name = pkgName
+          .replace('weex-vue-', '')
+          .replace(/-(\w)/g, function ($0, $1) {
+            return $1.toUpperCase()
+          })
+          + 'Mod'
+        names.push(name)
+        try {
+          var version = require(`${pkgName}/package.json`).version
+        } catch (err) {
+          exec(`npm install ${pkgName}`)
+        }
+        return `import ${name} from '${pkgName}'\n`
+      }).join('')
+      str += `export default [\n${names.join(',  \n')}\n]\n`
+      return fs.writeFileSync(absolutePath('../weex-vue-plugins.js'), str)
+    })
+    .then(function () {
+      console.log(`\n => start to build weex-vue-render for examples.\n`)
+      return new Promise((resolve, reject) => {
+        runRollup(config).then(() => {
+          runRollup(minifyConfig).then(() => {
+            zip(minifyConfig.dest, resolve)
+          })
+        })
+      })
+    })
+}
+
 function build (name) {
   let pkgName = 'weex-js-framework'
   switch (name) {
@@ -120,12 +173,16 @@ function build (name) {
     case 'vue': pkgName = 'weex-vue-render'; break;
     case 'vue-plugins': pkgName = 'weex-vue-render-plugins'; break;
     case 'vue-core': pkgName = 'weex-vue-render-core'; break;
+    case 'web-examples': pkgName = 'weex-vue-render-core'; break;
   }
 
   const config = getConfig(pkgName)
   const minifyConfig = getConfig(pkgName, true)
 
-  if (pkgName === 'weex-vue-render-plugins') {
+  if (name === 'web-examples') {
+    buildForWebExamples(config, minifyConfig)
+  }
+  else if (pkgName === 'weex-vue-render-plugins') {
     // build multiple packages in a loop.
     console.log(`\n => start to build ${name} (${pkgName})\n`)
     const entries = getAllEntries(path.join(__dirname, '../packages/weex-vue-plugins'))

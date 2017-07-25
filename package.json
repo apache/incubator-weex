@@ -47,6 +47,7 @@
     "build:vue": "flow check && node build/build.js vue && npm run build:vue:core && npm run build:vue:plugins",
     "build:vue:core": "node build/build.js vue-core",
     "build:vue:plugins": "node build/build.js vue-plugins",
+    "build:vue:examples": "node build/build.js web-examples",
     "build:examples": "npm run build:examples:native && npm run build:examples:web",
     "build:examples:native": "webpack --config build/webpack.examples.config.js",
     "build:examples:web": "webpack --config build/webpack.examples.web.config.js",
