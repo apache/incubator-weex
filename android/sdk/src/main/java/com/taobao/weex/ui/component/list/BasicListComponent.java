@@ -1196,7 +1196,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
 
-    visibleCellCount = lastVisible - firstVisible;
+    if (mColumnCount > 0)
+      visibleCellCount = (lastVisible - firstVisible) * mColumnCount;
 
     while (it.hasNext()) {
       AppearanceHelper item = it.next();
