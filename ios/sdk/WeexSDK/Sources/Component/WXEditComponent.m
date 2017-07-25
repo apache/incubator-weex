@@ -566,7 +566,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
         if (offset > 0) {
             rect = (CGRect){
                 .origin.x = 0.f,
-                .origin.y = -offset,
+                .origin.y = rect.origin.y - offset,
                 .size = rootViewFrame.size
             };
         }
@@ -713,7 +713,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }else if ([_inputType isEqualToString:@"url"]) {
         [self setKeyboardType:UIKeyboardTypeURL];
     }else if ([_inputType isEqualToString:@"number"]) {
-        [self setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+        [self setKeyboardType:UIKeyboardTypeDecimalPad];
     }else if ([self isDateType]) {
         if (!_datePickerManager) {
             _datePickerManager = [[WXDatePickerManager alloc] init];

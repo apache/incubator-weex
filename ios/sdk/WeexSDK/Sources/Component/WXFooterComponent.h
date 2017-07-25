@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#import <WeexSDK/WeexSDK.h>
+#import "WXComponent.h"
 
 @interface WXFooterComponent : WXComponent
 

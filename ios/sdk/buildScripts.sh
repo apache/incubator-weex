@@ -68,6 +68,8 @@ function generateImport() {
 		fi
 	fi
 	headers=$(findHeaders $projectFilePath $searchPattern)
+	headers=$(awk -v RS=' ' '!headers[$1]++' <<< ${headers[@]})
+	echo $headers
 
 	for header in $headers; do
 		if [ "$searchPattern" = 'Private' ]; then

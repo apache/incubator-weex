@@ -2,7 +2,7 @@
 title: 事件冒泡 
 type: references
 order: 1.3
-version: 2.1
+version: 0.10
 ---
 
 # 事件冒泡 <span class="api-version">v0.13+</span>
@@ -11,7 +11,7 @@ Weex 1.0 实现了 W3C 标准的事件冒泡机制。
 
 ### 使用
 
-```javascript
+```html
 <template>
   <div class="root" onclick="rootClick" bubble="true">
     <div>
@@ -83,7 +83,7 @@ Weex 1.0 实现了 W3C 标准的事件冒泡机制。
 
 在事件处理函数中，可以使用 `e.stopPropagation()` 方法，来阻止本次事件向上的传递过程。注意，`e.stopPropagation()` 与 `bubble="true"` 不同，前者只会影响当前元素以及父元素的传播，不会影响子元素的传播；后者是为了版本兼容而增加的开关机制，会全局关闭或者开启冒泡机制，两者可以共同存在使用，如下：
 
-```javascript
+```html
 <template>
   <div class="root" onclick="rootClick" bubble="true">
     <div>

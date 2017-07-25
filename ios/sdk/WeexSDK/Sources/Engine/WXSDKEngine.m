@@ -65,7 +65,9 @@
 + (void)registerModule:(NSString *)name withClass:(Class)clazz
 {
     WXAssert(name && clazz, @"Fail to register the module, please check if the parameters are correct ！");
-    
+    if (!clazz || !name) {
+        return;
+    }
     NSString *moduleName = [WXModuleFactory registerModule:name withClass:clazz];
     NSDictionary *dict = [WXModuleFactory moduleMethodMapsWithName:moduleName];
     
@@ -159,8 +161,10 @@
     [self registerHandler:[WXResourceRequestHandlerDefaultImpl new] withProtocol:@protocol(WXResourceRequestHandler)];
     [self registerHandler:[WXNavigationDefaultImpl new] withProtocol:@protocol(WXNavigationProtocol)];
     [self registerHandler:[WXURLRewriteDefaultImpl new] withProtocol:@protocol(WXURLRewriteProtocol)];
-    [self registerHandler:[WXWebSocketDefaultImpl new] withProtocol:@protocol(WXWebSocketHandler)];
-
+    if (NSClassFromString(@"WXWebSocketDefaultImpl")) {
+        [self registerHandler:[NSClassFromString(@"WXWebSocketDefaultImpl") new] withProtocol:NSProtocolFromString(@"WXWebSocketHandler")];
+    }
+    
 }
 
 + (void)registerHandler:(id)handler withProtocol:(Protocol *)protocol
