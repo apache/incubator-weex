@@ -273,7 +273,6 @@
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
-		DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0F99301D48E5320087C6AF /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
 		DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */; };
@@ -835,7 +834,6 @@
 		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextAreaComponent.m; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
-        DC0F99301D48E5320087C6AF /* WeexSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeexSDK.h; sourceTree = "<group>"; };
 		DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterProtocol.h; sourceTree = "<group>"; };
 		DC9867431D826D1E000AF388 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStreamModuleTests.m; sourceTree = "<group>"; };
@@ -902,13 +900,6 @@
 		2A27E7D61C3E360400D7A552 /* dependency */ = {
 			isa = PBXGroup;
 			children = (
-				DC04C4331F063EB8004D2DDD /* YGEnums.h */,
-				DC04C4341F063EB8004D2DDD /* Yoga.h */,
-				DC04C4351F063EB8004D2DDD /* YGEnums.c */,
-				DC04C4361F063EB8004D2DDD /* YGMacros.h */,
-				DC04C4371F063EB8004D2DDD /* YGNodeList.c */,
-				DC04C4381F063EB8004D2DDD /* YGNodeList.h */,
-				DC04C4391F063EB8004D2DDD /* Yoga.c */,
 				2A27E7D71C3E360B00D7A552 /* SRWebSocket.h */,
 				2A27E7D81C3E360B00D7A552 /* SRWebSocket.m */,
 			);
@@ -1518,7 +1509,6 @@
 				042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */,
 				C4D872221E5DDEDA00E39BC1 /* WXInnerLayer.h in Headers */,
 				2A919DA61E321F1F006EB6B5 /* WXBridgeMethod.h in Headers */,
-				DC04C43A1F063EB8004D2DDD /* YGEnums.h in Headers */,
 				37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */,
 				77D161281C02DE1A0010B15B /* WXSDKManager.h in Headers */,
 				59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */,
@@ -1528,7 +1518,6 @@
 				DCA446271EFA5DAF00D0CFA8 /* WeexSDK.h in Headers */,
 				7423899F1C32733800D748CA /* WXType.h in Headers */,
 				59A582FC1CF5B17B0081FD3E /* WXBridgeContext.h in Headers */,
-				DC04C43F1F063EB8004D2DDD /* YGNodeList.h in Headers */,
 				77D161621C02ED790010B15B /* WXLog.h in Headers */,
 				77D1614B1C02E3790010B15B /* WXConvert.h in Headers */,
 				59A596221CB6311F0012CD52 /* WXNavigatorModule.h in Headers */,
@@ -1567,7 +1556,6 @@
 				74862F7D1E03A0F300B7A041 /* WXModuleMethod.h in Headers */,
 				742AD7331DF98C45007DC46C /* WXResourceResponse.h in Headers */,
 				77E65A0D1C155E99008B8775 /* WXDivComponent.h in Headers */,
-				DC04C43D1F063EB8004D2DDD /* YGMacros.h in Headers */,
 				C41E1A971DC1FD15009C7F90 /* WXDatePickerManager.h in Headers */,
 				C4F0127B1E1502A6003378D0 /* WXWebSocketDefaultImpl.h in Headers */,
 				7461F8901CFB373100F62D44 /* WXDisplayQueue.h in Headers */,
@@ -2514,6 +2502,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/WeexSDK/Dependency";
 				INFOPLIST_FILE = "WeexSDK-Dynamic/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2537,6 +2526,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/WeexSDK/Dependency";
 				INFOPLIST_FILE = "WeexSDK-Dynamic/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
