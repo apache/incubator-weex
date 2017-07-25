@@ -705,7 +705,7 @@ WX_EXPORT_METHOD(@selector(getSelectionRange:))
     }else if ([_inputType isEqualToString:@"url"]) {
         [self setKeyboardType:UIKeyboardTypeURL];
     }else if ([_inputType isEqualToString:@"number"]) {
-        [self setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+        [self setKeyboardType:UIKeyboardTypeDecimalPad];
     }else if ([self isDateType]) {
         if (!_datePickerManager) {
             _datePickerManager = [[WXDatePickerManager alloc] init];

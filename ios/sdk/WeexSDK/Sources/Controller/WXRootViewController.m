@@ -20,6 +20,7 @@
 #import "WXRootViewController.h"
 #import "WXBaseViewController.h"
 #import "WXThreadSafeMutableArray.h"
+#import "WXDefine.h"
 
 typedef void(^OperationBlock)(void);
 

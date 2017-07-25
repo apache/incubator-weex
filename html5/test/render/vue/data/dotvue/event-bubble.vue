@@ -23,14 +23,3 @@
     }
   }
 </script>
-
-<style scoped>
-.ct {
-  height: 600px;
-  background-color: #fff;
-}
-.txt {
-  font-size: 32px;
-  padding: 20px;
-}
-</style>
