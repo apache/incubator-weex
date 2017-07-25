@@ -204,7 +204,7 @@ static NSThread *WXComponentThread;
     _rootComponent = [self _buildComponentForData:data];
     
     [self _initRootCSSNode];
-    YGNodeInsertChild(_rootCSSNode, _rootComponent.cssNode,0);
+    YGNodeInsertChild(_rootCSSNode, _rootComponent.cssNode,(int32_t)[_fixedComponents count]);
     __weak typeof(self) weakSelf = self;
     [self _addUITask:^{
         __strong typeof(self) strongSelf = weakSelf;
@@ -251,9 +251,12 @@ static NSThread *WXComponentThread;
     } else {
         index = (index == -1 ? supercomponent->_subcomponents.count : index);
     }
-    
+    //if (component->_positionType != WXPositionTypeFixed) {
+    //}
     [supercomponent _insertSubcomponent:component atIndex:index];
-    [supercomponent _insertChildCssNode:component atIndex:index];
+    if (component->_isNeedJoinLayoutSystem) {
+        [supercomponent _insertChildCssNode:component atIndex:index];
+    }
     // use _lazyCreateView to forbid component like cell's view creating
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
@@ -735,12 +738,14 @@ static NSThread *WXComponentThread;
     [_fixedComponents addObject:fixComponent];
     // rootCssNode contains body and fixed component, and the body must be only one.
     // _rootCSSNode->children_count = (int)[_fixedComponents count] + 1;
+    YGNodeInsertChild(_rootCSSNode, fixComponent.cssNode, (int32_t)([_fixedComponents count]));
 }
 
 - (void)removeFixedComponent:(WXComponent *)fixComponent
 {
     [_fixedComponents removeObject:fixComponent];
 //    _rootCSSNode->children_count = (int)[_fixedComponents count] + 1;
+    YGNodeRemoveChild(_rootCSSNode, fixComponent.cssNode);
 }
 
 @end

@@ -220,7 +220,7 @@
     // flex
     if (styles[@"flex"]) {
         YGNodeStyleSetFlex(_cssNode, [WXConvert CGFloat:styles[@"flex"]]);
-    }else {
+    } else {
         // to make the default flex value is zero, yoga is nan, maybe this can configured by yoga config
         YGNodeStyleSetFlex(_cssNode, 0);
     }
