@@ -43,6 +43,7 @@
     float _rotateX;
     float _rotateY;
     float _rotateZ;
+    float _perspective;
     
     CATransform3D _nativeTransform;
     BOOL _useNativeTransform;
@@ -58,6 +59,9 @@
         _rotateY = 0.0;
         _rotateZ = 0.0;
         _rotateAngle = 0.0;
+        
+        // default is parallel projection
+        _perspective = CGFLOAT_MAX;
         
         [self parseTransform:cssValue];
         [self parseTransformOrigin:origin];
@@ -147,8 +151,8 @@
     if (_useNativeTransform) {
         return _nativeTransform;
     }
-    CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     
+    CATransform3D nativeTransform3d = [self nativeTransformWithoutRotateWithView:view];
     if (_rotateX != 0) {
         CATransform3D rotateXTransform = CATransform3DMakeRotation(_rotateX, 1, 0, 0);
         nativeTransform3d = CATransform3DConcat(nativeTransform3d, rotateXTransform);
@@ -169,6 +173,9 @@
 {
     CATransform3D nativeTansform3D = CATransform3DIdentity;
     
+    if (_perspective && !isinf(_perspective)) {
+        nativeTansform3D.m34 = -1.0/_perspective;
+    }
     if (!view || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) {
         return nativeTansform3D;
     }
@@ -224,6 +231,11 @@
     }
     CATransform3D nativeTransform3d = [self nativeTransformWithView:view];
     if (!CATransform3DEqualToTransform(view.layer.transform, nativeTransform3d)){
+        CATransform3D presentationTransform = view.layer.presentationLayer.transform;
+        if (presentationTransform.m34 != 0) {
+            //  just for perspective
+            nativeTransform3d = presentationTransform;
+        }
         view.layer.transform = nativeTransform3d;
     }
 }

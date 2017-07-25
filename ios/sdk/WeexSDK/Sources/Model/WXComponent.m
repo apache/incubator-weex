@@ -94,6 +94,7 @@
         _ariaHidden = NO;
         
         _async = NO;
+        _perspective = CGFLOAT_MAX;
         
         //TODO set indicator style 
         if ([type isEqualToString:@"indicator"]) {

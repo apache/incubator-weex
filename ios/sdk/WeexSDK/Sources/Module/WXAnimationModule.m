@@ -85,7 +85,6 @@
 
 - (void)animationDidStart:(CAAnimation *)anim
 {
-    [self applyTransform];
 }
 
 -(void)applyTransform
@@ -94,7 +93,9 @@
         return;
     }
     if ([_animationInfo.propertyName hasPrefix:@"transform"]) {
+        float perspective = _animationInfo.target->_perspective;
         WXTransform *transform = _animationInfo.target->_transform;
+        transform.perspective = perspective;
         [transform applyTransformForView:_animationInfo.target.view];
     } else if ([_animationInfo.propertyName isEqualToString:@"backgroundColor"]) {
         _animationInfo.target.view.layer.backgroundColor = (__bridge CGColorRef _Nullable)(_animationInfo.toValue);
@@ -116,6 +117,8 @@
     if (!_animationInfo.target) {
         return;
     }
+    
+    [self applyTransform];
     
     if ([_animationInfo.propertyName hasPrefix:@"bounds.size"]) {
         /*
@@ -193,6 +196,7 @@ WX_EXPORT_METHOD(@selector(transition:args:callback:))
         if ([property isEqualToString:@"transform"]) {
             NSString *transformOrigin = styles[@"transformOrigin"];
             WXTransform *wxTransform = [[WXTransform alloc] initWithCSSValue:value origin:transformOrigin instance:self.weexInstance];
+            wxTransform.perspective = target->_perspective;
             WXTransform *oldTransform = target->_transform;
             if (wxTransform.rotateAngle != oldTransform.rotateAngle) {
                 WXAnimationInfo *newInfo = [info copy];
