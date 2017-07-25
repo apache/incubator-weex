@@ -84,7 +84,7 @@ These components have already integrated into render-core. You don't have to imp
 | weex-vue-geolocation | geolocation |
 | weex-vue-global-event | globalEvent |
 | weex-vue-modal | modal |
-| weex-vue-navigator | navigator |
+| weex-vue-nav | navigator |
 | weex-vue-storage | storage |
 | weex-vue-stream | stream |
 | weex-vue-websocket | websocket |
@@ -93,6 +93,14 @@ These components have already integrated into render-core. You don't have to imp
 Some of the above plugins may not be mentioned in weex documents. Just ignore them if you have no idear about what they are and how to use them.
 
 You can develop more plugins for your app. Accordingly the same plugin for other two platforms (iOS and Android) should also be built and intergrated in your app if you want it run on all three platforms.
+
+#### scan your code
+
+Use `weex-vue-bundle-util` to scan you code, which will return a promise with a object to tell which components and modules you have used in your project, so that can generate a entry file accordingly to import those plugins.
+
+https://github.com/weexteam/weex-vue-bundle-util
+
+You can see the examples of weex built in this way by running the script `npm run build:vue:examples`, and use the `<script src="./dist/render.vue.js"></script>` as the render in the `vue.html` file.
 
 ## use vue-loader to bundle .vue file
 

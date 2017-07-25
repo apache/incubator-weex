@@ -85,8 +85,7 @@ const configs = {
     entry: absolute('packages/weex-vue-render/src/index.js'),
     dest: absolute('packages/weex-vue-render/dist/index.js'),
     banner:`
-console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');
-window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
+console.log('START WEEX VUE RENDER: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
     format: 'umd',
     plugins: [
       postcss(),
@@ -105,8 +104,7 @@ window._jslib_init_start = window.performance && window.performance.now && windo
     entry: absolute('packages/weex-vue-render/src/index.core.js'),
     dest: absolute('packages/weex-vue-render/dist/index.core.js'),
     banner:`
-console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');
-window._jslib_init_start = window.performance && window.performance.now && window.performance.now() || +new Date();\n\n`,
+console.log('START WEEX VUE RENDER CORE: ${subversion['vue-render']}, Build ${now()}.');\n\n`,
     format: 'umd',
     plugins: [
       postcss(),

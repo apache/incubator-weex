@@ -32,3 +32,7 @@ export function nodeListToArray (obj) {
   }
   return array
 }
+
+export function isPhantom () {
+  return window.navigator.userAgent.indexOf('PhantomJS') !== -1
+}

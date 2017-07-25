@@ -24,21 +24,6 @@ import {
   extend
 } from '../utils'
 
-import {
-  tagBeforeCreate,
-  // tagMounted,
-  tagRootMounted,
-  tagFirstScreen,
-  tagBeforeUpdate,
-  tagUpdated,
-  tagBegin,
-  tagEnd
-} from '../utils/perf'
-
-// import { extractComponentStyle } from '../core'
-
-// import config from '../config'
-
 let lazyloadWatched = false
 function watchLazyload () {
   lazyloadWatched = true
@@ -70,21 +55,9 @@ export default {
     if (!lazyloadWatched) {
       watchLazyload()
     }
-    if (process.env.NODE_ENV === 'development') {
-      tagBeforeCreate()
-    }
   },
 
   mounted () {
-    if (this.$options._componentTag === 'image') {
-      window._has_image_in_first_screen = true
-    }
-    if (this === this.$root) {
-      tagRootMounted()
-      if (!window._has_image_in_first_screen) {
-        tagFirstScreen()
-      }
-    }
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
@@ -104,31 +77,13 @@ export default {
     watchAppear(this)
   },
 
-  beforeUpdate () {
-    if (process.env.NODE_ENV === 'development') {
-      tagBeforeUpdate()
-    }
-  },
-
-  updated () {
-    if (process.env.NODE_ENV === 'development') {
-      tagUpdated()
-    }
-  },
-
   destroyed () {
     triggerDisappear(this)
   },
 
   methods: {
     _fireLazyload (el) {
-      if (process.env.NODE_ENV === 'development') {
-        tagBegin('base._fireLazyload')
-      }
       getThrottleLazyload(25)()
-      if (process.env.NODE_ENV === 'development') {
-        tagEnd('base._fireLazyload')
-      }
     }
   }
 }
