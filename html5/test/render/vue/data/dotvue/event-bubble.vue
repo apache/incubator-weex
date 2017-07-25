@@ -15,8 +15,9 @@
     },
     methods: {
       click (e) {
-        console.log(e,'component')
-        this.tracker += ' > component-bar'
+        if (this.tracker.indexOf(' > component-bar') === -1) {
+          this.tracker += ' > component-bar'
+        }
       }
     },
     components: {

@@ -38,8 +38,6 @@ init('core node', (Vue, helper) => {
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
       infoStr = shouldBe
-      console.log('-------------compare---------------')
-      console.log(tracker, shouldBe)
       expect(tracker).to.equal(shouldBe)
     }
 
@@ -55,8 +53,6 @@ init('core node', (Vue, helper) => {
       el.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
-        console.log('-------------registerdone---------------')
-        console.log('stop event bubble', tracker)
         trackerShouldBe(tracker, ' > in-bar-outter-div > component-bar')
         done()
       })
@@ -72,8 +68,6 @@ init('core node', (Vue, helper) => {
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
-        console.log('-------------registerdone---------------')
-        console.log('should not bubble if already triggered', tracker)
         trackerShouldBe(tracker, ' > in-bar-inner-div')
         helper.unregisterDone(id)
         done()
