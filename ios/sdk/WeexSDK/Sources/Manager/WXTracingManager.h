@@ -112,7 +112,7 @@ typedef enum : NSUInteger {
 
 /**
  *  @discusstion set bundle type
- *  @param jsBundleString: the bundle source.
+ *  @param jsBundleString the bundle source.
  *  @param iid the instance  id.
  */
 +(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
