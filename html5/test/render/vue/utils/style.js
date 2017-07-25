@@ -122,7 +122,6 @@ describe('transform', () => {
     })
     it('should replace all transform properties', () => {
       addTransform(node, style, true)
-      debugger;
       expect(trimSpace(node.style.transform)).to.be.equal(
         trimSpace(style.translate + style.rotate))
       // webkitTransform will remove last whitespace automatically
@@ -151,7 +150,6 @@ describe('transform', () => {
       node.style.transform = nodeStyle.translate + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate
       node.style.webkitTransform = nodeStyle.translate + ' ' + nodeStyle.scale + ' ' + nodeStyle.rotate
       addTranslateX(node, toAdd)
-      debugger;
       // webkitTransform will reserved whitespace between translate value but transform will not.
       expect(trimSpace(node.style.transform)).to.be.equal(
         trimSpace(nodeStyle.translate.replace(translateReg, translateReplaceFunction)
