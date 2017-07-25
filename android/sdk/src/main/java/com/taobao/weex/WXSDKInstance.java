@@ -55,6 +55,7 @@ import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
 import com.taobao.weex.common.WXResponse;
+import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.dom.DomContext;
 import com.taobao.weex.dom.WXDomHandler;
 import com.taobao.weex.dom.WXDomObject;
@@ -391,15 +392,11 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
   public void render(String pageName, String template, Map<String, Object> options, String jsonInitData, WXRenderStrategy flag) {
     if(WXEnvironment.isApkDebugable()){
       if(TextUtils.isEmpty(pageName) || WXPerformance.DEFAULT.equals(pageName)){
-        WXLogUtils.e("Please set your pageName or your js bundle url !!!!!!!");
-
-        final String pageNameNotSetting = "pageNameNotSetting";
-        final String pageNotSettingBundleJs = "https://gw.alicdn.com/bao/uploaded/TB1oK02SpXXXXXnaFXXXXXXXXXX.js?" +
-                "spm=a1z3i.a4.0.0.75ba3c68wlzSnR&file=TB1oK02SpXXXXXnaFXXXXXXXXXX.js";
-
-        renderByUrlInternal(pageNameNotSetting, pageNotSettingBundleJs, options, jsonInitData, flag);
-        return;
-      }
+        String msg = "Please set your pageName (in general, it's bundleJs url address.) \n" +
+                     "Use {@link WXSDKInstance#render(String, String, Map, String, WXRenderStrategy)} instead.";
+        WXLogUtils.e(msg);
+        throw new WXRuntimeException(msg);
+        }
     }
 
     renderInternal(pageName,template,options,jsonInitData,flag);
@@ -1497,7 +1494,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       this.flag = flag;
       this.startRequestTime = startRequestTime;
     }
-    
+
     public void setSDKInstance(WXSDKInstance instance) {
       this.instance = instance;
     }
