@@ -37,8 +37,10 @@ init('core node', (Vue, helper) => {
     let infoStr = ''
     function trackerShouldBe (tracker, shouldBe) {
       shouldBe = infoStr + shouldBe
-      expect(tracker).to.equal(shouldBe)
       infoStr = shouldBe
+      console.log('-------------compare---------------')
+      console.log(tracker,shouldBe)
+      expect(tracker).to.equal(shouldBe)
     }
 
     it('should trigger the closest parent.', function (done) {
@@ -49,12 +51,13 @@ init('core node', (Vue, helper) => {
        * child vnode -> parent vnode.
        *  e.g.  div -> foo (whoes root element is the div.)
        */
-      const evt = new Event('tap', { bubbles: false })
+      const evt = new Event('tap', { bubbles: true })
       el.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
+        console.log('-------------registerdone---------------')
+        console.log('stop event bubble',tracker)
         trackerShouldBe(tracker, ' > in-bar-outter-div > component-bar')
-        helper.unregisterDone(id)
         done()
       })
     })
@@ -69,6 +72,8 @@ init('core node', (Vue, helper) => {
       inner.dispatchEvent(evt)
 
       helper.registerDone(id, (tracker) => {
+        console.log('-------------registerdone---------------')
+        console.log('should not bubble if already triggered',tracker)
         trackerShouldBe(tracker, ' > in-bar-inner-div')
         helper.unregisterDone(id)
         done()

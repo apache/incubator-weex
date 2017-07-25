@@ -15,6 +15,7 @@
     },
     methods: {
       click (e) {
+        console.log(e,'component')
         this.tracker += ' > component-bar'
       }
     },
