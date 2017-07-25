@@ -92,6 +92,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private int mListCellCount = 0;
   private boolean mForceLoadmoreNextTime = false;
   private ArrayList<ListBaseViewHolder> recycleViewList = new ArrayList<>();
+  private static int visibleCellCount = 6;
   private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
@@ -818,11 +819,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if(holder.canRecycled()) {
       recycleViewList.add(holder);
 
+      // recycleViewList allowed max size
+      int threshold = visibleCellCount >= 6 ? (visibleCellCount * 6) : (6*6);
+
       /**
-       * Recycle cache{@link recycleViewList} when recycleViewList.size() > list max child count
+       * Recycle cache{@link recycleViewList} when recycleViewList.size() > list max child count or threshold
        */
-      if (recycleViewList.size() > getChildCount() + 1)
+      if (recycleViewList.size() > getChildCount() + 1 || recycleViewList.size() >= threshold) {
+        WXLogUtils.d(TAG, "Recycle holder list recycled : cache size is " + recycleViewList.size() +
+                ", visibleCellCount is " + visibleCellCount + ", threshold is " + threshold +
+                ", child count is " + getChildCount());
         recycleViewHolderList();
+      }
     } else {
       WXLogUtils.w(TAG, "this holder can not be allowed to  recycled" );
     }
@@ -1187,6 +1195,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     if (getOrientation() == Constants.Orientation.HORIZONTAL && directionX != 0) {
       direction = directionX > 0 ? Constants.Value.DIRECTION_LEFT : Constants.Value.DIRECTION_RIGHT;
     }
+
+    visibleCellCount = lastVisible - firstVisible;
 
     while (it.hasNext()) {
       AppearanceHelper item = it.next();
