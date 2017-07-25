@@ -85,7 +85,7 @@ typedef enum : NSUInteger {
 +(BOOL)isTracing;
 /**
  *  @discusstion  set weex perfermance  tracing state , you should use in debug environment
- *  @param isTracing , YES weex will be traced, NO weex will not be traced .
+ *  @param isTracing YES weex will be traced, NO weex will not be traced .
  */
 +(void)switchTracing:(BOOL)isTracing;
 /**
@@ -113,7 +113,7 @@ typedef enum : NSUInteger {
 /**
  *  @discusstion set bundle type
  *  @param jsBundleString: the bundle source.
- *  @param iid: the instance  id.
+ *  @param iid the instance  id.
  */
 +(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
 /**
