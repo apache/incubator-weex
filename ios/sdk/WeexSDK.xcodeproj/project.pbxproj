@@ -430,7 +430,6 @@
 		DCA445C41EFA57E300D0CFA8 /* WXAppConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 74A4BA941CB365D100195969 /* WXAppConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445C51EFA57E800D0CFA8 /* WXAComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2AE5B7501CAB7DBD0082FDDB /* WXAComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445C61EFA57EE00D0CFA8 /* NSObject+WXSwizzle.h in Headers */ = {isa = PBXBuildFile; fileRef = 74896F2E1D1AC79400D1D593 /* NSObject+WXSwizzle.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DCA445C71EFA57F300D0CFA8 /* (null) in Headers */ = {isa = PBXBuildFile; settings = {ATTRIBUTES = (Public, ); }; };
 		DCA445C91EFA58CE00D0CFA8 /* native-bundle-main.js in Resources */ = {isa = PBXBuildFile; fileRef = DCF0CD9D1EAF3A6B0062CA8F /* native-bundle-main.js */; };
 		DCA445CA1EFA58CE00D0CFA8 /* wx_load_error@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 59AC02501D2A7E6E00355112 /* wx_load_error@3x.png */; };
 		DCA445CB1EFA590600D0CFA8 /* WXComponent+Layout.h in Headers */ = {isa = PBXBuildFile; fileRef = 744BEA571D0520F300452B5D /* WXComponent+Layout.h */; };
@@ -521,7 +520,6 @@
 		DCA446221EFA5AC400D0CFA8 /* WXResourceRequestHandlerDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 742AD7281DF98C45007DC46C /* WXResourceRequestHandlerDefaultImpl.h */; };
 		DCA446241EFA5AFE00D0CFA8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCA446231EFA5AFE00D0CFA8 /* UIKit.framework */; };
 		DCA446271EFA5DAF00D0CFA8 /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DCA446261EFA5DAF00D0CFA8 /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DCA446281EFA611300D0CFA8 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		DCA446291EFA688B00D0CFA8 /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DCA446261EFA5DAF00D0CFA8 /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCAB35FE1D658EB700C0EA70 /* WXRuleManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DCAB35FC1D658EB700C0EA70 /* WXRuleManager.h */; };
 		DCAB35FF1D658EB700C0EA70 /* WXRuleManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DCAB35FD1D658EB700C0EA70 /* WXRuleManager.m */; };
@@ -1641,7 +1639,6 @@
 				DCA445B31EFA577300D0CFA8 /* WXLayoutDefine.h in Headers */,
 				DCA4459F1EFA56EC00D0CFA8 /* WXURLRewriteProtocol.h in Headers */,
 				DCA445A21EFA570100D0CFA8 /* WXScrollerComponent.h in Headers */,
-				DCA445C71EFA57F300D0CFA8 /* (null) in Headers */,
 				DCA445B71EFA579200D0CFA8 /* WXImgLoaderProtocol.h in Headers */,
 				DCA445C21EFA57D700D0CFA8 /* WXBaseViewController.h in Headers */,
 				DCA445AB1EFA574100D0CFA8 /* WXPrerenderManager.h in Headers */,
@@ -2144,7 +2141,6 @@
 				DCA445541EFA55B300D0CFA8 /* WXListComponent.m in Sources */,
 				DCA445551EFA55B300D0CFA8 /* WXIndicatorComponent.m in Sources */,
 				DCA445561EFA55B300D0CFA8 /* WXTextInputComponent.m in Sources */,
-				DCA446281EFA611300D0CFA8 /* (null) in Sources */,
 				DCA445571EFA55B300D0CFA8 /* WXTextAreaComponent.m in Sources */,
 				DCA445581EFA55B300D0CFA8 /* WXTransform.m in Sources */,
 				DCA445591EFA55B300D0CFA8 /* WXWebComponent.m in Sources */,
