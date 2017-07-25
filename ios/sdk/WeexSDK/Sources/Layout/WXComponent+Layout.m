@@ -24,6 +24,7 @@
 #import "WXComponent_internal.h"
 #import "WXSDKInstance_private.h"
 #import "WXComponent+BoxShadow.h"
+#import "WXLayoutDefine.h"
 
 @implementation WXComponent (Layout)
 
@@ -215,7 +216,7 @@
     return [WXConvert WXPixelType:value scaleFactor:self.weexInstance.pixelScaleFactor];
 }
 
-- (void)_fillCSSNode:(NSDictionary *)styles;
+- (void)_fillCSSNode:(NSDictionary *)styles
 {
     // flex
     if (styles[@"flex"]) {

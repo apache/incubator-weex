@@ -107,7 +107,7 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
-    NSMutableString *newURL = [urlStr mutableCopy];
+    NSString *newURL = [urlStr copy];
     WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
     urlStr = newURL;
     

@@ -28,6 +28,9 @@
 #import "WXCellComponent.h"
 #import "WXAssert.h"
 #import "WXConvert.h"
+#import "WXUtility.h"
+#import "WXMonitor.h"
+#import "NSObject+WXSwizzle.h"
 
 static NSString * const kCollectionCellReuseIdentifier = @"WXRecyclerCell";
 static NSString * const kCollectionHeaderReuseIdentifier = @"WXRecyclerHeader";
@@ -339,8 +342,7 @@ typedef enum : NSUInteger {
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     NSInteger numberOfItems = [self.dataController numberOfItemsInSection:section];
-    
-    WXLogDebug(@"Number of items is %ld in section:%ld", (long)numberOfItems, section);
+    WXLogDebug(@"Number of items is %ld in section:%ld", (long)numberOfItems, (long)section);
     
     return numberOfItems;
 }

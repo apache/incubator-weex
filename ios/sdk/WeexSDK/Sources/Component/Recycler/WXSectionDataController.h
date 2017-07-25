@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 #import "WXDiffUtil.h"
+#import <UIKit/UIKit.h>
+
 @class WXComponent;
 @class WXCellComponent;
 @class WXHeaderComponent;

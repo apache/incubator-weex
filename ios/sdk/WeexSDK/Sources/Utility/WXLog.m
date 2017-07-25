@@ -85,6 +85,7 @@ static id<WXLogProtocol> _externalLog;
         
         [[WXSDKManager bridgeMgr] resetEnvironment];
     }
+    
 }
 
 + (WXLogLevel)logLevel

@@ -123,8 +123,10 @@ autoprefixer:
 # docsearch
 docsearch:
   enable: true
-  en: weex_io
-  cn: weex_io_cn
+  index_name_en: weex_io
+  index_name_cn: weex_io_cn
+  api_key_en: e487bb3d17e4fa1787db9976b086792c
+  api_key_cn: ce50ba9d18b3295d568b305a7171ceef
 
 alias:
   doc/index.html: index.html

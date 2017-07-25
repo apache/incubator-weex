@@ -22,7 +22,6 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
@@ -329,7 +328,8 @@ public class WXParallax extends WXDiv implements OnWXScrollListener, ICheckBindi
           if (fromOpacity == toOpacity) {
             return null;
           }
-          animation = new AlphaAnimation(fromOpacity, toOpacity);
+          setOpacity(toOpacity);
+//        animation = new AlphaAnimation(fromOpacity, toOpacity);
 
           if (WXEnvironment.isApkDebugable()) {
             WXLogUtils.d("WXParallax", "opacity fromOpacity:" + fromOpacity + " toOpacity:" + toOpacity);

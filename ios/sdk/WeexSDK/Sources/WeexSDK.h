@@ -61,5 +61,6 @@
 #import "WXAppConfiguration.h"
 #import "WXAComponent.h"
 #import "NSObject+WXSwizzle.h"
+#import "WXTracingManager.h"
 
 #endif /* __OBJC__ */

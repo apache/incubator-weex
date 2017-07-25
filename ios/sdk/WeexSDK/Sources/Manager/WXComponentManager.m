@@ -34,6 +34,8 @@
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
+#import "WXLayoutDefine.h"
 
 static NSThread *WXComponentThread;
 
@@ -261,8 +263,9 @@ static NSThread *WXComponentThread;
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
-    
+
     [self _addUITask:^{
+        
         [supercomponent insertSubview:component atIndex:index];
     }];
 

@@ -141,6 +141,7 @@ WX_EXPORT_METHOD(@selector(resetLoadmore))
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     [self setContentSize:_contentSize];
     UIScrollView* scrollView = (UIScrollView *)self.view;
     scrollView.delegate = self;
