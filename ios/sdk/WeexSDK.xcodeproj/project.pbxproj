@@ -273,9 +273,7 @@
 		D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = D3FC0DF61C508B2A002B9E31 /* WXTimerModule.m */; };
 		DC03ADB91D508719003F76E7 /* WXTextAreaComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */; };
 		DC03ADBA1D508719003F76E7 /* WXTextAreaComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */; };
-		DC04C43A1F063EB8004D2DDD /* YGEnums.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4331F063EB8004D2DDD /* YGEnums.h */; };
-		DC04C43D1F063EB8004D2DDD /* YGMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4361F063EB8004D2DDD /* YGMacros.h */; };
-		DC04C43F1F063EB8004D2DDD /* YGNodeList.h in Headers */ = {isa = PBXBuildFile; fileRef = DC04C4381F063EB8004D2DDD /* YGNodeList.h */; };
+		DC0F99311D48E5320087C6AF /* WeexSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = DC0F99301D48E5320087C6AF /* WeexSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC6836E61EBB12B200AD2D84 /* WXConfigCenterProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DC9867441D826D1E000AF388 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9867431D826D1E000AF388 /* GLKit.framework */; };
 		DC9F46831D61AC8800A88239 /* WXStreamModuleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */; };
@@ -837,13 +835,7 @@
 		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTextAreaComponent.m; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
-		DC04C4331F063EB8004D2DDD /* YGEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGEnums.h; path = dependency/YGEnums.h; sourceTree = "<group>"; };
-		DC04C4341F063EB8004D2DDD /* Yoga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Yoga.h; path = dependency/Yoga.h; sourceTree = "<group>"; };
-		DC04C4351F063EB8004D2DDD /* YGEnums.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = YGEnums.c; path = dependency/YGEnums.c; sourceTree = "<group>"; };
-		DC04C4361F063EB8004D2DDD /* YGMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGMacros.h; path = dependency/YGMacros.h; sourceTree = "<group>"; };
-		DC04C4371F063EB8004D2DDD /* YGNodeList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = YGNodeList.c; path = dependency/YGNodeList.c; sourceTree = "<group>"; };
-		DC04C4381F063EB8004D2DDD /* YGNodeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YGNodeList.h; path = dependency/YGNodeList.h; sourceTree = "<group>"; };
-		DC04C4391F063EB8004D2DDD /* Yoga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Yoga.c; path = dependency/Yoga.c; sourceTree = "<group>"; };
+        DC0F99301D48E5320087C6AF /* WeexSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeexSDK.h; sourceTree = "<group>"; };
 		DC6836E51EBB12B200AD2D84 /* WXConfigCenterProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConfigCenterProtocol.h; sourceTree = "<group>"; };
 		DC9867431D826D1E000AF388 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		DC9F46821D61AC8800A88239 /* WXStreamModuleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXStreamModuleTests.m; sourceTree = "<group>"; };
