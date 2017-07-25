@@ -90,13 +90,13 @@ typedef enum : NSUInteger {
 +(void)switchTracing:(BOOL)isTracing;
 /**
  *  @discusstion  weex perfermance  tracing state
- *  @param iid, the instance id.
- *  @param ref, the component ref
- *  @param className, the module or component class name
- *  @param name,  the module or component name
- *  @param phase, the trace phase
- *  @param functionName, function name
- *  @param options, the optional refer:support ts,duration,parentRef
+ *  @param iid the instance id.
+ *  @param ref the component ref
+ *  @param className the module or component class name
+ *  @param name  the module or component name
+ *  @param phase the trace phase
+ *  @param functionName function name
+ *  @param options the optional refer:support ts,duration,parentRef
  */
 +(void)startTracingWithInstanceId:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name phase:(NSString *)phase functionName:(NSString *)functionName options:(NSDictionary *)options;
 /**
