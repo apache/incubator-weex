@@ -21,17 +21,17 @@
 #import "WXSDKInstance.h"
 
 #define WXTNetworkHanding          @"loadjs"
-#define WXTExecJS          @"execjs"
-#define WXTJSCall          @"jsCall"
-#define WXTRender          @"render"
-#define WXTRenderFinish          @"RenderFinish"
+#define WXTExecJS                  @"execjs"
+#define WXTJSCall                  @"jsCall"
+#define WXTRender                  @"render"
+#define WXTRenderFinish            @"RenderFinish"
 
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
 #define WXTracingDuration          @"D"
-#define WXTracingInstant          @"i"
+#define WXTracingInstant           @"i"
 
-#define WXTracingDurationDefault 0
+#define WXTracingDurationDefault   0
 
 typedef enum : NSUInteger {
     // global
@@ -62,6 +62,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *fName; // functionName
 @property (nonatomic, copy) NSString *iid; // instance id
 @property (nonatomic, copy) NSString *parentId;// parent event id
+@property (nonatomic, copy) NSString *bundleUrl;
 -(NSDictionary *)dictionary;
 @end
 
@@ -103,7 +104,7 @@ typedef enum : NSUInteger {
  *  @discusstion  fetch tracing data
  *  @return  the tracing data
  */
-+(WXTracingTask*)getTracingData;
++(NSMutableDictionary*)getTracingData;
 
 /**
  *  @discusstion  clear tracing data
