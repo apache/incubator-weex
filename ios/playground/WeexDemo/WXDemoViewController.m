@@ -146,7 +146,6 @@
     
     _instance.renderFinish = ^(UIView *view) {
          WXLogDebug(@"%@", @"Render Finish...");
-        [WXTracingManager startTracingWithInstanceId:weakSelf.instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
         [weakSelf updateInstanceState:WeexInstanceAppear];
     };
     

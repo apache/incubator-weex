@@ -21,17 +21,17 @@
 #import "WXSDKInstance.h"
 
 #define WXTNetworkHanding          @"loadjs"
-#define WXTExecJS          @"execjs"
-#define WXTJSCall          @"jsCall"
-#define WXTRender          @"render"
-#define WXTRenderFinish          @"RenderFinish"
+#define WXTExecJS                  @"execjs"
+#define WXTJSCall                  @"jsCall"
+#define WXTRender                  @"render"
+#define WXTRenderFinish            @"RenderFinish"
 
 #define WXTracingBegin             @"B"
 #define WXTracingEnd               @"E"
 #define WXTracingDuration          @"D"
-#define WXTracingInstant          @"i"
+#define WXTracingInstant           @"i"
 
-#define WXTracingDurationDefault 0
+#define WXTracingDurationDefault   0
 
 typedef enum : NSUInteger {
     // global
@@ -62,6 +62,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *fName; // functionName
 @property (nonatomic, copy) NSString *iid; // instance id
 @property (nonatomic, copy) NSString *parentId;// parent event id
+@property (nonatomic, copy) NSString *bundleUrl;
 -(NSDictionary *)dictionary;
 @end
 
@@ -85,25 +86,25 @@ typedef enum : NSUInteger {
 +(BOOL)isTracing;
 /**
  *  @discusstion  set weex perfermance  tracing state , you should use in debug environment
- *  @param isTracing , YES weex will be traced, NO weex will not be traced .
+ *  @param isTracing YES weex will be traced, NO weex will not be traced .
  */
 +(void)switchTracing:(BOOL)isTracing;
 /**
  *  @discusstion  weex perfermance  tracing state
- *  @param iid, the instance id.
- *  @param ref, the component ref
- *  @param className, the module or component class name
- *  @param name,  the module or component name
- *  @param phase, the trace phase
- *  @param functionName, function name
- *  @param options, the optional refer:support ts,duration,parentRef
+ *  @param iid the instance id.
+ *  @param ref the component ref
+ *  @param className the module or component class name
+ *  @param name  the module or component name
+ *  @param phase the trace phase
+ *  @param functionName function name
+ *  @param options the optional refer:support ts,duration,parentRef
  */
 +(void)startTracingWithInstanceId:(NSString *)iid ref:(NSString*)ref className:(NSString *)className name:(NSString *)name phase:(NSString *)phase functionName:(NSString *)functionName options:(NSDictionary *)options;
 /**
  *  @discusstion  fetch tracing data
  *  @return  the tracing data
  */
-+(WXTracingTask*)getTracingData;
++(NSMutableDictionary*)getTracingData;
 
 /**
  *  @discusstion  clear tracing data
@@ -112,8 +113,8 @@ typedef enum : NSUInteger {
 
 /**
  *  @discusstion set bundle type
- *  @param jsBundleString: the bundle source.
- *  @param iid: the instance  id.
+ *  @param jsBundleString the bundle source.
+ *  @param iid the instance  id.
  */
 +(void)setBundleJSType:(NSString *)jsBundleString instanceId:(NSString *)iid;
 /**
