@@ -18,10 +18,11 @@
  */
 /*global Event*/
 import * as animations from '../../../../render/vue/modules/animation'
-
 describe('animation module', () => {
   it('should transition be worked', (done) => {
-    const { transition } = animations.default
+    const {
+      transition
+    } = animations.default
     const config = {
       duration: 100,
       timingFunction: 'ease',
@@ -37,7 +38,9 @@ describe('animation module', () => {
         'margin-left': '-10px'
       }
     }
-    const vnode = { $el: document.createElement('div') }
+    const vnode = {
+      $el: document.createElement('div')
+    }
     const callback = sinon.spy()
     const transitionValue = `all ${config.duration}ms ${config.timingFunction} ${config.delay}ms`
     transition([vnode], config, callback)
@@ -46,13 +49,13 @@ describe('animation module', () => {
     expect(vnode.$el.style.transition).to.be.equal('')
     expect(callback.called).to.be.true
     setTimeout(() => {
-        expect(vnode.$el.style.position).to.be.equal(config.styles.position)
-        expect(vnode.$el.style['-webkit-box-align']).to.be.equal(config.styles['align-items'])
-        expect(vnode.$el.style['-webkit-align-items']).to.be.equal(config.styles['align-items'])
-        expect(vnode.$el.style['-webkit-box-flex']).to.be.equal(config.styles.flex+'')
-        expect(vnode.$el.style.top).to.be.equal(config.styles.top + 'px')
-        expect(vnode.$el.style['margin-left']).to.be.equal('0px')
-        done()
-    },100)
+      expect(vnode.$el.style.position).to.be.equal(config.styles.position)
+      expect(vnode.$el.style['-webkit-box-align']).to.be.equal(config.styles['align-items'])
+      expect(vnode.$el.style['-webkit-align-items']).to.be.equal(config.styles['align-items'])
+      expect(vnode.$el.style['-webkit-box-flex']).to.be.equal(config.styles.flex + '')
+      expect(vnode.$el.style.top).to.be.equal(config.styles.top + 'px')
+      expect(vnode.$el.style['margin-left']).to.be.equal('0px')
+      done()
+    }, 100)
   })
 })

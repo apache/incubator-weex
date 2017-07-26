@@ -18,25 +18,28 @@
  */
 /*global Event*/
 import * as globalEvent from '../../../../render/vue/modules/globalEvent'
-
 describe('globalEvent module', () => {
   const callback = sinon.spy()
   it('should addEventListener be worked', () => {
-      const { addEventListener } = globalEvent.default
-      const event = 'click'
-      expect(addEventListener).to.be.a('function')
-      addEventListener(event, callback)
-      expect(callback.called).to.be.false
-      document.dispatchEvent(new Event(event))
-      expect(callback.called).to.be.true
-      expect(callback.callCount).to.be.equal(1)
+    const {
+      addEventListener
+    } = globalEvent.default
+    const event = 'click'
+    expect(addEventListener).to.be.a('function')
+    addEventListener(event, callback)
+    expect(callback.called).to.be.false
+    document.dispatchEvent(new Event(event))
+    expect(callback.called).to.be.true
+    expect(callback.callCount).to.be.equal(1)
   })
   it('should removeEventListener be worked', () => {
-      const { removeEventListener } = globalEvent.default
-      const event = 'click'
-      expect(removeEventListener).to.be.a('function')
-      removeEventListener(event)
-      document.dispatchEvent(new Event(event))
-      expect(callback.callCount).to.be.equal(1)
+    const {
+      removeEventListener
+    } = globalEvent.default
+    const event = 'click'
+    expect(removeEventListener).to.be.a('function')
+    removeEventListener(event)
+    document.dispatchEvent(new Event(event))
+    expect(callback.callCount).to.be.equal(1)
   })
 })

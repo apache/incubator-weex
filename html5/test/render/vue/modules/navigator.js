@@ -16,27 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*global Event*/
 import * as navigator from '../../../../render/vue/modules/navigator'
-
 describe('navigator module', () => {
   const callback = sinon.spy()
   it('should push be worked', () => {
-      const { push } = navigator.default
-      const config = {
-        url: '/'
-      }
-      expect(push).to.be.a('function')
-      push(config, callback)
-      expect(callback.callCount).to.be.equal(1)
+    const {
+      push
+    } = navigator.default
+    const config = {
+      url: '/'
+    }
+    expect(push).to.be.a('function')
+    push(config, callback)
+    expect(callback.callCount).to.be.equal(1)
   })
   it('should push be worked', () => {
-      const { pop } = navigator.default
-      const config = {
-        url: '/'
-      }
-      expect(pop).to.be.a('function')
-      pop(config, callback)
-      expect(callback.callCount).to.be.equal(2)
+    const {
+      pop
+    } = navigator.default
+    const config = {
+      url: '/'
+    }
+    expect(pop).to.be.a('function')
+    pop(config, callback)
+    expect(callback.callCount).to.be.equal(2)
   })
 })

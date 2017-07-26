@@ -17,7 +17,6 @@
  * under the License.
  */
 import * as webview from '../../../../render/vue/modules/webview'
-
 describe('webview module', () => {
   const gobackSpy = sinon.spy()
   const reloadSpy = sinon.spy()
@@ -28,21 +27,27 @@ describe('webview module', () => {
     goForward: goforwardSpy
   }
   it('should goBack be worked', () => {
-      const { goBack } = webview.default
-      expect(goBack).to.be.a('function')
-      goBack([vnode])
-      expect(gobackSpy.callCount).to.be.equal(1)
+    const {
+      goBack
+    } = webview.default
+    expect(goBack).to.be.a('function')
+    goBack([vnode])
+    expect(gobackSpy.callCount).to.be.equal(1)
   })
   it('should reload be worked', () => {
-      const { reload } = webview.default
-      expect(reload).to.be.a('function')
-      reload([vnode])
-      expect(reloadSpy.callCount).to.be.equal(1)
+    const {
+      reload
+    } = webview.default
+    expect(reload).to.be.a('function')
+    reload([vnode])
+    expect(reloadSpy.callCount).to.be.equal(1)
   })
   it('should goForward be worked', () => {
-      const { goForward } = webview.default
-      expect(goForward).to.be.a('function')
-      goForward([vnode])
-      expect(goforwardSpy.callCount).to.be.equal(1)
+    const {
+      goForward
+    } = webview.default
+    expect(goForward).to.be.a('function')
+    goForward([vnode])
+    expect(goforwardSpy.callCount).to.be.equal(1)
   })
 })
