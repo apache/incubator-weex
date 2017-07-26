@@ -83,8 +83,8 @@ export class TaskCenter {
     }
   }
 
-  send (type, options, args) {
-    const { action, component, ref, module, method } = options
+  send (type, params, args, options) {
+    const { action, component, ref, module, method } = params
 
     args = args.map(arg => this.normalize(arg))
 
@@ -92,9 +92,9 @@ export class TaskCenter {
       case 'dom':
         return this[action](this.instanceId, args)
       case 'component':
-        return this.componentHandler(this.instanceId, ref, method, args, { component })
+        return this.componentHandler(this.instanceId, ref, method, args, Object.assign({ component }, options))
       default:
-        return this.moduleHandler(this.instanceId, module, method, args, {})
+        return this.moduleHandler(this.instanceId, module, method, args, options)
     }
   }
 
@@ -102,12 +102,12 @@ export class TaskCenter {
     return this[action](this.instanceId, args)
   }
 
-  callComponent (ref, method, args) {
-    return this.componentHandler(this.instanceId, ref, method, args, {})
+  callComponent (ref, method, args, options) {
+    return this.componentHandler(this.instanceId, ref, method, args, options)
   }
 
-  callModule (module, method, args) {
-    return this.moduleHandler(this.instanceId, module, method, args, {})
+  callModule (module, method, args, options) {
+    return this.moduleHandler(this.instanceId, module, method, args, options)
   }
 }
 
