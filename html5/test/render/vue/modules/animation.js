@@ -17,12 +17,13 @@
  * under the License.
  */
 /*global Event*/
-import * as animations from '../../../../render/vue/modules/animation'
+// import * as animations from '../../../../render/vue/modules/animation'
+import animation from '../../../../render/vue/modules/animation'
 describe('animation module', () => {
+  weex.install(animation)
+  const animationModule = weex.requireModule('animation')
   it('should transition be worked', (done) => {
-    const {
-      transition
-    } = animations.default
+    const { transition } = animationModule
     const config = {
       duration: 100,
       timingFunction: 'ease',
@@ -53,8 +54,7 @@ describe('animation module', () => {
       expect(vnode.$el.style['-webkit-box-align']).to.be.equal(config.styles['align-items'])
       expect(vnode.$el.style['-webkit-align-items']).to.be.equal(config.styles['align-items'])
       expect(vnode.$el.style['-webkit-box-flex']).to.be.equal(config.styles.flex + '')
-      expect(vnode.$el.style.top).to.be.equal(config.styles.top + 'px')
-      expect(vnode.$el.style['margin-left']).to.be.equal('0px')
+      expect(vnode.$el.style['margin-left']).to.be.equal(-10 * weex.config.env.scale + 'px')
       done()
     }, 100)
   })

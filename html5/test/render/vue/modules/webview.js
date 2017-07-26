@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import * as webview from '../../../../render/vue/modules/webview'
+import webview from '../../../../render/vue/modules/webview'
 describe('webview module', () => {
+  weex.install(webview)
+  const webviewModule = weex.requireModule('webview')
   const gobackSpy = sinon.spy()
   const reloadSpy = sinon.spy()
   const goforwardSpy = sinon.spy()
@@ -29,7 +31,7 @@ describe('webview module', () => {
   it('should goBack be worked', () => {
     const {
       goBack
-    } = webview.default
+    } = webviewModule
     expect(goBack).to.be.a('function')
     goBack([vnode])
     expect(gobackSpy.callCount).to.be.equal(1)
@@ -37,7 +39,7 @@ describe('webview module', () => {
   it('should reload be worked', () => {
     const {
       reload
-    } = webview.default
+    } = webviewModule
     expect(reload).to.be.a('function')
     reload([vnode])
     expect(reloadSpy.callCount).to.be.equal(1)
@@ -45,7 +47,7 @@ describe('webview module', () => {
   it('should goForward be worked', () => {
     const {
       goForward
-    } = webview.default
+    } = webviewModule
     expect(goForward).to.be.a('function')
     goForward([vnode])
     expect(goforwardSpy.callCount).to.be.equal(1)
