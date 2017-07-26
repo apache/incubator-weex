@@ -28,6 +28,7 @@ typedef NSInteger(^WXJSCallUpdateAttrs)(NSString *instanceId,NSString *ref,NSDic
 typedef NSInteger(^WXJSCallUpdateStyle)(NSString *instanceId,NSString *ref,NSDictionary *stylesData);
 typedef NSInteger(^WXJSCallAddEvent)(NSString *instanceId,NSString *ref,NSString *event);
 typedef NSInteger(^WXJSCallRemoveEvent)(NSString *instanceId,NSString *ref,NSString *event);
+typedef NSInteger(^WXJSCallCreateFinish)(NSString *instanceId);
 typedef NSInvocation *(^WXJSCallNativeModule)(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *args, NSDictionary *options);
 typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options);
 
@@ -109,6 +110,10 @@ typedef void (^WXJSCallNativeComponent)(NSString *instanceId, NSString *componen
  * Register callback when removeEvent tasks occur
  */
 - (void)registerCallRemoveEvent:(WXJSCallRemoveEvent)callRemoveEvent;
+/**
+ * Register callback when createFinish tasks occur
+*/
+- (void)registerCallCreateFinish:(WXJSCallCreateFinish)callCreateFinish;
 /**
  * Register callback for global js function `callNativeModule`
  */

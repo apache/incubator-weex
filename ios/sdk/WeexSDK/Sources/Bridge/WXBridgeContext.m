@@ -294,6 +294,28 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
+    [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager createFinish];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:nil];
+        });
+        
+        return 0;
+    }];
+    
     [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
         
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
