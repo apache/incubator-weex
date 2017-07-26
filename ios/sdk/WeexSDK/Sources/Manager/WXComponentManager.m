@@ -34,6 +34,7 @@
 #import "WXHandlerFactory.h"
 #import "WXValidateProtocol.h"
 #import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 #import "WXLayoutDefine.h"
 
 static NSThread *WXComponentThread;
@@ -255,8 +256,9 @@ static css_node_t * rootNodeGetChild(void *context, int i)
     if(supercomponent && component && supercomponent->_lazyCreateView) {
         component->_lazyCreateView = YES;
     }
-    
+
     [self _addUITask:^{
+        
         [supercomponent insertSubview:component atIndex:index];
     }];
 
@@ -517,6 +519,7 @@ static css_node_t * rootNodeGetChild(void *context, int i)
         WX_MONITOR_SUCCESS(WXMTNativeRender);
         
         if(instance.renderFinish){
+            [WXTracingManager startTracingWithInstanceId:instance.instanceId ref:nil className:nil name:nil phase:WXTracingInstant functionName:WXTRenderFinish options:nil];
             instance.renderFinish(rootView);
         }
     }];

@@ -27,6 +27,7 @@
 #import "WXUtility.h"
 #import "WXRuleManager.h"
 #import "WXSDKInstance.h"
+#import "WXTracingManager.h"
 
 @interface WXDomModule ()
 
@@ -50,7 +51,6 @@ WX_EXPORT_METHOD(@selector(updateStyle:styles:))
 WX_EXPORT_METHOD(@selector(updateAttrs:attrs:))
 WX_EXPORT_METHOD(@selector(addRule:rule:))
 WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
-
 
 - (void)performBlockOnComponentManager:(void(^)(WXComponentManager *))block
 {
@@ -94,6 +94,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager addComponent:element toSupercomponent:parentRef atIndex:index appendingInTree:NO];
     }];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"addElement" options:nil];
 }
 
 - (void)removeElement:(NSString *)ref
@@ -129,6 +130,7 @@ WX_EXPORT_METHOD(@selector(getComponentRect:callback:))
     [self performBlockOnComponentManager:^(WXComponentManager *manager) {
         [manager createFinish];
     }];
+    [WXTracingManager startTracingWithInstanceId:self.weexInstance.instanceId ref:nil className:nil name:@"dom" phase:WXTracingEnd functionName:@"createFinish" options:nil];
 }
 
 - (void)updateFinish

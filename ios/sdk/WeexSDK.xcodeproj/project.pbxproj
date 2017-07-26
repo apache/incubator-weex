@@ -250,6 +250,8 @@
 		C4D872261E5DDF7500E39BC1 /* WXBoxShadow.m in Sources */ = {isa = PBXBuildFile; fileRef = C4D872241E5DDF7500E39BC1 /* WXBoxShadow.m */; };
 		C4E375371E5FCBD3009B2D9C /* WXComponent+BoxShadow.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E375351E5FCBD3009B2D9C /* WXComponent+BoxShadow.m */; };
 		C4E375381E5FCBD3009B2D9C /* WXComponent+BoxShadow.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E375361E5FCBD3009B2D9C /* WXComponent+BoxShadow.h */; };
+		C4E97D331F1EF46D00ABC314 /* WXTracingManager.h in Headers */ = {isa = PBXBuildFile; fileRef = C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */; };
 		C4F012791E1502A6003378D0 /* SRWebSocket+Weex.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012721E1502A6003378D0 /* SRWebSocket+Weex.h */; };
 		C4F0127A1E1502A6003378D0 /* SRWebSocket+Weex.m in Sources */ = {isa = PBXBuildFile; fileRef = C4F012731E1502A6003378D0 /* SRWebSocket+Weex.m */; };
 		C4F0127B1E1502A6003378D0 /* WXWebSocketDefaultImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = C4F012741E1502A6003378D0 /* WXWebSocketDefaultImpl.h */; };
@@ -810,6 +812,8 @@
 		C4D872241E5DDF7500E39BC1 /* WXBoxShadow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBoxShadow.m; sourceTree = "<group>"; };
 		C4E375351E5FCBD3009B2D9C /* WXComponent+BoxShadow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "WXComponent+BoxShadow.m"; sourceTree = "<group>"; };
 		C4E375361E5FCBD3009B2D9C /* WXComponent+BoxShadow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+BoxShadow.h"; sourceTree = "<group>"; };
+		C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTracingManager.h; sourceTree = "<group>"; };
+		C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTracingManager.m; sourceTree = "<group>"; };
 		C4F012721E1502A6003378D0 /* SRWebSocket+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SRWebSocket+Weex.h"; sourceTree = "<group>"; };
 		C4F012731E1502A6003378D0 /* SRWebSocket+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SRWebSocket+Weex.m"; sourceTree = "<group>"; };
 		C4F012741E1502A6003378D0 /* WXWebSocketDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXWebSocketDefaultImpl.h; sourceTree = "<group>"; };
@@ -1204,6 +1208,8 @@
 		77D1611A1C02DD3C0010B15B /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				C4E97D311F1EF46D00ABC314 /* WXTracingManager.h */,
+				C4E97D321F1EF46D00ABC314 /* WXTracingManager.m */,
 				740451E81E14BB26004157CB /* WXServiceFactory.h */,
 				740451E91E14BB26004157CB /* WXServiceFactory.m */,
 				DCF0875F1DCAE161005CD6EB /* WXInvocationConfig.h */,
@@ -1504,6 +1510,7 @@
 				591DD3321D23AD5800BE8709 /* WXErrorView.h in Headers */,
 				D362F94F1C83EDA20003F546 /* WXWebViewModule.h in Headers */,
 				C4F012861E150307003378D0 /* WXWebSocketLoader.h in Headers */,
+				C4E97D331F1EF46D00ABC314 /* WXTracingManager.h in Headers */,
 				77D161381C02DE940010B15B /* WXBridgeManager.h in Headers */,
 				C4D872251E5DDF7500E39BC1 /* WXBoxShadow.h in Headers */,
 				042013AD1E66CD6A001FC79C /* WXValidateProtocol.h in Headers */,
@@ -2084,6 +2091,7 @@
 				7463192A1C71B92600EFEBD4 /* WXModalUIModule.m in Sources */,
 				77D161501C02E3880010B15B /* WXUtility.m in Sources */,
 				74A4BA9F1CB3C0A100195969 /* WXHandlerFactory.m in Sources */,
+				C4E97D341F1EF46D00ABC314 /* WXTracingManager.m in Sources */,
 				742AD72F1DF98C45007DC46C /* WXResourceRequest.m in Sources */,
 				7461F8931CFB373100F62D44 /* WXLayer.m in Sources */,
 				74D205211E091B8000128F44 /* WXCallJSMethod.m in Sources */,
