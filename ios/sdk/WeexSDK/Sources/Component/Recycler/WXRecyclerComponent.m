@@ -96,6 +96,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong, readonly) WXRecyclerDataController *dataController;
 @property (nonatomic, strong, readonly) WXRecyclerUpdateController *updateController;
 @property (nonatomic, weak, readonly) UICollectionView *collectionView;
+@property (nonatomic, strong) UILongPressGestureRecognizer *currentLongPress;
 @property (nonatomic, strong) NSIndexPath  *startIndexPath;
 @property (nonatomic, strong) NSIndexPath  *dragingIndexPath;
 @property (nonatomic, strong) NSIndexPath  *targetIndexPath;
@@ -186,9 +187,9 @@ typedef enum : NSUInteger {
     [_collectionView registerClass:[WXCollectionViewCell class] forCellWithReuseIdentifier:kCollectionCellReuseIdentifier];
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kCollectionSupplementaryViewKindHeader withReuseIdentifier:kCollectionHeaderReuseIdentifier];
     
-    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
-    longPress.minimumPressDuration = 0.3f;
-    [_collectionView addGestureRecognizer:longPress];
+    _currentLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
+    _currentLongPress.minimumPressDuration = 0.3f;
+    [_collectionView addGestureRecognizer:_currentLongPress];
     
     _dragingCell = [[WXCollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 100, 100/2.0f)];
     _dragingCell.hidden = true;
@@ -833,7 +834,7 @@ typedef enum : NSUInteger {
     //遍历获取锚点
     NSMutableArray *subviewComponents = [[NSMutableArray alloc] init];
     [subviewComponents addObjectsFromArray:wxComponent.subcomponents];
-    __block WXComponent *anchorComponent;
+    WXComponent *anchorComponent;
     for (int i = 0 ; i < subviewComponents.count ; i++){
         WXComponent *compoent = subviewComponents[i];
         if (compoent.attributes[@"dragAnchor"]) {
@@ -848,13 +849,12 @@ typedef enum : NSUInteger {
     }
     
     if (anchorComponent) {
-        //去除全局UILongPressGestureRecognizer手势
-        __weak typeof(self) weakSelf = self;
-        [_collectionView.gestureRecognizers enumerateObjectsUsingBlock:^(__kindof UIGestureRecognizer * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj isKindOfClass:[UILongPressGestureRecognizer class]]) {
-                [weakSelf.collectionView removeGestureRecognizer:obj];
-            }
-        }];
+        //去除全局UILongPressGestureRecognizer手势        
+        if (_currentLongPress) {
+            [self.collectionView removeGestureRecognizer:_currentLongPress];
+            _currentLongPress = nil;
+        }
+        
         //添加锚点的手势
         if (_dragTriggerType == WXRecyclerDragTriggerPan) {
             UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(longPressMethod:)];
